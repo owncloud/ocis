@@ -499,14 +499,14 @@ func (i *LDAP) GetGroup(ctx context.Context, nameOrID string, queryParam url.Val
 		return nil, errorcode.New(errorcode.ItemNotFound, "not found")
 	}
 	if slices.Contains(sel, "members") || slices.Contains(exp, "members") {
-		members, err := i.GetGroupMembers(ctx, *g.Id)
+		members, err := i.expandLDAPGroupMembers(ctx, e)
 		if err != nil {
 			return nil, err
 		}
 		if len(members) > 0 {
 			m := make([]libregraph.User, 0, len(members))
 			for _, u := range members {
-				m = append(m, *u)
+				m = append(m, *i.createUserModelFromLDAP(u))
 			}
 			g.Members = m
 		}
@@ -629,6 +629,14 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 	if search == "" {
 		search = queryParam.Get("$search")
 	}
+
+	var expandMembers bool
+	sel := strings.Split(queryParam.Get("$select"), ",")
+	exp := strings.Split(queryParam.Get("$expand"), ",")
+	if slices.Contains(sel, "members") || slices.Contains(exp, "members") {
+		expandMembers = true
+	}
+
 	var groupFilter string
 	if search != "" {
 		search = ldap.EscapeFilter(search)
@@ -639,13 +647,19 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 		)
 	}
 	groupFilter = fmt.Sprintf("(&%s(objectClass=%s)%s)", i.groupFilter, i.groupObjectClass, groupFilter)
+
+	groupAttrs := []string{
+		i.groupAttributeMap.name,
+		i.groupAttributeMap.id,
+	}
+	if expandMembers {
+		groupAttrs = append(groupAttrs, i.groupAttributeMap.member)
+	}
+
 	searchRequest := ldap.NewSearchRequest(
 		i.groupBaseDN, i.groupScope, ldap.NeverDerefAliases, 0, 0, false,
 		groupFilter,
-		[]string{
-			i.groupAttributeMap.name,
-			i.groupAttributeMap.id,
-		},
+		groupAttrs,
 		nil,
 	)
 	i.logger.Debug().Str("backend", "ldap").
@@ -664,20 +678,18 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 
 	var g *libregraph.Group
 	for _, e := range res.Entries {
-		sel := strings.Split(queryParam.Get("$select"), ",")
-		exp := strings.Split(queryParam.Get("$expand"), ",")
 		if g = i.createGroupModelFromLDAP(e); g == nil {
 			continue
 		}
-		if slices.Contains(sel, "members") || slices.Contains(exp, "members") {
-			members, err := i.GetGroupMembers(ctx, *g.Id)
+		if expandMembers {
+			members, err := i.expandLDAPGroupMembers(ctx, e)
 			if err != nil {
 				return nil, err
 			}
 			if len(members) > 0 {
 				m := make([]libregraph.User, 0, len(members))
 				for _, u := range members {
-					m = append(m, *u)
+					m = append(m, *i.createUserModelFromLDAP(u))
 				}
 				g.Members = m
 			}
@@ -696,6 +708,20 @@ func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string) ([]*libregra
 
 	result := []*libregraph.User{}
 
+	memberEntries, err := i.expandLDAPGroupMembers(ctx, e)
+	if err != nil {
+		return nil, err
+	}
+	for _, member := range memberEntries {
+		result = append(result, i.createUserModelFromLDAP(member))
+	}
+
+	return result, nil
+}
+
+func (i *LDAP) expandLDAPGroupMembers(ctx context.Context, e *ldap.Entry) ([]*ldap.Entry, error) {
+	result := []*ldap.Entry{}
+
 	for _, memberDN := range e.GetEqualFoldAttributeValues(i.groupAttributeMap.member) {
 		if memberDN == "" {
 			continue
@@ -707,7 +733,7 @@ func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string) ([]*libregra
 			i.logger.Warn().Err(err).Str("member", memberDN).Msg("error reading group member")
 			continue
 		}
-		result = append(result, i.createUserModelFromLDAP(ue))
+		result = append(result, ue)
 	}
 
 	return result, nil
