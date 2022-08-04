@@ -101,6 +101,7 @@ The following sections list the changes for unreleased.
    https://github.com/cs3org/reva/pull/3096 https://github.com/cs3org/reva/pull/4315
 
    https://github.com/owncloud/ocis/pull/4294
+   https://github.com/owncloud/ocis/pull/4330
 
 * Enhancement - Update ownCloud Web to v5.7.0-rc.7: [#4314](https://github.com/owncloud/ocis/pull/4314)
 
