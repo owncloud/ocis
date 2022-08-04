@@ -15,12 +15,15 @@ import (
 	"strings"
 )
 
+// Tika is used to extract content from a resource,
+// it uses apache tika to retrieve all the data.
 type Tika struct {
 	*Basic
 	Retriever
 	tika *tika.Client
 }
 
+// NewTikaExtractor creates a new Tika instance.
 func NewTikaExtractor(gw gateway.GatewayAPIClient, logger log.Logger, cfg *config.Config) (*Tika, error) {
 	basic, err := NewBasicExtractor(logger)
 	if err != nil {
@@ -41,6 +44,7 @@ func NewTikaExtractor(gw gateway.GatewayAPIClient, logger log.Logger, cfg *confi
 	}, nil
 }
 
+// Extract loads a resource from its underlying storage, passes it to tika and processes the result into a Document.
 func (t Tika) Extract(ctx context.Context, ref *provider.Reference, ri *provider.ResourceInfo) (Document, error) {
 	doc, err := t.Basic.Extract(ctx, ref, ri)
 	if err != nil {
@@ -69,11 +73,11 @@ func (t Tika) Extract(ctx context.Context, ref *provider.Reference, ri *provider
 	}
 
 	for _, meta := range metas {
-		if title, err := t.getMeta(meta, "title"); err == nil {
+		if title, err := getFirstValue(meta, "title"); err == nil {
 			doc.Title = strings.TrimSpace(fmt.Sprintf("%s %s", doc.Title, title))
 		}
 
-		if content, err := t.getMeta(meta, "X-TIKA:content"); err == nil {
+		if content, err := getFirstValue(meta, "X-TIKA:content"); err == nil {
 			if lang != "" {
 				content = stopwords.CleanString(content, lang, true)
 			}
@@ -83,13 +87,4 @@ func (t Tika) Extract(ctx context.Context, ref *provider.Reference, ri *provider
 	}
 
 	return doc, nil
-}
-
-func (t Tika) getMeta(meta map[string][]string, key string) (string, error) {
-	v, ok := meta[key]
-	if !ok {
-		return "", fmt.Errorf("unknown meta: %v", key)
-	}
-
-	return v[0], nil
 }

@@ -26,6 +26,8 @@ import (
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 )
 
+// Provider is responsible for indexing spaces and pass on a search
+// to it's underlying engine.
 type Provider struct {
 	logger    log.Logger
 	gateway   gateway.GatewayAPIClient
@@ -34,6 +36,7 @@ type Provider struct {
 	secret    string
 }
 
+// NewProvider creates a new Provider instance.
 func NewProvider(gw gateway.GatewayAPIClient, eng engine.Engine, extractor content.Extractor, logger log.Logger, secret string) *Provider {
 	return &Provider{
 		gateway:   gw,
@@ -44,6 +47,7 @@ func NewProvider(gw gateway.GatewayAPIClient, eng engine.Engine, extractor conte
 	}
 }
 
+// Search processes a search request and passes it down to the engine.
 func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error) {
 	if req.Query == "" {
 		return nil, errtypes.BadRequest("empty query provided")
@@ -77,7 +81,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		mountpointMap[grantSpaceId] = space.Id.OpaqueId
 	}
 
-	matches := MatchArray{}
+	matches := matchArray{}
 	total := int32(0)
 	for _, space := range listSpacesRes.StorageSpaces {
 		searchRootId := &searchmsg.ResourceID{
@@ -165,6 +169,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 	}, nil
 }
 
+// IndexSpace (re)indexes all resources of a given space.
 func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequest) (*searchsvc.IndexSpaceResponse, error) {
 	// get user
 	res, err := p.gateway.GetUserByClaim(context.Background(), &user.GetUserByClaimRequest{
@@ -213,7 +218,7 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 			p.logger.Error().Err(err).Msg("error extracting content")
 		}
 
-		ent := engine.Entity{
+		r := engine.Resource{
 			ID:       storagespace.FormatResourceID(*info.Id),
 			RootID:   storagespace.FormatResourceID(*ref.ResourceId),
 			Path:     ref.Path,
@@ -221,7 +226,7 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 			Document: doc,
 		}
 
-		err = p.engine.Upsert(ent.ID, ent)
+		err = p.engine.Upsert(r.ID, r)
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error adding resource to the index")
 		} else {

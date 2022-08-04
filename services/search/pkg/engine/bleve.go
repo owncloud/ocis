@@ -23,10 +23,13 @@ import (
 	"time"
 )
 
+// Bleve represents a search engine which utilizes bleve to search and store resources.
 type Bleve struct {
 	index bleve.Index
 }
 
+// NewBleveIndex returns a new bleve index
+// given path must exist.
 func NewBleveIndex(root string) (bleve.Index, error) {
 	destination := filepath.Join(root, "index.bleve")
 	index, err := bleve.Open(destination)
@@ -44,6 +47,7 @@ func NewBleveIndex(root string) (bleve.Index, error) {
 	return index, nil
 }
 
+// NewBleveEngine creates a new Bleve instance
 func NewBleveEngine(index bleve.Index) *Bleve {
 	return &Bleve{
 		index: index,
@@ -76,6 +80,8 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 	return indexMapping, nil
 }
 
+// Search executes a search request operation within the index.
+// Returns a SearchIndexResponse object or an error.
 func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error) {
 	deletedQuery := bleve.NewBoolFieldQuery(false)
 	deletedQuery.SetField("Deleted")
@@ -104,12 +110,12 @@ func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexReques
 
 	matches := []*searchMessage.Match{}
 	for _, hit := range res.Hits {
-		rootID, err := storagespace.ParseID(hit.Fields["RootID"].(string))
+		rootID, err := storagespace.ParseID(getValue[string](hit.Fields, "RootID"))
 		if err != nil {
 			return nil, err
 		}
 
-		rID, err := storagespace.ParseID(hit.Fields["ID"].(string))
+		rID, err := storagespace.ParseID(getValue[string](hit.Fields, "ID"))
 		if err != nil {
 			return nil, err
 		}
@@ -119,18 +125,18 @@ func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexReques
 			Entity: &searchMessage.Entity{
 				Ref: &searchMessage.Reference{
 					ResourceId: resourceIDtoSearchID(rootID),
-					Path:       hit.Fields["Path"].(string),
+					Path:       getValue[string](hit.Fields, "Path"),
 				},
 				Id:       resourceIDtoSearchID(rID),
-				Name:     hit.Fields["Name"].(string),
-				Size:     uint64(hit.Fields["Size"].(float64)),
-				Type:     uint64(hit.Fields["Type"].(float64)),
-				MimeType: hit.Fields["MimeType"].(string),
-				Deleted:  hit.Fields["Deleted"].(bool),
+				Name:     getValue[string](hit.Fields, "Name"),
+				Size:     uint64(getValue[float64](hit.Fields, "Size")),
+				Type:     uint64(getValue[float64](hit.Fields, "Type")),
+				MimeType: getValue[string](hit.Fields, "MimeType"),
+				Deleted:  getValue[bool](hit.Fields, "Deleted"),
 			},
 		}
 
-		if mtime, err := time.Parse(time.RFC3339, hit.Fields["Mtime"].(string)); err == nil {
+		if mtime, err := time.Parse(time.RFC3339, getValue[string](hit.Fields, "Mtime")); err == nil {
 			match.Entity.LastModifiedTime = &timestamppb.Timestamp{Seconds: mtime.Unix(), Nanos: int32(mtime.Nanosecond())}
 		}
 
@@ -143,29 +149,31 @@ func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexReques
 	}, nil
 }
 
-func (b *Bleve) Upsert(id string, ent Entity) error {
-	return b.index.Index(id, ent)
+// Upsert indexes or stores Resource data fields.
+func (b *Bleve) Upsert(id string, r Resource) error {
+	return b.index.Index(id, r)
 }
 
+// Move updates the resource location and all of its necessary fields.
 func (b *Bleve) Move(id string, target string) error {
-	ent, err := b.getEntity(id)
+	r, err := b.getResource(id)
 	if err != nil {
 		return err
 	}
-	oldName := ent.Path
+	oldName := r.Path
 	newName := utils.MakeRelativePath(target)
 
-	ent, err = b.updateEntity(id, func(ent *Entity) {
-		ent.Path = newName
-		ent.Name = path.Base(newName)
+	r, err = b.updateEntity(id, func(r *Resource) {
+		r.Path = newName
+		r.Name = path.Base(newName)
 	})
 	if err != nil {
 		return err
 	}
 
-	if ent.Type == uint64(storageProvider.ResourceType_RESOURCE_TYPE_CONTAINER) {
+	if r.Type == uint64(storageProvider.ResourceType_RESOURCE_TYPE_CONTAINER) {
 		query := bleve.NewConjunctionQuery(
-			bleve.NewQueryStringQuery("RootID:"+ent.RootID),
+			bleve.NewQueryStringQuery("RootID:"+r.RootID),
 			bleve.NewQueryStringQuery("Path:"+escapeQuery(oldName+"/*")),
 		)
 		bleveReq := bleve.NewSearchRequest(query)
@@ -177,8 +185,8 @@ func (b *Bleve) Move(id string, target string) error {
 		}
 
 		for _, h := range res.Hits {
-			_, err := b.updateEntity(h.ID, func(ent *Entity) {
-				ent.Path = strings.Replace(ent.Path, oldName, newName, 1)
+			_, err := b.updateEntity(h.ID, func(r *Resource) {
+				r.Path = strings.Replace(r.Path, oldName, newName, 1)
 			})
 			if err != nil {
 				return err
@@ -189,23 +197,31 @@ func (b *Bleve) Move(id string, target string) error {
 	return nil
 }
 
+// Delete marks the resource as deleted.
+// The resource object will stay in the bleve index,
+// instead of removing the resource it just marks it as deleted!
+// can be undone
 func (b *Bleve) Delete(id string) error {
 	return b.setDeleted(id, true)
 }
 
+// Restore is the counterpart to Delete.
+// It restores the resource which makes it available again.
 func (b *Bleve) Restore(id string) error {
 	return b.setDeleted(id, false)
 }
 
+// Purge removes a resource from the index, irreversible operation.
 func (b *Bleve) Purge(id string) error {
 	return b.index.Delete(id)
 }
 
+// DocCount returns the number of resources in the index.
 func (b *Bleve) DocCount() (uint64, error) {
 	return b.index.DocCount()
 }
 
-func (b *Bleve) getEntity(id string) (*Entity, error) {
+func (b *Bleve) getResource(id string) (*Resource, error) {
 	req := bleve.NewSearchRequest(bleve.NewDocIDQuery([]string{id}))
 	req.Fields = []string{"*"}
 	res, err := b.index.Search(req)
@@ -218,40 +234,35 @@ func (b *Bleve) getEntity(id string) (*Entity, error) {
 
 	fields := res.Hits[0].Fields
 
-	return &Entity{
-		ID:      fields["ID"].(string),
-		RootID:  fields["RootID"].(string),
-		Path:    fields["Path"].(string),
-		Type:    uint64(fields["Type"].(float64)),
-		Deleted: fields["Deleted"].(bool),
+	return &Resource{
+		ID:      getValue[string](fields, "ID"),
+		RootID:  getValue[string](fields, "RootID"),
+		Path:    getValue[string](fields, "Path"),
+		Type:    uint64(getValue[float64](fields, "Type")),
+		Deleted: getValue[bool](fields, "Deleted"),
 		Document: content.Document{
-			Name:     fields["Name"].(string),
-			Size:     uint64(fields["Size"].(float64)),
-			Mtime:    fields["Mtime"].(string),
-			MimeType: fields["MimeType"].(string),
+			Name:     getValue[string](fields, "Name"),
+			Size:     uint64(getValue[float64](fields, "Size")),
+			Mtime:    getValue[string](fields, "Mtime"),
+			MimeType: getValue[string](fields, "MimeType"),
 		},
 	}, nil
 }
 
-func (b *Bleve) updateEntity(id string, mutateFunc func(ent *Entity)) (*Entity, error) {
-	it, err := b.getEntity(id)
+func (b *Bleve) updateEntity(id string, mutateFunc func(r *Resource)) (*Resource, error) {
+	it, err := b.getResource(id)
 	if err != nil {
 		return nil, err
 	}
 
 	mutateFunc(it)
 
-	err = b.index.Index(it.ID, it)
-	if err != nil {
-		return nil, err
-	}
-
-	return it, nil
+	return it, b.index.Index(it.ID, it)
 }
 
 func (b *Bleve) setDeleted(id string, deleted bool) error {
-	it, err := b.updateEntity(id, func(ent *Entity) {
-		ent.Deleted = deleted
+	it, err := b.updateEntity(id, func(r *Resource) {
+		r.Deleted = deleted
 	})
 	if err != nil {
 		return err
@@ -271,8 +282,8 @@ func (b *Bleve) setDeleted(id string, deleted bool) error {
 		}
 
 		for _, h := range res.Hits {
-			_, err := b.updateEntity(h.ID, func(ent *Entity) {
-				ent.Deleted = deleted
+			_, err := b.updateEntity(h.ID, func(r *Resource) {
+				r.Deleted = deleted
 			})
 			if err != nil {
 				return err

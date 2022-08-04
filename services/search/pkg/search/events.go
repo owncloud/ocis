@@ -23,6 +23,8 @@ type eventHandler struct {
 	secret    string
 }
 
+// HandleEvents listens to the needed events,
+// it handles the whole resource indexing livecycle.
 func HandleEvents(eng engine.Engine, extractor content.Extractor, gw gateway.GatewayAPIClient, bus events.Stream, logger log.Logger, cfg *config.Config) error {
 	ch, err := events.Consume(
 		bus,
@@ -42,34 +44,29 @@ func HandleEvents(eng engine.Engine, extractor content.Extractor, gw gateway.Gat
 
 	go func(eh *eventHandler, ch <-chan interface{}) {
 		for e := range ch {
+
+			eh.logger.Debug().Interface("event", e).Msg("updating index")
+
 			switch ev := e.(type) {
 			case events.ItemTrashed:
-				eh.logger.Debug().Interface("event", e).Msg("marking document as deleted")
 				eh.trashItem(ev.ID)
 			case events.ItemMoved:
-				eh.logger.Debug().Interface("event", e).Msg("resource has been moved, updating the document")
 				eh.moveItem(ev.Ref, &user.User{Id: ev.Executant})
 			case events.ItemRestored:
-				eh.logger.Debug().Interface("event", e).Msg("marking document as restored")
 				eh.restoreItem(ev.Ref, &user.User{Id: ev.Executant})
 			case events.ContainerCreated:
-				eh.logger.Debug().Interface("event", e).Msg("resource container created, updating the document")
 				eh.upsertItem(ev.Ref, &user.User{Id: ev.Executant})
 			case events.FileTouched:
-				eh.logger.Debug().Interface("event", e).Msg("resource has been changed, updating the document")
 				eh.upsertItem(ev.Ref, &user.User{Id: ev.Executant})
 			case events.FileVersionRestored:
-				eh.logger.Debug().Interface("event", e).Msg("resource version restored, updating the document")
 				eh.upsertItem(ev.Ref, &user.User{Id: ev.Executant})
 			case events.FileUploaded:
 				if cfg.Events.AsyncUploads {
 					return
 				}
 
-				eh.logger.Debug().Interface("event", e).Msg("resource upload ready, updating the document")
 				eh.upsertItem(ev.Ref, &user.User{Id: ev.Executant})
 			case events.UploadReady:
-				eh.logger.Debug().Interface("event", e).Msg("async resource upload ready, updating the document")
 				eh.upsertItem(ev.FileRef, ev.ExecutingUser)
 			}
 		}
@@ -115,7 +112,7 @@ func (eh *eventHandler) upsertItem(ref *provider.Reference, owner *user.User) {
 		return
 	}
 
-	ent := engine.Entity{
+	r := engine.Resource{
 		ID:       storagespace.FormatResourceID(*statRes.Info.Id),
 		RootID:   storagespace.FormatResourceID(*ref.ResourceId),
 		Path:     ref.Path,
@@ -123,7 +120,7 @@ func (eh *eventHandler) upsertItem(ref *provider.Reference, owner *user.User) {
 		Document: doc,
 	}
 
-	err = eh.engine.Upsert(ent.ID, ent)
+	err = eh.engine.Upsert(r.ID, r)
 	if err != nil {
 		eh.logger.Error().Err(err).Msg("error adding updating the resource in the index")
 	} else {

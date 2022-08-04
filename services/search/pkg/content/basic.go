@@ -7,14 +7,17 @@ import (
 	"time"
 )
 
+// Basic is the simplest Extractor implementation.
 type Basic struct {
 	logger log.Logger
 }
 
+// NewBasicExtractor creates a new Basic instance.
 func NewBasicExtractor(logger log.Logger) (*Basic, error) {
 	return &Basic{logger: logger}, nil
 }
 
+// Extract literally just rearranges the inputs and processes them into a Document.
 func (b Basic) Extract(ctx context.Context, ref *storageProvider.Reference, ri *storageProvider.ResourceInfo) (Document, error) {
 	doc := Document{
 		Name:     ri.Path,

@@ -116,13 +116,13 @@ func (_m *Engine) Search(ctx context.Context, req *v0.SearchIndexRequest) (*v0.S
 	return r0, r1
 }
 
-// Upsert provides a mock function with given fields: id, ent
-func (_m *Engine) Upsert(id string, ent engine.Entity) error {
-	ret := _m.Called(id, ent)
+// Upsert provides a mock function with given fields: id, r
+func (_m *Engine) Upsert(id string, r engine.Resource) error {
+	ret := _m.Called(id, r)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(string, engine.Entity) error); ok {
-		r0 = rf(id, ent)
+	if rf, ok := ret.Get(0).(func(string, engine.Resource) error); ok {
+		r0 = rf(id, r)
 	} else {
 		r0 = ret.Error(0)
 	}

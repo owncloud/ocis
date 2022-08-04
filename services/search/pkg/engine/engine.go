@@ -14,7 +14,7 @@ import (
 // Engine is the interface to the search engine
 type Engine interface {
 	Search(ctx context.Context, req *searchSearvice.SearchIndexRequest) (*searchSearvice.SearchIndexResponse, error)
-	Upsert(id string, ent Entity) error
+	Upsert(id string, r Resource) error
 	Move(id string, target string) error
 	Delete(id string) error
 	Restore(id string) error
@@ -22,7 +22,8 @@ type Engine interface {
 	DocCount() (uint64, error)
 }
 
-type Entity struct {
+// Resource is the entity that is stored in the index.
+type Resource struct {
 	content.Document
 
 	ID      string
@@ -42,4 +43,15 @@ func resourceIDtoSearchID(id storageProvider.ResourceId) *searchMessage.Resource
 func escapeQuery(s string) string {
 	re := regexp.MustCompile(`([` + regexp.QuoteMeta(`+=&|><!(){}[]^\"~*?:\/`) + `\-\s])`)
 	return re.ReplaceAllString(s, "\\$1")
+}
+
+func getValue[T any](m map[string]interface{}, key string) (out T) {
+	val, ok := m[key]
+	if !ok {
+		return
+	}
+
+	out, _ = val.(T)
+
+	return
 }

@@ -14,16 +14,16 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-type MatchArray []*searchmsg.Match
+type matchArray []*searchmsg.Match
 
-func (s MatchArray) Len() int {
-	return len(s)
+func (ma matchArray) Len() int {
+	return len(ma)
 }
-func (s MatchArray) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
+func (ma matchArray) Swap(i, j int) {
+	ma[i], ma[j] = ma[j], ma[i]
 }
-func (s MatchArray) Less(i, j int) bool {
-	return s[i].Score > s[j].Score
+func (ma matchArray) Less(i, j int) bool {
+	return ma[i].Score > ma[j].Score
 }
 
 func logDocCount(engine engine.Engine, logger log.Logger) {

@@ -19,14 +19,14 @@ var _ = Describe("Bleve", func() {
 		idx bleve.Index
 		ctx context.Context
 
-		createEntity = func(id sprovider.ResourceId, doc content.Document) engine.Entity {
+		createEntity = func(id sprovider.ResourceId, doc content.Document) engine.Resource {
 			name := doc.Name
 
 			if name == "" {
 				name = "default.pdf"
 			}
 
-			return engine.Entity{
+			return engine.Resource{
 				ID:       fmt.Sprintf("%s$%s!%s", id.StorageId, id.SpaceId, id.OpaqueId),
 				RootID:   fmt.Sprintf("%s$%s!%s", id.StorageId, id.SpaceId, id.OpaqueId),
 				Path:     fmt.Sprintf("./%s", name),
@@ -82,8 +82,8 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				ent := createEntity(rid, content.Document{Size: 12345})
-				err := eng.Upsert(ent.ID, ent)
+				r := createEntity(rid, content.Document{Size: 12345})
+				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
 
 				assertDocCount(rid, `Size:12345`, 1)
@@ -103,8 +103,8 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				ent := createEntity(rid, content.Document{Name: "Foo oo.pdf"})
-				err := eng.Upsert(ent.ID, ent)
+				r := createEntity(rid, content.Document{Name: "Foo oo.pdf"})
+				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
 				assertDocCount(rid, `Name:foo\ o*`, 1)
 			})
@@ -115,8 +115,8 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				ent := createEntity(rid, content.Document{Name: "12345.pdf"})
-				err := eng.Upsert(ent.ID, ent)
+				r := createEntity(rid, content.Document{Name: "12345.pdf"})
+				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
 
 				assertDocCount(rid, `Name:1234*`, 1)
@@ -129,8 +129,8 @@ var _ = Describe("Bleve", func() {
 						SpaceId:   "2",
 						OpaqueId:  "3",
 					}
-					ent := createEntity(rid, content.Document{Name: "foo.pdf"})
-					err := eng.Upsert(ent.ID, ent)
+					r := createEntity(rid, content.Document{Name: "foo.pdf"})
+					err := eng.Upsert(r.ID, r)
 					Expect(err).ToNot(HaveOccurred())
 
 					assertDocCount(rid, `Name:foo.pdf`, 1)
@@ -148,8 +148,8 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				ent := createEntity(rid, content.Document{Name: "bar.pdf", Size: 789})
-				err := eng.Upsert(ent.ID, ent)
+				r := createEntity(rid, content.Document{Name: "bar.pdf", Size: 789})
+				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
 
 				assertDocCount(rid, `Name:bar.pdf`, 1)
@@ -163,8 +163,8 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				ent := createEntity(rid, content.Document{Name: "bar.pdf"})
-				err := eng.Upsert(ent.ID, ent)
+				r := createEntity(rid, content.Document{Name: "bar.pdf"})
+				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
 
 				res, err := doSearch(rid, "Name:bar*")
@@ -178,21 +178,21 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				ent := createEntity(rid, content.Document{Name: "bar.pdf"})
-				ent.Type = 3
-				ent.MimeType = "application/pdf"
+				r := createEntity(rid, content.Document{Name: "bar.pdf"})
+				r.Type = 3
+				r.MimeType = "application/pdf"
 
-				err := eng.Upsert(ent.ID, ent)
+				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
 
-				matches := assertDocCount(rid, fmt.Sprintf("Name:%s", ent.Name), 1)
+				matches := assertDocCount(rid, fmt.Sprintf("Name:%s", r.Name), 1)
 				match := matches[0]
 				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(rid.OpaqueId))
-				Expect(match.Entity.Ref.Path).To(Equal(ent.Path))
-				Expect(match.Entity.Name).To(Equal(ent.Name))
-				Expect(match.Entity.Size).To(Equal(ent.Size))
-				Expect(match.Entity.Type).To(Equal(ent.Type))
-				Expect(match.Entity.MimeType).To(Equal(ent.MimeType))
+				Expect(match.Entity.Ref.Path).To(Equal(r.Path))
+				Expect(match.Entity.Name).To(Equal(r.Name))
+				Expect(match.Entity.Size).To(Equal(r.Size))
+				Expect(match.Entity.Type).To(Equal(r.Type))
+				Expect(match.Entity.MimeType).To(Equal(r.MimeType))
 				Expect(match.Entity.Deleted).To(BeFalse())
 				Expect(match.Score > 0).To(BeTrue())
 			})
@@ -206,17 +206,17 @@ var _ = Describe("Bleve", func() {
 						OpaqueId:  string(rune(i + 3)),
 					}
 
-					ent := createEntity(rid, content.Document{Name: "foo.pdf"})
-					ent.Size = uint64(i + 250)
-					err := eng.Upsert(ent.ID, ent)
+					r := createEntity(rid, content.Document{Name: "foo.pdf"})
+					r.Size = uint64(i + 250)
+					err := eng.Upsert(r.ID, r)
 					Expect(err).ToNot(HaveOccurred())
 
 					matches := assertDocCount(rid, query, 1)
 					Expect(matches[0].Entity.Ref.ResourceId.OpaqueId).To(Equal(rid.OpaqueId))
-					Expect(matches[0].Entity.Ref.Path).To(Equal(ent.Path))
+					Expect(matches[0].Entity.Ref.Path).To(Equal(r.Path))
 					Expect(matches[0].Entity.Id.OpaqueId).To(Equal(rid.OpaqueId))
-					Expect(matches[0].Entity.Name).To(Equal(ent.Name))
-					Expect(matches[0].Entity.Size).To(Equal(ent.Size))
+					Expect(matches[0].Entity.Name).To(Equal(r.Name))
+					Expect(matches[0].Entity.Size).To(Equal(r.Size))
 				}
 			})
 
@@ -226,11 +226,11 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				ent := createEntity(rid, content.Document{Name: "foo.pdf"})
-				ent.Type = 3
-				ent.MimeType = "application/pdf"
+				r := createEntity(rid, content.Document{Name: "foo.pdf"})
+				r.Type = 3
+				r.MimeType = "application/pdf"
 
-				err := eng.Upsert(ent.ID, ent)
+				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
 
 				assertDocCount(rid, "Name:foo*", 1)
@@ -240,9 +240,9 @@ var _ = Describe("Bleve", func() {
 			Context("and an additional file in a subdirectory", func() {
 				var (
 					ridT sprovider.ResourceId
-					entT engine.Entity
+					entT engine.Resource
 					ridD sprovider.ResourceId
-					entD engine.Entity
+					entD engine.Resource
 				)
 
 				BeforeEach(func() {

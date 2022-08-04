@@ -4,10 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/server"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-micro/plugins/v4/events/natsjs"
@@ -24,17 +22,12 @@ import (
 
 // NewHandler returns a service implementation for Service.
 func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
-	var eng engine.Engine
-	var gw gateway.GatewayAPIClient
-	var bus events.Stream
-	var extractor content.Extractor
-	var err error
-
 	options := newOptions(opts...)
 	logger := options.Logger
 	cfg := options.Config
 
 	// initialize search engine
+	var eng engine.Engine
 	switch cfg.Engine.Type {
 	case "bleve":
 		idx, err := engine.NewBleveIndex(cfg.Engine.Bleve.Datapath)
@@ -48,11 +41,13 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 	}
 
 	// initialize gateway
-	if gw, err = pool.GetGatewayServiceClient(cfg.Reva.Address); err != nil {
+	gw, err := pool.GetGatewayServiceClient(cfg.Reva.Address)
+	if err != nil {
 		logger.Fatal().Err(err).Str("addr", cfg.Reva.Address).Msg("could not get reva client")
 	}
 
 	// initialize search content extractor
+	var extractor content.Extractor
 	switch cfg.Extractor.Type {
 	case "basic":
 		if extractor, err = content.NewBasicExtractor(logger); err != nil {
@@ -67,10 +62,11 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 	}
 
 	// initialize nats
-	if bus, err = server.NewNatsStream(
+	bus, err := server.NewNatsStream(
 		natsjs.Address(cfg.Events.Endpoint),
 		natsjs.ClusterID(cfg.Events.Cluster),
-	); err != nil {
+	)
+	if err != nil {
 		return nil, err
 	}
 
@@ -121,6 +117,7 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 	return nil
 }
 
+// IndexSpace (re)indexes all resources of a given space.
 func (s Service) IndexSpace(ctx context.Context, in *searchsvc.IndexSpaceRequest, out *searchsvc.IndexSpaceResponse) error {
 	_, err := s.provider.IndexSpace(ctx, in)
 	return err
