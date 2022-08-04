@@ -91,11 +91,11 @@ class SpacesContext implements Context {
 	 */
 	private $storedEtags = [];
 
-    private $etagPropfindBody = '<?xml version="1.0"?>'
-        . '<d:propfind xmlns:d="DAV:" '
-        . 'xmlns:oc="http://owncloud.org/ns" '
-        . 'xmlns:ocs="http://open-collaboration-services.org/ns">'
-        .'<d:prop><d:getetag/></d:prop></d:propfind>';
+	private $etagPropfindBody = '<?xml version="1.0"?>'
+		. '<d:propfind xmlns:d="DAV:" '
+		. 'xmlns:oc="http://owncloud.org/ns" '
+		. 'xmlns:ocs="http://open-collaboration-services.org/ns">'
+		. '<d:prop><d:getetag/></d:prop></d:propfind>';
 
 	/**
 	 * @param string $spaceName
@@ -246,7 +246,11 @@ class SpacesContext implements Context {
 		if ($spaceName === "Personal") {
 			$spaceName = $this->featureContext->getUserDisplayName($user);
 		}
-		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
+		if (strtolower($user) === 'admin') {
+			$this->theUserListsAllAvailableSpacesUsingTheGraphApi($user);
+		} else {
+			$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
+		}
 		$spaces = $this->getAvailableSpaces();
 		Assert::assertIsArray($spaces[$spaceName], "Space with name $spaceName for user $user not found");
 		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName for user $user not found");
@@ -391,6 +395,51 @@ class SpacesContext implements Context {
 			$this->baseUrl,
 			$this->featureContext->getOcPath()
 		);
+	}
+
+	/**
+	 * @AfterScenario
+	 *
+	 * @return void
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function cleanDataAfterTests(): void {
+		// TODO enable when admin can disable and delete spaces
+		// $this->deleteAllSpacesOfTheType('project');
+		// $this->deleteAllSpacesOfTheType('personal');
+	}
+
+	/**
+	 * The method first disables and then deletes spaces
+	 *
+	 * @param  string $driveType
+	 *
+	 * @return void
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function deleteAllSpacesOfTheType(string $driveType): void {
+		$query = "\$filter=driveType eq $driveType";
+		$userAdmin = $this->featureContext->getAdminUsername();
+
+		for ($i = 0; $i < 2; ++$i) {
+			$this->theUserListsAllAvailableSpacesUsingTheGraphApi(
+				$userAdmin,
+				$query
+			);
+			$drives = $this->getAvailableSpaces();
+
+			if (!empty($drives)) {
+				foreach ($drives as $value) {
+					if (!\array_key_exists("deleted", $value["root"])) {
+						$this->sendDisableSpaceRequest($userAdmin, $value["name"]);
+					} else {
+						$this->sendDeleteSpaceRequest($userAdmin, $value["name"]);
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -559,7 +608,6 @@ class SpacesContext implements Context {
 	 * @param mixed $body
 	 * @param string $xRequestId
 	 * @param array $headers
-	 *
 	 *
 	 * @return ResponseInterface
 	 *
@@ -1748,55 +1796,55 @@ class SpacesContext implements Context {
 		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
 	}
 
-    /**
-     * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" to "([^"]*)" in space "([^"]*)" using the WebDAV API$/
-     *
-     * @param string $user
-     * @param string $fileSource
-     * @param string $fileDestination
-     * @param string $spaceName
-     *
-     * @return void
-     */
-    public function userMovesFileWithinSpaceUsingTheWebDAVAPI(
-        string $user,
-        string $fileSource,
-        string $fileDestination,
-        string $spaceName
-    ):void {
-        $space = $this->getSpaceByName($user, $spaceName);
-        $headers['Destination'] = $this->destinationHeaderValueWithSpaceName(
-            $user,
-            $fileDestination,
-            $spaceName
-        );
+	/**
+	 * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" to "([^"]*)" in space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $fileSource
+	 * @param string $fileDestination
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 */
+	public function userMovesFileWithinSpaceUsingTheWebDAVAPI(
+		string $user,
+		string $fileSource,
+		string $fileDestination,
+		string $spaceName
+	):void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName(
+			$user,
+			$fileDestination,
+			$spaceName
+		);
 
-        $fullUrl = $space["root"]["webDavUrl"] . '/' . \trim($fileSource, "/");
-        $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
-    }
+		$fullUrl = $space["root"]["webDavUrl"] . '/' . \trim($fileSource, "/");
+		$this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+	}
 
-    /**
-     * MOVE request for files|folders
-     *
-     * @param string $user
-     * @param string $fullUrl
-     * @param string $headers
-     *
-     * @return void
-     * @throws GuzzleException
-     */
-    public function moveFilesAndFoldersRequest(string $user, string $fullUrl, array $headers):void {
-        $this->featureContext->setResponse(
-            HttpRequestHelper::sendRequest(
-                $fullUrl,
-                $this->featureContext->getStepLineRef(),
-                'MOVE',
-                $user,
-                $this->featureContext->getPasswordForUser($user),
-                $headers,
-            )
-        );
-    }
+	/**
+	 * MOVE request for files|folders
+	 *
+	 * @param string $user
+	 * @param string $fullUrl
+	 * @param string $headers
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function moveFilesAndFoldersRequest(string $user, string $fullUrl, array $headers):void {
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				$this->featureContext->getStepLineRef(),
+				'MOVE',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$headers,
+			)
+		);
+	}
 
 	/**
 	 * @When /^user "([^"]*)" copies (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
@@ -1823,31 +1871,30 @@ class SpacesContext implements Context {
 		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
 	}
 
-
-    /**
-     * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
-     *
-     * @param string $user
-     * @param string $fileSource
-     * @param string $fromSpaceName
-     * @param string $fileDestination
-     * @param string $toSpaceName
-     *
-     * @return void
-     * @throws GuzzleException
-     */
-    public function userMovesFileFromAndToSpaceBetweenSpaces(
-        string $user,
-        string $fileSource,
-        string $fromSpaceName,
-        string $fileDestination,
-        string $toSpaceName
-    ):void {
-        $space = $this->getSpaceByName($user, $fromSpaceName);
-        $headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
-        $fullUrl = $space["root"]["webDavUrl"] . '/' . \ltrim($fileSource, "/");
-        $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
-    }
+	/**
+	 * @When /^user "([^"]*)" moves (?:file|folder) "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $fileSource
+	 * @param string $fromSpaceName
+	 * @param string $fileDestination
+	 * @param string $toSpaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userMovesFileFromAndToSpaceBetweenSpaces(
+		string $user,
+		string $fileSource,
+		string $fromSpaceName,
+		string $fileDestination,
+		string $toSpaceName
+	):void {
+		$space = $this->getSpaceByName($user, $fromSpaceName);
+		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
+		$fullUrl = $space["root"]["webDavUrl"] . '/' . \ltrim($fileSource, "/");
+		$this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+	}
 
 	/**
 	 * returns a url for destination with spacename
@@ -2852,7 +2899,7 @@ class SpacesContext implements Context {
 		);
 
 		$should = ($shouldOrNot !== "not");
-		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml()->data),true, 512, JSON_THROW_ON_ERROR);
+		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml()->data), true, 512, JSON_THROW_ON_ERROR);
 
 		if ($should) {
 			Assert::assertNotEmpty($responseArray, __METHOD__ . ' Response should contain a link, but it is empty');
