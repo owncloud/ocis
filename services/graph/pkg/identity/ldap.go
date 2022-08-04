@@ -315,7 +315,13 @@ func (i *LDAP) getEntryByDN(dn string, attrs []string) (*ldap.Entry, error) {
 		nil,
 	)
 
-	i.logger.Debug().Str("backend", "ldap").Str("dn", dn).Msg("Search user by DN")
+	i.logger.Debug().Str("backend", "ldap").
+		Str("base", searchRequest.BaseDN).
+		Str("filter", searchRequest.Filter).
+		Int("scope", searchRequest.Scope).
+		Int("sizelimit", searchRequest.SizeLimit).
+		Interface("attributes", searchRequest.Attributes).
+		Msg("getEntryByDN")
 	res, err := i.conn.Search(searchRequest)
 
 	if err != nil {
@@ -353,7 +359,13 @@ func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
 		},
 		nil,
 	)
-	i.logger.Debug().Str("backend", "ldap").Msgf("Search %s", i.userBaseDN)
+	i.logger.Debug().Str("backend", "ldap").
+		Str("base", searchRequest.BaseDN).
+		Str("filter", searchRequest.Filter).
+		Int("scope", searchRequest.Scope).
+		Int("sizelimit", searchRequest.SizeLimit).
+		Interface("attributes", searchRequest.Attributes).
+		Msg("getLDAPUserByFilter")
 	res, err := i.conn.Search(searchRequest)
 
 	if err != nil {
@@ -425,7 +437,13 @@ func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregra
 		},
 		nil,
 	)
-	i.logger.Debug().Str("backend", "ldap").Msgf("Search %s", i.userBaseDN)
+	i.logger.Debug().Str("backend", "ldap").
+		Str("base", searchRequest.BaseDN).
+		Str("filter", searchRequest.Filter).
+		Int("scope", searchRequest.Scope).
+		Int("sizelimit", searchRequest.SizeLimit).
+		Interface("attributes", searchRequest.Attributes).
+		Msg("GetUsers")
 	res, err := i.conn.Search(searchRequest)
 	if err != nil {
 		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
@@ -543,7 +561,13 @@ func (i *LDAP) getLDAPGroupsByFilter(filter string, requestMembers, single bool)
 		attrs,
 		nil,
 	)
-	i.logger.Debug().Str("backend", "ldap").Msgf("Search %s", i.groupBaseDN)
+	i.logger.Debug().Str("backend", "ldap").
+		Str("base", searchRequest.BaseDN).
+		Str("filter", searchRequest.Filter).
+		Int("scope", searchRequest.Scope).
+		Int("sizelimit", searchRequest.SizeLimit).
+		Interface("attributes", searchRequest.Attributes).
+		Msg("getLDAPGroupsByFilter")
 	res, err := i.conn.Search(searchRequest)
 
 	if err != nil {
@@ -624,7 +648,13 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 		},
 		nil,
 	)
-	i.logger.Debug().Str("backend", "ldap").Str("Base", i.groupBaseDN).Str("filter", groupFilter).Msg("ldap search")
+	i.logger.Debug().Str("backend", "ldap").
+		Str("base", searchRequest.BaseDN).
+		Str("filter", searchRequest.Filter).
+		Int("scope", searchRequest.Scope).
+		Int("sizelimit", searchRequest.SizeLimit).
+		Interface("attributes", searchRequest.Attributes).
+		Msg("GetGroups")
 	res, err := i.conn.Search(searchRequest)
 	if err != nil {
 		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
