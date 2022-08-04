@@ -9,3 +9,4 @@ https://github.com/cs3org/reva/pull/3096
 https://github.com/cs3org/reva/pull/4315
 
 https://github.com/owncloud/ocis/pull/4294
+https://github.com/owncloud/ocis/pull/4330
