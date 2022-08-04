@@ -392,9 +392,12 @@ func (i *LDAP) GetUser(ctx context.Context, nameOrID string, queryParam url.Valu
 	if err != nil {
 		return nil, err
 	}
+	u := i.createUserModelFromLDAP(e)
+	if u == nil {
+		return nil, errNotFound
+	}
 	sel := strings.Split(queryParam.Get("$select"), ",")
 	exp := strings.Split(queryParam.Get("$expand"), ",")
-	u := i.createUserModelFromLDAP(e)
 	if slices.Contains(sel, "memberOf") || slices.Contains(exp, "memberOf") {
 		userGroups, err := i.getGroupsForUser(e.DN)
 		if err != nil {
@@ -455,6 +458,10 @@ func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregra
 		sel := strings.Split(queryParam.Get("$select"), ",")
 		exp := strings.Split(queryParam.Get("$expand"), ",")
 		u := i.createUserModelFromLDAP(e)
+		// Skip invalid LDAP users
+		if u == nil {
+			continue
+		}
 		if slices.Contains(sel, "memberOf") || slices.Contains(exp, "memberOf") {
 			userGroups, err := i.getGroupsForUser(e.DN)
 			if err != nil {
@@ -505,8 +512,10 @@ func (i *LDAP) GetGroup(ctx context.Context, nameOrID string, queryParam url.Val
 		}
 		if len(members) > 0 {
 			m := make([]libregraph.User, 0, len(members))
-			for _, u := range members {
-				m = append(m, *i.createUserModelFromLDAP(u))
+			for _, ue := range members {
+				if u := i.createUserModelFromLDAP(ue); u != nil {
+					m = append(m, *u)
+				}
 			}
 			g.Members = m
 		}
@@ -688,8 +697,10 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 			}
 			if len(members) > 0 {
 				m := make([]libregraph.User, 0, len(members))
-				for _, u := range members {
-					m = append(m, *i.createUserModelFromLDAP(u))
+				for _, ue := range members {
+					if u := i.createUserModelFromLDAP(ue); u != nil {
+						m = append(m, *u)
+					}
 				}
 				g.Members = m
 			}
@@ -706,14 +717,15 @@ func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string) ([]*libregra
 		return nil, err
 	}
 
-	result := []*libregraph.User{}
-
 	memberEntries, err := i.expandLDAPGroupMembers(ctx, e)
+	result := make([]*libregraph.User, 0, len(memberEntries))
 	if err != nil {
 		return nil, err
 	}
 	for _, member := range memberEntries {
-		result = append(result, i.createUserModelFromLDAP(member))
+		if u := i.createUserModelFromLDAP(member); u != nil {
+			result = append(result, u)
+		}
 	}
 
 	return result, nil
@@ -909,12 +921,20 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 	if e == nil {
 		return nil
 	}
-	return &libregraph.User{
-		DisplayName:              pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName)),
-		Mail:                     pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.mail)),
-		OnPremisesSamAccountName: pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.userName)),
-		Id:                       pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.id)),
+
+	opsan := e.GetEqualFoldAttributeValue(i.userAttributeMap.userName)
+	id := e.GetEqualFoldAttributeValue(i.userAttributeMap.id)
+
+	if id != "" && opsan != "" {
+		return &libregraph.User{
+			DisplayName:              pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName)),
+			Mail:                     pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.mail)),
+			OnPremisesSamAccountName: &opsan,
+			Id:                       &id,
+		}
 	}
+	i.logger.Warn().Str("dn", e.DN).Msg("Invalid User. Missing username or id attribute")
+	return nil
 }
 
 func (i *LDAP) createGroupModelFromLDAP(e *ldap.Entry) *libregraph.Group {

@@ -42,11 +42,20 @@ var userEntry = ldap.NewEntry("uid=user",
 		"mail":        {"user@example"},
 		"entryuuid":   {"abcd-defg"},
 	})
+var invalidUserEntry = ldap.NewEntry("uid=user",
+	map[string][]string{
+		"uid":         {"invalid"},
+		"displayname": {"DisplayName"},
+		"mail":        {"user@example"},
+	})
 var groupEntry = ldap.NewEntry("cn=group",
 	map[string][]string{
 		"cn":        {"group"},
 		"entryuuid": {"abcd-defg"},
-		"member":    {"uid=user,ou=people,dc=test"},
+		"member": {
+			"uid=user,ou=people,dc=test",
+			"uid=invalid,ou=people,dc=test",
+		},
 	})
 var invalidGroupEntry = ldap.NewEntry("cn=invalid",
 	map[string][]string{
@@ -196,6 +205,21 @@ func TestGetUser(t *testing.T) {
 	} else if *u.Id != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id) {
 		t.Errorf("Expected GetUser to return a valid user")
 	}
+
+	// Mock invalid Search Result
+	lm = &mocks.Client{}
+	lm.On("Search", mock.Anything).
+		Return(
+			&ldap.SearchResult{
+				Entries: []*ldap.Entry{invalidUserEntry},
+			},
+			nil)
+
+	b, _ = getMockedBackend(lm, lconfig, &logger)
+	u, err = b.GetUser(context.Background(), "invalid", nil)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
 }
 
 func TestGetUsers(t *testing.T) {
@@ -298,9 +322,17 @@ func TestGetGroup(t *testing.T) {
 		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
 		Controls:   []ldap.Control(nil),
 	}
+	sr3 := &ldap.SearchRequest{
+		BaseDN:     "uid=invalid,ou=people,dc=test",
+		SizeLimit:  1,
+		Filter:     "(objectclass=*)",
+		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
+		Controls:   []ldap.Control(nil),
+	}
 
 	lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
 	lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{userEntry}}, nil)
+	lm.On("Search", sr3).Return(&ldap.SearchResult{Entries: []*ldap.Entry{invalidUserEntry}}, nil)
 	b, _ = getMockedBackend(lm, lconfig, &logger)
 	g, err = b.GetGroup(context.Background(), "group", nil)
 	if err != nil {
@@ -385,9 +417,18 @@ func TestGetGroups(t *testing.T) {
 		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
 		Controls:   []ldap.Control(nil),
 	}
+	sr3 := &ldap.SearchRequest{
+		BaseDN:     "uid=invalid,ou=people,dc=test",
+		SizeLimit:  1,
+		Filter:     "(objectclass=*)",
+		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
+		Controls:   []ldap.Control(nil),
+	}
+
 	for _, param := range []url.Values{queryParamSelect, queryParamExpand} {
 		lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
 		lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{userEntry}}, nil)
+		lm.On("Search", sr3).Return(&ldap.SearchResult{Entries: []*ldap.Entry{invalidUserEntry}}, nil)
 		b, _ = getMockedBackend(lm, lconfig, &logger)
 		g, err = b.GetGroups(context.Background(), param)
 		switch {
