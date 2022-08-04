@@ -23,8 +23,6 @@ func TestBasicAuth__isPublicLink(t *testing.T) {
 		{url: "/ocs/v1.php/cloud/capabilities", username: "public", expected: true},
 		{url: "/ocs/v1.php/cloud/users/admin", username: "public", expected: false},
 	}
-	ba := basicAuth{}
-
 	for _, tt := range tests {
 		req := httptest.NewRequest("", tt.url, nil)
 
@@ -32,7 +30,7 @@ func TestBasicAuth__isPublicLink(t *testing.T) {
 			req.SetBasicAuth(tt.username, "")
 		}
 
-		result := ba.isPublicLink(req)
+		result := isPublicPath(req.URL.Path)
 		if result != tt.expected {
 			t.Errorf("with %s expected %t got %t", tt.url, tt.expected, result)
 		}

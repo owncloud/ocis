@@ -25,7 +25,7 @@ func SignedURLAuth(optionSetters ...Option) func(next http.Handler) http.Handler
 	options := newOptions(optionSetters...)
 
 	return func(next http.Handler) http.Handler {
-		return &signedURLAuth{
+		return &SignedURLAuthenticator{
 			next:               next,
 			logger:             options.Logger,
 			preSignedURLConfig: options.PreSignedURLConfig,
@@ -35,7 +35,7 @@ func SignedURLAuth(optionSetters ...Option) func(next http.Handler) http.Handler
 	}
 }
 
-type signedURLAuth struct {
+type SignedURLAuthenticator struct {
 	next               http.Handler
 	logger             log.Logger
 	preSignedURLConfig config.PreSignedURL
@@ -43,7 +43,7 @@ type signedURLAuth struct {
 	store              storesvc.StoreService
 }
 
-func (m signedURLAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (m SignedURLAuthenticator) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	if !m.shouldServe(req) {
 		m.next.ServeHTTP(w, req)
 		return
@@ -67,14 +67,14 @@ func (m signedURLAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	m.next.ServeHTTP(w, req)
 }
 
-func (m signedURLAuth) shouldServe(req *http.Request) bool {
+func (m SignedURLAuthenticator) shouldServe(req *http.Request) bool {
 	if !m.preSignedURLConfig.Enabled {
 		return false
 	}
 	return req.URL.Query().Get("OC-Signature") != ""
 }
 
-func (m signedURLAuth) validate(req *http.Request) (err error) {
+func (m SignedURLAuthenticator) validate(req *http.Request) (err error) {
 	query := req.URL.Query()
 
 	if ok, err := m.allRequiredParametersArePresent(query); !ok {
@@ -100,7 +100,7 @@ func (m signedURLAuth) validate(req *http.Request) (err error) {
 	return nil
 }
 
-func (m signedURLAuth) allRequiredParametersArePresent(query url.Values) (ok bool, err error) {
+func (m SignedURLAuthenticator) allRequiredParametersArePresent(query url.Values) (ok bool, err error) {
 	// check if required query parameters exist in given request query parameters
 	// OC-Signature - the computed signature - server will verify the request upon this REQUIRED
 	// OC-Credential - defines the user scope (shall we use the owncloud user id here - this might leak internal data ....) REQUIRED
@@ -122,7 +122,7 @@ func (m signedURLAuth) allRequiredParametersArePresent(query url.Values) (ok boo
 	return true, nil
 }
 
-func (m signedURLAuth) requestMethodMatches(meth string, query url.Values) (ok bool, err error) {
+func (m SignedURLAuthenticator) requestMethodMatches(meth string, query url.Values) (ok bool, err error) {
 	// check if given url query parameter OC-Verb matches given request method
 	if !strings.EqualFold(meth, query.Get("OC-Verb")) {
 		return false, errors.New("required OC-Verb parameter did not match request method")
@@ -131,7 +131,7 @@ func (m signedURLAuth) requestMethodMatches(meth string, query url.Values) (ok b
 	return true, nil
 }
 
-func (m signedURLAuth) requestMethodIsAllowed(meth string) (ok bool, err error) {
+func (m SignedURLAuthenticator) requestMethodIsAllowed(meth string) (ok bool, err error) {
 	//  check if given request method is allowed
 	methodIsAllowed := false
 	for _, am := range m.preSignedURLConfig.AllowedHTTPMethods {
@@ -147,7 +147,7 @@ func (m signedURLAuth) requestMethodIsAllowed(meth string) (ok bool, err error) 
 
 	return true, nil
 }
-func (m signedURLAuth) urlIsExpired(query url.Values, now func() time.Time) (expired bool, err error) {
+func (m SignedURLAuthenticator) urlIsExpired(query url.Values, now func() time.Time) (expired bool, err error) {
 	// check if url is expired by checking if given date (OC-Date) + expires in seconds (OC-Expires) is after now
 	validFrom, err := time.Parse(time.RFC3339, query.Get("OC-Date"))
 	if err != nil {
@@ -164,7 +164,7 @@ func (m signedURLAuth) urlIsExpired(query url.Values, now func() time.Time) (exp
 	return !(now().After(validFrom) && now().Before(validTo)), nil
 }
 
-func (m signedURLAuth) signatureIsValid(req *http.Request) (ok bool, err error) {
+func (m SignedURLAuthenticator) signatureIsValid(req *http.Request) (ok bool, err error) {
 	u := revactx.ContextMustGetUser(req.Context())
 	signingKey, err := m.getSigningKey(req.Context(), u.Id.OpaqueId)
 	if err != nil {
@@ -187,7 +187,7 @@ func (m signedURLAuth) signatureIsValid(req *http.Request) (ok bool, err error) 
 	return m.createSignature(url, signingKey) == signature, nil
 }
 
-func (m signedURLAuth) createSignature(url string, signingKey []byte) string {
+func (m SignedURLAuthenticator) createSignature(url string, signingKey []byte) string {
 	// the oc10 signature check: $hash = \hash_pbkdf2("sha512", $url, $signingKey, 10000, 64, false);
 	// - sets the length of the output string to 64
 	// - sets raw output to false ->  if raw_output is FALSE length corresponds to twice the byte-length of the derived key (as every byte of the key is returned as two hexits).
@@ -197,7 +197,7 @@ func (m signedURLAuth) createSignature(url string, signingKey []byte) string {
 	return hex.EncodeToString(hash)
 }
 
-func (m signedURLAuth) getSigningKey(ctx context.Context, ocisID string) ([]byte, error) {
+func (m SignedURLAuthenticator) getSigningKey(ctx context.Context, ocisID string) ([]byte, error) {
 	res, err := m.store.Read(ctx, &storesvc.ReadRequest{
 		Options: &storemsg.ReadOptions{
 			Database: "proxy",
@@ -210,4 +210,27 @@ func (m signedURLAuth) getSigningKey(ctx context.Context, ocisID string) ([]byte
 	}
 
 	return res.Records[0].Value, nil
+}
+
+func (m SignedURLAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
+	if !m.shouldServe(r) {
+		return nil, false
+	}
+
+	user, _, err := m.userProvider.GetUserByClaims(r.Context(), "username", r.URL.Query().Get("OC-Credential"), true)
+	if err != nil {
+		m.logger.Error().Err(err).Msg("Could not get user by claim")
+		return nil, false
+	}
+
+	ctx := revactx.ContextSetUser(r.Context(), user)
+
+	r = r.WithContext(ctx)
+
+	if err := m.validate(r); err != nil {
+		// http.Error(w, "Invalid url signature", http.StatusUnauthorized)
+		return nil, false
+	}
+
+	return r, true
 }
