@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix handling of invalid LDAP users and groups: [#4274](https://github.com/owncloud/ocis/issues/4274)
 * Bugfix - Fix search in received shares: [#4308](https://github.com/owncloud/ocis/issues/4308)
 * Bugfix - Substring search for sharees: [#547](https://github.com/owncloud/ocis/issues/547)
 * Bugfix - Space Creators can hand over spaces: [#4244](https://github.com/owncloud/ocis/pull/4244)
@@ -18,6 +19,13 @@ The following sections list the changes for unreleased.
 * Enhancement - Update ownCloud Web to v5.7.0-rc.7: [#4314](https://github.com/owncloud/ocis/pull/4314)
 
 ## Details
+
+* Bugfix - Fix handling of invalid LDAP users and groups: [#4274](https://github.com/owncloud/ocis/issues/4274)
+
+   We fixed an issue where ocis would exit with a panic when LDAP users or groups where missing
+   required attributes (e.g. the id)
+
+   https://github.com/owncloud/ocis/issues/4274
 
 * Bugfix - Fix search in received shares: [#4308](https://github.com/owncloud/ocis/issues/4308)
 
