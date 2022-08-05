@@ -2560,6 +2560,74 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" requests the checksum of "([^"]*)" in space "([^"]*)" via propfind$/
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $spaceName
+	 *
+	 * @throws GuzzleException
+	 */
+	public function userRequestsTheChecksumViaPropfindInSpace(
+		string $user,
+		string $path,
+		string $spaceName
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($path, "/");
+		$body = '<?xml version="1.0"?>
+			<d:propfind  xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns">
+			  <d:prop>
+				<oc:checksums />
+			  </d:prop>
+			</d:propfind>';
+
+		$this->featureContext->setResponse(
+			$this->sendPropfindRequestToUrl(
+				$fullUrl,
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$this->featureContext->getStepLineRef(),
+				[],
+				$body
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" uploads file with checksum "([^"]*)" and content "([^"]*)" to "([^"]*)" in space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $checksum
+	 * @param string $content
+	 * @param string $path
+	 * @param string $spaceName
+	 *
+	 * @throws GuzzleException
+	 */
+	public function userUploadsFileWithChecksumWithContentInSpace(
+		string $user,
+		string $checksum,
+		string $content,
+		string $path,
+		string $spaceName
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($path, "/");
+
+		$this->featureContext->setResponse(
+			$this->sendPutRequestToUrl(
+				$fullUrl,
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				"",
+				['OC-Checksum' => $checksum],
+				$content
+			)
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" downloads version of the file "([^"]*)" with the index "([^"]*)" of the space "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param  string $user
