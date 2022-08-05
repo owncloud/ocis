@@ -173,6 +173,11 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		chimiddleware.RequestID,
 		middleware.AccessLog(logger),
 		middleware.HTTPSRedirect,
+		middleware.OIDCWellKnownRewrite(
+			logger, cfg.OIDC.Issuer,
+			cfg.OIDC.RewriteWellKnown,
+			oidcHTTPClient,
+		),
 
 		// now that we established the basics, on with authentication middleware
 		middleware.Authentication(
