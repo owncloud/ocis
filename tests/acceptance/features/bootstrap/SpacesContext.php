@@ -377,6 +377,21 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * using method from core to set share data
+	 * 
+	 * @return void
+	 */
+	public function setLastShareData(): void
+	{
+		// set last response as PublicShareData
+		$this->featureContext->setLastPublicShareData($this->featureContext->getResponseXml(null, __METHOD__));
+		// set last shareId if ShareData exists
+		if (isset($this->featureContext->getLastPublicShareData()->data)) {
+			$this->featureContext->setLastPublicLinkShareId((string) $this->featureContext->getLastPublicShareData()->data[0]->id);
+		}
+	}
+
+	/**
 	 * @BeforeScenario
 	 *
 	 * @param BeforeScenarioScope $scope
@@ -2055,8 +2070,7 @@ class SpacesContext implements Context {
 				$body
 			)
 		);
-		$this->featureContext->setLastPublicShareData($this->featureContext->getResponseXml(null, __METHOD__));
-		$this->featureContext->setLastPublicLinkShareId((string) $this->featureContext->getLastPublicShareData()->data[0]->id);
+		$this->setLastShareData();
 	}
 
 	/**
@@ -2104,8 +2118,7 @@ class SpacesContext implements Context {
 			)
 		);
 
-		$this->featureContext->setLastPublicShareData($this->featureContext->getResponseXml(null, __METHOD__));
-		$this->featureContext->setLastPublicLinkShareId((string) $this->featureContext->getLastPublicShareData()->data[0]->id);
+		$this->setLastShareData();
 	}
 
 	/**
@@ -2946,12 +2959,7 @@ class SpacesContext implements Context {
 			)
 		);
 
-		// set last response as PublicShareData. using method from core
-		$this->featureContext->setLastPublicShareData($this->featureContext->getResponseXml(null, __METHOD__));
-		// set last shareId if ShareData exists. using method from core
-		if (isset($this->featureContext->getLastPublicShareData()->data)) {
-			$this->featureContext->setLastPublicLinkShareId((string) $this->featureContext->getLastPublicShareData()->data[0]->id);
-		}
+		$this->setLastShareData();
 	}
 
 	/**
