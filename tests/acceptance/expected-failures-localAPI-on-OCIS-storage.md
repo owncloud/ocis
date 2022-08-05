@@ -25,3 +25,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 ### [Changing personal drive quota on another user as admin is not possible](https://github.com/owncloud/ocis/issues/4325)
 - [apiSpaces/changeSpaces.feature:221](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/changeSpaces.feature#L221)
 
+### [Member of project space cannot see "share a resource with people](https://github.com/owncloud/ocis/issues/4347)
+- [apiSpaces/shareSubItemOfSpace.feature:74](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L74)
+- [apiSpaces/shareSubItemOfSpace.feature:75](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L75)
+- [apiSpaces/shareSubItemOfSpace.feature:76](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareSubItemOfSpace.feature#L76)
