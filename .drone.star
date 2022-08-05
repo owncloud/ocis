@@ -2783,10 +2783,8 @@ def performWebCache(ctx):
             "image": OC_UBUNTU,
             "commands": [
                 "curl -s -o .drone.env %s" % path_to_drone_env,
-                "cat .drone.env",
                 "curl -s -o check_web_cache.sh %s" % path_to_check_script,
                 "chmod +x check_web_cache.sh",
-                "cat check_web_cache.sh",
             ],
         },
         {
@@ -2852,7 +2850,7 @@ def performWebCache(ctx):
 
 def restoreWebCache():
     return [{
-        "name": "retore-web-cache",
+        "name": "restore-web-cache",
         "image": MINIO_MC,
         "environment": MINIO_MC_ENV,
         "commands": [
@@ -2866,7 +2864,7 @@ def restoreWebCache():
 
 def restoreWebE2EYarnCache():
     return [{
-        "name": "retore-web-e2e-yarn-cache",
+        "name": "restore-web-e2e-yarn-cache",
         "image": MINIO_MC,
         "environment": MINIO_MC_ENV,
         "commands": [
@@ -2887,7 +2885,7 @@ def restoreWebE2EYarnCache():
 
 def restoreWebAcceptanceYarnCache():
     return [{
-        "name": "retore-web-acceptance-yarn-cache",
+        "name": "restore-web-acceptance-yarn-cache",
         "image": MINIO_MC,
         "environment": MINIO_MC_ENV,
         "commands": [
