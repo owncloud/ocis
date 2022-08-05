@@ -273,7 +273,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[username]
 a| [subs=-attributes]
-The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Currently defaults to 'mail'. Supported values are 'username' and 'displayname'.
+The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Supported values are 'username', 'mail' and 'userid'.
 
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `PROXY_MACHINE_AUTH_API_KEY`
@@ -290,7 +290,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
-Set this to 'true' to automatically provsion users that do not yet exist in the users service on-demand upon first signin. To use this a write-enabled libregraph user backend needs to be setup an running.
+Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running.
 
 |`PROXY_ENABLE_BASIC_AUTH`
 a| [subs=-attributes]
