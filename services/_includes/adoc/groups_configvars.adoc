@@ -238,7 +238,7 @@ LDAP search scope to use when looking up groups. Supported scopes are 'base', 'o
 a| [subs=-attributes]
 +string+
 a| [subs=-attributes]
-pass:[initial]
+pass:[any]
 a| [subs=-attributes]
 Type of substring search filter to use for substring searches for groups. Possible values: 'initial' for doing prefix only searches, 'final' for doing suffix only searches or 'any' for doing full substring searches
 

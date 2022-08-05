@@ -28,7 +28,7 @@
 | LDAP_GROUP_BASE_DN<br/>GROUPS_LDAP_GROUP_BASE_DN | string | ou=groups,o=libregraph-idm | Search base DN for looking up LDAP groups.|
 | LDAP_USER_SCOPE<br/>GROUPS_LDAP_USER_SCOPE | string | sub | LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.|
 | LDAP_GROUP_SCOPE<br/>GROUPS_LDAP_GROUP_SCOPE | string | sub | LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.|
-| LDAP_GROUP_SUBSTRING_FILTER_TYPE<br/>GROUP_LDAP_GROUP_SUBSTRING_FILTER_TYPE | string | initial | Type of substring search filter to use for substring searches for groups. Possible values: 'initial' for doing prefix only searches, 'final' for doing suffix only searches or 'any' for doing full substring searches|
+| LDAP_GROUP_SUBSTRING_FILTER_TYPE<br/>GROUP_LDAP_GROUP_SUBSTRING_FILTER_TYPE | string | any | Type of substring search filter to use for substring searches for groups. Possible values: 'initial' for doing prefix only searches, 'final' for doing suffix only searches or 'any' for doing full substring searches|
 | LDAP_USER_FILTER<br/>GROUPS_LDAP_USER_FILTER | string |  | LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.|
 | LDAP_GROUP_FILTER<br/>GROUPS_LDAP_GROUP_FILTER | string |  | LDAP filter to add to the default filters for group searches.|
 | LDAP_USER_OBJECTCLASS<br/>GROUPS_LDAP_USER_OBJECTCLASS | string | inetOrgPerson | The object class to use for users in the default user search filter ('inetOrgPerson').|
