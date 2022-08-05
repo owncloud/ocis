@@ -1808,8 +1808,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         environment = {
             "OCIS_URL": OCIS_URL,
             "OCIS_CONFIG_DIR": "/root/.ocis/config",
-            "LDAP_GROUP_SUBSTRING_FILTER_TYPE": "any",
-            "LDAP_USER_SUBSTRING_FILTER_TYPE": "any",
             "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # cs3api-validator needs the cs3api gatway exposed
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
