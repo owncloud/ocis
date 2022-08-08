@@ -20,7 +20,7 @@ func TestSignedURLAuth_shouldServe(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		pua.preSignedURLConfig.Enabled = tt.enabled
+		pua.PreSignedURLConfig.Enabled = tt.enabled
 		r := httptest.NewRequest("", tt.url, nil)
 		result := pua.shouldServe(r)
 
@@ -89,7 +89,7 @@ func TestSignedURLAuth_requestMethodIsAllowed(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		pua.preSignedURLConfig.AllowedHTTPMethods = tt.allowed
+		pua.PreSignedURLConfig.AllowedHTTPMethods = tt.allowed
 		ok, _ := pua.requestMethodIsAllowed(tt.method)
 
 		if ok != tt.expected {
