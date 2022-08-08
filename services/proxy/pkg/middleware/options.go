@@ -215,7 +215,7 @@ func JWKSOptions(jo config.JWKS) Option {
 	}
 }
 
-// DefaultSpaceQuota ssets the default space quota for personal spaces
+// DefaultSpaceQuota sets the default space quota for personal spaces
 func DefaultSpaceQuota(q string) Option {
 	return func(o *Options) {
 		o.DefaultSpaceQuota = q
