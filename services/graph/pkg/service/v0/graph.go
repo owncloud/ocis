@@ -78,6 +78,9 @@ type Graph struct {
 	roleService          settingssvc.RoleService
 	spacePropertiesCache *ttlcache.Cache
 	eventsPublisher      events.Publisher
+	defaultQuota         uint64
+	maxQuotaPersonal     uint64
+	maxQuotaProject      uint64
 }
 
 // ServeHTTP implements the Service interface.

@@ -57,12 +57,19 @@ func NewService(opts ...Option) Service {
 	m := chi.NewMux()
 	m.Use(options.Middleware...)
 
+	defaultQuota, _ := strconv.ParseUint(options.Config.Spaces.DefaultQuota, 10, 64)
+	personalQuota, _ := strconv.ParseUint(options.Config.Spaces.MaxQuotaPersonal, 10, 64)
+	projectQuota, _ := strconv.ParseUint(options.Config.Spaces.MaxQuotaProject, 10, 64)
+
 	svc := Graph{
 		config:               options.Config,
 		mux:                  m,
 		logger:               &options.Logger,
 		spacePropertiesCache: ttlcache.NewCache(),
 		eventsPublisher:      options.EventsPublisher,
+		defaultQuota:         defaultQuota,
+		maxQuotaPersonal:     personalQuota,
+		maxQuotaProject:      projectQuota,
 	}
 	if options.GatewayClient == nil {
 		var err error

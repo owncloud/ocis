@@ -33,6 +33,7 @@ type Config struct {
 	EnableBasicAuth       bool            `yaml:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH" desc:"Set this to true to enable 'basic' (username/password) authentication."`
 	InsecureBackends      bool            `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS" desc:"Disable TLS certificate validation for all HTTP backend connections."`
 	AuthMiddleware        AuthMiddleware  `yaml:"auth_middleware"`
+	DefaultSpaceQuota     string          `yaml:"default_space_quota" env:"OCIS_DEFAULT_SPACE_QUOTA" desc:"The default quota for personal spaces in bytes"`
 
 	Context context.Context `yaml:"-" json:"-"`
 }

@@ -31,7 +31,9 @@ type Config struct {
 type Spaces struct {
 	WebDavBase                      string `yaml:"webdav_base" env:"OCIS_URL;GRAPH_SPACES_WEBDAV_BASE" desc:"The public facing URL of WebDAV."`
 	WebDavPath                      string `yaml:"webdav_path" env:"GRAPH_SPACES_WEBDAV_PATH" desc:"The WebDAV subpath for spaces."`
-	DefaultQuota                    string `yaml:"default_quota" env:"GRAPH_SPACES_DEFAULT_QUOTA" desc:"The default quota in bytes."`
+	DefaultQuota                    string `yaml:"default_quota" env:"GRAPH_SPACES_DEFAULT_QUOTA" desc:"The default quota for project spaces in bytes."`
+	MaxQuotaPersonal                string `yaml:"max_quota_personal" env:"GRAPH_SPACES_MAX_QUOTA_PERSONAL" desc:"The maximum quota for a personal space in bytes."`
+	MaxQuotaProject                 string `yaml:"max_quota_project" env:"GRAPH_SPACES_MAX_QUOTA_PROJECT" desc:"The maximum quota for a project space in bytes."`
 	ExtendedSpacePropertiesCacheTTL int    `yaml:"extended_space_properties_cache_ttl" env:"GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL" desc:"Max TTL in seconds for the spaces property cache."`
 }
 
