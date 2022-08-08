@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix handling of invalid LDAP users and groups: [#4274](https://github.com/owncloud/ocis/issues/4274)
 * Bugfix - Fix search in received shares: [#4308](https://github.com/owncloud/ocis/issues/4308)
 * Bugfix - Substring search for sharees: [#547](https://github.com/owncloud/ocis/issues/547)
+* Bugfix - Fix unrestricted quota on the graphAPI: [#4363](https://github.com/owncloud/ocis/pull/4363)
 * Bugfix - Space Creators can hand over spaces: [#4244](https://github.com/owncloud/ocis/pull/4244)
 * Enhancement - Add drives field to users endpoint: [#4072](https://github.com/owncloud/ocis/pull/4072)
 * Enhancement - Improve validation of OIDC access tokens: [#3841](https://github.com/owncloud/ocis/issues/3841)
@@ -50,6 +51,13 @@ The following sections list the changes for unreleased.
    This setting is e.g. evaluated by the web ui via the capabilities endpoint.
 
    https://github.com/owncloud/ocis/issues/547
+
+* Bugfix - Fix unrestricted quota on the graphAPI: [#4363](https://github.com/owncloud/ocis/pull/4363)
+
+   Unrestricted quota needs to show 0 on the API. It is not good for clients when the property is
+   missing.
+
+   https://github.com/owncloud/ocis/pull/4363
 
 * Bugfix - Space Creators can hand over spaces: [#4244](https://github.com/owncloud/ocis/pull/4244)
 
