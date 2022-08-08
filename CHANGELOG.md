@@ -18,7 +18,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Fix behavior for foobar (in present tense): [#4346](https://github.com/owncloud/ocis/pull/4346)
 * Enhancement - Use storageID when requesting special items: [#4356](https://github.com/owncloud/ocis/pull/4356)
 * Enhancement - Update reva to vx.x.x: [#4294](https://github.com/owncloud/ocis/pull/4294)
-* Enhancement - Update ownCloud Web to v5.7.0-rc.7: [#4314](https://github.com/owncloud/ocis/pull/4314)
+* Enhancement - Update ownCloud Web to v5.7.0-rc.8: [#4314](https://github.com/owncloud/ocis/pull/4314)
 * Enhancement - Expand personal drive on the graph user: [#4357](https://github.com/owncloud/ocis/pull/4357)
 
 ## Details
@@ -136,11 +136,11 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/4294
    https://github.com/owncloud/ocis/pull/4330
 
-* Enhancement - Update ownCloud Web to v5.7.0-rc.7: [#4314](https://github.com/owncloud/ocis/pull/4314)
+* Enhancement - Update ownCloud Web to v5.7.0-rc.8: [#4314](https://github.com/owncloud/ocis/pull/4314)
 
    Tags: web
 
-   We updated ownCloud Web to v5.7.0-rc.7. Please refer to the changelog (linked) for details on
+   We updated ownCloud Web to v5.7.0-rc.8. Please refer to the changelog (linked) for details on
    the web release.
 
   * Bugfix [owncloud/web#7080](https://github.com/owncloud/web/issues/7080): Add Droparea again
@@ -160,14 +160,19 @@ The following sections list the changes for unreleased.
   * Bugfix [owncloud/web#7272](https://github.com/owncloud/web/issues/7272): Print backend version
   * Bugfix [owncloud/web#7379](https://github.com/owncloud/web/pull/7379): Rename shared space resource not possible
   * Bugfix [owncloud/web#7210](https://github.com/owncloud/web/pull/7210): Repair navigation highlighter
+  * Bugfix [owncloud/web#7393](https://github.com/owncloud/web/pull/7393): Selected item bottom glue
   * Bugfix [owncloud/web#7308](https://github.com/owncloud/web/pull/7308): "Shared with others" and "Shared via Link" resource links not working
+  * Bugfix [owncloud/web#7400](https://github.com/owncloud/web/issues/7400): Respect space quota permission
   * Bugfix [owncloud/web#7349](https://github.com/owncloud/web/pull/7349): Missing quick actions in spaces file list
+  * Bugfix [owncloud/web#7396](https://github.com/owncloud/web/pull/7396): Add storage ID when navigating to a shared parent directory
+  * Bugfix [owncloud/web#7394](https://github.com/owncloud/web/pull/7394): Suppress active panel error log
   * Bugfix [owncloud/web#7038](https://github.com/owncloud/web/issues/7038): File list render performance
   * Bugfix [owncloud/web#7240](https://github.com/owncloud/web/issues/7240): Access token renewal during upload
   * Bugfix [owncloud/web#7376](https://github.com/owncloud/web/pull/7376): Tooltips not shown on disabled create and upload button
   * Bugfix [owncloud/web#7297](https://github.com/owncloud/web/pull/7297): Upload overlay progress bar spacing
   * Bugfix [owncloud/web#7332](https://github.com/owncloud/web/pull/7332): Users list not loading if user has no role
   * Bugfix [owncloud/web#7313](https://github.com/owncloud/web/pull/7313): Versions of shared files not visible
+  * Enhancement [owncloud/web#7404](https://github.com/owncloud/web/pull/7404): Adjust helper texts
   * Enhancement [owncloud/web#7350](https://github.com/owncloud/web/pull/7350): Change file loading mechanism in `preview` app
   * Enhancement [owncloud/web#7356](https://github.com/owncloud/web/pull/7356): Declined shares are now easily accessible
   * Enhancement [owncloud/web#7365](https://github.com/owncloud/web/pull/7365): Drop menu styling in right sidebar
@@ -179,7 +184,7 @@ The following sections list the changes for unreleased.
   * Enhancement [owncloud/web#7375](https://github.com/owncloud/web/pull/7375): User management app saved dialog
 
    https://github.com/owncloud/ocis/pull/4314
-   https://github.com/owncloud/web/releases/tag/v5.7.0-rc.7
+   https://github.com/owncloud/web/releases/tag/v5.7.0-rc.8
 
 * Enhancement - Expand personal drive on the graph user: [#4357](https://github.com/owncloud/ocis/pull/4357)
 
