@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -17,7 +16,18 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	osync "github.com/owncloud/ocis/v2/ocis-pkg/sync"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
+)
+
+const (
+	_headerAuthorization = "Authorization"
+	_bearerPrefix        = "Bearer "
+)
+
+var (
+	// _unauthenticatePaths contains paths which don't need to be authenticated.
+	_unauthenticatePaths = [...]string{"/konnect/v1/userinfo", "/status.php"}
 )
 
 // OIDCProvider used to mock the oidc provider during tests
@@ -42,14 +52,13 @@ type OIDCAuthenticator struct {
 	JWKS     *keyfunc.JWKS
 }
 
-func (m OIDCAuthenticator) getClaims(token string, req *http.Request) (claims map[string]interface{}, status int) {
+func (m OIDCAuthenticator) getClaims(token string, req *http.Request) (map[string]interface{}, error) {
+	var claims map[string]interface{}
 	hit := m.TokenCache.Load(token)
 	if hit == nil {
 		aClaims, err := m.verifyAccessToken(token)
 		if err != nil {
-			m.Logger.Error().Err(err).Msg("Failed to verify access token")
-			status = http.StatusUnauthorized
-			return
+			return nil, errors.Wrap(err, "failed to verify access token")
 		}
 
 		oauth2Token := &oauth2.Token{
@@ -61,31 +70,25 @@ func (m OIDCAuthenticator) getClaims(token string, req *http.Request) (claims ma
 			oauth2.StaticTokenSource(oauth2Token),
 		)
 		if err != nil {
-			m.Logger.Error().Err(err).Msg("Failed to get userinfo")
-			status = http.StatusUnauthorized
-			return
+			return nil, errors.Wrap(err, "failed to get userinfo")
 		}
-
 		if err := userInfo.Claims(&claims); err != nil {
-			m.Logger.Error().Err(err).Interface("userinfo", userInfo).Msg("failed to unmarshal userinfo claims")
-			status = http.StatusInternalServerError
-			return
+			return nil, errors.Wrap(err, "failed to unmarshal userinfo claims")
 		}
 
 		expiration := m.extractExpiration(aClaims)
 		m.TokenCache.Store(token, claims, expiration)
 
 		m.Logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Time("expiration", expiration.UTC()).Msg("unmarshalled and cached userinfo")
-		return
+		return claims, nil
 	}
 
 	var ok bool
 	if claims, ok = hit.V.(map[string]interface{}); !ok {
-		status = http.StatusInternalServerError
-		return
+		return nil, errors.New("failed to cast claims from the cache")
 	}
 	m.Logger.Debug().Interface("claims", claims).Msg("cache hit for userinfo")
-	return
+	return claims, nil
 }
 
 func (m OIDCAuthenticator) verifyAccessToken(token string) (jwt.RegisteredClaims, error) {
@@ -139,21 +142,20 @@ func (m OIDCAuthenticator) extractExpiration(aClaims jwt.RegisteredClaims) time.
 }
 
 func (m OIDCAuthenticator) shouldServe(req *http.Request) bool {
-	header := req.Header.Get("Authorization")
-
 	if m.OIDCIss == "" {
 		return false
 	}
 
 	// todo: looks dirty, check later
 	// TODO: make a PR to coreos/go-oidc for exposing userinfo endpoint on provider, see https://github.com/coreos/go-oidc/issues/248
-	for _, ignoringPath := range []string{"/konnect/v1/userinfo", "/status.php"} {
+	for _, ignoringPath := range _unauthenticatePaths {
 		if req.URL.Path == ignoringPath {
 			return false
 		}
 	}
 
-	return strings.HasPrefix(header, "Bearer ")
+	header := req.Header.Get(_headerAuthorization)
+	return strings.HasPrefix(header, _bearerPrefix)
 }
 
 type jwksJSON struct {
@@ -234,14 +236,10 @@ func (m *OIDCAuthenticator) getProvider() OIDCProvider {
 func (m OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	// there is no bearer token on the request,
 	if !m.shouldServe(r) {
-		// // oidc supported but token not present, add header and handover to the next middleware.
-		// userAgentAuthenticateLockIn(w, r, options.CredentialsByUserAgent, "bearer")
-		// next.ServeHTTP(w, r)
 		return nil, false
 	}
 
 	if m.getProvider() == nil {
-		// w.WriteHeader(http.StatusInternalServerError)
 		return nil, false
 	}
 	// Force init of jwks keyfunc if needed (contacts the .well-known and jwks endpoints on first call)
@@ -249,13 +247,20 @@ func (m OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 		return nil, false
 	}
 
-	token := strings.TrimPrefix(r.Header.Get("Authorization"), "Bearer ")
+	token := strings.TrimPrefix(r.Header.Get(_headerAuthorization), _bearerPrefix)
 
-	claims, status := m.getClaims(token, r)
-	if status != 0 {
-		// w.WriteHeader(status)
-		// TODO log
+	claims, err := m.getClaims(token, r)
+	if err != nil {
+		m.Logger.Error().
+			Err(err).
+			Str("authenticator", "oidc").
+			Str("path", r.URL.Path).
+			Msg("failed to authenticate the request")
 		return nil, false
 	}
+	m.Logger.Debug().
+		Str("authenticator", "oidc").
+		Str("path", r.URL.Path).
+		Msg("successfully authenticated request")
 	return r.WithContext(oidc.NewContext(r.Context(), claims)), true
 }

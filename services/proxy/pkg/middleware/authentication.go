@@ -18,7 +18,7 @@ var (
 	// regexp.Regexp which are safe to use concurrently.
 	ProxyWwwAuthenticate = []regexp.Regexp{*regexp.MustCompile("/ocs/v[12].php/cloud/")}
 
-	_publicPaths = []string{
+	_publicPaths = [...]string{
 		"/dav/public-files/",
 		"/remote.php/dav/public-files/",
 		"/remote.php/ocs/apps/files_sharing/api/v1/tokeninfo/unprotected",
@@ -164,57 +164,3 @@ func evalRequestURI(l userAgentLocker, r regexp.Regexp) {
 	}
 	l.w.Header().Add(WwwAuthenticate, fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(l.fallback), l.r.Host))
 }
-
-// AuthenticationOld is a higher order authentication middleware.
-func AuthenticationOld(opts ...Option) func(next http.Handler) http.Handler {
-	options := newOptions(opts...)
-
-	configureSupportedChallenges(options)
-	oidc := newOIDCAuth(options)
-	// basic := newBasicAuth(options)
-
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if options.OIDCIss != "" && options.EnableBasicAuth {
-				//oidc(basic(next)).ServeHTTP(w, r)
-				oidc(next).ServeHTTP(w, r)
-			}
-
-			if options.OIDCIss != "" && !options.EnableBasicAuth {
-				oidc(next).ServeHTTP(w, r)
-			}
-
-			// if options.OIDCIss == "" && options.EnableBasicAuth {
-			// 	basic(next).ServeHTTP(w, r)
-			// }
-		})
-	}
-}
-
-// newOIDCAuth returns a configured oidc middleware
-func newOIDCAuth(options Options) func(http.Handler) http.Handler {
-	return OIDCAuth(
-		Logger(options.Logger),
-		OIDCProviderFunc(options.OIDCProviderFunc),
-		HTTPClient(options.HTTPClient),
-		OIDCIss(options.OIDCIss),
-		TokenCacheSize(options.UserinfoCacheSize),
-		TokenCacheTTL(options.UserinfoCacheTTL),
-		CredentialsByUserAgent(options.CredentialsByUserAgent),
-		AccessTokenVerifyMethod(options.AccessTokenVerifyMethod),
-		JWKSOptions(options.JWKS),
-	)
-}
-
-// // newBasicAuth returns a configured basic middleware
-// func newBasicAuth(options Options) func(http.Handler) http.Handler {
-// 	return BasicAuth(
-// 		UserProvider(options.UserProvider),
-// 		Logger(options.Logger),
-// 		EnableBasicAuth(options.EnableBasicAuth),
-// 		OIDCIss(options.OIDCIss),
-// 		UserOIDCClaim(options.UserOIDCClaim),
-// 		UserCS3Claim(options.UserCS3Claim),
-// 		CredentialsByUserAgent(options.CredentialsByUserAgent),
-// 	)
-// }

@@ -19,6 +19,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/cs3"
@@ -149,7 +150,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		logger.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
 	}
 
-	// storeClient := storesvc.NewStoreService("com.owncloud.api.store", grpc.DefaultClient)
+	storeClient := storesvc.NewStoreService("com.owncloud.api.store", grpc.DefaultClient)
 	if err != nil {
 		logger.Error().Err(err).
 			Str("gateway", cfg.Reva.Address).
@@ -193,10 +194,17 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		JWKSOptions:             cfg.OIDC.JWKS,
 		AccessTokenVerifyMethod: cfg.OIDC.AccessTokenVerifyMethod,
 	})
-	// authenticators = append(authenticators, middleware.PublicShareAuthenticator{
-	// 	Logger:            logger,
-	// 	RevaGatewayClient: revaClient,
-	// })
+	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
+		Logger:            logger,
+		RevaGatewayClient: revaClient,
+	})
+
+	authenticators = append(authenticators, middleware.SignedURLAuthenticator{
+		Logger:             logger,
+		PreSignedURLConfig: cfg.PreSignedURL,
+		UserProvider:       userProvider,
+		Store:              storeClient,
+	})
 
 	return alice.New(
 		// first make sure we log all requests and redirect to https if necessary
@@ -211,18 +219,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			oidcHTTPClient,
 		),
 
-		// middleware.AuthenticationOld(
-		// 	// OIDC Options
-		// 	middleware.OIDCProviderFunc(func() (middleware.OIDCProvider, error) {
-		// 		// Initialize a provider by specifying the issuer URL.
-		// 		// it will fetch the keys from the issuer using the .well-known
-		// 		// endpoint
-		// 		return oidc.NewProvider(
-		// 			context.WithValue(ctx, oauth2.HTTPClient, oidcHTTPClient),
-		// 			cfg.OIDC.Issuer,
-		// 		)
-		// 	}),
-
 		middleware.Authentication(
 			authenticators,
 			middleware.CredentialsByUserAgent(cfg.AuthMiddleware.CredentialsByUserAgent),
@@ -230,25 +226,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			middleware.OIDCIss(cfg.OIDC.Issuer),
 			middleware.EnableBasicAuth(cfg.EnableBasicAuth),
 		),
-		// 	middleware.HTTPClient(oidcHTTPClient),
-		// 	middleware.TokenCacheSize(cfg.OIDC.UserinfoCache.Size),
-		// 	middleware.TokenCacheTTL(time.Second*time.Duration(cfg.OIDC.UserinfoCache.TTL)),
-		//
-		// 	// basic Options
-		// 	middleware.Logger(logger),
-		// 	middleware.EnableBasicAuth(cfg.EnableBasicAuth),
-		// 	middleware.UserProvider(userProvider),
-		// 	middleware.OIDCIss(cfg.OIDC.Issuer),
-		// 	middleware.UserOIDCClaim(cfg.UserOIDCClaim),
-		// 	middleware.UserCS3Claim(cfg.UserCS3Claim),
-		// 	middleware.CredentialsByUserAgent(cfg.AuthMiddleware.CredentialsByUserAgent),
-		// ),
-		// middleware.SignedURLAuth(
-		// 	middleware.Logger(logger),
-		// 	middleware.PreSignedURLConfig(cfg.PreSignedURL),
-		// 	middleware.UserProvider(userProvider),
-		// 	middleware.Store(storeClient),
-		// ),
 		middleware.AccountResolver(
 			middleware.Logger(logger),
 			middleware.UserProvider(userProvider),
@@ -270,9 +247,5 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			middleware.TokenManagerConfig(*cfg.TokenManager),
 			middleware.RevaGatewayClient(revaClient),
 		),
-		// middleware.PublicShareAuth(
-		// 	middleware.Logger(logger),
-		// 	middleware.RevaGatewayClient(revaClient),
-		// ),
 	)
 }

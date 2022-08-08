@@ -15,22 +15,26 @@ type BasicAuthenticator struct {
 	UserOIDCClaim string
 }
 
-func (m BasicAuthenticator) Authenticate(req *http.Request) (*http.Request, bool) {
-	if isPublicPath(req.URL.Path) {
+func (m BasicAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
+	if isPublicPath(r.URL.Path) {
 		// The authentication of public path requests is handled by another authenticator.
 		// Since we can't guarantee the order of execution of the authenticators, we better
 		// implement an early return here for paths we can't authenticate in this authenticator.
 		return nil, false
 	}
 
-	login, password, ok := req.BasicAuth()
+	login, password, ok := r.BasicAuth()
 	if !ok {
 		return nil, false
 	}
 
-	user, _, err := m.UserProvider.Authenticate(req.Context(), login, password)
+	user, _, err := m.UserProvider.Authenticate(r.Context(), login, password)
 	if err != nil {
-		// TODO add log line
+		m.Logger.Error().
+			Err(err).
+			Str("authenticator", "basic").
+			Str("path", r.URL.Path).
+			Msg("failed to authenticate request")
 		return nil, false
 	}
 
@@ -48,5 +52,9 @@ func (m BasicAuthenticator) Authenticate(req *http.Request) (*http.Request, bool
 		claims[m.UserOIDCClaim] = user.Id.OpaqueId
 
 	}
-	return req.WithContext(oidc.NewContext(req.Context(), claims)), true
+	m.Logger.Debug().
+		Str("authenticator", "basic").
+		Str("path", r.URL.Path).
+		Msg("successfully authenticated request")
+	return r.WithContext(oidc.NewContext(r.Context(), claims)), true
 }

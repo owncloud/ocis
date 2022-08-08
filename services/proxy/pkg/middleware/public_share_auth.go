@@ -13,6 +13,9 @@ const (
 	headerShareToken        = "public-token"
 	basicAuthPasswordPrefix = "password|"
 	authenticationType      = "publicshares"
+
+	_paramSignature  = "signature"
+	_paramExpiration = "expiration"
 )
 
 type PublicShareAuthenticator struct {
@@ -38,8 +41,8 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 	}
 
 	var sharePassword string
-	if signature := query.Get("signature"); signature != "" {
-		expiration := query.Get("expiration")
+	if signature := query.Get(_paramSignature); signature != "" {
+		expiration := query.Get(_paramExpiration)
 		if expiration == "" {
 			a.Logger.Warn().Str("signature", signature).Msg("cannot do signature auth without the expiration")
 			return nil, false
@@ -62,11 +65,20 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 	})
 
 	if err != nil {
-		a.Logger.Debug().Err(err).Str("public_share_token", shareToken).Msg("could not authenticate public share")
-		// try another middleware
+		a.Logger.Error().
+			Err(err).
+			Str("authenticator", "public_share").
+			Str("public_share_token", shareToken).
+			Str("path", r.URL.Path).
+			Msg("failed to authenticate request")
 		return nil, false
 	}
 
 	r.Header.Add(headerRevaAccessToken, authResp.Token)
+
+	a.Logger.Debug().
+		Str("authenticator", "public_share").
+		Str("path", r.URL.Path).
+		Msg("successfully authenticated request")
 	return r, false
 }
