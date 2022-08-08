@@ -64,7 +64,7 @@ require (
 	github.com/xhit/go-simple-mail/v2 v2.11.0
 	go-micro.dev/v4 v4.8.0
 	go.opencensus.io v0.23.0
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.33.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.34.0
 	go.opentelemetry.io/otel v1.9.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.9.0
 	go.opentelemetry.io/otel/sdk v1.9.0
