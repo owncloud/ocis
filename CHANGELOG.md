@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Improve error log for "could not get user by claim" error: [#4227](https://github.com/owncloud/ocis/pull/4227)
 * Enhancement - Allow providing list of services NOT to start: [#4254](https://github.com/owncloud/ocis/pull/4254)
 * Enhancement - Introduce insecure flag for smtp email notifications: [#4279](https://github.com/owncloud/ocis/pull/4279)
+* Enhancement - Fix behavior for foobar (in present tense): [#4346](https://github.com/owncloud/ocis/pull/4346)
 * Enhancement - Update reva to vx.x.x: [#4294](https://github.com/owncloud/ocis/pull/4294)
 * Enhancement - Update ownCloud Web to v5.7.0-rc.7: [#4314](https://github.com/owncloud/ocis/pull/4314)
 
@@ -98,6 +99,21 @@ The following sections list the changes for unreleased.
    skip certificate verification for smtp email servers.
 
    https://github.com/owncloud/ocis/pull/4279
+
+* Enhancement - Fix behavior for foobar (in present tense): [#4346](https://github.com/owncloud/ocis/pull/4346)
+
+   We've added the configuration option `PROXY_OIDC_REWRITE_WELLKNOWN` to rewrite the
+   `/.well-known/openid-configuration` endpoint. If active, it serves the
+   `/.well-known/openid-configuration` response of the original IDP configured in
+   `OCIS_OIDC_ISSUER` / `PROXY_OIDC_ISSUER`. This is needed so that the Desktop Client,
+   Android Client and iOS Client can discover the OIDC identity provider.
+
+   Previously this rewrite needed to be performed with an external proxy as NGINX or Traefik if an
+   external IDP was used.
+
+   https://github.com/owncloud/ocis/issues/2819
+   https://github.com/owncloud/ocis/issues/3280
+   https://github.com/owncloud/ocis/pull/4346
 
 * Enhancement - Update reva to vx.x.x: [#4294](https://github.com/owncloud/ocis/pull/4294)
 
