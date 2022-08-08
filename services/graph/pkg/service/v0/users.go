@@ -213,13 +213,13 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			d.Quota = quota
 			if slices.Contains(sel, "drive") || slices.Contains(exp, "drive") {
 				if *d.DriveType == "personal" {
-					drives = append(drives, *d)
+					user.Drive = d
 				}
 			} else {
 				drives = append(drives, *d)
+				user.Drives = drives
 			}
 		}
-		user.Drives = drives
 	}
 
 	render.Status(r, http.StatusOK)
