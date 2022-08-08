@@ -234,6 +234,14 @@ pass:[true]
 a| [subs=-attributes]
 If set to 'true', the JWKS refresh request will occur every time an unknown KEY ID (KID) is seen. Always set a 'refresh_limit' when enabling this.
 
+|`PROXY_OIDC_REWRITE_WELLKNOWN`
+a| [subs=-attributes]
++bool+
+a| [subs=-attributes]
+pass:[false]
+a| [subs=-attributes]
+Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider.
+
 |`OCIS_JWT_SECRET` +
 `PROXY_JWT_SECRET`
 a| [subs=-attributes]

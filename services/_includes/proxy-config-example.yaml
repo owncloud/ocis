@@ -95,6 +95,7 @@ oidc:
     refresh_timeout: 10
     refresh_limit: 60
     refresh_unknown_kid: true
+  rewrite_well_known: false
 token_manager:
   jwt_secret: ""
 policy_selector:
