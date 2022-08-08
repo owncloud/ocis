@@ -5,14 +5,10 @@ import (
 	"crypto/tls"
 	"fmt"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"google.golang.org/grpc/metadata"
 	"io"
 	"net/http"
 )
@@ -24,53 +20,39 @@ type cs3 struct {
 	secret   string
 }
 
-func newCS3Retriever(client gateway.GatewayAPIClient, logger log.Logger, secret string, insecure bool) cs3 {
+func newCS3Retriever(client gateway.GatewayAPIClient, logger log.Logger, insecure bool) cs3 {
 	return cs3{
 		client:   client,
 		insecure: insecure,
-		secret:   secret,
 		logger:   logger,
 	}
 }
 
 // Retrieve downloads the file from a cs3 service
 // The caller MUST make sure to close the returned ReadCloser
-func (s cs3) Retrieve(ctx context.Context, ref *provider.Reference, owner *user.User) (io.ReadCloser, error) {
-	authRes, err := s.client.Authenticate(
-		ctxpkg.ContextSetUser(ctx, owner),
-		&gateway.AuthenticateRequest{
-			Type:         "machine",
-			ClientId:     "userid:" + owner.GetId().GetOpaqueId(),
-			ClientSecret: s.secret,
-		},
-	)
-	if err == nil && authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		err = errtypes.NewErrtypeFromStatus(authRes.Status)
-	}
-	if err != nil {
-		s.logger.Error().Err(err).Interface("owner", owner).Interface("authRes", authRes).Msg("error using machine auth")
-		return nil, err
+func (s cs3) Retrieve(ctx context.Context, rid *provider.ResourceId) (io.ReadCloser, error) {
+	at, ok := contextGet(ctx, revactx.TokenHeader)
+	if !ok {
+		return nil, fmt.Errorf("context without %s", revactx.TokenHeader)
 	}
 
-	ctx = metadata.AppendToOutgoingContext(ctx, ctxpkg.TokenHeader, authRes.Token)
-	res, err := s.client.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: ref})
+	res, err := s.client.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: &provider.Reference{ResourceId: rid, Path: "."}})
 	if err != nil {
 		return nil, err
 	}
-
 	if res.Status.Code != rpc.Code_CODE_OK {
 		return nil, fmt.Errorf("could not load resoure: %s", res.Status.Message)
 	}
 
-	var ep, tk string
+	var ep, tt string
 	for _, p := range res.Protocols {
 		if p.Protocol == "spaces" {
-			ep, tk = p.DownloadEndpoint, p.Token
+			ep, tt = p.DownloadEndpoint, p.Token
 			break
 		}
 	}
-	if (ep == "" || tk == "") && len(res.Protocols) > 0 {
-		ep, tk = res.Protocols[0].DownloadEndpoint, res.Protocols[0].Token
+	if (ep == "" || tt == "") && len(res.Protocols) > 0 {
+		ep, tt = res.Protocols[0].DownloadEndpoint, res.Protocols[0].Token
 	}
 
 	req, err := http.NewRequest("GET", ep, nil)
@@ -78,8 +60,8 @@ func (s cs3) Retrieve(ctx context.Context, ref *provider.Reference, owner *user.
 		return nil, err
 	}
 
-	req.Header.Set(revactx.TokenHeader, authRes.Token)
-	req.Header.Set("X-Reva-Transfer", tk)
+	req.Header.Set(revactx.TokenHeader, at)
+	req.Header.Set("X-Reva-Transfer", tt)
 
 	client := http.Client{
 		Transport: &http.Transport{
@@ -93,7 +75,7 @@ func (s cs3) Retrieve(ctx context.Context, ref *provider.Reference, owner *user.
 	}
 
 	if cres.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("could not get the resource \"%s\". Request returned with statuscode %d ", ref.Path, cres.StatusCode)
+		return nil, fmt.Errorf("could not download resource. Request returned with statuscode %d ", cres.StatusCode)
 	}
 
 	return cres.Body, nil

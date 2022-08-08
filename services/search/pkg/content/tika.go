@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/bbalet/stopwords"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/google/go-tika/tika"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -39,19 +38,22 @@ func NewTikaExtractor(gw gateway.GatewayAPIClient, logger log.Logger, cfg *confi
 
 	return &Tika{
 		Basic:     basic,
-		Retriever: newCS3Retriever(gw, logger, cfg.MachineAuthAPIKey, cfg.Extractor.CS3AllowInsecure),
+		Retriever: newCS3Retriever(gw, logger, cfg.Extractor.CS3AllowInsecure),
 		tika:      tika.NewClient(nil, cfg.Extractor.Tika.TikaURL),
 	}, nil
 }
 
 // Extract loads a resource from its underlying storage, passes it to tika and processes the result into a Document.
-func (t Tika) Extract(ctx context.Context, ref *provider.Reference, ri *provider.ResourceInfo) (Document, error) {
-	doc, err := t.Basic.Extract(ctx, ref, ri)
+func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document, error) {
+	doc, err := t.Basic.Extract(ctx, ri)
 	if err != nil {
 		return doc, err
 	}
+	if ri.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
+		return doc, nil
+	}
 
-	data, err := t.Retrieve(ctx, ref, &user.User{Id: ri.Owner})
+	data, err := t.Retrieve(ctx, ri.Id)
 	if err != nil {
 		return doc, err
 	}
@@ -61,6 +63,8 @@ func (t Tika) Extract(ctx context.Context, ref *provider.Reference, ri *provider
 	if _, err := io.Copy(io.MultiWriter(&d1, &d2), data); err != nil {
 		return doc, err
 	}
+
+	fmt.Println(d1.String())
 
 	lang, err := t.tika.Language(ctx, bytes.NewReader(d1.Bytes()))
 	if err != nil {

@@ -36,6 +36,8 @@ type Config struct {
 
 	Context context.Context `yaml:"-"`
 	Status  Status          `yaml:"-"`
+
+	Events Events `yaml:"events"`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;OCDAV_TRACING_ENABLED" desc:"Activates tracing."`
@@ -87,4 +89,10 @@ type Status struct {
 	ProductName    string
 	ProductVersion string
 	Edition        string
+}
+
+// Events combines the configuration options for the event bus.
+type Events struct {
+	Endpoint string `yaml:"endpoint" env:"OCDAV_EVENTS_ENDPOINT" desc:"Endpoint of the event system."`
+	Cluster  string `yaml:"cluster" env:"OCDAV_EVENTS_CLUSTER" desc:"Cluster ID of the event system."`
 }

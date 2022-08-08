@@ -213,7 +213,7 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 			ResourceId: &rootId,
 		}
 
-		doc, err := p.extractor.Extract(ctx, ref, info)
+		doc, err := p.extractor.Extract(ctx, info)
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error extracting content")
 		}

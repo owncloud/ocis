@@ -289,9 +289,5 @@ var _ = Describe("Bleve", func() {
 				})
 			})
 		})
-
-		Context("query", func() {
-
-		})
 	})
 })

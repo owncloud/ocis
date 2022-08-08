@@ -6,6 +6,7 @@ import (
 	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchSearvice "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
+	"reflect"
 	"regexp"
 )
 
@@ -46,12 +47,34 @@ func escapeQuery(s string) string {
 }
 
 func getValue[T any](m map[string]interface{}, key string) (out T) {
-	val, ok := m[key]
+	keyValue, ok := m[key]
 	if !ok {
 		return
 	}
 
-	out, _ = val.(T)
+	rk := reflect.TypeOf(out).Kind()
 
+	if rk == reflect.Slice {
+		values, ok := keyValue.([]interface{})
+		if !ok {
+			return
+		}
+
+		slice := reflect.MakeSlice(reflect.TypeOf(out), 0, len(values))
+		sliceOf := slice.Type().Elem()
+
+		for _, val := range values {
+			if reflect.TypeOf(val) != sliceOf {
+				continue
+			}
+
+			slice = reflect.Append(slice, reflect.ValueOf(val))
+		}
+
+		out, _ = slice.Interface().(T)
+		return
+	}
+
+	out, _ = keyValue.(T)
 	return
 }

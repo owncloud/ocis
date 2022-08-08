@@ -21,7 +21,6 @@ var _ = Describe("Tika", func() {
 	Describe("extract", func() {
 		var (
 			body     string
-			title    string
 			language string
 			version  string
 			srv      *httptest.Server
@@ -30,7 +29,6 @@ var _ = Describe("Tika", func() {
 
 		BeforeEach(func() {
 			body = ""
-			title = ""
 			language = ""
 			version = ""
 			srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -41,7 +39,7 @@ var _ = Describe("Tika", func() {
 				case "/language/stream":
 					out = language
 				case "/rmeta/text":
-					out = fmt.Sprintf(`[{"X-TIKA:content":"%s"},{"title":"%s"}]`, body, title)
+					out = fmt.Sprintf(`[{"X-TIKA:content":"%s"}]`, body)
 				}
 
 				_, _ = w.Write([]byte(out))
@@ -65,21 +63,29 @@ var _ = Describe("Tika", func() {
 			srv.Close()
 		})
 
-		It("basic operations", func() {
-			body = "any body"
-			title = "any title"
-
-			doc, err := tika.Extract(context.TODO(), &provider.Reference{}, &provider.ResourceInfo{})
+		It("skips non file resources", func() {
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{})
 			Expect(err).ToNot(HaveOccurred())
-			Expect(doc.Title).To(Equal(title))
+			Expect(doc.Content).To(Equal(""))
+		})
+
+		It("adds content", func() {
+			body = "any body"
+
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+			})
+			Expect(err).ToNot(HaveOccurred())
 			Expect(doc.Content).To(Equal(body))
 		})
 
-		It("remove stop words", func() {
+		It("removes stop words", func() {
 			body = "body to test stop words!!! I, you, he, she, it, we, you, they, stay"
 			language = "en"
 
-			doc, err := tika.Extract(context.TODO(), &provider.Reference{}, &provider.ResourceInfo{})
+			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
+				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+			})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(doc.Content).To(Equal("body test stop words i stay"))
 		})
