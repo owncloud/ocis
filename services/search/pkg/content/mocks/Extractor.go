@@ -17,20 +17,20 @@ type Extractor struct {
 	mock.Mock
 }
 
-// Extract provides a mock function with given fields: ctx, ref, ri
-func (_m *Extractor) Extract(ctx context.Context, ref *providerv1beta1.Reference, ri *providerv1beta1.ResourceInfo) (content.Document, error) {
-	ret := _m.Called(ctx, ref, ri)
+// Extract provides a mock function with given fields: ctx, ri
+func (_m *Extractor) Extract(ctx context.Context, ri *providerv1beta1.ResourceInfo) (content.Document, error) {
+	ret := _m.Called(ctx, ri)
 
 	var r0 content.Document
-	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.Reference, *providerv1beta1.ResourceInfo) content.Document); ok {
-		r0 = rf(ctx, ref, ri)
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.ResourceInfo) content.Document); ok {
+		r0 = rf(ctx, ri)
 	} else {
 		r0 = ret.Get(0).(content.Document)
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.Reference, *providerv1beta1.ResourceInfo) error); ok {
-		r1 = rf(ctx, ref, ri)
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.ResourceInfo) error); ok {
+		r1 = rf(ctx, ri)
 	} else {
 		r1 = ret.Error(1)
 	}

@@ -10,7 +10,7 @@ import (
 //go:generate mockery --name=Extractor
 // Extractor is responsible to extract content and meta information from documents.
 type Extractor interface {
-	Extract(ctx context.Context, ref *provider.Reference, ri *provider.ResourceInfo) (Document, error)
+	Extract(ctx context.Context, ri *provider.ResourceInfo) (Document, error)
 }
 
 func getFirstValue(m map[string][]string, key string) (string, error) {

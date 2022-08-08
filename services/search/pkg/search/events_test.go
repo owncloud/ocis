@@ -66,15 +66,19 @@ var _ = Describe("Events", func() {
 			Token:  "authtoken",
 		}, nil)
 		gw.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
-			Status: status.NewOK(context.Background()),
+			Status: status.NewOK(ctx),
 			Info:   ri,
+		}, nil)
+		gw.On("GetPath", mock.Anything, mock.Anything).Return(&provider.GetPathResponse{
+			Status: status.NewOK(ctx),
+			Path:   "",
 		}, nil)
 		engine.On("DocCount").Return(uint64(1), nil)
 	})
 	Describe("events", func() {
 		It("triggers an index update when a file has been uploaded", func() {
 			called := false
-			extractor.Mock.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
+			extractor.Mock.On("Extract", mock.Anything, mock.Anything).Return(content.Document{}, nil)
 			engine.On("Upsert", mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 				called = true
 			})
@@ -160,10 +164,6 @@ var _ = Describe("Events", func() {
 
 		It("indexes items when they are being moved", func() {
 			called := false
-			gw.On("GetPath", mock.Anything, mock.Anything).Return(&provider.GetPathResponse{
-				Status: status.NewOK(ctx),
-				Path:   "",
-			}, nil)
 			engine.On("Move", mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 				called = true
 			})

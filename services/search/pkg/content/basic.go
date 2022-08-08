@@ -4,6 +4,7 @@ import (
 	"context"
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"strings"
 	"time"
 )
 
@@ -18,11 +19,21 @@ func NewBasicExtractor(logger log.Logger) (*Basic, error) {
 }
 
 // Extract literally just rearranges the inputs and processes them into a Document.
-func (b Basic) Extract(ctx context.Context, ref *storageProvider.Reference, ri *storageProvider.ResourceInfo) (Document, error) {
+func (b Basic) Extract(ctx context.Context, ri *storageProvider.ResourceInfo) (Document, error) {
 	doc := Document{
 		Name:     ri.Path,
 		Size:     ri.Size,
 		MimeType: ri.MimeType,
+	}
+
+	if ri.ArbitraryMetadata != nil && ri.ArbitraryMetadata.Metadata != nil {
+		if tags, ok := ri.ArbitraryMetadata.Metadata["tags"]; ok {
+			doc.Tags = strings.FieldsFunc(tags, func(r rune) bool { return r == ',' })
+
+			for i, t := range doc.Tags {
+				doc.Tags[i] = strings.TrimSpace(t)
+			}
+		}
 	}
 
 	if ri.Mtime != nil {

@@ -54,20 +54,31 @@ func getAuthContext(owner *user.User, gw gateway.GatewayAPIClient, secret string
 	return metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token), nil
 }
 
-func statResource(ref *provider.Reference, owner *user.User, gw gateway.GatewayAPIClient, secret string, logger log.Logger) (*provider.StatResponse, error) {
-	ownerCtx, err := getAuthContext(owner, gw, secret, logger)
+func statResource(ctx context.Context, ref *provider.Reference, gw gateway.GatewayAPIClient, logger log.Logger) (*provider.StatResponse, error) {
+	res, err := gw.Stat(ctx, &provider.StatRequest{Ref: ref})
 	if err != nil {
+		logger.Error().Err(err).Msg("failed to stat the moved resource")
+		return nil, err
+	}
+	if res.Status.Code != rpc.Code_CODE_OK {
+		logger.Error().Interface("res", res).Msg("failed to stat the moved resource")
 		return nil, err
 	}
 
-	return gw.Stat(ownerCtx, &provider.StatRequest{Ref: ref})
+	return res, nil
 }
 
-func getPath(id *provider.ResourceId, owner *user.User, gw gateway.GatewayAPIClient, secret string, logger log.Logger) (*provider.GetPathResponse, error) {
-	ownerCtx, err := getAuthContext(owner, gw, secret, logger)
+func getPath(ctx context.Context, id *provider.ResourceId, gw gateway.GatewayAPIClient, logger log.Logger) (*provider.GetPathResponse, error) {
+	res, err := gw.GetPath(ctx, &provider.GetPathRequest{ResourceId: id})
+
 	if err != nil {
+		logger.Error().Err(err).Interface("id", id).Msg("failed to get path for moved resource")
+		return nil, err
+	}
+	if res.Status.Code != rpc.Code_CODE_OK {
+		logger.Error().Interface("status", res.Status).Interface("id", id).Msg("failed to get path for moved resource")
 		return nil, err
 	}
 
-	return gw.GetPath(ownerCtx, &provider.GetPathRequest{ResourceId: id})
+	return res, nil
 }

@@ -52,6 +52,10 @@ func DefaultConfig() *config.Config {
 			ProductName:    "Infinite Scale",
 			Edition:        "Community",
 		},
+		Events: config.Events{
+			Endpoint: "127.0.0.1:9233",
+			Cluster:  "ocis-cluster",
+		},
 	}
 }
 

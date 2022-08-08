@@ -3,12 +3,14 @@ package engine
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/custom"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/keyword"
 	"github.com/blevesearch/bleve/v2/analysis/token/lowercase"
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/single"
 	"github.com/blevesearch/bleve/v2/mapping"
+	"github.com/blevesearch/bleve/v2/search/query"
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
@@ -31,7 +33,7 @@ type Bleve struct {
 // NewBleveIndex returns a new bleve index
 // given path must exist.
 func NewBleveIndex(root string) (bleve.Index, error) {
-	destination := filepath.Join(root, "index.bleve")
+	destination := filepath.Join(root, "bleve")
 	index, err := bleve.Open(destination)
 	if err != nil {
 		m, err := BuildBleveMapping()
@@ -56,11 +58,13 @@ func NewBleveEngine(index bleve.Index) *Bleve {
 
 // BuildBleveMapping builds a bleve index mapping which can be used for indexing
 func BuildBleveMapping() (mapping.IndexMapping, error) {
-	nameMapping := bleve.NewTextFieldMapping()
-	nameMapping.Analyzer = "lowercaseKeyword"
+	lowercaseMapping := bleve.NewTextFieldMapping()
+	lowercaseMapping.Analyzer = "lowercaseKeyword"
 
 	docMapping := bleve.NewDocumentMapping()
-	docMapping.AddFieldMappingsAt("Name", nameMapping)
+	docMapping.AddFieldMappingsAt("Name", lowercaseMapping)
+	docMapping.AddFieldMappingsAt("Tags", lowercaseMapping)
+	docMapping.AddFieldMappingsAt("Content", lowercaseMapping)
 
 	indexMapping := bleve.NewIndexMapping()
 	indexMapping.DefaultAnalyzer = keyword.Name
@@ -83,21 +87,34 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 // Search executes a search request operation within the index.
 // Returns a SearchIndexResponse object or an error.
 func (b *Bleve) Search(ctx context.Context, sir *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error) {
-	deletedQuery := bleve.NewBoolFieldQuery(false)
-	deletedQuery.SetField("Deleted")
-	query := bleve.NewConjunctionQuery(
-		bleve.NewQueryStringQuery(b.buildQuery(sir.Query)),
-		deletedQuery, // Skip documents that have been marked as deleted
-		bleve.NewQueryStringQuery("RootID:"+storagespace.FormatResourceID(
-			storageProvider.ResourceId{
-				StorageId: sir.Ref.GetResourceId().GetStorageId(),
-				SpaceId:   sir.Ref.GetResourceId().GetSpaceId(),
-				OpaqueId:  sir.Ref.GetResourceId().GetOpaqueId(),
-			})), // Limit search to the space
-		bleve.NewQueryStringQuery("Path:"+escapeQuery(utils.MakeRelativePath(path.Join(sir.Ref.Path, "/"))+"*")), // Limit search to this directory in the space
+	q := bleve.NewConjunctionQuery(
+		&query.QueryStringQuery{
+			Query: b.buildQuery(sir.Query),
+		},
+		// Skip documents that have been marked as deleted
+		&query.BoolFieldQuery{
+			Bool:     false,
+			FieldVal: "Deleted",
+		},
+		&query.QueryStringQuery{
+			Query: fmt.Sprintf(
+				"RootID:%s",
+				storagespace.FormatResourceID(
+					storageProvider.ResourceId{
+						StorageId: sir.Ref.GetResourceId().GetStorageId(),
+						SpaceId:   sir.Ref.GetResourceId().GetSpaceId(),
+						OpaqueId:  sir.Ref.GetResourceId().GetOpaqueId(),
+					},
+				),
+			),
+		},
+		// Limit search to this directory in the space
+		&query.QueryStringQuery{
+			Query: fmt.Sprintf("Path:%s*", escapeQuery(utils.MakeRelativePath(path.Join(sir.Ref.Path, "/")))),
+		},
 	)
 
-	bleveReq := bleve.NewSearchRequest(query)
+	bleveReq := bleve.NewSearchRequest(q)
 	bleveReq.Size = 200
 	if sir.PageSize > 0 {
 		bleveReq.Size = int(sir.PageSize)
@@ -172,11 +189,11 @@ func (b *Bleve) Move(id string, target string) error {
 	}
 
 	if r.Type == uint64(storageProvider.ResourceType_RESOURCE_TYPE_CONTAINER) {
-		query := bleve.NewConjunctionQuery(
+		q := bleve.NewConjunctionQuery(
 			bleve.NewQueryStringQuery("RootID:"+r.RootID),
 			bleve.NewQueryStringQuery("Path:"+escapeQuery(oldName+"/*")),
 		)
-		bleveReq := bleve.NewSearchRequest(query)
+		bleveReq := bleve.NewSearchRequest(q)
 		bleveReq.Size = math.MaxInt
 		bleveReq.Fields = []string{"*"}
 		res, err := b.index.Search(bleveReq)
@@ -245,6 +262,7 @@ func (b *Bleve) getResource(id string) (*Resource, error) {
 			Size:     uint64(getValue[float64](fields, "Size")),
 			Mtime:    getValue[string](fields, "Mtime"),
 			MimeType: getValue[string](fields, "MimeType"),
+			Tags:     getValue[[]string](fields, "Tags"),
 		},
 	}, nil
 }
@@ -269,11 +287,11 @@ func (b *Bleve) setDeleted(id string, deleted bool) error {
 	}
 
 	if it.Type == uint64(storageProvider.ResourceType_RESOURCE_TYPE_CONTAINER) {
-		query := bleve.NewConjunctionQuery(
+		q := bleve.NewConjunctionQuery(
 			bleve.NewQueryStringQuery("RootID:"+it.RootID),
 			bleve.NewQueryStringQuery("Path:"+escapeQuery(it.Path+"/*")),
 		)
-		bleveReq := bleve.NewSearchRequest(query)
+		bleveReq := bleve.NewSearchRequest(q)
 		bleveReq.Size = math.MaxInt
 		bleveReq.Fields = []string{"*"}
 		res, err := b.index.Search(bleveReq)
@@ -294,17 +312,16 @@ func (b *Bleve) setDeleted(id string, deleted bool) error {
 	return nil
 }
 
-func (b Bleve) buildQuery(q string) string {
-	query := q
-	fields := []string{"RootID", "Path", "ID", "Name", "Size", "Mtime", "MimeType", "Type", "Content", "Title"}
+func (b *Bleve) buildQuery(qs string) string {
+	fields := []string{"RootID", "Path", "ID", "Name", "Size", "Mtime", "MimeType", "Type", "Content", "Title", "Tags"}
 	for _, field := range fields {
-		query = strings.ReplaceAll(query, strings.ToLower(field)+":", field+":")
+		qs = strings.ReplaceAll(qs, strings.ToLower(field)+":", field+":")
 	}
 
-	if strings.Contains(query, ":") {
-		return query // Sophisticated field based search
+	if strings.Contains(qs, ":") {
+		return qs // Sophisticated field based search
 	}
 
 	// this is a basic filename search
-	return "Name:*" + strings.ReplaceAll(strings.ToLower(query), " ", `\ `) + "*"
+	return "Name:*" + strings.ReplaceAll(strings.ToLower(qs), " ", `\ `) + "*"
 }

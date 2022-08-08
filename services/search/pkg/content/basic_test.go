@@ -14,13 +14,11 @@ var _ = Describe("Basic", func() {
 	var (
 		basic  content.Extractor
 		logger = log.NewLogger()
-		ref    = &storageProvider.Reference{}
 		ctx    = context.TODO()
 	)
 
 	BeforeEach(func() {
 		basic, _ = content.NewBasicExtractor(logger)
-		ref = &storageProvider.Reference{}
 	})
 
 	Describe("extract", func() {
@@ -31,13 +29,38 @@ var _ = Describe("Basic", func() {
 				MimeType: "application/pdf",
 			}
 
-			doc, err := basic.Extract(ctx, ref, ri)
+			doc, err := basic.Extract(ctx, ri)
 
 			Expect(err).To(BeNil())
 			Expect(doc).ToNot(BeNil())
 			Expect(doc.Name).To(Equal(ri.Path))
 			Expect(doc.Size).To(Equal(ri.Size))
 			Expect(doc.MimeType).To(Equal(ri.MimeType))
+		})
+
+		It("adds tags", func() {
+			for _, data := range []struct {
+				tags   string
+				expect []string
+			}{
+				{tags: "", expect: []string{}},
+				{tags: ",,,", expect: []string{}},
+				{tags: ",foo,,", expect: []string{"foo"}},
+				{tags: ",foo,,bar, baz, a,,b,,       start and end         space  ,,", expect: []string{"foo", "bar", "baz", "a", "b", "start and end         space"}},
+			} {
+				ri := &storageProvider.ResourceInfo{
+					ArbitraryMetadata: &storageProvider.ArbitraryMetadata{
+						Metadata: map[string]string{
+							"tags": data.tags,
+						},
+					},
+				}
+
+				doc, err := basic.Extract(ctx, ri)
+				Expect(err).To(BeNil())
+				Expect(doc).ToNot(BeNil())
+				Expect(doc.Tags).To(Equal(data.expect))
+			}
 		})
 
 		It("RFC3339 mtime", func() {
@@ -55,7 +78,7 @@ var _ = Describe("Basic", func() {
 					ri.Mtime = &cs3Types.Timestamp{Seconds: data.second}
 				}
 
-				doc, err := basic.Extract(ctx, ref, ri)
+				doc, err := basic.Extract(ctx, ri)
 				Expect(err).To(BeNil())
 				Expect(doc).ToNot(BeNil())
 				Expect(doc.Mtime).To(Equal(data.expect))
