@@ -10,8 +10,8 @@ require (
 	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.3
 	github.com/coreos/go-oidc/v3 v3.2.0
-	github.com/cs3org/go-cs3apis v0.0.0-20220711084433-8f71d4e812a3
-	github.com/cs3org/reva/v2 v2.7.3-0.20220802154801-7dd63f110056
+	github.com/cs3org/go-cs3apis v0.0.0-20220719130120-361e9f987d64
+	github.com/cs3org/reva/v2 v2.7.3-0.20220808090146-264a9a8caa99
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
