@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/golang/protobuf/jsonpb"
+	merrors "go-micro.dev/v4/errors"
 
 	ptypesempty "github.com/golang/protobuf/ptypes/empty"
 )
@@ -38,7 +39,11 @@ func (h *webBundleServiceHandler) SaveBundle(w http.ResponseWriter, r *http.Requ
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -60,7 +65,11 @@ func (h *webBundleServiceHandler) GetBundle(w http.ResponseWriter, r *http.Reque
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -82,7 +91,11 @@ func (h *webBundleServiceHandler) ListBundles(w http.ResponseWriter, r *http.Req
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -104,7 +117,11 @@ func (h *webBundleServiceHandler) AddSettingToBundle(w http.ResponseWriter, r *h
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -126,7 +143,11 @@ func (h *webBundleServiceHandler) RemoveSettingFromBundle(w http.ResponseWriter,
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -170,7 +191,11 @@ func (h *webValueServiceHandler) SaveValue(w http.ResponseWriter, r *http.Reques
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -192,7 +217,11 @@ func (h *webValueServiceHandler) GetValue(w http.ResponseWriter, r *http.Request
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -214,7 +243,11 @@ func (h *webValueServiceHandler) ListValues(w http.ResponseWriter, r *http.Reque
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -236,7 +269,11 @@ func (h *webValueServiceHandler) GetValueByUniqueIdentifiers(w http.ResponseWrit
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -279,7 +316,11 @@ func (h *webRoleServiceHandler) ListRoles(w http.ResponseWriter, r *http.Request
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -301,7 +342,11 @@ func (h *webRoleServiceHandler) ListRoleAssignments(w http.ResponseWriter, r *ht
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -323,7 +368,11 @@ func (h *webRoleServiceHandler) AssignRoleToUser(w http.ResponseWriter, r *http.
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -345,7 +394,11 @@ func (h *webRoleServiceHandler) RemoveRoleFromUser(w http.ResponseWriter, r *htt
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -388,7 +441,11 @@ func (h *webPermissionServiceHandler) ListPermissionsByResource(w http.ResponseW
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -410,7 +467,11 @@ func (h *webPermissionServiceHandler) GetPermissionByID(w http.ResponseWriter, r
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 

@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/golang/protobuf/jsonpb"
+	merrors "go-micro.dev/v4/errors"
 )
 
 type webSearchProviderHandler struct {
@@ -36,7 +37,11 @@ func (h *webSearchProviderHandler) Search(w http.ResponseWriter, r *http.Request
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -58,7 +63,11 @@ func (h *webSearchProviderHandler) IndexSpace(w http.ResponseWriter, r *http.Req
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
@@ -99,7 +108,11 @@ func (h *webIndexProviderHandler) Search(w http.ResponseWriter, r *http.Request)
 		req,
 		resp,
 	); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
 		return
 	}
 
