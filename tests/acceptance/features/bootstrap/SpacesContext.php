@@ -381,8 +381,7 @@ class SpacesContext implements Context {
 	 * 
 	 * @return void
 	 */
-	public function setLastShareData(): void
-	{
+	public function setLastShareData(): void {
 		// set last response as PublicShareData
 		$this->featureContext->setLastPublicShareData($this->featureContext->getResponseXml(null, __METHOD__));
 		// set last shareId if ShareData exists
@@ -2078,7 +2077,7 @@ class SpacesContext implements Context {
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
-	 * @param TableNode|null $table
+	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -2086,7 +2085,7 @@ class SpacesContext implements Context {
 	public function createPublicLinkToEntityInsideOfSpaceRequest(
 		string $user,
 		string $spaceName,
-		?TableNode $table
+		TableNode $table
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$rows = $table->getRowsHash();
@@ -2122,19 +2121,19 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" has created a public link share inside of space "([^"]*)" with settings:$/
+	 * @Given /^user "([^"]*)" has created a public link share inside of space "([^"]*)" with settings:$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
-	 * @param TableNode|null $table
+	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userHAsCreatedPublicLinkToEntityInsideOfSpaceRequest(
+	public function userHasCreatedPublicLinkToEntityInsideOfSpaceRequest(
 		string $user,
 		string $spaceName,
-		?TableNode $table
+		TableNode $table
 	): void {
 		$this->createPublicLinkToEntityInsideOfSpaceRequest($user, $spaceName, $table);
 
