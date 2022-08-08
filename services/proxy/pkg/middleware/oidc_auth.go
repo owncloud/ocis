@@ -2,14 +2,21 @@ package middleware
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
+	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
+	"github.com/MicahParks/keyfunc"
 	gOidc "github.com/coreos/go-oidc/v3/oidc"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
-	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
+	osync "github.com/owncloud/ocis/v2/ocis-pkg/sync"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"golang.org/x/oauth2"
 )
 
@@ -21,15 +28,19 @@ type OIDCProvider interface {
 // OIDCAuth provides a middleware to check access secured by a static token.
 func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
-	tokenCache := sync.NewCache(options.UserinfoCacheSize)
+	tokenCache := osync.NewCache(options.UserinfoCacheSize)
 
 	h := oidcAuth{
-		logger:        options.Logger,
-		providerFunc:  options.OIDCProviderFunc,
-		httpClient:    options.HTTPClient,
-		oidcIss:       options.OIDCIss,
-		tokenCache:    &tokenCache,
-		tokenCacheTTL: options.UserinfoCacheTTL,
+		logger:                  options.Logger,
+		providerFunc:            options.OIDCProviderFunc,
+		httpClient:              options.HTTPClient,
+		oidcIss:                 options.OIDCIss,
+		tokenCache:              &tokenCache,
+		tokenCacheTTL:           options.UserinfoCacheTTL,
+		accessTokenVerifyMethod: options.AccessTokenVerifyMethod,
+		jwksOptions:             options.JWKS,
+		jwksLock:                &sync.Mutex{},
+		providerLock:            &sync.Mutex{},
 	}
 
 	return func(next http.Handler) http.Handler {
@@ -43,6 +54,12 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 			}
 
 			if h.getProvider() == nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			// Force init of jwks keyfunc if needed (contacts the .well-known and jwks endpoints on first call)
+			if h.accessTokenVerifyMethod == config.AccessTokenVerificationJWT && h.getKeyfunc() == nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
@@ -62,19 +79,30 @@ func OIDCAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
 }
 
 type oidcAuth struct {
-	logger        log.Logger
-	provider      OIDCProvider
-	providerFunc  func() (OIDCProvider, error)
-	httpClient    *http.Client
-	oidcIss       string
-	tokenCache    *sync.Cache
-	tokenCacheTTL time.Duration
+	logger                  log.Logger
+	provider                OIDCProvider
+	providerLock            *sync.Mutex
+	jwksOptions             config.JWKS
+	jwks                    *keyfunc.JWKS
+	jwksLock                *sync.Mutex
+	providerFunc            func() (OIDCProvider, error)
+	httpClient              *http.Client
+	oidcIss                 string
+	tokenCache              *osync.Cache
+	tokenCacheTTL           time.Duration
+	accessTokenVerifyMethod string
 }
 
 func (m oidcAuth) getClaims(token string, req *http.Request) (claims map[string]interface{}, status int) {
 	hit := m.tokenCache.Load(token)
 	if hit == nil {
-		// TODO cache userinfo for access token if we can determine the expiry (which works in case it is a jwt based access token)
+		aClaims, err := m.verifyAccessToken(token)
+		if err != nil {
+			m.logger.Error().Err(err).Msg("Failed to verify access token")
+			status = http.StatusUnauthorized
+			return
+		}
+
 		oauth2Token := &oauth2.Token{
 			AccessToken: token,
 		}
@@ -95,7 +123,7 @@ func (m oidcAuth) getClaims(token string, req *http.Request) (claims map[string]
 			return
 		}
 
-		expiration := m.extractExpiration(token)
+		expiration := m.extractExpiration(aClaims)
 		m.tokenCache.Store(token, claims, expiration)
 
 		m.logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Time("expiration", expiration.UTC()).Msg("unmarshalled and cached userinfo")
@@ -111,20 +139,53 @@ func (m oidcAuth) getClaims(token string, req *http.Request) (claims map[string]
 	return
 }
 
-// extractExpiration currently just returns a hardcoded default for now. It was
-// supposed to parse and extract the expiration time from the provided
-// access_token.
-// As the access_token is defined as an opaque string. Validating and parsing it
-// can be tricky:
-// 1. Try to treat it as a JWT:
-//    - Verifying the validity of the token requires downloading the propoer public
-//      key from the IDP (uri in "jwks_uri" in ".well-known/openid-configuration"
-// 2. Verify and extract it via the introspection endpoint of the IDP (RFC7662) for
-//    IDPs that provide that feature
-// 3. Other IDP implementation specific methods.
-// 4. Fallback to default value
-func (m oidcAuth) extractExpiration(token string) time.Time {
+func (m oidcAuth) verifyAccessToken(token string) (jwt.RegisteredClaims, error) {
+	switch m.accessTokenVerifyMethod {
+	case config.AccessTokenVerificationJWT:
+		return m.verifyAccessTokenJWT(token)
+	case config.AccessTokenVerificationNone:
+		m.logger.Debug().Msg("Access Token verification disabled")
+		return jwt.RegisteredClaims{}, nil
+	default:
+		m.logger.Error().Str("access_token_verify_method", m.accessTokenVerifyMethod).Msg("Unknown Access Token verification setting")
+		return jwt.RegisteredClaims{}, errors.New("Unknown Access Token Verification method")
+	}
+}
+
+// verifyAccessTokenJWT tries to parse and verify the access token as a JWT.
+func (m oidcAuth) verifyAccessTokenJWT(token string) (jwt.RegisteredClaims, error) {
+	var claims jwt.RegisteredClaims
+	jwks := m.getKeyfunc()
+	if jwks == nil {
+		return claims, errors.New("Error initializing jwks keyfunc")
+	}
+
+	_, err := jwt.ParseWithClaims(token, &claims, jwks.Keyfunc)
+	m.logger.Debug().Interface("access token", &claims).Msg("parsed access token")
+	if err != nil {
+		m.logger.Info().Err(err).Msg("Failed to parse/verify the access token.")
+		return claims, err
+	}
+
+	if !claims.VerifyIssuer(m.oidcIss, true) {
+		vErr := jwt.ValidationError{}
+		vErr.Inner = jwt.ErrTokenInvalidIssuer
+		vErr.Errors |= jwt.ValidationErrorIssuer
+		return claims, vErr
+	}
+
+	return claims, nil
+}
+
+// extractExpiration tries to extract the expriration time from the access token
+// If the access token does not have an exp claim it will fallback to the configured
+// default expiration
+func (m oidcAuth) extractExpiration(aClaims jwt.RegisteredClaims) time.Time {
 	defaultExpiration := time.Now().Add(m.tokenCacheTTL)
+	if aClaims.ExpiresAt != nil {
+		m.logger.Debug().Str("exp", aClaims.ExpiresAt.String()).Msg("Expiration Time from access_token")
+		return aClaims.ExpiresAt.Time
+	}
 	return defaultExpiration
 }
 
@@ -146,7 +207,64 @@ func (m oidcAuth) shouldServe(req *http.Request) bool {
 	return strings.HasPrefix(header, "Bearer ")
 }
 
+type jwksJSON struct {
+	JWKSURL string `json:"jwks_uri"`
+}
+
+func (m *oidcAuth) getKeyfunc() *keyfunc.JWKS {
+	m.jwksLock.Lock()
+	defer m.jwksLock.Unlock()
+	if m.jwks == nil {
+		wellKnown := strings.TrimSuffix(m.oidcIss, "/") + "/.well-known/openid-configuration"
+
+		resp, err := m.httpClient.Get(wellKnown)
+		if err != nil {
+			m.logger.Error().Err(err).Msg("Failed to set request for .well-known/openid-configuration")
+			return nil
+		}
+		defer resp.Body.Close()
+
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			m.logger.Error().Err(err).Msg("unable to read discovery response body")
+			return nil
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			m.logger.Error().Str("status", resp.Status).Str("body", string(body)).Msg("error requesting openid-configuration")
+			return nil
+		}
+
+		var j jwksJSON
+		err = json.Unmarshal(body, &j)
+		if err != nil {
+			m.logger.Error().Err(err).Msg("failed to decode provider openid-configuration")
+			return nil
+		}
+		m.logger.Debug().Str("jwks", j.JWKSURL).Msg("discovered jwks endpoint")
+		options := keyfunc.Options{
+			Client: m.httpClient,
+			RefreshErrorHandler: func(err error) {
+				m.logger.Error().Err(err).Msg("There was an error with the jwt.Keyfunc")
+			},
+			RefreshInterval:   time.Minute * time.Duration(m.jwksOptions.RefreshInterval),
+			RefreshRateLimit:  time.Second * time.Duration(m.jwksOptions.RefreshRateLimit),
+			RefreshTimeout:    time.Second * time.Duration(m.jwksOptions.RefreshTimeout),
+			RefreshUnknownKID: m.jwksOptions.RefreshUnknownKID,
+		}
+		m.jwks, err = keyfunc.Get(j.JWKSURL, options)
+		if err != nil {
+			m.jwks = nil
+			m.logger.Error().Err(err).Msg("Failed to create JWKS from resource at the given URL.")
+			return nil
+		}
+	}
+	return m.jwks
+}
+
 func (m *oidcAuth) getProvider() OIDCProvider {
+	m.providerLock.Lock()
+	defer m.providerLock.Unlock()
 	if m.provider == nil {
 		// Lazily initialize a provider
 

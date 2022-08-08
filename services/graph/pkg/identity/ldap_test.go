@@ -2,43 +2,35 @@ package identity
 
 import (
 	"context"
-	"crypto/tls"
 	"errors"
-	"fmt"
 	"net/url"
 	"testing"
-	"time"
 
 	"github.com/go-ldap/ldap/v3"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
+	"github.com/test-go/testify/mock"
 )
 
-// ldapMock implements the ldap.Client interfac
-type ldapMock struct {
-	SearchFunc *searchFunc
-}
-
-type searchFunc func(*ldap.SearchRequest) (*ldap.SearchResult, error)
-
-func getMockedBackend(sf *searchFunc, lc config.LDAP, logger *log.Logger) (*LDAP, error) {
-	// Mock a Sizelimit Error
-	lm := ldapMock{SearchFunc: sf}
-	return NewLDAPBackend(lm, lconfig, logger)
+func getMockedBackend(l ldap.Client, lc config.LDAP, logger *log.Logger) (*LDAP, error) {
+	return NewLDAPBackend(l, lconfig, logger)
 }
 
 var lconfig = config.LDAP{
-	UserBaseDN:               "dc=test",
+	UserBaseDN:               "ou=people,dc=test",
+	UserObjectClass:          "inetOrgPerson",
 	UserSearchScope:          "sub",
-	UserFilter:               "filter",
+	UserFilter:               "",
 	UserDisplayNameAttribute: "displayname",
 	UserIDAttribute:          "entryUUID",
 	UserEmailAttribute:       "mail",
 	UserNameAttribute:        "uid",
 
-	GroupBaseDN:        "dc=test",
+	GroupBaseDN:        "ou=groups,dc=test",
+	GroupObjectClass:   "groupOfNames",
 	GroupSearchScope:   "sub",
-	GroupFilter:        "filter",
+	GroupFilter:        "",
 	GroupNameAttribute: "cn",
 	GroupIDAttribute:   "entryUUID",
 }
@@ -50,17 +42,31 @@ var userEntry = ldap.NewEntry("uid=user",
 		"mail":        {"user@example"},
 		"entryuuid":   {"abcd-defg"},
 	})
+var invalidUserEntry = ldap.NewEntry("uid=user",
+	map[string][]string{
+		"uid":         {"invalid"},
+		"displayname": {"DisplayName"},
+		"mail":        {"user@example"},
+	})
 var groupEntry = ldap.NewEntry("cn=group",
 	map[string][]string{
 		"cn":        {"group"},
 		"entryuuid": {"abcd-defg"},
+		"member": {
+			"uid=user,ou=people,dc=test",
+			"uid=invalid,ou=people,dc=test",
+		},
+	})
+var invalidGroupEntry = ldap.NewEntry("cn=invalid",
+	map[string][]string{
+		"cn": {"invalid"},
 	})
 
 var logger = log.NewLogger(log.Level("debug"))
 
 func TestNewLDAPBackend(t *testing.T) {
 
-	l := ldapMock{}
+	l := &mocks.Client{}
 
 	tc := lconfig
 	tc.UserDisplayNameAttribute = ""
@@ -93,7 +99,7 @@ func TestNewLDAPBackend(t *testing.T) {
 }
 
 func TestCreateUserModelFromLDAP(t *testing.T) {
-	l := ldapMock{}
+	l := &mocks.Client{}
 	logger := log.NewLogger(log.Level("debug"))
 
 	b, _ := NewLDAPBackend(l, lconfig, &logger)
@@ -121,10 +127,11 @@ func TestCreateUserModelFromLDAP(t *testing.T) {
 
 func TestGetUser(t *testing.T) {
 	// Mock a Sizelimit Error
-	var sf searchFunc = func(*ldap.SearchRequest) (*ldap.SearchResult, error) {
-		return nil, ldap.NewError(ldap.LDAPResultSizeLimitExceeded, errors.New("mock"))
-	}
-	b, _ := getMockedBackend(&sf, lconfig, &logger)
+	lm := &mocks.Client{}
+	lm.On("Search", mock.Anything).
+		Return(
+			nil, ldap.NewError(ldap.LDAPResultSizeLimitExceeded, errors.New("mock")))
+	b, _ := getMockedBackend(lm, lconfig, &logger)
 
 	queryParamExpand := url.Values{
 		"$expand": []string{"memberOf"},
@@ -148,10 +155,11 @@ func TestGetUser(t *testing.T) {
 	}
 
 	// Mock an empty Search Result
-	sf = func(*ldap.SearchRequest) (*ldap.SearchResult, error) {
-		return &ldap.SearchResult{}, nil
-	}
-	b, _ = getMockedBackend(&sf, lconfig, &logger)
+	lm = &mocks.Client{}
+	lm.On("Search", mock.Anything).
+		Return(
+			&ldap.SearchResult{}, nil)
+	b, _ = getMockedBackend(lm, lconfig, &logger)
 	_, err = b.GetUser(context.Background(), "fred", nil)
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
@@ -167,13 +175,16 @@ func TestGetUser(t *testing.T) {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
 
-	// Mock a valid	Search Result
-	sf = func(*ldap.SearchRequest) (*ldap.SearchResult, error) {
-		return &ldap.SearchResult{
-			Entries: []*ldap.Entry{userEntry},
-		}, nil
-	}
-	b, _ = getMockedBackend(&sf, lconfig, &logger)
+	// Mock a valid Search Result
+	lm = &mocks.Client{}
+	lm.On("Search", mock.Anything).
+		Return(
+			&ldap.SearchResult{
+				Entries: []*ldap.Entry{userEntry},
+			},
+			nil)
+
+	b, _ = getMockedBackend(lm, lconfig, &logger)
 	u, err := b.GetUser(context.Background(), "user", nil)
 	if err != nil {
 		t.Errorf("Expected GetUser to succeed. Got %s", err.Error())
@@ -194,22 +205,37 @@ func TestGetUser(t *testing.T) {
 	} else if *u.Id != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id) {
 		t.Errorf("Expected GetUser to return a valid user")
 	}
+
+	// Mock invalid Search Result
+	lm = &mocks.Client{}
+	lm.On("Search", mock.Anything).
+		Return(
+			&ldap.SearchResult{
+				Entries: []*ldap.Entry{invalidUserEntry},
+			},
+			nil)
+
+	b, _ = getMockedBackend(lm, lconfig, &logger)
+	u, err = b.GetUser(context.Background(), "invalid", nil)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
 }
 
 func TestGetUsers(t *testing.T) {
-	var sf searchFunc = func(*ldap.SearchRequest) (*ldap.SearchResult, error) {
-		return nil, ldap.NewError(ldap.LDAPResultOperationsError, errors.New("mock"))
-	}
-	b, _ := getMockedBackend(&sf, lconfig, &logger)
+	// Mock a Sizelimit Error
+	lm := &mocks.Client{}
+	lm.On("Search", mock.Anything).Return(nil, ldap.NewError(ldap.LDAPResultOperationsError, errors.New("mock")))
+
+	b, _ := getMockedBackend(lm, lconfig, &logger)
 	_, err := b.GetUsers(context.Background(), url.Values{})
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
 
-	sf = func(*ldap.SearchRequest) (*ldap.SearchResult, error) {
-		return &ldap.SearchResult{}, nil
-	}
-	b, _ = getMockedBackend(&sf, lconfig, &logger)
+	lm = &mocks.Client{}
+	lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)
+	b, _ = getMockedBackend(lm, lconfig, &logger)
 	g, err := b.GetUsers(context.Background(), url.Values{})
 	if err != nil {
 		t.Errorf("Expected success, got '%s'", err.Error())
@@ -220,16 +246,16 @@ func TestGetUsers(t *testing.T) {
 
 func TestGetGroup(t *testing.T) {
 	// Mock a Sizelimit Error
-	var sf searchFunc = func(*ldap.SearchRequest) (*ldap.SearchResult, error) {
-		return nil, ldap.NewError(ldap.LDAPResultSizeLimitExceeded, errors.New("mock"))
-	}
+	lm := &mocks.Client{}
+	lm.On("Search", mock.Anything).Return(nil, ldap.NewError(ldap.LDAPResultSizeLimitExceeded, errors.New("mock")))
+
 	queryParamExpand := url.Values{
-		"$expand": []string{"memberOf"},
+		"$expand": []string{"members"},
 	}
 	queryParamSelect := url.Values{
-		"$select": []string{"memberOf"},
+		"$select": []string{"members"},
 	}
-	b, _ := getMockedBackend(&sf, lconfig, &logger)
+	b, _ := getMockedBackend(lm, lconfig, &logger)
 	_, err := b.GetGroup(context.Background(), "group", nil)
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
@@ -244,10 +270,9 @@ func TestGetGroup(t *testing.T) {
 	}
 
 	// Mock an empty Search Result
-	sf = func(*ldap.SearchRequest) (*ldap.SearchResult, error) {
-		return &ldap.SearchResult{}, nil
-	}
-	b, _ = getMockedBackend(&sf, lconfig, &logger)
+	lm = &mocks.Client{}
+	lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)
+	b, _ = getMockedBackend(lm, lconfig, &logger)
 	_, err = b.GetGroup(context.Background(), "group", nil)
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
@@ -261,122 +286,160 @@ func TestGetGroup(t *testing.T) {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
 
-	// Mock a valid	Search Result
-	sf = func(*ldap.SearchRequest) (*ldap.SearchResult, error) {
-		return &ldap.SearchResult{
-			Entries: []*ldap.Entry{groupEntry},
-		}, nil
-	}
-	b, _ = getMockedBackend(&sf, lconfig, &logger)
+	// Mock an invalid Search Result
+	lm = &mocks.Client{}
+	lm.On("Search", mock.Anything).Return(&ldap.SearchResult{
+		Entries: []*ldap.Entry{invalidGroupEntry},
+	}, nil)
+	b, _ = getMockedBackend(lm, lconfig, &logger)
 	g, err := b.GetGroup(context.Background(), "group", nil)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
+	g, err = b.GetGroup(context.Background(), "group", queryParamExpand)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
+	g, err = b.GetGroup(context.Background(), "group", queryParamSelect)
+	if err == nil || err.Error() != "itemNotFound" {
+		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	}
+
+	// Mock a valid	Search Result
+	lm = &mocks.Client{}
+	sr1 := &ldap.SearchRequest{
+		BaseDN:     "ou=groups,dc=test",
+		Scope:      2,
+		SizeLimit:  1,
+		Filter:     "(&(objectClass=groupOfNames)(|(cn=group)(entryUUID=group)))",
+		Attributes: []string{"cn", "entryUUID", "member"},
+		Controls:   []ldap.Control(nil),
+	}
+	sr2 := &ldap.SearchRequest{
+		BaseDN:     "uid=user,ou=people,dc=test",
+		SizeLimit:  1,
+		Filter:     "(objectclass=*)",
+		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
+		Controls:   []ldap.Control(nil),
+	}
+	sr3 := &ldap.SearchRequest{
+		BaseDN:     "uid=invalid,ou=people,dc=test",
+		SizeLimit:  1,
+		Filter:     "(objectclass=*)",
+		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
+		Controls:   []ldap.Control(nil),
+	}
+
+	lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
+	lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{userEntry}}, nil)
+	lm.On("Search", sr3).Return(&ldap.SearchResult{Entries: []*ldap.Entry{invalidUserEntry}}, nil)
+	b, _ = getMockedBackend(lm, lconfig, &logger)
+	g, err = b.GetGroup(context.Background(), "group", nil)
 	if err != nil {
 		t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
 	} else if *g.Id != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id) {
 		t.Errorf("Expected GetGroup to return a valid group")
 	}
 	g, err = b.GetGroup(context.Background(), "group", queryParamExpand)
-	if err != nil {
+	switch {
+	case err != nil:
 		t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
-	} else if *g.Id != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id) {
+	case g.GetId() != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id):
 		t.Errorf("Expected GetGroup to return a valid group")
+	case len(g.Members) != 1:
+		t.Errorf("Expected GetGroup with expand to return one member")
+	case g.Members[0].GetId() != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id):
+		t.Errorf("Expected GetGroup with expand to return correct member")
 	}
 	g, err = b.GetGroup(context.Background(), "group", queryParamSelect)
-	if err != nil {
+	switch {
+	case err != nil:
 		t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
-	} else if *g.Id != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id) {
+	case g.GetId() != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id):
 		t.Errorf("Expected GetGroup to return a valid group")
+	case len(g.Members) != 1:
+		t.Errorf("Expected GetGroup with expand to return one member")
+	case g.Members[0].GetId() != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id):
+		t.Errorf("Expected GetGroup with expand to return correct member")
 	}
 }
 
 func TestGetGroups(t *testing.T) {
-	var sf searchFunc = func(*ldap.SearchRequest) (*ldap.SearchResult, error) {
-		return nil, ldap.NewError(ldap.LDAPResultOperationsError, errors.New("mock"))
+	queryParamExpand := url.Values{
+		"$expand": []string{"members"},
 	}
-	b, _ := getMockedBackend(&sf, lconfig, &logger)
+	queryParamSelect := url.Values{
+		"$select": []string{"members"},
+	}
+	lm := &mocks.Client{}
+	lm.On("Search", mock.Anything).Return(nil, ldap.NewError(ldap.LDAPResultOperationsError, errors.New("mock")))
+	b, _ := getMockedBackend(lm, lconfig, &logger)
 	_, err := b.GetGroups(context.Background(), url.Values{})
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
 
-	sf = func(*ldap.SearchRequest) (*ldap.SearchResult, error) {
-		return &ldap.SearchResult{}, nil
-	}
-	b, _ = getMockedBackend(&sf, lconfig, &logger)
+	lm = &mocks.Client{}
+	lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)
+	b, _ = getMockedBackend(lm, lconfig, &logger)
 	g, err := b.GetGroups(context.Background(), url.Values{})
 	if err != nil {
 		t.Errorf("Expected success, got '%s'", err.Error())
 	} else if g == nil || len(g) != 0 {
 		t.Errorf("Expected zero length user slice")
 	}
-}
 
-// below here ldap.Client interface method for ldapMock
-
-func (c ldapMock) Start() {}
-
-func (c ldapMock) StartTLS(*tls.Config) error {
-	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-
-func (c ldapMock) Close() {}
-
-func (c ldapMock) IsClosing() bool {
-	return false
-}
-
-func (c ldapMock) SetTimeout(time.Duration) {}
-
-func (c ldapMock) Bind(username, password string) error {
-	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-
-func (c ldapMock) UnauthenticatedBind(username string) error {
-	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-
-func (c ldapMock) SimpleBind(*ldap.SimpleBindRequest) (*ldap.SimpleBindResult, error) {
-	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-
-func (c ldapMock) ExternalBind() error {
-	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-
-func (c ldapMock) Add(*ldap.AddRequest) error {
-	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-
-func (c ldapMock) Del(*ldap.DelRequest) error {
-	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-
-func (c ldapMock) Modify(*ldap.ModifyRequest) error {
-	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-
-func (c ldapMock) ModifyDN(*ldap.ModifyDNRequest) error {
-	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-
-func (c ldapMock) ModifyWithResult(*ldap.ModifyRequest) (*ldap.ModifyResult, error) {
-	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-
-func (c ldapMock) Compare(dn, attribute, value string) (bool, error) {
-	return false, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-
-func (c ldapMock) PasswordModify(*ldap.PasswordModifyRequest) (*ldap.PasswordModifyResult, error) {
-	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-
-func (c ldapMock) Search(searchRequest *ldap.SearchRequest) (*ldap.SearchResult, error) {
-	if c.SearchFunc != nil {
-		return (*c.SearchFunc)(searchRequest)
+	lm = &mocks.Client{}
+	lm.On("Search", mock.Anything).Return(&ldap.SearchResult{
+		Entries: []*ldap.Entry{groupEntry},
+	}, nil)
+	b, _ = getMockedBackend(lm, lconfig, &logger)
+	g, err = b.GetGroups(context.Background(), url.Values{})
+	if err != nil {
+		t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
+	} else if *g[0].Id != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id) {
+		t.Errorf("Expected GetGroup to return a valid group")
 	}
 
-	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
-}
-func (c ldapMock) SearchWithPaging(searchRequest *ldap.SearchRequest, pagingSize uint32) (*ldap.SearchResult, error) {
-	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
+	// Mock a valid	Search Result with expanded group members
+	lm = &mocks.Client{}
+	sr1 := &ldap.SearchRequest{
+		BaseDN:     "ou=groups,dc=test",
+		Scope:      2,
+		Filter:     "(&(objectClass=groupOfNames))",
+		Attributes: []string{"cn", "entryUUID", "member"},
+		Controls:   []ldap.Control(nil),
+	}
+	sr2 := &ldap.SearchRequest{
+		BaseDN:     "uid=user,ou=people,dc=test",
+		SizeLimit:  1,
+		Filter:     "(objectclass=*)",
+		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
+		Controls:   []ldap.Control(nil),
+	}
+	sr3 := &ldap.SearchRequest{
+		BaseDN:     "uid=invalid,ou=people,dc=test",
+		SizeLimit:  1,
+		Filter:     "(objectclass=*)",
+		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
+		Controls:   []ldap.Control(nil),
+	}
+
+	for _, param := range []url.Values{queryParamSelect, queryParamExpand} {
+		lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
+		lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{userEntry}}, nil)
+		lm.On("Search", sr3).Return(&ldap.SearchResult{Entries: []*ldap.Entry{invalidUserEntry}}, nil)
+		b, _ = getMockedBackend(lm, lconfig, &logger)
+		g, err = b.GetGroups(context.Background(), param)
+		switch {
+		case err != nil:
+			t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
+		case g[0].GetId() != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id):
+			t.Errorf("Expected GetGroup to return a valid group")
+		case len(g[0].Members) != 1:
+			t.Errorf("Expected GetGroup to return group with one member")
+		case g[0].Members[0].GetId() != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id):
+			t.Errorf("Expected GetGroup to return group with correct member")
+		}
+	}
 }

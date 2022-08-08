@@ -39,7 +39,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpaces/moveSpaces.feature:186](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/moveSpaces.feature#L186)
 - [apiSpaces/moveSpaces.feature:189](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/moveSpaces.feature#L189)
 
-### [User without space manager role cannot restore space](https://github.com/owncloud/ocis/issues/4027)
- - [apiSpaces/restoreSpaces.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/restoreSpaces.feature#L63)
- - [apiSpaces/restoreSpaces.feature:64](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/restoreSpaces.feature#L64)
-
+### [Changing personal drive quota on another user as admin is not possible](https://github.com/owncloud/ocis/issues/4325)
+- [apiSpaces/changeSpaces.feature:221](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/changeSpaces.feature#L221)
+- [apiSpaces/changeSpaces.feature:222](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/changeSpaces.feature#L222)
+- [apiSpaces/changeSpaces.feature:223](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/changeSpaces.feature#L223)
+- [apiSpaces/changeSpaces.feature:224](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/changeSpaces.feature#L224)

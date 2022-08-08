@@ -2,6 +2,7 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -39,6 +40,15 @@ func Validate(cfg *config.Config) error {
 
 	if cfg.MachineAuthAPIKey == "" {
 		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
+	}
+
+	if cfg.OIDC.AccessTokenVerifyMethod != config.AccessTokenVerificationNone &&
+		cfg.OIDC.AccessTokenVerifyMethod != config.AccessTokenVerificationJWT {
+		return fmt.Errorf(
+			"Invalid value '%s' for 'access_token_verify_method' in service %s. Possible values are: '%s' or '%s'.",
+			cfg.OIDC.AccessTokenVerifyMethod, cfg.Service.Name,
+			config.AccessTokenVerificationJWT, config.AccessTokenVerificationNone,
+		)
 	}
 
 	return nil

@@ -9,6 +9,7 @@ import (
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"golang.org/x/oauth2"
 )
 
@@ -21,6 +22,7 @@ func TestOIDCAuthMiddleware(t *testing.T) {
 			return mockOP(false), nil
 		}),
 		OIDCIss("https://localhost:9200"),
+		AccessTokenVerifyMethod(config.AccessTokenVerificationNone),
 	)(next)
 
 	r := httptest.NewRequest(http.MethodGet, "https://idp.example.com", nil)
