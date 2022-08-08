@@ -227,6 +227,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			middleware.Logger(logger),
 			middleware.TokenManagerConfig(*cfg.TokenManager),
 			middleware.RevaGatewayClient(revaClient),
+			middleware.DefaultSpaceQuota(cfg.DefaultSpaceQuota),
 		),
 		middleware.PublicShareAuth(
 			middleware.Logger(logger),

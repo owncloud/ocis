@@ -8,6 +8,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"google.golang.org/grpc/metadata"
 )
@@ -22,6 +23,7 @@ func CreateHome(optionSetters ...Option) func(next http.Handler) http.Handler {
 			next:              next,
 			logger:            logger,
 			revaGatewayClient: options.RevaGatewayClient,
+			defaultQuota:      options.DefaultSpaceQuota,
 		}
 	}
 }
@@ -30,6 +32,7 @@ type createHome struct {
 	next              http.Handler
 	logger            log.Logger
 	revaGatewayClient gateway.GatewayAPIClient
+	defaultQuota      string
 }
 
 func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -45,8 +48,10 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	ctx := metadata.AppendToOutgoingContext(req.Context(), revactx.TokenHeader, token)
 
 	createHomeReq := &provider.CreateHomeRequest{}
+	if m.defaultQuota != "" {
+		createHomeReq.Opaque = utils.AppendPlainToOpaque(nil, "quota", m.defaultQuota)
+	}
 	createHomeRes, err := m.revaGatewayClient.CreateHome(ctx, createHomeReq)
-
 	if err != nil {
 		m.logger.Err(err).Msg("error calling CreateHome")
 	} else if createHomeRes.Status.Code != rpc.Code_CODE_OK {

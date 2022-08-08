@@ -60,6 +60,8 @@ type Options struct {
 	AccessTokenVerifyMethod string
 	// JWKS sets the options for fetching the JWKS from the IDP
 	JWKS config.JWKS
+	// DefaultSpaceQuota is the default space quota for personal drives
+	DefaultSpaceQuota string
 }
 
 // newOptions initializes the available default options.
@@ -210,5 +212,12 @@ func AccessTokenVerifyMethod(method string) Option {
 func JWKSOptions(jo config.JWKS) Option {
 	return func(o *Options) {
 		o.JWKS = jo
+	}
+}
+
+// DefaultSpaceQuota ssets the default space quota for personal spaces
+func DefaultSpaceQuota(q string) Option {
+	return func(o *Options) {
+		o.DefaultSpaceQuota = q
 	}
 }

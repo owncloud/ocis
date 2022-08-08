@@ -16,6 +16,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
@@ -210,22 +211,32 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var driveType string
+	var (
+		driveType string
+		maxQuota  uint64
+	)
 	if drive.DriveType != nil {
 		driveType = *drive.DriveType
 	}
 	switch driveType {
 	case "", "project":
 		driveType = "project"
+		maxQuota = g.maxQuotaProject
 	default:
 		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("drives of type %s cannot be created via this api", driveType))
+		return
+	}
+
+	quota := getQuota(drive.Quota, g.defaultQuota)
+	if maxQuota != 0 && maxQuota < quota.QuotaMaxBytes {
+		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("exceeding maximum drive quota. Max is %d", maxQuota))
 		return
 	}
 
 	csr := storageprovider.CreateStorageSpaceRequest{
 		Type:  driveType,
 		Name:  spaceName,
-		Quota: getQuota(drive.Quota, g.config.Spaces.DefaultQuota),
+		Quota: quota,
 	}
 
 	if drive.Description != nil {
@@ -350,8 +361,50 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 			errorcode.GeneralException.Render(w, r, http.StatusUnauthorized, "user is not allowed to set the space quota")
 			return
 		}
+
+		maxQuota := g.maxQuotaPersonal
+		if g.maxQuotaPersonal != g.maxQuotaProject {
+			// different quotas set - we need to find out if we are patching a personal or a project space
+			sres, err := client.ListStorageSpaces(r.Context(), &provider.ListStorageSpacesRequest{
+				Filters: []*provider.ListStorageSpacesRequest_Filter{
+					{
+						Type: provider.ListStorageSpacesRequest_Filter_TYPE_ID,
+						Term: &provider.ListStorageSpacesRequest_Filter_Id{
+							Id: &provider.StorageSpaceId{OpaqueId: driveID},
+						},
+					},
+				},
+			})
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+			if len(sres.StorageSpaces) != 1 {
+				errorcode.GeneralException.Render(w, r, http.StatusBadRequest, "drive to patch does not exist")
+				return
+			}
+
+			switch sres.StorageSpaces[0].SpaceType {
+			case "personal":
+				maxQuota = g.maxQuotaPersonal
+			case "project":
+				maxQuota = g.maxQuotaProject
+			default:
+				errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("can't patch drive of type %s", sres.StorageSpaces[0].SpaceType))
+				return
+
+			}
+		}
+
+		quota := uint64(*drive.Quota.Total)
+		if maxQuota != 0 && maxQuota < quota {
+			errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("exceeding maximum drive quota. Max is %d", maxQuota))
+			return
+		}
+
 		updateSpaceRequest.StorageSpace.Quota = &storageprovider.Quota{
-			QuotaMaxBytes: uint64(*drive.Quota.Total),
+			QuotaMaxBytes: quota,
 		}
 	}
 
@@ -677,18 +730,15 @@ func calculateQuotaState(total int64, used int64) (state string) {
 	}
 }
 
-func getQuota(quota *libregraph.Quota, defaultQuota string) *storageprovider.Quota {
+func getQuota(quota *libregraph.Quota, defaultQuota uint64) *storageprovider.Quota {
 	switch {
 	case quota != nil && quota.Total != nil:
 		if q := *quota.Total; q >= 0 {
 			return &storageprovider.Quota{QuotaMaxBytes: uint64(q)}
 		}
 		fallthrough
-	case defaultQuota != "":
-		if q, err := strconv.ParseInt(defaultQuota, 10, 64); err == nil && q >= 0 {
-			return &storageprovider.Quota{QuotaMaxBytes: uint64(q)}
-		}
-		fallthrough
+	case defaultQuota != 0:
+		return &storageprovider.Quota{QuotaMaxBytes: defaultQuota}
 	default:
 		return nil
 	}
