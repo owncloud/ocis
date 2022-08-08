@@ -434,8 +434,7 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 	if err != nil {
 		return nil, err
 	}
-
-	res, err := client.ListStorageSpaces(ctx, &storageprovider.ListStorageSpacesRequest{
+	lReq := &storageprovider.ListStorageSpacesRequest{
 		Opaque: &types.Opaque{Map: map[string]*types.OpaqueEntry{
 			"permissions": {
 				Decoder: "json",
@@ -447,7 +446,8 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 			},
 		}},
 		Filters: filters,
-	})
+	}
+	res, err := client.ListStorageSpaces(ctx, lReq)
 	return res, err
 }
 
