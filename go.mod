@@ -5,18 +5,19 @@ go 1.18
 require (
 	github.com/CiscoM31/godata v1.0.5
 	github.com/Masterminds/semver v1.5.0
+	github.com/MicahParks/keyfunc v1.2.0
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
 	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.3
 	github.com/coreos/go-oidc/v3 v3.2.0
-	github.com/cs3org/go-cs3apis v0.0.0-20220711084433-8f71d4e812a3
-	github.com/cs3org/reva/v2 v2.7.3-0.20220802154801-7dd63f110056
+	github.com/cs3org/go-cs3apis v0.0.0-20220719130120-361e9f987d64
+	github.com/cs3org/reva/v2 v2.7.3-0.20220808090146-264a9a8caa99
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/cors v1.2.1
 	github.com/go-chi/render v1.0.1
-	github.com/go-ldap/ldap/v3 v3.4.3
+	github.com/go-ldap/ldap/v3 v3.4.4
 	github.com/go-ldap/ldif v0.0.0-20200320164324-fd88d9b715b3
 	github.com/go-micro/plugins/v4/client/grpc v1.1.0
 	github.com/go-micro/plugins/v4/events/natsjs v1.1.0
@@ -38,7 +39,7 @@ require (
 	github.com/google/go-tika v0.2.0
 	github.com/gookit/config/v2 v2.1.2
 	github.com/gorilla/mux v1.8.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.1
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/idm v0.3.1-0.20220718103124-c4f6613dce2b
 	github.com/libregraph/lico v0.54.1-0.20220325072321-31efc3995d63
@@ -65,18 +66,18 @@ require (
 	go-micro.dev/v4 v4.8.0
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.33.0
-	go.opentelemetry.io/otel v1.8.0
-	go.opentelemetry.io/otel/exporters/jaeger v1.8.0
-	go.opentelemetry.io/otel/sdk v1.8.0
-	go.opentelemetry.io/otel/trace v1.8.0
+	go.opentelemetry.io/otel v1.9.0
+	go.opentelemetry.io/otel/exporters/jaeger v1.9.0
+	go.opentelemetry.io/otel/sdk v1.9.0
+	go.opentelemetry.io/otel/trace v1.9.0
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 	golang.org/x/exp v0.0.0-20220518171630-0b5c67f07fdf
 	golang.org/x/image v0.0.0-20220321031419-a8550c1d254a
 	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e
 	golang.org/x/oauth2 v0.0.0-20220722155238-128564f6959c
-	google.golang.org/genproto v0.0.0-20220722212130-b98a9ff5e252
+	google.golang.org/genproto v0.0.0-20220728213248-dd149ef739b9
 	google.golang.org/grpc v1.48.0
-	google.golang.org/protobuf v1.28.0
+	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/v3 v3.3.0
 	stash.kopano.io/kgol/oidc-go v0.3.4
@@ -85,7 +86,7 @@ require (
 
 require (
 	contrib.go.opencensus.io/exporter/prometheus v0.4.1 // indirect
-	github.com/Azure/go-ntlmssp v0.0.0-20211209120228-48547f28849e // indirect
+	github.com/Azure/go-ntlmssp v0.0.0-20220621081337-cb9428e4ac1e // indirect
 	github.com/BurntSushi/toml v1.2.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect

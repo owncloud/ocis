@@ -18,7 +18,7 @@ OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
 OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:0.2.0"
 OC_LITMUS = "owncloud/litmus:latest"
-OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.6.0"
+OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.8.0"
 OC_SERVER = "owncloud/server:10"
 OC_UBUNTU = "owncloud/ubuntu:20.04"
 OSIXIA_OPEN_LDAP = "osixia/openldap:latest"
@@ -101,6 +101,10 @@ config = {
         "filterTags": "@ocisSmokeTest",
         "skip": False,
         "skipExceptParts": [],
+        "earlyFail": True,
+    },
+    "e2eTests": {
+        "skip": False,
         "earlyFail": True,
     },
     "settingsUITests": {
@@ -317,6 +321,18 @@ def yarnInstallUITests():
         ],
     }]
 
+def yarnInstallE2eTests():
+    return [{
+        "name": "yarn-install-e2e",
+        "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+        "commands": [
+            ". /drone/src/.drone.env",
+            "cd webTestRunner",
+            "git checkout $WEB_COMMITID",
+            "retry -t 3 'yarn install --immutable'",
+        ],
+    }]
+
 def testOcisModules(ctx):
     pipelines = []
     for module in config["modules"]:
@@ -371,6 +387,9 @@ def testPipelines(ctx):
 
     if "skip" not in config["uiTests"] or not config["uiTests"]["skip"]:
         pipelines += uiTests(ctx)
+
+    if "skip" not in config["e2eTests"] or not config["e2eTests"]["skip"]:
+        pipelines += e2eTests(ctx)
 
     if "skip" not in config["settingsUITests"] or not config["settingsUITests"]["skip"]:
         pipelines.append(settingsUITests(ctx))
@@ -834,6 +853,134 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
             ],
         },
     }
+
+def e2eTests(ctx):
+    e2e_trigger = {
+        "ref": [
+            "refs/heads/master",
+            "refs/tags/**",
+            "refs/pull/**",
+        ],
+    }
+
+    e2e_volumes = [{
+        "name": "uploads",
+        "temp": {},
+    }, {
+        "name": "configs",
+        "temp": {},
+    }, {
+        "name": "gopath",
+        "temp": {},
+    }]
+
+    e2e_test_ocis = [{
+        "name": "e2e-tests",
+        "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+        "environment": {
+            "BASE_URL_OCIS": "ocis-server:9200",
+            "HEADLESS": "true",
+            "OCIS": "true",
+            "RETRY": "1",
+            "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
+            "LOCAL_UPLOAD_DIR": "/uploads",
+        },
+        "commands": [
+            "cd webTestRunner",
+            "sleep 10 && yarn test:e2e:cucumber tests/e2e/cucumber/**/*[!.oc10].feature",
+        ],
+    }]
+
+    e2eTestsSteps = \
+        skipIfUnchanged(ctx, "e2e-tests") + \
+        restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
+        restoreBuildArtifactCache(ctx, "web-dist", "webTestRunner") + \
+        yarnInstallE2eTests() + \
+        ocisServer("ocis", 4, []) + \
+        e2e_test_ocis + \
+        uploadTracingResult(ctx) + \
+        publishTracingResult(ctx, "e2e test")
+
+    if ("skip-e2e" in ctx.build.title.lower()):
+        return []
+
+    if (ctx.build.event != "tag"):
+        return [{
+            "kind": "pipeline",
+            "type": "docker",
+            "name": "e2e-tests",
+            "steps": e2eTestsSteps,
+            "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+            "trigger": e2e_trigger,
+            "volumes": e2e_volumes,
+        }]
+
+def uploadTracingResult(ctx):
+    return [{
+        "name": "upload-tracing-result",
+        "image": PLUGINS_S3,
+        "pull": "if-not-exists",
+        "settings": {
+            "bucket": {
+                "from_secret": "cache_public_s3_bucket",
+            },
+            "endpoint": {
+                "from_secret": "cache_public_s3_server",
+            },
+            "path_style": True,
+            "source": "webTestRunner/reports/e2e/playwright/tracing/**/*",
+            "strip_prefix": "webTestRunner/reports/e2e/playwright/tracing",
+            "target": "${DRONE_BUILD_NUMBER}/tracing",
+        },
+        "environment": {
+            "AWS_ACCESS_KEY_ID": {
+                "from_secret": "cache_public_s3_access_key",
+            },
+            "AWS_SECRET_ACCESS_KEY": {
+                "from_secret": "cache_public_s3_secret_key",
+            },
+        },
+        "when": {
+            "status": [
+                "failure",
+            ],
+            "event": [
+                "pull_request",
+                "cron",
+            ],
+        },
+    }]
+
+def publishTracingResult(ctx, suite):
+    return [{
+        "name": "publish-tracing-result",
+        "image": OC_UBUNTU,
+        "commands": [
+            "cd webTestRunner/reports/e2e/playwright/tracing/",
+            'echo "<details><summary>:boom: To see the trace, please open the link in the console ...</summary>\\n\\n<p>\\n\\n" >>  comments.file',
+            'for f in *.zip; do echo "#### npx playwright show-trace $CACHE_ENDPOINT/$CACHE_BUCKET/${DRONE_BUILD_NUMBER}/tracing/$f \n" >>  comments.file; done',
+            'echo "\n</p></details>" >>  comments.file',
+            "more  comments.file",
+        ],
+        "environment": {
+            "TEST_CONTEXT": suite,
+            "CACHE_ENDPOINT": {
+                "from_secret": "cache_public_s3_server",
+            },
+            "CACHE_BUCKET": {
+                "from_secret": "cache_public_s3_bucket",
+            },
+        },
+        "when": {
+            "status": [
+                "failure",
+            ],
+            "event": [
+                "pull_request",
+                "cron",
+            ],
+        },
+    }]
 
 def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
     early_fail = config["settingsUITests"]["earlyFail"] if "earlyFail" in config["settingsUITests"] else False
@@ -1661,8 +1808,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
         environment = {
             "OCIS_URL": OCIS_URL,
             "OCIS_CONFIG_DIR": "/root/.ocis/config",
-            "LDAP_GROUP_SUBSTRING_FILTER_TYPE": "any",
-            "LDAP_USER_SUBSTRING_FILTER_TYPE": "any",
             "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # cs3api-validator needs the cs3api gatway exposed
             "STORAGE_USERS_DRIVER": "%s" % (storage),
             "STORAGE_USERS_DRIVER_LOCAL_ROOT": "/srv/app/tmp/ocis/local/root",
@@ -1899,6 +2044,8 @@ def skipIfUnchanged(ctx, type):
         skip = base + unit + acceptance
     if type == "cache":
         skip = base
+    if type == "e2e-tests":
+        skip = base + unit
     if len(skip) == 0:
         return []
 

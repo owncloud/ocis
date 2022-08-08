@@ -17,6 +17,7 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -180,8 +181,11 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	if slices.Contains(sel, "drive") || slices.Contains(sel, "drives") || slices.Contains(exp, "drive") || slices.Contains(exp, "drives") {
 		wdu, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath)
 		f := listStorageSpacesUserFilter(user.GetId())
+		// use the unrestricted flag to get all possible spaces
+		// users with the canListAllSpaces permission should see all spaces
+		opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
 		lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
-			Opaque:  nil,
+			Opaque:  opaque,
 			Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
 		})
 		if err != nil {
@@ -202,6 +206,11 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				g.logger.Err(err).Interface("query", r.URL.Query()).Msg("error converting space to drive")
 			}
+			quota, err := g.getDriveQuota(r.Context(), sp)
+			if err != nil {
+				g.logger.Err(err).Interface("query", r.URL.Query()).Msg("error calling get quota")
+			}
+			d.Quota = quota
 			if slices.Contains(sel, "drive") || slices.Contains(exp, "drive") {
 				if *d.DriveType == "personal" {
 					drives = append(drives, *d)
