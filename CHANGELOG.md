@@ -16,6 +16,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow providing list of services NOT to start: [#4254](https://github.com/owncloud/ocis/pull/4254)
 * Enhancement - Introduce insecure flag for smtp email notifications: [#4279](https://github.com/owncloud/ocis/pull/4279)
 * Enhancement - Fix behavior for foobar (in present tense): [#4346](https://github.com/owncloud/ocis/pull/4346)
+* Enhancement - Use storageID when requesting special items: [#4356](https://github.com/owncloud/ocis/pull/4356)
 * Enhancement - Update reva to vx.x.x: [#4294](https://github.com/owncloud/ocis/pull/4294)
 * Enhancement - Update ownCloud Web to v5.7.0-rc.7: [#4314](https://github.com/owncloud/ocis/pull/4314)
 
@@ -114,6 +115,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/2819
    https://github.com/owncloud/ocis/issues/3280
    https://github.com/owncloud/ocis/pull/4346
+
+* Enhancement - Use storageID when requesting special items: [#4356](https://github.com/owncloud/ocis/pull/4356)
+
+   We need to use the storageID when requesting the special items of a space to spare a registry
+   lookup and improve the performance
+
+   https://github.com/owncloud/ocis/pull/4356
 
 * Enhancement - Update reva to vx.x.x: [#4294](https://github.com/owncloud/ocis/pull/4294)
 
