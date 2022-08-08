@@ -25,11 +25,6 @@ const (
 	_bearerPrefix        = "Bearer "
 )
 
-var (
-	// _unauthenticatePaths contains paths which don't need to be authenticated.
-	_unauthenticatePaths = [...]string{"/konnect/v1/userinfo", "/status.php"}
-)
-
 // OIDCProvider used to mock the oidc provider during tests
 type OIDCProvider interface {
 	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*gOidc.UserInfo, error)
@@ -144,14 +139,6 @@ func (m OIDCAuthenticator) extractExpiration(aClaims jwt.RegisteredClaims) time.
 func (m OIDCAuthenticator) shouldServe(req *http.Request) bool {
 	if m.OIDCIss == "" {
 		return false
-	}
-
-	// todo: looks dirty, check later
-	// TODO: make a PR to coreos/go-oidc for exposing userinfo endpoint on provider, see https://github.com/coreos/go-oidc/issues/248
-	for _, ignoringPath := range _unauthenticatePaths {
-		if req.URL.Path == ignoringPath {
-			return false
-		}
 	}
 
 	header := req.Header.Get(_headerAuthorization)
