@@ -19,6 +19,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Use storageID when requesting special items: [#4356](https://github.com/owncloud/ocis/pull/4356)
 * Enhancement - Update reva to vx.x.x: [#4294](https://github.com/owncloud/ocis/pull/4294)
 * Enhancement - Update ownCloud Web to v5.7.0-rc.7: [#4314](https://github.com/owncloud/ocis/pull/4314)
+* Enhancement - Expand personal drive on the graph user: [#4357](https://github.com/owncloud/ocis/pull/4357)
 
 ## Details
 
@@ -179,6 +180,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4314
    https://github.com/owncloud/web/releases/tag/v5.7.0-rc.7
+
+* Enhancement - Expand personal drive on the graph user: [#4357](https://github.com/owncloud/ocis/pull/4357)
+
+   We can now list the personal drive on the users endpoint via the graph API. A user can add an
+   `$expand=drive` query to list the personal drive of the requested user.
+
+   https://github.com/owncloud/ocis/pull/4357
 # Changelog for [2.0.0-beta.5] (2022-07-19)
 
 The following sections list the changes for 2.0.0-beta.5.
