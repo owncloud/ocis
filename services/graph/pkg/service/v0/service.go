@@ -13,6 +13,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/bytesize"
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
@@ -56,10 +57,34 @@ func NewService(opts ...Option) Service {
 
 	m := chi.NewMux()
 	m.Use(options.Middleware...)
+	log := options.Logger
 
-	defaultQuota, _ := strconv.ParseUint(options.Config.Spaces.DefaultQuota, 10, 64)
-	personalQuota, _ := strconv.ParseUint(options.Config.Spaces.MaxQuotaPersonal, 10, 64)
-	projectQuota, _ := strconv.ParseUint(options.Config.Spaces.MaxQuotaProject, 10, 64)
+	var (
+		defaultQuota, personalQuota, projectQuota bytesize.ByteSize
+		err                                       error
+	)
+
+	if options.Config.Spaces.DefaultQuota != "" {
+		defaultQuota, err = bytesize.Parse(options.Config.Spaces.DefaultQuota)
+		if err != nil {
+			log.Error().Err(err).Msg("Could not parse default quota - using unlimited")
+		}
+	}
+
+	if options.Config.Spaces.MaxQuotaPersonal != "" {
+		personalQuota, err = bytesize.Parse(options.Config.Spaces.MaxQuotaPersonal)
+		if err != nil {
+			log.Error().Err(err).Msg("Could not parse max personal quota - using unlimited")
+		}
+
+	}
+
+	if options.Config.Spaces.MaxQuotaProject != "" {
+		projectQuota, err = bytesize.Parse(options.Config.Spaces.MaxQuotaProject)
+		if err != nil {
+			log.Error().Err(err).Msg("Could not parse max project quota - using unlimited")
+		}
+	}
 
 	svc := Graph{
 		config:               options.Config,
@@ -67,15 +92,15 @@ func NewService(opts ...Option) Service {
 		logger:               &options.Logger,
 		spacePropertiesCache: ttlcache.NewCache(),
 		eventsPublisher:      options.EventsPublisher,
-		defaultQuota:         defaultQuota,
-		maxQuotaPersonal:     personalQuota,
-		maxQuotaProject:      projectQuota,
+		defaultQuota:         defaultQuota.Bytes(),
+		maxQuotaPersonal:     personalQuota.Bytes(),
+		maxQuotaProject:      projectQuota.Bytes(),
 	}
 	if options.GatewayClient == nil {
 		var err error
 		svc.gatewayClient, err = pool.GetGatewayServiceClient(options.Config.Reva.Address)
 		if err != nil {
-			options.Logger.Error().Err(err).Msg("Could not get gateway client")
+			log.Error().Err(err).Msg("Could not get gateway client")
 			return nil
 		}
 	} else {
