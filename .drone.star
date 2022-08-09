@@ -43,7 +43,9 @@ DEFAULT_NODEJS_VERSION = "14"
 dirs = {
     "base": "/drone/src",
     "web": "/drone/src/webTestRunner",
-    # relative paths from /drone/src
+    # relate path from the base directory, i.e. "/drone/src"
+    # this is because the PLUGINS_S3_CACHE does not support absolute paths
+    # PLUGINS_S3_CACHE is used to cache the core and testing app
     "core": "oc10/testrunner",
     "testing_app": "oc10/testing",
 }
@@ -460,6 +462,8 @@ def cacheCoreReposForTesting(ctx):
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +  # skip for those pipelines where core repos are not needed
                  cloneCoreRepos() +
+                 # this does not support the absolute path to the target directory
+                 # so we need to use a relative path :(
                  rebuildBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
                  rebuildBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]),
         "trigger": {
@@ -585,11 +589,11 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                          "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
                          "environment": {
                              "TEST_WITH_GRAPH_API": "true",
-                             "PATH_TO_OCIS": "/drone/src",
-                             "PATH_TO_CORE": "/drone/src/%s" % dirs["core"],
+                             "PATH_TO_OCIS": dirs["base"],
+                             "PATH_TO_CORE": "%s/%s" % (dirs["base"], dirs["core"]),
                              "TEST_SERVER_URL": "https://ocis-server:9200",
                              "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
-                             "SKELETON_DIR": "/drone/src/%s/data/apiSkeleton" % dirs["testing_app"],
+                             "SKELETON_DIR": "%s/%s/data/apiSkeleton" % (dirs["base"], dirs["testing_app"]),
                              "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
                              "TEST_OCIS": "true",
                              "SEND_SCENARIO_LINE_REFERENCES": "true",
@@ -679,7 +683,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "PATH_TO_CORE": "/drone/src/%s" % dirs["core"],
                              "TEST_SERVER_URL": "https://ocis-server:9200",
                              "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
-                             "SKELETON_DIR": "/drone/src/%s/data/apiSkeleton" % dirs["testing_app"],
+                             "SKELETON_DIR": "%s/%s/data/apiSkeleton" % (dirs["base"], dirs["testing_app"]),
                              "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
                              "TEST_OCIS": "true",
                              "SEND_SCENARIO_LINE_REFERENCES": "true",
@@ -796,14 +800,14 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                              "BACKEND_HOST": "https://ocis-server:9200",
                              "RUN_ON_OCIS": "true",
                              "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/owncloud/data",
-                             "TESTING_DATA_DIR": "/drone/src/%s" % dirs["testing_app"],
+                             "TESTING_DATA_DIR": "%s/%s" % (dirs["base"], dirs["testing_app"]),
                              "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
                              "TEST_TAGS": finalFilterTags,
                              "LOCAL_UPLOAD_DIR": "/uploads",
                              "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                              "RUN_PART": runPart,
                              "DIVIDE_INTO_NUM_PARTS": numberOfParts,
-                             "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-webUI-on-%s-storage%s.md" % (storage.upper(), expectedFailuresFileFilterTags),
+                             "EXPECTED_FAILURES_FILE": "/%s/tests/acceptance/expected-failures-webUI-on-%s-storage%s.md" % (dirs["base"], storage.upper(), expectedFailuresFileFilterTags),
                              "MIDDLEWARE_HOST": "http://middleware:3000",
                          },
                          "commands": [
@@ -2469,8 +2473,8 @@ def parallelAcceptance(env):
         "REVA_LDAP_BASE_DN": "dc=owncloud,dc=com",
         "REVA_LDAP_HOSTNAME": "openldap",
         "REVA_LDAP_BIND_DN": "cn=admin,dc=owncloud,dc=com",
-        "SKELETON_DIR": "/drone/src/%s/data/apiSkeleton" % dirs["testing_app"],
-        "PATH_TO_CORE": "/drone/src/%s" % dirs["core"],
+        "SKELETON_DIR": "/%s/%s/data/apiSkeleton" % (dirs["base"], dirs["testing_app"]),
+        "PATH_TO_CORE": "/%s/%s" % (dirs["base"], dirs["core"]),
         "OCIS_REVA_DATA_ROOT": "/mnt/data/",
         "EXPECTED_FAILURES_FILE": "/drone/src/tests/parallelDeployAcceptance/expected-failures-API.md",
         "OCIS_SKELETON_STRATEGY": "copy",
@@ -2807,9 +2811,9 @@ def generateWebCache(ctx):
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
             "commands": [
                 ". ./.drone.env",
-                "rm -rf /drone/src/webTestRunner",
-                "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git webTestRunner",
-                "cd webTestRunner && git checkout $WEB_COMMITID",
+                "rm -rf %s" % dirs["web"],
+                "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git %s" % dirs["web"],
+                "cd %s && git checkout $WEB_COMMITID" % dirs["web"],
                 "ls -la",
             ],
         },
@@ -2821,16 +2825,16 @@ def generateWebCache(ctx):
                 "source ./.drone.env",
                 # cache using the minio/mc client to the 'owncloud' bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc mirror --overwrite --remove webTestRunner s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID",
+                "mc mirror --overwrite --remove %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["web"],
             ],
         },
         {
             "name": "install-yarn",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
             "commands": [
-                "cd %s/webTestRunner" % dirs["base"],
+                "cd %s" % dirs["web"],
                 "retry -t 3 'yarn install --immutable --frozen-lockfile'",
-                "cd %s/webTestRunner/tests/acceptance" % dirs["base"],
+                "cd %s/tests/acceptance" % dirs["web"],
                 "retry -t 3 'yarn install --immutable --frozen-lockfile'",
             ],
         },
@@ -2842,8 +2846,8 @@ def generateWebCache(ctx):
                 "source ./.drone.env",
                 # cache using the minio/mc client to the 'owncloud' bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc mirror --overwrite --remove webTestRunner/.yarn s3/$CACHE_BUCKET/ocis/web-test-runner/yarn-e2e-$WEB_COMMITID",
-                "mc mirror --overwrite --remove webTestRunner/tests/acceptance/.yarn s3/$CACHE_BUCKET/ocis/web-test-runner/yarn-acceptance-$WEB_COMMITID",
+                "mc mirror --overwrite --remove %s/.yarn s3/$CACHE_BUCKET/ocis/web-test-runner/yarn-e2e-$WEB_COMMITID" % dirs["web"],
+                "mc mirror --overwrite --remove %s/tests/acceptance/.yarn s3/$CACHE_BUCKET/ocis/web-test-runner/yarn-acceptance-$WEB_COMMITID" % dirs["web"],
             ],
         },
     ]
