@@ -6,7 +6,6 @@
 | Type
 | Default Value
 | Description
-
 |`IDP_PASSWORD_RESET_URI`
 a| [subs=-attributes]
 +string+
@@ -14,7 +13,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The URI where a user can reset their password.
-
 |`OCIS_TRACING_ENABLED` +
 `IDP_TRACING_ENABLED`
 a| [subs=-attributes]
@@ -23,7 +21,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates tracing.
-
 |`OCIS_TRACING_TYPE` +
 `IDP_TRACING_TYPE`
 a| [subs=-attributes]
@@ -32,7 +29,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
-
 |`OCIS_TRACING_ENDPOINT` +
 `IDP_TRACING_ENDPOINT`
 a| [subs=-attributes]
@@ -41,7 +37,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The endpoint of the tracing agent.
-
 |`OCIS_TRACING_COLLECTOR` +
 `IDP_TRACING_COLLECTOR`
 a| [subs=-attributes]
@@ -50,7 +45,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
-
 |`OCIS_LOG_LEVEL` +
 `IDP_LOG_LEVEL`
 a| [subs=-attributes]
@@ -59,7 +53,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
-
 |`OCIS_LOG_PRETTY` +
 `IDP_LOG_PRETTY`
 a| [subs=-attributes]
@@ -68,7 +61,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates pretty log output.
-
 |`OCIS_LOG_COLOR` +
 `IDP_LOG_COLOR`
 a| [subs=-attributes]
@@ -77,7 +69,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates colorized log output.
-
 |`OCIS_LOG_FILE` +
 `IDP_LOG_FILE`
 a| [subs=-attributes]
@@ -86,7 +77,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
-
 |`IDP_DEBUG_ADDR`
 a| [subs=-attributes]
 +string+
@@ -94,7 +84,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9134]
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
-
 |`IDP_DEBUG_TOKEN`
 a| [subs=-attributes]
 +string+
@@ -102,7 +91,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
-
 |`IDP_DEBUG_PPROF`
 a| [subs=-attributes]
 +bool+
@@ -110,7 +98,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
-
 |`IDP_DEBUG_ZPAGES`
 a| [subs=-attributes]
 +bool+
@@ -118,7 +105,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
-
 |`IDP_HTTP_ADDR`
 a| [subs=-attributes]
 +string+
@@ -126,7 +112,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9130]
 a| [subs=-attributes]
 The bind address of the HTTP service.
-
 |`IDP_HTTP_ROOT`
 a| [subs=-attributes]
 +string+
@@ -134,7 +119,6 @@ a| [subs=-attributes]
 pass:[/]
 a| [subs=-attributes]
 Subdirectory that serves as the root for this HTTP service.
-
 |`IDP_TRANSPORT_TLS_CERT`
 a| [subs=-attributes]
 +string+
@@ -142,7 +126,6 @@ a| [subs=-attributes]
 pass:[~/.ocis/idp/server.crt]
 a| [subs=-attributes]
 File name of the TLS server certificate for the HTTPS server.
-
 |`IDP_TRANSPORT_TLS_KEY`
 a| [subs=-attributes]
 +string+
@@ -150,7 +133,6 @@ a| [subs=-attributes]
 pass:[~/.ocis/idp/server.key]
 a| [subs=-attributes]
 File name of the TLS server certificate key for the HTTPS server.
-
 |`IDP_TLS`
 a| [subs=-attributes]
 +bool+
@@ -158,7 +140,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Use the HTTPS server instead of the HTTP server.
-
 |`REVA_GATEWAY`
 a| [subs=-attributes]
 +string+
@@ -166,7 +147,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9142]
 a| [subs=-attributes]
 CS3 gateway used to authenticate and look up users
-
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `IDP_MACHINE_AUTH_API_KEY`
 a| [subs=-attributes]
@@ -175,7 +155,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Machine auth API key used to validate internal requests necessary for the access to resources from other services.
-
 |`IDP_ASSET_PATH`
 a| [subs=-attributes]
 +string+
@@ -183,7 +162,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Serve IDP assets from a path on the filesystem instead of the builtin assets.
-
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `IDP_ISS`
@@ -193,7 +171,6 @@ a| [subs=-attributes]
 pass:[https://localhost:9200]
 a| [subs=-attributes]
 The OIDC issuer URL to use.
-
 |`IDP_IDENTITY_MANAGER`
 a| [subs=-attributes]
 +string+
@@ -201,7 +178,6 @@ a| [subs=-attributes]
 pass:[ldap]
 a| [subs=-attributes]
 The identity manager implementation to use. Supported identity managers are 'ldap', 'cs3', 'kc', 'libregraph', 'cookie' and 'guest'.
-
 |`IDP_URI_BASE_PATH`
 a| [subs=-attributes]
 +string+
@@ -209,7 +185,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 IDP uri base path (defaults to "").
-
 |`IDP_SIGN_IN_URI`
 a| [subs=-attributes]
 +string+
@@ -217,7 +192,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 IDP sign-in url.
-
 |`IDP_SIGN_OUT_URI`
 a| [subs=-attributes]
 +string+
@@ -225,7 +199,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 IDP sign-out url.
-
 |`IDP_ENDPOINT_URI`
 a| [subs=-attributes]
 +string+
@@ -233,7 +206,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 URL of the IDP endpoint.
-
 |`LDAP_INSECURE` +
 `IDP_INSECURE`
 a| [subs=-attributes]
@@ -242,7 +214,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Allow insecure connections to the user backend like LDAP, CS3 api, ...
-
 |`IDP_ALLOW_CLIENT_GUESTS`
 a| [subs=-attributes]
 +bool+
@@ -250,7 +221,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Allow guest clients to access oCIS.
-
 |`IDP_ALLOW_DYNAMIC_CLIENT_REGISTRATION`
 a| [subs=-attributes]
 +bool+
@@ -258,7 +228,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Allow dynamic client registration.
-
 |`IDP_ENCRYPTION_SECRET_FILE`
 a| [subs=-attributes]
 +string+
@@ -266,7 +235,6 @@ a| [subs=-attributes]
 pass:[~/.ocis/idp/encryption.key]
 a| [subs=-attributes]
 Path to the encryption secret file, if unset, a new certificate will be autogenerated upon each restart, thus invalidating all existing sessions.
-
 |`IDP_SIGNING_KID`
 a| [subs=-attributes]
 +string+
@@ -274,7 +242,6 @@ a| [subs=-attributes]
 pass:[private-key]
 a| [subs=-attributes]
 Value of the KID (Key ID) field which is used in created tokens to uniquely identify the signing-private-key.
-
 |`IDP_SIGNING_METHOD`
 a| [subs=-attributes]
 +string+
@@ -282,7 +249,6 @@ a| [subs=-attributes]
 pass:[PS256]
 a| [subs=-attributes]
 Signing method of IDP requests like 'PS256'
-
 |`IDP_SIGNING_PRIVATE_KEY_FILES`
 a| [subs=-attributes]
 +[]string+
@@ -290,7 +256,6 @@ a| [subs=-attributes]
 pass:[[~/.ocis/idp/private-key.pem]]
 a| [subs=-attributes]
 Private key files for signing IDP requests.
-
 |`IDP_VALIDATION_KEYS_PATH`
 a| [subs=-attributes]
 +string+
@@ -298,7 +263,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Path to validation keys for IDP requests.
-
 |`IDP_ACCESS_TOKEN_EXPIRATION`
 a| [subs=-attributes]
 +uint64+
@@ -306,7 +270,6 @@ a| [subs=-attributes]
 pass:[86400]
 a| [subs=-attributes]
 Expiration time in seconds for IDP access token.
-
 |`IDP_ID_TOKEN_EXPIRATION`
 a| [subs=-attributes]
 +uint64+
@@ -314,7 +277,6 @@ a| [subs=-attributes]
 pass:[3600]
 a| [subs=-attributes]
 Expiration time in seconds for IDP ID tokens.
-
 |`IDP_REFRESH_TOKEN_EXPIRATION`
 a| [subs=-attributes]
 +uint64+
@@ -322,7 +284,6 @@ a| [subs=-attributes]
 pass:[94608000]
 a| [subs=-attributes]
 Expiration time in seconds for refresh tokens.
-
 |`IDP_DYNAMIC_CLIENT_SECRET_DURATION`
 a| [subs=-attributes]
 +uint64+
@@ -330,7 +291,6 @@ a| [subs=-attributes]
 pass:[0]
 a| [subs=-attributes]
 Expiration time in seconds for dynamic clients.
-
 |`LDAP_URI` +
 `IDP_LDAP_URI`
 a| [subs=-attributes]
@@ -339,7 +299,6 @@ a| [subs=-attributes]
 pass:[ldaps://localhost:9235]
 a| [subs=-attributes]
 Url of the LDAP service to use as IDP.
-
 |`LDAP_CACERT` +
 `IDP_LDAP_TLS_CACERT`
 a| [subs=-attributes]
@@ -348,7 +307,6 @@ a| [subs=-attributes]
 pass:[~/.ocis/idm/ldap.crt]
 a| [subs=-attributes]
 Path to the TLS cert for the LDAP service.
-
 |`LDAP_BIND_DN` +
 `IDP_LDAP_BIND_DN`
 a| [subs=-attributes]
@@ -357,7 +315,6 @@ a| [subs=-attributes]
 pass:[uid=idp,ou=sysusers,o=libregraph-idm]
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
-
 |`LDAP_BIND_PASSWORD` +
 `IDP_LDAP_BIND_PASSWORD`
 a| [subs=-attributes]
@@ -366,7 +323,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Password to use for authenticating the 'bind_dn'.
-
 |`LDAP_USER_BASE_DN` +
 `IDP_LDAP_BASE_DN`
 a| [subs=-attributes]
@@ -375,7 +331,6 @@ a| [subs=-attributes]
 pass:[ou=users,o=libregraph-idm]
 a| [subs=-attributes]
 Search base DN for looking up LDAP users.
-
 |`LDAP_USER_SCOPE` +
 `IDP_LDAP_SCOPE`
 a| [subs=-attributes]
@@ -384,7 +339,6 @@ a| [subs=-attributes]
 pass:[sub]
 a| [subs=-attributes]
 LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
-
 |`IDP_LDAP_LOGIN_ATTRIBUTE`
 a| [subs=-attributes]
 +string+
@@ -392,7 +346,6 @@ a| [subs=-attributes]
 pass:[uid]
 a| [subs=-attributes]
 LDAP User attribute to use for login like 'uid'.
-
 |`LDAP_USER_SCHEMA_MAIL` +
 `IDP_LDAP_EMAIL_ATTRIBUTE`
 a| [subs=-attributes]
@@ -401,7 +354,6 @@ a| [subs=-attributes]
 pass:[mail]
 a| [subs=-attributes]
 LDAP User email attribute like 'mail'.
-
 |`LDAP_USER_SCHEMA_USERNAME` +
 `IDP_LDAP_NAME_ATTRIBUTE`
 a| [subs=-attributes]
@@ -410,7 +362,6 @@ a| [subs=-attributes]
 pass:[displayName]
 a| [subs=-attributes]
 LDAP User name attribute like 'displayName'.
-
 |`LDAP_USER_SCHEMA_ID` +
 `IDP_LDAP_UUID_ATTRIBUTE`
 a| [subs=-attributes]
@@ -419,7 +370,6 @@ a| [subs=-attributes]
 pass:[uid]
 a| [subs=-attributes]
 LDAP User uuid attribute like 'uid'.
-
 |`IDP_LDAP_UUID_ATTRIBUTE_TYPE`
 a| [subs=-attributes]
 +string+
@@ -427,7 +377,6 @@ a| [subs=-attributes]
 pass:[text]
 a| [subs=-attributes]
 LDAP User uuid attribute type like 'text'.
-
 |`LDAP_USER_FILTER` +
 `IDP_LDAP_FILTER`
 a| [subs=-attributes]
@@ -436,7 +385,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.
-
 |`LDAP_USER_OBJECTCLASS` +
 `IDP_LDAP_OBJECTCLASS`
 a| [subs=-attributes]

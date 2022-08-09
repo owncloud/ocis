@@ -6,7 +6,6 @@
 | Type
 | Default Value
 | Description
-
 |`OCIS_TRACING_ENABLED` +
 `OCDAV_TRACING_ENABLED`
 a| [subs=-attributes]
@@ -15,7 +14,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates tracing.
-
 |`OCIS_TRACING_TYPE` +
 `OCDAV_TRACING_TYPE`
 a| [subs=-attributes]
@@ -24,7 +22,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
-
 |`OCIS_TRACING_ENDPOINT` +
 `OCDAV_TRACING_ENDPOINT`
 a| [subs=-attributes]
@@ -33,7 +30,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The endpoint of the tracing agent.
-
 |`OCIS_TRACING_COLLECTOR` +
 `OCDAV_TRACING_COLLECTOR`
 a| [subs=-attributes]
@@ -42,7 +38,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
-
 |`OCIS_LOG_LEVEL` +
 `OCDAV_LOG_LEVEL`
 a| [subs=-attributes]
@@ -51,7 +46,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
-
 |`OCIS_LOG_PRETTY` +
 `OCDAV_LOG_PRETTY`
 a| [subs=-attributes]
@@ -60,7 +54,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates pretty log output.
-
 |`OCIS_LOG_COLOR` +
 `OCDAV_LOG_COLOR`
 a| [subs=-attributes]
@@ -69,7 +62,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates colorized log output.
-
 |`OCIS_LOG_FILE` +
 `OCDAV_LOG_FILE`
 a| [subs=-attributes]
@@ -78,7 +70,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
-
 |`OCDAV_DEBUG_ADDR`
 a| [subs=-attributes]
 +string+
@@ -86,7 +77,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9163]
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
-
 |`OCDAV_DEBUG_TOKEN`
 a| [subs=-attributes]
 +string+
@@ -94,7 +84,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
-
 |`OCDAV_DEBUG_PPROF`
 a| [subs=-attributes]
 +bool+
@@ -102,7 +91,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
-
 |`OCDAV_DEBUG_ZPAGES`
 a| [subs=-attributes]
 +bool+
@@ -110,7 +98,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
-
 |`OCDAV_HTTP_ADDR`
 a| [subs=-attributes]
 +string+
@@ -118,7 +105,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:0]
 a| [subs=-attributes]
 The bind address of the HTTP service.
-
 |`OCDAV_HTTP_PROTOCOL`
 a| [subs=-attributes]
 +string+
@@ -126,7 +112,6 @@ a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
 The transport protocol of the HTTP service.
-
 |`OCDAV_HTTP_PREFIX`
 a| [subs=-attributes]
 +string+
@@ -134,7 +119,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 A URL path prefix for the handler.
-
 |`OCIS_JWT_SECRET` +
 `OCDAV_JWT_SECRET`
 a| [subs=-attributes]
@@ -143,7 +127,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
-
 |`REVA_GATEWAY`
 a| [subs=-attributes]
 +string+
@@ -151,7 +134,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9142]
 a| [subs=-attributes]
 The CS3 gateway endpoint.
-
 |`OCDAV_SKIP_USER_GROUPS_IN_TOKEN`
 a| [subs=-attributes]
 +bool+
@@ -159,7 +141,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Disables the loading of user's group memberships from the reva access token.
-
 |`OCDAV_WEBDAV_NAMESPACE`
 a| [subs=-attributes]
 +string+
@@ -167,7 +148,6 @@ a| [subs=-attributes]
 pass:[/users/{{.Id.OpaqueId}}]
 a| [subs=-attributes]
 Jail requests to /dav/webdav into this CS3 namespace. Supports template layouting with CS3 User properties.
-
 |`OCDAV_FILES_NAMESPACE`
 a| [subs=-attributes]
 +string+
@@ -175,7 +155,6 @@ a| [subs=-attributes]
 pass:[/users/{{.Id.OpaqueId}}]
 a| [subs=-attributes]
 Jail requests to /dav/files/{username} into this CS3 namespace. Supports template layouting with CS3 User properties.
-
 |`OCDAV_SHARES_NAMESPACE`
 a| [subs=-attributes]
 +string+
@@ -183,7 +162,6 @@ a| [subs=-attributes]
 pass:[/Shares]
 a| [subs=-attributes]
 The human readable path for the share jail. Relative to a users personal space root. Upcased intentionally.
-
 |`OCIS_URL` +
 `OCDAV_PUBLIC_URL`
 a| [subs=-attributes]
@@ -192,7 +170,6 @@ a| [subs=-attributes]
 pass:[https://localhost:9200]
 a| [subs=-attributes]
 URL where oCIS is reachable for users.
-
 |`OCIS_INSECURE` +
 `OCDAV_INSECURE`
 a| [subs=-attributes]
@@ -201,7 +178,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Allow insecure connections to the GATEWAY service.
-
 |`OCDAV_GATEWAY_REQUEST_TIMEOUT`
 a| [subs=-attributes]
 +int64+
@@ -209,7 +185,6 @@ a| [subs=-attributes]
 pass:[84300]
 a| [subs=-attributes]
 Request timeout in seconds for requests from the oCDAV service to the GATEWAY service.
-
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `OCDAV_MACHINE_AUTH_API_KEY`
 a| [subs=-attributes]

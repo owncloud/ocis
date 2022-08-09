@@ -6,7 +6,6 @@
 | Type
 | Default Value
 | Description
-
 |`OCIS_LOG_LEVEL` +
 `NATS_LOG_LEVEL`
 a| [subs=-attributes]
@@ -15,7 +14,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
-
 |`OCIS_LOG_PRETTY` +
 `NATS_LOG_PRETTY`
 a| [subs=-attributes]
@@ -24,7 +22,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates pretty log output.
-
 |`OCIS_LOG_COLOR` +
 `NATS_LOG_COLOR`
 a| [subs=-attributes]
@@ -33,7 +30,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates colorized log output.
-
 |`OCIS_LOG_FILE` +
 `NATS_LOG_FILE`
 a| [subs=-attributes]
@@ -42,7 +38,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
-
 |`NATS_DEBUG_ADDR`
 a| [subs=-attributes]
 +string+
@@ -50,7 +45,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9234]
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
-
 |`NATS_DEBUG_TOKEN`
 a| [subs=-attributes]
 +string+
@@ -58,7 +52,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
-
 |`NATS_DEBUG_PPROF`
 a| [subs=-attributes]
 +bool+
@@ -66,7 +59,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
-
 |`NATS_DEBUG_ZPAGES`
 a| [subs=-attributes]
 +bool+
@@ -74,7 +66,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
-
 |`NATS_NATS_HOST`
 a| [subs=-attributes]
 +string+
@@ -82,7 +73,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1]
 a| [subs=-attributes]
 Bind address.
-
 |`NATS_NATS_PORT`
 a| [subs=-attributes]
 +int+
@@ -90,7 +80,6 @@ a| [subs=-attributes]
 pass:[9233]
 a| [subs=-attributes]
 Bind port.
-
 |`NATS_NATS_CLUSTER_ID`
 a| [subs=-attributes]
 +string+
@@ -98,7 +87,6 @@ a| [subs=-attributes]
 pass:[ocis-cluster]
 a| [subs=-attributes]
 ID of the NATS cluster.
-
 |`NATS_NATS_STORE_DIR`
 a| [subs=-attributes]
 +string+

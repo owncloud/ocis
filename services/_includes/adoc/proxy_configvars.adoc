@@ -6,7 +6,6 @@
 | Type
 | Default Value
 | Description
-
 |`OCIS_TRACING_ENABLED` +
 `PROXY_TRACING_ENABLED`
 a| [subs=-attributes]
@@ -15,7 +14,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates tracing.
-
 |`OCIS_TRACING_TYPE` +
 `PROXY_TRACING_TYPE`
 a| [subs=-attributes]
@@ -24,7 +22,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
-
 |`OCIS_TRACING_ENDPOINT` +
 `PROXY_TRACING_ENDPOINT`
 a| [subs=-attributes]
@@ -33,7 +30,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The endpoint of the tracing agent.
-
 |`OCIS_TRACING_COLLECTOR` +
 `PROXY_TRACING_COLLECTOR`
 a| [subs=-attributes]
@@ -42,7 +38,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
-
 |`OCIS_LOG_LEVEL` +
 `PROXY_LOG_LEVEL`
 a| [subs=-attributes]
@@ -51,7 +46,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
-
 |`OCIS_LOG_PRETTY` +
 `PROXY_LOG_PRETTY`
 a| [subs=-attributes]
@@ -60,7 +54,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates pretty log output.
-
 |`OCIS_LOG_COLOR` +
 `PROXY_LOG_COLOR`
 a| [subs=-attributes]
@@ -69,7 +62,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates colorized log output.
-
 |`OCIS_LOG_FILE` +
 `PROXY_LOG_FILE`
 a| [subs=-attributes]
@@ -78,7 +70,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
-
 |`PROXY_DEBUG_ADDR`
 a| [subs=-attributes]
 +string+
@@ -86,7 +77,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9205]
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
-
 |`PROXY_DEBUG_TOKEN`
 a| [subs=-attributes]
 +string+
@@ -94,7 +84,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
-
 |`PROXY_DEBUG_PPROF`
 a| [subs=-attributes]
 +bool+
@@ -102,7 +91,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
-
 |`PROXY_DEBUG_ZPAGES`
 a| [subs=-attributes]
 +bool+
@@ -110,7 +98,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
-
 |`PROXY_HTTP_ADDR`
 a| [subs=-attributes]
 +string+
@@ -118,7 +105,6 @@ a| [subs=-attributes]
 pass:[0.0.0.0:9200]
 a| [subs=-attributes]
 The bind address of the HTTP service.
-
 |`PROXY_HTTP_ROOT`
 a| [subs=-attributes]
 +string+
@@ -126,7 +112,6 @@ a| [subs=-attributes]
 pass:[/]
 a| [subs=-attributes]
 Subdirectory that serves as the root for this HTTP service.
-
 |`PROXY_TRANSPORT_TLS_CERT`
 a| [subs=-attributes]
 +string+
@@ -134,7 +119,6 @@ a| [subs=-attributes]
 pass:[~/.ocis/proxy/server.crt]
 a| [subs=-attributes]
 File name of the TLS server certificate for the HTTPS server.
-
 |`PROXY_TRANSPORT_TLS_KEY`
 a| [subs=-attributes]
 +string+
@@ -142,7 +126,6 @@ a| [subs=-attributes]
 pass:[~/.ocis/proxy/server.key]
 a| [subs=-attributes]
 File name of the TLS server certificate key for the HTTPS server.
-
 |`PROXY_TLS`
 a| [subs=-attributes]
 +bool+
@@ -150,7 +133,6 @@ a| [subs=-attributes]
 pass:[true]
 a| [subs=-attributes]
 Use the HTTPS server instead of the HTTP server.
-
 |`REVA_GATEWAY`
 a| [subs=-attributes]
 +string+
@@ -158,7 +140,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9142]
 a| [subs=-attributes]
 The CS3 gateway endpoint.
-
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `PROXY_OIDC_ISSUER`
@@ -168,7 +149,6 @@ a| [subs=-attributes]
 pass:[https://localhost:9200]
 a| [subs=-attributes]
 URL of the OIDC issuer. It defaults to URL of the builtin IDP.
-
 |`OCIS_INSECURE` +
 `PROXY_OIDC_INSECURE`
 a| [subs=-attributes]
@@ -177,7 +157,6 @@ a| [subs=-attributes]
 pass:[true]
 a| [subs=-attributes]
 Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments.
-
 |`PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD`
 a| [subs=-attributes]
 +string+
@@ -185,7 +164,6 @@ a| [subs=-attributes]
 pass:[jwt]
 a| [subs=-attributes]
 Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'.
-
 |`PROXY_OIDC_USERINFO_CACHE_SIZE`
 a| [subs=-attributes]
 +int+
@@ -193,7 +171,6 @@ a| [subs=-attributes]
 pass:[1024]
 a| [subs=-attributes]
 Cache size for OIDC user info.
-
 |`PROXY_OIDC_USERINFO_CACHE_TTL`
 a| [subs=-attributes]
 +int+
@@ -201,7 +178,6 @@ a| [subs=-attributes]
 pass:[10]
 a| [subs=-attributes]
 Max TTL in seconds for the OIDC user info cache.
-
 |`PROXY_OIDC_JWKS_REFRESH_INTERVAL`
 a| [subs=-attributes]
 +uint64+
@@ -209,7 +185,6 @@ a| [subs=-attributes]
 pass:[60]
 a| [subs=-attributes]
 The interval for refreshing the JWKS (JSON Web Key Set) in minutes in the background via a new HTTP request to the IDP.
-
 |`PROXY_OIDC_JWKS_REFRESH_TIMEOUT`
 a| [subs=-attributes]
 +uint64+
@@ -217,7 +192,6 @@ a| [subs=-attributes]
 pass:[10]
 a| [subs=-attributes]
 The timeout in seconds for an outgoing JWKS request.
-
 |`PROXY_OIDC_JWKS_REFRESH_RATE_LIMIT`
 a| [subs=-attributes]
 +uint64+
@@ -225,7 +199,6 @@ a| [subs=-attributes]
 pass:[60]
 a| [subs=-attributes]
 Limits the rate in seconds at which refresh requests are performed for unknown keys. This is used to prevent malicious clients from imposing high network load on the IDP via ocis.
-
 |`PROXY_OIDC_JWKS_REFRESH_UNKNOWN_KID`
 a| [subs=-attributes]
 +bool+
@@ -233,7 +206,6 @@ a| [subs=-attributes]
 pass:[true]
 a| [subs=-attributes]
 If set to 'true', the JWKS refresh request will occur every time an unknown KEY ID (KID) is seen. Always set a 'refresh_limit' when enabling this.
-
 |`PROXY_OIDC_REWRITE_WELLKNOWN`
 a| [subs=-attributes]
 +bool+
@@ -241,7 +213,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider.
-
 |`OCIS_JWT_SECRET` +
 `PROXY_JWT_SECRET`
 a| [subs=-attributes]
@@ -250,7 +221,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The secret to mint and validate JWT tokens.
-
 |`PROXY_ENABLE_PRESIGNEDURLS`
 a| [subs=-attributes]
 +bool+
@@ -258,7 +228,6 @@ a| [subs=-attributes]
 pass:[true]
 a| [subs=-attributes]
 Allow OCS to get a signing key to sign requests.
-
 |`PROXY_ACCOUNT_BACKEND_TYPE`
 a| [subs=-attributes]
 +string+
@@ -266,7 +235,6 @@ a| [subs=-attributes]
 pass:[cs3]
 a| [subs=-attributes]
 Account backend the PROXY service should use. Currently only 'cs3' is possible here.
-
 |`PROXY_USER_OIDC_CLAIM`
 a| [subs=-attributes]
 +string+
@@ -274,7 +242,6 @@ a| [subs=-attributes]
 pass:[preferred_username]
 a| [subs=-attributes]
 The name of an OpenID Connect claim that should be used for resolving users with the account backend. Currently defaults to 'email'.
-
 |`PROXY_USER_CS3_CLAIM`
 a| [subs=-attributes]
 +string+
@@ -282,7 +249,6 @@ a| [subs=-attributes]
 pass:[username]
 a| [subs=-attributes]
 The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Supported values are 'username', 'mail' and 'userid'.
-
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `PROXY_MACHINE_AUTH_API_KEY`
 a| [subs=-attributes]
@@ -291,7 +257,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Machine auth API key used to validate internal requests necessary to access resources from other services.
-
 |`PROXY_AUTOPROVISION_ACCOUNTS`
 a| [subs=-attributes]
 +bool+
@@ -299,7 +264,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running.
-
 |`PROXY_ENABLE_BASIC_AUTH`
 a| [subs=-attributes]
 +bool+
@@ -307,7 +271,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Set this to true to enable 'basic' (username/password) authentication.
-
 |`PROXY_INSECURE_BACKENDS`
 a| [subs=-attributes]
 +bool+

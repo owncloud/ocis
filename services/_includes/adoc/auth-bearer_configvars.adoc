@@ -6,7 +6,6 @@
 | Type
 | Default Value
 | Description
-
 |`OCIS_TRACING_ENABLED` +
 `AUTH_BEARER_TRACING_ENABLED`
 a| [subs=-attributes]
@@ -15,7 +14,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates tracing.
-
 |`OCIS_TRACING_TYPE` +
 `AUTH_BEARER_TRACING_TYPE`
 a| [subs=-attributes]
@@ -24,7 +22,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
-
 |`OCIS_TRACING_ENDPOINT` +
 `AUTH_BEARER_TRACING_ENDPOINT`
 a| [subs=-attributes]
@@ -33,7 +30,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The endpoint of the tracing agent.
-
 |`OCIS_TRACING_COLLECTOR` +
 `AUTH_BEARER_TRACING_COLLECTOR`
 a| [subs=-attributes]
@@ -42,7 +38,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
-
 |`OCIS_LOG_LEVEL` +
 `AUTH_BEARER_LOG_LEVEL`
 a| [subs=-attributes]
@@ -51,7 +46,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
-
 |`OCIS_LOG_PRETTY` +
 `AUTH_BEARER_LOG_PRETTY`
 a| [subs=-attributes]
@@ -60,7 +54,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates pretty log output.
-
 |`OCIS_LOG_COLOR` +
 `AUTH_BEARER_LOG_COLOR`
 a| [subs=-attributes]
@@ -69,7 +62,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates colorized log output.
-
 |`OCIS_LOG_FILE` +
 `AUTH_BEARER_LOG_FILE`
 a| [subs=-attributes]
@@ -78,7 +70,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
-
 |`AUTH_BEARER_DEBUG_ADDR`
 a| [subs=-attributes]
 +string+
@@ -86,7 +77,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9149]
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
-
 |`AUTH_BEARER_DEBUG_TOKEN`
 a| [subs=-attributes]
 +string+
@@ -94,7 +84,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
-
 |`AUTH_BEARER_DEBUG_PPROF`
 a| [subs=-attributes]
 +bool+
@@ -102,7 +91,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
-
 |`AUTH_BEARER_DEBUG_ZPAGES`
 a| [subs=-attributes]
 +bool+
@@ -110,7 +98,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
-
 |`AUTH_BEARER_GRPC_ADDR`
 a| [subs=-attributes]
 +string+
@@ -118,7 +105,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9148]
 a| [subs=-attributes]
 The bind address of the GRPC service.
-
 |`AUTH_BEARER_GRPC_PROTOCOL`
 a| [subs=-attributes]
 +string+
@@ -126,7 +112,6 @@ a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
 The transport protocol of the GRPC service.
-
 |`OCIS_JWT_SECRET` +
 `AUTH_BEARER_JWT_SECRET`
 a| [subs=-attributes]
@@ -135,7 +120,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
-
 |`REVA_GATEWAY`
 a| [subs=-attributes]
 +string+
@@ -143,7 +127,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9142]
 a| [subs=-attributes]
 The CS3 gateway endpoint.
-
 |`AUTH_BEARER_SKIP_USER_GROUPS_IN_TOKEN`
 a| [subs=-attributes]
 +bool+
@@ -151,7 +134,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Disables the encoding of the user's group memberships in the reva access token. This reduces the token size, especially when users are members of a large number of groups.
-
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `AUTH_BEARER_OIDC_ISSUER`
@@ -161,7 +143,6 @@ a| [subs=-attributes]
 pass:[https://localhost:9200]
 a| [subs=-attributes]
 URL of the OIDC issuer. It defaults to URL of the builtin IDP.
-
 |`OCIS_INSECURE` +
 `AUTH_BEARER_OIDC_INSECURE`
 a| [subs=-attributes]
@@ -170,7 +151,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Allow insecure connections to the OIDC issuer.
-
 |`AUTH_BEARER_OIDC_ID_CLAIM`
 a| [subs=-attributes]
 +string+
@@ -178,7 +158,6 @@ a| [subs=-attributes]
 pass:[preferred_username]
 a| [subs=-attributes]
 Name of the claim, which holds the user identifier.
-
 |`AUTH_BEARER_OIDC_UID_CLAIM`
 a| [subs=-attributes]
 +string+
@@ -186,7 +165,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Name of the claim, which holds the UID.
-
 |`AUTH_BEARER_OIDC_GID_CLAIM`
 a| [subs=-attributes]
 +string+

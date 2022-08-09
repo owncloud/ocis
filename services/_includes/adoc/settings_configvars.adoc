@@ -6,7 +6,6 @@
 | Type
 | Default Value
 | Description
-
 |`OCIS_TRACING_ENABLED` +
 `SETTINGS_TRACING_ENABLED`
 a| [subs=-attributes]
@@ -15,7 +14,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates tracing.
-
 |`OCIS_TRACING_TYPE` +
 `SETTINGS_TRACING_TYPE`
 a| [subs=-attributes]
@@ -24,7 +22,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
-
 |`OCIS_TRACING_ENDPOINT` +
 `SETTINGS_TRACING_ENDPOINT`
 a| [subs=-attributes]
@@ -33,7 +30,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The endpoint of the tracing agent.
-
 |`OCIS_TRACING_COLLECTOR` +
 `SETTINGS_TRACING_COLLECTOR`
 a| [subs=-attributes]
@@ -42,7 +38,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
-
 |`OCIS_LOG_LEVEL` +
 `SETTINGS_LOG_LEVEL`
 a| [subs=-attributes]
@@ -51,7 +46,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
-
 |`OCIS_LOG_PRETTY` +
 `SETTINGS_LOG_PRETTY`
 a| [subs=-attributes]
@@ -60,7 +54,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates pretty log output.
-
 |`OCIS_LOG_COLOR` +
 `SETTINGS_LOG_COLOR`
 a| [subs=-attributes]
@@ -69,7 +62,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates colorized log output.
-
 |`OCIS_LOG_FILE` +
 `SETTINGS_LOG_FILE`
 a| [subs=-attributes]
@@ -78,7 +70,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
-
 |`SETTINGS_DEBUG_ADDR`
 a| [subs=-attributes]
 +string+
@@ -86,7 +77,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9194]
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
-
 |`SETTINGS_DEBUG_TOKEN`
 a| [subs=-attributes]
 +string+
@@ -94,7 +84,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
-
 |`SETTINGS_DEBUG_PPROF`
 a| [subs=-attributes]
 +bool+
@@ -102,7 +91,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
-
 |`SETTINGS_DEBUG_ZPAGES`
 a| [subs=-attributes]
 +bool+
@@ -110,7 +98,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
-
 |`SETTINGS_HTTP_ADDR`
 a| [subs=-attributes]
 +string+
@@ -118,7 +105,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9190]
 a| [subs=-attributes]
 The bind address of the HTTP service.
-
 |`SETTINGS_HTTP_ROOT`
 a| [subs=-attributes]
 +string+
@@ -126,7 +112,6 @@ a| [subs=-attributes]
 pass:[/]
 a| [subs=-attributes]
 Subdirectory that serves as the root for this HTTP service.
-
 |`SETTINGS_CACHE_TTL`
 a| [subs=-attributes]
 +int+
@@ -134,7 +119,6 @@ a| [subs=-attributes]
 pass:[604800]
 a| [subs=-attributes]
 Browser cache control max-age value in seconds for settings Web UI assets.
-
 |`SETTINGS_GRPC_ADDR`
 a| [subs=-attributes]
 +string+
@@ -142,7 +126,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9191]
 a| [subs=-attributes]
 The bind address of the GRPC service.
-
 |`SETTINGS_STORE_TYPE`
 a| [subs=-attributes]
 +string+
@@ -150,7 +133,6 @@ a| [subs=-attributes]
 pass:[metadata]
 a| [subs=-attributes]
 Store type configures the persistency driver. Supported values are "metadata" and "filesystem".
-
 |`SETTINGS_DATA_PATH`
 a| [subs=-attributes]
 +string+
@@ -158,7 +140,6 @@ a| [subs=-attributes]
 pass:[~/.ocis/settings]
 a| [subs=-attributes]
 Path for the persistence directory.
-
 |`STORAGE_GATEWAY_GRPC_ADDR`
 a| [subs=-attributes]
 +string+
@@ -166,7 +147,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9215]
 a| [subs=-attributes]
 GRPC address of the STORAGE-SYSTEM service.
-
 |`STORAGE_GRPC_ADDR`
 a| [subs=-attributes]
 +string+
@@ -174,7 +154,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9215]
 a| [subs=-attributes]
 GRPC address of the STORAGE-SYSTEM service.
-
 |`OCIS_SYSTEM_USER_ID` +
 `SETTINGS_SYSTEM_USER_ID`
 a| [subs=-attributes]
@@ -183,7 +162,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
-
 |`OCIS_SYSTEM_USER_IDP` +
 `SETTINGS_SYSTEM_USER_IDP`
 a| [subs=-attributes]
@@ -192,7 +170,6 @@ a| [subs=-attributes]
 pass:[internal]
 a| [subs=-attributes]
 IDP of the oCIS STORAGE-SYSTEM system user.
-
 |`OCIS_SYSTEM_USER_API_KEY`
 a| [subs=-attributes]
 +string+
@@ -200,7 +177,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 API key for the STORAGE-SYSTEM system user.
-
 |`OCIS_ADMIN_USER_ID` +
 `SETTINGS_ADMIN_USER_ID`
 a| [subs=-attributes]
@@ -209,7 +185,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 ID of the user that should receive admin privileges.
-
 |`SETTINGS_ASSET_PATH`
 a| [subs=-attributes]
 +string+
@@ -217,7 +192,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Serve settings Web UI assets from a path on the filesystem instead of the builtin assets. Can be used for development and customization.
-
 |`OCIS_JWT_SECRET` +
 `SETTINGS_JWT_SECRET`
 a| [subs=-attributes]
@@ -226,7 +200,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
-
 |`SETTINGS_SETUP_DEFAULT_ASSIGNMENTS` +
 `ACCOUNTS_DEMO_USERS_AND_GROUPS`
 a| [subs=-attributes]

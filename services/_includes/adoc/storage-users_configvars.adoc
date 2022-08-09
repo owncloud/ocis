@@ -6,7 +6,6 @@
 | Type
 | Default Value
 | Description
-
 |`OCIS_TRACING_ENABLED` +
 `STORAGE_USERS_TRACING_ENABLED`
 a| [subs=-attributes]
@@ -15,7 +14,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates tracing.
-
 |`OCIS_TRACING_TYPE` +
 `STORAGE_USERS_TRACING_TYPE`
 a| [subs=-attributes]
@@ -24,7 +22,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
-
 |`OCIS_TRACING_ENDPOINT` +
 `STORAGE_USERS_TRACING_ENDPOINT`
 a| [subs=-attributes]
@@ -33,7 +30,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The endpoint of the tracing agent.
-
 |`OCIS_TRACING_COLLECTOR` +
 `STORAGE_USERS_TRACING_COLLECTOR`
 a| [subs=-attributes]
@@ -42,7 +38,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
-
 |`OCIS_LOG_LEVEL` +
 `STORAGE_USERS_LOG_LEVEL`
 a| [subs=-attributes]
@@ -51,7 +46,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
-
 |`OCIS_LOG_PRETTY` +
 `STORAGE_USERS_LOG_PRETTY`
 a| [subs=-attributes]
@@ -60,7 +54,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates pretty log output.
-
 |`OCIS_LOG_COLOR` +
 `STORAGE_USERS_LOG_COLOR`
 a| [subs=-attributes]
@@ -69,7 +62,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Activates colorized log output.
-
 |`OCIS_LOG_FILE` +
 `STORAGE_USERS_LOG_FILE`
 a| [subs=-attributes]
@@ -78,7 +70,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
-
 |`STORAGE_USERS_DEBUG_ADDR`
 a| [subs=-attributes]
 +string+
@@ -86,7 +77,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9159]
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
-
 |`STORAGE_USERS_DEBUG_TOKEN`
 a| [subs=-attributes]
 +string+
@@ -94,7 +84,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
-
 |`STORAGE_USERS_DEBUG_PPROF`
 a| [subs=-attributes]
 +bool+
@@ -102,7 +91,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
-
 |`STORAGE_USERS_DEBUG_ZPAGES`
 a| [subs=-attributes]
 +bool+
@@ -110,7 +98,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
-
 |`STORAGE_USERS_GRPC_ADDR`
 a| [subs=-attributes]
 +string+
@@ -118,7 +105,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9157]
 a| [subs=-attributes]
 The bind address of the GRPC service.
-
 |`STORAGE_USERS_GRPC_PROTOCOL`
 a| [subs=-attributes]
 +string+
@@ -126,7 +112,6 @@ a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
 The transport protocol of the GPRC service.
-
 |`STORAGE_USERS_HTTP_ADDR`
 a| [subs=-attributes]
 +string+
@@ -134,7 +119,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9158]
 a| [subs=-attributes]
 The bind address of the HTTP service.
-
 |`STORAGE_USERS_HTTP_PROTOCOL`
 a| [subs=-attributes]
 +string+
@@ -142,7 +126,6 @@ a| [subs=-attributes]
 pass:[tcp]
 a| [subs=-attributes]
 The transport protocol of the HTTP service.
-
 |`OCIS_JWT_SECRET` +
 `STORAGE_USERS_JWT_SECRET`
 a| [subs=-attributes]
@@ -151,7 +134,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
-
 |`REVA_GATEWAY`
 a| [subs=-attributes]
 +string+
@@ -159,7 +141,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9142]
 a| [subs=-attributes]
 The CS3 gateway endpoint.
-
 |`STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN`
 a| [subs=-attributes]
 +bool+
@@ -167,7 +148,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Disables the loading of user's group memberships from the reva access token.
-
 |`STORAGE_USERS_DRIVER`
 a| [subs=-attributes]
 +string+
@@ -175,7 +155,6 @@ a| [subs=-attributes]
 pass:[ocis]
 a| [subs=-attributes]
 The storage driver which should be used by the service
-
 |`STORAGE_USERS_OCIS_ROOT`
 a| [subs=-attributes]
 +string+
@@ -183,7 +162,6 @@ a| [subs=-attributes]
 pass:[~/.ocis/storage/users]
 a| [subs=-attributes]
 Path for the persistence directory.
-
 |`STORAGE_USERS_OCIS_USER_LAYOUT`
 a| [subs=-attributes]
 +string+
@@ -191,7 +169,6 @@ a| [subs=-attributes]
 pass:[{{.Id.OpaqueId}}]
 a| [subs=-attributes]
 Template string for the user storage layout in the persistence directory.
-
 |`STORAGE_USERS_PERMISSION_ENDPOINT,STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT`
 a| [subs=-attributes]
 +string+
@@ -199,7 +176,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9191]
 a| [subs=-attributes]
 Endpoint of the permissions service.
-
 |`STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE`
 a| [subs=-attributes]
 +string+
@@ -207,7 +183,6 @@ a| [subs=-attributes]
 pass:[{{.SpaceType}}/{{.User.Username \| lower}}]
 a| [subs=-attributes]
 Template string to construct personal space aliases.
-
 |`STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE`
 a| [subs=-attributes]
 +string+
@@ -215,7 +190,6 @@ a| [subs=-attributes]
 pass:[{{.SpaceType}}/{{.SpaceName \| replace " " "-" \| lower}}]
 a| [subs=-attributes]
 Template string to construct general space aliases.
-
 |`STORAGE_USERS_OCIS_SHARE_FOLDER`
 a| [subs=-attributes]
 +string+
@@ -223,7 +197,6 @@ a| [subs=-attributes]
 pass:[/Shares]
 a| [subs=-attributes]
 Name of the folder jailing all shares.
-
 |`STORAGE_USERS_S3NG_ROOT`
 a| [subs=-attributes]
 +string+
@@ -231,7 +204,6 @@ a| [subs=-attributes]
 pass:[~/.ocis/storage/users]
 a| [subs=-attributes]
 Path for the persistence directory.
-
 |`STORAGE_USERS_S3NG_USER_LAYOUT`
 a| [subs=-attributes]
 +string+
@@ -239,7 +211,6 @@ a| [subs=-attributes]
 pass:[{{.Id.OpaqueId}}]
 a| [subs=-attributes]
 Template string for the user storage layout in the persistence directory.
-
 |`STORAGE_USERS_PERMISSION_ENDPOINT` +
 `STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT`
 a| [subs=-attributes]
@@ -248,7 +219,6 @@ a| [subs=-attributes]
 pass:[127.0.0.1:9191]
 a| [subs=-attributes]
 Endpoint of the permissions service.
-
 |`STORAGE_USERS_S3NG_REGION`
 a| [subs=-attributes]
 +string+
@@ -256,7 +226,6 @@ a| [subs=-attributes]
 pass:[default]
 a| [subs=-attributes]
 Region of the S3 bucket.
-
 |`STORAGE_USERS_S3NG_ACCESS_KEY`
 a| [subs=-attributes]
 +string+
@@ -264,7 +233,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Access key for the S3 bucket.
-
 |`STORAGE_USERS_S3NG_SECRET_KEY`
 a| [subs=-attributes]
 +string+
@@ -272,7 +240,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Secret key for the S3 bucket.
-
 |`STORAGE_USERS_S3NG_ENDPOINT`
 a| [subs=-attributes]
 +string+
@@ -280,7 +247,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Endpoint for the S3 bucket.
-
 |`STORAGE_USERS_S3NG_BUCKET`
 a| [subs=-attributes]
 +string+
@@ -288,7 +254,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Name of the S3 bucket.
-
 |`STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE`
 a| [subs=-attributes]
 +string+
@@ -296,7 +261,6 @@ a| [subs=-attributes]
 pass:[{{.SpaceType}}/{{.User.Username \| lower}}]
 a| [subs=-attributes]
 Template string to construct personal space aliases.
-
 |`STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE`
 a| [subs=-attributes]
 +string+
@@ -304,7 +268,6 @@ a| [subs=-attributes]
 pass:[{{.SpaceType}}/{{.SpaceName \| replace " " "-" \| lower}}]
 a| [subs=-attributes]
 Template string to construct general space aliases.
-
 |`STORAGE_USERS_S3NG_SHARE_FOLDER`
 a| [subs=-attributes]
 +string+
@@ -312,7 +275,6 @@ a| [subs=-attributes]
 pass:[/Shares]
 a| [subs=-attributes]
 Name of the folder jailing all shares.
-
 |`STORAGE_USERS_OWNCLOUDSQL_DATADIR`
 a| [subs=-attributes]
 +string+
@@ -320,7 +282,6 @@ a| [subs=-attributes]
 pass:[~/.ocis/storage/owncloud]
 a| [subs=-attributes]
 Path for the persistence directory.
-
 |`STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER`
 a| [subs=-attributes]
 +string+
@@ -328,7 +289,6 @@ a| [subs=-attributes]
 pass:[/Shares]
 a| [subs=-attributes]
 Name of the folder jailing all shares.
-
 |`STORAGE_USERS_OWNCLOUDSQL_LAYOUT`
 a| [subs=-attributes]
 +string+
@@ -336,7 +296,6 @@ a| [subs=-attributes]
 pass:[{{.Username}}]
 a| [subs=-attributes]
 Path layout to use to navigate into a users folder in an owncloud data directory
-
 |`STORAGE_USERS_OWNCLOUDSQL_UPLOADINFO_DIR`
 a| [subs=-attributes]
 +string+
@@ -344,7 +303,6 @@ a| [subs=-attributes]
 pass:[~/.ocis/storage/uploadinfo]
 a| [subs=-attributes]
 Path to a directory, where uploads will be stored temporarily.
-
 |`STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME`
 a| [subs=-attributes]
 +string+
@@ -352,7 +310,6 @@ a| [subs=-attributes]
 pass:[owncloud]
 a| [subs=-attributes]
 Username for the database.
-
 |`STORAGE_USERS_OWNCLOUDSQL_DB_PASSWORD`
 a| [subs=-attributes]
 +string+
@@ -360,7 +317,6 @@ a| [subs=-attributes]
 pass:[owncloud]
 a| [subs=-attributes]
 Password for the database.
-
 |`STORAGE_USERS_OWNCLOUDSQL_DB_HOST`
 a| [subs=-attributes]
 +string+
@@ -368,7 +324,6 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 Hostname or IP of the database server.
-
 |`STORAGE_USERS_OWNCLOUDSQL_DB_PORT`
 a| [subs=-attributes]
 +int+
@@ -376,7 +331,6 @@ a| [subs=-attributes]
 pass:[3306]
 a| [subs=-attributes]
 Port that the database server is listening on.
-
 |`STORAGE_USERS_OWNCLOUDSQL_DB_NAME`
 a| [subs=-attributes]
 +string+
@@ -384,7 +338,6 @@ a| [subs=-attributes]
 pass:[owncloud]
 a| [subs=-attributes]
 Name of the database to be used.
-
 |`STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT`
 a| [subs=-attributes]
 +string+
@@ -392,7 +345,6 @@ a| [subs=-attributes]
 pass:[localhost:9144]
 a| [subs=-attributes]
 Endpoint of the users provider.
-
 |`STORAGE_USERS_DATA_SERVER_URL`
 a| [subs=-attributes]
 +string+
@@ -400,14 +352,12 @@ a| [subs=-attributes]
 pass:[http://localhost:9158/data]
 a| [subs=-attributes]
 URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.
-
 |`STORAGE_USERS_EVENTS_ENDPOINT`
 a| [subs=-attributes]
 +string+
 a| [subs=-attributes]
 pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-
 
 |`STORAGE_USERS_EVENTS_CLUSTER`
 a| [subs=-attributes]
@@ -416,7 +366,6 @@ a| [subs=-attributes]
 pass:[ocis-cluster]
 a| [subs=-attributes]
 The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
-
 |`STORAGE_USERS_MOUNT_ID`
 a| [subs=-attributes]
 +string+
@@ -424,7 +373,6 @@ a| [subs=-attributes]
 pass:[1284d238-aa92-42ce-bdc4-0b0000009157]
 a| [subs=-attributes]
 Mount ID of this storage.
-
 |`STORAGE_USERS_EXPOSE_DATA_SERVER`
 a| [subs=-attributes]
 +bool+
@@ -432,7 +380,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users.
-
 |`STORAGE_USERS_READ_ONLY`
 a| [subs=-attributes]
 +bool+
@@ -440,7 +387,6 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Set this storage to be read-only.
-
 |`STORAGE_USERS_UPLOAD_EXPIRATION`
 a| [subs=-attributes]
 +int64+
