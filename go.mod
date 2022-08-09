@@ -63,6 +63,7 @@ require (
 	github.com/urfave/cli/v2 v2.11.1
 	github.com/xhit/go-simple-mail/v2 v2.11.0
 	go-micro.dev/v4 v4.8.0
+	go.etcd.io/bbolt v1.3.6
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.34.0
 	go.opentelemetry.io/otel v1.9.0
@@ -74,6 +75,7 @@ require (
 	golang.org/x/image v0.0.0-20220321031419-a8550c1d254a
 	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e
 	golang.org/x/oauth2 v0.0.0-20220722155238-128564f6959c
+	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035
 	google.golang.org/genproto v0.0.0-20220805133916-01dd62135a58
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.1
@@ -254,7 +256,6 @@ require (
 	github.com/wk8/go-ordered-map v1.0.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
-	go.etcd.io/bbolt v1.3.6 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.2 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.2 // indirect
 	go.etcd.io/etcd/client/v3 v3.5.2 // indirect
