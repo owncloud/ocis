@@ -39,9 +39,10 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		DataServerURL: "http://localhost:9158/data",
-		MountID:       "1284d238-aa92-42ce-bdc4-0b0000009157",
-		Driver:        "ocis",
+		DataServerURL:    "http://localhost:9158/data",
+		MountID:          "1284d238-aa92-42ce-bdc4-0b0000009157",
+		UploadExpiration: 24 * 60 * 60,
+		Driver:           "ocis",
 		Drivers: config.Drivers{
 			OwnCloudSQL: config.OwnCloudSQLDriver{
 				Root:                  filepath.Join(defaults.BaseDataPath(), "storage", "owncloud"),
