@@ -40,7 +40,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.2
 	github.com/justinas/alice v1.2.0
-	github.com/libregraph/idm v0.3.1-0.20220718103124-c4f6613dce2b
+	github.com/libregraph/idm v0.3.1-0.20220808071235-17bb032176de
 	github.com/libregraph/lico v0.54.1-0.20220325072321-31efc3995d63
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
@@ -121,6 +121,7 @@ require (
 	github.com/blevesearch/zapx/v15 v15.3.4 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f // indirect
+	github.com/bombsimon/logrusr/v3 v3.0.0 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/ceph/go-ceph v0.15.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
