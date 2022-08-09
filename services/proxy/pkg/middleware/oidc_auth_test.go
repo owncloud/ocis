@@ -5,35 +5,27 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	"github.com/coreos/go-oidc/v3/oidc"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	. "github.com/onsi/ginkgo/v2"
 	"golang.org/x/oauth2"
 )
 
-func TestOIDCAuthMiddleware(t *testing.T) {
-	next := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
+var _ = Describe("Test OIDC Authenticator", func() {
+	It("should authenticate requests", func() {
+		m := OIDCAuthenticator{
+			ProviderFunc: func() (OIDCProvider, error) { return mockOP(false), nil },
+		}
 
-	m := OIDCAuth(
-		Logger(log.NewLogger()),
-		OIDCProviderFunc(func() (OIDCProvider, error) {
-			return mockOP(false), nil
-		}),
-		OIDCIss("https://localhost:9200"),
-		AccessTokenVerifyMethod(config.AccessTokenVerificationNone),
-	)(next)
+		r := httptest.NewRequest(http.MethodGet, "https://idp.example.com", nil)
+		r.Header.Set("Authorization", "Bearer sometoken")
 
-	r := httptest.NewRequest(http.MethodGet, "https://idp.example.com", nil)
-	r.Header.Set("Authorization", "Bearer sometoken")
-	w := httptest.NewRecorder()
-	m.ServeHTTP(w, r)
-
-	if w.Code != http.StatusInternalServerError {
-		t.Errorf("expected an internal server error")
-	}
-}
+		_, ok := m.Authenticate(r)
+		if ok {
+			Fail("expected an internal server error")
+		}
+	})
+})
 
 type mockOIDCProvider struct {
 	UserInfoFunc func(ctx context.Context, ts oauth2.TokenSource) (*oidc.UserInfo, error)
