@@ -67,3 +67,4 @@ events:
 mount_id: 1284d238-aa92-42ce-bdc4-0b0000009157
 expose_data_server: false
 readonly: false
+upload_expiration: 86400

@@ -440,6 +440,14 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Set this storage to be read-only.
+
+|`STORAGE_USERS_UPLOAD_EXPIRATION`
+a| [subs=-attributes]
++int64+
+a| [subs=-attributes]
+pass:[86400]
+a| [subs=-attributes]
+Duration after which uploads will expire.
 |===
 
 Since Version: `+` added, `-` deprecated
