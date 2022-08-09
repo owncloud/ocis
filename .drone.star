@@ -288,7 +288,7 @@ def buildCacheWeb(ctx):
         "clone": {
             "disable": True,
         },
-        "steps": performWebCache(ctx),
+        "steps": generateWebCache(ctx),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -784,7 +784,8 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                  restoreWebCache() +
                  restoreWebAcceptanceYarnCache() +
                  ocisServer(storage, accounts_hash_difficulty) +
-                 waitForSeleniumService() + waitForMiddlewareService() +
+                 waitForSeleniumService() +
+                 waitForMiddlewareService() +
                  restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
                  [
                      {
@@ -2772,7 +2773,7 @@ def setupForLitmus():
         ],
     }]
 
-def performWebCache(ctx):
+def generateWebCache(ctx):
     ocis_git_base_url = "https://raw.githubusercontent.com/owncloud/ocis"
     path_to_drone_env = "%s/%s/.drone.env" % (ocis_git_base_url, ctx.build.commit)
     path_to_check_script = "%s/%s/tests/config/drone/check_web_cache.sh" % (ocis_git_base_url, ctx.build.commit)
@@ -2784,7 +2785,6 @@ def performWebCache(ctx):
             "commands": [
                 "curl -s -o .drone.env %s" % path_to_drone_env,
                 "curl -s -o check_web_cache.sh %s" % path_to_check_script,
-                "chmod +x check_web_cache.sh",
             ],
         },
         {
