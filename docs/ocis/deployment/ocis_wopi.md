@@ -80,7 +80,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
   DEMO_USERS=
 
   ### Wopi server settings ###
-  # cs3org wopi server version. Defaults to "latest"
+  # cs3org wopi server version. Defaults to "v8.3.3"
   WOPISERVER_DOCKER_TAG=
   # cs3org wopi server domain. Defaults to "wopiserver.owncloud.test"
   WOPISERVER_DOMAIN=
