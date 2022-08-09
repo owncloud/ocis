@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	headerRevaAccessToken   = "x-access-token"
+	_headerRevaAccessToken  = "x-access-token"
 	headerShareToken        = "public-token"
 	basicAuthPasswordPrefix = "password|"
 	authenticationType      = "publicshares"
@@ -74,11 +74,11 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 		return nil, false
 	}
 
-	r.Header.Add(headerRevaAccessToken, authResp.Token)
+	r.Header.Add(_headerRevaAccessToken, authResp.Token)
 
 	a.Logger.Debug().
 		Str("authenticator", "public_share").
 		Str("path", r.URL.Path).
 		Msg("successfully authenticated request")
-	return r, false
+	return r, true
 }
