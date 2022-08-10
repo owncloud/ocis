@@ -43,7 +43,7 @@ DEFAULT_NODEJS_VERSION = "14"
 dirs = {
     "base": "/drone/src",
     "web": "/drone/src/webTestRunner",
-    # relate path from the base directory, i.e. "/drone/src"
+    # relative path from the base directory dirs["base"]
     # this is because the PLUGINS_S3_CACHE does not support absolute paths
     # PLUGINS_S3_CACHE is used to cache the core and testing app
     "core": "oc10/testrunner",
@@ -600,7 +600,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                              "STORAGE_DRIVER": storage,
                              "BEHAT_SUITE": suite,
                              "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
-                             "EXPECTED_FAILURES_FILE": "/drone/src/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (storage.upper()),
+                             "EXPECTED_FAILURES_FILE": "%s/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (dirs["base"], storage.upper()),
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                          },
                          "commands": [
@@ -658,7 +658,7 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
     early_fail = config["apiTests"]["earlyFail"] if "earlyFail" in config["apiTests"] else False
     filterTags = "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage&&~@caldav&&~@carddav" % ("OC" if storage == "owncloud" else "OCIS")
-    expectedFailuresFile = "/drone/src/tests/acceptance/expected-failures-API-on-%s-storage.md" % (storage.upper())
+    expectedFailuresFile = "%s/tests/acceptance/expected-failures-API-on-%s-storage.md" % (dirs["base"], storage.upper())
 
     return {
         "kind": "pipeline",
@@ -679,8 +679,8 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                          "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
                          "environment": {
                              "TEST_WITH_GRAPH_API": "true",
-                             "PATH_TO_OCIS": "/drone/src",
-                             "PATH_TO_CORE": "/drone/src/%s" % dirs["core"],
+                             "PATH_TO_OCIS": "%s" % dirs["base"],
+                             "PATH_TO_CORE": "%s/%s" % (dirs["base"], dirs["core"]),
                              "TEST_SERVER_URL": "https://ocis-server:9200",
                              "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
                              "SKELETON_DIR": "%s/%s/data/apiSkeleton" % (dirs["base"], dirs["testing_app"]),
@@ -695,7 +695,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                          },
                          "commands": [
-                             "make -C /drone/src/%s test-acceptance-api" % dirs["core"],
+                             "make -C %s/%s test-acceptance-api" % (dirs["base"], dirs["core"]),
                          ],
                      },
                  ] + failEarly(ctx, early_fail),
@@ -801,7 +801,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                              "RUN_ON_OCIS": "true",
                              "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/owncloud/data",
                              "TESTING_DATA_DIR": "%s/%s" % (dirs["base"], dirs["testing_app"]),
-                             "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
+                             "WEB_UI_CONFIG": "%s/tests/config/drone/ocis-config.json" % dirs["base"],
                              "TEST_TAGS": finalFilterTags,
                              "LOCAL_UPLOAD_DIR": "/uploads",
                              "NODE_TLS_REJECT_UNAUTHORIZED": 0,
@@ -858,11 +858,11 @@ def e2eTests(ctx):
             "HEADLESS": "true",
             "OCIS": "true",
             "RETRY": "1",
-            "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
+            "WEB_UI_CONFIG": "%s/tests/config/drone/ocis-config.json" % dirs["base"],
             "LOCAL_UPLOAD_DIR": "/uploads",
         },
         "commands": [
-            "cd webTestRunner",
+            "cd %s" % dirs["web"],
             "sleep 10 && yarn test:e2e:cucumber tests/e2e/cucumber/**/*[!.oc10].feature",
         ],
     }]
@@ -932,7 +932,7 @@ def publishTracingResult(ctx, suite):
         "name": "publish-tracing-result",
         "image": OC_UBUNTU,
         "commands": [
-            "cd webTestRunner/reports/e2e/playwright/tracing/",
+            "cd %s/reports/e2e/playwright/tracing/" % dirs["web"],
             'echo "<details><summary>:boom: To see the trace, please open the link in the console ...</summary>\\n\\n<p>\\n\\n" >>  comments.file',
             'for f in *.zip; do echo "#### npx playwright show-trace $CACHE_ENDPOINT/$CACHE_BUCKET/${DRONE_BUILD_NUMBER}/tracing/$f \n" >>  comments.file; done',
             'echo "\n</p></details>" >>  comments.file',
@@ -985,18 +985,18 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                              "BACKEND_HOST": "https://ocis-server:9200",
                              "RUN_ON_OCIS": "true",
                              "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/owncloud/data",
-                             "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
+                             "WEB_UI_CONFIG": "%s/tests/config/drone/ocis-config.json" % dirs["base"],
                              "TEST_TAGS": "not @skipOnOCIS and not @skip",
                              "LOCAL_UPLOAD_DIR": "/uploads",
                              "NODE_TLS_REJECT_UNAUTHORIZED": 0,
                              "WEB_PATH": dirs["web"],
-                             "FEATURE_PATH": "/drone/src/services/settings/ui/tests/acceptance/features",
+                             "FEATURE_PATH": "%s/services/settings/ui/tests/acceptance/features" % dirs["base"],
                              "MIDDLEWARE_HOST": "http://middleware:3000",
                          },
                          "commands": [
                              # TODO: settings/package.json has all the acceptance test dependencies
                              # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
-                             "cd /drone/src/services/settings",
+                             "cd %s/services/settings" % dirs["base"],
                              "retry -t 3 'yarn install --immutable'",
                              "make test-acceptance-webui",
                          ],
@@ -1792,7 +1792,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "STORAGE_SYSTEM_DRIVER_OCIS_ROOT": "/srv/app/tmp/ocis/storage/metadata",
             "SHARING_USER_JSON_FILE": "/srv/app/tmp/ocis/shares.json",
             "PROXY_ENABLE_BASIC_AUTH": True,
-            "WEB_UI_CONFIG": "/drone/src/tests/config/drone/ocis-config.json",
+            "WEB_UI_CONFIG": "%s/tests/config/drone/ocis-config.json" % dirs["base"],
             "OCIS_LOG_LEVEL": "error",
             "SETTINGS_DATA_PATH": "/srv/app/tmp/ocis/settings",
             "IDM_CREATE_DEMO_USERS": True,
@@ -2325,7 +2325,7 @@ def pipelineSanityChecks(ctx, pipelines):
 OCIS_URL = "https://ocis-server:9200"
 OCIS_DOMAIN = "ocis-server:9200"
 OC10_URL = "http://oc10:8080"
-PARALLEL_DEPLOY_CONFIG_PATH = "/drone/src/tests/parallelDeployAcceptance/drone"
+PARALLEL_DEPLOY_CONFIG_PATH = "%s/tests/parallelDeployAcceptance/drone" % dirs["base"]
 
 # step volumes
 stepVolumeOC10Templates = \
@@ -2476,7 +2476,7 @@ def parallelAcceptance(env):
         "SKELETON_DIR": "/%s/%s/data/apiSkeleton" % (dirs["base"], dirs["testing_app"]),
         "PATH_TO_CORE": "/%s/%s" % (dirs["base"], dirs["core"]),
         "OCIS_REVA_DATA_ROOT": "/mnt/data/",
-        "EXPECTED_FAILURES_FILE": "/drone/src/tests/parallelDeployAcceptance/expected-failures-API.md",
+        "EXPECTED_FAILURES_FILE": "%s/tests/parallelDeployAcceptance/expected-failures-API.md" % dirs["base"],
         "OCIS_SKELETON_STRATEGY": "copy",
         "SEND_SCENARIO_LINE_REFERENCES": "true",
         "UPLOAD_DELETE_WAIT_TIME": "1",
