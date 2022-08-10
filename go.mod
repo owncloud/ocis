@@ -11,7 +11,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.3
 	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220719130120-361e9f987d64
-	github.com/cs3org/reva/v2 v2.7.3-0.20220810074418-45c42bf59913
+	github.com/cs3org/reva/v2 v2.7.4-0.20220810133919-94acff51db04
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
@@ -61,6 +61,7 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.2
+	github.com/tus/tusd v1.9.0
 	github.com/urfave/cli/v2 v2.11.1
 	github.com/xhit/go-simple-mail/v2 v2.11.0
 	go-micro.dev/v4 v4.8.0
@@ -252,7 +253,6 @@ require (
 	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/toorop/go-dkim v0.0.0-20201103131630-e1cd1a0a5208 // indirect
 	github.com/trustelem/zxcvbn v1.0.1 // indirect
-	github.com/tus/tusd v1.9.0 // indirect
 	github.com/wk8/go-ordered-map v1.0.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
