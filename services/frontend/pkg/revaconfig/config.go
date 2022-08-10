@@ -23,11 +23,12 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 
 	appProviders := []map[string]interface{}{
 		{
-			"enabled":  true,
-			"version":  "1.0.0",
-			"apps_url": "/app/list",
-			"open_url": "/app/open",
-			"new_url":  "/app/new",
+			"enabled":      true,
+			"version":      "1.1.0",
+			"apps_url":     "/app/list",
+			"open_url":     "/app/open",
+			"open_web_url": "/app/open-in-web",
+			"new_url":      "/app/new",
 		},
 	}
 
@@ -88,6 +89,14 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"transfer_shared_secret": cfg.TransferSecret,
 					"timeout":                86400,
 					"insecure":               cfg.AppHandler.Insecure,
+					"webbaseuri":             "https://ocis.owncloud.test/external",
+					"web": map[string]interface{}{
+						"urlparamsmapping": map[string]string{
+							// param -> value mapper
+							"fileId": "fileid",
+							"app":    "appname",
+						},
+					},
 				},
 				"archiver": map[string]interface{}{
 					"prefix":        cfg.Archiver.Prefix,

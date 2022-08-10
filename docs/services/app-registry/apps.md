@@ -22,9 +22,10 @@ The capabilities endpoint (e.g. `https://localhost:9200/ocs/v1.php/cloud/capabil
           "app_providers": [
             {
               "enabled": true,
-              "version": "1.0.0",
+              "version": "1.1.0",
               "apps_url": "/app/list",
               "open_url": "/app/open",
+              "open_web_url": "/app/open-in-web",
               "new_url": "/app/new"
             }
           ]
