@@ -87,6 +87,7 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 				}
 			}
 			if !isPublicPath(r.URL.Path) {
+				writeSupportedAuthenticateHeader(w, r)
 				for _, s := range SupportedAuthStrategies {
 					userAgentAuthenticateLockIn(w, r, options.CredentialsByUserAgent, s)
 				}
@@ -178,6 +179,7 @@ func userAgentAuthenticateLockIn(w http.ResponseWriter, r *http.Request, locks m
 	for _, r := range ProxyWwwAuthenticate {
 		evalRequestURI(u, r)
 	}
+	fmt.Println(w.Header())
 }
 
 func evalRequestURI(l userAgentLocker, r regexp.Regexp) {
