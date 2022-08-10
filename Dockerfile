@@ -21,14 +21,14 @@ COPY ./ /ocis/
 WORKDIR /ocis/ocis
 RUN make ci-node-generate
 
-FROM owncloudci/golang:1.17 as build
+FROM owncloudci/golang:1.18 as build
 
 COPY --from=generate /ocis /ocis
 
 WORKDIR /ocis/ocis
 RUN make ci-go-generate build
 
-FROM alpine:3.13
+FROM alpine:3.15
 
 RUN apk update && \
 	apk upgrade && \
