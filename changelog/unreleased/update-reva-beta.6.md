@@ -1,4 +1,8 @@
-Enhancement: update reva to v2.7.3
+Enhancement: update reva to v2.7.4
+
+Updated reva to version 2.7.4 This update includes:
+
+*  Bugfix [cs3org/reva#3141](https://github.com/cs3org/reva/pull/3141): Check ListGrants permission when listing shares
 
 Updated reva to version 2.7.3 This update includes:
 
