@@ -104,12 +104,17 @@ type Store_ListService interface {
 	Context() context.Context
 	SendMsg(interface{}) error
 	RecvMsg(interface{}) error
+	CloseSend() error
 	Close() error
 	Recv() (*ListResponse, error)
 }
 
 type storeServiceList struct {
 	stream client.Stream
+}
+
+func (x *storeServiceList) CloseSend() error {
+	return x.stream.CloseSend()
 }
 
 func (x *storeServiceList) Close() error {

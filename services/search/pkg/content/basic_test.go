@@ -46,7 +46,7 @@ var _ = Describe("Basic", func() {
 				{tags: "", expect: []string{}},
 				{tags: ",,,", expect: []string{}},
 				{tags: ",foo,,", expect: []string{"foo"}},
-				{tags: ",foo,,bar, baz, a,,b,,       start and end         space  ,,", expect: []string{"foo", "bar", "baz", "a", "b", "start and end         space"}},
+				{tags: ",foo,,bar,", expect: []string{"foo", "bar"}},
 			} {
 				ri := &storageProvider.ResourceInfo{
 					ArbitraryMetadata: &storageProvider.ArbitraryMetadata{

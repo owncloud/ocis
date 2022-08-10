@@ -21,7 +21,6 @@ func contextGet(ctx context.Context, k string) (string, bool) {
 	}
 
 	token, ok := md[k]
-
 	if len(token) == 0 || !ok {
 		return "", false
 	}

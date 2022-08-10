@@ -2,6 +2,7 @@ package search
 
 import (
 	"context"
+	"errors"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -61,7 +62,8 @@ func statResource(ctx context.Context, ref *provider.Reference, gw gateway.Gatew
 		return nil, err
 	}
 	if res.Status.Code != rpc.Code_CODE_OK {
-		logger.Error().Interface("res", res).Msg("failed to stat the moved resource")
+		err := errors.New("failed to stat the moved resource")
+		logger.Error().Interface("res", res).Msg(err.Error())
 		return nil, err
 	}
 
@@ -76,7 +78,9 @@ func getPath(ctx context.Context, id *provider.ResourceId, gw gateway.GatewayAPI
 		return nil, err
 	}
 	if res.Status.Code != rpc.Code_CODE_OK {
-		logger.Error().Interface("status", res.Status).Interface("id", id).Msg("failed to get path for moved resource")
+		err := errors.New("failed to get path for moved resource")
+
+		logger.Error().Interface("status", res.Status).Interface("id", id).Msg(err.Error())
 		return nil, err
 	}
 
