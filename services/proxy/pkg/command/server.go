@@ -16,7 +16,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
-	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
@@ -175,14 +174,12 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			UserProvider: userProvider,
 		})
 	}
-	tokenCache := sync.NewCache(cfg.OIDC.UserinfoCache.Size)
-	authenticators = append(authenticators, middleware.OIDCAuthenticator{
-		Logger:        logger,
-		TokenCache:    &tokenCache,
-		TokenCacheTTL: time.Duration(cfg.OIDC.UserinfoCache.TTL),
-		HTTPClient:    oidcHTTPClient,
-		OIDCIss:       cfg.OIDC.Issuer,
-		ProviderFunc: func() (middleware.OIDCProvider, error) {
+	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
+		logger,
+		cfg.OIDC.UserinfoCache.TTL,
+		oidcHTTPClient,
+		cfg.OIDC.Issuer,
+		func() (middleware.OIDCProvider, error) {
 			// Initialize a provider by specifying the issuer URL.
 			// it will fetch the keys from the issuer using the .well-known
 			// endpoint
@@ -191,9 +188,9 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 				cfg.OIDC.Issuer,
 			)
 		},
-		JWKSOptions:             cfg.OIDC.JWKS,
-		AccessTokenVerifyMethod: cfg.OIDC.AccessTokenVerifyMethod,
-	})
+		cfg.OIDC.JWKS,
+		cfg.OIDC.AccessTokenVerifyMethod,
+	))
 	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
 		Logger:            logger,
 		RevaGatewayClient: revaClient,

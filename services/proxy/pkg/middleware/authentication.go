@@ -36,6 +36,7 @@ var (
 		"/data":                {},
 		"/konnect/v1/userinfo": {},
 		"/status.php":          {},
+		"/favicon.ico":         {},
 	}
 	// _unprotectedPathPrefixes contains paths which don't need to be authenticated.
 	_unprotectedPathPrefixes = [...]string{
@@ -44,6 +45,7 @@ var (
 		"/user-management",
 		"/.well-known",
 		"/js",
+		"/css",
 		"/icons",
 		"/themes",
 		"/signin",

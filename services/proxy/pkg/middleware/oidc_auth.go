@@ -30,11 +30,28 @@ type OIDCProvider interface {
 	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*gOidc.UserInfo, error)
 }
 
+func NewOIDCAuthenticator(logger log.Logger, tokenCacheTTL int, oidcHTTPClient *http.Client, oidcIss string, providerFunc func() (OIDCProvider, error),
+	jwksOptions config.JWKS, accessTokenVerifyMethod string) OIDCAuthenticator {
+	tokenCache := osync.NewCache(tokenCacheTTL)
+	return OIDCAuthenticator{
+		Logger:                  logger,
+		tokenCache:              &tokenCache,
+		TokenCacheTTL:           time.Duration(tokenCacheTTL),
+		HTTPClient:              oidcHTTPClient,
+		OIDCIss:                 oidcIss,
+		ProviderFunc:            providerFunc,
+		JWKSOptions:             jwksOptions,
+		AccessTokenVerifyMethod: accessTokenVerifyMethod,
+		providerLock:            &sync.Mutex{},
+		jwksLock:                &sync.Mutex{},
+	}
+}
+
 type OIDCAuthenticator struct {
 	Logger                  log.Logger
 	HTTPClient              *http.Client
 	OIDCIss                 string
-	TokenCache              *osync.Cache
+	tokenCache              *osync.Cache
 	TokenCacheTTL           time.Duration
 	ProviderFunc            func() (OIDCProvider, error)
 	AccessTokenVerifyMethod string
@@ -49,7 +66,7 @@ type OIDCAuthenticator struct {
 
 func (m OIDCAuthenticator) getClaims(token string, req *http.Request) (map[string]interface{}, error) {
 	var claims map[string]interface{}
-	hit := m.TokenCache.Load(token)
+	hit := m.tokenCache.Load(token)
 	if hit == nil {
 		aClaims, err := m.verifyAccessToken(token)
 		if err != nil {
@@ -72,7 +89,7 @@ func (m OIDCAuthenticator) getClaims(token string, req *http.Request) (map[strin
 		}
 
 		expiration := m.extractExpiration(aClaims)
-		m.TokenCache.Store(token, claims, expiration)
+		m.tokenCache.Store(token, claims, expiration)
 
 		m.Logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Time("expiration", expiration.UTC()).Msg("unmarshalled and cached userinfo")
 		return claims, nil
@@ -149,7 +166,7 @@ type jwksJSON struct {
 	JWKSURL string `json:"jwks_uri"`
 }
 
-func (m *OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
+func (m OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
 	m.jwksLock.Lock()
 	defer m.jwksLock.Unlock()
 	if m.JWKS == nil {
@@ -200,7 +217,7 @@ func (m *OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
 	return m.JWKS
 }
 
-func (m *OIDCAuthenticator) getProvider() OIDCProvider {
+func (m OIDCAuthenticator) getProvider() OIDCProvider {
 	m.providerLock.Lock()
 	defer m.providerLock.Unlock()
 	if m.provider == nil {
@@ -229,11 +246,11 @@ func (m OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	if m.getProvider() == nil {
 		return nil, false
 	}
+
 	// Force init of jwks keyfunc if needed (contacts the .well-known and jwks endpoints on first call)
 	if m.AccessTokenVerifyMethod == config.AccessTokenVerificationJWT && m.getKeyfunc() == nil {
 		return nil, false
 	}
-
 	token := strings.TrimPrefix(r.Header.Get(_headerAuthorization), _bearerPrefix)
 
 	claims, err := m.getClaims(token, r)
