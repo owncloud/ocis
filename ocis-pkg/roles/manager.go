@@ -14,7 +14,7 @@ import (
 
 const (
 	cacheDatabase  = "ocis-pkg"
-	cacheTableName = "ocis-pkg/store/"
+	cacheTableName = "ocis-pkg/roles"
 	cacheTTL       = time.Hour
 )
 
