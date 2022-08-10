@@ -64,8 +64,6 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 		return doc, err
 	}
 
-	fmt.Println(d1.String())
-
 	lang, err := t.tika.Language(ctx, bytes.NewReader(d1.Bytes()))
 	if err != nil {
 		return doc, nil

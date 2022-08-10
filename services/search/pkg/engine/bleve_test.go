@@ -94,6 +94,25 @@ var _ = Describe("Bleve", func() {
 				assertDocCount(rid, `Size:<1000`, 0)
 				assertDocCount(rid, `Size:>100000`, 0)
 			})
+
+			It("finds files by tags", func() {
+				rid := sprovider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "2",
+					OpaqueId:  "3",
+				}
+				r := createEntity(rid, content.Document{Tags: []string{"foo", "bar"}})
+				err := eng.Upsert(r.ID, r)
+				Expect(err).ToNot(HaveOccurred())
+
+				assertDocCount(rid, `Tags:foo`, 1)
+				assertDocCount(rid, `Tags:bar`, 1)
+				assertDocCount(rid, `Tags:foo Tags:bar`, 1)
+				assertDocCount(rid, `Tags:foo Tags:bar Tags:baz`, 1)
+				assertDocCount(rid, `+Tags:foo +Tags:bar Tags:baz`, 1)
+				assertDocCount(rid, `+Tags:foo +Tags:bar +Tags:baz`, 0)
+				assertDocCount(rid, `Tags:baz`, 0)
+			})
 		})
 
 		Context("by filename", func() {
