@@ -164,7 +164,7 @@ The following sections list the changes for unreleased.
 
    Tags: web
 
-   We updated ownCloud Web to v5.7.0-rc.8. Please refer to the changelog (linked) for details on
+   We updated ownCloud Web to v5.7.0-rc.9. Please refer to the changelog (linked) for details on
    the web release.
 
   * Bugfix [owncloud/web#7080](https://github.com/owncloud/web/issues/7080): Add Droparea again
@@ -182,6 +182,7 @@ The following sections list the changes for unreleased.
   * Bugfix [owncloud/web#7268](https://github.com/owncloud/web/issues/7268): Personal shares leaked into project space
   * Bugfix [owncloud/web#7359](https://github.com/owncloud/web/pull/7359): Fix infinite loading spinner on invalid preview links
   * Bugfix [owncloud/web#7272](https://github.com/owncloud/web/issues/7272): Print backend version
+  * Bugfix [owncloud/web#7424](https://github.com/owncloud/web/pull/7424): Quicklinks not shown
   * Bugfix [owncloud/web#7379](https://github.com/owncloud/web/pull/7379): Rename shared space resource not possible
   * Bugfix [owncloud/web#7210](https://github.com/owncloud/web/pull/7210): Repair navigation highlighter
   * Bugfix [owncloud/web#7393](https://github.com/owncloud/web/pull/7393): Selected item bottom glue
