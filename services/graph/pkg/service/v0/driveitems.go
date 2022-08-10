@@ -227,6 +227,8 @@ func (g Graph) GetExtendedSpaceProperties(ctx context.Context, baseURL *url.URL,
 	for _, itemName := range names {
 		if itemID, ok := metadata[itemName]; ok {
 			rid, _ := storagespace.ParseID(string(itemID.Value))
+			// add the storageID of the space, all drive items of this space belong to the same storageID
+			rid.StorageId = space.GetRoot().GetStorageId()
 			spaceItem := g.getSpecialDriveItem(ctx, rid, itemName, baseURL, space)
 			if spaceItem != nil {
 				spaceItems = append(spaceItems, *spaceItem)
@@ -244,12 +246,12 @@ func (g Graph) getSpecialDriveItem(ctx context.Context, id storageprovider.Resou
 
 	spaceItem, err := g.getDriveItem(ctx, id)
 	if err != nil {
-		g.logger.Error().Err(err).Str("ID", id.OpaqueId).Msg("Could not get readme Item")
+		g.logger.Error().Err(err).Str("ID", id.OpaqueId).Str("name", itemName).Msg("Could not get item info")
 		return nil
 	}
 	itemPath, err := g.getPathForResource(ctx, id)
 	if err != nil {
-		g.logger.Error().Err(err).Str("ID", id.OpaqueId).Msg("Could not get readme path")
+		g.logger.Error().Err(err).Str("ID", id.OpaqueId).Str("name", itemName).Msg("Could not get item path")
 		return nil
 	}
 	spaceItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(itemName)}

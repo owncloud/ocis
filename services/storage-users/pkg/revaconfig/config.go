@@ -29,6 +29,7 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"mount_id":           cfg.MountID,
 					"expose_data_server": cfg.ExposeDataServer,
 					"data_server_url":    cfg.DataServerURL,
+					"upload_expiration":  cfg.UploadExpiration,
 				},
 			},
 			"interceptors": map[string]interface{}{
