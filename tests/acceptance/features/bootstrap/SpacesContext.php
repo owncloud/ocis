@@ -2560,7 +2560,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" requests the checksum of "([^"]*)" in space "([^"]*)" via propfind$/
+	 * @When /^user "([^"]*)" requests the checksum of (?:file|folder|entry) "([^"]*)" in space "([^"]*)" via propfind using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $path
