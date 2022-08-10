@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/go-micro/plugins/v4/store/redis"
+	"github.com/owncloud/ocis/v2/ocis-pkg/store/etcd"
 	"github.com/owncloud/ocis/v2/ocis-pkg/store/memory"
 	"go-micro.dev/v4/store"
 )
@@ -31,14 +31,14 @@ var ocMemStore *store.Store
 // via environment variables.
 // Available options for "OCIS_STORE" are:
 // * "noop", for a noop store (it does nothing)
-// * "redis", for redis
+// * "etcd", for etcd
 // * "ocmem", custom in-memory implementation, with fixed size and optimized prefix
 // and suffix search
 // * "memory", for a in-memory implementation, which is the default if noone matches
 //
 // "OCIS_STORE_ADDRESS" is a comma-separated list of nodes that the store
-// will use. This is currently usable only with the redis implementation. If it
-// isn't provided, "redis://127.0.0.1:6379" will be the only node used.
+// will use. This is currently usable only with the etcd implementation. If it
+// isn't provided, "127.0.0.1:2379" will be the only node used.
 //
 // "OCIS_STORE_OCMEM_SIZE" will configure the maximum capacity of the cache for
 // the "ocmem" implementation, in number of items that the cache can hold per table.
@@ -57,8 +57,8 @@ func GetStore() store.Store {
 	switch os.Getenv(storeEnv) {
 	case "noop":
 		s = store.NewNoopStore(opts...)
-	case "redis":
-		s = redis.NewStore(opts...)
+	case "etcd":
+		s = etcd.NewEtcdStore(opts...)
 	case "ocmem":
 		if ocMemStore == nil {
 			var memStore store.Store

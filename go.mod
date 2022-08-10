@@ -33,7 +33,6 @@ require (
 	github.com/go-micro/plugins/v4/registry/nats v1.1.0
 	github.com/go-micro/plugins/v4/server/grpc v1.1.1
 	github.com/go-micro/plugins/v4/server/http v1.1.0
-	github.com/go-micro/plugins/v4/store/redis v1.1.0
 	github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.1.0
 	github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.1.0
 	github.com/go-micro/plugins/v4/wrapper/trace/opencensus v1.1.0
@@ -70,6 +69,7 @@ require (
 	github.com/xhit/go-simple-mail/v2 v2.11.0
 	go-micro.dev/v4 v4.8.1
 	go.etcd.io/bbolt v1.3.6
+	go.etcd.io/etcd/client/v3 v3.5.2
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.34.0
 	go.opentelemetry.io/otel v1.10.0
