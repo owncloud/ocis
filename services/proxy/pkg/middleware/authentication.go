@@ -41,6 +41,8 @@ var (
 	// _unprotectedPathPrefixes contains paths which don't need to be authenticated.
 	_unprotectedPathPrefixes = [...]string{
 		"/files",
+		"/data",
+		"/s/",
 		"/settings",
 		"/user-management",
 		"/.well-known",

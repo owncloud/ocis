@@ -34,10 +34,10 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 		shareToken = query.Get(headerShareToken)
 	}
 
-	// Currently we only want to authenticate app open request coming from public shares.
 	if shareToken == "" {
-		// Don't authenticate
-		return nil, false
+		// If the share token is not set then we don't need to inject the user to
+		// the request context so we can just continue with the request.
+		return r, true
 	}
 
 	var sharePassword string
