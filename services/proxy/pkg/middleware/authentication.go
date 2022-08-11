@@ -37,6 +37,8 @@ var (
 		"/konnect/v1/userinfo": {},
 		"/status.php":          {},
 		"/favicon.ico":         {},
+		"/ocs/v1.php/config":   {},
+		"/ocs/v2.php/config":   {},
 	}
 	// _unprotectedPathPrefixes contains paths which don't need to be authenticated.
 	_unprotectedPathPrefixes = [...]string{
@@ -179,7 +181,6 @@ func userAgentAuthenticateLockIn(w http.ResponseWriter, r *http.Request, locks m
 	for _, r := range ProxyWwwAuthenticate {
 		evalRequestURI(u, r)
 	}
-	fmt.Println(w.Header())
 }
 
 func evalRequestURI(l userAgentLocker, r regexp.Regexp) {
