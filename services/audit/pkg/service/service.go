@@ -34,7 +34,7 @@ func AuditLoggerFromConfig(ctx context.Context, cfg config.Auditlog, ch <-chan i
 
 }
 
-// StartAuditLogger will block. run in seperate go routine
+// StartAuditLogger will block. run in separate go routine
 func StartAuditLogger(ctx context.Context, ch <-chan interface{}, log log.Logger, marshaller Marshaller, logto ...Log) {
 	for {
 		select {
