@@ -89,10 +89,31 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 				}
 			}
 			if !isPublicPath(r.URL.Path) {
-				writeSupportedAuthenticateHeader(w, r)
-				for _, s := range SupportedAuthStrategies {
-					userAgentAuthenticateLockIn(w, r, options.CredentialsByUserAgent, s)
+				// Failed basic authentication attempts receive the Www-Authenticate header in the response
+				var touch bool
+				for k, v := range options.CredentialsByUserAgent {
+					if strings.Contains(k, r.UserAgent()) {
+						removeSuperfluousAuthenticate(w)
+						w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(v), r.Host))
+						touch = true
+						break
+					}
 				}
+
+				// if the request is not bound to any user agent, write all available challenges
+				if !touch &&
+					// This is a temporary hack... Before the authentication middleware rewrite all
+					// unauthenticated requests were still handled. The reva http services then did add
+					// the supported authentication headers to the response. Since we are not allowing the
+					// requests to continue so far we have to do it here. But we shouldn't do it for the graph service.
+					// That's the reason for this hard check here.
+					!strings.HasPrefix(r.URL.Path, "/graph") {
+					writeSupportedAuthenticateHeader(w, r)
+				}
+			}
+
+			for _, s := range SupportedAuthStrategies {
+				userAgentAuthenticateLockIn(w, r, options.CredentialsByUserAgent, s)
 			}
 			w.WriteHeader(http.StatusUnauthorized)
 			// if the request is a PROPFIND return a WebDAV error code.
