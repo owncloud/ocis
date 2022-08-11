@@ -185,6 +185,18 @@ protobuf:
         echo -n "% protobuf $$mod: "; $(MAKE) --no-print-directory -C $$mod protobuf || exit 1; \
     done
 
+.PHONY: golangci-lint
+golangci-lint:
+	@for mod in $(OCIS_MODULES); do \
+        $(MAKE) --no-print-directory -C $$mod golangci-lint; \
+    done
+
+.PHONY: golangci-lint-fix
+golangci-lint-fix:
+	@for mod in $(OCIS_MODULES); do \
+        $(MAKE) --no-print-directory -C $$mod golangci-lint-fix; \
+    done
+
 .PHONY: bingo-update
 bingo-update: $(BINGO)
 	$(BINGO) get -l -u
