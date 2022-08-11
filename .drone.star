@@ -891,6 +891,8 @@ def e2eTests(ctx):
             "volumes": e2e_volumes,
         }]
 
+    return []
+
 def uploadTracingResult(ctx):
     return [{
         "name": "upload-tracing-result",
