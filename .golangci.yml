@@ -40,11 +40,25 @@ linters:
     - gocognit
     - nestif # each 10-50 issues in codebase
 
+linters-settings:
+  gocyclo:
+    min-complexity: 35 # there are some func unforuntately who need this - should we refactor them?
+
 severity:
   default-severity: error
 
 issues:
-  exclude-use-default: false
+  exclude-use-default: true
+  exclude-rules:
+    - path: _test.go
+      source: "." # exclude _test.go files from linting
+  include: # include comment errors. We want comments!
+    - EXC0002
+    - EXC0011
+    - EXC0012
+    - EXC0013
+    - EXC0014
+    - EXC0015
 
 # Enabled by default linters:
 # deadcode: Finds unused code [fast: false, auto-fix: false]
