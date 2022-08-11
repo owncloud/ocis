@@ -1129,12 +1129,12 @@ func TestConcurrentWrite(t *testing.T) {
 			)
 
 			var wg sync.WaitGroup
-			index := &atomic.Int64{}
+			var index int64
 
 			wg.Add(threads)
 			for i := 0; i < threads; i++ {
-				go func(cache store.Store, index *atomic.Int64) {
-					j := index.Add(1) - 1
+				go func(cache store.Store, ind *int64) {
+					j := atomic.AddInt64(ind, 1) - 1
 					for j < 100000 {
 						v := strconv.FormatInt(j, 10)
 						record := &store.Record{
@@ -1142,10 +1142,10 @@ func TestConcurrentWrite(t *testing.T) {
 							Value: []byte(v),
 						}
 						cache.Write(record)
-						j = index.Add(1) - 1
+						j = atomic.AddInt64(ind, 1) - 1
 					}
 					wg.Done()
-				}(cache, index)
+				}(cache, &index)
 			}
 			wg.Wait()
 
