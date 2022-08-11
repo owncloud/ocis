@@ -20,8 +20,8 @@ func TestWriteReadTables(t *testing.T) {
 		Value: []byte("from record2"),
 	}
 
-	cache.Write(record1)
-	cache.Write(record2, store.WriteTo("DB02", "Table02"))
+	_ = cache.Write(record1)
+	_ = cache.Write(record2, store.WriteTo("DB02", "Table02"))
 
 	records1, _ := cache.Read("sameKey")
 	if len(records1) != 1 {
@@ -58,8 +58,8 @@ func TestDeleteTables(t *testing.T) {
 		Value: []byte("from record2"),
 	}
 
-	cache.Write(record1)
-	cache.Write(record2, store.WriteTo("DB02", "Table02"))
+	_ = cache.Write(record1)
+	_ = cache.Write(record2, store.WriteTo("DB02", "Table02"))
 
 	records1, _ := cache.Read("sameKey")
 	if len(records1) != 1 {
@@ -83,9 +83,8 @@ func TestDeleteTables(t *testing.T) {
 		t.Errorf("Wrong value, expected \"from record2\", got %s", string(records2[0].Value))
 	}
 
-	cache.Delete("sameKey")
-	_, err := cache.Read("sameKey")
-	if err != store.ErrNotFound {
+	_ = cache.Delete("sameKey")
+	if _, err := cache.Read("sameKey"); err != store.ErrNotFound {
 		t.Errorf("Key \"sameKey\" still exists after deletion")
 	}
 
@@ -113,8 +112,8 @@ func TestListTables(t *testing.T) {
 		Value: []byte("from record2"),
 	}
 
-	cache.Write(record1)
-	cache.Write(record2, store.WriteTo("DB02", "Table02"))
+	_ = cache.Write(record1)
+	_ = cache.Write(record2, store.WriteTo("DB02", "Table02"))
 
 	keys, _ := cache.List(store.ListFrom("DB02", "Table02"))
 	expectedKeys := []string{"key002"}
@@ -145,8 +144,8 @@ func TestWriteSizeLimit(t *testing.T) {
 		v := strconv.Itoa(i)
 		record.Key = v
 		record.Value = []byte(v)
-		cache.Write(record)
-		cache.Write(record, store.WriteTo("DB02", "Table02"))
+		_ = cache.Write(record)
+		_ = cache.Write(record, store.WriteTo("DB02", "Table02"))
 	}
 
 	keys1, _ := cache.List()

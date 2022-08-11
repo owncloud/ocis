@@ -82,11 +82,14 @@ func (m *Manager) List(ctx context.Context, roleIDs []string) []*settingsmsg.Bun
 				Value:  jsonbytes,
 				Expiry: cacheTTL,
 			}
-			m.cache.Write(
+			err := m.cache.Write(
 				record,
 				store.WriteTo(cacheDatabase, cacheTableName),
 				store.WriteTTL(cacheTTL),
 			)
+			if err != nil {
+				m.logger.Debug().Err(err).Msg("failed to cache roles")
+			}
 			result = append(result, role)
 		}
 	}

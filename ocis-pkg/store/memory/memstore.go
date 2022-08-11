@@ -392,9 +392,8 @@ func (m *MemStore) Len() (int, bool) {
 }
 
 func (m *MemStore) radixTreeCallBack(offset, limit uint, result *[]*store.Record, expiredElements map[string]*list.Element) radix.WalkFn {
-	var currentIndex *uint = new(uint)
-	var maxIndex *uint = new(uint)
-	*currentIndex = uint(0)
+	currentIndex := new(uint) // needs to be a pointer so the value persist across callback calls
+	maxIndex := new(uint)     // needs to be a pointer so the value persist across callback calls
 	*maxIndex = offset + limit
 	return func(key string, value interface{}) bool {
 		element := value.(*list.Element)
@@ -416,16 +415,14 @@ func (m *MemStore) radixTreeCallBack(offset, limit uint, result *[]*store.Record
 
 		if *currentIndex < *maxIndex || *maxIndex == offset {
 			return false
-		} else {
-			return true
 		}
+		return true
 	}
 }
 
 func (m *MemStore) radixTreeCallBackCheckSuffix(offset, limit uint, presuf string, result *[]*store.Record, expiredElements map[string]*list.Element) radix.WalkFn {
-	var currentIndex *uint = new(uint)
-	var maxIndex *uint = new(uint)
-	*currentIndex = uint(0)
+	currentIndex := new(uint) // needs to be a pointer so the value persist across callback calls
+	maxIndex := new(uint)     // needs to be a pointer so the value persist across callback calls
 	*maxIndex = offset + limit
 	return func(key string, value interface{}) bool {
 		if !strings.HasSuffix(key, presuf) {
@@ -450,16 +447,14 @@ func (m *MemStore) radixTreeCallBackCheckSuffix(offset, limit uint, presuf strin
 
 		if *currentIndex < *maxIndex || *maxIndex == offset {
 			return false
-		} else {
-			return true
 		}
+		return true
 	}
 }
 
 func (m *MemStore) radixTreeCallBackKeysOnly(offset, limit uint, result *[]string, expiredElements map[string]*list.Element) radix.WalkFn {
-	var currentIndex *uint = new(uint)
-	var maxIndex *uint = new(uint)
-	*currentIndex = uint(0)
+	currentIndex := new(uint) // needs to be a pointer so the value persist across callback calls
+	maxIndex := new(uint)     // needs to be a pointer so the value persist across callback calls
 	*maxIndex = offset + limit
 	return func(key string, value interface{}) bool {
 		element := value.(*list.Element)
@@ -480,16 +475,14 @@ func (m *MemStore) radixTreeCallBackKeysOnly(offset, limit uint, result *[]strin
 
 		if *currentIndex < *maxIndex || *maxIndex == offset {
 			return false
-		} else {
-			return true
 		}
+		return true
 	}
 }
 
 func (m *MemStore) radixTreeCallBackKeysOnlyWithSuffix(offset, limit uint, presuf string, result *[]string, expiredElements map[string]*list.Element) radix.WalkFn {
-	var currentIndex *uint = new(uint)
-	var maxIndex *uint = new(uint)
-	*currentIndex = uint(0)
+	currentIndex := new(uint) // needs to be a pointer so the value persist across callback calls
+	maxIndex := new(uint)     // needs to be a pointer so the value persist across callback calls
 	*maxIndex = offset + limit
 	return func(key string, value interface{}) bool {
 		if !strings.HasSuffix(key, presuf) {
@@ -514,8 +507,7 @@ func (m *MemStore) radixTreeCallBackKeysOnlyWithSuffix(offset, limit uint, presu
 
 		if *currentIndex < *maxIndex || *maxIndex == offset {
 			return false
-		} else {
-			return true
 		}
+		return true
 	}
 }

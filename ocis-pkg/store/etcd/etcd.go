@@ -11,6 +11,11 @@ import (
 	"go.etcd.io/etcd/client/v3/namespace"
 )
 
+const (
+	prefixNS = ".prefix"
+	suffixNS = ".suffix"
+)
+
 type EtcdStore struct {
 	options store.Options
 	client  *clientv3.Client
@@ -23,9 +28,9 @@ func NewEtcdStore(opts ...store.Option) store.Store {
 	return es
 }
 
-func (es *EtcdStore) getCtx() context.Context {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	return ctx
+func (es *EtcdStore) getCtx() (context.Context, context.CancelFunc) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	return ctx, cancel
 }
 
 // Setup the etcd client based on the current options. The old client (if any)
@@ -121,8 +126,8 @@ func (es *EtcdStore) Write(r *store.Record, opts ...store.WriteOption) error {
 		opt(&wopts)
 	}
 
-	prefix := wopts.Database + "/" + wopts.Table + "/.prefix/"
-	suffix := wopts.Database + "/" + wopts.Table + "/.suffix/"
+	prefix := buildPrefix(wopts.Database, wopts.Table, prefixNS)
+	suffix := buildPrefix(wopts.Database, wopts.Table, suffixNS)
 
 	kv := es.client.KV
 
@@ -137,7 +142,9 @@ func (es *EtcdStore) Write(r *store.Record, opts ...store.WriteOption) error {
 
 	if effectiveTTL != 0 {
 		lease := es.client.Lease
-		gResp, gErr := lease.Grant(es.getCtx(), getEffectiveTTL(r, wopts))
+		ctx, cancel := es.getCtx()
+		gResp, gErr := lease.Grant(ctx, getEffectiveTTL(r, wopts))
+		cancel()
 		if gErr != nil {
 			return gErr
 		}
@@ -146,17 +153,19 @@ func (es *EtcdStore) Write(r *store.Record, opts ...store.WriteOption) error {
 		opOpts = []clientv3.OpOption{clientv3.WithLease(0)}
 	}
 
-	_, err = kv.Txn(es.getCtx()).Then(
+	ctx, cancel := es.getCtx()
+	_, err = kv.Txn(ctx).Then(
 		clientv3.OpPut(prefix+r.Key, jsonStringRecord, opOpts...),
 		clientv3.OpPut(suffix+reverseString(r.Key), jsonStringRecord, opOpts...),
 	).Commit()
+	cancel()
 
 	return err
 }
 
 // Process a Get response taking into account the provided offset
 func processGetResponse(resp *clientv3.GetResponse, offset int64) ([]*store.Record, error) {
-	var result []*store.Record
+	result := make([]*store.Record, 0, len(resp.Kvs))
 	for index, kvs := range resp.Kvs {
 		if int64(index) < offset {
 			// skip entries before the offset
@@ -178,7 +187,7 @@ func processGetResponse(resp *clientv3.GetResponse, offset int64) ([]*store.Reco
 // "zyxw" will be reversed to "wxyz". This is used for suffix searches,
 // where the keys are stored reversed and need to be changed
 func processListResponse(resp *clientv3.GetResponse, offset int64, reverse bool) ([]string, error) {
-	var result []string
+	result := make([]string, 0, len(resp.Kvs))
 	for index, kvs := range resp.Kvs {
 		if int64(index) < offset {
 			// skip entries before the offset
@@ -196,7 +205,9 @@ func processListResponse(resp *clientv3.GetResponse, offset int64, reverse bool)
 
 // Perform an exact key read and return the result
 func (es *EtcdStore) directRead(kv clientv3.KV, key string) ([]*store.Record, error) {
-	resp, err := kv.Get(es.getCtx(), key)
+	ctx, cancel := es.getCtx()
+	resp, err := kv.Get(ctx, key)
+	cancel()
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +230,9 @@ func (es *EtcdStore) prefixRead(kv clientv3.KV, key string, limit, offset int64)
 		getOptions = append(getOptions, clientv3.WithLimit(limit+offset))
 	}
 
-	resp, err := kv.Get(es.getCtx(), key, getOptions...)
+	ctx, cancel := es.getCtx()
+	resp, err := kv.Get(ctx, key, getOptions...)
+	cancel()
 	if err != nil {
 		return nil, err
 	}
@@ -244,13 +257,15 @@ func (es *EtcdStore) prefixSuffixRead(kv clientv3.KV, prefix, suffix string, lim
 		getOptions = append(getOptions, clientv3.WithLimit((limit+offset)*2))
 	}
 
-	var currentRecordOffset int64 = 0
+	var currentRecordOffset int64
 	result := []*store.Record{}
 	initialKey := prefix
 
 	keepGoing := true
 	for keepGoing {
-		resp, respErr := kv.Get(es.getCtx(), initialKey, getOptions...)
+		ctx, cancel := es.getCtx()
+		resp, respErr := kv.Get(ctx, initialKey, getOptions...)
+		cancel()
 		if respErr != nil {
 			return nil, respErr
 		}
@@ -314,8 +329,8 @@ func (es *EtcdStore) Read(key string, opts ...store.ReadOption) ([]*store.Record
 		opt(&ropts)
 	}
 
-	prefix := ropts.Database + "/" + ropts.Table + "/.prefix/"
-	suffix := ropts.Database + "/" + ropts.Table + "/.suffix/"
+	prefix := buildPrefix(ropts.Database, ropts.Table, prefixNS)
+	suffix := buildPrefix(ropts.Database, ropts.Table, suffixNS)
 
 	kv := es.client.KV
 	preKv := namespace.NewKV(kv, prefix)
@@ -350,15 +365,17 @@ func (es *EtcdStore) Delete(key string, opts ...store.DeleteOption) error {
 		opt(&dopts)
 	}
 
-	prefix := dopts.Database + "/" + dopts.Table + "/.prefix/"
-	suffix := dopts.Database + "/" + dopts.Table + "/.suffix/"
+	prefix := buildPrefix(dopts.Database, dopts.Table, prefixNS)
+	suffix := buildPrefix(dopts.Database, dopts.Table, suffixNS)
 
 	kv := es.client.KV
 
-	_, err := kv.Txn(es.getCtx()).Then(
+	ctx, cancel := es.getCtx()
+	_, err := kv.Txn(ctx).Then(
 		clientv3.OpDelete(prefix+key),
 		clientv3.OpDelete(suffix+reverseString(key)),
 	).Commit()
+	cancel()
 
 	return err
 }
@@ -380,7 +397,9 @@ func (es *EtcdStore) listKeys(kv clientv3.KV, prefixKey string, limit, offset in
 		getOptions = append(getOptions, clientv3.WithLimit(limit+offset))
 	}
 
-	resp, err := kv.Get(es.getCtx(), prefixKey, getOptions...)
+	ctx, cancel := es.getCtx()
+	resp, err := kv.Get(ctx, prefixKey, getOptions...)
+	cancel()
 	if err != nil {
 		return nil, err
 	}
@@ -406,13 +425,15 @@ func (es *EtcdStore) prefixSuffixList(kv clientv3.KV, prefix, suffix string, lim
 		getOptions = append(getOptions, clientv3.WithLimit((limit+offset)*2))
 	}
 
-	var currentRecordOffset int64 = 0
+	var currentRecordOffset int64
 	result := []string{}
 	initialKey := prefix
 
 	keepGoing := true
 	for keepGoing {
-		resp, respErr := kv.Get(es.getCtx(), initialKey, getOptions...)
+		ctx, cancel := es.getCtx()
+		resp, respErr := kv.Get(ctx, initialKey, getOptions...)
+		cancel()
 		if respErr != nil {
 			return nil, respErr
 		}
@@ -471,8 +492,8 @@ func (es *EtcdStore) List(opts ...store.ListOption) ([]string, error) {
 		opt(&lopts)
 	}
 
-	prefix := lopts.Database + "/" + lopts.Table + "/.prefix/"
-	suffix := lopts.Database + "/" + lopts.Table + "/.suffix/"
+	prefix := buildPrefix(lopts.Database, lopts.Table, prefixNS)
+	suffix := buildPrefix(lopts.Database, lopts.Table, suffixNS)
 
 	kv := es.client.KV
 	preKv := namespace.NewKV(kv, prefix)

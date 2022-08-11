@@ -67,9 +67,7 @@ func (m *MultiMemStore) Init(opts ...store.Option) error {
 	prefix := optList.Database + "/" + optList.Table
 
 	mStore := m.getMemStore(prefix)
-	mStore.Init(opts...)
-
-	return nil
+	return mStore.Init(opts...)
 }
 
 // Get the options used to create the MultiMemStore.

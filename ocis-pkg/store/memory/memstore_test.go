@@ -36,7 +36,7 @@ func TestWriteAndRead(t *testing.T) {
 			Key:   key,
 			Value: []byte(value),
 		}
-		cache.Write(record)
+		_ = cache.Write(record)
 	}
 
 	t.Run("Plain", func(t *testing.T) {
@@ -364,7 +364,7 @@ func TestWriteExpiryAndRead(t *testing.T) {
 			Value:  []byte(value),
 			Expiry: time.Second * 1000,
 		}
-		cache.Write(record)
+		_ = cache.Write(record)
 	}
 
 	records, _ := cache.Read("zzaz")
@@ -399,7 +399,7 @@ func TestWriteExpiryWithExpiryAndRead(t *testing.T) {
 			Expiry: time.Second * 1000,
 		}
 		// write option will override the record data
-		cache.Write(record, store.WriteExpiry(time.Now().Add(time.Hour)))
+		_ = cache.Write(record, store.WriteExpiry(time.Now().Add(time.Hour)))
 	}
 
 	records, _ := cache.Read("zzaz")
@@ -434,7 +434,7 @@ func TestWriteExpiryWithTTLAndRead(t *testing.T) {
 			Expiry: time.Second * 1000,
 		}
 		// write option will override the record data, TTL takes precedence
-		cache.Write(record, store.WriteTTL(20*time.Second), store.WriteExpiry(time.Now().Add(time.Hour)))
+		_ = cache.Write(record, store.WriteTTL(20*time.Second), store.WriteExpiry(time.Now().Add(time.Hour)))
 	}
 
 	records, _ := cache.Read("zzaz")
@@ -460,7 +460,7 @@ func TestDelete(t *testing.T) {
 		t.Fatal("Found key in cache but it shouldn't be there")
 	}
 
-	cache.Write(record)
+	_ = cache.Write(record)
 	records, err = cache.Read("record")
 	if err != nil {
 		t.Fatal("Key not found in cache after inserting it")
@@ -502,7 +502,7 @@ func TestList(t *testing.T) {
 			Key:   key,
 			Value: []byte(value),
 		}
-		cache.Write(record)
+		_ = cache.Write(record)
 	}
 
 	t.Run("Plain", func(t *testing.T) {
@@ -660,7 +660,7 @@ func TestEvictWriteUpdate(t *testing.T) {
 			Key:   v,
 			Value: []byte(v),
 		}
-		cache.Write(record)
+		_ = cache.Write(record)
 	}
 
 	// update first item
@@ -668,14 +668,14 @@ func TestEvictWriteUpdate(t *testing.T) {
 		Key:   "0",
 		Value: []byte("zero"),
 	}
-	cache.Write(updatedRecord)
+	_ = cache.Write(updatedRecord)
 
 	// new record, to force eviction
 	newRecord := &store.Record{
 		Key:   "new",
 		Value: []byte("newNew"),
 	}
-	cache.Write(newRecord)
+	_ = cache.Write(newRecord)
 
 	records, _ := cache.Read("", store.ReadPrefix())
 	if len(records) != 3 {
@@ -718,7 +718,7 @@ func TestEvictRead(t *testing.T) {
 			Key:   v,
 			Value: []byte(v),
 		}
-		cache.Write(record)
+		_ = cache.Write(record)
 	}
 
 	// Read first item
@@ -729,7 +729,7 @@ func TestEvictRead(t *testing.T) {
 		Key:   "new",
 		Value: []byte("newNew"),
 	}
-	cache.Write(newRecord)
+	_ = cache.Write(newRecord)
 
 	records, _ := cache.Read("", store.ReadPrefix())
 	if len(records) != 3 {
@@ -772,7 +772,7 @@ func TestEvictReadPrefix(t *testing.T) {
 			Key:   v,
 			Value: []byte(v),
 		}
-		cache.Write(record)
+		_ = cache.Write(record)
 	}
 
 	// Read prefix won't change evcition list
@@ -783,7 +783,7 @@ func TestEvictReadPrefix(t *testing.T) {
 		Key:   "new",
 		Value: []byte("newNew"),
 	}
-	cache.Write(newRecord)
+	_ = cache.Write(newRecord)
 
 	records, _ := cache.Read("", store.ReadPrefix())
 	if len(records) != 3 {
@@ -826,7 +826,7 @@ func TestEvictReadSuffix(t *testing.T) {
 			Key:   v,
 			Value: []byte(v),
 		}
-		cache.Write(record)
+		_ = cache.Write(record)
 	}
 
 	// Read suffix won't change evcition list
@@ -837,7 +837,7 @@ func TestEvictReadSuffix(t *testing.T) {
 		Key:   "new",
 		Value: []byte("newNew"),
 	}
-	cache.Write(newRecord)
+	_ = cache.Write(newRecord)
 
 	records, _ := cache.Read("", store.ReadPrefix())
 	if len(records) != 3 {
@@ -880,7 +880,7 @@ func TestEvictList(t *testing.T) {
 			Key:   v,
 			Value: []byte(v),
 		}
-		cache.Write(record)
+		_ = cache.Write(record)
 	}
 
 	// List won't change evcition list
@@ -891,7 +891,7 @@ func TestEvictList(t *testing.T) {
 		Key:   "new",
 		Value: []byte("newNew"),
 	}
-	cache.Write(newRecord)
+	_ = cache.Write(newRecord)
 
 	records, _ := cache.Read("", store.ReadPrefix())
 	if len(records) != 3 {
@@ -930,7 +930,7 @@ func TestExpireReadPrefix(t *testing.T) {
 		} else {
 			record.Expiry = time.Duration(-i) * time.Minute
 		}
-		cache.Write(record)
+		_ = cache.Write(record)
 	}
 
 	records, _ := cache.Read("", store.ReadPrefix())
@@ -968,7 +968,7 @@ func TestExpireReadSuffix(t *testing.T) {
 		} else {
 			record.Expiry = time.Duration(-i) * time.Minute
 		}
-		cache.Write(record)
+		_ = cache.Write(record)
 	}
 
 	records, _ := cache.Read("", store.ReadSuffix())
@@ -1008,7 +1008,7 @@ func TestExpireList(t *testing.T) {
 		} else {
 			record.Expiry = time.Duration(-i) * time.Minute
 		}
-		cache.Write(record)
+		_ = cache.Write(record)
 	}
 
 	keys, _ := cache.List()
@@ -1046,7 +1046,7 @@ func TestExpireListPrefix(t *testing.T) {
 		} else {
 			record.Expiry = time.Duration(-i) * time.Minute
 		}
-		cache.Write(record)
+		_ = cache.Write(record)
 	}
 
 	keys, _ := cache.List(store.ListPrefix("1"))
@@ -1085,7 +1085,7 @@ func TestExpireListSuffix(t *testing.T) {
 		} else {
 			record.Expiry = time.Duration(-i) * time.Minute
 		}
-		cache.Write(record)
+		_ = cache.Write(record)
 	}
 
 	keys, _ := cache.List(store.ListSuffix("8"))
@@ -1141,7 +1141,7 @@ func TestConcurrentWrite(t *testing.T) {
 							Key:   v,
 							Value: []byte(v),
 						}
-						cache.Write(record)
+						_ = cache.Write(record)
 						j = atomic.AddInt64(ind, 1) - 1
 					}
 					wg.Done()
@@ -1184,7 +1184,7 @@ func BenchmarkWrite(b *testing.B) {
 				v := strconv.Itoa(i)
 				record.Key = v
 				record.Value = []byte(v)
-				cache.Write(record)
+				_ = cache.Write(record)
 			}
 		})
 	}
@@ -1210,13 +1210,13 @@ func BenchmarkRead(b *testing.B) {
 			v := strconv.Itoa(i)
 			record.Key = v
 			record.Value = []byte(v)
-			cache.Write(record)
+			_ = cache.Write(record)
 		}
 		b.Run("CacheSize"+strconv.Itoa(size), func(b *testing.B) {
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				v := strconv.Itoa(i)
-				cache.Read(v)
+				_, _ = cache.Read(v)
 			}
 		})
 	}
@@ -1248,7 +1248,7 @@ func BenchmarkWriteMedKey(b *testing.B) {
 				// records will be copied, so it's safe to overwrite the previous record
 				record.Key = hex.EncodeToString(h.Sum(nil))
 				record.Value = bys
-				cache.Write(record)
+				_ = cache.Write(record)
 			}
 		})
 	}
@@ -1278,7 +1278,7 @@ func BenchmarkReadMedKey(b *testing.B) {
 			// records will be copied, so it's safe to overwrite the previous record
 			record.Key = hex.EncodeToString(h.Sum(nil))
 			record.Value = bys
-			cache.Write(record)
+			_ = cache.Write(record)
 		}
 		b.Run("CacheSize"+strconv.Itoa(size), func(b *testing.B) {
 			b.ResetTimer()
@@ -1287,7 +1287,7 @@ func BenchmarkReadMedKey(b *testing.B) {
 				v := strconv.Itoa(i)
 				bys := []byte(v)
 				h.Write(bys)
-				cache.Read(hex.EncodeToString(h.Sum(nil)))
+				_, _ = cache.Read(hex.EncodeToString(h.Sum(nil)))
 			}
 		})
 	}
@@ -1317,7 +1317,7 @@ func BenchmarkReadMedKeyPrefix(b *testing.B) {
 			// records will be copied, so it's safe to overwrite the previous record
 			record.Key = hex.EncodeToString(h.Sum(nil))
 			record.Value = bys
-			cache.Write(record)
+			_ = cache.Write(record)
 		}
 		b.Run("CacheSize"+strconv.Itoa(size), func(b *testing.B) {
 			b.ResetTimer()
@@ -1326,7 +1326,7 @@ func BenchmarkReadMedKeyPrefix(b *testing.B) {
 				v := strconv.Itoa(i)
 				bys := []byte(v)
 				h.Write(bys)
-				cache.Read(hex.EncodeToString(h.Sum(nil))[:10], store.ReadPrefix(), store.ReadLimit(50))
+				_, _ = cache.Read(hex.EncodeToString(h.Sum(nil))[:10], store.ReadPrefix(), store.ReadLimit(50))
 			}
 		})
 	}
@@ -1356,7 +1356,7 @@ func BenchmarkReadMedKeySuffix(b *testing.B) {
 			// records will be copied, so it's safe to overwrite the previous record
 			record.Key = hex.EncodeToString(h.Sum(nil))
 			record.Value = bys
-			cache.Write(record)
+			_ = cache.Write(record)
 		}
 		b.Run("CacheSize"+strconv.Itoa(size), func(b *testing.B) {
 			b.ResetTimer()
@@ -1365,7 +1365,7 @@ func BenchmarkReadMedKeySuffix(b *testing.B) {
 				v := strconv.Itoa(i)
 				bys := []byte(v)
 				h.Write(bys)
-				cache.Read(hex.EncodeToString(h.Sum(nil))[23:], store.ReadSuffix(), store.ReadLimit(50))
+				_, _ = cache.Read(hex.EncodeToString(h.Sum(nil))[23:], store.ReadSuffix(), store.ReadLimit(50))
 			}
 		})
 	}
@@ -1432,7 +1432,7 @@ func concurrentRetrieveBench(b *testing.B, threads int) {
 				v := strconv.Itoa(i)
 				record.Key = v
 				record.Value = []byte(v)
-				cache.Write(record)
+				_ = cache.Write(record)
 			}
 
 			b.SetParallelism(threads)
@@ -1470,7 +1470,7 @@ func concurrentRemoveBench(b *testing.B, threads int) {
 				v := strconv.Itoa(i)
 				record.Key = v
 				record.Value = []byte(v)
-				cache.Write(record)
+				_ = cache.Write(record)
 			}
 
 			b.SetParallelism(threads)
