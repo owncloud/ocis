@@ -1989,6 +1989,10 @@ class SpacesContext implements Context {
 		string $role
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
+		$availableRoleToAssignToShareSpace = ['manager', 'editor', 'viewer'];
+		if (!\in_array(\strtolower($role), $availableRoleToAssignToShareSpace)) {
+			throw new Error("The Selected " . $role . " Cannot be Found");
+		}
 		$body = [
 			"space_ref" => $space['id'],
 			"shareType" => 7,
@@ -1997,7 +2001,6 @@ class SpacesContext implements Context {
 		];
 
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
-
 		$this->featureContext->setResponse(
 			$this->sendPostRequestToUrl(
 				$fullUrl,
@@ -2111,7 +2114,6 @@ class SpacesContext implements Context {
 		string $role
 	): void {
 		$this->sendShareSpaceRequest($user, $spaceName, $userRecipient, $role);
-
 		$expectedHTTPStatus = "200";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$expectedHTTPStatus,
