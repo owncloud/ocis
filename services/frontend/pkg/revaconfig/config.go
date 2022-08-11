@@ -96,6 +96,9 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"fileId": "fileid",
 							"app":    "appname",
 						},
+						"staticurlparams": map[string]string{
+							"contextRouteName": "files-spaces-personal",
+						},
 					},
 				},
 				"archiver": map[string]interface{}{
