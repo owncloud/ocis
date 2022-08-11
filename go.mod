@@ -10,7 +10,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.3
 	github.com/blevesearch/bleve_index_api v1.0.2
 	github.com/coreos/go-oidc/v3 v3.2.0
-	github.com/cs3org/go-cs3apis v0.0.0-20220719130120-361e9f987d64
+	github.com/cs3org/go-cs3apis v0.0.0-20220818202316-e92afdddac6d
 	github.com/cs3org/reva/v2 v2.7.4
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
@@ -138,6 +138,7 @@ require (
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
+	github.com/emvi/iso-639-1 v1.0.1 // indirect
 	github.com/eternnoir/gncp v0.0.0-20170707042257-c70df2d0cd68 // indirect
 	github.com/evanphx/json-patch/v5 v5.5.0 // indirect
 	github.com/fatih/color v1.13.0 // indirect
@@ -276,3 +277,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	stash.kopano.io/kgol/kcc-go/v5 v5.0.1 // indirect
 )
+
+replace github.com/cs3org/reva/v2 => github.com/butonic/reva/v2 v2.0.0-20220819090247-6183f486f61e
