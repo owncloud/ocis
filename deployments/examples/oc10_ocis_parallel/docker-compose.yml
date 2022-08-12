@@ -70,6 +70,7 @@ services:
     environment:
       # Keycloak IDP specific configuration
       OCIS_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-owncloud}
+      PROXY_OIDC_REWRITE_WELLKNOWN: "true"
       WEB_OIDC_CLIENT_ID: ocis-web
       WEB_OIDC_SCOPE: openid profile email owncloud
       # external ldap is supposed to be read only
@@ -227,17 +228,6 @@ services:
       - "traefik.http.routers.keycloak.tls.certresolver=http"
       - "traefik.http.routers.keycloak.service=keycloak"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
-      # let /.well-known/openid-configuration be served by Keycloak
-      # so that clients (Desktop, iOS and Android) can detect OIDC, 302 redirect is not valid according RFC
-      # https://doc.owncloud.com/server/admin_manual/configuration/user/oidc/#set-up-service-discovery
-      - "traefik.http.middlewares.idp-headers.headers.customrequestheaders.X-Forwarded-Host=${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}"
-      - "traefik.http.middlewares.idp-prefix.addprefix.prefix=/auth/realms/${KEYCLOAK_REALM:-owncloud}"
-      - "traefik.http.middlewares.idp-override.chain.middlewares=idp-headers,idp-prefix"
-      - "traefik.http.routers.idp-wellknown.entrypoints=https"
-      - "traefik.http.routers.idp-wellknown.tls.certresolver=http"
-      - "traefik.http.routers.idp-wellknown.rule=Host(`${CLOUD_DOMAIN:-cloud.owncloud.test}`) && Path(`/.well-known/openid-configuration`)"
-      - "traefik.http.routers.idp-wellknown.middlewares=idp-override"
-      - "traefik.http.routers.idp-wellknown.service=keycloak"
     logging:
       driver: "local"
     restart: always

@@ -1,8 +1,8 @@
-Enhancement: Update ownCloud Web to v5.7.0-rc.7
+Enhancement: Update ownCloud Web to v5.7.0-rc.8
 
 Tags: web
 
-We updated ownCloud Web to v5.7.0-rc.7. Please refer to the changelog (linked) for details on the web release.
+We updated ownCloud Web to v5.7.0-rc.9. Please refer to the changelog (linked) for details on the web release.
 
 * Bugfix [owncloud/web#7080](https://github.com/owncloud/web/issues/7080): Add Droparea again
 * Bugfix [owncloud/web#7357](https://github.com/owncloud/web/pull/7357): Batch deleting multiple files
@@ -19,16 +19,22 @@ We updated ownCloud Web to v5.7.0-rc.7. Please refer to the changelog (linked) f
 * Bugfix [owncloud/web#7268](https://github.com/owncloud/web/issues/7268): Personal shares leaked into project space
 * Bugfix [owncloud/web#7359](https://github.com/owncloud/web/pull/7359): Fix infinite loading spinner on invalid preview links
 * Bugfix [owncloud/web#7272](https://github.com/owncloud/web/issues/7272): Print backend version
+* Bugfix [owncloud/web#7424](https://github.com/owncloud/web/pull/7424): Quicklinks not shown
 * Bugfix [owncloud/web#7379](https://github.com/owncloud/web/pull/7379): Rename shared space resource not possible
 * Bugfix [owncloud/web#7210](https://github.com/owncloud/web/pull/7210): Repair navigation highlighter
+* Bugfix [owncloud/web#7393](https://github.com/owncloud/web/pull/7393): Selected item bottom glue
 * Bugfix [owncloud/web#7308](https://github.com/owncloud/web/pull/7308): "Shared with others" and "Shared via Link" resource links not working
+* Bugfix [owncloud/web#7400](https://github.com/owncloud/web/issues/7400): Respect space quota permission
 * Bugfix [owncloud/web#7349](https://github.com/owncloud/web/pull/7349): Missing quick actions in spaces file list
+* Bugfix [owncloud/web#7396](https://github.com/owncloud/web/pull/7396): Add storage ID when navigating to a shared parent directory
+* Bugfix [owncloud/web#7394](https://github.com/owncloud/web/pull/7394): Suppress active panel error log
 * Bugfix [owncloud/web#7038](https://github.com/owncloud/web/issues/7038): File list render performance
 * Bugfix [owncloud/web#7240](https://github.com/owncloud/web/issues/7240): Access token renewal during upload
 * Bugfix [owncloud/web#7376](https://github.com/owncloud/web/pull/7376): Tooltips not shown on disabled create and upload button
 * Bugfix [owncloud/web#7297](https://github.com/owncloud/web/pull/7297): Upload overlay progress bar spacing
 * Bugfix [owncloud/web#7332](https://github.com/owncloud/web/pull/7332): Users list not loading if user has no role
 * Bugfix [owncloud/web#7313](https://github.com/owncloud/web/pull/7313): Versions of shared files not visible
+* Enhancement [owncloud/web#7404](https://github.com/owncloud/web/pull/7404): Adjust helper texts
 * Enhancement [owncloud/web#7350](https://github.com/owncloud/web/pull/7350): Change file loading mechanism in `preview` app
 * Enhancement [owncloud/web#7356](https://github.com/owncloud/web/pull/7356): Declined shares are now easily accessible
 * Enhancement [owncloud/web#7365](https://github.com/owncloud/web/pull/7365): Drop menu styling in right sidebar
@@ -40,4 +46,4 @@ We updated ownCloud Web to v5.7.0-rc.7. Please refer to the changelog (linked) f
 * Enhancement [owncloud/web#7375](https://github.com/owncloud/web/pull/7375): User management app saved dialog
 
 https://github.com/owncloud/ocis/pull/4314
-https://github.com/owncloud/web/releases/tag/v5.7.0-rc.7
+https://github.com/owncloud/web/releases/tag/v5.7.0-rc.8

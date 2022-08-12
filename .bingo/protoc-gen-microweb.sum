@@ -261,6 +261,8 @@ github.com/owncloud/protoc-gen-microweb v0.0.0-20211219183901-997c02cae878 h1:rg
 github.com/owncloud/protoc-gen-microweb v0.0.0-20211219183901-997c02cae878/go.mod h1:FnVsgi9o7QljV0o82CEqgNzRu4FBtDbx0Fl1Bm39vWQ=
 github.com/owncloud/protoc-gen-microweb v0.0.0-20220407065143-a4a3e07bbb7c h1:zfcwaNIl2ULSwJguxR+IBp1SqJQHYYsQ3oB3ZSipgCg=
 github.com/owncloud/protoc-gen-microweb v0.0.0-20220407065143-a4a3e07bbb7c/go.mod h1:Tj4b1L5vKN7saayN2uqAKIchkm76R80HViLmZvZP2d0=
+github.com/owncloud/protoc-gen-microweb v0.0.0-20220808092353-b5d6c3960e19 h1:ByaZQEfVxPAKlZAS+i0RsXqcLBGLFVu4dTp4lNOZDts=
+github.com/owncloud/protoc-gen-microweb v0.0.0-20220808092353-b5d6c3960e19/go.mod h1:Tj4b1L5vKN7saayN2uqAKIchkm76R80HViLmZvZP2d0=
 github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c/go.mod h1:X07ZCGwUbLaax7L0S3Tw4hpejzu63ZrrQiUe6W0hcy0=
 github.com/pelletier/go-buffruneio v0.2.0/go.mod h1:JkE26KsDizTr40EUHkXVtNPvgGtbSNq5BcowyYOWdKo=
 github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=

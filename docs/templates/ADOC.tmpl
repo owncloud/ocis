@@ -8,10 +8,9 @@
 | Description
 
 {{- range .Fields}}
-{{ $numVars := len .EnvVars }}
 | {{- range $i, $value := .EnvVars }}{{- if $i }} +
 {{ end -}}
-`{{- $value }}` 
+`{{- $value }}`
 {{- end }}
 a| [subs=-attributes]
 +{{.Type}}+
