@@ -336,20 +336,19 @@ func (es *EtcdStore) Read(key string, opts ...store.ReadOption) ([]*store.Record
 	preKv := namespace.NewKV(kv, prefix)
 	sufKv := namespace.NewKV(kv, suffix)
 
-	if !ropts.Prefix && !ropts.Suffix {
-		return es.directRead(preKv, key)
-	}
-
 	if ropts.Prefix && ropts.Suffix {
 		return es.prefixSuffixRead(preKv, key, key, int64(ropts.Limit), int64(ropts.Offset))
-	} else {
-		if ropts.Prefix {
-			return es.prefixRead(preKv, key, int64(ropts.Limit), int64(ropts.Offset))
-		} else if ropts.Suffix {
-			return es.prefixRead(sufKv, reverseString(key), int64(ropts.Limit), int64(ropts.Offset))
-		}
 	}
-	return []*store.Record{}, nil
+
+	if ropts.Prefix {
+		return es.prefixRead(preKv, key, int64(ropts.Limit), int64(ropts.Offset))
+	}
+
+	if ropts.Suffix {
+		return es.prefixRead(sufKv, reverseString(key), int64(ropts.Limit), int64(ropts.Offset))
+	}
+
+	return es.directRead(preKv, key)
 }
 
 // Delete the record containing the key provided. Database and Table
@@ -413,11 +412,14 @@ func (es *EtcdStore) listKeys(kv clientv3.KV, prefixKey string, limit, offset in
 // additional requests to the etcd server to get more results matching all the
 // requirements.
 func (es *EtcdStore) prefixSuffixList(kv clientv3.KV, prefix, suffix string, limit, offset int64) ([]string, error) {
-	// FIXME: Check with prefix = "\xff" -> no key out of prefix
 	firstKeyOut := firstKeyOutOfPrefixString(prefix)
 	getOptions := []clientv3.OpOption{
 		clientv3.WithKeysOnly(),
 		clientv3.WithRange(firstKeyOut),
+	}
+	if firstKeyOut == "" {
+		// could happen of all bytes are "\xff"
+		getOptions = getOptions[:1] // remove the WithRange option
 	}
 
 	if limit > 0 {
@@ -499,20 +501,19 @@ func (es *EtcdStore) List(opts ...store.ListOption) ([]string, error) {
 	preKv := namespace.NewKV(kv, prefix)
 	sufKv := namespace.NewKV(kv, suffix)
 
-	if lopts.Prefix == "" && lopts.Suffix == "" {
-		return es.listKeys(preKv, "", int64(lopts.Limit), int64(lopts.Offset), false)
-	}
-
 	if lopts.Prefix != "" && lopts.Suffix != "" {
 		return es.prefixSuffixList(preKv, lopts.Prefix, lopts.Suffix, int64(lopts.Limit), int64(lopts.Offset))
-	} else {
-		if lopts.Prefix != "" {
-			return es.listKeys(preKv, lopts.Prefix, int64(lopts.Limit), int64(lopts.Offset), false)
-		} else if lopts.Suffix != "" {
-			return es.listKeys(sufKv, reverseString(lopts.Suffix), int64(lopts.Limit), int64(lopts.Offset), true)
-		}
 	}
-	return nil, nil
+
+	if lopts.Prefix != "" {
+		return es.listKeys(preKv, lopts.Prefix, int64(lopts.Limit), int64(lopts.Offset), false)
+	}
+
+	if lopts.Suffix != "" {
+		return es.listKeys(sufKv, reverseString(lopts.Suffix), int64(lopts.Limit), int64(lopts.Offset), true)
+	}
+
+	return es.listKeys(preKv, "", int64(lopts.Limit), int64(lopts.Offset), false)
 }
 
 // Close the client

@@ -1396,7 +1396,7 @@ func concurrentStoreBench(b *testing.B, threads int) {
 				record := &store.Record{}
 				for pb.Next() {
 					h.Reset()
-					v := strconv.Itoa(rand.Int())
+					v := strconv.Itoa(rand.Int()) //nolint:gosec
 					bys := []byte(v)
 					h.Write(bys)
 					// records will be copied, so it's safe to overwrite the previous record
@@ -1439,7 +1439,7 @@ func concurrentRetrieveBench(b *testing.B, threads int) {
 			b.ResetTimer()
 			b.RunParallel(func(pb *testing.PB) {
 				for pb.Next() {
-					v := strconv.Itoa(rand.Intn(size * 2))
+					v := strconv.Itoa(rand.Intn(size * 2)) //nolint:gosec
 					_, _ = cache.Read(v)
 				}
 			})
@@ -1478,7 +1478,7 @@ func concurrentRemoveBench(b *testing.B, threads int) {
 			b.RunParallel(func(pb *testing.PB) {
 				record := &store.Record{}
 				for pb.Next() {
-					v := strconv.Itoa(rand.Intn(size * 2))
+					v := strconv.Itoa(rand.Intn(size * 2)) //nolint:gosec
 					_ = cache.Delete(v)
 					record.Key = v
 					record.Value = []byte(v)
