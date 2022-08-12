@@ -28,6 +28,7 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
+use TestHelpers\WebDavHelper;
 use TestHelpers\SetupHelper;
 use TestHelpers\GraphHelper;
 use PHPUnit\Framework\Assert;
@@ -53,6 +54,11 @@ class SpacesContext implements Context {
 	 * @var TrashbinContext
 	 */
 	private TrashbinContext $trashbinContext;
+
+	/**
+	 * @var WebDavPropertiesContext
+	 */
+	private WebDavPropertiesContext $webDavPropertiesContext;
 
 	/**
 	 * @var string
@@ -386,6 +392,7 @@ class SpacesContext implements Context {
 		$this->featureContext = $environment->getContext('FeatureContext');
 		$this->ocsContext = $environment->getContext('OCSContext');
 		$this->trashbinContext = $environment->getContext('TrashbinContext');
+		$this->webDavPropertiesContext = $environment->getContext('WebDavPropertiesContext');
 		// Run the BeforeScenario function in OCSContext to set it up correctly
 		$this->ocsContext->before($scope);
 		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
@@ -1318,7 +1325,7 @@ class SpacesContext implements Context {
 	): array {
 		$spaceId = $this->getResponseSpaceId();
 		//if we are using that step the second time in a scenario e.g. 'But ... should not'
-		//then don't parse the result again, because the result in a ResponseInterface
+		//then don't parse the result again, because the result is in a ResponseInterface
 		if (empty($this->getResponseXml())) {
 			$this->setResponseXml(
 				HttpRequestHelper::parseResponseAsXml($this->featureContext->getResponse())
@@ -2978,5 +2985,92 @@ class SpacesContext implements Context {
 		} else {
 			Assert::assertEmpty($responseArray, __METHOD__ . ' Response should be empty');
 		}
+	}
+	   
+	/**
+	 * @When /^user "([^"]*)" gets the following properties of (?:file|folder|entry|resource) "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string    $user
+	 * @param string    $resourceName
+	 * @param string    $spaceName
+	 * @param TableNode|null $propertiesTable
+	 *
+	 * @return void
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function userGetsTheFollowingPropertiesOfFileInsideSpaceUsingTheWebdavApi(
+		string $user,
+		string $resourceName,
+		string $spaceName,
+		TableNode $propertiesTable
+	):void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$properties = null;
+		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($resourceName, "/");
+		$this->featureContext->verifyTableNodeColumns($propertiesTable, ["propertyName"]);
+		$this->featureContext->verifyTableNodeColumnsCount($propertiesTable, 1);
+		if ($propertiesTable instanceof TableNode) {
+			foreach ($propertiesTable->getColumnsHash() as $row) {
+				$properties[] = $row["propertyName"];
+			}
+		}
+		$body = WebDavHelper::getBodyForPropfind($properties);
+		$headers['Depth'] = '1';
+		$this->featureContext->setResponse(
+			$this->sendPropfindRequestToUrl(
+				$fullUrl,
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				'',
+				$headers,
+				$body
+			)
+		);
+		$responseXml = $this->featureContext->getResponseXml(null, __METHOD__);
+		$this->featureContext->setResponseXmlObject($responseXml);
+	}
+
+	/**
+	 * @Then /^as user "([^"]*)" (?:file|folder|entry|resource) "([^"]*)" inside space "([^"]*)" should contain a property "([^"]*)" with value "([^"]*)"$/
+	 *
+	 * @param string    $user
+	 * @param string    $resourceName
+	 * @param string    $spaceName
+	 * @param string    $property
+	 * @param string    $expectedValue
+	 *
+	 * @return void
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function asUserFileInsideSpaceShouldContainAPropertyWithValue(
+		string $user,
+		string $resourceName,
+		string $spaceName,
+		string $property,
+		string $expectedValue
+	):void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($resourceName, "/");
+		$body = WebDavHelper::getBodyForPropfind([$property]);
+		$headers['Depth'] = '1';
+		$this->featureContext->setResponse(
+			$this->sendPropfindRequestToUrl(
+				$fullUrl,
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				'',
+				$headers,
+				$body
+			)
+		);
+		$responseXml = $this->featureContext->getResponseXml(null, __METHOD__);
+		$this->featureContext->setResponseXmlObject($responseXml);
+		$this->webDavPropertiesContext->checkSingleResponseContainsAPropertyWithValueAndAlternative(
+			$property,
+			$expectedValue,
+			$expectedValue
+		);
 	}
 }
