@@ -23,14 +23,17 @@ func CreateHome(optionSetters ...Option) func(next http.Handler) http.Handler {
 	// to an uint64 and then convert this to a string again.
 	// It would possibly be simpler to convert bytes sizes on reva side,
 	// but then all byte handling endpoints should be able to do this
-	q, err := bytesize.Parse(options.DefaultSpaceQuota)
-	if err != nil {
-		logger.Error().Str("quota", options.DefaultSpaceQuota).Err(err).Msg("can't parse default quota size - using unlimited")
-	}
-
 	var defaultQuota string
-	if q != 0 {
-		defaultQuota = q.String()
+	if options.DefaultSpaceQuota != "" {
+		q, err := bytesize.Parse(options.DefaultSpaceQuota)
+		if err != nil {
+			logger.Error().Str("quota", options.DefaultSpaceQuota).Err(err).Msg("can't parse default quota size - using unlimited")
+		}
+
+		if q != 0 {
+			defaultQuota = q.String()
+		}
+
 	}
 
 	return func(next http.Handler) http.Handler {
