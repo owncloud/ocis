@@ -9,10 +9,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/experimental/pkg/config"
 	"github.com/owncloud/ocis/v2/services/experimental/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/experimental/pkg/logging"
-	eMetrics "github.com/owncloud/ocis/v2/services/experimental/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/experimental/pkg/server/debug"
 	"github.com/owncloud/ocis/v2/services/experimental/pkg/server/http"
-	"github.com/owncloud/ocis/v2/services/experimental/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 
@@ -32,10 +30,6 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			err := tracing.Configure(cfg)
-			if err != nil {
-				return err
-			}
 
 			var (
 				gr          = run.Group{}
@@ -45,7 +39,6 @@ func Server(cfg *config.Config) *cli.Command {
 					}
 					return context.WithCancel(cfg.Context)
 				}()
-				metrics = eMetrics.New()
 			)
 
 			defer cancel()
@@ -56,7 +49,6 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Context(ctx),
 					http.Namespace(cfg.HTTP.Namespace),
 					http.Config(cfg),
-					http.Metrics(metrics),
 				)
 
 				if err != nil {

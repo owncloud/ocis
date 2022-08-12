@@ -12,7 +12,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Version prints the service versions of all running instances.
+// Version prints the service version.
 func Version(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "version",

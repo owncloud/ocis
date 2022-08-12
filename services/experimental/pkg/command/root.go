@@ -44,9 +44,5 @@ func NewSutureService(cfg *ociscfg.Config) suture.Service {
 
 func (s SutureService) Serve(ctx context.Context) error {
 	s.cfg.Context = ctx
-	if err := Execute(s.cfg); err != nil {
-		return err
-	}
-
-	return nil
+	return Execute(s.cfg)
 }

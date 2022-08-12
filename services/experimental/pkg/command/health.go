@@ -37,6 +37,7 @@ func Health(cfg *config.Config) *cli.Command {
 				logger.Fatal().
 					Err(err).
 					Msg("Failed to request health check")
+				return nil
 			}
 
 			defer resp.Body.Close()

@@ -20,7 +20,6 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Version(version.GetString()),
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
-		http.Flags(options.Flags...),
 	)
 
 	handle := svc.NewService(

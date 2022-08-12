@@ -5,8 +5,6 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/experimental/pkg/config"
-	"github.com/owncloud/ocis/v2/services/experimental/pkg/metrics"
-	"github.com/urfave/cli/v2"
 )
 
 // Option defines a single option function.
@@ -17,8 +15,6 @@ type Options struct {
 	Logger    log.Logger
 	Context   context.Context
 	Config    *config.Config
-	Metrics   *metrics.Metrics
-	Flags     []cli.Flag
 	Namespace string
 }
 
@@ -51,20 +47,6 @@ func Context(val context.Context) Option {
 func Config(val *config.Config) Option {
 	return func(o *Options) {
 		o.Config = val
-	}
-}
-
-// Metrics provides a function to set the metrics option.
-func Metrics(val *metrics.Metrics) Option {
-	return func(o *Options) {
-		o.Metrics = val
-	}
-}
-
-// Flags provides a function to set the flags option.
-func Flags(val []cli.Flag) Option {
-	return func(o *Options) {
-		o.Flags = append(o.Flags, val...)
 	}
 }
 
