@@ -7,6 +7,7 @@ import (
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/config/defaults"
 	authbearer "github.com/owncloud/ocis/v2/services/auth-bearer/pkg/config/defaults"
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/config/defaults"
+	experimental "github.com/owncloud/ocis/v2/services/experimental/pkg/config/defaults"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/config/defaults"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/config/defaults"
 	graphExplorer "github.com/owncloud/ocis/v2/services/graph-explorer/pkg/config/defaults"
@@ -72,5 +73,6 @@ func DefaultConfig() *Config {
 		Users:             users.DefaultConfig(),
 		Web:               web.DefaultConfig(),
 		WebDAV:            webdav.DefaultConfig(),
+		Experimental:      experimental.DefaultConfig(),
 	}
 }

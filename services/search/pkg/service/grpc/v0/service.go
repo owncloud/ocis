@@ -118,7 +118,7 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 }
 
 // IndexSpace (re)indexes all resources of a given space.
-func (s Service) IndexSpace(ctx context.Context, in *searchsvc.IndexSpaceRequest, out *searchsvc.IndexSpaceResponse) error {
+func (s Service) IndexSpace(ctx context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
 	_, err := s.provider.IndexSpace(ctx, in)
 	return err
 }

@@ -25,6 +25,7 @@ import (
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/command"
 	authbearer "github.com/owncloud/ocis/v2/services/auth-bearer/pkg/command"
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/command"
+	experimental "github.com/owncloud/ocis/v2/services/experimental/pkg/command"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/command"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/command"
 	graphExplorer "github.com/owncloud/ocis/v2/services/graph-explorer/pkg/command"
@@ -131,6 +132,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.Notifications.Service.Name] = notifications.NewSutureService
 	s.ServicesRegistry[opts.Config.Search.Service.Name] = search.NewSutureService
 	s.ServicesRegistry[opts.Config.Postprocessing.Service.Name] = postprocessing.NewSutureService
+	s.ServicesRegistry[opts.Config.Experimental.Service.Name] = experimental.NewSutureService
 
 	// populate delayed services
 	s.Delayed[opts.Config.Sharing.Service.Name] = sharing.NewSutureService
@@ -268,7 +270,7 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 }
 
 // List running processes for the Service Controller.
-func (s *Service) List(args struct{}, reply *string) error {
+func (s *Service) List(_ struct{}, reply *string) error {
 	tableString := &strings.Builder{}
 	table := tablewriter.NewWriter(tableString)
 	table.SetHeader([]string{"Extension"})
