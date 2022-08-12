@@ -115,10 +115,16 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 	)
 
 	bleveReq := bleve.NewSearchRequest(q)
-	bleveReq.Size = 200
-	if sir.PageSize > 0 {
+
+	switch {
+	case sir.PageSize == -1:
+		bleveReq.Size = math.MaxInt
+	case sir.PageSize == 0:
+		bleveReq.Size = 200
+	default:
 		bleveReq.Size = int(sir.PageSize)
 	}
+
 	bleveReq.Fields = []string{"*"}
 	res, err := b.index.Search(bleveReq)
 	if err != nil {
@@ -150,7 +156,7 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 				Type:     uint64(getValue[float64](hit.Fields, "Type")),
 				MimeType: getValue[string](hit.Fields, "MimeType"),
 				Deleted:  getValue[bool](hit.Fields, "Deleted"),
-				Tags:     getValue[[]string](hit.Fields, "Tags"),
+				Tags:     getSliceValue[string](hit.Fields, "Tags"),
 			},
 		}
 
@@ -263,7 +269,7 @@ func (b *Bleve) getResource(id string) (*Resource, error) {
 			Size:     uint64(getValue[float64](fields, "Size")),
 			Mtime:    getValue[string](fields, "Mtime"),
 			MimeType: getValue[string](fields, "MimeType"),
-			Tags:     getValue[[]string](fields, "Tags"),
+			Tags:     getSliceValue[string](fields, "Tags"),
 		},
 	}, nil
 }

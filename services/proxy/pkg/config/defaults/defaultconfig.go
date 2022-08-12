@@ -173,6 +173,10 @@ func DefaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9135",
 				},
 				{
+					Endpoint: "/experimental",
+					Backend:  "http://localhost:9180",
+				},
+				{
 					Endpoint: "/api/v0/settings",
 					Backend:  "http://localhost:9190",
 				},

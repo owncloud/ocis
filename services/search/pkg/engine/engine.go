@@ -55,3 +55,16 @@ func getValue[T any](m map[string]interface{}, key string) (out T) {
 
 	return
 }
+
+func getSliceValue[T any](m map[string]interface{}, key string) (out []T) {
+	for _, iv := range getValue[[]interface{}](m, key) {
+		cv, ok := iv.(T)
+		if !ok {
+			continue
+		}
+
+		out = append(out, cv)
+	}
+
+	return
+}

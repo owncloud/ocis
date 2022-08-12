@@ -159,7 +159,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 	if limit == 0 {
 		limit = 200
 	}
-	if int32(len(matches)) > limit {
+	if int32(len(matches)) > limit && limit != -1 {
 		matches = matches[0:limit]
 	}
 

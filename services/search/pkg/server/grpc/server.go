@@ -4,7 +4,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
-	svc "github.com/owncloud/ocis/v2/services/search/pkg/service/v0"
+	svc "github.com/owncloud/ocis/v2/services/search/pkg/service/grpc/v0"
 )
 
 // Server initializes a new go-micro service ready to run

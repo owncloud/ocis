@@ -9,6 +9,7 @@ import (
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/config"
 	authbearer "github.com/owncloud/ocis/v2/services/auth-bearer/pkg/config"
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/config"
+	experimental "github.com/owncloud/ocis/v2/services/experimental/pkg/config"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/config"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/config"
 	graphExplorer "github.com/owncloud/ocis/v2/services/graph-explorer/pkg/config"
@@ -105,4 +106,5 @@ type Config struct {
 	Web               *web.Config            `yaml:"web"`
 	WebDAV            *webdav.Config         `yaml:"webdav"`
 	Search            *search.Config         `yaml:"search"`
+	Experimental      *experimental.Config   `yaml:"experimental"`
 }
