@@ -228,6 +228,9 @@ func NewService(opts ...Option) Service {
 					r.Delete("/", svc.DeleteDrive)
 				})
 			})
+			r.Route("/drivequotas", func(r chi.Router) {
+				r.Get("/", svc.GetDefaultQuotas)
+			})
 		})
 	})
 
