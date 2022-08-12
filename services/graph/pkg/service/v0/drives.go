@@ -48,13 +48,13 @@ func (g Graph) GetAllDrives(w http.ResponseWriter, r *http.Request) {
 func (g Graph) GetDefaultQuotas(w http.ResponseWriter, r *http.Request) {
 	var driveResp = struct {
 		// NOTE: default personal quota is defined in proxy
-		MaxPersonalQuota    string `json:"max_personal_quota"`
-		DefaultProjectQuota string `json:"default_project_quota"`
-		MaxProjectQuota     string `json:"max_project_quota"`
+		MaxPersonalQuota    uint64 `json:"max_personal_quota"`
+		DefaultProjectQuota uint64 `json:"default_project_quota"`
+		MaxProjectQuota     uint64 `json:"max_project_quota"`
 	}{
-		MaxPersonalQuota:    g.config.Spaces.MaxQuotaPersonal,
-		DefaultProjectQuota: g.config.Spaces.DefaultQuota,
-		MaxProjectQuota:     g.config.Spaces.MaxQuotaProject,
+		MaxPersonalQuota:    g.maxQuotaPersonal,
+		DefaultProjectQuota: g.defaultQuota,
+		MaxProjectQuota:     g.maxQuotaProject,
 	}
 
 	render.Status(r, http.StatusCreated)
