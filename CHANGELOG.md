@@ -1,3 +1,22 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
+
+## Summary
+
+* Enhancement - Added command to reset administrator password: [#4084](https://github.com/owncloud/ocis/issues/4084)
+
+## Details
+
+* Enhancement - Added command to reset administrator password: [#4084](https://github.com/owncloud/ocis/issues/4084)
+
+   The new command `ocis idm resetpassword` allows to reset the administrator password when ocis
+   is not running. So it is possible to recover setups where the admin password was lost.
+
+   https://github.com/owncloud/ocis/issues/4084
+   https://github.com/owncloud/ocis/pull/4365
 # Changelog for [2.0.0-beta.6] (2022-08-11)
 
 The following sections list the changes for 2.0.0-beta.6.
