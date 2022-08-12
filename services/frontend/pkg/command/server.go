@@ -48,7 +48,10 @@ func Server(cfg *config.Config) *cli.Command {
 
 			pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
 
-			rcfg := revaconfig.FrontendConfigFromStruct(cfg)
+			rcfg, err := revaconfig.FrontendConfigFromStruct(cfg)
+			if err != nil {
+				return err
+			}
 
 			gr.Add(func() error {
 				runtime.RunWithOptions(rcfg, pidFile, runtime.WithLogger(&logger.Logger))
