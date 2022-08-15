@@ -40,6 +40,7 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 		"archivers":         archivers,
 		"app_providers":     appProviders,
 		"favorites":         cfg.EnableFavorites,
+		"tags":              true,
 	}
 
 	if cfg.DefaultUploadProtocol == "tus" {
