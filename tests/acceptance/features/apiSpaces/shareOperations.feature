@@ -227,9 +227,8 @@ Feature: sharing
     And the single response should contain a property "ocs:share-permissions" with value "15"
 
 
-   Scenario: Uploading file to a group read-only share folder does not work
-    Given using spaces DAV path
-    And group "grp1" has been created
+   Scenario: Uploading a file to a group read-only share folder does not work
+    Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
@@ -244,8 +243,7 @@ Feature: sharing
    
   
   Scenario: Uploading file to a user upload-only share folder works
-    Given using spaces DAV path
-    And user "Alice" has created folder "FOLDER"
+    Given user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
       | path        | FOLDER |
       | shareType   | user   |
@@ -263,7 +261,7 @@ Feature: sharing
 
 
   Scenario: Uploading file to a group upload-only share folder works
-    Given using spaces DAV path
+    Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
@@ -283,8 +281,7 @@ Feature: sharing
 
 
   Scenario: Uploading file to a user read/write share folder works
-    Given using spaces DAV path
-    And user "Alice" has created folder "FOLDER"
+    Given user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
       | path        | FOLDER |
       | shareType   | user   |
@@ -300,8 +297,7 @@ Feature: sharing
 
 
   Scenario: Uploading file to a group read/write share folder works
-    Given using spaces DAV path
-    And group "grp1" has been created
+    Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
@@ -319,12 +315,11 @@ Feature: sharing
     
 
   Scenario: Check quota of owners parent directory of a shared file
-    Given using spaces DAV path
-    And the quota of user "Brian" has been set to "0"
+    Given user "Admin" has changed the quota of the "Brian Murphy" space to "1"
     And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/myfile.txt"
     And user "Alice" has shared file "myfile.txt" with user "Brian"
     And user "Brian" has accepted share "/myfile.txt" offered by user "Alice"
-     When user "Brian" uploads a file inside space "Shares Jail" with content "new description" to "/myfile.txt" using the WebDAV API
+    When user "Brian" uploads a file inside space "Shares Jail" with content "new description" to "/myfile.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And the following headers should match these regular expressions for user "Brian"
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
@@ -334,39 +329,36 @@ Feature: sharing
     """
 
 
- Scenario: Uploading to a user shared folder with read/write permission when the sharer has unsufficient quota does not work
-    Given using spaces DAV path
-    And user "Alice" has created folder "FOLDER"
+ Scenario: Uploading to a user shared folder with read/write permission when the sharer has insufficient quota does not work
+    Given user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
       | path        | FOLDER |
       | shareType   | user   |
       | permissions | change |
       | shareWith   | Brian  |
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    And the quota of user "Alice" has been set to "0"
+    And user "Admin" has changed the quota of the "Alice Hansen" space to "1"
     When user "Brian" uploads a file inside space "Shares Jail" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/textfile.txt" should not exist
   
   
   Scenario: Uploading to a user shared folder with upload-only permission when the sharer has insufficient quota does not work
-    Given using spaces DAV path
-    And user "Alice" has created folder "FOLDER"
+    Given user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
       | path        | FOLDER |
       | shareType   | user   |
       | permissions | create |
       | shareWith   | Brian  |
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    And the quota of user "Alice" has been set to "0"
+     And user "Admin" has changed the quota of the "Alice Hansen" space to "1"
     When user "Brian" uploads a file inside space "Shares Jail" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/textfile.txt" should not exist
 
    
-   Scenario: Uploading to a group shared folder with upload-only permission when the sharer has insufficient quota does not work
-    Given using spaces DAV path
-    And group "grp1" has been created
+   Scenario: Uploading a file to a group shared folder with upload-only permission when the sharer has insufficient quota does not work
+    Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
@@ -375,15 +367,14 @@ Feature: sharing
       | permissions | create |
       | shareWith   | grp1   |
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    And the quota of user "Alice" has been set to "0"
+    And user "Admin" has changed the quota of the "Alice Hansen" space to "1"
     When user "Brian" uploads a file inside space "Shares Jail" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/textfile.txt" should not exist  
 
   
   Scenario Outline: Sharer can download file uploaded with different permission by sharee to a shared folder
-    Given using spaces DAV path
-    And user "Alice" has created folder "FOLDER"
+    Given user "Alice" has created folder "FOLDER"
     And user "Alice" has created a share with settings
       | path        | FOLDER        |
       | shareType   | user          |

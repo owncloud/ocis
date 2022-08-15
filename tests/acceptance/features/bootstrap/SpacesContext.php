@@ -1620,6 +1620,29 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Given /^user "([^"]*)" has changed the quota of the "([^"]*)" space to "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param int $newQuota
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userHasChangedTheQuotaOfTheSpaceTo(
+		string $user,
+		string $spaceName,
+		int $newQuota
+	): void {
+		$this->updateSpaceQuota($user, $spaceName, $newQuota);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" sets the file "([^"]*)" as a (description|space image)\s? in a special section of the "([^"]*)" space$/
 	 *
 	 * @param string $user
