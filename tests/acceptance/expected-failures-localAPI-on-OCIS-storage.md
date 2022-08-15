@@ -22,6 +22,3 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 ### [Search by shares jail works incorrect](https://github.com/owncloud/ocis/issues/4014)
 - [apiSpaces/search.feature:43](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/search.feature#L43)
 
-### [Changing personal drive quota on another user as admin is not possible](https://github.com/owncloud/ocis/issues/4325)
-- [apiSpaces/changeSpaces.feature:221](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/changeSpaces.feature#L221)
-
