@@ -121,11 +121,11 @@ Feature: Share a file or folder that is inside a space via public link
 
   Scenario Outline: An user participant of the project space can see the created public resources link
     Given user "Alice" has shared a space "share sub-item" to user "Brian" with role "<spaceRole>"
-    And user "Alice" has created a public link share inside of space "share sub-item" with settings:
+    When user "Alice" creates a public link share inside of space "share sub-item" with settings:
       | path        | folder/file.txt |
       | shareType   | 3               |
       | permissions | 1               |
-    And for user "Brian" the space "share sub-item" should contain the last created public link of the file "folder/file.txt"
+    Then for user "Brian" the space "share sub-item" should contain the last created public link of the file "folder/file.txt"
     Examples:
       | spaceRole |
       | editor    |
