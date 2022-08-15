@@ -30,6 +30,7 @@ var (
 		"/login":               {},
 		"/app/list":            {},
 		"/config.json":         {},
+		"/manifest.json":       {},
 		"/oidc-callback.html":  {},
 		"/oidc-callback":       {},
 		"/settings.js":         {},
