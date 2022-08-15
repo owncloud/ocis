@@ -45,6 +45,7 @@ var (
 	_unprotectedPathPrefixes = [...]string{
 		"/files",
 		"/data",
+		"/account",
 		"/s/",
 		"/settings",
 		"/user-management",
