@@ -6,9 +6,17 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Autocreate IDP private key also if file exists but is empty: [#4394](https://github.com/owncloud/ocis/pull/4394)
 * Enhancement - Added command to reset administrator password: [#4084](https://github.com/owncloud/ocis/issues/4084)
 
 ## Details
+
+* Bugfix - Autocreate IDP private key also if file exists but is empty: [#4394](https://github.com/owncloud/ocis/pull/4394)
+
+   We've fixed the behavior for the IDP private key generation so that a private key is also
+   generated when the file already exists but is empty.
+
+   https://github.com/owncloud/ocis/pull/4394
 
 * Enhancement - Added command to reset administrator password: [#4084](https://github.com/owncloud/ocis/issues/4084)
 
