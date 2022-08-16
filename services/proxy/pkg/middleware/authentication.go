@@ -48,6 +48,7 @@ var (
 		"/account",
 		"/s/",
 		"/external/spaces",
+		"/apps/openidconnect/redirect",
 		"/settings",
 		"/user-management",
 		"/.well-known",
