@@ -47,6 +47,7 @@ var (
 		"/data",
 		"/account",
 		"/s/",
+		"/external/spaces",
 		"/settings",
 		"/user-management",
 		"/.well-known",
