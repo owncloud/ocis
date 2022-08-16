@@ -240,7 +240,7 @@ def main(ctx):
     test_pipelines.append(
         pipelineDependsOn(
             purgeBuildArtifactCache(ctx),
-            failEarly(ctx, True) + testPipelines(ctx),
+            testPipelines(ctx),
         ),
     )
 
