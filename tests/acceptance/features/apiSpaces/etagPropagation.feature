@@ -397,6 +397,7 @@ Feature: check etag propagation after different file alterations
       | user  | path | space    |
       | Brian | /    | Personal |
 
+
   Scenario: As sharer deleting (removing) a folder changes the etags of all parents for all collaborators
     Given user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
