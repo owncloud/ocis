@@ -81,7 +81,7 @@ Feature: check etag propagation after different file alterations
       | Alice | /                   | Personal    |
       | Alice | /upload             | Personal    |
       | Brian | /                   | Shares Jail |
-      | Brian | /upload             | Shares Jail | 
+      | Brian | /upload             | Shares Jail |
     And these etags should not have changed
       | user  | path                | space       |
       | Alice | /upload/renamed.txt | Personal    |
@@ -105,7 +105,7 @@ Feature: check etag propagation after different file alterations
       | Alice | /                   | Personal    |
       | Alice | /upload             | Personal    |
       | Brian | /                   | Shares Jail |
-      | Brian | /upload             | Shares Jail | 
+      | Brian | /upload             | Shares Jail |
     And these etags should not have changed
       | user  | path                | space       |
       | Alice | /upload/renamed.txt | Personal    |
@@ -186,7 +186,7 @@ Feature: check etag propagation after different file alterations
       | Brian | /           | Shares Jail |
       | Brian | /upload     | Shares Jail |
       | Brian | /dst        | Shares Jail |
-  
+
 
   Scenario: as share reciever moving a folder from one folder to an other changes the etags of both folders for all collaborators
     Given user "Alice" has created folder "/dst"
@@ -229,7 +229,7 @@ Feature: check etag propagation after different file alterations
       | Brian | /              | Shares Jail |
       | Brian | /upload        | Shares Jail |
 
-  
+
   Scenario: as sharer creating a folder inside a shared folder changes etag for all collaborators
     Given user "Alice" has shared folder "/upload" with user "Brian"
     And user "Brian" has accepted share "/upload" offered by user "Alice"
@@ -261,10 +261,10 @@ Feature: check etag propagation after different file alterations
       | Alice | /              | Personal    |
       | Alice | /upload        | Personal    |
       | Brian | /              | Shares Jail |
-      | Brian | /upload        | Shares Jail |    
+      | Brian | /upload        | Shares Jail |
 
 
-  Scenario: as sharer uploading a file inside a shared folder should update etags for all collaborators    
+  Scenario: as sharer uploading a file inside a shared folder should update etags for all collaborators
     Given user "Alice" has shared folder "/upload" with user "Brian"
     And user "Brian" has accepted share "/upload" offered by user "Alice"
     And user "Alice" has stored etag of element "/" inside space "Personal"
@@ -298,8 +298,8 @@ Feature: check etag propagation after different file alterations
       | Brian | /              | Shares Jail |
       | Brian | /upload        | Shares Jail |
 
-  
-  Scenario: as sharer overwriting a file inside a shared folder should update etags for all collaborators    
+
+  Scenario: as sharer overwriting a file inside a shared folder should update etags for all collaborators
     Given user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
     And user "Brian" has accepted share "/upload" offered by user "Alice"
@@ -315,3 +315,110 @@ Feature: check etag propagation after different file alterations
       | Alice | /upload        | Personal    |
       | Brian | /              | Shares Jail |
       | Brian | /upload        | Shares Jail |
+
+
+  Scenario: As share receiver deleting (removing) a file changes the etags of all parents for all collaborators
+    Given user "Alice" has created folder "/upload/sub"
+    And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
+    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Brian" has accepted share "/upload" offered by user "Alice"
+    And user "Alice" has stored etag of element "/" inside space "Personal"
+    And user "Alice" has stored etag of element "/upload" inside space "Personal"
+    And user "Alice" has stored etag of element "/upload/sub" inside space "Personal"
+    And user "Brian" has stored etag of element "/" inside space "Personal"
+    And user "Brian" has stored etag of element "/" inside space "Shares Jail"
+    And user "Brian" has stored etag of element "/upload" inside space "Shares Jail"
+    And user "Brian" has stored etag of element "/upload/sub" inside space "Shares Jail"
+    When user "Brian" removes the file "upload/sub/file.txt" from space "Shares Jail"
+    Then the HTTP status code should be "204"
+    And these etags should have changed
+      | user  | path        | space       |
+      | Alice | /           | Personal    |
+      | Alice | /upload     | Personal    |
+      | Alice | /upload/sub | Personal    |
+      | Brian | /           | Shares Jail |
+      | Brian | /upload     | Shares Jail |
+      | Brian | /upload/sub | Shares Jail |
+    And these etags should not have changed
+      | user  | path | space    |
+      | Brian | /    | Personal |
+
+
+  Scenario: As sharer deleting (removing) a file changes the etags of all parents for all collaborators
+    Given user "Alice" has created folder "/upload/sub"
+    And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
+    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Brian" has accepted share "/upload" offered by user "Alice"
+    And user "Alice" has stored etag of element "/" inside space "Personal"
+    And user "Alice" has stored etag of element "/upload" inside space "Personal"
+    And user "Alice" has stored etag of element "/upload/sub" inside space "Personal"
+    And user "Brian" has stored etag of element "/" inside space "Personal"
+    And user "Brian" has stored etag of element "/" inside space "Shares Jail"
+    And user "Brian" has stored etag of element "/upload" inside space "Shares Jail"
+    And user "Brian" has stored etag of element "/upload/sub" inside space "Shares Jail"
+    When user "Alice" removes the file "upload/sub/file.txt" from space "Personal"
+    Then the HTTP status code should be "204"
+    And these etags should have changed
+      | user  | path        | space       |
+      | Alice | /           | Personal    |
+      | Alice | /upload     | Personal    |
+      | Alice | /upload/sub | Personal    |
+      | Brian | /           | Shares Jail |
+      | Brian | /upload     | Shares Jail |
+      | Brian | /upload/sub | Shares Jail |
+    And these etags should not have changed
+      | user  | path | space    |
+      | Brian | /    | Personal |
+
+
+  Scenario: As share receiver deleting (removing) a folder changes the etags of all parents for all collaborators
+    Given user "Alice" has created folder "/upload/sub"
+    And user "Alice" has created folder "/upload/sub/toDelete"
+    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Brian" has accepted share "/upload" offered by user "Alice"
+    And user "Alice" has stored etag of element "/" inside space "Personal"
+    And user "Alice" has stored etag of element "/upload" inside space "Personal"
+    And user "Alice" has stored etag of element "/upload/sub" inside space "Personal"
+    And user "Brian" has stored etag of element "/" inside space "Personal"
+    And user "Brian" has stored etag of element "/" inside space "Shares Jail"
+    And user "Brian" has stored etag of element "/upload" inside space "Shares Jail"
+    And user "Brian" has stored etag of element "/upload/sub" inside space "Shares Jail"
+    When user "Brian" removes the file "upload/sub/toDelete" from space "Shares Jail"
+    Then the HTTP status code should be "204"
+    And these etags should have changed
+      | user  | path        | space       |
+      | Alice | /           | Personal    |
+      | Alice | /upload     | Personal    |
+      | Alice | /upload/sub | Personal    |
+      | Brian | /           | Shares Jail |
+      | Brian | /upload     | Shares Jail |
+      | Brian | /upload/sub | Shares Jail |
+    And these etags should not have changed
+      | user  | path | space    |
+      | Brian | /    | Personal |
+
+  Scenario: As sharer deleting (removing) a folder changes the etags of all parents for all collaborators
+    Given user "Alice" has created folder "/upload/sub"
+    And user "Alice" has created folder "/upload/sub/toDelete"
+    And user "Alice" has shared folder "/upload" with user "Brian"
+    And user "Brian" has accepted share "/upload" offered by user "Alice"
+    And user "Alice" has stored etag of element "/" inside space "Personal"
+    And user "Alice" has stored etag of element "/upload" inside space "Personal"
+    And user "Alice" has stored etag of element "/upload/sub" inside space "Personal"
+    And user "Brian" has stored etag of element "/" inside space "Personal"
+    And user "Brian" has stored etag of element "/" inside space "Shares Jail"
+    And user "Brian" has stored etag of element "/upload" inside space "Shares Jail"
+    And user "Brian" has stored etag of element "/upload/sub" inside space "Shares Jail"
+    When user "Alice" removes the file "upload/sub/toDelete" from space "Personal"
+    Then the HTTP status code should be "204"
+    And these etags should have changed
+      | user  | path        | space       |
+      | Alice | /           | Personal    |
+      | Alice | /upload     | Personal    |
+      | Alice | /upload/sub | Personal    |
+      | Brian | /           | Shares Jail |
+      | Brian | /upload     | Shares Jail |
+      | Brian | /upload/sub | Shares Jail |
+    And these etags should not have changed
+      | user  | path | space    |
+      | Brian | /    | Personal |
