@@ -38,6 +38,7 @@ var (
 	}
 )
 
+// SignedURLAuthenticator is the authenticator responsible for authenticating signed URL requests.
 type SignedURLAuthenticator struct {
 	Logger             log.Logger
 	PreSignedURLConfig config.PreSignedURL

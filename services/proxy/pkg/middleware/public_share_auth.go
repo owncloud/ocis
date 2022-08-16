@@ -18,6 +18,8 @@ const (
 	_paramExpiration = "expiration"
 )
 
+// PublicShareAuthenticator is the authenticator which can authenticate public share requests.
+// It will add the share owner into the request context.
 type PublicShareAuthenticator struct {
 	Logger            log.Logger
 	RevaGatewayClient gateway.GatewayAPIClient
