@@ -43,6 +43,10 @@ DEFAULT_NODEJS_VERSION = "14"
 dirs = {
     "base": "/drone/src",
     "web": "/drone/src/webTestRunner",
+    "zip": "/drone/src/zip",
+    "webZip": "/drone/src/zip/web.tar.gz",
+    "e2eYarnZip": "/drone/src/zip/e2e.tar.gz",
+    "acceptanceYarnZip": "/drone/src/zip/acceptance.tar.gz",
     # relative path from the base directory dirs["base"]
     # this is because the PLUGINS_S3_CACHE does not support absolute paths
     # PLUGINS_S3_CACHE is used to cache the core and testing app
@@ -220,7 +224,7 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
-        buildCacheWeb(ctx) + \
+        buildWebCache(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
         cacheCoreReposForTesting(ctx) + \
         testOcisModules(ctx) + \
@@ -270,11 +274,11 @@ def main(ctx):
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
-def buildCacheWeb(ctx):
+def buildWebCache(ctx):
     return [{
         "kind": "pipeline",
         "type": "docker",
-        "name": "cache-web",
+        "name": "build-web-cache",
         "clone": {
             "disable": True,
         },
@@ -809,7 +813,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
             "name": "uploads",
             "temp": {},
         }],
-        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -874,7 +878,7 @@ def e2eTests(ctx):
             "type": "docker",
             "name": "e2e-tests",
             "steps": e2eTestsSteps,
-            "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+            "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
             "trigger": e2e_trigger,
             "volumes": e2e_volumes,
         }]
@@ -1006,7 +1010,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
             "name": "uploads",
             "temp": {},
         }],
-        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -2808,7 +2812,14 @@ def generateWebCache(ctx):
                 "rm -rf %s" % dirs["web"],
                 "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git %s" % dirs["web"],
                 "cd %s && git checkout $WEB_COMMITID" % dirs["web"],
-                "ls -la",
+            ],
+        },
+        {
+            "name": "zip-web",
+            "image": OC_UBUNTU,
+            "commands": [
+                "if [ ! -d '%s' ]; then mkdir -p %s; fi" % (dirs["zip"], dirs["zip"]),
+                "tar -czvf %s webTestRunner" % dirs["webZip"],
             ],
         },
         {
@@ -2819,7 +2830,7 @@ def generateWebCache(ctx):
                 "source ./.drone.env",
                 # cache using the minio/mc client to the 'owncloud' bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc mirror --overwrite --remove %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["web"],
+                "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["webZip"],
             ],
         },
         {
@@ -2828,8 +2839,19 @@ def generateWebCache(ctx):
             "commands": [
                 "cd %s" % dirs["web"],
                 "retry -t 3 'yarn install --immutable --frozen-lockfile'",
-                "cd %s/tests/acceptance" % dirs["web"],
+                "cd tests/acceptance",
                 "retry -t 3 'yarn install --immutable --frozen-lockfile'",
+            ],
+        },
+        {
+            "name": "zip-yarn",
+            "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+            "commands": [
+                # zip the yarn deps before caching
+                "cd %s" % dirs["web"],
+                "tar -czvf %s .yarn" % dirs["e2eYarnZip"],
+                "cd tests/acceptance",
+                "tar -czvf %s .yarn" % dirs["acceptanceYarnZip"],
             ],
         },
         {
@@ -2838,10 +2860,19 @@ def generateWebCache(ctx):
             "environment": MINIO_MC_ENV,
             "commands": [
                 "source ./.drone.env",
-                # cache using the minio/mc client to the 'owncloud' bucket (long term bucket)
+                # cache using the minio/mc client to the public bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc mirror --overwrite --remove %s/.yarn s3/$CACHE_BUCKET/ocis/web-test-runner/yarn-e2e-$WEB_COMMITID" % dirs["web"],
-                "mc mirror --overwrite --remove %s/tests/acceptance/.yarn s3/$CACHE_BUCKET/ocis/web-test-runner/yarn-acceptance-$WEB_COMMITID" % dirs["web"],
+                "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["e2eYarnZip"],
+                "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["acceptanceYarnZip"],
+            ],
+        },
+        {
+            "name": "list-web-cache",
+            "image": MINIO_MC,
+            "environment": MINIO_MC_ENV,
+            "commands": [
+                "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
+                "mc ls --recursive s3/$CACHE_BUCKET/ocis/web-test-runner",
             ],
         },
     ]
@@ -2853,10 +2884,16 @@ def restoreWebCache():
         "environment": MINIO_MC_ENV,
         "commands": [
             "source ./.drone.env",
+            "rm -rf %s" % dirs["web"],
+            "mkdir -p %s" % dirs["web"],
             "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-            "mc mirror s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID %s" % dirs["web"],
-            "ls -la %s" % dirs["web"],
-            "chmod +x %s/tests/acceptance/*.sh" % dirs["web"],
+            "mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/web.tar.gz %s" % dirs["zip"],
+        ],
+    }, {
+        "name": "unzip-web-cache",
+        "image": OC_UBUNTU,
+        "commands": [
+            "tar -xvf %s -C ." % dirs["webZip"],
         ],
     }]
 
@@ -2868,15 +2905,16 @@ def restoreWebE2EYarnCache():
         "commands": [
             "source ./.drone.env",
             "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-            "mc mirror s3/$CACHE_BUCKET/ocis/web-test-runner/yarn-e2e-$WEB_COMMITID %s/.yarn" % dirs["web"],
-            "ls -la %s/.yarn" % dirs["web"],
+            "mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/e2e.tar.gz %s" % dirs["zip"],
         ],
     }, {
         # we need to install again becase the node_modules are not cached
-        "name": "install-yarn-e2e",
+        "name": "unzip-and-install-yarn-e2e",
         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
         "commands": [
             "cd %s" % dirs["web"],
+            "rm -rf .yarn",
+            "tar -xvf %s" % dirs["e2eYarnZip"],
             "retry -t 3 'yarn install --immutable'",
         ],
     }]
@@ -2889,15 +2927,16 @@ def restoreWebAcceptanceYarnCache():
         "commands": [
             "source ./.drone.env",
             "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-            "mc mirror s3/$CACHE_BUCKET/ocis/web-test-runner/yarn-acceptance-$WEB_COMMITID %s/tests/acceptance/.yarn" % dirs["web"],
-            "ls -la %s/tests/acceptance/.yarn" % dirs["web"],
+            "mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/acceptance.tar.gz %s" % dirs["zip"],
         ],
     }, {
         # we need to install again becase the node_modules are not cached
-        "name": "install-yarn-acceptance",
+        "name": "unzip-and-install-yarn-acceptance",
         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
         "commands": [
             "cd %s/tests/acceptance" % dirs["web"],
+            "rm -rf .yarn",
+            "tar -xvf %s -C ." % dirs["acceptanceYarnZip"],
             "retry -t 3 'yarn install --immutable'",
         ],
     }]
