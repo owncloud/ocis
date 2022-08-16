@@ -30,6 +30,7 @@ type OIDCProvider interface {
 	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*gOidc.UserInfo, error)
 }
 
+// NewOIDCAuthenticator returns a ready to use authenticator which can handle OIDC authentication.
 func NewOIDCAuthenticator(logger log.Logger, tokenCacheTTL int, oidcHTTPClient *http.Client, oidcIss string, providerFunc func() (OIDCProvider, error),
 	jwksOptions config.JWKS, accessTokenVerifyMethod string) OIDCAuthenticator {
 	tokenCache := osync.NewCache(tokenCacheTTL)
@@ -47,6 +48,7 @@ func NewOIDCAuthenticator(logger log.Logger, tokenCacheTTL int, oidcHTTPClient *
 	}
 }
 
+// OIDCAuthenticator is an authenticator responsible for OIDC authentication.
 type OIDCAuthenticator struct {
 	Logger                  log.Logger
 	HTTPClient              *http.Client
@@ -239,7 +241,10 @@ func (m OIDCAuthenticator) getProvider() OIDCProvider {
 
 func (m OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	// there is no bearer token on the request,
-	if !m.shouldServe(r) {
+	if !m.shouldServe(r) || isPublicPath(r.URL.Path) {
+		// The authentication of public path requests is handled by another authenticator.
+		// Since we can't guarantee the order of execution of the authenticators, we better
+		// implement an early return here for paths we can't authenticate in this authenticator.
 		return nil, false
 	}
 

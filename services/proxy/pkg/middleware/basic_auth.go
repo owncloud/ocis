@@ -8,6 +8,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 )
 
+// BasicAuthenticator is the authenticator responsible for HTTP Basic authentication.
 type BasicAuthenticator struct {
 	Logger        log.Logger
 	UserProvider  backend.UserBackend

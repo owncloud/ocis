@@ -65,9 +65,11 @@ const (
 )
 
 // Authenticator is the common interface implemented by all request authenticators.
-// The Authenticator may augment the request with user info or anything related to the
-// authentication and return the augmented request.
+
 type Authenticator interface {
+	// Authenticate is used to authenticate incoming HTTP requests.
+	// The Authenticator may augment the request with user info or anything related to the
+	// authentication and return the augmented request.
 	Authenticate(*http.Request) (*http.Request, bool)
 }
 
