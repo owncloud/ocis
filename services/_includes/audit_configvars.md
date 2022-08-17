@@ -10,7 +10,7 @@
 | AUDIT_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | AUDIT_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | AUDIT_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
-| AUDIT_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | |
+| AUDIT_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | AUDIT_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | AUDIT_EVENTS_GROUP | string | audit | The consumergroup of the service. One group will only get one copy of an event.|
 | AUDIT_LOG_TO_CONSOLE | bool | true | Logs to Stdout if true. Independent of the log to file option.|

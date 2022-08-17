@@ -72,7 +72,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[127.0.0.1:9233]
 a| [subs=-attributes]
-
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 |`AUDIT_EVENTS_CLUSTER`
 a| [subs=-attributes]
 +string+
