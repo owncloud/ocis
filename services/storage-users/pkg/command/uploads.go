@@ -20,7 +20,7 @@ import (
 func Uploads(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "uploads",
-		Usage:    "manage uploads",
+		Usage:    "manage unfinished uploads",
 		Category: "maintenance",
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg); err != nil {
@@ -40,7 +40,7 @@ func Uploads(cfg *config.Config) *cli.Command {
 func ListUploads(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "list",
-		Usage:    "Print a list of all expired or aborted uploads",
+		Usage:    "Print a list of all incomplete uploads",
 		Category: "services",
 		Before: func(c *cli.Context) error {
 			err := parser.ParseConfig(cfg)
@@ -87,7 +87,7 @@ func ListUploads(cfg *config.Config) *cli.Command {
 func PurgeExpiredUploads(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "purge",
-		Usage:    fmt.Sprintf("Let %s extension clean up leftovers from expired downloads", cfg.Service.Name),
+		Usage:    "Clean up leftovers from expired uploads",
 		Category: "services",
 		Before: func(c *cli.Context) error {
 			err := parser.ParseConfig(cfg)
