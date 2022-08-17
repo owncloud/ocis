@@ -40,7 +40,7 @@ func Uploads(cfg *config.Config) *cli.Command {
 func ListUploads(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "list",
-		Usage:    fmt.Sprintf("Print a list of all incomplete uploads"),
+		Usage:    "Print a list of all incomplete uploads",
 		Category: "services",
 		Before: func(c *cli.Context) error {
 			err := parser.ParseConfig(cfg)
