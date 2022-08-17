@@ -19,8 +19,9 @@ import (
 
 func Uploads(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:  "uploads",
-		Usage: "manage uploads",
+		Name:     "uploads",
+		Usage:    "manage uploads",
+		Category: "maintenance",
 		Before: func(c *cli.Context) error {
 			if err := parser.ParseConfig(cfg); err != nil {
 				fmt.Printf("%v", err)
