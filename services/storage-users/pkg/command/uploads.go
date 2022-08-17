@@ -39,9 +39,8 @@ func Uploads(cfg *config.Config) *cli.Command {
 // ListUploads prints a list of all incomplete uploads
 func ListUploads(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "list",
-		Usage:    "Print a list of all incomplete uploads",
-		Category: "services",
+		Name:  "list",
+		Usage: "Print a list of all incomplete uploads",
 		Before: func(c *cli.Context) error {
 			err := parser.ParseConfig(cfg)
 			if err != nil {
@@ -86,9 +85,8 @@ func ListUploads(cfg *config.Config) *cli.Command {
 // PurgeExpiredUploads is the entry point for the server command.
 func PurgeExpiredUploads(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "purge",
-		Usage:    "Clean up leftovers from expired uploads",
-		Category: "services",
+		Name:  "clean",
+		Usage: "Clean up leftovers from expired uploads",
 		Before: func(c *cli.Context) error {
 			err := parser.ParseConfig(cfg)
 			if err != nil {
