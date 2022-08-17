@@ -23,7 +23,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 )
 
-// Service defines the extension handlers.
+// Service defines the service handlers.
 type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
 	GetConfig(http.ResponseWriter, *http.Request)
