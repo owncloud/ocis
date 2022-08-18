@@ -27,7 +27,7 @@ const (
 	HeaderPurge = "Purge"
 )
 
-// Service defines the extension handlers.
+// Service defines the service handlers.
 type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
 	GetMe(http.ResponseWriter, *http.Request)

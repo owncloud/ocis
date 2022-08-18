@@ -17,7 +17,7 @@ import (
 func VersionCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "version",
-		Usage:    "print the version of this binary and all running extension instances",
+		Usage:    "print the version of this binary and all running service instances",
 		Category: "info",
 		Action: func(c *cli.Context) error {
 			fmt.Println("Version: " + version.GetString())

@@ -25,7 +25,7 @@ import (
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "server",
-		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
+		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
 		Before: func(c *cli.Context) error {
 			err := parser.ParseConfig(cfg)
@@ -108,7 +108,7 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-// defineContext sets the context for the extension. If there is a context configured it will create a new child from it,
+// defineContext sets the context for the service. If there is a context configured it will create a new child from it,
 // if not, it will create a root context that can be cancelled.
 func defineContext(cfg *config.Config) (context.Context, context.CancelFunc) {
 	return func() (context.Context, context.CancelFunc) {

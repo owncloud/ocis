@@ -22,7 +22,7 @@ var (
 	ErrConfigInvalid = `Invalid or missing config`
 )
 
-// Service defines the extension handlers.
+// Service defines the service handlers.
 type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
 	Config(http.ResponseWriter, *http.Request)
