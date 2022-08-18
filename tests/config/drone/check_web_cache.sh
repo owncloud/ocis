@@ -3,7 +3,7 @@ source .drone.env
 
 echo "Checking web version - $WEB_COMMITID in cache"
 
-URL="$CACHE_ENDPOINT/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/README.md"
+URL="$CACHE_ENDPOINT/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/web.tar.gz"
 
 echo "Checking for the web cache at '$URL'."
 
