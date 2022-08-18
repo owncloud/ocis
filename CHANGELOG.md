@@ -7,7 +7,9 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Autocreate IDP private key also if file exists but is empty: [#4394](https://github.com/owncloud/ocis/pull/4394)
+* Enhancement - Add /app/open-with-web endpoint: [#4376](https://github.com/owncloud/ocis/pull/4376)
 * Enhancement - Added command to reset administrator password: [#4084](https://github.com/owncloud/ocis/issues/4084)
+* Enhancement - Update reva to vx.x.x: [#4376](https://github.com/owncloud/ocis/pull/4376)
 
 ## Details
 
@@ -18,6 +20,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4394
 
+* Enhancement - Add /app/open-with-web endpoint: [#4376](https://github.com/owncloud/ocis/pull/4376)
+
+   We've added an /app/open-with-web endpoint to the app provider, so that clients that are no
+   browser or have only limited browser access can also open apps with the help of a Web URL.
+
+   https://github.com/owncloud/ocis/pull/4376
+   https://github.com/cs3org/reva/pull/3143
+
 * Enhancement - Added command to reset administrator password: [#4084](https://github.com/owncloud/ocis/issues/4084)
 
    The new command `ocis idm resetpassword` allows to reset the administrator password when ocis
@@ -25,6 +35,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4084
    https://github.com/owncloud/ocis/pull/4365
+
+* Enhancement - Update reva to vx.x.x: [#4376](https://github.com/owncloud/ocis/pull/4376)
+
+   Updated reva to version x.x.x. This update includes:
+
+  * TODO:
+
+   https://github.com/owncloud/ocis/pull/4376
 # Changelog for [2.0.0-beta.6] (2022-08-11)
 
 The following sections list the changes for 2.0.0-beta.6.
