@@ -16,7 +16,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 	if err != nil {
 		return nil, err
 	}
-	webURL.Path = path.Join(webURL.Path, "/external")
+	webURL.Path = path.Join(webURL.Path, "external")
 	webOpenInAppURL := webURL.String()
 
 	archivers := []map[string]interface{}{
