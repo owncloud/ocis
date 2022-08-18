@@ -1,6 +1,7 @@
 package revaconfig
 
 import (
+	"net/url"
 	"path"
 	"strconv"
 
@@ -9,7 +10,15 @@ import (
 )
 
 // FrontendConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
-func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
+func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error) {
+
+	webURL, err := url.Parse(cfg.PublicURL)
+	if err != nil {
+		return nil, err
+	}
+	webURL.Path = path.Join(webURL.Path, "external")
+	webOpenInAppURL := webURL.String()
+
 	archivers := []map[string]interface{}{
 		{
 			"enabled":       true,
@@ -23,11 +32,12 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 
 	appProviders := []map[string]interface{}{
 		{
-			"enabled":  true,
-			"version":  "1.0.0",
-			"apps_url": "/app/list",
-			"open_url": "/app/open",
-			"new_url":  "/app/new",
+			"enabled":      true,
+			"version":      "1.1.0",
+			"apps_url":     "/app/list",
+			"open_url":     "/app/open",
+			"open_web_url": "/app/open-with-web",
+			"new_url":      "/app/new",
 		},
 	}
 
@@ -89,6 +99,18 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"transfer_shared_secret": cfg.TransferSecret,
 					"timeout":                86400,
 					"insecure":               cfg.AppHandler.Insecure,
+					"webbaseuri":             webOpenInAppURL,
+					"web": map[string]interface{}{
+						"urlparamsmapping": map[string]string{
+							// param -> value mapper
+							// these mappers are static and are only subject to change when changed in oC Web
+							"fileId": "fileid",
+							"app":    "appname",
+						},
+						"staticurlparams": map[string]string{
+							"contextRouteName": "files-spaces-personal", // TODO: remove when https://github.com/owncloud/web/pull/7437 arrived in oCIS
+						},
+					},
 				},
 				"archiver": map[string]interface{}{
 					"prefix":        cfg.Archiver.Prefix,
@@ -228,5 +250,5 @@ func FrontendConfigFromStruct(cfg *config.Config) map[string]interface{} {
 				},
 			},
 		},
-	}
+	}, nil
 }

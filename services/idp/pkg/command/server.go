@@ -161,12 +161,12 @@ func ensureEncryptionSecretExists(path string) error {
 
 func ensureSigningPrivateKeyExists(paths []string) error {
 	for _, path := range paths {
-		_, err := os.Stat(path)
-		if err == nil {
-			// If the file exists we can just return
+		file, err := os.Stat(path)
+		if err == nil && file.Size() > 0 {
+			// If the file exists and is not empty we can just return
 			return nil
 		}
-		if !errors.Is(err, fs.ErrNotExist) {
+		if !errors.Is(err, fs.ErrNotExist) && file.Size() > 0 {
 			return err
 		}
 
