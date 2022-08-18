@@ -377,6 +377,20 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * using method from core to set share data
+	 * 
+	 * @return void
+	 */
+	public function setLastShareData(): void {
+		// set last response as PublicShareData
+		$this->featureContext->setLastPublicShareData($this->featureContext->getResponseXml(null, __METHOD__));
+		// set last shareId if ShareData exists
+		if (isset($this->featureContext->getLastPublicShareData()->data)) {
+			$this->featureContext->setLastPublicLinkShareId((string) $this->featureContext->getLastPublicShareData()->data[0]->id);
+		}
+	}
+
+	/**
 	 * @BeforeScenario
 	 *
 	 * @param BeforeScenarioScope $scope
@@ -2055,6 +2069,7 @@ class SpacesContext implements Context {
 				$body
 			)
 		);
+		$this->setLastShareData();
 	}
 
 	/**
@@ -2062,7 +2077,7 @@ class SpacesContext implements Context {
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
-	 * @param TableNode|null $table
+	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -2070,7 +2085,7 @@ class SpacesContext implements Context {
 	public function createPublicLinkToEntityInsideOfSpaceRequest(
 		string $user,
 		string $spaceName,
-		?TableNode $table
+		TableNode $table
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$rows = $table->getRowsHash();
@@ -2100,6 +2115,32 @@ class SpacesContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 				$body
 			)
+		);
+
+		$this->setLastShareData();
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has created a public link share inside of space "([^"]*)" with settings:$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasCreatedPublicLinkToEntityInsideOfSpaceRequest(
+		string $user,
+		string $spaceName,
+		TableNode $table
+	): void {
+		$this->createPublicLinkToEntityInsideOfSpaceRequest($user, $spaceName, $table);
+
+		$expectedHTTPStatus = "200";
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			$expectedHTTPStatus,
+			"Expected response status code should be $expectedHTTPStatus"
 		);
 	}
 
@@ -2917,12 +2958,7 @@ class SpacesContext implements Context {
 			)
 		);
 
-		// set last response as PublicShareData. using method from core
-		$this->featureContext->setLastPublicShareData($this->featureContext->getResponseXml(null, __METHOD__));
-		// set last shareId if ShareData exists. using method from core
-		if (isset($this->featureContext->getLastPublicShareData()->data)) {
-			$this->featureContext->setLastPublicLinkShareId((string) $this->featureContext->getLastPublicShareData()->data[0]->id);
-		}
+		$this->setLastShareData();
 	}
 
 	/**
@@ -2952,10 +2988,13 @@ class SpacesContext implements Context {
 
 	/**
 	 * @Then /^for user "([^"]*)" the space "([^"]*)" should (not|)\s?contain the last created public link$/
+	 * @Then /^for user "([^"]*)" the space "([^"]*)" should (not|)\s?contain the last created public link of the file "([^"]*)"$/
+	 * @Then /^for user "([^"]*)" the space "([^"]*)" should (not|)\s?contain the last created share of the file "([^"]*)"$/
 	 *
 	 * @param string    $user
 	 * @param string    $spaceName
 	 * @param string    $shouldOrNot   (not|)
+	 * @param string    $fileName
 	 *
 	 * @return void
 	 *
@@ -2964,10 +3003,18 @@ class SpacesContext implements Context {
 	public function forUserSpaceShouldContainLinks(
 		string $user,
 		string $spaceName,
-		string $shouldOrNot
+		string $shouldOrNot,
+		string $fileName = ''
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$url = "/apps/files_sharing/api/v1/shares?reshares=true&space_ref=" . $space['id'];
+		$body = '';
+		if (!empty ($fileName)) {
+			$body = $this->getFileId($user, $spaceName, $fileName);
+		} else {
+			$space = $this->getSpaceByName($user, $spaceName);
+			$body = $space['id'];
+		}
+		
+		$url = "/apps/files_sharing/api/v1/shares?reshares=true&space_ref=" . $body;
 
 		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
