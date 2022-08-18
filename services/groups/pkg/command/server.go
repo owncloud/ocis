@@ -9,6 +9,7 @@ import (
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/external"
 	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
@@ -29,12 +30,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
 		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
-				fmt.Printf("%v", err)
-				os.Exit(1)
-			}
-			return err
+			return configlog.LogReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)

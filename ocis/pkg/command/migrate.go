@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"sync"
 
@@ -13,6 +12,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/share/manager/registry"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 	sharing "github.com/owncloud/ocis/v2/services/sharing/pkg/config"
@@ -27,21 +27,6 @@ func Migrate(cfg *config.Config) *cli.Command {
 		Name:     "migrate",
 		Usage:    "migrate data from an existing to another instance",
 		Category: "migration",
-		Before: func(c *cli.Context) error {
-			// Parse base config
-			if err := parser.ParseConfig(cfg, true); err != nil {
-				fmt.Printf("%v", err)
-				return err
-			}
-
-			// Parse sharing config
-			cfg.Sharing.Commons = cfg.Commons
-			if err := sharingparser.ParseConfig(cfg.Sharing); err != nil {
-				fmt.Printf("%v", err)
-				return err
-			}
-			return nil
-		},
 		Subcommands: []*cli.Command{
 			MigrateShares(cfg),
 			MigratePublicShares(cfg),
@@ -68,6 +53,16 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 				Value: "cs3",
 				Usage: "Share manager to import the data into",
 			},
+		},
+		Before: func(c *cli.Context) error {
+			// Parse base config
+			if err := parser.ParseConfig(cfg, true); err != nil {
+				return configlog.LogReturnError(err)
+			}
+
+			// Parse sharing config
+			cfg.Sharing.Commons = cfg.Commons
+			return configlog.LogReturnError(sharingparser.ParseConfig(cfg.Sharing))
 		},
 		Action: func(c *cli.Context) error {
 			log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()
@@ -153,6 +148,16 @@ func MigratePublicShares(cfg *config.Config) *cli.Command {
 				Value: "cs3",
 				Usage: "Public share manager to import the data into",
 			},
+		},
+		Before: func(c *cli.Context) error {
+			// Parse base config
+			if err := parser.ParseConfig(cfg, true); err != nil {
+				return configlog.LogReturnError(err)
+			}
+
+			// Parse sharing config
+			cfg.Sharing.Commons = cfg.Commons
+			return configlog.LogReturnError(sharingparser.ParseConfig(cfg.Sharing))
 		},
 		Action: func(c *cli.Context) error {
 			log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()

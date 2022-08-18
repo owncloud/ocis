@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/config"
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/sharing/pkg/logging"
@@ -17,11 +18,7 @@ func Health(cfg *config.Config) *cli.Command {
 		Usage:    "check health status",
 		Category: "info",
 		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
-				fmt.Printf("%v", err)
-			}
-			return err
+			return configlog.LogReturnError(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)

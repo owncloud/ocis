@@ -11,6 +11,7 @@ import (
 	"github.com/go-ldap/ldap/v3"
 	"github.com/libregraph/idm/pkg/ldbbolt"
 	"github.com/libregraph/idm/server"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/idm/pkg/config"
 	"github.com/owncloud/ocis/v2/services/idm/pkg/config/parser"
@@ -24,15 +25,10 @@ import (
 func ResetPassword(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "resetpassword",
-		Usage:    fmt.Sprintf("Reset admin password"),
+		Usage:    "Reset admin password",
 		Category: "password reset",
 		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
-				fmt.Printf("%v", err)
-				os.Exit(1)
-			}
-			return err
+			return configlog.LogReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
