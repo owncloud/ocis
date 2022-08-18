@@ -1347,6 +1347,20 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * Escapes the given string for
+	 * 1. Space --> %20
+	 * 2. Opening Small Bracket --> %28
+	 * 3. Closing Small Bracket --> %29
+	 *
+	 * @param string $path - File path to parse
+	 *
+	 * @return string
+	 */
+	public function escapePath(string $path): string {
+		return \str_replace([" ", "(", ")"], ["%20", "%28", "%29"], $path);
+	}
+
+	/**
 	 * parses a PROPFIND response from $this->response into xml
 	 * and returns found search results if found else returns false
 	 *
@@ -1374,6 +1388,9 @@ class SpacesContext implements Context {
 
 		// trim any leading "/" passed by the caller, we can just match the "raw" name
 		$trimmedEntryNameToSearch = \trim($entryNameToSearch, "/");
+
+		// url encode for spaces and brackets that may appear in the filePath
+		$folderPath = $this->escapePath($folderPath);
 
 		// topWebDavPath should be something like /remote.php/webdav/ or
 		// /remote.php/dav/files/alice/
@@ -1850,6 +1867,7 @@ class SpacesContext implements Context {
 	 * @param string $spaceName
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function userMovesFileWithinSpaceUsingTheWebDAVAPI(
 		string $user,
@@ -1864,8 +1882,40 @@ class SpacesContext implements Context {
 			$spaceName
 		);
 
-		$fullUrl = $space["root"]["webDavUrl"] . '/' . \trim($fileSource, "/");
+		$fileSource = $this->escapePath(\trim($fileSource, "/"));
+		$fullUrl = $space["root"]["webDavUrl"] . '/' . $fileSource;
 		$this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has moved (?:file|folder) "([^"]*)" to "([^"]*)" in space "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $fileSource
+	 * @param string $fileDestination
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasMovedFileWithinSpaceUsingTheWebDAVAPI(
+		string $user,
+		string $fileSource,
+		string $fileDestination,
+		string $spaceName
+	):void {
+		$this->userMovesFileWithinSpaceUsingTheWebDAVAPI(
+			$user,
+			$fileSource,
+			$fileDestination,
+			$spaceName
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			__METHOD__ . "Expected response status code should be 201 (Created)\n" .
+			"Actual response status code was: " . $this->featureContext->getResponse()->getStatusCode() . "\n" .
+			"Actual response body was: " . $this->featureContext->getResponse()->getBody()
+		);
 	}
 
 	/**
@@ -1888,6 +1938,9 @@ class SpacesContext implements Context {
 				$this->featureContext->getPasswordForUser($user),
 				$headers,
 			)
+		);
+		$this->featureContext->pushToLastHttpStatusCodesArray(
+			(string)$this->featureContext->getResponse()->getStatusCode()
 		);
 	}
 
@@ -1953,7 +2006,10 @@ class SpacesContext implements Context {
 	 */
 	public function destinationHeaderValueWithSpaceName(string $user, string $fileDestination, string $spaceName):string {
 		$space = $this->getSpaceByName($user, $spaceName);
-		return $space["root"]["webDavUrl"] . '/' . \ltrim($fileDestination, '/');
+
+		$fileDestination = $this->escapePath(\ltrim($fileDestination, "/"));
+
+		return $space["root"]["webDavUrl"] . '/' . $fileDestination;
 	}
 
 	/**

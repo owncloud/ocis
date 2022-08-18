@@ -198,6 +198,8 @@ Feature: move (rename) file
     Then the HTTP status code should be "201"
     And for user "Alice" folder "testshare2" of the space "Shares Jail" should contain these entries:
       | testshare1.txt |
+    And for user "Alice" folder "testshare1" of the space "Shares Jail" should not contain these entries:
+      | testshare1.txt |
     And for user "Brian" the space "Personal" should contain these entries:
       | /testshare2/testshare1.txt |
 
