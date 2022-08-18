@@ -1,6 +1,6 @@
 Enhancement: Added language option to the app provider
 
-We've added an language option to the app provider which will in the
+We've added a language option to the app provider which will in the
 end be passed to the app a user opens so that the web ui is displayed in the users language.
 
 https://github.com/owncloud/ocis/pull/4399
