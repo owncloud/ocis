@@ -200,9 +200,9 @@ HTTP status code: 200
 **Request examples**:
 
 ```bash
-curl -X POST 'https://ocis.test/app/open?file_id=ZmlsZTppZAo='
+curl -X POST 'https://ocis.test/app/open-with-web?file_id=ZmlsZTppZAo='
 
-curl -X POST 'https://ocis.test/app/open?file_id=ZmlsZTppZAo=&app_name=Collabora'
+curl -X POST 'https://ocis.test/app/open-with-web?file_id=ZmlsZTppZAo=&app_name=Collabora'
 ```
 
 **Response examples**:
