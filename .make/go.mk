@@ -75,6 +75,7 @@ golangci-lint: $(GOLANGCI_LINT)
 .PHONY: ci-golangci-lint
 ci-golangci-lint: $(GOLANGCI_LINT)
 	$(GOLANGCI_LINT) run --path-prefix services/$(NAME) --timeout 10m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
+	cat checkstyle.xml
 
 .PHONY: test
 test:
