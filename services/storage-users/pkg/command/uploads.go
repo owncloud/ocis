@@ -110,7 +110,7 @@ func PurgeExpiredUploads(cfg *config.Config) *cli.Command {
 
 			managingFS, ok := fs.(storage.UploadsManager)
 			if !ok {
-				fmt.Fprintf(os.Stderr, "'%s' storage does not support purging expired uploads\n", cfg.Driver)
+				fmt.Fprintf(os.Stderr, "'%s' storage does not support clean expired uploads\n", cfg.Driver)
 				os.Exit(1)
 			}
 
@@ -118,11 +118,10 @@ func PurgeExpiredUploads(cfg *config.Config) *cli.Command {
 			wg.Add(1)
 			purgedChannel := make(chan tusd.FileInfo)
 
+			fmt.Println("Cleaned uploads:")
 			go func() {
 				for purged := range purgedChannel {
-					fmt.Printf("Purging %s (Filename: %s, Size: %d, Expires: %s)\n",
-						purged.ID, purged.MetaData["filename"], purged.Size, expiredString(purged.MetaData["expires"]))
-
+					fmt.Printf(" - %s (%s, Size: %d, Expires: %s)\n", purged.ID, purged.MetaData["filename"], purged.Size, expiredString(purged.MetaData["expires"]))
 				}
 				wg.Done()
 			}()
@@ -131,7 +130,7 @@ func PurgeExpiredUploads(cfg *config.Config) *cli.Command {
 			close(purgedChannel)
 			wg.Wait()
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Failed to purge expired uploads '%s'\n", err)
+				fmt.Fprintf(os.Stderr, "Failed to clean expired uploads '%s'\n", err)
 				return err
 			}
 			return nil
