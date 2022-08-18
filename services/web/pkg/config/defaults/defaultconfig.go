@@ -49,7 +49,7 @@ func DefaultConfig() *config.Config {
 				},
 				Apps: []string{"files", "search", "preview", "text-editor", "pdf-viewer", "external", "user-management"},
 				Options: map[string]interface{}{
-					"hideSearchBar": false,
+					"hideSearchBar":        false,
 					"previewFileMimeTypes": []string{"image/gif", "image/png", "image/jpeg", "text/plain"},
 				},
 			},
