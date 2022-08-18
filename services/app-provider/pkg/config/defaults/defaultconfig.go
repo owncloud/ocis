@@ -5,6 +5,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/app-provider/pkg/config"
 )
 
+// FullDefaultConfig -- correct comment here
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
 	EnsureDefaults(cfg)
@@ -12,6 +13,7 @@ func FullDefaultConfig() *config.Config {
 	return cfg
 }
 
+// Wrong comment here
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
@@ -37,6 +39,8 @@ func DefaultConfig() *config.Config {
 		},
 	}
 }
+
+// No comment here
 
 func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for "envdecode".
