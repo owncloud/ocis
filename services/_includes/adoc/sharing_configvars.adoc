@@ -255,7 +255,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[127.0.0.1:9215]
 a| [subs=-attributes]
-GRPC address of the STORAGE-SYSTEM extension.
+GRPC address of the STORAGE-SYSTEM service.
 |`OCIS_SYSTEM_USER_ID` +
 `SHARING_PUBLIC_CS3_SYSTEM_USER_ID`
 a| [subs=-attributes]

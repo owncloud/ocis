@@ -35,7 +35,7 @@
 | SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID | string |  | Mount ID of the ownCloudSQL users storage for mapping ownCloud 10 shares.|
 | SHARING_PUBLIC_DRIVER | string | cs3 | Driver to be used to persist public shares. Supported values are 'json' and 'cs3'.|
 | SHARING_PUBLIC_JSON_FILE | string | ~/.ocis/storage/publicshares.json | Path to the JSON file where public share meta-data will be stored. This JSON file contains the information about public shares that have been created.|
-| SHARING_PUBLIC_CS3_PROVIDER_ADDR | string | 127.0.0.1:9215 | GRPC address of the STORAGE-SYSTEM extension.|
+| SHARING_PUBLIC_CS3_PROVIDER_ADDR | string | 127.0.0.1:9215 | GRPC address of the STORAGE-SYSTEM service.|
 | OCIS_SYSTEM_USER_ID<br/>SHARING_PUBLIC_CS3_SYSTEM_USER_ID | string |  | ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|
 | OCIS_SYSTEM_USER_IDP<br/>SHARING_PUBLIC_CS3_SYSTEM_USER_IDP | string | internal | IDP of the oCIS STORAGE-SYSTEM system user.|
 | OCIS_SYSTEM_USER_API_KEY<br/>SHARING_USER_CS3_SYSTEM_USER_API_KEY | string |  | API key for the STORAGE-SYSTEM system user.|
