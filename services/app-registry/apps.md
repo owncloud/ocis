@@ -22,9 +22,10 @@ The capabilities endpoint (e.g. `https://localhost:9200/ocs/v1.php/cloud/capabil
           "app_providers": [
             {
               "enabled": true,
-              "version": "1.0.0",
+              "version": "1.1.0",
               "apps_url": "/app/list",
               "open_url": "/app/open",
+              "open_web_url": "/app/open-with-web",
               "new_url": "/app/new"
             }
           ]
@@ -177,6 +178,48 @@ HTTP status code: 200
   ]
 }
 ```
+
+### Open a file with the ownCloud Web
+
+**Endpoint**: specified in the capabilities in `open_web_url`, currently `/app/open-with-web`
+
+**Method**: HTTP POST
+
+**Authentication** (one of them):
+
+- `Authorization` header with OIDC Bearer token for authenticated users or basic auth credentials (if enabled in oCIS)
+- `X-Access-Token` header with a REVA token for authenticated users
+
+**Query parameters**:
+
+- `file_id` (mandatory): id of the file to be opened
+- `app_name` (optional)
+  - default (not given): default app for mime type
+  - possible values depend on the app providers for a mimetype from the `/app/open` endpoint
+
+**Request examples**:
+
+```bash
+curl -X POST 'https://ocis.test/app/open?file_id=ZmlsZTppZAo='
+
+curl -X POST 'https://ocis.test/app/open?file_id=ZmlsZTppZAo=&app_name=Collabora'
+```
+
+**Response examples**:
+
+The URI from the response JSON is intended to be opened with a GET request in a browser. If the user has not yet a session in the browser, a login flow is handled by ownCloud Web.
+
+HTTP status code: 200
+
+```json
+{
+  "uri": "https://....."
+}
+```
+
+**Example responses (error case)**:
+
+See error cases for [Open a file with the app provider](#open-a-file-with-the-app-provider)
 
 ### Open a file with the app provider
 
