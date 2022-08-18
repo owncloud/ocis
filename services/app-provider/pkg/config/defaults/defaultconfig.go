@@ -74,6 +74,8 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Reva = &config.Reva{}
 	}
 
+	// function changed - will the linter react?
+
 	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
 		cfg.TokenManager = &config.TokenManager{
 			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
