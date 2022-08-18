@@ -21,7 +21,8 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// Server is the entry point for the server command.
+// Servr is the entry point for the server command.
+// does linter act if I change this file?
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "server",
