@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
 
+// There is no comment here
 type Config struct {
 	Commons *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
 	Service Service         `yaml:"-"`
