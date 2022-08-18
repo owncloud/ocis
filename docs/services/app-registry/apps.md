@@ -245,11 +245,20 @@ See error cases for [Open a file with the app provider](#open-a-file-with-the-ap
     - `write`: user can edit and download in the opening app
     - `read`: user can view and download from the opening app
     - `view`: user can view in the opening app (download is not possible)
+- `lang` (optional)
+  - default (not given): default language of the application (which might maybe use the browser language)
+  - possible value is any ISO 639-1 language code. Examples:
+    - de
+    - en
+    - es
+    - ...
 
 **Request examples**:
 
 ```bash
 curl -X POST 'https://ocis.test/app/open?file_id=ZmlsZTppZAo='
+
+curl -X POST 'https://ocis.test/app/open?file_id=ZmlsZTppZAo=&lang=de'
 
 curl -X POST 'https://ocis.test/app/open?file_id=ZmlsZTppZAo=&app_name=Collabora'
 
@@ -359,6 +368,17 @@ HTTP status code: 200
   {
     "code": "RESOURCE_NOT_FOUND",
     "message": "file does not exist"
+  }
+  ```
+
+- invalid language code
+
+  HTTP status code: 400
+
+  ```json
+  {
+    "code": "INVALID_PARAMETER",
+    "message": "lang parameter does not contain a valid ISO 639-1 language code"
   }
   ```
 
