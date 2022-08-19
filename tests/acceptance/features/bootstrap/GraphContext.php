@@ -429,6 +429,32 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @When /^the administrator creates a group "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $group
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function adminCreatesGroupUsingTheGraphApi(string $group): void {
+		$response = GraphHelper::createGroup(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+			$group,
+		);
+		$this->featureContext->setResponse($response);
+		$this->featureContext->pushToLastHttpStatusCodesArray((string) $response->getStatusCode());
+
+		if ($response->getStatusCode() === 200) {
+			$groupId = $this->featureContext->getJsonDecodedResponse($response)["id"];
+			$this->featureContext->addGroupToCreatedGroupsList($group, true, true, $groupId);
+		}
+	}
+
+	/**
 	 * create group with provided data
 	 *
 	 * @param string $group

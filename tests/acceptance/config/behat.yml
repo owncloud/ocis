@@ -6,7 +6,7 @@ default:
     apiAccountsHashDifficulty:
       paths:
         - '%paths.base%/../features/apiAccountsHashDifficulty'
-      context:
+      context: &common_ldap_suite_context
         parameters:
           ldapAdminPassword: admin
           ldapUsersOU: TestUsers
@@ -57,6 +57,14 @@ default:
         - ChecksumContext:
         - FilesVersionsContext:
         - PublicWebDavContext:
+
+    apiGraph:
+      paths:
+        - '%paths.base%/../features/apiGraph'
+      context: *common_ldap_suite_context
+      contexts:
+        - GraphContext:
+        - FeatureContext: *common_feature_context_params
 
   extensions:
     Cjm\Behat\StepThroughExtension: ~
