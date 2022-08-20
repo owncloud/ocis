@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix configuration of mimetypes for the app registry: [#4411](https://github.com/owncloud/ocis/pull/4411)
 * Bugfix - Autocreate IDP private key also if file exists but is empty: [#4394](https://github.com/owncloud/ocis/pull/4394)
 * Bugfix - Rename extensions to services (leftover occurences): [#4407](https://github.com/owncloud/ocis/pull/4407)
 * Change - Rename "uploads purge" command to "uploads clean": [#4403](https://github.com/owncloud/ocis/pull/4403)
@@ -15,6 +16,15 @@ The following sections list the changes for unreleased.
 * Enhancement - Update reva to vx.x.x: [#4376](https://github.com/owncloud/ocis/pull/4376)
 
 ## Details
+
+* Bugfix - Fix configuration of mimetypes for the app registry: [#4411](https://github.com/owncloud/ocis/pull/4411)
+
+   We've fixed the configuration option for mimetypes in the app registry. Previously the
+   default config would always be merged over the user provided configuration. Now the default
+   mimetype configuration is only used if the user does not providy any mimetype configuration
+   (like it is already done in the proxy with the routes configuration).
+
+   https://github.com/owncloud/ocis/pull/4411
 
 * Bugfix - Autocreate IDP private key also if file exists but is empty: [#4394](https://github.com/owncloud/ocis/pull/4394)
 
