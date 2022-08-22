@@ -249,18 +249,46 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function getSpaceByName(string $user, string $spaceName): array {
+		// var_dump($user,$spaceName);
+		$targetUser="";
 		if ($spaceName === "Personal") {
 			$spaceName = $this->featureContext->getUserDisplayName($user);
 		}
 		if (strtolower($user) === 'admin') {
+			// var_dump("here admin");
 			$this->theUserListsAllAvailableSpacesUsingTheGraphApi($user);
 		} else {
 			$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
 		}
+		$createdUsers = $this->featureContext->getCreatedUsers();
+		$createdUsersId = array_column($createdUsers, 'id');
+		// var_dump($createdUsers);
 		$spaces = $this->getAvailableSpaces();
+		if(strtolower($user) !== 'admin'){
+			$targetUser=$user;
+		}
+		// var_dump($spaces);
+		foreach ($spaces as $space) {
+			// get the user id of all the spaces availabe till now
+			$userId=$space["owner"]["user"]["id"];
+			$username=$space["name"];
+			// var_dump($username);
+			// get the id of the users created by the running scenario
+			// var_dump($userId, $createdUsersId);
+			// when the user gets deleted the spaces related to user isn't deleted so we add only the spaces
+			// of users created by a paticular scenario to the array 
+			// this work around can be removed after the fix of https://github.com/owncloud/ocis/issues/4195
+			if(in_array($userId,$createdUsersId) && $space["driveType"]==='personal'){
+				$spaces[$spaceName] = $space;
+				var_dump($spaces[$spaceName]);
+			} else {
+				$spaces[$spaceName] = $space;
+			}
+		}
 		Assert::assertIsArray($spaces[$spaceName], "Space with name $spaceName for user $user not found");
 		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName for user $user not found");
-
+       var_dump("next thing");
+		var_dump($spaces[$spaceName]);
 		return $spaces[$spaceName];
 	}
 
@@ -402,6 +430,7 @@ class SpacesContext implements Context {
 			$this->baseUrl,
 			$this->featureContext->getOcPath()
 		);
+		$this->availableSpaces = [];
 	}
 
 	/**
@@ -415,6 +444,8 @@ class SpacesContext implements Context {
 		// TODO enable when admin can disable and delete spaces
 		// $this->deleteAllSpacesOfTheType('project');
 		// $this->deleteAllSpacesOfTheType('personal');
+		$this->availableSpaces = [];
+		// var_dump('here at after');
 	}
 
 	/**
@@ -499,7 +530,7 @@ class SpacesContext implements Context {
 		array  $headers = []
 	): ResponseInterface {
 		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/" . $urlArguments;
-
+		// var_dump($fullUrl, $xRequestId, $user, $password, $headers, $body);
 		return HttpRequestHelper::get($fullUrl, $xRequestId, $user, $password, $headers, $body);
 	}
 
@@ -552,7 +583,6 @@ class SpacesContext implements Context {
 		array $headers = []
 	): ResponseInterface {
 		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/";
-
 		return HttpRequestHelper::post($fullUrl, $xRequestId, $user, $password, $headers, $body);
 	}
 
@@ -603,6 +633,7 @@ class SpacesContext implements Context {
 		array $headers = [],
 		string $content = ""
 	): ResponseInterface {
+		// var_dump($fullUrl, $xRequestId, 'PUT', $user, $password, $headers, $content);
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'PUT', $user, $password, $headers, $content);
 	}
 
@@ -1473,6 +1504,7 @@ class SpacesContext implements Context {
 		string $destination
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
+		// var_dump($space);
 		Assert::assertIsArray($space, "Space with name $spaceName not found");
 		Assert::assertNotEmpty($space["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName not found");
 
@@ -1605,7 +1637,7 @@ class SpacesContext implements Context {
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$spaceId = $space["id"];
-
+		// var_dump($space);
 		$bodyData = ["quota" => ["total" => $newQuota]];
 		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
 
@@ -1617,6 +1649,7 @@ class SpacesContext implements Context {
 				$spaceId
 			)
 		);
+		$res =$this->featureContext->getJsonDecodedResponse();
 	}
 
 	/**
@@ -1732,8 +1765,8 @@ class SpacesContext implements Context {
 	): ResponseInterface {
 		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/$spaceId";
 		$method = 'PATCH';
-
-		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers, $body);
+		$res = HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers, $body);
+		return $res;
 	}
 
 	/**

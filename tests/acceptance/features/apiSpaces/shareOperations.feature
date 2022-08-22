@@ -367,8 +367,8 @@ Feature: sharing
       | permissions | create |
       | shareWith   | grp1   |
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    And user "Admin" has changed the quota of the "Alice Hansen" space to "1"
-    When user "Brian" uploads a file inside space "Shares Jail" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
+    And user "Admin" has changed the quota of the "Alice Hansen" space to "10"
+    When user "Brian" uploads a file inside space "Shares Jail" with content "new descriptionfgshsywhhh" to "/FOLDER/textfile.txt" using the WebDAV API
     Then the HTTP status code should be "507"
     And as "Alice" file "/FOLDER/textfile.txt" should not exist  
 

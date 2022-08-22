@@ -211,14 +211,14 @@ Feature: Change data of space
       | -1         | between "201" and "204" |
 
 
-  Scenario Outline: An admin user set an user personal space quota of via the Graph API
-    When user "Admin" changes the quota of the "Brian Murphy" space to "<quotaValue>"
+  Scenario: An admin user set an user personal space quota of via the Graph API
+    When user "Admin" changes the quota of the "Brian Murphy" space to "15"
     Then the HTTP status code should be "200"
     When user "Brian" uploads a file inside space "Brian Murphy" with content "file is more than 15 bytes" to "file.txt" using the WebDAV API
-    Then the HTTP status code should be <code>
-    Examples:
-      | quotaValue | code                    |
-      | 15         | "507"                   |
-      | 10000      | between "201" and "204" |
-      | 0          | between "201" and "204" |
-      | -1         | between "201" and "204" |
+    Then the HTTP status code should be "507"
+    # Examples:
+    #   | quotaValue | code                    |
+    #   | 15         | "507"                   |
+    #   | 10000      | between "201" and "204" |
+    #   | 0          | between "201" and "204" |
+    #   | -1         | between "201" and "204" |
