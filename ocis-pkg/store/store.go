@@ -2,8 +2,6 @@ package store
 
 import (
 	"context"
-	"os"
-	"strconv"
 	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/store/etcd"
@@ -18,6 +16,12 @@ var (
 )
 
 var ocMemStore *store.Store
+
+type OcisStoreOptions struct {
+	Type    string
+	Address string
+	Size    int
+}
 
 // Get the configured key-value store to be used.
 //
@@ -46,15 +50,15 @@ var ocMemStore *store.Store
 // The parameter only affects to the "ocmem" implementation, the rest will ignore it.
 // If an invalid value is used, the default will be used instead, so up to 512 elements
 // the cache will hold.
-func GetStore() store.Store {
+func GetStore(ocisOpts OcisStoreOptions) store.Store {
 	var s store.Store
 
-	addresses := strings.Split(os.Getenv(storeAddressEnv), ",")
+	addresses := strings.Split(ocisOpts.Address, ",")
 	opts := []store.Option{
 		store.Nodes(addresses...),
 	}
 
-	switch os.Getenv(storeEnv) {
+	switch ocisOpts.Type {
 	case "noop":
 		s = store.NewNoopStore(opts...)
 	case "etcd":
@@ -63,9 +67,8 @@ func GetStore() store.Store {
 		if ocMemStore == nil {
 			var memStore store.Store
 
-			size := os.Getenv(storeOCMemSize)
-			sizeNum, err := strconv.Atoi(size)
-			if err != nil {
+			sizeNum := ocisOpts.Size
+			if sizeNum <= 0 {
 				memStore = memory.NewMultiMemStore()
 			} else {
 				memStore = memory.NewMultiMemStore(

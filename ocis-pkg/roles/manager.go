@@ -29,7 +29,7 @@ type Manager struct {
 func NewManager(o ...Option) Manager {
 	opts := newOptions(o...)
 
-	nStore := ocisstore.GetStore()
+	nStore := ocisstore.GetStore(opts.storeOptions)
 	return Manager{
 		cache:       nStore,
 		roleService: opts.roleService,

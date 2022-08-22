@@ -15,6 +15,7 @@ import (
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
@@ -143,7 +144,13 @@ func NewService(opts ...Option) Service {
 
 	roleManager := options.RoleManager
 	if roleManager == nil {
+		storeOptions := store.OcisStoreOptions{
+			Type:    options.Config.CacheStore.Type,
+			Address: options.Config.CacheStore.Address,
+			Size:    options.Config.CacheStore.Size,
+		}
 		m := roles.NewManager(
+			roles.StoreOptions(storeOptions),
 			roles.Logger(options.Logger),
 			roles.RoleService(svc.roleService),
 		)
