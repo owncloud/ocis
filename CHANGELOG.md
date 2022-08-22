@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Autocreate IDP private key also if file exists but is empty: [#4394](https://github.com/owncloud/ocis/pull/4394)
 * Bugfix - Rename extensions to services (leftover occurences): [#4407](https://github.com/owncloud/ocis/pull/4407)
 * Change - Rename "uploads purge" command to "uploads clean": [#4403](https://github.com/owncloud/ocis/pull/4403)
+* Enhancement - Bump reva version: [#4412](https://github.com/owncloud/ocis/pull/4412)
 * Enhancement - Add /app/open-with-web endpoint: [#4376](https://github.com/owncloud/ocis/pull/4376)
 * Enhancement - Added language option to the app provider: [#4399](https://github.com/owncloud/ocis/pull/4399)
 * Enhancement - Added command to reset administrator password: [#4084](https://github.com/owncloud/ocis/issues/4084)
@@ -53,6 +54,12 @@ The following sections list the changes for unreleased.
    We've renamed the storage-users service's "uploads purge" command to "upload clean".
 
    https://github.com/owncloud/ocis/pull/4403
+
+* Enhancement - Bump reva version: [#4412](https://github.com/owncloud/ocis/pull/4412)
+
+   Bumps reva version
+
+   https://github.com/owncloud/ocis/pull/4412
 
 * Enhancement - Add /app/open-with-web endpoint: [#4376](https://github.com/owncloud/ocis/pull/4376)
 
