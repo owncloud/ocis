@@ -2215,7 +2215,7 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$spaceWebDavUrl = $space["root"]["webDavUrl"] . '/' . $object;
+		$spaceWebDavUrl = $space["root"]["webDavUrl"] . '/' . ltrim($object, "/");
 		$this->featureContext->setResponse(
 			HttpRequestHelper::delete(
 				$spaceWebDavUrl,
@@ -3035,7 +3035,7 @@ class SpacesContext implements Context {
 			Assert::assertEmpty($responseArray, __METHOD__ . ' Response should be empty');
 		}
 	}
-	   
+
 	/**
 	 * @When /^user "([^"]*)" gets the following properties of (?:file|folder|entry|resource) "([^"]*)" inside space "([^"]*)" using the WebDAV API$/
 	 *
