@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix configuration of mimetypes for the app registry: [#4411](https://github.com/owncloud/ocis/pull/4411)
+* Bugfix - Show help for some commands when unconfigured: [#4405](https://github.com/owncloud/ocis/pull/4405)
 * Bugfix - Autocreate IDP private key also if file exists but is empty: [#4394](https://github.com/owncloud/ocis/pull/4394)
 * Bugfix - Rename extensions to services (leftover occurences): [#4407](https://github.com/owncloud/ocis/pull/4407)
 * Change - Rename "uploads purge" command to "uploads clean": [#4403](https://github.com/owncloud/ocis/pull/4403)
@@ -25,6 +26,13 @@ The following sections list the changes for unreleased.
    (like it is already done in the proxy with the routes configuration).
 
    https://github.com/owncloud/ocis/pull/4411
+
+* Bugfix - Show help for some commands when unconfigured: [#4405](https://github.com/owncloud/ocis/pull/4405)
+
+   We've fixed some commands to show the help also when oCIS is not yet configured. Previously the
+   help was not displayed to the user but instead a configuration validation error.
+
+   https://github.com/owncloud/ocis/pull/4405
 
 * Bugfix - Autocreate IDP private key also if file exists but is empty: [#4394](https://github.com/owncloud/ocis/pull/4394)
 
