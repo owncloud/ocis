@@ -11,7 +11,7 @@ require (
 	github.com/blevesearch/bleve_index_api v1.0.2
 	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220719130120-361e9f987d64
-	github.com/cs3org/reva/v2 v2.7.5-0.20220818145858-9c40953ac4a8
+	github.com/cs3org/reva/v2 v2.7.5-0.20220822092927-15d066642614
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
