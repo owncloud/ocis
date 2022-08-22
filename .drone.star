@@ -33,7 +33,7 @@ PLUGINS_S3 = "plugins/s3:latest"
 PLUGINS_S3_CACHE = "plugins/s3-cache:1"
 PLUGINS_SLACK = "plugins/slack:1"
 REDIS = "redis:6-alpine"
-SELENIUM_STANDALONE_CHROME_DEBUG = "selenium/standalone-chrome-debug:3.141.59"
+SELENIUM_STANDALONE_CHROME = "selenium/standalone-chrome:104.0-20220812"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:latest"
 THEGEEKLAB_DRONE_GITHUB_COMMENT = "thegeeklab/drone-github-comment:1"
 
@@ -333,7 +333,7 @@ def testPipelines(ctx):
         pipelines += litmus(ctx, "ocis")
 
     if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
-        pipelines += [cs3ApiTests(ctx, "ocis", "default")]
+        pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
     if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
         pipelines += [
             localApiTests(ctx, "ocis", "apiAccountsHashDifficulty"),
@@ -1955,7 +1955,7 @@ def selenium():
     return [
         {
             "name": "selenium",
-            "image": SELENIUM_STANDALONE_CHROME_DEBUG,
+            "image": SELENIUM_STANDALONE_CHROME,
             "volumes": [{
                 "name": "uploads",
                 "path": "/uploads",
