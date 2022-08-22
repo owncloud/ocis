@@ -17,7 +17,7 @@ func ProxyCommand(cfg *config.Config) *cli.Command {
 		Usage:    helper.SubcommandDescription(cfg.Proxy.Service.Name),
 		Category: "services",
 		Before: func(c *cli.Context) error {
-			configlog.LogError(parser.ParseConfig(cfg, true))
+			configlog.Error(parser.ParseConfig(cfg, true))
 			cfg.Proxy.Commons = cfg.Commons
 			return nil
 		},

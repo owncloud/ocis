@@ -17,7 +17,7 @@ func AppRegistryCommand(cfg *config.Config) *cli.Command {
 		Usage:    helper.SubcommandDescription(cfg.AppRegistry.Service.Name),
 		Category: "services",
 		Before: func(c *cli.Context) error {
-			configlog.LogError(parser.ParseConfig(cfg, true))
+			configlog.Error(parser.ParseConfig(cfg, true))
 			cfg.AppRegistry.Commons = cfg.Commons
 			return nil
 		},

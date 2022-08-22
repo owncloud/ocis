@@ -17,7 +17,7 @@ func AppProviderCommand(cfg *config.Config) *cli.Command {
 		Usage:    helper.SubcommandDescription(cfg.AppProvider.Service.Name),
 		Category: "services",
 		Before: func(c *cli.Context) error {
-			configlog.LogError(parser.ParseConfig(cfg, true))
+			configlog.Error(parser.ParseConfig(cfg, true))
 			cfg.AppProvider.Commons = cfg.Commons
 			return nil
 		},

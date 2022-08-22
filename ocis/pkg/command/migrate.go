@@ -57,12 +57,12 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 		Before: func(c *cli.Context) error {
 			// Parse base config
 			if err := parser.ParseConfig(cfg, true); err != nil {
-				return configlog.LogReturnError(err)
+				return configlog.ReturnError(err)
 			}
 
 			// Parse sharing config
 			cfg.Sharing.Commons = cfg.Commons
-			return configlog.LogReturnError(sharingparser.ParseConfig(cfg.Sharing))
+			return configlog.ReturnError(sharingparser.ParseConfig(cfg.Sharing))
 		},
 		Action: func(c *cli.Context) error {
 			log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()
@@ -152,12 +152,12 @@ func MigratePublicShares(cfg *config.Config) *cli.Command {
 		Before: func(c *cli.Context) error {
 			// Parse base config
 			if err := parser.ParseConfig(cfg, true); err != nil {
-				return configlog.LogReturnError(err)
+				return configlog.ReturnError(err)
 			}
 
 			// Parse sharing config
 			cfg.Sharing.Commons = cfg.Commons
-			return configlog.LogReturnError(sharingparser.ParseConfig(cfg.Sharing))
+			return configlog.ReturnError(sharingparser.ParseConfig(cfg.Sharing))
 		},
 		Action: func(c *cli.Context) error {
 			log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()

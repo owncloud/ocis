@@ -36,7 +36,7 @@ func ListUploads(cfg *config.Config) *cli.Command {
 		Name:  "list",
 		Usage: "Print a list of all incomplete uploads",
 		Before: func(c *cli.Context) error {
-			return configlog.LogReturnFatal(parser.ParseConfig(cfg))
+			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
 			f, ok := registry.NewFuncs[cfg.Driver]
@@ -77,7 +77,7 @@ func PurgeExpiredUploads(cfg *config.Config) *cli.Command {
 		Name:  "clean",
 		Usage: "Clean up leftovers from expired uploads",
 		Before: func(c *cli.Context) error {
-			return configlog.LogReturnFatal(parser.ParseConfig(cfg))
+			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
 			f, ok := registry.NewFuncs[cfg.Driver]

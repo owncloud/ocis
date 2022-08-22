@@ -17,7 +17,7 @@ func Health(cfg *config.Config) *cli.Command {
 		Name:  "health",
 		Usage: "Check health status",
 		Before: func(c *cli.Context) error {
-			return configlog.LogReturnError(parser.ParseConfig(cfg))
+			return configlog.ReturnError(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)

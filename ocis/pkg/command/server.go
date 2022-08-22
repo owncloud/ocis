@@ -16,7 +16,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:    "start a fullstack server (runtime and all services in supervised mode)",
 		Category: "fullstack",
 		Before: func(c *cli.Context) error {
-			return configlog.LogReturnError(parser.ParseConfig(cfg, false))
+			return configlog.ReturnError(parser.ParseConfig(cfg, false))
 		},
 		Action: func(c *cli.Context) error {
 			r := runtime.New(cfg)

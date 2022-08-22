@@ -17,7 +17,7 @@ func UsersCommand(cfg *config.Config) *cli.Command {
 		Usage:    helper.SubcommandDescription(cfg.Users.Service.Name),
 		Category: "services",
 		Before: func(c *cli.Context) error {
-			configlog.LogError(parser.ParseConfig(cfg, true))
+			configlog.Error(parser.ParseConfig(cfg, true))
 			cfg.Users.Commons = cfg.Commons
 			return nil
 		},

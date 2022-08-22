@@ -17,7 +17,7 @@ func SettingsCommand(cfg *config.Config) *cli.Command {
 		Usage:    helper.SubcommandDescription(cfg.Settings.Service.Name),
 		Category: "services",
 		Before: func(c *cli.Context) error {
-			configlog.LogError(parser.ParseConfig(cfg, true))
+			configlog.Error(parser.ParseConfig(cfg, true))
 			cfg.Settings.Commons = cfg.Commons
 			return nil
 		},
