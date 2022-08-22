@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/webdav"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 var (
@@ -96,10 +98,11 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 			if !isPublicPath(r.URL.Path) {
 				// Failed basic authentication attempts receive the Www-Authenticate header in the response
 				var touch bool
+				caser := cases.Title(language.Und)
 				for k, v := range options.CredentialsByUserAgent {
 					if strings.Contains(k, r.UserAgent()) {
 						removeSuperfluousAuthenticate(w)
-						w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(v), r.Host))
+						w.Header().Add("Www-Authenticate", fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", caser.String(v), r.Host))
 						touch = true
 						break
 					}
@@ -175,8 +178,9 @@ func configureSupportedChallenges(options Options) {
 }
 
 func writeSupportedAuthenticateHeader(w http.ResponseWriter, r *http.Request) {
+	caser := cases.Title(language.Und)
 	for _, s := range SupportedAuthStrategies {
-		w.Header().Add(WwwAuthenticate, fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(s), r.Host))
+		w.Header().Add(WwwAuthenticate, fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", caser.String(s), r.Host))
 	}
 }
 
@@ -213,12 +217,13 @@ func evalRequestURI(l userAgentLocker, r regexp.Regexp) {
 	if !r.MatchString(l.r.RequestURI) {
 		return
 	}
+	caser := cases.Title(language.Und)
 	for k, v := range l.locks {
 		if strings.Contains(k, l.r.UserAgent()) {
 			removeSuperfluousAuthenticate(l.w)
-			l.w.Header().Add(WwwAuthenticate, fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(v), l.r.Host))
+			l.w.Header().Add(WwwAuthenticate, fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", caser.String(v), l.r.Host))
 			return
 		}
 	}
-	l.w.Header().Add(WwwAuthenticate, fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", strings.Title(l.fallback), l.r.Host))
+	l.w.Header().Add(WwwAuthenticate, fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", caser.String(l.fallback), l.r.Host))
 }
