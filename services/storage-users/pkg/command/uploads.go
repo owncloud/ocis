@@ -12,6 +12,7 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/revaconfig"
@@ -19,16 +20,9 @@ import (
 
 func Uploads(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-		Name:     "uploads",
-		Usage:    "manage unfinished uploads",
-		Category: "maintenance",
-		Before: func(c *cli.Context) error {
-			if err := parser.ParseConfig(cfg); err != nil {
-				fmt.Printf("%v", err)
-				return err
-			}
-			return nil
-		},
+
+		Name:  "uploads",
+		Usage: "manage unfinished uploads",
 		Subcommands: []*cli.Command{
 			ListUploads(cfg),
 			PurgeExpiredUploads(cfg),
@@ -42,12 +36,7 @@ func ListUploads(cfg *config.Config) *cli.Command {
 		Name:  "list",
 		Usage: "Print a list of all incomplete uploads",
 		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
-				fmt.Printf("%v", err)
-				os.Exit(1)
-			}
-			return err
+			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
 			f, ok := registry.NewFuncs[cfg.Driver]
@@ -88,12 +77,7 @@ func PurgeExpiredUploads(cfg *config.Config) *cli.Command {
 		Name:  "clean",
 		Usage: "Clean up leftovers from expired uploads",
 		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
-				fmt.Printf("%v", err)
-				os.Exit(1)
-			}
-			return err
+			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
 			f, ok := registry.NewFuncs[cfg.Driver]

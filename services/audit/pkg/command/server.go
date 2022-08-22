@@ -3,11 +3,11 @@ package command
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/server"
 	"github.com/go-micro/plugins/v4/events/natsjs"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/services/audit/pkg/config"
 	"github.com/owncloud/ocis/v2/services/audit/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/audit/pkg/logging"
@@ -23,12 +23,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
 		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
-				fmt.Printf("%v", err)
-				os.Exit(1)
-			}
-			return err
+			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
