@@ -1,40 +1,68 @@
 package middleware
 
 import (
+	"context"
+	"net/http"
 	"net/http/httptest"
-	"testing"
+
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	. "github.com/onsi/ginkgo/v2"
+
+	. "github.com/onsi/gomega"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend/test"
 )
 
-/**/
-
-func TestBasicAuth__isPublicLink(t *testing.T) {
-	tests := []struct {
-		url      string
-		username string
-		expected bool
-	}{
-		{url: "/remote.php/dav/public-files/", username: "", expected: false},
-		{url: "/remote.php/dav/public-files/", username: "abc", expected: false},
-		{url: "/remote.php/dav/public-files/", username: "private", expected: false},
-		{url: "/remote.php/dav/public-files/", username: "public", expected: true},
-		{url: "/ocs/v1.php/cloud/capabilities", username: "", expected: false},
-		{url: "/ocs/v1.php/cloud/capabilities", username: "abc", expected: false},
-		{url: "/ocs/v1.php/cloud/capabilities", username: "private", expected: false},
-		{url: "/ocs/v1.php/cloud/capabilities", username: "public", expected: true},
-		{url: "/ocs/v1.php/cloud/users/admin", username: "public", expected: false},
-	}
-	ba := basicAuth{}
-
-	for _, tt := range tests {
-		req := httptest.NewRequest("", tt.url, nil)
-
-		if tt.username != "" {
-			req.SetBasicAuth(tt.username, "")
+var _ = Describe("Authenticating requests", Label("BasicAuthenticator"), func() {
+	var authenticator Authenticator
+	BeforeEach(func() {
+		authenticator = BasicAuthenticator{
+			Logger: log.NewLogger(),
+			UserProvider: &test.UserBackendMock{
+				AuthenticateFunc: func(ctx context.Context, username, password string) (*userv1beta1.User, string, error) {
+					var user *userv1beta1.User
+					if username == "testuser" && password == "testpassword" {
+						user = &userv1beta1.User{
+							Id: &userv1beta1.UserId{
+								Idp:      "IdpId",
+								OpaqueId: "OpaqueId",
+							},
+							Username: "testuser",
+							Mail:     "testuser@example.com",
+						}
+						return user, "", nil
+					}
+					return nil, "", backend.ErrAccountNotFound
+				},
+			},
 		}
+	})
 
-		result := ba.isPublicLink(req)
-		if result != tt.expected {
-			t.Errorf("with %s expected %t got %t", tt.url, tt.expected, result)
-		}
-	}
-}
+	When("the request contains correct data", func() {
+		It("should successfully authenticate", func() {
+			req := httptest.NewRequest(http.MethodGet, "http://example.com/example/path", http.NoBody)
+			req.SetBasicAuth("testuser", "testpassword")
+
+			req2, valid := authenticator.Authenticate(req)
+
+			Expect(valid).To(Equal(true))
+			Expect(req2).ToNot(BeNil())
+		})
+		It("adds claims to the request context", func() {
+			req := httptest.NewRequest(http.MethodGet, "http://example.com/example/path", http.NoBody)
+			req.SetBasicAuth("testuser", "testpassword")
+
+			req2, valid := authenticator.Authenticate(req)
+			Expect(valid).To(Equal(true))
+
+			claims := oidc.FromContext(req2.Context())
+			Expect(claims).ToNot(BeNil())
+			Expect(claims[oidc.Iss]).To(Equal("IdpId"))
+			Expect(claims[oidc.PreferredUsername]).To(Equal("testuser"))
+			Expect(claims[oidc.Email]).To(Equal("testuser@example.com"))
+			Expect(claims[oidc.OwncloudUUID]).To(Equal("OpaqueId"))
+		})
+	})
+})
