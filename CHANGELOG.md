@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add /app/open-with-web endpoint: [#4376](https://github.com/owncloud/ocis/pull/4376)
 * Enhancement - Added language option to the app provider: [#4399](https://github.com/owncloud/ocis/pull/4399)
 * Enhancement - Added command to reset administrator password: [#4084](https://github.com/owncloud/ocis/issues/4084)
+* Enhancement - Rewrite of the request authentication middleware: [#4374](https://github.com/owncloud/ocis/pull/4374)
 * Enhancement - Update reva to vx.x.x: [#4376](https://github.com/owncloud/ocis/pull/4376)
 
 ## Details
@@ -85,6 +86,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4084
    https://github.com/owncloud/ocis/pull/4365
+
+* Enhancement - Rewrite of the request authentication middleware: [#4374](https://github.com/owncloud/ocis/pull/4374)
+
+   There were some flaws in the authentication middleware which were resolved by this rewrite.
+   This rewrite also introduced the need to manually mark certain paths as "unprotected" if
+   requests to these paths must not be authenticated.
+
+   https://github.com/owncloud/ocis/pull/4374
 
 * Enhancement - Update reva to vx.x.x: [#4376](https://github.com/owncloud/ocis/pull/4376)
 
