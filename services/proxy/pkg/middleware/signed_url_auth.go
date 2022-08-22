@@ -186,6 +186,7 @@ func (m SignedURLAuthenticator) getSigningKey(ctx context.Context, ocisID string
 	return res.Records[0].Value, nil
 }
 
+// Authenticate implements the authenticator interface to authenticate requests via signed URL auth.
 func (m SignedURLAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	if !m.shouldServe(r) {
 		return nil, false

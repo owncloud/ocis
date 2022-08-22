@@ -239,6 +239,7 @@ func (m OIDCAuthenticator) getProvider() OIDCProvider {
 	return m.provider
 }
 
+// Authenticate implements the authenticator interface to authenticate requests via oidc auth.
 func (m OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	// there is no bearer token on the request,
 	if !m.shouldServe(r) || isPublicPath(r.URL.Path) {

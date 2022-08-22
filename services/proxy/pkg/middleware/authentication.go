@@ -67,7 +67,6 @@ const (
 )
 
 // Authenticator is the common interface implemented by all request authenticators.
-
 type Authenticator interface {
 	// Authenticate is used to authenticate incoming HTTP requests.
 	// The Authenticator may augment the request with user info or anything related to the

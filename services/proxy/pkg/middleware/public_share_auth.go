@@ -25,6 +25,7 @@ type PublicShareAuthenticator struct {
 	RevaGatewayClient gateway.GatewayAPIClient
 }
 
+// Authenticate implements the authenticator interface to authenticate requests via public share auth.
 func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	if !isPublicPath(r.URL.Path) {
 		return nil, false

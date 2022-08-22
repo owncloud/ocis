@@ -16,6 +16,7 @@ type BasicAuthenticator struct {
 	UserOIDCClaim string
 }
 
+// Authenticate implements the authenticator interface to authenticate requests via basic auth.
 func (m BasicAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	if isPublicPath(r.URL.Path) {
 		// The authentication of public path requests is handled by another authenticator.
