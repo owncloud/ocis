@@ -50,13 +50,18 @@ func Server(cfg *config.Config) *cli.Command {
 			mtrcs := metrics.New()
 			mtrcs.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
-			grpcServer := grpc.Server(
+			grpcServer, teardown, err := grpc.Server(
 				grpc.Config(cfg),
 				grpc.Logger(logger),
 				grpc.Name(cfg.Service.Name),
 				grpc.Context(ctx),
 				grpc.Metrics(mtrcs),
 			)
+			defer teardown()
+			if err != nil {
+				logger.Info().Err(err).Str("transport", "grpc").Msg("Failed to initialize server")
+				return err
+			}
 
 			gr.Add(grpcServer.Run, func(_ error) {
 				logger.Error().
@@ -71,7 +76,6 @@ func Server(cfg *config.Config) *cli.Command {
 				debug.Context(ctx),
 				debug.Config(cfg),
 			)
-
 			if err != nil {
 				logger.Info().Err(err).Str("transport", "debug").Msg("Failed to initialize server")
 				return err

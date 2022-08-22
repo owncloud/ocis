@@ -21,7 +21,8 @@ import (
 )
 
 // NewHandler returns a service implementation for Service.
-func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
+func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error) {
+	teardown := func() {}
 	options := newOptions(opts...)
 	logger := options.Logger
 	cfg := options.Config
@@ -32,33 +33,37 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 	case "bleve":
 		idx, err := engine.NewBleveIndex(cfg.Engine.Bleve.Datapath)
 		if err != nil {
-			return nil, err
+			return nil, teardown, err
+		}
+
+		teardown = func() {
+			_ = idx.Close()
 		}
 
 		eng = engine.NewBleveEngine(idx)
 	default:
-		return nil, fmt.Errorf("unknown search engine: %s", cfg.Engine.Type)
+		return nil, teardown, fmt.Errorf("unknown search engine: %s", cfg.Engine.Type)
 	}
 
 	// initialize gateway
 	gw, err := pool.GetGatewayServiceClient(cfg.Reva.Address)
 	if err != nil {
 		logger.Fatal().Err(err).Str("addr", cfg.Reva.Address).Msg("could not get reva client")
+		return nil, teardown, err
 	}
-
 	// initialize search content extractor
 	var extractor content.Extractor
 	switch cfg.Extractor.Type {
 	case "basic":
 		if extractor, err = content.NewBasicExtractor(logger); err != nil {
-			return nil, err
+			return nil, teardown, err
 		}
 	case "tika":
 		if extractor, err = content.NewTikaExtractor(gw, logger, cfg); err != nil {
-			return nil, err
+			return nil, teardown, err
 		}
 	default:
-		return nil, fmt.Errorf("unknown search extractor: %s", cfg.Extractor.Type)
+		return nil, teardown, fmt.Errorf("unknown search extractor: %s", cfg.Extractor.Type)
 	}
 
 	// initialize nats
@@ -67,19 +72,19 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 		natsjs.ClusterID(cfg.Events.Cluster),
 	)
 	if err != nil {
-		return nil, err
+		return nil, teardown, err
 	}
 
 	// setup event handling
 	if err := search.HandleEvents(eng, extractor, gw, bus, logger, cfg); err != nil {
-		return nil, err
+		return nil, teardown, err
 	}
 
 	return &Service{
 		id:       cfg.GRPC.Namespace + "." + cfg.Service.Name,
 		log:      logger,
 		provider: search.NewProvider(gw, eng, extractor, logger, cfg.MachineAuthAPIKey),
-	}, nil
+	}, teardown, nil
 }
 
 // Service implements the searchServiceHandler interface

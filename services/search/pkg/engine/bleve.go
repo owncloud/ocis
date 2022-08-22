@@ -35,7 +35,7 @@ type Bleve struct {
 func NewBleveIndex(root string) (bleve.Index, error) {
 	destination := filepath.Join(root, "bleve")
 	index, err := bleve.Open(destination)
-	if err != nil {
+	if errors.Is(bleve.ErrorIndexPathDoesNotExist, err) {
 		m, err := BuildBleveMapping()
 		if err != nil {
 			return nil, err
@@ -44,9 +44,11 @@ func NewBleveIndex(root string) (bleve.Index, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		return index, nil
 	}
 
-	return index, nil
+	return index, err
 }
 
 // NewBleveEngine creates a new Bleve instance

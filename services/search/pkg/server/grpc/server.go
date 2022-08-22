@@ -8,7 +8,7 @@ import (
 )
 
 // Server initializes a new go-micro service ready to run
-func Server(opts ...Option) grpc.Service {
+func Server(opts ...Option) (grpc.Service, func(), error) {
 	options := newOptions(opts...)
 
 	service := grpc.NewService(
@@ -21,7 +21,7 @@ func Server(opts ...Option) grpc.Service {
 		grpc.Version(version.GetString()),
 	)
 
-	handle, err := svc.NewHandler(
+	handle, teardown, err := svc.NewHandler(
 		svc.Config(options.Config),
 		svc.Logger(options.Logger),
 	)
@@ -29,11 +29,18 @@ func Server(opts ...Option) grpc.Service {
 		options.Logger.Error().
 			Err(err).
 			Msg("Error initializing search service")
-		return grpc.Service{}
+		return grpc.Service{}, teardown, err
 	}
-	_ = searchsvc.RegisterSearchProviderHandler(
+
+	if err := searchsvc.RegisterSearchProviderHandler(
 		service.Server(),
 		handle,
-	)
-	return service
+	); err != nil {
+		options.Logger.Error().
+			Err(err).
+			Msg("Error registering search provider handler")
+		return grpc.Service{}, teardown, err
+	}
+
+	return service, teardown, nil
 }
