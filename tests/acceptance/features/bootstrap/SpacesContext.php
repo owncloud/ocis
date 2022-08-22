@@ -250,12 +250,11 @@ class SpacesContext implements Context {
 	 */
 	public function getSpaceByName(string $user, string $spaceName): array {
 		// var_dump($user,$spaceName);
-		$targetUser="";
+		$targetUser = "";
 		if ($spaceName === "Personal") {
 			$spaceName = $this->featureContext->getUserDisplayName($user);
 		}
 		if (strtolower($user) === 'admin') {
-			// var_dump("here admin");
 			$this->theUserListsAllAvailableSpacesUsingTheGraphApi($user);
 		} else {
 			$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
@@ -264,31 +263,35 @@ class SpacesContext implements Context {
 		$createdUsersId = array_column($createdUsers, 'id');
 		// var_dump($createdUsers);
 		$spaces = $this->getAvailableSpaces();
-		if(strtolower($user) !== 'admin'){
-			$targetUser=$user;
+		if (strtolower($user) === 'admin') {
+			$targetUser = strtolower(strtok($spaceName, ' '));
+		} else {
+			$targetUser = strtolower($user);
 		}
+		var_dump($createdUsersId);
+		var_dump($spaces);
 		// var_dump($spaces);
 		foreach ($spaces as $space) {
 			// get the user id of all the spaces availabe till now
-			$userId=$space["owner"]["user"]["id"];
-			$username=$space["name"];
-			// var_dump($username);
+			$userId = $space["owner"]["user"]["id"];
+			$spacename = strtolower(strtok($space["name"], ' '));
+			var_dump("target:" . $targetUser);
+			// var_dump($targetUser,$spacename);
+			// var_dump($space);
 			// get the id of the users created by the running scenario
 			// var_dump($userId, $createdUsersId);
 			// when the user gets deleted the spaces related to user isn't deleted so we add only the spaces
-			// of users created by a paticular scenario to the array 
+			// of users created by a paticular scenario to the array
 			// this work around can be removed after the fix of https://github.com/owncloud/ocis/issues/4195
-			if(in_array($userId,$createdUsersId) && $space["driveType"]==='personal'){
+			if (\in_array($userId, $createdUsersId) && $space["driveType"] === 'personal' && $targetUser === $spacename) {
+				//var_dump("here");
 				$spaces[$spaceName] = $space;
-				var_dump($spaces[$spaceName]);
-			} else {
-				$spaces[$spaceName] = $space;
+				return $spaces[$spaceName];
 			}
 		}
 		Assert::assertIsArray($spaces[$spaceName], "Space with name $spaceName for user $user not found");
 		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName for user $user not found");
-       var_dump("next thing");
-		var_dump($spaces[$spaceName]);
+		// var_dump($spaces[$spaceName]);
 		return $spaces[$spaceName];
 	}
 
@@ -530,7 +533,6 @@ class SpacesContext implements Context {
 		array  $headers = []
 	): ResponseInterface {
 		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/" . $urlArguments;
-		// var_dump($fullUrl, $xRequestId, $user, $password, $headers, $body);
 		return HttpRequestHelper::get($fullUrl, $xRequestId, $user, $password, $headers, $body);
 	}
 
@@ -892,16 +894,29 @@ class SpacesContext implements Context {
 	 * @throws Exception
 	 */
 	public function rememberTheAvailableSpaces(): void {
+		$this->availableSpaces = [];
 		$rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
 		$drives = json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
 		if (isset($drives["value"])) {
 			$drives = $drives["value"];
 		}
-
 		Assert::assertArrayHasKey(0, $drives, "No drives were found on that endpoint");
 		$spaces = [];
+		$createdUsers = $this->featureContext->getCreatedUsers();
+		$createdUsersId = array_column($createdUsers, 'id');
 		foreach ($drives as $drive) {
-			$spaces[$drive["name"]] = $drive;
+			var_dump($createdUsersId);
+			var_dump($spaces);
+			// get the user id of all the spaces availabe till now
+			$userId = $drive["owner"]["user"]["id"];
+			// when the user gets deleted the spaces related to user isn't deleted so we add only the spaces
+			// of users created by a paticular scenario to the array
+			// this work around can be removed after the fix of https://github.com/owncloud/ocis/issues/4195
+			if (\in_array($userId, $createdUsersId) && $drive["driveType"] === 'personal') {
+				$spaces[$drive["name"]] = $drive;
+			} elseif ($drive["driveType"] !== 'personal') {
+				$spaces[$drive["name"]] = $drive;
+			}
 		}
 		$this->setAvailableSpaces($spaces);
 		Assert::assertNotEmpty($spaces, "No spaces have been found");
@@ -1649,7 +1664,7 @@ class SpacesContext implements Context {
 				$spaceId
 			)
 		);
-		$res =$this->featureContext->getJsonDecodedResponse();
+		$res = $this->featureContext->getJsonDecodedResponse();
 	}
 
 	/**
