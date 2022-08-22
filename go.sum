@@ -1230,8 +1230,8 @@ github.com/zclconf/go-cty v1.2.0/go.mod h1:hOPWgoHbaTUnI5k4D2ld+GRpFJSCe6bCM7m1q
 github.com/zclconf/go-cty v1.8.0/go.mod h1:vVKLxnk3puL4qRAv72AO+W99LUD4da90g3uUAzyuvAk=
 github.com/zclconf/go-cty-debug v0.0.0-20191215020915-b22d67c1ba0b/go.mod h1:ZRKQfBXbGkpdV6QMzT3rU1kSTAnfu1dO8dPKjYprgj8=
 github.com/zenazn/goji v1.0.1/go.mod h1:7S9M489iMyHBNxwZnk9/EHS098H4/F6TATF2mIxtB1Q=
-go-micro.dev/v4 v4.8.0 h1:4rrKpGHUTnrD2k2eVUVayJgWDoFlDcB/Ijkga8dZMNc=
-go-micro.dev/v4 v4.8.0/go.mod h1:Ju8HrZ5hQSF+QguZ2QUs9Kbe42MHP1tJa/fpP5g07Cs=
+go-micro.dev/v4 v4.8.1 h1:6/3YtUQ+ofkMJh98lC8TkpuMGoFS8kVcj0cnkQhzwDY=
+go-micro.dev/v4 v4.8.1/go.mod h1:Ju8HrZ5hQSF+QguZ2QUs9Kbe42MHP1tJa/fpP5g07Cs=
 go.etcd.io/bbolt v1.3.2/go.mod h1:IbVyRI1SCnLcuJnV2u8VeU0CEYM7e686BmAb1XKL+uU=
 go.etcd.io/bbolt v1.3.5/go.mod h1:G5EMThwa9y8QZGBClrRx5EY+Yw9kAhnjy3bSjsnlVTQ=
 go.etcd.io/bbolt v1.3.6 h1:/ecaJf0sk1l4l6V4awd65v2C3ILy7MSj+s/x1ADCIMU=

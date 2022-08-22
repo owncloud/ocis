@@ -63,7 +63,7 @@ require (
 	github.com/tus/tusd v1.9.0
 	github.com/urfave/cli/v2 v2.11.1
 	github.com/xhit/go-simple-mail/v2 v2.11.0
-	go-micro.dev/v4 v4.8.0
+	go-micro.dev/v4 v4.8.1
 	go.etcd.io/bbolt v1.3.6
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.34.0
