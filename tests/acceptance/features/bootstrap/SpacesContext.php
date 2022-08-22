@@ -872,14 +872,18 @@ class SpacesContext implements Context {
 		$createdUsers = $this->featureContext->getCreatedUsers();
 		$createdUsersId = array_column($createdUsers, 'id');
 		foreach ($drives as $drive) {
-			// get the user id of all the spaces availabe till now
-			$userId = $drive["owner"]["user"]["id"];
 			// when the user gets deleted the spaces related to user isn't deleted so we add only the spaces
 			// of users created by a paticular scenario to the array
 			// this work around can be removed after the fix of https://github.com/owncloud/ocis/issues/4195
-			if (\in_array($userId, $createdUsersId) && $drive["driveType"] === 'personal') {
-				$spaces[$drive["name"]] = $drive;
+			if ($drive["driveType"] === 'personal') {
+				// get the user id of all the personal spaces availabe till now
+				$userId = $drive["owner"]["user"]["id"];
+				if (\in_array($userId, $createdUsersId)) {
+					$spaces[$drive["name"]] = $drive;
+				}
 			} elseif ($drive["driveType"] !== 'personal') {
+				$spaces[$drive["name"]] = $drive;
+			} elseif ($drive["name"] === 'Admin') {
 				$spaces[$drive["name"]] = $drive;
 			}
 		}
