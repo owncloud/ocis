@@ -45,22 +45,22 @@ var (
 	}
 	// _unprotectedPathPrefixes contains paths which don't need to be authenticated.
 	_unprotectedPathPrefixes = [...]string{
-		"/files",
-		"/data",
-		"/account",
+		"/files/",
+		"/data/",
+		"/account/",
 		"/s/",
 		"/external/spaces",
 		"/apps/openidconnect/redirect",
-		"/settings",
-		"/user-management",
-		"/.well-known",
-		"/js",
-		"/css",
-		"/fonts",
-		"/icons",
-		"/themes",
-		"/signin",
-		"/konnect",
+		"/settings/",
+		"/user-management/",
+		"/.well-known/",
+		"/js/",
+		"/css/",
+		"/fonts/",
+		"/icons/",
+		"/themes/",
+		"/signin/",
+		"/konnect/",
 	}
 )
 
