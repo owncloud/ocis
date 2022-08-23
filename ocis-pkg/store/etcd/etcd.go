@@ -29,7 +29,11 @@ func NewEtcdStore(opts ...store.Option) store.Store {
 }
 
 func (es *EtcdStore) getCtx() (context.Context, context.CancelFunc) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	currentCtx := es.options.Context
+	if currentCtx == nil {
+		currentCtx = context.TODO()
+	}
+	ctx, cancel := context.WithTimeout(currentCtx, 10*time.Second)
 	return ctx, cancel
 }
 

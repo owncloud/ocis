@@ -8,9 +8,6 @@ require (
 	github.com/MicahParks/keyfunc v1.2.2
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
 	github.com/armon/go-radix v1.0.0
-	github.com/blevesearch/bleve/v2 v2.3.3
-	github.com/blevesearch/bleve_index_api v1.0.2
-	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/blevesearch/bleve/v2 v2.3.4
 	github.com/blevesearch/bleve_index_api v1.0.3
 	github.com/coreos/go-oidc/v3 v3.4.0
@@ -106,7 +103,6 @@ require (
 	github.com/alexedwards/argon2id v0.0.0-20211130144151-3585854a6387 // indirect
 	github.com/amoghe/go-crypt v0.0.0-20220222110647-20eada5f5964 // indirect
 	github.com/armon/go-metrics v0.3.10 // indirect
-	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/aws/aws-sdk-go v1.44.94 // indirect
 	github.com/beevik/etree v1.1.0 // indirect
@@ -267,7 +263,6 @@ require (
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.2 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.2 // indirect
-	go.etcd.io/etcd/client/v3 v3.5.2 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.19.1 // indirect
