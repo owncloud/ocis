@@ -56,6 +56,7 @@ var (
 		"/.well-known",
 		"/js",
 		"/css",
+		"/fonts",
 		"/icons",
 		"/themes",
 		"/signin",
