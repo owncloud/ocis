@@ -125,10 +125,19 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 					"insecure":               true,
 				},
 				"ocs": map[string]interface{}{
-					"storage_registry_svc":      cfg.Reva.Address,
-					"share_prefix":              cfg.OCS.SharePrefix,
-					"home_namespace":            cfg.OCS.HomeNamespace,
-					"resource_info_cache_ttl":   cfg.OCS.ResourceInfoCacheTTL,
+					"storage_registry_svc":     cfg.Reva.Address,
+					"share_prefix":             cfg.OCS.SharePrefix,
+					"home_namespace":           cfg.OCS.HomeNamespace,
+					"resource_info_cache_ttl":  cfg.OCS.ResourceInfoCacheTTL,
+					"resource_info_cache_type": cfg.OCS.ResourceInfoCacheType,
+					"resource_info_caches": map[string]interface{}{
+						// memory has no additional config
+						"redis": map[string]interface{}{
+							"redis_address":  cfg.OCS.ResourceInfoCaches.Redis.Address,
+							"redis_username": cfg.OCS.ResourceInfoCaches.Redis.Username,
+							"redis_password": cfg.OCS.ResourceInfoCaches.Redis.Password,
+						},
+					},
 					"prefix":                    cfg.OCS.Prefix,
 					"additional_info_attribute": cfg.OCS.AdditionalInfoAttribute,
 					"machine_auth_apikey":       cfg.MachineAuthAPIKey,

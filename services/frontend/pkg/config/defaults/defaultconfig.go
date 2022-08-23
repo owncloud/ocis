@@ -61,7 +61,8 @@ func DefaultConfig() *config.Config {
 			SharePrefix:             "/Shares",
 			HomeNamespace:           "/users/{{.Id.OpaqueId}}",
 			AdditionalInfoAttribute: "{{.Mail}}",
-			ResourceInfoCacheTTL:    0,
+			ResourceInfoCacheType:   "memory",
+			ResourceInfoCacheTTL:    60,
 		},
 		Middleware: config.Middleware{
 			Auth: config.Auth{
