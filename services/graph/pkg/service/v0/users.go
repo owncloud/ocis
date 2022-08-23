@@ -238,6 +238,34 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	currentUser := ctxpkg.ContextMustGetUser(r.Context())
+
+	opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
+	f := listStorageSpacesUserFilter(userID)
+	lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
+		Opaque:  opaque,
+		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
+	})
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "could not read spaces")
+	}
+	for _, sp := range lspr.GetStorageSpaces() {
+		if sp.SpaceType == "personal" {
+			if sp.Owner.Id.OpaqueId == userID {
+				_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+					Opaque: opaque,
+					Id: &storageprovider.StorageSpaceId{
+						OpaqueId: sp.Id.OpaqueId,
+					},
+				})
+				if err != nil {
+					errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "could not delete homespace")
+				}
+				break
+			}
+		}
+	}
+
 	err = g.identityBackend.DeleteUser(r.Context(), userID)
 
 	if err != nil {
@@ -249,7 +277,6 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	currentUser := ctxpkg.ContextMustGetUser(r.Context())
 	g.publishEvent(events.UserDeleted{Executant: currentUser.Id, UserID: userID})
 
 	render.Status(r, http.StatusNoContent)
