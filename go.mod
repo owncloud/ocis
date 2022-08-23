@@ -8,7 +8,7 @@ require (
 	github.com/MicahParks/keyfunc v1.2.2
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
 	github.com/blevesearch/bleve/v2 v2.3.3
-	github.com/blevesearch/bleve_index_api v1.0.2
+	github.com/blevesearch/bleve_index_api v1.0.3
 	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220818202316-e92afdddac6d
 	github.com/cs3org/reva/v2 v2.8.0

@@ -184,8 +184,9 @@ github.com/bketelsen/crypt v0.0.3-0.20200106085610-5cbc8cc4026c/go.mod h1:MKsuJm
 github.com/blevesearch/bleve/v2 v2.3.3 h1:aDvFXy9TxdVLcu/YmHAiLQ2VsCO7hcAYDCgm0SYDEVE=
 github.com/blevesearch/bleve/v2 v2.3.3/go.mod h1:3NBtjJ4ZENIuzztTEZylWgtVdZvMWnbGcTJB7Ry/YeU=
 github.com/blevesearch/bleve_index_api v1.0.1/go.mod h1:fiwKS0xLEm+gBRgv5mumf0dhgFr2mDgZah1pqv1c1M4=
-github.com/blevesearch/bleve_index_api v1.0.2 h1:rO736FwEPMVY1mGi7d4n7CgBB3+tB7uYN7QTjR+Ij+s=
 github.com/blevesearch/bleve_index_api v1.0.2/go.mod h1:fiwKS0xLEm+gBRgv5mumf0dhgFr2mDgZah1pqv1c1M4=
+github.com/blevesearch/bleve_index_api v1.0.3 h1:DDSWaPXOZZJ2BB73ZTWjKxydAugjwywcqU+91AAqcAg=
+github.com/blevesearch/bleve_index_api v1.0.3/go.mod h1:fiwKS0xLEm+gBRgv5mumf0dhgFr2mDgZah1pqv1c1M4=
 github.com/blevesearch/geo v0.1.12-0.20220606102651-aab42add3121 h1:5uNzC0Mn/8aCGbSJA6T8ZCjrKW8MKsZKQYBDowmeV/g=
 github.com/blevesearch/geo v0.1.12-0.20220606102651-aab42add3121/go.mod h1:8z6udmXe8Ek8uuX4qOIWKb50vY/OQ1SG+XhL5FrcHOU=
 github.com/blevesearch/go-metrics v0.0.0-20201227073835-cf1acfcdf475/go.mod h1:9eJDeqxJ3E7WnLebQUlPD7ZjSce7AnDb9vjGmMCbD0A=
