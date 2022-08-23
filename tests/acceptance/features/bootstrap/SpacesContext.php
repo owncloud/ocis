@@ -126,14 +126,8 @@ class SpacesContext implements Context {
 		$this->createdSpaces[$spaceName] = $spaceCreator;
 	}
 
-	/**
-	 * @var array
-	 */
-	private array $availableSpaces;
+	private array $availableSpaces = [];
 
-	/**
-	 * @var array
-	 */
 	private array $lastPublicLinkData = [];
 
 	/**
@@ -378,7 +372,7 @@ class SpacesContext implements Context {
 
 	/**
 	 * using method from core to set share data
-	 * 
+	 *
 	 * @return void
 	 */
 	public function setLastShareData(): void {
@@ -483,14 +477,12 @@ class SpacesContext implements Context {
 					$query
 				);
 				$drives = $this->getAvailableSpaces();
-	
-				if (!empty($drives)) {
-					foreach ($drives as $value) {
-						if (!\array_key_exists("deleted", $value["root"])) {
-							$this->sendDisableSpaceRequest($user["actualUsername"], $value["name"]);
-						} else {
-							$this->sendDeleteSpaceRequest($user["actualUsername"], $value["name"]);
-						}
+
+				foreach ($drives as $value) {
+					if (!\array_key_exists("deleted", $value["root"])) {
+						$this->sendDisableSpaceRequest($user["actualUsername"], $value["name"]);
+					} else {
+						$this->sendDeleteSpaceRequest($user["actualUsername"], $value["name"]);
 					}
 				}
 			}
@@ -3047,7 +3039,7 @@ class SpacesContext implements Context {
 			$space = $this->getSpaceByName($user, $spaceName);
 			$body = $space['id'];
 		}
-		
+
 		$url = "/apps/files_sharing/api/v1/shares?reshares=true&space_ref=" . $body;
 
 		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
