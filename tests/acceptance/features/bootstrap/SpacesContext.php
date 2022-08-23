@@ -468,23 +468,17 @@ class SpacesContext implements Context {
 		$query = "\$filter=driveType eq personal";
 		$createdUsers= $this->featureContext->getCreatedUsers();
 
-		foreach($createdUsers as $user)
-		{
-			for ($i = 0; $i < 2; ++$i) {
-
-				$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi(
-					$user["actualUsername"],
-					$query
-				);
-				$drives = $this->getAvailableSpaces();
-
-				foreach ($drives as $value) {
-					if (!\array_key_exists("deleted", $value["root"])) {
-						$this->sendDisableSpaceRequest($user["actualUsername"], $value["name"]);
-					} else {
-						$this->sendDeleteSpaceRequest($user["actualUsername"], $value["name"]);
-					}
+		foreach($createdUsers as $user) {
+			$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi(
+				$user["actualUsername"],
+				$query
+			);
+			$drives = $this->getAvailableSpaces();
+			foreach ($drives as $value) {
+				if (!\array_key_exists("deleted", $value["root"])) {
+					$this->sendDisableSpaceRequest($user["actualUsername"], $value["name"]);
 				}
+				$this->sendDeleteSpaceRequest($user["actualUsername"], $value["name"]);
 			}
 		}
 	}
