@@ -126,14 +126,8 @@ class SpacesContext implements Context {
 		$this->createdSpaces[$spaceName] = $spaceCreator;
 	}
 
-	/**
-	 * @var array
-	 */
-	private array $availableSpaces;
+	private array $availableSpaces = [];
 
-	/**
-	 * @var array
-	 */
 	private array $lastPublicLinkData = [];
 
 	/**
@@ -378,7 +372,7 @@ class SpacesContext implements Context {
 
 	/**
 	 * using method from core to set share data
-	 * 
+	 *
 	 * @return void
 	 */
 	public function setLastShareData(): void {
@@ -428,11 +422,11 @@ class SpacesContext implements Context {
 	public function cleanDataAfterTests(): void {
 		// TODO enable when admin can disable and delete spaces
 		// $this->deleteAllSpacesOfTheType('project');
-		// $this->deleteAllSpacesOfTheType('personal');
+		$this->deleteAllPersonalSpaces();
 	}
 
 	/**
-	 * The method first disables and then deletes spaces
+	 * Admin first disables and then deletes spaces
 	 *
 	 * @param  string $driveType
 	 *
@@ -459,6 +453,32 @@ class SpacesContext implements Context {
 						$this->sendDeleteSpaceRequest($userAdmin, $value["name"]);
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * users delete their personal space at the end of the test
+	 *
+	 * @return void
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function deleteAllPersonalSpaces(): void {
+		$query = "\$filter=driveType eq personal";
+		$createdUsers= $this->featureContext->getCreatedUsers();
+
+		foreach($createdUsers as $user) {
+			$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi(
+				$user["actualUsername"],
+				$query
+			);
+			$drives = $this->getAvailableSpaces();
+			foreach ($drives as $value) {
+				if (!\array_key_exists("deleted", $value["root"])) {
+					$this->sendDisableSpaceRequest($user["actualUsername"], $value["name"]);
+				}
+				$this->sendDeleteSpaceRequest($user["actualUsername"], $value["name"]);
 			}
 		}
 	}
@@ -3013,7 +3033,7 @@ class SpacesContext implements Context {
 			$space = $this->getSpaceByName($user, $spaceName);
 			$body = $space['id'];
 		}
-		
+
 		$url = "/apps/files_sharing/api/v1/shares?reshares=true&space_ref=" . $body;
 
 		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
