@@ -166,4 +166,44 @@ class SpacesTUSContext implements Context {
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
 		$this->tusContext->userUploadsAFileWithContentToUsingTus($user, $content, $resource);
 	}
+
+	/**
+	 * @When /^user "([^"]*)" uploads a file "([^"]*)" to "([^"]*)" with mtime "([^"]*)" via TUS inside of the space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $source
+	 * @param string $destination
+	 * @param string $mtime Time in human readable format is taken as input which is converted into milliseconds that is used by API
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 *
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userUploadsAFileToWithMtimeViaTusInsideOfTheSpaceUsingTheWebdavApi(string $user, string $source, string $destination, string $mtime, string $spaceName): void {
+		$this->spacesContext->setSpaceIDByName($user, $spaceName);
+		$this->tusContext->userUploadsFileWithContentToWithMtimeUsingTUS($user, $source, $destination, $mtime);
+	}
+
+	/**
+	 * @Then /^as "([^"]*)" the mtime of the file "([^"]*)" in space "([^"]*)" should be "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param string $spaceName
+	 * @param string $mtime
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleExceptebDavion
+	 */
+	public function theMtimeOfTheFileInSpaceShouldBe(
+		string $user,
+		string $resource,
+		string $spaceName,
+		string $mtime
+	): void {
+		$this->spacesContext->setSpaceIDByName($user, $spaceName);
+		$this->featureContext->theMtimeOfTheFileShouldBe($user, $resource, $mtime);
+	}
 }
