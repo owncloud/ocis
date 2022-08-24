@@ -33,3 +33,13 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 ### [PROPFIND on accepted shares with identical names containing brackets exit with 404](https://github.com/owncloud/ocis/issues/4421)
 
 - [apiSpaces/changingFilesShare.feature:12](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/changingFilesShare.feature#L12)
+
+#### [Webdav LOCK operations](https://github.com/owncloud/ocis/issues/1284)
+- [apiSpaces/lockSpaces.feature:31](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L31)
+- [apiSpaces/lockSpaces.feature:32](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L32)
+- [apiSpaces/lockSpaces.feature:52](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L52)
+- [apiSpaces/lockSpaces.feature:53](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L53)
+- [apiSpaces/lockSpaces.feature:73](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L73)
+- [apiSpaces/lockSpaces.feature:74](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L74)
+- [apiSpaces/lockSpaces.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L91)
+- [apiSpaces/lockSpaces.feature:92](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L92)
