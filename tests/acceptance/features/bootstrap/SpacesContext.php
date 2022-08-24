@@ -2992,46 +2992,22 @@ class SpacesContext implements Context {
 		}
 	}
 
-    /**
-     * @Then /^as user "([^"]*)" the lock discovery property "([^"]*)" of the (?:file|folder|entry) "([^"]*)" inside space "([^"]*)" should match "([^"]*)"$/
-     *
-     * @param string|null $user
-     * @param string $xpath
-     * @param string $path
-     * @param string $spaceName
-     * @param string $pattern
-     *
-     * @return void
-     * @throws Exception
-     */
-    public function userGetsPropertiesOfFolderOfSpaceAndAssertValueOfItemInResponseToUserRegExp(string $user, string $xpath, string $path, string $spaceName, string $pattern):void {
-        $space = $this->getSpaceByName($user, $spaceName);
-        $fullUrl = $space['root']['webDavUrl'] . '/' . ltrim($path, '/');
-        $propertiesTable = new TableNode([['propertyName'],['d:lockdiscovery']]);
-        $properties = null;
-        $this->featureContext->verifyTableNodeColumns($propertiesTable, ["propertyName"]);
-        $this->featureContext->verifyTableNodeColumnsCount($propertiesTable, 1);
-        if ($propertiesTable instanceof TableNode) {
-            foreach ($propertiesTable->getColumnsHash() as $row) {
-                $properties[] = $row["propertyName"];
-            }
-        }
-        $body = WebDavHelper::getBodyForPropfind($properties);
-        $headers['Depth'] = '1';
-        $this->featureContext->setResponse(
-            $this->sendPropfindRequestToUrl(
-                $fullUrl,
-                $user,
-                $this->featureContext->getPasswordForUser($user),
-                "",
-                $headers,
-                $body
-            )
-        );
-        $this->featureContext->theHTTPStatusCodeShouldBe('207');
-        $this->webDavPropertiesContext->assertValueOfItemInResponseToUserRegExp($xpath, $user, $pattern);
-
-    }
+	/**
+	 * @Then /^as user "([^"]*)" the lock discovery property "([^"]*)" of the (?:file|folder|entry) "([^"]*)" inside space "([^"]*)" should match "([^"]*)"$/
+	 *
+	 * @param string|null $user
+	 * @param string $xpath
+	 * @param string $path
+	 * @param string $spaceName
+	 * @param string $pattern
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userGetsPropertiesOfFolderOfSpaceAndAssertValueOfItemInResponseToUserRegExp(string $user, string $xpath, string $path, string $spaceName, string $pattern):void {
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->webDavPropertiesContext->userGetsPropertiesOfFolderAndAssertValueOfItemInResponseToUserRegExp($user, $xpath, $path, $pattern);
+	}
 
 	/**
 	 * @Given /^user "([^"]*)" has locked folder "([^"]*)" inside space "([^"]*)" setting the following properties$/
@@ -3044,6 +3020,24 @@ class SpacesContext implements Context {
 	 * @throws Exception | GuzzleException
 	 */
 	public function userHasLockedResourceOfSpace(string $user, string $resource, TableNode $properties, string $spaceName) {
+		$this->userLocksResourceInsideOfSpace($user, $resource, $properties, $spaceName);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" locks folder "([^"]*)" inside space "([^"]*)" setting the following properties$/
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param TableNode $properties
+	 * @param string $spaceName
+	 *
+	 * @throws Exception | GuzzleException
+	 */
+	public function userLocksResourceInsideOfSpace(string $user, string $resource, TableNode $properties, string $spaceName) {
 		$this->setSpaceIDByName($user, $spaceName);
 		$this->webDavLockingContext->lockFileUsingWebDavAPI($user, $resource, $properties);
 	}
