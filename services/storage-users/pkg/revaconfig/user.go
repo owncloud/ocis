@@ -130,6 +130,17 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 			"s3.secret_key":               cfg.Drivers.S3NG.SecretKey,
 			"s3.endpoint":                 cfg.Drivers.S3NG.Endpoint,
 			"s3.bucket":                   cfg.Drivers.S3NG.Bucket,
+			"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
+			"events": map[string]interface{}{
+				"natsaddress":   cfg.Events.Addr,
+				"natsclusterid": cfg.Events.ClusterID,
+			},
+			"tokens": map[string]interface{}{
+				"transfer_shared_secret": cfg.Commons.TransferSecret,
+				"transfer_expires":       cfg.TransferExpires,
+				"download_endpoint":      cfg.DataServerURL,
+				"datagateway_endpoint":   cfg.DataGatewayURL,
+			},
 		},
 	}
 }
