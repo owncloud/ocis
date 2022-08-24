@@ -30,9 +30,6 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		AppRegistry: config.AppRegistry{
-			MimeTypeConfig: defaultMimeTypeConfig(),
-		},
 	}
 }
 
@@ -150,6 +147,9 @@ func EnsureDefaults(cfg *config.Config) {
 
 }
 
+// Sanitize the config
 func Sanitize(cfg *config.Config) {
-	// nothing to sanitize here atm
+	if cfg.AppRegistry.MimeTypeConfig == nil {
+		cfg.AppRegistry.MimeTypeConfig = defaultMimeTypeConfig()
+	}
 }

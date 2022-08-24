@@ -29,7 +29,7 @@ import (
 	"stash.kopano.io/kgol/rndm"
 )
 
-// Service defines the extension handlers.
+// Service defines the service handlers.
 type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
 }

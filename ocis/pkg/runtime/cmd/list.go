@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// List running extensions.
+// List running service.
 func List(cfg *config.Config) *cobra.Command {
 	return &cobra.Command{
 		Use:     "list",

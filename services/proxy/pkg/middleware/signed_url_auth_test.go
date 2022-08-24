@@ -7,7 +7,7 @@ import (
 )
 
 func TestSignedURLAuth_shouldServe(t *testing.T) {
-	pua := signedURLAuth{}
+	pua := SignedURLAuthenticator{}
 	tests := []struct {
 		url      string
 		enabled  bool
@@ -20,7 +20,7 @@ func TestSignedURLAuth_shouldServe(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		pua.preSignedURLConfig.Enabled = tt.enabled
+		pua.PreSignedURLConfig.Enabled = tt.enabled
 		r := httptest.NewRequest("", tt.url, nil)
 		result := pua.shouldServe(r)
 
@@ -31,7 +31,7 @@ func TestSignedURLAuth_shouldServe(t *testing.T) {
 }
 
 func TestSignedURLAuth_allRequiredParametersPresent(t *testing.T) {
-	pua := signedURLAuth{}
+	pua := SignedURLAuthenticator{}
 	baseURL := "https://example.com/example.jpg?"
 	tests := []struct {
 		params   string
@@ -54,7 +54,7 @@ func TestSignedURLAuth_allRequiredParametersPresent(t *testing.T) {
 }
 
 func TestSignedURLAuth_requestMethodMatches(t *testing.T) {
-	pua := signedURLAuth{}
+	pua := SignedURLAuthenticator{}
 	tests := []struct {
 		method   string
 		url      string
@@ -75,7 +75,7 @@ func TestSignedURLAuth_requestMethodMatches(t *testing.T) {
 }
 
 func TestSignedURLAuth_requestMethodIsAllowed(t *testing.T) {
-	pua := signedURLAuth{}
+	pua := SignedURLAuthenticator{}
 	tests := []struct {
 		method   string
 		allowed  []string
@@ -89,7 +89,7 @@ func TestSignedURLAuth_requestMethodIsAllowed(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		pua.preSignedURLConfig.AllowedHTTPMethods = tt.allowed
+		pua.PreSignedURLConfig.AllowedHTTPMethods = tt.allowed
 		ok, _ := pua.requestMethodIsAllowed(tt.method)
 
 		if ok != tt.expected {
@@ -99,7 +99,7 @@ func TestSignedURLAuth_requestMethodIsAllowed(t *testing.T) {
 }
 
 func TestSignedURLAuth_urlIsExpired(t *testing.T) {
-	pua := signedURLAuth{}
+	pua := SignedURLAuthenticator{}
 	nowFunc := func() time.Time {
 		t, _ := time.Parse(time.RFC3339, "2020-02-02T12:30:00.000Z")
 		return t
@@ -126,7 +126,7 @@ func TestSignedURLAuth_urlIsExpired(t *testing.T) {
 }
 
 func TestSignedURLAuth_createSignature(t *testing.T) {
-	pua := signedURLAuth{}
+	pua := SignedURLAuthenticator{}
 	expected := "27d2ebea381384af3179235114801dcd00f91e46f99fca72575301cf3948101d"
 	s := pua.createSignature("something", []byte("somerandomkey"))
 
