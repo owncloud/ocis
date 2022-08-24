@@ -88,3 +88,47 @@ Feature: lock
       | lock-scope |
       | shared     |
       | exclusive  |
+
+  Scenario Outline: set timeouts of LOCKS on shares as owner set timeout on folder as receiver check it
+    Given user "Alice" has created folder "PARENT/CHILD"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
+    And user "Brian" has created folder "PARENT/CHILD"
+    And user "Brian" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
+    And user "Alice" has shared folder "PARENT" with user "Brian"
+    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
+    And user "Alice" has locked folder "/PARENT" inside space "Personal" setting the following properties
+      | lockscope | shared    |
+      | timeout   | <timeout> |
+    Then the HTTP status code should be "200"
+    And as user "Brian" the lock discovery property "//d:timeout" of the folder "/PARENT" inside space "Shares Jail" should match "<result>"
+    And as user "Brian" the lock discovery property "//d:timeout" of the folder "/PARENT/CHILD" inside space "Shares Jail" should match "<result>"
+    And as user "Brian" the lock discovery property "//d:timeout" of the folder "/PARENT/parent.txt" inside space "Shares Jail" should match "<result>"
+    Examples:
+      | timeout         | result          |
+      | second-999      | /Second-\d{3}$/ |
+      | second-99999999 | /Second-\d{5}$/ |
+      | infinite        | /Second-\d{5}$/ |
+      | second--1       | /Second-\d{5}$/ |
+      | second-0        | /Second-\d{4}$/ |
+
+  Scenario Outline: set timeouts of LOCKS on shares as share receiver set timeout on folder as owner check it
+    Given user "Alice" has created folder "PARENT/CHILD"
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
+    And user "Brian" has created folder "PARENT/CHILD"
+    And user "Brian" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
+    And user "Alice" has shared folder "PARENT" with user "Brian"
+    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
+    And user "Brian" has locked folder "/PARENT" inside space "Shares Jail" setting the following properties
+      | lockscope | shared    |
+      | timeout   | <timeout> |
+    Then the HTTP status code should be "200"
+    And as user "Alice" the lock discovery property "//d:timeout" of the folder "/PARENT" inside space "Shares Jail" should match "<result>"
+    And as user "Alice" the lock discovery property "//d:timeout" of the folder "/PARENT/CHILD" inside space "Shares Jail" should match "<result>"
+    And as user "Alice" the lock discovery property "//d:timeout" of the folder "/PARENT/parent.txt" inside space "Shares Jail" should match "<result>"
+    Examples:
+      | timeout         | result          |
+      | second-999      | /Second-\d{3}$/ |
+      | second-99999999 | /Second-\d{5}$/ |
+      | infinite        | /Second-\d{5}$/ |
+      | second--1       | /Second-\d{5}$/ |
+      | second-0        | /Second-\d{4}$/ |
