@@ -84,16 +84,23 @@ Port of the SMTP host to connect to.
 a| [subs=-attributes]
 +string+
 a| [subs=-attributes]
-pass:[noreply@example.com]
+pass:[ownCloud <noreply@example.com>]
 a| [subs=-attributes]
-Sender of emails that will be sent.
+Sender address of emails that will be sent.
+|`NOTIFICATIONS_SMTP_USERNAME`
+a| [subs=-attributes]
++string+
+a| [subs=-attributes]
+pass:[]
+a| [subs=-attributes]
+Username for the SMTP host to connect to.
 |`NOTIFICATIONS_SMTP_PASSWORD`
 a| [subs=-attributes]
 +string+
 a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
-Password of the SMTP host to connect to.
+Password for the SMTP host to connect to.
 |`NOTIFICATIONS_SMTP_INSECURE`
 a| [subs=-attributes]
 +bool+
@@ -101,6 +108,20 @@ a| [subs=-attributes]
 pass:[false]
 a| [subs=-attributes]
 Allow insecure connections to the SMTP server.
+|`NOTIFICATIONS_SMTP_AUTHENTICATION`
+a| [subs=-attributes]
++string+
+a| [subs=-attributes]
+pass:[none]
+a| [subs=-attributes]
+Authentication method for the SMTP communication. Possible values are 'login', 'plain', 'crammd5', 'none'
+|`NOTIFICATIONS_SMTP_ENCRYPTION`
+a| [subs=-attributes]
++string+
+a| [subs=-attributes]
+pass:[none]
+a| [subs=-attributes]
+Encryption method for the SMTP communication. Possible values  are 'starttls', 'ssl', 'ssltls', 'tls'  and 'none'.
 |`NOTIFICATIONS_EVENTS_ENDPOINT`
 a| [subs=-attributes]
 +string+

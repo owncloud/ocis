@@ -15,9 +15,12 @@ notifications:
   SMTP:
     smtp_host: ""
     smtp_port: 1025
-    smtp_sender: noreply@example.com
+    smtp_sender: ownCloud <noreply@example.com>
+    smtp_username: ""
     smtp_password: ""
     insecure: false
+    smtp_authentication: none
+    smtp_encryption: none
   events:
     endpoint: 127.0.0.1:9233
     cluster: ocis-cluster

@@ -12,9 +12,12 @@
 | NOTIFICATIONS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | NOTIFICATIONS_SMTP_HOST | string |  | SMTP host to connect to.|
 | NOTIFICATIONS_SMTP_PORT | int | 1025 | Port of the SMTP host to connect to.|
-| NOTIFICATIONS_SMTP_SENDER | string | noreply@example.com | Sender of emails that will be sent.|
-| NOTIFICATIONS_SMTP_PASSWORD | string |  | Password of the SMTP host to connect to.|
+| NOTIFICATIONS_SMTP_SENDER | string | ownCloud &lt;noreply@example.com&gt; | Sender address of emails that will be sent.|
+| NOTIFICATIONS_SMTP_USERNAME | string |  | Username for the SMTP host to connect to.|
+| NOTIFICATIONS_SMTP_PASSWORD | string |  | Password for the SMTP host to connect to.|
 | NOTIFICATIONS_SMTP_INSECURE | bool | false | Allow insecure connections to the SMTP server.|
+| NOTIFICATIONS_SMTP_AUTHENTICATION | string | none | Authentication method for the SMTP communication. Possible values are 'login', 'plain', 'crammd5', 'none'|
+| NOTIFICATIONS_SMTP_ENCRYPTION | string | none | Encryption method for the SMTP communication. Possible values  are 'starttls', 'ssl', 'ssltls', 'tls'  and 'none'.|
 | NOTIFICATIONS_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | NOTIFICATIONS_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | NOTIFICATIONS_EVENTS_GROUP | string | notifications | Name of the event group / queue on the event system.|
