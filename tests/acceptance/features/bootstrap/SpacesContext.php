@@ -2021,7 +2021,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^user "([^"]*)" should not be able to download file "([^"]*)" inside space "([^"]*)"$/
+	 * @Then /^user "([^"]*)" should not be able to download file "([^"]*)" from space "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $fileName
