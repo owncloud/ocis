@@ -62,6 +62,10 @@ var (
 		"/themes/",
 		"/signin/",
 		"/konnect/",
+		"/text-editor/",
+		"/preview/",
+		"/pdf-viewer/",
+		"/draw-io/",
 	}
 )
 
