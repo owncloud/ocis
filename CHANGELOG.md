@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Added language option to the app provider: [#4399](https://github.com/owncloud/ocis/pull/4399)
 * Enhancement - Add configuration options for mail authentication and encryption: [#4443](https://github.com/owncloud/ocis/pull/4443)
 * Enhancement - Added command to reset administrator password: [#4084](https://github.com/owncloud/ocis/issues/4084)
+* Enhancement - Add missing unprotected paths: [#4454](https://github.com/owncloud/ocis/pull/4454)
 * Enhancement - Rewrite of the request authentication middleware: [#4374](https://github.com/owncloud/ocis/pull/4374)
 * Enhancement - Update reva to v2.8.0: [#4444](https://github.com/owncloud/ocis/pull/4444)
 * Enhancement - Update ownCloud Web to v5.7.0-rc.10: [#4439](https://github.com/owncloud/ocis/pull/4439)
@@ -93,6 +94,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4084
    https://github.com/owncloud/ocis/pull/4365
+
+* Enhancement - Add missing unprotected paths: [#4454](https://github.com/owncloud/ocis/pull/4454)
+
+   Added missing unprotected paths for the text-editor, preview, pdf-viewer and draw-io to the
+   authentication middleware.
+
+   https://github.com/owncloud/ocis/pull/4454
 
 * Enhancement - Rewrite of the request authentication middleware: [#4374](https://github.com/owncloud/ocis/pull/4374)
 
