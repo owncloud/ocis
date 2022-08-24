@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Change - Rename "uploads purge" command to "uploads clean": [#4403](https://github.com/owncloud/ocis/pull/4403)
 * Enhancement - Add /app/open-with-web endpoint: [#4376](https://github.com/owncloud/ocis/pull/4376)
 * Enhancement - Added language option to the app provider: [#4399](https://github.com/owncloud/ocis/pull/4399)
+* Enhancement - Add configuration options for mail authentication and encryption: [#4443](https://github.com/owncloud/ocis/pull/4443)
 * Enhancement - Added command to reset administrator password: [#4084](https://github.com/owncloud/ocis/issues/4084)
 * Enhancement - Rewrite of the request authentication middleware: [#4374](https://github.com/owncloud/ocis/pull/4374)
 * Enhancement - Update reva to v2.8.0: [#4444](https://github.com/owncloud/ocis/pull/4444)
@@ -71,6 +72,18 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/4367
    https://github.com/owncloud/ocis/pull/4399
    https://github.com/cs3org/reva/pull/3156
+
+* Enhancement - Add configuration options for mail authentication and encryption: [#4443](https://github.com/owncloud/ocis/pull/4443)
+
+   We've added configuration options to configure the authentication and encryption for
+   sending mails in the notifications service.
+
+   Furthermore there is now a distinguished configuration option for the username to use for
+   authentication against the mail server. This allows you to customize the sender address to
+   your liking. For example sender addresses like `my oCIS instance <ocis@owncloud.test>` are
+   now possible, too.
+
+   https://github.com/owncloud/ocis/pull/4443
 
 * Enhancement - Added command to reset administrator password: [#4084](https://github.com/owncloud/ocis/issues/4084)
 
