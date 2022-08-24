@@ -97,6 +97,12 @@ class SpacesContext implements Context {
 	 */
 	private $storedEtags = [];
 
+	/**
+	 *
+	 * @var string[][]
+	 */
+	private $tokenOfLastLock = [];
+
 	private $etagPropfindBody = '<?xml version="1.0"?>'
 		. '<d:propfind xmlns:d="DAV:" '
 		. 'xmlns:oc="http://owncloud.org/ns" '
@@ -457,7 +463,7 @@ class SpacesContext implements Context {
 							}
 							$this->sendDeleteSpaceRequest($userName, $value["name"]);
 						}
-					}						
+					}
 				}
 			}
 		}
@@ -1562,6 +1568,42 @@ class SpacesContext implements Context {
 				[],
 				$content
 			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" uploads a file "([^"]*)" inside space "([^"]*)" to "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $source
+	 * @param string $spaceName
+	 * @param string $destination
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserUploadsSpecificFileToSpace(
+		string $user,
+		string $source,
+		string $spaceName,
+		string $destination
+	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$file = \fopen($this->featureContext->acceptanceTestsDirLocation() . $source, 'r');
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$space["root"]["webDavUrl"] . "/" . $destination,
+				"",
+				'PUT',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				$file
+			)
+		);
+		$this->featureContext->pushToLastHttpStatusCodesArray(
+			(string) $this->featureContext->getResponse()->getStatusCode()
 		);
 	}
 
@@ -3013,6 +3055,59 @@ class SpacesContext implements Context {
 		);
 		if ($this->storedEtags[$user][$space][$storePath] === "" || $this->storedEtags[$user][$space][$storePath] === null) {
 			throw new Exception("Expected stored etag to be some string but found null!");
+		}
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has locked folder "([^"]*)" inside space "([^"]*)" setting the following properties$/
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param TableNode $properties
+	 * @param string $spaceName
+	 *
+	 * @throws Exception | GuzzleException
+	 */
+	public function userHasLockedResourceOfSpace(string $user, string $resource, TableNode $properties, string $spaceName) {
+		$body
+			= "<?xml version='1.0' encoding='UTF-8'?>" .
+			"<d:lockinfo xmlns:d='DAV:'> ";
+		$headers = [];
+		$this->featureContext->verifyTableNodeRows($properties, [], ['lockscope', 'depth', 'timeout']);
+		$propertiesRows = $properties->getRowsHash();
+		foreach ($propertiesRows as $property => $value) {
+			if ($property === "depth" || $property === "timeout") {
+				//properties that are set in the header not in the xml
+				$headers[$property] = $value;
+			} else {
+				$body .= "<d:$property><d:$value/></d:$property>";
+			}
+		}
+		$body .= "</d:lockinfo>";
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $space['root']['webDavUrl'] . '/' . ltrim($resource, '/');
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				"",
+				'LOCK',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				$body
+			)
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			__METHOD__ . " Failed to lock the resource $resource"
+		);
+		$responseXml = $this->featureContext->getResponseXml(null, __METHOD__);
+		$this->featureContext->setResponseXmlObject($responseXml);
+		$xmlPart = $responseXml->xpath("//d:locktoken/d:href");
+		if (\is_array($xmlPart) && isset($xmlPart[0])) {
+			$this->tokenOfLastLock[$user][$resource] = (string) $xmlPart[0];
+		} else {
+			Assert::fail("could not find lock token after trying to lock '$resource'");
 		}
 	}
 
