@@ -57,13 +57,26 @@ func getValue[T any](m map[string]interface{}, key string) (out T) {
 }
 
 func getSliceValue[T any](m map[string]interface{}, key string) (out []T) {
-	for _, iv := range getValue[[]interface{}](m, key) {
-		cv, ok := iv.(T)
+	iv := getValue[interface{}](m, key)
+	add := func(v interface{}) {
+		cv, ok := v.(T)
 		if !ok {
-			continue
+			return
 		}
 
 		out = append(out, cv)
+	}
+
+	// bleve tend to convert []string{"foo"} to type string if slice contains only one value
+	// bleve: []string{"foo"} -> "foo"
+	// bleve: []string{"foo", "bar"} -> []string{"foo", "bar"}
+	switch v := iv.(type) {
+	case T:
+		add(v)
+	case []interface{}:
+		for _, rv := range v {
+			add(rv)
+		}
 	}
 
 	return
