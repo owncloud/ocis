@@ -451,3 +451,244 @@ Feature: copy file
       | permissions |
       | 31          |
       | 17          |
+
+
+  Scenario: Copying a file to a folder with no permissions
+    Given using spaces DAV path
+    And user "Brian" has created folder "/testshare"
+    And user "Brian" has created a share with settings
+      | path        | testshare |
+      | shareType   | user      |
+      | permissions | read      |
+      | shareWith   | Alice     |
+    And user "Alice" has accepted share "/testshare" offered by user "Brian"
+    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    When user "Alice" copies file "/textfile0.txt" from space "Personal" to "/testshare/textfile0.txt" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And user "Alice" should not be able to download file "/testshare/textfile0.txt" inside space "Shares Jail"
+
+
+  Scenario: Copying a file to overwrite a file into a folder with no permissions
+    Given using spaces DAV path
+    And user "Brian" has created folder "/testshare"
+    And user "Brian" has uploaded file with content "ownCloud test text file 1" to "textfile1.txt"
+    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
+    And user "Brian" has created a share with settings
+      | path        | testshare |
+      | shareType   | user      |
+      | permissions | read      |
+      | shareWith   | Alice     |
+    And user "Alice" has accepted share "/testshare" offered by user "Brian"
+    And user "Brian" has copied file "textfile1.txt" to "/testshare/overwritethis.txt"
+    When user "Alice" copies file "/textfile0.txt" from space "Personal" to "/testshare/overwritethis.txt" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "403"
+    And for user "Alice" the content of the file "/testshare/overwritethis.txt" of the space "Shares Jail" should be "ownCloud test text file 1"
+
+
+  Scenario: copy a file over the top of an existing folder received as a user share
+    Given using spaces DAV path
+    And user "Alice" has uploaded file with content "ownCloud test text file 1" to "textfile1.txt"
+    And user "Brian" has created folder "/BRIAN-Folder"
+    And user "Brian" has created folder "BRIAN-Folder/sample-folder"
+    And user "Brian" has shared folder "BRIAN-Folder" with user "Alice"
+    And user "Alice" has accepted share "/BRIAN-Folder" offered by user "Brian"
+    When user "Alice" copies file "/textfile1.txt" from space "Personal" to "/BRIAN-Folder" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And for user "Alice" the content of the file "/BRIAN-Folder" of the space "Shares Jail" should be "ownCloud test text file 1"
+    And for user "Alice" folder "BRIAN-Folder" of the space "Shares Jail" should not contain these files:
+      | /sample-folder |
+    And as "Alice" file "/textfile1.txt" should exist
+    And user "Alice" should not have any received shares
+
+
+  Scenario: copy a folder over the top of an existing file received as a user share
+    Given using spaces DAV path
+    And user "Alice" has created folder "/FOLDER"
+    And user "Alice" has created folder "/FOLDER/sample-folder"
+    And user "Brian" has uploaded file with content "file to share" to "/sharedfile1.txt"
+    And user "Brian" has shared file "/sharedfile1.txt" with user "Alice"
+    And user "Alice" has accepted share "/sharedfile1.txt" offered by user "Brian"
+    When user "Alice" copies folder "/FOLDER" from space "Personal" to "/sharedfile1.txt" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And as "Alice" folder "/FOLDER/sample-folder" should exist
+    And for user "Alice" folder "sharedfile1.txt" of the space "Shares Jail" should contain these files:
+      | /sample-folder |
+    And user "Alice" should not have any received shares
+
+
+  Scenario: copy a folder into another folder at different level which is received as a user share
+    Given using spaces DAV path
+    And user "Brian" has created folder "BRIAN-FOLDER"
+    And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
+    And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder/third-level-folder"
+    And user "Brian" has shared folder "BRIAN-FOLDER" with user "Alice"
+    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
+    And user "Alice" has created folder "Sample-Folder-A"
+    And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
+    And user "Alice" has created folder "Sample-Folder-A/sample-folder-b/sample-folder-c"
+    When user "Alice" copies folder "Sample-Folder-A/sample-folder-b" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-folder" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And as "Alice" folder "/Sample-Folder-A/sample-folder-b/sample-folder-c" should exist
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these files:
+      | /second-level-folder/third-level-folder/sample-folder-c |
+    And the response when user "Alice" gets the info of the last share should include
+      | file_target | /Shares/BRIAN-FOLDER |
+
+
+  Scenario: copy a file into a folder at different level received as a user share
+    Given using spaces DAV path
+    And user "Brian" has created folder "BRIAN-FOLDER"
+    And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
+    And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder/third-level-folder"
+    And user "Brian" has shared folder "BRIAN-FOLDER" with user "Alice"
+    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
+    And user "Alice" has created folder "Sample-Folder-A"
+    And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
+    And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
+    When user "Alice" copies folder "Sample-Folder-A/sample-folder-b/textfile-c.txt" from space "Personal" to "/BRIAN-FOLDER/second-level-folder" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should not contain these files:
+      | /second-level-folder/third-level-folder |
+    And as "Alice" file "Sample-Folder-A/sample-folder-b/textfile-c.txt" should exist
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these files:
+      | /second-level-folder |
+    And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-folder" of the space "Shares Jail" should be "sample file-c"
+    And the response when user "Alice" gets the info of the last share should include
+      | file_target | /Shares/BRIAN-FOLDER |
+
+
+  Scenario: copy a file into a file at different level received as a user share
+    Given using spaces DAV path
+    And user "Brian" has created folder "BRIAN-FOLDER"
+    And user "Brian" has uploaded file with content "file at second level" to "BRIAN-FOLDER/second-level-file.txt"
+    And user "Brian" has shared folder "BRIAN-FOLDER" with user "Alice"
+    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
+    And user "Alice" has created folder "Sample-Folder-A"
+    And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
+    And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
+    When user "Alice" copies folder "Sample-Folder-A/sample-folder-b/textfile-c.txt" from space "Personal" to "/BRIAN-FOLDER/second-level-file.txt" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And as "Alice" file "Sample-Folder-A/sample-folder-b/textfile-c.txt" should exist
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these files:
+      | /second-level-file.txt |
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should not contain these files:
+      | /textfile-c.txt |
+    And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-file.txt" of the space "Shares Jail" should be "sample file-c"
+    And the response when user "Alice" gets the info of the last share should include
+      | file_target | /Shares/BRIAN-FOLDER |
+
+
+  Scenario: copy a folder into a file at different level received as a user share
+    Given using spaces DAV path
+    And user "Alice" has created folder "FOLDER"
+    And user "Alice" has created folder "FOLDER/second-level-folder"
+    And user "Alice" has created folder "FOLDER/second-level-folder/third-level-folder"
+    And user "Brian" has created folder "BRIAN-FOLDER"
+    And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
+    And user "Brian" has uploaded file with content "file at third level" to "BRIAN-FOLDER/second-level-folder/third-level-file.txt"
+    And user "Brian" has shared folder "BRIAN-FOLDER" with user "Alice"
+    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
+    When user "Alice" copies folder "FOLDER/second-level-folder" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-file.txt" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And as "Alice" folder "FOLDER/second-level-folder/third-level-folder" should exist
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these entries:
+      | /second-level-folder/third-level-file.txt/third-level-folder |
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should not contain these entries:
+      | /second-level-folder/second-level-folder |
+    And the response when user "Alice" gets the info of the last share should include
+      | file_target | /Shares/BRIAN-FOLDER |
+
+
+  Scenario: copy a folder into another folder at different level which is received as a group share
+    Given using spaces DAV path
+    And group "grp1" has been created
+    And user "Alice" has been added to group "grp1"
+    And user "Brian" has been added to group "grp1"
+    And user "Brian" has created folder "BRIAN-FOLDER"
+    And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
+    And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder/third-level-folder"
+    And user "Brian" has shared folder "BRIAN-FOLDER" with group "grp1"
+    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
+    And user "Alice" has created folder "Sample-Folder-A"
+    And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
+    And user "Alice" has created folder "Sample-Folder-A/sample-folder-b/sample-folder-c"
+    When user "Alice" copies folder "Sample-Folder-A/sample-folder-b" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-folder" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And as "Alice" folder "/Sample-Folder-A/sample-folder-b/sample-folder-c" should exist
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these files:
+      | /second-level-folder/third-level-folder/sample-folder-c |
+    And the response when user "Alice" gets the info of the last share should include
+      | file_target | /Shares/BRIAN-FOLDER |
+
+
+  Scenario: copy a file into a folder at different level received as a group share
+    Given using spaces DAV path
+    And group "grp1" has been created
+    And user "Alice" has been added to group "grp1"
+    And user "Brian" has been added to group "grp1"
+    And user "Brian" has created folder "BRIAN-FOLDER"
+    And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
+    And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder/third-level-folder"
+    And user "Brian" has shared folder "BRIAN-FOLDER" with group "grp1"
+    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
+    And user "Alice" has created folder "Sample-Folder-A"
+    And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
+    And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
+    When user "Alice" copies file "Sample-Folder-A/sample-folder-b/textfile-c.txt" from space "Personal" to "/BRIAN-FOLDER/second-level-folder" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should not contain these entries:
+      | /second-level-folder/third-level-folder |
+    And as "Alice" file "Sample-Folder-A/sample-folder-b/textfile-c.txt" should exist
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these files:
+      | /second-level-folder |
+    And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-folder" of the space "Shares Jail" should be "sample file-c"
+    And the response when user "Alice" gets the info of the last share should include
+      | file_target | /Shares/BRIAN-FOLDER |
+
+
+  Scenario: overwrite a file received as a group share with a file from different level
+    Given using spaces DAV path
+    And group "grp1" has been created
+    And user "Alice" has been added to group "grp1"
+    And user "Brian" has been added to group "grp1"
+    And user "Brian" has created folder "BRIAN-FOLDER"
+    And user "Brian" has uploaded file with content "file at second level" to "BRIAN-FOLDER/second-level-file.txt"
+    And user "Brian" has shared folder "BRIAN-FOLDER" with group "grp1"
+    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
+    And user "Alice" has created folder "Sample-Folder-A"
+    And user "Alice" has created folder "Sample-Folder-A/sample-folder-b"
+    And user "Alice" has uploaded file with content "sample file-c" to "Sample-Folder-A/sample-folder-b/textfile-c.txt"
+    When user "Alice" copies file "Sample-Folder-A/sample-folder-b/textfile-c.txt" from space "Personal" to "/BRIAN-FOLDER/second-level-file.txt" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And as "Alice" file "Sample-Folder-A/sample-folder-b/textfile-c.txt" should exist
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should not contain these files:
+      | /textfile-c.txt |
+    And as "Alice" file "Sample-Folder-A/sample-folder-b/textfile-c.txt" should exist
+    And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-file.txt" of the space "Shares Jail" should be "sample file-c"
+    And the response when user "Alice" gets the info of the last share should include
+      | file_target | /Shares/BRIAN-FOLDER |
+
+
+  Scenario: copy a folder into a file at different level received as a group share
+    Given using spaces DAV path
+    And group "grp1" has been created
+    And user "Alice" has been added to group "grp1"
+    And user "Brian" has been added to group "grp1"
+    And user "Brian" has created folder "BRIAN-FOLDER"
+    And user "Brian" has created folder "BRIAN-FOLDER/second-level-folder"
+    And user "Brian" has uploaded file with content "file at third level" to "BRIAN-FOLDER/second-level-folder/third-level-file.txt"
+    And user "Brian" has shared folder "BRIAN-FOLDER" with group "grp1"
+    And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
+    And user "Alice" has created folder "FOLDER"
+    And user "Alice" has created folder "FOLDER/second-level-folder"
+    And user "Alice" has created folder "FOLDER/second-level-folder/third-level-folder"
+    When user "Alice" copies folder "FOLDER/second-level-folder" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-file.txt" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these files:
+      | /second-level-folder/third-level-file.txt                    |
+      | /second-level-folder/third-level-file.txt/third-level-folder |
+    And as "Alice" folder "FOLDER/second-level-folder/third-level-folder" should exist
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should not contain these files:
+      | /second-level-folder/second-level-folder |
+    And the response when user "Alice" gets the info of the last share should include
+      | file_target | /Shares/BRIAN-FOLDER |
