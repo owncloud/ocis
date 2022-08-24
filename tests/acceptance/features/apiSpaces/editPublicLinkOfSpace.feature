@@ -52,18 +52,18 @@ Feature: A manager of the space can edit public link
       | 15          | read,update,create,delete |          | newName  | 2042-03-25T23:59:59+0100 |
 
 
-  Scenario Outline: Only users with manager role can see a created public link
+  Scenario Outline: All members can see a created public link
     Given using OCS API version "2"
     When user "Alice" shares a space "edit space" to user "Brian" with role "<role>"
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And for user "Alice" the space "edit space" should contain the last created public link
-    And for user "Brian" the space "edit space" <shouldOrNot> contain the last created public link
+    And for user "Brian" the space "edit space" should contain the last created public link
     Examples:
-      | role    | shouldOrNot |
-      | manager | should      |
-      | editor  | should      |
-      | viewer  | should      |
+      | role    |
+      | manager |
+      | editor  |
+      | viewer  |
 
 
   Scenario Outline: Members of the space try to edit a public link

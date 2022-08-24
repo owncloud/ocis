@@ -5,7 +5,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/audit/pkg/config"
 )
 
-// LoggerFromConfig initializes a service-specific logger instance.
+// Configure initializes a service-specific logger instance.
 func Configure(name string, cfg *config.Log) log.Logger {
 	return log.NewLogger(
 		log.Name(name),

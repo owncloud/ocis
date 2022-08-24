@@ -13,6 +13,8 @@ import (
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 )
 
+const _linktype = "link"
+
 // BasicAuditEvent creates an AuditEvent from given values
 func BasicAuditEvent(uid string, ctime string, msg string, action string) AuditEvent {
 	return AuditEvent{
@@ -68,7 +70,7 @@ func ShareCreated(ev events.ShareCreated) AuditEventShareCreated {
 // LinkCreated converts a ShareCreated Event to an AuditEventShareCreated
 func LinkCreated(ev events.LinkCreated) AuditEventShareCreated {
 	uid := ev.Sharer.OpaqueId
-	with, typ := "", "link"
+	with, typ := "", _linktype
 	base := BasicAuditEvent(uid, formatTime(ev.CTime), MessageLinkCreated(uid, ev.ItemID.OpaqueId, ev.ShareID.OpaqueId), ActionShareCreated)
 	return AuditEventShareCreated{
 		AuditEventSharing: SharingAuditEvent("", ev.ItemID.OpaqueId, uid, base),
@@ -108,7 +110,7 @@ func ShareUpdated(ev events.ShareUpdated) AuditEventShareUpdated {
 // LinkUpdated converts a LinkUpdated event to an AuditEventShareUpdated
 func LinkUpdated(ev events.LinkUpdated) AuditEventShareUpdated {
 	uid := ev.Sharer.OpaqueId
-	with, typ := "", "link"
+	with, typ := "", _linktype
 	base := BasicAuditEvent(uid, formatTime(ev.CTime), MessageLinkUpdated(uid, ev.ShareID.OpaqueId, ev.FieldUpdated), updateType(ev.FieldUpdated))
 	return AuditEventShareUpdated{
 		AuditEventSharing: SharingAuditEvent(ev.ShareID.GetOpaqueId(), ev.ItemID.OpaqueId, uid, base),
@@ -150,7 +152,7 @@ func ShareRemoved(ev events.ShareRemoved) AuditEventShareRemoved {
 
 // LinkRemoved converts a LinkRemoved event to an AuditEventShareRemoved
 func LinkRemoved(ev events.LinkRemoved) AuditEventShareRemoved {
-	uid, sid, typ := ev.Executant.GetOpaqueId(), "", "link"
+	uid, sid, typ := ev.Executant.GetOpaqueId(), "", _linktype
 	if ev.ShareID != nil {
 		sid = ev.ShareID.GetOpaqueId()
 	} else {

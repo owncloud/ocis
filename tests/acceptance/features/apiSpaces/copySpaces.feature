@@ -437,7 +437,7 @@ Feature: copy file
   Scenario Outline: User copies a folder from space shares jail with different role to space project with role viewer
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" to user "Alice" with role "viewer"
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created folder "/testshare/folder1"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/folder1/testshare.txt"

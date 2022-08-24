@@ -62,3 +62,15 @@ Feature: Share a file or folder that is inside a space
       | file.txt | editor    | 404        | No share permission |
       | file.txt | viewer    | 404        | No share permission |
       | folder   | viewer    | 404        | No share permission |
+
+
+  Scenario Outline: An user participant of the project space can see the created resources share
+    Given user "Alice" has shared a space "share sub-item" to user "Brian" with role "<spaceRole>"
+    When user "Alice" shares the following entity "file.txt" inside of space "share sub-item" with user "Bob" with role "editor"
+    Then for user "Alice" the space "share sub-item" should contain the last created share of the file "file.txt"
+    And for user "Brian" the space "share sub-item" should contain the last created share of the file "file.txt"
+    Examples:
+      | spaceRole |
+      | editor    |
+      | viewer    |
+      | manager   |

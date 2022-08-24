@@ -3,7 +3,7 @@
 {{ $version := .Version -}}
 {{/* ocis beta program */ -}}
 {{ if eq .Version "2.0.0" -}}
-{{ $version = (printf  "%v-%v" $version "beta.5") -}}
+{{ $version = (printf  "%v-%v" $version "beta.6") -}}
 {{ end -}}
 {{ if gt (len $allVersions) 1 -}}
 # Changelog for [{{ $version }}] ({{ .Date }})

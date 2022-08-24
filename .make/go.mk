@@ -64,13 +64,17 @@ go-mod-tidy:
 fmt:
 	gofmt -s -w $(SOURCES)
 
+.PHONY: golangci-lint-fix
+golangci-lint-fix: $(GOLANGCI_LINT)
+	$(GOLANGCI_LINT) run $(LINTERS) --fix
+
 .PHONY: golangci-lint
 golangci-lint: $(GOLANGCI_LINT)
-	$(GOLANGCI_LINT) run -E gosec -E bodyclose -E dogsled -E durationcheck -E revive -E ifshort -E makezero -E prealloc -E predeclared --path-prefix $(NAME)
+	$(GOLANGCI_LINT) run --path-prefix services/$(NAME)
 
 .PHONY: ci-golangci-lint
 ci-golangci-lint: $(GOLANGCI_LINT)
-	$(GOLANGCI_LINT) run -E gosec -E bodyclose -E dogsled -E durationcheck -E revive -E ifshort -E makezero -E prealloc -E predeclared --path-prefix $(NAME) --timeout 10m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
+	$(GOLANGCI_LINT) run --path-prefix services/$(NAME) --timeout 10m0s --issues-exit-code 0 --out-format checkstyle > checkstyle.xml
 
 .PHONY: test
 test:
