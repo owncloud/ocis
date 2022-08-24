@@ -4,6 +4,7 @@ package channels
 import (
 	"context"
 	"crypto/tls"
+	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	groups "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
@@ -45,6 +46,59 @@ type Mail struct {
 	logger        log.Logger
 }
 
+func (m Mail) getMailClient() (*mail.SMTPClient, error) {
+	server := mail.NewSMTPClient()
+	server.Host = m.conf.Notifications.SMTP.Host
+	server.Port = m.conf.Notifications.SMTP.Port
+	server.Username = m.conf.Notifications.SMTP.Username
+	if server.Username == "" {
+		// compatibility fallback
+		server.Username = m.conf.Notifications.SMTP.Sender
+	}
+	server.Password = m.conf.Notifications.SMTP.Password
+	if server.TLSConfig == nil {
+		server.TLSConfig = &tls.Config{}
+	}
+	server.TLSConfig.InsecureSkipVerify = m.conf.Notifications.SMTP.Insecure
+
+	switch strings.ToLower(m.conf.Notifications.SMTP.Authentication) {
+	case "login":
+		server.Authentication = mail.AuthLogin
+	case "plain":
+		server.Authentication = mail.AuthPlain
+	case "crammd5":
+		server.Authentication = mail.AuthCRAMMD5
+	case "none":
+		server.Authentication = mail.AuthNone
+	default:
+		return nil, errors.New("unknown mail authentication method")
+	}
+
+	switch strings.ToLower(m.conf.Notifications.SMTP.Encryption) {
+	case "tls":
+		server.Encryption = mail.EncryptionTLS
+		server.TLSConfig.ServerName = m.conf.Notifications.SMTP.Host
+	case "starttls":
+		server.Encryption = mail.EncryptionSTARTTLS
+		server.TLSConfig.ServerName = m.conf.Notifications.SMTP.Host
+	case "ssl":
+		server.Encryption = mail.EncryptionSSL
+	case "ssltls":
+		server.Encryption = mail.EncryptionSSLTLS
+	case "none":
+		server.Encryption = mail.EncryptionNone
+	default:
+		return nil, errors.New("unknown mail encryption method")
+	}
+
+	smtpClient, err := server.Connect()
+	if err != nil {
+		return nil, err
+	}
+
+	return smtpClient, nil
+}
+
 // SendMessage sends a message to all given users.
 func (m Mail) SendMessage(userIDs []string, msg string) error {
 	if m.conf.Notifications.SMTP.Host == "" {
@@ -56,22 +110,13 @@ func (m Mail) SendMessage(userIDs []string, msg string) error {
 		return err
 	}
 
-	server := mail.NewSMTPClient()
-	server.Host = m.conf.Notifications.SMTP.Host
-	server.Port = m.conf.Notifications.SMTP.Port
-	server.Username = m.conf.Notifications.SMTP.Sender
-	server.Password = m.conf.Notifications.SMTP.Password
-	server.TLSConfig = &tls.Config{InsecureSkipVerify: m.conf.Notifications.SMTP.Insecure}
-
-	smtpClient, err := server.Connect()
+	smtpClient, err := m.getMailClient()
 	if err != nil {
 		return err
 	}
 
 	email := mail.NewMSG()
-
 	email.SetFrom(m.conf.Notifications.SMTP.Sender).AddTo(to...)
-
 	email.SetBody(mail.TextPlain, msg)
 
 	return email.Send(smtpClient)
