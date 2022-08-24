@@ -30,6 +30,7 @@ var (
 	_unprotectedPaths = map[string]struct{}{
 		"/":                    {},
 		"/login":               {},
+		"/settings":            {},
 		"/app/list":            {},
 		"/config.json":         {},
 		"/manifest.json":       {},
