@@ -68,7 +68,8 @@ services:
       # email server (in this case inbucket acts as mail catcher)
       NOTIFICATIONS_SMTP_HOST: inbucket
       NOTIFICATIONS_SMTP_PORT: 2500
-      NOTIFICATIONS_SMTP_SENDER: notifications@${OCIS_DOMAIN:-ocis.owncloud.test}
+      NOTIFICATIONS_SMTP_SENDER: oCIS notifications <notifications@${OCIS_DOMAIN:-ocis.owncloud.test}>
+      NOTIFICATIONS_SMTP_USERNAME: notifications@${OCIS_DOMAIN:-ocis.owncloud.test}
       NOTIFICATIONS_SMTP_INSECURE: true # the mail catcher uses self signed certificates
     volumes:
       - ocis-config:/etc/ocis

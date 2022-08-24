@@ -2,7 +2,10 @@
     "config" : {
       "platform": {
         "php": "7.4"
-      }
+      },
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        }
     },
     "require": {
       "behat/behat": "^3.9",

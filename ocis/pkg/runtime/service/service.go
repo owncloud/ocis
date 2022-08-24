@@ -55,7 +55,7 @@ import (
 )
 
 var (
-	// runset keeps track of which extensions to start supervised.
+	// runset keeps track of which services to start supervised.
 	runset map[string]struct{}
 )
 
@@ -142,7 +142,7 @@ func NewService(options ...Option) (*Service, error) {
 	return s, nil
 }
 
-// Start an rpc service. By default the package scope Start will run all default extensions to provide with a working
+// Start an rpc service. By default the package scope Start will run all default services to provide with a working
 // oCIS instance.
 func Start(o ...Option) error {
 	// Start the runtime. Most likely this was called ONLY by the `ocis server` subcommand, but since we cannot protect
@@ -241,12 +241,12 @@ func scheduleServiceTokens(s *Service, funcSet serviceFuncMap) {
 	}
 }
 
-// generateRunSet interprets the cfg.Runtime.Extensions config option to cherry-pick which services to start using
+// generateRunSet interprets the cfg.Runtime.Services config option to cherry-pick which services to start using
 // the runtime.
 func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	runset = make(map[string]struct{})
-	if cfg.Runtime.Extensions != "" {
-		e := strings.Split(strings.ReplaceAll(cfg.Runtime.Extensions, " ", ""), ",")
+	if cfg.Runtime.Services != "" {
+		e := strings.Split(strings.ReplaceAll(cfg.Runtime.Services, " ", ""), ",")
 		for _, name := range e {
 			runset[name] = struct{}{}
 		}
@@ -273,7 +273,7 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 func (s *Service) List(_ struct{}, reply *string) error {
 	tableString := &strings.Builder{}
 	table := tablewriter.NewWriter(tableString)
-	table.SetHeader([]string{"Extension"})
+	table.SetHeader([]string{"Service"})
 
 	names := []string{}
 	for t := range s.serviceToken {

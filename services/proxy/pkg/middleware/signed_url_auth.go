@@ -20,61 +20,40 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 )
 
-// SignedURLAuth provides a middleware to check access secured by a signed URL.
-func SignedURLAuth(optionSetters ...Option) func(next http.Handler) http.Handler {
-	options := newOptions(optionSetters...)
+const (
+	_paramOCSignature  = "OC-Signature"
+	_paramOCCredential = "OC-Credential"
+	_paramOCDate       = "OC-Date"
+	_paramOCExpires    = "OC-Expires"
+	_paramOCVerb       = "OC-Verb"
+)
 
-	return func(next http.Handler) http.Handler {
-		return &signedURLAuth{
-			next:               next,
-			logger:             options.Logger,
-			preSignedURLConfig: options.PreSignedURLConfig,
-			store:              options.Store,
-			userProvider:       options.UserProvider,
-		}
+var (
+	_requiredParams = [...]string{
+		_paramOCSignature,
+		_paramOCCredential,
+		_paramOCDate,
+		_paramOCExpires,
+		_paramOCVerb,
 	}
+)
+
+// SignedURLAuthenticator is the authenticator responsible for authenticating signed URL requests.
+type SignedURLAuthenticator struct {
+	Logger             log.Logger
+	PreSignedURLConfig config.PreSignedURL
+	UserProvider       backend.UserBackend
+	Store              storesvc.StoreService
 }
 
-type signedURLAuth struct {
-	next               http.Handler
-	logger             log.Logger
-	preSignedURLConfig config.PreSignedURL
-	userProvider       backend.UserBackend
-	store              storesvc.StoreService
-}
-
-func (m signedURLAuth) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	if !m.shouldServe(req) {
-		m.next.ServeHTTP(w, req)
-		return
-	}
-
-	user, _, err := m.userProvider.GetUserByClaims(req.Context(), "username", req.URL.Query().Get("OC-Credential"), true)
-	if err != nil {
-		m.logger.Error().Err(err).Msg("Could not get user by claim")
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-
-	ctx := revactx.ContextSetUser(req.Context(), user)
-
-	req = req.WithContext(ctx)
-
-	if err := m.validate(req); err != nil {
-		http.Error(w, "Invalid url signature", http.StatusUnauthorized)
-		return
-	}
-
-	m.next.ServeHTTP(w, req)
-}
-
-func (m signedURLAuth) shouldServe(req *http.Request) bool {
-	if !m.preSignedURLConfig.Enabled {
+func (m SignedURLAuthenticator) shouldServe(req *http.Request) bool {
+	if !m.PreSignedURLConfig.Enabled {
 		return false
 	}
-	return req.URL.Query().Get("OC-Signature") != ""
+	return req.URL.Query().Get(_paramOCSignature) != ""
 }
 
-func (m signedURLAuth) validate(req *http.Request) (err error) {
+func (m SignedURLAuthenticator) validate(req *http.Request) (err error) {
 	query := req.URL.Query()
 
 	if ok, err := m.allRequiredParametersArePresent(query); !ok {
@@ -100,20 +79,14 @@ func (m signedURLAuth) validate(req *http.Request) (err error) {
 	return nil
 }
 
-func (m signedURLAuth) allRequiredParametersArePresent(query url.Values) (ok bool, err error) {
+func (m SignedURLAuthenticator) allRequiredParametersArePresent(query url.Values) (ok bool, err error) {
 	// check if required query parameters exist in given request query parameters
 	// OC-Signature - the computed signature - server will verify the request upon this REQUIRED
 	// OC-Credential - defines the user scope (shall we use the owncloud user id here - this might leak internal data ....) REQUIRED
 	// OC-Date - defined the date the url was signed (ISO 8601 UTC) REQUIRED
 	// OC-Expires - defines the expiry interval in seconds (between 1 and 604800 = 7 days) REQUIRED
 	// TODO OC-Verb - defines for which http verb the request is valid - defaults to GET OPTIONAL
-	for _, p := range []string{
-		"OC-Signature",
-		"OC-Credential",
-		"OC-Date",
-		"OC-Expires",
-		"OC-Verb",
-	} {
+	for _, p := range _requiredParams {
 		if query.Get(p) == "" {
 			return false, fmt.Errorf("required %s parameter not found", p)
 		}
@@ -122,19 +95,19 @@ func (m signedURLAuth) allRequiredParametersArePresent(query url.Values) (ok boo
 	return true, nil
 }
 
-func (m signedURLAuth) requestMethodMatches(meth string, query url.Values) (ok bool, err error) {
+func (m SignedURLAuthenticator) requestMethodMatches(meth string, query url.Values) (ok bool, err error) {
 	// check if given url query parameter OC-Verb matches given request method
-	if !strings.EqualFold(meth, query.Get("OC-Verb")) {
+	if !strings.EqualFold(meth, query.Get(_paramOCVerb)) {
 		return false, errors.New("required OC-Verb parameter did not match request method")
 	}
 
 	return true, nil
 }
 
-func (m signedURLAuth) requestMethodIsAllowed(meth string) (ok bool, err error) {
+func (m SignedURLAuthenticator) requestMethodIsAllowed(meth string) (ok bool, err error) {
 	//  check if given request method is allowed
 	methodIsAllowed := false
-	for _, am := range m.preSignedURLConfig.AllowedHTTPMethods {
+	for _, am := range m.PreSignedURLConfig.AllowedHTTPMethods {
 		if strings.EqualFold(meth, am) {
 			methodIsAllowed = true
 			break
@@ -147,14 +120,15 @@ func (m signedURLAuth) requestMethodIsAllowed(meth string) (ok bool, err error) 
 
 	return true, nil
 }
-func (m signedURLAuth) urlIsExpired(query url.Values, now func() time.Time) (expired bool, err error) {
+
+func (m SignedURLAuthenticator) urlIsExpired(query url.Values, now func() time.Time) (expired bool, err error) {
 	// check if url is expired by checking if given date (OC-Date) + expires in seconds (OC-Expires) is after now
-	validFrom, err := time.Parse(time.RFC3339, query.Get("OC-Date"))
+	validFrom, err := time.Parse(time.RFC3339, query.Get(_paramOCDate))
 	if err != nil {
 		return true, err
 	}
 
-	requestExpiry, err := time.ParseDuration(query.Get("OC-Expires") + "s")
+	requestExpiry, err := time.ParseDuration(query.Get(_paramOCExpires) + "s")
 	if err != nil {
 		return true, err
 	}
@@ -164,20 +138,20 @@ func (m signedURLAuth) urlIsExpired(query url.Values, now func() time.Time) (exp
 	return !(now().After(validFrom) && now().Before(validTo)), nil
 }
 
-func (m signedURLAuth) signatureIsValid(req *http.Request) (ok bool, err error) {
+func (m SignedURLAuthenticator) signatureIsValid(req *http.Request) (ok bool, err error) {
 	u := revactx.ContextMustGetUser(req.Context())
 	signingKey, err := m.getSigningKey(req.Context(), u.Id.OpaqueId)
 	if err != nil {
-		m.logger.Error().Err(err).Msg("could not retrieve signing key")
+		m.Logger.Error().Err(err).Msg("could not retrieve signing key")
 		return false, err
 	}
 	if len(signingKey) == 0 {
-		m.logger.Error().Err(err).Msg("signing key empty")
+		m.Logger.Error().Err(err).Msg("signing key empty")
 		return false, err
 	}
 	q := req.URL.Query()
-	signature := q.Get("OC-Signature")
-	q.Del("OC-Signature")
+	signature := q.Get(_paramOCSignature)
+	q.Del(_paramOCSignature)
 	req.URL.RawQuery = q.Encode()
 	url := req.URL.String()
 	if !req.URL.IsAbs() {
@@ -187,7 +161,7 @@ func (m signedURLAuth) signatureIsValid(req *http.Request) (ok bool, err error) 
 	return m.createSignature(url, signingKey) == signature, nil
 }
 
-func (m signedURLAuth) createSignature(url string, signingKey []byte) string {
+func (m SignedURLAuthenticator) createSignature(url string, signingKey []byte) string {
 	// the oc10 signature check: $hash = \hash_pbkdf2("sha512", $url, $signingKey, 10000, 64, false);
 	// - sets the length of the output string to 64
 	// - sets raw output to false ->  if raw_output is FALSE length corresponds to twice the byte-length of the derived key (as every byte of the key is returned as two hexits).
@@ -197,8 +171,8 @@ func (m signedURLAuth) createSignature(url string, signingKey []byte) string {
 	return hex.EncodeToString(hash)
 }
 
-func (m signedURLAuth) getSigningKey(ctx context.Context, ocisID string) ([]byte, error) {
-	res, err := m.store.Read(ctx, &storesvc.ReadRequest{
+func (m SignedURLAuthenticator) getSigningKey(ctx context.Context, ocisID string) ([]byte, error) {
+	res, err := m.Store.Read(ctx, &storesvc.ReadRequest{
 		Options: &storemsg.ReadOptions{
 			Database: "proxy",
 			Table:    "signing-keys",
@@ -206,8 +180,44 @@ func (m signedURLAuth) getSigningKey(ctx context.Context, ocisID string) ([]byte
 		Key: ocisID,
 	})
 	if err != nil || len(res.Records) < 1 {
-		return []byte{}, err
+		return nil, err
 	}
 
 	return res.Records[0].Value, nil
+}
+
+// Authenticate implements the authenticator interface to authenticate requests via signed URL auth.
+func (m SignedURLAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
+	if !m.shouldServe(r) {
+		return nil, false
+	}
+
+	user, _, err := m.UserProvider.GetUserByClaims(r.Context(), "username", r.URL.Query().Get(_paramOCCredential), true)
+	if err != nil {
+		m.Logger.Error().
+			Err(err).
+			Str("authenticator", "signed_url").
+			Str("path", r.URL.Path).
+			Msg("Could not get user by claim")
+		return nil, false
+	}
+
+	ctx := revactx.ContextSetUser(r.Context(), user)
+
+	r = r.WithContext(ctx)
+
+	if err := m.validate(r); err != nil {
+		m.Logger.Error().
+			Err(err).
+			Str("authenticator", "signed_url").
+			Str("path", r.URL.Path).
+			Msg("Could not get user by claim")
+		return nil, false
+	}
+
+	m.Logger.Debug().
+		Str("authenticator", "signed_url").
+		Str("path", r.URL.Path).
+		Msg("successfully authenticated request")
+	return r, true
 }

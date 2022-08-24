@@ -23,24 +23,24 @@ type TokenManager struct {
 	JWTSecret string `yaml:"jwt_secret"`
 }
 
-type InsecureExtension struct {
+type InsecureService struct {
 	Insecure bool
 }
 
-type InsecureProxyExtension struct {
+type InsecureProxyService struct {
 	InsecureBackends bool `yaml:"insecure_backends"`
 }
 
 type LdapSettings struct {
 	BindPassword string `yaml:"bind_password"`
 }
-type LdapBasedExtension struct {
+type LdapBasedService struct {
 	Ldap LdapSettings
 }
 
-type GraphExtension struct {
-	Spaces   InsecureExtension
-	Identity LdapBasedExtension
+type GraphService struct {
+	Spaces   InsecureService
+	Identity LdapBasedService
 }
 
 type ServiceUserPasswordsSettings struct {
@@ -49,27 +49,27 @@ type ServiceUserPasswordsSettings struct {
 	RevaPassword  string `yaml:"reva_password"`
 	IdpPassword   string `yaml:"idp_password"`
 }
-type IdmExtension struct {
+type IdmService struct {
 	ServiceUserPasswords ServiceUserPasswordsSettings `yaml:"service_user_passwords"`
 }
 
-type FrontendExtension struct {
-	Archiver InsecureExtension
+type FrontendService struct {
+	Archiver InsecureService
 }
 
-type AuthbasicExtension struct {
-	AuthProviders LdapBasedExtension `yaml:"auth_providers"`
+type AuthbasicService struct {
+	AuthProviders LdapBasedService `yaml:"auth_providers"`
 }
 
 type AuthProviderSettings struct {
-	Oidc InsecureExtension
+	Oidc InsecureService
 }
-type AuthbearerExtension struct {
+type AuthbearerService struct {
 	AuthProviders AuthProviderSettings `yaml:"auth_providers"`
 }
 
-type UsersAndGroupsExtension struct {
-	Drivers LdapBasedExtension
+type UsersAndGroupsService struct {
+	Drivers LdapBasedService
 }
 
 type ThumbnailSettings struct {
@@ -78,7 +78,7 @@ type ThumbnailSettings struct {
 	Cs3AllowInsecure    bool   `yaml:"cs3_allow_insecure"`
 }
 
-type ThumbnailExtension struct {
+type ThumbnailService struct {
 	Thumbnail ThumbnailSettings
 }
 
@@ -101,17 +101,17 @@ type OcisConfig struct {
 	TransferSecret    string       `yaml:"transfer_secret"`
 	SystemUserID      string       `yaml:"system_user_id"`
 	AdminUserID       string       `yaml:"admin_user_id"`
-	Graph             GraphExtension
-	Idp               LdapBasedExtension
-	Idm               IdmExtension
-	Proxy             InsecureProxyExtension
-	Frontend          FrontendExtension
-	AuthBasic         AuthbasicExtension  `yaml:"auth_basic"`
-	AuthBearer        AuthbearerExtension `yaml:"auth_bearer"`
-	Users             UsersAndGroupsExtension
-	Groups            UsersAndGroupsExtension
-	Ocdav             InsecureExtension
-	Thumbnails        ThumbnailExtension
+	Graph             GraphService
+	Idp               LdapBasedService
+	Idm               IdmService
+	Proxy             InsecureProxyService
+	Frontend          FrontendService
+	AuthBasic         AuthbasicService  `yaml:"auth_basic"`
+	AuthBearer        AuthbearerService `yaml:"auth_bearer"`
+	Users             UsersAndGroupsService
+	Groups            UsersAndGroupsService
+	Ocdav             InsecureService
+	Thumbnails        ThumbnailService
 }
 
 func checkConfigPath(configPath string) error {
@@ -213,7 +213,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		TransferSecret:    revaTransferSecret,
 		SystemUserID:      systemUserID,
 		AdminUserID:       adminUserID,
-		Idm: IdmExtension{
+		Idm: IdmService{
 			ServiceUserPasswords: ServiceUserPasswordsSettings{
 				AdminPassword: ocisAdminServicePassword,
 				IdpPassword:   idpServicePassword,
@@ -221,40 +221,40 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 				IdmPassword:   idmServicePassword,
 			},
 		},
-		Idp: LdapBasedExtension{
+		Idp: LdapBasedService{
 			Ldap: LdapSettings{
 				BindPassword: idpServicePassword,
 			},
 		},
-		AuthBasic: AuthbasicExtension{
-			AuthProviders: LdapBasedExtension{
+		AuthBasic: AuthbasicService{
+			AuthProviders: LdapBasedService{
 				Ldap: LdapSettings{
 					BindPassword: revaServicePassword,
 				},
 			},
 		},
-		Groups: UsersAndGroupsExtension{
-			Drivers: LdapBasedExtension{
+		Groups: UsersAndGroupsService{
+			Drivers: LdapBasedService{
 				Ldap: LdapSettings{
 					BindPassword: revaServicePassword,
 				},
 			},
 		},
-		Users: UsersAndGroupsExtension{
-			Drivers: LdapBasedExtension{
+		Users: UsersAndGroupsService{
+			Drivers: LdapBasedService{
 				Ldap: LdapSettings{
 					BindPassword: revaServicePassword,
 				},
 			},
 		},
-		Graph: GraphExtension{
-			Identity: LdapBasedExtension{
+		Graph: GraphService{
+			Identity: LdapBasedService{
 				Ldap: LdapSettings{
 					BindPassword: idmServicePassword,
 				},
 			},
 		},
-		Thumbnails: ThumbnailExtension{
+		Thumbnails: ThumbnailService{
 			Thumbnail: ThumbnailSettings{
 				TransferSecret: thumbnailsTransferSecret,
 			},
@@ -262,25 +262,25 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 	}
 
 	if insecure {
-		cfg.AuthBearer = AuthbearerExtension{
+		cfg.AuthBearer = AuthbearerService{
 			AuthProviders: AuthProviderSettings{
-				Oidc: InsecureExtension{
+				Oidc: InsecureService{
 					Insecure: true,
 				},
 			},
 		}
-		cfg.Frontend = FrontendExtension{
-			Archiver: InsecureExtension{
+		cfg.Frontend = FrontendService{
+			Archiver: InsecureService{
 				Insecure: true,
 			},
 		}
-		cfg.Graph.Spaces = InsecureExtension{
+		cfg.Graph.Spaces = InsecureService{
 			Insecure: true,
 		}
-		cfg.Ocdav = InsecureExtension{
+		cfg.Ocdav = InsecureService{
 			Insecure: true,
 		}
-		cfg.Proxy = InsecureProxyExtension{
+		cfg.Proxy = InsecureProxyService{
 			InsecureBackends: true,
 		}
 

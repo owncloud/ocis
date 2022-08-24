@@ -3,10 +3,10 @@ package command
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/cs3org/reva/v2/pkg/micro/ocdav"
 	"github.com/oklog/run"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/ocdav/pkg/config"
 	"github.com/owncloud/ocis/v2/services/ocdav/pkg/config/parser"
@@ -20,15 +20,10 @@ import (
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "server",
-		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
+		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
 		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
-				fmt.Printf("%v", err)
-				os.Exit(1)
-			}
-			return err
+			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
@@ -110,7 +105,7 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-// defineContext sets the context for the extension. If there is a context configured it will create a new child from it,
+// defineContext sets the context for the service. If there is a context configured it will create a new child from it,
 // if not, it will create a root context that can be cancelled.
 func defineContext(cfg *config.Config) (context.Context, context.CancelFunc) {
 	return func() (context.Context, context.CancelFunc) {

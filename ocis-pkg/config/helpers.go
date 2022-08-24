@@ -17,14 +17,14 @@ var (
 
 // BindSourcesToStructs assigns any config value from a config file / env variable to struct `dst`. Its only purpose
 // is to solely modify `dst`, not dealing with the config structs; and do so in a thread safe manner.
-func BindSourcesToStructs(extension string, dst interface{}) (*gofig.Config, error) {
-	cnf := gofig.NewWithOptions(extension)
+func BindSourcesToStructs(service string, dst interface{}) (*gofig.Config, error) {
+	cnf := gofig.NewWithOptions(service)
 	cnf.WithOptions(func(options *gofig.Options) {
 		options.DecoderConfig.TagName = decoderConfigTagName
 	})
 	cnf.AddDriver(gooyaml.Driver)
 
-	cfgFile := path.Join(defaults.BaseConfigPath(), extension+".yaml")
+	cfgFile := path.Join(defaults.BaseConfigPath(), service+".yaml")
 	_ = cnf.LoadFiles([]string{cfgFile}...)
 
 	err := cnf.BindStruct("", &dst)

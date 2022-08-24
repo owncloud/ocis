@@ -6,14 +6,36 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix configuration of mimetypes for the app registry: [#4411](https://github.com/owncloud/ocis/pull/4411)
+* Bugfix - Show help for some commands when unconfigured: [#4405](https://github.com/owncloud/ocis/pull/4405)
 * Bugfix - Autocreate IDP private key also if file exists but is empty: [#4394](https://github.com/owncloud/ocis/pull/4394)
+* Bugfix - Rename extensions to services (leftover occurences): [#4407](https://github.com/owncloud/ocis/pull/4407)
 * Change - Rename "uploads purge" command to "uploads clean": [#4403](https://github.com/owncloud/ocis/pull/4403)
 * Enhancement - Add /app/open-with-web endpoint: [#4376](https://github.com/owncloud/ocis/pull/4376)
 * Enhancement - Added language option to the app provider: [#4399](https://github.com/owncloud/ocis/pull/4399)
+* Enhancement - Add configuration options for mail authentication and encryption: [#4443](https://github.com/owncloud/ocis/pull/4443)
 * Enhancement - Added command to reset administrator password: [#4084](https://github.com/owncloud/ocis/issues/4084)
-* Enhancement - Update reva to vx.x.x: [#4376](https://github.com/owncloud/ocis/pull/4376)
+* Enhancement - Rewrite of the request authentication middleware: [#4374](https://github.com/owncloud/ocis/pull/4374)
+* Enhancement - Update reva to v2.8.0: [#4444](https://github.com/owncloud/ocis/pull/4444)
+* Enhancement - Update ownCloud Web to v5.7.0-rc.10: [#4439](https://github.com/owncloud/ocis/pull/4439)
 
 ## Details
+
+* Bugfix - Fix configuration of mimetypes for the app registry: [#4411](https://github.com/owncloud/ocis/pull/4411)
+
+   We've fixed the configuration option for mimetypes in the app registry. Previously the
+   default config would always be merged over the user provided configuration. Now the default
+   mimetype configuration is only used if the user does not providy any mimetype configuration
+   (like it is already done in the proxy with the routes configuration).
+
+   https://github.com/owncloud/ocis/pull/4411
+
+* Bugfix - Show help for some commands when unconfigured: [#4405](https://github.com/owncloud/ocis/pull/4405)
+
+   We've fixed some commands to show the help also when oCIS is not yet configured. Previously the
+   help was not displayed to the user but instead a configuration validation error.
+
+   https://github.com/owncloud/ocis/pull/4405
 
 * Bugfix - Autocreate IDP private key also if file exists but is empty: [#4394](https://github.com/owncloud/ocis/pull/4394)
 
@@ -21,6 +43,13 @@ The following sections list the changes for unreleased.
    generated when the file already exists but is empty.
 
    https://github.com/owncloud/ocis/pull/4394
+
+* Bugfix - Rename extensions to services (leftover occurences): [#4407](https://github.com/owncloud/ocis/pull/4407)
+
+   We've already renamed extensions to services in previous PRs and this PR peforms this rename
+   for leftover occurences.
+
+   https://github.com/owncloud/ocis/pull/4407
 
 * Change - Rename "uploads purge" command to "uploads clean": [#4403](https://github.com/owncloud/ocis/pull/4403)
 
@@ -45,6 +74,18 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/4399
    https://github.com/cs3org/reva/pull/3156
 
+* Enhancement - Add configuration options for mail authentication and encryption: [#4443](https://github.com/owncloud/ocis/pull/4443)
+
+   We've added configuration options to configure the authentication and encryption for
+   sending mails in the notifications service.
+
+   Furthermore there is now a distinguished configuration option for the username to use for
+   authentication against the mail server. This allows you to customize the sender address to
+   your liking. For example sender addresses like `my oCIS instance <ocis@owncloud.test>` are
+   now possible, too.
+
+   https://github.com/owncloud/ocis/pull/4443
+
 * Enhancement - Added command to reset administrator password: [#4084](https://github.com/owncloud/ocis/issues/4084)
 
    The new command `ocis idm resetpassword` allows to reset the administrator password when ocis
@@ -53,13 +94,61 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/4084
    https://github.com/owncloud/ocis/pull/4365
 
-* Enhancement - Update reva to vx.x.x: [#4376](https://github.com/owncloud/ocis/pull/4376)
+* Enhancement - Rewrite of the request authentication middleware: [#4374](https://github.com/owncloud/ocis/pull/4374)
 
-   Updated reva to version x.x.x. This update includes:
+   There were some flaws in the authentication middleware which were resolved by this rewrite.
+   This rewrite also introduced the need to manually mark certain paths as "unprotected" if
+   requests to these paths must not be authenticated.
 
-  * TODO:
+   https://github.com/owncloud/ocis/pull/4374
 
-   https://github.com/owncloud/ocis/pull/4376
+* Enhancement - Update reva to v2.8.0: [#4444](https://github.com/owncloud/ocis/pull/4444)
+
+   Updated reva to version 2.8.0. This update includes:
+
+  * Bugfix [cs3org/reva#3158](https://github.com/cs3org/reva/pull/3158): Add name to the propfind response
+  * Bugfix [cs3org/reva#3157](https://github.com/cs3org/reva/pull/3157): Fix locking response codes
+  * Bugfix [cs3org/reva#3152](https://github.com/cs3org/reva/pull/3152): Disable caching of not found stat responses
+  * Bugfix [cs3org/reva#4251](https://github.com/cs3org/reva/pull/4251): Disable caching
+  * Enhancement [cs3org/reva#3154](https://github.com/cs3org/reva/pull/3154): Dataproviders now return file metadata
+  * Enhancement [cs3org/reva#3143](https://github.com/cs3org/reva/pull/3143): Add /app/open-with-web endpoint
+  * Enhancement [cs3org/reva#3156](https://github.com/cs3org/reva/pull/3156): Added language option to the app provider
+  * Enhancement [cs3org/reva#3148](https://github.com/cs3org/reva/pull/3148): Add new jsoncs3 share manager
+
+   https://github.com/owncloud/ocis/pull/4444
+
+* Enhancement - Update ownCloud Web to v5.7.0-rc.10: [#4439](https://github.com/owncloud/ocis/pull/4439)
+
+   Tags: web
+
+   We updated ownCloud Web to v5.7.0-rc.10. Please refer to the changelog (linked) for details on
+   the web release.
+
+  * Bugfix [owncloud/web#7443](https://github.com/owncloud/web/pull/7443): Datetime formatting
+  * Bugfix [owncloud/web#7437](https://github.com/owncloud/web/pull/7437): Default to user context
+  * Bugfix [owncloud/web#7473](https://github.com/owncloud/web/pull/7473): Dragging a file causes no selection
+  * Bugfix [owncloud/web#7469](https://github.com/owncloud/web/pull/7469): File size not updated while restoring file version
+  * Bugfix [owncloud/web#7443](https://github.com/owncloud/web/pull/7443): File size formatting
+  * Bugfix [owncloud/web#7474](https://github.com/owncloud/web/pull/7474): Load only supported thumbnails (configurable)
+  * Bugfix [owncloud/web#7309](https://github.com/owncloud/web/pull/7309): SidebarNavItem icon flickering
+  * Bugfix [owncloud/web#7425](https://github.com/owncloud/web/pull/7425): Open Folder in project space context menu
+  * Bugfix [owncloud/web#7486](https://github.com/owncloud/web/issues/7486): Prevent unnecessary PROPFIND request during upload
+  * Bugfix [owncloud/web#7415](https://github.com/owncloud/web/pull/7415): Re-fetch quota
+  * Bugfix [owncloud/web#7478](https://github.com/owncloud/web/issues/7478): "Shared via"-indicator for links
+  * Bugfix [owncloud/web#7480](https://github.com/owncloud/web/issues/7480): Missing space image in sidebar
+  * Bugfix [owncloud/web#7436](https://github.com/owncloud/web/issues/7436): Hide share actions for space viewers/editors
+  * Bugfix [owncloud/web#7445](https://github.com/owncloud/web/pull/7445): User management app close side bar throws error
+  * Enhancement [owncloud/web#7309](https://github.com/owncloud/web/pull/7309): Keyboard shortcut indicators in ContextMenu
+  * Enhancement [owncloud/web#7309](https://github.com/owncloud/web/pull/7309): Lowlight cut resources
+  * Enhancement [owncloud/web#7133](https://github.com/owncloud/web/pull/7133): Permissionless (internal) link shares
+  * Enhancement [owncloud/web#7309](https://github.com/owncloud/web/pull/7309): Replace locationpicker with clipboard actions
+  * Enhancement [owncloud/web#7363](https://github.com/owncloud/web/pull/7363): Streamline UI sizings
+  * Enhancement [owncloud/web#7355](https://github.com/owncloud/web/pull/7355): Update ODS to v14.0.0-alpha.16
+  * Enhancement [owncloud/web#7476](https://github.com/owncloud/web/pull/7476): Users table on small screen
+  * Enhancement [owncloud/web#7182](https://github.com/owncloud/web/pull/7182): User management app edit quota
+
+   https://github.com/owncloud/ocis/pull/4439
+   https://github.com/owncloud/web/releases/tag/v5.7.0-rc.10
 # Changelog for [2.0.0-beta.6] (2022-08-11)
 
 The following sections list the changes for 2.0.0-beta.6.

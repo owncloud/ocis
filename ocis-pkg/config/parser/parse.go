@@ -10,7 +10,7 @@ import (
 
 // ParseConfig loads the ocis configuration and
 // copies applicable parts into the commons part, from
-// where the extensions can copy it into their own config
+// where the services can copy it into their own config
 func ParseConfig(cfg *config.Config, skipValidate bool) error {
 	_, err := config.BindSourcesToStructs("ocis", cfg)
 	if err != nil {
@@ -37,7 +37,7 @@ func ParseConfig(cfg *config.Config, skipValidate bool) error {
 }
 
 // EnsureDefaults, ensures that all pointers in the
-// oCIS config (not the extensions configs) are initialized
+// oCIS config (not the services configs) are initialized
 func EnsureDefaults(cfg *config.Config) {
 	if cfg.Tracing == nil {
 		cfg.Tracing = &shared.Tracing{}
