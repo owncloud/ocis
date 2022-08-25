@@ -14,23 +14,29 @@ import (
 	"go-micro.dev/v4/selector"
 )
 
-const directorCtxKey string = "director"
+const routingInfoCtxKey string = "director"
+
+var noInfo = RoutingInfo{}
 
 func Middleware(policySelector *config.PolicySelector, policies []config.Policy, logger log.Logger) func(http.Handler) http.Handler {
 	router := New(policySelector, policies, logger)
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			fn := router.Route(r)
-			next.ServeHTTP(w, r.WithContext(SetDirectorFunc(r.Context(), fn)))
+			ri, ok := router.Route(r)
+			if !ok {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			next.ServeHTTP(w, r.WithContext(SetRoutingInfo(r.Context(), ri)))
 		})
 	}
 }
 
-func (rt Router) Route(r *http.Request) func(*http.Request) {
+func (rt Router) Route(r *http.Request) (RoutingInfo, bool) {
 	pol, err := rt.policySelector(r)
 	if err != nil {
 		rt.logger.Error().Err(err).Msg("Error while selecting pol")
-		return nil
+		return noInfo, false
 	}
 
 	if _, ok := rt.directors[pol]; !ok {
@@ -38,7 +44,7 @@ func (rt Router) Route(r *http.Request) func(*http.Request) {
 			Error().
 			Str("policy", pol).
 			Msg("policy is not configured")
-		return nil
+		return noInfo, false
 	}
 
 	method := ""
@@ -70,19 +76,16 @@ func (rt Router) Route(r *http.Request) func(*http.Request) {
 					Str("routeType", string(rtype)).
 					Msg("director found")
 
-				return rt.directors[pol][rtype][method][endpoint]
+				return rt.directors[pol][rtype][method][endpoint], true
 			}
 		}
 	}
 
 	// override default director with root. If any
-	switch {
-	case rt.directors[pol][config.PrefixRoute][method]["/"] != nil:
-		// try specific method
-		return rt.directors[pol][config.PrefixRoute][method]["/"]
-	case rt.directors[pol][config.PrefixRoute][""]["/"] != nil:
-		// fallback to unspecific method
-		return rt.directors[pol][config.PrefixRoute][""]["/"]
+	if ri, ok := rt.directors[pol][config.PrefixRoute][method]["/"]; ok { // try specific method
+		return ri, true
+	} else if ri, ok := rt.directors[pol][config.PrefixRoute][""]["/"]; ok { // fallback to unspecific method
+		return ri, true
 	}
 
 	rt.logger.
@@ -90,7 +93,7 @@ func (rt Router) Route(r *http.Request) func(*http.Request) {
 		Str("policy", pol).
 		Str("path", r.URL.Path).
 		Msg("no director found")
-	return nil
+	return noInfo, false
 }
 
 func New(policySelector *config.PolicySelector, policies []config.Policy, logger log.Logger) Router {
@@ -114,7 +117,7 @@ func New(policySelector *config.PolicySelector, policies []config.Policy, logger
 	}
 
 	r := Router{
-		directors:      make(map[string]map[config.RouteType]map[string]map[string]func(req *http.Request)),
+		directors:      make(map[string]map[config.RouteType]map[string]map[string]RoutingInfo),
 		policySelector: selector,
 	}
 	for _, pol := range policies {
@@ -140,72 +143,88 @@ func New(policySelector *config.PolicySelector, policies []config.Policy, logger
 	return r
 }
 
+type RoutingInfo struct {
+	director    func(*http.Request)
+	unprotected bool
+}
+
+func (r RoutingInfo) Director() func(*http.Request) {
+	return r.director
+}
+
+func (r RoutingInfo) IsRouteUnprotected() bool {
+	return r.unprotected
+}
+
 type Router struct {
 	logger         log.Logger
-	directors      map[string]map[config.RouteType]map[string]map[string]func(req *http.Request)
+	directors      map[string]map[config.RouteType]map[string]map[string]RoutingInfo
 	policySelector policy.Selector
 }
 
 func (rt Router) addHost(policy string, target *url.URL, route config.Route) {
 	targetQuery := target.RawQuery
 	if rt.directors[policy] == nil {
-		rt.directors[policy] = make(map[config.RouteType]map[string]map[string]func(req *http.Request))
+		rt.directors[policy] = make(map[config.RouteType]map[string]map[string]RoutingInfo)
 	}
 	routeType := config.DefaultRouteType
 	if route.Type != "" {
 		routeType = route.Type
 	}
 	if rt.directors[policy][routeType] == nil {
-		rt.directors[policy][routeType] = make(map[string]map[string]func(req *http.Request))
+		rt.directors[policy][routeType] = make(map[string]map[string]RoutingInfo)
 	}
 	if rt.directors[policy][routeType][route.Method] == nil {
-		rt.directors[policy][routeType][route.Method] = make(map[string]func(req *http.Request))
+		rt.directors[policy][routeType][route.Method] = make(map[string]RoutingInfo)
 	}
 
 	reg := registry.GetRegistry()
 	sel := selector.NewSelector(selector.Registry(reg))
 
-	rt.directors[policy][routeType][route.Method][route.Endpoint] = func(req *http.Request) {
-		if route.Service != "" {
-			// select next node
-			next, err := sel.Select(route.Service)
-			if err != nil {
-				rt.logger.Error().Err(err).
-					Str("service", route.Service).
-					Msg("could not select service from the registry")
-				return // TODO error? fallback to target.Host & Scheme?
+	rt.directors[policy][routeType][route.Method][route.Endpoint] = RoutingInfo{
+		unprotected: route.Unprotected,
+		director: func(req *http.Request) {
+			if route.Service != "" {
+				// select next node
+				next, err := sel.Select(route.Service)
+				if err != nil {
+					rt.logger.Error().Err(err).
+						Str("service", route.Service).
+						Msg("could not select service from the registry")
+					return // TODO error? fallback to target.Host & Scheme?
+				}
+				node, err := next()
+				if err != nil {
+					rt.logger.Error().Err(err).
+						Str("service", route.Service).
+						Msg("could not select next node")
+					return // TODO error? fallback to target.Host & Scheme?
+				}
+				req.URL.Host = node.Address
+				req.URL.Scheme = node.Metadata["protocol"] // TODO check property exists?
+
+			} else {
+				req.URL.Host = target.Host
+				req.URL.Scheme = target.Scheme
 			}
-			node, err := next()
-			if err != nil {
-				rt.logger.Error().Err(err).
-					Str("service", route.Service).
-					Msg("could not select next node")
-				return // TODO error? fallback to target.Host & Scheme?
+
+			// Apache deployments host addresses need to match on req.Host and req.URL.Host
+			// see https://stackoverflow.com/questions/34745654/golang-reverseproxy-with-apache2-sni-hostname-error
+			if route.ApacheVHost {
+				req.Host = target.Host
 			}
-			req.URL.Host = node.Address
-			req.URL.Scheme = node.Metadata["protocol"] // TODO check property exists?
 
-		} else {
-			req.URL.Host = target.Host
-			req.URL.Scheme = target.Scheme
-		}
-
-		// Apache deployments host addresses need to match on req.Host and req.URL.Host
-		// see https://stackoverflow.com/questions/34745654/golang-reverseproxy-with-apache2-sni-hostname-error
-		if route.ApacheVHost {
-			req.Host = target.Host
-		}
-
-		req.URL.Path = singleJoiningSlash(target.Path, req.URL.Path)
-		if targetQuery == "" || req.URL.RawQuery == "" {
-			req.URL.RawQuery = targetQuery + req.URL.RawQuery
-		} else {
-			req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
-		}
-		if _, ok := req.Header["User-Agent"]; !ok {
-			// explicitly disable User-Agent so it's not set to default value
-			req.Header.Set("User-Agent", "")
-		}
+			req.URL.Path = singleJoiningSlash(target.Path, req.URL.Path)
+			if targetQuery == "" || req.URL.RawQuery == "" {
+				req.URL.RawQuery = targetQuery + req.URL.RawQuery
+			} else {
+				req.URL.RawQuery = targetQuery + "&" + req.URL.RawQuery
+			}
+			if _, ok := req.Header["User-Agent"]; !ok {
+				// explicitly disable User-Agent so it's not set to default value
+				req.Header.Set("User-Agent", "")
+			}
+		},
 	}
 }
 func singleJoiningSlash(a, b string) string {
@@ -250,12 +269,12 @@ func prefixRouteMatcher(prefix string, target url.URL) bool {
 	return strings.HasPrefix(target.Path, prefix) && prefix != "/"
 }
 
-func SetDirectorFunc(parent context.Context, fn func(*http.Request)) context.Context {
-	return context.WithValue(parent, directorCtxKey, fn)
+func SetRoutingInfo(parent context.Context, ri RoutingInfo) context.Context {
+	return context.WithValue(parent, routingInfoCtxKey, ri)
 }
 
-// DirectorFunc gets the director function from the context.
-func DirectorFunc(ctx context.Context) func(*http.Request) {
-	val := ctx.Value(directorCtxKey)
-	return val.(func(*http.Request))
+// ContextRoutingInfo gets the routing information from the context.
+func ContextRoutingInfo(ctx context.Context) RoutingInfo {
+	val := ctx.Value(routingInfoCtxKey)
+	return val.(RoutingInfo)
 }

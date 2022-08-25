@@ -71,20 +71,24 @@ func DefaultPolicies() []config.Policy {
 			Name: "ocis",
 			Routes: []config.Route{
 				{
-					Endpoint: "/",
-					Backend:  "http://localhost:9100",
+					Endpoint:    "/",
+					Backend:     "http://localhost:9100",
+					Unprotected: true,
 				},
 				{
-					Endpoint: "/.well-known/",
-					Backend:  "http://localhost:9130",
+					Endpoint:    "/.well-known/",
+					Backend:     "http://localhost:9130",
+					Unprotected: true,
 				},
 				{
-					Endpoint: "/konnect/",
-					Backend:  "http://localhost:9130",
+					Endpoint:    "/konnect/",
+					Backend:     "http://localhost:9130",
+					Unprotected: true,
 				},
 				{
-					Endpoint: "/signin/",
-					Backend:  "http://localhost:9130",
+					Endpoint:    "/signin/",
+					Backend:     "http://localhost:9130",
+					Unprotected: true,
 				},
 				{
 					Endpoint: "/archiver",
@@ -161,24 +165,27 @@ func DefaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9140",
 				},
 				{
-					Endpoint: "/app/", // /app or /apps? ocdav only handles /apps
-					Backend:  "http://localhost:9140",
+					Endpoint:    "/app/", // /app or /apps? ocdav only handles /apps
+					Backend:     "http://localhost:9140",
+					Unprotected: true, // TODO check if this is safe
 				},
 				{
 					Endpoint: "/graph/",
 					Backend:  "http://localhost:9120",
 				},
 				{
-					Endpoint: "/graph-explorer",
-					Backend:  "http://localhost:9135",
+					Endpoint:    "/graph-explorer",
+					Backend:     "http://localhost:9135",
+					Unprotected: true,
 				},
 				{
 					Endpoint: "/api/v0/settings",
 					Backend:  "http://localhost:9190",
 				},
 				{
-					Endpoint: "/settings.js",
-					Backend:  "http://localhost:9190",
+					Endpoint:    "/settings.js",
+					Backend:     "http://localhost:9190",
+					Unprotected: true,
 				},
 			},
 		},

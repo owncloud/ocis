@@ -54,6 +54,7 @@ type Route struct {
 	// Service name to look up in the registry
 	Service     string `yaml:"service,omitempty"`
 	ApacheVHost bool   `yaml:"apache_vhost,omitempty"`
+	Unprotected bool   `yaml:"unprotected,omitempty"`
 }
 
 // RouteType defines the type of a route
