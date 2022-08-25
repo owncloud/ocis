@@ -14,10 +14,10 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/parser"
+	oclog "github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis/pkg/register"
 	sharing "github.com/owncloud/ocis/v2/services/sharing/pkg/config"
 	sharingparser "github.com/owncloud/ocis/v2/services/sharing/pkg/config/parser"
-	"github.com/rs/zerolog"
 	"github.com/urfave/cli/v2"
 )
 
@@ -70,7 +70,7 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()
+			log := oclog.LoggerFromConfig("migrate", cfg.Log)
 			ctx := log.WithContext(context.Background())
 			rcfg := revaShareConfig(cfg.Sharing)
 			oldDriver := c.String("from")
@@ -155,7 +155,7 @@ func MigratePublicShares(cfg *config.Config) *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			log := zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()
+			log := oclog.LoggerFromConfig("migrate", cfg.Log)
 			ctx := log.WithContext(context.Background())
 
 			rcfg := revaPublicShareConfig(cfg.Sharing)
@@ -253,6 +253,13 @@ func revaShareConfig(cfg *sharing.Config) map[string]interface{} {
 			"service_user_id":     cfg.UserSharingDrivers.CS3.SystemUserID,
 			"service_user_idp":    cfg.UserSharingDrivers.CS3.SystemUserIDP,
 			"machine_auth_apikey": cfg.UserSharingDrivers.CS3.SystemUserAPIKey,
+		},
+		"jsoncs3": map[string]interface{}{
+			"gateway_addr":        cfg.UserSharingDrivers.JSONCS3.ProviderAddr,
+			"provider_addr":       cfg.UserSharingDrivers.JSONCS3.ProviderAddr,
+			"service_user_id":     cfg.UserSharingDrivers.JSONCS3.SystemUserID,
+			"service_user_idp":    cfg.UserSharingDrivers.JSONCS3.SystemUserIDP,
+			"machine_auth_apikey": cfg.UserSharingDrivers.JSONCS3.SystemUserAPIKey,
 		},
 	}
 }
