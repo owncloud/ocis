@@ -6,6 +6,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/webdav"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -25,49 +26,6 @@ var (
 		"/remote.php/dav/public-files/",
 		"/remote.php/ocs/apps/files_sharing/api/v1/tokeninfo/unprotected",
 		"/ocs/v1.php/cloud/capabilities",
-	}
-	// _unprotectedPaths contains paths which don't need to be authenticated.
-	_unprotectedPaths = map[string]struct{}{
-		"/":                    {},
-		"/login":               {},
-		"/settings":            {},
-		"/app/list":            {},
-		"/config.json":         {},
-		"/manifest.json":       {},
-		"/index.html":          {},
-		"/oidc-callback.html":  {},
-		"/oidc-callback":       {},
-		"/settings.js":         {},
-		"/data":                {},
-		"/konnect/v1/userinfo": {},
-		"/status.php":          {},
-		"/favicon.ico":         {},
-		"/ocs/v1.php/config":   {},
-		"/ocs/v2.php/config":   {},
-	}
-	// _unprotectedPathPrefixes contains paths which don't need to be authenticated.
-	_unprotectedPathPrefixes = [...]string{
-		"/files/",
-		"/data/",
-		"/account/",
-		"/s/",
-		"/external",
-		"/apps/openidconnect/redirect",
-		"/settings/",
-		"/user-management/",
-		"/.well-known/",
-		"/js/",
-		"/css/",
-		"/fonts/",
-		"/icons/",
-		"/themes/",
-		"/signin/",
-		"/konnect/",
-		"/text-editor/",
-		"/preview/",
-		"/pdf-viewer/",
-		"/draw-io/",
-		"/index.html#/",
 	}
 )
 
@@ -91,7 +49,8 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if isOIDCTokenAuth(r) || isUnprotectedPath(r) {
+			ri := router.ContextRoutingInfo(r.Context())
+			if isOIDCTokenAuth(r) || ri.IsRouteUnprotected() {
 				// The authentication for this request is handled by the IdP.
 				next.ServeHTTP(w, r)
 				return
@@ -151,18 +110,6 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 // > The Client MUST authenticate to the Token Endpoint using the HTTP Basic method, as described in 2.3.1 of OAuth 2.0.
 func isOIDCTokenAuth(req *http.Request) bool {
 	return req.URL.Path == "/konnect/v1/token"
-}
-
-func isUnprotectedPath(r *http.Request) bool {
-	if _, ok := _unprotectedPaths[r.URL.Path]; ok {
-		return true
-	}
-	for _, p := range _unprotectedPathPrefixes {
-		if strings.HasPrefix(r.URL.Path, p) {
-			return true
-		}
-	}
-	return false
 }
 
 func isPublicPath(p string) bool {

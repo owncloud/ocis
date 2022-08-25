@@ -43,8 +43,8 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 	}
 
 	rp.Director = func(r *http.Request) {
-		fn := router.DirectorFunc(r.Context())
-		fn(r)
+		ri := router.ContextRoutingInfo(r.Context())
+		ri.Director()(r)
 	}
 
 	// equals http.DefaultTransport except TLSClientConfig
