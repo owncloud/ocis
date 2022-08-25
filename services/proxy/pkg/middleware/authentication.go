@@ -66,6 +66,7 @@ var (
 		"/preview/",
 		"/pdf-viewer/",
 		"/draw-io/",
+		"/index.html#/",
 	}
 )
 
