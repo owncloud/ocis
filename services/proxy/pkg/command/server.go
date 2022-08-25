@@ -26,6 +26,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/proxy"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/server/debug"
 	proxyHTTP "github.com/owncloud/ocis/v2/services/proxy/pkg/server/http"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/tracing"
@@ -210,6 +211,8 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			cfg.OIDC.RewriteWellKnown,
 			oidcHTTPClient,
 		),
+
+		router.Middleware(cfg.PolicySelector, cfg.Policies, logger),
 
 		middleware.Authentication(
 			authenticators,
