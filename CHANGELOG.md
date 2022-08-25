@@ -97,10 +97,11 @@ The following sections list the changes for unreleased.
 
 * Enhancement - Add missing unprotected paths: [#4454](https://github.com/owncloud/ocis/pull/4454)
 
-   Added missing unprotected paths for the text-editor, preview, pdf-viewer and draw-io to the
-   authentication middleware.
+   Added missing unprotected paths for the text-editor, preview, pdf-viewer, draw-io and
+   index.html to the authentication middleware.
 
    https://github.com/owncloud/ocis/pull/4454
+   https://github.com/owncloud/ocis/pull/4458
 
 * Enhancement - Rewrite of the request authentication middleware: [#4374](https://github.com/owncloud/ocis/pull/4374)
 
