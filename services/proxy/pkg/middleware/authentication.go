@@ -50,7 +50,7 @@ var (
 		"/data/",
 		"/account/",
 		"/s/",
-		"/external/spaces",
+		"/external",
 		"/apps/openidconnect/redirect",
 		"/settings/",
 		"/user-management/",
