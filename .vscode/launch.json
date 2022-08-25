@@ -2,6 +2,11 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Listen for Xdebug",
+            "type": "php",
+            "request": "launch"
+        },
+        {
             "name": "oCIS server",
             "type": "go",
             "request": "launch",

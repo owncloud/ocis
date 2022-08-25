@@ -9,6 +9,7 @@ import (
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/external"
 	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -25,15 +26,10 @@ import (
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "server",
-		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
+		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
 		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
-				fmt.Printf("%v", err)
-				os.Exit(1)
-			}
-			return err
+			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
@@ -48,7 +44,10 @@ func Server(cfg *config.Config) *cli.Command {
 
 			pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
 
-			rcfg := revaconfig.FrontendConfigFromStruct(cfg)
+			rcfg, err := revaconfig.FrontendConfigFromStruct(cfg)
+			if err != nil {
+				return err
+			}
 
 			gr.Add(func() error {
 				runtime.RunWithOptions(rcfg, pidFile, runtime.WithLogger(&logger.Logger))
@@ -97,7 +96,7 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-// defineContext sets the context for the extension. If there is a context configured it will create a new child from it,
+// defineContext sets the context for the service. If there is a context configured it will create a new child from it,
 // if not, it will create a root context that can be cancelled.
 func defineContext(cfg *config.Config) (context.Context, context.CancelFunc) {
 	return func() (context.Context, context.CancelFunc) {

@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 
 	"github.com/oklog/run"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/config"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/config/parser"
@@ -32,14 +33,10 @@ const _rsaKeySize = 4096
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "server",
-		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
+		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
 		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
-				fmt.Printf("%v", err)
-				os.Exit(1)
-			}
+			configlog.ReturnFatal(parser.ParseConfig(cfg))
 
 			if cfg.IDP.EncryptionSecretFile != "" {
 				if err := ensureEncryptionSecretExists(cfg.IDP.EncryptionSecretFile); err != nil {
@@ -49,7 +46,7 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 			}
-			return err
+			return nil
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
@@ -161,12 +158,12 @@ func ensureEncryptionSecretExists(path string) error {
 
 func ensureSigningPrivateKeyExists(paths []string) error {
 	for _, path := range paths {
-		_, err := os.Stat(path)
-		if err == nil {
-			// If the file exists we can just return
+		file, err := os.Stat(path)
+		if err == nil && file.Size() > 0 {
+			// If the file exists and is not empty we can just return
 			return nil
 		}
-		if !errors.Is(err, fs.ErrNotExist) {
+		if !errors.Is(err, fs.ErrNotExist) && file.Size() > 0 {
 			return err
 		}
 

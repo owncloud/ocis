@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
@@ -13,6 +12,7 @@ import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
@@ -38,15 +38,10 @@ import (
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "server",
-		Usage:    fmt.Sprintf("start %s extension without runtime (unsupervised mode)", cfg.Service.Name),
+		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
 		Before: func(c *cli.Context) error {
-			err := parser.ParseConfig(cfg)
-			if err != nil {
-				fmt.Printf("%v", err)
-				os.Exit(1)
-			}
-			return err
+			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
@@ -166,6 +161,43 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		Timeout: time.Second * 10,
 	}
 
+	var authenticators []middleware.Authenticator
+	if cfg.EnableBasicAuth {
+		logger.Warn().Msg("basic auth enabled, use only for testing or development")
+		authenticators = append(authenticators, middleware.BasicAuthenticator{
+			Logger:       logger,
+			UserProvider: userProvider,
+		})
+	}
+	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
+		logger,
+		cfg.OIDC.UserinfoCache.TTL,
+		oidcHTTPClient,
+		cfg.OIDC.Issuer,
+		func() (middleware.OIDCProvider, error) {
+			// Initialize a provider by specifying the issuer URL.
+			// it will fetch the keys from the issuer using the .well-known
+			// endpoint
+			return oidc.NewProvider(
+				context.WithValue(ctx, oauth2.HTTPClient, oidcHTTPClient),
+				cfg.OIDC.Issuer,
+			)
+		},
+		cfg.OIDC.JWKS,
+		cfg.OIDC.AccessTokenVerifyMethod,
+	))
+	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
+		Logger:            logger,
+		RevaGatewayClient: revaClient,
+	})
+
+	authenticators = append(authenticators, middleware.SignedURLAuthenticator{
+		Logger:             logger,
+		PreSignedURLConfig: cfg.PreSignedURL,
+		UserProvider:       userProvider,
+		Store:              storeClient,
+	})
+
 	return alice.New(
 		// first make sure we log all requests and redirect to https if necessary
 		pkgmiddleware.TraceContext,
@@ -179,38 +211,12 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			oidcHTTPClient,
 		),
 
-		// now that we established the basics, on with authentication middleware
 		middleware.Authentication(
-			// OIDC Options
-			middleware.OIDCProviderFunc(func() (middleware.OIDCProvider, error) {
-				// Initialize a provider by specifying the issuer URL.
-				// it will fetch the keys from the issuer using the .well-known
-				// endpoint
-				return oidc.NewProvider(
-					context.WithValue(ctx, oauth2.HTTPClient, oidcHTTPClient),
-					cfg.OIDC.Issuer,
-				)
-			}),
-			middleware.HTTPClient(oidcHTTPClient),
-			middleware.TokenCacheSize(cfg.OIDC.UserinfoCache.Size),
-			middleware.TokenCacheTTL(time.Second*time.Duration(cfg.OIDC.UserinfoCache.TTL)),
-			middleware.AccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
-			middleware.JWKSOptions(cfg.OIDC.JWKS),
-
-			// basic Options
-			middleware.Logger(logger),
-			middleware.EnableBasicAuth(cfg.EnableBasicAuth),
-			middleware.UserProvider(userProvider),
-			middleware.OIDCIss(cfg.OIDC.Issuer),
-			middleware.UserOIDCClaim(cfg.UserOIDCClaim),
-			middleware.UserCS3Claim(cfg.UserCS3Claim),
+			authenticators,
 			middleware.CredentialsByUserAgent(cfg.AuthMiddleware.CredentialsByUserAgent),
-		),
-		middleware.SignedURLAuth(
 			middleware.Logger(logger),
-			middleware.PreSignedURLConfig(cfg.PreSignedURL),
-			middleware.UserProvider(userProvider),
-			middleware.Store(storeClient),
+			middleware.OIDCIss(cfg.OIDC.Issuer),
+			middleware.EnableBasicAuth(cfg.EnableBasicAuth),
 		),
 		middleware.AccountResolver(
 			middleware.Logger(logger),
@@ -231,10 +237,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		middleware.CreateHome(
 			middleware.Logger(logger),
 			middleware.TokenManagerConfig(*cfg.TokenManager),
-			middleware.RevaGatewayClient(revaClient),
-		),
-		middleware.PublicShareAuth(
-			middleware.Logger(logger),
 			middleware.RevaGatewayClient(revaClient),
 		),
 	)

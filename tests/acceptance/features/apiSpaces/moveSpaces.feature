@@ -33,7 +33,7 @@ Feature: move (rename) file
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created a folder "newfolder" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" to user "Alice" with role "viewer"
     When user "Alice" moves file "insideSpace.txt" to "newfolder/insideSpace.txt" in space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" the space "Project" should not contain these entries:

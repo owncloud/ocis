@@ -34,7 +34,7 @@ type Reva struct {
 	Address string `yaml:"address" env:"REVA_GATEWAY" desc:"The CS3 gateway endpoint."`
 }
 
-// Commons holds configuration that are common to all extensions. Each extension can then decide whether
+// Commons holds configuration that are common to all services. Each service can then decide whether
 // to overwrite its values.
 type Commons struct {
 	Log               *Log          `yaml:"log"`
