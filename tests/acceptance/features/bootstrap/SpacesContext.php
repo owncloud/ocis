@@ -420,38 +420,44 @@ class SpacesContext implements Context {
 	 * @throws Exception|GuzzleException
 	 */
 	public function cleanDataAfterTests(): void {
-		// TODO enable when admin can disable and delete spaces
-		// $this->deleteAllSpacesOfTheType('project');
+		$this->deleteAllProjectSpaces();
 		$this->deleteAllPersonalSpaces();
 	}
 
 	/**
-	 * Admin first disables and then deletes spaces
-	 *
-	 * @param  string $driveType
+	 * manager of the project space first disables and then deletes spaces
 	 *
 	 * @return void
 	 *
 	 * @throws Exception|GuzzleException
 	 */
-	public function deleteAllSpacesOfTheType(string $driveType): void {
-		$query = "\$filter=driveType eq $driveType";
+	public function deleteAllProjectSpaces(): void {
+		$query = "\$filter=driveType eq project";
 		$userAdmin = $this->featureContext->getAdminUsername();
 
-		for ($i = 0; $i < 2; ++$i) {
-			$this->theUserListsAllAvailableSpacesUsingTheGraphApi(
-				$userAdmin,
-				$query
-			);
-			$drives = $this->getAvailableSpaces();
+		$this->theUserListsAllAvailableSpacesUsingTheGraphApi(
+			$userAdmin,
+			$query
+		);
+		$drives = $this->getAvailableSpaces();
+		$createdUsers = $this->featureContext->getCreatedUsers();
 
-			if (!empty($drives)) {
-				foreach ($drives as $value) {
-					if (!\array_key_exists("deleted", $value["root"])) {
-						$this->sendDisableSpaceRequest($userAdmin, $value["name"]);
-					} else {
-						$this->sendDeleteSpaceRequest($userAdmin, $value["name"]);
-					}
+		foreach ($drives as $value) {
+			foreach ($value["root"]["permissions"] as $permissions) {
+				// find an user who is a manager
+				if ($permissions["roles"][0] === "manager") {
+					$userId = $permissions["grantedTo"][0]["user"]["id"];
+
+					foreach ($createdUsers as $user) {
+						if ($user["id"] === $userId) {
+							$userName = $user["actualUsername"];
+
+							if (!\array_key_exists("deleted", $value["root"])) {
+								$this->sendDisableSpaceRequest($userName, $value["name"]);
+							}
+							$this->sendDeleteSpaceRequest($userName, $value["name"]);
+						}
+					}						
 				}
 			}
 		}
@@ -466,9 +472,9 @@ class SpacesContext implements Context {
 	 */
 	public function deleteAllPersonalSpaces(): void {
 		$query = "\$filter=driveType eq personal";
-		$createdUsers= $this->featureContext->getCreatedUsers();
+		$createdUsers = $this->featureContext->getCreatedUsers();
 
-		foreach($createdUsers as $user) {
+		foreach ($createdUsers as $user) {
 			$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi(
 				$user["actualUsername"],
 				$query
@@ -901,13 +907,11 @@ class SpacesContext implements Context {
 			$drives = $drives["value"];
 		}
 
-		Assert::assertArrayHasKey(0, $drives, "No drives were found on that endpoint");
 		$spaces = [];
 		foreach ($drives as $drive) {
 			$spaces[$drive["name"]] = $drive;
 		}
 		$this->setAvailableSpaces($spaces);
-		Assert::assertNotEmpty($spaces, "No spaces have been found");
 	}
 
 	/**
@@ -3027,7 +3031,7 @@ class SpacesContext implements Context {
 		string $fileName = ''
 	): void {
 		$body = '';
-		if (!empty ($fileName)) {
+		if (!empty($fileName)) {
 			$body = $this->getFileId($user, $spaceName, $fileName);
 		} else {
 			$space = $this->getSpaceByName($user, $spaceName);
