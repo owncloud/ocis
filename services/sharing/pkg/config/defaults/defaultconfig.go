@@ -119,6 +119,14 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.UserSharingDrivers.CS3.SystemUserID = cfg.Commons.SystemUserID
 	}
 
+	if cfg.UserSharingDrivers.JSONCS3.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
+		cfg.UserSharingDrivers.JSONCS3.SystemUserAPIKey = cfg.Commons.SystemUserAPIKey
+	}
+
+	if cfg.UserSharingDrivers.JSONCS3.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
+		cfg.UserSharingDrivers.JSONCS3.SystemUserID = cfg.Commons.SystemUserID
+	}
+
 	if cfg.PublicSharingDrivers.CS3.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
 		cfg.PublicSharingDrivers.CS3.SystemUserAPIKey = cfg.Commons.SystemUserAPIKey
 	}
