@@ -34,6 +34,7 @@ var (
 		"/app/list":            {},
 		"/config.json":         {},
 		"/manifest.json":       {},
+		"/index.html":          {},
 		"/oidc-callback.html":  {},
 		"/oidc-callback":       {},
 		"/settings.js":         {},
