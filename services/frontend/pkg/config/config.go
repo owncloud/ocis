@@ -117,10 +117,12 @@ type OCS struct {
 	CacheWarmupDrivers      CacheWarmupDrivers `yaml:"cache_warmup_drivers,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 
+// ResourceInfoCaches holds resource info cache configurations
 type ResourceInfoCaches struct {
 	Redis RedisDriver `yaml:"redis,omitempty"`
 }
 
+// RedisDriver holds redis configuration
 type RedisDriver struct {
 	Address  string `yaml:"address" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_ADDR" desc:"Redis service address"`
 	Username string `yaml:"username" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_USERNAME" desc:"Redis username"`
