@@ -20,7 +20,7 @@ type Config struct {
 	Context context.Context `yaml:"-"`
 }
 
-// Notifications definces the config options for the notifications service.
+// Notifications defines the config options for the notifications service.
 type Notifications struct {
 	SMTP              SMTP   `yaml:"SMTP"`
 	Events            Events `yaml:"events"`
