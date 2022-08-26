@@ -45,4 +45,8 @@ web:
     - user-management
     external_apps: []
     options:
-      hideSearchBar: false
+      previewFileMimeTypes:
+      - image/gif
+      - image/png
+      - image/jpeg
+      - text/plain
