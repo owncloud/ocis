@@ -3,7 +3,7 @@ variables. It's basically a fork of https://github.com/joeshaw/envdecode,
 but changed to support multiple environment variables (precedence).
 
 `envdecode` uses struct tags to map environment variables to fields,
-allowing you you use any names you want for environment variables.
+allowing you to use any names you want for environment variables.
 `envdecode` will recurse into nested structs, including pointers to
 nested structs, but it will not allocate new pointers to structs.
 
