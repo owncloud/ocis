@@ -696,6 +696,28 @@ class SpacesContext implements Context {
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers);
 	}
 
+    /**
+     * send proppatch request to url
+     * @param string $fullUrl
+     * @param string $user
+     * @param string $password
+     * @param string $xRequestId
+     * @param array $headers
+     * @param mixed|null $body
+     * @return ResponseInterface
+     */
+    public function sendPropPatchRequest(
+        string $fullUrl,
+        string $user,
+        string $password,
+        string $xRequestId = '',
+        array  $headers = [],
+        $body
+    ): ResponseInterface
+    {
+        return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'PROPPATCH', $user, $password, $headers, $body);
+    }
+
 	/**
 	 * @When /^user "([^"]*)" lists all available spaces via the GraphApi$/
 	 * @When /^user "([^"]*)" lists all available spaces via the GraphApi with query "([^"]*)"$/
@@ -3146,4 +3168,39 @@ class SpacesContext implements Context {
 			$expectedValue
 		);
 	}
+
+    /**
+     * @When /^user "([^"]*)" favorites element "([^"]*)" in space "([^"]*)" using the WebDAV API$/
+     *
+     * @param string $user
+     * @param string $path
+     * @param string $spaceName
+     *
+     * @return void
+     * @throws GuzzleException
+     */
+    public function userFavoritesElementInSpaceUsingTheWebdavApi(string $user, string $path, string $spaceName): void
+    {
+        $space = $this->getSpaceByName($user, $spaceName);
+        $fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($path, "/");
+        $body = '<?xml version="1.0"?>
+				<d:propertyupdate xmlns:d="DAV:"
+				   xmlns:oc="http://owncloud.org/ns">
+				 <d:set>
+				  <d:prop>
+				    <oc:favorite xmlns:oc="http://owncloud.org/ns">1</oc:favorite>
+				  </d:prop>
+				 </d:set>
+				</d:propertyupdate>';
+        $this->featureContext->setResponse(
+            $this->sendProppatchRequest(
+                $fullUrl,
+                $user,
+                $this->featureContext->getPasswordForUser($user),
+                $this->featureContext->getStepLineRef(),
+                [],
+                $body
+            )
+        );
+    }
 }
