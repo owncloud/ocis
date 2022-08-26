@@ -252,6 +252,9 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	for _, sp := range lspr.GetStorageSpaces() {
 		if sp.SpaceType == "personal" {
 			if sp.Owner.Id.OpaqueId == userID {
+				// TODO: check if request contains a homespace and if, check if requesting user has the privilege to
+				// delete it and make sure it is not deleting its own homespace
+				// needs modification of the cs3api
 				_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 					Opaque: opaque,
 					Id: &storageprovider.StorageSpaceId{
