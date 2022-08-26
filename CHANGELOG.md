@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
+
+## Summary
+
+* Enhancement - Add previewFileMimeTypes to web default config: [#4414](https://github.com/owncloud/ocis/pull/4414)
+
+## Details
+
+* Enhancement - Add previewFileMimeTypes to web default config: [#4414](https://github.com/owncloud/ocis/pull/4414)
+
+   We've added previewFileMimeTypes to the web default config, so web can determine which
+   preview types are supported by the backend.
+
+   https://github.com/owncloud/ocis/pull/4414
 # Changelog for [2.0.0-beta.7] (2022-08-26)
 
 The following sections list the changes for 2.0.0-beta.7.
