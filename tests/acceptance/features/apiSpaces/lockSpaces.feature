@@ -17,12 +17,12 @@ Feature: lock
   Scenario Outline: lock should propagate correctly when uploaded to a reshare that was locked by the owner
     Given user "Alice" has shared folder "PARENT" with user "Brian"
     And user "Brian" has accepted share "/PARENT" offered by user "Alice"
-    And user "Brian" has shared folder "Shares/PARENT" with user "Carol"
+    And user "Brian" has shared the following entity "PARENT" inside of space "Shares Jail" with user "Carol" with role "editor"
     And user "Carol" has accepted share "/PARENT" offered by user "Brian"
     And user "Alice" has locked folder "/PARENT" inside space "Personal" setting the following properties
       | lockscope | <lock-scope> |
-    When user "Carol" uploads a file "filesForUpload/textfile.txt" inside space "Shares Jail" to "PARENT/textfile.txt" using the WebDAV API
-    And user "Brian" uploads a file "filesForUpload/textfile.txt" inside space "Shares Jail" to "PARENT/textfile.txt" using the WebDAV API
+    When user "Carol" uploads a file inside space "Shares Jail" with content "uploaded by carol" to "PARENT/textfile.txt" using the WebDAV API
+    And user "Brian" uploads a file inside space "Shares Jail" with content "uploaded by brian" to "PARENT/textfile.txt" using the WebDAV API
     And user "Alice" uploads file "filesForUpload/textfile.txt" to "/PARENT/textfile.txt" using the WebDAV API
     Then the HTTP status code of responses on all endpoints should be "423"
     And as "Alice" file "/PARENT/textfile.txt" should not exist
@@ -34,16 +34,14 @@ Feature: lock
 
   Scenario Outline: lock should propagate correctly when uploaded overwriting to a reshare that was locked by the owner
     Given user "Alice" has uploaded file with content "ownCloud test text file parent" to "PARENT/parent.txt"
-    And user "Brian" has uploaded file with content "ownCloud test text file parent" to "PARENT/parent.txt"
-    And user "Carol" has uploaded file with content "ownCloud test text file parent" to "PARENT/parent.txt"
     And user "Alice" has shared folder "PARENT" with user "Brian"
     And user "Brian" has accepted share "/PARENT" offered by user "Alice"
-    And user "Brian" has shared folder "Shares/PARENT" with user "Carol"
+    And user "Brian" has shared the following entity "PARENT" inside of space "Shares Jail" with user "Carol" with role "editor"
     And user "Carol" has accepted share "/PARENT" offered by user "Brian"
     And user "Alice" has locked folder "/PARENT" inside space "Personal" setting the following properties
       | lockscope | <lock-scope> |
-    When user "Carol" uploads a file "filesForUpload/textfile.txt" inside space "Shares Jail" to "PARENT/parent.txt" using the WebDAV API
-    And user "Brian" uploads a file "filesForUpload/textfile.txt" inside space "Shares Jail" to "PARENT/parent.txt" using the WebDAV API
+    When user "Carol" uploads a file inside space "Shares Jail" with content "uploaded by carol" to "PARENT/textfile.txt" using the WebDAV API
+    And user "Brian" uploads a file inside space "Shares Jail" with content "uploaded by brian" to "PARENT/textfile.txt" using the WebDAV API
     And user "Alice" uploads file "filesForUpload/textfile.txt" to "/PARENT/parent.txt" using the WebDAV API
     Then the HTTP status code of responses on all endpoints should be "423"
     And the content of file "/PARENT/parent.txt" for user "Alice" should be "ownCloud test text file parent"
@@ -56,7 +54,7 @@ Feature: lock
   Scenario Outline: lock should propagate correctly when the public uploads to a reshared share that was locked by the original owner
     Given user "Alice" has shared folder "PARENT" with user "Brian"
     And user "Brian" has accepted share "/PARENT" offered by user "Alice"
-    And user "Brian" has shared folder "Shares/PARENT" with user "Carol"
+    And user "Brian" has shared the following entity "PARENT" inside of space "Shares Jail" with user "Carol" with role "editor"
     And user "Carol" has accepted share "/PARENT" offered by user "Brian"
     And user "Carol" has created a public link share inside of space "Shares Jail" with settings:
       | path        | PARENT      |
@@ -67,7 +65,7 @@ Feature: lock
       | lockscope | <lock-scope> |
     When the public uploads file "test.txt" with content "test" using the new public WebDAV API
     Then the HTTP status code should be "423"
-    And as "Alice" file "/PARENT/textfile.txt" should not exist
+    And as "Alice" file "/PARENT/test.txt" should not exist
     Examples:
       | lock-scope |
       | shared     |
@@ -77,12 +75,12 @@ Feature: lock
   Scenario Outline: lock should propagate correctly when uploaded to a reshare that was locked by the resharing user
     Given user "Alice" has shared folder "PARENT" with user "Brian"
     And user "Brian" has accepted share "/PARENT" offered by user "Alice"
-    And user "Brian" has shared folder "Shares/PARENT" with user "Carol"
+    And user "Brian" has shared the following entity "PARENT" inside of space "Shares Jail" with user "Carol" with role "editor"
     And user "Carol" has accepted share "/PARENT" offered by user "Brian"
     And user "Brian" has locked folder "/PARENT" inside space "Shares Jail" setting the following properties
       | lockscope | <lock-scope> |
-    When user "Carol" uploads a file "filesForUpload/textfile.txt" inside space "Shares Jail" to "PARENT/textfile.txt" using the WebDAV API
-    And user "Brian" uploads a file "filesForUpload/textfile.txt" inside space "Shares Jail" to "PARENT/textfile.txt" using the WebDAV API
+    When user "Carol" uploads a file inside space "Shares Jail" with content "uploaded by carol" to "PARENT/textfile.txt" using the WebDAV API
+    And user "Brian" uploads a file inside space "Shares Jail" with content "uploaded by brian" to "PARENT/textfile.txt" using the WebDAV API
     And user "Alice" uploads file "filesForUpload/textfile.txt" to "/PARENT/textfile.txt" using the WebDAV API
     Then the HTTP status code of responses on all endpoints should be "423"
     And as "Alice" file "/PARENT/textfile.txt" should not exist
