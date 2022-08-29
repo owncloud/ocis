@@ -262,13 +262,13 @@ def main(ctx):
                 pipelines,
             )
 
-    # always append notification step
-    pipelines.append(
-        pipelineDependsOn(
+    # always append notification pipeline
+    pipelines = \
+        pipelines + \
+        pipelinesDependsOn(
             notify(),
             pipelines,
-        ),
-    )
+        )
 
     pipelines += checkStarlark()
     pipelineSanityChecks(ctx, pipelines)
@@ -1742,37 +1742,72 @@ def makeGoGenerate(module):
     ]
 
 def notify():
-    return {
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "chat-notifications",
-        "clone": {
-            "disable": True,
-        },
-        "steps": [
-            {
-                "name": "notify-rocketchat",
-                "image": PLUGINS_SLACK,
-                "settings": {
-                    "webhook": {
-                        "from_secret": config["rocketchat"]["from_secret"],
-                    },
-                    "channel": config["rocketchat"]["channel"],
+    rocketChatStep = [
+        {
+            "name": "notify-rocketchat",
+            "image": PLUGINS_SLACK,
+            "settings": {
+                "webhook": {
+                    "from_secret": config["rocketchat"]["from_secret"],
                 },
+                "channel": config["rocketchat"]["channel"],
             },
-        ],
-        "depends_on": [],
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/heads/release*",
-                "refs/tags/**",
-            ],
-            "status": [
-                "failure",
-            ],
         },
-    }
+    ]
+    # notify the chat if the build fails for:
+    # 1) any builds that happen on master branch, or a tag
+    # 2) any PR builds that happen for a PR that is for a branch with a
+    #    name starting with "release"
+    # Two pipelines are defined below, because we can't express both of
+    # the trigger conditions (1) and (2) in a single "trigger" structure.
+    # Only at most one of the pipelines can ever happen in a single build.
+
+    # On ordinary development PRs, neither of the conditions will trigger,
+    # so neither pipeline will happen. A build failure will cause the PR
+    # status to fail in GitHub, but not notify to chat.
+
+    return [
+        {
+            "kind": "pipeline",
+            "type": "docker",
+            "name": "chat-notifications",
+            "clone": {
+                "disable": True,
+            },
+            "steps": rocketChatStep,
+            "depends_on": [],
+            "trigger": {
+                "ref": [
+                    "refs/heads/master",
+                    "refs/tags/**",
+                ],
+                "status": [
+                    "failure",
+                ],
+            },
+        },
+        {
+            "kind": "pipeline",
+            "type": "docker",
+            "name": "chat-notifications-release",
+            "clone": {
+                "disable": True,
+            },
+            "steps": rocketChatStep,
+            "depends_on": [],
+            "trigger": {
+                "event": [
+                    "pull_request",
+                ],
+                "ref": [
+                    "refs/heads/release*",
+                ],
+                "status": [
+                    "failure",
+                ],
+            },
+        },
+    ]
 
 def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], testing_parallel_deploy = False):
     if not testing_parallel_deploy:
