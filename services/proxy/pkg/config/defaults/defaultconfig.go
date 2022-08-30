@@ -174,9 +174,13 @@ func DefaultPolicies() []config.Policy {
 					Unprotected: true,
 				},
 				{
-					Endpoint:    "/app/", // /app or /apps? ocdav only handles /apps
+					Endpoint:    "/app/list",
 					Backend:     "http://localhost:9140",
-					Unprotected: true, // TODO check if this is safe
+					Unprotected: true,
+				},
+				{
+					Endpoint: "/app/", // /app or /apps? ocdav only handles /apps
+					Backend:  "http://localhost:9140",
 				},
 				{
 					Endpoint: "/graph/",
