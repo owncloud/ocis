@@ -100,6 +100,12 @@ func DefaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9110",
 				},
 				{
+					Type:        config.RegexRoute,
+					Endpoint:    "/ocs/v[12].php/config",
+					Backend:     "http://localhost:9140",
+					Unprotected: true,
+				},
+				{
 					Endpoint: "/ocs/",
 					Backend:  "http://localhost:9140",
 				},
@@ -145,12 +151,14 @@ func DefaultPolicies() []config.Policy {
 					Service:  "com.owncloud.web.ocdav",
 				},
 				{
-					Endpoint: "/status",
-					Service:  "com.owncloud.web.ocdav",
+					Endpoint:    "/status",
+					Service:     "com.owncloud.web.ocdav",
+					Unprotected: true,
 				},
 				{
-					Endpoint: "/status.php",
-					Service:  "com.owncloud.web.ocdav",
+					Endpoint:    "/status.php",
+					Service:     "com.owncloud.web.ocdav",
+					Unprotected: true,
 				},
 				{
 					Endpoint: "/index.php/",
@@ -161,8 +169,9 @@ func DefaultPolicies() []config.Policy {
 					Service:  "com.owncloud.web.ocdav",
 				},
 				{
-					Endpoint: "/data",
-					Backend:  "http://localhost:9140",
+					Endpoint:    "/data",
+					Backend:     "http://localhost:9140",
+					Unprotected: true,
 				},
 				{
 					Endpoint:    "/app/", // /app or /apps? ocdav only handles /apps
