@@ -39,9 +39,24 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 	}
 
 	g.logger.Info().Interface("user", u).Msg("User in /me")
-
-	me := identity.CreateUserModelFromCS3(u)
-
+	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
+	var me *libregraph.User
+	// We can just return the user from context unless we need to expand the group memberships
+	if !slices.Contains(exp, "memberOf") {
+		me = identity.CreateUserModelFromCS3(u)
+	} else {
+		var err error
+		me, err = g.identityBackend.GetUser(r.Context(), u.GetId().GetOpaqueId(), r.URL.Query())
+		if err != nil {
+			var errcode errorcode.Error
+			if errors.As(err, &errcode) {
+				errcode.Render(w, r)
+			} else {
+				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			}
+			return
+		}
+	}
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, me)
 }
