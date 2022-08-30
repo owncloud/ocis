@@ -14,10 +14,11 @@ import (
 	"go-micro.dev/v4/selector"
 )
 
-const routingInfoCtxKey string = "director"
+type routingInfoCtxKey struct{}
 
 var noInfo = RoutingInfo{}
 
+// Middleware returns a HTTP middleware containing the router.
 func Middleware(policySelector *config.PolicySelector, policies []config.Policy, logger log.Logger) func(http.Handler) http.Handler {
 	router := New(policySelector, policies, logger)
 	return func(next http.Handler) http.Handler {
@@ -32,70 +33,8 @@ func Middleware(policySelector *config.PolicySelector, policies []config.Policy,
 	}
 }
 
-func (rt Router) Route(r *http.Request) (RoutingInfo, bool) {
-	pol, err := rt.policySelector(r)
-	if err != nil {
-		rt.logger.Error().Err(err).Msg("Error while selecting pol")
-		return noInfo, false
-	}
-
-	if _, ok := rt.directors[pol]; !ok {
-		rt.logger.
-			Error().
-			Str("policy", pol).
-			Msg("policy is not configured")
-		return noInfo, false
-	}
-
-	method := ""
-	// find matching director
-	for _, rtype := range config.RouteTypes {
-		var handler func(string, url.URL) bool
-		switch rtype {
-		case config.QueryRoute:
-			handler = queryRouteMatcher
-		case config.RegexRoute:
-			handler = rt.regexRouteMatcher
-		case config.PrefixRoute:
-			fallthrough
-		default:
-			handler = prefixRouteMatcher
-		}
-		if rt.directors[pol][rtype][r.Method] != nil {
-			// use specific method
-			method = r.Method
-		}
-		for endpoint := range rt.directors[pol][rtype][method] {
-			if handler(endpoint, *r.URL) {
-
-				rt.logger.Debug().
-					Str("policy", pol).
-					Str("method", r.Method).
-					Str("prefix", endpoint).
-					Str("path", r.URL.Path).
-					Str("routeType", string(rtype)).
-					Msg("director found")
-
-				return rt.directors[pol][rtype][method][endpoint], true
-			}
-		}
-	}
-
-	// override default director with root. If any
-	if ri, ok := rt.directors[pol][config.PrefixRoute][method]["/"]; ok { // try specific method
-		return ri, true
-	} else if ri, ok := rt.directors[pol][config.PrefixRoute][""]["/"]; ok { // fallback to unspecific method
-		return ri, true
-	}
-
-	rt.logger.
-		Warn().
-		Str("policy", pol).
-		Str("path", r.URL.Path).
-		Msg("no director found")
-	return noInfo, false
-}
-
+// New creates a new request router.
+// It initializes the routes before returning the router.
 func New(policySelector *config.PolicySelector, policies []config.Policy, logger log.Logger) Router {
 	if policySelector == nil {
 		firstPolicy := policies[0].Name
@@ -143,19 +82,23 @@ func New(policySelector *config.PolicySelector, policies []config.Policy, logger
 	return r
 }
 
+// RoutingInfo contains the proxy director and some information about the route.
 type RoutingInfo struct {
 	director    func(*http.Request)
 	unprotected bool
 }
 
+// Director returns the proxy director.
 func (r RoutingInfo) Director() func(*http.Request) {
 	return r.director
 }
 
+// IsRouteUnprotected returns true if the route doesn't need to be authenticated.
 func (r RoutingInfo) IsRouteUnprotected() bool {
 	return r.unprotected
 }
 
+// Router handles the routing of HTTP requests according to the given policies.
 type Router struct {
 	logger         log.Logger
 	directors      map[string]map[config.RouteType]map[string]map[string]RoutingInfo
@@ -227,6 +170,84 @@ func (rt Router) addHost(policy string, target *url.URL, route config.Route) {
 		},
 	}
 }
+
+// Route is evaluating the policies on the request and returns the RoutingInfo if successful.
+func (rt Router) Route(r *http.Request) (RoutingInfo, bool) {
+	pol, err := rt.policySelector(r)
+	if err != nil {
+		rt.logger.Error().Err(err).Msg("Error while selecting pol")
+		return noInfo, false
+	}
+
+	if _, ok := rt.directors[pol]; !ok {
+		rt.logger.
+			Error().
+			Str("policy", pol).
+			Msg("policy is not configured")
+		return noInfo, false
+	}
+
+	method := ""
+	// find matching director
+	for _, rtype := range config.RouteTypes {
+		var handler func(string, url.URL) bool
+		switch rtype {
+		case config.QueryRoute:
+			handler = queryRouteMatcher
+		case config.RegexRoute:
+			handler = rt.regexRouteMatcher
+		case config.PrefixRoute:
+			fallthrough
+		default:
+			handler = prefixRouteMatcher
+		}
+		if rt.directors[pol][rtype][r.Method] != nil {
+			// use specific method
+			method = r.Method
+		}
+		for endpoint := range rt.directors[pol][rtype][method] {
+			if handler(endpoint, *r.URL) {
+
+				rt.logger.Debug().
+					Str("policy", pol).
+					Str("method", r.Method).
+					Str("prefix", endpoint).
+					Str("path", r.URL.Path).
+					Str("routeType", string(rtype)).
+					Msg("director found")
+
+				return rt.directors[pol][rtype][method][endpoint], true
+			}
+		}
+	}
+
+	// override default director with root. If any
+	if ri, ok := rt.directors[pol][config.PrefixRoute][method]["/"]; ok { // try specific method
+		return ri, true
+	} else if ri, ok := rt.directors[pol][config.PrefixRoute][""]["/"]; ok { // fallback to unspecific method
+		return ri, true
+	}
+
+	rt.logger.
+		Warn().
+		Str("policy", pol).
+		Str("path", r.URL.Path).
+		Msg("no director found")
+	return noInfo, false
+}
+
+func (rt Router) regexRouteMatcher(pattern string, target url.URL) bool {
+	matched, err := regexp.MatchString(pattern, target.String())
+	if err != nil {
+		rt.logger.Warn().Err(err).Str("pattern", pattern).Msg("regex with pattern failed")
+	}
+	return matched
+}
+
+func prefixRouteMatcher(prefix string, target url.URL) bool {
+	return strings.HasPrefix(target.Path, prefix) && prefix != "/"
+}
+
 func singleJoiningSlash(a, b string) string {
 	aslash := strings.HasSuffix(a, "/")
 	bslash := strings.HasPrefix(b, "/")
@@ -257,24 +278,13 @@ func queryRouteMatcher(endpoint string, target url.URL) bool {
 	return true
 }
 
-func (rt Router) regexRouteMatcher(pattern string, target url.URL) bool {
-	matched, err := regexp.MatchString(pattern, target.String())
-	if err != nil {
-		rt.logger.Warn().Err(err).Str("pattern", pattern).Msg("regex with pattern failed")
-	}
-	return matched
-}
-
-func prefixRouteMatcher(prefix string, target url.URL) bool {
-	return strings.HasPrefix(target.Path, prefix) && prefix != "/"
-}
-
+// SetRoutingInfo puts the routing info in the context.
 func SetRoutingInfo(parent context.Context, ri RoutingInfo) context.Context {
-	return context.WithValue(parent, routingInfoCtxKey, ri)
+	return context.WithValue(parent, routingInfoCtxKey{}, ri)
 }
 
 // ContextRoutingInfo gets the routing information from the context.
 func ContextRoutingInfo(ctx context.Context) RoutingInfo {
-	val := ctx.Value(routingInfoCtxKey)
+	val := ctx.Value(routingInfoCtxKey{})
 	return val.(RoutingInfo)
 }
