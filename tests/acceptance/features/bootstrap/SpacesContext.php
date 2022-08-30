@@ -90,6 +90,11 @@ class SpacesContext implements Context {
 	 */
 	private string $davSpacesUrl = '/remote.php/dav/spaces/';
 
+    /**
+     * @var string
+     */
+    private string $storedFileID;
+
 	/**
 	 * @var array map with user as key, spaces and file etags as value
 	 * @example

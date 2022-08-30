@@ -19,9 +19,9 @@ Feature: move (rename) file
     When user "Alice" moves file "insideSpace.txt" to "newfolder/insideSpace.txt" in space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Project" should contain these entries:
-      | newfolder/insideSpace.txt       |
+      | newfolder/insideSpace.txt |
     And for user "Alice" the space "Project" should not contain these entries:
-      | insideSpace.txt       |
+      | insideSpace.txt |
     Examples:
       | role    |
       | manager |
@@ -37,9 +37,9 @@ Feature: move (rename) file
     When user "Alice" moves file "insideSpace.txt" to "newfolder/insideSpace.txt" in space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" the space "Project" should not contain these entries:
-      | newfolder/insideSpace.txt       |
+      | newfolder/insideSpace.txt |
     And for user "Alice" the space "Project" should contain these entries:
-      | insideSpace.txt       |
+      | insideSpace.txt |
 
 
   Scenario Outline: User moves a file from a space project with different a role to a space project with different role
@@ -52,9 +52,9 @@ Feature: move (rename) file
     When user "Alice" moves file "project1.txt" from space "Project1" to "project1.txt" inside space "Project2" using the WebDAV API
     Then the HTTP status code should be "<https_status_code>"
     And for user "Alice" the space "Project1" should contain these entries:
-      | project1.txt       |
+      | project1.txt |
     And for user "Alice" the space "Project2" should not contain these entries:
-      | project1.txt       |
+      | project1.txt |
     Examples:
       | from_role | to_role | https_status_code |
       | manager   | manager | 502               |
@@ -76,9 +76,9 @@ Feature: move (rename) file
     When user "Alice" moves file "project.txt" from space "Project" to "project.txt" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "<https_status_code>"
     And for user "Alice" the space "Project" should contain these entries:
-      | project.txt       |
+      | project.txt |
     And for user "Alice" the space "Personal" should not contain these entries:
-      | project.txt       |
+      | project.txt |
     Examples:
       | role    | https_status_code |
       | manager | 502               |
@@ -97,9 +97,9 @@ Feature: move (rename) file
     When user "Alice" moves file "project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares Jail" using the WebDAV API
     Then the HTTP status code should be "502"
     And for user "Alice" the space "Project" should contain these entries:
-      | project.txt       |
+      | project.txt |
     And for user "Alice" the space "Shares Jail" should not contain these entries:
-      | /testshare/project.txt       |
+      | /testshare/project.txt |
     Examples:
       | role    | permissions |
       | manager | 31          |
@@ -118,9 +118,9 @@ Feature: move (rename) file
     When user "Alice" moves file "personal.txt" from space "Personal" to "personal.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "<https_status_code>"
     And for user "Alice" the space "Personal" should contain these entries:
-      | personal.txt       |
+      | personal.txt |
     And for user "Alice" the space "Project" should not contain these entries:
-      | personal.txt       |
+      | personal.txt |
     Examples:
       | role    | https_status_code |
       | manager | 502               |
@@ -136,13 +136,14 @@ Feature: move (rename) file
     When user "Alice" moves file "personal.txt" from space "Personal" to "/testshare/personal.txt" inside space "Shares Jail" using the WebDAV API
     Then the HTTP status code should be "502"
     And for user "Alice" the space "Personal" should contain these entries:
-      | personal.txt       |
+      | personal.txt |
     And for user "Alice" the space "Shares Jail" should not contain these entries:
-      | /testshare/personal.txt       |
+      | /testshare/personal.txt |
     Examples:
       | permissions |
       | 31          |
       | 17          |
+      | 1           |
 
 
   Scenario Outline: User moves a file from space shares jail with different role (permissions) to space personal
@@ -160,6 +161,7 @@ Feature: move (rename) file
       | permissions |
       | 31          |
       | 17          |
+      | 1           |
 
 
   Scenario Outline: User moves a file from space shares jail with different role (permissions) to space project with different role
@@ -234,3 +236,66 @@ Feature: move (rename) file
       | /testshare2/testshare1.txt |
     And for user "Brian" the space "Personal" should not contain these entries:
       | /testshare2/testshare1.txt |
+
+
+  Scenario: Checking file id after a move between received shares
+    Given user "Alice" has created the following folders
+      | path     |
+      | /folderA |
+      | /folderB |
+    And user "Alice" has shared folder "/folderA" with user "Brian"
+    And user "Alice" has shared folder "/folderB" with user "Brian"
+    And user "Brian" has accepted share "/folderA" offered by user "Alice"
+    And user "Brian" has accepted share "/folderB" offered by user "Alice"
+    And user "Brian" has created a folder "/folderA/ONE" in space "Shares Jail"
+    And user "Brian" has created a folder "/folderA/ONE/TWO" in space "Shares Jail"
+    And user "Brian" has stored id of folder "/folderA/ONE" of the space "Shares Jail"
+    When user "Brian" moves folder "/folderA/ONE" from space "Shares Jail" to "/folderB/ONE" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Brian" the space "Shares Jail" should contain these entries:
+      | /folderA |
+    And for user "Brian" folder "folderB" of the space "Shares Jail" should contain these entries:
+      | /ONE |
+    And for user "Brian" folder "folderA" of the space "Shares Jail" should not contain these entries:
+      | /ONE     |
+      | /ONE/TWO |
+    And user "Brian" folder "/folderB/ONE" of the space "Shares Jail" should have the previously stored id
+
+
+  Scenario: Moving a file out of a shared folder as the sharer
+    Given user "Brian" has created folder "/testshare"
+    And user "Brian" has uploaded file with content "test data" to "/testshare/testfile.txt"
+    And user "Brian" has created a share with settings
+      | path        | testshare |
+      | shareType   | user      |
+      | permissions | change    |
+      | shareWith   | Alice     |
+    And user "Alice" has accepted share "/testshare" offered by user "Brian"
+    When user "Brian" moves file "/testshare/testfile.txt" from space "Personal" to "/testfile.txt" inside space "Personal" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And the content of file "/testfile.txt" for user "Brian" should be "test data"
+    And for user "Alice" folder "testshare" of the space "Shares Jail" should not contain these entries:
+      | testfile.txt |
+    And for user "Brian" the space "Personal" should not contain these entries:
+      | /testshare/testfile.txt |
+
+
+  Scenario: Moving a folder out of a shared folder as the sharer
+    Given user "Brian" has created the following folders
+      | path                     |
+      | /testshare               |
+      | /testshare/testsubfolder |
+    And user "Brian" has uploaded file with content "test data" to "/testshare/testsubfolder/testfile.txt"
+    And user "Brian" has created a share with settings
+      | path        | testshare |
+      | shareType   | user      |
+      | permissions | change    |
+      | shareWith   | Alice     |
+    And user "Alice" has accepted share "/testshare" offered by user "Brian"
+    When user "Brian" moves folder "/testshare/testsubfolder" from space "Personal" to "/testsubfolder" inside space "Personal" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And the content of file "/testsubfolder/testfile.txt" for user "Brian" should be "test data"
+    And for user "Alice" folder "testshare" of the space "Shares Jail" should not contain these entries:
+      | testsubfolder |
+    And for user "Brian" the space "Personal" should not contain these entries:
+      | /testshare/testsubfolder |
