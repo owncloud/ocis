@@ -54,7 +54,7 @@ require (
 	github.com/owncloud/libre-graph-api-go v0.16.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.13.0
-	github.com/rs/zerolog v1.27.0
+	github.com/rs/zerolog v1.28.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
@@ -243,7 +243,7 @@ require (
 	github.com/prometheus/statsd_exporter v0.22.4 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rs/cors v1.8.2 // indirect
-	github.com/rs/xid v1.3.0 // indirect
+	github.com/rs/xid v1.4.0 // indirect
 	github.com/russellhaering/goxmldsig v1.1.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sciencemesh/meshdirectory-web v1.0.4 // indirect
