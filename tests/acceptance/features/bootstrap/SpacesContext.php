@@ -97,6 +97,12 @@ class SpacesContext implements Context {
 	 */
 	private $storedEtags = [];
 
+	/**
+	 *
+	 * @var string[][]
+	 */
+	private $tokenOfLastLock = [];
+
 	private $etagPropfindBody = '<?xml version="1.0"?>'
 		. '<d:propfind xmlns:d="DAV:" '
 		. 'xmlns:oc="http://owncloud.org/ns" '
@@ -457,7 +463,7 @@ class SpacesContext implements Context {
 							}
 							$this->sendDeleteSpaceRequest($userName, $value["name"]);
 						}
-					}						
+					}
 				}
 			}
 		}
@@ -696,27 +702,27 @@ class SpacesContext implements Context {
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers);
 	}
 
-    /**
-     * send proppatch request to url
-     * @param string $fullUrl
-     * @param string $user
-     * @param string $password
-     * @param string $xRequestId
-     * @param array $headers
-     * @param mixed|null $body
-     * @return ResponseInterface
-     */
-    public function sendPropPatchRequest(
-        string $fullUrl,
-        string $user,
-        string $password,
-        string $xRequestId = '',
-        array  $headers = [],
-        $body
-    ): ResponseInterface
-    {
-        return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'PROPPATCH', $user, $password, $headers, $body);
-    }
+	/**
+	 * send proppatch request to url
+	 *
+	 * @param string $fullUrl
+	 * @param string $user
+	 * @param string $password
+	 * @param string $xRequestId
+	 * @param array $headers
+	 * @param mixed|null $body
+	 * @return ResponseInterface
+	 */
+	public function sendPropPatchRequest(
+		string $fullUrl,
+		string $user,
+		string $password,
+		string $xRequestId = '',
+		array  $headers = [],
+		$body
+	): ResponseInterface {
+		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'PROPPATCH', $user, $password, $headers, $body);
+	}
 
 	/**
 	 * @When /^user "([^"]*)" lists all available spaces via the GraphApi$/
@@ -2135,7 +2141,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" shares the following entity "([^"]*)" inside of space "([^"]*)" with user "([^"]*)" with role "([^"]*)"$/
+	 * Request to send share of resource inside of space
 	 *
 	 * @param  string $user
 	 * @param  string $entity
@@ -2146,13 +2152,7 @@ class SpacesContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function sendShareEntityInsideOfSpaceRequest(
-		string $user,
-		string $entity,
-		string $spaceName,
-		string $userRecipient,
-		string $role
-	): void {
+	public function sendRequestForShareOfEntityInsideOfSpace(string $user, string $entity, string $spaceName, string $userRecipient, string $role):void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$body = [
 			"space_ref" => $space['id'] . "/" . $entity,
@@ -2172,6 +2172,54 @@ class SpacesContext implements Context {
 			)
 		);
 		$this->setLastShareData();
+	}
+
+	/**
+	 * @When /^user "([^"]*)" shares the following entity "([^"]*)" inside of space "([^"]*)" with user "([^"]*)" with role "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $entity
+	 * @param  string $spaceName
+	 * @param  string $userRecipient
+	 * @param  string $role
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sharesTheFollowingEntityInsideOfSpace(
+		string $user,
+		string $entity,
+		string $spaceName,
+		string $userRecipient,
+		string $role
+	): void {
+		$this->sendRequestForShareOfEntityInsideOfSpace($user, $entity, $spaceName, $userRecipient, $role);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has shared the following entity "([^"]*)" inside of space "([^"]*)" with user "([^"]*)" with role "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $entity
+	 * @param  string $spaceName
+	 * @param  string $userRecipient
+	 * @param  string $role
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function hasSharedTheFollowingEntityInsideOfSpace(
+		string $user,
+		string $entity,
+		string $spaceName,
+		string $userRecipient,
+		string $role
+	): void {
+		$this->sendRequestForShareOfEntityInsideOfSpace($user, $entity, $spaceName, $userRecipient, $role);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
 	}
 
 	/**
@@ -3017,6 +3065,74 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * Request to lock the resource inside of space
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param TableNode $properties
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function sendRequestToLockResouceInsideOfSpace(string $user, string $resource, TableNode $properties, string $spaceName):void {
+		$body
+			= "<?xml version='1.0' encoding='UTF-8'?>" .
+			"<d:lockinfo xmlns:d='DAV:'> ";
+		$headers = [];
+		$this->featureContext->verifyTableNodeRows($properties, [], ['lockscope', 'depth', 'timeout']);
+		$propertiesRows = $properties->getRowsHash();
+		foreach ($propertiesRows as $property => $value) {
+			if ($property === "depth" || $property === "timeout") {
+				//properties that are set in the header not in the xml
+				$headers[$property] = $value;
+			} else {
+				$body .= "<d:$property><d:$value/></d:$property>";
+			}
+		}
+		$body .= "</d:lockinfo>";
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $space['root']['webDavUrl'] . '/' . ltrim($resource, '/');
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				"",
+				'LOCK',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				[],
+				$body
+			)
+		);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			__METHOD__ . " Failed to lock the resource $resource"
+		);
+		$responseXml = $this->featureContext->getResponseXml(null, __METHOD__);
+		$this->featureContext->setResponseXmlObject($responseXml);
+		$xmlPart = $responseXml->xpath("//d:locktoken/d:href");
+		if (\is_array($xmlPart) && isset($xmlPart[0])) {
+			$this->tokenOfLastLock[$user][$resource] = (string) $xmlPart[0];
+		} else {
+			Assert::fail("could not find lock token after trying to lock '$resource'");
+		}
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has locked folder "([^"]*)" inside space "([^"]*)" setting the following properties$/
+	 *
+	 * @param string $user
+	 * @param string $resource
+	 * @param TableNode $properties
+	 * @param string $spaceName
+	 *
+	 * @throws Exception | GuzzleException
+	 */
+	public function userHasLockedResourceOfSpace(string $user, string $resource, TableNode $properties, string $spaceName) {
+		$this->sendRequestToLockResouceInsideOfSpace($user, $resource, $properties, $spaceName);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" creates a public link share of the space "([^"]*)" with settings:$/
 	 *
 	 * @param  string $user
@@ -3225,21 +3341,20 @@ class SpacesContext implements Context {
 		);
 	}
 
-    /**
-     * @When /^user "([^"]*)" favorites element "([^"]*)" in space "([^"]*)" using the WebDAV API$/
-     *
-     * @param string $user
-     * @param string $path
-     * @param string $spaceName
-     *
-     * @return void
-     * @throws GuzzleException
-     */
-    public function userFavoritesElementInSpaceUsingTheWebdavApi(string $user, string $path, string $spaceName): void
-    {
-        $space = $this->getSpaceByName($user, $spaceName);
-        $fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($path, "/");
-        $body = '<?xml version="1.0"?>
+	/**
+	 * @When /^user "([^"]*)" favorites element "([^"]*)" in space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userFavoritesElementInSpaceUsingTheWebdavApi(string $user, string $path, string $spaceName): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($path, "/");
+		$body = '<?xml version="1.0"?>
 				<d:propertyupdate xmlns:d="DAV:"
 				   xmlns:oc="http://owncloud.org/ns">
 				 <d:set>
@@ -3248,15 +3363,15 @@ class SpacesContext implements Context {
 				  </d:prop>
 				 </d:set>
 				</d:propertyupdate>';
-        $this->featureContext->setResponse(
-            $this->sendProppatchRequest(
-                $fullUrl,
-                $user,
-                $this->featureContext->getPasswordForUser($user),
-                $this->featureContext->getStepLineRef(),
-                [],
-                $body
-            )
-        );
-    }
+		$this->featureContext->setResponse(
+			$this->sendProppatchRequest(
+				$fullUrl,
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$this->featureContext->getStepLineRef(),
+				[],
+				$body
+			)
+		);
+	}
 }
