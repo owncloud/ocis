@@ -572,31 +572,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * Send Graph Create Space Request
-	 *
-	 * @param  string $user
-	 * @param  string $password
-	 * @param  string $body
-	 * @param  string $xRequestId
-	 * @param  array  $headers
-	 *
-	 * @return ResponseInterface
-	 *
-	 * @throws GuzzleException
-	 */
-	public function sendCreateSpaceRequest(
-		string $user,
-		string $password,
-		string $body,
-		string $xRequestId = '',
-		array $headers = []
-	): ResponseInterface {
-		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/";
-
-		return HttpRequestHelper::post($fullUrl, $xRequestId, $user, $password, $headers, $body);
-	}
-
-	/**
 	 * Send Propfind Request to Url
 	 *
 	 * @param  string $fullUrl
@@ -782,13 +757,13 @@ class SpacesContext implements Context {
 	): void {
 		$space = ["Name" => $spaceName, "driveType" => $spaceType];
 		$body = json_encode($space, JSON_THROW_ON_ERROR);
-		$this->featureContext->setResponse(
-			$this->sendCreateSpaceRequest(
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body
-			)
-		);
+		$this->featureContext->setResponse(GraphHelper::createSpace(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body
+		));
+
 		$this->setSpaceCreator($spaceName, $user);
 	}
 
@@ -813,13 +788,12 @@ class SpacesContext implements Context {
 	): void {
 		$space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$body = json_encode($space);
-		$this->featureContext->setResponse(
-			$this->sendCreateSpaceRequest(
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body
-			)
-		);
+		$this->featureContext->setResponse(GraphHelper::createSpace(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body
+		));
 		$this->setSpaceCreator($spaceName, $user);
 	}
 
@@ -1584,14 +1558,13 @@ class SpacesContext implements Context {
 		$bodyData = ["Name" => $newName];
 		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
 
-		$this->featureContext->setResponse(
-			$this->sendUpdateSpaceRequest(
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body,
-				$spaceId
-			)
-		);
+		$this->featureContext->setResponse(GraphHelper::updateSpace(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body,
+			$spaceId
+		));
 	}
 
 	/**
@@ -1615,14 +1588,13 @@ class SpacesContext implements Context {
 		$bodyData = ["description" => $newDescription];
 		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
 
-		$this->featureContext->setResponse(
-			$this->sendUpdateSpaceRequest(
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body,
-				$spaceId
-			)
-		);
+		$this->featureContext->setResponse(GraphHelper::updateSpace(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body,
+			$spaceId
+		));
 	}
 
 	/**
@@ -1647,14 +1619,13 @@ class SpacesContext implements Context {
 		$bodyData = ["quota" => ["total" => $newQuota]];
 		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
 
-		$this->featureContext->setResponse(
-			$this->sendUpdateSpaceRequest(
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body,
-				$spaceId
-			)
-		);
+		$this->featureContext->setResponse(GraphHelper::updateSpace(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body,
+			$spaceId
+		));
 	}
 
 	/**
@@ -1688,14 +1659,13 @@ class SpacesContext implements Context {
 		$bodyData = ["special" => [["specialFolder" => ["name" => "$type"], "id" => "$fileId"]]];
 		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
 
-		$this->featureContext->setResponse(
-			$this->sendUpdateSpaceRequest(
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body,
-				$spaceId
-			)
-		);
+		$this->featureContext->setResponse(GraphHelper::updateSpace(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body,
+			$spaceId
+		));
 	}
 
 	/**
@@ -1724,34 +1694,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * Send Graph Update Space Request
-	 *
-	 * @param  string $user
-	 * @param  string $password
-	 * @param  mixed $body
-	 * @param  string $spaceId
-	 * @param  string $xRequestId
-	 * @param  array  $headers
-	 *
-	 * @return ResponseInterface
-	 *
-	 * @throws GuzzleException
-	 */
-	public function sendUpdateSpaceRequest(
-		string $user,
-		string $password,
-		$body,
-		string $spaceId,
-		string $xRequestId = '',
-		array $headers = []
-	): ResponseInterface {
-		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/$spaceId";
-		$method = 'PATCH';
-
-		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers, $body);
-	}
-
-	/**
 	 * @Given /^user "([^"]*)" has created a space "([^"]*)" of type "([^"]*)" with quota "([^"]*)"$/
 	 *
 	 * @param string $user
@@ -1770,13 +1712,12 @@ class SpacesContext implements Context {
 	): void {
 		$space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$body = json_encode($space);
-		$this->featureContext->setResponse(
-			$this->sendCreateSpaceRequest(
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body
-			)
-		);
+		$this->featureContext->setResponse(GraphHelper::createSpace(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body
+		));
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)"
@@ -1800,13 +1741,12 @@ class SpacesContext implements Context {
 	): void {
 		$space = ["Name" => $spaceName];
 		$body = json_encode($space, JSON_THROW_ON_ERROR);
-		$this->featureContext->setResponse(
-			$this->sendCreateSpaceRequest(
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body
-			)
-		);
+		$this->featureContext->setResponse(GraphHelper::createSpace(
+			$this->featureContext->getBaseUrl(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body
+		));
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)"

@@ -523,4 +523,59 @@ class GraphHelper {
 		}
 		return \json_encode($payload);
 	}
+	
+	/**
+	 * Send Graph Create Space Request
+	 *
+	 * @param string $baseUrl
+	 * @param  string $user
+	 * @param  string $password
+	 * @param  string $body
+	 * @param  string $xRequestId
+	 * @param  array  $headers
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function createSpace(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $body,
+		string $xRequestId = '',
+		array $headers = []
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'drives');
+
+		return HttpRequestHelper::post($url, $xRequestId, $user, $password, $headers, $body);
+	}
+
+	/**
+	 * Send Graph Update Space Request
+	 *
+	 * @param  string $baseUrl
+	 * @param  string $user
+	 * @param  string $password
+	 * @param  mixed $body
+	 * @param  string $spaceId
+	 * @param  string $xRequestId
+	 * @param  array  $headers
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function updateSpace(
+		string $baseUrl,
+		string $user,
+		string $password,
+		$body,
+		string $spaceId,
+		string $xRequestId = '',
+		array $headers = []
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId);
+		$method = 'PATCH';
+
+		return HttpRequestHelper::sendRequest($url, $xRequestId, $method, $user, $password, $headers, $body);
+	}
 }
