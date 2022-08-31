@@ -457,7 +457,7 @@ class SpacesContext implements Context {
 							}
 							$this->sendDeleteSpaceRequest($userName, $value["name"]);
 						}
-					}						
+					}
 				}
 			}
 		}

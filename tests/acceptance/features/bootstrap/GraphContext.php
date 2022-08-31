@@ -539,7 +539,7 @@ class GraphContext implements Context {
 
 	/**
 	 * @When /^the user "([^"]*)" changes its own password "([^"]*)" to "([^"]*)" using the Graph API$/
-	 * @param string $user 
+	 * @param string $user
 	 * @param string $currentPassword
 	 * @param string $newPassword
 	 *

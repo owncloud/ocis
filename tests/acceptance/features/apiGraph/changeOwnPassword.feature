@@ -5,7 +5,6 @@ Feature: an user changes its own password
         Given user "Alice" has been created with default attributes and without skeleton files
         When the user "Alice" changes its own password "<currentPassword>" to "<newPassword>" using the Graph API
         Then the HTTP status code should be "<code>"
-        And the HTTP response message should be "<message>"
         Examples:
             | currentPassword | newPassword | code |
             | 123456          | validPass   | 204  |
