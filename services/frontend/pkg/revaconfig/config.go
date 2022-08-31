@@ -206,7 +206,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 										},
 									},
 									"expire_date": map[string]interface{}{
-										"enabled": true,
+										"enabled": false,
 									},
 									"can_edit": true,
 								},

@@ -14,6 +14,7 @@ default:
           ldapInitialUserFilePath: /../../config/ldap-users.ldif
       contexts:
         - GraphContext:
+        - SpacesContext:
         - OccContext:
         - FeatureContext: &common_feature_context_params
             baseUrl: http://localhost:8080
@@ -25,6 +26,7 @@ default:
         - ChecksumContext:
         - FavoritesContext:
         - FilesVersionsContext:
+        - OCSContext:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
@@ -51,12 +53,16 @@ default:
         - '%paths.base%/../features/apiArchiver'
       contexts:
         - ArchiverContext:
+        - SpacesContext:
         - OccContext:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - ChecksumContext:
         - FilesVersionsContext:
+        - OCSContext:
         - PublicWebDavContext:
+        - TrashbinContext:
+        - WebDavPropertiesContext:
 
     apiGraph:
       paths:
