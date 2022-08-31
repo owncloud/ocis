@@ -523,4 +523,38 @@ class GraphHelper {
 		}
 		return \json_encode($payload);
 	}
+	
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $currentPassword
+	 * @param string $newPassword
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function changeOwnPassword(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $currentPassword,
+		string $newPassword
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'me/changePassword');
+		$payload['currentPassword'] = $currentPassword;
+		$payload['newPassword'] = $newPassword;
+		
+		return HttpRequestHelper::sendRequest(
+			$url,
+			$xRequestId,
+			"POST",
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			\json_encode($payload)
+		);
+	}
 }
