@@ -490,88 +490,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * Send Graph List My Spaces Request
-	 *
-	 * @param  string $user
-	 * @param  string $password
-	 * @param  string $urlArguments
-	 * @param  string $xRequestId
-	 * @param  array  $body
-	 * @param  array  $headers
-	 *
-	 * @return ResponseInterface
-	 *
-	 * @throws GuzzleException
-	 */
-	public function listMySpacesRequest(
-		string $user,
-		string $password,
-		string $urlArguments = '',
-		string $xRequestId = '',
-		array  $body = [],
-		array  $headers = []
-	): ResponseInterface {
-		$fullUrl = $this->baseUrl . "/graph/v1.0/me/drives/" . $urlArguments;
-
-		return HttpRequestHelper::get($fullUrl, $xRequestId, $user, $password, $headers, $body);
-	}
-
-	/**
-	 * Send Graph List All Spaces Request
-	 *
-	 * @param  string $user
-	 * @param  string $password
-	 * @param  string $urlArguments
-	 * @param  string $xRequestId
-	 * @param  array  $body
-	 * @param  array  $headers
-	 *
-	 * @return ResponseInterface
-	 *
-	 * @throws GuzzleException
-	 */
-	public function listAllSpacesRequest(
-		string $user,
-		string $password,
-		string $urlArguments = '',
-		string $xRequestId = '',
-		array  $body = [],
-		array  $headers = []
-	): ResponseInterface {
-		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/" . $urlArguments;
-
-		return HttpRequestHelper::get($fullUrl, $xRequestId, $user, $password, $headers, $body);
-	}
-
-	/**
-	 * Send Graph List Single Space Request
-	 *
-	 * @param string $user
-	 * @param string $password
-	 * @param string $spaceId
-	 * @param string $urlArguments
-	 * @param string $xRequestId
-	 * @param array $body
-	 * @param array $headers
-	 *
-	 * @return ResponseInterface
-	 *
-	 */
-	public function listSingleSpaceRequest(
-		string $user,
-		string $password,
-		string $spaceId,
-		string $urlArguments = '',
-		string $xRequestId = '',
-		array  $body = [],
-		array  $headers = []
-	): ResponseInterface {
-		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/" . $spaceId . "/" . $urlArguments;
-
-		return HttpRequestHelper::get($fullUrl, $xRequestId, $user, $password, $headers, $body);
-	}
-
-	/**
 	 * Send Propfind Request to Url
 	 *
 	 * @param  string $fullUrl
@@ -685,7 +603,8 @@ class SpacesContext implements Context {
 	 */
 	public function theUserListsAllHisAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
 		$this->featureContext->setResponse(
-			$this->listMySpacesRequest(
+			GraphHelper::getMySpaces(
+				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				"?" . $query
@@ -706,7 +625,8 @@ class SpacesContext implements Context {
 	 */
 	public function theUserListsAllAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
 		$this->featureContext->setResponse(
-			$this->listAllSpacesRequest(
+			GraphHelper::getAllSpaces(
+				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				"?" . $query
@@ -730,7 +650,8 @@ class SpacesContext implements Context {
 		Assert::assertNotEmpty($spaceId = $space["id"]);
 		Assert::assertNotEmpty($space["root"]["webDavUrl"]);
 		$this->featureContext->setResponse(
-			$this->listSingleSpaceRequest(
+			GraphHelper::getSingleSpace(
+				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
 				$spaceId
@@ -757,12 +678,14 @@ class SpacesContext implements Context {
 	): void {
 		$space = ["Name" => $spaceName, "driveType" => $spaceType];
 		$body = json_encode($space, JSON_THROW_ON_ERROR);
-		$this->featureContext->setResponse(GraphHelper::createSpace(
-			$this->featureContext->getBaseUrl(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$body
-		));
+		$this->featureContext->setResponse(
+			GraphHelper::createSpace(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body
+			)
+		);
 
 		$this->setSpaceCreator($spaceName, $user);
 	}
@@ -788,12 +711,14 @@ class SpacesContext implements Context {
 	): void {
 		$space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$body = json_encode($space);
-		$this->featureContext->setResponse(GraphHelper::createSpace(
-			$this->featureContext->getBaseUrl(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$body
-		));
+		$this->featureContext->setResponse(
+			GraphHelper::createSpace(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body
+			)
+		);
 		$this->setSpaceCreator($spaceName, $user);
 	}
 
@@ -1558,13 +1483,15 @@ class SpacesContext implements Context {
 		$bodyData = ["Name" => $newName];
 		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
 
-		$this->featureContext->setResponse(GraphHelper::updateSpace(
-			$this->featureContext->getBaseUrl(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$body,
-			$spaceId
-		));
+		$this->featureContext->setResponse(
+			GraphHelper::updateSpace(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body,
+				$spaceId
+			)
+		);
 	}
 
 	/**
@@ -1588,13 +1515,15 @@ class SpacesContext implements Context {
 		$bodyData = ["description" => $newDescription];
 		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
 
-		$this->featureContext->setResponse(GraphHelper::updateSpace(
-			$this->featureContext->getBaseUrl(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$body,
-			$spaceId
-		));
+		$this->featureContext->setResponse(
+			GraphHelper::updateSpace(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body,
+				$spaceId
+			)
+		);
 	}
 
 	/**
@@ -1619,13 +1548,15 @@ class SpacesContext implements Context {
 		$bodyData = ["quota" => ["total" => $newQuota]];
 		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
 
-		$this->featureContext->setResponse(GraphHelper::updateSpace(
-			$this->featureContext->getBaseUrl(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$body,
-			$spaceId
-		));
+		$this->featureContext->setResponse(
+			GraphHelper::updateSpace(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body,
+				$spaceId
+			)
+		);
 	}
 
 	/**
@@ -1659,13 +1590,15 @@ class SpacesContext implements Context {
 		$bodyData = ["special" => [["specialFolder" => ["name" => "$type"], "id" => "$fileId"]]];
 		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
 
-		$this->featureContext->setResponse(GraphHelper::updateSpace(
-			$this->featureContext->getBaseUrl(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$body,
-			$spaceId
-		));
+		$this->featureContext->setResponse(
+			GraphHelper::updateSpace(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body,
+				$spaceId
+			)
+		);
 	}
 
 	/**
@@ -1712,12 +1645,14 @@ class SpacesContext implements Context {
 	): void {
 		$space = ["Name" => $spaceName, "driveType" => $spaceType, "quota" => ["total" => $quota]];
 		$body = json_encode($space);
-		$this->featureContext->setResponse(GraphHelper::createSpace(
-			$this->featureContext->getBaseUrl(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$body
-		));
+		$this->featureContext->setResponse(
+			GraphHelper::createSpace(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body
+			)
+		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)"
@@ -1741,12 +1676,14 @@ class SpacesContext implements Context {
 	): void {
 		$space = ["Name" => $spaceName];
 		$body = json_encode($space, JSON_THROW_ON_ERROR);
-		$this->featureContext->setResponse(GraphHelper::createSpace(
-			$this->featureContext->getBaseUrl(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$body
-		));
+		$this->featureContext->setResponse(
+			GraphHelper::createSpace(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$body
+			)
+		);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			201,
 			"Expected response status code should be 201 (Created)"
@@ -2204,13 +2141,12 @@ class SpacesContext implements Context {
 		string $spaceName
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/" . $space["id"];
 		$this->featureContext->setResponse(
-			HttpRequestHelper::delete(
-				$fullUrl,
-				"",
+			GraphHelper::disableSpace(
+				$this->featureContext->getBaseUrl(),
 				$user,
-				$this->featureContext->getPasswordForUser($user)
+				$this->featureContext->getPasswordForUser($user),
+				$space["id"]
 			)
 		);
 	}
@@ -2274,14 +2210,13 @@ class SpacesContext implements Context {
 	): void {
 		$header = ["Purge" => "T"];
 		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/" . $space["id"];
-
+		
 		$this->featureContext->setResponse(
-			HttpRequestHelper::delete(
-				$fullUrl,
-				"",
+			GraphHelper::deleteSpace(
+				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
+				$space["id"],
 				$header
 			)
 		);
@@ -2307,18 +2242,12 @@ class SpacesContext implements Context {
 		} else {
 			$space = $this->getSpaceByName($user, $spaceName);
 		}
-		$header = ["restore" => true];
-		$body = '{}';
-		$fullUrl = $this->baseUrl . "/graph/v1.0/drives/" . $space["id"];
 		$this->featureContext->setResponse(
-			HttpRequestHelper::sendRequest(
-				$fullUrl,
-				"",
-				'PATCH',
+			GraphHelper::restoreSpace(
+				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$header,
-				$body
+				$space["id"]
 			)
 		);
 	}
