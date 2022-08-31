@@ -69,7 +69,13 @@ func (g Graph) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if authRes.Status.Code != cs3rpc.Code_CODE_OK {
+	switch authRes.Status.Code {
+	case cs3rpc.Code_CODE_OK:
+		break
+	case cs3rpc.Code_CODE_UNAUTHENTICATED, cs3rpc.Code_CODE_PERMISSION_DENIED:
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "wrong current password")
+		return
+	default:
 		errorcode.InvalidRequest.Render(w, r, http.StatusInternalServerError, "password change failed")
 		return
 	}

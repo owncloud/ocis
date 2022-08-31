@@ -13,5 +13,5 @@ Feature: an user changes its own password
             | 123456          | ?&^%0       | 204  |
             | 123456          |             | 400  |
             | 123456          | 123456      | 400  |
-            | wrongPass       | 123456      | 500  |
+            | wrongPass       | 123456      | 400  |
             |                 | validPass   | 400  |
