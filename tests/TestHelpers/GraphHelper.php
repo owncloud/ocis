@@ -751,6 +751,7 @@ class GraphHelper {
 		return HttpRequestHelper::sendRequest($url, '', 'PATCH', $user, $password, $header, $body);
 	}
   
+	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
 	 * @param string $user
