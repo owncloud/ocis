@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Disable default expiration for public links: [#4445](https://github.com/owncloud/ocis/issues/4445)
 * Enhancement - Add previewFileMimeTypes to web default config: [#4414](https://github.com/owncloud/ocis/pull/4414)
+* Enhancement - Refactor the proxy service: [#4401](https://github.com/owncloud/ocis/issues/4401)
 
 ## Details
 
@@ -28,6 +29,15 @@ The following sections list the changes for unreleased.
    preview types are supported by the backend.
 
    https://github.com/owncloud/ocis/pull/4414
+
+* Enhancement - Refactor the proxy service: [#4401](https://github.com/owncloud/ocis/issues/4401)
+
+   The routes of the proxy service now have a "unprotected" flag. This is used by the
+   authentication middleware to determine if the request needs to be blocked when missing
+   authentication or not.
+
+   https://github.com/owncloud/ocis/issues/4401
+   https://github.com/owncloud/ocis/pull/4461
 # Changelog for [2.0.0-beta.7] (2022-08-26)
 
 The following sections list the changes for 2.0.0-beta.7.
