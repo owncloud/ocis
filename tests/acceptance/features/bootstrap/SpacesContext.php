@@ -61,6 +61,11 @@ class SpacesContext implements Context {
 	private WebDavPropertiesContext $webDavPropertiesContext;
 
 	/**
+	 * @var FavoritesContext
+	 */
+	private FavoritesContext $favoritesContext;
+
+	/**
 	 * @var string
 	 */
 	private string $baseUrl;
@@ -430,6 +435,7 @@ class SpacesContext implements Context {
 		$this->ocsContext = $environment->getContext('OCSContext');
 		$this->trashbinContext = $environment->getContext('TrashbinContext');
 		$this->webDavPropertiesContext = $environment->getContext('WebDavPropertiesContext');
+		$this->favoritesContext = $environment->getContext('FavoritesContext');
 		// Run the BeforeScenario function in OCSContext to set it up correctly
 		$this->ocsContext->before($scope);
 		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
@@ -616,28 +622,6 @@ class SpacesContext implements Context {
 		array $headers = []
 	): ResponseInterface {
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, $method, $user, $password, $headers);
-	}
-
-	/**
-	 * send proppatch request to url
-	 *
-	 * @param string $fullUrl
-	 * @param string $user
-	 * @param string $password
-	 * @param string $xRequestId
-	 * @param array $headers
-	 * @param mixed|null $body
-	 * @return ResponseInterface
-	 */
-	public function sendPropPatchRequest(
-		string $fullUrl,
-		string $user,
-		string $password,
-		string $xRequestId = '',
-		array  $headers = [],
-		$body
-	): ResponseInterface {
-		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'PROPPATCH', $user, $password, $headers, $body);
 	}
 
 	/**
@@ -3276,25 +3260,6 @@ class SpacesContext implements Context {
 	 */
 	public function userFavoritesElementInSpaceUsingTheWebdavApi(string $user, string $path, string $spaceName): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($path, "/");
-		$body = '<?xml version="1.0"?>
-				<d:propertyupdate xmlns:d="DAV:"
-				   xmlns:oc="http://owncloud.org/ns">
-				 <d:set>
-				  <d:prop>
-				    <oc:favorite xmlns:oc="http://owncloud.org/ns">1</oc:favorite>
-				  </d:prop>
-				 </d:set>
-				</d:propertyupdate>';
-		$this->featureContext->setResponse(
-			$this->sendProppatchRequest(
-				$fullUrl,
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$this->featureContext->getStepLineRef(),
-				[],
-				$body
-			)
-		);
+		$this->favoritesContext->userFavoritesElement($user, $path, $space['id']);
 	}
 }
