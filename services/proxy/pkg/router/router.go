@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -205,9 +206,16 @@ func (rt Router) Route(r *http.Request) (RoutingInfo, bool) {
 			// use specific method
 			method = r.Method
 		}
-		for endpoint := range rt.directors[pol][rtype][method] {
-			if handler(endpoint, *r.URL) {
 
+		endpoints := make([]string, 0, len(rt.directors[pol][rtype][method]))
+		for endpoint := range rt.directors[pol][rtype][method] {
+			endpoints = append(endpoints, endpoint)
+		}
+		sort.Slice(endpoints, func(i, j int) bool {
+			return len(endpoints[j]) < len(endpoints[i])
+		})
+		for _, endpoint := range endpoints {
+			if handler(endpoint, *r.URL) {
 				rt.logger.Debug().
 					Str("policy", pol).
 					Str("method", r.Method).
