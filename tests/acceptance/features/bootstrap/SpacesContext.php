@@ -270,6 +270,21 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * This method sets space id by Space Name
+	 * This is currently used to set space id from ocis in core so that we can reuse available resource (code) and avoid duplication
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function setSpaceIDByName(string $user, string $spaceName): void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		WebDavHelper::$SPACE_ID_FROM_OCIS = $space['id'];
+	}
+
+	/**
 	 * The method finds available spaces to the manager user and returns the space by spaceName
 	 *
 	 * @param string $user
@@ -3259,7 +3274,7 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userFavoritesElementInSpaceUsingTheWebdavApi(string $user, string $path, string $spaceName): void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$this->favoritesContext->userFavoritesElement($user, $path, $space['id']);
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->favoritesContext->userFavoritesElement($user, $path);
 	}
 }
