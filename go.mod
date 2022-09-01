@@ -9,7 +9,7 @@ require (
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
 	github.com/blevesearch/bleve/v2 v2.3.4
 	github.com/blevesearch/bleve_index_api v1.0.3
-	github.com/coreos/go-oidc/v3 v3.2.0
+	github.com/coreos/go-oidc/v3 v3.3.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220818202316-e92afdddac6d
 	github.com/cs3org/reva/v2 v2.8.0
 	github.com/disintegration/imaging v1.6.2
@@ -74,8 +74,8 @@ require (
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 	golang.org/x/exp v0.0.0-20220518171630-0b5c67f07fdf
 	golang.org/x/image v0.0.0-20220321031419-a8550c1d254a
-	golang.org/x/net v0.0.0-20220722155237-a158d28d115b
-	golang.org/x/oauth2 v0.0.0-20220722155238-128564f6959c
+	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b
+	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094
 	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035
 	golang.org/x/text v0.3.7
 	google.golang.org/genproto v0.0.0-20220805133916-01dd62135a58
