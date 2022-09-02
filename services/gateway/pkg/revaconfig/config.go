@@ -52,6 +52,8 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 					"transfer_shared_secret":         cfg.TransferSecret,
 					"transfer_expires":               cfg.TransferExpires,
 					"etag_cache_ttl":                 cfg.EtagCacheTTL,
+					"personal_quota_default":         cfg.DefaultPersonalQuota,
+					"group_quota_file":               cfg.GroupQuotaFile,
 				},
 				"authregistry": map[string]interface{}{
 					"driver": "static",

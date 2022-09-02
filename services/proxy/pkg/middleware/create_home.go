@@ -9,7 +9,6 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"github.com/owncloud/ocis/v2/ocis-pkg/bytesize"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"google.golang.org/grpc/metadata"
 )
@@ -19,29 +18,11 @@ func CreateHome(optionSetters ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(optionSetters...)
 	logger := options.Logger
 
-	// NOTE: reva currently expects bytes to work with - so we need to convert the human readable string
-	// to an uint64 and then convert this to a string again.
-	// It would possibly be simpler to convert bytes sizes on reva side,
-	// but then all byte handling endpoints should be able to do this
-	var defaultQuota string
-	if options.DefaultSpaceQuota != "" {
-		q, err := bytesize.Parse(options.DefaultSpaceQuota)
-		if err != nil {
-			logger.Error().Str("quota", options.DefaultSpaceQuota).Err(err).Msg("can't parse default quota size - using unlimited")
-		}
-
-		if q != 0 {
-			defaultQuota = q.String()
-		}
-
-	}
-
 	return func(next http.Handler) http.Handler {
 		return &createHome{
 			next:              next,
 			logger:            logger,
 			revaGatewayClient: options.RevaGatewayClient,
-			defaultQuota:      defaultQuota,
 		}
 	}
 }
@@ -64,6 +45,28 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// we need to pass the token to authenticate the CreateHome request.
 	//ctx := tokenpkg.ContextSetToken(r.Context(), token)
 	ctx := metadata.AppendToOutgoingContext(req.Context(), revactx.TokenHeader, token)
+
+	getHomeReq := &provider.ListStorageSpacesRequest{
+		Filters: []*provider.ListStorageSpacesRequest_Filter{
+			{
+				Type: provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
+				Term: &provider.ListStorageSpacesRequest_Filter_SpaceType{
+					SpaceType: "personal",
+				},
+			},
+		},
+	}
+
+	getHomeResp, err := m.revaGatewayClient.ListStorageSpaces(ctx, getHomeReq)
+	if err != nil || getHomeResp.Status.Code != rpc.Code_CODE_OK {
+		m.next.ServeHTTP(w, req)
+		return
+	}
+
+	if len(getHomeResp.StorageSpaces) != 0 {
+		m.next.ServeHTTP(w, req)
+		return
+	}
 
 	createHomeReq := &provider.CreateHomeRequest{}
 	if m.defaultQuota != "" {
