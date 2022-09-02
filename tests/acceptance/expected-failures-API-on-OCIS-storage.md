@@ -869,7 +869,7 @@ _ocdav: api compatibility, return correct status code_
 
 - [apiCapabilities/capabilitiesWithNormalUser.feature:11](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiCapabilities/capabilitiesWithNormalUser.feature#L11) Scenario: getting default capabilities with normal user
 
-#### [/webdav and spaces endpoint does not alloow REPORT requests](https://github.com/owncloud/ocis/issues/4034)
+#### [/webdav and spaces endpoint does not allow REPORT requests](https://github.com/owncloud/ocis/issues/4034)
 
 - [apiWebdavOperations/search.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L48)
 - [apiWebdavOperations/search.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L70)
@@ -1301,5 +1301,20 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiAuthWebDav/webDavDELETEAuth.feature:188](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavDELETEAuth.feature#L188)
 - [apiAuthWebDav/webDavDELETEAuth.feature:199](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavDELETEAuth.feature#L199)
 
+#### [search tests are parsing id wrongly](https://github.com/owncloud/ocis/pull/4485)
+- [apiWebdavOperations/search.feature:126](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L126)
+- [apiWebdavOperations/search.feature:127](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L127)
+- [apiWebdavOperations/search.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L150)
+- [apiWebdavOperations/search.feature:151](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L151)
+- [apiWebdavOperations/search.feature:42](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L42)
+- [apiWebdavOperations/search.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L43)
+- [apiWebdavOperations/search.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L64)
+- [apiWebdavOperations/search.feature:65](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L65)
+- [apiWebdavOperations/search.feature:87](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L87)
+- [apiWebdavOperations/search.feature:88](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L88)
+- [apiWebdavOperations/search.feature:174](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L174)
+- [apiWebdavOperations/search.feature:175](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L175)
+- [apiWebdavOperations/search.feature:264](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L264)
+- [apiWebdavOperations/search.feature:265](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L265)
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
