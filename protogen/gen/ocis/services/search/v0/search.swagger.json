@@ -192,6 +192,9 @@
         },
         "deleted": {
           "type": "boolean"
+        },
+        "shareRootName": {
+          "type": "string"
         }
       }
     },
