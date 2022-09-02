@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Disable default expiration for public links: [#4445](https://github.com/owncloud/ocis/issues/4445)
 * Enhancement - Add previewFileMimeTypes to web default config: [#4414](https://github.com/owncloud/ocis/pull/4414)
+* Enhancement - Improve login screen design: [#4500](https://github.com/owncloud/ocis/pull/4500)
 * Enhancement - Refactor the proxy service: [#4401](https://github.com/owncloud/ocis/issues/4401)
 
 ## Details
@@ -29,6 +30,13 @@ The following sections list the changes for unreleased.
    preview types are supported by the backend.
 
    https://github.com/owncloud/ocis/pull/4414
+
+* Enhancement - Improve login screen design: [#4500](https://github.com/owncloud/ocis/pull/4500)
+
+   We've improved the design of the login screen to match with the general design used in Web.
+
+   https://github.com/owncloud/web/issues/7552
+   https://github.com/owncloud/ocis/pull/4500
 
 * Enhancement - Refactor the proxy service: [#4401](https://github.com/owncloud/ocis/issues/4401)
 
