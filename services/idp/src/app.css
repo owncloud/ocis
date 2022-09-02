@@ -1,6 +1,13 @@
 /* additional css on top of kpop */
+@font-face {
+  font-family: Inter;
+  src: url(./fonts/inter.ttf) format('truetype');
+  font-weight: 100 900;
+  font-style: oblique 0deg 12deg;
+}
+
 body {
-  font-family: 'Open Sans', sans-serif;
+  font-family: Inter, 'Open Sans', sans-serif;
 }
 
 strong {
@@ -43,7 +50,7 @@ strong {
 
 .oc-input {
   background-color: #fff;
-  border: 1px solid rgba(78, 133, 200, 0.8);
+  border: 1px solid #fff;
   border-radius: 3px;
   height: 40px;
   width: 300px;
@@ -70,10 +77,6 @@ strong {
 .oc-input:focus {
   outline: none;
   border: 1px solid #fff;
-}
-
-.oc-input::placeholder {
-  color: rgba(78, 133, 200, 0.8);
 }
 
 .oc-input + .oc-input {
