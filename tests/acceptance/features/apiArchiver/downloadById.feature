@@ -17,7 +17,7 @@ Feature: download multiple resources bundled into an archive
     When user "Alice" downloads the archive of "/textfile0.txt" using the resource id and setting these headers
       | header     | value        |
       | User-Agent | <user-agent> |
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "300"
     And the downloaded <archive-type> archive should contain these files:
       | name          | content   |
       | textfile0.txt | some data |

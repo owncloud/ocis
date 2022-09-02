@@ -120,7 +120,7 @@ Feature: download multiple resources bundled into an archive
     When user "Brian" downloads the archive of "/home/Shares" using the resource path and setting these headers
       | header     | value        |
       | User-Agent | <user-agent> |
-    Then the HTTP status code should be "300"
+    Then the HTTP status code should be "200"
     And the downloaded <archive-type> archive should contain these files:
       | name                               | content    |
       | Shares/textfile0.txt               | some data  |
