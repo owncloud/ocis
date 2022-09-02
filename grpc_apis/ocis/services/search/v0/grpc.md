@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.search.v0"
 url: /grpc_apis/ocis_services_search_v0
-date: 2022-09-02T13:03:36Z
+date: 2022-09-02T15:09:32Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
