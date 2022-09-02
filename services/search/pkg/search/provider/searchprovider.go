@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -26,6 +27,25 @@ import (
 
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
+)
+
+// Permissions is copied from reva internal conversion pkg
+type Permissions uint
+
+// consts are copied from reva internal conversion pkg
+const (
+	// PermissionInvalid represents an invalid permission
+	PermissionInvalid Permissions = 0
+	// PermissionRead grants read permissions on a resource
+	PermissionRead Permissions = 1 << (iota - 1)
+	// PermissionWrite grants write permissions on a resource
+	PermissionWrite
+	// PermissionCreate grants create permissions on a resource
+	PermissionCreate
+	// PermissionDelete grants delete permissions on a resource
+	PermissionDelete
+	// PermissionShare grants share permissions on a resource
+	PermissionShare
 )
 
 var ListenEvents = []events.Unmarshaller{
@@ -119,7 +139,11 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			SpaceId:   space.Root.SpaceId,
 			OpaqueId:  space.Root.OpaqueId,
 		}
-		var mountpointRootId *searchmsg.ResourceID
+		var (
+			mountpointRootID *searchmsg.ResourceID
+			rootName         string
+			permissions      *provider.ResourcePermissions
+		)
 		mountpointPrefix := ""
 		switch space.SpaceType {
 		case "mountpoint":
@@ -127,7 +151,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		case "grant":
 			// In case of grant spaces we search the root of the outer space and translate the paths to the according mountpoint
 			searchRootId.OpaqueId = space.Root.SpaceId
-			mountpointId, ok := mountpointMap[space.Id.OpaqueId]
+			mountpointID, ok := mountpointMap[space.Id.OpaqueId]
 			if !ok {
 				p.logger.Warn().Interface("space", space).Msg("could not find mountpoint space for grant space")
 				continue
@@ -144,17 +168,19 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 				continue
 			}
 			mountpointPrefix = utils.MakeRelativePath(gpRes.Path)
-			sid, spid, oid, err := storagespace.SplitID(mountpointId)
+			sid, spid, oid, err := storagespace.SplitID(mountpointID)
 			if err != nil {
-				p.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Str("mountpointId", mountpointId).Msg("invalid mountpoint space id")
+				p.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Str("mountpointId", mountpointID).Msg("invalid mountpoint space id")
 				continue
 			}
-			mountpointRootId = &searchmsg.ResourceID{
+			mountpointRootID = &searchmsg.ResourceID{
 				StorageId: sid,
 				SpaceId:   spid,
 				OpaqueId:  oid,
 			}
-			p.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootId).Msg("searching a grant")
+			rootName = space.GetRootInfo().GetPath()
+			permissions = space.GetRootInfo().GetPermissionSet()
+			p.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootID).Msg("searching a grant")
 		}
 
 		res, err := p.indexClient.Search(ctx, &searchsvc.SearchIndexRequest{
@@ -176,9 +202,11 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			if mountpointPrefix != "" {
 				match.Entity.Ref.Path = utils.MakeRelativePath(strings.TrimPrefix(match.Entity.Ref.Path, mountpointPrefix))
 			}
-			if mountpointRootId != nil {
-				match.Entity.Ref.ResourceId = mountpointRootId
+			if mountpointRootID != nil {
+				match.Entity.Ref.ResourceId = mountpointRootID
 			}
+			match.Entity.ShareRootName = rootName
+			match.Entity.Permissions = convertToOCS(permissions)
 			matches = append(matches, match)
 		}
 	}
@@ -278,4 +306,41 @@ func formatQuery(q string) string {
 
 	// this is a basic filename search
 	return "Name:*" + strings.ReplaceAll(strings.ToLower(query), " ", `\ `) + "*"
+}
+
+// NOTE: this converts cs3 to ocs permissions
+// since conversions pkg is reva internal we have no other choice than to duplicate the logic
+func convertToOCS(p *provider.ResourcePermissions) string {
+	var ocs Permissions
+	if p == nil {
+		return ""
+	}
+	if p.ListContainer &&
+		p.ListFileVersions &&
+		p.ListRecycle &&
+		p.Stat &&
+		p.GetPath &&
+		p.GetQuota &&
+		p.InitiateFileDownload {
+		ocs |= PermissionRead
+	}
+	if p.InitiateFileUpload &&
+		p.RestoreFileVersion &&
+		p.RestoreRecycleItem {
+		ocs |= PermissionWrite
+	}
+	if p.ListContainer &&
+		p.Stat &&
+		p.CreateContainer &&
+		p.InitiateFileUpload {
+		ocs |= PermissionCreate
+	}
+	if p.Delete &&
+		p.PurgeRecycle {
+		ocs |= PermissionDelete
+	}
+	if p.AddGrant {
+		ocs |= PermissionShare
+	}
+	return strconv.FormatUint(uint64(ocs), 10)
 }
