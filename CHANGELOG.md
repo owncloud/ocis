@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Disable default expiration for public links: [#4445](https://github.com/owncloud/ocis/issues/4445)
+* Bugfix - Translations on login page: [#7550](https://github.com/owncloud/web/issues/7550)
 * Bugfix - Fix search report: [#7557](https://github.com/owncloud/web/issues/7557)
 * Enhancement - Add previewFileMimeTypes to web default config: [#4414](https://github.com/owncloud/ocis/pull/4414)
 * Enhancement - Improve login screen design: [#4500](https://github.com/owncloud/ocis/pull/4500)
@@ -24,6 +25,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4445
    https://github.com/owncloud/ocis/pull/4475
+
+* Bugfix - Translations on login page: [#7550](https://github.com/owncloud/web/issues/7550)
+
+   We've fixed several translations on the login page. Also, the browser language is now being
+   used properly to determine the language.
+
+   https://github.com/owncloud/web/issues/7550
+   https://github.com/owncloud/ocis/pull/4504
 
 * Bugfix - Fix search report: [#7557](https://github.com/owncloud/web/issues/7557)
 
