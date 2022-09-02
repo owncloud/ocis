@@ -14,7 +14,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * A helper class for managing users and groups using the Graph API
+ * A helper class for managing Graph API requests
  */
 class GraphHelper {
 	/**
@@ -524,6 +524,233 @@ class GraphHelper {
 		return \json_encode($payload);
 	}
 	
+	/**
+	 * Send Graph Create Space Request
+	 *
+	 * @param string $baseUrl
+	 * @param  string $user
+	 * @param  string $password
+	 * @param  string $body
+	 * @param  string $xRequestId
+	 * @param  array  $headers
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function createSpace(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $body,
+		string $xRequestId = '',
+		array $headers = []
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'drives');
+
+		return HttpRequestHelper::post($url, $xRequestId, $user, $password, $headers, $body);
+	}
+
+	/**
+	 * Send Graph Update Space Request
+	 *
+	 * @param  string $baseUrl
+	 * @param  string $user
+	 * @param  string $password
+	 * @param  mixed $body
+	 * @param  string $spaceId
+	 * @param  string $xRequestId
+	 * @param  array  $headers
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function updateSpace(
+		string $baseUrl,
+		string $user,
+		string $password,
+		$body,
+		string $spaceId,
+		string $xRequestId = '',
+		array $headers = []
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId);
+
+		return HttpRequestHelper::sendRequest($url, $xRequestId, 'PATCH', $user, $password, $headers, $body);
+	}
+
+	/**
+	 * Send Graph List My Spaces Request
+	 *
+	 * @param  string $baseUrl
+	 * @param  string $user
+	 * @param  string $password
+	 * @param  string $urlArguments
+	 * @param  string $xRequestId
+	 * @param  array  $body
+	 * @param  array  $headers
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 */
+	public static function getMySpaces(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $urlArguments = '',
+		string $xRequestId = '',
+		array  $body = [],
+		array  $headers = []
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'me/drives/' . $urlArguments);
+
+		return HttpRequestHelper::get($url, $xRequestId, $user, $password, $headers, $body);
+	}
+
+	/**
+	 * Send Graph List All Spaces Request
+	 *
+	 * @param  string $baseUrl
+	 * @param  string $user
+	 * @param  string $password
+	 * @param  string $urlArguments
+	 * @param  string $xRequestId
+	 * @param  array  $body
+	 * @param  array  $headers
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 */
+	public static function getAllSpaces(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $urlArguments = '',
+		string $xRequestId = '',
+		array  $body = [],
+		array  $headers = []
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'drives/' . $urlArguments);
+
+		return HttpRequestHelper::get($url, $xRequestId, $user, $password, $headers, $body);
+	}
+
+	/**
+	 * Send Graph List Single Space Request
+	 *
+	 * @param string $baseUrl
+	 * @param string $user
+	 * @param string $password
+	 * @param string $spaceId
+	 * @param string $urlArguments
+	 * @param string $xRequestId
+	 * @param array $body
+	 * @param array $headers
+	 *
+	 * @return ResponseInterface
+	 *
+	 */
+	public static function getSingleSpace(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $spaceId,
+		string $urlArguments = '',
+		string $xRequestId = '',
+		array  $body = [],
+		array  $headers = []
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId . "/" . $urlArguments);
+
+		return HttpRequestHelper::get($url, $xRequestId, $user, $password, $headers, $body);
+	}
+
+	/**
+	 * send disable space request
+	 * 
+	 * @param string $baseUrl
+	 * @param string $user
+	 * @param string $password
+	 * @param string $spaceId
+	 * @param string $xRequestId
+	 * 
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function disableSpace(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $spaceId,
+		string $xRequestId = ''
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId);
+		
+		return HttpRequestHelper::delete(
+			$url,
+			$xRequestId,
+			$user,
+			$password
+		);
+	}
+
+	/**
+	 * send delete space request
+	 * 
+	 * @param string $baseUrl
+	 * @param string $user
+	 * @param string $password
+	 * @param string $spaceId
+	 * @param array  $header
+	 * @param string $xRequestId
+	 * 
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function deleteSpace(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $spaceId,
+		array $header,
+		string $xRequestId = ''
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId);
+		
+		return HttpRequestHelper::delete(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			$header
+		);
+	}
+
+	/**
+	 * Send restore Space Request
+	 *
+	 * @param  string $baseUrl
+	 * @param  string $user
+	 * @param  string $password
+	 * @param  string $spaceId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function restoreSpace(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $spaceId
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId);
+		$header = ["restore" => true];
+		$body = '{}';
+
+		return HttpRequestHelper::sendRequest($url, '', 'PATCH', $user, $password, $header, $body);
+	}
+  
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
