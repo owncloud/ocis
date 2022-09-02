@@ -2334,16 +2334,14 @@ class SpacesContext implements Context {
 		string $user,
 		string $spaceName
 	): void {
-		$header = ["Purge" => "T"];
 		$space = $this->getSpaceByName($user, $spaceName);
-		
+
 		$this->featureContext->setResponse(
 			GraphHelper::deleteSpace(
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$space["id"],
-				$header
+				$space["id"]
 			)
 		);
 	}

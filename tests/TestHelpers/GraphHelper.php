@@ -523,7 +523,7 @@ class GraphHelper {
 		}
 		return \json_encode($payload);
 	}
-	
+
 	/**
 	 * Send Graph Create Space Request
 	 *
@@ -668,13 +668,13 @@ class GraphHelper {
 
 	/**
 	 * send disable space request
-	 * 
+	 *
 	 * @param string $baseUrl
 	 * @param string $user
 	 * @param string $password
 	 * @param string $spaceId
 	 * @param string $xRequestId
-	 * 
+	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
@@ -686,7 +686,7 @@ class GraphHelper {
 		string $xRequestId = ''
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId);
-		
+
 		return HttpRequestHelper::delete(
 			$url,
 			$xRequestId,
@@ -697,14 +697,13 @@ class GraphHelper {
 
 	/**
 	 * send delete space request
-	 * 
+	 *
 	 * @param string $baseUrl
 	 * @param string $user
 	 * @param string $password
 	 * @param string $spaceId
-	 * @param array  $header
 	 * @param string $xRequestId
-	 * 
+	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
@@ -713,11 +712,11 @@ class GraphHelper {
 		string $user,
 		string $password,
 		string $spaceId,
-		array $header,
 		string $xRequestId = ''
 	): ResponseInterface {
 		$url = self::getFullUrl($baseUrl, 'drives/' . $spaceId);
-		
+		$header = ["Purge" => "T"];
+
 		return HttpRequestHelper::delete(
 			$url,
 			$xRequestId,
@@ -750,7 +749,7 @@ class GraphHelper {
 
 		return HttpRequestHelper::sendRequest($url, '', 'PATCH', $user, $password, $header, $body);
 	}
-  
+
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
@@ -773,7 +772,7 @@ class GraphHelper {
 		$url = self::getFullUrl($baseUrl, 'me/changePassword');
 		$payload['currentPassword'] = $currentPassword;
 		$payload['newPassword'] = $newPassword;
-		
+
 		return HttpRequestHelper::sendRequest(
 			$url,
 			$xRequestId,
