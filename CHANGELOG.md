@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Disable default expiration for public links: [#4445](https://github.com/owncloud/ocis/issues/4445)
+* Bugfix - Fix search report: [#7557](https://github.com/owncloud/web/issues/7557)
 * Enhancement - Add previewFileMimeTypes to web default config: [#4414](https://github.com/owncloud/ocis/pull/4414)
 * Enhancement - Improve login screen design: [#4500](https://github.com/owncloud/ocis/pull/4500)
 * Enhancement - Refactor the proxy service: [#4401](https://github.com/owncloud/ocis/issues/4401)
@@ -23,6 +24,18 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4445
    https://github.com/owncloud/ocis/pull/4475
+
+* Bugfix - Fix search report: [#7557](https://github.com/owncloud/web/issues/7557)
+
+   There were multiple issues with REPORT search responses from webdav. Also we want it to be
+   consistent with PROPFIND responses. * the `remote.php` prefix was missing from the href
+   (added even though not neccessary) * the ids were formatted wrong, they should look different
+   for shares and spaces. * the name of the resource was missing * the shareid was missing (for
+   shares) * the prop `shareroot` (containing the name of the share root) was missing * the
+   permissions prop was empty
+
+   https://github.com/owncloud/web/issues/7557
+   https://github.com/owncloud/ocis/pull/4484
 
 * Enhancement - Add previewFileMimeTypes to web default config: [#4414](https://github.com/owncloud/ocis/pull/4414)
 
