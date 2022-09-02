@@ -28,6 +28,7 @@ message Entity {
 	string permissions = 8;
 	uint64 type = 9;
 	bool deleted = 10;
+	string shareRootName = 11;
 }
 
 message Match {
