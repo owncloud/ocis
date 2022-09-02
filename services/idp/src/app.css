@@ -92,8 +92,8 @@ strong {
 .oc-button-primary {
   /* Needs to be important to overwrite material-ui */
   width: 100%;
-  background-size: 103% !important;
   background: linear-gradient(to right, #2c588e, #4e85c8) -1px;
+  background-size: 103% !important;
   border: 1px solid transparent !important;
 }
 
