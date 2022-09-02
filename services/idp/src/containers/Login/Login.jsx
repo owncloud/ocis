@@ -147,8 +147,8 @@ function Login(props) {
               margin="normal"
               onChange={handleChange('password')}
               autoComplete="kopano-account current-password"
-              placeholder={t("konnect.login.usernameField.label", "Password")}
-              label={t("konnect.login.usernameField.label", "Password")}
+              placeholder={t("konnect.login.passwordField.label", "Password")}
+              label={t("konnect.login.passwordField.label", "Password")}
               id="oc-login-password"
               {...extraPropsPassword}
           />
