@@ -6,6 +6,10 @@
   font-style: oblique 0deg 12deg;
 }
 
+html {
+  font-feature-settings: "cv11";
+}
+
 body {
   font-family: Inter, 'Open Sans', sans-serif;
 }
