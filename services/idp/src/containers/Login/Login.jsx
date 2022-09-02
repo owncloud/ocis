@@ -155,7 +155,6 @@ function Login(props) {
           {hasError && <Typography id="oc-login-error-message" variant="subtitle2" component="span" color="error" className={classes.message}>{errorMessage}</Typography>}
           <div className={classes.wrapper}>
             {loginFailed && passwordResetLink && <Link id="oc-login-password-reset" href={passwordResetLink} variant="subtitle2">{"Reset password?"}</Link>}
-            <br />
             <Button
               type="submit"
               color="primary"

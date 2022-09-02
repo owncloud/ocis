@@ -42,10 +42,9 @@ strong {
 }
 
 .oc-input {
-  background-color: #042047;
+  background-color: #fff;
   border: 1px solid rgba(78, 133, 200, 0.8);
   border-radius: 3px;
-  color: rgba(255, 255, 255, 0.8);
   height: 40px;
   width: 300px;
   padding: 16px;
@@ -92,15 +91,10 @@ strong {
 
 .oc-button-primary {
   /* Needs to be important to overwrite material-ui */
-  background-color: #4a76ac !important;
+  width: 100%;
+  background-size: 103% !important;
+  background: linear-gradient(to right, #2c588e, #4e85c8) -1px;
   border: 1px solid transparent !important;
-}
-
-.oc-button-primary:hover,
-.oc-button-primary:focus {
-  /* Needs to be important to overwrite material-ui */
-  background-color: #4a76ac !important;
-  border: 1px solid white !important;
 }
 
 .oc-checkbox-dark svg {
@@ -123,7 +117,7 @@ strong {
 
 /* Helpers */
 .oc-mt-l {
-  margin-top: 30px !important;
+  margin-top: 24px !important;
 }
 
 .oc-mb-m {
