@@ -57,6 +57,7 @@ func New(policySelector *config.PolicySelector, policies []config.Policy, logger
 	}
 
 	r := Router{
+		logger:         logger,
 		directors:      make(map[string]map[config.RouteType]map[string]map[string]RoutingInfo),
 		policySelector: selector,
 	}
