@@ -317,6 +317,29 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * Download a file using user password
+	 *
+	 * @param string $fullUrl
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function downloadFileAsUserUsingPassword(
+		string $fullUrl,
+		string $user
+	):void {
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				$this->featureContext->getStepLineRef(),
+				'GET',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+			)
+		);
+	}
+
+	/**
 	 * The method returns fileId
 	 *
 	 * @param string $user
@@ -1872,6 +1895,39 @@ class SpacesContext implements Context {
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
 		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
 		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
+	}
+
+	/**
+	 * @Then /^user "([^"]*)" should not be able to download file "([^"]*)" from space "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $fileName
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userShouldNotBeAbleToDownloadFileInsideSpace(
+		string $user,
+		string $fileName,
+		string $spaceName
+	):void {
+		$space = $this->getSpaceByName($user, $spaceName);
+		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileName, "/");
+		$this->downloadFileAsUserUsingPassword($fullUrl, $user);
+		Assert::assertGreaterThanOrEqual(
+			400,
+			$this->featureContext->getResponse()->getStatusCode(),
+			__METHOD__
+			. ' download must fail'
+		);
+		Assert::assertLessThanOrEqual(
+			499,
+			$this->featureContext->getResponse()->getStatusCode(),
+			__METHOD__
+			. ' 4xx error expected but got status code "'
+			. $this->featureContext->getResponse()->getStatusCode() . '"'
+		);
 	}
 
 	/**
