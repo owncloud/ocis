@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
-	"sort"
 	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -58,7 +57,7 @@ func New(policySelector *config.PolicySelector, policies []config.Policy, logger
 
 	r := Router{
 		logger:         logger,
-		directors:      make(map[string]map[config.RouteType]map[string]map[string]RoutingInfo),
+		directors:      make(map[string]map[config.RouteType]map[string][]RoutingInfo),
 		policySelector: selector,
 	}
 	for _, pol := range policies {
@@ -87,6 +86,7 @@ func New(policySelector *config.PolicySelector, policies []config.Policy, logger
 // RoutingInfo contains the proxy director and some information about the route.
 type RoutingInfo struct {
 	director    func(*http.Request)
+	endpoint    string
 	unprotected bool
 }
 
@@ -103,30 +103,31 @@ func (r RoutingInfo) IsRouteUnprotected() bool {
 // Router handles the routing of HTTP requests according to the given policies.
 type Router struct {
 	logger         log.Logger
-	directors      map[string]map[config.RouteType]map[string]map[string]RoutingInfo
+	directors      map[string]map[config.RouteType]map[string][]RoutingInfo
 	policySelector policy.Selector
 }
 
 func (rt Router) addHost(policy string, target *url.URL, route config.Route) {
 	targetQuery := target.RawQuery
 	if rt.directors[policy] == nil {
-		rt.directors[policy] = make(map[config.RouteType]map[string]map[string]RoutingInfo)
+		rt.directors[policy] = make(map[config.RouteType]map[string][]RoutingInfo)
 	}
 	routeType := config.DefaultRouteType
 	if route.Type != "" {
 		routeType = route.Type
 	}
 	if rt.directors[policy][routeType] == nil {
-		rt.directors[policy][routeType] = make(map[string]map[string]RoutingInfo)
+		rt.directors[policy][routeType] = make(map[string][]RoutingInfo)
 	}
 	if rt.directors[policy][routeType][route.Method] == nil {
-		rt.directors[policy][routeType][route.Method] = make(map[string]RoutingInfo)
+		rt.directors[policy][routeType][route.Method] = make([]RoutingInfo, 0)
 	}
 
 	reg := registry.GetRegistry()
 	sel := selector.NewSelector(selector.Registry(reg))
 
-	rt.directors[policy][routeType][route.Method][route.Endpoint] = RoutingInfo{
+	rt.directors[policy][routeType][route.Method] = append(rt.directors[policy][routeType][route.Method], RoutingInfo{
+		endpoint:    route.Endpoint,
 		unprotected: route.Unprotected,
 		director: func(req *http.Request) {
 			if route.Service != "" {
@@ -170,7 +171,7 @@ func (rt Router) addHost(policy string, target *url.URL, route config.Route) {
 				req.Header.Set("User-Agent", "")
 			}
 		},
-	}
+	})
 }
 
 // Route is evaluating the policies on the request and returns the RoutingInfo if successful.
@@ -208,32 +209,25 @@ func (rt Router) Route(r *http.Request) (RoutingInfo, bool) {
 			method = r.Method
 		}
 
-		endpoints := make([]string, 0, len(rt.directors[pol][rtype][method]))
-		for endpoint := range rt.directors[pol][rtype][method] {
-			endpoints = append(endpoints, endpoint)
-		}
-		sort.Slice(endpoints, func(i, j int) bool {
-			return len(endpoints[j]) < len(endpoints[i])
-		})
-		for _, endpoint := range endpoints {
-			if handler(endpoint, *r.URL) {
+		for _, ri := range rt.directors[pol][rtype][method] {
+			if handler(ri.endpoint, *r.URL) {
 				rt.logger.Debug().
 					Str("policy", pol).
 					Str("method", r.Method).
-					Str("prefix", endpoint).
+					Str("prefix", ri.endpoint).
 					Str("path", r.URL.Path).
 					Str("routeType", string(rtype)).
 					Msg("director found")
 
-				return rt.directors[pol][rtype][method][endpoint], true
+				return ri, true
 			}
 		}
 	}
 
 	// override default director with root. If any
-	if ri, ok := rt.directors[pol][config.PrefixRoute][method]["/"]; ok { // try specific method
+	if ri := rt.directors[pol][config.PrefixRoute][method][0]; ri.endpoint == "/" { // try specific method
 		return ri, true
-	} else if ri, ok := rt.directors[pol][config.PrefixRoute][""]["/"]; ok { // fallback to unspecific method
+	} else if ri := rt.directors[pol][config.PrefixRoute][""][0]; ri.endpoint == "/" { // fallback to unspecific method
 		return ri, true
 	}
 
