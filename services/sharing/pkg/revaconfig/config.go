@@ -56,6 +56,13 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"service_user_idp":    cfg.UserSharingDrivers.CS3.SystemUserIDP,
 							"machine_auth_apikey": cfg.UserSharingDrivers.CS3.SystemUserAPIKey,
 						},
+						"jsoncs3": map[string]interface{}{
+							"gateway_addr":        cfg.UserSharingDrivers.JSONCS3.ProviderAddr,
+							"provider_addr":       cfg.UserSharingDrivers.JSONCS3.ProviderAddr,
+							"service_user_id":     cfg.UserSharingDrivers.JSONCS3.SystemUserID,
+							"service_user_idp":    cfg.UserSharingDrivers.JSONCS3.SystemUserIDP,
+							"machine_auth_apikey": cfg.UserSharingDrivers.JSONCS3.SystemUserAPIKey,
+						},
 					},
 				},
 				"publicshareprovider": map[string]interface{}{

@@ -33,12 +33,16 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		UserSharingDriver: "cs3",
+		UserSharingDriver: "jsoncs3",
 		UserSharingDrivers: config.UserSharingDrivers{
 			JSON: config.UserSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "shares.json"),
 			},
 			CS3: config.UserSharingCS3Driver{
+				ProviderAddr:  "127.0.0.1:9215", // system storage
+				SystemUserIDP: "internal",
+			},
+			JSONCS3: config.UserSharingJSONCS3Driver{
 				ProviderAddr:  "127.0.0.1:9215", // system storage
 				SystemUserIDP: "internal",
 			},
@@ -113,6 +117,14 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.UserSharingDrivers.CS3.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
 		cfg.UserSharingDrivers.CS3.SystemUserID = cfg.Commons.SystemUserID
+	}
+
+	if cfg.UserSharingDrivers.JSONCS3.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
+		cfg.UserSharingDrivers.JSONCS3.SystemUserAPIKey = cfg.Commons.SystemUserAPIKey
+	}
+
+	if cfg.UserSharingDrivers.JSONCS3.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
+		cfg.UserSharingDrivers.JSONCS3.SystemUserID = cfg.Commons.SystemUserID
 	}
 
 	if cfg.PublicSharingDrivers.CS3.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
