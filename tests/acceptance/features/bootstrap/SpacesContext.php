@@ -90,11 +90,6 @@ class SpacesContext implements Context {
 	 */
 	private string $davSpacesUrl = '/remote.php/dav/spaces/';
 
-    /**
-     * @var string
-     */
-    private string $storedFileID;
-
 	/**
 	 * @var array map with user as key, spaces and file etags as value
 	 * @example
@@ -3229,5 +3224,39 @@ class SpacesContext implements Context {
 	public function userFavoritesElementInSpaceUsingTheWebdavApi(string $user, string $path, string $spaceName): void {
 		$this->setSpaceIDByName($user, $spaceName);
 		$this->favoritesContext->userFavoritesElement($user, $path);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has stored id of (file|folder) "([^"]*)" of the space "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $fileOrFolder
+	 * @param string $path
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 */
+	public function userHasStoredIdOfPathOfTheSpace(string $user, string $fileOrFolder, string $path, string $spaceName): void {
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->featureContext->userStoresFileIdForPath($user, $fileOrFolder, $path);
+	}
+
+	/**
+	 * @Then /^user "([^"]*)" (folder|file) "([^"]*)" of the space "([^"]*)" should have the previously stored id$/
+	 *
+	 * @param string|null $user
+	 * @param string $fileOrFolder
+	 * @param string $path
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 */
+	public function userFolderOfTheSpaceShouldHaveThePreviouslyStoredId(string $user, string $fileOrFolder, string $path, string $spaceName): void {
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->featureContext->userFileShouldHaveStoredId($user, $fileOrFolder, $path);
 	}
 }

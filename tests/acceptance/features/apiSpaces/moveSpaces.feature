@@ -262,7 +262,7 @@ Feature: move (rename) file
     And user "Brian" folder "/folderB/ONE" of the space "Shares Jail" should have the previously stored id
 
 
-  Scenario: Moving a file out of a shared folder as the sharer
+  Scenario: Moving a file out of a shared folder as a sharer
     Given user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "test data" to "/testshare/testfile.txt"
     And user "Brian" has created a share with settings
@@ -280,7 +280,7 @@ Feature: move (rename) file
       | /testshare/testfile.txt |
 
 
-  Scenario: Moving a folder out of a shared folder as the sharer
+  Scenario: Moving a folder out of a shared folder as a sharer
     Given user "Brian" has created the following folders
       | path                     |
       | /testshare               |
