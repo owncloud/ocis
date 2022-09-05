@@ -21,7 +21,11 @@
 | SHARING_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | |
 | SHARING_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | SHARING_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
-| SHARING_USER_DRIVER | string | cs3 | Driver to be used to persist shares. Supported values are 'json', 'cs3' and 'owncloudsql'.|
+| SHARING_USER_DRIVER | string | jsoncs3 | Driver to be used to persist shares. Supported values are 'json', 'cs3' and 'owncloudsql'.|
+| SHARING_USER_CS3_PROVIDER_ADDR | string | 127.0.0.1:9215 | GRPC address of the STORAGE-SYSTEM service.|
+| OCIS_SYSTEM_USER_ID<br/>SHARING_USER_CS3_SYSTEM_USER_ID | string |  | ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|
+| OCIS_SYSTEM_USER_IDP<br/>SHARING_USER_CS3_SYSTEM_USER_IDP | string | internal | IDP of the oCIS STORAGE-SYSTEM system user.|
+| OCIS_SYSTEM_USER_API_KEY<br/>SHARING_USER_CS3_SYSTEM_USER_API_KEY | string |  | API key for the STORAGE-SYSTEM system user.|
 | SHARING_USER_JSON_FILE | string | ~/.ocis/storage/shares.json | Path to the JSON file where shares will be persisted.|
 | SHARING_USER_CS3_PROVIDER_ADDR | string | 127.0.0.1:9215 | GRPC address of the STORAGE-SYSTEM service.|
 | OCIS_SYSTEM_USER_ID<br/>SHARING_USER_CS3_SYSTEM_USER_ID | string |  | ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|
