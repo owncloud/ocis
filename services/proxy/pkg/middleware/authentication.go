@@ -51,7 +51,8 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			ri := router.ContextRoutingInfo(r.Context())
 			if isOIDCTokenAuth(r) || ri.IsRouteUnprotected() {
-				// The authentication for this request is handled by the IdP.
+				// Either this is a request that does not need any authentication or
+				// the authentication for this request is handled by the IdP.
 				next.ServeHTTP(w, r)
 				return
 			}
