@@ -270,7 +270,6 @@ class SpacesContext implements Context {
 		$spaces = $this->getAvailableSpaces();
 		Assert::assertIsArray($spaces[$spaceName], "Space with name $spaceName for user $user not found");
 		Assert::assertNotEmpty($spaces[$spaceName]["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName for user $user not found");
-
 		return $spaces[$spaceName];
 	}
 
@@ -1629,6 +1628,29 @@ class SpacesContext implements Context {
 				$body,
 				$spaceId
 			)
+		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has changed the quota of the personal space of "([^"]*)" space to "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param int $newQuota
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userHasChangedTheQuotaOfTheSpaceTo(
+		string $user,
+		string $spaceName,
+		int $newQuota
+	): void {
+		$this->updateSpaceQuota($user, $spaceName, $newQuota);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
 		);
 	}
 
