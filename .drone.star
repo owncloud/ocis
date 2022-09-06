@@ -149,9 +149,6 @@ config = {
     },
     "litmus": True,
     "codestyle": True,
-    "branches": [
-        "master",
-    ],
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -228,9 +225,9 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
+        codestyle(ctx) + \
         buildWebCache(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
-        codestyle(ctx) + \
         cacheCoreReposForTesting(ctx) + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
@@ -593,7 +590,7 @@ def codestyle(ctx):
     pipelines = []
 
     if "codestyle" not in config:
-        return pipelines
+        return []
 
     default = {
         "phpVersions": [DEFAULT_PHP_VERSION],
@@ -633,7 +630,7 @@ def codestyle(ctx):
                     "base": "/drone",
                     "path": "src",
                 },
-                "steps": skipIfUnchanged(ctx, "acceptance-tests") +
+                "steps": skipIfUnchanged(ctx, "lint") +
                          vendorbinCodestyle(phpVersion) +
                          vendorbinCodesniffer(phpVersion) +
                          [
@@ -648,14 +645,12 @@ def codestyle(ctx):
                 "depends_on": [],
                 "trigger": {
                     "ref": [
+                        "refs/heads/master",
                         "refs/pull/**",
                         "refs/tags/**",
                     ],
                 },
             }
-
-            for branch in config["branches"]:
-                result["trigger"]["ref"].append("refs/heads/%s" % branch)
 
             pipelines.append(result)
 
@@ -2109,17 +2104,15 @@ def skipIfUnchanged(ctx, type):
     ]
 
     skip = []
-    if type == "acceptance-tests":
+    if type == "acceptance-tests" or type == "e2e-tests" or type == "lint":
         skip = base + unit
-    if type == "unit-tests":
+    elif type == "unit-tests":
         skip = base + acceptance
-    if type == "build-binary" or type == "build-docker" or type == "litmus":
+    elif type == "build-binary" or type == "build-docker" or type == "litmus":
         skip = base + unit + acceptance
-    if type == "cache":
+    elif type == "cache":
         skip = base
-    if type == "e2e-tests":
-        skip = base + unit
-    if len(skip) == 0:
+    else:
         return []
 
     return [{
@@ -3010,7 +3003,7 @@ def restoreWebE2EYarnCache():
             "mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/e2e.tar.gz %s" % dirs["zip"],
         ],
     }, {
-        # we need to install again becase the node_modules are not cached
+        # we need to install again because the node_modules are not cached
         "name": "unzip-and-install-yarn-e2e",
         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
         "commands": [
@@ -3032,7 +3025,7 @@ def restoreWebAcceptanceYarnCache():
             "mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/acceptance.tar.gz %s" % dirs["zip"],
         ],
     }, {
-        # we need to install again becase the node_modules are not cached
+        # we need to install again because the node_modules are not cached
         "name": "unzip-and-install-yarn-acceptance",
         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
         "commands": [

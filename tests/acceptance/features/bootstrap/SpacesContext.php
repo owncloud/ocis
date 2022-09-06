@@ -1008,8 +1008,8 @@ class SpacesContext implements Context {
 	 * @Then /^the json responded should contain a space "([^"]*)" (?:|(?:owned by|granted to) "([^"]*)" )(?:|(?:with description file|with space image) "([^"]*)" )with these key and value pairs:$/
 	 *
 	 * @param string $spaceName
-	 * @param string $userName
-	 * @param string $fileName
+	 * @param string|null $userName
+	 * @param string|null $fileName
 	 * @param TableNode $table
 	 *
 	 * @return void
@@ -1017,8 +1017,8 @@ class SpacesContext implements Context {
 	 */
 	public function jsonRespondedShouldContain(
 		string $spaceName,
-		string $userName,
-		string $fileName,
+		?string $userName = null,
+		?string $fileName = null,
 		TableNode $table
 	): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
@@ -1081,8 +1081,8 @@ class SpacesContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $spaceName
-	 * @param string $grantedUser
-	 * @param string $fileName
+	 * @param string|null $grantedUser
+	 * @param string|null $fileName
 	 * @param TableNode $table
 	 *
 	 * @return void
@@ -1091,8 +1091,8 @@ class SpacesContext implements Context {
 	public function userHasSpaceWith(
 		string $user,
 		string $spaceName,
-		string $grantedUser,
-		string $fileName,
+		?string $grantedUser = null,
+		?string $fileName = null,
 		TableNode $table
 	): void {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
@@ -2989,15 +2989,15 @@ class SpacesContext implements Context {
 	/**
 	 * @Given /^user "([^"]*)" has stored etag of element "([^"]*)" on path "([^"]*)" inside space "([^"]*)"$/
 	 *
-	 * @param $user
-	 * @param $path
-	 * @param $storePath
-	 * @param $space
+	 * @param string $user
+	 * @param string $path
+	 * @param string $storePath
+	 * @param string $space
 	 *
 	 * @return void
 	 * @throws Exception | GuzzleException
 	 */
-	public function userHasStoredEtagOfElementOnPathFromSpace($user, $path, $storePath, $space):void {
+	public function userHasStoredEtagOfElementOnPathFromSpace(string $user, string $path, string $storePath, string $space):void {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->storeEtagOfElementInSpaceForUser(
 			$user,
