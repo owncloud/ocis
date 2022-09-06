@@ -181,6 +181,8 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			rootName = space.GetRootInfo().GetPath()
 			permissions = space.GetRootInfo().GetPermissionSet()
 			p.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootID).Msg("searching a grant")
+		case "personal":
+			permissions = space.GetRootInfo().GetPermissionSet()
 		}
 
 		res, err := p.indexClient.Search(ctx, &searchsvc.SearchIndexRequest{
