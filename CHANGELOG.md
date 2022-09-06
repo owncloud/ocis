@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix search report: [#7557](https://github.com/owncloud/web/issues/7557)
 * Enhancement - Add previewFileMimeTypes to web default config: [#4414](https://github.com/owncloud/ocis/pull/4414)
 * Enhancement - Improve login screen design: [#4500](https://github.com/owncloud/ocis/pull/4500)
+* Enhancement - Automatically orientate photos when generating thumbnails: [#4477](https://github.com/owncloud/ocis/issues/4477)
 * Enhancement - Refactor the proxy service: [#4401](https://github.com/owncloud/ocis/issues/4401)
 
 ## Details
@@ -59,6 +60,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/web/issues/7552
    https://github.com/owncloud/ocis/pull/4500
+
+* Enhancement - Automatically orientate photos when generating thumbnails: [#4477](https://github.com/owncloud/ocis/issues/4477)
+
+   The thumbnailer now makes use of the exif orientation information to automatically orientate
+   pictures before generating thumbnails.
+
+   https://github.com/owncloud/ocis/issues/4477
+   https://github.com/owncloud/ocis/pull/4513
 
 * Enhancement - Refactor the proxy service: [#4401](https://github.com/owncloud/ocis/issues/4401)
 
