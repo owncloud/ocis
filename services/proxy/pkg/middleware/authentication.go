@@ -34,6 +34,7 @@ var (
 		"/app/list":            {},
 		"/config.json":         {},
 		"/manifest.json":       {},
+		"/index.html":          {},
 		"/oidc-callback.html":  {},
 		"/oidc-callback":       {},
 		"/settings.js":         {},
@@ -50,7 +51,7 @@ var (
 		"/data/",
 		"/account/",
 		"/s/",
-		"/external/spaces",
+		"/external",
 		"/apps/openidconnect/redirect",
 		"/settings/",
 		"/user-management/",
@@ -62,6 +63,11 @@ var (
 		"/themes/",
 		"/signin/",
 		"/konnect/",
+		"/text-editor/",
+		"/preview/",
+		"/pdf-viewer/",
+		"/draw-io/",
+		"/index.html#/",
 	}
 )
 
