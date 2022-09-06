@@ -148,6 +148,10 @@ config = {
         "architectures": ["arm", "arm64", "amd64"],
     },
     "litmus": True,
+    "codestyle": True,
+    "branches": [
+        "master",
+    ],
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -226,6 +230,7 @@ def main(ctx):
         cancelPreviousBuilds() + \
         buildWebCache(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
+        codestyle(ctx) + \
         cacheCoreReposForTesting(ctx) + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
@@ -559,6 +564,102 @@ def uploadScanResults(ctx):
             ],
         },
     }
+
+def vendorbinCodestyle(phpVersion):
+    return [{
+        "name": "vendorbin-codestyle",
+        "image": OC_CI_PHP % phpVersion,
+        "environment": {
+            "COMPOSER_HOME": "%s/.cache/composer" % dirs["base"],
+        },
+        "commands": [
+            "make vendor-bin-codestyle",
+        ],
+    }]
+
+def vendorbinCodesniffer(phpVersion):
+    return [{
+        "name": "vendorbin-codesniffer",
+        "image": OC_CI_PHP % phpVersion,
+        "environment": {
+            "COMPOSER_HOME": "%s/.cache/composer" % dirs["base"],
+        },
+        "commands": [
+            "make vendor-bin-codesniffer",
+        ],
+    }]
+
+def codestyle(ctx):
+    pipelines = []
+
+    if "codestyle" not in config:
+        return pipelines
+
+    default = {
+        "phpVersions": [DEFAULT_PHP_VERSION],
+    }
+
+    if "defaults" in config:
+        if "codestyle" in config["defaults"]:
+            for item in config["defaults"]["codestyle"]:
+                default[item] = config["defaults"]["codestyle"][item]
+
+    codestyleConfig = config["codestyle"]
+
+    if type(codestyleConfig) == "bool":
+        if codestyleConfig:
+            # the config has 'codestyle' true, so specify an empty dict that will get the defaults
+            codestyleConfig = {}
+        else:
+            return pipelines
+
+    if len(codestyleConfig) == 0:
+        # 'codestyle' is an empty dict, so specify a single section that will get the defaults
+        codestyleConfig = {"doDefault": {}}
+
+    for category, matrix in codestyleConfig.items():
+        params = {}
+        for item in default:
+            params[item] = matrix[item] if item in matrix else default[item]
+
+        for phpVersion in params["phpVersions"]:
+            name = "coding-standard-php%s" % phpVersion
+
+            result = {
+                "kind": "pipeline",
+                "type": "docker",
+                "name": name,
+                "workspace": {
+                    "base": "/drone",
+                    "path": "src",
+                },
+                "steps": skipIfUnchanged(ctx, "acceptance-tests") +
+                         vendorbinCodestyle(phpVersion) +
+                         vendorbinCodesniffer(phpVersion) +
+                         [
+                             {
+                                 "name": "php-style",
+                                 "image": OC_CI_PHP % phpVersion,
+                                 "commands": [
+                                     "make test-php-style",
+                                 ],
+                             },
+                         ],
+                "depends_on": [],
+                "trigger": {
+                    "ref": [
+                        "refs/pull/**",
+                        "refs/tags/**",
+                    ],
+                },
+            }
+
+            for branch in config["branches"]:
+                result["trigger"]["ref"].append("refs/heads/%s" % branch)
+
+            pipelines.append(result)
+
+    return pipelines
 
 def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
     early_fail = config["localApiTests"]["earlyFail"] if "earlyFail" in config["localApiTests"] else False
