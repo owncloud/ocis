@@ -1,5 +1,5 @@
 @api @skipOnOcV10
-Feature: Change data of space
+Feature: Change data of space test
   As a user with space admin rights
   I want to be able to change the data of a created space (increase the quota, change name, etc.)
 
