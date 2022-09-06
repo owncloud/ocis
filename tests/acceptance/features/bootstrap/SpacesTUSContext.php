@@ -85,12 +85,11 @@ class SpacesTUSContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $source
-	 * @param string $spaceName
 	 * @param string $destination
+	 * @param string $spaceName
 	 * @param array|null $uploadMetadata
 	 *
 	 * @return void
-	 *
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
