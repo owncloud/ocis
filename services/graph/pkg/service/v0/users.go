@@ -283,8 +283,23 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		// TODO: check if request contains a homespace and if, check if requesting user has the privilege to
 		// delete it and make sure it is not deleting its own homespace
 		// needs modification of the cs3api
+
+		// Deleting a space a two step process (1. disabling/trashing, 2. purging)
+		// Do the "disable/trash" step only if the space is not marked as trashed yet:
+		if _, ok := sp.Opaque.Map["trashed"]; !ok {
+			_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+				Id: &storageprovider.StorageSpaceId{
+					OpaqueId: sp.Id.OpaqueId,
+				},
+			})
+			if err != nil {
+				errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "could not disable homespace")
+				return
+			}
+		}
+		purgeFlag := utils.AppendPlainToOpaque(nil, "purge", "")
 		_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
-			Opaque: opaque,
+			Opaque: purgeFlag,
 			Id: &storageprovider.StorageSpaceId{
 				OpaqueId: sp.Id.OpaqueId,
 			},
