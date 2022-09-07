@@ -95,6 +95,7 @@ The following sections list the changes for unreleased.
    Update reva to latest edge.
 
    https://github.com/owncloud/ocis/pull/4522
+   https://github.com/owncloud/ocis/pull/4534
 # Changelog for [2.0.0-beta.7] (2022-08-26)
 
 The following sections list the changes for 2.0.0-beta.7.
