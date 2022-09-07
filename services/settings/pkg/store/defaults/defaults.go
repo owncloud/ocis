@@ -48,6 +48,11 @@ const (
 	// DeleteHomeSpacesPermissionName is the hardcoded setting name for the delete home space permission
 	DeleteHomeSpacesPermissionName string = "delete-all-home-spaces"
 
+	// DeleteAllSpacesPermissionID is the hardcoded setting UUID for the delete all spaces permission
+	DeleteAllSpacesPermissionID string = "fb60b004-c1fa-4f09-bf87-55ce7d46ac61"
+	// DeleteAllSpacesPermissionName is the hardcoded setting name for the delete all space permission
+	DeleteAllSpacesPermissionName string = "delete-all-spaces"
+
 	settingUUIDProfileLanguage = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f"
 
 	// AccountManagementPermissionID is the hardcoded setting UUID for the account management permission
@@ -215,6 +220,21 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				Name:        DeleteHomeSpacesPermissionName,
 				DisplayName: "Delete All Home Spaces",
 				Description: "This permission allows to delete home spaces.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SYSTEM,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_DELETE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+			{
+				Id:          DeleteAllSpacesPermissionID,
+				Name:        DeleteAllSpacesPermissionName,
+				DisplayName: "Delete AllSpaces",
+				Description: "This permission allows to delete all spaces.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
