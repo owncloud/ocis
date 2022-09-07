@@ -263,11 +263,21 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
 		return
 	}
+	user, err := g.identityBackend.GetUser(r.Context(), userID, r.URL.Query())
+	if err != nil {
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
 
 	currentUser := ctxpkg.ContextMustGetUser(r.Context())
 
 	opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
-	f := listStorageSpacesUserFilter(userID)
+	f := listStorageSpacesUserFilter(user.GetId())
 	lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
 		Opaque:  opaque,
 		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
@@ -277,7 +287,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for _, sp := range lspr.GetStorageSpaces() {
-		if !(sp.SpaceType == "personal" && sp.Owner.Id.OpaqueId == userID) {
+		if !(sp.SpaceType == "personal" && sp.Owner.Id.OpaqueId == user.GetId()) {
 			continue
 		}
 		// TODO: check if request contains a homespace and if, check if requesting user has the privilege to
@@ -311,7 +321,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		break
 	}
 
-	err = g.identityBackend.DeleteUser(r.Context(), userID)
+	err = g.identityBackend.DeleteUser(r.Context(), user.GetId())
 
 	if err != nil {
 		var errcode errorcode.Error
@@ -323,7 +333,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	g.publishEvent(events.UserDeleted{Executant: currentUser.Id, UserID: userID})
+	g.publishEvent(events.UserDeleted{Executant: currentUser.Id, UserID: user.GetId()})
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
