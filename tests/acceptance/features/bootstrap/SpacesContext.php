@@ -476,7 +476,7 @@ class SpacesContext implements Context {
 	 */
 	public function cleanDataAfterTests(): void {
 		$this->deleteAllProjectSpaces();
-		$this->deleteAllPersonalSpaces();
+		$this->deleteAllCreatedUsers();
 	}
 
 	/**
@@ -519,29 +519,25 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * users delete their personal space at the end of the test
+	 * admin deletes created user with their personal space (this happens automatically after deleting users)
 	 *
 	 * @return void
 	 *
 	 * @throws Exception|GuzzleException
 	 */
-	public function deleteAllPersonalSpaces(): void {
-		$query = "\$filter=driveType eq personal";
+	public function deleteAllCreatedUsers(): void {
 		$createdUsers = $this->featureContext->getCreatedUsers();
-		$userAdmin = $this->featureContext->getAdminUsername();
 
 		foreach ($createdUsers as $user) {
-			$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi(
-				$user["actualUsername"],
-				$query
+			$this->featureContext->setResponse(
+				GraphHelper::deleteUser(
+					$this->featureContext->getBaseUrl(),
+					$this->featureContext->getStepLineRef(),
+					$this->featureContext->getAdminUsername(),
+					$this->featureContext->getAdminPassword(),
+					$user['actualUsername']
+				)
 			);
-			$drives = $this->getAvailableSpaces();
-			foreach ($drives as $value) {
-				if (!\array_key_exists("deleted", $value["root"])) {
-					$this->sendDisableSpaceRequest($userAdmin, $value["name"]);
-				}
-				$this->sendDeleteSpaceRequest($userAdmin, $value["name"]);
-			}
 		}
 	}
 
