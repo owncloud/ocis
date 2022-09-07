@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Improve login screen design: [#4500](https://github.com/owncloud/ocis/pull/4500)
 * Enhancement - Automatically orientate photos when generating thumbnails: [#4477](https://github.com/owncloud/ocis/issues/4477)
 * Enhancement - Refactor the proxy service: [#4401](https://github.com/owncloud/ocis/issues/4401)
+* Enhancement - Update Reva: [#4522](https://github.com/owncloud/ocis/pull/4522)
 
 ## Details
 
@@ -88,6 +89,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/4461
    https://github.com/owncloud/ocis/pull/4498
    https://github.com/owncloud/ocis/pull/4514
+
+* Enhancement - Update Reva: [#4522](https://github.com/owncloud/ocis/pull/4522)
+
+   Update reva to latest edge.
+
+   https://github.com/owncloud/ocis/pull/4522
 # Changelog for [2.0.0-beta.7] (2022-08-26)
 
 The following sections list the changes for 2.0.0-beta.7.
