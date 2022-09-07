@@ -498,9 +498,23 @@ class SpacesContext implements Context {
 
 		foreach ($drives as $value) {
 			if (!\array_key_exists("deleted", $value["root"])) {
-				$this->sendDisableSpaceRequest($userAdmin, $value["name"]);
+				$this->featureContext->setResponse(
+					GraphHelper::disableSpace(
+						$this->featureContext->getBaseUrl(),
+						$userAdmin,
+						$this->featureContext->getPasswordForUser($userAdmin),
+						$value["id"]
+					)
+				);
 			}
-			$this->sendDeleteSpaceRequest($userAdmin, $value["name"]);
+			$this->featureContext->setResponse(
+				GraphHelper::deleteSpace(
+					$this->featureContext->getBaseUrl(),
+					$userAdmin,
+					$this->featureContext->getPasswordForUser($userAdmin),
+					$value["id"]
+				)
+			);
 		}
 	}
 
