@@ -35,6 +35,7 @@ default:
     apiSpaces:
       paths:
         - '%paths.base%/../features/apiSpaces'
+      context: *common_ldap_suite_context
       contexts:
         - SpacesContext:
         - OccContext:
@@ -55,6 +56,7 @@ default:
     apiArchiver:
       paths:
         - '%paths.base%/../features/apiArchiver'
+      context: *common_ldap_suite_context
       contexts:
         - ArchiverContext:
         - SpacesContext:
