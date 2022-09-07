@@ -76,7 +76,10 @@ The following sections list the changes for unreleased.
    authentication or not.
 
    https://github.com/owncloud/ocis/issues/4401
+   https://github.com/owncloud/ocis/issues/4497
    https://github.com/owncloud/ocis/pull/4461
+   https://github.com/owncloud/ocis/pull/4498
+   https://github.com/owncloud/ocis/pull/4514
 # Changelog for [2.0.0-beta.7] (2022-08-26)
 
 The following sections list the changes for 2.0.0-beta.7.
