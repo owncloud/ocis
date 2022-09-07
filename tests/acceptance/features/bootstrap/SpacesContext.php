@@ -480,7 +480,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * manager of the project space first disables and then deletes spaces
+	 * the admin user first disables and then deletes spaces
 	 *
 	 * @return void
 	 *
@@ -495,26 +495,12 @@ class SpacesContext implements Context {
 			$query
 		);
 		$drives = $this->getAvailableSpaces();
-		$createdUsers = $this->featureContext->getCreatedUsers();
 
 		foreach ($drives as $value) {
-			foreach ($value["root"]["permissions"] as $permissions) {
-				// find an user who is a manager
-				if ($permissions["roles"][0] === "manager") {
-					$userId = $permissions["grantedTo"][0]["user"]["id"];
-
-					foreach ($createdUsers as $user) {
-						if ($user["id"] === $userId) {
-							$userName = $user["actualUsername"];
-
-							if (!\array_key_exists("deleted", $value["root"])) {
-								$this->sendDisableSpaceRequest($userName, $value["name"]);
-							}
-							$this->sendDeleteSpaceRequest($userName, $value["name"]);
-						}
-					}
-				}
+			if (!\array_key_exists("deleted", $value["root"])) {
+				$this->sendDisableSpaceRequest($userAdmin, $value["name"]);
 			}
+			$this->sendDeleteSpaceRequest($userAdmin, $value["name"]);
 		}
 	}
 
@@ -528,6 +514,7 @@ class SpacesContext implements Context {
 	public function deleteAllPersonalSpaces(): void {
 		$query = "\$filter=driveType eq personal";
 		$createdUsers = $this->featureContext->getCreatedUsers();
+		$userAdmin = $this->featureContext->getAdminUsername();
 
 		foreach ($createdUsers as $user) {
 			$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi(
@@ -537,9 +524,9 @@ class SpacesContext implements Context {
 			$drives = $this->getAvailableSpaces();
 			foreach ($drives as $value) {
 				if (!\array_key_exists("deleted", $value["root"])) {
-					$this->sendDisableSpaceRequest($user["actualUsername"], $value["name"]);
+					$this->sendDisableSpaceRequest($userAdmin, $value["name"]);
 				}
-				$this->sendDeleteSpaceRequest($user["actualUsername"], $value["name"]);
+				$this->sendDeleteSpaceRequest($userAdmin, $value["name"]);
 			}
 		}
 	}
