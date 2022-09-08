@@ -33,7 +33,7 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		UserSharingDriver: "jsoncs3",
+		UserSharingDriver: "cs3", // "jsoncs3", // TODO: jsoncs3 breaks experimental - investigate!
 		UserSharingDrivers: config.UserSharingDrivers{
 			JSON: config.UserSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "shares.json"),
