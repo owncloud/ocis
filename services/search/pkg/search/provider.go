@@ -8,10 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"path/filepath"
-	"sort"
-	"strings"
-
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -286,14 +282,6 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 
 	logDocCount(p.engine, p.logger)
 	return &searchsvc.IndexSpaceResponse{}, nil
-}
-
-func (p *Provider) logDocCount() {
-	c, err := p.indexClient.DocCount()
-	if err != nil {
-		p.logger.Error().Err(err).Msg("error getting document count from the index")
-	}
-	p.logger.Debug().Interface("count", c).Msg("new document count")
 }
 
 func formatQuery(q string) string {
