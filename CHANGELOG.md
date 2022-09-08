@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Disable default expiration for public links: [#4445](https://github.com/owncloud/ocis/issues/4445)
 * Bugfix - Translations on login page: [#7550](https://github.com/owncloud/web/issues/7550)
+* Bugfix - Fix permissions in REPORT: [#4520](https://github.com/owncloud/ocis/pull/4520)
 * Bugfix - Fix search report: [#7557](https://github.com/owncloud/web/issues/7557)
 * Enhancement - Introduce "delete-all-spaces" permission: [#4196](https://github.com/owncloud/ocis/issues/4196)
 * Enhancement - Add previewFileMimeTypes to web default config: [#4414](https://github.com/owncloud/ocis/pull/4414)
@@ -36,6 +37,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/web/issues/7550
    https://github.com/owncloud/ocis/pull/4504
+
+* Bugfix - Fix permissions in REPORT: [#4520](https://github.com/owncloud/ocis/pull/4520)
+
+   The REPORT endpoint wouldn't return any permissions on personal spaces Now it does. Also bumps
+   reva
+
+   https://github.com/owncloud/ocis/pull/4520
 
 * Bugfix - Fix search report: [#7557](https://github.com/owncloud/web/issues/7557)
 
