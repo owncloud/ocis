@@ -48,6 +48,7 @@ const (
 	PermissionShare
 )
 
+// ListenEvents are the events the service is listening to
 var ListenEvents = []events.Unmarshaller{
 	events.ItemTrashed{},
 	events.ItemRestored{},
@@ -282,21 +283,6 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 
 	logDocCount(p.engine, p.logger)
 	return &searchsvc.IndexSpaceResponse{}, nil
-}
-
-func formatQuery(q string) string {
-	query := q
-	fields := []string{"RootID", "Path", "ID", "Name", "Size", "Mtime", "MimeType", "Type"}
-	for _, field := range fields {
-		query = strings.ReplaceAll(query, strings.ToLower(field)+":", field+":")
-	}
-
-	if strings.Contains(query, ":") {
-		return query // Sophisticated field based search
-	}
-
-	// this is a basic filename search
-	return "Name:*" + strings.ReplaceAll(strings.ToLower(query), " ", `\ `) + "*"
 }
 
 // NOTE: this converts cs3 to ocs permissions
