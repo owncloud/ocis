@@ -34,3 +34,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 ### [copy to overwrite (file and folder) from Personal to Shares Jail behaves differently](https://github.com/owncloud/ocis/issues/4393)
 - [apiSpaces/copySpaces.feature:487](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L487)
 - [apiSpaces/copySpaces.feature:501](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L501)
+
+### [search doesn't find the project space by name](https://github.com/owncloud/ocis/issues/4506)
+- [apiSpaces/search.feature:95](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/search.feature#L95)

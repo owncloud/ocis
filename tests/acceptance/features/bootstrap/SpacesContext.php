@@ -3211,4 +3211,38 @@ class SpacesContext implements Context {
 		$this->setSpaceIDByName($user, $spaceName);
 		$this->featureContext->userFileShouldHaveStoredId($user, $fileOrFolder, $path);
 	}
+
+	/**
+	 * @Then /^for user "([^"]*)" the search result should contain space "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function searchResultShouldContainSpace(string $user, string $spaceName): void {
+		// get a response after a Report request (called in the core)
+		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml()->xpath("//d:response/d:href")), true, 512, JSON_THROW_ON_ERROR);
+		Assert::assertNotEmpty($responseArray, "search result is empty");
+		
+		// for mountpoint, id looks a little different than for project space  
+		if (str_contains($spaceName, 'mountpoint')) {
+			$splitSpaceName = explode("/", $spaceName);
+			$space = $this->getSpaceByName($user, $splitSpaceName[1]);
+			$splitSpaceId = explode("$", $space['id']);
+			$topWebDavPath = "/remote.php/dav/spaces/" . str_replace('!', '%21', $splitSpaceId[1]);
+		} else {
+			$space = $this->getSpaceByName($user, $spaceName);
+			$topWebDavPath = "/remote.php/dav/spaces/" . $space['id'];
+		}
+		
+		$spaceFound = false;
+		foreach ($responseArray as $value){
+			if ($topWebDavPath === $value[0]) {
+				$spaceFound = true;
+			}
+		}
+		Assert::assertTrue($spaceFound, "response does not contain the space '$spaceName'");
+	}
 }
