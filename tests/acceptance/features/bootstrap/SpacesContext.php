@@ -476,7 +476,6 @@ class SpacesContext implements Context {
 	 */
 	public function cleanDataAfterTests(): void {
 		$this->deleteAllProjectSpaces();
-		$this->deleteAllPersonalSpaces();
 	}
 
 	/**
@@ -515,33 +514,6 @@ class SpacesContext implements Context {
 					$value["id"]
 				)
 			);
-		}
-	}
-
-	/**
-	 * users delete their personal space at the end of the test
-	 *
-	 * @return void
-	 *
-	 * @throws Exception|GuzzleException
-	 */
-	public function deleteAllPersonalSpaces(): void {
-		$query = "\$filter=driveType eq personal";
-		$createdUsers = $this->featureContext->getCreatedUsers();
-		$userAdmin = $this->featureContext->getAdminUsername();
-
-		foreach ($createdUsers as $user) {
-			$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi(
-				$user["actualUsername"],
-				$query
-			);
-			$drives = $this->getAvailableSpaces();
-			foreach ($drives as $value) {
-				if (!\array_key_exists("deleted", $value["root"])) {
-					$this->sendDisableSpaceRequest($userAdmin, $value["name"]);
-				}
-				$this->sendDeleteSpaceRequest($userAdmin, $value["name"]);
-			}
 		}
 	}
 
