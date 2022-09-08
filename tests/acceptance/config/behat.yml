@@ -30,9 +30,12 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
+        - WebDavLockingContext:
+
     apiSpaces:
       paths:
         - '%paths.base%/../features/apiSpaces'
+      context: *common_ldap_suite_context
       contexts:
         - SpacesContext:
         - OccContext:
@@ -46,11 +49,14 @@ default:
         - SearchContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
-        - TusContext:
+        - WebDavLockingContext:
+        - TUSContext:
+        - SpacesTUSContext:
 
     apiArchiver:
       paths:
         - '%paths.base%/../features/apiArchiver'
+      context: *common_ldap_suite_context
       contexts:
         - ArchiverContext:
         - SpacesContext:
@@ -61,8 +67,10 @@ default:
         - FilesVersionsContext:
         - OCSContext:
         - PublicWebDavContext:
+        - FavoritesContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
+        - WebDavLockingContext:
 
     apiGraph:
       paths:

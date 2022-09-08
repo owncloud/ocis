@@ -7,7 +7,15 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Disable default expiration for public links: [#4445](https://github.com/owncloud/ocis/issues/4445)
+* Bugfix - Translations on login page: [#7550](https://github.com/owncloud/web/issues/7550)
+* Bugfix - Fix permissions in REPORT: [#4520](https://github.com/owncloud/ocis/pull/4520)
+* Bugfix - Fix search report: [#7557](https://github.com/owncloud/web/issues/7557)
+* Enhancement - Introduce "delete-all-spaces" permission: [#4196](https://github.com/owncloud/ocis/issues/4196)
 * Enhancement - Add previewFileMimeTypes to web default config: [#4414](https://github.com/owncloud/ocis/pull/4414)
+* Enhancement - Improve login screen design: [#4500](https://github.com/owncloud/ocis/pull/4500)
+* Enhancement - Automatically orientate photos when generating thumbnails: [#4477](https://github.com/owncloud/ocis/issues/4477)
+* Enhancement - Refactor the proxy service: [#4401](https://github.com/owncloud/ocis/issues/4401)
+* Enhancement - Update Reva: [#4522](https://github.com/owncloud/ocis/pull/4522)
 
 ## Details
 
@@ -22,12 +30,80 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/4445
    https://github.com/owncloud/ocis/pull/4475
 
+* Bugfix - Translations on login page: [#7550](https://github.com/owncloud/web/issues/7550)
+
+   We've fixed several translations on the login page. Also, the browser language is now being
+   used properly to determine the language.
+
+   https://github.com/owncloud/web/issues/7550
+   https://github.com/owncloud/ocis/pull/4504
+
+* Bugfix - Fix permissions in REPORT: [#4520](https://github.com/owncloud/ocis/pull/4520)
+
+   The REPORT endpoint wouldn't return any permissions on personal spaces Now it does. Also bumps
+   reva
+
+   https://github.com/owncloud/ocis/pull/4520
+
+* Bugfix - Fix search report: [#7557](https://github.com/owncloud/web/issues/7557)
+
+   There were multiple issues with REPORT search responses from webdav. Also we want it to be
+   consistent with PROPFIND responses. * the `remote.php` prefix was missing from the href
+   (added even though not neccessary) * the ids were formatted wrong, they should look different
+   for shares and spaces. * the name of the resource was missing * the shareid was missing (for
+   shares) * the prop `shareroot` (containing the name of the share root) was missing * the
+   permissions prop was empty
+
+   https://github.com/owncloud/web/issues/7557
+   https://github.com/owncloud/ocis/pull/4484
+
+* Enhancement - Introduce "delete-all-spaces" permission: [#4196](https://github.com/owncloud/ocis/issues/4196)
+
+   This is assigned to the Admin role by default and allows to cleanup orphaned spaces (e.g. where
+   the owner as been deleted)
+
+   https://github.com/owncloud/ocis/issues/4196
+
 * Enhancement - Add previewFileMimeTypes to web default config: [#4414](https://github.com/owncloud/ocis/pull/4414)
 
    We've added previewFileMimeTypes to the web default config, so web can determine which
    preview types are supported by the backend.
 
    https://github.com/owncloud/ocis/pull/4414
+
+* Enhancement - Improve login screen design: [#4500](https://github.com/owncloud/ocis/pull/4500)
+
+   We've improved the design of the login screen to match with the general design used in Web.
+
+   https://github.com/owncloud/web/issues/7552
+   https://github.com/owncloud/ocis/pull/4500
+
+* Enhancement - Automatically orientate photos when generating thumbnails: [#4477](https://github.com/owncloud/ocis/issues/4477)
+
+   The thumbnailer now makes use of the exif orientation information to automatically orientate
+   pictures before generating thumbnails.
+
+   https://github.com/owncloud/ocis/issues/4477
+   https://github.com/owncloud/ocis/pull/4513
+
+* Enhancement - Refactor the proxy service: [#4401](https://github.com/owncloud/ocis/issues/4401)
+
+   The routes of the proxy service now have a "unprotected" flag. This is used by the
+   authentication middleware to determine if the request needs to be blocked when missing
+   authentication or not.
+
+   https://github.com/owncloud/ocis/issues/4401
+   https://github.com/owncloud/ocis/issues/4497
+   https://github.com/owncloud/ocis/pull/4461
+   https://github.com/owncloud/ocis/pull/4498
+   https://github.com/owncloud/ocis/pull/4514
+
+* Enhancement - Update Reva: [#4522](https://github.com/owncloud/ocis/pull/4522)
+
+   Update reva to latest edge.
+
+   https://github.com/owncloud/ocis/pull/4522
+   https://github.com/owncloud/ocis/pull/4534
 # Changelog for [2.0.0-beta.7] (2022-08-26)
 
 The following sections list the changes for 2.0.0-beta.7.

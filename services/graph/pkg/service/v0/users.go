@@ -174,6 +174,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	userID, err := url.PathUnescape(userID)
 	if err != nil {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
+		return
 	}
 
 	if userID == "" {
@@ -190,11 +191,20 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		} else {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
+		return
 	}
 	sel := strings.Split(r.URL.Query().Get("$select"), ",")
 	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
 	if slices.Contains(sel, "drive") || slices.Contains(sel, "drives") || slices.Contains(exp, "drive") || slices.Contains(exp, "drives") {
 		wdu, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath)
+		if err != nil {
+			g.logger.Err(err).
+				Str("webdav_base", g.config.Spaces.WebDavBase).
+				Str("webdav_path", g.config.Spaces.WebDavPath).
+				Msg("error parsing webdav URL")
+			render.Status(r, http.StatusInternalServerError)
+			return
+		}
 		f := listStorageSpacesUserFilter(user.GetId())
 		// use the unrestricted flag to get all possible spaces
 		// users with the canListAllSpaces permission should see all spaces
@@ -246,15 +256,14 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	userID, err := url.PathUnescape(userID)
 	if err != nil {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
+		return
 	}
 
 	if userID == "" {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
 		return
 	}
-
-	err = g.identityBackend.DeleteUser(r.Context(), userID)
-
+	user, err := g.identityBackend.GetUser(r.Context(), userID, r.URL.Query())
 	if err != nil {
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
@@ -262,10 +271,69 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		} else {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
+		return
 	}
 
 	currentUser := ctxpkg.ContextMustGetUser(r.Context())
-	g.publishEvent(events.UserDeleted{Executant: currentUser.Id, UserID: userID})
+
+	opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
+	f := listStorageSpacesUserFilter(user.GetId())
+	lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
+		Opaque:  opaque,
+		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
+	})
+	if err != nil {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "could not read spaces")
+		return
+	}
+	for _, sp := range lspr.GetStorageSpaces() {
+		if !(sp.SpaceType == "personal" && sp.Owner.Id.OpaqueId == user.GetId()) {
+			continue
+		}
+		// TODO: check if request contains a homespace and if, check if requesting user has the privilege to
+		// delete it and make sure it is not deleting its own homespace
+		// needs modification of the cs3api
+
+		// Deleting a space a two step process (1. disabling/trashing, 2. purging)
+		// Do the "disable/trash" step only if the space is not marked as trashed yet:
+		if _, ok := sp.Opaque.Map["trashed"]; !ok {
+			_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+				Id: &storageprovider.StorageSpaceId{
+					OpaqueId: sp.Id.OpaqueId,
+				},
+			})
+			if err != nil {
+				errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "could not disable homespace")
+				return
+			}
+		}
+		purgeFlag := utils.AppendPlainToOpaque(nil, "purge", "")
+		_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+			Opaque: purgeFlag,
+			Id: &storageprovider.StorageSpaceId{
+				OpaqueId: sp.Id.OpaqueId,
+			},
+		})
+		if err != nil {
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "could not delete homespace")
+			return
+		}
+		break
+	}
+
+	err = g.identityBackend.DeleteUser(r.Context(), user.GetId())
+
+	if err != nil {
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			return
+		}
+	}
+
+	g.publishEvent(events.UserDeleted{Executant: currentUser.Id, UserID: user.GetId()})
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
@@ -278,6 +346,7 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	nameOrID, err := url.PathUnescape(nameOrID)
 	if err != nil {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
+		return
 	}
 
 	if nameOrID == "" {
@@ -313,6 +382,7 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		} else {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
+		return
 	}
 
 	currentUser := ctxpkg.ContextMustGetUser(r.Context())

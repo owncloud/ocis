@@ -14,9 +14,9 @@ const config = {
   uiLocaleLocalStorageName: 'lico.identifier_ui_locale', // Sufficiently unique, set here.
 }
 
-const supportedLanguages = locales.map((locale) => {
+const supportedLanguages = ['en-GB', 'en', ...locales.map((locale) => {
   return locale.locale;
-});
+})];
 
 const queryUiLocalesDetector: CustomDetector = {
   name: 'queryUiLocales',
