@@ -3196,48 +3196,20 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponseXmlObject($responseXml);
 	}
 
-	/**
-	 * @Then /^as user "([^"]*)" (?:file|folder|entry|resource) "([^"]*)" inside space "([^"]*)" should contain a property "([^"]*)" with value "([^"]*)"$/
-	 *
-	 * @param string    $user
-	 * @param string    $resourceName
-	 * @param string    $spaceName
-	 * @param string    $property
-	 * @param string    $expectedValue
-	 *
-	 * @return void
-	 *
-	 * @throws Exception|GuzzleException
-	 */
-	public function asUserFileInsideSpaceShouldContainAPropertyWithValue(
-		string $user,
-		string $resourceName,
-		string $spaceName,
-		string $property,
-		string $expectedValue
-	):void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($resourceName, "/");
-		$body = WebDavHelper::getBodyForPropfind([$property]);
-		$headers['Depth'] = '1';
-		$this->featureContext->setResponse(
-			$this->sendPropfindRequestToUrl(
-				$fullUrl,
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				'',
-				$headers,
-				$body
-			)
-		);
-		$responseXml = $this->featureContext->getResponseXml(null, __METHOD__);
-		$this->featureContext->setResponseXmlObject($responseXml);
-		$this->webDavPropertiesContext->checkSingleResponseContainsAPropertyWithValueAndAlternative(
-			$property,
-			$expectedValue,
-			$expectedValue
-		);
-	}
+    /**
+     * @Then /^as user "([^"]*)" (?:file|folder|entry) "([^"]*)" inside space "([^"]*)" (should|should not) be favorited$/
+     *
+     * @param string $user
+     * @param string $path
+     * @param string $spaceName
+     * @param string $shouldOrNot
+     *
+     * @return void
+     */
+    public function asUserFileOrFolderInsideSpaceShouldOrNotBeFavorited(string $user, string $path, string $spaceName, string $shouldOrNot):void {
+        $this->setSpaceIDByName($user, $spaceName);
+        $this->favoritesContext->asUserFileOrFolderShouldBeFavorited($user, $path, ($shouldOrNot === 'should') ? 1 : 0);
+    }
 
 	/**
 	 * @When /^user "([^"]*)" favorites element "([^"]*)" in space "([^"]*)" using the WebDAV API$/
