@@ -71,24 +71,20 @@ func DefaultPolicies() []config.Policy {
 			Name: "ocis",
 			Routes: []config.Route{
 				{
-					Endpoint:    "/",
-					Backend:     "http://localhost:9100",
-					Unprotected: true,
+					Endpoint: "/",
+					Backend:  "http://localhost:9100",
 				},
 				{
-					Endpoint:    "/.well-known/",
-					Backend:     "http://localhost:9130",
-					Unprotected: true,
+					Endpoint: "/.well-known/",
+					Backend:  "http://localhost:9130",
 				},
 				{
-					Endpoint:    "/konnect/",
-					Backend:     "http://localhost:9130",
-					Unprotected: true,
+					Endpoint: "/konnect/",
+					Backend:  "http://localhost:9130",
 				},
 				{
-					Endpoint:    "/signin/",
-					Backend:     "http://localhost:9130",
-					Unprotected: true,
+					Endpoint: "/signin/",
+					Backend:  "http://localhost:9130",
 				},
 				{
 					Endpoint: "/archiver",
@@ -98,12 +94,6 @@ func DefaultPolicies() []config.Policy {
 					Type:     config.RegexRoute,
 					Endpoint: "/ocs/v[12].php/cloud/user/signing-key", // only `user/signing-key` is left in ocis-ocs
 					Backend:  "http://localhost:9110",
-				},
-				{
-					Type:        config.RegexRoute,
-					Endpoint:    "/ocs/v[12].php/config",
-					Backend:     "http://localhost:9140",
-					Unprotected: true,
 				},
 				{
 					Endpoint: "/ocs/",
@@ -151,14 +141,12 @@ func DefaultPolicies() []config.Policy {
 					Service:  "com.owncloud.web.ocdav",
 				},
 				{
-					Endpoint:    "/status",
-					Service:     "com.owncloud.web.ocdav",
-					Unprotected: true,
+					Endpoint: "/status",
+					Service:  "com.owncloud.web.ocdav",
 				},
 				{
-					Endpoint:    "/status.php",
-					Service:     "com.owncloud.web.ocdav",
-					Unprotected: true,
+					Endpoint: "/status.php",
+					Service:  "com.owncloud.web.ocdav",
 				},
 				{
 					Endpoint: "/index.php/",
@@ -169,14 +157,8 @@ func DefaultPolicies() []config.Policy {
 					Service:  "com.owncloud.web.ocdav",
 				},
 				{
-					Endpoint:    "/data",
-					Backend:     "http://localhost:9140",
-					Unprotected: true,
-				},
-				{
-					Endpoint:    "/app/list",
-					Backend:     "http://localhost:9140",
-					Unprotected: true,
+					Endpoint: "/data",
+					Backend:  "http://localhost:9140",
 				},
 				{
 					Endpoint: "/app/", // /app or /apps? ocdav only handles /apps
@@ -187,9 +169,8 @@ func DefaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9120",
 				},
 				{
-					Endpoint:    "/graph-explorer",
-					Backend:     "http://localhost:9135",
-					Unprotected: true,
+					Endpoint: "/graph-explorer",
+					Backend:  "http://localhost:9135",
 				},
 				{
 					Endpoint: "/experimental",
@@ -200,9 +181,8 @@ func DefaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9190",
 				},
 				{
-					Endpoint:    "/settings.js",
-					Backend:     "http://localhost:9190",
-					Unprotected: true,
+					Endpoint: "/settings.js",
+					Backend:  "http://localhost:9190",
 				},
 			},
 		},

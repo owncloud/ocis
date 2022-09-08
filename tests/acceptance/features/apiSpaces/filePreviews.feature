@@ -24,18 +24,17 @@ Feature: Preview file in project space
 
 
   Scenario Outline: An user can preview image files in the project space
-    Given using spaces DAV path
-    And user "Alice" has uploaded a file from "<source>" to "<destination>" via TUS inside of the space "previews of the files" using the WebDAV API
-    When user "Alice" downloads the preview of "<destination>" of the space "previews of the files" with width "<width>" and height "<height>" using the WebDAV API
+    Given user "Alice" has uploaded a file "<entity>" via TUS inside of the space "previews of the files" using the WebDAV API
+    When user "Alice" downloads the preview of "<entity>" of the space "previews of the files" with width "<width>" and height "<height>" using the WebDAV API
     Then the HTTP status code should be "200"
     Examples:
-      | source                        | destination    | width | height |
-      | filesForUpload/testavatar.png | testavatar.png | 36    | 36     |
-      | filesForUpload/testavatar.png | testavatar.png | 1200  | 1200   |
-      | filesForUpload/testavatar.png | testavatar.png | 1920  | 1920   |
-      | filesForUpload/testavatar.jpg | testavatar.jpg | 36    | 36     |
-      | filesForUpload/testavatar.jpg | testavatar.jpg | 1200  | 1200   |
-      | filesForUpload/testavatar.jpg | testavatar.jpg | 1920  | 1920   |
-      | filesForUpload/example.gif    | example.gif    | 36    | 36     |
-      | filesForUpload/example.gif    | example.gif    | 1200  | 1200   |
-      | filesForUpload/example.gif    | example.gif    | 1280  | 1280   |
+      | entity         | width | height |
+      | qrcode.png     | 36    | 36     |
+      | qrcode.png     | 1200  | 1200   |
+      | qrcode.png     | 1920  | 1920   |
+      | testavatar.jpg | 36    | 36     |
+      | testavatar.jpg | 1200  | 1200   |
+      | testavatar.jpg | 1920  | 1920   |
+      | example.gif    | 36    | 36     |
+      | example.gif    | 1200  | 1200   |
+      | example.gif    | 1280  | 1280   |

@@ -1,17 +1,6 @@
 /* additional css on top of kpop */
-@font-face {
-  font-family: Inter;
-  src: url(./fonts/inter.ttf) format('truetype');
-  font-weight: 100 900;
-  font-style: oblique 0deg 12deg;
-}
-
-html {
-  font-feature-settings: "cv11";
-}
-
 body {
-  font-family: Inter, 'Open Sans', sans-serif;
+  font-family: 'Open Sans', sans-serif;
 }
 
 strong {
@@ -53,9 +42,10 @@ strong {
 }
 
 .oc-input {
-  background-color: #fff;
-  border: 1px solid #fff;
+  background-color: #042047;
+  border: 1px solid rgba(78, 133, 200, 0.8);
   border-radius: 3px;
+  color: rgba(255, 255, 255, 0.8);
   height: 40px;
   width: 300px;
   padding: 16px;
@@ -83,6 +73,10 @@ strong {
   border: 1px solid #fff;
 }
 
+.oc-input::placeholder {
+  color: rgba(78, 133, 200, 0.8);
+}
+
 .oc-input + .oc-input {
   margin-top: 15px;
 }
@@ -98,10 +92,15 @@ strong {
 
 .oc-button-primary {
   /* Needs to be important to overwrite material-ui */
-  width: 100%;
-  background: linear-gradient(to right, #2c588e, #4e85c8) -1px;
-  background-size: 103% !important;
+  background-color: #4a76ac !important;
   border: 1px solid transparent !important;
+}
+
+.oc-button-primary:hover,
+.oc-button-primary:focus {
+  /* Needs to be important to overwrite material-ui */
+  background-color: #4a76ac !important;
+  border: 1px solid white !important;
 }
 
 .oc-checkbox-dark svg {
@@ -124,7 +123,7 @@ strong {
 
 /* Helpers */
 .oc-mt-l {
-  margin-top: 24px !important;
+  margin-top: 30px !important;
 }
 
 .oc-mb-m {

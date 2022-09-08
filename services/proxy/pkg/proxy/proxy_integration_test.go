@@ -2,17 +2,15 @@ package proxy
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
 )
 
 func TestProxyIntegration(t *testing.T) {
@@ -116,8 +114,6 @@ func TestProxyIntegration(t *testing.T) {
 		t.Run(tests[k].id, func(t *testing.T) {
 			t.Parallel()
 			tc := tests[k]
-
-			rt := router.Middleware(nil, tc.conf, log.NewLogger())
 			rp := newTestProxy(testConfig(tc.conf), func(req *http.Request) *http.Response {
 				if got, want := req.URL.String(), tc.expect.String(); got != want {
 					t.Errorf("Proxied url should be %v got %v", want, got)
@@ -139,7 +135,7 @@ func TestProxyIntegration(t *testing.T) {
 			})
 
 			rr := httptest.NewRecorder()
-			rt(rp).ServeHTTP(rr, tc.input)
+			rp.ServeHTTP(rr, tc.input)
 			rsp := rr.Result()
 
 			if rsp.StatusCode != 200 {
@@ -208,7 +204,7 @@ func (tc *testCase) withRequest(method string, target string, body io.Reader) *t
 func (tc *testCase) expectProxyTo(strURL string) testCase {
 	pu, err := url.Parse(strURL)
 	if err != nil {
-		panic(fmt.Sprintf("Error parsing %v", strURL))
+		log.Fatalf("Error parsing %v", strURL)
 	}
 
 	tc.expect = pu

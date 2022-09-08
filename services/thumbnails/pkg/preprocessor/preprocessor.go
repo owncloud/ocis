@@ -10,7 +10,6 @@ import (
 	"mime"
 	"strings"
 
-	"github.com/disintegration/imaging"
 	"github.com/pkg/errors"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
@@ -24,7 +23,7 @@ type FileConverter interface {
 type ImageDecoder struct{}
 
 func (i ImageDecoder) Convert(r io.Reader) (interface{}, error) {
-	img, err := imaging.Decode(r, imaging.AutoOrientation(true))
+	img, _, err := image.Decode(r)
 	if err != nil {
 		return nil, errors.Wrap(err, `could not decode the image`)
 	}

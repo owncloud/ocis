@@ -1,4 +1,4 @@
-package router
+package proxy
 
 import (
 	"fmt"
@@ -7,20 +7,19 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config/defaults"
 )
 
 type matchertest struct {
 	method, endpoint, target string
-	unprotected              bool
 	matches                  bool
 }
 
 func TestPrefixRouteMatcher(t *testing.T) {
 	cfg := defaults.DefaultConfig()
 	cfg.Policies = defaults.DefaultPolicies()
+	p := NewMultiHostReverseProxy(Config(cfg))
 
 	table := []matchertest{
 		{endpoint: "/foobar", target: "/foobar/baz/some/url", matches: true},
@@ -29,7 +28,7 @@ func TestPrefixRouteMatcher(t *testing.T) {
 
 	for _, test := range table {
 		u, _ := url.Parse(test.target)
-		matched := prefixRouteMatcher(test.endpoint, *u)
+		matched := p.prefixRouteMatcher(test.endpoint, *u)
 		if matched != test.matches {
 			t.Errorf("PrefixRouteMatcher returned %t expected %t for endpoint: %s and target %s",
 				matched, test.matches, test.endpoint, u.String())
@@ -40,6 +39,7 @@ func TestPrefixRouteMatcher(t *testing.T) {
 func TestQueryRouteMatcher(t *testing.T) {
 	cfg := defaults.DefaultConfig()
 	cfg.Policies = defaults.DefaultPolicies()
+	p := NewMultiHostReverseProxy(Config(cfg))
 
 	table := []matchertest{
 		{endpoint: "/foobar?parameter=true", target: "/foobar/baz/some/url?parameter=true", matches: true},
@@ -56,7 +56,7 @@ func TestQueryRouteMatcher(t *testing.T) {
 
 	for _, test := range table {
 		u, _ := url.Parse(test.target)
-		matched := queryRouteMatcher(test.endpoint, *u)
+		matched := p.queryRouteMatcher(test.endpoint, *u)
 		if matched != test.matches {
 			t.Errorf("QueryRouteMatcher returned %t expected %t for endpoint: %s and target %s",
 				matched, test.matches, test.endpoint, u.String())
@@ -67,7 +67,7 @@ func TestQueryRouteMatcher(t *testing.T) {
 func TestRegexRouteMatcher(t *testing.T) {
 	cfg := defaults.DefaultConfig()
 	cfg.Policies = defaults.DefaultPolicies()
-	rt := New(cfg.PolicySelector, cfg.Policies, log.NewLogger())
+	p := NewMultiHostReverseProxy(Config(cfg))
 
 	table := []matchertest{
 		{endpoint: ".*some\\/url.*parameter=true", target: "/foobar/baz/some/url?parameter=true", matches: true},
@@ -76,7 +76,7 @@ func TestRegexRouteMatcher(t *testing.T) {
 
 	for _, test := range table {
 		u, _ := url.Parse(test.target)
-		matched := rt.regexRouteMatcher(test.endpoint, *u)
+		matched := p.regexRouteMatcher(test.endpoint, *u)
 		if matched != test.matches {
 			t.Errorf("RegexRouteMatcher returned %t expected %t for endpoint: %s and target %s",
 				matched, test.matches, test.endpoint, u.String())
@@ -104,52 +104,34 @@ func TestSingleJoiningSlash(t *testing.T) {
 	}
 }
 
-func TestRouter(t *testing.T) {
+func TestDirectorSelectionDirector(t *testing.T) {
+
 	svr := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "ok")
 	}))
 	defer svr.Close()
 
-	selector := &config.PolicySelector{
-		Static: &config.StaticSelectorConf{
-			Policy: "default",
-		},
-	}
-
-	policies := []config.Policy{
-		{
-			Name: "default",
-			Routes: []config.Route{
-				{Type: config.PrefixRoute, Endpoint: "/web/unprotected/demo/", Backend: "http://web", Unprotected: true},
-				{Type: config.PrefixRoute, Endpoint: "/dav", Backend: "http://ocdav"},
-				{Type: config.PrefixRoute, Method: "REPORT", Endpoint: "/dav", Backend: "http://ocis-webdav"},
+	p := NewMultiHostReverseProxy(Config(&config.Config{
+		PolicySelector: &config.PolicySelector{
+			Static: &config.StaticSelectorConf{
+				Policy: "default",
 			},
 		},
-	}
-
-	router := New(selector, policies, log.NewLogger())
+	}))
+	p.AddHost("default", &url.URL{Host: "ocdav"}, config.Route{Type: config.PrefixRoute, Method: "", Endpoint: "/dav", Backend: "ocdav"})
+	p.AddHost("default", &url.URL{Host: "ocis-webdav"}, config.Route{Type: config.PrefixRoute, Method: "REPORT", Endpoint: "/dav", Backend: "ocis-webdav"})
 
 	table := []matchertest{
 		{method: "PROPFIND", endpoint: "/dav/files/demo/", target: "ocdav"},
 		{method: "REPORT", endpoint: "/dav/files/demo/", target: "ocis-webdav"},
-		{method: "GET", endpoint: "/web/unprotected/demo/", target: "web", unprotected: true},
 	}
 
 	for _, test := range table {
-		r := httptest.NewRequest(test.method, test.endpoint, nil)
-		routingInfo, ok := router.Route(r)
-		if !ok {
-			t.Errorf("TestRouter router.Route failed to route the request.")
-		}
-
-		if routingInfo.IsRouteUnprotected() != test.unprotected {
-			t.Errorf("TestRouter route flag unprotected expected to be %t got %t", test.unprotected, routingInfo.IsRouteUnprotected())
-		}
-
-		routingInfo.Director()(r)
-
+		r := httptest.NewRequest(test.method, "/dav/files/demo/", nil)
+		p.directorSelectionDirector(r)
 		if r.URL.Host != test.target {
-			t.Errorf("TestRouter got host %s expected %s", r.URL.Host, test.target)
+			t.Errorf("TestDirectorSelectionDirector got host %s expected %s", r.Host, test.target)
+
 		}
 	}
 }

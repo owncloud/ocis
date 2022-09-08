@@ -7,7 +7,7 @@ Feature: sharing
       | username |
       | Alice    |
       | Brian    |
-    And using spaces DAV path
+    And using spaces DAV path  
 
 
   Scenario: Correct webdav share-permissions for received file with edit and reshare permissions
@@ -73,7 +73,7 @@ Feature: sharing
       | permissions | share,read |
     Then the HTTP status code should be "200"
     And as user "Brian" file "/tmp.txt" inside space "Shares Jail" should contain a property "ocs:share-permissions" with value "17"
-
+  
 
   Scenario: Correct webdav share-permissions for received group shared file with reshare permissions but no edit permissions
     Given group "grp1" has been created
@@ -101,7 +101,7 @@ Feature: sharing
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
     And the single response should contain a property "ocs:share-permissions" with value "31"
-
+    
 
   Scenario: Correct webdav share-permissions for received group shared folder with all permissions
     Given group "grp1" has been created
@@ -144,7 +144,7 @@ Feature: sharing
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
     And the single response should contain a property "ocs:share-permissions" with value "29"
-
+   
 
   Scenario: Correct webdav share-permissions for received folder with all permissions but create
     Given user "Alice" has created folder "/tmp"
@@ -154,7 +154,7 @@ Feature: sharing
       | permissions | share,delete,update,read |
     Then the HTTP status code should be "200"
      And as user "Brian" folder "/tmp" inside space "Shares Jail" should contain a property "ocs:share-permissions" with value "27"
-
+   
 
   Scenario: Correct webdav share-permissions for received group shared folder with all permissions but create
     Given group "grp1" has been created
@@ -171,7 +171,7 @@ Feature: sharing
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
     And the single response should contain a property "ocs:share-permissions" with value "27"
-
+   
 
   Scenario: Correct webdav share-permissions for received folder with all permissions but delete
     Given user "Alice" has created folder "/tmp"
@@ -181,8 +181,8 @@ Feature: sharing
       | permissions | share,create,update,read |
     Then the HTTP status code should be "200"
     And as user "Brian" folder "/tmp" inside space "Shares Jail" should contain a property "ocs:share-permissions" with value "23"
-
-
+   
+   
   Scenario: Correct webdav share-permissions for received group shared folder with all permissions but delete
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
@@ -198,7 +198,7 @@ Feature: sharing
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
     And the single response should contain a property "ocs:share-permissions" with value "23"
-
+    
 
   Scenario: Correct webdav share-permissions for received folder with all permissions but share
     Given user "Alice" has created folder "/tmp"
@@ -208,7 +208,7 @@ Feature: sharing
       | permissions | change |
     Then the HTTP status code should be "200"
     And as user "Brian" folder "/tmp" inside space "Shares Jail" should contain a property "ocs:share-permissions" with value "15"
-
+   
 
   Scenario: Correct webdav share-permissions for received group shared folder with all permissions but share
     Given group "grp1" has been created
@@ -225,152 +225,3 @@ Feature: sharing
       | ocs:share-permissions |
     Then the HTTP status code should be "207"
     And the single response should contain a property "ocs:share-permissions" with value "15"
-
-
-   Scenario: Uploading a file to a folder received as a read-only group share
-    Given group "grp1" has been created
-    And user "Brian" has been added to group "grp1"
-    And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | group  |
-      | permissions | read   |
-      | shareWith   | grp1   |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    When user "Brian" uploads a file inside space "Shares Jail" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
-    Then the HTTP status code should be "403"
-    And as "Alice" file "/FOLDER/textfile.txt" should not exist
-
-
-  Scenario: Uploading a file to a folder received as a upload-only user share
-    Given user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | user   |
-      | permissions | create |
-      | shareWith   | Brian  |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    When user "Brian" uploads a file inside space "Shares Jail" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And the following headers should match these regular expressions for user "Brian"
-      | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
-    And the content of file "/FOLDER/textfile.txt" for user "Alice" should be:
-    """
-    new description
-    """
-
-
-  Scenario: Uploading a file to a folder received as a upload-only group share
-    Given group "grp1" has been created
-    And user "Brian" has been added to group "grp1"
-    And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | group  |
-      | permissions | create |
-      | shareWith   | grp1   |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    When user "Brian" uploads a file inside space "Shares Jail" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And the following headers should match these regular expressions for user "Brian"
-      | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
-    And the content of file "/FOLDER/textfile.txt" for user "Alice" should be:
-    """
-    new description
-    """
-
-
-  Scenario:  Uploading a file to a folder received as a read/write user share
-    Given user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | user   |
-      | permissions | change |
-      | shareWith   | Brian  |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    When user "Brian" uploads a file inside space "Shares Jail" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And the content of file "/FOLDER/textfile.txt" for user "Alice" should be:
-    """
-    new description
-    """
-
-
-  Scenario: Uploading a file to a folder received as a read/write group share
-    Given group "grp1" has been created
-    And user "Brian" has been added to group "grp1"
-    And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | group  |
-      | permissions | change |
-      | shareWith   | grp1   |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    When user "Brian" uploads a file inside space "Shares Jail" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And the content of file "/FOLDER/textfile.txt" for user "Alice" should be:
-    """
-    new description
-    """
-
-
- Scenario: Uploading to a user shared folder with read/write permission when the sharer has insufficient quota
-    Given user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | user   |
-      | permissions | change |
-      | shareWith   | Brian  |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
-    When user "Brian" uploads a file inside space "Shares Jail" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
-    Then the HTTP status code should be "507"
-    And as "Alice" file "/FOLDER/textfile.txt" should not exist
-
-
-  Scenario: Uploading to a user shared folder with upload-only permission when the sharer has insufficient quota
-    Given user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | user   |
-      | permissions | create |
-      | shareWith   | Brian  |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "1"
-    When user "Brian" uploads a file inside space "Shares Jail" with content "new description" to "/FOLDER/textfile.txt" using the WebDAV API
-    Then the HTTP status code should be "507"
-    And as "Alice" file "/FOLDER/textfile.txt" should not exist
-
-
-   Scenario: Uploading a file to a group shared folder with upload-only permission when the sharer has insufficient quota
-    Given group "grp1" has been created
-    And user "Brian" has been added to group "grp1"
-    And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER |
-      | shareType   | group  |
-      | permissions | create |
-      | shareWith   | grp1   |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "10"
-    When user "Brian" uploads a file inside space "Shares Jail" with content "new descriptionfgshsywhhh" to "/FOLDER/textfile.txt" using the WebDAV API
-    Then the HTTP status code should be "507"
-    And as "Alice" file "/FOLDER/textfile.txt" should not exist
-
-
-  Scenario Outline: Sharer can download file uploaded with different permission by sharee to a shared folder
-    Given user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a share with settings
-      | path        | FOLDER        |
-      | shareType   | user          |
-      | permissions | <permissions> |
-      | shareWith   | Brian         |
-    And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    When user "Brian" uploads a file inside space "Shares Jail" with content "some content" to "/FOLDER/textfile.txt" using the WebDAV API
-    And user "Alice" downloads file "/FOLDER/textfile.txt" using the WebDAV API
-    Then the HTTP status code should be "200"
-    And the downloaded content should be "some content"
-     Examples:
-      | permissions |
-      | change      |
-      | create      |
