@@ -668,8 +668,8 @@ class SpacesContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $spaceName
-	 * @return void
 	 *
+	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function theUserLooksUpTheSingleSpaceUsingTheGraphApiByUsingItsId(string $user, string $spaceName): void {
@@ -847,8 +847,8 @@ class SpacesContext implements Context {
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $foldersPath
-	 * @return void
 	 *
+	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
@@ -1006,9 +1006,10 @@ class SpacesContext implements Context {
 
 	/**
 	 * @Then /^the json responded should contain a space "([^"]*)" (?:|(?:owned by|granted to) "([^"]*)" )(?:|(?:with description file|with space image) "([^"]*)" )with these key and value pairs:$/
+	 *
 	 * @param string $spaceName
-	 * @param string $userName
-	 * @param string $fileName
+	 * @param string|null $userName
+	 * @param string|null $fileName
 	 * @param TableNode $table
 	 *
 	 * @return void
@@ -1016,8 +1017,8 @@ class SpacesContext implements Context {
 	 */
 	public function jsonRespondedShouldContain(
 		string $spaceName,
-		string $userName = '',
-		string $fileName = '',
+		?string $userName = null,
+		?string $fileName = null,
 		TableNode $table
 	): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
@@ -1080,8 +1081,8 @@ class SpacesContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $spaceName
-	 * @param string $grantedUser
-	 * @param string $fileName
+	 * @param string|null $grantedUser
+	 * @param string|null $fileName
 	 * @param TableNode $table
 	 *
 	 * @return void
@@ -1090,8 +1091,8 @@ class SpacesContext implements Context {
 	public function userHasSpaceWith(
 		string $user,
 		string $spaceName,
-		string $grantedUser = '',
-		string $fileName = '',
+		?string $grantedUser = null,
+		?string $fileName = null,
 		TableNode $table
 	): void {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
@@ -1292,6 +1293,7 @@ class SpacesContext implements Context {
 	 * and returns found search results if found else returns false
 	 *
 	 * @param  string|null $entryNameToSearch
+	 * @param  string $folderPath
 	 *
 	 * @return array
 	 * string if $entryNameToSearch is given and is found
@@ -1545,6 +1547,7 @@ class SpacesContext implements Context {
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $newDescription
+	 *
 	 * @return void
 	 * @throws GuzzleException
 	 * @throws JsonException
@@ -2496,7 +2499,7 @@ class SpacesContext implements Context {
 	/**
 	 * User get all objects in the trash of project space
 	 *
-	 * method "getTrashbinContentFromResponseXml" borrowed from core repository
+	 * Method "getTrashbinContentFromResponseXml" borrowed from core repository
 	 * and return array like:
 	 * 	[1] => Array
 	 *       (
@@ -2619,6 +2622,7 @@ class SpacesContext implements Context {
 	 * @param  string $width
 	 * @param  string $height
 	 *
+	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function downloadPreview(
@@ -2659,6 +2663,7 @@ class SpacesContext implements Context {
 	 * @param  string $fileName
 	 * @param  string $spaceName
 	 *
+	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function downloadFile(
@@ -2689,6 +2694,7 @@ class SpacesContext implements Context {
 	 * @param string $path
 	 * @param string $spaceName
 	 *
+	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function userRequestsTheChecksumViaPropfindInSpace(
@@ -2726,6 +2732,7 @@ class SpacesContext implements Context {
 	 * @param string $path
 	 * @param string $spaceName
 	 *
+	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function userUploadsFileWithChecksumWithContentInSpace(
@@ -2758,6 +2765,7 @@ class SpacesContext implements Context {
 	 * @param  string $index
 	 * @param  string $spaceName
 	 *
+	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function downloadVersionOfTheFile(
@@ -2903,6 +2911,9 @@ class SpacesContext implements Context {
 	/**
 	 * @Then /^these etags should have changed$/
 	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function theseEtagsShouldHaveChanged(TableNode $table): void {
@@ -2930,6 +2941,7 @@ class SpacesContext implements Context {
 	 *
 	 * @param TableNode $table
 	 *
+	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function theseEtagsShouldNotHaveChanged(TableNode $table): void {
@@ -2955,6 +2967,11 @@ class SpacesContext implements Context {
 	/**
 	 * @Given /^user "([^"]*)" has stored etag of element "([^"]*)" inside space "([^"]*)"$/
 	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $space
+	 *
+	 * @return void
 	 * @throws GuzzleException | Exception
 	 */
 	public function userHasStoredEtagOfElementFromSpace(string $user, string $path, string $space):void {
@@ -2972,9 +2989,15 @@ class SpacesContext implements Context {
 	/**
 	 * @Given /^user "([^"]*)" has stored etag of element "([^"]*)" on path "([^"]*)" inside space "([^"]*)"$/
 	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $storePath
+	 * @param string $space
+	 *
+	 * @return void
 	 * @throws Exception | GuzzleException
 	 */
-	public function userHasStoredEtagOfElementOnPathFromSpace($user, $path, $storePath, $space) {
+	public function userHasStoredEtagOfElementOnPathFromSpace(string $user, string $path, string $storePath, string $space):void {
 		$user = $this->featureContext->getActualUsername($user);
 		$this->storeEtagOfElementInSpaceForUser(
 			$user,
@@ -2995,9 +3018,10 @@ class SpacesContext implements Context {
 	 * @param TableNode $properties
 	 * @param string $spaceName
 	 *
+	 * @return void
 	 * @throws Exception | GuzzleException
 	 */
-	public function userHasLockedResourceOfSpace(string $user, string $resource, TableNode $properties, string $spaceName) {
+	public function userHasLockedResourceOfSpace(string $user, string $resource, TableNode $properties, string $spaceName): void {
 		$this->setSpaceIDByName($user, $spaceName);
 		$this->webDavLockingContext->lockFileUsingWebDavAPI($user, $resource, $properties);
 	}

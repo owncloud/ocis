@@ -509,6 +509,7 @@ class GraphContext implements Context {
 	 * @param string $shouldOrNot (not|)
 	 * @param TableNode $table
 	 *
+	 * @return void
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
@@ -539,10 +540,12 @@ class GraphContext implements Context {
 
 	/**
 	 * @When /^the user "([^"]*)" changes its own password "([^"]*)" to "([^"]*)" using the Graph API$/
+	 *
 	 * @param string $user
 	 * @param string $currentPassword
 	 * @param string $newPassword
 	 *
+	 * @return void
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
