@@ -476,7 +476,6 @@ class SpacesContext implements Context {
 	 */
 	public function cleanDataAfterTests(): void {
 		$this->deleteAllProjectSpaces();
-		$this->deleteAllCreatedUsers();
 	}
 
 	/**
@@ -513,29 +512,6 @@ class SpacesContext implements Context {
 					$userAdmin,
 					$this->featureContext->getPasswordForUser($userAdmin),
 					$value["id"]
-				)
-			);
-		}
-	}
-
-	/**
-	 * admin deletes created user with their personal space (this happens automatically after deleting users)
-	 *
-	 * @return void
-	 *
-	 * @throws Exception|GuzzleException
-	 */
-	public function deleteAllCreatedUsers(): void {
-		$createdUsers = $this->featureContext->getCreatedUsers();
-
-		foreach ($createdUsers as $user) {
-			$this->featureContext->setResponse(
-				GraphHelper::deleteUser(
-					$this->featureContext->getBaseUrl(),
-					$this->featureContext->getStepLineRef(),
-					$this->featureContext->getAdminUsername(),
-					$this->featureContext->getAdminPassword(),
-					$user['actualUsername']
 				)
 			);
 		}
