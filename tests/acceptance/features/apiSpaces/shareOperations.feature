@@ -17,7 +17,7 @@ Feature: sharing
     When user "Brian" gets the following properties of file "/tmp.txt" inside space "Shares Jail" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
-    Then the HTTP status code should be "207"
+    Then the HTTP status code should be "200"
     And the single response should contain a property "ocs:share-permissions" with value "19"
 
 
@@ -34,7 +34,7 @@ Feature: sharing
     When user "Brian" gets the following properties of file "/tmp.txt" inside space "Shares Jail" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
-    Then the HTTP status code should be "207"
+    Then the HTTP status code should be "200"
     And the single response should contain a property "ocs:share-permissions" with value "19"
 
 
@@ -61,7 +61,7 @@ Feature: sharing
     When user "Brian" gets the following properties of file "/tmp.txt" inside space "Shares Jail" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
-    Then the HTTP status code should be "207"
+    Then the HTTP status code should be "200"
     And the single response should contain a property "ocs:share-permissions" with value "3"
 
 
@@ -88,7 +88,7 @@ Feature: sharing
     When user "Brian" gets the following properties of file "/tmp.txt" inside space "Shares Jail" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
-    Then the HTTP status code should be "207"
+    Then the HTTP status code should be "200"
     And the single response should contain a property "ocs:share-permissions" with value "17"
 
 
@@ -99,7 +99,7 @@ Feature: sharing
     When user "Brian" gets the following properties of folder "/tmp" inside space "Shares Jail" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
-    Then the HTTP status code should be "207"
+    Then the HTTP status code should be "200"
     And the single response should contain a property "ocs:share-permissions" with value "31"
 
 
@@ -115,7 +115,7 @@ Feature: sharing
     When user "Brian" gets the following properties of folder "/tmp" inside space "Shares Jail" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
-    Then the HTTP status code should be "207"
+    Then the HTTP status code should be "200"
     And the single response should contain a property "ocs:share-permissions" with value "31"
 
 
@@ -142,7 +142,7 @@ Feature: sharing
      When user "Brian" gets the following properties of folder "/tmp" inside space "Shares Jail" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
-    Then the HTTP status code should be "207"
+    Then the HTTP status code should be "200"
     And the single response should contain a property "ocs:share-permissions" with value "29"
 
 
@@ -169,7 +169,7 @@ Feature: sharing
     When user "Brian" gets the following properties of folder "/tmp" inside space "Shares Jail" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
-    Then the HTTP status code should be "207"
+    Then the HTTP status code should be "200"
     And the single response should contain a property "ocs:share-permissions" with value "27"
 
 
@@ -196,7 +196,7 @@ Feature: sharing
     When user "Brian" gets the following properties of folder "/tmp" inside space "Shares Jail" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
-    Then the HTTP status code should be "207"
+    Then the HTTP status code should be "200"
     And the single response should contain a property "ocs:share-permissions" with value "23"
 
 
@@ -223,7 +223,7 @@ Feature: sharing
     When user "Brian" gets the following properties of folder "/tmp" inside space "Shares Jail" using the WebDAV API
       | propertyName          |
       | ocs:share-permissions |
-    Then the HTTP status code should be "207"
+    Then the HTTP status code should be "200"
     And the single response should contain a property "ocs:share-permissions" with value "15"
 
 

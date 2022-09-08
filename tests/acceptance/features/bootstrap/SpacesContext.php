@@ -3122,30 +3122,8 @@ class SpacesContext implements Context {
 		string $spaceName,
 		TableNode $propertiesTable
 	):void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$properties = null;
-		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($resourceName, "/");
-		$this->featureContext->verifyTableNodeColumns($propertiesTable, ["propertyName"]);
-		$this->featureContext->verifyTableNodeColumnsCount($propertiesTable, 1);
-		if ($propertiesTable instanceof TableNode) {
-			foreach ($propertiesTable->getColumnsHash() as $row) {
-				$properties[] = $row["propertyName"];
-			}
-		}
-		$body = WebDavHelper::getBodyForPropfind($properties);
-		$headers['Depth'] = '1';
-		$this->featureContext->setResponse(
-			$this->sendPropfindRequestToUrl(
-				$fullUrl,
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				'',
-				$headers,
-				$body
-			)
-		);
-		$responseXml = $this->featureContext->getResponseXml(null, __METHOD__);
-		$this->featureContext->setResponseXmlObject($responseXml);
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->webDavPropertiesContext->userGetsPropertiesOfFolder($user, $resourceName, $propertiesTable);
 	}
 
 	/**
