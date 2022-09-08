@@ -47,8 +47,6 @@ Feature: Search
     Then the HTTP status code should be "207"
     And the search result should contain "4" entries
     And the search result of user "Brian" should contain these entries:
-      | /folder                                           |
-      | /folder/SubFolder1                                |
-      | /folder/SubFolder1/subFOLDER2                     |
-      | /folder/SubFolder1/subFOLDER2/insideTheFolder.txt |
-
+      | /SubFolder1                                |
+      | /SubFolder1/subFOLDER2                     |
+      | /SubFolder1/subFOLDER2/insideTheFolder.txt |

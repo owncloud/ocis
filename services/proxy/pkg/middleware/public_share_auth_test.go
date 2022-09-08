@@ -28,6 +28,10 @@ var _ = Describe("Authenticating requests", Label("PublicShareAuthenticator"), f
 						return "exampletoken", rpcv1beta1.Code_CODE_OK
 					}
 
+					if clientID == "sharetoken" && clientSecret == "password|" {
+						return "otherexampletoken", rpcv1beta1.Code_CODE_OK
+					}
+
 					return "", rpcv1beta1.Code_CODE_NOT_FOUND
 				},
 			},
@@ -59,6 +63,29 @@ var _ = Describe("Authenticating requests", Label("PublicShareAuthenticator"), f
 
 				h := req2.Header
 				Expect(h.Get(_headerRevaAccessToken)).To(Equal("exampletoken"))
+			})
+		})
+	})
+	When("the reguest is for the archiver", func() {
+		Context("using a public-token", func() {
+			It("should successfully authenticate", func() {
+				req := httptest.NewRequest(http.MethodGet, "http://example.com/archiver?public-token=sharetoken", http.NoBody)
+				req2, valid := authenticator.Authenticate(req)
+
+				Expect(valid).To(Equal(true))
+				Expect(req2).ToNot(BeNil())
+
+				h := req2.Header
+				Expect(h.Get(_headerRevaAccessToken)).To(Equal("otherexampletoken"))
+			})
+		})
+		Context("not using a public-token", func() {
+			It("should fail to authenticate", func() {
+				req := httptest.NewRequest(http.MethodGet, "http://example.com/archiver", http.NoBody)
+				req2, valid := authenticator.Authenticate(req)
+
+				Expect(valid).To(Equal(false))
+				Expect(req2).To(BeNil())
 			})
 		})
 	})
