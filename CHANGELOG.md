@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Introduce "delete-all-spaces" permission: [#4196](https://github.com/owncloud/ocis/issues/4196)
 * Enhancement - Add previewFileMimeTypes to web default config: [#4414](https://github.com/owncloud/ocis/pull/4414)
 * Enhancement - Improve login screen design: [#4500](https://github.com/owncloud/ocis/pull/4500)
+* Enhancement - OCS get share now also handle received shares: [#4322](https://github.com/owncloud/ocis/issues/4322)
 * Enhancement - Automatically orientate photos when generating thumbnails: [#4477](https://github.com/owncloud/ocis/issues/4477)
 * Enhancement - Refactor the proxy service: [#4401](https://github.com/owncloud/ocis/issues/4401)
 * Enhancement - Update Reva: [#4522](https://github.com/owncloud/ocis/pull/4522)
@@ -77,6 +78,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/web/issues/7552
    https://github.com/owncloud/ocis/pull/4500
+
+* Enhancement - OCS get share now also handle received shares: [#4322](https://github.com/owncloud/ocis/issues/4322)
+
+   Requesting a specific share can now also correctly map the path to the mountpoint if the
+   requested share is a received share.
+
+   https://github.com/owncloud/ocis/issues/4322
+   https://github.com/owncloud/ocis/pull/4539
 
 * Enhancement - Automatically orientate photos when generating thumbnails: [#4477](https://github.com/owncloud/ocis/issues/4477)
 
