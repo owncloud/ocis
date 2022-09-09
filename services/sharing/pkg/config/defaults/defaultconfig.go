@@ -53,12 +53,16 @@ func DefaultConfig() *config.Config {
 				DBName:     "owncloud",
 			},
 		},
-		PublicSharingDriver: "cs3",
+		PublicSharingDriver: "jsoncs3",
 		PublicSharingDrivers: config.PublicSharingDrivers{
 			JSON: config.PublicSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "publicshares.json"),
 			},
 			CS3: config.PublicSharingCS3Driver{
+				ProviderAddr:  "127.0.0.1:9215", // system storage
+				SystemUserIDP: "internal",
+			},
+			JSONCS3: config.PublicSharingJSONCS3Driver{
 				ProviderAddr:  "127.0.0.1:9215", // system storage
 				SystemUserIDP: "internal",
 			},
@@ -133,6 +137,14 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.PublicSharingDrivers.CS3.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
 		cfg.PublicSharingDrivers.CS3.SystemUserID = cfg.Commons.SystemUserID
+	}
+
+	if cfg.PublicSharingDrivers.JSONCS3.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
+		cfg.PublicSharingDrivers.JSONCS3.SystemUserAPIKey = cfg.Commons.SystemUserAPIKey
+	}
+
+	if cfg.PublicSharingDrivers.JSONCS3.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
+		cfg.PublicSharingDrivers.JSONCS3.SystemUserID = cfg.Commons.SystemUserID
 	}
 }
 
