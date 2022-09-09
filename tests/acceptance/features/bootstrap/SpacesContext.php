@@ -3226,7 +3226,7 @@ class SpacesContext implements Context {
 		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml()->xpath("//d:response/d:href")), true, 512, JSON_THROW_ON_ERROR);
 		Assert::assertNotEmpty($responseArray, "search result is empty");
 		
-		// for mountpoint, id looks a little different than for project space  
+		// for mountpoint, id looks a little different than for project space
 		if (str_contains($spaceName, 'mountpoint')) {
 			$splitSpaceName = explode("/", $spaceName);
 			$space = $this->getSpaceByName($user, $splitSpaceName[1]);
@@ -3238,7 +3238,7 @@ class SpacesContext implements Context {
 		}
 		
 		$spaceFound = false;
-		foreach ($responseArray as $value){
+		foreach ($responseArray as $value) {
 			if ($topWebDavPath === $value[0]) {
 				$spaceFound = true;
 			}
