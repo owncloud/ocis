@@ -31,16 +31,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiSpaces/changingFilesShare.feature:12](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/changingFilesShare.feature#L12)
 
-#### [Webdav LOCK operations](https://github.com/owncloud/ocis/issues/1284)
-- [apiSpaces/lockSpaces.feature:31](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L31)
-- [apiSpaces/lockSpaces.feature:32](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L32)
-- [apiSpaces/lockSpaces.feature:50](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L50)
-- [apiSpaces/lockSpaces.feature:51](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L51)
-- [apiSpaces/lockSpaces.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L71)
-- [apiSpaces/lockSpaces.feature:72](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L72)
-- [apiSpaces/lockSpaces.feature:89](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L89)
-- [apiSpaces/lockSpaces.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L90)
-
 ### [copy to overwrite (file and folder) from Personal to Shares Jail behaves differently](https://github.com/owncloud/ocis/issues/4393)
 - [apiSpaces/copySpaces.feature:487](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L487)
 - [apiSpaces/copySpaces.feature:501](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L501)

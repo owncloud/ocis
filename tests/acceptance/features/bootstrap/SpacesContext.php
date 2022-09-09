@@ -66,11 +66,6 @@ class SpacesContext implements Context {
 	private FavoritesContext $favoritesContext;
 
 	/**
-	 * @var WebDavLockingContext
-	 */
-	private WebDavLockingContext $webDavLockingContext;
-
-	/**
 	 * @var ChecksumContext
 	 */
 	private ChecksumContext $checksumContext;
@@ -460,7 +455,6 @@ class SpacesContext implements Context {
 		$this->trashbinContext = $environment->getContext('TrashbinContext');
 		$this->webDavPropertiesContext = $environment->getContext('WebDavPropertiesContext');
 		$this->favoritesContext = $environment->getContext('FavoritesContext');
-		$this->webDavLockingContext = $environment->getContext('WebDavLockingContext');
 		$this->checksumContext = $environment->getContext('ChecksumContext');
 		// Run the BeforeScenario function in OCSContext to set it up correctly
 		$this->ocsContext->before($scope);
@@ -2989,22 +2983,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has locked folder "([^"]*)" inside space "([^"]*)" setting the following properties$/
-	 *
-	 * @param string $user
-	 * @param string $resource
-	 * @param TableNode $properties
-	 * @param string $spaceName
-	 *
-	 * @return void
-	 * @throws Exception | GuzzleException
-	 */
-	public function userHasLockedResourceOfSpace(string $user, string $resource, TableNode $properties, string $spaceName): void {
-		$this->setSpaceIDByName($user, $spaceName);
-		$this->webDavLockingContext->lockFileUsingWebDavAPI($user, $resource, $properties);
-	}
-
-	/**
 	 * @When /^user "([^"]*)" creates a public link share of the space "([^"]*)" with settings:$/
 	 *
 	 * @param  string $user
@@ -3170,20 +3148,20 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponseXmlObject($responseXml);
 	}
 
-    /**
-     * @Then /^as user "([^"]*)" (?:file|folder|entry) "([^"]*)" inside space "([^"]*)" (should|should not) be favorited$/
-     *
-     * @param string $user
-     * @param string $path
-     * @param string $spaceName
-     * @param string $shouldOrNot
-     *
-     * @return void
-     */
-    public function asUserFileOrFolderInsideSpaceShouldOrNotBeFavorited(string $user, string $path, string $spaceName, string $shouldOrNot):void {
-        $this->setSpaceIDByName($user, $spaceName);
-        $this->favoritesContext->asUserFileOrFolderShouldBeFavorited($user, $path, ($shouldOrNot === 'should') ? 1 : 0);
-    }
+	/**
+	 * @Then /^as user "([^"]*)" (?:file|folder|entry) "([^"]*)" inside space "([^"]*)" (should|should not) be favorited$/
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $spaceName
+	 * @param string $shouldOrNot
+	 *
+	 * @return void
+	 */
+	public function asUserFileOrFolderInsideSpaceShouldOrNotBeFavorited(string $user, string $path, string $spaceName, string $shouldOrNot):void {
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->favoritesContext->asUserFileOrFolderShouldBeFavorited($user, $path, ($shouldOrNot === 'should') ? 1 : 0);
+	}
 
 	/**
 	 * @When /^user "([^"]*)" favorites element "([^"]*)" in space "([^"]*)" using the WebDAV API$/
