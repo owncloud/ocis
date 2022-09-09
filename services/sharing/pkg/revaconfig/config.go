@@ -90,7 +90,7 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"machine_auth_apikey": cfg.PublicSharingDrivers.CS3.SystemUserAPIKey,
 						},
 						"jsoncs3": map[string]interface{}{
-							"gateway_addr":        cfg.PublicSharingDrivers.JSONCS3.ProviderAddr,
+							"gateway_addr":        cfg.Reva.Address,
 							"provider_addr":       cfg.PublicSharingDrivers.JSONCS3.ProviderAddr,
 							"service_user_id":     cfg.PublicSharingDrivers.JSONCS3.SystemUserID,
 							"service_user_idp":    cfg.PublicSharingDrivers.JSONCS3.SystemUserIDP,
