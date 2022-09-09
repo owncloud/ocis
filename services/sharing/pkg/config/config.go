@@ -111,8 +111,8 @@ type UserSharingJSONCS3Driver struct {
 
 type PublicSharingDrivers struct {
 	JSON    PublicSharingJSONDriver    `yaml:"json"`
-	CS3     PublicSharingCS3Driver     `yaml:"cs3"`
 	JSONCS3 PublicSharingJSONCS3Driver `yaml:"jsoncs3"`
+	CS3     PublicSharingCS3Driver     `yaml:"cs3"`
 
 	SQL PublicSharingSQLDriver `yaml:"sql,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
