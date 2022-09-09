@@ -3170,20 +3170,20 @@ class SpacesContext implements Context {
 		$this->featureContext->setResponseXmlObject($responseXml);
 	}
 
-    /**
-     * @Then /^as user "([^"]*)" (?:file|folder|entry) "([^"]*)" inside space "([^"]*)" (should|should not) be favorited$/
-     *
-     * @param string $user
-     * @param string $path
-     * @param string $spaceName
-     * @param string $shouldOrNot
-     *
-     * @return void
-     */
-    public function asUserFileOrFolderInsideSpaceShouldOrNotBeFavorited(string $user, string $path, string $spaceName, string $shouldOrNot):void {
-        $this->setSpaceIDByName($user, $spaceName);
-        $this->favoritesContext->asUserFileOrFolderShouldBeFavorited($user, $path, ($shouldOrNot === 'should') ? 1 : 0);
-    }
+	/**
+	 * @Then /^as user "([^"]*)" (?:file|folder|entry) "([^"]*)" inside space "([^"]*)" (should|should not) be favorited$/
+	 *
+	 * @param string $user
+	 * @param string $path
+	 * @param string $spaceName
+	 * @param string $shouldOrNot
+	 *
+	 * @return void
+	 */
+	public function asUserFileOrFolderInsideSpaceShouldOrNotBeFavorited(string $user, string $path, string $spaceName, string $shouldOrNot):void {
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->favoritesContext->asUserFileOrFolderShouldBeFavorited($user, $path, ($shouldOrNot === 'should') ? 1 : 0);
+	}
 
 	/**
 	 * @When /^user "([^"]*)" favorites element "([^"]*)" in space "([^"]*)" using the WebDAV API$/
