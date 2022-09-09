@@ -66,11 +66,6 @@ class SpacesContext implements Context {
 	private FavoritesContext $favoritesContext;
 
 	/**
-	 * @var WebDavLockingContext
-	 */
-	private WebDavLockingContext $webDavLockingContext;
-
-	/**
 	 * @var ChecksumContext
 	 */
 	private ChecksumContext $checksumContext;
@@ -460,7 +455,6 @@ class SpacesContext implements Context {
 		$this->trashbinContext = $environment->getContext('TrashbinContext');
 		$this->webDavPropertiesContext = $environment->getContext('WebDavPropertiesContext');
 		$this->favoritesContext = $environment->getContext('FavoritesContext');
-		$this->webDavLockingContext = $environment->getContext('WebDavLockingContext');
 		$this->checksumContext = $environment->getContext('ChecksumContext');
 		// Run the BeforeScenario function in OCSContext to set it up correctly
 		$this->ocsContext->before($scope);
@@ -2986,22 +2980,6 @@ class SpacesContext implements Context {
 		if ($this->storedEtags[$user][$space][$storePath] === "" || $this->storedEtags[$user][$space][$storePath] === null) {
 			throw new Exception("Expected stored etag to be some string but found null!");
 		}
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has locked folder "([^"]*)" inside space "([^"]*)" setting the following properties$/
-	 *
-	 * @param string $user
-	 * @param string $resource
-	 * @param TableNode $properties
-	 * @param string $spaceName
-	 *
-	 * @return void
-	 * @throws Exception | GuzzleException
-	 */
-	public function userHasLockedResourceOfSpace(string $user, string $resource, TableNode $properties, string $spaceName): void {
-		$this->setSpaceIDByName($user, $spaceName);
-		$this->webDavLockingContext->lockFileUsingWebDavAPI($user, $resource, $properties);
 	}
 
 	/**

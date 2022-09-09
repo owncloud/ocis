@@ -30,7 +30,6 @@ default:
         - PublicWebDavContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
-        - WebDavLockingContext:
 
     apiSpaces:
       paths:
@@ -49,7 +48,6 @@ default:
         - SearchContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
-        - WebDavLockingContext:
         - TUSContext:
         - SpacesTUSContext:
 
@@ -70,7 +68,6 @@ default:
         - FavoritesContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
-        - WebDavLockingContext:
 
     apiGraph:
       paths:
