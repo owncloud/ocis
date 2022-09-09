@@ -276,7 +276,7 @@ func revaPublicShareConfig(cfg *sharing.Config) map[string]interface{} {
 			"gateway_addr": cfg.Reva.Address,
 		},
 		"jsoncs3": map[string]interface{}{
-			"gateway_addr":        cfg.PublicSharingDrivers.JSONCS3.ProviderAddr,
+			"gateway_addr":        cfg.Reva.Address,
 			"provider_addr":       cfg.PublicSharingDrivers.JSONCS3.ProviderAddr,
 			"service_user_id":     cfg.PublicSharingDrivers.JSONCS3.SystemUserID,
 			"service_user_idp":    cfg.PublicSharingDrivers.JSONCS3.SystemUserIDP,
