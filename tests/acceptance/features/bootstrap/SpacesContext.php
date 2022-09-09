@@ -71,6 +71,11 @@ class SpacesContext implements Context {
 	private WebDavLockingContext $webDavLockingContext;
 
 	/**
+	 * @var ChecksumContext
+	 */
+	private ChecksumContext $checksumContext;
+
+	/**
 	 * @var string
 	 */
 	private string $baseUrl;
@@ -456,6 +461,7 @@ class SpacesContext implements Context {
 		$this->webDavPropertiesContext = $environment->getContext('WebDavPropertiesContext');
 		$this->favoritesContext = $environment->getContext('FavoritesContext');
 		$this->webDavLockingContext = $environment->getContext('WebDavLockingContext');
+		$this->checksumContext = $environment->getContext('ChecksumContext');
 		// Run the BeforeScenario function in OCSContext to set it up correctly
 		$this->ocsContext->before($scope);
 		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
@@ -2702,25 +2708,8 @@ class SpacesContext implements Context {
 		string $path,
 		string $spaceName
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($path, "/");
-		$body = '<?xml version="1.0"?>
-			<d:propfind  xmlns:d="DAV:" xmlns:oc="http://owncloud.org/ns">
-			  <d:prop>
-				<oc:checksums />
-			  </d:prop>
-			</d:propfind>';
-
-		$this->featureContext->setResponse(
-			$this->sendPropfindRequestToUrl(
-				$fullUrl,
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$this->featureContext->getStepLineRef(),
-				[],
-				$body
-			)
-		);
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->checksumContext->userRequestsTheChecksumOfViaPropfind($user, $path);
 	}
 
 	/**
@@ -2729,7 +2718,7 @@ class SpacesContext implements Context {
 	 * @param string $user
 	 * @param string $checksum
 	 * @param string $content
-	 * @param string $path
+	 * @param string $destination
 	 * @param string $spaceName
 	 *
 	 * @return void
@@ -2739,22 +2728,11 @@ class SpacesContext implements Context {
 		string $user,
 		string $checksum,
 		string $content,
-		string $path,
+		string $destination,
 		string $spaceName
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($path, "/");
-
-		$this->featureContext->setResponse(
-			$this->sendPutRequestToUrl(
-				$fullUrl,
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				"",
-				['OC-Checksum' => $checksum],
-				$content
-			)
-		);
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->featureContext->userUploadsAFileWithChecksumAndContentTo($user, $checksum, $content, $destination);
 	}
 
 	/**
