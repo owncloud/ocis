@@ -17,7 +17,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Automatically orientate photos when generating thumbnails: [#4477](https://github.com/owncloud/ocis/issues/4477)
 * Enhancement - Refactor the proxy service: [#4401](https://github.com/owncloud/ocis/issues/4401)
 * Enhancement - Update Reva: [#4522](https://github.com/owncloud/ocis/pull/4522)
-* Enhancement - Update ownCloud Web to v5.7.0-rc.11: [#4508](https://github.com/owncloud/ocis/pull/4508)
+* Enhancement - Update ownCloud Web to v5.7.0-rc.13: [#4508](https://github.com/owncloud/ocis/pull/4508)
 
 ## Details
 
@@ -115,11 +115,11 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/4522
    https://github.com/owncloud/ocis/pull/4534
 
-* Enhancement - Update ownCloud Web to v5.7.0-rc.11: [#4508](https://github.com/owncloud/ocis/pull/4508)
+* Enhancement - Update ownCloud Web to v5.7.0-rc.13: [#4508](https://github.com/owncloud/ocis/pull/4508)
 
    Tags: web
 
-   We updated ownCloud Web to v5.7.0-rc.11. Please refer to the changelog (linked) for details on
+   We updated ownCloud Web to v5.7.0-rc.13. Please refer to the changelog (linked) for details on
    the web release.
 
   * Bugfix [owncloud/web#7522](https://github.com/owncloud/web/pull/7522): Allow uploads outside of user's home despite quota being exceeded
@@ -131,15 +131,24 @@ The following sections list the changes for unreleased.
   * Bugfix [owncloud/web#7534](https://github.com/owncloud/web/issues/7534): Redirect after removing self from space members
   * Bugfix [owncloud/web#7519](https://github.com/owncloud/web/issues/7519): Sidebar for current folder
   * Bugfix [owncloud/web#7453](https://github.com/owncloud/web/issues/7453): Stuck After Session Expired
+  * Bugfix [owncloud/web#7560](https://github.com/owncloud/web/pull/7560): Search share representation
+  * Bugfix [owncloud/web#7595](https://github.com/owncloud/web/pull/7595): Typo when reading public links capabilities
   * Enhancement [owncloud/web#7540](https://github.com/owncloud/web/issues/7540): Left sidebar hover effect
   * Enhancement [owncloud/web#7555](https://github.com/owncloud/web/pull/7555): Propose unique file name while creating a new file
   * Enhancement [owncloud/web#7485](https://github.com/owncloud/web/pull/7485): Add resource name to the WebDAV properties
   * Enhancement [owncloud/web#7559](https://github.com/owncloud/web/pull/7559): Don't open right sidebar from private links
   * Enhancement [owncloud/web#7177](https://github.com/owncloud/web/issues/7177): Update Uppy to v3.0.1
   * Enhancement [owncloud/web#7570](https://github.com/owncloud/web/pull/7570): Adjust spacing of the files list options menu
+  * Enhancement [owncloud/web#7038](https://github.com/owncloud/web/issues/7038): Reduce pagination options
+  * Enhancement [owncloud/web#6173](https://github.com/owncloud/web/pull/6173): Remember the UI that was last selected via the application switcher
+  * Enhancement [owncloud/web#7584](https://github.com/owncloud/web/pull/7584): Remove clickOutside directive
+  * Enhancement [owncloud/web#7586](https://github.com/owncloud/web/pull/7586): Search improvements
+  * Enhancement [owncloud/web#7605](https://github.com/owncloud/web/pull/7605): Simplify mime type checking
+  * Enhancement [owncloud/web#7606](https://github.com/owncloud/web/pull/7606): Update ODS to v14.0.0-alpha.17
 
    https://github.com/owncloud/ocis/pull/4508
-   https://github.com/owncloud/web/releases/tag/v5.7.0-rc.11
+   https://github.com/owncloud/ocis/pull/4547
+   https://github.com/owncloud/web/releases/tag/v5.7.0-rc.13
 # Changelog for [2.0.0-beta.7] (2022-08-26)
 
 The following sections list the changes for 2.0.0-beta.7.
