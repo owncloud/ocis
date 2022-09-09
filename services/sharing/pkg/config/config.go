@@ -110,8 +110,9 @@ type UserSharingJSONCS3Driver struct {
 }
 
 type PublicSharingDrivers struct {
-	JSON PublicSharingJSONDriver `yaml:"json"`
-	CS3  PublicSharingCS3Driver  `yaml:"cs3"`
+	JSON    PublicSharingJSONDriver    `yaml:"json"`
+	CS3     PublicSharingCS3Driver     `yaml:"cs3"`
+	JSONCS3 PublicSharingJSONCS3Driver `yaml:"jsoncs3"`
 
 	SQL PublicSharingSQLDriver `yaml:"sql,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
@@ -136,7 +137,15 @@ type PublicSharingCS3Driver struct {
 	ProviderAddr     string `yaml:"provider_addr" env:"SHARING_PUBLIC_CS3_PROVIDER_ADDR" desc:"GRPC address of the STORAGE-SYSTEM service."`
 	SystemUserID     string `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID;SHARING_PUBLIC_CS3_SYSTEM_USER_ID" desc:"ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
 	SystemUserIDP    string `yaml:"system_user_idp" env:"OCIS_SYSTEM_USER_IDP;SHARING_PUBLIC_CS3_SYSTEM_USER_IDP" desc:"IDP of the oCIS STORAGE-SYSTEM system user."`
-	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY;SHARING_USER_CS3_SYSTEM_USER_API_KEY" desc:"API key for the STORAGE-SYSTEM system user."`
+	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY;SHARING_PUBLIC_CS3_SYSTEM_USER_API_KEY" desc:"API key for the STORAGE-SYSTEM system user."`
+}
+
+// PublicSharingJSONCS3Driver holds the jsoncs3 driver config
+type PublicSharingJSONCS3Driver struct {
+	ProviderAddr     string `yaml:"provider_addr" env:"SHARING_PUBLIC_CS3_PROVIDER_ADDR" desc:"GRPC address of the STORAGE-SYSTEM service."`
+	SystemUserID     string `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID;SHARING_PUBLIC_CS3_SYSTEM_USER_ID" desc:"ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
+	SystemUserIDP    string `yaml:"system_user_idp" env:"OCIS_SYSTEM_USER_IDP;SHARING_PUBLIC_CS3_SYSTEM_USER_ID" desc:"IDP of the oCIS STORAGE-SYSTEM system user."`
+	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY;SHARING_PUBLIC_CS3_SYSTEM_USER_API_KEY" desc:"API key for the STORAGE-SYSTEM system user."`
 }
 
 type Events struct {

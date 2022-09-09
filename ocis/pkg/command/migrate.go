@@ -275,6 +275,13 @@ func revaPublicShareConfig(cfg *sharing.Config) map[string]interface{} {
 			"file":         cfg.PublicSharingDrivers.JSON.File,
 			"gateway_addr": cfg.Reva.Address,
 		},
+		"jsoncs3": map[string]interface{}{
+			"gateway_addr":        cfg.PublicSharingDrivers.JSONCS3.ProviderAddr,
+			"provider_addr":       cfg.PublicSharingDrivers.JSONCS3.ProviderAddr,
+			"service_user_id":     cfg.PublicSharingDrivers.JSONCS3.SystemUserID,
+			"service_user_idp":    cfg.PublicSharingDrivers.JSONCS3.SystemUserIDP,
+			"machine_auth_apikey": cfg.PublicSharingDrivers.JSONCS3.SystemUserAPIKey,
+		},
 		"sql": map[string]interface{}{
 			"db_username":                   cfg.PublicSharingDrivers.SQL.DBUsername,
 			"db_password":                   cfg.PublicSharingDrivers.SQL.DBPassword,

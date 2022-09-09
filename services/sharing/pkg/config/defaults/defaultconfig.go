@@ -62,6 +62,10 @@ func DefaultConfig() *config.Config {
 				ProviderAddr:  "127.0.0.1:9215", // system storage
 				SystemUserIDP: "internal",
 			},
+			JSONCS3: config.PublicSharingJSONCS3Driver{
+				ProviderAddr:  "127.0.0.1:9215", // system storage
+				SystemUserIDP: "internal",
+			},
 			// TODO implement and add owncloudsql publicshare driver
 		},
 		Events: config.Events{
