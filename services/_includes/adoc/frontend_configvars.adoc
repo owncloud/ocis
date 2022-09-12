@@ -291,7 +291,35 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 pass:[0]
 a| [subs=-attributes]
-Max TTL for the resource info cache.
+Max TTL for the resource info cache. 0 disables the cache.
+|`FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE`
+a| [subs=-attributes]
++string+
+a| [subs=-attributes]
+pass:[memory]
+a| [subs=-attributes]
+Resource info cache type ('memory' or 'redis').
+|`FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_ADDR`
+a| [subs=-attributes]
++string+
+a| [subs=-attributes]
+pass:[]
+a| [subs=-attributes]
+Redis service address
+|`FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_USERNAME`
+a| [subs=-attributes]
++string+
+a| [subs=-attributes]
+pass:[]
+a| [subs=-attributes]
+Redis username
+|`FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_PASSWORD`
+a| [subs=-attributes]
++string+
+a| [subs=-attributes]
+pass:[]
+a| [subs=-attributes]
+Redis password
 |`FRONTEND_CHECKSUMS_SUPPORTED_TYPES`
 a| [subs=-attributes]
 +[]string+

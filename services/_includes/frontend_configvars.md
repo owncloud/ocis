@@ -40,6 +40,10 @@
 | FRONTEND_OCS_SHARE_PREFIX | string | /Shares | Path prefix for shares.|
 | FRONTEND_OCS_HOME_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Homespace namespace identifier.|
 | FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE | string | {{.Mail}} | Additional information attribute for the user like {{.Mail}}.|
-| FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL | int | 0 | Max TTL for the resource info cache.|
+| FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL | int | 0 | Max TTL for the resource info cache. 0 disables the cache.|
+| FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE | string | memory | Resource info cache type ('memory' or 'redis').|
+| FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_ADDR | string |  | Redis service address|
+| FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_USERNAME | string |  | Redis username|
+| FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_PASSWORD | string |  | Redis password|
 | FRONTEND_CHECKSUMS_SUPPORTED_TYPES | []string | [sha1 md5 adler32] | Supported checksum types to be announced to the client. You can provide multiple types separated by blank or comma.|
 | FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPES | string |  | Preferred checksum types to be announced to the client for uploads (e.g. md5)|

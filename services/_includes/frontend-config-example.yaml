@@ -50,6 +50,7 @@ ocs:
   home_namespace: /users/{{.Id.OpaqueId}}
   additional_info_attribute: '{{.Mail}}'
   resource_info_cache_ttl: 0
+  resource_info_cache_type: memory
 checksums:
   supported_types:
   - sha1
