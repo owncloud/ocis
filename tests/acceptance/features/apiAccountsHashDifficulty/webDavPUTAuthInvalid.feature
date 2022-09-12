@@ -1,4 +1,4 @@
-@api
+@api @skipOnReva
 Feature: attempt to PUT files with invalid password
   As an admin
   I want to the system to be secure when passwords are stored with the full hash difficulty
