@@ -5,6 +5,7 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/server"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
@@ -47,7 +48,12 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			svc := service.NewEventsNotifier(evts, channel, logger)
+			gwclient, err := pool.GetGatewayServiceClient(cfg.Notifications.RevaGateway)
+			if err != nil {
+				logger.Fatal().Err(err).Str("addr", cfg.Notifications.RevaGateway).Msg("could not get reva client")
+			}
+
+			svc := service.NewEventsNotifier(evts, channel, logger, gwclient, cfg.Commons.MachineAuthAPIKey)
 			return svc.Run()
 		},
 	}
