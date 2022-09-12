@@ -459,8 +459,7 @@ def cacheCoreReposForTesting(ctx):
                  cloneCoreRepos() +
                  # this does not support the absolute path to the target directory
                  # so we need to use a relative path :(
-                 rebuildBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
-                 rebuildBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]),
+                 rebuildBuildArtifactCache(ctx, "testrunner", dirs["core"]),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -671,7 +670,6 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  ocisServer(storage, accounts_hash_difficulty) +
                  restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
-                 restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
                  [
                      {
                          "name": "localApiTests-%s-%s" % (suite, storage),
@@ -682,7 +680,6 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                              "PATH_TO_CORE": "%s/%s" % (dirs["base"], dirs["core"]),
                              "TEST_SERVER_URL": "https://ocis-server:9200",
                              "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
-                             "SKELETON_DIR": "%s/%s/data/apiSkeleton" % (dirs["base"], dirs["testing_app"]),
                              "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
                              "TEST_OCIS": "true",
                              "SEND_SCENARIO_LINE_REFERENCES": "true",
@@ -761,7 +758,6 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  ocisServer(storage, accounts_hash_difficulty) +
                  restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
-                 restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
                  [
                      {
                          "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
@@ -772,7 +768,6 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "PATH_TO_CORE": "%s/%s" % (dirs["base"], dirs["core"]),
                              "TEST_SERVER_URL": "https://ocis-server:9200",
                              "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
-                             "SKELETON_DIR": "%s/%s/data/apiSkeleton" % (dirs["base"], dirs["testing_app"]),
                              "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
                              "TEST_OCIS": "true",
                              "SEND_SCENARIO_LINE_REFERENCES": "true",
@@ -879,7 +874,6 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                  ocisServer(storage, accounts_hash_difficulty) +
                  waitForSeleniumService() +
                  waitForMiddlewareService() +
-                 restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
                  [
                      {
                          "name": "webUITests",
@@ -889,7 +883,6 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                              "BACKEND_HOST": "https://ocis-server:9200",
                              "RUN_ON_OCIS": "true",
                              "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/owncloud/data",
-                             "TESTING_DATA_DIR": "%s/%s" % (dirs["base"], dirs["testing_app"]),
                              "WEB_UI_CONFIG": "%s/tests/config/drone/ocis-config.json" % dirs["base"],
                              "TEST_TAGS": finalFilterTags,
                              "LOCAL_UPLOAD_DIR": "/uploads",
