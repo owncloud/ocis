@@ -1,4 +1,4 @@
-@api
+@api @skipOnReva
 Feature: upload file
   As a user
   I want to be able to upload files when passwords are stored with the full hash difficulty
