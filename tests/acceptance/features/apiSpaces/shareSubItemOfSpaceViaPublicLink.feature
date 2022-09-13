@@ -41,15 +41,15 @@ Feature: Share a file or folder that is inside a space via public link
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
     And the fields of the last response to user "Alice" should include
-      | path | /<entity> |
+      | path | <path> |
     Examples:
-      | entity          | permissions | password | name | expireDate               |
-      | folder          | 1           | 123      | link | 2042-03-25T23:59:59+0100 |
-      | folder          | 4           |          |      |                          |
-      | folder          | 5           | 200      |      | 2042-03-25T23:59:59+0100 |
-      | folder          | 15          |          | link |                          |
-      | folder/file.txt | 1           | 123      | link | 2042-03-25T23:59:59+0100 |
-      | folder/file.txt | 3           | 123      | link | 2042-03-25T23:59:59+0100 |
+      | entity          | path     | permissions | password | name | expireDate               |
+      | folder          | /folder   |1           | 123      | link | 2042-03-25T23:59:59+0100 |
+      | folder          | /folder   |4           |          |      |                          |
+      | folder          | /folder   |5           | 200      |      | 2042-03-25T23:59:59+0100 |
+      | folder          | /folder   |15          |          | link |                          |
+      | folder/file.txt | /file.txt |1           | 123      | link | 2042-03-25T23:59:59+0100 |
+      | folder/file.txt | /file.txt |3           | 123      | link | 2042-03-25T23:59:59+0100 |
 
 
   Scenario Outline: An user participant of the project space with space manager role can share an entity inside project space via public link
@@ -65,11 +65,11 @@ Feature: Share a file or folder that is inside a space via public link
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
     And the fields of the last response to user "Alice" should include
-      | path | /<entity> |
+      | path | <path> |
     Examples:
-      | entity          |
-      | folder          |
-      | folder/file.txt |
+      | entity          | path      |
+      | folder          | /folder   |
+      | folder/file.txt | /file.txt |
 
 
   Scenario Outline: An user participant of the project space without space manager role cannot share an entity inside project space via public link
