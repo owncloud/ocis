@@ -65,6 +65,8 @@ func Server(cfg *config.Config) *cli.Command {
 					// ocdav.FavoriteManager() // FIXME needs a proper persistence implementation https://github.com/owncloud/ocis/issues/1228
 					// ocdav.LockSystem(), // will default to the CS3 lock system
 					// ocdav.TLSConfig() // tls config for the http server
+					ocdav.MetricsEnabled(true),
+					ocdav.MetricsNamespace("ocis"),
 				}
 
 				if cfg.Tracing.Enabled {
