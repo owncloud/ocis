@@ -44,6 +44,12 @@ func GroupsConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					},
 				},
 			},
+			"interceptors": map[string]interface{}{
+				"prometheus": map[string]interface{}{
+					"namespace": "ocis",
+					"subsystem": "groups",
+				},
+			},
 		},
 	}
 }

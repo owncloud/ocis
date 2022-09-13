@@ -42,6 +42,12 @@ func AuthBasicConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					},
 				},
 			},
+			"interceptors": map[string]interface{}{
+				"prometheus": map[string]interface{}{
+					"namespace": "ocis",
+					"subsystem": "auth_basic",
+				},
+			},
 		},
 	}
 	return rcfg

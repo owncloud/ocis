@@ -107,6 +107,10 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"address":   cfg.Events.Addr,
 					"clusterID": cfg.Events.ClusterID,
 				},
+				"prometheus": map[string]interface{}{
+					"namespace": "ocis",
+					"subsystem": "sharing",
+				},
 			},
 		},
 	}

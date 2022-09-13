@@ -39,6 +39,10 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"address":   cfg.Events.Addr,
 					"clusterID": cfg.Events.ClusterID,
 				},
+				"prometheus": map[string]interface{}{
+					"namespace": "ocis",
+					"subsystem": "storage_users",
+				},
 			},
 		},
 		"http": map[string]interface{}{

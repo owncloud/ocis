@@ -85,6 +85,10 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 					"credentials_by_user_agent": cfg.Middleware.Auth.CredentialsByUserAgent,
 					"credential_chain":          []string{"bearer"},
 				},
+				"prometheus": map[string]interface{}{
+					"namespace": "ocis",
+					"subsystem": "frontend",
+				},
 			},
 			// TODO build services dynamically
 			"services": map[string]interface{}{
