@@ -3,6 +3,10 @@ package search
 import (
 	"context"
 	"fmt"
+	"path/filepath"
+	"sort"
+	"strings"
+
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -18,9 +22,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
 	"google.golang.org/grpc/metadata"
-	"path/filepath"
-	"sort"
-	"strings"
 
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
@@ -89,7 +90,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			SpaceId:   space.Root.SpaceId,
 			OpaqueId:  space.Root.OpaqueId,
 		}
-		var mountpointRootId *searchmsg.ResourceID
+		var mountpointRootID *searchmsg.ResourceID
 		mountpointPrefix := ""
 		switch space.SpaceType {
 		case "mountpoint":
@@ -97,7 +98,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		case "grant":
 			// In case of grant spaces we search the root of the outer space and translate the paths to the according mountpoint
 			searchRootId.OpaqueId = space.Root.SpaceId
-			mountpointId, ok := mountpointMap[space.Id.OpaqueId]
+			mountpointID, ok := mountpointMap[space.Id.OpaqueId]
 			if !ok {
 				p.logger.Warn().Interface("space", space).Msg("could not find mountpoint space for grant space")
 				continue
@@ -114,17 +115,17 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 				continue
 			}
 			mountpointPrefix = utils.MakeRelativePath(gpRes.Path)
-			sid, spid, oid, err := storagespace.SplitID(mountpointId)
+			sid, spid, oid, err := storagespace.SplitID(mountpointID)
 			if err != nil {
-				p.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Str("mountpointId", mountpointId).Msg("invalid mountpoint space id")
+				p.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Str("mountpointId", mountpointID).Msg("invalid mountpoint space id")
 				continue
 			}
-			mountpointRootId = &searchmsg.ResourceID{
+			mountpointRootID = &searchmsg.ResourceID{
 				StorageId: sid,
 				SpaceId:   spid,
 				OpaqueId:  oid,
 			}
-			p.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootId).Msg("searching a grant")
+			p.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootID).Msg("searching a grant")
 		}
 
 		res, err := p.engine.Search(ctx, &searchsvc.SearchIndexRequest{
@@ -146,8 +147,8 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			if mountpointPrefix != "" {
 				match.Entity.Ref.Path = utils.MakeRelativePath(strings.TrimPrefix(match.Entity.Ref.Path, mountpointPrefix))
 			}
-			if mountpointRootId != nil {
-				match.Entity.Ref.ResourceId = mountpointRootId
+			if mountpointRootID != nil {
+				match.Entity.Ref.ResourceId = mountpointRootID
 			}
 			matches = append(matches, match)
 		}
