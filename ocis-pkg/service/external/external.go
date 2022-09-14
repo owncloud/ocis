@@ -6,7 +6,6 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	oregistry "github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	"go-micro.dev/v4/broker"
 	"go-micro.dev/v4/registry"
 )
 
@@ -20,7 +19,6 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, ver
 	}
 	ocisRegistry := oregistry.GetRegistry()
 
-	node.Metadata["broker"] = broker.String()
 	node.Metadata["registry"] = ocisRegistry.String()
 	node.Metadata["server"] = "grpc"
 	node.Metadata["transport"] = "grpc"
@@ -76,7 +74,6 @@ func RegisterHTTPEndpoint(ctx context.Context, serviceID, uuid, addr string, ver
 	}
 	ocisRegistry := oregistry.GetRegistry()
 
-	node.Metadata["broker"] = broker.String()
 	node.Metadata["registry"] = ocisRegistry.String()
 	node.Metadata["server"] = "http"
 	node.Metadata["transport"] = "http"
