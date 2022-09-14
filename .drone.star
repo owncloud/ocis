@@ -2909,7 +2909,7 @@ def restoreWebE2EYarnCache():
             "mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/e2e.tar.gz %s" % dirs["zip"],
         ],
     }, {
-        # we need to install again because the node_modules are not cached
+        # we need to install again becase the node_modules are not cached
         "name": "unzip-and-install-yarn-e2e",
         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
         "commands": [
@@ -2931,7 +2931,7 @@ def restoreWebAcceptanceYarnCache():
             "mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/acceptance.tar.gz %s" % dirs["zip"],
         ],
     }, {
-        # we need to install again because the node_modules are not cached
+        # we need to install again becase the node_modules are not cached
         "name": "unzip-and-install-yarn-acceptance",
         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
         "commands": [

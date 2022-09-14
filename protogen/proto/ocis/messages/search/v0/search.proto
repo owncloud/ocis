@@ -29,7 +29,6 @@ message Entity {
   uint64 type = 9;
   bool deleted = 10;
   repeated string tags = 11;
-  string shareRootName = 12;
 }
 
 message Match {

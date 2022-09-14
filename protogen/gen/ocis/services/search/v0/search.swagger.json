@@ -198,9 +198,6 @@
           "items": {
             "type": "string"
           }
-        },
-        "shareRootName": {
-          "type": "string"
         }
       }
     },

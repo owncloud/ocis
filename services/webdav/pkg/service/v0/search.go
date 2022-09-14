@@ -12,8 +12,6 @@ import (
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
@@ -104,39 +102,8 @@ func multistatusResponse(ctx context.Context, matches []*searchmsg.Match) ([]byt
 }
 
 func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind.ResponseXML, error) {
-	// unfortunately search uses own versions of ResourceId and Ref. So we need to assert them here
-	var (
-		ref string
-		err error
-	)
-
-	// to copy PROPFIND behaviour we need to deliver different ids
-	// for shares it needs to be sharestorageproviderid!shareid
-	// for other spaces it needs to be storageproviderid$spaceid
-	switch match.Entity.Ref.ResourceId.StorageId {
-	default:
-		ref, err = storagespace.FormatReference(&provider.Reference{
-			ResourceId: &provider.ResourceId{
-				StorageId: match.Entity.Ref.ResourceId.StorageId,
-				SpaceId:   match.Entity.Ref.ResourceId.SpaceId,
-			},
-			Path: match.Entity.Ref.Path,
-		})
-	case utils.ShareStorageProviderID:
-		ref, err = storagespace.FormatReference(&provider.Reference{
-			ResourceId: &provider.ResourceId{
-				//StorageId: match.Entity.Ref.ResourceId.StorageId,
-				SpaceId:  match.Entity.Ref.ResourceId.SpaceId,
-				OpaqueId: match.Entity.Ref.ResourceId.OpaqueId,
-			},
-			Path: match.Entity.Ref.Path,
-		})
-	}
-	if err != nil {
-		return nil, err
-	}
 	response := propfind.ResponseXML{
-		Href:     net.EncodePath(path.Join("/remote.php/dav/spaces/", ref)),
+		Href:     net.EncodePath(path.Join("/dav/spaces/", match.Entity.Ref.ResourceId.StorageId+"!"+match.Entity.Ref.ResourceId.OpaqueId, match.Entity.Ref.Path)),
 		Propstat: []propfind.PropstatXML{},
 	}
 
@@ -145,22 +112,10 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind
 		Prop:   []prop.PropertyXML{},
 	}
 
-	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:fileid", storagespace.FormatResourceID(provider.ResourceId{
-		StorageId: match.Entity.Id.StorageId,
-		SpaceId:   match.Entity.Id.SpaceId,
-		OpaqueId:  match.Entity.Id.OpaqueId,
-	})))
-	if match.Entity.Ref.ResourceId.StorageId == utils.ShareStorageProviderID {
-		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:shareid", match.Entity.Ref.ResourceId.OpaqueId))
-		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:shareroot", match.Entity.ShareRootName))
-	}
-	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:name", match.Entity.Name))
+	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:fileid", match.Entity.Id.StorageId+"!"+match.Entity.Id.OpaqueId))
+	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getetag", match.Entity.Etag))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getlastmodified", match.Entity.LastModifiedTime.AsTime().Format(time.RFC3339)))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getcontenttype", match.Entity.MimeType))
-	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:permissions", match.Entity.Permissions))
-
-	// those seem empty - bug?
-	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getetag", match.Entity.Etag))
 
 	size := strconv.FormatUint(match.Entity.Size, 10)
 	if match.Entity.Type == uint64(provider.ResourceType_RESOURCE_TYPE_CONTAINER) {

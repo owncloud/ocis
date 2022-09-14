@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -15,7 +14,6 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
-	"github.com/cs3org/reva/v2/pkg/events"
 	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -28,36 +26,6 @@ import (
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 )
-
-// Permissions is copied from reva internal conversion pkg
-type Permissions uint
-
-// consts are copied from reva internal conversion pkg
-const (
-	// PermissionInvalid represents an invalid permission
-	PermissionInvalid Permissions = 0
-	// PermissionRead grants read permissions on a resource
-	PermissionRead Permissions = 1 << (iota - 1)
-	// PermissionWrite grants write permissions on a resource
-	PermissionWrite
-	// PermissionCreate grants create permissions on a resource
-	PermissionCreate
-	// PermissionDelete grants delete permissions on a resource
-	PermissionDelete
-	// PermissionShare grants share permissions on a resource
-	PermissionShare
-)
-
-// ListenEvents are the events the service is listening to
-var ListenEvents = []events.Unmarshaller{
-	events.ItemTrashed{},
-	events.ItemRestored{},
-	events.ItemMoved{},
-	events.ContainerCreated{},
-	events.FileUploaded{},
-	events.FileTouched{},
-	events.FileVersionRestored{},
-}
 
 // Provider is responsible for indexing spaces and pass on a search
 // to it's underlying engine.
@@ -122,11 +90,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			SpaceId:   space.Root.SpaceId,
 			OpaqueId:  space.Root.OpaqueId,
 		}
-		var (
-			mountpointRootID *searchmsg.ResourceID
-			rootName         string
-			permissions      *provider.ResourcePermissions
-		)
+		var mountpointRootID *searchmsg.ResourceID
 		mountpointPrefix := ""
 		switch space.SpaceType {
 		case "mountpoint":
@@ -161,11 +125,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 				SpaceId:   spid,
 				OpaqueId:  oid,
 			}
-			rootName = space.GetRootInfo().GetPath()
-			permissions = space.GetRootInfo().GetPermissionSet()
 			p.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootID).Msg("searching a grant")
-		case "personal":
-			permissions = space.GetRootInfo().GetPermissionSet()
 		}
 
 		res, err := p.engine.Search(ctx, &searchsvc.SearchIndexRequest{
@@ -190,8 +150,6 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			if mountpointRootID != nil {
 				match.Entity.Ref.ResourceId = mountpointRootID
 			}
-			match.Entity.ShareRootName = rootName
-			match.Entity.Permissions = convertToOCS(permissions)
 			matches = append(matches, match)
 		}
 	}
@@ -283,41 +241,4 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 
 	logDocCount(p.engine, p.logger)
 	return &searchsvc.IndexSpaceResponse{}, nil
-}
-
-// NOTE: this converts cs3 to ocs permissions
-// since conversions pkg is reva internal we have no other choice than to duplicate the logic
-func convertToOCS(p *provider.ResourcePermissions) string {
-	var ocs Permissions
-	if p == nil {
-		return ""
-	}
-	if p.ListContainer &&
-		p.ListFileVersions &&
-		p.ListRecycle &&
-		p.Stat &&
-		p.GetPath &&
-		p.GetQuota &&
-		p.InitiateFileDownload {
-		ocs |= PermissionRead
-	}
-	if p.InitiateFileUpload &&
-		p.RestoreFileVersion &&
-		p.RestoreRecycleItem {
-		ocs |= PermissionWrite
-	}
-	if p.ListContainer &&
-		p.Stat &&
-		p.CreateContainer &&
-		p.InitiateFileUpload {
-		ocs |= PermissionCreate
-	}
-	if p.Delete &&
-		p.PurgeRecycle {
-		ocs |= PermissionDelete
-	}
-	if p.AddGrant {
-		ocs |= PermissionShare
-	}
-	return strconv.FormatUint(uint64(ocs), 10)
 }

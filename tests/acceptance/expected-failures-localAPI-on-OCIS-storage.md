@@ -19,6 +19,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiArchiver/downloadById.feature:134](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L134)
 - [apiArchiver/downloadById.feature:135](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiArchiver/downloadById.feature#L135)
 
+### [Search by shares jail works incorrect](https://github.com/owncloud/ocis/issues/4014)
+- [apiSpaces/search.feature:43](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/search.feature#L43)
+
 ### [create request for already existing user exits with status code 500 ](https://github.com/owncloud/ocis/issues/3516)
 - [apiGraph/createGroupCaseSensitive.feature:16](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroupCaseSensitive.feature#L16)
 - [apiGraph/createGroupCaseSensitive.feature:17](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroupCaseSensitive.feature#L17)
@@ -40,7 +43,3 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpaces/lockSpaces.feature:72](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L72)
 - [apiSpaces/lockSpaces.feature:89](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L89)
 - [apiSpaces/lockSpaces.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/lockSpaces.feature#L90)
-
-### [copy to overwrite (file and folder) from Personal to Shares Jail behaves differently](https://github.com/owncloud/ocis/issues/4393)
-- [apiSpaces/copySpaces.feature:487](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L487)
-- [apiSpaces/copySpaces.feature:501](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L501)

@@ -9,9 +9,10 @@ require (
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
 	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.4
-	github.com/coreos/go-oidc/v3 v3.3.0
+	github.com/blevesearch/bleve_index_api v1.0.3
+	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220818202316-e92afdddac6d
-	github.com/cs3org/reva/v2 v2.8.1-0.20220908103049-a4e24666b1db
+	github.com/cs3org/reva/v2 v2.8.1-0.20220831084750-0be72e4642ec
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
@@ -39,7 +40,7 @@ require (
 	github.com/google/go-tika v0.2.0
 	github.com/gookit/config/v2 v2.1.2
 	github.com/gorilla/mux v1.8.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.3
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.2
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/idm v0.3.1-0.20220808071235-17bb032176de
 	github.com/libregraph/lico v0.54.1-0.20220325072321-31efc3995d63
@@ -49,20 +50,20 @@ require (
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/ginkgo/v2 v2.1.6
-	github.com/onsi/gomega v1.20.2
+	github.com/onsi/ginkgo/v2 v2.1.4
+	github.com/onsi/gomega v1.20.0
 	github.com/orcaman/concurrent-map v1.0.0
-	github.com/owncloud/libre-graph-api-go v0.17.0
+	github.com/owncloud/libre-graph-api-go v0.16.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.13.0
-	github.com/rs/zerolog v1.28.0
+	github.com/rs/zerolog v1.27.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.2
-	github.com/tus/tusd v1.9.1
-	github.com/urfave/cli/v2 v2.14.0
+	github.com/tus/tusd v1.9.0
+	github.com/urfave/cli/v2 v2.11.2
 	github.com/xhit/go-simple-mail/v2 v2.11.0
 	go-micro.dev/v4 v4.8.1
 	go.etcd.io/bbolt v1.3.6
@@ -72,15 +73,15 @@ require (
 	go.opentelemetry.io/otel/exporters/jaeger v1.9.0
 	go.opentelemetry.io/otel/sdk v1.9.0
 	go.opentelemetry.io/otel/trace v1.9.0
-	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90
+	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa
 	golang.org/x/exp v0.0.0-20220518171630-0b5c67f07fdf
 	golang.org/x/image v0.0.0-20220321031419-a8550c1d254a
-	golang.org/x/net v0.0.0-20220826154423-83b083e8dc8b
-	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094
+	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e
+	golang.org/x/oauth2 v0.0.0-20220722155238-128564f6959c
 	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035
 	golang.org/x/text v0.3.7
-	google.golang.org/genproto v0.0.0-20220822174746-9e6da59bd2fc
-	google.golang.org/grpc v1.49.0
+	google.golang.org/genproto v0.0.0-20220805133916-01dd62135a58
+	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/v3 v3.3.0
@@ -109,7 +110,6 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bits-and-blooms/bitset v1.2.1 // indirect
-	github.com/blevesearch/bleve_index_api v1.0.3 // indirect
 	github.com/blevesearch/geo v0.1.13 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.3 // indirect
 	github.com/blevesearch/gtreap v0.1.1 // indirect
@@ -179,7 +179,7 @@ require (
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/gookit/goutil v0.5.11 // indirect
+	github.com/gookit/goutil v0.5.2 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
@@ -208,7 +208,7 @@ require (
 	github.com/longsleep/go-metrics v1.0.0 // indirect
 	github.com/mattermost/xml-roundtrip-validator v0.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
-	github.com/mattn/go-isatty v0.0.16 // indirect
+	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
@@ -245,7 +245,7 @@ require (
 	github.com/prometheus/statsd_exporter v0.22.4 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/rs/cors v1.8.2 // indirect
-	github.com/rs/xid v1.4.0 // indirect
+	github.com/rs/xid v1.3.0 // indirect
 	github.com/russellhaering/goxmldsig v1.1.1 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sciencemesh/meshdirectory-web v1.0.4 // indirect
@@ -268,11 +268,12 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.19.1 // indirect
-	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
+	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
-	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
+	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
 	golang.org/x/time v0.0.0-20220224211638-0e9765cccd65 // indirect
-	golang.org/x/tools v0.1.12 // indirect
+	golang.org/x/tools v0.1.10 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	gopkg.in/ini.v1 v1.66.2 // indirect
 	gopkg.in/square/go-jose.v2 v2.6.0 // indirect

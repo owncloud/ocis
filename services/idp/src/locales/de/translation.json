@@ -32,7 +32,6 @@
         },
         "login": {
             "usernameField": {
-                "label": "Benutzername",
                 "placeholder": {
                     "email": "E-Mail",
                     "identity": "Identität",

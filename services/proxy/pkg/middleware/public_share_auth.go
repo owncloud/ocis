@@ -25,22 +25,9 @@ type PublicShareAuthenticator struct {
 	RevaGatewayClient gateway.GatewayAPIClient
 }
 
-// The archiver is able to create archives from public shares in which case it needs to use the
-// PublicShareAuthenticator. It might however also be called using "normal" authentication or
-// using signed url, which are handled by other middleware. For this reason we can't just
-// handle `/archiver` with the `isPublicPath()` check.
-func isPublicShareArchive(r *http.Request) bool {
-	if strings.HasPrefix(r.URL.Path, "/archiver") {
-		if r.URL.Query().Get(headerShareToken) != "" || r.Header.Get(headerShareToken) != "" {
-			return true
-		}
-	}
-	return false
-}
-
 // Authenticate implements the authenticator interface to authenticate requests via public share auth.
 func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
-	if !isPublicPath(r.URL.Path) && !isPublicShareArchive(r) {
+	if !isPublicPath(r.URL.Path) {
 		return nil, false
 	}
 
