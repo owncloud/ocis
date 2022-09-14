@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Render webdav permissions as string in search report: [#4575](https://github.com/owncloud/ocis/issues/4575)
+* Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
 
 ## Details
 
@@ -16,6 +17,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4575
    https://github.com/owncloud/ocis/pull/4579
+
+* Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
+
+   We've added the possibility to configure applications in the Web configuration.
+
+   https://github.com/owncloud/ocis/pull/4578
 # Changelog for [2.0.0-beta.8] (2022-09-13)
 
 The following sections list the changes for 2.0.0-beta.8.
