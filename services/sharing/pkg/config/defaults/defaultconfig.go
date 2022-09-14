@@ -33,12 +33,16 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		UserSharingDriver: "cs3",
+		UserSharingDriver: "json", // "jsoncs3", // jsoncs3 doesn't like experimental
 		UserSharingDrivers: config.UserSharingDrivers{
 			JSON: config.UserSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "shares.json"),
 			},
 			CS3: config.UserSharingCS3Driver{
+				ProviderAddr:  "127.0.0.1:9215", // system storage
+				SystemUserIDP: "internal",
+			},
+			JSONCS3: config.UserSharingJSONCS3Driver{
 				ProviderAddr:  "127.0.0.1:9215", // system storage
 				SystemUserIDP: "internal",
 			},
@@ -49,12 +53,16 @@ func DefaultConfig() *config.Config {
 				DBName:     "owncloud",
 			},
 		},
-		PublicSharingDriver: "cs3",
+		PublicSharingDriver: "json", // "jsoncs3", // jsoncs3 doesn't like experimental
 		PublicSharingDrivers: config.PublicSharingDrivers{
 			JSON: config.PublicSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "publicshares.json"),
 			},
 			CS3: config.PublicSharingCS3Driver{
+				ProviderAddr:  "127.0.0.1:9215", // system storage
+				SystemUserIDP: "internal",
+			},
+			JSONCS3: config.PublicSharingJSONCS3Driver{
 				ProviderAddr:  "127.0.0.1:9215", // system storage
 				SystemUserIDP: "internal",
 			},
@@ -115,12 +123,28 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.UserSharingDrivers.CS3.SystemUserID = cfg.Commons.SystemUserID
 	}
 
+	if cfg.UserSharingDrivers.JSONCS3.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
+		cfg.UserSharingDrivers.JSONCS3.SystemUserAPIKey = cfg.Commons.SystemUserAPIKey
+	}
+
+	if cfg.UserSharingDrivers.JSONCS3.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
+		cfg.UserSharingDrivers.JSONCS3.SystemUserID = cfg.Commons.SystemUserID
+	}
+
 	if cfg.PublicSharingDrivers.CS3.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
 		cfg.PublicSharingDrivers.CS3.SystemUserAPIKey = cfg.Commons.SystemUserAPIKey
 	}
 
 	if cfg.PublicSharingDrivers.CS3.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
 		cfg.PublicSharingDrivers.CS3.SystemUserID = cfg.Commons.SystemUserID
+	}
+
+	if cfg.PublicSharingDrivers.JSONCS3.SystemUserAPIKey == "" && cfg.Commons != nil && cfg.Commons.SystemUserAPIKey != "" {
+		cfg.PublicSharingDrivers.JSONCS3.SystemUserAPIKey = cfg.Commons.SystemUserAPIKey
+	}
+
+	if cfg.PublicSharingDrivers.JSONCS3.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
+		cfg.PublicSharingDrivers.JSONCS3.SystemUserID = cfg.Commons.SystemUserID
 	}
 }
 

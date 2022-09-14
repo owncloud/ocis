@@ -47,8 +47,54 @@ Feature: Search
     Then the HTTP status code should be "207"
     And the search result should contain "4" entries
     And the search result of user "Brian" should contain these entries:
-      | /folder                                           |
-      | /folder/SubFolder1                                |
-      | /folder/SubFolder1/subFOLDER2                     |
-      | /folder/SubFolder1/subFOLDER2/insideTheFolder.txt |
+      | /SubFolder1                                |
+      | /SubFolder1/subFOLDER2                     |
+      | /SubFolder1/subFOLDER2/insideTheFolder.txt |
+    And for user "Brian" the search result should contain space "mountpoint/folder"
+    
+
+  Scenario: User can find hidden file
+    Given user "Alice" has created a folder ".space" in space "find data"
+    When user "Alice" searches for ".sp" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain these entries:
+      | /.space |
+
+
+  Scenario: User cannot find pending folder
+    Given user "Alice" shares the following entity "folder" inside of space "find data" with user "Brian" with role "viewer"
+    When user "Brian" searches for "folder" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "0" entries
+    And the search result of user "Brian" should not contain these entries:
+      | /SubFolder1                                |
+      | /SubFolder1/subFOLDER2                     |
+      | /SubFolder1/subFOLDER2/insideTheFolder.txt |
+
+  
+  Scenario: User cannot find declined folder
+    Given user "Alice" shares the following entity "folder" inside of space "find data" with user "Brian" with role "viewer"
+    And user "Brian" has declined share "/folder" offered by user "Alice"
+    When user "Brian" searches for "folder" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "0" entries
+    And the search result of user "Brian" should not contain these entries:
+      | /SubFolder1                                |
+      | /SubFolder1/subFOLDER2                     |
+      | /SubFolder1/subFOLDER2/insideTheFolder.txt |
+
+
+  Scenario: User cannot find deleted folder
+    Given user "Alice" has removed the folder "folder" from space "find data"
+    When user "Alice" searches for "folder" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "0" entries
+    
+
+  Scenario: User can find project space by name
+    When user "Alice" searches for "find data" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And for user "Alice" the search result should contain space "find data"
 

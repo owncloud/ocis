@@ -276,12 +276,18 @@ ci-format: $(BUILDIFIER)
 .PHONY: test-php-style
 test-php-style: vendor-bin/owncloud-codestyle/vendor vendor-bin/php_codesniffer/vendor
 	$(PHP_CS_FIXER) fix -v --diff --allow-risky yes --dry-run
-	$(PHP_CODESNIFFER) --cache --runtime-set ignore_warnings_on_exit --standard=phpcs.xml tests/acceptance
+	$(PHP_CODESNIFFER) --cache --runtime-set ignore_warnings_on_exit --standard=phpcs.xml tests/acceptance tests/TestHelpers
 
 .PHONY: test-php-style-fix
 test-php-style-fix: vendor-bin/owncloud-codestyle/vendor
 	$(PHP_CS_FIXER) fix -v --diff --allow-risky yes
 	$(PHP_CODEBEAUTIFIER) --cache --runtime-set ignore_warnings_on_exit --standard=phpcs.xml tests/acceptance
+
+.PHONY: vendor-bin-codestyle
+vendor-bin-codestyle: vendor-bin/owncloud-codestyle/vendor
+
+.PHONY: vendor-bin-codesniffer
+vendor-bin-codesniffer: vendor-bin/php_codesniffer/vendor
 
 vendor-bin/owncloud-codestyle/vendor: vendor/bamarni/composer-bin-plugin vendor-bin/owncloud-codestyle/composer.lock
 	composer bin owncloud-codestyle install --no-progress

@@ -36,6 +36,7 @@ type WebConfig struct {
 	Theme         string                 `json:"theme,omitempty" yaml:"-"`
 	OpenIDConnect OIDC                   `json:"openIdConnect,omitempty" yaml:"oidc"`
 	Apps          []string               `json:"apps" yaml:"apps"`
+	Applications  []Application          `json:"applications,omitempty" yaml:"applications"`
 	ExternalApps  []ExternalApp          `json:"external_apps,omitempty" yaml:"external_apps"`
 	Options       map[string]interface{} `json:"options,omitempty" yaml:"options"`
 }
@@ -47,6 +48,15 @@ type OIDC struct {
 	ClientID     string `json:"client_id,omitempty" yaml:"client_id" env:"WEB_OIDC_CLIENT_ID" desc:"OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP."`
 	ResponseType string `json:"response_type,omitempty" yaml:"response_type" env:"WEB_OIDC_RESPONSE_TYPE" desc:"OIDC response type to use for authentication."`
 	Scope        string `json:"scope,omitempty" yaml:"scope" env:"WEB_OIDC_SCOPE" desc:"OIDC scopes to request during authentication."`
+}
+
+// Application defines an application for the Web app switcher.
+type Application struct {
+	Icon   string            `json:"icon,omitempty" yaml:"icon"`
+	Target string            `json:"target,omitempty" yaml:"target"`
+	Title  map[string]string `json:"title,omitempty" yaml:"title"`
+	Menu   string            `json:"menu,omitempty" yaml:"menu"`
+	URL    string            `json:"url,omitempty" yaml:"url"`
 }
 
 // ExternalApp defines an external web app.
