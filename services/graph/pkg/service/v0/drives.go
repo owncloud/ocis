@@ -45,7 +45,7 @@ func (g Graph) GetAllDrives(w http.ResponseWriter, r *http.Request) {
 
 // getDrives implements the Service interface.
 func (g Graph) getDrives(w http.ResponseWriter, r *http.Request, unrestricted bool) {
-	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/") // FIXME the /graph/ endpoint might have been configured differently
 	// Parse the request with odata parser
 	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
 	if err != nil {
@@ -89,7 +89,7 @@ func (g Graph) getDrives(w http.ResponseWriter, r *http.Request, unrestricted bo
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-	spaces, err := g.formatDrives(ctx, wdu, res.StorageSpaces)
+	spaces, err := g.formatDrives(ctx, wdu, res.StorageSpaces, odataReq)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error encoding response as json")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -114,6 +114,14 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 		err := fmt.Errorf("no valid space id retrieved")
 		g.logger.Err(err)
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/") // FIXME the /graph/ endpoint might have been configured differently
+	// Parse the request with odata parser
+	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
+	if err != nil {
+		g.logger.Err(err).Interface("query", r.URL.Query()).Msg("query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -146,7 +154,7 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
-	spaces, err := g.formatDrives(ctx, wdu, res.StorageSpaces)
+	spaces, err := g.formatDrives(ctx, wdu, res.StorageSpaces, odataReq)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error encoding response")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -258,7 +266,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newDrive, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, resp.StorageSpace)
+	newDrive, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, resp.StorageSpace, nil)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error parsing space")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -382,7 +390,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	spaces, err := g.formatDrives(r.Context(), wdu, []*storageprovider.StorageSpace{resp.StorageSpace})
+	spaces, err := g.formatDrives(r.Context(), wdu, []*storageprovider.StorageSpace{resp.StorageSpace}, nil)
 	if err != nil {
 		g.logger.Error().Err(err).Msg("error parsing space")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -393,20 +401,63 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, spaces[0])
 }
 
-func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces []*storageprovider.StorageSpace) ([]*libregraph.Drive, error) {
+func isSelected(odataReq *godata.GoDataRequest, item string) bool {
+	switch {
+	case odataReq == nil:
+		fallthrough
+	case odataReq.Query == nil:
+		fallthrough
+	case odataReq.Query.Select == nil:
+		fallthrough
+	case len(odataReq.Query.Select.SelectItems) == 0:
+		return true
+	default:
+		for _, queryItem := range odataReq.Query.Select.SelectItems {
+			if len(queryItem.Segments) == 1 && queryItem.Segments[0].Value == item {
+				return true
+			}
+		}
+		return false
+	}
+}
+func isExpanded(odataReq *godata.GoDataRequest, item string) bool {
+	switch {
+	case odataReq == nil:
+		fallthrough
+	case odataReq.Query == nil:
+		fallthrough
+	case odataReq.Query.Expand == nil:
+		fallthrough
+	case len(odataReq.Query.Expand.ExpandItems) == 0:
+		return false
+	default:
+		for _, queryItem := range odataReq.Query.Expand.ExpandItems {
+			if len(queryItem.Path) == 1 && queryItem.Path[0].Value == item {
+				return true
+			}
+		}
+		return false
+	}
+}
+
+func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces []*storageprovider.StorageSpace, odataReq *godata.GoDataRequest) ([]*libregraph.Drive, error) {
 	responses := make([]*libregraph.Drive, 0, len(storageSpaces))
 	for _, storageSpace := range storageSpaces {
-		res, err := g.cs3StorageSpaceToDrive(ctx, baseURL, storageSpace)
+		res, err := g.cs3StorageSpaceToDrive(ctx, baseURL, storageSpace, odataReq)
 		if err != nil {
 			return nil, err
 		}
 
 		// can't access disabled space
 		if utils.ReadPlainFromOpaque(storageSpace.Opaque, "trashed") != "trashed" {
-			res.Special = g.GetExtendedSpaceProperties(ctx, baseURL, storageSpace)
-			res.Quota, err = g.getDriveQuota(ctx, storageSpace)
-			if err != nil {
-				return nil, err
+			if isSelected(odataReq, "quota") {
+				res.Quota, err = g.getDriveQuota(ctx, storageSpace)
+				if err != nil {
+					return nil, err
+				}
+			}
+			if isExpanded(odataReq, "special") {
+				res.Special = g.GetExtendedSpaceProperties(ctx, baseURL, storageSpace)
 			}
 		}
 		responses = append(responses, res)
@@ -446,169 +497,233 @@ func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*stor
 			},
 		}},
 		Filters: filters,
+		// TODO FieldMask: &fieldmaskpb.FieldMask{Paths: }, // only fetch rootInfo if necessary to save a stat reuqest
 	}
 	res, err := client.ListStorageSpaces(ctx, lReq)
 	return res, err
 }
 
-func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace) (*libregraph.Drive, error) {
-	if space.Root == nil {
-		return nil, fmt.Errorf("space has no root")
-	}
-	spaceRid := *space.Root
-	if space.Root.GetSpaceId() == space.Root.GetOpaqueId() {
-		spaceRid.OpaqueId = ""
-	}
-	spaceID := storagespace.FormatResourceID(spaceRid)
+func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace, odataReq *godata.GoDataRequest) (*libregraph.Drive, error) {
 
-	var permissions []libregraph.Permission
-	if space.Opaque != nil {
-		var m map[string]*storageprovider.ResourcePermissions
-		entry, ok := space.Opaque.Map["grants"]
-		if ok {
-			err := json.Unmarshal(entry.Value, &m)
-			if err != nil {
-				g.logger.Error().
-					Err(err).
-					Str("space", space.Root.OpaqueId).
-					Msg("failed to read spaces grants")
+	selected := []string{"id", "createdby", "createddatetime", "description", "etag", "lastmodifiedby", "lastmodifieddatetime", "name", "parentreference", "weburl", "drivetype", "drivealias", "owner", "quota"}
+	// FIXME "lastModifiedByUser" is redundant with "lastModifiedBy"
+	// FIXME "createdByUser" is redundant with "createdBy"
+	if odataReq != nil && odataReq.Query != nil && odataReq.Query.Select != nil && len(odataReq.Query.Select.SelectItems) > 0 {
+		selected = []string{}
+		for _, item := range odataReq.Query.Select.SelectItems {
+			if len(item.Segments) != 1 {
+				return nil, fmt.Errorf("only one select item segment supported")
 			}
+			selected = append(selected, strings.ToLower(item.Segments[0].Value))
 		}
-		if len(m) != 0 {
-			managerIdentities := []libregraph.IdentitySet{}
-			editorIdentities := []libregraph.IdentitySet{}
-			viewerIdentities := []libregraph.IdentitySet{}
+	}
 
-			for id, perm := range m {
-				// This temporary variable is necessary since we need to pass a pointer to the
-				// libregraph.Identity and if we pass the pointer from the loop every identity
-				// will have the same id.
-				tmp := id
-				identity := libregraph.IdentitySet{User: &libregraph.Identity{Id: &tmp}}
-				// we need to map the permissions to the roles
-				switch {
-				// having RemoveGrant qualifies you as a manager
-				case perm.RemoveGrant:
-					managerIdentities = append(managerIdentities, identity)
-				// InitiateFileUpload means you are an editor
-				case perm.InitiateFileUpload:
-					editorIdentities = append(editorIdentities, identity)
-				// Stat permission at least makes you a viewer
-				case perm.Stat:
-					viewerIdentities = append(viewerIdentities, identity)
+	spaceID := space.GetId().GetOpaqueId()
+	if space.Root != nil {
+		spaceRid := *space.Root
+		if space.Root.GetSpaceId() == space.Root.GetOpaqueId() {
+			spaceRid.OpaqueId = ""
+		}
+		spaceID = storagespace.FormatResourceID(spaceRid)
+	}
+	drive := &libregraph.Drive{}
+	for _, item := range selected {
+		switch item {
+		case "id":
+			drive.Id = libregraph.PtrString(spaceID)
+		case "createdby":
+			// TODO
+		case "createddatetime":
+			// FIXME add createdDateTime to CS3 space property -> drop from libregraph drive
+		case "description":
+			// FIXME add description to CS3 space property -> drop from libregraph drive
+			if space.Opaque != nil {
+				if description, ok := space.Opaque.Map["description"]; ok {
+					drive.Description = libregraph.PtrString(string(description.Value))
+				}
+			}
+		case "etag":
+			// FIXME add eTag to CS3 space property
+			// FIXME mountpoints have no etag here ...
+			if space.Opaque != nil {
+				if entry, ok := space.Opaque.Map["etag"]; ok {
+					drive.ETag = libregraph.PtrString(string(entry.Value))
+				}
+			}
+		case "lastmodifiedby":
+			// TODO
+		case "lastmodifieddatetime":
+			if space.Mtime != nil {
+				lastModified := cs3TimestampToTime(space.Mtime)
+				drive.LastModifiedDateTime = &lastModified
+			}
+		case "name":
+			drive.Name = &space.Name
+		case "parentreference":
+			// FIXME only makes sense for the root driveItem -> drop from libregraph drive
+		case "weburl":
+			// URL that displays the resource in the browser. Read-only
+			// TODO shortlink for end users
+		case "drivetype":
+			drive.DriveType = &space.SpaceType
+		case "drivealias":
+			if space.Opaque != nil {
+				if alias, ok := space.Opaque.Map["spaceAlias"]; ok {
+					drive.DriveAlias = libregraph.PtrString(string(alias.Value))
+				}
+			}
+		case "owner":
+			// FIXME expose coowner from https://github.com/owncloud/open-graph-api ?
+			if space.Owner != nil && space.Owner.Id != nil {
+				drive.Owner = &libregraph.IdentitySet{
+					User: &libregraph.Identity{
+						Id: &space.Owner.Id.OpaqueId,
+						// DisplayName: , TODO read and cache from users provider
+					},
+				}
+			}
+		case "quota":
+			if space.Quota != nil {
+				var t int64
+				if space.Quota.QuotaMaxBytes > math.MaxInt64 {
+					t = math.MaxInt64
+				} else {
+					t = int64(space.Quota.QuotaMaxBytes)
+				}
+				drive.Quota = &libregraph.Quota{
+					Total: &t,
+				}
+			}
+		default:
+			return nil, fmt.Errorf("unknown property selected '" + item + "'")
+		}
+
+	}
+
+	expanded := []string{}
+	if odataReq != nil && odataReq.Query != nil && odataReq.Query.Expand != nil && len(odataReq.Query.Expand.ExpandItems) > 0 {
+		for _, item := range odataReq.Query.Expand.ExpandItems {
+			if len(item.Path) != 1 {
+				return nil, fmt.Errorf("only one expand item path supported")
+			}
+			expanded = append(selected, item.Path[0].Value)
+		}
+	}
+	for _, item := range expanded {
+		switch item {
+		case "root":
+			if space.Root == nil {
+				return nil, fmt.Errorf("space has no root")
+			}
+			var permissions []libregraph.Permission
+			if space.Opaque != nil {
+				var m map[string]*storageprovider.ResourcePermissions
+				entry, ok := space.Opaque.Map["grants"]
+				if ok {
+					err := json.Unmarshal(entry.Value, &m)
+					if err != nil {
+						g.logger.Error().
+							Err(err).
+							Str("space", space.Root.OpaqueId).
+							Msg("failed to read spaces grants")
+					}
+				}
+				if len(m) != 0 {
+					managerIdentities := []libregraph.IdentitySet{}
+					editorIdentities := []libregraph.IdentitySet{}
+					viewerIdentities := []libregraph.IdentitySet{}
+
+					for id, perm := range m {
+						// This temporary variable is necessary since we need to pass a pointer to the
+						// libregraph.Identity and if we pass the pointer from the loop every identity
+						// will have the same id.
+						tmp := id
+						identity := libregraph.IdentitySet{User: &libregraph.Identity{Id: &tmp}}
+						// we need to map the permissions to the roles
+						switch {
+						// having RemoveGrant qualifies you as a manager
+						case perm.RemoveGrant:
+							managerIdentities = append(managerIdentities, identity)
+						// InitiateFileUpload means you are an editor
+						case perm.InitiateFileUpload:
+							editorIdentities = append(editorIdentities, identity)
+						// Stat permission at least makes you a viewer
+						case perm.Stat:
+							viewerIdentities = append(viewerIdentities, identity)
+						}
+					}
+
+					permissions = make([]libregraph.Permission, 0, 3)
+					if len(managerIdentities) != 0 {
+						permissions = append(permissions, libregraph.Permission{
+							GrantedTo: managerIdentities,
+							Roles:     []string{"manager"},
+						})
+					}
+					if len(editorIdentities) != 0 {
+						permissions = append(permissions, libregraph.Permission{
+							GrantedTo: editorIdentities,
+							Roles:     []string{"editor"},
+						})
+					}
+					if len(viewerIdentities) != 0 {
+						permissions = append(permissions, libregraph.Permission{
+							GrantedTo: viewerIdentities,
+							Roles:     []string{"viewer"},
+						})
+					}
 				}
 			}
 
-			permissions = make([]libregraph.Permission, 0, 3)
-			if len(managerIdentities) != 0 {
-				permissions = append(permissions, libregraph.Permission{
-					GrantedTo: managerIdentities,
-					Roles:     []string{"manager"},
-				})
+			spaceRid := *space.Root
+			if space.Root.GetSpaceId() == space.Root.GetOpaqueId() {
+				spaceRid.OpaqueId = ""
 			}
-			if len(editorIdentities) != 0 {
-				permissions = append(permissions, libregraph.Permission{
-					GrantedTo: editorIdentities,
-					Roles:     []string{"editor"},
-				})
+			drive.Root = &libregraph.DriveItem{
+				Id:          libregraph.PtrString(storagespace.FormatResourceID(spaceRid)),
+				Permissions: permissions,
 			}
-			if len(viewerIdentities) != 0 {
-				permissions = append(permissions, libregraph.Permission{
-					GrantedTo: viewerIdentities,
-					Roles:     []string{"viewer"},
-				})
+			if space.RootInfo != nil {
+				drive.Root.ETag = &space.RootInfo.Etag
+				if space.GetRootInfo().GetMtime() != nil {
+					lastModified := cs3TimestampToTime(space.RootInfo.Mtime)
+					drive.Root.LastModifiedDateTime = &lastModified
+				}
+				// TODO allow selecting more root item properties?
 			}
-		}
-	}
-
-	drive := &libregraph.Drive{
-		Id:   libregraph.PtrString(spaceID),
-		Name: &space.Name,
-		//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
-		DriveType: &space.SpaceType,
-		Root: &libregraph.DriveItem{
-			Id:          libregraph.PtrString(storagespace.FormatResourceID(spaceRid)),
-			Permissions: permissions,
-		},
-	}
-	if space.SpaceType == "mountpoint" {
-		var remoteItem *libregraph.RemoteItem
-		grantID := storageprovider.ResourceId{
-			StorageId: utils.ReadPlainFromOpaque(space.Opaque, "grantStorageID"),
-			SpaceId:   utils.ReadPlainFromOpaque(space.Opaque, "grantSpaceID"),
-			OpaqueId:  utils.ReadPlainFromOpaque(space.Opaque, "grantOpaqueID"),
-		}
-		if grantID.SpaceId != "" && grantID.OpaqueId != "" {
-			var err error
-			remoteItem, err = g.getRemoteItem(ctx, &grantID, baseURL)
-			if err != nil {
-				g.logger.Debug().Err(err).Msg(err.Error())
+			if space.SpaceType == "mountpoint" {
+				var remoteItem *libregraph.RemoteItem
+				grantID := storageprovider.ResourceId{
+					StorageId: utils.ReadPlainFromOpaque(space.Opaque, "grantStorageID"),
+					SpaceId:   utils.ReadPlainFromOpaque(space.Opaque, "grantSpaceID"),
+					OpaqueId:  utils.ReadPlainFromOpaque(space.Opaque, "grantOpaqueID"),
+				}
+				if grantID.SpaceId != "" && grantID.OpaqueId != "" {
+					var err error
+					remoteItem, err = g.getRemoteItem(ctx, &grantID, baseURL)
+					if err != nil {
+						g.logger.Debug().Err(err).Msg(err.Error())
+					}
+				}
+				if remoteItem != nil {
+					drive.Root.RemoteItem = remoteItem
+				}
 			}
-		}
-		if remoteItem != nil {
-			drive.Root.RemoteItem = remoteItem
-		}
-	}
-
-	if space.Opaque != nil {
-		if description, ok := space.Opaque.Map["description"]; ok {
-			drive.Description = libregraph.PtrString(string(description.Value))
-		}
-
-		if alias, ok := space.Opaque.Map["spaceAlias"]; ok {
-			drive.DriveAlias = libregraph.PtrString(string(alias.Value))
-		}
-
-		if v, ok := space.Opaque.Map["trashed"]; ok {
-			deleted := &libregraph.Deleted{}
-			deleted.SetState(string(v.Value))
-			drive.Root.Deleted = deleted
-		}
-
-		if entry, ok := space.Opaque.Map["etag"]; ok {
-			drive.Root.ETag = libregraph.PtrString(string(entry.Value))
-		}
-	}
-
-	if baseURL != nil {
-		webDavURL := *baseURL
-		webDavURL.Path = path.Join(webDavURL.Path, spaceID)
-		drive.Root.WebDavUrl = libregraph.PtrString(webDavURL.String())
-	}
-
-	webURL, err := url.Parse(g.config.Commons.OcisURL)
-	if err != nil {
-		g.logger.Error().
-			Err(err).
-			Str("url", g.config.Commons.OcisURL).
-			Msg("failed to parse base url")
-		return nil, err
-	}
-
-	webURL.Path = path.Join(webURL.Path, "f", storagespace.FormatResourceID(spaceRid))
-	drive.WebUrl = libregraph.PtrString(webURL.String())
-
-	if space.Owner != nil && space.Owner.Id != nil {
-		drive.Owner = &libregraph.IdentitySet{
-			User: &libregraph.Identity{
-				Id: &space.Owner.Id.OpaqueId,
-				// DisplayName: , TODO read and cache from users provider
-			},
-		}
-	}
-	if space.Mtime != nil {
-		lastModified := cs3TimestampToTime(space.Mtime)
-		drive.LastModifiedDateTime = &lastModified
-	}
-	if space.Quota != nil {
-		var t int64
-		if space.Quota.QuotaMaxBytes > math.MaxInt64 {
-			t = math.MaxInt64
-		} else {
-			t = int64(space.Quota.QuotaMaxBytes)
-		}
-		drive.Quota = &libregraph.Quota{
-			Total: &t,
+			if space.Opaque != nil {
+				if v, ok := space.Opaque.Map["trashed"]; ok {
+					deleted := &libregraph.Deleted{}
+					deleted.SetState(string(v.Value))
+					drive.Root.Deleted = deleted
+				}
+			}
+			if baseURL != nil {
+				// TODO read from StorageSpace ... needs Opaque for now
+				// TODO how do we build the url?
+				// for now: read from request
+				webDavURL := *baseURL
+				webDavURL.Path = path.Join(webDavURL.Path, spaceID)
+				drive.Root.WebDavUrl = libregraph.PtrString(webDavURL.String())
+			}
 		}
 	}
 

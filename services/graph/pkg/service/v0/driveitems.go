@@ -224,6 +224,7 @@ func (g Graph) GetExtendedSpaceProperties(ctx context.Context, baseURL *url.URL,
 	metadata := space.Opaque.Map
 	names := [2]string{SpaceImageSpecialFolderName, ReadmeSpecialFolderName}
 
+	// TODO skip fetching if not selected
 	for _, itemName := range names {
 		if itemID, ok := metadata[itemName]; ok {
 			rid, _ := storagespace.ParseID(string(itemID.Value))

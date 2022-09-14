@@ -227,7 +227,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		}
 		drives := []libregraph.Drive{}
 		for _, sp := range lspr.GetStorageSpaces() {
-			d, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, sp)
+			d, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, sp, nil)
 			if err != nil {
 				g.logger.Err(err).Interface("query", r.URL.Query()).Msg("error converting space to drive")
 			}
