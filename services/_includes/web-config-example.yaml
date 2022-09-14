@@ -43,6 +43,7 @@ web:
     - pdf-viewer
     - external
     - user-management
+    applications: []
     external_apps: []
     options:
       previewFileMimeTypes:
