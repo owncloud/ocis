@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -208,7 +207,11 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 				match.Entity.Ref.ResourceId = mountpointRootID
 			}
 			match.Entity.ShareRootName = rootName
-			match.Entity.Permissions = convertToOCS(permissions)
+
+			isShared := match.GetEntity().GetRef().GetResourceId().GetSpaceId() == utils.ShareStorageSpaceID
+			isMountpoint := isShared && match.GetEntity().GetRef().GetPath() == "."
+			isDir := match.GetEntity().GetMimeType() == "httpd/unix-directory"
+			match.Entity.Permissions = convertToWebDAVPermissions(isShared, isMountpoint, isDir, permissions)
 			matches = append(matches, match)
 		}
 	}
@@ -310,12 +313,15 @@ func formatQuery(q string) string {
 	return "Name:*" + strings.ReplaceAll(strings.ToLower(query), " ", `\ `) + "*"
 }
 
-// NOTE: this converts cs3 to ocs permissions
+// NOTE: this converts CS3 to WebDAV permissions
 // since conversions pkg is reva internal we have no other choice than to duplicate the logic
-func convertToOCS(p *provider.ResourcePermissions) string {
-	var ocs Permissions
+func convertToWebDAVPermissions(isShared, isMountpoint, isDir bool, p *provider.ResourcePermissions) string {
 	if p == nil {
 		return ""
+	}
+	var b strings.Builder
+	if isShared {
+		fmt.Fprintf(&b, "S")
 	}
 	if p.ListContainer &&
 		p.ListFileVersions &&
@@ -324,25 +330,29 @@ func convertToOCS(p *provider.ResourcePermissions) string {
 		p.GetPath &&
 		p.GetQuota &&
 		p.InitiateFileDownload {
-		ocs |= PermissionRead
+		fmt.Fprintf(&b, "R")
+	}
+	if isMountpoint {
+		fmt.Fprintf(&b, "M")
+	}
+	if p.Delete &&
+		p.PurgeRecycle {
+		fmt.Fprintf(&b, "D")
 	}
 	if p.InitiateFileUpload &&
 		p.RestoreFileVersion &&
 		p.RestoreRecycleItem {
-		ocs |= PermissionWrite
+		fmt.Fprintf(&b, "NV")
+		if !isDir {
+			fmt.Fprintf(&b, "W")
+		}
 	}
-	if p.ListContainer &&
+	if isDir &&
+		p.ListContainer &&
 		p.Stat &&
 		p.CreateContainer &&
 		p.InitiateFileUpload {
-		ocs |= PermissionCreate
+		fmt.Fprintf(&b, "CK")
 	}
-	if p.Delete &&
-		p.PurgeRecycle {
-		ocs |= PermissionDelete
-	}
-	if p.AddGrant {
-		ocs |= PermissionShare
-	}
-	return strconv.FormatUint(uint64(ocs), 10)
+	return b.String()
 }
