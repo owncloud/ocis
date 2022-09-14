@@ -24,7 +24,8 @@ type Service interface {
 	Run() error
 }
 
-func NewEventsNotifier(events <-chan interface{}, channel channels.Channel, logger log.Logger, gwClient gateway.GatewayAPIClient, machineAuthAPIKey string) Service {
+// NewEventsNotifier provides a new eventsNotifier
+func NewEventsNotifier(events <-chan interface{}, channel channels.Channel, logger log.Logger, gwClient gateway.GatewayAPIClient, machineAuthAPIKey, emailTemplatePath string) Service {
 	return eventsNotifier{
 		logger:            logger,
 		channel:           channel,
@@ -32,6 +33,7 @@ func NewEventsNotifier(events <-chan interface{}, channel channels.Channel, logg
 		signals:           make(chan os.Signal, 1),
 		gwClient:          gwClient,
 		machineAuthAPIKey: machineAuthAPIKey,
+		emailTemplatePath: emailTemplatePath,
 	}
 }
 
@@ -42,6 +44,7 @@ type eventsNotifier struct {
 	signals           chan os.Signal
 	gwClient          gateway.GatewayAPIClient
 	machineAuthAPIKey string
+	emailTemplatePath string
 }
 
 func (s eventsNotifier) Run() error {
@@ -146,7 +149,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 	msg, err := email.RenderEmailTemplate("shareCreated.email.tmpl", map[string]string{
 		"ShareSharer": userResponse.User.DisplayName,
 		"ShareFolder": md.Info.Name,
-	})
+	}, s.emailTemplatePath)
 
 	if err != nil {
 		s.logger.Error().

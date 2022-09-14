@@ -53,7 +53,7 @@ func Server(cfg *config.Config) *cli.Command {
 				logger.Fatal().Err(err).Str("addr", cfg.Notifications.RevaGateway).Msg("could not get reva client")
 			}
 
-			svc := service.NewEventsNotifier(evts, channel, logger, gwclient, cfg.Commons.MachineAuthAPIKey)
+			svc := service.NewEventsNotifier(evts, channel, logger, gwclient, cfg.Commons.MachineAuthAPIKey, cfg.Notifications.EmailTemplatePath)
 			return svc.Run()
 		},
 	}

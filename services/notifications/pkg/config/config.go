@@ -26,6 +26,7 @@ type Notifications struct {
 	Events            Events `yaml:"events"`
 	RevaGateway       string `yaml:"reva_gateway" env:"REVA_GATEWAY;NOTIFICATIONS_REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata"`
 	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;NOTIFICATIONS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
+	EmailTemplatePath string `yaml:"email_template_path" env:"OCIS_EMAIL_TEMPLATE_PATH;NOTIFICATIONS_EMAIL_TEMPLATE_PATH" desc:"Path to the E-Mail templates for the notifications to override the embedded ones."`
 }
 
 // SMTP combines the smtp configuration options.
