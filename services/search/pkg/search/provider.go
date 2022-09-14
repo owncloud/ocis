@@ -287,14 +287,6 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 	return &searchsvc.IndexSpaceResponse{}, nil
 }
 
-func (p *Provider) logDocCount() {
-	c, err := p.indexClient.DocCount()
-	if err != nil {
-		p.logger.Error().Err(err).Msg("error getting document count from the index")
-	}
-	p.logger.Debug().Interface("count", c).Msg("new document count")
-}
-
 func formatQuery(q string) string {
 	query := q
 	fields := []string{"RootID", "Path", "ID", "Name", "Size", "Mtime", "MimeType", "Type"}
