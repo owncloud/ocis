@@ -71,7 +71,97 @@ func (s eventsNotifier) Run() error {
 }
 
 func (s eventsNotifier) handleSpaceCreated(e events.SpaceCreated) {
-	// TODO: implement me
+	userResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
+		UserId: e.Executant,
+	})
+	if err != nil || userResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
+		s.logger.Error().
+			Err(err).
+			Str("event", "SpaceCreated").
+			Msg("Could not get user response from gatway client")
+		return
+	}
+	// Get auth context
+	ownerCtx := ctxpkg.ContextSetUser(context.Background(), userResponse.User)
+	authRes, err := s.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
+		Type:         "machine",
+		ClientId:     "userid:" + e.Executant.OpaqueId,
+		ClientSecret: s.machineAuthAPIKey,
+	})
+	if err != nil || authRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
+		s.logger.Error().
+			Err(err).
+			Str("event", "SpaceCreated").
+			Msg("Could not impersonate sharer")
+		return
+	}
+
+	if authRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
+		s.logger.Error().
+			Err(err).
+			Str("event", "SpaceCreated").
+			Msg("could not get authenticated context for user")
+		return
+	}
+	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
+
+	resourceID, err := storagespace.ParseID(e.ID.OpaqueId)
+	if err != nil {
+		s.logger.Error().
+			Err(err).
+			Str("event", "SpaceCreated").
+			Str("itemid", e.ID.OpaqueId).
+			Msg("could not parse resourceid from ItemID ")
+		return
+	}
+	// TODO: maybe cache this stat to reduce storage iops
+	md, err := s.gwClient.Stat(ownerCtx, &providerv1beta1.StatRequest{
+		Ref: &providerv1beta1.Reference{
+			ResourceId: &resourceID,
+		},
+		FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"name"}},
+	})
+
+	if err != nil || md.Status.Code != rpcv1beta1.Code_CODE_OK {
+		s.logger.Error().
+			Err(err).
+			Str("event", "ShareCreated").
+			Str("itemid", e.ID.OpaqueId).
+			Msg("could not stat resource")
+		return
+	}
+
+	if md.Status.Code != rpcv1beta1.Code_CODE_OK {
+		s.logger.Error().
+			Err(err).
+			Str("event", "ShareCreated").
+			Str("itemid", e.ID.OpaqueId).
+			Str("rpc status", md.Status.Code.String()).
+			Msg("could not stat resource")
+		return
+	}
+
+	// old code
+	msg, err := email.RenderEmailTemplate("sharedSpace.email.tmpl", map[string]string{
+		"SpaceSharer": "spacesharer",
+		"SpaceName":   "spacename",
+	}, s.emailTemplatePath)
+
+	if err != nil {
+		s.logger.Error().
+			Err(err).
+			Str("event", "SpaceCreated").
+			Msg("Could not render E-Mail template for spaces")
+	}
+	if e.Executant != nil {
+		err = s.channel.SendMessage([]string{e.Executant.OpaqueId}, msg)
+	}
+	if err != nil {
+		s.logger.Error().
+			Err(err).
+			Str("event", "SpaceCreated").
+			Msg("failed to send a message")
+	}
 }
 
 func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
