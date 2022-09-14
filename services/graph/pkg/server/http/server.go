@@ -49,6 +49,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
+			middleware.TraceContext,
 			chimiddleware.RequestID,
 			middleware.Version(
 				"graph",
