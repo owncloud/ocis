@@ -7,8 +7,9 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 )
 
-//go:generate mockery --name=Extractor
 // Extractor is responsible to extract content and meta information from documents.
+//
+//go:generate mockery --name=Extractor
 type Extractor interface {
 	Extract(ctx context.Context, ri *provider.ResourceInfo) (Document, error)
 }

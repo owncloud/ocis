@@ -76,25 +76,6 @@ var _ = Describe("Bleve", func() {
 
 	Describe("Search", func() {
 		Context("by other fields than filename", func() {
-			It("finds files by size", func() {
-				rid := sprovider.ResourceId{
-					StorageId: "1",
-					SpaceId:   "2",
-					OpaqueId:  "3",
-				}
-				r := createEntity(rid, content.Document{Size: 12345})
-				err := eng.Upsert(r.ID, r)
-				Expect(err).ToNot(HaveOccurred())
-
-				assertDocCount(rid, `Size:12345`, 1)
-				assertDocCount(rid, `Size:>1000`, 1)
-				assertDocCount(rid, `Size:<100000`, 1)
-
-				assertDocCount(rid, `Size:12344`, 0)
-				assertDocCount(rid, `Size:<1000`, 0)
-				assertDocCount(rid, `Size:>100000`, 0)
-			})
-
 			It("finds files by tags", func() {
 				rid := sprovider.ResourceId{
 					StorageId: "1",
@@ -109,8 +90,7 @@ var _ = Describe("Bleve", func() {
 				assertDocCount(rid, `Tags:bar`, 1)
 				assertDocCount(rid, `Tags:foo Tags:bar`, 1)
 				assertDocCount(rid, `Tags:foo Tags:bar Tags:baz`, 1)
-				assertDocCount(rid, `+Tags:foo +Tags:bar Tags:baz`, 1)
-				assertDocCount(rid, `+Tags:foo +Tags:bar +Tags:baz`, 0)
+				assertDocCount(rid, `Tags:foo Tags:bar Tags:baz`, 1)
 				assertDocCount(rid, `Tags:baz`, 0)
 			})
 		})
@@ -172,7 +152,6 @@ var _ = Describe("Bleve", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				assertDocCount(rid, `Name:bar.pdf`, 1)
-				assertDocCount(rid, `Size:789`, 1)
 				assertDocCount(rid, `Unknown:field`, 0)
 			})
 
@@ -239,7 +218,7 @@ var _ = Describe("Bleve", func() {
 				}
 			})
 
-			It("uses a lower-case index", func() {
+			It("ignores case", func() {
 				rid := sprovider.ResourceId{
 					StorageId: "1",
 					SpaceId:   "2",
@@ -253,7 +232,7 @@ var _ = Describe("Bleve", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				assertDocCount(rid, "Name:foo*", 1)
-				assertDocCount(rid, "Name:Foo*", 0)
+				assertDocCount(rid, "Name:Foo*", 1)
 			})
 
 			Context("and an additional file in a subdirectory", func() {
