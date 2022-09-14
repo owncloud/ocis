@@ -148,6 +148,7 @@ config = {
         "architectures": ["arm", "arm64", "amd64"],
     },
     "litmus": True,
+    "codestyle": True,
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -224,6 +225,7 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
+        codestyle(ctx) + \
         buildWebCache(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
         cacheCoreReposForTesting(ctx) + \
@@ -559,6 +561,100 @@ def uploadScanResults(ctx):
             ],
         },
     }
+
+def vendorbinCodestyle(phpVersion):
+    return [{
+        "name": "vendorbin-codestyle",
+        "image": OC_CI_PHP % phpVersion,
+        "environment": {
+            "COMPOSER_HOME": "%s/.cache/composer" % dirs["base"],
+        },
+        "commands": [
+            "make vendor-bin-codestyle",
+        ],
+    }]
+
+def vendorbinCodesniffer(phpVersion):
+    return [{
+        "name": "vendorbin-codesniffer",
+        "image": OC_CI_PHP % phpVersion,
+        "environment": {
+            "COMPOSER_HOME": "%s/.cache/composer" % dirs["base"],
+        },
+        "commands": [
+            "make vendor-bin-codesniffer",
+        ],
+    }]
+
+def codestyle(ctx):
+    pipelines = []
+
+    if "codestyle" not in config:
+        return []
+
+    default = {
+        "phpVersions": [DEFAULT_PHP_VERSION],
+    }
+
+    if "defaults" in config:
+        if "codestyle" in config["defaults"]:
+            for item in config["defaults"]["codestyle"]:
+                default[item] = config["defaults"]["codestyle"][item]
+
+    codestyleConfig = config["codestyle"]
+
+    if type(codestyleConfig) == "bool":
+        if codestyleConfig:
+            # the config has 'codestyle' true, so specify an empty dict that will get the defaults
+            codestyleConfig = {}
+        else:
+            return pipelines
+
+    if len(codestyleConfig) == 0:
+        # 'codestyle' is an empty dict, so specify a single section that will get the defaults
+        codestyleConfig = {"doDefault": {}}
+
+    for category, matrix in codestyleConfig.items():
+        params = {}
+        for item in default:
+            params[item] = matrix[item] if item in matrix else default[item]
+
+        for phpVersion in params["phpVersions"]:
+            name = "coding-standard-php%s" % phpVersion
+
+            result = {
+                "kind": "pipeline",
+                "type": "docker",
+                "name": name,
+                "workspace": {
+                    "base": "/drone",
+                    "path": "src",
+                },
+                "steps": skipIfUnchanged(ctx, "lint") +
+                         vendorbinCodestyle(phpVersion) +
+                         vendorbinCodesniffer(phpVersion) +
+                         [
+                             {
+                                 "name": "php-style",
+                                 "image": OC_CI_PHP % phpVersion,
+                                 "commands": [
+                                     "make test-php-style",
+                                 ],
+                             },
+                         ],
+                "depends_on": [],
+                "trigger": {
+                    "ref": [
+                        "refs/heads/master",
+                        "refs/pull/**",
+                        "refs/tags/**",
+                    ],
+                },
+            }
+
+            pipelines.append(result)
+
+    return pipelines
 
 def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
     early_fail = config["localApiTests"]["earlyFail"] if "earlyFail" in config["localApiTests"] else False
@@ -2008,17 +2104,15 @@ def skipIfUnchanged(ctx, type):
     ]
 
     skip = []
-    if type == "acceptance-tests":
+    if type == "acceptance-tests" or type == "e2e-tests" or type == "lint":
         skip = base + unit
-    if type == "unit-tests":
+    elif type == "unit-tests":
         skip = base + acceptance
-    if type == "build-binary" or type == "build-docker" or type == "litmus":
+    elif type == "build-binary" or type == "build-docker" or type == "litmus":
         skip = base + unit + acceptance
-    if type == "cache":
+    elif type == "cache":
         skip = base
-    if type == "e2e-tests":
-        skip = base + unit
-    if len(skip) == 0:
+    else:
         return []
 
     return [{
@@ -2909,7 +3003,7 @@ def restoreWebE2EYarnCache():
             "mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/e2e.tar.gz %s" % dirs["zip"],
         ],
     }, {
-        # we need to install again becase the node_modules are not cached
+        # we need to install again because the node_modules are not cached
         "name": "unzip-and-install-yarn-e2e",
         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
         "commands": [
@@ -2931,7 +3025,7 @@ def restoreWebAcceptanceYarnCache():
             "mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/acceptance.tar.gz %s" % dirs["zip"],
         ],
     }, {
-        # we need to install again becase the node_modules are not cached
+        # we need to install again because the node_modules are not cached
         "name": "unzip-and-install-yarn-acceptance",
         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
         "commands": [

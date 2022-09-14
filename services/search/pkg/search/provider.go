@@ -14,6 +14,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/events"
 	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -26,6 +27,35 @@ import (
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 )
+
+// Permissions is copied from reva internal conversion pkg
+type Permissions uint
+
+// consts are copied from reva internal conversion pkg
+const (
+	// PermissionInvalid represents an invalid permission
+	PermissionInvalid Permissions = 0
+	// PermissionRead grants read permissions on a resource
+	PermissionRead Permissions = 1 << (iota - 1)
+	// PermissionWrite grants write permissions on a resource
+	PermissionWrite
+	// PermissionCreate grants create permissions on a resource
+	PermissionCreate
+	// PermissionDelete grants delete permissions on a resource
+	PermissionDelete
+	// PermissionShare grants share permissions on a resource
+	PermissionShare
+)
+
+var ListenEvents = []events.Unmarshaller{
+	events.ItemTrashed{},
+	events.ItemRestored{},
+	events.ItemMoved{},
+	events.ContainerCreated{},
+	events.FileUploaded{},
+	events.FileTouched{},
+	events.FileVersionRestored{},
+}
 
 // Provider is responsible for indexing spaces and pass on a search
 // to it's underlying engine.
@@ -90,7 +120,11 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			SpaceId:   space.Root.SpaceId,
 			OpaqueId:  space.Root.OpaqueId,
 		}
-		var mountpointRootID *searchmsg.ResourceID
+		var (
+			mountpointRootID *searchmsg.ResourceID
+			rootName         string
+			permissions      *provider.ResourcePermissions
+		)
 		mountpointPrefix := ""
 		switch space.SpaceType {
 		case "mountpoint":
@@ -125,7 +159,11 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 				SpaceId:   spid,
 				OpaqueId:  oid,
 			}
+			rootName = space.GetRootInfo().GetPath()
+			permissions = space.GetRootInfo().GetPermissionSet()
 			p.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootID).Msg("searching a grant")
+		case "personal":
+			permissions = space.GetRootInfo().GetPermissionSet()
 		}
 
 		res, err := p.engine.Search(ctx, &searchsvc.SearchIndexRequest{
@@ -150,6 +188,12 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			if mountpointRootID != nil {
 				match.Entity.Ref.ResourceId = mountpointRootID
 			}
+			match.Entity.ShareRootName = rootName
+
+			isShared := match.GetEntity().GetRef().GetResourceId().GetSpaceId() == utils.ShareStorageSpaceID
+			isMountpoint := isShared && match.GetEntity().GetRef().GetPath() == "."
+			isDir := match.GetEntity().GetMimeType() == "httpd/unix-directory"
+			match.Entity.Permissions = convertToWebDAVPermissions(isShared, isMountpoint, isDir, permissions)
 			matches = append(matches, match)
 		}
 	}
@@ -241,4 +285,71 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 
 	logDocCount(p.engine, p.logger)
 	return &searchsvc.IndexSpaceResponse{}, nil
+}
+
+func (p *Provider) logDocCount() {
+	c, err := p.indexClient.DocCount()
+	if err != nil {
+		p.logger.Error().Err(err).Msg("error getting document count from the index")
+	}
+	p.logger.Debug().Interface("count", c).Msg("new document count")
+}
+
+func formatQuery(q string) string {
+	query := q
+	fields := []string{"RootID", "Path", "ID", "Name", "Size", "Mtime", "MimeType", "Type"}
+	for _, field := range fields {
+		query = strings.ReplaceAll(query, strings.ToLower(field)+":", field+":")
+	}
+
+	if strings.Contains(query, ":") {
+		return query // Sophisticated field based search
+	}
+
+	// this is a basic filename search
+	return "Name:*" + strings.ReplaceAll(strings.ToLower(query), " ", `\ `) + "*"
+}
+
+// NOTE: this converts CS3 to WebDAV permissions
+// since conversions pkg is reva internal we have no other choice than to duplicate the logic
+func convertToWebDAVPermissions(isShared, isMountpoint, isDir bool, p *provider.ResourcePermissions) string {
+	if p == nil {
+		return ""
+	}
+	var b strings.Builder
+	if isShared {
+		fmt.Fprintf(&b, "S")
+	}
+	if p.ListContainer &&
+		p.ListFileVersions &&
+		p.ListRecycle &&
+		p.Stat &&
+		p.GetPath &&
+		p.GetQuota &&
+		p.InitiateFileDownload {
+		fmt.Fprintf(&b, "R")
+	}
+	if isMountpoint {
+		fmt.Fprintf(&b, "M")
+	}
+	if p.Delete &&
+		p.PurgeRecycle {
+		fmt.Fprintf(&b, "D")
+	}
+	if p.InitiateFileUpload &&
+		p.RestoreFileVersion &&
+		p.RestoreRecycleItem {
+		fmt.Fprintf(&b, "NV")
+		if !isDir {
+			fmt.Fprintf(&b, "W")
+		}
+	}
+	if isDir &&
+		p.ListContainer &&
+		p.Stat &&
+		p.CreateContainer &&
+		p.InitiateFileUpload {
+		fmt.Fprintf(&b, "CK")
+	}
+	return b.String()
 }

@@ -193,11 +193,16 @@
         "deleted": {
           "type": "boolean"
         },
+<<<<<<< HEAD
         "tags": {
           "type": "array",
           "items": {
             "type": "string"
           }
+=======
+        "shareRootName": {
+          "type": "string"
+>>>>>>> master
         }
       }
     },

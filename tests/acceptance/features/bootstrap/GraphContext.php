@@ -509,6 +509,7 @@ class GraphContext implements Context {
 	 * @param string $shouldOrNot (not|)
 	 * @param TableNode $table
 	 *
+	 * @return void
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
@@ -535,5 +536,28 @@ class GraphContext implements Context {
 				);
 			}
 		}
+	}
+
+	/**
+	 * @When /^the user "([^"]*)" changes its own password "([^"]*)" to "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $currentPassword
+	 * @param string $newPassword
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userChangesOwnPassword(string $user, string $currentPassword, $newPassword): void {
+		$response = GraphHelper::changeOwnPassword(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$currentPassword,
+			$newPassword
+		);
+		$this->featureContext->setResponse($response);
 	}
 }

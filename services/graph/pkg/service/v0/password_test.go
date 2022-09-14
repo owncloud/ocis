@@ -122,7 +122,7 @@ var _ = Describe("Users changing their own password", func() {
 		Entry("fails when new password is empty", "currentpassword", "", "", http.StatusBadRequest),
 		Entry("fails when current and new password are equal", "password", "password", "", http.StatusBadRequest),
 		Entry("fails authentication with current password errors", "currentpassword", "newpassword", "error", http.StatusInternalServerError),
-		Entry("fails when current password is wrong", "currentpassword", "newpassword", "deny", http.StatusInternalServerError),
+		Entry("fails when current password is wrong", "currentpassword", "newpassword", "deny", http.StatusBadRequest),
 		Entry("succeeds when current password is correct", "currentpassword", "newpassword", "", http.StatusNoContent),
 	)
 })

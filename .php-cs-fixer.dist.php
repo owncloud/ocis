@@ -4,7 +4,8 @@ $dirToParse = 'tests/acceptance/';
 $dirIterator = new DirectoryIterator(__DIR__ . '/' . $dirToParse);
 
 $excludeDirs = [
-    'node_modules'
+    'node_modules',
+    'vendor-php'
 ];
 
 $finder = PhpCsFixer\Finder::create()
