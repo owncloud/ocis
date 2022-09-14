@@ -543,6 +543,9 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 				}
 			}
 		case "etag":
+			// actually a space only has lastModifiedDateTime
+			// we could implement `$expand=root&$select=id,root/etag` or whatever clients need to quickly determine changes
+			// maybe even an if-match header for the list of drives itself
 			// FIXME add eTag to CS3 space property
 			// FIXME mountpoints have no etag here ...
 			if space.Opaque != nil {
