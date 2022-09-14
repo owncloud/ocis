@@ -9,6 +9,7 @@ Feature: move (rename) file
       | username |
       | Alice    |
       | Brian    |
+    And using spaces DAV path
 
   Scenario Outline: Moving a file within same space project with role manager and editor
     Given the administrator has given "Brian" the role "Space Admin" using the settings api

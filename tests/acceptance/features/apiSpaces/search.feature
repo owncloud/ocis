@@ -10,12 +10,12 @@ Feature: Search
       | username |
       | Alice    |
       | Brian    |
-    And using new DAV path
+    And using spaces DAV path
     And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "find data" with the default quota using the GraphApi
     And user "Alice" has created a folder "folder/SubFolder1/subFOLDER2" in space "find data"
     And user "Alice" has uploaded a file inside space "find data" with content "some content" to "folder/SubFolder1/subFOLDER2/insideTheFolder.txt"
-
+    And using new DAV path
 
   Scenario: Alice can find data from the project space
     When user "Alice" searches for "fol" using the WebDAV API
@@ -51,7 +51,7 @@ Feature: Search
       | /SubFolder1/subFOLDER2                     |
       | /SubFolder1/subFOLDER2/insideTheFolder.txt |
     And for user "Brian" the search result should contain space "mountpoint/folder"
-    
+
 
   Scenario: User can find hidden file
     Given user "Alice" has created a folder ".space" in space "find data"
@@ -72,7 +72,7 @@ Feature: Search
       | /SubFolder1/subFOLDER2                     |
       | /SubFolder1/subFOLDER2/insideTheFolder.txt |
 
-  
+
   Scenario: User cannot find declined folder
     Given user "Alice" shares the following entity "folder" inside of space "find data" with user "Brian" with role "viewer"
     And user "Brian" has declined share "/folder" offered by user "Alice"
@@ -90,7 +90,7 @@ Feature: Search
     When user "Alice" searches for "folder" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "0" entries
-    
+
 
   Scenario: User can find project space by name
     When user "Alice" searches for "find data" using the WebDAV API

@@ -11,6 +11,7 @@ Feature: Preview file in project space
       | Alice    |
     And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "previews of the files" with the default quota using the GraphApi
+    And using spaces DAV path
 
 
   Scenario Outline: An user can preview created txt files in the project space
