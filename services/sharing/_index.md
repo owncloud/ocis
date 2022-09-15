@@ -9,7 +9,7 @@ geekdocCollapseSection: true
 
 ## Abstract
 
-This service provides sharing functionality.
+This service implements the CS3 [LinkAPI](https://cs3org.github.io/cs3apis/#cs3.sharing.link.v1beta1.LinkAPI) to manage public links as well as the [CollaborationAPI](https://cs3org.github.io/cs3apis/#cs3.sharing.collaboration.v1beta1.CollaborationAPI) to manage user and group shares.
 
 ## Table of Contents
 
