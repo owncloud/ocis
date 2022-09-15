@@ -298,13 +298,6 @@ cannot share a folder with create permission
 - [apiTrashbin/trashbinSharingToShares.feature:212](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L212)
 - [apiTrashbin/trashbinSharingToShares.feature:236](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinSharingToShares.feature#L236)
 
-
-#### [oc:privatelink property not returned in webdav responses](https://github.com/owncloud/product/issues/262)
-
-- [apiWebdavProperties2/getFileProperties.feature:306](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L306)
-- [apiWebdavProperties2/getFileProperties.feature:307](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L307)
-- [apiWebdavProperties2/getFileProperties.feature:312](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L312)
-
 #### [changing user quota gives ocs status 103 / Cannot set quota](https://github.com/owncloud/product/issues/247)
 
 - [apiShareOperationsToShares2/uploadToShare.feature:210](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/uploadToShare.feature#L210)
