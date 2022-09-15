@@ -8,7 +8,9 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Render webdav permissions as string in search report: [#4575](https://github.com/owncloud/ocis/issues/4575)
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
+* Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
+* Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
 
 ## Details
 
@@ -23,11 +25,23 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4582
 
+* Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
+
+   Add the web url to the space root on the graphAPI.
+
+   https://github.com/owncloud/ocis/pull/4588
+
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
 
    We've added the possibility to configure applications in the Web configuration.
 
    https://github.com/owncloud/ocis/pull/4578
+
+* Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
+
+   TBD
+
+   https://github.com/owncloud/ocis/pull/4588
 # Changelog for [2.0.0-beta.8] (2022-09-13)
 
 The following sections list the changes for 2.0.0-beta.8.
