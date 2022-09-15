@@ -3127,6 +3127,30 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Then /^as user "([^"]*)" (?:file|folder|entry|resource) "([^"]*)" inside space "([^"]*)" should contain a property "([^"]*)" with value "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $resourceName
+	 * @param string $spaceName
+	 * @param string $property
+	 * @param string $value
+	 *
+	 * @return void
+	 *
+	 * @throws Exception|GuzzleException
+	 */
+	public function userGetsTheFollowingPropertiesOfFileInsideSpaceWithValueUsingTheWebdavApi(
+		string $user,
+		string $resourceName,
+		string $spaceName,
+		string $property,
+		string $value
+	):void {
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->webDavPropertiesContext->asUserFolderShouldContainAPropertyWithValue($user, $resourceName, $property, $value);
+	}
+
+	/**
 	 * @Then /^as user "([^"]*)" (?:file|folder|entry) "([^"]*)" inside space "([^"]*)" (should|should not) be favorited$/
 	 *
 	 * @param string $user
@@ -3203,7 +3227,7 @@ class SpacesContext implements Context {
 		// get a response after a Report request (called in the core)
 		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml()->xpath("//d:response/d:href")), true, 512, JSON_THROW_ON_ERROR);
 		Assert::assertNotEmpty($responseArray, "search result is empty");
-		
+
 		// for mountpoint, id looks a little different than for project space
 		if (str_contains($spaceName, 'mountpoint')) {
 			$splitSpaceName = explode("/", $spaceName);
@@ -3214,7 +3238,7 @@ class SpacesContext implements Context {
 			$space = $this->getSpaceByName($user, $spaceName);
 			$topWebDavPath = "/remote.php/dav/spaces/" . $space['id'];
 		}
-		
+
 		$spaceFound = false;
 		foreach ($responseArray as $value) {
 			if ($topWebDavPath === $value[0]) {
