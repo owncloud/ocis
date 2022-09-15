@@ -4,6 +4,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/broker"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 
 	mhttps "github.com/go-micro/plugins/v4/server/http"
@@ -18,9 +19,11 @@ type Service struct {
 
 // NewService initializes a new http service.
 func NewService(opts ...Option) Service {
+	noopBroker := broker.NoOp{}
 	sopts := newOptions(opts...)
 	wopts := []micro.Option{
 		micro.Server(mhttps.NewServer(server.TLSConfig(sopts.TLSConfig))),
+		micro.Broker(noopBroker),
 		micro.Address(sopts.Address),
 		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
 		micro.Version(sopts.Version),
