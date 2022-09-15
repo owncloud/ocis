@@ -9,7 +9,7 @@ require (
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
 	github.com/blevesearch/bleve/v2 v2.3.4
 	github.com/blevesearch/bleve_index_api v1.0.3
-	github.com/coreos/go-oidc/v3 v3.3.0
+	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220818202316-e92afdddac6d
 	github.com/cs3org/reva/v2 v2.10.1-0.20220914095102-44dc469bd48b
 	github.com/disintegration/imaging v1.6.2
@@ -33,7 +33,7 @@ require (
 	github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.1.0
 	github.com/go-micro/plugins/v4/wrapper/trace/opencensus v1.1.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
-	github.com/gofrs/uuid v4.2.0+incompatible
+	github.com/gofrs/uuid v4.3.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/golang/protobuf v1.5.2
 	github.com/gookit/config/v2 v2.1.5
