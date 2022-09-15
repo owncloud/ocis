@@ -72,7 +72,7 @@ func (s eventsNotifier) Run() error {
 
 func (s eventsNotifier) handleSpaceCreated(e events.SpaceCreated) {
 	userResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
-		UserId: e.Executant,
+		UserId: e.Owner,
 	})
 	if err != nil || userResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
 		s.logger.Error().
@@ -143,8 +143,9 @@ func (s eventsNotifier) handleSpaceCreated(e events.SpaceCreated) {
 
 	// old code
 	msg, err := email.RenderEmailTemplate("sharedSpace.email.tmpl", map[string]string{
+		// TODO: add additional fields here (like link etc.)
 		"SpaceSharer": "spacesharer",
-		"SpaceName":   "spacename",
+		"SpaceName":   md.Info.Space.Name,
 	}, s.emailTemplatePath)
 
 	if err != nil {
@@ -200,19 +201,10 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 	}
 	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
 
-	resourceID, err := storagespace.ParseID(e.ItemID.OpaqueId)
-	if err != nil {
-		s.logger.Error().
-			Err(err).
-			Str("event", "ShareCreated").
-			Str("itemid", e.ItemID.OpaqueId).
-			Msg("could not parse resourceid from ItemID ")
-		return
-	}
 	// TODO: maybe cache this stat to reduce storage iops
 	md, err := s.gwClient.Stat(ownerCtx, &providerv1beta1.StatRequest{
 		Ref: &providerv1beta1.Reference{
-			ResourceId: &resourceID,
+			ResourceId: e.ItemID,
 		},
 		FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"name"}},
 	})
@@ -237,6 +229,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 	}
 
 	msg, err := email.RenderEmailTemplate("shareCreated.email.tmpl", map[string]string{
+		// TODO: add additional fields here (like link etc.)
 		"ShareSharer": userResponse.User.DisplayName,
 		"ShareFolder": md.Info.Name,
 	}, s.emailTemplatePath)

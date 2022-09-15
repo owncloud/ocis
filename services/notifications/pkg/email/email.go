@@ -7,11 +7,13 @@ import (
 	"path/filepath"
 )
 
-// go:embed templates/*.tmpl
+var (
+	//go:embed templates
+	templatesFS embed.FS
+)
 
 // RenderEmailTemplate renders the email template for a new share
 func RenderEmailTemplate(templateName string, templateVariables map[string]string, emailTemplatePath string) (string, error) {
-	var fs embed.FS
 	var err error
 	var tpl *template.Template
 	templateHasBeenFound := false
@@ -24,7 +26,7 @@ func RenderEmailTemplate(templateName string, templateVariables map[string]strin
 	}
 	if !templateHasBeenFound {
 		// template has not been found in the fs, or path has not been specified => use embed templates
-		tpl, err = template.ParseFS(fs, templateName)
+		tpl, err = template.ParseFS(templatesFS, filepath.Join("templates/", templateName))
 		if err != nil {
 			return "", err
 		}
