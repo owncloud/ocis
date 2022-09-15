@@ -586,7 +586,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	}
 
 	webURL.Path = path.Join(webURL.Path, "f", storagespace.FormatResourceID(spaceRid))
-	drive.Root.WebUrl = libregraph.PtrString(webURL.String())
+	drive.WebUrl = libregraph.PtrString(webURL.String())
 
 	if space.Owner != nil && space.Owner.Id != nil {
 		drive.Owner = &libregraph.IdentitySet{
