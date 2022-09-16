@@ -16,6 +16,7 @@ Feature: Change data of space
     And user "Alice" has created a space "Project Jupiter" of type "project" with quota "20"
     And user "Alice" has shared a space "Project Jupiter" to user "Brian" with role "editor"
     And user "Alice" has shared a space "Project Jupiter" to user "Bob" with role "viewer"
+    And using spaces DAV path
 
 
   Scenario Outline: Only space admin user can change the name of a Space via the Graph API

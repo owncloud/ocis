@@ -9,6 +9,7 @@ Feature: copy file
       | username |
       | Alice    |
       | Brian    |
+    And using spaces DAV path
 
 
   Scenario Outline: Copying a file within a same space project with role manager and editor
@@ -527,9 +528,9 @@ Feature: copy file
     Then the HTTP status code should be "204"
     And as "Alice" folder "/Sample-Folder-A/sample-folder-b/sample-folder-c" should exist
     And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these entries:
-      | /second-level-folder/third-level-folder/sample-folder-c |
+      | /second-level-folder/third-level-folder/sample-folder-c/ |
     And for user "Brian" folder "BRIAN-FOLDER" of the space "Personal" should contain these files:
-      | /second-level-folder/third-level-folder/sample-folder-c |
+      | /second-level-folder/third-level-folder/sample-folder-c/ |
     And the response when user "Alice" gets the info of the last share should include
       | file_target | /Shares/BRIAN-FOLDER |
 
@@ -594,7 +595,7 @@ Feature: copy file
     And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these entries:
       | /second-level-folder/third-level-file.txt/third-level-folder |
     And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should not contain these entries:
-      | /second-level-folder/second-level-folder |
+      | /second-level-folder/second-level-folder/ |
     And the response when user "Alice" gets the info of the last share should include
       | file_target | /Shares/BRIAN-FOLDER |
 
@@ -616,7 +617,7 @@ Feature: copy file
     Then the HTTP status code should be "204"
     And as "Alice" folder "/Sample-Folder-A/sample-folder-b/sample-folder-c" should exist
     And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these files:
-      | /second-level-folder/third-level-folder/sample-folder-c |
+      | /second-level-folder/third-level-folder/sample-folder-c/ |
     And the response when user "Alice" gets the info of the last share should include
       | file_target | /Shares/BRIAN-FOLDER |
 
@@ -684,8 +685,8 @@ Feature: copy file
     When user "Alice" copies folder "/FOLDER/second-level-folder" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-file.txt" inside space "Shares Jail" using the WebDAV API
     Then the HTTP status code should be "204"
     And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these files:
-      | /second-level-folder/third-level-file.txt                    |
-      | /second-level-folder/third-level-file.txt/third-level-folder |
+      | /second-level-folder/third-level-file.txt/                    |
+      | /second-level-folder/third-level-file.txt/third-level-folder/ |
     And as "Alice" folder "FOLDER/second-level-folder/third-level-folder" should exist
     And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should not contain these files:
       | /second-level-folder/second-level-folder |

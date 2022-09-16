@@ -32,9 +32,9 @@ type OIDCProvider interface {
 
 // NewOIDCAuthenticator returns a ready to use authenticator which can handle OIDC authentication.
 func NewOIDCAuthenticator(logger log.Logger, tokenCacheTTL int, oidcHTTPClient *http.Client, oidcIss string, providerFunc func() (OIDCProvider, error),
-	jwksOptions config.JWKS, accessTokenVerifyMethod string) OIDCAuthenticator {
+	jwksOptions config.JWKS, accessTokenVerifyMethod string) *OIDCAuthenticator {
 	tokenCache := osync.NewCache(tokenCacheTTL)
-	return OIDCAuthenticator{
+	return &OIDCAuthenticator{
 		Logger:                  logger,
 		tokenCache:              &tokenCache,
 		TokenCacheTTL:           time.Duration(tokenCacheTTL),
@@ -66,7 +66,7 @@ type OIDCAuthenticator struct {
 	JWKS     *keyfunc.JWKS
 }
 
-func (m OIDCAuthenticator) getClaims(token string, req *http.Request) (map[string]interface{}, error) {
+func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[string]interface{}, error) {
 	var claims map[string]interface{}
 	hit := m.tokenCache.Load(token)
 	if hit == nil {
@@ -168,7 +168,7 @@ type jwksJSON struct {
 	JWKSURL string `json:"jwks_uri"`
 }
 
-func (m OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
+func (m *OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
 	m.jwksLock.Lock()
 	defer m.jwksLock.Unlock()
 	if m.JWKS == nil {
@@ -219,7 +219,7 @@ func (m OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
 	return m.JWKS
 }
 
-func (m OIDCAuthenticator) getProvider() OIDCProvider {
+func (m *OIDCAuthenticator) getProvider() OIDCProvider {
 	m.providerLock.Lock()
 	defer m.providerLock.Unlock()
 	if m.provider == nil {
@@ -240,7 +240,7 @@ func (m OIDCAuthenticator) getProvider() OIDCProvider {
 }
 
 // Authenticate implements the authenticator interface to authenticate requests via oidc auth.
-func (m OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
+func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	// there is no bearer token on the request,
 	if !m.shouldServe(r) || isPublicPath(r.URL.Path) {
 		// The authentication of public path requests is handled by another authenticator.

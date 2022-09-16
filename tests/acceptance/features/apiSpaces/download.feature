@@ -11,6 +11,7 @@ Feature: Download file in project space
             | Alice    |
             | Brian    |
             | Bob    |
+        And using spaces DAV path
         And the administrator has given "Alice" the role "Space Admin" using the settings api
         And user "Alice" has created a space "download file" with the default quota using the GraphApi
         And user "Alice" has uploaded a file inside space "download file" with content "some content" to "file.txt"
