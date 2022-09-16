@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix the OIDC provider cache: [#4600](https://github.com/owncloud/ocis/pull/4600)
 * Bugfix - Render webdav permissions as string in search report: [#4575](https://github.com/owncloud/ocis/issues/4575)
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
 * Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
@@ -13,6 +14,14 @@ The following sections list the changes for unreleased.
 * Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
 
 ## Details
+
+* Bugfix - Fix the OIDC provider cache: [#4600](https://github.com/owncloud/ocis/pull/4600)
+
+   We've fixed the OIDC provider cache. It never had a cache hit before this fix. Under some
+   circumstances it could cause a painfully slow OCIS if the IDP wellknown endpoint takes some
+   time to respond.
+
+   https://github.com/owncloud/ocis/pull/4600
 
 * Bugfix - Render webdav permissions as string in search report: [#4575](https://github.com/owncloud/ocis/issues/4575)
 
