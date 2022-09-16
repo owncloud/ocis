@@ -92,6 +92,7 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 // Search executes a search request operation within the index.
 // Returns a SearchIndexResponse object or an error.
 func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error) {
+	fmt.Println(b.buildQuery(sir.Query))
 	q := bleve.NewConjunctionQuery(
 		&query.QueryStringQuery{
 			Query: b.buildQuery(sir.Query),
@@ -322,22 +323,23 @@ func (b *Bleve) setDeleted(id string, deleted bool) error {
 	return nil
 }
 
-func (b *Bleve) buildQuery(si string) (so string) {
+func (b *Bleve) buildQuery(si string) string {
 	var queries [][]string
+	var so []string
 	lexer := sq.NewLexer(strings.NewReader(si))
 	allowedFields := []string{"content", "title", "tags"}
 
 	for {
 		tok, lit := lexer.Scan()
-		if tok == sq.T_FIELD {
+		if tok == sq.TField {
 			for _, field := range allowedFields {
-				if strings.ToLower(field) == strings.ToLower(lit) {
+				if strings.EqualFold(field, lit) {
 					queries = append(queries, []string{cases.Title(language.Und, cases.NoLower).String(lit)})
 				}
 			}
 		}
 
-		if tok == sq.T_VALUE {
+		if tok == sq.TValue {
 			if len(queries) == 0 {
 				queries = append(queries, []string{"*"})
 			}
@@ -345,7 +347,7 @@ func (b *Bleve) buildQuery(si string) (so string) {
 			queries[len(queries)-1] = append(queries[len(queries)-1], lit)
 		}
 
-		if tok == sq.T_EOF {
+		if tok == sq.TEof {
 			break
 		}
 	}
@@ -362,15 +364,15 @@ func (b *Bleve) buildQuery(si string) (so string) {
 		}
 
 		for _, field := range fields {
-			ss := strings.ToLower(strings.Join(q[1:], " "))
+			ss := strings.ToLower(strings.Join(q[1:], `\ `))
 
 			if !strings.Contains(ss, "*") {
 				ss = "*" + ss + "*"
 			}
 
-			so += fmt.Sprintf("%s:%s ", field, ss)
+			so = append(so, fmt.Sprintf("%s:%s", field, ss))
 		}
 	}
 
-	return
+	return strings.Join(so, " ")
 }

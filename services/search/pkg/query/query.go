@@ -4,25 +4,32 @@ package query
 type Token int
 
 const (
-	T_EOF Token = iota
-	T_UNKNOWN
-	T_NEGATION
-	T_QUOTATION_MARK
-	T_FIELD
-	T_VALUE
-	T_SHORTCUT
+	// TEof end of file token type
+	TEof Token = iota
+	// TUnknown unknown token type
+	TUnknown
+	// TNegation negation token type
+	TNegation
+	// TQuotationMark quotation-mark token type, e.g. not of type - "-"
+	TQuotationMark
+	// TField field token type, e.g. - '"'
+	TField
+	// TValue value token type, e.g. - "content:"
+	TValue
+	// TShortcut shortcut token type, e.g. all images - ":image"
+	TShortcut
 )
 
 var eof = rune(0)
 
 var tokens = map[Token]string{
-	T_EOF:            "EOF",
-	T_UNKNOWN:        "UNKNOWN",
-	T_NEGATION:       "NEGATION",
-	T_QUOTATION_MARK: "QUOTATION_MARK",
-	T_FIELD:          "FIELD",
-	T_VALUE:          "VALUE",
-	T_SHORTCUT:       "SHORTCUT",
+	TEof:           "EOF",
+	TUnknown:       "UNKNOWN",
+	TNegation:      "NEGATION",
+	TQuotationMark: "QUOTATION_MARK",
+	TField:         "FIELD",
+	TValue:         "VALUE",
+	TShortcut:      "SHORTCUT",
 }
 
 // String returns the Token human-readable.

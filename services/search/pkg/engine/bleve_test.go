@@ -105,7 +105,7 @@ var _ = Describe("Bleve", func() {
 				r := createEntity(rid, content.Document{Name: "Foo oo.pdf"})
 				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
-				assertDocCount(rid, `Name:foo\ o*`, 1)
+				assertDocCount(rid, `Name:foo o*`, 1)
 			})
 
 			It("finds files by digits in the filename", func() {

@@ -25,7 +25,7 @@ func (l *Lexer) Scan() (Token, string) {
 		r := l.read()
 
 		if r == eof {
-			return T_EOF, ""
+			return TEof, ""
 		}
 
 		if unicode.IsSpace(r) {
@@ -33,23 +33,23 @@ func (l *Lexer) Scan() (Token, string) {
 		}
 
 		if r == '"' {
-			return T_QUOTATION_MARK, ""
+			return TQuotationMark, ""
 		}
 
 		if r == '-' {
-			return T_NEGATION, ""
+			return TNegation, ""
 		}
 
 		if r != ':' {
 			l.unread()
-			return l.scanUnknown(T_VALUE)
+			return l.scanUnknown(TValue)
 		}
 
 		if r == ':' && (unicode.IsLetter(l.peek(1)) || unicode.IsNumber(l.peek(1))) {
-			return l.scanUnknown(T_SHORTCUT)
+			return l.scanUnknown(TShortcut)
 		}
 
-		return T_UNKNOWN, string(r)
+		return TUnknown, string(r)
 	}
 }
 
@@ -69,7 +69,7 @@ func (l *Lexer) scanUnknown(t Token) (Token, string) {
 		}
 
 		if r == ':' {
-			return T_FIELD, buf.String()
+			return TField, buf.String()
 		}
 
 		buf.WriteRune(r)
