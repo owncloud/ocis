@@ -11,6 +11,10 @@ log:
   pretty: false
   color: false
   file: ""
+cache_store:
+  type: ""
+  address: ""
+  size: 0
 debug:
   addr: 127.0.0.1:9114
   token: ""

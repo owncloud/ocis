@@ -10,6 +10,9 @@
 | OCIS_LOG_PRETTY<br/>OCS_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>OCS_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>OCS_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
+| OCIS_CACHE_STORE_TYPE<br/>OCS_CACHE_STORE_TYPE | string |  | The type of the cache store. Valid options are "noop", "ocmem", "etcd" and "memory"|
+| OCIS_CACHE_STORE_ADDRESS<br/>OCS_CACHE_STORE_ADDRESS | string |  | a comma-separated list of addresses to connect to. Only for etcd|
+| OCIS_CACHE_STORE_SIZE<br/>OCS_CACHE_STORE_SIZE | int | 0 | Maximum size for the cache store. Only ocmem will use this option, in number of items per table. The rest will ignore the option and can grow indefinitely|
 | OCS_DEBUG_ADDR | string | 127.0.0.1:9114 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | OCS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | OCS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|

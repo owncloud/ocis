@@ -70,6 +70,30 @@ a| [subs=-attributes]
 pass:[]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
+|`OCIS_CACHE_STORE_TYPE` +
+`GRAPH_CACHE_STORE_TYPE`
+a| [subs=-attributes]
++string+
+a| [subs=-attributes]
+pass:[]
+a| [subs=-attributes]
+The type of the cache store. Valid options are "noop", "ocmem", "etcd" and "memory"
+|`OCIS_CACHE_STORE_ADDRESS` +
+`GRAPH_CACHE_STORE_ADDRESS`
+a| [subs=-attributes]
++string+
+a| [subs=-attributes]
+pass:[]
+a| [subs=-attributes]
+a comma-separated list of addresses to connect to. Only for etcd
+|`OCIS_CACHE_STORE_SIZE` +
+`GRAPH_CACHE_STORE_SIZE`
+a| [subs=-attributes]
++int+
+a| [subs=-attributes]
+pass:[0]
+a| [subs=-attributes]
+Maximum size for the cache store. Only ocmem will use this option, in number of items per table. The rest will ignore the option and can grow indefinitely
 |`GRAPH_DEBUG_ADDR`
 a| [subs=-attributes]
 +string+
