@@ -595,7 +595,6 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		Id:   libregraph.PtrString(spaceID),
 		Name: &space.Name,
 		//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
-		//"description": "string", // TODO read from StorageSpace ... needs Opaque for now
 		DriveType: &space.SpaceType,
 		Root: &libregraph.DriveItem{
 			Id:          libregraph.PtrString(storagespace.FormatResourceID(spaceRid)),
@@ -642,15 +641,23 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	}
 
 	if baseURL != nil {
-		// TODO read from StorageSpace ... needs Opaque for now
-		// TODO how do we build the url?
-		// for now: read from request
 		webDavURL := *baseURL
 		webDavURL.Path = path.Join(webDavURL.Path, spaceID)
 		drive.Root.WebDavUrl = libregraph.PtrString(webDavURL.String())
 	}
 
-	// TODO The public space has no owner ... should we even show it?
+	webURL, err := url.Parse(g.config.Commons.OcisURL)
+	if err != nil {
+		g.logger.Error().
+			Err(err).
+			Str("url", g.config.Commons.OcisURL).
+			Msg("failed to parse base url")
+		return nil, err
+	}
+
+	webURL.Path = path.Join(webURL.Path, "f", storagespace.FormatResourceID(spaceRid))
+	drive.WebUrl = libregraph.PtrString(webURL.String())
+
 	if space.Owner != nil && space.Owner.Id != nil {
 		drive.Owner = &libregraph.IdentitySet{
 			User: &libregraph.Identity{
@@ -674,7 +681,6 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 			Total: &t,
 		}
 	}
-	// FIXME use coowner from https://github.com/owncloud/open-graph-api
 
 	return drive, nil
 }
