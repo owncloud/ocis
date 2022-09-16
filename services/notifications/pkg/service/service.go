@@ -57,8 +57,8 @@ func (s eventsNotifier) Run() error {
 		case evt := <-s.events:
 			go func() {
 				switch e := evt.(type) {
-				case events.SpaceCreated:
-					s.handleSpaceCreated(e)
+				case events.SpaceShared:
+					s.handleSpaceShared(e)
 				case events.ShareCreated:
 					s.handleShareCreated(e)
 				}
@@ -71,7 +71,7 @@ func (s eventsNotifier) Run() error {
 	}
 }
 
-func (s eventsNotifier) handleSpaceCreated(e events.SpaceCreated) {
+func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 	userResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
 		UserId: e.Owner,
 	})
