@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"net/url"
 	"os"
 	"os/signal"
 	"syscall"
@@ -228,10 +229,21 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		return
 	}
 
+	shareLink, err := url.JoinPath(e.Executant.Idp, "files/shares/with-me")
+
+	if err != nil {
+		s.logger.Error().
+			Err(err).
+			Str("event", "ShareCreated").
+			Msg("could not create link to the share")
+		return
+	}
+
 	msg, err := email.RenderEmailTemplate("shareCreated.email.tmpl", map[string]string{
 		// TODO: add additional fields here (like link etc.)
 		"ShareSharer": userResponse.User.DisplayName,
 		"ShareFolder": md.Info.Name,
+		"ShareLink":   shareLink,
 	}, s.emailTemplatePath)
 
 	if err != nil {
