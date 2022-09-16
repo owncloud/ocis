@@ -14,6 +14,7 @@ Feature: Upload files into a space
       | Bob      |
     And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "Project Ceres" of type "project" with quota "2000"
+    And using spaces DAV path
 
 
   Scenario Outline: An user creates a folder in the Space via the Graph API

@@ -18,12 +18,12 @@ Feature: create file or folder named similar to Shares folder
     When user "Brian" creates folder "<folder_name>" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Brian" the space "Personal" should contain these entries:
-      | /<folder_name> |
+      | <folder_name>/ |
     Examples:
       | folder_name |
-      | /Share      |
-      | /shares     |
-      | /Share1     |
+      | Share       |
+      | shares      |
+      | Share1      |
 
   Scenario Outline: create a file with a name similar to Shares
     Given using spaces DAV path
@@ -31,25 +31,25 @@ Feature: create file or folder named similar to Shares folder
     Then the HTTP status code should be "201"
     And the content of file "<file_name>" for user "Brian" should be "some text"
     And for user "Brian" the space "Personal" should contain these entries:
-      | /<file_name> |
+      | <file_name> |
     And for user "Brian" the space "Shares Jail" should contain these entries:
-      | /FOLDER |
+      | FOLDER/ |
     Examples:
       | file_name |
-      | /Share    |
-      | /shares   |
-      | /Share1   |
+      | Share    |
+      | shares   |
+      | Share1   |
 
   Scenario: try to create a folder named Shares
     Given using spaces DAV path
     When user "Brian" creates folder "/Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Brian" the space "Shares Jail" should contain these entries:
-      | /FOLDER |
+      | FOLDER/ |
 
   Scenario: try to create a file named Shares
     Given using spaces DAV path
     When user "Brian" uploads file with content "some text" to "/Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Brian" the space "Shares Jail" should contain these entries:
-      | /FOLDER |
+      | FOLDER/ |

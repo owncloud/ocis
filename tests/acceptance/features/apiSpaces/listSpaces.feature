@@ -8,6 +8,7 @@ Feature: List and create spaces
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
+    And using spaces DAV path
 
 
   Scenario: An ordinary user can request information about their Space via the Graph API
