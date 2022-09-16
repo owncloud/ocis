@@ -155,7 +155,7 @@ func (s eventsNotifier) handleSpaceCreated(e events.SpaceCreated) {
 			Msg("Could not render E-Mail template for spaces")
 	}
 	if e.Executant != nil {
-		err = s.channel.SendMessage([]string{e.Executant.OpaqueId}, msg)
+		err = s.channel.SendMessage([]string{e.Executant.OpaqueId}, msg, "You were invited to join a space")
 	}
 	if err != nil {
 		s.logger.Error().
@@ -241,9 +241,9 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 			Msg("Could not render E-Mail template for shares")
 	}
 	if e.GranteeUserID != nil {
-		err = s.channel.SendMessage([]string{e.GranteeUserID.OpaqueId}, msg)
+		err = s.channel.SendMessage([]string{e.GranteeUserID.OpaqueId}, msg, "You have received a share.")
 	} else if e.GranteeGroupID != nil {
-		err = s.channel.SendMessageToGroup(e.GranteeGroupID, msg)
+		err = s.channel.SendMessageToGroup(e.GranteeGroupID, msg, "You have received a share.")
 	}
 	if err != nil {
 		s.logger.Error().

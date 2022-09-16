@@ -19,9 +19,9 @@ import (
 // Channel defines the methods of a communication channel.
 type Channel interface {
 	// SendMessage sends a message to users.
-	SendMessage(userIDs []string, msg string) error
+	SendMessage(userIDs []string, msg, subject string) error
 	// SendMessageToGroup sends a message to a group.
-	SendMessageToGroup(groupdID *groups.GroupId, msg string) error
+	SendMessageToGroup(groupdID *groups.GroupId, msg, subject string) error
 }
 
 // NewMailChannel instantiates a new mail communication channel.
@@ -100,7 +100,7 @@ func (m Mail) getMailClient() (*mail.SMTPClient, error) {
 }
 
 // SendMessage sends a message to all given users.
-func (m Mail) SendMessage(userIDs []string, msg string) error {
+func (m Mail) SendMessage(userIDs []string, msg, subject string) error {
 	if m.conf.Notifications.SMTP.Host == "" {
 		return nil
 	}
@@ -118,12 +118,13 @@ func (m Mail) SendMessage(userIDs []string, msg string) error {
 	email := mail.NewMSG()
 	email.SetFrom(m.conf.Notifications.SMTP.Sender).AddTo(to...)
 	email.SetBody(mail.TextPlain, msg)
+	email.SetSubject(subject)
 
 	return email.Send(smtpClient)
 }
 
 // SendMessageToGroup sends a message to all members of the given group.
-func (m Mail) SendMessageToGroup(groupID *groups.GroupId, msg string) error {
+func (m Mail) SendMessageToGroup(groupID *groups.GroupId, msg, subject string) error {
 	// TODO We need an authenticated context here...
 	res, err := m.gatewayClient.GetGroup(context.Background(), &groups.GetGroupRequest{GroupId: groupID})
 	if err != nil {
@@ -138,7 +139,7 @@ func (m Mail) SendMessageToGroup(groupID *groups.GroupId, msg string) error {
 		members = append(members, id.OpaqueId)
 	}
 
-	return m.SendMessage(members, msg)
+	return m.SendMessage(members, msg, subject)
 }
 
 func (m Mail) getReceiverAddresses(receivers []string) ([]string, error) {
