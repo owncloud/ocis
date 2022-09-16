@@ -17,6 +17,9 @@ import (
 	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
+	sq "github.com/owncloud/ocis/v2/services/search/pkg/query"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"math"
 	"path"
@@ -89,6 +92,7 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 // Search executes a search request operation within the index.
 // Returns a SearchIndexResponse object or an error.
 func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error) {
+	fmt.Println(b.buildQuery(sir.Query))
 	q := bleve.NewConjunctionQuery(
 		&query.QueryStringQuery{
 			Query: b.buildQuery(sir.Query),
@@ -98,16 +102,14 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 			Bool:     false,
 			FieldVal: "Deleted",
 		},
-		&query.QueryStringQuery{
-			Query: fmt.Sprintf(
-				"RootID:%s",
-				storagespace.FormatResourceID(
-					storageProvider.ResourceId{
-						StorageId: sir.Ref.GetResourceId().GetStorageId(),
-						SpaceId:   sir.Ref.GetResourceId().GetSpaceId(),
-						OpaqueId:  sir.Ref.GetResourceId().GetOpaqueId(),
-					},
-				),
+		&query.TermQuery{
+			FieldVal: "RootID",
+			Term: storagespace.FormatResourceID(
+				storageProvider.ResourceId{
+					StorageId: sir.Ref.GetResourceId().GetStorageId(),
+					SpaceId:   sir.Ref.GetResourceId().GetSpaceId(),
+					OpaqueId:  sir.Ref.GetResourceId().GetOpaqueId(),
+				},
 			),
 		},
 		// Limit search to this directory in the space
@@ -321,16 +323,56 @@ func (b *Bleve) setDeleted(id string, deleted bool) error {
 	return nil
 }
 
-func (b *Bleve) buildQuery(qs string) string {
-	fields := []string{"RootID", "Path", "ID", "Name", "Size", "Mtime", "MimeType", "Type", "Content", "Title", "Tags"}
-	for _, field := range fields {
-		qs = strings.ReplaceAll(qs, strings.ToLower(field)+":", field+":")
+func (b *Bleve) buildQuery(si string) string {
+	var queries [][]string
+	var so []string
+	lexer := sq.NewLexer(strings.NewReader(si))
+	allowedFields := []string{"content", "title", "tags"}
+
+	for {
+		tok, lit := lexer.Scan()
+		if tok == sq.TField {
+			for _, field := range allowedFields {
+				if strings.EqualFold(field, lit) {
+					queries = append(queries, []string{cases.Title(language.Und, cases.NoLower).String(lit)})
+				}
+			}
+		}
+
+		if tok == sq.TValue {
+			if len(queries) == 0 {
+				queries = append(queries, []string{"*"})
+			}
+
+			queries[len(queries)-1] = append(queries[len(queries)-1], lit)
+		}
+
+		if tok == sq.TEof {
+			break
+		}
 	}
 
-	if strings.Contains(qs, ":") {
-		return qs // Sophisticated field based search
+	for _, q := range queries {
+		if len(q) <= 1 {
+			continue
+		}
+
+		fields := []string{q[0]}
+
+		if fields[0] == "*" {
+			fields = []string{"Content", "Name", "Tags"}
+		}
+
+		for _, field := range fields {
+			ss := strings.ToLower(strings.Join(q[1:], `\ `))
+
+			if !strings.Contains(ss, "*") {
+				ss = "*" + ss + "*"
+			}
+
+			so = append(so, fmt.Sprintf("%s:%s", field, ss))
+		}
 	}
 
-	// this is a basic filename search
-	return "Name:*" + strings.ReplaceAll(strings.ToLower(qs), " ", `\ `) + "*"
+	return strings.Join(so, " ")
 }
