@@ -1,36 +1,20 @@
 package roles
 
 import (
-	"time"
-
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	ocisstore "github.com/owncloud/ocis/v2/ocis-pkg/store"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 )
 
 // Options are all the possible options.
 type Options struct {
-	size        int
-	ttl         time.Duration
-	logger      log.Logger
-	roleService settingssvc.RoleService
+	storeOptions ocisstore.OcisStoreOptions
+	logger       log.Logger
+	roleService  settingssvc.RoleService
 }
 
 // Option mutates option
 type Option func(*Options)
-
-// CacheSize configures the size of the cache in items.
-func CacheSize(s int) Option {
-	return func(o *Options) {
-		o.size = s
-	}
-}
-
-// CacheTTL rebuilds the cache after the configured duration.
-func CacheTTL(ttl time.Duration) Option {
-	return func(o *Options) {
-		o.ttl = ttl
-	}
-}
 
 // Logger sets a preconfigured logger
 func Logger(logger log.Logger) Option {
@@ -43,6 +27,12 @@ func Logger(logger log.Logger) Option {
 func RoleService(rs settingssvc.RoleService) Option {
 	return func(o *Options) {
 		o.roleService = rs
+	}
+}
+
+func StoreOptions(storeOpts ocisstore.OcisStoreOptions) Option {
+	return func(o *Options) {
+		o.storeOptions = storeOpts
 	}
 }
 

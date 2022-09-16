@@ -34,11 +34,18 @@ type Reva struct {
 	Address string `yaml:"address" env:"REVA_GATEWAY" desc:"The CS3 gateway endpoint."`
 }
 
-// Commons holds configuration that are common to all services. Each service can then decide whether
+type CacheStore struct {
+	Type    string `yaml:"type" env:"OCIS_CACHE_STORE_TYPE" desc:"The type of the cache store. Valid options are \"noop\", \"ocmem\", \"etcd\" and \"memory\""`
+	Address string `yaml:"address" env:"OCIS_CACHE_STORE_ADDRESS" desc:"a comma-separated list of addresses to connect to. Only for etcd"`
+	Size    int    `yaml:"size" env:"OCIS_CACHE_STORE_SIZE" desc:"Maximum size for the cache store. Only ocmem will use this option, in number of items per table. The rest will ignore the option and can grow indefinitely"`
+}
+
+// Commons holds configuration that are common to all extensions. Each extension can then decide whether
 // to overwrite its values.
 type Commons struct {
 	Log               *Log          `yaml:"log"`
 	Tracing           *Tracing      `yaml:"tracing"`
+	CacheStore        *CacheStore   `yaml:"cache_store"`
 	OcisURL           string        `yaml:"ocis_url" env:"OCIS_URL" desc:"URL, where oCIS is reachable for users."`
 	TokenManager      *TokenManager `mask:"struct" yaml:"token_manager"`
 	Reva              *Reva         `yaml:"reva"`

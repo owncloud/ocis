@@ -2,16 +2,26 @@ package roles
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	ocisstore "github.com/owncloud/ocis/v2/ocis-pkg/store"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"go-micro.dev/v4/store"
+	"google.golang.org/protobuf/encoding/protojson"
+)
+
+const (
+	cacheDatabase  = "ocis-pkg"
+	cacheTableName = "ocis-pkg/roles"
+	cacheTTL       = time.Hour
 )
 
 // Manager manages a cache of roles by fetching unknown roles from the settings.RoleService.
 type Manager struct {
 	logger      log.Logger
-	cache       cache
+	cache       store.Store
 	roleService settingssvc.RoleService
 }
 
@@ -19,8 +29,9 @@ type Manager struct {
 func NewManager(o ...Option) Manager {
 	opts := newOptions(o...)
 
+	nStore := ocisstore.GetStore(opts.storeOptions)
 	return Manager{
-		cache:       newCache(opts.size, opts.ttl),
+		cache:       nStore,
 		roleService: opts.roleService,
 	}
 }
@@ -31,10 +42,26 @@ func (m *Manager) List(ctx context.Context, roleIDs []string) []*settingsmsg.Bun
 	result := make([]*settingsmsg.Bundle, 0)
 	lookup := make([]string, 0)
 	for _, roleID := range roleIDs {
-		if hit := m.cache.get(roleID); hit == nil {
+		if records, err := m.cache.Read(roleID, store.ReadFrom(cacheDatabase, cacheTableName)); err != nil {
 			lookup = append(lookup, roleID)
 		} else {
-			result = append(result, hit)
+			role := &settingsmsg.Bundle{}
+			found := false
+			for _, record := range records {
+				if record.Key == roleID {
+					if err := protojson.Unmarshal(record.Value, role); err == nil {
+						// if we can unmarshal the role, append it to the result
+						// otherwise assume the role wasn't found (data was damaged and
+						// we need to get the role again)
+						result = append(result, role)
+						found = true
+						break
+					}
+				}
+			}
+			if !found {
+				lookup = append(lookup, roleID)
+			}
 		}
 	}
 
@@ -49,7 +76,20 @@ func (m *Manager) List(ctx context.Context, roleIDs []string) []*settingsmsg.Bun
 			return nil
 		}
 		for _, role := range res.Bundles {
-			m.cache.set(role.Id, role)
+			jsonbytes, _ := protojson.Marshal(role)
+			record := &store.Record{
+				Key:    role.Id,
+				Value:  jsonbytes,
+				Expiry: cacheTTL,
+			}
+			err := m.cache.Write(
+				record,
+				store.WriteTo(cacheDatabase, cacheTableName),
+				store.WriteTTL(cacheTTL),
+			)
+			if err != nil {
+				m.logger.Debug().Err(err).Msg("failed to cache roles")
+			}
 			result = append(result, role)
 		}
 	}

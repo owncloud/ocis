@@ -96,6 +96,16 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
+	if cfg.CacheStore == nil && cfg.Commons != nil && cfg.Commons.CacheStore != nil {
+		cfg.CacheStore = &config.CacheStore{
+			Type:    cfg.Commons.CacheStore.Type,
+			Address: cfg.Commons.CacheStore.Address,
+			Size:    cfg.Commons.CacheStore.Size,
+		}
+	} else if cfg.CacheStore == nil {
+		cfg.CacheStore = &config.CacheStore{}
+	}
+
 	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
 		cfg.TokenManager = &config.TokenManager{
 			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
