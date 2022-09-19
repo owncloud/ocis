@@ -73,7 +73,7 @@ func (s eventsNotifier) Run() error {
 
 func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 	userResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
-		UserId: e.Owner,
+		UserId: e.Creator,
 	})
 	if err != nil || userResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
 		s.logger.Error().
@@ -120,7 +120,8 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		Ref: &providerv1beta1.Reference{
 			ResourceId: &resourceID,
 		},
-		FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"name"}},
+		// TODO: this filter needs to be implemented
+		//FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"space.name"}},
 	})
 
 	if err != nil || md.Status.Code != rpcv1beta1.Code_CODE_OK {
@@ -142,11 +143,21 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		return
 	}
 
-	// old code
+	shareLink, err := url.JoinPath(e.Executant.Idp, "files/spaces/projects", storagespace.FormatResourceID(*e.ID))
+
+	if err != nil {
+		s.logger.Error().
+			Err(err).
+			Str("event", "ShareCreated").
+			Msg("could not create link to the share")
+		return
+	}
+
 	msg, err := email.RenderEmailTemplate("sharedSpace.email.tmpl", map[string]string{
 		// TODO: add additional fields here (like link etc.)
-		"SpaceSharer": "spacesharer",
-		"SpaceName":   md.Info.Space.Name,
+		"SpaceSharer": userResponse.GetUser().DisplayName,
+		"SpaceName":   md.GetInfo().GetSpace().Name,
+		"ShareLink":   shareLink,
 	}, s.emailTemplatePath)
 
 	if err != nil {
@@ -155,8 +166,10 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 			Str("event", "SpaceCreated").
 			Msg("Could not render E-Mail template for spaces")
 	}
-	if e.Executant != nil {
-		err = s.channel.SendMessage([]string{e.Executant.OpaqueId}, msg, "You were invited to join a space")
+	if e.GranteeUserID != nil {
+		err = s.channel.SendMessage([]string{e.GranteeUserID.OpaqueId}, msg, "You have received a share.")
+	} else if e.GranteeGroupID != nil {
+		err = s.channel.SendMessageToGroup(e.GranteeGroupID, msg, "You have received a share.")
 	}
 	if err != nil {
 		s.logger.Error().
@@ -241,8 +254,8 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 
 	msg, err := email.RenderEmailTemplate("shareCreated.email.tmpl", map[string]string{
 		// TODO: add additional fields here (like link etc.)
-		"ShareSharer": userResponse.User.DisplayName,
-		"ShareFolder": md.Info.Name,
+		"ShareSharer": userResponse.GetUser().DisplayName,
+		"ShareFolder": md.GetInfo().Name,
 		"ShareLink":   shareLink,
 	}, s.emailTemplatePath)
 

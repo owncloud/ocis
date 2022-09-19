@@ -28,8 +28,10 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
+			// evs defines a list of events to subscribe to
 			evs := []events.Unmarshaller{
 				events.ShareCreated{},
+				events.SpaceShared{},
 			}
 
 			evtsCfg := cfg.Notifications.Events
