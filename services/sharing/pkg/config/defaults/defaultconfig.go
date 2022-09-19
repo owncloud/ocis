@@ -33,7 +33,7 @@ func DefaultConfig() *config.Config {
 		Reva: &config.Reva{
 			Address: "127.0.0.1:9142",
 		},
-		UserSharingDriver: "json", // "jsoncs3", // jsoncs3 doesn't like experimental
+		UserSharingDriver: "jsoncs3",
 		UserSharingDrivers: config.UserSharingDrivers{
 			JSON: config.UserSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "shares.json"),
@@ -53,7 +53,7 @@ func DefaultConfig() *config.Config {
 				DBName:     "owncloud",
 			},
 		},
-		PublicSharingDriver: "json", // "jsoncs3", // jsoncs3 doesn't like experimental
+		PublicSharingDriver: "jsoncs3",
 		PublicSharingDrivers: config.PublicSharingDrivers{
 			JSON: config.PublicSharingJSONDriver{
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "publicshares.json"),
