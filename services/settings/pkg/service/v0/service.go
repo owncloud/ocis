@@ -385,6 +385,17 @@ func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRo
 	if validationError := validateAssignRoleToUser(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
+
+	ownAccountUUID, ok := metadata.Get(ctx, middleware.AccountID)
+	if !ok {
+		g.logger.Debug().Str("id", g.id).Msg("user not in context")
+		return merrors.InternalServerError(g.id, "user not in context")
+	}
+	if ownAccountUUID == req.AccountUuid {
+		g.logger.Debug().Str("id", g.id).Msg("Changing own role assignment forbidden")
+		return merrors.Forbidden(g.id, "%s", "Changing own role assignment forbidden")
+	}
+
 	r, err := g.manager.WriteRoleAssignment(req.AccountUuid, req.RoleId)
 	if err != nil {
 		return merrors.BadRequest(g.id, "%s", err)
@@ -399,9 +410,29 @@ func (g Service) RemoveRoleFromUser(ctx context.Context, req *settingssvc.Remove
 		return err
 	}
 
+	ownAccountUUID, ok := metadata.Get(ctx, middleware.AccountID)
+	if !ok {
+		g.logger.Debug().Str("id", g.id).Msg("user not in context")
+		return merrors.InternalServerError(g.id, "user not in context")
+	}
+
+	al, err := g.manager.ListRoleAssignments(ownAccountUUID)
+	if err != nil {
+		g.logger.Debug().Err(err).Str("id", g.id).Msg("ListRoleAssignments failed")
+		return merrors.InternalServerError(g.id, "%s", err)
+	}
+
+	for _, a := range al {
+		if a.Id == req.Id {
+			g.logger.Debug().Str("id", g.id).Msg("Removing own role assignment forbidden")
+			return merrors.Forbidden(g.id, "%s", "Removing own role assignment forbidden")
+		}
+	}
+
 	if validationError := validateRemoveRoleFromUser(req); validationError != nil {
 		return merrors.BadRequest(g.id, "%s", validationError)
 	}
+
 	if err := g.manager.RemoveRoleAssignment(req.Id); err != nil {
 		return merrors.BadRequest(g.id, "%s", err)
 	}
