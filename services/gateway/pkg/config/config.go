@@ -44,6 +44,9 @@ type Config struct {
 
 	StorageRegistry StorageRegistry `yaml:"storage_registry"` //TODO: should we even support switching this?
 
+	DefaultPersonalQuota string `yaml:"default_personal_quota" env:"PERSONAL_SPACES_DEFAULT_QUOTA" desc:"The default quota for personal spaces in bytes. Usable common abbreviations: [KB, KiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 1GB. 0 means unlimited and is the default."`
+	GroupQuotaFile       string `yaml:"group_quota_file" env:"GROUP_QUOTA_FILE" desc:"The path to the file containing the group quotas. The file needs to be json in the form groupname:quota. Note: If set and the target is not json or the entries are not parseable (see default_personal_quota) the service will refuse to start."`
+
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
 }
