@@ -43,7 +43,6 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	token := req.Header.Get("x-access-token")
 
 	// we need to pass the token to authenticate the CreateHome request.
-	//ctx := tokenpkg.ContextSetToken(r.Context(), token)
 	ctx := metadata.AppendToOutgoingContext(req.Context(), revactx.TokenHeader, token)
 
 	getHomeReq := &provider.ListStorageSpacesRequest{
