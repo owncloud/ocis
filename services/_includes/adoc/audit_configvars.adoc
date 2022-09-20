@@ -9,110 +9,110 @@
 |`OCIS_LOG_LEVEL` +
 `AUDIT_LOG_LEVEL`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[]
+++++
 a| [subs=-attributes]
 The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 |`OCIS_LOG_PRETTY` +
 `AUDIT_LOG_PRETTY`
 a| [subs=-attributes]
-+bool+
+++bool++
 a| [subs=-attributes]
-pass:[false]
+++false++
 a| [subs=-attributes]
 Activates pretty log output.
 |`OCIS_LOG_COLOR` +
 `AUDIT_LOG_COLOR`
 a| [subs=-attributes]
-+bool+
+++bool++
 a| [subs=-attributes]
-pass:[false]
+++false++
 a| [subs=-attributes]
 Activates colorized log output.
 |`OCIS_LOG_FILE` +
 `AUDIT_LOG_FILE`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[]
+++++
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
 |`AUDIT_DEBUG_ADDR`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[127.0.0.1:9234]
+++127.0.0.1:9234++
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 |`AUDIT_DEBUG_TOKEN`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[]
+++++
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
 |`AUDIT_DEBUG_PPROF`
 a| [subs=-attributes]
-+bool+
+++bool++
 a| [subs=-attributes]
-pass:[false]
+++false++
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
 |`AUDIT_DEBUG_ZPAGES`
 a| [subs=-attributes]
-+bool+
+++bool++
 a| [subs=-attributes]
-pass:[false]
+++false++
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
 |`AUDIT_EVENTS_ENDPOINT`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[127.0.0.1:9233]
+++127.0.0.1:9233++
 a| [subs=-attributes]
 The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 |`AUDIT_EVENTS_CLUSTER`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[ocis-cluster]
+++ocis-cluster++
 a| [subs=-attributes]
 The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
 |`AUDIT_EVENTS_GROUP`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[audit]
+++audit++
 a| [subs=-attributes]
 The consumergroup of the service. One group will only get one copy of an event.
 |`AUDIT_LOG_TO_CONSOLE`
 a| [subs=-attributes]
-+bool+
+++bool++
 a| [subs=-attributes]
-pass:[true]
+++true++
 a| [subs=-attributes]
 Logs to Stdout if true. Independent of the log to file option.
 |`AUDIT_LOG_TO_FILE`
 a| [subs=-attributes]
-+bool+
+++bool++
 a| [subs=-attributes]
-pass:[false]
+++false++
 a| [subs=-attributes]
 Logs to file if true. Independent of the log to Stdout file option.
 |`AUDIT_FILEPATH`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[]
+++++
 a| [subs=-attributes]
 Filepath to the logfile. Mandatory if LogToFile is true.
 |`AUDIT_FORMAT`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[json]
+++json++
 a| [subs=-attributes]
 Log format. Using json is advised.
 |===

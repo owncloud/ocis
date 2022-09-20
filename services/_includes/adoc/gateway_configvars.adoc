@@ -9,256 +9,256 @@
 |`OCIS_TRACING_ENABLED` +
 `GATEWAY_TRACING_ENABLED`
 a| [subs=-attributes]
-+bool+
+++bool++
 a| [subs=-attributes]
-pass:[false]
+++false++
 a| [subs=-attributes]
 Activates tracing.
 |`OCIS_TRACING_TYPE` +
 `GATEWAY_TRACING_TYPE`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[]
+++++
 a| [subs=-attributes]
 The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
 |`OCIS_TRACING_ENDPOINT` +
 `GATEWAY_TRACING_ENDPOINT`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[]
+++++
 a| [subs=-attributes]
 The endpoint of the tracing agent.
 |`OCIS_TRACING_COLLECTOR` +
 `GATEWAY_TRACING_COLLECTOR`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[]
+++++
 a| [subs=-attributes]
 The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 |`OCIS_LOG_LEVEL` +
 `GATEWAY_LOG_LEVEL`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[]
+++++
 a| [subs=-attributes]
 The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
 |`OCIS_LOG_PRETTY` +
 `GATEWAY_LOG_PRETTY`
 a| [subs=-attributes]
-+bool+
+++bool++
 a| [subs=-attributes]
-pass:[false]
+++false++
 a| [subs=-attributes]
 Activates pretty log output.
 |`OCIS_LOG_COLOR` +
 `GATEWAY_LOG_COLOR`
 a| [subs=-attributes]
-+bool+
+++bool++
 a| [subs=-attributes]
-pass:[false]
+++false++
 a| [subs=-attributes]
 Activates colorized log output.
 |`OCIS_LOG_FILE` +
 `GATEWAY_LOG_FILE`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[]
+++++
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
 |`GATEWAY_DEBUG_ADDR`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[127.0.0.1:9143]
+++127.0.0.1:9143++
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
 |`GATEWAY_DEBUG_TOKEN`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[]
+++++
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
 |`GATEWAY_DEBUG_PPROF`
 a| [subs=-attributes]
-+bool+
+++bool++
 a| [subs=-attributes]
-pass:[false]
+++false++
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
 |`GATEWAY_DEBUG_ZPAGES`
 a| [subs=-attributes]
-+bool+
+++bool++
 a| [subs=-attributes]
-pass:[false]
+++false++
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
 |`GATEWAY_GRPC_ADDR`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[127.0.0.1:9142]
+++127.0.0.1:9142++
 a| [subs=-attributes]
 The bind address of the GRPC service.
 |`GATEWAY_GRPC_PROTOCOL`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[tcp]
+++tcp++
 a| [subs=-attributes]
 The transport protocol of the GRPC service.
 |`OCIS_JWT_SECRET` +
 `GATEWAY_JWT_SECRET`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[]
+++++
 a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
 |`REVA_GATEWAY`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[127.0.0.1:9142]
+++127.0.0.1:9142++
 a| [subs=-attributes]
 The CS3 gateway endpoint.
 |`GATEWAY_SKIP_USER_GROUPS_IN_TOKEN`
 a| [subs=-attributes]
-+bool+
+++bool++
 a| [subs=-attributes]
-pass:[false]
+++false++
 a| [subs=-attributes]
 Disables the loading of user's group memberships from the reva access token.
 |`GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT`
 a| [subs=-attributes]
-+bool+
+++bool++
 a| [subs=-attributes]
-pass:[true]
+++true++
 a| [subs=-attributes]
 Commit shares to storage grants. This grants access to shared resources for the share receiver directly on the storage.
 |`GATEWAY_SHARE_FOLDER_NAME`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[Shares]
+++Shares++
 a| [subs=-attributes]
 Name of the share folder in users' home space.
 |`GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN`
 a| [subs=-attributes]
-+bool+
+++bool++
 a| [subs=-attributes]
-pass:[true]
+++true++
 a| [subs=-attributes]
 Disable creation of the home space on login.
 |`STORAGE_TRANSFER_SECRET`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[]
+++++
 a| [subs=-attributes]
 The storage transfer secret.
 |`GATEWAY_TRANSFER_EXPIRES`
 a| [subs=-attributes]
-+int+
+++int++
 a| [subs=-attributes]
-pass:[86400]
+++86400++
 a| [subs=-attributes]
 Expiry for the gateway tokens.
 |`GATEWAY_ETAG_CACHE_TTL`
 a| [subs=-attributes]
-+int+
+++int++
 a| [subs=-attributes]
-pass:[0]
+++0++
 a| [subs=-attributes]
 Max TTL in seconds for the gateway's ETAG cache.
 |`OCIS_URL` +
 `GATEWAY_FRONTEND_PUBLIC_URL`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[https://localhost:9200]
+++https://localhost:9200++
 a| [subs=-attributes]
 The public facing URL of the oCIS frontend.
 |`GATEWAY_USERS_ENDPOINT`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[localhost:9144]
+++localhost:9144++
 a| [subs=-attributes]
 The USERS API endpoint.
 |`GATEWAY_GROUPS_ENDPOINT`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[localhost:9160]
+++localhost:9160++
 a| [subs=-attributes]
 The GROUPS API endpoint.
 |`GATEWAY_PERMISSIONS_ENDPOINT`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[localhost:9191]
+++localhost:9191++
 a| [subs=-attributes]
 The SETTINGS API endpoint.
 |`GATEWAY_SHARING_ENDPOINT`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[localhost:9150]
+++localhost:9150++
 a| [subs=-attributes]
 The SHARE API endpoint.
 |`GATEWAY_AUTH_BASIC_ENDPOINT`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[localhost:9146]
+++localhost:9146++
 a| [subs=-attributes]
 The AUTH BASIC API endpoint.
 |`GATEWAY_AUTH_BEARER_ENDPOINT`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[localhost:9148]
+++localhost:9148++
 a| [subs=-attributes]
 The AUTH BEARER API endpoint.
 |`GATEWAY_AUTH_MACHINE_ENDPOINT`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[localhost:9166]
+++localhost:9166++
 a| [subs=-attributes]
 The AUTH MACHINE API endpoint.
 |`GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[localhost:9178]
+++localhost:9178++
 a| [subs=-attributes]
 The STORAGE PUBLICLINK API endpoint.
 |`GATEWAY_STORAGE_USERS_ENDPOINT`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[localhost:9157]
+++localhost:9157++
 a| [subs=-attributes]
 The STORAGE USERS API endpoint.
 |`GATEWAY_STORAGE_SHARES_ENDPOINT`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[localhost:9154]
+++localhost:9154++
 a| [subs=-attributes]
 The STORAGE SHARES API endpoint.
 |`GATEWAY_APP_REGISTRY_ENDPOINT`
 a| [subs=-attributes]
-+string+
+++string++
 a| [subs=-attributes]
-pass:[localhost:9242]
+++localhost:9242++
 a| [subs=-attributes]
 The APP REGISTRY API endpoint.
 |===
