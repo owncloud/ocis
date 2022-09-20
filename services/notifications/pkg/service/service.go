@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
+	"path"
 	"syscall"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -155,7 +156,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		return
 	}
 
-	shareLink, err := url.JoinPath(e.Executant.Idp, "files/spaces/projects", storagespace.FormatResourceID(*e.ID))
+	shareLink, err := urlJoinPath(e.Executant.Idp, "files/spaces/projects", storagespace.FormatResourceID(*e.ID))
 
 	if err != nil {
 		s.logger.Error().
@@ -268,7 +269,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		return
 	}
 
-	shareLink, err := url.JoinPath(e.Executant.Idp, "files/shares/with-me")
+	shareLink, err := urlJoinPath(e.Executant.Idp, "files/shares/with-me")
 
 	if err != nil {
 		s.logger.Error().
@@ -305,4 +306,14 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 			Str("event", "ShareCreated").
 			Msg("failed to send a message")
 	}
+}
+
+// TODO: this function is a backport for go1.19 url.JoinPath, upon go bump, replace this
+func urlJoinPath(base string, elements ...string) (string, error) {
+	u, err := url.Parse(base)
+	if err != nil {
+		return "", err
+	}
+	u.Path = path.Join(append([]string{u.Path}, elements...)...)
+	return u.String(), nil
 }
