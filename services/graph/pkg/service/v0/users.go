@@ -255,6 +255,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	userID := chi.URLParam(r, "userID")
 	userID, err := url.PathUnescape(userID)
 	if err != nil {
+		g.logger.Debug().Err(err).Msg("unescaping user id failed")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
 		return
 	}
@@ -265,6 +266,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 	user, err := g.identityBackend.GetUser(r.Context(), userID, r.URL.Query())
 	if err != nil {
+		g.logger.Debug().Err(err).Str("userID", userID).Msg("failed to get user")
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
 			errcode.Render(w, r)
@@ -276,6 +278,12 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	currentUser := ctxpkg.ContextMustGetUser(r.Context())
 
+	if currentUser.GetId().GetOpaqueId() == user.GetId() {
+		g.logger.Debug().Msg("self deletion forbidden")
+		errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "self deletion forbidden")
+		return
+	}
+
 	opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
 	f := listStorageSpacesUserFilter(user.GetId())
 	lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
@@ -283,6 +291,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
 	})
 	if err != nil {
+		g.logger.Debug().Err(err).Msg("could not read spaces")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "could not read spaces")
 		return
 	}
@@ -303,6 +312,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 				},
 			})
 			if err != nil {
+				g.logger.Debug().Err(err).Msg("could not disable homespace")
 				errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "could not disable homespace")
 				return
 			}
@@ -315,6 +325,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			},
 		})
 		if err != nil {
+			g.logger.Debug().Err(err).Msg("could not delete homespace")
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "could not delete homespace")
 			return
 		}
