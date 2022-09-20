@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 	"os"
 	"os/signal"
@@ -72,10 +73,21 @@ func (s eventsNotifier) Run() error {
 }
 
 func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
-	userResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
+	sharerUserResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
 		UserId: e.Creator,
 	})
-	if err != nil || userResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
+	if err != nil || sharerUserResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
+		s.logger.Error().
+			Err(err).
+			Str("event", "SpaceCreated").
+			Msg("Could not get user response from gatway client")
+		return
+	}
+
+	granteeUserResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
+		UserId: e.Creator,
+	})
+	if err != nil || sharerUserResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
 		s.logger.Error().
 			Err(err).
 			Str("event", "SpaceCreated").
@@ -83,7 +95,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		return
 	}
 	// Get auth context
-	ownerCtx := ctxpkg.ContextSetUser(context.Background(), userResponse.User)
+	ownerCtx := ctxpkg.ContextSetUser(context.Background(), sharerUserResponse.User)
 	authRes, err := s.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + e.Executant.OpaqueId,
@@ -153,11 +165,12 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		return
 	}
 
+	sharerDisplayName := sharerUserResponse.GetUser().DisplayName
 	msg, err := email.RenderEmailTemplate("sharedSpace.email.tmpl", map[string]string{
-		// TODO: add additional fields here (like link etc.)
-		"SpaceSharer": userResponse.GetUser().DisplayName,
-		"SpaceName":   md.GetInfo().GetSpace().Name,
-		"ShareLink":   shareLink,
+		"SpaceGrantee": granteeUserResponse.GetUser().DisplayName,
+		"SpaceSharer":  sharerDisplayName,
+		"SpaceName":    md.GetInfo().GetSpace().Name,
+		"ShareLink":    shareLink,
 	}, s.emailTemplatePath)
 
 	if err != nil {
@@ -166,10 +179,12 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 			Str("event", "SpaceCreated").
 			Msg("Could not render E-Mail template for spaces")
 	}
+
+	emailSubject := fmt.Sprintf("%s invited you to join %s", sharerUserResponse.GetUser().DisplayName, md.GetInfo().GetSpace().Name)
 	if e.GranteeUserID != nil {
-		err = s.channel.SendMessage([]string{e.GranteeUserID.OpaqueId}, msg, "You have received a share.")
+		err = s.channel.SendMessage([]string{e.GranteeUserID.OpaqueId}, msg, emailSubject, sharerDisplayName)
 	} else if e.GranteeGroupID != nil {
-		err = s.channel.SendMessageToGroup(e.GranteeGroupID, msg, "You have received a share.")
+		err = s.channel.SendMessageToGroup(e.GranteeGroupID, msg, emailSubject, sharerDisplayName)
 	}
 	if err != nil {
 		s.logger.Error().
@@ -180,10 +195,21 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 }
 
 func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
-	userResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
+	sharerUserResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
 		UserId: e.Sharer,
 	})
-	if err != nil || userResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
+	if err != nil || sharerUserResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
+		s.logger.Error().
+			Err(err).
+			Str("event", "ShareCreated").
+			Msg("Could not get user response from gatway client")
+		return
+	}
+
+	granteeUserResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
+		UserId: e.GranteeUserID,
+	})
+	if err != nil || sharerUserResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
 		s.logger.Error().
 			Err(err).
 			Str("event", "ShareCreated").
@@ -192,7 +218,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 	}
 
 	// Get auth context
-	ownerCtx := ctxpkg.ContextSetUser(context.Background(), userResponse.User)
+	ownerCtx := ctxpkg.ContextSetUser(context.Background(), sharerUserResponse.User)
 	authRes, err := s.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + e.Sharer.OpaqueId,
@@ -252,11 +278,12 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		return
 	}
 
+	sharerDisplayName := sharerUserResponse.GetUser().DisplayName
 	msg, err := email.RenderEmailTemplate("shareCreated.email.tmpl", map[string]string{
-		// TODO: add additional fields here (like link etc.)
-		"ShareSharer": userResponse.GetUser().DisplayName,
-		"ShareFolder": md.GetInfo().Name,
-		"ShareLink":   shareLink,
+		"ShareGrantee": granteeUserResponse.GetUser().DisplayName,
+		"ShareSharer":  sharerDisplayName,
+		"ShareFolder":  md.GetInfo().Name,
+		"ShareLink":    shareLink,
 	}, s.emailTemplatePath)
 
 	if err != nil {
@@ -265,10 +292,12 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 			Str("event", "ShareCreated").
 			Msg("Could not render E-Mail template for shares")
 	}
+
+	emailSubject := fmt.Sprintf("%s shared %s with you", sharerUserResponse.GetUser().DisplayName, md.GetInfo().Name)
 	if e.GranteeUserID != nil {
-		err = s.channel.SendMessage([]string{e.GranteeUserID.OpaqueId}, msg, "You have received a share.")
+		err = s.channel.SendMessage([]string{e.GranteeUserID.OpaqueId}, msg, emailSubject, sharerDisplayName)
 	} else if e.GranteeGroupID != nil {
-		err = s.channel.SendMessageToGroup(e.GranteeGroupID, msg, "You have received a share.")
+		err = s.channel.SendMessageToGroup(e.GranteeGroupID, msg, emailSubject, sharerDisplayName)
 	}
 	if err != nil {
 		s.logger.Error().

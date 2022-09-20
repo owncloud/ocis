@@ -4,6 +4,7 @@ package channels
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -19,9 +20,9 @@ import (
 // Channel defines the methods of a communication channel.
 type Channel interface {
 	// SendMessage sends a message to users.
-	SendMessage(userIDs []string, msg, subject string) error
+	SendMessage(userIDs []string, msg, subject, senderDisplayName string) error
 	// SendMessageToGroup sends a message to a group.
-	SendMessageToGroup(groupdID *groups.GroupId, msg, subject string) error
+	SendMessageToGroup(groupdID *groups.GroupId, msg, subject, senderDisplayName string) error
 }
 
 // NewMailChannel instantiates a new mail communication channel.
@@ -100,7 +101,7 @@ func (m Mail) getMailClient() (*mail.SMTPClient, error) {
 }
 
 // SendMessage sends a message to all given users.
-func (m Mail) SendMessage(userIDs []string, msg, subject string) error {
+func (m Mail) SendMessage(userIDs []string, msg, subject, senderDisplayName string) error {
 	if m.conf.Notifications.SMTP.Host == "" {
 		return nil
 	}
@@ -116,7 +117,11 @@ func (m Mail) SendMessage(userIDs []string, msg, subject string) error {
 	}
 
 	email := mail.NewMSG()
-	email.SetFrom(m.conf.Notifications.SMTP.Sender).AddTo(to...)
+	if senderDisplayName != "" {
+		email.SetFrom(fmt.Sprintf("%s via owncloud <%s>", senderDisplayName, m.conf.Notifications.SMTP.Sender)).AddTo(to...)
+	} else {
+		email.SetFrom(m.conf.Notifications.SMTP.Sender).AddTo(to...)
+	}
 	email.SetBody(mail.TextPlain, msg)
 	email.SetSubject(subject)
 
@@ -124,7 +129,7 @@ func (m Mail) SendMessage(userIDs []string, msg, subject string) error {
 }
 
 // SendMessageToGroup sends a message to all members of the given group.
-func (m Mail) SendMessageToGroup(groupID *groups.GroupId, msg, subject string) error {
+func (m Mail) SendMessageToGroup(groupID *groups.GroupId, msg, subject, senderDisplayName string) error {
 	// TODO We need an authenticated context here...
 	res, err := m.gatewayClient.GetGroup(context.Background(), &groups.GetGroupRequest{GroupId: groupID})
 	if err != nil {
@@ -139,7 +144,7 @@ func (m Mail) SendMessageToGroup(groupID *groups.GroupId, msg, subject string) e
 		members = append(members, id.OpaqueId)
 	}
 
-	return m.SendMessage(members, msg, subject)
+	return m.SendMessage(members, msg, subject, senderDisplayName)
 }
 
 func (m Mail) getReceiverAddresses(receivers []string) ([]string, error) {
