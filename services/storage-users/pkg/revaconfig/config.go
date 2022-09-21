@@ -52,6 +52,23 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"drivers":        UserDrivers(cfg),
 					"nats_address":   cfg.Events.Addr,
 					"nats_clusterID": cfg.Events.ClusterID,
+					"data_txs": map[string]interface{}{
+						"simple": map[string]interface{}{
+							"cache_store":    cfg.Cache.Store,
+							"cache_nodes":    cfg.Cache.Nodes,
+							"cache_database": cfg.Cache.Database,
+						},
+						"spaces": map[string]interface{}{
+							"cache_store":    cfg.Cache.Store,
+							"cache_nodes":    cfg.Cache.Nodes,
+							"cache_database": cfg.Cache.Database,
+						},
+						"tus": map[string]interface{}{
+							"cache_store":    cfg.Cache.Store,
+							"cache_nodes":    cfg.Cache.Nodes,
+							"cache_database": cfg.Cache.Database,
+						},
+					},
 				},
 			},
 		},
