@@ -137,7 +137,7 @@ func NewService(opts ...Option) Service {
 	}
 
 	if options.RoleService == nil {
-		svc.roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
+		svc.roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
 	} else {
 		svc.roleService = options.RoleService
 	}

@@ -69,8 +69,8 @@ func NewService(opts ...Option) (Service, error) {
 		config:           conf,
 		log:              options.Logger,
 		mux:              m,
-		searchClient:     searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient),
-		thumbnailsClient: thumbnailssvc.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient),
+		searchClient:     searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient()),
+		thumbnailsClient: thumbnailssvc.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient()),
 		revaClient:       gwc,
 	}
 
