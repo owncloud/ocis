@@ -28,6 +28,18 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "experimental",
 		},
+		Events: config.Events{
+			Endpoint: "127.0.0.1:9233",
+			Cluster:  "ocis-cluster",
+		},
+		Activities: config.Activities{
+			Storage: config.ActivitiesStorage{
+				Type: "mem_storage",
+				MemStore: config.ActivitiesMemStorage{
+					Capacity: 2500,
+				},
+			},
+		},
 	}
 }
 
@@ -43,6 +55,14 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Log == nil {
 		cfg.Log = &config.Log{}
+	}
+
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
 	}
 }
 

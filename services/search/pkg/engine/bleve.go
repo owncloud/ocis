@@ -92,7 +92,6 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 // Search executes a search request operation within the index.
 // Returns a SearchIndexResponse object or an error.
 func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error) {
-	fmt.Println(b.buildQuery(sir.Query))
 	q := bleve.NewConjunctionQuery(
 		&query.QueryStringQuery{
 			Query: b.buildQuery(sir.Query),

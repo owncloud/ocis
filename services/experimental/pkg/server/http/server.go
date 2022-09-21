@@ -2,6 +2,7 @@ package http
 
 import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -22,7 +23,7 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Context(options.Context),
 	)
 
-	handle := svc.NewService(
+	handle, err := svc.NewService(
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
@@ -34,8 +35,15 @@ func Server(opts ...Option) (http.Service, error) {
 			middleware.Logger(
 				options.Logger,
 			),
+			middleware.ExtractAccountUUID(
+				account.Logger(options.Logger),
+				account.JWTSecret(options.Config.TokenManager.JWTSecret),
+			),
 		),
 	)
+	if err != nil {
+		return http.Service{}, err
+	}
 
 	if err := micro.RegisterHandler(service.Server(), handle); err != nil {
 		return http.Service{}, err
