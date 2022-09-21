@@ -38,9 +38,18 @@ func isPublicShareArchive(r *http.Request) bool {
 	return false
 }
 
+// The app open requests can be made in public share contexts. For that the PublicShareAuthenticator needs to
+// augment the request context.
+// The app open requests can also be made in authenticated context. In these cases the PublicShareAuthenticator
+// needs to ignore the request.
+func isPublicShareAppOpen(r *http.Request) bool {
+	return strings.HasPrefix(r.URL.Path, "/app/open") &&
+		(r.URL.Query().Get(headerShareToken) != "" || r.Header.Get(headerShareToken) != "")
+}
+
 // Authenticate implements the authenticator interface to authenticate requests via public share auth.
 func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
-	if !isPublicPath(r.URL.Path) && !isPublicShareArchive(r) {
+	if !isPublicPath(r.URL.Path) && !isPublicShareArchive(r) && !isPublicShareAppOpen(r) {
 		return nil, false
 	}
 
