@@ -37,7 +37,7 @@ require (
 	github.com/gofrs/uuid v4.3.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/golang/protobuf v1.5.2
-	github.com/gookit/config/v2 v2.1.5
+	github.com/gookit/config/v2 v2.1.6
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.3
 	github.com/justinas/alice v1.2.0
@@ -66,7 +66,7 @@ require (
 	github.com/xhit/go-simple-mail/v2 v2.11.0
 	go-micro.dev/v4 v4.8.1
 	go.etcd.io/bbolt v1.3.6
-	go.etcd.io/etcd/client/v3 v3.5.2
+	go.etcd.io/etcd/client/v3 v3.5.5
 	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.34.0
 	go.opentelemetry.io/otel v1.10.0
@@ -178,7 +178,7 @@ require (
 	github.com/google/go-cmp v0.5.8 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/gookit/goutil v0.5.11 // indirect
+	github.com/gookit/goutil v0.5.12 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
@@ -261,8 +261,8 @@ require (
 	github.com/wk8/go-ordered-map v1.0.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.2 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.5.2 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.5 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.5.5 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
 	go.uber.org/zap v1.19.1 // indirect
