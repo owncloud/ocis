@@ -17,12 +17,3 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. This 
 
 ### [impossible to navigate into a folder in the trashbin](https://github.com/owncloud/web/issues/1725)
 - [webUITrashbinDelete/trashbinDelete.feature:29](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L29)
-
-### [Creating folder with & character makes the UI act weird](https://github.com/owncloud/web/issues/7528)
-- [webUIUpload/uploadEdgecases.feature:48](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L48)
-- [webUIUpload/uploadEdgecases.feature:49](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L49)
-- [webUIUpload/uploadEdgecases.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L50)
-- [webUIMoveFilesFolders/moveFiles.feature:20](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIMoveFilesFolders/moveFiles.feature#L20)
-- [webUIDeleteFilesFolders/deleteFilesFolders.feature:10](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L10)
-- [webUIRenameFolders/renameFolders.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFolders/renameFolders.feature#L25)
-- [webUIRenameFiles/renameFiles.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L25)
