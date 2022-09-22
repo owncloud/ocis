@@ -159,6 +159,14 @@ a| [subs=-attributes]
 ++++
 a| [subs=-attributes]
 Machine auth API key used to validate internal requests necessary to access resources from other services.
+|`OCIS_EMAIL_TEMPLATE_PATH` +
+`NOTIFICATIONS_EMAIL_TEMPLATE_PATH`
+a| [subs=-attributes]
+++string++
+a| [subs=-attributes]
+++++
+a| [subs=-attributes]
+Path to the E-Mail templates for the notifications to override the embedded ones.
 |===
 
 Since Version: `+` added, `-` deprecated
