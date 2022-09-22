@@ -23,4 +23,4 @@
 | NOTIFICATIONS_EVENTS_GROUP | string | notifications | Name of the event group / queue on the event system.|
 | REVA_GATEWAY<br/>NOTIFICATIONS_REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to look up user metadata|
 | OCIS_MACHINE_AUTH_API_KEY<br/>NOTIFICATIONS_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary to access resources from other services.|
-| OCIS_EMAIL_TEMPLATE_PATH<br/>NOTIFICATIONS_EMAIL_TEMPLATE_PATH | string |  | Path to the E-Mail templates for the notifications to override the embedded ones.|
+| OCIS_EMAIL_TEMPLATE_PATH<br/>NOTIFICATIONS_EMAIL_TEMPLATE_PATH | string |  | Path to Email notification templates overriding embedded ones.|

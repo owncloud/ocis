@@ -166,7 +166,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++++
 a| [subs=-attributes]
-Path to the E-Mail templates for the notifications to override the embedded ones.
+Path to Email notification templates overriding embedded ones.
 |===
 
 Since Version: `+` added, `-` deprecated
