@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Render webdav permissions as string in search report: [#4575](https://github.com/owncloud/ocis/issues/4575)
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
 * Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
+* Enhancement - Add Email templating: [#4564](https://github.com/owncloud/ocis/pull/4564)
 * Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
 * Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
@@ -42,6 +43,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4382
    https://github.com/owncloud/ocis/pull/4631
+
+* Enhancement - Add Email templating: [#4564](https://github.com/owncloud/ocis/pull/4564)
+
+   We have added email templating to ocis. Which are send on the SpaceShared and ShareCreated
+   event.
+
+   https://github.com/owncloud/ocis/issues/4303
+   https://github.com/owncloud/ocis/pull/4564
+   https://github.com/cs3org/reva/pull/3252
 
 * Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
 
