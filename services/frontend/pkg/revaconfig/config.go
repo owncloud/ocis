@@ -146,6 +146,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 					"prefix":                    cfg.OCS.Prefix,
 					"additional_info_attribute": cfg.OCS.AdditionalInfoAttribute,
 					"machine_auth_apikey":       cfg.MachineAuthAPIKey,
+					"enable_denials":            cfg.OCS.EnableDenials,
 					"cache_warmup_driver":       cfg.OCS.CacheWarmupDriver,
 					"cache_warmup_drivers": map[string]interface{}{
 						"cbox": map[string]interface{}{
@@ -198,6 +199,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 								"resharing":                         cfg.EnableResharing,
 								"group_sharing":                     true,
 								"sharing_roles":                     true,
+								"deny_access":                       cfg.OCS.EnableDenials,
 								"auto_accept_share":                 true,
 								"share_with_group_members_only":     true,
 								"share_with_membership_groups_only": true,

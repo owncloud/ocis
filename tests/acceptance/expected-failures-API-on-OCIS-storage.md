@@ -194,6 +194,10 @@ File and sync features in a shared scenario
 - [apiShareManagementBasicToShares/createShareToSharesFolder.feature:802](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L802)
 - [apiShareManagementBasicToShares/createShareToSharesFolder.feature:803](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L803)
 
+#### [different webdav permissions in ocis](https://github.com/owncloud/ocis/issues/4929)
+
+- [apiShareManagementToShares/mergeShare.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L93)
+
 #### [file_target of an auto-renamed file is not correct directly after sharing](https://github.com/owncloud/core/issues/32322)
 
 - [apiShareManagementToShares/mergeShare.feature:105](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L105)
