@@ -86,7 +86,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 	}
 
 	granteeUserResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
-		UserId: e.Creator,
+		UserId: e.GranteeUserID,
 	})
 	if err != nil || sharerUserResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
 		s.logger.Error().
@@ -102,7 +102,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		ClientId:     "userid:" + e.Executant.OpaqueId,
 		ClientSecret: s.machineAuthAPIKey,
 	})
-	if err != nil || authRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
+	if err != nil {
 		s.logger.Error().
 			Err(err).
 			Str("event", "SpaceCreated").
@@ -137,7 +137,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		//FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"space.name"}},
 	})
 
-	if err != nil || md.Status.Code != rpcv1beta1.Code_CODE_OK {
+	if err != nil {
 		s.logger.Error().
 			Err(err).
 			Str("event", "ShareCreated").
@@ -225,7 +225,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		ClientId:     "userid:" + e.Sharer.OpaqueId,
 		ClientSecret: s.machineAuthAPIKey,
 	})
-	if err != nil || authRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
+	if err != nil {
 		s.logger.Error().
 			Err(err).
 			Str("event", "ShareCreated").
@@ -250,7 +250,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"name"}},
 	})
 
-	if err != nil || md.Status.Code != rpcv1beta1.Code_CODE_OK {
+	if err != nil {
 		s.logger.Error().
 			Err(err).
 			Str("event", "ShareCreated").
