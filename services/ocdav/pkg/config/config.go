@@ -38,6 +38,9 @@ type Config struct {
 	Status  Status          `yaml:"-"`
 
 	Events Events `yaml:"events"`
+
+	ForceRescanPeriod string `yaml:"force_rescan_period" env:"FORCE_RESCAN_PERIOD" desc:"The time period after which a file needs to be rescanned before it can be downloaded, use: [s, m or h]. Example: 24h. 0 means rescan on every download. Leave empty for no rescanning."`
+	PollingTimeout    string `yaml:"polling_timeout" env:"STAT_POLLING_TIMEOUT" desc:"[Advanced configuration] The timeout after which the server errors when a rescan has not finished, use: [s, m or h]. Example: 1m. Mandatory when FORCE_RESCAN_PERIOD is set, unused when not set."`
 }
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;OCDAV_TRACING_ENABLED" desc:"Activates tracing."`
