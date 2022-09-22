@@ -29,6 +29,17 @@ type Activity struct {
 	Data     any       `json:"data"`
 }
 
+// VirusScanActivity provides activity information from the VirusscanFinished event
+type VirusScanActivity struct {
+	Infected    bool                         `json:"infected"`
+	Outcome     events.PostprocessingOutcome `json:"outcome"`
+	Description string                       `json:"description"`
+	Filename    string                       `json:"filename"`
+	Scandate    time.Time                    `json:"scandate"`
+	ResourceID  string                       `json:"resourceID"`
+	Error       string                       `json:"error"`
+}
+
 type activitiesService struct {
 	logger  log.Logger
 	storage Storage
@@ -68,14 +79,14 @@ func (s *activitiesService) GetActivities(w http.ResponseWriter, r *http.Request
 
 	jm, err := json.Marshal(s.storage.List(u.Id.OpaqueId))
 	if err != nil {
-		s.logger.Error().Err(err).Msg("Could not read activities")
+		s.logger.Error().Err(err).Interface("user", u).Msg("Could not read activities")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if _, err = w.Write(jm); err != nil {
-		s.logger.Error().Err(err).Msg("Could not write activities")
+		s.logger.Error().Err(err).Interface("user", u).Msg("Could not write activities")
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
@@ -101,15 +112,7 @@ func (s *activitiesService) handleEvents(bus events.Stream) error {
 						ID:       uuid.Must(uuid.NewV4()).String(),
 						UserID:   ev.ExecutingUser.Id.OpaqueId,
 						DateTime: ev.Scandate,
-						Data: struct {
-							Infected    bool                         `json:"infected"`
-							Outcome     events.PostprocessingOutcome `json:"outcome"`
-							Description string                       `json:"description"`
-							Filename    string                       `json:"filename"`
-							Scandate    time.Time                    `json:"scandate"`
-							ResourceID  string                       `json:"resourceID"`
-							Error       string                       `json:"error"`
-						}{
+						Data: VirusScanActivity{
 							Infected:    ev.Infected,
 							Outcome:     ev.Outcome,
 							Description: ev.Description,
