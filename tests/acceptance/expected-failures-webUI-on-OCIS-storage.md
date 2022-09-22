@@ -226,8 +226,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIWebdavLockProtection/delete.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L74)
 - [webUIWebdavLockProtection/move.feature:123](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L123)
 - [webUIWebdavLockProtection/move.feature:124](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L124)
-- [webUIWebdavLockProtection/move.feature:146](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L146)
-- [webUIWebdavLockProtection/move.feature:147](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L147)
 - [webUIWebdavLockProtection/upload.feature:90](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L90)
 - [webUIWebdavLockProtection/upload.feature:91](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L91)
 
