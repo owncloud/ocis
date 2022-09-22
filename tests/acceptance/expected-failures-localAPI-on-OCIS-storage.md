@@ -37,3 +37,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 ### [search doesn't find the project space by name](https://github.com/owncloud/ocis/issues/4506)
 - [apiSpaces/search.feature:95](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/search.feature#L95)
+
+#### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
+- [apiSpaces/shareUploadTUS.feature:204](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareUploadTUS.feature#L204)
+- [apiSpaces/shareUploadTUS.feature:219](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareUploadTUS.feature#L219)
+- [apiSpaces/shareUploadTUS.feature:284](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareUploadTUS.feature#L284)
