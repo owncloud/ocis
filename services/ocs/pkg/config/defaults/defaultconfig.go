@@ -69,6 +69,16 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
+	if cfg.CacheStore == nil && cfg.Commons != nil && cfg.Commons.CacheStore != nil {
+		cfg.CacheStore = &config.CacheStore{
+			Type:    cfg.Commons.CacheStore.Type,
+			Address: cfg.Commons.CacheStore.Address,
+			Size:    cfg.Commons.CacheStore.Size,
+		}
+	} else if cfg.CacheStore == nil {
+		cfg.CacheStore = &config.CacheStore{}
+	}
+
 	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
 		cfg.Reva = &config.Reva{
 			Address: cfg.Commons.Reva.Address,

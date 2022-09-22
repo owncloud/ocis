@@ -59,8 +59,9 @@ type Runtime struct {
 type Config struct {
 	*shared.Commons `yaml:"shared"`
 
-	Tracing *shared.Tracing `yaml:"tracing"`
-	Log     *shared.Log     `yaml:"log"`
+	Tracing    *shared.Tracing    `yaml:"tracing"`
+	Log        *shared.Log        `yaml:"log"`
+	CacheStore *shared.CacheStore `yaml:"cache_store"`
 
 	Mode    Mode // DEPRECATED
 	File    string
