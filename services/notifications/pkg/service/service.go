@@ -77,7 +77,7 @@ func (s eventsNotifier) Run() error {
 					}
 					m := "Dear %s,\nThe virusscan of file '%s' discovered it is infected with '%s'.\nThe system is configured to handle infected files like: %s.\nContact your administrator for more information."
 					msg := fmt.Sprintf(m, e.ExecutingUser.GetUsername(), e.Filename, e.Description, e.Outcome)
-					if err := s.channel.SendMessage([]string{e.ExecutingUser.GetId().GetOpaqueId()}, msg); err != nil {
+					if err := s.channel.SendMessage([]string{e.ExecutingUser.GetId().GetOpaqueId()}, msg, "", ""); err != nil {
 						s.logger.Error().Err(err).Str("event", "VirusScanFinished").Msg("failed to send a message")
 					}
 				}
