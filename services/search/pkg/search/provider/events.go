@@ -117,6 +117,11 @@ func (p *Provider) handleEvent(ev interface{}) {
 		return
 	}
 
+	ref, err = p.resolveReference(ref, statRes.Info)
+	if err != nil {
+		p.logger.Error().Err(err).Msg("error resolving reference")
+		return
+	}
 	err = p.indexClient.Add(ref, statRes.Info)
 	if err != nil {
 		p.logger.Error().Err(err).Msg("error adding updating the resource in the index")
