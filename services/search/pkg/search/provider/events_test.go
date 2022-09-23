@@ -37,6 +37,7 @@ var _ = Describe("Searchprovider", func() {
 		ref = &sprovider.Reference{
 			ResourceId: &sprovider.ResourceId{
 				StorageId: "storageid",
+				SpaceId:   "rootopaqueid",
 				OpaqueId:  "rootopaqueid",
 			},
 			Path: "./foo.pdf",
@@ -44,6 +45,7 @@ var _ = Describe("Searchprovider", func() {
 		ri = &sprovider.ResourceInfo{
 			Id: &sprovider.ResourceId{
 				StorageId: "storageid",
+				SpaceId:   "rootopaqueid",
 				OpaqueId:  "opaqueid",
 			},
 			Path: "foo.pdf",
