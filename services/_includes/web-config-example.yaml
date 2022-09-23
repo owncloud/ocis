@@ -38,16 +38,25 @@ web:
     apps:
     - files
     - search
-    - preview
     - text-editor
     - pdf-viewer
     - external
     - user-management
     applications: []
-    external_apps: []
+    external_apps:
+    - id: preview
+      path: web-app-preview
+      config:
+        mimeTypes:
+        - image/tiff
+        - image/bmp
+        - image/x-ms-bmp
     options:
       previewFileMimeTypes:
       - image/gif
       - image/png
       - image/jpeg
       - text/plain
+      - image/tiff
+      - image/bmp
+      - image/x-ms-bmp
