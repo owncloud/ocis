@@ -274,7 +274,7 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
 			ResourceId: &rootId,
 		}
-		ref, err = p.resolveReference(ref, info)
+		ref, err = p.resolveReference(ownerCtx, ref, info)
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error resolving reference")
 			return nil
@@ -295,15 +295,11 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 	return &searchsvc.IndexSpaceResponse{}, nil
 }
 
-func (p *Provider) resolveReference(ref *provider.Reference, ri *provider.ResourceInfo) (*provider.Reference, error) {
+func (p *Provider) resolveReference(ctx context.Context, ref *provider.Reference, ri *provider.ResourceInfo) (*provider.Reference, error) {
 	if ref.GetResourceId().GetOpaqueId() == ref.GetResourceId().GetSpaceId() {
 		return ref, nil
 	}
 
-	ctx, err := p.getAuthContext(ri.GetSpace().GetOwner())
-	if err != nil {
-		return nil, err
-	}
 	gpRes, err := p.gwClient.GetPath(ctx, &provider.GetPathRequest{
 		ResourceId: ri.Id,
 	})
