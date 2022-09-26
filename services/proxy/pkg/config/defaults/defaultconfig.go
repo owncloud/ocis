@@ -129,6 +129,11 @@ func DefaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9115", // TODO use registry?
 				},
 				{
+					Method:   "REPORT",
+					Endpoint: "/dav/spaces",
+					Backend:  "http://localhost:9115",
+				},
+				{
 					Type:     config.QueryRoute,
 					Endpoint: "/dav/?preview=1",
 					Backend:  "http://localhost:9115",
