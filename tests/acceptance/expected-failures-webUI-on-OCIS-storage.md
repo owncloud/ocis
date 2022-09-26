@@ -7,10 +7,10 @@ Please follow this format for the actual expected failures.
 
 Level-3 headings should be used for the references to the relevant issues. Include the issue title with a link to the issue in GitHub.
 
-Other free text and markdown formatting can be used elsewhere in the document if needed. But if you want to explain something about the issue, then please post that in the issue itself.
+Other free text and Markdown formatting can be used elsewhere in the document if needed. But if you want to explain something about the issue, then please post that in the issue itself.
 
 
-### [Exit page re-appears in loop when logged in user is deleted](https://github.com/owncloud/web/issues/4677)
+### [Exit page re-appears in loop when logged-in user is deleted](https://github.com/owncloud/web/issues/4677)
 - [webUILogin/openidLogin.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L50)
 
 ### [Support for favorites](https://github.com/owncloud/ocis/issues/1228)
@@ -55,14 +55,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIRestrictSharing/restrictSharing.feature:31](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature#L31)
 - [webUIRestrictSharing/restrictSharing.feature:40](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature#L40)
 - [webUIRestrictSharing/restrictSharing.feature:56](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRestrictSharing/restrictSharing.feature#L56)
-
-### [Cannot create users with special characters](https://github.com/owncloud/ocis/issues/1417)
-- [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:37](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L37)
-- [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:38](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L38)
-- [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:39](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L39)
-- [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:40](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L40)
-
-### [No occ command in ocis](https://github.com/owncloud/ocis/issues/1317)
 - [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:16](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L16)
 - [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:34](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L34)
 - [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:52](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L52)
@@ -70,7 +62,13 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUISharingInternalUsersBlacklisted/shareWithUsers.feature:82](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersBlacklisted/shareWithUsers.feature#L82)
 - [webUISharingInternalGroups/shareWithGroups.feature:202](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L202)
 
-### webUI-Private-Links
+### [Cannot create users with special characters](https://github.com/owncloud/ocis/issues/1417)
+- [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:37](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L37)
+- [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:38](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L38)
+- [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:39](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L39)
+- [webUISharingAutocompletion/shareAutocompletionSpecialChars.feature:40](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAutocompletion/shareAutocompletionSpecialChars.feature#L40)
+
+### [webUI-Private-Links](https://github.com/owncloud/web/issues/6844)
 - [webUIPrivateLinks/accessingPrivateLinks.feature:9](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L9)
 - [webUIPrivateLinks/accessingPrivateLinks.feature:17](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L17)
 - [webUIPrivateLinks/accessingPrivateLinks.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L25)
@@ -78,7 +76,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 ### [Share additional info](https://github.com/owncloud/ocis/issues/1253)
 - [webUISharingInternalUsersShareWithPage/shareWithUsers.feature:140](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersShareWithPage/shareWithUsers.feature#L140)
 
-### [No occ command in ocis](https://github.com/owncloud/ocis/issues/1317)
 ### [Expiration date set is not implemented in user share](https://github.com/owncloud/ocis/issues/1250)
 - [webUISharingInternalGroups/shareWithGroups.feature:279](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L279)
 
@@ -229,10 +226,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIWebdavLockProtection/delete.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L74)
 - [webUIWebdavLockProtection/move.feature:123](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L123)
 - [webUIWebdavLockProtection/move.feature:124](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L124)
-- [webUIWebdavLockProtection/move.feature:146](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L146)
-- [webUIWebdavLockProtection/move.feature:147](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L147)
-- [webUIWebdavLockProtection/upload.feature:90](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L90)
-- [webUIWebdavLockProtection/upload.feature:91](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L91)
 
 ### [Writing to locked files/folders give only a generic error message](https://github.com/owncloud/web/issues/5741)
 - [webUIWebdavLockProtection/upload.feature:90](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L90)
@@ -248,7 +241,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIUpload/upload.feature:159](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/upload.feature#L159)
 - [webUIUpload/uploadEdgecases.feature:69](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L69)
 
-### [browsing directly to a details 'tab' is not possible](https://github.com/owncloud/web/issues/5464)
+### [browsing directly to a details tab is not possible](https://github.com/owncloud/web/issues/5464)
 - [webUIFiles/browseDirectlyToDetailsTab.feature:21](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/browseDirectlyToDetailsTab.feature#L21)
 - [webUIFiles/browseDirectlyToDetailsTab.feature:22](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/browseDirectlyToDetailsTab.feature#L22)
 - [webUIFiles/browseDirectlyToDetailsTab.feature:31](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/browseDirectlyToDetailsTab.feature#L31)
@@ -286,28 +279,3 @@ Other free text and markdown formatting can be used elsewhere in the document if
 ### [PROPFIND to sub-folder of a shared resources with same name gives 404](https://github.com/owncloud/ocis/issues/3859)
 - [webUISharingAcceptShares/acceptShares.feature:245](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L245)
 
-### [Creating folder with & character makes the UI act weird](https://github.com/owncloud/web/issues/7528)
-- [webUICreateFilesFolders/createFolderEdgeCases.feature:26](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUICreateFilesFolders/createFolderEdgeCases.feature#L26)
-- [webUIDeleteFilesFolders/deleteFilesFolders.feature:170](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L170)
-- [webUICreateFilesFolders/createFolders.feature:51](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUICreateFilesFolders/createFolders.feature#L51)
-- [webUIDeleteFilesFolders/deleteFilesFolders.feature:54](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L54)
-- [webUIFilesCopy/copy.feature:73](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copy.feature#L73)
-- [webUIDeleteFilesFolders/deleteFilesFolders.feature:150](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L150)
-- [webUIDeleteFilesFolders/deleteFilesFolders.feature:10](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L10)
-- [webUIFilesCopy/copy.feature:28](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copy.feature#L28)
-- [webUIRenameFiles/renameFiles.feature:38](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L38)
-- [webUIRenameFiles/renameFiles.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L25)
-- [webUIRenameFiles/renameFiles.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L42)
-- [webUIRenameFolders/renameFolders.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFolders/renameFolders.feature#L25)
-- [webUIRenameFolders/renameFolders.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFolders/renameFolders.feature#L42)
-- [webUIUpload/uploadEdgecases.feature:15](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L15)
-- [webUIUpload/uploadEdgecases.feature:53](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L53)
-- [webUIUpload/uploadEdgecases.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L50)
-- [webUIUpload/uploadEdgecases.feature:48](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L48)
-- [webUIUpload/uploadEdgecases.feature:49](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L49)
-- [webUIUpload/uploadEdgecases.feature:96](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L96)
-- [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:114](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L114)
-- [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:93](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L93)
-- [webUIMoveFilesFolders/moveFiles.feature:82](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIMoveFilesFolders/moveFiles.feature#L82)
-- [webUIMoveFilesFolders/moveFiles.feature:20](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIMoveFilesFolders/moveFiles.feature#L20)
-- [webUIMoveFilesFolders/moveFolders.feature:69](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIMoveFilesFolders/moveFolders.feature#L69)

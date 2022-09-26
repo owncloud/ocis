@@ -23,6 +23,7 @@ Feature: Share a file or folder that is inside a space via public link
       | username |
       | Alice    |
       | Brian    |
+    And using spaces DAV path
     And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "share sub-item" with the default quota using the GraphApi
     And user "Alice" has created a folder "folder" in space "share sub-item"

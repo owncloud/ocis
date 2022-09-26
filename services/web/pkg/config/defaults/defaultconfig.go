@@ -47,9 +47,22 @@ func DefaultConfig() *config.Config {
 					ResponseType: "code",
 					Scope:        "openid profile email",
 				},
-				Apps: []string{"files", "search", "preview", "text-editor", "pdf-viewer", "external", "user-management"},
+				Apps: []string{"files", "search", "text-editor", "pdf-viewer", "external", "user-management"},
+				ExternalApps: []config.ExternalApp{
+					{
+						ID:   "preview",
+						Path: "web-app-preview",
+						Config: map[string]interface{}{
+							"mimeTypes": []string{
+								"image/tiff",
+								"image/bmp",
+								"image/x-ms-bmp",
+							},
+						},
+					},
+				},
 				Options: map[string]interface{}{
-					"previewFileMimeTypes": []string{"image/gif", "image/png", "image/jpeg", "text/plain"},
+					"previewFileMimeTypes": []string{"image/gif", "image/png", "image/jpeg", "text/plain", "image/tiff", "image/bmp", "image/x-ms-bmp"},
 				},
 			},
 		},

@@ -15,8 +15,7 @@ Feature: upload resources using TUS protocol
   Scenario: upload a file within the set quota to a project space
     Given user "Alice" has created a space "Project Jupiter" of type "project" with quota "10000"
     When user "Alice" uploads a file with content "uploaded content" to "/upload.txt" via TUS inside of the space "Project Jupiter" using the WebDAV API
-    Then the HTTP status code should be "200"
-    And for user "Alice" the space "Project Jupiter" should contain these entries:
+    Then for user "Alice" the space "Project Jupiter" should contain these entries:
       | upload.txt |
 
 

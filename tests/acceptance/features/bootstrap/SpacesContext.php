@@ -69,7 +69,10 @@ class SpacesContext implements Context {
 	 * @var ChecksumContext
 	 */
 	private ChecksumContext $checksumContext;
-
+	/**
+	 * @var FilesVersionsContext
+	 */
+	private FilesVersionsContext $filesVersionsContext;
 	/**
 	 * @var string
 	 */
@@ -106,18 +109,6 @@ class SpacesContext implements Context {
 	 * ]
 	 */
 	private $storedEtags = [];
-
-	/**
-	 *
-	 * @var string[][]
-	 */
-	private $tokenOfLastLock = [];
-
-	private $etagPropfindBody = '<?xml version="1.0"?>'
-		. '<d:propfind xmlns:d="DAV:" '
-		. 'xmlns:oc="http://owncloud.org/ns" '
-		. 'xmlns:ocs="http://open-collaboration-services.org/ns">'
-		. '<d:prop><d:getetag/></d:prop></d:propfind>';
 
 	/**
 	 * @param string $spaceName
@@ -191,22 +182,6 @@ class SpacesContext implements Context {
 	 * @var string
 	 */
 	private string $responseSpaceId;
-
-	/**
-	 * @param string $responseSpaceId
-	 *
-	 * @return void
-	 */
-	public function setResponseSpaceId(string $responseSpaceId): void {
-		$this->responseSpaceId = $responseSpaceId;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getResponseSpaceId(): string {
-		return $this->responseSpaceId;
-	}
 
 	/**
 	 * Get SpaceId by Name
@@ -285,6 +260,8 @@ class SpacesContext implements Context {
 	 */
 	public function setSpaceIDByName(string $user, string $spaceName): void {
 		$space = $this->getSpaceByName($user, $spaceName);
+		Assert::assertIsArray($space, "Space with name $spaceName not found");
+		Assert::assertNotEmpty($space["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName not found");
 		WebDavHelper::$SPACE_ID_FROM_OCIS = $space['id'];
 	}
 
@@ -338,29 +315,6 @@ class SpacesContext implements Context {
 			"file $fileName not found"
 		);
 		return $this->featureContext->getResponse();
-	}
-
-	/**
-	 * Download a file using user password
-	 *
-	 * @param string $fullUrl
-	 * @param string $user
-	 *
-	 * @return void
-	 */
-	public function downloadFileAsUserUsingPassword(
-		string $fullUrl,
-		string $user
-	):void {
-		$this->featureContext->setResponse(
-			HttpRequestHelper::sendRequest(
-				$fullUrl,
-				$this->featureContext->getStepLineRef(),
-				'GET',
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-			)
-		);
 	}
 
 	/**
@@ -456,6 +410,7 @@ class SpacesContext implements Context {
 		$this->webDavPropertiesContext = $environment->getContext('WebDavPropertiesContext');
 		$this->favoritesContext = $environment->getContext('FavoritesContext');
 		$this->checksumContext = $environment->getContext('ChecksumContext');
+		$this->filesVersionsContext = $environment->getContext('FilesVersionsContext');
 		// Run the BeforeScenario function in OCSContext to set it up correctly
 		$this->ocsContext->before($scope);
 		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
@@ -540,31 +495,6 @@ class SpacesContext implements Context {
 		$body = null
 	): ResponseInterface {
 		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'PROPFIND', $user, $password, $headers, $body);
-	}
-
-	/**
-	 * Send Put Request to Url
-	 *
-	 * @param string $fullUrl
-	 * @param string $user
-	 * @param string $password
-	 * @param string $xRequestId
-	 * @param array $headers
-	 * @param string $content
-	 *
-	 * @return ResponseInterface
-	 *
-	 * @throws GuzzleException
-	 */
-	public function sendPutRequestToUrl(
-		string $fullUrl,
-		string $user,
-		string $password,
-		string $xRequestId = '',
-		array $headers = [],
-		string $content = ""
-	): ResponseInterface {
-		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'PUT', $user, $password, $headers, $content);
 	}
 
 	/**
@@ -856,23 +786,19 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $foldersPath = ''
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		Assert::assertIsArray($space);
-		Assert::assertNotEmpty($spaceId = $space["id"]);
-		Assert::assertNotEmpty($spaceWebDavUrl = $space["root"]["webDavUrl"]);
-		$headers['Depth'] = 'infinity';
+		$this->setSpaceIDByName($user, $spaceName);
 		$this->featureContext->setResponse(
-			$this->sendPropfindRequestToUrl(
-				$spaceWebDavUrl . '/' . $foldersPath,
+			WebDavHelper::propfind(
+				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
+				$foldersPath,
+				[],
 				'',
-				$headers
+				'infinity',
+				'files',
+				WebDavHelper::DAV_VERSION_SPACES
 			)
-		);
-		$this->setResponseSpaceId($spaceId);
-		$this->setResponseXml(
-			HttpRequestHelper::parseResponseAsXml($this->featureContext->getResponse())
 		);
 	}
 
@@ -890,10 +816,11 @@ class SpacesContext implements Context {
 		string $shouldOrNot,
 		TableNode $expectedFiles
 	): void {
-		$this->propfindResultShouldContainEntries(
+		$this->featureContext->propfindResultShouldContainEntries(
 			$shouldOrNot,
 			$expectedFiles,
 		);
+		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
 
 	/**
@@ -912,14 +839,18 @@ class SpacesContext implements Context {
 		string $shouldOrNot,
 		TableNode $expectedFiles
 	): void {
+		$spaceCreator = $this->getSpaceCreator($spaceName);
+		$space = $this->getSpaceByName($spaceCreator, $spaceName);
 		$this->theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
-			$this->getSpaceCreator($spaceName),
+			$spaceCreator,
 			$spaceName
 		);
-		$this->propfindResultShouldContainEntries(
+		WebDavHelper::$SPACE_ID_FROM_OCIS = $space['id'];
+		$this->featureContext->propfindResultShouldContainEntries(
 			$shouldOrNot,
 			$expectedFiles,
 		);
+		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
 
 	/**
@@ -940,14 +871,14 @@ class SpacesContext implements Context {
 		string $shouldOrNot,
 		TableNode $expectedFiles
 	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
 		$this->theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
 			$user,
 			$spaceName
 		);
-		$this->propfindResultShouldContainEntries(
-			$shouldOrNot,
-			$expectedFiles
-		);
+		WebDavHelper::$SPACE_ID_FROM_OCIS = $space['id'];
+		$this->featureContext->propfindResultShouldContainEntries($shouldOrNot, $expectedFiles, $user, 'PROPFIND');
+		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
 
 	/**
@@ -970,16 +901,21 @@ class SpacesContext implements Context {
 		string $shouldOrNot,
 		TableNode $expectedFiles
 	): void {
+		$space = $this->getSpaceByName($user, $spaceName);
 		$this->theUserListsTheContentOfAPersonalSpaceRootUsingTheWebDAvApi(
 			$user,
 			$spaceName,
 			$folderPath
 		);
-		$this->propfindResultShouldContainEntries(
+		WebDavHelper::$SPACE_ID_FROM_OCIS = $space['id'];
+		$this->featureContext->propfindResultShouldContainEntries(
 			$shouldOrNot,
 			$expectedFiles,
+			$this->featureContext->getActualUsername($user),
+			'PROPFIND',
 			$folderPath
 		);
+		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
 
 	/**
@@ -1215,43 +1151,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @param string    $shouldOrNot   (not|)
-	 * @param TableNode $expectedFiles
-	 * @param string $folderPath
-	 *
-	 * @return void
-	 *
-	 * @throws Exception
-	 */
-	public function propfindResultShouldContainEntries(
-		string $shouldOrNot,
-		TableNode $expectedFiles,
-		string $folderPath = ''
-	): void {
-		$this->verifyTableNodeColumnsCount($expectedFiles, 1);
-		$elementRows = $expectedFiles->getRows();
-		$should = ($shouldOrNot !== "not");
-
-		foreach ($elementRows as $expectedFile) {
-			$fileFound = $this->findEntryFromPropfindResponse(
-				$expectedFile[0],
-				$folderPath
-			);
-			if ($should) {
-				Assert::assertNotEmpty(
-					$fileFound,
-					"response does not contain the entry '$expectedFile[0]'"
-				);
-			} else {
-				Assert::assertEmpty(
-					$fileFound,
-					"response does contain the entry '$expectedFile[0]' but should not"
-				);
-			}
-		}
-	}
-
-	/**
 	 * Verify that the tableNode contains expected number of columns
 	 *
 	 * @param TableNode $table
@@ -1286,72 +1185,6 @@ class SpacesContext implements Context {
 	 */
 	public function escapePath(string $path): string {
 		return \str_replace([" ", "(", ")"], ["%20", "%28", "%29"], $path);
-	}
-
-	/**
-	 * parses a PROPFIND response from $this->response into xml
-	 * and returns found search results if found else returns false
-	 *
-	 * @param  string|null $entryNameToSearch
-	 * @param  string $folderPath
-	 *
-	 * @return array
-	 * string if $entryNameToSearch is given and is found
-	 * array if $entryNameToSearch is not given
-	 * boolean false if $entryNameToSearch is given and is not found
-	 */
-	public function findEntryFromPropfindResponse(
-		string $entryNameToSearch = null,
-		string $folderPath = ''
-	): array {
-		$spaceId = $this->getResponseSpaceId();
-		//if we are using that step the second time in a scenario e.g. 'But ... should not'
-		//then don't parse the result again, because the result is in a ResponseInterface
-		if (empty($this->getResponseXml())) {
-			$this->setResponseXml(
-				HttpRequestHelper::parseResponseAsXml($this->featureContext->getResponse())
-			);
-		}
-		Assert::assertNotEmpty($this->getResponseXml(), __METHOD__ . ' Response is empty');
-		Assert::assertNotEmpty($spaceId, __METHOD__ . ' SpaceId is empty');
-
-		// trim any leading "/" passed by the caller, we can just match the "raw" name
-		$trimmedEntryNameToSearch = \trim($entryNameToSearch, "/");
-
-		// url encode for spaces and brackets that may appear in the filePath
-		$folderPath = $this->escapePath($folderPath);
-
-		// topWebDavPath should be something like /remote.php/webdav/ or
-		// /remote.php/dav/files/alice/
-		$topWebDavPath = "/" . "dav/spaces/" . $spaceId . "/" . $folderPath;
-
-		Assert::assertIsArray(
-			$this->responseXml,
-			__METHOD__ . " responseXml for space $spaceId is not an array"
-		);
-		Assert::assertArrayHasKey(
-			"value",
-			$this->responseXml,
-			__METHOD__ . " responseXml for space $spaceId does not have key 'value'"
-		);
-		$multistatusResults = $this->responseXml["value"];
-		$results = [];
-		if ($multistatusResults !== null) {
-			foreach ($multistatusResults as $multistatusResult) {
-				$entryPath = \urldecode($multistatusResult['value'][0]['value']);
-				$entryName = \str_replace($topWebDavPath, "", $entryPath);
-				$entryName = \rawurldecode($entryName);
-				$entryName = \trim($entryName, "/");
-				if ($trimmedEntryNameToSearch === $entryName) {
-					return $multistatusResult;
-				}
-				$results[] = $entryName;
-			}
-		}
-		if ($entryNameToSearch === null) {
-			return $results;
-		}
-		return [];
 	}
 
 	/**
@@ -1423,19 +1256,8 @@ class SpacesContext implements Context {
 		if ($ownerUser === '') {
 			$ownerUser = $user;
 		}
-
-		$space = $this->getSpaceByName($ownerUser, $spaceName);
-
-		$fullUrl = $this->baseUrl . "/dav/spaces/" . $space['id'] . '/' . $folder;
-
-		$this->featureContext->setResponse(
-			$this->sendCreateFolderRequest(
-				$fullUrl,
-				"MKCOL",
-				$user,
-				$this->featureContext->getPasswordForUser($user)
-			)
-		);
+		$this->setSpaceIDByName($ownerUser, $spaceName);
+		$this->featureContext->userCreatesFolder($user, $folder);
 	}
 
 	/**
@@ -1456,20 +1278,8 @@ class SpacesContext implements Context {
 		string $content,
 		string $destination
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		Assert::assertIsArray($space, "Space with name $spaceName not found");
-		Assert::assertNotEmpty($space["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName not found");
-
-		$this->featureContext->setResponse(
-			$this->sendPutRequestToUrl(
-				$space["root"]["webDavUrl"] . "/" . $destination,
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				"",
-				[],
-				$content
-			)
-		);
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->featureContext->uploadFileWithContent($user, $content, $destination);
 	}
 
 	/**
@@ -1492,20 +1302,8 @@ class SpacesContext implements Context {
 		string $content,
 		string $destination
 	): void {
-		$space = $this->getSpaceByName($ownerUser, $spaceName);
-		Assert::assertIsArray($space, "Space with name $spaceName not found");
-		Assert::assertNotEmpty($space["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName not found");
-
-		$this->featureContext->setResponse(
-			$this->sendPutRequestToUrl(
-				$space["root"]["webDavUrl"] . "/" . $destination,
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				"",
-				[],
-				$content
-			)
-		);
+		$this->setSpaceIDByName($ownerUser, $spaceName);
+		$this->featureContext->uploadFileWithContent($user, $content, $destination);
 	}
 
 	/**
@@ -1917,7 +1715,7 @@ class SpacesContext implements Context {
 	):void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileName, "/");
-		$this->downloadFileAsUserUsingPassword($fullUrl, $user);
+		$this->featureContext->downloadFileAsUserUsingPassword($user, $fileName, $this->featureContext->getPasswordForUser($user));
 		Assert::assertGreaterThanOrEqual(
 			400,
 			$this->featureContext->getResponse()->getStatusCode(),
@@ -2017,22 +1815,7 @@ class SpacesContext implements Context {
 		string $destination
 	): void {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
-
-		$space = $this->getSpaceByName($user, $spaceName);
-		Assert::assertIsArray($space, "Space with name $spaceName not found");
-		Assert::assertNotEmpty($space["root"]["webDavUrl"], "WebDavUrl for space with name $spaceName not found");
-
-		$this->featureContext->setResponse(
-			$this->sendPutRequestToUrl(
-				$space["root"]["webDavUrl"] . "/" . $destination,
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				"",
-				[],
-				$fileContent
-			)
-		);
-
+		$this->theUserUploadsAFileToSpace($user, $spaceName, $fileContent, $destination);
 		$this->featureContext->theHTTPStatusCodeShouldBeOr(201, 204);
 	}
 
@@ -2098,7 +1881,6 @@ class SpacesContext implements Context {
 		];
 
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
-
 		$this->featureContext->setResponse(
 			$this->sendPostRequestToUrl(
 				$fullUrl,
@@ -2671,20 +2453,8 @@ class SpacesContext implements Context {
 		string $fileName,
 		string $spaceName
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $this->baseUrl . $this->davSpacesUrl . $space['id'] . '/' . $fileName;
-
-		$this->featureContext->setResponse(
-			HttpRequestHelper::sendRequest(
-				$fullUrl,
-				"",
-				'HEAD',
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				[],
-				""
-			)
-		);
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->featureContext->downloadFileAsUserUsingPassword($user, $fileName, $this->featureContext->getPasswordForUser($user));
 	}
 
 	/**
@@ -2746,56 +2516,9 @@ class SpacesContext implements Context {
 		string $index,
 		string $spaceName
 	): void {
-		$fileVersion = $this->listFileVersion($user, $fileName, $spaceName);
-		if (!isset($fileVersion[$index])) {
-			Assert::fail(
-				'could not find version of file "' . $fileName . '" with index "' . $index . '"'
-			);
-		}
-		$url = $this->baseUrl . $fileVersion[$index][0];
-
-		$this->featureContext->setResponse(
-			HttpRequestHelper::sendRequest(
-				$url,
-				"",
-				'HEAD',
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				[],
-				""
-			)
-		);
-	}
-
-	/**
-	 * Method returns an array with url values from the propfind request
-	 * like: /remote.php/dav/meta/spaceUuid%fileUuid/v/fileUuid.REV.2022-05-17T10:39:49.672285951Z
-	 *
-	 * @param  string $user
-	 * @param  string $fileName
-	 * @param  string $spaceName
-	 *
-	 * @return array
-	 * @throws GuzzleException
-	 */
-	public function listFileVersion(
-		string $user,
-		string $fileName,
-		string $spaceName
-	): array {
-		$fileId = $this->getFileId($user, $spaceName, $fileName);
-		$fullUrl = $this->baseUrl . '/remote.php/dav/meta/' . $fileId . '/v';
-
-		$this->featureContext->setResponse(
-			$this->sendPropfindRequestToUrl(
-				$fullUrl,
-				$user,
-				$this->featureContext->getPasswordForUser($user)
-			)
-		);
-
-		$responseXml = HttpRequestHelper::getResponseXml($this->featureContext->getResponse());
-		return $responseXml->xpath("//d:response/d:href");
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->filesVersionsContext->downloadVersion($user, $fileName, $index);
+		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
 	}
 
 	/**
@@ -2809,20 +2532,8 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function userGetsEtagOfElementInASpace(string $user, string $space, string $path) {
-		$user = $this->featureContext->getActualUsername($user);
-		$space = $this->getSpaceByName($user, $space);
-
-		$fullUrl = $space['root']['webDavUrl'] . '/' . ltrim($path, '/');
-		$response = $this->sendPropfindRequestToUrl(
-			$fullUrl,
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			$this->featureContext->getStepLineRef(),
-			[],
-			$this->etagPropfindBody
-		);
-		$responseXml = HttpRequestHelper::getResponseXml($response);
-		$this->featureContext->setResponseXmlObject($responseXml);
+		$this->setSpaceIDByName($user, $space);
+		$this->webDavPropertiesContext->storeEtagOfElement($user, $path);
 		return $this->featureContext->getEtagFromResponseXmlObject();
 	}
 

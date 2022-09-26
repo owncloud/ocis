@@ -11,6 +11,7 @@ Feature: Share spaces via link
             | username |
             | Alice    |
             | Brian    |
+        And using spaces DAV path
         And the administrator has given "Alice" the role "Space Admin" using the settings api
         And user "Alice" has created a space "share space" with the default quota using the GraphApi
         And user "Alice" has uploaded a file inside space "share space" with content "some content" to "test.txt"
