@@ -118,7 +118,7 @@ func (m Mail) SendMessage(userIDs []string, msg, subject, senderDisplayName stri
 
 	email := mail.NewMSG()
 	if senderDisplayName != "" {
-		email.SetFrom(fmt.Sprintf("%s via owncloud <%s>", senderDisplayName, m.conf.Notifications.SMTP.Sender)).AddTo(to...)
+		email.SetFrom(fmt.Sprintf("%s via %s", senderDisplayName, m.conf.Notifications.SMTP.Sender)).AddTo(to...)
 	} else {
 		email.SetFrom(m.conf.Notifications.SMTP.Sender).AddTo(to...)
 	}
