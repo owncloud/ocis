@@ -53,7 +53,7 @@ default:
 
     apiSpacesShares:
       paths:
-        - '%paths.base%/../features/apiSpaces'
+        - '%paths.base%/../features/apiSpacesShares'
       context: *common_ldap_suite_context
       contexts:
         - SpacesContext:
