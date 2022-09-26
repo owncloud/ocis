@@ -78,93 +78,104 @@ var _ = Describe("Searchprovider", func() {
 	})
 
 	Describe("events", func() {
-		It("triggers an index update when a file has been uploaded", func() {
-			called := false
-			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
-				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
-			})).Return(nil).Run(func(args mock.Arguments) {
-				called = true
+		Context("with the file being in the original location", func() {
+			BeforeEach(func() {
+				gwClient.On("GetPath", mock.Anything, mock.MatchedBy(func(req *sprovider.GetPathRequest) bool {
+					return req.ResourceId.OpaqueId == ri.Id.OpaqueId
+				})).Return(&sprovider.GetPathResponse{
+					Status: status.NewOK(context.Background()),
+					Path:   ri.Path,
+				}, nil)
 			})
-			eventsChan <- events.FileUploaded{
-				Ref:       ref,
-				Executant: user.Id,
-			}
 
-			Eventually(func() bool {
-				return called
-			}, "2s").Should(BeTrue())
-		})
+			It("triggers an index update when a file has been uploaded", func() {
+				called := false
+				indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
+					return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
+				})).Return(nil).Run(func(args mock.Arguments) {
+					called = true
+				})
+				eventsChan <- events.FileUploaded{
+					Ref:       ref,
+					Executant: user.Id,
+				}
 
-		It("triggers an index update when a file has been touched", func() {
-			called := false
-			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
-				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
-			})).Return(nil).Run(func(args mock.Arguments) {
-				called = true
+				Eventually(func() bool {
+					return called
+				}, "2s").Should(BeTrue())
 			})
-			eventsChan <- events.FileTouched{
-				Ref:       ref,
-				Executant: user.Id,
-			}
 
-			Eventually(func() bool {
-				return called
-			}, "2s").Should(BeTrue())
-		})
+			It("triggers an index update when a file has been touched", func() {
+				called := false
+				indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
+					return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
+				})).Return(nil).Run(func(args mock.Arguments) {
+					called = true
+				})
+				eventsChan <- events.FileTouched{
+					Ref:       ref,
+					Executant: user.Id,
+				}
 
-		It("removes an entry from the index when the file has been deleted", func() {
-			called := false
-			gwClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
-				Status: status.NewNotFound(context.Background(), ""),
-			}, nil)
-			indexClient.On("Delete", mock.MatchedBy(func(id *sprovider.ResourceId) bool {
-				return id.OpaqueId == ri.Id.OpaqueId
-			})).Return(nil).Run(func(args mock.Arguments) {
-				called = true
+				Eventually(func() bool {
+					return called
+				}, "2s").Should(BeTrue())
 			})
-			eventsChan <- events.ItemTrashed{
-				Ref:       ref,
-				ID:        ri.Id,
-				Executant: user.Id,
-			}
 
-			Eventually(func() bool {
-				return called
-			}, "2s").Should(BeTrue())
-		})
+			It("removes an entry from the index when the file has been deleted", func() {
+				called := false
+				gwClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+					Status: status.NewNotFound(context.Background(), ""),
+				}, nil)
+				indexClient.On("Delete", mock.MatchedBy(func(id *sprovider.ResourceId) bool {
+					return id.OpaqueId == ri.Id.OpaqueId
+				})).Return(nil).Run(func(args mock.Arguments) {
+					called = true
+				})
+				eventsChan <- events.ItemTrashed{
+					Ref:       ref,
+					ID:        ri.Id,
+					Executant: user.Id,
+				}
 
-		It("indexes items when they are being restored", func() {
-			called := false
-			indexClient.On("Restore", mock.MatchedBy(func(id *sprovider.ResourceId) bool {
-				return id.OpaqueId == ri.Id.OpaqueId
-			})).Return(nil).Run(func(args mock.Arguments) {
-				called = true
+				Eventually(func() bool {
+					return called
+				}, "2s").Should(BeTrue())
 			})
-			eventsChan <- events.ItemRestored{
-				Ref:       ref,
-				Executant: user.Id,
-			}
 
-			Eventually(func() bool {
-				return called
-			}, "2s").Should(BeTrue())
-		})
+			It("indexes items when they are being restored", func() {
+				called := false
+				indexClient.On("Restore", mock.MatchedBy(func(id *sprovider.ResourceId) bool {
+					return id.OpaqueId == ri.Id.OpaqueId
+				})).Return(nil).Run(func(args mock.Arguments) {
+					called = true
+				})
+				eventsChan <- events.ItemRestored{
+					Ref:       ref,
+					Executant: user.Id,
+				}
 
-		It("indexes items when a version has been restored", func() {
-			called := false
-			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
-				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
-			})).Return(nil).Run(func(args mock.Arguments) {
-				called = true
+				Eventually(func() bool {
+					return called
+				}, "2s").Should(BeTrue())
 			})
-			eventsChan <- events.FileVersionRestored{
-				Ref:       ref,
-				Executant: user.Id,
-			}
 
-			Eventually(func() bool {
-				return called
-			}, "2s").Should(BeTrue())
+			It("indexes items when a version has been restored", func() {
+				called := false
+				indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
+					return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
+				})).Return(nil).Run(func(args mock.Arguments) {
+					called = true
+				})
+				eventsChan <- events.FileVersionRestored{
+					Ref:       ref,
+					Executant: user.Id,
+				}
+
+				Eventually(func() bool {
+					return called
+				}, "2s").Should(BeTrue())
+			})
 		})
 
 		It("indexes items when they are being moved", func() {

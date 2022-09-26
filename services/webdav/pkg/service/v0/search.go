@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -46,10 +47,30 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 	t := r.Header.Get(TokenHeader)
 	ctx := revactx.ContextSetToken(r.Context(), t)
 	ctx = metadata.Set(ctx, revactx.TokenHeader, t)
-	rsp, err := g.searchClient.Search(ctx, &searchsvc.SearchRequest{
+
+	req := &searchsvc.SearchRequest{
 		Query:    rep.SearchFiles.Search.Pattern,
 		PageSize: int32(rep.SearchFiles.Search.Limit),
-	})
+	}
+
+	// Limit search to the according space when searching /dav/spaces/
+	if strings.HasPrefix(r.URL.Path, "/dav/spaces") {
+		space := strings.TrimPrefix(r.URL.Path, "/dav/spaces/")
+		rid, err := storagespace.ParseID(space)
+		if err != nil {
+			g.log.Error().Err(err).Msg("error parsing the space id for filtering")
+		} else {
+			req.Ref = &searchmsg.Reference{
+				ResourceId: &searchmsg.ResourceID{
+					StorageId: rid.StorageId,
+					SpaceId:   rid.SpaceId,
+					OpaqueId:  rid.SpaceId,
+				},
+			}
+		}
+	}
+
+	rsp, err := g.searchClient.Search(ctx, req)
 	if err != nil {
 		e := merrors.Parse(err.Error())
 		switch e.Code {

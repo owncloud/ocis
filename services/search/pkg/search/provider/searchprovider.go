@@ -138,6 +138,14 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			SpaceId:   space.Root.SpaceId,
 			OpaqueId:  space.Root.OpaqueId,
 		}
+
+		if req.Ref != nil &&
+			(req.Ref.ResourceId.StorageId != searchRootId.StorageId ||
+				req.Ref.ResourceId.SpaceId != searchRootId.SpaceId ||
+				req.Ref.ResourceId.OpaqueId != searchRootId.OpaqueId) {
+			continue
+		}
+
 		var (
 			mountpointRootID *searchmsg.ResourceID
 			rootName         string
