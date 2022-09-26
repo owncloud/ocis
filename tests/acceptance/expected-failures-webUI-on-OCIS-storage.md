@@ -7,10 +7,10 @@ Please follow this format for the actual expected failures.
 
 Level-3 headings should be used for the references to the relevant issues. Include the issue title with a link to the issue in GitHub.
 
-Other free text and markdown formatting can be used elsewhere in the document if needed. But if you want to explain something about the issue, then please post that in the issue itself.
+Other free text and Markdown formatting can be used elsewhere in the document if needed. But if you want to explain something about the issue, then please post that in the issue itself.
 
 
-### [Exit page re-appears in loop when logged in user is deleted](https://github.com/owncloud/web/issues/4677)
+### [Exit page re-appears in loop when logged-in user is deleted](https://github.com/owncloud/web/issues/4677)
 - [webUILogin/openidLogin.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/openidLogin.feature#L50)
 
 ### [Support for favorites](https://github.com/owncloud/ocis/issues/1228)
@@ -226,8 +226,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIWebdavLockProtection/delete.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L74)
 - [webUIWebdavLockProtection/move.feature:123](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L123)
 - [webUIWebdavLockProtection/move.feature:124](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L124)
-- [webUIWebdavLockProtection/upload.feature:90](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L90)
-- [webUIWebdavLockProtection/upload.feature:91](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L91)
 
 ### [Writing to locked files/folders give only a generic error message](https://github.com/owncloud/web/issues/5741)
 - [webUIWebdavLockProtection/upload.feature:90](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L90)
@@ -243,7 +241,7 @@ Other free text and markdown formatting can be used elsewhere in the document if
 - [webUIUpload/upload.feature:159](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/upload.feature#L159)
 - [webUIUpload/uploadEdgecases.feature:69](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L69)
 
-### [browsing directly to a details 'tab' is not possible](https://github.com/owncloud/web/issues/5464)
+### [browsing directly to a details tab is not possible](https://github.com/owncloud/web/issues/5464)
 - [webUIFiles/browseDirectlyToDetailsTab.feature:21](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/browseDirectlyToDetailsTab.feature#L21)
 - [webUIFiles/browseDirectlyToDetailsTab.feature:22](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/browseDirectlyToDetailsTab.feature#L22)
 - [webUIFiles/browseDirectlyToDetailsTab.feature:31](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/browseDirectlyToDetailsTab.feature#L31)

@@ -15,7 +15,7 @@ Basic file management like up and download, move, copy, properties, trash, versi
 
 #### [Custom dav properties with namespaces are rendered incorrectly](https://github.com/owncloud/ocis/issues/2140)
 
-_ocdav: double check the webdav property parsing when custom namespaces are used_
+_ocdav: double-check the webdav property parsing when custom namespaces are used_
 
 - [apiWebdavProperties1/setFileProperties.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L37)
 - [apiWebdavProperties1/setFileProperties.feature:38](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties1/setFileProperties.feature#L38)
@@ -185,7 +185,6 @@ File and sync features in a shared scenario
 - [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:203](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L203)
 - [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L45)
 - [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L46)
-- [apiShareCreateSpecialToShares1/createShareUniqueReceivedNames.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareUniqueReceivedNames.feature#L15)
 
 #### [sharing the shares folder to users exits with different status code than in oc10 backend](https://github.com/owncloud/ocis/issues/2215)
 
@@ -196,7 +195,7 @@ File and sync features in a shared scenario
 - [apiShareManagementBasicToShares/createShareToSharesFolder.feature:762](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L762)
 - [apiShareManagementBasicToShares/createShareToSharesFolder.feature:763](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L763)
 
-#### [file_target of a auto-renamed file is not correct directly after sharing](https://github.com/owncloud/core/issues/32322)
+#### [file_target of an auto-renamed file is not correct directly after sharing](https://github.com/owncloud/core/issues/32322)
 
 - [apiShareManagementToShares/mergeShare.feature:105](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L105)
 
@@ -468,7 +467,7 @@ cannot share a folder with create permission
 - [apiShareCreateSpecialToShares2/createShareWithDisabledUser.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareWithDisabledUser.feature#L23)
 
 
-#### [Edit user share response has an "name" field](https://github.com/owncloud/ocis/issues/1225)
+#### [Edit user share response has a "name" field](https://github.com/owncloud/ocis/issues/1225)
 
 - [apiShareUpdateToShares/updateShare.feature:288](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L288)
 - [apiShareUpdateToShares/updateShare.feature:289](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L289)
@@ -604,7 +603,7 @@ _ocdav: api compatibility, return correct status code_
 - [apiWebdavOperations/search.feature:245](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L245)
 - [apiWebdavOperations/search.feature:270](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L270)
 
-### [No permisions propertry in response while searching for files and folders on ocis with new webdav](https://github.com/owncloud/ocis/issues/4009)
+### [No permissions property in response while searching for files and folders on ocis with new webdav](https://github.com/owncloud/ocis/issues/4009)
 
 - [apiWebdavOperations/search.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L208)
 - [apiWebdavOperations/search.feature:240](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L240)
