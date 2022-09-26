@@ -154,7 +154,7 @@ URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 a| [subs=-attributes]
 ++bool++
 a| [subs=-attributes]
-++true++
+++false++
 a| [subs=-attributes]
 Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments.
 |`PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD`

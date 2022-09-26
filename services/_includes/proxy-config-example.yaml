@@ -101,7 +101,7 @@ policies:
     unprotected: true
 oidc:
   issuer: https://localhost:9200
-  insecure: true
+  insecure: false
   access_token_verify_method: jwt
   user_info_cache:
     size: 1024
