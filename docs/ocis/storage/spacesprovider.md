@@ -3,7 +3,7 @@ title: "Spaces Provider"
 date: 2018-05-02T00:00:00+00:00
 weight: 6
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/storage
+geekdocEditPath: edit/master/docs/ocis/storage
 geekdocFilePath: spacesprovider.md
 ---
 
