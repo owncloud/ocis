@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add Email templating: [#4564](https://github.com/owncloud/ocis/pull/4564)
 * Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
+* Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
 * Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
 * Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
 
@@ -83,6 +84,14 @@ The following sections list the changes for unreleased.
    We've added the possibility to configure applications in the Web configuration.
 
    https://github.com/owncloud/ocis/pull/4578
+
+* Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
+
+   Admin users are no longer allowed to remove their own account or to edit their own role
+   assigments. By this restriction we try to prevent situation where no administrative users is
+   available in the system anymore
+
+   https://github.com/owncloud/ocis/issues/3713
 
 * Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
 
