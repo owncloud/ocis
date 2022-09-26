@@ -25,6 +25,7 @@ type Config struct {
 	Drivers          Drivers `yaml:"drivers"`
 	DataServerURL    string  `yaml:"data_server_url" env:"STORAGE_USERS_DATA_SERVER_URL" desc:"URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed."`
 	Events           Events  `yaml:"events"`
+	Cache            Cache   `yaml:"cache"`
 	MountID          string  `yaml:"mount_id" env:"STORAGE_USERS_MOUNT_ID" desc:"Mount ID of this storage."`
 	ExposeDataServer bool    `yaml:"expose_data_server" env:"STORAGE_USERS_EXPOSE_DATA_SERVER" desc:"Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users."`
 	ReadOnly         bool    `yaml:"readonly" env:"STORAGE_USERS_READ_ONLY" desc:"Set this storage to be read-only."`
@@ -135,6 +136,14 @@ type Events struct {
 	Addr      string `yaml:"endpoint" env:"STORAGE_USERS_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.`
 	ClusterID string `yaml:"cluster" env:"STORAGE_USERS_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system."`
 }
+
+// Cache holds cache config
+type Cache struct {
+	Store    string   `yaml:"store" env:"STORAGE_USERS_CACHE_STORE" desc:"Store implementation for the cache. Valid values are \"memory\" (default), \"redis\", and \"etcd\"."`
+	Nodes    []string `yaml:"nodes" env:"STORAGE_USERS_CACHE_NODES" desc:"Node addresses to use for the cache store."`
+	Database string   `yaml:"database" env:"STORAGE_USERS_CACHE_DATABASE" desc:"Database name of the cache."`
+}
+
 type S3Driver struct {
 	// Root is the absolute path to the location of the data
 	Root      string `yaml:"root"`

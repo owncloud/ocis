@@ -51,7 +51,13 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 					"datagateway":                    strings.TrimRight(cfg.FrontendPublicURL, "/") + "/data",
 					"transfer_shared_secret":         cfg.TransferSecret,
 					"transfer_expires":               cfg.TransferExpires,
-					"etag_cache_ttl":                 cfg.EtagCacheTTL,
+					// cache and TTLs
+					"cache_store":           cfg.Cache.Store,
+					"cache_nodes":           cfg.Cache.Nodes,
+					"cache_database":        cfg.Cache.Database,
+					"stat_cache_ttl":        cfg.Cache.StatCacheTTL,
+					"provider_cache_ttl":    cfg.Cache.ProviderCacheTTL,
+					"create_home_cache_ttl": cfg.Cache.CreateHomeCacheTTL,
 				},
 				"authregistry": map[string]interface{}{
 					"driver": "static",
