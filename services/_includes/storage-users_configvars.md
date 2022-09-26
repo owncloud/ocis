@@ -52,6 +52,9 @@
 | STORAGE_USERS_DATA_SERVER_URL | string | http://localhost:9158/data | URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.|
 | STORAGE_USERS_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | |
 | STORAGE_USERS_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
+| STORAGE_USERS_CACHE_STORE | string | memory | Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".|
+| STORAGE_USERS_CACHE_NODES | []string | [] | Node addresses to use for the cache store.|
+| STORAGE_USERS_CACHE_DATABASE | string | users | Database name of the cache.|
 | STORAGE_USERS_MOUNT_ID | string | 1284d238-aa92-42ce-bdc4-0b0000009157 | Mount ID of this storage.|
 | STORAGE_USERS_EXPOSE_DATA_SERVER | bool | false | Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users.|
 | STORAGE_USERS_READ_ONLY | bool | false | Set this storage to be read-only.|

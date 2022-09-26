@@ -24,7 +24,12 @@
 | GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN | bool | true | Disable creation of the home space on login.|
 | STORAGE_TRANSFER_SECRET | string |  | The storage transfer secret.|
 | GATEWAY_TRANSFER_EXPIRES | int | 86400 | Expiry for the gateway tokens.|
-| GATEWAY_ETAG_CACHE_TTL | int | 0 | Max TTL in seconds for the gateway's ETAG cache.|
+| GATEWAY_CACHE_STORE | string | memory | Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".|
+| GATEWAY_CACHE_NODES | []string | [] | Node addresses to use for the cache store.|
+| GATEWAY_CACHE_DATABASE | string | users | Database name of the cache.|
+| GATEWAY_STAT_CACHE_TTL | int | 300 | Max TTL in seconds for the gateway's stat cache.|
+| GATEWAY_PROVIDER_CACHE_TTL | int | 300 | Max TTL in seconds for the gateway's provider cache.|
+| GATEWAY_CREATE_HOME_CACHE_TTL | int | 300 | Max TTL in seconds for the gateway's create home cache.|
 | OCIS_URL<br/>GATEWAY_FRONTEND_PUBLIC_URL | string | https://localhost:9200 | The public facing URL of the oCIS frontend.|
 | GATEWAY_USERS_ENDPOINT | string | localhost:9144 | The USERS API endpoint.|
 | GATEWAY_GROUPS_ENDPOINT | string | localhost:9160 | The GROUPS API endpoint.|

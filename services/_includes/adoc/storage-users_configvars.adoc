@@ -366,6 +366,27 @@ a| [subs=-attributes]
 ++ocis-cluster++
 a| [subs=-attributes]
 The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
+|`STORAGE_USERS_CACHE_STORE`
+a| [subs=-attributes]
+++string++
+a| [subs=-attributes]
+++memory++
+a| [subs=-attributes]
+Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
+|`STORAGE_USERS_CACHE_NODES`
+a| [subs=-attributes]
+++[]string++
+a| [subs=-attributes]
+++[]++
+a| [subs=-attributes]
+Node addresses to use for the cache store.
+|`STORAGE_USERS_CACHE_DATABASE`
+a| [subs=-attributes]
+++string++
+a| [subs=-attributes]
+++users++
+a| [subs=-attributes]
+Database name of the cache.
 |`STORAGE_USERS_MOUNT_ID`
 a| [subs=-attributes]
 ++string++

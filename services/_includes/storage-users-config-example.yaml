@@ -64,6 +64,10 @@ data_server_url: http://localhost:9158/data
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster
+cache:
+  store: memory
+  nodes: []
+  database: users
 mount_id: 1284d238-aa92-42ce-bdc4-0b0000009157
 expose_data_server: false
 readonly: false

@@ -169,13 +169,48 @@ a| [subs=-attributes]
 ++86400++
 a| [subs=-attributes]
 Expiry for the gateway tokens.
-|`GATEWAY_ETAG_CACHE_TTL`
+|`GATEWAY_CACHE_STORE`
+a| [subs=-attributes]
+++string++
+a| [subs=-attributes]
+++memory++
+a| [subs=-attributes]
+Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
+|`GATEWAY_CACHE_NODES`
+a| [subs=-attributes]
+++[]string++
+a| [subs=-attributes]
+++[]++
+a| [subs=-attributes]
+Node addresses to use for the cache store.
+|`GATEWAY_CACHE_DATABASE`
+a| [subs=-attributes]
+++string++
+a| [subs=-attributes]
+++users++
+a| [subs=-attributes]
+Database name of the cache.
+|`GATEWAY_STAT_CACHE_TTL`
 a| [subs=-attributes]
 ++int++
 a| [subs=-attributes]
-++0++
+++300++
 a| [subs=-attributes]
-Max TTL in seconds for the gateway's ETAG cache.
+Max TTL in seconds for the gateway's stat cache.
+|`GATEWAY_PROVIDER_CACHE_TTL`
+a| [subs=-attributes]
+++int++
+a| [subs=-attributes]
+++300++
+a| [subs=-attributes]
+Max TTL in seconds for the gateway's provider cache.
+|`GATEWAY_CREATE_HOME_CACHE_TTL`
+a| [subs=-attributes]
+++int++
+a| [subs=-attributes]
+++300++
+a| [subs=-attributes]
+Max TTL in seconds for the gateway's create home cache.
 |`OCIS_URL` +
 `GATEWAY_FRONTEND_PUBLIC_URL`
 a| [subs=-attributes]
