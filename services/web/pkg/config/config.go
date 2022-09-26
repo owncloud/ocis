@@ -39,6 +39,8 @@ type WebConfig struct {
 	Applications  []Application          `json:"applications,omitempty" yaml:"applications"`
 	ExternalApps  []ExternalApp          `json:"external_apps,omitempty" yaml:"external_apps"`
 	Options       map[string]interface{} `json:"options,omitempty" yaml:"options"`
+	Scripts       []interface{}          `json:"scripts,omitempty" yaml:"scripts"`
+	Styles        []interface{}          `json:"styles,omitempty" yaml:"styles"`
 }
 
 // OIDC defines the available oidc configuration
@@ -60,13 +62,14 @@ type Application struct {
 }
 
 // ExternalApp defines an external web app.
-// {
-//	"name": "hello",
-//	"path": "http://localhost:9105/hello.js",
-//	  "config": {
-//	    "url": "http://localhost:9105"
-//	  }
-//  }
+//
+//	{
+//		"name": "hello",
+//		"path": "http://localhost:9105/hello.js",
+//		  "config": {
+//		    "url": "http://localhost:9105"
+//		  }
+//	 }
 type ExternalApp struct {
 	ID   string `json:"id,omitempty" yaml:"id"`
 	Path string `json:"path,omitempty" yaml:"path"`
