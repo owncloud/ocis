@@ -1,0 +1,19 @@
+Hello {{ .ExecutingUser }},
+
+The virusscan of file {{ .Filename }} discovered it is infected with {{ .Virus }}.
+The system is configured to handle infected files like: {{ .Outcome }}.
+
+Please contact your administrator for more information.
+
+----------------------------------------------------------
+
+Hallo {{ .ExecutingUser }},
+
+Der Viren Scan der Datei {{ .Filename }} hat herausgefunden dass sie mit {{ .Virus }} infiziert ist.
+Das System ist konfiguriert auf infizierte Dateien mit {{ .Outcome }} zu reagieren. /* NOTE: .Outcome is always english */
+
+Für mehr informationen wende dich bitte an deinen Systemadministrator.
+
+---
+ownCloud - Store. Share. Work.
+https://owncloud.com

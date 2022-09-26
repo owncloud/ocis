@@ -64,22 +64,7 @@ func (s eventsNotifier) Run() error {
 				case events.ShareCreated:
 					s.handleShareCreated(e)
 				case events.VirusscanFinished:
-					// TODO: use templating system
-
-					if !e.Infected {
-						// no need to annoy the user
-						return
-					}
-
-					if e.ExecutingUser == nil {
-						s.logger.Error().Str("events", "VirusscanFinished").Str("uploadid", e.UploadID).Msg("no executing user")
-						return
-					}
-					m := "Dear %s,\nThe virusscan of file '%s' discovered it is infected with '%s'.\nThe system is configured to handle infected files like: %s.\nContact your administrator for more information."
-					msg := fmt.Sprintf(m, e.ExecutingUser.GetUsername(), e.Filename, e.Description, e.Outcome)
-					if err := s.channel.SendMessage([]string{e.ExecutingUser.GetId().GetOpaqueId()}, msg, "", ""); err != nil {
-						s.logger.Error().Err(err).Str("event", "VirusScanFinished").Msg("failed to send a message")
-					}
+					s.handleVirusscanFinished(e)
 				}
 			}()
 		case <-s.signals:
@@ -323,6 +308,37 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 			Str("event", "ShareCreated").
 			Msg("failed to send a message")
 	}
+}
+
+func (s eventsNotifier) handleVirusscanFinished(e events.VirusscanFinished) {
+	if !e.Infected {
+		// no need to annoy the user
+		return
+	}
+
+	// should we send the email to all user who have access to the file? If so - how to find them?
+	if e.ExecutingUser == nil {
+		s.logger.Error().Str("events", "VirusscanFinished").Interface("resourceid", e.ResourceID).Str("uploadid", e.UploadID).Msg("no executing user")
+		return
+	}
+
+	msg, err := email.RenderEmailTemplate("virusdetected.email.tmpl", map[string]string{
+		"ExecutingUser": e.ExecutingUser.Username,
+		"Virus":         e.Description,
+		"Outcome":       string(e.Outcome),
+		"Filename":      e.Filename,
+	}, s.emailTemplatePath)
+	if err != nil {
+		s.logger.Error().Str("events", "VirusscanFinished").Interface("resourceid", e.ResourceID).Str("uploadid", e.UploadID).Msg("can't render email template")
+		return
+	}
+
+	senderDisplayName := "Owncloud"
+	emailSubject := "Virus detected"
+	if err := s.channel.SendMessage([]string{e.ExecutingUser.GetId().GetOpaqueId()}, msg, emailSubject, senderDisplayName); err != nil {
+		s.logger.Error().Err(err).Str("event", "VirusScanFinished").Msg("failed to send a message")
+	}
+
 }
 
 // TODO: this function is a backport for go1.19 url.JoinPath, upon go bump, replace this
