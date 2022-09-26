@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Change the default value for PROXY_OIDC_INSECURE to false: [#4601](https://github.com/owncloud/ocis/pull/4601)
 * Bugfix - Fix notifications service settings: [#4652](https://github.com/owncloud/ocis/pull/4652)
 * Bugfix - Fix the OIDC provider cache: [#4600](https://github.com/owncloud/ocis/pull/4600)
 * Bugfix - Render webdav permissions as string in search report: [#4575](https://github.com/owncloud/ocis/issues/4575)
@@ -18,6 +19,13 @@ The following sections list the changes for unreleased.
 * Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
 
 ## Details
+
+* Bugfix - Change the default value for PROXY_OIDC_INSECURE to false: [#4601](https://github.com/owncloud/ocis/pull/4601)
+
+   We've changed the default value for PROXY_OIDC_INSECURE to `false`. Previously the default
+   values was `true` which is not acceptable since default values need to be secure.
+
+   https://github.com/owncloud/ocis/pull/4601
 
 * Bugfix - Fix notifications service settings: [#4652](https://github.com/owncloud/ocis/pull/4652)
 
