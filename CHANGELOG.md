@@ -6,11 +6,25 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix the OIDC provider cache: [#4600](https://github.com/owncloud/ocis/pull/4600)
 * Bugfix - Render webdav permissions as string in search report: [#4575](https://github.com/owncloud/ocis/issues/4575)
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
+* Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
+* Enhancement - Add Email templating: [#4564](https://github.com/owncloud/ocis/pull/4564)
+* Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
+* Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
+* Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
 
 ## Details
+
+* Bugfix - Fix the OIDC provider cache: [#4600](https://github.com/owncloud/ocis/pull/4600)
+
+   We've fixed the OIDC provider cache. It never had a cache hit before this fix. Under some
+   circumstances it could cause a painfully slow OCIS if the IDP wellknown endpoint takes some
+   time to respond.
+
+   https://github.com/owncloud/ocis/pull/4600
 
 * Bugfix - Render webdav permissions as string in search report: [#4575](https://github.com/owncloud/ocis/issues/4575)
 
@@ -23,11 +37,46 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4582
 
+* Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
+
+   I've added a request check to the public share authenticator middleware to allow wopi to access
+   public shares.
+
+   https://github.com/owncloud/ocis/issues/4382
+   https://github.com/owncloud/ocis/pull/4631
+
+* Enhancement - Add Email templating: [#4564](https://github.com/owncloud/ocis/pull/4564)
+
+   We have added email templating to ocis. Which are send on the SpaceShared and ShareCreated
+   event.
+
+   https://github.com/owncloud/ocis/issues/4303
+   https://github.com/owncloud/ocis/pull/4564
+   https://github.com/cs3org/reva/pull/3252
+
+* Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
+
+   Add the web url to the space root on the graphAPI.
+
+   https://github.com/owncloud/ocis/pull/4588
+
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
 
    We've added the possibility to configure applications in the Web configuration.
 
    https://github.com/owncloud/ocis/pull/4578
+
+* Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
+
+   Support generating thumbnails for tiff and bmp files in the thumbnails service.
+
+   https://github.com/owncloud/ocis/pull/4634
+
+* Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
+
+   TBD
+
+   https://github.com/owncloud/ocis/pull/4588
 # Changelog for [2.0.0-beta.8] (2022-09-13)
 
 The following sections list the changes for 2.0.0-beta.8.

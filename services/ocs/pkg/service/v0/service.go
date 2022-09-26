@@ -2,10 +2,10 @@ package svc
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -42,9 +42,13 @@ func NewService(opts ...Option) Service {
 	}
 	roleManager := options.RoleManager
 	if roleManager == nil {
+		storeOptions := store.OcisStoreOptions{
+			Type:    options.Config.CacheStore.Type,
+			Address: options.Config.CacheStore.Address,
+			Size:    options.Config.CacheStore.Size,
+		}
 		m := roles.NewManager(
-			roles.CacheSize(1024),
-			roles.CacheTTL(time.Hour*24*7),
+			roles.StoreOptions(storeOptions),
 			roles.Logger(options.Logger),
 			roles.RoleService(roleService),
 		)

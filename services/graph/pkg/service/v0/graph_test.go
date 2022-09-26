@@ -17,6 +17,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
@@ -39,6 +40,8 @@ var _ = Describe("Graph", func() {
 		cfg = defaults.FullDefaultConfig()
 		cfg.Identity.LDAP.CACert = "" // skip the startup checks, we don't use LDAP at all in this tests
 		cfg.TokenManager.JWTSecret = "loremipsum"
+		cfg.Commons = &shared.Commons{}
+		cfg.Commons.OcisURL = "https://ocis.test"
 
 		gatewayClient = &mocks.GatewayClient{}
 		eventsPublisher = mocks.Publisher{}
@@ -108,7 +111,8 @@ var _ = Describe("Graph", func() {
 						"root":{
 							"id":"pro-1$sameID",
 							"webDavUrl":"https://localhost:9200/dav/spaces/pro-1$sameID"
-						}
+						},
+						"webUrl": "https://ocis.test/f/pro-1$sameID"
 					}
 				]
 			}
@@ -178,7 +182,8 @@ var _ = Describe("Graph", func() {
 							"eTag":"101112131415",
 							"id":"pro-1$asameID",
 							"webDavUrl":"https://localhost:9200/dav/spaces/pro-1$asameID"
-						}
+						},
+						"webUrl": "https://ocis.test/f/pro-1$asameID"
 					},
 					{
 						"driveAlias":"bspacetype/bspacename",
@@ -189,7 +194,8 @@ var _ = Describe("Graph", func() {
 							"eTag":"123456789",
 							"id":"pro-1$bsameID",
 							"webDavUrl":"https://localhost:9200/dav/spaces/pro-1$bsameID"
-						}
+						},
+						"webUrl": "https://ocis.test/f/pro-1$bsameID"
 					}
 				]
 			}

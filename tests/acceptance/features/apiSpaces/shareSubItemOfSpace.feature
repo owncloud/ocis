@@ -13,13 +13,15 @@ Feature: Share a file or folder that is inside a space
       | Alice    |
       | Brian    |
       | Bob      |
+    And using spaces DAV path
     And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "share sub-item" with the default quota using the GraphApi
     And user "Alice" has created a folder "folder" in space "share sub-item"
     And user "Alice" has uploaded a file inside space "share sub-item" with content "some content" to "file.txt"
+  And using new DAV path
 
-
-  Scenario Outline: A manager of the space can share an entity inside project space to another user with role:
+    
+  Scenario Outline: A manager of the space can share an entity inside project space to another user with role
     When user "Alice" shares the following entity "<entity>" inside of space "share sub-item" with user "Brian" with role "<role>"
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"

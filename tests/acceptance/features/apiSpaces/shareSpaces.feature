@@ -14,6 +14,7 @@ Feature: Share spaces
       | Bob      |
     And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "share space" with the default quota using the GraphApi
+    And using spaces DAV path
 
 
   Scenario Outline:: A user can share a space to another user

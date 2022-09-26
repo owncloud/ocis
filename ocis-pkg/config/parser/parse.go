@@ -48,6 +48,9 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.TokenManager == nil {
 		cfg.TokenManager = &shared.TokenManager{}
 	}
+	if cfg.CacheStore == nil {
+		cfg.CacheStore = &shared.CacheStore{}
+	}
 }
 
 // EnsureCommons copies applicable parts of the oCIS config into the commons part
@@ -79,6 +82,16 @@ func EnsureCommons(cfg *config.Config) {
 		}
 	} else {
 		cfg.Commons.Tracing = &shared.Tracing{}
+	}
+
+	if cfg.CacheStore != nil {
+		cfg.Commons.CacheStore = &shared.CacheStore{
+			Type:    cfg.CacheStore.Type,
+			Address: cfg.CacheStore.Address,
+			Size:    cfg.CacheStore.Size,
+		}
+	} else {
+		cfg.Commons.CacheStore = &shared.CacheStore{}
 	}
 
 	// copy token manager to the commons part if set

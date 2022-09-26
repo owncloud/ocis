@@ -16,6 +16,7 @@ Feature: Restoring space
       | Bob      |
     And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "restore a space" of type "project" with quota "10"
+    And using spaces DAV path
 
 
   Scenario: An owner can restore a Space via the Graph API

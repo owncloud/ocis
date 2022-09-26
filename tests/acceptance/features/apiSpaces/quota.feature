@@ -14,6 +14,7 @@ Feature: State of the quota
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And using spaces DAV path
 
 
   Scenario Outline: Quota information is returned in the list of spaces returned via the Graph API
