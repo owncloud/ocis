@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/CiscoM31/godata v1.0.5
 	github.com/Masterminds/semver v1.5.0
-	github.com/MicahParks/keyfunc v1.2.2
+	github.com/MicahParks/keyfunc v1.3.0
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
 	github.com/armon/go-radix v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.4

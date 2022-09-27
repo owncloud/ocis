@@ -102,8 +102,8 @@ github.com/Masterminds/semver v1.5.0 h1:H65muMkzWKEuNDnfl9d70GUjFniHKHRbFPGBuZ3Q
 github.com/Masterminds/semver v1.5.0/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=
 github.com/Masterminds/sprig v2.22.0+incompatible h1:z4yfnGrZ7netVz+0EDJ0Wi+5VZCSYp4Z0m2dk6cEM60=
 github.com/Masterminds/sprig v2.22.0+incompatible/go.mod h1:y6hNFY5UBTIWBxnzTeuNhlNS5hqE0NB0E6fgfo2Br3o=
-github.com/MicahParks/keyfunc v1.2.2 h1:MtA/6bnmhcyDMarVF9QRQmfKg1ssKxH1C+k3Gw8DY1g=
-github.com/MicahParks/keyfunc v1.2.2/go.mod h1:GWZYIBflWXRPShQPMFRrUg+8buvyD0IWeg3Fi2rcrME=
+github.com/MicahParks/keyfunc v1.3.0 h1:+3nQWlJ3UYdAr1syqHjF3cRE+pWCOCFCqCo2allP8oM=
+github.com/MicahParks/keyfunc v1.3.0/go.mod h1:GWZYIBflWXRPShQPMFRrUg+8buvyD0IWeg3Fi2rcrME=
 github.com/Microsoft/go-winio v0.4.14/go.mod h1:qXqCSQ3Xa7+6tgxaGTIe4Kpcdsi+P8jBhyzoq1bpyYA=
 github.com/Microsoft/go-winio v0.4.16/go.mod h1:XB6nPKklQyQ7GC9LdcBEcBl8PF76WugXOPRXwdLnMv0=
 github.com/Microsoft/go-winio v0.5.2 h1:a9IhgEQBCUEk6QCdml9CiJGhAws+YwffDHEMp1VMrpA=
