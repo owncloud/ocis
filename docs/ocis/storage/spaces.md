@@ -3,7 +3,7 @@ title: "Spaces"
 date: 2020-04-27T18:46:00+01:00
 weight: 38
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/storage
+geekdocEditPath: edit/master/docs/ocis/storage
 geekdocFilePath: spaces.md
 ---
 

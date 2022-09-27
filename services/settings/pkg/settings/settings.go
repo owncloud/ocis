@@ -18,6 +18,8 @@ var (
 // RegisterFunc stores store constructors
 type RegisterFunc func(*config.Config) Manager
 
+//go:generate mockery --name=Manager
+
 // Manager combines service interfaces for abstraction of storage implementations
 type Manager interface {
 	BundleManager

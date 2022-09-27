@@ -81,6 +81,10 @@ func DefaultConfig() *config.Config {
 			Addr:      "127.0.0.1:9233",
 			ClusterID: "ocis-cluster",
 		},
+		Cache: config.Cache{
+			Store:    "memory",
+			Database: "users",
+		},
 	}
 }
 

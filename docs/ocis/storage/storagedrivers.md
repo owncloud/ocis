@@ -3,7 +3,7 @@ title: "Storage drivers"
 date: 2020-04-27T18:46:00+01:00
 weight: 12
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/storage
+geekdocEditPath: edit/master/docs/ocis/storage
 geekdocFilePath: storages.md
 ---
 
@@ -84,14 +84,27 @@ Reva currently has several storage driver implementations that can be used for *
 
 ### OCIS and S3NG Storage Driver
 
-The oCIS storage driver is the default storage driver. It decomposes the metadata and persists it in a POSIX filesystem. Blobs are stored on the filesystem as well. The layout makes extensive use of symlinks and extended attributes. A filesystem like xfs or zfs without inode size limitations is recommended. We will evolve this to further integrate with file systems like cephfs or gpfs.
+The oCIS storage driver is the default storage driver. It decomposes the metadata and persists it in a POSIX filesystem. Blobs are stored on the filesystem as well. The layout makes extensive use of symlinks and extended attributes. A filesystem like xfs or zfs without practical inode size limitations is recommended. We will evolve this to further integrate with file systems like cephfs or gpfs.
+
+{{< hint warning >}}
+Ext4 limits the number of bytes that can be used for extended attribute names and their values to the size of a single block (by default 4k). This reduces the number of shares for a single file or folder to roughly 20-30, as grants have to share the available space with other metadata.
+{{< /hint >}}
 
 The S3NG storage driver uses the same metadata layout on a POSIX storage as the oCIS driver, but it uses S3 as the blob storage.
 
-TODO add list of capabilities / tradeoffs
+#### Tradeoffs
+➕ Efficient ID based lookup
+
+➕ Leverages Kernel VFS cache
+
+➕ No database needed
+
+➖ Not intended to be accessed by end users on the server side as it does not reflect a normal filesystem on disk
+
+➖ Metadata limited by Kernel VFS limits (see below)
 
 #### Related Kernel limits
-The decomposedfs currently stores CS3 grants in extended attributes. When listing extended attributes the result is currently limited to 64kB. Assuming a 20 byte uuid a grant has ~40 bytes. Which would limit the number of extended attributes to ~1630 entries or ~1600 shares. This can be extended by moving the grants from extended attributes into a dedicated file.
+The Decomposed FS currently stores CS3 grants in extended attributes. When listing extended attributes the result is currently limited to 64kB. Assuming a 20 byte uuid a grant has ~40 bytes. Which would limit the number of extended attributes to ~1630 entries or ~1600 shares. This can be extended by moving the grants from extended attributes into a dedicated file and is tracked in [ocis/issues/4638](https://github.com/owncloud/ocis/issues/4638).
 
 From [Wikipedia on Extended file attributes](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux):
 > The Linux kernel allows extended attribute to have names of up to 255 bytes and values of up to 64 KiB,[14] as do XFS and ReiserFS, but ext2/3/4 and btrfs impose much smaller limits, requiring all the attributes (names and values) of one file to fit in one "filesystem block" (usually 4 KiB). Per POSIX.1e,[citation needed] the names are required to start with one of security, system, trusted, and user plus a period. This defines the four namespaces of extended attributes.[15]

@@ -28,7 +28,12 @@ type InsecureService struct {
 }
 
 type InsecureProxyService struct {
-	InsecureBackends bool `yaml:"insecure_backends"`
+	OIDC             InsecureProxyOIDC `yaml:"oidc"`
+	InsecureBackends bool              `yaml:"insecure_backends"`
+}
+
+type InsecureProxyOIDC struct {
+	Insecure bool `yaml:"insecure"`
 }
 
 type LdapSettings struct {
@@ -282,6 +287,9 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		}
 		cfg.Proxy = InsecureProxyService{
 			InsecureBackends: true,
+			OIDC: InsecureProxyOIDC{
+				Insecure: true,
+			},
 		}
 
 		cfg.Thumbnails.Thumbnail.WebdavAllowInsecure = true

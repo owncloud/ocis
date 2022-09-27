@@ -33,9 +33,8 @@ func DefaultConfig() *config.Config {
 			Name: "proxy",
 		},
 		OIDC: config.OIDC{
-			Issuer:   "https://localhost:9200",
-			Insecure: true,
-			//Insecure: true,
+			Issuer: "https://localhost:9200",
+
 			AccessTokenVerifyMethod: config.AccessTokenVerificationJWT,
 			UserinfoCache: config.UserinfoCache{
 				Size: 1024,

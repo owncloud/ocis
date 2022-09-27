@@ -34,6 +34,8 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 					// other
 					"disable_home_creation_on_login": true, // metadata manually creates a space
 					// metadata always uses the simple upload, so no transfer secret or datagateway needed
+					"cache_store":    "noop",
+					"cache_database": "system",
 				},
 				"userprovider": map[string]interface{}{
 					"driver": "memory",
@@ -106,6 +108,20 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 					"prefix":  "data",
 					"driver":  cfg.Driver,
 					"drivers": metadataDrivers(cfg),
+					"data_txs": map[string]interface{}{
+						"simple": map[string]interface{}{
+							"cache_store":    "noop",
+							"cache_database": "system",
+						},
+						"spaces": map[string]interface{}{
+							"cache_store":    "noop",
+							"cache_database": "system",
+						},
+						"tus": map[string]interface{}{
+							"cache_store":    "noop",
+							"cache_database": "system",
+						},
+					},
 				},
 			},
 		},
