@@ -12,7 +12,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.4
 	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220818202316-e92afdddac6d
-	github.com/cs3org/reva/v2 v2.10.1-0.20220922135544-ed2be2adc599
+	github.com/cs3org/reva/v2 v2.10.1-0.20220926130532-e0a975fdee34
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
@@ -145,6 +145,7 @@ require (
 	github.com/deckarep/golang-set v1.8.0 // indirect
 	github.com/desertbit/timer v0.0.0-20180107155436-c41aec40b27f // indirect
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
@@ -166,6 +167,9 @@ require (
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-micro/plugins/v4/store/nats-js v1.1.0 // indirect
+	github.com/go-micro/plugins/v4/store/redis v1.1.0 // indirect
+	github.com/go-redis/redis/v8 v8.10.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
 	github.com/go-test/deep v1.0.8 // indirect
@@ -268,6 +272,8 @@ require (
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	go.etcd.io/etcd/api/v3 v3.5.5 // indirect
 	go.etcd.io/etcd/client/pkg/v3 v3.5.5 // indirect
+	go.opentelemetry.io/otel/internal/metric v0.27.0 // indirect
+	go.opentelemetry.io/otel/metric v0.27.0 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.23.0 // indirect
