@@ -76,6 +76,10 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			if err != nil {
 				m.logger.Error().Err(err).Msg("Autoprovisioning user failed")
 			}
+			user, token, err = m.userProvider.GetUserByClaims(req.Context(), "userid", user.Id.OpaqueId, true)
+			if err != nil {
+				m.logger.Error().Err(err).Str("userid", user.Id.OpaqueId).Msg("Error getting token for autoprovisioned user")
+			}
 		}
 
 		if errors.Is(err, backend.ErrAccountDisabled) {
