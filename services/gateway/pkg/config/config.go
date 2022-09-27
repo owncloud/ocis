@@ -26,7 +26,7 @@ type Config struct {
 	DisableHomeCreationOnLogin bool   `yaml:"disable_home_creation_on_login" env:"GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN" desc:"Disable creation of the home space on login."`
 	TransferSecret             string `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET" desc:"The storage transfer secret."` // TODO: how to name the env
 	TransferExpires            int    `yaml:"transfer_expires" env:"GATEWAY_TRANSFER_EXPIRES" desc:"Expiry for the gateway tokens."`
-	EtagCacheTTL               int    `yaml:"etag_cache_ttl" env:"GATEWAY_ETAG_CACHE_TTL" desc:"Max TTL in seconds for the gateway's ETAG cache."`
+	Cache                      Cache  `yaml:"cache"`
 
 	FrontendPublicURL string `yaml:"frontend_public_url" env:"OCIS_URL;GATEWAY_FRONTEND_PUBLIC_URL" desc:"The public facing URL of the oCIS frontend."`
 
@@ -85,4 +85,14 @@ type StorageRegistry struct {
 	Driver string   `yaml:"driver"` //TODO: configure via env?
 	Rules  []string `yaml:"rules"`  //TODO: configure via env?
 	JSON   string   `yaml:"json"`   //TODO: configure via env?
+}
+
+// Cache holds cache config
+type Cache struct {
+	Store              string   `yaml:"store" env:"GATEWAY_CACHE_STORE" desc:"Store implementation for the cache. Valid values are \"memory\" (default), \"redis\", and \"etcd\"."`
+	Nodes              []string `yaml:"nodes" env:"GATEWAY_CACHE_NODES" desc:"Node addresses to use for the cache store."`
+	Database           string   `yaml:"database" env:"GATEWAY_CACHE_DATABASE" desc:"Database name of the cache."`
+	StatCacheTTL       int      `yaml:"stat_cache_ttl" env:"GATEWAY_STAT_CACHE_TTL" desc:"Max TTL in seconds for the gateway's stat cache."`
+	ProviderCacheTTL   int      `yaml:"provider_cache_ttl" env:"GATEWAY_PROVIDER_CACHE_TTL" desc:"Max TTL in seconds for the gateway's provider cache."`
+	CreateHomeCacheTTL int      `yaml:"create_home_cache_ttl" env:"GATEWAY_CREATE_HOME_CACHE_TTL" desc:"Max TTL in seconds for the gateway's create home cache."`
 }

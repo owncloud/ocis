@@ -54,6 +54,13 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 					"etag_cache_ttl":                 cfg.EtagCacheTTL,
 					"personal_quota_default":         cfg.DefaultPersonalQuota,
 					"group_quota_file":               cfg.GroupQuotaFile,
+					// cache and TTLs
+					"cache_store":           cfg.Cache.Store,
+					"cache_nodes":           cfg.Cache.Nodes,
+					"cache_database":        cfg.Cache.Database,
+					"stat_cache_ttl":        cfg.Cache.StatCacheTTL,
+					"provider_cache_ttl":    cfg.Cache.ProviderCacheTTL,
+					"create_home_cache_ttl": cfg.Cache.CreateHomeCacheTTL,
 				},
 				"authregistry": map[string]interface{}{
 					"driver": "static",

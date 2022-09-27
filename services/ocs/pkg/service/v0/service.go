@@ -38,7 +38,7 @@ func NewService(opts ...Option) Service {
 
 	roleService := options.RoleService
 	if roleService == nil {
-		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
+		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
 	}
 	roleManager := options.RoleManager
 	if roleManager == nil {

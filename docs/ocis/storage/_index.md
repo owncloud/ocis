@@ -3,14 +3,14 @@ title: "Storage"
 date: 2018-05-02T00:00:00+00:00
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/extensions/storage
+geekdocEditPath: edit/master/docs/ocis/storage
 geekdocFilePath: _index.md
 geekdocCollapseSection: true
 ---
 
 ## Overview
 
-The storage extension wraps [reva](https://github.com/cs3org/reva/) and adds an opinionated configuration to provide two core services for the oCIS platform:
+OCIS wraps [reva](https://github.com/cs3org/reva/) and adds an opinionated configuration to provide two core services for the oCIS platform:
 1. A [*Spaces Registry*]({{< ref "./spacesregistry.md" >}}) that acts as a dictionary for storage *Spaces* and their metadata
 2. A [*Spaces Provider*]({{< ref "./spacesprovider.md" >}}) that organizes *Resources* in storage *Spaces* and persists them in an underlying *Storage System*
 

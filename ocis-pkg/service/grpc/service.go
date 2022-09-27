@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"strings"
+	"sync"
 	"time"
 
 	mgrpcc "github.com/go-micro/plugins/v4/client/grpc"
@@ -15,16 +16,25 @@ import (
 )
 
 // DefaultClient is a custom oCIS grpc configured client.
-var DefaultClient = getDefaultGrpcClient()
+var (
+	defaultClient client.Client
+	once          sync.Once
+)
+
+func DefaultClient() client.Client {
+	return getDefaultGrpcClient()
+}
 
 func getDefaultGrpcClient() client.Client {
+	once.Do(func() {
+		reg := registry.GetRegistry()
 
-	reg := registry.GetRegistry()
-
-	return mgrpcc.NewClient(
-		client.Registry(reg),
-		client.Wrap(mbreaker.NewClientWrapper()),
-	)
+		defaultClient = mgrpcc.NewClient(
+			client.Registry(reg),
+			client.Wrap(mbreaker.NewClientWrapper()),
+		)
+	})
+	return defaultClient
 }
 
 // Service simply wraps the go-micro grpc service.
@@ -40,7 +50,7 @@ func NewService(opts ...Option) Service {
 		// first add a server because it will reset any options
 		micro.Server(mgrpcs.NewServer()),
 		// also add a client that can be used after initializing the service
-		micro.Client(DefaultClient),
+		micro.Client(DefaultClient()),
 		micro.Address(sopts.Address),
 		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
 		micro.Version(sopts.Version),

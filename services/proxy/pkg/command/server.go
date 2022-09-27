@@ -127,7 +127,7 @@ func Server(cfg *config.Config) *cli.Command {
 }
 
 func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config) alice.Chain {
-	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient)
+	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
 	revaClient, err := cs3.GetGatewayServiceClient(cfg.Reva.Address)
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
@@ -145,7 +145,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		logger.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
 	}
 
-	storeClient := storesvc.NewStoreService("com.owncloud.api.store", grpc.DefaultClient)
+	storeClient := storesvc.NewStoreService("com.owncloud.api.store", grpc.DefaultClient())
 	if err != nil {
 		logger.Error().Err(err).
 			Str("gateway", cfg.Reva.Address).
