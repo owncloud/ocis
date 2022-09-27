@@ -51,7 +51,6 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 					"datagateway":                    strings.TrimRight(cfg.FrontendPublicURL, "/") + "/data",
 					"transfer_shared_secret":         cfg.TransferSecret,
 					"transfer_expires":               cfg.TransferExpires,
-					"etag_cache_ttl":                 cfg.EtagCacheTTL,
 					"personal_quota_default":         cfg.DefaultPersonalQuota,
 					"group_quota_file":               cfg.GroupQuotaFile,
 					// cache and TTLs

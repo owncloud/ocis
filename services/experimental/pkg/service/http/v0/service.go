@@ -1,11 +1,12 @@
 package svc
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/experimental/pkg/tags"
-	"net/http"
 )
 
 // NewService returns a service implementation for Service.
@@ -22,7 +23,7 @@ func NewService(opts ...Option) Experimental {
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		tags.NewTagsService(
 			r,
-			searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient),
+			searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient()),
 			options.Logger,
 		)
 	})
