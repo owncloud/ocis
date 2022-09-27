@@ -50,7 +50,7 @@ var _ = Describe("Searchprovider", func() {
 				},
 			},
 			Id:   &sprovider.StorageSpaceId{OpaqueId: "storageid$personalspace!personalspace"},
-			Root: &sprovider.ResourceId{StorageId: "storageid", SpaceId: "personalspace", OpaqueId: "storageid"},
+			Root: &sprovider.ResourceId{StorageId: "storageid", SpaceId: "personalspace", OpaqueId: "personalspace"},
 			Name: "personalspace",
 		}
 
@@ -79,6 +79,12 @@ var _ = Describe("Searchprovider", func() {
 		gwClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
 			Status: status.NewOK(context.Background()),
 			Info:   ri,
+		}, nil)
+		gwClient.On("GetPath", mock.Anything, mock.MatchedBy(func(req *sprovider.GetPathRequest) bool {
+			return req.ResourceId.OpaqueId == ri.Id.OpaqueId
+		})).Return(&sprovider.GetPathResponse{
+			Status: status.NewOK(context.Background()),
+			Path:   ri.Path,
 		}, nil)
 		indexClient.On("DocCount").Return(uint64(1), nil)
 	})
@@ -368,6 +374,23 @@ var _ = Describe("Searchprovider", func() {
 							},
 						},
 					}, nil)
+				})
+
+				It("considers the search Ref parameter", func() {
+					res, err := p.Search(ctx, &searchsvc.SearchRequest{
+						Query: "foo",
+						Ref: &searchmsg.Reference{
+							ResourceId: &searchmsg.ResourceID{
+								StorageId: "storageid",
+								SpaceId:   "personalspace",
+								OpaqueId:  "personalspace",
+							},
+						},
+					})
+					Expect(err).ToNot(HaveOccurred())
+					Expect(res).ToNot(BeNil())
+					Expect(len(res.Matches)).To(Equal(1))
+					Expect(res.Matches[0].Entity.Id.OpaqueId).To(Equal("foo-id"))
 				})
 
 				It("finds matches in both the personal space AND the grant", func() {
