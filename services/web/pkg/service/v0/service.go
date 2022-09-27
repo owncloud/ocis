@@ -73,15 +73,6 @@ func (p Web) getPayload() (payload []byte, err error) {
 			p.config.Web.Config.Theme = p.config.Web.ThemePath
 		}
 
-		if p.config.Web.Config.ExternalApps == nil {
-			p.config.Web.Config.ExternalApps = []config.ExternalApp{
-				{
-					ID:   "settings",
-					Path: "/settings.js",
-				},
-			}
-		}
-
 		// make apps render as empty array if it is empty
 		// TODO remove once https://github.com/golang/go/issues/27589 is fixed
 		if len(p.config.Web.Config.Apps) == 0 {

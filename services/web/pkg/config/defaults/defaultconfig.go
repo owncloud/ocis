@@ -50,6 +50,10 @@ func DefaultConfig() *config.Config {
 				Apps: []string{"files", "search", "text-editor", "pdf-viewer", "external", "user-management"},
 				ExternalApps: []config.ExternalApp{
 					{
+						ID:   "settings",
+						Path: "/settings.js",
+					},
+					{
 						ID:   "preview",
 						Path: "web-app-preview",
 						Config: map[string]interface{}{
