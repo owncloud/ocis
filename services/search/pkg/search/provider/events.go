@@ -32,7 +32,11 @@ func (p *Provider) handleEvent(ev interface{}) {
 			Id: e.Executant,
 		}
 
-		statRes, err := p.statResource(ref, owner)
+		ownerCtx, err := p.getAuthContext(owner)
+		if err != nil {
+			return
+		}
+		statRes, err := p.statResource(ownerCtx, ref, owner)
 		if err != nil {
 			p.logger.Error().Err(err).Msg("failed to stat the changed resource")
 			return
@@ -56,7 +60,11 @@ func (p *Provider) handleEvent(ev interface{}) {
 			Id: e.Executant,
 		}
 
-		statRes, err := p.statResource(ref, owner)
+		ownerCtx, err := p.getAuthContext(owner)
+		if err != nil {
+			return
+		}
+		statRes, err := p.statResource(ownerCtx, ref, owner)
 		if err != nil {
 			p.logger.Error().Err(err).Msg("failed to stat the moved resource")
 			return
@@ -66,7 +74,7 @@ func (p *Provider) handleEvent(ev interface{}) {
 			return
 		}
 
-		gpRes, err := p.getPath(statRes.Info.Id, owner)
+		gpRes, err := p.getPath(ownerCtx, statRes.Info.Id, owner)
 		if err != nil {
 			p.logger.Error().Err(err).Interface("ref", ref).Msg("failed to get path for moved resource")
 			return
@@ -107,7 +115,12 @@ func (p *Provider) handleEvent(ev interface{}) {
 	}
 	p.logger.Debug().Interface("event", ev).Msg("resource has been changed, updating the document")
 
-	statRes, err := p.statResource(ref, owner)
+	ownerCtx, err := p.getAuthContext(owner)
+	if err != nil {
+		return
+	}
+
+	statRes, err := p.statResource(ownerCtx, ref, owner)
 	if err != nil {
 		p.logger.Error().Err(err).Msg("failed to stat the changed resource")
 		return
@@ -117,6 +130,11 @@ func (p *Provider) handleEvent(ev interface{}) {
 		return
 	}
 
+	ref, err = p.resolveReference(ownerCtx, ref, statRes.Info)
+	if err != nil {
+		p.logger.Error().Err(err).Msg("error resolving reference")
+		return
+	}
 	err = p.indexClient.Add(ref, statRes.Info)
 	if err != nil {
 		p.logger.Error().Err(err).Msg("error adding updating the resource in the index")
@@ -125,22 +143,12 @@ func (p *Provider) handleEvent(ev interface{}) {
 	}
 }
 
-func (p *Provider) statResource(ref *provider.Reference, owner *user.User) (*provider.StatResponse, error) {
-	ownerCtx, err := p.getAuthContext(owner)
-	if err != nil {
-		return nil, err
-	}
-
-	return p.gwClient.Stat(ownerCtx, &provider.StatRequest{Ref: ref})
+func (p *Provider) statResource(ctx context.Context, ref *provider.Reference, owner *user.User) (*provider.StatResponse, error) {
+	return p.gwClient.Stat(ctx, &provider.StatRequest{Ref: ref})
 }
 
-func (p *Provider) getPath(id *provider.ResourceId, owner *user.User) (*provider.GetPathResponse, error) {
-	ownerCtx, err := p.getAuthContext(owner)
-	if err != nil {
-		return nil, err
-	}
-
-	return p.gwClient.GetPath(ownerCtx, &provider.GetPathRequest{ResourceId: id})
+func (p *Provider) getPath(ctx context.Context, id *provider.ResourceId, owner *user.User) (*provider.GetPathResponse, error) {
+	return p.gwClient.GetPath(ctx, &provider.GetPathRequest{ResourceId: id})
 }
 
 func (p *Provider) getAuthContext(owner *user.User) (context.Context, error) {

@@ -107,7 +107,7 @@ var _ = Describe("Searchprovider", func() {
 			})).Return(nil)
 
 			res, err := p.IndexSpace(ctx, &searchsvc.IndexSpaceRequest{
-				SpaceId: "storageid",
+				SpaceId: "storageid$spaceid!spaceid",
 				UserId:  "user",
 			})
 			Expect(err).ToNot(HaveOccurred())

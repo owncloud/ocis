@@ -282,6 +282,11 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
 			ResourceId: &rootId,
 		}
+		ref, err = p.resolveReference(ownerCtx, ref, info)
+		if err != nil {
+			p.logger.Error().Err(err).Msg("error resolving reference")
+			return nil
+		}
 		err = p.indexClient.Add(ref, info)
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error adding resource to the index")
@@ -296,6 +301,27 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 
 	p.logDocCount()
 	return &searchsvc.IndexSpaceResponse{}, nil
+}
+
+func (p *Provider) resolveReference(ctx context.Context, ref *provider.Reference, ri *provider.ResourceInfo) (*provider.Reference, error) {
+	if ref.GetResourceId().GetOpaqueId() == ref.GetResourceId().GetSpaceId() {
+		return ref, nil
+	}
+
+	gpRes, err := p.gwClient.GetPath(ctx, &provider.GetPathRequest{
+		ResourceId: ri.Id,
+	})
+	if err != nil || gpRes.Status.Code != rpcv1beta1.Code_CODE_OK {
+		return nil, err
+	}
+	return &provider.Reference{
+		ResourceId: &provider.ResourceId{
+			StorageId: ref.GetResourceId().GetStorageId(),
+			SpaceId:   ref.GetResourceId().GetSpaceId(),
+			OpaqueId:  ref.GetResourceId().GetSpaceId(),
+		},
+		Path: utils.MakeRelativePath(gpRes.Path),
+	}, nil
 }
 
 func (p *Provider) logDocCount() {
