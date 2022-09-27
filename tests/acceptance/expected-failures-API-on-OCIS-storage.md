@@ -1026,5 +1026,9 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiAuthWebDav/webDavCOPYAuth.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavCOPYAuth.feature#L166)
 - [apiAuthWebDav/webDavCOPYAuth.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavCOPYAuth.feature#L178)
 
+#### [Identical shares have different naming convention in oc10 and ocis](https://github.com/owncloud/ocis/issues/4674)
+#### [different url encoding pattern used in oc10 and ocis for identical share ](https://github.com/owncloud/ocis/issues/4676)
+- [apiShareCreateSpecialToShares1/createShareUniqueReceivedNames.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareUniqueReceivedNames.feature#L15)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
