@@ -59,6 +59,9 @@ policies:
   - method: REPORT
     endpoint: /remote.php/webdav
     backend: http://localhost:9115
+  - method: REPORT
+    endpoint: /dav/spaces
+    backend: http://localhost:9115
   - type: query
     endpoint: /dav/?preview=1
     backend: http://localhost:9115

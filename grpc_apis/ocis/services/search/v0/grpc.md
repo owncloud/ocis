@@ -1,7 +1,7 @@
 ---
 title: "ocis.services.search.v0"
 url: /grpc_apis/ocis_services_search_v0
-date: 2022-09-27T08:38:34Z
+date: 2022-09-27T08:42:13Z
 weight: 50
 geekdocRepo: https://github.com/owncloud/ocis
 ---
@@ -56,6 +56,7 @@ geekdocRepo: https://github.com/owncloud/ocis
 | page_size | [int32](#int32) |  | Optional. The maximum number of entries to return in the response |
 | page_token | [string](#string) |  | Optional. A pagination token returned from a previous call to `Get`<br>that indicates from where search should continue |
 | query | [string](#string) |  |  |
+| ref | [ocis.messages.search.v0.Reference](/grpc_apis/ocis_messages_search_v0/#reference) |  |  |
 
 ### SearchResponse
 
