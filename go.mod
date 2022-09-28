@@ -5,14 +5,14 @@ go 1.18
 require (
 	github.com/CiscoM31/godata v1.0.5
 	github.com/Masterminds/semver v1.5.0
-	github.com/MicahParks/keyfunc v1.2.2
+	github.com/MicahParks/keyfunc v1.3.0
 	github.com/ReneKroon/ttlcache/v2 v2.11.0
 	github.com/armon/go-radix v1.0.0
 	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.4
 	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220818202316-e92afdddac6d
-	github.com/cs3org/reva/v2 v2.10.1-0.20220928081219-44d46076348c
+	github.com/cs3org/reva/v2 v2.10.1-0.20220928094556-1ed01295a37f
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
@@ -70,7 +70,7 @@ require (
 	go.etcd.io/bbolt v1.3.6
 	go.etcd.io/etcd/client/v3 v3.5.5
 	go.opencensus.io v0.23.0
-	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.36.0
+	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.36.1
 	go.opentelemetry.io/otel v1.10.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.10.0
 	go.opentelemetry.io/otel/sdk v1.10.0

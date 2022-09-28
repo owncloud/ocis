@@ -113,8 +113,10 @@ func NewService(opts ...Option) (Service, error) {
 		// back to using `chi.RegisterMethod`.
 		m.MethodNotAllowed(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			routePrefix := path.Join(options.Config.HTTP.Root, "/remote.php/dav/files/")
+			spacesPrefix := path.Join(options.Config.HTTP.Root, "/dav/spaces/")
 			legacyRoutePrefix := path.Join(options.Config.HTTP.Root, "/remote.php/webdav")
-			if req.Method == "REPORT" && (strings.HasPrefix(req.URL.Path, routePrefix) || strings.HasPrefix(req.URL.Path, legacyRoutePrefix)) {
+			if req.Method == "REPORT" &&
+				(strings.HasPrefix(req.URL.Path, spacesPrefix) || strings.HasPrefix(req.URL.Path, routePrefix) || strings.HasPrefix(req.URL.Path, legacyRoutePrefix)) {
 				// The URLParam will not be available here. If it is needed it
 				// needs to be passed manually or chi needs to be fixed
 				// To use it properly.

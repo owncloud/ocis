@@ -4,6 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
+	"path"
+	"path/filepath"
+	"strings"
+	"time"
+
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/custom"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/keyword"
@@ -21,11 +27,6 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"math"
-	"path"
-	"path/filepath"
-	"strings"
-	"time"
 )
 
 // Bleve represents a search engine which utilizes bleve to search and store resources.

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events/server"
@@ -94,6 +95,7 @@ type Service struct {
 	provider *search.Provider
 }
 
+// Search handles the search
 func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *searchsvc.SearchResponse) error {
 	// Get token from the context (go-micro) and make it known to the reva client too (grpc)
 	t, ok := metadata.Get(ctx, revactx.TokenHeader)
@@ -106,6 +108,7 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 	res, err := s.provider.Search(ctx, &searchsvc.SearchRequest{
 		Query:    in.Query,
 		PageSize: in.PageSize,
+		Ref:      in.Ref,
 	})
 	if err != nil {
 		switch err.(type) {

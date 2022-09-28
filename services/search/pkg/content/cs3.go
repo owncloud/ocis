@@ -4,20 +4,20 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"io"
+	"net/http"
+
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"io"
-	"net/http"
 )
 
 type cs3 struct {
 	client   gateway.GatewayAPIClient
 	logger   log.Logger
 	insecure bool
-	secret   string
 }
 
 func newCS3Retriever(client gateway.GatewayAPIClient, logger log.Logger, insecure bool) cs3 {

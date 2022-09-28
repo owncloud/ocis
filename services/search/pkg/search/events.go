@@ -2,6 +2,7 @@ package search
 
 import (
 	"context"
+
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -24,7 +25,7 @@ type eventHandler struct {
 
 // HandleEvents listens to the needed events,
 // it handles the whole resource indexing livecycle.
-func HandleEvents(eng engine.Engine, extractor content.Extractor, gw gateway.GatewayAPIClient, bus events.Stream, logger log.Logger, cfg *config.Config) error {
+func HandleEvents(eng engine.Engine, extractor content.Extractor, gw gateway.GatewayAPIClient, bus events.Consumer, logger log.Logger, cfg *config.Config) error {
 	evts := []events.Unmarshaller{
 		events.ItemTrashed{},
 		events.ItemRestored{},
@@ -97,7 +98,7 @@ func (eh *eventHandler) trashItem(rid *provider.ResourceId) {
 
 func (eh *eventHandler) upsertItem(ref *provider.Reference, uid *user.UserId) {
 	ctx, stat, path := eh.resInfo(uid, ref)
-	if ctx == nil || stat == nil || path == nil {
+	if ctx == nil || stat == nil || path == "" {
 		return
 	}
 
@@ -114,7 +115,7 @@ func (eh *eventHandler) upsertItem(ref *provider.Reference, uid *user.UserId) {
 			OpaqueId:  stat.Info.Id.SpaceId,
 			SpaceId:   stat.Info.Id.SpaceId,
 		}),
-		Path:     utils.MakeRelativePath(path.Path),
+		Path:     utils.MakeRelativePath(path),
 		Type:     uint64(stat.Info.Type),
 		Document: doc,
 	}
@@ -128,7 +129,7 @@ func (eh *eventHandler) upsertItem(ref *provider.Reference, uid *user.UserId) {
 
 func (eh *eventHandler) restoreItem(ref *provider.Reference, uid *user.UserId) {
 	ctx, stat, path := eh.resInfo(uid, ref)
-	if ctx == nil || stat == nil || path == nil {
+	if ctx == nil || stat == nil || path == "" {
 		return
 	}
 
@@ -139,30 +140,30 @@ func (eh *eventHandler) restoreItem(ref *provider.Reference, uid *user.UserId) {
 
 func (eh *eventHandler) moveItem(ref *provider.Reference, uid *user.UserId) {
 	ctx, stat, path := eh.resInfo(uid, ref)
-	if ctx == nil || stat == nil || path == nil {
+	if ctx == nil || stat == nil || path == "" {
 		return
 	}
 
-	if err := eh.engine.Move(storagespace.FormatResourceID(*stat.Info.Id), path.Path); err != nil {
+	if err := eh.engine.Move(storagespace.FormatResourceID(*stat.Info.Id), path); err != nil {
 		eh.logger.Error().Err(err).Msg("failed to move the changed resource in the index")
 	}
 }
 
-func (eh *eventHandler) resInfo(uid *user.UserId, ref *provider.Reference) (context.Context, *provider.StatResponse, *provider.GetPathResponse) {
+func (eh *eventHandler) resInfo(uid *user.UserId, ref *provider.Reference) (context.Context, *provider.StatResponse, string) {
 	ownerCtx, err := getAuthContext(&user.User{Id: uid}, eh.gateway, eh.secret, eh.logger)
 	if err != nil {
-		return nil, nil, nil
+		return nil, nil, ""
 	}
 
 	statRes, err := statResource(ownerCtx, ref, eh.gateway, eh.logger)
 	if err != nil {
-		return nil, nil, nil
+		return nil, nil, ""
 	}
 
-	pathRes, err := getPath(ownerCtx, statRes.Info.Id, eh.gateway, eh.logger)
+	r, err := ResolveReference(ownerCtx, ref, statRes.GetInfo(), eh.gateway)
 	if err != nil {
-		return nil, nil, nil
+		return nil, nil, ""
 	}
 
-	return ownerCtx, statRes, pathRes
+	return ownerCtx, statRes, r.GetPath()
 }

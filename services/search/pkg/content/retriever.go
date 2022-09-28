@@ -2,9 +2,10 @@ package content
 
 import (
 	"context"
+	"io"
+
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"google.golang.org/grpc/metadata"
-	"io"
 )
 
 // Retriever is the interface that wraps the basic Retrieve method. 🐕

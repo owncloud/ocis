@@ -2,10 +2,11 @@ package content
 
 import (
 	"context"
+	"time"
+
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/tags"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"time"
 )
 
 // Basic is the simplest Extractor implementation.

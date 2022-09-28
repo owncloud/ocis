@@ -310,6 +310,9 @@
         },
         "query": {
           "type": "string"
+        },
+        "ref": {
+          "$ref": "#/definitions/v0Reference"
         }
       }
     },

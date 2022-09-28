@@ -2,11 +2,12 @@ package engine
 
 import (
 	"context"
+	"regexp"
+
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchSearvice "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
-	"regexp"
 )
 
 //go:generate mockery --name=Engine

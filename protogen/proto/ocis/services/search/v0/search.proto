@@ -68,6 +68,7 @@ message SearchRequest {
   string page_token = 2 [(google.api.field_behavior) = OPTIONAL];
 
   string query = 3;
+  ocis.messages.search.v0.Reference ref = 4 [(google.api.field_behavior) = OPTIONAL];
 }
 
 message SearchResponse {
