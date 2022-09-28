@@ -625,31 +625,6 @@ services:
       driver: "local"
     restart: always
 
-  auth-bearer:
-    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
-    deploy:
-      replicas: ${OCIS_SCALE:-1}
-    networks:
-      ocis-net:
-    entrypoint:
-      - ocis
-      - auth-bearer
-      - server
-    environment:
-      AUTH_BEARER_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      AUTH_BEARER_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      AUTH_BEARER_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
-
-      AUTH_BEARER_GRPC_ADDR: 0.0.0.0:9148
-
-      AUTH_BEARER_JWT_SECRET: ${OCIS_JWT_SECRET}
-      REVA_GATEWAY: gateway:9142
-      AUTH_BEARER_OIDC_ISSUER: https://${OCIS_DOMAIN}
-
-    logging:
-      driver: "local"
-    restart: always
-
   storage-shares:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:
@@ -873,8 +848,6 @@ services:
       GATEWAY_USERS_ENDPOINT: users:9144
       GATEWAY_GROUPS_ENDPOINT: groups:9160
       GATEWAY_AUTH_BASIC_ENDPOINT: auth-basic:9146
-      GATEWAY_AUTH_BEARER_ENDPOINT: auth-bearer:9148
-      GATEWAY_AUTH_MACHINE_ENDPOINT: auth-machine:9166
       GATEWAY_PERMISSIONS_ENDPOINT: settings:9191
       GATEWAY_SHARING_ENDPOINT: sharing:9150
       GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT: storage-publiclink:9178
