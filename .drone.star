@@ -38,7 +38,7 @@ SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:latest"
 THEGEEKLAB_DRONE_GITHUB_COMMENT = "thegeeklab/drone-github-comment:1"
 
 DEFAULT_PHP_VERSION = "7.4"
-DEFAULT_NODEJS_VERSION = "14"
+DEFAULT_NODEJS_VERSION = "16"
 
 dirs = {
     "base": "/drone/src",
@@ -276,15 +276,15 @@ def main(ctx):
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
-def buildWebCache(ctx):
-    return [{
+def cachePipeline(name, steps):
+    return {
         "kind": "pipeline",
         "type": "docker",
-        "name": "build-web-cache",
+        "name": "build-%s-cache" % name,
         "clone": {
             "disable": True,
         },
-        "steps": generateWebCache(ctx),
+        "steps": steps,
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -292,7 +292,14 @@ def buildWebCache(ctx):
                 "refs/pull/**",
             ],
         },
-    }]
+    }
+
+def buildWebCache(ctx):
+    return [
+        cachePipeline("web", generateWebCache(ctx)),
+        cachePipeline("web-acceptance", generateWebAcceptanceCache(ctx)),
+        cachePipeline("web-e2e", generateWebE2ECache(ctx)),
+    ]
 
 def testOcisModules(ctx):
     pipelines = []
@@ -459,8 +466,7 @@ def cacheCoreReposForTesting(ctx):
                  cloneCoreRepos() +
                  # this does not support the absolute path to the target directory
                  # so we need to use a relative path :(
-                 rebuildBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
-                 rebuildBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]),
+                 rebuildBuildArtifactCache(ctx, "testrunner", dirs["core"]),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -671,7 +677,6 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  ocisServer(storage, accounts_hash_difficulty) +
                  restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
-                 restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
                  [
                      {
                          "name": "localApiTests-%s-%s" % (suite, storage),
@@ -682,7 +687,6 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                              "PATH_TO_CORE": "%s/%s" % (dirs["base"], dirs["core"]),
                              "TEST_SERVER_URL": "https://ocis-server:9200",
                              "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
-                             "SKELETON_DIR": "%s/%s/data/apiSkeleton" % (dirs["base"], dirs["testing_app"]),
                              "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
                              "TEST_OCIS": "true",
                              "SEND_SCENARIO_LINE_REFERENCES": "true",
@@ -761,7 +765,6 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  ocisServer(storage, accounts_hash_difficulty) +
                  restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
-                 restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
                  [
                      {
                          "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
@@ -772,7 +775,6 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "PATH_TO_CORE": "%s/%s" % (dirs["base"], dirs["core"]),
                              "TEST_SERVER_URL": "https://ocis-server:9200",
                              "OCIS_REVA_DATA_ROOT": "%s" % ("/srv/app/tmp/ocis/owncloud/data/" if storage == "owncloud" else ""),
-                             "SKELETON_DIR": "%s/%s/data/apiSkeleton" % (dirs["base"], dirs["testing_app"]),
                              "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
                              "TEST_OCIS": "true",
                              "SEND_SCENARIO_LINE_REFERENCES": "true",
@@ -879,7 +881,6 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                  ocisServer(storage, accounts_hash_difficulty) +
                  waitForSeleniumService() +
                  waitForMiddlewareService() +
-                 restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
                  [
                      {
                          "name": "webUITests",
@@ -889,7 +890,6 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
                              "BACKEND_HOST": "https://ocis-server:9200",
                              "RUN_ON_OCIS": "true",
                              "OCIS_REVA_DATA_ROOT": "/srv/app/tmp/ocis/owncloud/data",
-                             "TESTING_DATA_DIR": "%s/%s" % (dirs["base"], dirs["testing_app"]),
                              "WEB_UI_CONFIG": "%s/tests/config/drone/ocis-config.json" % dirs["base"],
                              "TEST_TAGS": finalFilterTags,
                              "LOCAL_UPLOAD_DIR": "/uploads",
@@ -2870,45 +2870,127 @@ def setupForLitmus():
         ],
     }]
 
-def generateWebCache(ctx):
+def getDroneEnvAndCheckScript(ctx):
     ocis_git_base_url = "https://raw.githubusercontent.com/owncloud/ocis"
     path_to_drone_env = "%s/%s/.drone.env" % (ocis_git_base_url, ctx.build.commit)
     path_to_check_script = "%s/%s/tests/config/drone/check_web_cache.sh" % (ocis_git_base_url, ctx.build.commit)
+    return {
+        "name": "get-drone-env-and-check-script",
+        "image": OC_UBUNTU,
+        "commands": [
+            "curl -s -o .drone.env %s" % path_to_drone_env,
+            "curl -s -o check_web_cache.sh %s" % path_to_check_script,
+        ],
+    }
 
-    return [
-        {
-            "name": "get-drone-env-and-check-script",
-            "image": OC_UBUNTU,
-            "commands": [
-                "curl -s -o .drone.env %s" % path_to_drone_env,
-                "curl -s -o check_web_cache.sh %s" % path_to_check_script,
-            ],
-        },
-        {
-            "name": "check-for-web-cache",
-            "image": OC_UBUNTU,
-            "environment": {
-                "CACHE_ENDPOINT": {
-                    "from_secret": "cache_public_s3_server",
-                },
-                "CACHE_BUCKET": {
-                    "from_secret": "cache_public_s3_bucket",
-                },
+def checkForWebCache(name):
+    return {
+        "name": "check-for-%s-cache" % name,
+        "image": OC_UBUNTU,
+        "environment": {
+            "CACHE_ENDPOINT": {
+                "from_secret": "cache_public_s3_server",
             },
-            "commands": [
-                "bash check_web_cache.sh",
-            ],
+            "CACHE_BUCKET": {
+                "from_secret": "cache_public_s3_bucket",
+            },
         },
+        "commands": [
+            "bash -x check_web_cache.sh %s" % name,
+        ],
+    }
+
+def cloneWeb():
+    return {
+        "name": "clone-web",
+        "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+        "commands": [
+            ". ./.drone.env",
+            "rm -rf %s" % dirs["web"],
+            "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git %s" % dirs["web"],
+            "cd %s && git checkout $WEB_COMMITID" % dirs["web"],
+        ],
+    }
+
+def generateWebAcceptanceCache(ctx):
+    return [
+        getDroneEnvAndCheckScript(ctx),
+        checkForWebCache("acceptance"),
+        cloneWeb(),
         {
-            "name": "clone-web",
+            "name": "install-yarn",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
             "commands": [
-                ". ./.drone.env",
-                "rm -rf %s" % dirs["web"],
-                "git clone -b $WEB_BRANCH --single-branch --no-tags https://github.com/owncloud/web.git %s" % dirs["web"],
-                "cd %s && git checkout $WEB_COMMITID" % dirs["web"],
+                "cd %s" % dirs["web"],
+                "cd tests/acceptance",
+                "retry -t 3 'yarn install --immutable --frozen-lockfile'",
             ],
         },
+        {
+            "name": "zip-yarn",
+            "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+            "commands": [
+                # zip the yarn deps before caching
+                "if [ ! -d '%s' ]; then mkdir -p %s; fi" % (dirs["zip"], dirs["zip"]),
+                "cd %s" % dirs["web"],
+                "cd tests/acceptance",
+                "tar -czvf %s .yarn" % dirs["acceptanceYarnZip"],
+            ],
+        },
+        {
+            "name": "cache-yarn",
+            "image": MINIO_MC,
+            "environment": MINIO_MC_ENV,
+            "commands": [
+                "source ./.drone.env",
+                # cache using the minio/mc client to the public bucket (long term bucket)
+                "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
+                "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["acceptanceYarnZip"],
+            ],
+        },
+    ]
+
+def generateWebE2ECache(ctx):
+    return [
+        getDroneEnvAndCheckScript(ctx),
+        checkForWebCache("e2e"),
+        cloneWeb(),
+        {
+            "name": "install-yarn",
+            "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+            "commands": [
+                "cd %s" % dirs["web"],
+                "retry -t 3 'yarn install --immutable --frozen-lockfile'",
+            ],
+        },
+        {
+            "name": "zip-yarn",
+            "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+            "commands": [
+                # zip the yarn deps before caching
+                "if [ ! -d '%s' ]; then mkdir -p %s; fi" % (dirs["zip"], dirs["zip"]),
+                "cd %s" % dirs["web"],
+                "tar -czvf %s .yarn" % dirs["e2eYarnZip"],
+            ],
+        },
+        {
+            "name": "cache-yarn",
+            "image": MINIO_MC,
+            "environment": MINIO_MC_ENV,
+            "commands": [
+                "source ./.drone.env",
+                # cache using the minio/mc client to the public bucket (long term bucket)
+                "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
+                "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["e2eYarnZip"],
+            ],
+        },
+    ]
+
+def generateWebCache(ctx):
+    return [
+        getDroneEnvAndCheckScript(ctx),
+        checkForWebCache("web"),
+        cloneWeb(),
         {
             "name": "zip-web",
             "image": OC_UBUNTU,
@@ -2926,48 +3008,6 @@ def generateWebCache(ctx):
                 # cache using the minio/mc client to the 'owncloud' bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
                 "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["webZip"],
-            ],
-        },
-        {
-            "name": "install-yarn",
-            "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-            "commands": [
-                "cd %s" % dirs["web"],
-                "retry -t 3 'yarn install --immutable --frozen-lockfile'",
-                "cd tests/acceptance",
-                "retry -t 3 'yarn install --immutable --frozen-lockfile'",
-            ],
-        },
-        {
-            "name": "zip-yarn",
-            "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-            "commands": [
-                # zip the yarn deps before caching
-                "cd %s" % dirs["web"],
-                "tar -czvf %s .yarn" % dirs["e2eYarnZip"],
-                "cd tests/acceptance",
-                "tar -czvf %s .yarn" % dirs["acceptanceYarnZip"],
-            ],
-        },
-        {
-            "name": "cache-yarn",
-            "image": MINIO_MC,
-            "environment": MINIO_MC_ENV,
-            "commands": [
-                "source ./.drone.env",
-                # cache using the minio/mc client to the public bucket (long term bucket)
-                "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["e2eYarnZip"],
-                "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["acceptanceYarnZip"],
-            ],
-        },
-        {
-            "name": "list-web-cache",
-            "image": MINIO_MC,
-            "environment": MINIO_MC_ENV,
-            "commands": [
-                "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc ls --recursive s3/$CACHE_BUCKET/ocis/web-test-runner",
             ],
         },
     ]

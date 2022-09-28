@@ -3,17 +3,41 @@ package search
 import (
 	"context"
 	"errors"
+
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
 	"google.golang.org/grpc/metadata"
 )
+
+// ResolveReference makes sure the path is relative to the space root
+func ResolveReference(ctx context.Context, ref *provider.Reference, ri *provider.ResourceInfo, gw gateway.GatewayAPIClient) (*provider.Reference, error) {
+	if ref.GetResourceId().GetOpaqueId() == ref.GetResourceId().GetSpaceId() {
+		return ref, nil
+	}
+
+	gpRes, err := gw.GetPath(ctx, &provider.GetPathRequest{
+		ResourceId: ri.Id,
+	})
+	if err != nil || gpRes.Status.Code != rpc.Code_CODE_OK {
+		return nil, err
+	}
+	return &provider.Reference{
+		ResourceId: &provider.ResourceId{
+			StorageId: ref.GetResourceId().GetStorageId(),
+			SpaceId:   ref.GetResourceId().GetSpaceId(),
+			OpaqueId:  ref.GetResourceId().GetSpaceId(),
+		},
+		Path: utils.MakeRelativePath(gpRes.Path),
+	}, nil
+}
 
 type matchArray []*searchmsg.Match
 
@@ -64,23 +88,6 @@ func statResource(ctx context.Context, ref *provider.Reference, gw gateway.Gatew
 	if res.Status.Code != rpc.Code_CODE_OK {
 		err := errors.New("failed to stat the moved resource")
 		logger.Error().Interface("res", res).Msg(err.Error())
-		return nil, err
-	}
-
-	return res, nil
-}
-
-func getPath(ctx context.Context, id *provider.ResourceId, gw gateway.GatewayAPIClient, logger log.Logger) (*provider.GetPathResponse, error) {
-	res, err := gw.GetPath(ctx, &provider.GetPathRequest{ResourceId: id})
-
-	if err != nil {
-		logger.Error().Err(err).Interface("id", id).Msg("failed to get path for moved resource")
-		return nil, err
-	}
-	if res.Status.Code != rpc.Code_CODE_OK {
-		err := errors.New("failed to get path for moved resource")
-
-		logger.Error().Interface("status", res.Status).Interface("id", id).Msg(err.Error())
 		return nil, err
 	}
 

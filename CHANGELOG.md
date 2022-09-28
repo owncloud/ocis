@@ -6,21 +6,38 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix authentication for autoprovisioned users: [#4616](https://github.com/owncloud/ocis/issues/4616)
+* Bugfix - Bring back the settings UI in Web: [#4691](https://github.com/owncloud/ocis/pull/4691)
 * Bugfix - Change the default value for PROXY_OIDC_INSECURE to false: [#4601](https://github.com/owncloud/ocis/pull/4601)
 * Bugfix - Fix notifications service settings: [#4652](https://github.com/owncloud/ocis/pull/4652)
 * Bugfix - Fix the OIDC provider cache: [#4600](https://github.com/owncloud/ocis/pull/4600)
 * Bugfix - Render webdav permissions as string in search report: [#4575](https://github.com/owncloud/ocis/issues/4575)
+* Bugfix - Fix unfindable entities from shares/publicshares: [#4651](https://github.com/owncloud/ocis/pull/4651)
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
 * Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
 * Enhancement - Add Email templating: [#4564](https://github.com/owncloud/ocis/pull/4564)
 * Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
 * Enhancement - Allow to configuring the reva cache store: [#4627](https://github.com/owncloud/ocis/pull/4627)
+* Enhancement - Add support for REPORT requests to /dav/spaces URLs: [#4661](https://github.com/owncloud/ocis/pull/4661)
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
 * Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
 * Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
 * Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
 
 ## Details
+
+* Bugfix - Fix authentication for autoprovisioned users: [#4616](https://github.com/owncloud/ocis/issues/4616)
+
+   We've fixed an issue in the proxy, which made the first http request of an autoprovisioned user
+   fail.
+
+   https://github.com/owncloud/ocis/issues/4616
+
+* Bugfix - Bring back the settings UI in Web: [#4691](https://github.com/owncloud/ocis/pull/4691)
+
+   We've fixed the oC Web configuration in oCIS so that the settings UI will be shown again in Web.
+
+   https://github.com/owncloud/ocis/pull/4691
 
 * Bugfix - Change the default value for PROXY_OIDC_INSECURE to false: [#4601](https://github.com/owncloud/ocis/pull/4601)
 
@@ -52,6 +69,14 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4575
    https://github.com/owncloud/ocis/pull/4579
+
+* Bugfix - Fix unfindable entities from shares/publicshares: [#4651](https://github.com/owncloud/ocis/pull/4651)
+
+   We fixed a problem where directories or empty files weren't findable because they were to the
+   search index improperly when created through a share or publicshare.
+
+   https://github.com/owncloud/ocis/issues/4489
+   https://github.com/owncloud/ocis/pull/4651
 
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
 
@@ -86,6 +111,13 @@ The following sections list the changes for unreleased.
    storage.
 
    https://github.com/owncloud/ocis/pull/4627
+
+* Enhancement - Add support for REPORT requests to /dav/spaces URLs: [#4661](https://github.com/owncloud/ocis/pull/4661)
+
+   We added support for /dav/spaces REPORT requests which allow for searching specific spaces.
+
+   https://github.com/owncloud/ocis/issues/4034
+   https://github.com/owncloud/ocis/pull/4661
 
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
 

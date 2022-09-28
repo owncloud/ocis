@@ -176,9 +176,8 @@ File and sync features in a shared scenario
 - [apiShareManagementToShares/acceptShares.feature:366](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L366)
 - [apiShareManagementToShares/acceptShares.feature:402](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L402)
 - [apiShareManagementToShares/acceptShares.feature:304](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L304)
-- [apiShareCreateSpecialToShares1/createShareUniqueReceivedNames.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareUniqueReceivedNames.feature#L15)
-- [apiShareManagementToShares/acceptShares.feature:599](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L599)
-- [apiShareManagementToShares/acceptShares.feature:664](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L664)
+- [apiShareManagementToShares/acceptShares.feature:594](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L594)
+- [apiShareManagementToShares/acceptShares.feature:659](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L659)
 - [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:162](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L162)
 - [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:163](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L163)
 - [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:202](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L202)
@@ -323,7 +322,7 @@ cannot share a folder with create permission
 
 #### [restoring an older version of a shared file deletes the share](https://github.com/owncloud/ocis/issues/765)
 
-- [apiShareManagementToShares/acceptShares.feature:588](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L588)
+- [apiShareManagementToShares/acceptShares.feature:583](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L583)
 
 #### [Expiration date for shares is not implemented](https://github.com/owncloud/ocis/issues/1250)
 
@@ -494,9 +493,9 @@ User and group management features
 
 special character username not valid
 
-- [apiTrashbin/trashbinFilesFolders.feature:336](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L336)
 - [apiTrashbin/trashbinFilesFolders.feature:337](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L337)
 - [apiTrashbin/trashbinFilesFolders.feature:338](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L338)
+- [apiTrashbin/trashbinFilesFolders.feature:339](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L339)
 
 #### [incorrect ocs(v2) status value when getting info of share that does not exist should be 404, gives 998](https://github.com/owncloud/product/issues/250)
 
@@ -590,18 +589,10 @@ _ocdav: api compatibility, return correct status code_
 
 #### [/webdav and spaces endpoint does not allow REPORT requests](https://github.com/owncloud/ocis/issues/4034)
 
-- [apiWebdavOperations/search.feature:48](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L48)
-- [apiWebdavOperations/search.feature:70](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L70)
-- [apiWebdavOperations/search.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L93)
-- [apiWebdavOperations/search.feature:108](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L108)
-- [apiWebdavOperations/search.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L132)
-- [apiWebdavOperations/search.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L156)
-- [apiWebdavOperations/search.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L180)
 - [apiWebdavOperations/search.feature:207](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L207)
 - [apiWebdavOperations/search.feature:213](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L213)
 - [apiWebdavOperations/search.feature:239](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L239)
 - [apiWebdavOperations/search.feature:245](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L245)
-- [apiWebdavOperations/search.feature:270](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L270)
 
 ### [No permissions property in response while searching for files and folders on ocis with new webdav](https://github.com/owncloud/ocis/issues/4009)
 
@@ -905,8 +896,8 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiShareManagementToShares/acceptShares.feature:252](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L252)
 - [apiShareManagementToShares/acceptShares.feature:295](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L295)
 - [apiShareManagementToShares/acceptShares.feature:335](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L335)
-- [apiShareManagementToShares/acceptShares.feature:577](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L577)
-- [apiShareManagementToShares/acceptShares.feature:578](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L578)
+- [apiShareManagementToShares/acceptShares.feature:572](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L572)
+- [apiShareManagementToShares/acceptShares.feature:573](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L573)
 - [apiShareOperationsToShares2/shareAccessByID.feature:124](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L124)
 - [apiShareOperationsToShares2/shareAccessByID.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L125)
 - [apiShareManagementBasicToShares/deleteShareFromShares.feature:185](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L185)
@@ -988,10 +979,10 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 #### [HTTP status code differ while listing the contents of another user's trash bin](https://github.com/owncloud/ocis/issues/3561)
 - [apiTrashbin/trashbinFilesFolders.feature:199](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L199)
 - [apiTrashbin/trashbinFilesFolders.feature:223](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L223)
-- [apiTrashbin/trashbinFilesFolders.feature:253](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L253)
-- [apiTrashbin/trashbinFilesFolders.feature:269](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L269)
-- [apiTrashbin/trashbinFilesFolders.feature:278](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L278)
-- [apiTrashbin/trashbinFilesFolders.feature:283](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L283)
+- [apiTrashbin/trashbinFilesFolders.feature:254](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L254)
+- [apiTrashbin/trashbinFilesFolders.feature:270](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L270)
+- [apiTrashbin/trashbinFilesFolders.feature:279](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L279)
+- [apiTrashbin/trashbinFilesFolders.feature:284](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L284)
 
 #### [HTTP status code differ while deleting file of another user's trash bin](https://github.com/owncloud/ocis/issues/3544)
 
@@ -1017,16 +1008,16 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiTrashbin/trashbinFilesFolders.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L99)
 - [apiTrashbin/trashbinFilesFolders.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L135)
 - [apiTrashbin/trashbinFilesFolders.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L158)
-- [apiTrashbin/trashbinFilesFolders.feature:343](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L343)
 - [apiTrashbin/trashbinFilesFolders.feature:344](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L344)
 - [apiTrashbin/trashbinFilesFolders.feature:345](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L345)
 - [apiTrashbin/trashbinFilesFolders.feature:346](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L346)
 - [apiTrashbin/trashbinFilesFolders.feature:347](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L347)
 - [apiTrashbin/trashbinFilesFolders.feature:348](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L348)
-- [apiTrashbin/trashbinFilesFolders.feature:364](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L364)
-- [apiTrashbin/trashbinFilesFolders.feature:384](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L384)
-- [apiTrashbin/trashbinFilesFolders.feature:438](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L438)
-- [apiTrashbin/trashbinFilesFolders.feature:475](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L475)
+- [apiTrashbin/trashbinFilesFolders.feature:349](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L349)
+- [apiTrashbin/trashbinFilesFolders.feature:365](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L365)
+- [apiTrashbin/trashbinFilesFolders.feature:385](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L385)
+- [apiTrashbin/trashbinFilesFolders.feature:439](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L439)
+- [apiTrashbin/trashbinFilesFolders.feature:476](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L476)
 
 #### [valid WebDAV (DELETE, COPY or MOVE) requests with body must exit with 415](https://github.com/owncloud/ocis/issues/4332)
 
@@ -1034,6 +1025,10 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiAuthWebDav/webDavDELETEAuth.feature:199](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavDELETEAuth.feature#L199)
 - [apiAuthWebDav/webDavCOPYAuth.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavCOPYAuth.feature#L166)
 - [apiAuthWebDav/webDavCOPYAuth.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavCOPYAuth.feature#L178)
+
+#### [Identical shares have different naming convention in oc10 and ocis](https://github.com/owncloud/ocis/issues/4674)
+#### [different url encoding pattern used in oc10 and ocis for identical share ](https://github.com/owncloud/ocis/issues/4676)
+- [apiShareCreateSpecialToShares1/createShareUniqueReceivedNames.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareUniqueReceivedNames.feature#L15)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

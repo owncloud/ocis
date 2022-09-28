@@ -121,6 +121,14 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			SpaceId:   space.Root.SpaceId,
 			OpaqueId:  space.Root.OpaqueId,
 		}
+
+		if req.Ref != nil &&
+			(req.Ref.ResourceId.StorageId != searchRootId.StorageId ||
+				req.Ref.ResourceId.SpaceId != searchRootId.SpaceId ||
+				req.Ref.ResourceId.OpaqueId != searchRootId.OpaqueId) {
+			continue
+		}
+
 		var (
 			mountpointRootID *searchmsg.ResourceID
 			rootName         string
@@ -245,18 +253,22 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 
 	// Walk the space and index all files
 	w := walker.NewWalker(p.gateway)
-	rootId, err := storagespace.ParseID(req.SpaceId)
+	rootID, err := storagespace.ParseID(req.SpaceId)
 	if err != nil {
 		p.logger.Error().Err(err).Msg(err.Error())
 		return nil, err
 	}
-	err = w.Walk(ownerCtx, &rootId, func(wd string, info *provider.ResourceInfo, err error) error {
+	err = w.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error walking the tree")
 		}
-		ref := &provider.Reference{
+		ref, err := ResolveReference(ownerCtx, &provider.Reference{
 			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
-			ResourceId: &rootId,
+			ResourceId: &rootID,
+		}, info, p.gateway)
+		if err != nil {
+			p.logger.Error().Err(err).Msg("error resolving reference")
+			return nil
 		}
 
 		doc, err := p.extractor.Extract(ctx, info)
@@ -284,7 +296,6 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 		return nil, err
 	}
 
-	logDocCount(p.engine, p.logger)
 	return &searchsvc.IndexSpaceResponse{}, nil
 }
 

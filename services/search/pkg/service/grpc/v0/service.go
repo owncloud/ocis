@@ -106,6 +106,7 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 	res, err := s.provider.Search(ctx, &searchsvc.SearchRequest{
 		Query:    in.Query,
 		PageSize: in.PageSize,
+		Ref:      in.Ref,
 	})
 	if err != nil {
 		switch err.(type) {
