@@ -4,14 +4,15 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"strings"
+
 	"github.com/bbalet/stopwords"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/google/go-tika/tika"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
-	"io"
-	"strings"
 )
 
 // Tika is used to extract content from a resource,
@@ -64,11 +65,7 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 		return doc, err
 	}
 
-	lang, err := t.tika.Language(ctx, bytes.NewReader(d1.Bytes()))
-	if err != nil {
-		return doc, nil
-	}
-
+	lang, _ := t.tika.Language(ctx, bytes.NewReader(d1.Bytes()))
 	metas, err := t.tika.MetaRecursive(ctx, bytes.NewReader(d2.Bytes()))
 	if err != nil {
 		return doc, err

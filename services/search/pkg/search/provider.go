@@ -105,27 +105,27 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			continue
 		}
 		opaqueMap := sdk.DecodeOpaqueMap(space.Opaque)
-		grantSpaceId := storagespace.FormatResourceID(provider.ResourceId{
+		grantSpaceID := storagespace.FormatResourceID(provider.ResourceId{
 			StorageId: opaqueMap["grantStorageID"],
 			SpaceId:   opaqueMap["grantSpaceID"],
 			OpaqueId:  opaqueMap["grantOpaqueID"],
 		})
-		mountpointMap[grantSpaceId] = space.Id.OpaqueId
+		mountpointMap[grantSpaceID] = space.Id.OpaqueId
 	}
 
 	matches := matchArray{}
 	total := int32(0)
 	for _, space := range listSpacesRes.StorageSpaces {
-		searchRootId := &searchmsg.ResourceID{
+		searchRootID := &searchmsg.ResourceID{
 			StorageId: space.Root.StorageId,
 			SpaceId:   space.Root.SpaceId,
 			OpaqueId:  space.Root.OpaqueId,
 		}
 
 		if req.Ref != nil &&
-			(req.Ref.ResourceId.StorageId != searchRootId.StorageId ||
-				req.Ref.ResourceId.SpaceId != searchRootId.SpaceId ||
-				req.Ref.ResourceId.OpaqueId != searchRootId.OpaqueId) {
+			(req.Ref.ResourceId.StorageId != searchRootID.StorageId ||
+				req.Ref.ResourceId.SpaceId != searchRootID.SpaceId ||
+				req.Ref.ResourceId.OpaqueId != searchRootID.OpaqueId) {
 			continue
 		}
 
@@ -140,7 +140,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 			continue // mountpoint spaces are only "links" to the shared spaces. we have to search the shared "grant" space instead
 		case "grant":
 			// In case of grant spaces we search the root of the outer space and translate the paths to the according mountpoint
-			searchRootId.OpaqueId = space.Root.SpaceId
+			searchRootID.OpaqueId = space.Root.SpaceId
 			mountpointID, ok := mountpointMap[space.Id.OpaqueId]
 			if !ok {
 				p.logger.Warn().Interface("space", space).Msg("could not find mountpoint space for grant space")
@@ -178,7 +178,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		res, err := p.engine.Search(ctx, &searchsvc.SearchIndexRequest{
 			Query: req.Query,
 			Ref: &searchmsg.Reference{
-				ResourceId: searchRootId,
+				ResourceId: searchRootID,
 				Path:       mountpointPrefix,
 			},
 			PageSize: req.PageSize,

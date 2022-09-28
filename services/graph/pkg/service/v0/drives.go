@@ -33,6 +33,8 @@ import (
 	merrors "go-micro.dev/v4/errors"
 )
 
+var _project = "project"
+
 // GetDrives lists all drives the current user has access to
 func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 	g.getDrives(w, r, false)
@@ -236,8 +238,8 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		driveType = *drive.DriveType
 	}
 	switch driveType {
-	case "", "project":
-		driveType = "project"
+	case "", _project:
+		driveType = _project
 		maxQuota = g.maxQuotaProject
 	default:
 		errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("drives of type %s cannot be created via this api", driveType))
@@ -405,7 +407,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 			switch sres.StorageSpaces[0].SpaceType {
 			case "personal":
 				maxQuota = g.maxQuotaPersonal
-			case "project":
+			case _project:
 				maxQuota = g.maxQuotaProject
 			default:
 				errorcode.GeneralException.Render(w, r, http.StatusBadRequest, fmt.Sprintf("can't patch drive of type %s", sres.StorageSpaces[0].SpaceType))

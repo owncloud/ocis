@@ -25,7 +25,7 @@ type eventHandler struct {
 
 // HandleEvents listens to the needed events,
 // it handles the whole resource indexing livecycle.
-func HandleEvents(eng engine.Engine, extractor content.Extractor, gw gateway.GatewayAPIClient, bus events.Stream, logger log.Logger, cfg *config.Config) error {
+func HandleEvents(eng engine.Engine, extractor content.Extractor, gw gateway.GatewayAPIClient, bus events.Consumer, logger log.Logger, cfg *config.Config) error {
 	evts := []events.Unmarshaller{
 		events.ItemTrashed{},
 		events.ItemRestored{},
