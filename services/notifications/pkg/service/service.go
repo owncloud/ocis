@@ -10,6 +10,7 @@ import (
 	"syscall"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	groupv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -85,16 +86,6 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		return
 	}
 
-	granteeUserResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
-		UserId: e.GranteeUserID,
-	})
-	if err != nil || sharerUserResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
-		s.logger.Error().
-			Err(err).
-			Str("event", "SpaceCreated").
-			Msg("Could not get user response from gatway client")
-		return
-	}
 	// Get auth context
 	ownerCtx := ctxpkg.ContextSetUser(context.Background(), sharerUserResponse.User)
 	authRes, err := s.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
@@ -165,10 +156,45 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 			Msg("could not create link to the share")
 		return
 	}
+	spaceGrantee := ""
+	switch {
+	// Note: We're using the 'ownerCtx' (authenticated as the share owner) here for requesting
+	// the Grantees of the shares. Ideally the notfication service would use some kind of service
+	// user for this.
+	case e.GranteeUserID != nil:
+		granteeUserResponse, err := s.gwClient.GetUser(ownerCtx, &userv1beta1.GetUserRequest{
+			UserId: e.GranteeUserID,
+		})
+		if err != nil || granteeUserResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
+			s.logger.Error().
+				Err(err).
+				Str("event", "ShareCreated").
+				Msg("Could not get user response from gatway client")
+			return
+		}
+		spaceGrantee = granteeUserResponse.GetUser().DisplayName
+	case e.GranteeGroupID != nil:
+		granteeGroupResponse, err := s.gwClient.GetGroup(ownerCtx, &groupv1beta1.GetGroupRequest{
+			GroupId: e.GranteeGroupID,
+		})
+		if err != nil || granteeGroupResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
+			s.logger.Error().
+				Err(err).
+				Str("event", "ShareCreated").
+				Msg("Could not get group response from gatway client")
+			return
+		}
+		spaceGrantee = granteeGroupResponse.GetGroup().DisplayName
+	default:
+		s.logger.Error().
+			Str("event", "ShareCreated").
+			Msg("Event 'ShareCreated' has no grantee")
+		return
+	}
 
 	sharerDisplayName := sharerUserResponse.GetUser().DisplayName
 	msg, err := email.RenderEmailTemplate("sharedSpace.email.tmpl", map[string]string{
-		"SpaceGrantee": granteeUserResponse.GetUser().DisplayName,
+		"SpaceGrantee": spaceGrantee,
 		"SpaceSharer":  sharerDisplayName,
 		"SpaceName":    md.GetInfo().GetSpace().Name,
 		"ShareLink":    shareLink,
@@ -198,17 +224,6 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 	sharerUserResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
 		UserId: e.Sharer,
-	})
-	if err != nil || sharerUserResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
-		s.logger.Error().
-			Err(err).
-			Str("event", "ShareCreated").
-			Msg("Could not get user response from gatway client")
-		return
-	}
-
-	granteeUserResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
-		UserId: e.GranteeUserID,
 	})
 	if err != nil || sharerUserResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
 		s.logger.Error().
@@ -279,9 +294,45 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		return
 	}
 
+	shareGrantee := ""
+	switch {
+	// Note: We're using the 'ownerCtx' (authenticated as the share owner) here for requesting
+	// the Grantees of the shares. Ideally the notfication service would use some kind of service
+	// user for this.
+	case e.GranteeUserID != nil:
+		granteeUserResponse, err := s.gwClient.GetUser(ownerCtx, &userv1beta1.GetUserRequest{
+			UserId: e.GranteeUserID,
+		})
+		if err != nil || granteeUserResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
+			s.logger.Error().
+				Err(err).
+				Str("event", "ShareCreated").
+				Msg("Could not get user response from gatway client")
+			return
+		}
+		shareGrantee = granteeUserResponse.GetUser().DisplayName
+	case e.GranteeGroupID != nil:
+		granteeGroupResponse, err := s.gwClient.GetGroup(ownerCtx, &groupv1beta1.GetGroupRequest{
+			GroupId: e.GranteeGroupID,
+		})
+		if err != nil || granteeGroupResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
+			s.logger.Error().
+				Err(err).
+				Str("event", "ShareCreated").
+				Msg("Could not get group response from gatway client")
+			return
+		}
+		shareGrantee = granteeGroupResponse.GetGroup().DisplayName
+	default:
+		s.logger.Error().
+			Str("event", "ShareCreated").
+			Msg("Event 'ShareCreated' has no grantee")
+		return
+	}
+
 	sharerDisplayName := sharerUserResponse.GetUser().DisplayName
 	msg, err := email.RenderEmailTemplate("shareCreated.email.tmpl", map[string]string{
-		"ShareGrantee": granteeUserResponse.GetUser().DisplayName,
+		"ShareGrantee": shareGrantee,
 		"ShareSharer":  sharerDisplayName,
 		"ShareFolder":  md.GetInfo().Name,
 		"ShareLink":    shareLink,
