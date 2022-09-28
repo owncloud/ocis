@@ -4,31 +4,34 @@ import (
 	"time"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
 )
 
 // Postprocessing handles postprocessing of a file
 type Postprocessing struct {
-	id       string
-	url      string
-	u        *user.User
-	m        map[events.Postprocessingstep]interface{}
-	filename string
-	c        config.Postprocessing
-	steps    []events.Postprocessingstep
+	id         string
+	url        string
+	u          *user.User
+	m          map[events.Postprocessingstep]interface{}
+	filename   string
+	resourceId *provider.ResourceId
+	c          config.Postprocessing
+	steps      []events.Postprocessingstep
 }
 
 // New returns a new postprocessing instance
-func New(uploadID string, uploadURL string, user *user.User, filename string, c config.Postprocessing) *Postprocessing {
+func New(uploadID string, uploadURL string, user *user.User, filename string, resourceId *provider.ResourceId, c config.Postprocessing) *Postprocessing {
 	return &Postprocessing{
-		id:       uploadID,
-		url:      uploadURL,
-		u:        user,
-		m:        make(map[events.Postprocessingstep]interface{}),
-		c:        c,
-		filename: filename,
-		steps:    getSteps(c),
+		id:         uploadID,
+		url:        uploadURL,
+		u:          user,
+		m:          make(map[events.Postprocessingstep]interface{}),
+		c:          c,
+		filename:   filename,
+		resourceId: resourceId,
+		steps:      getSteps(c),
 	}
 }
 
@@ -79,6 +82,7 @@ func (pp *Postprocessing) nextStep(next events.Postprocessingstep) events.StartP
 		URL:           pp.url,
 		ExecutingUser: pp.u,
 		Filename:      pp.filename,
+		ResourceID:    pp.resourceId,
 		StepToStart:   next,
 	}
 }
