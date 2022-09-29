@@ -24,16 +24,16 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/createGroupCaseSensitive.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroupCaseSensitive.feature#L21)
 
 ### [PROPFIND on accepted shares with identical names containing brackets exit with 404](https://github.com/owncloud/ocis/issues/4421)
-- [apiSpaces/changingFilesShare.feature:12](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/changingFilesShare.feature#L12)
+- [apiSpacesShares/changingFilesShare.feature:12](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/changingFilesShare.feature#L12)
 
 ### [copy to overwrite (file and folder) from Personal to Shares Jail behaves differently](https://github.com/owncloud/ocis/issues/4393)
-- [apiSpaces/copySpaces.feature:488](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L488)
-- [apiSpaces/copySpaces.feature:502](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/copySpaces.feature#L502)
+- [apiSpacesShares/copySpaces.feature:488](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L488)
+- [apiSpacesShares/copySpaces.feature:502](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L502)
 
 ### [search doesn't find the project space by name](https://github.com/owncloud/ocis/issues/4506)
 - [apiSpaces/search.feature:95](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/search.feature#L95)
 
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
-- [apiSpaces/shareUploadTUS.feature:204](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareUploadTUS.feature#L204)
-- [apiSpaces/shareUploadTUS.feature:219](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareUploadTUS.feature#L219)
-- [apiSpaces/shareUploadTUS.feature:284](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/shareUploadTUS.feature#L284)
+- [apiSpacesShares/shareUploadTUS.feature:204](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L204)
+- [apiSpacesShares/shareUploadTUS.feature:219](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L219)
+- [apiSpacesShares/shareUploadTUS.feature:284](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L284)
