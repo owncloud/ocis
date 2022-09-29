@@ -9,7 +9,7 @@ geekdocFilePath: dcfsnfs.md
 
 {{< toc >}}
 
-oCIS' default storage backend is the Decomposed FS. The Decomposed FS can be set up to run on a NFS share. That way the same storage can be provided over network to other nodes running oCIS.
+oCIS' default storage backend is the Decomposed FS. The Decomposed FS can be set up to run on a NFS share. That way the same storage can be provided over the network to other nodes running oCIS.
 
 This document summarizes a few important considerations of the NFS setup and describes a tested setup. The test has not covered concurrent access of data from different nodes yet.
 
@@ -39,7 +39,7 @@ The test setup uses the client mount command: `mount -t nfs -o nfsvers=4 192.168
 
 It sets the NFS version to 4, which is important to support extended attributes.
 
-After successful mounting the storage on the client, it can be checked if the NFS setup really supports extended attributes properly using the following commands.
+After successfully mounting the storage on the client, it can be checked if the NFS setup really supports extended attributes properly using the following commands.
 
 `setfattr -n user.test -v "xattr test string" ocisdata/foo` to write an extended attribute to a file, and `getfattr -d ocisdata/foo` to list all the attributes a file has set.
 
@@ -54,8 +54,8 @@ The oCIS server can be instructed to set up the decomposed FS at a certain path 
 The test setup started an oCIS tech preview single binary release using this start command:
 
 ```bash
-ocis init
-OCIS_BASE_DATA_PATH=/mnt/ocisdata/ OCIS_LOG_LEVEL=debug OCIS_INSECURE=true PROXY_HTTP_ADDR=0.0.0.0:9200 OCIS_URL=https://hostname:9200  ./ocis-1.18.0-linux-amd64 server
+./ocis init
+OCIS_BASE_DATA_PATH=/mnt/ocisdata/ OCIS_LOG_LEVEL=debug OCIS_INSECURE=true PROXY_HTTP_ADDR=0.0.0.0:9200 OCIS_URL=https://hostname:9200  ./ocis server
 ```
 
 This starts oCIS and a decomposed FS skeleton file system structure is set up on the NFS share.
