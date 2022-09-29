@@ -68,7 +68,7 @@ Feature: download multiple resources bundled into an archive
 
   Scenario: download a not existing single file
     When user "Alice" downloads the archive of "/doesnotexist.txt" of user "Alice" using the resource path
-    Then the HTTP status code should be "400"
+    Then the HTTP status code should be "404"
 
 
   Scenario: download multiple shared items as share receiver
