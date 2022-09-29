@@ -29,7 +29,12 @@ type Service interface {
 }
 
 // NewEventsNotifier provides a new eventsNotifier
-func NewEventsNotifier(events <-chan interface{}, channel channels.Channel, logger log.Logger, gwClient gateway.GatewayAPIClient, machineAuthAPIKey, emailTemplatePath string) Service {
+func NewEventsNotifier(
+	events <-chan interface{},
+	channel channels.Channel,
+	logger log.Logger,
+	gwClient gateway.GatewayAPIClient,
+	machineAuthAPIKey, emailTemplatePath, ocisURL string) Service {
 	return eventsNotifier{
 		logger:            logger,
 		channel:           channel,
@@ -38,6 +43,7 @@ func NewEventsNotifier(events <-chan interface{}, channel channels.Channel, logg
 		gwClient:          gwClient,
 		machineAuthAPIKey: machineAuthAPIKey,
 		emailTemplatePath: emailTemplatePath,
+		ocisURL:           ocisURL,
 	}
 }
 
@@ -49,6 +55,7 @@ type eventsNotifier struct {
 	gwClient          gateway.GatewayAPIClient
 	machineAuthAPIKey string
 	emailTemplatePath string
+	ocisURL           string
 }
 
 func (s eventsNotifier) Run() error {
@@ -147,7 +154,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		return
 	}
 
-	shareLink, err := urlJoinPath(e.Executant.Idp, "files/spaces/projects", storagespace.FormatResourceID(*e.ID))
+	shareLink, err := urlJoinPath(s.ocisURL, "files/spaces/projects", storagespace.FormatResourceID(*e.ID))
 
 	if err != nil {
 		s.logger.Error().
@@ -284,7 +291,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		return
 	}
 
-	shareLink, err := urlJoinPath(e.Executant.Idp, "files/shares/with-me")
+	shareLink, err := urlJoinPath(s.ocisURL, "files/shares/with-me")
 
 	if err != nil {
 		s.logger.Error().
@@ -345,7 +352,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 			Msg("Could not render E-Mail template for shares")
 	}
 
-	emailSubject := fmt.Sprintf("%s shared %s with you", sharerUserResponse.GetUser().DisplayName, md.GetInfo().Name)
+	emailSubject := fmt.Sprintf("%s shared '%s' with you", sharerUserResponse.GetUser().DisplayName, md.GetInfo().Name)
 	if e.GranteeUserID != nil {
 		err = s.channel.SendMessage(ownerCtx, []string{e.GranteeUserID.OpaqueId}, msg, emailSubject, sharerDisplayName)
 	} else if e.GranteeGroupID != nil {

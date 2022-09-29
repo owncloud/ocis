@@ -124,6 +124,10 @@ func EnsureCommons(cfg *config.Config) {
 	if cfg.AdminUserID != "" {
 		cfg.Commons.AdminUserID = cfg.AdminUserID
 	}
+
+	if cfg.OcisURL != "" {
+		cfg.Commons.OcisURL = cfg.OcisURL
+	}
 }
 
 func Validate(cfg *config.Config) error {
