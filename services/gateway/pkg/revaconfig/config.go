@@ -65,7 +65,6 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 						"static": map[string]interface{}{
 							"rules": map[string]interface{}{
 								"basic":        cfg.AuthBasicEndpoint,
-								"bearer":       cfg.AuthBearerEndpoint,
 								"machine":      cfg.AuthMachineEndpoint,
 								"publicshares": cfg.StoragePublicLinkEndpoint,
 							},

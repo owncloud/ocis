@@ -47,7 +47,6 @@ func DefaultConfig() *config.Config {
 
 		AppRegistryEndpoint:       "localhost:9242",
 		AuthBasicEndpoint:         "localhost:9146",
-		AuthBearerEndpoint:        "localhost:9148",
 		AuthMachineEndpoint:       "localhost:9166",
 		GroupsEndpoint:            "localhost:9160",
 		PermissionsEndpoint:       "localhost:9191",
