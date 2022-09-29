@@ -473,31 +473,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * Send Propfind Request to Url
-	 *
-	 * @param  string $fullUrl
-	 * @param  string $user
-	 * @param  string $password
-	 * @param  string $xRequestId
-	 * @param  array  $headers
-	 * @param mixed $body
-	 *
-	 * @return ResponseInterface
-	 *
-	 * @throws GuzzleException
-	 */
-	public function sendPropfindRequestToUrl(
-		string $fullUrl,
-		string $user,
-		string $password,
-		string $xRequestId = '',
-		array $headers = [],
-		$body = null
-	): ResponseInterface {
-		return HttpRequestHelper::sendRequest($fullUrl, $xRequestId, 'PROPFIND', $user, $password, $headers, $body);
-	}
-
-	/**
 	 * Send POST Request to url
 	 *
 	 * @param string $fullUrl
@@ -2270,11 +2245,7 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$fullUrl = $this->baseUrl . $this->davSpacesUrl . "trash-bin/" . $space["id"];
 		$this->featureContext->setResponse(
-			$this->sendPropfindRequestToUrl(
-				$fullUrl,
-				$user,
-				$this->featureContext->getPasswordForUser($user)
-			)
+			HttpRequestHelper::sendRequest($fullUrl, '', 'PROPFIND', $user, $this->featureContext->getPasswordForUser($user))
 		);
 	}
 
