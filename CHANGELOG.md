@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix authentication for autoprovisioned users: [#4616](https://github.com/owncloud/ocis/issues/4616)
 * Bugfix - Bring back the settings UI in Web: [#4691](https://github.com/owncloud/ocis/pull/4691)
 * Bugfix - Change the default value for PROXY_OIDC_INSECURE to false: [#4601](https://github.com/owncloud/ocis/pull/4601)
+* Bugfix - Don't run auth-bearer service by default: [#4692](https://github.com/owncloud/ocis/issues/4692)
 * Bugfix - Fix notifications service settings: [#4652](https://github.com/owncloud/ocis/pull/4652)
 * Bugfix - Fix the OIDC provider cache: [#4600](https://github.com/owncloud/ocis/pull/4600)
 * Bugfix - Render webdav permissions as string in search report: [#4575](https://github.com/owncloud/ocis/issues/4575)
@@ -46,6 +47,15 @@ The following sections list the changes for unreleased.
    values was `true` which is not acceptable since default values need to be secure.
 
    https://github.com/owncloud/ocis/pull/4601
+
+* Bugfix - Don't run auth-bearer service by default: [#4692](https://github.com/owncloud/ocis/issues/4692)
+
+   We no longer start the auth-bearer service by default. This service is currently unused and not
+   required to run ocis. The equivalent functionality to verify OpenID connect tokens and to mint
+   reva tokes for OIDC authenticated clients is currently implemented inside the oidc-auth
+   middleware of the proxy.
+
+   https://github.com/owncloud/ocis/issues/4692
 
 * Bugfix - Fix notifications service settings: [#4652](https://github.com/owncloud/ocis/pull/4652)
 
