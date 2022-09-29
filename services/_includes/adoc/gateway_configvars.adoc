@@ -258,7 +258,7 @@ The AUTH BASIC API endpoint.
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++localhost:9148 ++
+++ ++
 a| [subs=-attributes]
 The AUTH BEARER API endpoint.
 |`GATEWAY_AUTH_MACHINE_ENDPOINT`

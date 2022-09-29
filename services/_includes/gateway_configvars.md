@@ -36,7 +36,7 @@
 | GATEWAY_PERMISSIONS_ENDPOINT | string | localhost:9191 | The SETTINGS API endpoint.|
 | GATEWAY_SHARING_ENDPOINT | string | localhost:9150 | The SHARE API endpoint.|
 | GATEWAY_AUTH_BASIC_ENDPOINT | string | localhost:9146 | The AUTH BASIC API endpoint.|
-| GATEWAY_AUTH_BEARER_ENDPOINT | string | localhost:9148 | The AUTH BEARER API endpoint.|
+| GATEWAY_AUTH_BEARER_ENDPOINT | string |  | The AUTH BEARER API endpoint.|
 | GATEWAY_AUTH_MACHINE_ENDPOINT | string | localhost:9166 | The AUTH MACHINE API endpoint.|
 | GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT | string | localhost:9178 | The STORAGE PUBLICLINK API endpoint.|
 | GATEWAY_STORAGE_USERS_ENDPOINT | string | localhost:9157 | The STORAGE USERS API endpoint.|

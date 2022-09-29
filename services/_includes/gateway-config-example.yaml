@@ -42,7 +42,7 @@ groups_endpoint: localhost:9160
 permissions_endpoint: localhost:9191
 sharing_endpoint: localhost:9150
 auth_basic_endpoint: localhost:9146
-auth_bearer_endpoint: localhost:9148
+auth_bearer_endpoint: ""
 auth_machine_endpoint: localhost:9166
 storage_public_link_endpoint: localhost:9178
 storage_users_endpoint: localhost:9157
