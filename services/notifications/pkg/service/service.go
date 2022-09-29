@@ -209,9 +209,9 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 
 	emailSubject := fmt.Sprintf("%s invited you to join %s", sharerUserResponse.GetUser().DisplayName, md.GetInfo().GetSpace().Name)
 	if e.GranteeUserID != nil {
-		err = s.channel.SendMessage([]string{e.GranteeUserID.OpaqueId}, msg, emailSubject, sharerDisplayName)
+		err = s.channel.SendMessage(ownerCtx, []string{e.GranteeUserID.OpaqueId}, msg, emailSubject, sharerDisplayName)
 	} else if e.GranteeGroupID != nil {
-		err = s.channel.SendMessageToGroup(e.GranteeGroupID, msg, emailSubject, sharerDisplayName)
+		err = s.channel.SendMessageToGroup(ownerCtx, e.GranteeGroupID, msg, emailSubject, sharerDisplayName)
 	}
 	if err != nil {
 		s.logger.Error().
@@ -347,9 +347,9 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 
 	emailSubject := fmt.Sprintf("%s shared %s with you", sharerUserResponse.GetUser().DisplayName, md.GetInfo().Name)
 	if e.GranteeUserID != nil {
-		err = s.channel.SendMessage([]string{e.GranteeUserID.OpaqueId}, msg, emailSubject, sharerDisplayName)
+		err = s.channel.SendMessage(ownerCtx, []string{e.GranteeUserID.OpaqueId}, msg, emailSubject, sharerDisplayName)
 	} else if e.GranteeGroupID != nil {
-		err = s.channel.SendMessageToGroup(e.GranteeGroupID, msg, emailSubject, sharerDisplayName)
+		err = s.channel.SendMessageToGroup(ownerCtx, e.GranteeGroupID, msg, emailSubject, sharerDisplayName)
 	}
 	if err != nil {
 		s.logger.Error().
