@@ -23,7 +23,6 @@ import (
 	appProvider "github.com/owncloud/ocis/v2/services/app-provider/pkg/command"
 	appRegistry "github.com/owncloud/ocis/v2/services/app-registry/pkg/command"
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/command"
-	authbearer "github.com/owncloud/ocis/v2/services/auth-bearer/pkg/command"
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/command"
 	experimental "github.com/owncloud/ocis/v2/services/experimental/pkg/command"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/command"
@@ -123,7 +122,6 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.Users.Service.Name] = users.NewSutureService
 	s.ServicesRegistry[opts.Config.Groups.Service.Name] = groups.NewSutureService
 	s.ServicesRegistry[opts.Config.AuthBasic.Service.Name] = authbasic.NewSutureService
-	s.ServicesRegistry[opts.Config.AuthBearer.Service.Name] = authbearer.NewSutureService
 	s.ServicesRegistry[opts.Config.AuthMachine.Service.Name] = authmachine.NewSutureService
 	s.ServicesRegistry[opts.Config.StorageUsers.Service.Name] = storageusers.NewSutureService
 	s.ServicesRegistry[opts.Config.StorageShares.Service.Name] = storageshares.NewSutureService
