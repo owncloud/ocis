@@ -24,7 +24,8 @@ var (
 	_publicPaths = [...]string{
 		"/dav/public-files/",
 		"/remote.php/dav/public-files/",
-		"/remote.php/ocs/apps/files_sharing/api/v1/tokeninfo/unprotected",
+		"/ocs/v1.php/apps/files_sharing/api/v1/tokeninfo/unprotected",
+		"/ocs/v2.php/apps/files_sharing/api/v1/tokeninfo/unprotected",
 		"/ocs/v1.php/cloud/capabilities",
 	}
 )
