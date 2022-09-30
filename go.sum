@@ -295,10 +295,10 @@ github.com/crewjam/httperr v0.2.0 h1:b2BfXR8U3AlIHwNeFFvZ+BV1LFvKLlzMjzaTnZMybNo
 github.com/crewjam/httperr v0.2.0/go.mod h1:Jlz+Sg/XqBQhyMjdDiC+GNNRzZTD7x39Gu3pglZ5oH4=
 github.com/crewjam/saml v0.4.6 h1:XCUFPkQSJLvzyl4cW9OvpWUbRf0gE7VUpU8ZnilbeM4=
 github.com/crewjam/saml v0.4.6/go.mod h1:ZBOXnNPFzB3CgOkRm7Nd6IVdkG+l/wF+0ZXLqD96t1A=
-github.com/cs3org/go-cs3apis v0.0.0-20220818202316-e92afdddac6d h1:toyZ7IsXlUdEPZ/IG8fg7hbM8HcLPY0bkX4FKBmgLVI=
-github.com/cs3org/go-cs3apis v0.0.0-20220818202316-e92afdddac6d/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
-github.com/cs3org/reva/v2 v2.10.1-0.20220927154108-3fb6adde0e8f h1:nCfCu5BQspeZmUGOmdcfZszibiTl4Lmy+8dS6Fpxpco=
-github.com/cs3org/reva/v2 v2.10.1-0.20220927154108-3fb6adde0e8f/go.mod h1:NfAt4eTciYZ8EZy/3U2oJDhkYGPZOjovulh8DRHV5RI=
+github.com/cs3org/go-cs3apis v0.0.0-20220929083235-bb0b1a236d6c h1:b+YTmOGlf43mnF8MzO0fsy8/Ho8JLu44Iq5Y0fKLJMM=
+github.com/cs3org/go-cs3apis v0.0.0-20220929083235-bb0b1a236d6c/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
+github.com/cs3org/reva/v2 v2.10.1-0.20220929124756-f2983940e36a h1:Yg3AmH0v41iEdHc+5/RQa+W1rqij3UPLwwFpH7gFveg=
+github.com/cs3org/reva/v2 v2.10.1-0.20220929124756-f2983940e36a/go.mod h1:0W93YjDTLBoBucKmQsvscNA3EyMTXteiHmv6hU8oLM4=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
