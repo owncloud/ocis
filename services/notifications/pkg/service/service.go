@@ -391,9 +391,10 @@ func (s eventsNotifier) handleVirusscanFinished(e events.VirusscanFinished) {
 		return
 	}
 
+	ctx := ctxpkg.ContextSetUser(context.Background(), e.ExecutingUser)
 	senderDisplayName := "Owncloud"
 	emailSubject := "Virus detected"
-	if err := s.channel.SendMessage([]string{e.ExecutingUser.GetId().GetOpaqueId()}, msg, emailSubject, senderDisplayName); err != nil {
+	if err := s.channel.SendMessage(ctx, []string{e.ExecutingUser.GetId().GetOpaqueId()}, msg, emailSubject, senderDisplayName); err != nil {
 		s.logger.Error().Err(err).Str("event", "VirusScanFinished").Msg("failed to send a message")
 	}
 
