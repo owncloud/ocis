@@ -164,6 +164,7 @@ The following sections list the changes for unreleased.
    TBD
 
    https://github.com/owncloud/ocis/pull/4588
+   https://github.com/owncloud/ocis/pull/4719
 # Changelog for [2.0.0-beta.8] (2022-09-13)
 
 The following sections list the changes for 2.0.0-beta.8.
