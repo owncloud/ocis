@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
+	"github.com/ReneKroon/ttlcache/v2"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events/server"
@@ -17,7 +19,10 @@ import (
 	"go-micro.dev/v4/metadata"
 	grpcmetadata "google.golang.org/grpc/metadata"
 
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 )
 
@@ -81,10 +86,16 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, err
 	}
 
+	cache := ttlcache.NewCache()
+	if err := cache.SetTTL(time.Second); err != nil {
+		return nil, teardown, err
+	}
+
 	return &Service{
 		id:       cfg.GRPC.Namespace + "." + cfg.Service.Name,
 		log:      logger,
 		provider: search.NewProvider(gw, eng, extractor, logger, cfg.MachineAuthAPIKey),
+		cache:    cache,
 	}, teardown, nil
 }
 
@@ -93,6 +104,7 @@ type Service struct {
 	id       string
 	log      log.Logger
 	provider *search.Provider
+	cache    *ttlcache.Cache
 }
 
 // Search handles the search
@@ -105,18 +117,26 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 	}
 	ctx = grpcmetadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
-	res, err := s.provider.Search(ctx, &searchsvc.SearchRequest{
-		Query:    in.Query,
-		PageSize: in.PageSize,
-		Ref:      in.Ref,
-	})
-	if err != nil {
-		switch err.(type) {
-		case errtypes.BadRequest:
-			return merrors.BadRequest(s.id, err.Error())
-		default:
-			return merrors.InternalServerError(s.id, err.Error())
+	u, _ := ctxpkg.ContextGetUser(ctx)
+	key := cacheKey(in.Query, in.PageSize, in.Ref, u)
+	res, ok := s.FromCache(key)
+	if !ok {
+		var err error
+		res, err = s.provider.Search(ctx, &searchsvc.SearchRequest{
+			Query:    in.Query,
+			PageSize: in.PageSize,
+			Ref:      in.Ref,
+		})
+		if err != nil {
+			switch err.(type) {
+			case errtypes.BadRequest:
+				return merrors.BadRequest(s.id, err.Error())
+			default:
+				return merrors.InternalServerError(s.id, err.Error())
+			}
 		}
+
+		s.Cache(key, res)
 	}
 
 	out.Matches = res.Matches
@@ -129,4 +149,25 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 func (s Service) IndexSpace(ctx context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
 	_, err := s.provider.IndexSpace(ctx, in)
 	return err
+}
+
+// FromCache pulls a search result from cache
+func (s Service) FromCache(key string) (*searchsvc.SearchResponse, bool) {
+	v, err := s.cache.Get(key)
+	if err != nil {
+		return nil, false
+	}
+
+	sr, ok := v.(*searchsvc.SearchResponse)
+	return sr, ok
+}
+
+// Cache caches the search result
+func (s Service) Cache(key string, res *searchsvc.SearchResponse) {
+	// lets ignore the error
+	_ = s.cache.Set(key, res)
+}
+
+func cacheKey(query string, pagesize int32, ref *v0.Reference, user *user.User) string {
+	return fmt.Sprintf("%s|%d|%s$%s!%s/%s|%s", query, pagesize, ref.GetResourceId().GetStorageId(), ref.GetResourceId().GetSpaceId(), ref.GetResourceId().GetOpaqueId(), ref.GetPath(), user.GetId().GetOpaqueId())
 }
