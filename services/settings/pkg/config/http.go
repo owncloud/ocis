@@ -11,8 +11,8 @@ type HTTP struct {
 
 // CORS defines the available cors configuration.
 type CORS struct {
-	AllowedOrigins   []string `yaml:"allowed_origins"`
-	AllowedMethods   []string `yaml:"allowed_methods"`
-	AllowedHeaders   []string `yaml:"allowed_headers"`
-	AllowCredentials bool     `yaml:"allowed_credentials"`
+	AllowedOrigins   []string `yaml:"allowed_origins" env:"OCIS_CORS_ALLOW_ORIGINS;SETTINGS_CORS_ALLOW_ORIGINS" desc:"Set the allowed CORS origins"`
+	AllowedMethods   []string `yaml:"allowed_methods" env:"OCIS_CORS_ALLOW_METHODS;SETTINGS_CORS_ALLOW_METHODS" desc:"Set the allowed CORS methods"`
+	AllowedHeaders   []string `yaml:"allowed_headers" env:"OCIS_CORS_ALLOW_HEADERS;SETTINGS_CORS_ALLOW_HEADERS" desc:"Set the allowed CORS headers"`
+	AllowCredentials bool     `yaml:"allowed_credentials" env:"OCIS_CORS_ALLOW_CREDENTIALS;SETTINGS_CORS_ALLOW_CREDENTIALS" desc:"Allow credentials for CORS"`
 }
