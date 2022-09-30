@@ -92,31 +92,31 @@ config = {
         "ocis",
     ],
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "localApiTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
         "skip": False,
-        "skipExceptParts": [],
+        "skipExceptParts": [19],
         "earlyFail": True,
     },
     "e2eTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "settingsUITests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "parallelApiTests": {
