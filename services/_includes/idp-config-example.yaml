@@ -68,15 +68,6 @@ clients:
   origins:
   - '{{OCIS_URL}}'
   application_type: ""
-- id: ocis-explorer.js
-  name: oCIS Graph Explorer
-  trusted: true
-  secret: ""
-  redirect_uris:
-  - '{{OCIS_URL}}/graph-explorer/'
-  origins:
-  - '{{OCIS_URL}}'
-  application_type: ""
 - id: xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69
   name: ownCloud desktop app
   trusted: false
