@@ -6,13 +6,12 @@ require (
 	github.com/CiscoM31/godata v1.0.5
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.4.0
-	github.com/ReneKroon/ttlcache/v2 v2.11.0
 	github.com/armon/go-radix v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.4
 	github.com/blevesearch/bleve_index_api v1.0.3
 	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220929083235-bb0b1a236d6c
-	github.com/cs3org/reva/v2 v2.10.1-0.20220929124756-f2983940e36a
+	github.com/cs3org/reva/v2 v2.10.1-0.20221004144201-2dfa067f4e96
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
@@ -41,6 +40,7 @@ require (
 	github.com/gookit/config/v2 v2.1.6
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.3
+	github.com/jellydator/ttlcache/v2 v2.11.1
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/idm v0.3.1-0.20220808071235-17bb032176de
 	github.com/libregraph/lico v0.54.1-0.20220325072321-31efc3995d63
@@ -220,7 +220,7 @@ require (
 	github.com/maxymania/go-system v0.0.0-20170110133659-647cc364bf0b // indirect
 	github.com/mendsley/gojwk v0.0.0-20141217222730-4d5ec6e58103 // indirect
 	github.com/miekg/dns v1.1.50 // indirect
-	github.com/mileusna/useragent v1.1.0 // indirect
+	github.com/mileusna/useragent v1.2.0 // indirect
 	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
 	github.com/minio/minio-go/v7 v7.0.32 // indirect
