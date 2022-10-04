@@ -112,14 +112,17 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 						"simple": map[string]interface{}{
 							"cache_store":    "noop",
 							"cache_database": "system",
+							"cache_table":    "stat",
 						},
 						"spaces": map[string]interface{}{
 							"cache_store":    "noop",
 							"cache_database": "system",
+							"cache_table":    "stat",
 						},
 						"tus": map[string]interface{}{
 							"cache_store":    "noop",
 							"cache_database": "system",
+							"cache_table":    "stat",
 						},
 					},
 				},
