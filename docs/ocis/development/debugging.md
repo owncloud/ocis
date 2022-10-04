@@ -28,7 +28,6 @@ Run the debug binary with `OCIS_LOG_LEVEL=debug bin/ocis-debug server` and then 
 12837 pts/1    Sl+    0:00 bin/ocis-debug server
 12845 pts/1    Sl     0:00 bin/ocis-debug graph
 12847 pts/1    Sl     0:00 bin/ocis-debug reva-auth-bearer
-12848 pts/1    Sl     0:00 bin/ocis-debug graph-explorer
 12849 pts/1    Sl     0:00 bin/ocis-debug ocs
 12850 pts/1    Sl     0:00 bin/ocis-debug reva-storage-oc-data
 12863 pts/1    Sl     0:00 bin/ocis-debug webdav
@@ -78,7 +77,6 @@ LOG_LEVEL="debug"
 bin/ocis --log-level=$LOG_LEVEL micro &
 
 bin/ocis --log-level=$LOG_LEVEL glauth &
-bin/ocis --log-level=$LOG_LEVEL graph-explorer &
 bin/ocis --log-level=$LOG_LEVEL graph &
 #bin/ocis --log-level=$LOG_LEVEL hello &
 bin/ocis --log-level=$LOG_LEVEL idp &
@@ -107,7 +105,6 @@ bin/ocis --log-level=$LOG_LEVEL proxy &
 12837 pts/1    Sl+    0:00 bin/ocis-debug server
 12845 pts/1    Sl     0:00 bin/ocis-debug graph
 12847 pts/1    Sl     0:00 bin/ocis-debug reva-auth-bearer
-12848 pts/1    Sl     0:00 bin/ocis-debug graph-explorer
 12849 pts/1    Sl     0:00 bin/ocis-debug ocs
 12850 pts/1    Sl     0:00 bin/ocis-debug reva-storage-oc-data
 12863 pts/1    Sl     0:00 bin/ocis-debug webdav
