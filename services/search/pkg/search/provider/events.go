@@ -38,7 +38,12 @@ func (p *Provider) handleEvent(ev interface{}) {
 		}
 		statRes, err := p.statResource(ownerCtx, ref, owner)
 		if err != nil {
-			p.logger.Error().Err(err).Msg("failed to stat the changed resource")
+			p.logger.Error().Err(err).
+				Str("storageid", ref.GetResourceId().GetStorageId()).
+				Str("spaceid", ref.GetResourceId().GetSpaceId()).
+				Str("opaqueid", ref.GetResourceId().GetOpaqueId()).
+				Str("path", ref.GetPath()).
+				Msg("failed to make stat call for the restored resource")
 			return
 		}
 
@@ -46,10 +51,20 @@ func (p *Provider) handleEvent(ev interface{}) {
 		case rpc.Code_CODE_OK:
 			err = p.indexClient.Restore(statRes.Info.Id)
 			if err != nil {
-				p.logger.Error().Err(err).Msg("failed to restore the changed resource in the index")
+				p.logger.Error().Err(err).
+					Str("storageid", ref.GetResourceId().GetStorageId()).
+					Str("spaceid", ref.GetResourceId().GetSpaceId()).
+					Str("opaqueid", ref.GetResourceId().GetOpaqueId()).
+					Str("path", ref.GetPath()).
+					Msg("failed to restore the changed resource in the index")
 			}
 		default:
-			p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the changed resource")
+			p.logger.Error().Interface("statRes", statRes).
+				Str("storageid", ref.GetResourceId().GetStorageId()).
+				Str("spaceid", ref.GetResourceId().GetSpaceId()).
+				Str("opaqueid", ref.GetResourceId().GetOpaqueId()).
+				Str("path", ref.GetPath()).
+				Msg("failed to stat the restored resource")
 		}
 
 		return
@@ -122,11 +137,21 @@ func (p *Provider) handleEvent(ev interface{}) {
 
 	statRes, err := p.statResource(ownerCtx, ref, owner)
 	if err != nil {
-		p.logger.Error().Err(err).Msg("failed to stat the changed resource")
+		p.logger.Error().Err(err).
+			Str("storageid", ref.GetResourceId().GetStorageId()).
+			Str("spaceid", ref.GetResourceId().GetSpaceId()).
+			Str("opaqueid", ref.GetResourceId().GetOpaqueId()).
+			Str("path", ref.GetPath()).
+			Msg("failed to make stat call for changed resource")
 		return
 	}
 	if statRes.Status.Code != rpc.Code_CODE_OK {
-		p.logger.Error().Interface("statRes", statRes).Msg("failed to stat the changed resource")
+		p.logger.Error().Interface("statRes", statRes).
+			Str("storageid", ref.GetResourceId().GetStorageId()).
+			Str("spaceid", ref.GetResourceId().GetSpaceId()).
+			Str("opaqueid", ref.GetResourceId().GetOpaqueId()).
+			Str("path", ref.GetPath()).
+			Msg("failed to stat the changed resource")
 		return
 	}
 
