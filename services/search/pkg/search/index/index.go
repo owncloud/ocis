@@ -222,13 +222,18 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 	query := bleve.NewConjunctionQuery(
 		bleve.NewQueryStringQuery(req.Query),
 		deletedQuery, // Skip documents that have been marked as deleted
-		bleve.NewQueryStringQuery("RootID:"+idToBleveId(&sprovider.ResourceId{
-			StorageId: req.Ref.GetResourceId().GetStorageId(),
-			SpaceId:   req.Ref.GetResourceId().GetSpaceId(),
-			OpaqueId:  req.Ref.GetResourceId().GetOpaqueId(),
-		})), // Limit search to the space
-		bleve.NewQueryStringQuery("Path:"+queryEscape(utils.MakeRelativePath(path.Join(req.Ref.Path, "/"))+"*")), // Limit search to this directory in the space
 	)
+	if req.Ref != nil {
+		query = bleve.NewConjunctionQuery(
+			query,
+			bleve.NewQueryStringQuery("RootID:"+idToBleveId(&sprovider.ResourceId{
+				StorageId: req.Ref.GetResourceId().GetStorageId(),
+				SpaceId:   req.Ref.GetResourceId().GetSpaceId(),
+				OpaqueId:  req.Ref.GetResourceId().GetOpaqueId(),
+			})), // Limit search to the space
+			bleve.NewQueryStringQuery("Path:"+queryEscape(utils.MakeRelativePath(path.Join(req.Ref.Path, "/"))+"*")), // Limit search to this directory in the space
+		)
+	}
 	bleveReq := bleve.NewSearchRequest(query)
 	bleveReq.Size = 200
 	if req.PageSize > 0 {
