@@ -3,9 +3,12 @@ package command
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/urfave/cli/v2"
+	"go-micro.dev/v4/client"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
@@ -30,18 +33,20 @@ func Index(cfg *config.Config) *cli.Command {
 				Name:     "user",
 				Aliases:  []string{"u"},
 				Required: true,
-				Usage:    "the username of the user tha shall be used to access the files",
+				Usage:    "the username of the user that shall be used to access the files",
 			},
 		},
 		Before: func(c *cli.Context) error {
-			return parser.ParseConfig(cfg)
+			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
-		Action: func(c *cli.Context) error {
-			client := searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient())
-			_, err := client.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
-				SpaceId: c.String("space"),
-				UserId:  c.String("user"),
-			})
+		Action: func(ctx *cli.Context) error {
+			grpcClient := grpc.DefaultClient()
+			grpcClient.Options()
+			c := searchsvc.NewSearchProviderService("com.owncloud.api.search", grpcClient)
+			_, err := c.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
+				SpaceId: ctx.String("space"),
+				UserId:  ctx.String("user"),
+			}, func(opts *client.CallOptions) { opts.RequestTimeout = 10 * time.Minute })
 			if err != nil {
 				fmt.Println("failed to index space: " + err.Error())
 				return err
