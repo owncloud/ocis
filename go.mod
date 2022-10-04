@@ -11,8 +11,8 @@ require (
 	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.4
 	github.com/coreos/go-oidc/v3 v3.4.0
-	github.com/cs3org/go-cs3apis v0.0.0-20220818202316-e92afdddac6d
-	github.com/cs3org/reva/v2 v2.10.1-0.20220929111800-a79d5b3430ec
+	github.com/cs3org/go-cs3apis v0.0.0-20220929083235-bb0b1a236d6c
+	github.com/cs3org/reva/v2 v2.10.1-0.20221004072729-ae801d2d7074
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
