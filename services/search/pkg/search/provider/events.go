@@ -2,6 +2,8 @@ package provider
 
 import (
 	"context"
+	"sync"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -13,6 +15,35 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"google.golang.org/grpc/metadata"
 )
+
+type SpaceDebouncer struct {
+	after   time.Duration
+	f       func(id *provider.StorageSpaceId)
+	pending map[string]*time.Timer
+
+	mutex sync.Mutex
+}
+
+func NewSpaceDebouncer(d time.Duration, f func(id *provider.StorageSpaceId)) *SpaceDebouncer {
+	return &SpaceDebouncer{
+		after:   d,
+		f:       f,
+		pending: map[string]*time.Timer{},
+	}
+}
+
+func (d *SpaceDebouncer) Debounce(id *provider.StorageSpaceId) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	if t := d.pending[id.OpaqueId]; t != nil {
+		t.Stop()
+	}
+
+	d.pending[id.OpaqueId] = time.AfterFunc(d.after, func() {
+		d.f(id)
+	})
+}
 
 func (p *Provider) handleEvent(ev interface{}) {
 	var ref *provider.Reference

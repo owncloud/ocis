@@ -2,6 +2,7 @@ package provider_test
 
 import (
 	"context"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -201,5 +202,48 @@ var _ = Describe("Searchprovider", func() {
 				return called
 			}, "2s").Should(BeTrue())
 		})
+	})
+})
+
+var _ = Describe("SpaceDebouncer", func() {
+	var (
+		debouncer *provider.SpaceDebouncer
+		callCount map[string]int
+	)
+
+	BeforeEach(func() {
+		callCount = map[string]int{}
+		debouncer = provider.NewSpaceDebouncer(50*time.Millisecond, func(id *sprovider.StorageSpaceId) {
+			callCount[id.OpaqueId] += 1
+		})
+	})
+
+	It("debounces", func() {
+		spaceid := &sprovider.StorageSpaceId{
+			OpaqueId: "spaceid",
+		}
+		debouncer.Debounce(spaceid)
+		debouncer.Debounce(spaceid)
+		debouncer.Debounce(spaceid)
+		Eventually(func() int {
+			return callCount["spaceid"]
+		}, "200ms").Should(Equal(1))
+	})
+
+	It("works multiple times", func() {
+		spaceid := &sprovider.StorageSpaceId{
+			OpaqueId: "spaceid",
+		}
+		debouncer.Debounce(spaceid)
+		debouncer.Debounce(spaceid)
+		debouncer.Debounce(spaceid)
+		time.Sleep(100 * time.Millisecond)
+
+		debouncer.Debounce(spaceid)
+		debouncer.Debounce(spaceid)
+
+		Eventually(func() int {
+			return callCount["spaceid"]
+		}, "200ms").Should(Equal(2))
 	})
 })
