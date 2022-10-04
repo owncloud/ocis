@@ -9,9 +9,11 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix authentication for autoprovisioned users: [#4616](https://github.com/owncloud/ocis/issues/4616)
 * Bugfix - Bring back the settings UI in Web: [#4691](https://github.com/owncloud/ocis/pull/4691)
 * Bugfix - Change the default value for PROXY_OIDC_INSECURE to false: [#4601](https://github.com/owncloud/ocis/pull/4601)
+* Bugfix - Don't run auth-bearer service by default: [#4692](https://github.com/owncloud/ocis/issues/4692)
 * Bugfix - Fix notifications service settings: [#4652](https://github.com/owncloud/ocis/pull/4652)
 * Bugfix - Fix the OIDC provider cache: [#4600](https://github.com/owncloud/ocis/pull/4600)
 * Bugfix - Render webdav permissions as string in search report: [#4575](https://github.com/owncloud/ocis/issues/4575)
+* Bugfix - Mail notifications for group shares: [#4714](https://github.com/owncloud/ocis/pull/4714)
 * Bugfix - Fix unfindable entities from shares/publicshares: [#4651](https://github.com/owncloud/ocis/pull/4651)
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
 * Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
@@ -46,6 +48,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4601
 
+* Bugfix - Don't run auth-bearer service by default: [#4692](https://github.com/owncloud/ocis/issues/4692)
+
+   We no longer start the auth-bearer service by default. This service is currently unused and not
+   required to run ocis. The equivalent functionality to verify OpenID connect tokens and to mint
+   reva tokes for OIDC authenticated clients is currently implemented inside the oidc-auth
+   middleware of the proxy.
+
+   https://github.com/owncloud/ocis/issues/4692
+
 * Bugfix - Fix notifications service settings: [#4652](https://github.com/owncloud/ocis/pull/4652)
 
    We've fixed two notifications service setting: - `NOTIFICATIONS_MACHINE_AUTH_API_KEY`
@@ -69,6 +80,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4575
    https://github.com/owncloud/ocis/pull/4579
+
+* Bugfix - Mail notifications for group shares: [#4714](https://github.com/owncloud/ocis/pull/4714)
+
+   We fixed multiple issues in the notifications service, which broke notifcation mails new
+   shares with groups.
+
+   https://github.com/owncloud/ocis/issues/4703
+   https://github.com/owncloud/ocis/issues/4688
+   https://github.com/owncloud/ocis/pull/4714
 
 * Bugfix - Fix unfindable entities from shares/publicshares: [#4651](https://github.com/owncloud/ocis/pull/4651)
 
@@ -144,6 +164,7 @@ The following sections list the changes for unreleased.
    TBD
 
    https://github.com/owncloud/ocis/pull/4588
+   https://github.com/owncloud/ocis/pull/4719
 # Changelog for [2.0.0-beta.8] (2022-09-13)
 
 The following sections list the changes for 2.0.0-beta.8.

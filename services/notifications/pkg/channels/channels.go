@@ -20,9 +20,9 @@ import (
 // Channel defines the methods of a communication channel.
 type Channel interface {
 	// SendMessage sends a message to users.
-	SendMessage(userIDs []string, msg, subject, senderDisplayName string) error
+	SendMessage(ctx context.Context, userIDs []string, msg, subject, senderDisplayName string) error
 	// SendMessageToGroup sends a message to a group.
-	SendMessageToGroup(groupdID *groups.GroupId, msg, subject, senderDisplayName string) error
+	SendMessageToGroup(ctx context.Context, groupdID *groups.GroupId, msg, subject, senderDisplayName string) error
 }
 
 // NewMailChannel instantiates a new mail communication channel.
@@ -101,12 +101,12 @@ func (m Mail) getMailClient() (*mail.SMTPClient, error) {
 }
 
 // SendMessage sends a message to all given users.
-func (m Mail) SendMessage(userIDs []string, msg, subject, senderDisplayName string) error {
+func (m Mail) SendMessage(ctx context.Context, userIDs []string, msg, subject, senderDisplayName string) error {
 	if m.conf.Notifications.SMTP.Host == "" {
 		return nil
 	}
 
-	to, err := m.getReceiverAddresses(userIDs)
+	to, err := m.getReceiverAddresses(ctx, userIDs)
 	if err != nil {
 		return err
 	}
@@ -129,9 +129,8 @@ func (m Mail) SendMessage(userIDs []string, msg, subject, senderDisplayName stri
 }
 
 // SendMessageToGroup sends a message to all members of the given group.
-func (m Mail) SendMessageToGroup(groupID *groups.GroupId, msg, subject, senderDisplayName string) error {
-	// TODO We need an authenticated context here...
-	res, err := m.gatewayClient.GetGroup(context.Background(), &groups.GetGroupRequest{GroupId: groupID})
+func (m Mail) SendMessageToGroup(ctx context.Context, groupID *groups.GroupId, msg, subject, senderDisplayName string) error {
+	res, err := m.gatewayClient.GetGroup(ctx, &groups.GetGroupRequest{GroupId: groupID})
 	if err != nil {
 		return err
 	}
@@ -144,15 +143,15 @@ func (m Mail) SendMessageToGroup(groupID *groups.GroupId, msg, subject, senderDi
 		members = append(members, id.OpaqueId)
 	}
 
-	return m.SendMessage(members, msg, subject, senderDisplayName)
+	return m.SendMessage(ctx, members, msg, subject, senderDisplayName)
 }
 
-func (m Mail) getReceiverAddresses(receivers []string) ([]string, error) {
+func (m Mail) getReceiverAddresses(ctx context.Context, receivers []string) ([]string, error) {
 	addresses := make([]string, 0, len(receivers))
 	for _, id := range receivers {
 		// Authenticate is too costly but at the moment our only option to get the user.
 		// We don't have an authenticated context so calling `GetUser` doesn't work.
-		res, err := m.gatewayClient.Authenticate(context.Background(), &gateway.AuthenticateRequest{
+		res, err := m.gatewayClient.Authenticate(ctx, &gateway.AuthenticateRequest{
 			Type:         "machine",
 			ClientId:     "userid:" + id,
 			ClientSecret: m.conf.Notifications.MachineAuthAPIKey,
