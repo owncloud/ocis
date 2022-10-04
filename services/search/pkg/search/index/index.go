@@ -300,7 +300,7 @@ func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *indexDocume
 	}
 
 	if ri.Mtime != nil {
-		doc.Mtime = time.Unix(int64(ri.Mtime.Seconds), int64(ri.Mtime.Nanos)).UTC().Format(time.RFC3339)
+		doc.Mtime = time.Unix(int64(ri.Mtime.Seconds), int64(ri.Mtime.Nanos)).UTC().Format(time.RFC3339Nano)
 	}
 
 	return doc
@@ -355,7 +355,7 @@ func fromDocumentMatch(hit *search.DocumentMatch) (*searchmsg.Match, error) {
 		match.Entity.ParentId = resourceIDtoSearchID(parentID)
 	}
 
-	if mtime, err := time.Parse(time.RFC3339, hit.Fields["Mtime"].(string)); err == nil {
+	if mtime, err := time.Parse(time.RFC3339Nano, hit.Fields["Mtime"].(string)); err == nil {
 		match.Entity.LastModifiedTime = &timestamppb.Timestamp{Seconds: mtime.Unix(), Nanos: int32(mtime.Nanosecond())}
 	}
 
