@@ -11,7 +11,6 @@ import (
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/config"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/config"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/config"
-	graphExplorer "github.com/owncloud/ocis/v2/services/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	groups "github.com/owncloud/ocis/v2/services/groups/pkg/config"
 	idm "github.com/owncloud/ocis/v2/services/idm/pkg/config"
@@ -83,7 +82,6 @@ type Config struct {
 	Frontend          *frontend.Config      `yaml:"frontend"`
 	Gateway           *gateway.Config       `yaml:"gateway"`
 	Graph             *graph.Config         `yaml:"graph"`
-	GraphExplorer     *graphExplorer.Config `yaml:"graph_explorer"`
 	Groups            *groups.Config        `yaml:"groups"`
 	IDM               *idm.Config           `yaml:"idm"`
 	IDP               *idp.Config           `yaml:"idp"`

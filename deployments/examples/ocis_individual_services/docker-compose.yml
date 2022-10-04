@@ -185,28 +185,6 @@ services:
       driver: "local"
     restart: always
 
-  graph-explorer:
-    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
-    deploy:
-      replicas: ${OCIS_SCALE:-1}
-    networks:
-      ocis-net:
-    entrypoint:
-      - ocis
-      - graph-explorer
-      - server
-    environment:
-      GRAPH_EXPLOER_LOG_LEVEL: "${OCIS_LOG_LEVEL:-error}"
-      GRAPH_EXPLOER_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
-      GRAPH_EXPLOER_LOG_PRETTY: "${OCIS_LOG_PRETTY:-false}"
-
-      GRAPH_EXPLORER_HTTP_ADDR: 0.0.0.0:9135
-      GRAPH_EXPLORER_ISSUER: https://${OCIS_DOMAIN}
-      GRAPH_EXPLORER_GRAPH_URL_BASE: https://${OCIS_DOMAIN}
-    logging:
-      driver: "local"
-    restart: always
-
   audit:
     image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     deploy:

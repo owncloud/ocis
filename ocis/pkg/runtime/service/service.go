@@ -26,7 +26,6 @@ import (
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/command"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/command"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/command"
-	graphExplorer "github.com/owncloud/ocis/v2/services/graph-explorer/pkg/command"
 	graph "github.com/owncloud/ocis/v2/services/graph/pkg/command"
 	groups "github.com/owncloud/ocis/v2/services/groups/pkg/command"
 	idm "github.com/owncloud/ocis/v2/services/idm/pkg/command"
@@ -106,7 +105,6 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.Nats.Service.Name] = nats.NewSutureService
 	s.ServicesRegistry[opts.Config.StorageSystem.Service.Name] = storageSystem.NewSutureService
 	s.ServicesRegistry[opts.Config.Graph.Service.Name] = graph.NewSutureService
-	s.ServicesRegistry[opts.Config.GraphExplorer.Service.Name] = graphExplorer.NewSutureService
 	s.ServicesRegistry[opts.Config.IDM.Service.Name] = idm.NewSutureService
 	s.ServicesRegistry[opts.Config.OCS.Service.Name] = ocs.NewSutureService
 	s.ServicesRegistry[opts.Config.Store.Service.Name] = store.NewSutureService
