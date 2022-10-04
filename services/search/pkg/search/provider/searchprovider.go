@@ -242,7 +242,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 
 func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequest) (*searchsvc.IndexSpaceResponse, error) {
 	// get user
-	res, err := p.gwClient.GetUserByClaim(context.Background(), &user.GetUserByClaimRequest{
+	res, err := p.gwClient.GetUserByClaim(ctx, &user.GetUserByClaimRequest{
 		Claim: "username",
 		Value: req.UserId,
 	})
@@ -252,7 +252,7 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 	}
 
 	// Get auth context
-	ownerCtx := ctxpkg.ContextSetUser(context.Background(), res.User)
+	ownerCtx := ctxpkg.ContextSetUser(ctx, res.User)
 	authRes, err := p.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + res.User.Id.OpaqueId,
@@ -271,9 +271,15 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 	walker := walker.NewWalker(p.gwClient)
 	rootId, err := storagespace.ParseID(req.SpaceId)
 	if err != nil {
-		p.logger.Error().Err(err).Msg(err.Error())
+		p.logger.Error().Err(err).Msg("invalid space id")
 		return nil, err
 	}
+	if rootId.StorageId == "" || rootId.SpaceId == "" {
+		p.logger.Error().Err(err).Msg("invalid space id")
+		return nil, fmt.Errorf("invalid space id")
+	}
+	rootId.OpaqueId = rootId.SpaceId
+
 	err = walker.Walk(ownerCtx, &rootId, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error walking the tree")
@@ -282,11 +288,16 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
 			ResourceId: &rootId,
 		}
-		ref, err = p.resolveReference(ownerCtx, ref, info)
-		if err != nil {
-			p.logger.Error().Err(err).Msg("error resolving reference")
-			return nil
+
+		// Has this part tree changed?
+		searchRes, err := p.indexClient.Search(ownerCtx, &searchsvc.SearchIndexRequest{
+			Query: "+ID:" + storagespace.FormatResourceID(*info.Id) + ` +Mtime:>="` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano) + `"`,
+		})
+		if err == nil && len(searchRes.Matches) >= 1 {
+			p.logger.Info().Str("path", ref.Path).Msg("subtree hasn't changed")
+			return filepath.SkipDir
 		}
+
 		err = p.indexClient.Add(ref, info)
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error adding resource to the index")

@@ -2,6 +2,7 @@ package provider_test
 
 import (
 	"context"
+	"time"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -12,6 +13,7 @@ import (
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
@@ -59,8 +61,9 @@ var _ = Describe("Searchprovider", func() {
 				StorageId: "storageid",
 				OpaqueId:  "opaqueid",
 			},
-			Path: "foo.pdf",
-			Size: 12345,
+			Path:  "foo.pdf",
+			Size:  12345,
+			Mtime: utils.TimeToTS(time.Now().Add(-time.Hour)),
 		}
 	)
 
@@ -105,6 +108,7 @@ var _ = Describe("Searchprovider", func() {
 			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
 				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
 			})).Return(nil)
+			indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{}, nil)
 
 			res, err := p.IndexSpace(ctx, &searchsvc.IndexSpaceRequest{
 				SpaceId: "storageid$spaceid!spaceid",
