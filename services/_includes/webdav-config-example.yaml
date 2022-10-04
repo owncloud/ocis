@@ -20,16 +20,16 @@ http:
   addr: 127.0.0.1:9115
   root: /
   cors:
-    allowed_origins:
+    allow_origins:
     - '*'
-    allowed_methods:
+    allow_methods:
     - GET
     - POST
     - PUT
     - PATCH
     - DELETE
     - OPTIONS
-    allowed_headers:
+    allow_headers:
     - Authorization
     - Origin
     - Content-Type

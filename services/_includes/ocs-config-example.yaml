@@ -24,22 +24,22 @@ http:
   addr: 127.0.0.1:9110
   root: /ocs
   cors:
-    allowed_origins:
+    allow_origins:
     - '*'
-    allowed_methods:
+    allow_methods:
     - GET
     - POST
     - PUT
     - PATCH
     - DELETE
     - OPTIONS
-    allowed_headers:
+    allow_headers:
     - Authorization
     - Origin
     - Content-Type
     - Accept
     - X-Requested-With
-    allowed_credentials: true
+    allow_credentials: true
 token_manager:
   jwt_secret: ""
 reva:

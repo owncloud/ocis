@@ -125,7 +125,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++127.0.0.1:9233 ++
 a| [subs=-attributes]
-
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 |`SEARCH_EVENTS_CLUSTER`
 a| [subs=-attributes]
 ++string ++

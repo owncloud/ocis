@@ -119,6 +119,38 @@ a| [subs=-attributes]
 ++604800 ++
 a| [subs=-attributes]
 Browser cache control max-age value in seconds for settings Web UI assets.
+|`OCIS_CORS_ALLOW_ORIGINS` +
+`SETTINGS_CORS_ALLOW_ORIGINS`
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[*] ++
+a| [subs=-attributes]
+A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
+|`OCIS_CORS_ALLOW_METHODS` +
+`SETTINGS_CORS_ALLOW_METHODS`
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[GET POST PUT PATCH DELETE OPTIONS] ++
+a| [subs=-attributes]
+A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
+|`OCIS_CORS_ALLOW_HEADERS` +
+`SETTINGS_CORS_ALLOW_HEADERS`
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[Authorization Origin Content-Type Accept X-Requested-With] ++
+a| [subs=-attributes]
+A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
+|`OCIS_CORS_ALLOW_CREDENTIALS` +
+`SETTINGS_CORS_ALLOW_CREDENTIALS`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
 |`SETTINGS_GRPC_ADDR`
 a| [subs=-attributes]
 ++string ++

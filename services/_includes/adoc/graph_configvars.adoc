@@ -85,7 +85,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-a comma-separated list of addresses to connect to. Only for etcd
+A comma-separated list of addresses to connect to. Only valid if the above setting is set to "etcd"
 |`OCIS_CACHE_STORE_SIZE` +
 `GRAPH_CACHE_STORE_SIZE`
 a| [subs=-attributes]
@@ -93,7 +93,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-Maximum size for the cache store. Only ocmem will use this option, in number of items per table. The rest will ignore the option and can grow indefinitely
+Maximum number of items per table in the ocmem cache store. Other cache stores will ignore the option and can grow indefinitely.
 |`GRAPH_DEBUG_ADDR`
 a| [subs=-attributes]
 ++string ++

@@ -17,6 +17,10 @@
 | SETTINGS_HTTP_ADDR | string | 127.0.0.1:9190 | The bind address of the HTTP service.|
 | SETTINGS_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
 | SETTINGS_CACHE_TTL | int | 604800 | Browser cache control max-age value in seconds for settings Web UI assets.|
+| OCIS_CORS_ALLOW_ORIGINS<br/>SETTINGS_CORS_ALLOW_ORIGINS | []string | [*] | A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin|
+| OCIS_CORS_ALLOW_METHODS<br/>SETTINGS_CORS_ALLOW_METHODS | []string | [GET POST PUT PATCH DELETE OPTIONS] | A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method|
+| OCIS_CORS_ALLOW_HEADERS<br/>SETTINGS_CORS_ALLOW_HEADERS | []string | [Authorization Origin Content-Type Accept X-Requested-With] | A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.|
+| OCIS_CORS_ALLOW_CREDENTIALS<br/>SETTINGS_CORS_ALLOW_CREDENTIALS | bool | true | Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
 | SETTINGS_GRPC_ADDR | string | 127.0.0.1:9191 | The bind address of the GRPC service.|
 | SETTINGS_STORE_TYPE | string | metadata | Store type configures the persistency driver. Supported values are "metadata" and "filesystem".|
 | SETTINGS_DATA_PATH | string | ~/.ocis/settings | Path for the persistence directory.|

@@ -183,7 +183,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++100000000 ++
 a| [subs=-attributes]
-Sets the max chunk sizes for uploads via the frontend.
+Sets the max chunk sizes in bytes for uploads via the frontend.
 |`FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE`
 a| [subs=-attributes]
 ++string ++

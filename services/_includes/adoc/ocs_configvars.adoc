@@ -85,7 +85,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-a comma-separated list of addresses to connect to. Only for etcd
+A comma-separated list of addresses to connect to. Only valid if the above setting is set to "etcd"
 |`OCIS_CACHE_STORE_SIZE` +
 `OCS_CACHE_STORE_SIZE`
 a| [subs=-attributes]
@@ -93,7 +93,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-Maximum size for the cache store. Only ocmem will use this option, in number of items per table. The rest will ignore the option and can grow indefinitely
+Maximum number of items per table in the ocmem cache store. Other cache stores will ignore the option and can grow indefinitely.
 |`OCS_DEBUG_ADDR`
 a| [subs=-attributes]
 ++string ++
@@ -136,6 +136,38 @@ a| [subs=-attributes]
 ++/ocs ++
 a| [subs=-attributes]
 Subdirectory that serves as the root for this HTTP service.
+|`OCIS_CORS_ALLOW_ORIGINS` +
+`OCS_CORS_ALLOW_ORIGINS`
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[*] ++
+a| [subs=-attributes]
+A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
+|`OCIS_CORS_ALLOW_METHODS` +
+`OCS_CORS_ALLOW_METHODS`
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[GET POST PUT PATCH DELETE OPTIONS] ++
+a| [subs=-attributes]
+A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
+|`OCIS_CORS_ALLOW_HEADERS` +
+`OCS_CORS_ALLOW_HEADERS`
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[Authorization Origin Content-Type Accept X-Requested-With] ++
+a| [subs=-attributes]
+A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
+|`OCIS_CORS_ALLOW_CREDENTIALS` +
+`OCS_CORS_ALLOW_CREDENTIALS`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
 |`OCIS_JWT_SECRET` +
 `OCS_JWT_SECRET`
 a| [subs=-attributes]

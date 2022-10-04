@@ -50,7 +50,7 @@
 | STORAGE_USERS_OWNCLOUDSQL_DB_NAME | string | owncloud | Name of the database to be used.|
 | STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT | string | localhost:9144 | Endpoint of the users provider.|
 | STORAGE_USERS_DATA_SERVER_URL | string | http://localhost:9158/data | URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.|
-| STORAGE_USERS_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | |
+| STORAGE_USERS_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | STORAGE_USERS_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | STORAGE_USERS_CACHE_STORE | string | memory | Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".|
 | STORAGE_USERS_CACHE_NODES | []string | [] | Node addresses to use for the cache store.|

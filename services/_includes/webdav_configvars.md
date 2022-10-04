@@ -16,6 +16,10 @@
 | WEBDAV_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | WEBDAV_HTTP_ADDR | string | 127.0.0.1:9115 | The bind address of the HTTP service.|
 | WEBDAV_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
+| OCIS_CORS_ALLOW_ORIGINS<br/>WEBDAV_CORS_ALLOW_ORIGINS | []string | [*] | A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin|
+| OCIS_CORS_ALLOW_METHODS<br/>WEBDAV_CORS_ALLOW_METHODS | []string | [GET POST PUT PATCH DELETE OPTIONS] | A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method|
+| OCIS_CORS_ALLOW_HEADERS<br/>WEBDAV_CORS_ALLOW_HEADERS | []string | [Authorization Origin Content-Type Accept X-Requested-With] | A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.|
+| OCIS_CORS_ALLOW_CREDENTIALS<br/>WEBDAV_CORS_ALLOW_CREDENTIALS | bool | true | Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
 | OCIS_URL<br/>OCIS_PUBLIC_URL | string | https://127.0.0.1:9200 | URL, where oCIS is reachable for users.|
 | WEBDAV_WEBDAV_NAMESPACE | string | /users/{{.Id.OpaqueId}} | CS3 path layout to use when forwarding /webdav requests|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|

@@ -11,14 +11,18 @@
 | OCIS_LOG_COLOR<br/>OCS_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>OCS_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
 | OCIS_CACHE_STORE_TYPE<br/>OCS_CACHE_STORE_TYPE | string |  | The type of the cache store. Valid options are "noop", "ocmem", "etcd" and "memory"|
-| OCIS_CACHE_STORE_ADDRESS<br/>OCS_CACHE_STORE_ADDRESS | string |  | a comma-separated list of addresses to connect to. Only for etcd|
-| OCIS_CACHE_STORE_SIZE<br/>OCS_CACHE_STORE_SIZE | int | 0 | Maximum size for the cache store. Only ocmem will use this option, in number of items per table. The rest will ignore the option and can grow indefinitely|
+| OCIS_CACHE_STORE_ADDRESS<br/>OCS_CACHE_STORE_ADDRESS | string |  | A comma-separated list of addresses to connect to. Only valid if the above setting is set to "etcd"|
+| OCIS_CACHE_STORE_SIZE<br/>OCS_CACHE_STORE_SIZE | int | 0 | Maximum number of items per table in the ocmem cache store. Other cache stores will ignore the option and can grow indefinitely.|
 | OCS_DEBUG_ADDR | string | 127.0.0.1:9114 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | OCS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | OCS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | OCS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | OCS_HTTP_ADDR | string | 127.0.0.1:9110 | The bind address of the HTTP service.|
 | OCS_HTTP_ROOT | string | /ocs | Subdirectory that serves as the root for this HTTP service.|
+| OCIS_CORS_ALLOW_ORIGINS<br/>OCS_CORS_ALLOW_ORIGINS | []string | [*] | A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin|
+| OCIS_CORS_ALLOW_METHODS<br/>OCS_CORS_ALLOW_METHODS | []string | [GET POST PUT PATCH DELETE OPTIONS] | A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method|
+| OCIS_CORS_ALLOW_HEADERS<br/>OCS_CORS_ALLOW_HEADERS | []string | [Authorization Origin Content-Type Accept X-Requested-With] | A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.|
+| OCIS_CORS_ALLOW_CREDENTIALS<br/>OCS_CORS_ALLOW_CREDENTIALS | bool | true | Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
 | OCIS_JWT_SECRET<br/>OCS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>OCS_IDM_ADDRESS | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
