@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Fix authentication for autoprovisioned users: [#4616](https://github.com/owncloud/ocis/issues/4616)
 * Bugfix - Bring back the settings UI in Web: [#4691](https://github.com/owncloud/ocis/pull/4691)
+* Bugfix - Fix cache stat table config: [#4732](https://github.com/owncloud/ocis/pull/4732)
 * Bugfix - Change the default value for PROXY_OIDC_INSECURE to false: [#4601](https://github.com/owncloud/ocis/pull/4601)
 * Bugfix - Don't run auth-bearer service by default: [#4692](https://github.com/owncloud/ocis/issues/4692)
 * Bugfix - Fix notifications service settings: [#4652](https://github.com/owncloud/ocis/pull/4652)
@@ -41,6 +42,13 @@ The following sections list the changes for unreleased.
    We've fixed the oC Web configuration in oCIS so that the settings UI will be shown again in Web.
 
    https://github.com/owncloud/ocis/pull/4691
+
+* Bugfix - Fix cache stat table config: [#4732](https://github.com/owncloud/ocis/pull/4732)
+
+   We have aligned the cache table config for the gateway and the dataprovider to make them
+   actually use the same cache instance.
+
+   https://github.com/owncloud/ocis/pull/4732
 
 * Bugfix - Change the default value for PROXY_OIDC_INSECURE to false: [#4601](https://github.com/owncloud/ocis/pull/4601)
 
