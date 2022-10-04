@@ -16,6 +16,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Mail notifications for group shares: [#4714](https://github.com/owncloud/ocis/pull/4714)
 * Bugfix - Fix unfindable entities from shares/publicshares: [#4651](https://github.com/owncloud/ocis/pull/4651)
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
+* Bugfix - Make tokeninfo endpoint unprotected: [#4715](https://github.com/owncloud/ocis/pull/4715)
 * Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
 * Enhancement - Add Email templating: [#4564](https://github.com/owncloud/ocis/pull/4564)
 * Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
@@ -101,6 +102,12 @@ The following sections list the changes for unreleased.
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
 
    https://github.com/owncloud/ocis/pull/4582
+
+* Bugfix - Make tokeninfo endpoint unprotected: [#4715](https://github.com/owncloud/ocis/pull/4715)
+
+   Make the tokeninfo endpoint unprotected as it is supposed to be available to the public.
+
+   https://github.com/owncloud/ocis/pull/4715
 
 * Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
 
