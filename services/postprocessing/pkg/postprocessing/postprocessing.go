@@ -70,7 +70,7 @@ func (pp *Postprocessing) next(current events.Postprocessingstep) interface{} {
 	l := len(pp.steps)
 	for i, s := range pp.steps {
 		if s == current && i+1 < l {
-			return pp.next(pp.steps[i+1])
+			return pp.nextStep(pp.steps[i+1])
 		}
 	}
 	return pp.finished(events.PPOutcomeContinue)
