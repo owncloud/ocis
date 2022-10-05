@@ -191,11 +191,6 @@ func DefaultPolicies() []config.Policy {
 					Backend:  "http://localhost:9120",
 				},
 				{
-					Endpoint:    "/graph-explorer",
-					Backend:     "http://localhost:9135",
-					Unprotected: true,
-				},
-				{
 					Endpoint: "/experimental",
 					Backend:  "http://localhost:9180",
 				},

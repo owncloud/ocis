@@ -25,7 +25,6 @@ OCIS_MODULES = \
 	services/frontend \
 	services/gateway \
 	services/graph \
-	services/graph-explorer \
 	services/groups \
 	services/idm \
 	services/idp \

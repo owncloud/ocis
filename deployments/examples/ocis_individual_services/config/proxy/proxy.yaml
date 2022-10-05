@@ -47,8 +47,6 @@ policies:
     backend: http://frontend:9140
   - endpoint: /graph/
     backend: http://graph:9120
-  - endpoint: /graph-explorer
-    backend: http://graph-explorer:9135
   - endpoint: /api/v0/settings
     backend: http://settings:9190
   - endpoint: /settings.js

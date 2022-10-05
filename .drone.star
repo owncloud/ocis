@@ -66,7 +66,6 @@ config = {
         "services/auth-machine",
         "services/frontend",
         "services/gateway",
-        "services/graph-explorer",
         "services/graph",
         "services/groups",
         "services/idm",
@@ -1944,7 +1943,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "SHARING_USER_OWNCLOUDSQL_DB_NAME": "owncloud",
             # General oCIS config
             # OCIS_RUN_SERVICES specifies to start all fullstack services except idm and idp. These are replaced by external services
-            "OCIS_RUN_SERVICES": "app-registry,app-provider,auth-basic,auth-machine,frontend,gateway,graph,graph-explorer,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav",
+            "OCIS_RUN_SERVICES": "app-registry,app-provider,auth-basic,auth-machine,frontend,gateway,graph,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav",
             "OCIS_LOG_LEVEL": "info",
             "OCIS_URL": OCIS_URL,
             "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",

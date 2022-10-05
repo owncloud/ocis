@@ -33,7 +33,10 @@ func DefaultConfig() *config.Config {
 		},
 		Driver: "",
 		Drivers: config.Drivers{
-			WOPI: config.WOPIDriver{},
+			WOPI: config.WOPIDriver{
+				WopiFolderURLBaseURL:      "https://localhost:9200/",
+				WopiFolderURLPathTemplate: "/f/{{.ResourceID}}",
+			},
 		},
 	}
 }
