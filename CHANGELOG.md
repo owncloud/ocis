@@ -27,6 +27,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
 * Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
 * Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
+* Enhancement - Make it possible to configure a WOPI folderurl: [#4716](https://github.com/owncloud/ocis/pull/4716)
 
 ## Details
 
@@ -179,7 +180,15 @@ The following sections list the changes for unreleased.
    TBD
 
    https://github.com/owncloud/ocis/pull/4588
+   https://github.com/owncloud/ocis/pull/4716
    https://github.com/owncloud/ocis/pull/4719
+
+* Enhancement - Make it possible to configure a WOPI folderurl: [#4716](https://github.com/owncloud/ocis/pull/4716)
+
+   The wopi folder URL is used to jump back from an application to the containing folder in the files
+   list.
+
+   https://github.com/owncloud/ocis/pull/4716
 # Changelog for [2.0.0-beta.8] (2022-09-13)
 
 The following sections list the changes for 2.0.0-beta.8.
