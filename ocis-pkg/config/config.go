@@ -12,7 +12,6 @@ import (
 	experimental "github.com/owncloud/ocis/v2/services/experimental/pkg/config"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/config"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/config"
-	graphExplorer "github.com/owncloud/ocis/v2/services/graph-explorer/pkg/config"
 	graph "github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	groups "github.com/owncloud/ocis/v2/services/groups/pkg/config"
 	idm "github.com/owncloud/ocis/v2/services/idm/pkg/config"
@@ -51,8 +50,8 @@ type Mode int
 type Runtime struct {
 	Port     string `yaml:"port" env:"OCIS_RUNTIME_PORT"`
 	Host     string `yaml:"host" env:"OCIS_RUNTIME_HOST"`
-	Services string `yaml:"services" env:"OCIS_RUN_EXTENSIONS;OCIS_RUN_SERVICES" desc:"Expects a comma separated list of service names. Will start only the listed services."`
-	Disabled string `yaml:"disabled_services" env:"OCIS_EXCLUDE_RUN_SERVICES" desc:"Expects a comma separated list of service names. Will start all services except of the ones listed. Has no effect when OCIS_RUN_SERVICES is set."`
+	Services string `yaml:"services" env:"OCIS_RUN_EXTENSIONS;OCIS_RUN_SERVICES" desc:"A comma-separated list of service names. Will start only the listed services."`
+	Disabled string `yaml:"disabled_services" env:"OCIS_EXCLUDE_RUN_SERVICES" desc:"A comma-separated list of service names. Will start all services except of the ones listed. Has no effect when OCIS_RUN_SERVICES is set."`
 }
 
 // Config combines all available configuration parts.
@@ -85,7 +84,6 @@ type Config struct {
 	Frontend          *frontend.Config       `yaml:"frontend"`
 	Gateway           *gateway.Config        `yaml:"gateway"`
 	Graph             *graph.Config          `yaml:"graph"`
-	GraphExplorer     *graphExplorer.Config  `yaml:"graph_explorer"`
 	Groups            *groups.Config         `yaml:"groups"`
 	IDM               *idm.Config            `yaml:"idm"`
 	IDP               *idp.Config            `yaml:"idp"`

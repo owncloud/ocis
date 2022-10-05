@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
@@ -21,7 +22,6 @@ import (
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/cs3"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/middleware"
@@ -128,7 +128,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config) alice.Chain {
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
-	revaClient, err := cs3.GetGatewayServiceClient(cfg.Reva.Address)
+	revaClient, err := pool.GetGatewayServiceClient(cfg.Reva.Address)
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
 	case "cs3":

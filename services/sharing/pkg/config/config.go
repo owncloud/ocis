@@ -150,6 +150,6 @@ type PublicSharingJSONCS3Driver struct {
 }
 
 type Events struct {
-	Addr      string `yaml:"endpoint" env:"SHARING_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.`
+	Addr      string `yaml:"endpoint" env:"SHARING_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture."`
 	ClusterID string `yaml:"cluster" env:"SHARING_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system."`
 }

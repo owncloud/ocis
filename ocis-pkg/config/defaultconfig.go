@@ -10,7 +10,6 @@ import (
 	experimental "github.com/owncloud/ocis/v2/services/experimental/pkg/config/defaults"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/config/defaults"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/config/defaults"
-	graphExplorer "github.com/owncloud/ocis/v2/services/graph-explorer/pkg/config/defaults"
 	graph "github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	groups "github.com/owncloud/ocis/v2/services/groups/pkg/config/defaults"
 	idm "github.com/owncloud/ocis/v2/services/idm/pkg/config/defaults"
@@ -52,7 +51,6 @@ func DefaultConfig() *Config {
 		Frontend:          frontend.DefaultConfig(),
 		Gateway:           gateway.DefaultConfig(),
 		Graph:             graph.DefaultConfig(),
-		GraphExplorer:     graphExplorer.DefaultConfig(),
 		Groups:            groups.DefaultConfig(),
 		IDM:               idm.DefaultConfig(),
 		IDP:               idp.DefaultConfig(),
