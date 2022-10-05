@@ -50,7 +50,7 @@ func DefaultConfig() *config.Config {
 			ProductVersion: version.GetString(),
 			Product:        "Infinite Scale",
 			ProductName:    "Infinite Scale",
-			Edition:        "Community",
+			Edition:        "Enterprise",
 		},
 		Events: config.Events{
 			Endpoint: "127.0.0.1:9233",
