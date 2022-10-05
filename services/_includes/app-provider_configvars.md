@@ -29,3 +29,5 @@
 | APP_PROVIDER_WOPI_INSECURE | bool | false | Allow insecure connections to the app.|
 | APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET | string |  | Shared secret of the CS3org WOPI server.|
 | APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL | string |  | External url of the CS3org WOPI server.|
+| OCIS_URL<br/>APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL | string | https://localhost:9200/ | Base url to navigate back from the app the containing folder in the file list.|
+| APP_PROVIDER_WOPI_FOLDER_URL_PATH_TEMPLATE | string | /f/{{.ResourceID}} | Path template to navigate back from the app the containing folder in the file list. Possible template variables are {{.ResourceInfo.ResourceID}}, {{.ResourceInfo.Mtime.Seconds}}, {{.ResourceInfo.Name}}, {{.ResourceInfo.Path}}, {{.ResourceInfo.Type}}, {{.ResourceInfo.Id.SpaceId}}, {{.ResourceInfo.Id.StorageId}}, {{.ResourceInfo.Id.OpaqueId}}, {{.ResourceInfo.MimeType}}|

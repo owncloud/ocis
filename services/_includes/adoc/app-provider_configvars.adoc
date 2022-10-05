@@ -204,6 +204,21 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 External url of the CS3org WOPI server.
+|`OCIS_URL` +
+`APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++https://localhost:9200/ ++
+a| [subs=-attributes]
+Base url to navigate back from the app the containing folder in the file list.
+|`APP_PROVIDER_WOPI_FOLDER_URL_PATH_TEMPLATE`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/f/{{.ResourceID}} ++
+a| [subs=-attributes]
+Path template to navigate back from the app the containing folder in the file list. Possible template variables are {{.ResourceInfo.ResourceID}}, {{.ResourceInfo.Mtime.Seconds}}, {{.ResourceInfo.Name}}, {{.ResourceInfo.Path}}, {{.ResourceInfo.Type}}, {{.ResourceInfo.Id.SpaceId}}, {{.ResourceInfo.Id.StorageId}}, {{.ResourceInfo.Id.OpaqueId}}, {{.ResourceInfo.MimeType}}
 |===
 
 Since Version: `+` added, `-` deprecated

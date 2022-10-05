@@ -36,3 +36,5 @@ drivers:
     insecure: false
     wopi_server_iop_secret: ""
     wopi_server_external_url: ""
+    wopi_folder_url_base_url: https://localhost:9200/
+    wopi_folder_url_path_template: /f/{{.ResourceID}}
