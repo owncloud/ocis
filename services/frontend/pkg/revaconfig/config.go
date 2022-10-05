@@ -173,7 +173,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 									"needsDbUpgrade": false,
 									"version":        version.Legacy,
 									"versionstring":  version.LegacyString,
-									"edition":        "Community",
+									"edition":        "Enterprise",
 									"productname":    "Infinite Scale",
 									"product":        "Infinite Scale",
 									"productversion": version.GetString(),
@@ -248,7 +248,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 						},
 						"version": map[string]interface{}{
 							"product":        "Infinite Scale",
-							"edition":        "Community",
+							"edition":        "Enterprise",
 							"major":          version.ParsedLegacy().Major(),
 							"minor":          version.ParsedLegacy().Minor(),
 							"micro":          version.ParsedLegacy().Patch(),
