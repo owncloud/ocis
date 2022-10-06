@@ -103,6 +103,10 @@ func getSteps(c config.Postprocessing) []events.Postprocessingstep {
 	// ideally by the spaceadmin itself
 	// We need to iterate over configuring PP service when we see fit
 	var steps []events.Postprocessingstep
+	if c.Delayprocessing != 0 {
+		steps = append(steps, events.PPStepDelay)
+	}
+
 	if c.Virusscan {
 		steps = append(steps, events.PPStepAntivirus)
 	}
@@ -111,8 +115,5 @@ func getSteps(c config.Postprocessing) []events.Postprocessingstep {
 		steps = append(steps, events.PPStepFTS)
 	}
 
-	if c.Delayprocessing != 0 {
-		steps = append(steps, events.PPStepDelay)
-	}
 	return steps
 }

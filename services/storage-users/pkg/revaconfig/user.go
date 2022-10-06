@@ -96,6 +96,11 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 			"treesize_accounting":         true,
 			"permissionssvc":              cfg.Drivers.OCIS.PermissionsEndpoint,
 			"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
+			"statcache": map[string]interface{}{
+				"cache_store":    cfg.Cache.Store,
+				"cache_nodes":    cfg.Cache.Nodes,
+				"cache_database": cfg.Cache.Database,
+			},
 			"events": map[string]interface{}{
 				"natsaddress":   cfg.Events.Addr,
 				"natsclusterid": cfg.Events.ClusterID,
