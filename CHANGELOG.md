@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Bring back the settings UI in Web: [#4691](https://github.com/owncloud/ocis/pull/4691)
 * Bugfix - Fix cache stat table config: [#4732](https://github.com/owncloud/ocis/pull/4732)
 * Bugfix - Change the default value for PROXY_OIDC_INSECURE to false: [#4601](https://github.com/owncloud/ocis/pull/4601)
+* Bugfix - Fix sharing jsoncs3 driver options: [#4593](https://github.com/owncloud/ocis/pull/4593)
 * Bugfix - Don't run auth-bearer service by default: [#4692](https://github.com/owncloud/ocis/issues/4692)
 * Bugfix - Fix notifications service settings: [#4652](https://github.com/owncloud/ocis/pull/4652)
 * Bugfix - Fix the OIDC provider cache: [#4600](https://github.com/owncloud/ocis/pull/4600)
@@ -57,6 +58,20 @@ The following sections list the changes for unreleased.
    values was `true` which is not acceptable since default values need to be secure.
 
    https://github.com/owncloud/ocis/pull/4601
+
+* Bugfix - Fix sharing jsoncs3 driver options: [#4593](https://github.com/owncloud/ocis/pull/4593)
+
+   We've fixed the environment variable config options of the jsoncs3 driver that previously
+   used the same environment variables as the cs3 driver. Now the jsoncs3 driver has it's own
+   configuration environment variables.
+
+   If you used the jsoncs3 sharing driver and explicitly set
+   `SHARING_PUBLIC_CS3_SYSTEM_USER_ID`, this PR is a breaking change for your deployment. To
+   workaround you may set the value you had configured in `SHARING_PUBLIC_CS3_SYSTEM_USER_ID`
+   to both `SHARING_PUBLIC_JSONCS3_SYSTEM_USER_ID` and
+   `SHARING_PUBLIC_JSONCS3_SYSTEM_USER_IDP`.
+
+   https://github.com/owncloud/ocis/pull/4593
 
 * Bugfix - Don't run auth-bearer service by default: [#4692](https://github.com/owncloud/ocis/issues/4692)
 

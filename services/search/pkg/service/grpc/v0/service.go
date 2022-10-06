@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ReneKroon/ttlcache/v2"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events/server"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-micro/plugins/v4/events/natsjs"
+	"github.com/jellydator/ttlcache/v2"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
 	"github.com/owncloud/ocis/v2/services/search/pkg/search"
