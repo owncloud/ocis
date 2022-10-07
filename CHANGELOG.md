@@ -26,6 +26,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add support for REPORT requests to /dav/spaces URLs: [#4661](https://github.com/owncloud/ocis/pull/4661)
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
 * Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
+* Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
 * Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
 * Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
 * Enhancement - Make it possible to configure a WOPI folderurl: [#4716](https://github.com/owncloud/ocis/pull/4716)
@@ -183,6 +184,13 @@ The following sections list the changes for unreleased.
    available in the system anymore
 
    https://github.com/owncloud/ocis/issues/3713
+
+* Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
+
+   We now index and return the parent id of a resource in search REPORTs.
+
+   https://github.com/owncloud/ocis/issues/4727
+   https://github.com/owncloud/ocis/pull/4757
 
 * Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
 
