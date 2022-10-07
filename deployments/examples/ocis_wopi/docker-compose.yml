@@ -99,6 +99,7 @@ services:
       APP_PROVIDER_WOPI_APP_URL: https://${COLLABORA_DOMAIN:-collabora.owncloud.test}
       APP_PROVIDER_WOPI_INSECURE: "${INSECURE:-false}"
       APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+      APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
     volumes:
       - ocis-config:/etc/ocis
     logging:
@@ -124,6 +125,7 @@ services:
       APP_PROVIDER_WOPI_APP_URL: https://${ONLYOFFICE_DOMAIN:-onlyoffice.owncloud.test}
       APP_PROVIDER_WOPI_INSECURE: "${INSECURE:-false}"
       APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL: https://${WOPISERVER_DOMAIN:-wopiserver.owncloud.test}
+      APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
     volumes:
       - ./config/ocis-appdriver-onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
       - ocis-config:/etc/ocis
