@@ -44,9 +44,10 @@ import (
 )
 
 type indexDocument struct {
-	RootID string
-	Path   string
-	ID     string
+	RootID   string
+	Path     string
+	ID       string
+	ParentID string
 
 	Name     string
 	Size     uint64
@@ -170,7 +171,7 @@ func (i *Index) Purge(id *sprovider.ResourceId) error {
 }
 
 // Move update the path of an entry and all its children
-func (i *Index) Move(id *sprovider.ResourceId, fullPath string) error {
+func (i *Index) Move(id, newParentID *sprovider.ResourceId, fullPath string) error {
 	bleveId := idToBleveId(id)
 	doc, err := i.getEntity(bleveId)
 	if err != nil {
@@ -182,6 +183,7 @@ func (i *Index) Move(id *sprovider.ResourceId, fullPath string) error {
 	doc, err = i.updateEntity(bleveId, func(doc *indexDocument) {
 		doc.Path = newName
 		doc.Name = path.Base(newName)
+		doc.ParentID = idToBleveId(newParentID)
 	})
 	if err != nil {
 		return err
@@ -284,6 +286,7 @@ func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *indexDocume
 		RootID:   idToBleveId(ref.ResourceId),
 		Path:     ref.Path,
 		ID:       idToBleveId(ri.Id),
+		ParentID: idToBleveId(ri.ParentId),
 		Name:     ri.Path,
 		Size:     ri.Size,
 		MimeType: ri.MimeType,
@@ -303,6 +306,7 @@ func fieldsToEntity(fields map[string]interface{}) *indexDocument {
 		RootID:   fields["RootID"].(string),
 		Path:     fields["Path"].(string),
 		ID:       fields["ID"].(string),
+		ParentID: fields["ParentID"].(string),
 		Name:     fields["Name"].(string),
 		Size:     uint64(fields["Size"].(float64)),
 		Mtime:    fields["Mtime"].(string),
@@ -337,6 +341,13 @@ func fromDocumentMatch(hit *search.DocumentMatch) (*searchmsg.Match, error) {
 			MimeType: hit.Fields["MimeType"].(string),
 			Deleted:  hit.Fields["Deleted"].(bool),
 		},
+	}
+	if hit.Fields["ParentID"] != nil && hit.Fields["ParentID"] != "" {
+		parentID, err := storagespace.ParseID(hit.Fields["ParentID"].(string))
+		if err != nil {
+			return nil, err
+		}
+		match.Entity.ParentId = resourceIDtoSearchID(parentID)
 	}
 
 	if mtime, err := time.Parse(time.RFC3339, hit.Fields["Mtime"].(string)); err == nil {

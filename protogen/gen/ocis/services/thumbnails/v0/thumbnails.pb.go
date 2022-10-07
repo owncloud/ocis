@@ -37,6 +37,7 @@ type GetThumbnailRequest struct {
 	// The height of the thumbnail
 	Height int32 `protobuf:"varint,4,opt,name=height,proto3" json:"height,omitempty"`
 	// Types that are assignable to Source:
+	//
 	//	*GetThumbnailRequest_WebdavSource
 	//	*GetThumbnailRequest_Cs3Source
 	Source isGetThumbnailRequest_Source `protobuf_oneof:"source"`

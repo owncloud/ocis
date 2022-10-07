@@ -33,6 +33,7 @@ OCIS_MODULES = \
 	services/ocdav \
 	services/ocs \
 	services/proxy \
+	services/search \
 	services/settings \
 	services/sharing \
 	services/storage-system \

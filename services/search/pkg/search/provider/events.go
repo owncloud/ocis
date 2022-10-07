@@ -99,7 +99,7 @@ func (p *Provider) handleEvent(ev interface{}) {
 			return
 		}
 
-		err = p.indexClient.Move(statRes.Info.Id, gpRes.Path)
+		err = p.indexClient.Move(statRes.GetInfo().GetId(), statRes.GetInfo().GetParentId(), gpRes.Path)
 		if err != nil {
 			p.logger.Error().Err(err).Msg("failed to move the changed resource in the index")
 		}

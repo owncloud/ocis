@@ -38,6 +38,11 @@ var _ = Describe("Index", func() {
 				SpaceId:   "spaceid",
 				OpaqueId:  "parentopaqueid",
 			},
+			ParentId: &sprovider.ResourceId{
+				StorageId: "provider-1",
+				SpaceId:   "spaceid",
+				OpaqueId:  "myopaqueid",
+			},
 			Path:  "sub d!r",
 			Size:  12345,
 			Type:  sprovider.ResourceType_RESOURCE_TYPE_CONTAINER,
@@ -370,20 +375,48 @@ var _ = Describe("Index", func() {
 	})
 
 	Describe("Move", func() {
-		It("moves the parent and its child resources", func() {
+		It("renames the parent and its child resources", func() {
 			err := i.Add(parentRef, parentRi)
 			Expect(err).ToNot(HaveOccurred())
 			err = i.Add(childRef, childRi)
 			Expect(err).ToNot(HaveOccurred())
 
 			parentRi.Path = "newname"
-			err = i.Move(parentRi.Id, "./somewhere/else/newname")
+			err = i.Move(parentRi.Id, parentRi.ParentId, "./my/newname")
 			Expect(err).ToNot(HaveOccurred())
 
 			assertDocCount(rootId, `sub\ d!r`, 0)
 
 			matches := assertDocCount(rootId, "Name:child.pdf", 1)
+			Expect(matches[0].Entity.ParentId.OpaqueId).To(Equal("parentopaqueid"))
+			Expect(matches[0].Entity.Ref.Path).To(Equal("./my/newname/child.pdf"))
+		})
+
+		It("moves the parent and its child resources", func() {
+			err := i.Add(parentRef, parentRi)
+			Expect(err).ToNot(HaveOccurred())
+			err = i.Add(childRef, childRi)
+			Expect(err).ToNot(HaveOccurred())
+
+			parentRi.Path = " "
+			parentRi.ParentId = &sprovider.ResourceId{
+				StorageId: "provider-1",
+				SpaceId:   "spaceid",
+				OpaqueId:  "somewhereopaqueid",
+			}
+			err = i.Move(parentRi.Id, parentRi.ParentId, "./somewhere/else/newname")
+			Expect(err).ToNot(HaveOccurred())
+
+			assertDocCount(rootId, `sub\ d!r`, 0)
+
+			matches := assertDocCount(rootId, "Name:child.pdf", 1)
+			Expect(matches[0].Entity.ParentId.OpaqueId).To(Equal("parentopaqueid"))
 			Expect(matches[0].Entity.Ref.Path).To(Equal("./somewhere/else/newname/child.pdf"))
+
+			matches = assertDocCount(rootId, `newname`, 1)
+			Expect(matches[0].Entity.ParentId.OpaqueId).To(Equal("somewhereopaqueid"))
+			Expect(matches[0].Entity.Ref.Path).To(Equal("./somewhere/else/newname"))
+
 		})
 	})
 })
