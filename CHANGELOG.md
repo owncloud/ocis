@@ -197,6 +197,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/4588
    https://github.com/owncloud/ocis/pull/4716
    https://github.com/owncloud/ocis/pull/4719
+   https://github.com/owncloud/ocis/pull/4750
 
 * Enhancement - Make it possible to configure a WOPI folderurl: [#4716](https://github.com/owncloud/ocis/pull/4716)
 
