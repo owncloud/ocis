@@ -195,6 +195,9 @@
         },
         "shareRootName": {
           "type": "string"
+        },
+        "parentId": {
+          "$ref": "#/definitions/v0ResourceID"
         }
       }
     },

@@ -29,6 +29,7 @@ message Entity {
 	uint64 type = 9;
 	bool deleted = 10;
 	string shareRootName = 11;
+	ResourceID parent_id = 12;
 }
 
 message Match {

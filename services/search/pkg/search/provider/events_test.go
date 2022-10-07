@@ -188,7 +188,7 @@ var _ = Describe("Searchprovider", func() {
 			}, nil)
 			indexClient.On("Move", mock.MatchedBy(func(id *sprovider.ResourceId) bool {
 				return id.OpaqueId == ri.Id.OpaqueId
-			}), "./new/path.pdf").Return(nil).Run(func(args mock.Arguments) {
+			}), mock.Anything, "./new/path.pdf").Return(nil).Run(func(args mock.Arguments) {
 				called = true
 			})
 			ref.Path = "./new/path.pdf"
