@@ -136,6 +136,11 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 			"s3.endpoint":                 cfg.Drivers.S3NG.Endpoint,
 			"s3.bucket":                   cfg.Drivers.S3NG.Bucket,
 			"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
+			"statcache": map[string]interface{}{
+				"cache_store":    cfg.Cache.Store,
+				"cache_nodes":    cfg.Cache.Nodes,
+				"cache_database": cfg.Cache.Database,
+			},
 			"events": map[string]interface{}{
 				"natsaddress":   cfg.Events.Addr,
 				"natsclusterid": cfg.Events.ClusterID,
