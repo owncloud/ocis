@@ -33,8 +33,8 @@ Feature: Search
     Then the HTTP status code should be "207"
     And the search result should contain "2" entries
     And the search result of user "Alice" should contain these entries:
-      | /folder/SubFolder1             |
-      | /folder/SubFolder1/subFOLDER2  |
+      | /folder/SubFolder1            |
+      | /folder/SubFolder1/subFOLDER2 |
     But the search result of user "Alice" should not contain these entries:
       | /folder                                           |
       | /folder/SubFolder1/subFOLDER2/insideTheFolder.txt |
@@ -98,3 +98,26 @@ Feature: Search
     And the search result should contain "1" entries
     And for user "Alice" the search result should contain space "find data"
 
+  Scenario Outline: search result for project space contains resource parentID
+    When user "Alice" searches for "<searchObject>" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Alice" should contain these entries:
+      | /<searchObject> |
+    And for user "Alice" the response should contains the parent "<parentFolder>" from space "find data"
+    Examples:
+      | searchObject        | parentFolder                 |
+      | SubFolder1          | folder                       |
+      | insideTheFolder.txt | folder/SubFolder1/subFOLDER2 |
+
+
+  Scenario: search result for shares jail contains resource parentID
+    Given user "Alice" shares the following entity "folder" inside of space "find data" with user "Brian" with role "viewer"
+    And user "Brian" has accepted share "/folder" offered by user "Alice"
+    When user "Brian" searches for "insideTheFolder.txt" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "1" entries
+    And the search result of user "Brian" should contain these entries:
+      | /insideTheFolder.txt |
+    And for user "Brian" the response should contains the parent "SubFolder1/subFOLDER2" from mountpoint "folder"
+   
