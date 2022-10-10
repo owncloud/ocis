@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/urfave/cli/v2"
 
@@ -37,7 +38,7 @@ func Index(cfg *config.Config) *cli.Command {
 			return parser.ParseConfig(cfg)
 		},
 		Action: func(c *cli.Context) error {
-			client := searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient())
+			client := searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.Client(grpc.RequestTimeout(60*time.Second)))
 			_, err := client.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
 				SpaceId: c.String("space"),
 				UserId:  c.String("user"),

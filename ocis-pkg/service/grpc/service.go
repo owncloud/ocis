@@ -2,40 +2,14 @@ package grpc
 
 import (
 	"strings"
-	"sync"
 	"time"
 
-	mgrpcc "github.com/go-micro/plugins/v4/client/grpc"
 	mgrpcs "github.com/go-micro/plugins/v4/server/grpc"
-	mbreaker "github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker"
 	"github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus"
 	"github.com/go-micro/plugins/v4/wrapper/trace/opencensus"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"go-micro.dev/v4"
-	"go-micro.dev/v4/client"
 )
-
-// DefaultClient is a custom oCIS grpc configured client.
-var (
-	defaultClient client.Client
-	once          sync.Once
-)
-
-func DefaultClient() client.Client {
-	return getDefaultGrpcClient()
-}
-
-func getDefaultGrpcClient() client.Client {
-	once.Do(func() {
-		reg := registry.GetRegistry()
-
-		defaultClient = mgrpcc.NewClient(
-			client.Registry(reg),
-			client.Wrap(mbreaker.NewClientWrapper()),
-		)
-	})
-	return defaultClient
-}
 
 // Service simply wraps the go-micro grpc service.
 type Service struct {

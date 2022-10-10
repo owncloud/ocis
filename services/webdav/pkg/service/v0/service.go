@@ -9,6 +9,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -69,7 +70,7 @@ func NewService(opts ...Option) (Service, error) {
 		config:           conf,
 		log:              options.Logger,
 		mux:              m,
-		searchClient:     searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient()),
+		searchClient:     searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.Client(grpc.RequestTimeout(60*time.Second))),
 		thumbnailsClient: thumbnailssvc.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient()),
 		revaClient:       gwc,
 	}
