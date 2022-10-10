@@ -164,7 +164,6 @@ The following sections list the changes for unreleased.
    Add the web url to the space root on the graphAPI.
 
    https://github.com/owncloud/ocis/pull/4588
-   https://github.com/owncloud/ocis/pull/4774
 
 * Enhancement - Allow to configuring the reva cache store: [#4627](https://github.com/owncloud/ocis/pull/4627)
 
