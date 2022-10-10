@@ -20,6 +20,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
 * Bugfix - Make tokeninfo endpoint unprotected: [#4715](https://github.com/owncloud/ocis/pull/4715)
 * Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
+* Enhancement - Add curl to the oCIS OCI image: [#4751](https://github.com/owncloud/ocis/pull/4751)
 * Enhancement - Add Email templating: [#4564](https://github.com/owncloud/ocis/pull/4564)
 * Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
 * Enhancement - Allow to configuring the reva cache store: [#4627](https://github.com/owncloud/ocis/pull/4627)
@@ -141,6 +142,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4382
    https://github.com/owncloud/ocis/pull/4631
+
+* Enhancement - Add curl to the oCIS OCI image: [#4751](https://github.com/owncloud/ocis/pull/4751)
+
+   We've added curl to the oCIS OCI image published on Dockerhub. This can be used for eg.
+   healthchecks with the services' health endpoint.
+
+   https://github.com/owncloud/ocis/pull/4751
 
 * Enhancement - Add Email templating: [#4564](https://github.com/owncloud/ocis/pull/4564)
 
