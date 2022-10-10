@@ -13,6 +13,7 @@ import (
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -51,11 +52,14 @@ func (p *Provider) handleEvent(ev interface{}) {
 	switch e := ev.(type) {
 	case events.ItemTrashed:
 		p.logger.Debug().Interface("event", ev).Msg("marking document as deleted")
+		ref = e.Ref
+		owner = &user.User{
+			Id: e.Executant,
+		}
 		err := p.indexClient.Delete(e.ID)
 		if err != nil {
 			p.logger.Error().Err(err).Interface("Id", e.ID).Msg("failed to remove item from index")
 		}
-		return
 	case events.ItemRestored:
 		p.logger.Debug().Interface("event", ev).Msg("marking document as restored")
 		ref = e.Ref
@@ -97,8 +101,6 @@ func (p *Provider) handleEvent(ev interface{}) {
 				Str("path", ref.GetPath()).
 				Msg("failed to stat the restored resource")
 		}
-
-		return
 	case events.ItemMoved:
 		p.logger.Debug().Interface("event", ev).Msg("resource has been moved, updating the document")
 		ref = e.Ref
@@ -134,7 +136,6 @@ func (p *Provider) handleEvent(ev interface{}) {
 		if err != nil {
 			p.logger.Error().Err(err).Msg("failed to move the changed resource in the index")
 		}
-		return
 	case events.ContainerCreated:
 		ref = e.Ref
 		owner = &user.User{
@@ -161,42 +162,11 @@ func (p *Provider) handleEvent(ev interface{}) {
 	}
 	p.logger.Debug().Interface("event", ev).Msg("resource has been changed, updating the document")
 
-	ownerCtx, err := p.getAuthContext(owner)
-	if err != nil {
-		return
-	}
-
-	statRes, err := p.statResource(ownerCtx, ref, owner)
-	if err != nil {
-		p.logger.Error().Err(err).
-			Str("storageid", ref.GetResourceId().GetStorageId()).
-			Str("spaceid", ref.GetResourceId().GetSpaceId()).
-			Str("opaqueid", ref.GetResourceId().GetOpaqueId()).
-			Str("path", ref.GetPath()).
-			Msg("failed to make stat call for changed resource")
-		return
-	}
-	if statRes.Status.Code != rpc.Code_CODE_OK {
-		p.logger.Error().Interface("statRes", statRes).
-			Str("storageid", ref.GetResourceId().GetStorageId()).
-			Str("spaceid", ref.GetResourceId().GetSpaceId()).
-			Str("opaqueid", ref.GetResourceId().GetOpaqueId()).
-			Str("path", ref.GetPath()).
-			Msg("failed to stat the changed resource")
-		return
-	}
-
-	ref, err = p.resolveReference(ownerCtx, ref, statRes.Info)
-	if err != nil {
-		p.logger.Error().Err(err).Msg("error resolving reference")
-		return
-	}
-	err = p.indexClient.Add(ref, statRes.Info)
-	if err != nil {
-		p.logger.Error().Err(err).Msg("error adding updating the resource in the index")
-	} else {
-		p.logDocCount()
-	}
+	p.indexSpaceDebouncer.Debounce(&provider.StorageSpaceId{OpaqueId: storagespace.FormatResourceID(provider.ResourceId{
+		StorageId: ref.GetResourceId().GetStorageId(),
+		SpaceId:   ref.GetResourceId().GetSpaceId(),
+	}),
+	}, owner.Id)
 }
 
 func (p *Provider) statResource(ctx context.Context, ref *provider.Reference, owner *user.User) (*provider.StatResponse, error) {
