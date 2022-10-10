@@ -34,10 +34,11 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 			},
 			"interceptors": map[string]interface{}{
 				"eventsmiddleware": map[string]interface{}{
-					"group":     "sharing",
-					"type":      "nats",
-					"address":   cfg.Events.Addr,
-					"clusterID": cfg.Events.ClusterID,
+					"group":        "sharing",
+					"type":         "nats",
+					"address":      cfg.Events.Addr,
+					"clusterID":    cfg.Events.ClusterID,
+					"tls-insecure": true,
 				},
 			},
 		},
@@ -47,11 +48,12 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"dataprovider": map[string]interface{}{
-					"prefix":         cfg.HTTP.Prefix,
-					"driver":         cfg.Driver,
-					"drivers":        UserDrivers(cfg),
-					"nats_address":   cfg.Events.Addr,
-					"nats_clusterID": cfg.Events.ClusterID,
+					"prefix":            cfg.HTTP.Prefix,
+					"driver":            cfg.Driver,
+					"drivers":           UserDrivers(cfg),
+					"nats_address":      cfg.Events.Addr,
+					"nats_clusterID":    cfg.Events.ClusterID,
+					"nats_tls_insecure": true, // TODO make configurable
 					"data_txs": map[string]interface{}{
 						"simple": map[string]interface{}{
 							"cache_store":    cfg.Cache.Store,

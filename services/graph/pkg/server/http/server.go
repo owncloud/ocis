@@ -1,6 +1,8 @@
 package http
 
 import (
+	"crypto/tls"
+
 	"github.com/cs3org/reva/v2/pkg/events/server"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-micro/plugins/v4/events/natsjs"
@@ -33,7 +35,10 @@ func Server(opts ...Option) (http.Service, error) {
 
 	if options.Config.Events.Endpoint != "" {
 		var err error
+
+		tlsConf := &tls.Config{InsecureSkipVerify: true}
 		publisher, err = server.NewNatsStream(
+			natsjs.TLSConfig(tlsConf),
 			natsjs.Address(options.Config.Events.Endpoint),
 			natsjs.ClusterID(options.Config.Events.Cluster),
 		)

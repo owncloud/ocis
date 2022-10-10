@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"path/filepath"
 
@@ -32,7 +33,10 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 
 	// Connect to nats to listen for changes that need to trigger an index update
 	evtsCfg := cfg.Events
+
+	tlsConf := &tls.Config{InsecureSkipVerify: true}
 	client, err := server.NewNatsStream(
+		natsjs.TLSConfig(tlsConf),
 		natsjs.Address(evtsCfg.Endpoint),
 		natsjs.ClusterID(evtsCfg.Cluster),
 	)

@@ -1,6 +1,7 @@
 package command
 
 import (
+	"crypto/tls"
 	"fmt"
 
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -35,7 +36,9 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			evtsCfg := cfg.Notifications.Events
+			tlsConf := &tls.Config{InsecureSkipVerify: true}
 			client, err := server.NewNatsStream(
+				natsjs.TLSConfig(tlsConf),
 				natsjs.Address(evtsCfg.Endpoint),
 				natsjs.ClusterID(evtsCfg.Cluster),
 			)

@@ -1,7 +1,7 @@
 package defaults
 
 import (
-	"path"
+	"path/filepath"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/nats/pkg/config"
@@ -29,7 +29,9 @@ func DefaultConfig() *config.Config {
 			Host:      "127.0.0.1",
 			Port:      9233,
 			ClusterID: "ocis-cluster",
-			StoreDir:  path.Join(defaults.BaseDataPath(), "nats"),
+			StoreDir:  filepath.Join(defaults.BaseDataPath(), "nats"),
+			TLSCert:   filepath.Join(defaults.BaseDataPath(), "nats/tls.crt"),
+			TLSKey:    filepath.Join(defaults.BaseDataPath(), "nats/tls.key"),
 		},
 	}
 }

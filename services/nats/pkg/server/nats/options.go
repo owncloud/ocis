@@ -1,6 +1,8 @@
 package nats
 
 import (
+	"crypto/tls"
+
 	nserver "github.com/nats-io/nats-server/v2/server"
 )
 
@@ -32,5 +34,12 @@ func ClusterID(clusterID string) NatsOption {
 func StoreDir(StoreDir string) NatsOption {
 	return func(o *nserver.Options) {
 		o.StoreDir = StoreDir
+	}
+}
+
+// TLSConfig sets the tls config for the nats server
+func TLSConfig(c *tls.Config) NatsOption {
+	return func(o *nserver.Options) {
+		o.TLSConfig = c
 	}
 }
