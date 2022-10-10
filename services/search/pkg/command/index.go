@@ -31,7 +31,7 @@ func Index(cfg *config.Config) *cli.Command {
 				Name:     "user",
 				Aliases:  []string{"u"},
 				Required: true,
-				Usage:    "the username of the user tha shall be used to access the files",
+				Usage:    "the id of the user tha shall be used to access the files",
 			},
 		},
 		Before: func(c *cli.Context) error {
