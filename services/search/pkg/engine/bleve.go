@@ -14,7 +14,9 @@ import (
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/custom"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/keyword"
 	"github.com/blevesearch/bleve/v2/analysis/token/lowercase"
+	"github.com/blevesearch/bleve/v2/analysis/token/porter"
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/single"
+	"github.com/blevesearch/bleve/v2/analysis/tokenizer/unicode"
 	"github.com/blevesearch/bleve/v2/mapping"
 	"github.com/blevesearch/bleve/v2/search/query"
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -67,10 +69,13 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 	lowercaseMapping := bleve.NewTextFieldMapping()
 	lowercaseMapping.Analyzer = "lowercaseKeyword"
 
+	fulltextFieldMapping := bleve.NewTextFieldMapping()
+	fulltextFieldMapping.Analyzer = "fulltext"
+
 	docMapping := bleve.NewDocumentMapping()
 	docMapping.AddFieldMappingsAt("Name", lowercaseMapping)
 	docMapping.AddFieldMappingsAt("Tags", lowercaseMapping)
-	docMapping.AddFieldMappingsAt("Content", lowercaseMapping)
+	docMapping.AddFieldMappingsAt("Content", fulltextFieldMapping)
 
 	indexMapping := bleve.NewIndexMapping()
 	indexMapping.DefaultAnalyzer = keyword.Name
@@ -82,7 +87,22 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 			"token_filters": []string{
 				lowercase.Name,
 			},
-		})
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	err = indexMapping.AddCustomAnalyzer("fulltext",
+		map[string]interface{}{
+			"type":      custom.Name,
+			"tokenizer": unicode.Name,
+			"token_filters": []string{
+				lowercase.Name,
+				porter.Name,
+			},
+		},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -366,7 +386,7 @@ func (b *Bleve) buildQuery(si string) string {
 		for _, field := range fields {
 			ss := strings.ToLower(strings.Join(q[1:], `\ `))
 
-			if !strings.Contains(ss, "*") {
+			if !strings.Contains(ss, "*") && field != "Content" {
 				ss = "*" + ss + "*"
 			}
 
