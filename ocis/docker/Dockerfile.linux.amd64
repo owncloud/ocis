@@ -3,10 +3,7 @@ FROM amd64/alpine:3.15
 ARG VERSION=""
 ARG REVISION=""
 
-RUN apk update && \
-	apk upgrade && \
-	apk add ca-certificates mailcap tree attr && \
-	rm -rf /var/cache/apk/* && \
+RUN apk add --no-cache ca-certificates mailcap tree attr curl && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
 
 LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \
