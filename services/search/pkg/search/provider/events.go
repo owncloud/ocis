@@ -18,13 +18,13 @@ import (
 
 type SpaceDebouncer struct {
 	after   time.Duration
-	f       func(id *provider.StorageSpaceId)
+	f       func(id *provider.StorageSpaceId, userID *user.UserId)
 	pending map[string]*time.Timer
 
 	mutex sync.Mutex
 }
 
-func NewSpaceDebouncer(d time.Duration, f func(id *provider.StorageSpaceId)) *SpaceDebouncer {
+func NewSpaceDebouncer(d time.Duration, f func(id *provider.StorageSpaceId, userID *user.UserId)) *SpaceDebouncer {
 	return &SpaceDebouncer{
 		after:   d,
 		f:       f,
@@ -32,7 +32,7 @@ func NewSpaceDebouncer(d time.Duration, f func(id *provider.StorageSpaceId)) *Sp
 	}
 }
 
-func (d *SpaceDebouncer) Debounce(id *provider.StorageSpaceId) {
+func (d *SpaceDebouncer) Debounce(id *provider.StorageSpaceId, userID *user.UserId) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
 
@@ -41,7 +41,7 @@ func (d *SpaceDebouncer) Debounce(id *provider.StorageSpaceId) {
 	}
 
 	d.pending[id.OpaqueId] = time.AfterFunc(d.after, func() {
-		d.f(id)
+		d.f(id, userID)
 	})
 }
 
