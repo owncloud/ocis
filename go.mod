@@ -8,7 +8,6 @@ require (
 	github.com/MicahParks/keyfunc v1.4.0
 	github.com/armon/go-radix v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.4
-	github.com/blevesearch/bleve_index_api v1.0.3
 	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/cs3org/go-cs3apis v0.0.0-20220929083235-bb0b1a236d6c
 	github.com/cs3org/reva/v2 v2.10.1-0.20221006145249-70bf0e95ec00
@@ -109,6 +108,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bits-and-blooms/bitset v1.2.1 // indirect
+	github.com/blevesearch/bleve_index_api v1.0.3 // indirect
 	github.com/blevesearch/geo v0.1.13 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.3 // indirect
 	github.com/blevesearch/gtreap v0.1.1 // indirect
