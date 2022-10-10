@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -225,21 +224,10 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 
 // IndexSpace (re)indexes all resources of a given space.
 func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequest) (*searchsvc.IndexSpaceResponse, error) {
-	// get user
-	res, err := p.gateway.GetUserByClaim(context.Background(), &user.GetUserByClaimRequest{
-		Claim: "username",
-		Value: req.UserId,
-	})
-	if err != nil || res.Status.Code != rpc.Code_CODE_OK {
-		fmt.Println("error: Could not get user by userid")
-		return nil, err
-	}
-
 	// Get auth context
-	ownerCtx := ctxpkg.ContextSetUser(context.Background(), res.User)
-	authRes, err := p.gateway.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
+	authRes, err := p.gateway.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "machine",
-		ClientId:     "userid:" + res.User.Id.OpaqueId,
+		ClientId:     "userid:" + req.UserId,
 		ClientSecret: p.secret,
 	})
 	if err != nil || authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
@@ -249,6 +237,7 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 	if authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		return nil, fmt.Errorf("could not get authenticated context for user")
 	}
+	ownerCtx := ctxpkg.ContextSetUser(context.Background(), authRes.User)
 	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
 
 	// Walk the space and index all files
@@ -271,7 +260,7 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 			return nil
 		}
 
-		doc, err := p.extractor.Extract(ctx, info)
+		doc, err := p.extractor.Extract(ownerCtx, info)
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error extracting content")
 		}
