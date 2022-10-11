@@ -303,18 +303,18 @@ func (p *Provider) doIndexSpace(ctx context.Context, spaceID *provider.StorageSp
 			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
 			ResourceId: &rootId,
 		}
-		p.logger.Info().Str("path", ref.Path).Msg("Walking tree")
+		p.logger.Debug().Str("path", ref.Path).Msg("Walking tree")
 
-		// Has this part tree changed?
+		// Has this item/subtree changed?
 		searchRes, err := p.indexClient.Search(ownerCtx, &searchsvc.SearchIndexRequest{
 			Query: "+ID:" + storagespace.FormatResourceID(*info.Id) + ` +Mtime:>="` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano) + `"`,
 		})
 		if err == nil && len(searchRes.Matches) >= 1 {
 			if info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
-				p.logger.Info().Str("path", ref.Path).Msg("subtree hasn't changed. Skipping.")
+				p.logger.Debug().Str("path", ref.Path).Msg("subtree hasn't changed. Skipping.")
 				return filepath.SkipDir
 			} else {
-				p.logger.Info().Str("path", ref.Path).Msg("element hasn't changed. Skipping.")
+				p.logger.Debug().Str("path", ref.Path).Msg("element hasn't changed. Skipping.")
 				return nil
 			}
 		}

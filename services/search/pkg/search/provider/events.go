@@ -160,13 +160,15 @@ func (p *Provider) handleEvent(ev interface{}) {
 		// Not sure what to do here. Skip.
 		return
 	}
-	p.logger.Debug().Interface("event", ev).Msg("resource has been changed, updating the document")
+	p.logger.Debug().Interface("event", ev).Msg("resource has been changed, scheduling a space resync")
 
-	p.indexSpaceDebouncer.Debounce(&provider.StorageSpaceId{OpaqueId: storagespace.FormatResourceID(provider.ResourceId{
-		StorageId: ref.GetResourceId().GetStorageId(),
-		SpaceId:   ref.GetResourceId().GetSpaceId(),
-	}),
-	}, owner.Id)
+	spaceID := &provider.StorageSpaceId{
+		OpaqueId: storagespace.FormatResourceID(provider.ResourceId{
+			StorageId: ref.GetResourceId().GetStorageId(),
+			SpaceId:   ref.GetResourceId().GetSpaceId(),
+		}),
+	}
+	p.indexSpaceDebouncer.Debounce(spaceID, owner.Id)
 }
 
 func (p *Provider) statResource(ctx context.Context, ref *provider.Reference, owner *user.User) (*provider.StatResponse, error) {
