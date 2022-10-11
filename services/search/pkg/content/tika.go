@@ -1,10 +1,8 @@
 package content
 
 import (
-	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"strings"
 
 	"github.com/bbalet/stopwords"
@@ -60,13 +58,7 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 	}
 	defer data.Close()
 
-	var d1, d2 bytes.Buffer
-	if _, err := io.Copy(io.MultiWriter(&d1, &d2), data); err != nil {
-		return doc, err
-	}
-
-	lang, _ := t.tika.Language(ctx, bytes.NewReader(d1.Bytes()))
-	metas, err := t.tika.MetaRecursive(ctx, bytes.NewReader(d2.Bytes()))
+	metas, err := t.tika.MetaRecursive(ctx, data)
 	if err != nil {
 		return doc, err
 	}
@@ -77,12 +69,12 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 		}
 
 		if content, err := getFirstValue(meta, "X-TIKA:content"); err == nil {
-			if lang != "" {
-				content = stopwords.CleanString(content, lang, true)
-			}
-
 			doc.Content = strings.TrimSpace(fmt.Sprintf("%s %s", doc.Content, content))
 		}
+	}
+
+	if lang, _ := t.tika.LanguageString(ctx, doc.Content); lang != "" {
+		doc.Content = stopwords.CleanString(doc.Content, lang, true)
 	}
 
 	return doc, nil
