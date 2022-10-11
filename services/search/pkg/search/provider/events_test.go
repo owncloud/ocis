@@ -9,10 +9,12 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/search/pkg/search/mocks"
@@ -21,9 +23,10 @@ import (
 
 var _ = Describe("Searchprovider", func() {
 	var (
-		p           *provider.Provider
-		gwClient    *cs3mocks.GatewayAPIClient
-		indexClient *mocks.IndexClient
+		p                   *provider.Provider
+		gwClient            *cs3mocks.GatewayAPIClient
+		indexClient         *mocks.IndexClient
+		debouncedIndexCalls int
 
 		ctx        context.Context
 		eventsChan chan interface{}
@@ -49,8 +52,9 @@ var _ = Describe("Searchprovider", func() {
 				SpaceId:   "rootopaqueid",
 				OpaqueId:  "opaqueid",
 			},
-			Path: "foo.pdf",
-			Size: 12345,
+			Path:  "foo.pdf",
+			Size:  12345,
+			Mtime: utils.TimeToTS(time.Now().Add(-time.Hour)),
 		}
 	)
 
@@ -60,7 +64,12 @@ var _ = Describe("Searchprovider", func() {
 		gwClient = &cs3mocks.GatewayAPIClient{}
 		indexClient = &mocks.IndexClient{}
 
-		p = provider.New(gwClient, indexClient, "", eventsChan, logger)
+		debouncedIndexCalls = 0
+		debouncer := provider.NewSpaceDebouncer(100*time.Millisecond, func(id *sprovider.StorageSpaceId, userID *userv1beta1.UserId) {
+			debouncedIndexCalls += 1
+		})
+
+		p = provider.NewWithDebouncer(gwClient, indexClient, "", eventsChan, logger, debouncer)
 
 		gwClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
 			Status: status.NewOK(ctx),
@@ -92,37 +101,25 @@ var _ = Describe("Searchprovider", func() {
 			})
 
 			It("triggers an index update when a file has been uploaded", func() {
-				called := false
-				indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
-					return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
-				})).Return(nil).Run(func(args mock.Arguments) {
-					called = true
-				})
 				eventsChan <- events.FileUploaded{
 					Ref:       ref,
 					Executant: user.Id,
 				}
 
-				Eventually(func() bool {
-					return called
-				}, "2s").Should(BeTrue())
+				Eventually(func() int {
+					return debouncedIndexCalls
+				}, "2s").Should(Equal(1))
 			})
 
 			It("triggers an index update when a file has been touched", func() {
-				called := false
-				indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
-					return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
-				})).Return(nil).Run(func(args mock.Arguments) {
-					called = true
-				})
 				eventsChan <- events.FileTouched{
 					Ref:       ref,
 					Executant: user.Id,
 				}
 
-				Eventually(func() bool {
-					return called
-				}, "2s").Should(BeTrue())
+				Eventually(func() int {
+					return debouncedIndexCalls
+				}, "2s").Should(Equal(1))
 			})
 
 			It("removes an entry from the index when the file has been deleted", func() {
@@ -164,20 +161,14 @@ var _ = Describe("Searchprovider", func() {
 			})
 
 			It("indexes items when a version has been restored", func() {
-				called := false
-				indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
-					return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
-				})).Return(nil).Run(func(args mock.Arguments) {
-					called = true
-				})
 				eventsChan <- events.FileVersionRestored{
 					Ref:       ref,
 					Executant: user.Id,
 				}
 
-				Eventually(func() bool {
-					return called
-				}, "2s").Should(BeTrue())
+				Eventually(func() int {
+					return debouncedIndexCalls
+				}, "2s").Should(Equal(1))
 			})
 		})
 
@@ -209,11 +200,15 @@ var _ = Describe("SpaceDebouncer", func() {
 	var (
 		debouncer *provider.SpaceDebouncer
 		callCount map[string]int
+
+		userId = &user.UserId{
+			OpaqueId: "user",
+		}
 	)
 
 	BeforeEach(func() {
 		callCount = map[string]int{}
-		debouncer = provider.NewSpaceDebouncer(50*time.Millisecond, func(id *sprovider.StorageSpaceId) {
+		debouncer = provider.NewSpaceDebouncer(50*time.Millisecond, func(id *sprovider.StorageSpaceId, _ *user.UserId) {
 			callCount[id.OpaqueId] += 1
 		})
 	})
@@ -222,9 +217,9 @@ var _ = Describe("SpaceDebouncer", func() {
 		spaceid := &sprovider.StorageSpaceId{
 			OpaqueId: "spaceid",
 		}
-		debouncer.Debounce(spaceid)
-		debouncer.Debounce(spaceid)
-		debouncer.Debounce(spaceid)
+		debouncer.Debounce(spaceid, userId)
+		debouncer.Debounce(spaceid, userId)
+		debouncer.Debounce(spaceid, userId)
 		Eventually(func() int {
 			return callCount["spaceid"]
 		}, "200ms").Should(Equal(1))
@@ -234,13 +229,13 @@ var _ = Describe("SpaceDebouncer", func() {
 		spaceid := &sprovider.StorageSpaceId{
 			OpaqueId: "spaceid",
 		}
-		debouncer.Debounce(spaceid)
-		debouncer.Debounce(spaceid)
-		debouncer.Debounce(spaceid)
+		debouncer.Debounce(spaceid, userId)
+		debouncer.Debounce(spaceid, userId)
+		debouncer.Debounce(spaceid, userId)
 		time.Sleep(100 * time.Millisecond)
 
-		debouncer.Debounce(spaceid)
-		debouncer.Debounce(spaceid)
+		debouncer.Debounce(spaceid, userId)
+		debouncer.Debounce(spaceid, userId)
 
 		Eventually(func() int {
 			return callCount["spaceid"]

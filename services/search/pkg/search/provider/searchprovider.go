@@ -104,6 +104,13 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 	return p
 }
 
+// NewWithDebouncer returns a new provider with a customer index space debouncer
+func NewWithDebouncer(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, machineAuthAPIKey string, eventsChan <-chan interface{}, logger log.Logger, debouncer *SpaceDebouncer) *Provider {
+	p := New(gwClient, indexClient, machineAuthAPIKey, eventsChan, logger)
+	p.indexSpaceDebouncer = debouncer
+	return p
+}
+
 func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error) {
 	if req.Query == "" {
 		return nil, errtypes.BadRequest("empty query provided")
@@ -286,7 +293,13 @@ func (p *Provider) doIndexSpace(ctx context.Context, spaceID *provider.StorageSp
 	err = walker.Walk(ownerCtx, &rootId, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error walking the tree")
+			return err
 		}
+
+		if info == nil {
+			return nil
+		}
+
 		ref := &provider.Reference{
 			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
 			ResourceId: &rootId,
