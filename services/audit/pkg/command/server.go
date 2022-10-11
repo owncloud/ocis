@@ -3,12 +3,15 @@ package command
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"os"
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/server"
 	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/services/audit/pkg/config"
 	"github.com/owncloud/ocis/v2/services/audit/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/audit/pkg/logging"
@@ -38,7 +41,24 @@ func Server(cfg *config.Config) *cli.Command {
 
 			evtsCfg := cfg.Events
 
-			tlsConf := &tls.Config{InsecureSkipVerify: evtsCfg.TLSInsecure} //nolint:gosec
+			var rootCAPool *x509.CertPool
+			if evtsCfg.TLSRootCACertificate != "" {
+				rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
+				if err != nil {
+					return err
+				}
+
+				rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
+				if err != nil {
+					return err
+				}
+				evtsCfg.TLSInsecure = false
+			}
+
+			tlsConf := &tls.Config{
+				InsecureSkipVerify: evtsCfg.TLSInsecure, //nolint:gosec
+				RootCAs:            rootCAPool,
+			}
 			client, err := server.NewNatsStream(
 				natsjs.TLSConfig(tlsConf),
 				natsjs.Address(evtsCfg.Endpoint),
