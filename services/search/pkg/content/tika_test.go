@@ -36,7 +36,7 @@ var _ = Describe("Tika", func() {
 				switch req.URL.Path {
 				case "/version":
 					out = version
-				case "/language/stream":
+				case "/language/string":
 					out = language
 				case "/rmeta/text":
 					out = fmt.Sprintf(`[{"X-TIKA:content":"%s"}]`, body)
@@ -87,7 +87,7 @@ var _ = Describe("Tika", func() {
 				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
 			})
 			Expect(err).ToNot(HaveOccurred())
-			Expect(doc.Content).To(Equal("body test stop words i stay"))
+			Expect(doc.Content).To(Equal("body test stop words i stay "))
 		})
 	})
 })
