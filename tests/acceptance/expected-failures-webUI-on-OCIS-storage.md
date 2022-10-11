@@ -70,7 +70,6 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 
 ### [webUI-Private-Links](https://github.com/owncloud/web/issues/6844)
 - [webUIPrivateLinks/accessingPrivateLinks.feature:9](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L9)
-- [webUIPrivateLinks/accessingPrivateLinks.feature:17](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L17)
 - [webUIPrivateLinks/accessingPrivateLinks.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L25)
 
 ### [Share additional info](https://github.com/owncloud/ocis/issues/1253)

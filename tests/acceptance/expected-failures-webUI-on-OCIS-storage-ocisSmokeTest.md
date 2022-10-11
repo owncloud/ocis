@@ -13,4 +13,3 @@ Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. This 
 
 ### [Copy private link option not available](https://github.com/owncloud/ocis/issues/1409)
 - [webUIPrivateLinks/accessingPrivateLinks.feature:9](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L9)
-- [webUIPrivateLinks/accessingPrivateLinks.feature:17](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L17)
