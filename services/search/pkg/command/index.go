@@ -17,7 +17,7 @@ import (
 func Index(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "index",
-		Usage:    "index the files for one one more users",
+		Usage:    "index the files for one or more users",
 		Category: "index management",
 		Aliases:  []string{"i"},
 		Flags: []cli.Flag{
@@ -31,7 +31,7 @@ func Index(cfg *config.Config) *cli.Command {
 				Name:     "user",
 				Aliases:  []string{"u"},
 				Required: true,
-				Usage:    "the id of the user tha shall be used to access the files",
+				Usage:    "the id of the user that shall be used to access the files",
 			},
 		},
 		Before: func(c *cli.Context) error {
