@@ -74,7 +74,7 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 - [webUIPrivateLinks/accessingPrivateLinks.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L25)
 
 ### [Share additional info](https://github.com/owncloud/ocis/issues/1253)
-- [webUISharingInternalUsersShareWithPage/shareWithUsers.feature:140](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersShareWithPage/shareWithUsers.feature#L140)
+- [webUISharingInternalUsersShareWithPage/shareWithUsers.feature:138](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersShareWithPage/shareWithUsers.feature#L138)
 
 ### [Expiration date set is not implemented in user share](https://github.com/owncloud/ocis/issues/1250)
 - [webUISharingInternalGroups/shareWithGroups.feature:279](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L279)
@@ -98,7 +98,7 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 - [webUISharingPublicManagement/shareByPublicLink.feature:133](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/shareByPublicLink.feature#L133)
 
 ### [Propfind response to trashbin endpoint is different in ocis](https://github.com/owncloud/product/issues/186)
-- [webUIFilesSearch/search.feature:178](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L178)
+- [webUIFilesSearch/search.feature:131](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L131)
 
 ### [restoring a file from "Deleted files" (trashbin) is not possible if the original folder does not exist any-more](https://github.com/owncloud/web/issues/1753)
 - [webUITrashbinRestore/trashbinRestore.feature:138](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinRestore/trashbinRestore.feature#L138)
@@ -107,7 +107,7 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 - [webUIUpload/uploadFileGreaterThanQuotaSize.feature:12](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadFileGreaterThanQuotaSize.feature#L12)
 
 ### [restoring a file deleted from a received shared folder is not possible](https://github.com/owncloud/ocis/issues/1124)
-- [webUITrashbinRestore/trashbinRestore.feature:260](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinRestore/trashbinRestore.feature#L260)
+- [webUITrashbinRestore/trashbinRestore.feature:244](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinRestore/trashbinRestore.feature#L244)
 
 ### [Blocked user is not logged out](https://github.com/owncloud/ocis/issues/902)
 - [webUILogin/adminBlocksUser.feature:13](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUILogin/adminBlocksUser.feature#L13)
@@ -129,18 +129,14 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 - [webUIFilesDetails/fileDetails.feature:106](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L106)
 - [webUIFilesDetails/fileDetails.feature:123](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L123)
 - [webUIFilesDetails/fileDetails.feature:140](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L140)
-- [webUIFilesDetails/fileDetails.feature:169](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesDetails/fileDetails.feature#L169)
 
 ### [Deletion of a recursive folder from trashbin is not possible](https://github.com/owncloud/product/issues/188)
-- [webUITrashbinDelete/trashbinDelete.feature:85](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L85)
-- [webUITrashbinDelete/trashbinDelete.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L71)
-- [webUITrashbinDelete/trashbinDelete.feature:48](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L48)
+- [webUITrashbinDelete/trashbinDelete.feature:51](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L51)
+- [webUITrashbinDelete/trashbinDelete.feature:65](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L65)
 
 ### [Tags page not implemented yet](https://github.com/owncloud/web/issues/5017)
-- [webUIDeleteFilesFolders/deleteFilesFolders.feature:135](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIDeleteFilesFolders/deleteFilesFolders.feature#L135)
-- [webUIFilesSearch/search.feature:63](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L63)
-- [webUIFilesSearch/search.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L71)
-- [webUIFilesSearch/search.feature:84](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L84)
+- [webUIFilesSearch/search.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L41)
+- [webUIFilesSearch/search.feature:85](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L85)
 - [webUITags/tagsSuggestion.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITags/tagsSuggestion.feature#L25)
 - [webUITags/tagsSuggestion.feature:35](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITags/tagsSuggestion.feature#L35)
 - [webUITags/createTags.feature:16](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITags/createTags.feature#L16)
@@ -150,19 +146,8 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 - [webUITags/createTags.feature:61](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITags/createTags.feature#L61)
 - [webUITags/createTags.feature:79](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITags/createTags.feature#L79)
 
-### [impossible to navigate into a folder in the trashbin](https://github.com/owncloud/web/issues/1725)
-- [webUITrashbinDelete/trashbinDelete.feature:29](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L29)
-
 ### [Saving public share is not possible](https://github.com/owncloud/web/issues/5321)
 - [webUISharingPublicManagement/shareByPublicLink.feature:31](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/shareByPublicLink.feature#L31)
-
-### [Public link send by email field](https://github.com/owncloud/web/issues/2422)
-- [webUISharingPublicManagement/publicLinkShareByEmail.feature:15](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkShareByEmail.feature#L15)
-- [webUISharingPublicManagement/publicLinkShareByEmail.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkShareByEmail.feature#L25)
-- [webUISharingPublicManagement/publicLinkShareByEmail.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkShareByEmail.feature#L41)
-- [webUISharingPublicManagement/publicLinkShareByEmail.feature:56](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkShareByEmail.feature#L56)
-- [webUISharingPublicManagement/publicLinkShareByEmail.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkShareByEmail.feature#L71)
-- [webUISharingPublicManagement/publicLinkShareByEmail.feature:99](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkShareByEmail.feature#L99)
 
 ### [Uploading folders does not work in files-drop](https://github.com/owncloud/web/issues/2443)
 - [webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature:247](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicDifferentRoles/shareByPublicLinkDifferentRoles.feature#L247)
@@ -202,52 +187,22 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 - [webUIWebdavLocks/unlock.feature:148](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLocks/unlock.feature#L148)
 - [webUIWebdavLocks/unlock.feature:198](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLocks/unlock.feature#L198)
 - [webUIWebdavLocks/unlock.feature:199](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLocks/unlock.feature#L199)
-- [webUIWebdavLockProtection/delete.feature:32](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L32)
 - [webUIWebdavLockProtection/delete.feature:33](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L33)
-- [webUIWebdavLockProtection/delete.feature:53](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L53)
-- [webUIWebdavLockProtection/delete.feature:54](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L54)
-- [webUIWebdavLockProtection/move.feature:35](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L35)
+- [webUIWebdavLockProtection/delete.feature:34](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L34)
 - [webUIWebdavLockProtection/move.feature:36](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L36)
-- [webUIWebdavLockProtection/move.feature:56](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L56)
-- [webUIWebdavLockProtection/move.feature:57](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L57)
-- [webUIWebdavLockProtection/move.feature:79](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L79)
-- [webUIWebdavLockProtection/move.feature:80](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L80)
-- [webUIWebdavLockProtection/move.feature:100](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L100)
-- [webUIWebdavLockProtection/move.feature:101](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L101)
-- [webUIWebdavLockProtection/upload.feature:31](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L31)
+- [webUIWebdavLockProtection/move.feature:37](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L37)
 - [webUIWebdavLockProtection/upload.feature:32](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L32)
-- [webUIWebdavLockProtection/upload.feature:51](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L51)
-- [webUIWebdavLockProtection/upload.feature:52](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L52)
-- [webUIWebdavLockProtection/upload.feature:71](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L71)
-- [webUIWebdavLockProtection/upload.feature:72](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L72)
-
-### [Resources cannot be locked under ocis](https://github.com/owncloud/ocis/issues/1284)
-- [webUIWebdavLockProtection/delete.feature:73](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L73)
-- [webUIWebdavLockProtection/delete.feature:74](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/delete.feature#L74)
-- [webUIWebdavLockProtection/move.feature:123](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L123)
-- [webUIWebdavLockProtection/move.feature:124](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/move.feature#L124)
-
-### [Writing to locked files/folders give only a generic error message](https://github.com/owncloud/web/issues/5741)
-- [webUIWebdavLockProtection/upload.feature:90](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L90)
-- [webUIWebdavLockProtection/upload.feature:91](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L91)
+- [webUIWebdavLockProtection/upload.feature:33](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIWebdavLockProtection/upload.feature#L33)
 
 ### [Federated shares not showing in shared with me page](https://github.com/owncloud/web/issues/2510)
 - [webUISharingExternal/federationSharing.feature:38](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingExternal/federationSharing.feature#L38)
 - [webUISharingExternal/federationSharing.feature:166](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingExternal/federationSharing.feature#L166)
 
 ### [Upload of folder with same name shows error](https://github.com/owncloud/web/issues/6996)
-- [webUIUpload/upload.feature:129](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/upload.feature#L129)
-- [webUIUpload/upload.feature:142](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/upload.feature#L142)
-- [webUIUpload/upload.feature:159](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/upload.feature#L159)
-- [webUIUpload/uploadEdgecases.feature:69](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L69)
-
-### [browsing directly to a details tab is not possible](https://github.com/owncloud/web/issues/5464)
-- [webUIFiles/browseDirectlyToDetailsTab.feature:21](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/browseDirectlyToDetailsTab.feature#L21)
-- [webUIFiles/browseDirectlyToDetailsTab.feature:22](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/browseDirectlyToDetailsTab.feature#L22)
-- [webUIFiles/browseDirectlyToDetailsTab.feature:31](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/browseDirectlyToDetailsTab.feature#L31)
-- [webUIFiles/browseDirectlyToDetailsTab.feature:32](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/browseDirectlyToDetailsTab.feature#L32)
-- [webUIFiles/browseDirectlyToDetailsTab.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/browseDirectlyToDetailsTab.feature#L41)
-- [webUIFiles/browseDirectlyToDetailsTab.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/browseDirectlyToDetailsTab.feature#L42)
+- [webUIUpload/upload.feature:120](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/upload.feature#L120)
+- [webUIUpload/upload.feature:130](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/upload.feature#L130)
+- [webUIUpload/upload.feature:138](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/upload.feature#L138)
+- [webUIUpload/uploadEdgecases.feature:53](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L53)
 
 ### [reshared share that is shared with a group the sharer is part of shows twice on "Share with me" page](https://github.com/owncloud/web/issues/2512)
 - [webUISharingAcceptShares/acceptShares.feature:32](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L32)
@@ -259,7 +214,7 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 
 ### [not possible to overwrite a received shared file](https://github.com/owncloud/ocis/issues/2267)
 - [webUISharingInternalGroups/shareWithGroups.feature:79](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L79)
-- [webUISharingInternalUsers/shareWithUsers.feature:59](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L59)
+- [webUISharingInternalUsers/shareWithUsers.feature:55](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsers/shareWithUsers.feature#L55)
 
 ### [web config update is not properly reflected after the ocis start](https://github.com/owncloud/ocis/issues/2944)
 - [webUIFiles/breadcrumb.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFiles/breadcrumb.feature#L50)
@@ -278,4 +233,3 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 
 ### [PROPFIND to sub-folder of a shared resources with same name gives 404](https://github.com/owncloud/ocis/issues/3859)
 - [webUISharingAcceptShares/acceptShares.feature:245](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L245)
-
