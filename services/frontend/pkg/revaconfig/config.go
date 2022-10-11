@@ -198,7 +198,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 								"default_permissions":               22,
 								"search_min_length":                 cfg.SearchMinLength,
 								"public": map[string]interface{}{
-									"alias":                      false,
+									"alias":                      true,
 									"enabled":                    true,
 									"send_mail":                  true,
 									"defaultPublicLinkShareName": "Public link",
