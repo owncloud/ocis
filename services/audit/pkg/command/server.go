@@ -38,7 +38,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			evtsCfg := cfg.Events
 
-			tlsConf := &tls.Config{InsecureSkipVerify: true}
+			tlsConf := &tls.Config{InsecureSkipVerify: evtsCfg.TLSInsecure} //nolint:gosec
 			client, err := server.NewNatsStream(
 				natsjs.TLSConfig(tlsConf),
 				natsjs.Address(evtsCfg.Endpoint),

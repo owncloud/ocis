@@ -70,6 +70,7 @@ type Identity struct {
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint string `yaml:"endpoint" env:"GRAPH_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events."`
-	Cluster  string `yaml:"cluster" env:"GRAPH_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture."`
+	Endpoint    string `yaml:"endpoint" env:"GRAPH_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events."`
+	Cluster     string `yaml:"cluster" env:"GRAPH_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture."`
+	TLSInsecure bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;GRAPH_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates."`
 }

@@ -36,7 +36,7 @@ func Server(opts ...Option) (http.Service, error) {
 	if options.Config.Events.Endpoint != "" {
 		var err error
 
-		tlsConf := &tls.Config{InsecureSkipVerify: true}
+		tlsConf := &tls.Config{InsecureSkipVerify: options.Config.Events.TLSInsecure} //nolint:gosec
 		publisher, err = server.NewNatsStream(
 			natsjs.TLSConfig(tlsConf),
 			natsjs.Address(options.Config.Events.Endpoint),
