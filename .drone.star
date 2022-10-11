@@ -1889,6 +1889,11 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "IDM_CREATE_DEMO_USERS": True,
             "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
             "FRONTEND_SEARCH_MIN_LENGTH": "2",
+            "AUDIT_EVENTS_TLS_INSECURE": True,
+            "GRAPH_EVENTS_TLS_INSECURE": True,
+            "NOTIFICATIONS_EVENTS_TLS_INSECURE": True,
+            "SEARCH_EVENTS_TLS_INSECURE": True,
+            "NATS_TLS_SKIP_VERIFY_CLIENT_CERT": True,
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
