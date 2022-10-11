@@ -134,8 +134,6 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 - [webUITrashbinDelete/trashbinDelete.feature:65](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITrashbinDelete/trashbinDelete.feature#L65)
 
 ### [Tags page not implemented yet](https://github.com/owncloud/web/issues/5017)
-- [webUIFilesSearch/search.feature:41](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L41)
-- [webUIFilesSearch/search.feature:85](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesSearch/search.feature#L85)
 - [webUITags/tagsSuggestion.feature:25](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITags/tagsSuggestion.feature#L25)
 - [webUITags/tagsSuggestion.feature:35](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITags/tagsSuggestion.feature#L35)
 - [webUITags/createTags.feature:16](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUITags/createTags.feature#L16)
@@ -197,19 +195,13 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 - [webUISharingExternal/federationSharing.feature:38](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingExternal/federationSharing.feature#L38)
 - [webUISharingExternal/federationSharing.feature:166](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingExternal/federationSharing.feature#L166)
 
-### [Upload of folder with same name shows error](https://github.com/owncloud/web/issues/6996)
-- [webUIUpload/upload.feature:120](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/upload.feature#L120)
-- [webUIUpload/upload.feature:130](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/upload.feature#L130)
-- [webUIUpload/upload.feature:138](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/upload.feature#L138)
-- [webUIUpload/uploadEdgecases.feature:53](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIUpload/uploadEdgecases.feature#L53)
-
 ### [reshared share that is shared with a group the sharer is part of shows twice on "Share with me" page](https://github.com/owncloud/web/issues/2512)
-- [webUISharingAcceptShares/acceptShares.feature:32](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L32)
+- [webUISharingAcceptShares/acceptShares.feature:31](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L31)
 
 ### [[oCIS] Received share cannot be deleted/unshared if not shared with full permissions](https://github.com/owncloud/web/issues/5531)
-- [webUISharingAcceptShares/acceptShares.feature:50](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L50)
-- [webUISharingAcceptShares/acceptShares.feature:162](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L162)
-- [webUISharingAcceptShares/acceptShares.feature:201](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L201)
+- [webUISharingAcceptShares/acceptShares.feature:49](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L49)
+- [webUISharingAcceptShares/acceptShares.feature:161](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L161)
+- [webUISharingAcceptShares/acceptShares.feature:200](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L200)
 
 ### [not possible to overwrite a received shared file](https://github.com/owncloud/ocis/issues/2267)
 - [webUISharingInternalGroups/shareWithGroups.feature:79](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L79)
@@ -231,4 +223,4 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 - [webUIFilesCopy/copy.feature:101](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copy.feature#L101)
 
 ### [PROPFIND to sub-folder of a shared resources with same name gives 404](https://github.com/owncloud/ocis/issues/3859)
-- [webUISharingAcceptShares/acceptShares.feature:245](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L245)
+- [webUISharingAcceptShares/acceptShares.feature:244](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingAcceptShares/acceptShares.feature#L244)
