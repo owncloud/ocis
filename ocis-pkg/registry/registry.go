@@ -69,7 +69,7 @@ func GetRegistry() registry.Registry {
 			reg = mdnsr.NewRegistry()
 		}
 		// No cache needed for in-memory registry
-		if plugin == "memory" {
+		if plugin != "memory" {
 			reg = cache.New(reg, cache.WithTTL(20*time.Second))
 		}
 	})
