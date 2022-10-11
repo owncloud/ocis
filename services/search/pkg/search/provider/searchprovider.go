@@ -256,21 +256,9 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 }
 
 func (p *Provider) doIndexSpace(ctx context.Context, spaceID *provider.StorageSpaceId, userID *user.UserId) error {
-	// get user
-	res, err := p.gwClient.GetUserByClaim(ctx, &user.GetUserByClaimRequest{
-		Claim: "userid",
-		Value: userID.OpaqueId,
-	})
-	if err != nil || res.Status.Code != rpc.Code_CODE_OK {
-		fmt.Println("error: Could not get user by userid")
-		return err
-	}
-
-	// Get auth context
-	ownerCtx := ctxpkg.ContextSetUser(ctx, res.User)
-	authRes, err := p.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
+	authRes, err := p.gwClient.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "machine",
-		ClientId:     "userid:" + res.User.Id.OpaqueId,
+		ClientId:     "userid:" + userID.OpaqueId,
 		ClientSecret: p.machineAuthAPIKey,
 	})
 	if err != nil || authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
@@ -280,7 +268,7 @@ func (p *Provider) doIndexSpace(ctx context.Context, spaceID *provider.StorageSp
 	if authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		return fmt.Errorf("could not get authenticated context for user")
 	}
-	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
+	ownerCtx := metadata.AppendToOutgoingContext(ctx, ctxpkg.TokenHeader, authRes.Token)
 
 	// Walk the space and index all files
 	walker := walker.NewWalker(p.gwClient)
