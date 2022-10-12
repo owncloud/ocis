@@ -48,6 +48,11 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 	if err != nil {
 		return doc, err
 	}
+
+	if ri.Size == 0 {
+		return doc, nil
+	}
+
 	if ri.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
 		return doc, nil
 	}
