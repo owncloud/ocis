@@ -28,8 +28,9 @@ message Entity {
   string permissions = 8;
   uint64 type = 9;
   bool deleted = 10;
-	string shareRootName = 11;
-  repeated string tags = 12;
+  string shareRootName = 11;
+  ResourceID parent_id = 12;
+  repeated string tags = 13;
 }
 
 message Match {

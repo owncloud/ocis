@@ -196,6 +196,9 @@
         "shareRootName": {
           "type": "string"
         },
+        "parentId": {
+          "$ref": "#/definitions/v0ResourceID"
+        },
         "tags": {
           "type": "array",
           "items": {

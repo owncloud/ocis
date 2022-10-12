@@ -115,6 +115,7 @@ func (eh *eventHandler) upsertItem(ref *provider.Reference, uid *user.UserId) {
 			OpaqueId:  stat.Info.Id.SpaceId,
 			SpaceId:   stat.Info.Id.SpaceId,
 		}),
+		ParentID: storagespace.FormatResourceID(*stat.GetInfo().GetParentId()),
 		Path:     utils.MakeRelativePath(path),
 		Type:     uint64(stat.Info.Type),
 		Document: doc,
@@ -144,7 +145,7 @@ func (eh *eventHandler) moveItem(ref *provider.Reference, uid *user.UserId) {
 		return
 	}
 
-	if err := eh.engine.Move(storagespace.FormatResourceID(*stat.Info.Id), path); err != nil {
+	if err := eh.engine.Move(storagespace.FormatResourceID(*stat.GetInfo().GetId()), storagespace.FormatResourceID(*stat.GetInfo().GetParentId()), path); err != nil {
 		eh.logger.Error().Err(err).Msg("failed to move the changed resource in the index")
 	}
 }

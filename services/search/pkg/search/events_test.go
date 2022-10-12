@@ -2,6 +2,7 @@ package search_test
 
 import (
 	"context"
+
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -46,6 +47,10 @@ var _ = Describe("Events", func() {
 			Id: &provider.ResourceId{
 				StorageId: "storageid",
 				OpaqueId:  "opaqueid",
+			},
+			ParentId: &provider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "parentopaqueid",
 			},
 			Path: "foo.pdf",
 			Size: 12345,
@@ -164,7 +169,7 @@ var _ = Describe("Events", func() {
 
 		It("indexes items when they are being moved", func() {
 			called := false
-			engine.On("Move", mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
+			engine.On("Move", mock.Anything, mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 				called = true
 			})
 

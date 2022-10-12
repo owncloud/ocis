@@ -30,10 +30,7 @@ RUN make ci-go-generate build
 
 FROM alpine:3.15
 
-RUN apk update && \
-	apk upgrade && \
-	apk add ca-certificates mailcap && \
-	rm -rf /var/cache/apk/* && \
+RUN apk add --no-cache ca-certificates mailcap tree attr curl && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
 
 LABEL maintainer="ownCloud GmbH <devops@owncloud.com>" \

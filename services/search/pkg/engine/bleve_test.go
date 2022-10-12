@@ -3,6 +3,7 @@ package engine_test
 import (
 	"context"
 	"fmt"
+
 	"github.com/blevesearch/bleve/v2"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	. "github.com/onsi/ginkgo/v2"
@@ -19,7 +20,7 @@ var _ = Describe("Bleve", func() {
 		idx bleve.Index
 		ctx context.Context
 
-		createEntity = func(id sprovider.ResourceId, doc content.Document) engine.Resource {
+		createEntity = func(id sprovider.ResourceId, parentOpaque string, doc content.Document) engine.Resource {
 			name := doc.Name
 
 			if name == "" {
@@ -29,6 +30,7 @@ var _ = Describe("Bleve", func() {
 			return engine.Resource{
 				ID:       fmt.Sprintf("%s$%s!%s", id.StorageId, id.SpaceId, id.OpaqueId),
 				RootID:   fmt.Sprintf("%s$%s!%s", id.StorageId, id.SpaceId, id.OpaqueId),
+				ParentID: fmt.Sprintf("%s$%s!%s", id.StorageId, id.SpaceId, parentOpaque),
 				Path:     fmt.Sprintf("./%s", name),
 				Document: doc,
 			}
@@ -82,7 +84,7 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				r := createEntity(rid, content.Document{Tags: []string{"foo", "bar"}})
+				r := createEntity(rid, "p", content.Document{Tags: []string{"foo", "bar"}})
 				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -102,7 +104,7 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				r := createEntity(rid, content.Document{Name: "Foo oo.pdf"})
+				r := createEntity(rid, "p", content.Document{Name: "Foo oo.pdf"})
 				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
 				assertDocCount(rid, `Name:foo o*`, 1)
@@ -114,7 +116,7 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				r := createEntity(rid, content.Document{Name: "12345.pdf"})
+				r := createEntity(rid, "p", content.Document{Name: "12345.pdf"})
 				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -128,7 +130,7 @@ var _ = Describe("Bleve", func() {
 						SpaceId:   "2",
 						OpaqueId:  "3",
 					}
-					r := createEntity(rid, content.Document{Name: "foo.pdf"})
+					r := createEntity(rid, "p", content.Document{Name: "foo.pdf"})
 					err := eng.Upsert(r.ID, r)
 					Expect(err).ToNot(HaveOccurred())
 
@@ -147,7 +149,7 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				r := createEntity(rid, content.Document{Name: "bar.pdf", Size: 789})
+				r := createEntity(rid, "p", content.Document{Name: "bar.pdf", Size: 789})
 				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -161,7 +163,7 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				r := createEntity(rid, content.Document{Name: "bar.pdf"})
+				r := createEntity(rid, "p", content.Document{Name: "bar.pdf"})
 				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -176,7 +178,7 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				r := createEntity(rid, content.Document{Name: "bar.pdf"})
+				r := createEntity(rid, "p", content.Document{Name: "bar.pdf"})
 				r.Type = 3
 				r.MimeType = "application/pdf"
 
@@ -204,7 +206,7 @@ var _ = Describe("Bleve", func() {
 						OpaqueId:  string(rune(i + 3)),
 					}
 
-					r := createEntity(rid, content.Document{Name: "foo.pdf"})
+					r := createEntity(rid, "p", content.Document{Name: "foo.pdf"})
 					r.Size = uint64(i + 250)
 					err := eng.Upsert(r.ID, r)
 					Expect(err).ToNot(HaveOccurred())
@@ -224,7 +226,7 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				r := createEntity(rid, content.Document{Name: "foo.pdf"})
+				r := createEntity(rid, "p", content.Document{Name: "foo.pdf"})
 				r.Type = 3
 				r.MimeType = "application/pdf"
 
@@ -249,7 +251,7 @@ var _ = Describe("Bleve", func() {
 						SpaceId:   "2",
 						OpaqueId:  "3",
 					}
-					entT = createEntity(ridT, content.Document{Name: "top.pdf"})
+					entT = createEntity(ridT, "p", content.Document{Name: "top.pdf"})
 					Expect(eng.Upsert(entT.ID, entT)).ToNot(HaveOccurred())
 
 					ridD = sprovider.ResourceId{
@@ -257,7 +259,7 @@ var _ = Describe("Bleve", func() {
 						SpaceId:   "2",
 						OpaqueId:  "4",
 					}
-					entD = createEntity(ridD, content.Document{Name: "deep.pdf"})
+					entD = createEntity(ridD, "p", content.Document{Name: "deep.pdf"})
 					entD.Path = "./nested/deep.pdf"
 					Expect(eng.Upsert(entD.ID, entD)).ToNot(HaveOccurred())
 				})

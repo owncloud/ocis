@@ -58,6 +58,10 @@ var _ = Describe("Searchprovider", func() {
 				StorageId: "storageid",
 				OpaqueId:  "opaqueid",
 			},
+			ParentId: &sprovider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "parentopaqueid",
+			},
 			Path: "foo.pdf",
 			Size: 12345,
 		}

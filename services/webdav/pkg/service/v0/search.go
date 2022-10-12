@@ -171,6 +171,13 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind
 		SpaceId:   match.Entity.Id.SpaceId,
 		OpaqueId:  match.Entity.Id.OpaqueId,
 	})))
+	if match.Entity.ParentId != nil {
+		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:file-parent", storagespace.FormatResourceID(provider.ResourceId{
+			StorageId: match.Entity.ParentId.StorageId,
+			SpaceId:   match.Entity.ParentId.SpaceId,
+			OpaqueId:  match.Entity.ParentId.OpaqueId,
+		})))
+	}
 	if match.Entity.Ref.ResourceId.StorageId == utils.ShareStorageProviderID {
 		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:shareid", match.Entity.Ref.ResourceId.OpaqueId))
 		propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:shareroot", match.Entity.ShareRootName))

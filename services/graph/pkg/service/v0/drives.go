@@ -648,11 +648,11 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		drive.Root.WebDavUrl = libregraph.PtrString(webDavURL.String())
 	}
 
-	webURL, err := url.Parse(g.config.Commons.OcisURL)
+	webURL, err := url.Parse(g.config.Spaces.WebDavBase)
 	if err != nil {
 		g.logger.Error().
 			Err(err).
-			Str("url", g.config.Commons.OcisURL).
+			Str("url", g.config.Spaces.WebDavBase).
 			Msg("failed to parse base url")
 		return nil, err
 	}

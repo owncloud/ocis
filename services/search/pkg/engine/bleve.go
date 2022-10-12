@@ -167,6 +167,11 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 			return nil, err
 		}
 
+		pID, err := storagespace.ParseID(getValue[string](hit.Fields, "ParentID"))
+		if err != nil {
+			return nil, err
+		}
+
 		match := &searchMessage.Match{
 			Score: float32(hit.Score),
 			Entity: &searchMessage.Entity{
@@ -176,6 +181,7 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 				},
 				Id:       resourceIDtoSearchID(rID),
 				Name:     getValue[string](hit.Fields, "Name"),
+				ParentId: resourceIDtoSearchID(pID),
 				Size:     uint64(getValue[float64](hit.Fields, "Size")),
 				Type:     uint64(getValue[float64](hit.Fields, "Type")),
 				MimeType: getValue[string](hit.Fields, "MimeType"),
@@ -203,7 +209,7 @@ func (b *Bleve) Upsert(id string, r Resource) error {
 }
 
 // Move updates the resource location and all of its necessary fields.
-func (b *Bleve) Move(id string, target string) error {
+func (b *Bleve) Move(id string, parentid string, target string) error {
 	r, err := b.getResource(id)
 	if err != nil {
 		return err
@@ -214,6 +220,7 @@ func (b *Bleve) Move(id string, target string) error {
 	r, err = b.updateEntity(id, func(r *Resource) {
 		r.Path = newName
 		r.Name = path.Base(newName)
+		r.ParentID = parentid
 	})
 	if err != nil {
 		return err
@@ -283,11 +290,12 @@ func (b *Bleve) getResource(id string) (*Resource, error) {
 	fields := res.Hits[0].Fields
 
 	return &Resource{
-		ID:      getValue[string](fields, "ID"),
-		RootID:  getValue[string](fields, "RootID"),
-		Path:    getValue[string](fields, "Path"),
-		Type:    uint64(getValue[float64](fields, "Type")),
-		Deleted: getValue[bool](fields, "Deleted"),
+		ID:       getValue[string](fields, "ID"),
+		RootID:   getValue[string](fields, "RootID"),
+		Path:     getValue[string](fields, "Path"),
+		ParentID: getValue[string](fields, "ParentID"),
+		Type:     uint64(getValue[float64](fields, "Type")),
+		Deleted:  getValue[bool](fields, "Deleted"),
 		Document: content.Document{
 			Name:     getValue[string](fields, "Name"),
 			Size:     uint64(getValue[float64](fields, "Size")),
