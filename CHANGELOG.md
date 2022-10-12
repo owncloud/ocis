@@ -30,7 +30,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
 * Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
 * Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
-* Enhancement - Update ownCloud Web to v6.0.0-rc.1: [#4779](https://github.com/owncloud/ocis/pull/4779)
+* Enhancement - Update ownCloud Web to v6.0.0-rc.2: [#4786](https://github.com/owncloud/ocis/pull/4786)
 * Enhancement - Make it possible to configure a WOPI folderurl: [#4716](https://github.com/owncloud/ocis/pull/4716)
 
 ## Details
@@ -216,11 +216,11 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/4719
    https://github.com/owncloud/ocis/pull/4750
 
-* Enhancement - Update ownCloud Web to v6.0.0-rc.1: [#4779](https://github.com/owncloud/ocis/pull/4779)
+* Enhancement - Update ownCloud Web to v6.0.0-rc.2: [#4786](https://github.com/owncloud/ocis/pull/4786)
 
    Tags: web
 
-   We updated ownCloud Web to v6.0.0-rc.1. Please refer to the changelog (linked) for details on
+   We updated ownCloud Web to v6.0.0-rc.2. Please refer to the changelog (linked) for details on
    the web release.
 
    ### Breaking changes * BREAKING CHANGE for users in
@@ -289,8 +289,8 @@ The following sections list the changes for unreleased.
    [owncloud/web#7430](https://github.com/owncloud/web/pull/7430): Webdav support in
    web-client package
 
-   https://github.com/owncloud/ocis/pull/4779
-   https://github.com/owncloud/web/releases/tag/v6.0.0-rc.1
+   https://github.com/owncloud/ocis/pull/4786
+   https://github.com/owncloud/web/releases/tag/v6.0.0-rc.2
 
 * Enhancement - Make it possible to configure a WOPI folderurl: [#4716](https://github.com/owncloud/ocis/pull/4716)
 
