@@ -87,6 +87,21 @@ a| [subs=-attributes]
 ++audit ++
 a| [subs=-attributes]
 The consumergroup of the service. One group will only get one copy of an event.
+|`OCIS_INSECURE` +
+`AUDIT_EVENTS_TLS_INSECURE`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Whether to verify the server TLS certificates.
+|`AUDIT_EVENTS_TLS_ROOT_CA_CERTIFICATE`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The root CA certificate used to validate the server's TLS certificate. If provided AUDIT_EVENTS_TLS_INSECURE will be seen as false.
 |`AUDIT_LOG_TO_CONSOLE`
 a| [subs=-attributes]
 ++bool ++

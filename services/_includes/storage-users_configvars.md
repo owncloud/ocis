@@ -52,6 +52,8 @@
 | STORAGE_USERS_DATA_SERVER_URL | string | http://localhost:9158/data | URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.|
 | STORAGE_USERS_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | STORAGE_USERS_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
+| OCIS_INSECURE<br/>STORAGE_USERS_EVENTS_TLS_INSECURE | bool | true | Whether to verify the server TLS certificates.|
+| STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT | string |  | The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false.|
 | STORAGE_USERS_CACHE_STORE | string | memory | Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".|
 | STORAGE_USERS_CACHE_NODES | []string | [] | Node addresses to use for the cache store.|
 | STORAGE_USERS_CACHE_DATABASE | string | users | Database name of the cache.|

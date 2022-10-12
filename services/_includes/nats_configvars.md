@@ -14,3 +14,6 @@
 | NATS_NATS_PORT | int | 9233 | Bind port.|
 | NATS_NATS_CLUSTER_ID | string | ocis-cluster | ID of the NATS cluster.|
 | NATS_NATS_STORE_DIR | string | ~/.ocis/nats | Path for the NATS JetStream persistence directory.|
+| NATS_TLS_CERT | string | ~/.ocis/nats/tls.crt | File name of the TLS server certificate for the nats listener.|
+| NATS_TLS_KEY | string | ~/.ocis/nats/tls.key | File name for the TLS certificate key for the server certificate.|
+| OCIS_INSECURE<br/>NATS_TLS_SKIP_VERIFY_CLIENT_CERT | bool | false | Whether the nats server should skip the client certificate verification during the TLS handshake.|

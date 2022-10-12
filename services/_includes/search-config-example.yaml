@@ -25,4 +25,6 @@ events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster
   group: search
+  tls_insecure: false
+  tls_root_ca_certificate: ""
 machine_auth_api_key: ""

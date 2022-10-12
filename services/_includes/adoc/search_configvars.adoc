@@ -140,6 +140,21 @@ a| [subs=-attributes]
 ++search ++
 a| [subs=-attributes]
 The customer group of the service. One group will only get one copy of an event
+|`OCIS_INSECURE` +
+`SEARCH_EVENTS_TLS_INSECURE`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Whether to verify the server TLS certificates.
+|`SEARCH_EVENTS_TLS_ROOT_CA_CERTIFICATE`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The root CA certificate used to validate the server's TLS certificate. If provided SEARCH_EVENTS_TLS_INSECURE will be seen as false.
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `SEARCH_MACHINE_AUTH_API_KEY`
 a| [subs=-attributes]

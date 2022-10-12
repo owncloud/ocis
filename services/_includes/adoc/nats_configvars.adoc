@@ -94,6 +94,28 @@ a| [subs=-attributes]
 ++~/.ocis/nats ++
 a| [subs=-attributes]
 Path for the NATS JetStream persistence directory.
+|`NATS_TLS_CERT`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++~/.ocis/nats/tls.crt ++
+a| [subs=-attributes]
+File name of the TLS server certificate for the nats listener.
+|`NATS_TLS_KEY`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++~/.ocis/nats/tls.key ++
+a| [subs=-attributes]
+File name for the TLS certificate key for the server certificate.
+|`OCIS_INSECURE` +
+`NATS_TLS_SKIP_VERIFY_CLIENT_CERT`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Whether the nats server should skip the client certificate verification during the TLS handshake.
 |===
 
 Since Version: `+` added, `-` deprecated

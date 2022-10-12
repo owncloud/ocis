@@ -16,3 +16,6 @@ nats:
   port: 9233
   clusterid: ocis-cluster
   store_dir: ~/.ocis/nats
+  tls_cert: ~/.ocis/nats/tls.crt
+  tls_key: ~/.ocis/nats/tls.key
+  tls_skip_verify_client_cert: false

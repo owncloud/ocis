@@ -366,6 +366,21 @@ a| [subs=-attributes]
 ++ocis-cluster ++
 a| [subs=-attributes]
 The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
+|`OCIS_INSECURE` +
+`STORAGE_USERS_EVENTS_TLS_INSECURE`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Whether to verify the server TLS certificates.
+|`STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false.
 |`STORAGE_USERS_CACHE_STORE`
 a| [subs=-attributes]
 ++string ++

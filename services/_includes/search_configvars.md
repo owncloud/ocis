@@ -20,4 +20,6 @@
 | SEARCH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | SEARCH_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | SEARCH_EVENTS_GROUP | string | search | The customer group of the service. One group will only get one copy of an event|
+| OCIS_INSECURE<br/>SEARCH_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
+| SEARCH_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided SEARCH_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_MACHINE_AUTH_API_KEY<br/>SEARCH_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|

@@ -143,6 +143,21 @@ a| [subs=-attributes]
 ++notifications ++
 a| [subs=-attributes]
 Name of the event group / queue on the event system.
+|`OCIS_INSECURE` +
+`NOTIFICATIONS_EVENTS_TLS_INSECURE`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Whether to verify the server TLS certificates.
+|`NOTIFICATIONS_EVENTS_TLS_ROOT_CA_CERTIFICATE`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
 |`REVA_GATEWAY` +
 `NOTIFICATIONS_REVA_GATEWAY`
 a| [subs=-attributes]

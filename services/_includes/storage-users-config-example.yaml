@@ -64,6 +64,8 @@ data_server_url: http://localhost:9158/data
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster
+  tls_insecure: true
+  tls_root_ca_cert_path: ""
 cache:
   store: memory
   nodes: []
