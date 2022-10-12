@@ -34,17 +34,6 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 ### [when sharer renames the shared resource, sharee get the updated name](https://github.com/owncloud/ocis/issues/2256)
 - [webUIRenameFiles/renameFiles.feature:234](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIRenameFiles/renameFiles.feature#L234)
 
-### [No share indicators inside share jail](https://github.com/owncloud/web/issues/6894)
-- [webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:100](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersSharingIndicator/shareWithUsers.feature#L100)
-- [webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:121](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersSharingIndicator/shareWithUsers.feature#L121)
-- [webUISharingPublicManagement/publicLinkIndicator.feature:64](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkIndicator.feature#L64)
-- [webUISharingPublicManagement/publicLinkIndicator.feature:81](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkIndicator.feature#L81)
-- [webUISharingPublicManagement/publicLinkIndicator.feature:98](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingPublicManagement/publicLinkIndicator.feature#L98)
-- [webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:61](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature#L61)
-- [webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:80](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature#L80)
-- [webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature:42](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroupsSharingIndicator/shareWithGroups.feature#L42)
-- [webUISharingInternalUsersSharingIndicator/shareWithUsers.feature:80](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalUsersSharingIndicator/shareWithUsers.feature#L80)
-
 ### [Scoped links](https://github.com/owncloud/web/issues/6844)
 - [webUIFilesCopy/copyPrivateLinks.feature:20](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copyPrivateLinks.feature#L20)
 - [webUIFilesCopy/copyPrivateLinks.feature:21](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIFilesCopy/copyPrivateLinks.feature#L21)
