@@ -18,6 +18,8 @@ port = 8880
 # Logging level. Debug enables the Flask debug mode as well.
 # Valid values are: Debug, Info, Warning, Error.
 loglevel = Error
+loghandler = stream
+logdest = stdout
 
 # URL of your WOPI server or your HA proxy in front of it
 wopiurl = https://wopiserver.owncloud.test
@@ -91,7 +93,6 @@ usehttps = no
 # to apply a change.
 wopicert = /etc/grid-security/host.crt
 wopikey = /etc/grid-security/host.key
-
 
 [bridge]
 # SSL certificate check for the connected apps

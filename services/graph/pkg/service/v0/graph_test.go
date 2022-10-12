@@ -41,7 +41,6 @@ var _ = Describe("Graph", func() {
 		cfg.Identity.LDAP.CACert = "" // skip the startup checks, we don't use LDAP at all in this tests
 		cfg.TokenManager.JWTSecret = "loremipsum"
 		cfg.Commons = &shared.Commons{}
-		cfg.Commons.OcisURL = "https://ocis.test"
 
 		gatewayClient = &mocks.GatewayClient{}
 		eventsPublisher = mocks.Publisher{}
@@ -112,7 +111,7 @@ var _ = Describe("Graph", func() {
 							"id":"pro-1$sameID",
 							"webDavUrl":"https://localhost:9200/dav/spaces/pro-1$sameID"
 						},
-						"webUrl": "https://ocis.test/f/pro-1$sameID"
+						"webUrl": "https://localhost:9200/f/pro-1$sameID"
 					}
 				]
 			}
@@ -183,7 +182,7 @@ var _ = Describe("Graph", func() {
 							"id":"pro-1$asameID",
 							"webDavUrl":"https://localhost:9200/dav/spaces/pro-1$asameID"
 						},
-						"webUrl": "https://ocis.test/f/pro-1$asameID"
+						"webUrl": "https://localhost:9200/f/pro-1$asameID"
 					},
 					{
 						"driveAlias":"bspacetype/bspacename",
@@ -195,7 +194,7 @@ var _ = Describe("Graph", func() {
 							"id":"pro-1$bsameID",
 							"webDavUrl":"https://localhost:9200/dav/spaces/pro-1$bsameID"
 						},
-						"webUrl": "https://ocis.test/f/pro-1$bsameID"
+						"webUrl": "https://localhost:9200/f/pro-1$bsameID"
 					}
 				]
 			}

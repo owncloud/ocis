@@ -24,7 +24,7 @@ docs-generate: config-docs-generate
 include ../../.make/generate.mk
 
 .PHONY: ci-go-generate
-ci-go-generate: # CI runs ci-node-generate automatically before this target
+ci-go-generate:  $(MOCKERY) # CI runs ci-node-generate automatically before this target
 
 .PHONY: ci-node-generate
 ci-node-generate:
