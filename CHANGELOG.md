@@ -200,6 +200,7 @@ The following sections list the changes for unreleased.
    Encyrpted the connection to the event broker using TLS.
 
    https://github.com/owncloud/ocis/pull/4781
+   https://github.com/owncloud/ocis/pull/4800
 
 * Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
 
