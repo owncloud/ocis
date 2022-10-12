@@ -19,6 +19,11 @@ const (
 	passwordLength = 32
 )
 
+var (
+	_insecureService = InsecureService{Insecure: true}
+	_insecureEvents  = Events{TLSInsecure: true}
+)
+
 type TokenManager struct {
 	JWTSecret string `yaml:"jwt_secret"`
 }
@@ -43,7 +48,12 @@ type LdapBasedService struct {
 	Ldap LdapSettings
 }
 
+type Events struct {
+	TLSInsecure bool `yaml:"tls_insecure"`
+}
+
 type GraphService struct {
+	Events   Events
 	Spaces   InsecureService
 	Identity LdapBasedService
 }
@@ -87,6 +97,33 @@ type ThumbnailService struct {
 	Thumbnail ThumbnailSettings
 }
 
+type Search struct {
+	Events Events
+}
+
+type Audit struct {
+	Events Events
+}
+
+type Sharing struct {
+	Events Events
+}
+
+type StorageUsers struct {
+	Events Events
+}
+
+type Notifications struct {
+	Notifications struct{ Events Events } // The notifications config has a field called notifications
+}
+
+type Nats struct {
+	// The nats config has a field called nats
+	Nats struct {
+		TLSSkipVerifyClientCert bool `yaml:"tls_skip_verify_client_cert"`
+	}
+}
+
 // TODO: use the oCIS config struct instead of this custom struct
 // We can't use it right now, because it would need  "omitempty" on
 // all elements, in order to produce a slim config file with `ocis init`.
@@ -117,6 +154,12 @@ type OcisConfig struct {
 	Groups            UsersAndGroupsService
 	Ocdav             InsecureService
 	Thumbnails        ThumbnailService
+	Search            Search
+	Audit             Audit
+	Sharing           Sharing
+	StorageUsers      StorageUsers `yaml:"storage_users"`
+	Notifications     Notifications
+	Nats              Nats
 }
 
 func checkConfigPath(configPath string) error {
@@ -267,24 +310,20 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 	}
 
 	if insecure {
+
 		cfg.AuthBearer = AuthbearerService{
-			AuthProviders: AuthProviderSettings{
-				Oidc: InsecureService{
-					Insecure: true,
-				},
-			},
+			AuthProviders: AuthProviderSettings{Oidc: _insecureService},
 		}
-		cfg.Frontend = FrontendService{
-			Archiver: InsecureService{
-				Insecure: true,
-			},
-		}
-		cfg.Graph.Spaces = InsecureService{
-			Insecure: true,
-		}
-		cfg.Ocdav = InsecureService{
-			Insecure: true,
-		}
+		cfg.Frontend = FrontendService{Archiver: _insecureService}
+		cfg.Graph.Spaces = _insecureService
+		cfg.Graph.Events = _insecureEvents
+		cfg.Notifications.Notifications.Events = _insecureEvents
+		cfg.Search.Events = _insecureEvents
+		cfg.Audit.Events = _insecureEvents
+		cfg.Sharing.Events = _insecureEvents
+		cfg.StorageUsers.Events = _insecureEvents
+		cfg.Nats.Nats.TLSSkipVerifyClientCert = true
+		cfg.Ocdav = _insecureService
 		cfg.Proxy = InsecureProxyService{
 			InsecureBackends: true,
 			OIDC: InsecureProxyOIDC{
