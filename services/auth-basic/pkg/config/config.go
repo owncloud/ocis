@@ -16,7 +16,7 @@ type Config struct {
 	GRPC GRPCConfig `yaml:"grpc"`
 
 	TokenManager *TokenManager `yaml:"token_manager"`
-	Reva         *Reva         `yaml:"reva"`
+	Reva         *shared.Reva  `yaml:"reva"`
 
 	SkipUserGroupsInToken bool          `yaml:"skip_user_groups_in_token" env:"AUTH_BASIC_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the encoding of the user's group memberships in the reva access token. This reduces the token size, especially when users are members of a large number of groups."`
 	AuthProvider          string        `yaml:"auth_provider" env:"AUTH_BASIC_AUTH_PROVIDER" desc:"The auth provider which should be used by the service like 'ldap'."`

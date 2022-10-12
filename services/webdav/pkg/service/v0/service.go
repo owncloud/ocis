@@ -60,7 +60,7 @@ func NewService(opts ...Option) (Service, error) {
 	// chi.RegisterMethod("REPORT")
 	m.Use(options.Middleware...)
 
-	gwc, err := pool.GetGatewayServiceClient(conf.RevaGateway)
+	gwc, err := pool.GetGatewayServiceClient(conf.Reva.Address)
 	if err != nil {
 		return nil, err
 	}

@@ -17,7 +17,7 @@ type Config struct {
 	HTTP HTTPConfig `yaml:"http"`
 
 	TokenManager *TokenManager `yaml:"token_manager"`
-	Reva         *Reva         `yaml:"reva"`
+	Reva         *shared.Reva  `yaml:"reva"`
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token."`
 

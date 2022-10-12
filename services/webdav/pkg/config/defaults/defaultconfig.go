@@ -3,6 +3,7 @@ package defaults
 import (
 	"strings"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/config"
 )
 
@@ -37,7 +38,9 @@ func DefaultConfig() *config.Config {
 		},
 		OcisPublicURL:   "https://127.0.0.1:9200",
 		WebdavNamespace: "/users/{{.Id.OpaqueId}}",
-		RevaGateway:     "127.0.0.1:9142",
+		Reva: shared.Reva{
+			Address: "127.0.0.1:9142",
+		},
 	}
 }
 

@@ -20,7 +20,7 @@ type Config struct {
 	TransferSecret string `yaml:"transfer_secret" env:"STORAGE_TRANSFER_SECRET" desc:"Transfer secret for signing file up- and download requests."`
 
 	TokenManager      *TokenManager `yaml:"token_manager"`
-	Reva              *Reva         `yaml:"reva"`
+	Reva              *shared.Reva  `yaml:"reva"`
 	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;FRONTEND_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"FRONTEND_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token."`
