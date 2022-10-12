@@ -74,6 +74,7 @@ var _ = Describe("Tika", func() {
 
 			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
 				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
 			})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(doc.Content).To(Equal(body))
@@ -85,6 +86,7 @@ var _ = Describe("Tika", func() {
 
 			doc, err := tika.Extract(context.TODO(), &provider.ResourceInfo{
 				Type: provider.ResourceType_RESOURCE_TYPE_FILE,
+				Size: 1,
 			})
 			Expect(err).ToNot(HaveOccurred())
 			Expect(doc.Content).To(Equal("body test stop words i stay "))
