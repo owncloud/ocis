@@ -45,7 +45,7 @@ require (
 	github.com/libregraph/lico v0.54.1-0.20220325072321-31efc3995d63
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
-	github.com/nats-io/nats-server/v2 v2.9.2
+	github.com/nats-io/nats-server/v2 v2.9.3
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
