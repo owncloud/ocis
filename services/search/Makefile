@@ -25,6 +25,7 @@ include ../../.make/generate.mk
 
 .PHONY: ci-go-generate
 ci-go-generate:  $(MOCKERY) # CI runs ci-node-generate automatically before this target
+	$(MOCKERY) --dir pkg/engine --output pkg/engine/mocks --case underscore --name Engine
 
 .PHONY: ci-node-generate
 ci-node-generate:

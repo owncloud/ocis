@@ -16,7 +16,7 @@ import (
 type Engine interface {
 	Search(ctx context.Context, req *searchSearvice.SearchIndexRequest) (*searchSearvice.SearchIndexResponse, error)
 	Upsert(id string, r Resource) error
-	Move(id string, target string) error
+	Move(id string, parentid string, target string) error
 	Delete(id string) error
 	Restore(id string) error
 	Purge(id string) error
@@ -27,11 +27,12 @@ type Engine interface {
 type Resource struct {
 	content.Document
 
-	ID      string
-	RootID  string
-	Path    string
-	Type    uint64
-	Deleted bool
+	ID       string
+	RootID   string
+	Path     string
+	ParentID string
+	Type     uint64
+	Deleted  bool
 }
 
 func resourceIDtoSearchID(id storageProvider.ResourceId) *searchMessage.ResourceID {
