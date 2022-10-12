@@ -1,8 +1,8 @@
-Enhancement: Update ownCloud Web to v6.0.0-rc.1
+Enhancement: Update ownCloud Web to v6.0.0-rc.2
 
 Tags: web
 
-We updated ownCloud Web to v6.0.0-rc.1. Please refer to the changelog (linked) for details on the web release.
+We updated ownCloud Web to v6.0.0-rc.2. Please refer to the changelog (linked) for details on the web release.
 
 ### Breaking changes
 * BREAKING CHANGE for users in [owncloud/web#6648](https://github.com/owncloud/web/issues/6648): breaks existing bookmarks - they won't resolve anymore.
@@ -42,5 +42,5 @@ We updated ownCloud Web to v6.0.0-rc.1. Please refer to the changelog (linked) f
 * Enhancement [owncloud/web#7684](https://github.com/owncloud/web/pull/7684): Update ODS to v14.0.0-alpha.20
 * Enhancement [owncloud/web#7430](https://github.com/owncloud/web/pull/7430): Webdav support in web-client package
 
-https://github.com/owncloud/ocis/pull/4779
-https://github.com/owncloud/web/releases/tag/v6.0.0-rc.1
+https://github.com/owncloud/ocis/pull/4786
+https://github.com/owncloud/web/releases/tag/v6.0.0-rc.2
