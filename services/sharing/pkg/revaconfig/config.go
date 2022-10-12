@@ -102,11 +102,12 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 			},
 			"interceptors": map[string]interface{}{
 				"eventsmiddleware": map[string]interface{}{
-					"group":        "sharing",
-					"type":         "nats",
-					"address":      cfg.Events.Addr,
-					"clusterID":    cfg.Events.ClusterID,
-					"tls-insecure": true,
+					"group":            "sharing",
+					"type":             "nats",
+					"address":          cfg.Events.Addr,
+					"clusterID":        cfg.Events.ClusterID,
+					"tls-insecure":     cfg.Events.TLSInsecure,
+					"tls-root-ca-cert": cfg.Events.TLSRootCaCertPath,
 				},
 			},
 		},
