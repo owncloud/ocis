@@ -47,23 +47,17 @@ func (d *SpaceDebouncer) Debounce(id *provider.StorageSpaceId, userID *user.User
 }
 
 func (p *Provider) handleEvent(ev interface{}) {
-	var ref *provider.Reference
-	var owner *user.User
 	switch e := ev.(type) {
 	case events.ItemTrashed:
 		p.logger.Debug().Interface("event", ev).Msg("marking document as deleted")
-		ref = e.Ref
-		owner = &user.User{
-			Id: e.Executant,
-		}
 		err := p.indexClient.Delete(e.ID)
 		if err != nil {
 			p.logger.Error().Err(err).Interface("Id", e.ID).Msg("failed to remove item from index")
 		}
+		p.reindexSpace(ev, e.Ref, e.Executant, e.SpaceOwner)
 	case events.ItemRestored:
 		p.logger.Debug().Interface("event", ev).Msg("marking document as restored")
-		ref = e.Ref
-		owner = &user.User{
+		owner := &user.User{
 			Id: e.Executant,
 		}
 
@@ -71,13 +65,13 @@ func (p *Provider) handleEvent(ev interface{}) {
 		if err != nil {
 			return
 		}
-		statRes, err := p.statResource(ownerCtx, ref, owner)
+		statRes, err := p.statResource(ownerCtx, e.Ref, owner)
 		if err != nil {
 			p.logger.Error().Err(err).
-				Str("storageid", ref.GetResourceId().GetStorageId()).
-				Str("spaceid", ref.GetResourceId().GetSpaceId()).
-				Str("opaqueid", ref.GetResourceId().GetOpaqueId()).
-				Str("path", ref.GetPath()).
+				Str("storageid", e.Ref.GetResourceId().GetStorageId()).
+				Str("spaceid", e.Ref.GetResourceId().GetSpaceId()).
+				Str("opaqueid", e.Ref.GetResourceId().GetOpaqueId()).
+				Str("path", e.Ref.GetPath()).
 				Msg("failed to make stat call for the restored resource")
 			return
 		}
@@ -87,24 +81,24 @@ func (p *Provider) handleEvent(ev interface{}) {
 			err = p.indexClient.Restore(statRes.Info.Id)
 			if err != nil {
 				p.logger.Error().Err(err).
-					Str("storageid", ref.GetResourceId().GetStorageId()).
-					Str("spaceid", ref.GetResourceId().GetSpaceId()).
-					Str("opaqueid", ref.GetResourceId().GetOpaqueId()).
-					Str("path", ref.GetPath()).
+					Str("storageid", e.Ref.GetResourceId().GetStorageId()).
+					Str("spaceid", e.Ref.GetResourceId().GetSpaceId()).
+					Str("opaqueid", e.Ref.GetResourceId().GetOpaqueId()).
+					Str("path", e.Ref.GetPath()).
 					Msg("failed to restore the changed resource in the index")
 			}
 		default:
 			p.logger.Error().Interface("statRes", statRes).
-				Str("storageid", ref.GetResourceId().GetStorageId()).
-				Str("spaceid", ref.GetResourceId().GetSpaceId()).
-				Str("opaqueid", ref.GetResourceId().GetOpaqueId()).
-				Str("path", ref.GetPath()).
+				Str("storageid", e.Ref.GetResourceId().GetStorageId()).
+				Str("spaceid", e.Ref.GetResourceId().GetSpaceId()).
+				Str("opaqueid", e.Ref.GetResourceId().GetOpaqueId()).
+				Str("path", e.Ref.GetPath()).
 				Msg("failed to stat the restored resource")
 		}
+		p.reindexSpace(ev, e.Ref, e.Executant, e.SpaceOwner)
 	case events.ItemMoved:
 		p.logger.Debug().Interface("event", ev).Msg("resource has been moved, updating the document")
-		ref = e.Ref
-		owner = &user.User{
+		owner := &user.User{
 			Id: e.Executant,
 		}
 
@@ -112,7 +106,7 @@ func (p *Provider) handleEvent(ev interface{}) {
 		if err != nil {
 			return
 		}
-		statRes, err := p.statResource(ownerCtx, ref, owner)
+		statRes, err := p.statResource(ownerCtx, e.Ref, owner)
 		if err != nil {
 			p.logger.Error().Err(err).Msg("failed to stat the moved resource")
 			return
@@ -124,11 +118,11 @@ func (p *Provider) handleEvent(ev interface{}) {
 
 		gpRes, err := p.getPath(ownerCtx, statRes.Info.Id, owner)
 		if err != nil {
-			p.logger.Error().Err(err).Interface("ref", ref).Msg("failed to get path for moved resource")
+			p.logger.Error().Err(err).Interface("ref", e.Ref).Msg("failed to get path for moved resource")
 			return
 		}
 		if gpRes.Status.Code != rpcv1beta1.Code_CODE_OK {
-			p.logger.Error().Interface("status", gpRes.Status).Interface("ref", ref).Msg("failed to get path for moved resource")
+			p.logger.Error().Interface("status", gpRes.Status).Interface("ref", e.Ref).Msg("failed to get path for moved resource")
 			return
 		}
 
@@ -136,30 +130,22 @@ func (p *Provider) handleEvent(ev interface{}) {
 		if err != nil {
 			p.logger.Error().Err(err).Msg("failed to move the changed resource in the index")
 		}
+		p.reindexSpace(ev, e.Ref, e.Executant, e.SpaceOwner)
 	case events.ContainerCreated:
-		ref = e.Ref
-		owner = &user.User{
-			Id: e.Executant,
-		}
+		p.reindexSpace(ev, e.Ref, e.Executant, e.SpaceOwner)
 	case events.FileUploaded:
-		ref = e.Ref
-		owner = &user.User{
-			Id: e.Executant,
-		}
+		p.reindexSpace(ev, e.Ref, e.Executant, e.SpaceOwner)
 	case events.FileTouched:
-		ref = e.Ref
-		owner = &user.User{
-			Id: e.Executant,
-		}
+		p.reindexSpace(ev, e.Ref, e.Executant, e.SpaceOwner)
 	case events.FileVersionRestored:
-		ref = e.Ref
-		owner = &user.User{
-			Id: e.Executant,
-		}
+		p.reindexSpace(ev, e.Ref, e.Executant, e.SpaceOwner)
 	default:
 		// Not sure what to do here. Skip.
 		return
 	}
+}
+
+func (p *Provider) reindexSpace(ev interface{}, ref *provider.Reference, executant, owner *user.UserId) {
 	p.logger.Debug().Interface("event", ev).Msg("resource has been changed, scheduling a space resync")
 
 	spaceID := &provider.StorageSpaceId{
@@ -168,7 +154,7 @@ func (p *Provider) handleEvent(ev interface{}) {
 			SpaceId:   ref.GetResourceId().GetSpaceId(),
 		}),
 	}
-	p.indexSpaceDebouncer.Debounce(spaceID, owner.Id)
+	p.indexSpaceDebouncer.Debounce(spaceID, owner)
 }
 
 func (p *Provider) statResource(ctx context.Context, ref *provider.Reference, owner *user.User) (*provider.StatResponse, error) {
