@@ -1,6 +1,7 @@
 package defaults
 
 import (
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 )
 
@@ -36,7 +37,9 @@ func DefaultConfig() *config.Config {
 				ConsumerGroup: "notifications",
 				EnableTLS:     false,
 			},
-			RevaGateway: "127.0.0.1:9142",
+			Reva: shared.Reva{
+				Address: "127.0.0.1:9142",
+			},
 		},
 	}
 }

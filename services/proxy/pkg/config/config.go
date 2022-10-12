@@ -18,7 +18,7 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
-	Reva *Reva `yaml:"reva"`
+	Reva *shared.Reva `yaml:"reva"`
 
 	Policies              []Policy        `yaml:"policies"`
 	OIDC                  OIDC            `yaml:"oidc"`

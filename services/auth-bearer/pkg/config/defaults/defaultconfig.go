@@ -1,6 +1,7 @@
 package defaults
 
 import (
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/auth-bearer/pkg/config"
 )
 
@@ -27,7 +28,7 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "auth-bearer",
 		},
-		Reva: &config.Reva{
+		Reva: &shared.Reva{
 			Address: "127.0.0.1:9142",
 		},
 		OIDC: config.OIDC{
@@ -63,11 +64,11 @@ func EnsureDefaults(cfg *config.Config) {
 	}
 
 	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
-		cfg.Reva = &config.Reva{
+		cfg.Reva = &shared.Reva{
 			Address: cfg.Commons.Reva.Address,
 		}
 	} else if cfg.Reva == nil {
-		cfg.Reva = &config.Reva{}
+		cfg.Reva = &shared.Reva{}
 	}
 
 	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {

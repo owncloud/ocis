@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 )
 
@@ -29,7 +30,7 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "graph",
 		},
-		Reva: &config.Reva{
+		Reva: &shared.Reva{
 			Address: "127.0.0.1:9142",
 		},
 		Spaces: config.Spaces{

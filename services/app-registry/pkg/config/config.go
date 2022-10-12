@@ -17,7 +17,7 @@ type Config struct {
 	GRPC GRPCConfig `yaml:"grpc"`
 
 	TokenManager *TokenManager `yaml:"token_manager"`
-	Reva         *Reva         `yaml:"reva"`
+	Reva         *shared.Reva  `yaml:"reva"`
 
 	AppRegistry AppRegistry `yaml:"app_registry"`
 

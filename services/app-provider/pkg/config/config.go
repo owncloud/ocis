@@ -16,7 +16,7 @@ type Config struct {
 	GRPC GRPCConfig `yaml:"grpc"`
 
 	TokenManager *TokenManager `yaml:"token_manager"`
-	Reva         *Reva         `yaml:"reva"`
+	Reva         *shared.Reva  `yaml:"reva"`
 
 	ExternalAddr string  `yaml:"external_addr" env:"APP_PROVIDER_EXTERNAL_ADDR" desc:"Address of the app provider, where the GATEWAY service can reach it."`
 	Driver       string  `yaml:"driver" env:"APP_PROVIDER_DRIVER" desc:"Driver, the APP PROVIDER services uses. Only \"wopi\" is supported as of now."`

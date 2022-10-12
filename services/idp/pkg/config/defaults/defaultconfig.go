@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/config"
 )
 
@@ -28,7 +29,7 @@ func DefaultConfig() *config.Config {
 			TLSKey:    filepath.Join(defaults.BaseDataPath(), "idp", "server.key"),
 			TLS:       false,
 		},
-		Reva: &config.Reva{
+		Reva: &shared.Reva{
 			Address: "127.0.0.1:9142",
 		},
 		Service: config.Service{
@@ -153,11 +154,11 @@ func EnsureDefaults(cfg *config.Config) {
 	}
 
 	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
-		cfg.Reva = &config.Reva{
+		cfg.Reva = &shared.Reva{
 			Address: cfg.Commons.Reva.Address,
 		}
 	} else if cfg.Reva == nil {
-		cfg.Reva = &config.Reva{}
+		cfg.Reva = &shared.Reva{}
 	}
 
 	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
