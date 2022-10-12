@@ -2,7 +2,10 @@ package service
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
+	"os"
 	"path/filepath"
 
 	"github.com/blevesearch/bleve/v2"
@@ -16,6 +19,7 @@ import (
 	"go-micro.dev/v4/metadata"
 	grpcmetadata "google.golang.org/grpc/metadata"
 
+	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
@@ -32,7 +36,27 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 
 	// Connect to nats to listen for changes that need to trigger an index update
 	evtsCfg := cfg.Events
+
+	var rootCAPool *x509.CertPool
+	if evtsCfg.TLSRootCACertificate != "" {
+		rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
+		if err != nil {
+			return nil, err
+		}
+
+		rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
+		if err != nil {
+			return nil, err
+		}
+		evtsCfg.TLSInsecure = false
+	}
+
+	tlsConf := &tls.Config{
+		InsecureSkipVerify: evtsCfg.TLSInsecure, //nolint:gosec
+		RootCAs:            rootCAPool,
+	}
 	client, err := server.NewNatsStream(
+		natsjs.TLSConfig(tlsConf),
 		natsjs.Address(evtsCfg.Endpoint),
 		natsjs.ClusterID(evtsCfg.Cluster),
 	)

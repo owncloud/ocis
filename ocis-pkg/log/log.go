@@ -53,6 +53,11 @@ func LoggerFromConfig(name string, cfg *shared.Log) Logger {
 	)
 }
 
+// NopLogger initializes a no-operation logger.
+func NopLogger() Logger {
+	return Logger{zerolog.Nop()}
+}
+
 // NewLogger initializes a new logger instance.
 func NewLogger(opts ...Option) Logger {
 	options := newOptions(opts...)
