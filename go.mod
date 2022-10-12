@@ -61,7 +61,7 @@ require (
 	github.com/stretchr/testify v1.8.0
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.2
-	github.com/tus/tusd v1.9.2
+	github.com/tus/tusd v1.10.0
 	github.com/urfave/cli/v2 v2.19.2
 	github.com/xhit/go-simple-mail/v2 v2.12.0
 	go-micro.dev/v4 v4.9.0
@@ -76,7 +76,7 @@ require (
 	golang.org/x/exp v0.0.0-20220518171630-0b5c67f07fdf
 	golang.org/x/image v0.0.0-20220321031419-a8550c1d254a
 	golang.org/x/net v0.0.0-20220921155015-db77216a4ee9
-	golang.org/x/oauth2 v0.0.0-20220822191816-0ebed06d0094
+	golang.org/x/oauth2 v0.0.0-20220909003341-f21342109be1
 	golang.org/x/term v0.0.0-20220722155259-a9ba230a4035
 	golang.org/x/text v0.3.7
 	google.golang.org/genproto v0.0.0-20220920201722-2b89144ce006
@@ -103,7 +103,7 @@ require (
 	github.com/amoghe/go-crypt v0.0.0-20220222110647-20eada5f5964 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
-	github.com/aws/aws-sdk-go v1.44.94 // indirect
+	github.com/aws/aws-sdk-go v1.44.114 // indirect
 	github.com/beevik/etree v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
