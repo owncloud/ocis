@@ -16,6 +16,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the OIDC provider cache: [#4600](https://github.com/owncloud/ocis/pull/4600)
 * Bugfix - Render webdav permissions as string in search report: [#4575](https://github.com/owncloud/ocis/issues/4575)
 * Bugfix - Mail notifications for group shares: [#4714](https://github.com/owncloud/ocis/pull/4714)
+* Bugfix - Disable cache for selected static web assets: [#4809](https://github.com/owncloud/ocis/pull/4809)
 * Bugfix - Fix unfindable entities from shares/publicshares: [#4651](https://github.com/owncloud/ocis/pull/4651)
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
 * Bugfix - Make tokeninfo endpoint unprotected: [#4715](https://github.com/owncloud/ocis/pull/4715)
@@ -119,6 +120,14 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/4703
    https://github.com/owncloud/ocis/issues/4688
    https://github.com/owncloud/ocis/pull/4714
+
+* Bugfix - Disable cache for selected static web assets: [#4809](https://github.com/owncloud/ocis/pull/4809)
+
+   We've disabled caching for some static web assets. Files like the web index.html,
+   oidc-callback.html or similar contain paths to timestamped resources and should not be
+   cached.
+
+   https://github.com/owncloud/ocis/pull/4809
 
 * Bugfix - Fix unfindable entities from shares/publicshares: [#4651](https://github.com/owncloud/ocis/pull/4651)
 
