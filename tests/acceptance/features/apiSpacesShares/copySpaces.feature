@@ -692,3 +692,77 @@ Feature: copy file
       | /second-level-folder/second-level-folder |
     And the response when user "Alice" gets the info of the last share should include
       | file_target | /Shares/BRIAN-FOLDER |
+
+
+  Scenario: Copying a file with an option "keep both" inside of the project space
+    Given the administrator has given "Alice" the role "Space Admin" using the settings api
+    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a folder "/newfolder" in space "Project"
+    And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/newfolder/insideSpace.txt"
+    And user "Alice" has uploaded a file inside space "Project" with content "new content" to "/insideSpace.txt"
+    When user "Alice" copies file "/insideSpace.txt" to "/newfolder/insideSpace (1).txt" inside space "Project" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the space "Project" should contain these entries:
+      | newfolder/insideSpace.txt     |
+      | newfolder/insideSpace (1).txt |
+    And for user "Alice" the content of the file "/newfolder/insideSpace (1).txt" of the space "Project" should be "new content"
+    
+
+  Scenario: Copying a file with an option "replace" inside of the project space
+    Given the administrator has given "Alice" the role "Space Admin" using the settings api
+    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a folder "/newfolder" in space "Project"
+    And user "Alice" has uploaded a file inside space "Project" with content "old content version 1" to "/newfolder/insideSpace.txt"
+    And user "Alice" has uploaded a file inside space "Project" with content "old content version 2" to "/newfolder/insideSpace.txt"
+    And user "Alice" has uploaded a file inside space "Project" with content "new content" to "/insideSpace.txt"
+    When user "Alice" overwrites file "/insideSpace.txt" from space "Project" to "/newfolder/insideSpace.txt" inside space "Project" while copying using the WebDAV API
+    Then the HTTP status code should be "204"
+    And for user "Alice" the content of the file "/newfolder/insideSpace.txt" of the space "Project" should be "new content"
+    When user "Alice" downloads version of the file "/newfolder/insideSpace.txt" with the index "2" of the space "Project" using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "old content version 1"
+    When user "Alice" downloads version of the file "/newfolder/insideSpace.txt" with the index "1" of the space "Project" using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "old content version 2"
+
+
+  Scenario: Copying a file from Personal to Shares Jail with an option "keep both"
+    Given the administrator has given "Alice" the role "Space Admin" using the settings api
+    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a folder "/newfolder" in space "Project"
+    And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/newfolder/personal.txt"
+    And user "Alice" shares the following entity "newfolder" inside of space "Project" with user "Brian" with role "editor"
+    And user "Brian" has accepted share "/newfolder" offered by user "Alice"
+    And user "Brian" has uploaded file with content "new content" to "/personal.txt"
+    When user "Brian" copies file "/personal.txt" from space "Personal" to "/newfolder/personal (1).txt" inside space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And for user "Alice" the space "Project" should contain these entries:
+      | newfolder/personal.txt     |
+      | newfolder/personal (1).txt |
+    And for user "Alice" the content of the file "/newfolder/personal (1).txt" of the space "Project" should be "new content"
+    And for user "Brian" the space "Shares Jail" should contain these entries:
+      | newfolder/personal.txt     |
+      | newfolder/personal (1).txt |
+
+
+  Scenario: Copying a file from Personal to Shares Jail with an option "replace"
+    Given the administrator has given "Alice" the role "Space Admin" using the settings api
+    And user "Alice" has created a space "Project" with the default quota using the GraphApi
+    And user "Alice" has created a folder "/newfolder" in space "Project"
+    And user "Alice" has uploaded a file inside space "Project" with content "old content version 1" to "/newfolder/personal.txt"
+    And user "Alice" has uploaded a file inside space "Project" with content "old content version 2" to "/newfolder/personal.txt"
+    And user "Alice" shares the following entity "newfolder" inside of space "Project" with user "Brian" with role "editor"
+    And user "Brian" has accepted share "/newfolder" offered by user "Alice"
+    And user "Brian" has uploaded file with content "new content" to "/personal.txt"
+    When user "Brian" overwrites file "/personal.txt" from space "Personal" to "/newfolder/personal.txt" inside space "Shares Jail" while copying using the WebDAV API
+    Then the HTTP status code should be "204"
+    And for user "Alice" the space "Project" should contain these entries:
+      | newfolder/personal.txt     |
+    And for user "Alice" the content of the file "/newfolder/personal.txt" of the space "Project" should be "new content"
+    When user "Alice" downloads version of the file "/newfolder/personal.txt" with the index "1" of the space "Project" using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "old content version 2"
+    And for user "Brian" the content of the file "/newfolder/personal.txt" of the space "Shares Jail" should be "new content"
+    When user "Brian" downloads version of the file "/newfolder/personal.txt" with the index "2" of the space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "old content version 1"
