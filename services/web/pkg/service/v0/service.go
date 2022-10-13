@@ -152,6 +152,13 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 		w.Header().Set("Cache-Control", fmt.Sprintf("max-age=%s, must-revalidate", strconv.Itoa(ttl)))
 		w.Header().Set("Expires", expires)
 		w.Header().Set("Last-Modified", lastModified)
+
+		if r.URL.Path == rootWithSlash || r.URL.Path == rootWithSlash+"index.html" {
+			w.Header().Set("Cache-Control", "no-cache")
+
+		} else {
+			w.Header().Set("Cache-Control", "must-revalidate")
+		}
 		w.Header().Set("SameSite", "Strict")
 
 		static.ServeHTTP(w, r)
