@@ -88,7 +88,10 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 	}
 
 	p.indexSpaceDebouncer = NewSpaceDebouncer(1*time.Second, func(id *provider.StorageSpaceId, userID *user.UserId) {
-		p.doIndexSpace(context.Background(), id, userID)
+		err := p.doIndexSpace(context.Background(), id, userID)
+		if err != nil {
+			p.logger.Error().Err(err).Interface("spaceID", id).Interface("userID", userID).Msg("error while indexing a space")
+		}
 	})
 
 	go func() {
@@ -279,18 +282,18 @@ func (p *Provider) doIndexSpace(ctx context.Context, spaceID *provider.StorageSp
 
 	// Walk the space and index all files
 	walker := walker.NewWalker(p.gwClient)
-	rootId, err := storagespace.ParseID(spaceID.OpaqueId)
+	rootID, err := storagespace.ParseID(spaceID.OpaqueId)
 	if err != nil {
 		p.logger.Error().Err(err).Msg("invalid space id")
 		return err
 	}
-	if rootId.StorageId == "" || rootId.SpaceId == "" {
+	if rootID.StorageId == "" || rootID.SpaceId == "" {
 		p.logger.Error().Err(err).Msg("invalid space id")
 		return fmt.Errorf("invalid space id")
 	}
-	rootId.OpaqueId = rootId.SpaceId
+	rootID.OpaqueId = rootID.SpaceId
 
-	err = walker.Walk(ownerCtx, &rootId, func(wd string, info *provider.ResourceInfo, err error) error {
+	err = walker.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error walking the tree")
 			return err
@@ -302,7 +305,7 @@ func (p *Provider) doIndexSpace(ctx context.Context, spaceID *provider.StorageSp
 
 		ref := &provider.Reference{
 			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
-			ResourceId: &rootId,
+			ResourceId: &rootID,
 		}
 		p.logger.Debug().Str("path", ref.Path).Msg("Walking tree")
 
@@ -314,10 +317,9 @@ func (p *Provider) doIndexSpace(ctx context.Context, spaceID *provider.StorageSp
 			if info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 				p.logger.Debug().Str("path", ref.Path).Msg("subtree hasn't changed. Skipping.")
 				return filepath.SkipDir
-			} else {
-				p.logger.Debug().Str("path", ref.Path).Msg("element hasn't changed. Skipping.")
-				return nil
 			}
+			p.logger.Debug().Str("path", ref.Path).Msg("element hasn't changed. Skipping.")
+			return nil
 		}
 
 		err = p.indexClient.Add(ref, info)
@@ -334,27 +336,6 @@ func (p *Provider) doIndexSpace(ctx context.Context, spaceID *provider.StorageSp
 
 	p.logDocCount()
 	return nil
-}
-
-func (p *Provider) resolveReference(ctx context.Context, ref *provider.Reference, ri *provider.ResourceInfo) (*provider.Reference, error) {
-	if ref.GetResourceId().GetOpaqueId() == ref.GetResourceId().GetSpaceId() {
-		return ref, nil
-	}
-
-	gpRes, err := p.gwClient.GetPath(ctx, &provider.GetPathRequest{
-		ResourceId: ri.Id,
-	})
-	if err != nil || gpRes.Status.Code != rpcv1beta1.Code_CODE_OK {
-		return nil, err
-	}
-	return &provider.Reference{
-		ResourceId: &provider.ResourceId{
-			StorageId: ref.GetResourceId().GetStorageId(),
-			SpaceId:   ref.GetResourceId().GetSpaceId(),
-			OpaqueId:  ref.GetResourceId().GetSpaceId(),
-		},
-		Path: utils.MakeRelativePath(gpRes.Path),
-	}, nil
 }
 
 func (p *Provider) logDocCount() {

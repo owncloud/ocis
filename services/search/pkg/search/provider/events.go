@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+// SpaceDebouncer debounces operations on spaces for a configurable amount of time
 type SpaceDebouncer struct {
 	after   time.Duration
 	f       func(id *provider.StorageSpaceId, userID *user.UserId)
@@ -25,6 +26,7 @@ type SpaceDebouncer struct {
 	mutex sync.Mutex
 }
 
+// NewSpaceDebouncer returns a new SpaceDebouncer instance
 func NewSpaceDebouncer(d time.Duration, f func(id *provider.StorageSpaceId, userID *user.UserId)) *SpaceDebouncer {
 	return &SpaceDebouncer{
 		after:   d,
@@ -33,6 +35,7 @@ func NewSpaceDebouncer(d time.Duration, f func(id *provider.StorageSpaceId, user
 	}
 }
 
+// Debounce restars the debounce timer for the given space
 func (d *SpaceDebouncer) Debounce(id *provider.StorageSpaceId, userID *user.UserId) {
 	d.mutex.Lock()
 	defer d.mutex.Unlock()
