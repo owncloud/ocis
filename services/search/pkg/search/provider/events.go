@@ -157,7 +157,11 @@ func (p *Provider) reindexSpace(ev interface{}, ref *provider.Reference, executa
 			SpaceId:   ref.GetResourceId().GetSpaceId(),
 		}),
 	}
-	p.indexSpaceDebouncer.Debounce(spaceID, owner)
+	if owner != nil {
+		p.indexSpaceDebouncer.Debounce(spaceID, owner)
+	} else {
+		p.indexSpaceDebouncer.Debounce(spaceID, executant)
+	}
 }
 
 func (p *Provider) statResource(ctx context.Context, ref *provider.Reference, owner *user.User) (*provider.StatResponse, error) {
