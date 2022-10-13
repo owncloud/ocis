@@ -28,9 +28,7 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "storage-publiclink",
 		},
-		Reva: &shared.Reva{
-			Address: "127.0.0.1:9142",
-		},
+		Reva: shared.DefaultRevaConfig(),
 		StorageProvider: config.StorageProvider{
 			MountID: "7993447f-687f-490d-875c-ac95e89a62a4",
 		},
@@ -63,7 +61,9 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
 		cfg.Reva = &shared.Reva{
-			Address: cfg.Commons.Reva.Address,
+			Address:   cfg.Commons.Reva.Address,
+			TLSMode:   cfg.Commons.Reva.TLSMode,
+			TLSCACert: cfg.Commons.Reva.TLSCACert,
 		}
 	} else if cfg.Reva == nil {
 		cfg.Reva = &shared.Reva{}

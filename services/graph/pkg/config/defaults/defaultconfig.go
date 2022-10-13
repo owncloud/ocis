@@ -30,9 +30,7 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "graph",
 		},
-		Reva: &shared.Reva{
-			Address: "127.0.0.1:9142",
-		},
+		Reva: shared.DefaultRevaConfig(),
 		Spaces: config.Spaces{
 			WebDavBase:   "https://localhost:9200",
 			WebDavPath:   "/dav/spaces/",

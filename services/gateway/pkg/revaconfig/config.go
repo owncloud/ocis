@@ -24,10 +24,16 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 			"jwt_secret":                cfg.TokenManager.JWTSecret,
 			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
+			"grpc_client_options":       cfg.Reva.GetGRPCClientConfig(),
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
+			"tls_settings": map[string]interface{}{
+				"enabled":     cfg.GRPC.TLSEnabled,
+				"certificate": cfg.GRPC.TLSCert,
+				"key":         cfg.GRPC.TLSKey,
+			},
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"gateway": map[string]interface{}{

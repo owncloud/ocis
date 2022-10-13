@@ -15,12 +15,18 @@ func AppProviderConfigFromStruct(cfg *config.Config) map[string]interface{} {
 			"tracing_service_name": cfg.Service.Name,
 		},
 		"shared": map[string]interface{}{
-			"jwt_secret": cfg.TokenManager.JWTSecret,
-			"gatewaysvc": cfg.Reva.Address,
+			"jwt_secret":          cfg.TokenManager.JWTSecret,
+			"gatewaysvc":          cfg.Reva.Address,
+			"grpc_client_options": cfg.Reva.GetGRPCClientConfig(),
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
+			"tls_settings": map[string]interface{}{
+				"enabled":     cfg.GRPC.TLSEnabled,
+				"certificate": cfg.GRPC.TLSCert,
+				"key":         cfg.GRPC.TLSKey,
+			},
 			"services": map[string]interface{}{
 				"appprovider": map[string]interface{}{
 					"app_provider_url": cfg.ExternalAddr,

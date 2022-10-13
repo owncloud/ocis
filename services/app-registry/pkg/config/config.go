@@ -50,9 +50,12 @@ type Debug struct {
 }
 
 type GRPCConfig struct {
-	Addr      string `yaml:"addr" env:"APP_REGISTRY_GRPC_ADDR" desc:"The bind address of the GRPC service."`
-	Namespace string `yaml:"-"`
-	Protocol  string `yaml:"protocol" env:"APP_REGISTRY_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service."`
+	Addr       string `yaml:"addr" env:"APP_REGISTRY_GRPC_ADDR" desc:"The bind address of the GRPC service."`
+	TLSEnabled bool   `yaml:"tls_enabled" env:"OCIS_GRPC_TLS_ENABLED"`
+	TLSCert    string `yaml:"tls_cert" env:"OCIS_GRPC_TLS_CERTIFICATE"`
+	TLSKey     string `yaml:"tls_key" env:"OCIS_GRPC_TLS_KEY"`
+	Namespace  string `yaml:"-"`
+	Protocol   string `yaml:"protocol" env:"APP_REGISTRY_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service."`
 }
 
 type AppRegistry struct {

@@ -118,7 +118,7 @@ func (o Ocs) NotFound(w http.ResponseWriter, r *http.Request) {
 }
 
 func (o Ocs) getCS3Backend() backend.UserBackend {
-	revaClient, err := pool.GetGatewayServiceClient(o.config.Reva.Address)
+	revaClient, err := pool.GetGatewayServiceClient(o.config.Reva.Address, o.config.Reva.GetRevaOptions()...)
 	if err != nil {
 		o.logger.Fatal().Msgf("could not get reva client at address %s", o.config.Reva.Address)
 	}
