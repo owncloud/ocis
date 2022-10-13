@@ -42,7 +42,7 @@ func (pps *PostprocessingService) Run() error {
 		var next interface{}
 		switch ev := e.(type) {
 		case events.BytesReceived:
-			pp := postprocessing.New(ev.UploadID, ev.URL, ev.ExecutingUser, ev.Filename, ev.ResourceID, pps.c)
+			pp := postprocessing.New(ev.UploadID, ev.URL, ev.ExecutingUser, ev.Filename, ev.Filesize, ev.ResourceID, pps.c)
 			current[ev.UploadID] = pp
 			next = pp.Init(ev)
 		case events.VirusscanFinished:
