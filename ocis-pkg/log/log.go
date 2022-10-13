@@ -1,16 +1,22 @@
 package log
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
 	"time"
 
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	mzlog "github.com/go-micro/plugins/v4/logger/zerolog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"go-micro.dev/v4/logger"
+)
+
+var (
+	RequestIDString = "request"
 )
 
 func init() {
@@ -115,5 +121,12 @@ func NewLogger(opts ...Option) Logger {
 
 	return Logger{
 		logger,
+	}
+}
+
+// SubloggerWithRequestID returns a sublogger with the x-request-id added to all events
+func (l Logger) SubloggerWithRequestID(c context.Context) Logger {
+	return Logger{
+		l.With().Str(RequestIDString, chimiddleware.GetReqID(c)).Logger(),
 	}
 }
