@@ -23,6 +23,7 @@ func NewNATSServer(ctx context.Context, logger nserver.Logger, opts ...NatsOptio
 
 	// enable JetStream
 	natsOpts.JetStream = true
+	natsOpts.AllowNonTLS = false
 
 	server, err := nserver.NewServer(natsOpts)
 	if err != nil {

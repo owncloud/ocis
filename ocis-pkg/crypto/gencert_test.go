@@ -58,7 +58,6 @@ func TestPersistKey(t *testing.T) {
 
 	type args struct {
 		keyName string
-		l       log.Logger
 		pk      interface{}
 	}
 	tests := []struct {
@@ -69,7 +68,6 @@ func TestPersistKey(t *testing.T) {
 			name: "writes a private key (rsa) to the specified location",
 			args: args{
 				keyName: keyPath,
-				l:       log.NewLogger(),
 				pk:      rsaPk,
 			},
 		},
@@ -77,14 +75,13 @@ func TestPersistKey(t *testing.T) {
 			name: "writes a private key (ecdsa) to the specified location",
 			args: args{
 				keyName: keyPath,
-				l:       log.NewLogger(),
 				pk:      ecdsaPk,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := persistKey(tt.args.keyName, tt.args.l, tt.args.pk); err != nil {
+			if err := persistKey(tt.args.keyName, log.NopLogger(), tt.args.pk); err != nil {
 				t.Error(err)
 			}
 		})
@@ -107,7 +104,6 @@ func TestPersistCertificate(t *testing.T) {
 
 	type args struct {
 		certName string
-		l        log.Logger
 		pk       interface{}
 	}
 	tests := []struct {
@@ -119,7 +115,6 @@ func TestPersistCertificate(t *testing.T) {
 			name: "store a certificate with an rsa private key",
 			args: args{
 				certName: certPath,
-				l:        log.NewLogger(),
 				pk:       rsaPk,
 			},
 			wantErr: false,
@@ -128,7 +123,6 @@ func TestPersistCertificate(t *testing.T) {
 			name: "store a certificate with an ecdsa private key",
 			args: args{
 				certName: certPath,
-				l:        log.NewLogger(),
 				pk:       ecdsaPk,
 			},
 			wantErr: false,
@@ -137,7 +131,6 @@ func TestPersistCertificate(t *testing.T) {
 			name: "should fail",
 			args: args{
 				certName: certPath,
-				l:        log.NewLogger(),
 				pk:       42,
 			},
 			wantErr: true,
@@ -146,7 +139,7 @@ func TestPersistCertificate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Run(tt.name, func(t *testing.T) {
-				if err := persistCertificate(tt.args.certName, tt.args.l, tt.args.pk); err != nil {
+				if err := persistCertificate(tt.args.certName, log.NopLogger(), tt.args.pk); err != nil {
 					if !tt.wantErr {
 						t.Error(err)
 					}

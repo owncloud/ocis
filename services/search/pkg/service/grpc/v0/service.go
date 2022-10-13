@@ -2,8 +2,11 @@ package service
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
@@ -21,6 +24,7 @@ import (
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
@@ -72,8 +76,26 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, fmt.Errorf("unknown search extractor: %s", cfg.Extractor.Type)
 	}
 
-	// initialize nats
+	var rootCAPool *x509.CertPool
+	if cfg.Events.TLSRootCACertificate != "" {
+		rootCrtFile, err := os.Open(cfg.Events.TLSRootCACertificate)
+		if err != nil {
+			return nil, teardown, err
+		}
+
+		rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
+		if err != nil {
+			return nil, teardown, err
+		}
+		cfg.Events.TLSInsecure = false
+	}
+
+	tlsConf := &tls.Config{
+		InsecureSkipVerify: cfg.Events.TLSInsecure, //nolint:gosec
+		RootCAs:            rootCAPool,
+	}
 	bus, err := server.NewNatsStream(
+		natsjs.TLSConfig(tlsConf),
 		natsjs.Address(cfg.Events.Endpoint),
 		natsjs.ClusterID(cfg.Events.Cluster),
 	)
