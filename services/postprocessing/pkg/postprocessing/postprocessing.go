@@ -16,13 +16,14 @@ type Postprocessing struct {
 	u          *user.User
 	m          map[events.Postprocessingstep]interface{}
 	filename   string
+	filesize   uint64
 	resourceId *provider.ResourceId
 	c          config.Postprocessing
 	steps      []events.Postprocessingstep
 }
 
 // New returns a new postprocessing instance
-func New(uploadID string, uploadURL string, user *user.User, filename string, resourceId *provider.ResourceId, c config.Postprocessing) *Postprocessing {
+func New(uploadID string, uploadURL string, user *user.User, filename string, filesize uint64, resourceId *provider.ResourceId, c config.Postprocessing) *Postprocessing {
 	return &Postprocessing{
 		id:         uploadID,
 		url:        uploadURL,
@@ -30,6 +31,7 @@ func New(uploadID string, uploadURL string, user *user.User, filename string, re
 		m:          make(map[events.Postprocessingstep]interface{}),
 		c:          c,
 		filename:   filename,
+		filesize:   filesize,
 		resourceId: resourceId,
 		steps:      getSteps(c),
 	}
@@ -82,6 +84,7 @@ func (pp *Postprocessing) nextStep(next events.Postprocessingstep) events.StartP
 		URL:           pp.url,
 		ExecutingUser: pp.u,
 		Filename:      pp.filename,
+		Filesize:      pp.filesize,
 		ResourceID:    pp.resourceId,
 		StepToStart:   next,
 	}
