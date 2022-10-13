@@ -61,7 +61,7 @@ func Server(cfg *config.Config) *cli.Command {
 					ocdav.VersionString(cfg.Status.VersionString),
 					ocdav.Edition(cfg.Status.Edition),
 					ocdav.MachineAuthAPIKey(cfg.MachineAuthAPIKey),
-					ocdav.Events(cfg.Events.Endpoint, cfg.Events.Cluster),
+					ocdav.Events(cfg.Events.Endpoint, cfg.Events.Cluster, cfg.Events.TLSRootCACertificate, cfg.Events.TLSInsecure),
 					ocdav.Broker(broker.NoOp{}),
 					ocdav.ForceRescan(cfg.ForceRescanPeriod, cfg.PollingTimeout),
 					// ocdav.FavoriteManager() // FIXME needs a proper persistence implementation https://github.com/owncloud/ocis/issues/1228
