@@ -40,7 +40,7 @@ var _ = Describe("Crypto", func() {
 	Describe("Creating key / certificate pair", func() {
 		Context("For ocis-proxy in the location of the user config directory", func() {
 			It(fmt.Sprintf("Creates the cert / key tuple in: %s", filepath.Join(userConfigDir, "ocis")), func() {
-				if err := crypto.GenCert(config.Proxy.HTTP.TLSCert, config.Proxy.HTTP.TLSKey, log.NewLogger()); err != nil {
+				if err := crypto.GenCert(config.Proxy.HTTP.TLSCert, config.Proxy.HTTP.TLSKey, log.NopLogger()); err != nil {
 					Fail(err.Error())
 				}
 
@@ -52,6 +52,52 @@ var _ = Describe("Crypto", func() {
 					Fail("certificate not found at the expected location")
 				}
 			})
+		})
+	})
+	Describe("Creating a new cert pool", func() {
+		var (
+			crtOne string
+			keyOne string
+			crtTwo string
+			keyTwo string
+		)
+		BeforeEach(func() {
+			crtOne = filepath.Join(userConfigDir, "ocis/one.cert")
+			keyOne = filepath.Join(userConfigDir, "ocis/one.key")
+			crtTwo = filepath.Join(userConfigDir, "ocis/two.cert")
+			keyTwo = filepath.Join(userConfigDir, "ocis/two.key")
+			if err := crypto.GenCert(crtOne, keyOne, log.NopLogger()); err != nil {
+				Fail(err.Error())
+			}
+			if err := crypto.GenCert(crtTwo, keyTwo, log.NopLogger()); err != nil {
+				Fail(err.Error())
+			}
+		})
+		It("handles one certificate", func() {
+			f1, _ := os.Open(crtOne)
+			defer f1.Close()
+
+			c, err := crypto.NewCertPoolFromPEM(f1)
+			if err != nil {
+				Fail(err.Error())
+			}
+			if len(c.Subjects()) != 1 {
+				Fail("expected 1 certificate in the cert pool")
+			}
+		})
+		It("handles multiple certificates", func() {
+			f1, _ := os.Open(crtOne)
+			f2, _ := os.Open(crtTwo)
+			defer f1.Close()
+			defer f2.Close()
+
+			c, err := crypto.NewCertPoolFromPEM(f1, f2)
+			if err != nil {
+				Fail(err.Error())
+			}
+			if len(c.Subjects()) != 2 {
+				Fail("expected 2 certificates in the cert pool")
+			}
 		})
 	})
 })

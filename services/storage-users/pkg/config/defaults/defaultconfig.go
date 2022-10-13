@@ -78,8 +78,9 @@ func DefaultConfig() *config.Config {
 			},
 		},
 		Events: config.Events{
-			Addr:      "127.0.0.1:9233",
-			ClusterID: "ocis-cluster",
+			Addr:        "127.0.0.1:9233",
+			ClusterID:   "ocis-cluster",
+			TLSInsecure: true,
 		},
 		Cache: config.Cache{
 			Store:    "memory",

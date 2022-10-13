@@ -2,11 +2,13 @@ package command
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
 
 	"github.com/oklog/run"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	pkgcrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/services/nats/pkg/config"
 	"github.com/owncloud/ocis/v2/services/nats/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/nats/pkg/logging"
@@ -36,6 +38,26 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
+			// Generate a self-signing cert if no certificate is present
+			if err := pkgcrypto.GenCert(cfg.Nats.TLSCert, cfg.Nats.TLSKey, logger); err != nil {
+				logger.Fatal().Err(err).Msgf("Could not generate test-certificate")
+			}
+
+			crt, err := tls.LoadX509KeyPair(cfg.Nats.TLSCert, cfg.Nats.TLSKey)
+			if err != nil {
+				return err
+			}
+
+			clientAuth := tls.RequireAndVerifyClientCert
+			if cfg.Nats.TLSSkipVerifyClientCert {
+				clientAuth = tls.NoClientCert
+			}
+
+			tlsConf := &tls.Config{
+				MinVersion:   tls.VersionTLS12,
+				ClientAuth:   clientAuth,
+				Certificates: []tls.Certificate{crt},
+			}
 			natsServer, err := nats.NewNATSServer(
 				ctx,
 				logging.NewLogWrapper(logger),
@@ -43,6 +65,7 @@ func Server(cfg *config.Config) *cli.Command {
 				nats.Port(cfg.Nats.Port),
 				nats.ClusterID(cfg.Nats.ClusterID),
 				nats.StoreDir(cfg.Nats.StoreDir),
+				nats.TLSConfig(tlsConf),
 			)
 			if err != nil {
 				return err

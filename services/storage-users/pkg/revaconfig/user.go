@@ -102,8 +102,10 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 				"cache_database": cfg.Cache.Database,
 			},
 			"events": map[string]interface{}{
-				"natsaddress":   cfg.Events.Addr,
-				"natsclusterid": cfg.Events.ClusterID,
+				"natsaddress":          cfg.Events.Addr,
+				"natsclusterid":        cfg.Events.ClusterID,
+				"tlsinsecure":          cfg.Events.TLSInsecure,
+				"tlsrootcacertificate": cfg.Events.TLSRootCaCertPath,
 			},
 			"tokens": map[string]interface{}{
 				"transfer_shared_secret": cfg.Commons.TransferSecret,
@@ -142,8 +144,10 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 				"cache_database": cfg.Cache.Database,
 			},
 			"events": map[string]interface{}{
-				"natsaddress":   cfg.Events.Addr,
-				"natsclusterid": cfg.Events.ClusterID,
+				"natsaddress":          cfg.Events.Addr,
+				"natsclusterid":        cfg.Events.ClusterID,
+				"tlsinsecure":          cfg.Events.TLSInsecure,
+				"tlsrootcacertificate": cfg.Events.TLSRootCaCertPath,
 			},
 			"tokens": map[string]interface{}{
 				"transfer_shared_secret": cfg.Commons.TransferSecret,

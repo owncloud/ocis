@@ -1,11 +1,15 @@
 package svc
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"net/http"
+	"os"
 
 	"github.com/cs3org/reva/v2/pkg/events/server"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-micro/plugins/v4/events/natsjs"
+	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	searchSvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/experimental/pkg/activities"
@@ -17,9 +21,30 @@ func NewService(opts ...Option) (Experimental, error) {
 	options := newOptions(opts...)
 	logger := options.Logger
 	cfg := options.Config
-	es, err := server.NewNatsStream(
-		natsjs.Address(cfg.Events.Endpoint),
-		natsjs.ClusterID(cfg.Events.Cluster),
+
+	evtsCfg := cfg.Events
+	var rootCAPool *x509.CertPool
+	if evtsCfg.TLSRootCACertificate != "" {
+		rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
+		if err != nil {
+			return Experimental{}, err
+		}
+
+		rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
+		if err != nil {
+			return Experimental{}, err
+		}
+		evtsCfg.TLSInsecure = false
+	}
+
+	tlsConf := &tls.Config{
+		InsecureSkipVerify: evtsCfg.TLSInsecure, //nolint:gosec
+		RootCAs:            rootCAPool,
+	}
+	bus, err := server.NewNatsStream(
+		natsjs.TLSConfig(tlsConf),
+		natsjs.Address(evtsCfg.Endpoint),
+		natsjs.ClusterID(evtsCfg.Cluster),
 	)
 	if err != nil {
 		return Experimental{}, err
@@ -38,7 +63,7 @@ func NewService(opts ...Option) (Experimental, error) {
 		logger,
 	)
 
-	if err := activities.NewActivitiesService(r, es, logger, cfg.Activities); err != nil {
+	if err := activities.NewActivitiesService(r, bus, logger, cfg.Activities); err != nil {
 		return svc, err
 	}
 
