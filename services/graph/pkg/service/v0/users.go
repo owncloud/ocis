@@ -30,15 +30,15 @@ import (
 
 // GetMe implements the Service interface.
 func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+	logger.Info().Msg("calling get user in /me")
 
 	u, ok := revactx.ContextGetUser(r.Context())
 	if !ok {
-		g.logger.Error().Msg("user not in context")
-		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "user not in context")
+		logger.Debug().Msg("could not get user: user not in context")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "user not in context")
 		return
 	}
-
-	g.logger.Info().Interface("user", u).Msg("User in /me")
 	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
 	var me *libregraph.User
 	// We can just return the user from context unless we need to expand the group memberships
@@ -46,8 +46,10 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 		me = identity.CreateUserModelFromCS3(u)
 	} else {
 		var err error
+		logger.Debug().Msg("calling get user on backend")
 		me, err = g.identityBackend.GetUser(r.Context(), u.GetId().GetOpaqueId(), r.URL.Query())
 		if err != nil {
+			logger.Debug().Err(err).Interface("user", u).Msg("could not get user from backend")
 			var errcode errorcode.Error
 			if errors.As(err, &errcode) {
 				errcode.Render(w, r)
@@ -63,15 +65,20 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 
 // GetUsers implements the Service interface.
 func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+	logger.Info().Interface("query", r.URL.Query()).Msg("calling get users")
 	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
 	if err != nil {
-		g.logger.Err(err).Interface("query", r.URL.Query()).Msg("query error")
+		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: query error")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
+
+	logger.Debug().Interface("query", r.URL.Query()).Msg("calling get users on backend")
 	users, err := g.identityBackend.GetUsers(r.Context(), r.URL.Query())
 	if err != nil {
+		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users from backend")
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
 			errcode.Render(w, r)
@@ -83,12 +90,8 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	users, err = sortUsers(odataReq, users)
 	if err != nil {
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		logger.Debug().Interface("query", odataReq).Msg("error while sorting users according to query")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 	render.Status(r, http.StatusOK)
@@ -96,35 +99,41 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+	logger.Info().Interface("body", r.Body).Msg("calling create user")
 	u := libregraph.NewUser()
 	err := json.NewDecoder(r.Body).Decode(u)
 	if err != nil {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create user: invalid request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %v", err.Error()))
 		return
 	}
 
 	if _, ok := u.GetDisplayNameOk(); !ok {
+		logger.Debug().Err(err).Interface("user", u).Msg("could not create user: missing required Attribute: 'displayName'")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'displayName'")
 		return
 	}
 	if accountName, ok := u.GetOnPremisesSamAccountNameOk(); ok {
 		if !isValidUsername(*accountName) {
-			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
-				fmt.Sprintf("username '%s' must be at least the local part of an email", *u.OnPremisesSamAccountName))
+			logger.Debug().Str("username", *accountName).Msg("could not create user: username must be at least the local part of an email")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("username %s must be at least the local part of an email", *u.OnPremisesSamAccountName))
 			return
 		}
 	} else {
+		logger.Debug().Interface("user", u).Msg("could not create user: missing required Attribute: 'onPremisesSamAccountName'")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'onPremisesSamAccountName'")
 		return
 	}
 
 	if mail, ok := u.GetMailOk(); ok {
 		if !isValidEmail(*mail) {
-			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
-				fmt.Sprintf("'%s' is not a valid email address", *u.Mail))
+			logger.Debug().Str("mail", *u.Mail).Msg("could not create user: invalid email address")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("%v is not a valid email address", *u.Mail))
 			return
 		}
 	} else {
+		logger.Debug().Interface("user", u).Msg("could not create user: missing required Attribute: 'mail'")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'mail'")
 		return
 	}
@@ -133,11 +142,14 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	// generating them in the backend ourselves or rely on the Backend's
 	// storage (e.g. LDAP) to provide a unique ID.
 	if _, ok := u.GetIdOk(); ok {
+		logger.Debug().Interface("user", u).Msg("could not create user: user id is a read-only attribute")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user id is a read-only attribute")
 		return
 	}
 
+	logger.Debug().Interface("user", u).Msg("calling create user on backend")
 	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {
+		logger.Debug().Err(err).Msg("could not create user: backend error")
 		var ecErr errorcode.Error
 		if errors.As(err, &ecErr) {
 			ecErr.Render(w, r)
@@ -150,6 +162,8 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	// All users get the user role by default currently.
 	// to all new users for now, as create Account request does not have any role field
 	if g.roleService == nil {
+		// log as error, admin needs to do something about it
+		logger.Error().Str("id", *u.Id).Msg("could not create user: role service not configured")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not assign role to account: roleService not configured")
 		return
 	}
@@ -157,7 +171,9 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		AccountUuid: *u.Id,
 		RoleId:      settingssvc.BundleUUIDRoleUser,
 	}); err != nil {
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, fmt.Sprintf("could not assign role to account %s", err.Error()))
+		// log as error, admin eventually needs to do something
+		logger.Error().Err(err).Str("id", *u.Id).Str("role", settingssvc.BundleUUIDRoleUser).Msg("could not create user: role assignment failed")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "role assignment failed")
 		return
 	}
 
@@ -170,21 +186,27 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 
 // GetUser implements the Service interface.
 func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+	logger.Info().Msg("calling get user")
 	userID := chi.URLParam(r, "userID")
 	userID, err := url.PathUnescape(userID)
 	if err != nil {
+		logger.Debug().Err(err).Str("id", userID).Msg("could not get user: unescaping user id failed")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
 		return
 	}
 
 	if userID == "" {
+		logger.Debug().Msg("could not get user: missing user id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
 		return
 	}
 
+	logger.Debug().Str("id", userID).Msg("calling get user from backend")
 	user, err := g.identityBackend.GetUser(r.Context(), userID, r.URL.Query())
 
 	if err != nil {
+		logger.Debug().Err(err).Msg("could not get user: error fetching user from backend")
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
 			errcode.Render(w, r)
@@ -196,15 +218,18 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	sel := strings.Split(r.URL.Query().Get("$select"), ",")
 	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
 	if slices.Contains(sel, "drive") || slices.Contains(sel, "drives") || slices.Contains(exp, "drive") || slices.Contains(exp, "drives") {
-		wdu, err := url.Parse(g.config.Spaces.WebDavBase + g.config.Spaces.WebDavPath)
+		wdu, err := g.getWebDavBaseURL()
 		if err != nil {
-			g.logger.Err(err).
+			// log error, wrong configuration
+			logger.Error().
+				Err(err).
 				Str("webdav_base", g.config.Spaces.WebDavBase).
 				Str("webdav_path", g.config.Spaces.WebDavPath).
 				Msg("error parsing webdav URL")
 			render.Status(r, http.StatusInternalServerError)
 			return
 		}
+		logger.Debug().Str("id", user.GetId()).Msg("calling list storage spaces with user id filter")
 		f := listStorageSpacesUserFilter(user.GetId())
 		// use the unrestricted flag to get all possible spaces
 		// users with the canListAllSpaces permission should see all spaces
@@ -214,12 +239,14 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
 		})
 		if err != nil {
-			g.logger.Err(err).Interface("query", r.URL.Query()).Msg("error getting storages")
+			// transport error, needs to be fixed by admin
+			logger.Error().Err(err).Interface("query", r.URL.Query()).Msg("error getting storages: transport error")
 			render.Status(r, http.StatusInternalServerError)
 			render.JSON(w, r, user)
 			return
 		}
-		if lspr.Status.Code != cs3rpc.Code_CODE_OK {
+		if lspr.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
+			logger.Debug().Str("grpc", lspr.GetStatus().GetMessage()).Msg("could not get drive for user")
 			// in case of NOT_OK, we can just return the user object with empty drives
 			render.Status(r, status.HTTPStatusFromCode(http.StatusOK))
 			render.JSON(w, r, user)
@@ -229,11 +256,11 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		for _, sp := range lspr.GetStorageSpaces() {
 			d, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, sp)
 			if err != nil {
-				g.logger.Err(err).Interface("query", r.URL.Query()).Msg("error converting space to drive")
+				logger.Debug().Err(err).Interface("id", sp.Id).Msg("error converting space to drive")
 			}
 			quota, err := g.getDriveQuota(r.Context(), sp)
 			if err != nil {
-				g.logger.Err(err).Interface("query", r.URL.Query()).Msg("error calling get quota")
+				logger.Debug().Err(err).Interface("id", sp.Id).Msg("error calling get quota on drive")
 			}
 			d.Quota = quota
 			if slices.Contains(sel, "drive") || slices.Contains(exp, "drive") {
@@ -252,21 +279,25 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+	logger.Info().Msg("calling delete user")
 	userID := chi.URLParam(r, "userID")
 	userID, err := url.PathUnescape(userID)
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("unescaping user id failed")
+		logger.Debug().Err(err).Str("id", userID).Msg("could not delete user: unescaping user id failed")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
 		return
 	}
 
 	if userID == "" {
+		logger.Debug().Msg("could not delete user: missing user id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
 		return
 	}
+	logger.Debug().Str("id", userID).Msg("calling get user on user backend")
 	user, err := g.identityBackend.GetUser(r.Context(), userID, r.URL.Query())
 	if err != nil {
-		g.logger.Debug().Err(err).Str("userID", userID).Msg("failed to get user")
+		logger.Debug().Err(err).Str("userID", userID).Msg("failed to get user from backend")
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
 			errcode.Render(w, r)
@@ -279,11 +310,14 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	currentUser := ctxpkg.ContextMustGetUser(r.Context())
 
 	if currentUser.GetId().GetOpaqueId() == user.GetId() {
-		g.logger.Debug().Msg("self deletion forbidden")
+		logger.Debug().Msg("could not delete user: self deletion forbidden")
 		errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "self deletion forbidden")
 		return
 	}
 
+	logger.Debug().
+		Str("user", user.GetId()).
+		Msg("calling list spaces with user filter to fetch the personal space for deletion")
 	opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
 	f := listStorageSpacesUserFilter(user.GetId())
 	lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
@@ -291,8 +325,9 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
 	})
 	if err != nil {
-		g.logger.Debug().Err(err).Msg("could not read spaces")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "could not read spaces")
+		// transport error, log as error
+		logger.Error().Err(err).Msg("could not fetch spaces: transport error")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not fetch spaces for deletion, aborting")
 		return
 	}
 	for _, sp := range lspr.GetStorageSpaces() {
@@ -312,8 +347,8 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 				},
 			})
 			if err != nil {
-				g.logger.Debug().Err(err).Msg("could not disable homespace")
-				errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "could not disable homespace")
+				logger.Error().Err(err).Msg("could not disable homespace: transport error")
+				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not disable homespace, aborting")
 				return
 			}
 		}
@@ -325,16 +360,19 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			},
 		})
 		if err != nil {
-			g.logger.Debug().Err(err).Msg("could not delete homespace")
-			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "could not delete homespace")
+			// transport error, log as error
+			logger.Error().Err(err).Msg("could not delete homespace: transport error")
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not delete homespace, aborting")
 			return
 		}
 		break
 	}
 
+	logger.Debug().Str("id", user.GetId()).Msg("calling delete user on backend")
 	err = g.identityBackend.DeleteUser(r.Context(), user.GetId())
 
 	if err != nil {
+		logger.Debug().Err(err).Msg("could not delete user: backend error")
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
 			errcode.Render(w, r)
@@ -353,27 +391,34 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 // PatchUser implements the Service Interface. Updates the specified attributes of an
 // ExistingUser
 func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+	logger.Info().Msg("calling patch user")
 	nameOrID := chi.URLParam(r, "userID")
 	nameOrID, err := url.PathUnescape(nameOrID)
 	if err != nil {
+		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not update user: unescaping user id failed")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
 		return
 	}
 
 	if nameOrID == "" {
+		logger.Debug().Msg("could not update user: missing user id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
 		return
 	}
 	changes := libregraph.NewUser()
 	err = json.NewDecoder(r.Body).Decode(changes)
 	if err != nil {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update user: invalid request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
+			fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
 	}
 
 	var features []events.UserFeature
 	if mail, ok := changes.GetMailOk(); ok {
 		if !isValidEmail(*mail) {
+			logger.Debug().Str("mail", *mail).Msg("could not update user: email is not a valid email address")
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
 				fmt.Sprintf("'%s' is not a valid email address", *mail))
 			return
@@ -385,8 +430,10 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		features = append(features, events.UserFeature{Name: "displayname", Value: *name})
 	}
 
+	logger.Debug().Str("nameid", nameOrID).Interface("changes", *changes).Msg("calling update user on backend")
 	u, err := g.identityBackend.UpdateUser(r.Context(), nameOrID, *changes)
 	if err != nil {
+		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not update user: backend error")
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
 			errcode.Render(w, r)
