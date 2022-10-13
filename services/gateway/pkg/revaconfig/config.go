@@ -80,6 +80,12 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 					},
 				},
 			},
+			"interceptors": map[string]interface{}{
+				"prometheus": map[string]interface{}{
+					"namespace": "ocis",
+					"subsystem": "gateway",
+				},
+			},
 		},
 	}
 	return rcfg
