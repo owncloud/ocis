@@ -95,6 +95,7 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 			"treetime_accounting":         true,
 			"treesize_accounting":         true,
 			"permissionssvc":              cfg.Drivers.OCIS.PermissionsEndpoint,
+			"permissionssvc_tls_mode":     "off",
 		},
 		"s3": map[string]interface{}{
 			"enable_home": false,
@@ -114,6 +115,7 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 			"treetime_accounting":         true,
 			"treesize_accounting":         true,
 			"permissionssvc":              cfg.Drivers.S3NG.PermissionsEndpoint,
+			"permissionssvc_tls_mode":     "off",
 			"s3.region":                   cfg.Drivers.S3NG.Region,
 			"s3.access_key":               cfg.Drivers.S3NG.AccessKey,
 			"s3.secret_key":               cfg.Drivers.S3NG.SecretKey,
