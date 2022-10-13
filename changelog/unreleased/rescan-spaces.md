@@ -1,4 +1,4 @@
-Fix: Trigger a rescan of spaces in the search index when items have changed
+Bugfix: Trigger a rescan of spaces in the search index when items have changed
 
 The search service now scans spaces when items have been changed. This fixes the problem
 that mtime and treesize propagation was not reflected in the search index properly.
