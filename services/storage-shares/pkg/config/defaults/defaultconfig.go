@@ -28,9 +28,7 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "storage-shares",
 		},
-		Reva: &shared.Reva{
-			Address: "127.0.0.1:9142",
-		},
+		Reva:                   shared.DefaultRevaConfig(),
 		MountID:                "7639e57c-4433-4a12-8201-722fd0009154",
 		ReadOnly:               false,
 		SharesProviderEndpoint: "localhost:9150",
@@ -63,7 +61,9 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
 		cfg.Reva = &shared.Reva{
-			Address: cfg.Commons.Reva.Address,
+			Address:   cfg.Commons.Reva.Address,
+			TLSMode:   cfg.Commons.Reva.TLSMode,
+			TLSCACert: cfg.Commons.Reva.TLSCACert,
 		}
 	} else if cfg.Reva == nil {
 		cfg.Reva = &shared.Reva{}

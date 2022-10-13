@@ -27,7 +27,7 @@ type Channel interface {
 
 // NewMailChannel instantiates a new mail communication channel.
 func NewMailChannel(cfg config.Config, logger log.Logger) (Channel, error) {
-	gc, err := pool.GetGatewayServiceClient(cfg.Notifications.Reva.Address)
+	gc, err := pool.GetGatewayServiceClient(cfg.Notifications.Reva.Address, cfg.Notifications.Reva.GetRevaOptions()...)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get gateway client")
 		return nil, err

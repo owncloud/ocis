@@ -26,7 +26,7 @@ func NewService(opts ...Option) grpc.Service {
 		grpc.Version(version.GetString()),
 	)
 	tconf := options.Config.Thumbnail
-	gc, err := pool.GetGatewayServiceClient(tconf.Reva.Address)
+	gc, err := pool.GetGatewayServiceClient(tconf.Reva.Address, tconf.Reva.GetRevaOptions()...)
 	if err != nil {
 		options.Logger.Error().Err(err).Msg("could not get gateway client")
 		return grpc.Service{}

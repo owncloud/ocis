@@ -128,7 +128,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config) alice.Chain {
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
-	revaClient, err := pool.GetGatewayServiceClient(cfg.Reva.Address)
+	revaClient, err := pool.GetGatewayServiceClient(cfg.Reva.Address, cfg.Reva.GetRevaOptions()...)
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
 	case "cs3":

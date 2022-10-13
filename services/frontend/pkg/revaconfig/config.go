@@ -73,6 +73,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 			"jwt_secret":                cfg.TokenManager.JWTSecret,
 			"gatewaysvc":                cfg.Reva.Address, // Todo or address?
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
+			"grpc_client_options":       cfg.Reva.GetGRPCClientConfig(),
 		},
 		"http": map[string]interface{}{
 			"network": cfg.HTTP.Protocol,

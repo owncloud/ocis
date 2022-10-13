@@ -37,9 +37,7 @@ func DefaultConfig() *config.Config {
 				ConsumerGroup: "notifications",
 				EnableTLS:     false,
 			},
-			Reva: shared.Reva{
-				Address: "127.0.0.1:9142",
-			},
+			Reva: *shared.DefaultRevaConfig(),
 		},
 	}
 }

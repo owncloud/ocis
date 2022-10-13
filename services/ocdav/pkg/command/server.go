@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cs3org/reva/v2/pkg/micro/ocdav"
+	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/broker"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
@@ -38,7 +39,17 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			gr.Add(func() error {
-
+				// init reva shared config explicitly as the go-micro based ocdav does not use
+				// the reva runtime. But we need e.g. the shared client settings to be initialized
+				sc := map[string]interface{}{
+					"jwt_secret":                cfg.TokenManager.JWTSecret,
+					"gatewaysvc":                cfg.Reva.Address,
+					"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
+					"grpc_client_options":       cfg.Reva.GetGRPCClientConfig(),
+				}
+				if err := sharedconf.Decode(sc); err != nil {
+					logger.Error().Err(err).Msg("error decoding shared config for ocdav")
+				}
 				opts := []ocdav.Option{
 					ocdav.Name(cfg.HTTP.Namespace + "." + cfg.Service.Name),
 					ocdav.Version(version.GetString()),

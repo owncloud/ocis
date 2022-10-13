@@ -66,7 +66,7 @@ func NewService(opts ...Option) Service {
 	}
 	if options.GatewayClient == nil {
 		var err error
-		svc.gatewayClient, err = pool.GetGatewayServiceClient(options.Config.Reva.Address)
+		svc.gatewayClient, err = pool.GetGatewayServiceClient(options.Config.Reva.Address, options.Config.Reva.GetRevaOptions()...)
 		if err != nil {
 			options.Logger.Error().Err(err).Msg("Could not get gateway client")
 			return nil

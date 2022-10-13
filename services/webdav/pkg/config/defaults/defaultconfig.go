@@ -38,9 +38,7 @@ func DefaultConfig() *config.Config {
 		},
 		OcisPublicURL:   "https://127.0.0.1:9200",
 		WebdavNamespace: "/users/{{.Id.OpaqueId}}",
-		Reva: shared.Reva{
-			Address: "127.0.0.1:9142",
-		},
+		Reva:            *shared.DefaultRevaConfig(),
 	}
 }
 

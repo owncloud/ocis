@@ -18,10 +18,16 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 			"jwt_secret":                cfg.TokenManager.JWTSecret,
 			"gatewaysvc":                cfg.Reva.Address,
 			"skip_user_groups_in_token": cfg.SkipUserGroupsInToken,
+			"grpc_client_options":       cfg.Reva.GetGRPCClientConfig(),
 		},
 		"grpc": map[string]interface{}{
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
+			"tls_settings": map[string]interface{}{
+				"enabled":     cfg.GRPC.TLSEnabled,
+				"certificate": cfg.GRPC.TLSCert,
+				"key":         cfg.GRPC.TLSKey,
+			},
 			"services": map[string]interface{}{
 				"gateway": map[string]interface{}{
 					// registries are located on the gateway

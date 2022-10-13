@@ -42,11 +42,9 @@ func DefaultConfig() *config.Config {
 				RootDirectory: path.Join(defaults.BaseDataPath(), "thumbnails"),
 			},
 			WebdavAllowInsecure: false,
-			Reva: shared.Reva{
-				Address: "127.0.0.1:9142",
-			},
-			CS3AllowInsecure: false,
-			DataEndpoint:     "http://127.0.0.1:9186/thumbnails/data",
+			Reva:                *shared.DefaultRevaConfig(),
+			CS3AllowInsecure:    false,
+			DataEndpoint:        "http://127.0.0.1:9186/thumbnails/data",
 		},
 	}
 }

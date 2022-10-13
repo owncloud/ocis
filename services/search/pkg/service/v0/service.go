@@ -88,7 +88,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 		return nil, err
 	}
 
-	gwclient, err := pool.GetGatewayServiceClient(cfg.Reva.Address)
+	gwclient, err := pool.GetGatewayServiceClient(cfg.Reva.Address, cfg.Reva.GetRevaOptions()...)
 	if err != nil {
 		logger.Fatal().Err(err).Str("addr", cfg.Reva.Address).Msg("could not get reva client")
 	}

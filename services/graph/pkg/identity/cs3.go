@@ -42,7 +42,7 @@ func (i *CS3) UpdateUser(ctx context.Context, nameOrID string, user libregraph.U
 func (i *CS3) GetUser(ctx context.Context, userID string, queryParam url.Values) (*libregraph.User, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetUser")
-	client, err := pool.GetGatewayServiceClient(i.Config.Address)
+	client, err := pool.GetGatewayServiceClient(i.Config.Address, i.Config.GetRevaOptions()...)
 	if err != nil {
 		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get client")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
@@ -70,7 +70,7 @@ func (i *CS3) GetUser(ctx context.Context, userID string, queryParam url.Values)
 func (i *CS3) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetUsers")
-	client, err := pool.GetGatewayServiceClient(i.Config.Address)
+	client, err := pool.GetGatewayServiceClient(i.Config.Address, i.Config.GetRevaOptions()...)
 	if err != nil {
 		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get client")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
@@ -110,7 +110,7 @@ func (i *CS3) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregrap
 func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetGroups")
-	client, err := pool.GetGatewayServiceClient(i.Config.Address)
+	client, err := pool.GetGatewayServiceClient(i.Config.Address, i.Config.GetRevaOptions()...)
 	if err != nil {
 		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get client")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
@@ -156,7 +156,7 @@ func (i *CS3) CreateGroup(ctx context.Context, group libregraph.Group) (*libregr
 func (i *CS3) GetGroup(ctx context.Context, groupID string, queryParam url.Values) (*libregraph.Group, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetGroup")
-	client, err := pool.GetGatewayServiceClient(i.Config.Address)
+	client, err := pool.GetGatewayServiceClient(i.Config.Address, i.Config.GetRevaOptions()...)
 	if err != nil {
 		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get client")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())

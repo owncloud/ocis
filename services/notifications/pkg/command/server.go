@@ -77,7 +77,10 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			gwclient, err := pool.GetGatewayServiceClient(cfg.Notifications.Reva.Address)
+			gwclient, err := pool.GetGatewayServiceClient(
+				cfg.Notifications.Reva.Address,
+				cfg.Notifications.Reva.GetRevaOptions()...,
+			)
 			if err != nil {
 				logger.Fatal().Err(err).Str("addr", cfg.Notifications.Reva.Address).Msg("could not get reva client")
 			}
