@@ -22,14 +22,14 @@
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
 | STORAGE_USERS_DRIVER | string | ocis | The storage driver which should be used by the service|
-| STORAGE_USERS_OCIS_ROOT | string | ~/.ocis/storage/users | Path for the persistence directory.|
-| STORAGE_USERS_OCIS_USER_LAYOUT | string | {{.Id.OpaqueId}} | Template string for the user storage layout in the persistence directory.|
+| STORAGE_USERS_OCIS_ROOT | string | ~/.ocis/storage/users | The directory where the filesystem storage will store user files. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.|
+| STORAGE_USERS_OCIS_USER_LAYOUT | string | {{.Id.OpaqueId}} | Template string for the user storage layout in the user directory.|
 | STORAGE_USERS_PERMISSION_ENDPOINT,STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT | string | 127.0.0.1:9191 | Endpoint of the permissions service.|
 | STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.User.Username \| lower}} | Template string to construct personal space aliases.|
 | STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.SpaceName \| replace &#34; &#34; &#34;-&#34; \| lower}} | Template string to construct general space aliases.|
 | STORAGE_USERS_OCIS_SHARE_FOLDER | string | /Shares | Name of the folder jailing all shares.|
-| STORAGE_USERS_S3NG_ROOT | string | ~/.ocis/storage/users | Path for the persistence directory.|
-| STORAGE_USERS_S3NG_USER_LAYOUT | string | {{.Id.OpaqueId}} | Template string for the user storage layout in the persistence directory.|
+| STORAGE_USERS_S3NG_ROOT | string | ~/.ocis/storage/users | The directory where the filesystem storage will store user files. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.|
+| STORAGE_USERS_S3NG_USER_LAYOUT | string | {{.Id.OpaqueId}} | Template string for the user storage layout in the user directory.|
 | STORAGE_USERS_PERMISSION_ENDPOINT<br/>STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT | string | 127.0.0.1:9191 | Endpoint of the permissions service.|
 | STORAGE_USERS_S3NG_REGION | string | default | Region of the S3 bucket.|
 | STORAGE_USERS_S3NG_ACCESS_KEY | string |  | Access key for the S3 bucket.|
@@ -39,7 +39,7 @@
 | STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.User.Username \| lower}} | Template string to construct personal space aliases.|
 | STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE | string | {{.SpaceType}}/{{.SpaceName \| replace &#34; &#34; &#34;-&#34; \| lower}} | Template string to construct general space aliases.|
 | STORAGE_USERS_S3NG_SHARE_FOLDER | string | /Shares | Name of the folder jailing all shares.|
-| STORAGE_USERS_OWNCLOUDSQL_DATADIR | string | ~/.ocis/storage/owncloud | Path for the persistence directory.|
+| STORAGE_USERS_OWNCLOUDSQL_DATADIR | string | ~/.ocis/storage/owncloud | The directory where the filesystem storage will store SQL migration data. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/owncloud.|
 | STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER | string | /Shares | Name of the folder jailing all shares.|
 | STORAGE_USERS_OWNCLOUDSQL_LAYOUT | string | {{.Username}} | Path layout to use to navigate into a users folder in an owncloud data directory|
 | STORAGE_USERS_OWNCLOUDSQL_UPLOADINFO_DIR | string | ~/.ocis/storage/uploadinfo | Path to a directory, where uploads will be stored temporarily.|

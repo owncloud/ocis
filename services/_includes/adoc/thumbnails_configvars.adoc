@@ -132,7 +132,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/thumbnails ++
 a| [subs=-attributes]
-The directory where the filesystem storage will store the thumbnails.
+The directory where the filesystem storage will store the thumbnails. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/thumbnails.
 |`OCIS_INSECURE` +
 `THUMBNAILS_WEBDAVSOURCE_INSECURE`
 a| [subs=-attributes]

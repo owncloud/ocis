@@ -23,7 +23,7 @@
 | OCIS_CORS_ALLOW_CREDENTIALS<br/>SETTINGS_CORS_ALLOW_CREDENTIALS | bool | true | Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
 | SETTINGS_GRPC_ADDR | string | 127.0.0.1:9191 | The bind address of the GRPC service.|
 | SETTINGS_STORE_TYPE | string | metadata | Store type configures the persistency driver. Supported values are "metadata" and "filesystem".|
-| SETTINGS_DATA_PATH | string | ~/.ocis/settings | Path for the persistence directory.|
+| SETTINGS_DATA_PATH | string | ~/.ocis/settings | The directory where the filesystem storage will store ocis settings. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/settings.|
 | STORAGE_GATEWAY_GRPC_ADDR | string | 127.0.0.1:9215 | GRPC address of the STORAGE-SYSTEM service.|
 | STORAGE_GRPC_ADDR | string | 127.0.0.1:9215 | GRPC address of the STORAGE-SYSTEM service.|
 | OCIS_SYSTEM_USER_ID<br/>SETTINGS_SYSTEM_USER_ID | string |  | ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|

@@ -111,7 +111,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/search ++
 a| [subs=-attributes]
-Path for the search persistence directory.
+The directory where the filesystem storage will store search data. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/search.
 |`REVA_GATEWAY`
 a| [subs=-attributes]
 ++string ++

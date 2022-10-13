@@ -93,7 +93,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/nats ++
 a| [subs=-attributes]
-Path for the NATS JetStream persistence directory.
+The directory where the filesystem storage will store NATS JetStream data. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/nats.
 |`NATS_TLS_CERT`
 a| [subs=-attributes]
 ++string ++
@@ -115,7 +115,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Whether the nats server should skip the client certificate verification during the TLS handshake.
+Whether the NATS server should skip the client certificate verification during the TLS handshake.
 |===
 
 Since Version: `+` added, `-` deprecated

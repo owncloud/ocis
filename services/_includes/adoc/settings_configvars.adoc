@@ -171,7 +171,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/settings ++
 a| [subs=-attributes]
-Path for the persistence directory.
+The directory where the filesystem storage will store ocis settings. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/settings.
 |`STORAGE_GATEWAY_GRPC_ADDR`
 a| [subs=-attributes]
 ++string ++
