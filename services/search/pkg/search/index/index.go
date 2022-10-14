@@ -222,13 +222,18 @@ func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (
 	query := bleve.NewConjunctionQuery(
 		bleve.NewQueryStringQuery(req.Query),
 		deletedQuery, // Skip documents that have been marked as deleted
-		bleve.NewQueryStringQuery("RootID:"+idToBleveId(&sprovider.ResourceId{
-			StorageId: req.Ref.GetResourceId().GetStorageId(),
-			SpaceId:   req.Ref.GetResourceId().GetSpaceId(),
-			OpaqueId:  req.Ref.GetResourceId().GetOpaqueId(),
-		})), // Limit search to the space
-		bleve.NewQueryStringQuery("Path:"+queryEscape(utils.MakeRelativePath(path.Join(req.Ref.Path, "/"))+"*")), // Limit search to this directory in the space
 	)
+	if req.Ref != nil {
+		query = bleve.NewConjunctionQuery(
+			query,
+			bleve.NewQueryStringQuery("RootID:"+idToBleveId(&sprovider.ResourceId{
+				StorageId: req.Ref.GetResourceId().GetStorageId(),
+				SpaceId:   req.Ref.GetResourceId().GetSpaceId(),
+				OpaqueId:  req.Ref.GetResourceId().GetOpaqueId(),
+			})), // Limit search to the space
+			bleve.NewQueryStringQuery("Path:"+queryEscape(utils.MakeRelativePath(path.Join(req.Ref.Path, "/"))+"*")), // Limit search to this directory in the space
+		)
+	}
 	bleveReq := bleve.NewSearchRequest(query)
 	bleveReq.Size = 200
 	if req.PageSize > 0 {
@@ -295,7 +300,7 @@ func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *indexDocume
 	}
 
 	if ri.Mtime != nil {
-		doc.Mtime = time.Unix(int64(ri.Mtime.Seconds), int64(ri.Mtime.Nanos)).UTC().Format(time.RFC3339)
+		doc.Mtime = time.Unix(int64(ri.Mtime.Seconds), int64(ri.Mtime.Nanos)).UTC().Format(time.RFC3339Nano)
 	}
 
 	return doc
@@ -350,7 +355,7 @@ func fromDocumentMatch(hit *search.DocumentMatch) (*searchmsg.Match, error) {
 		match.Entity.ParentId = resourceIDtoSearchID(parentID)
 	}
 
-	if mtime, err := time.Parse(time.RFC3339, hit.Fields["Mtime"].(string)); err == nil {
+	if mtime, err := time.Parse(time.RFC3339Nano, hit.Fields["Mtime"].(string)); err == nil {
 		match.Entity.LastModifiedTime = &timestamppb.Timestamp{Seconds: mtime.Unix(), Nanos: int32(mtime.Nanosecond())}
 	}
 

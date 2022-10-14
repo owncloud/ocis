@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"google.golang.org/grpc/metadata"
+
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -22,7 +24,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/search/pkg/search"
-	"google.golang.org/grpc/metadata"
 
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
@@ -62,6 +63,8 @@ type Provider struct {
 	gwClient          gateway.GatewayAPIClient
 	indexClient       search.IndexClient
 	machineAuthAPIKey string
+
+	indexSpaceDebouncer *SpaceDebouncer
 }
 
 type MatchArray []*searchmsg.Match
@@ -84,6 +87,13 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 		logger:            logger,
 	}
 
+	p.indexSpaceDebouncer = NewSpaceDebouncer(50*time.Millisecond, func(id *provider.StorageSpaceId, userID *user.UserId) {
+		err := p.doIndexSpace(context.Background(), id, userID)
+		if err != nil {
+			p.logger.Error().Err(err).Interface("spaceID", id).Interface("userID", userID).Msg("error while indexing a space")
+		}
+	})
+
 	go func() {
 		for {
 			ev := <-eventsChan
@@ -94,6 +104,13 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 		}
 	}()
 
+	return p
+}
+
+// NewWithDebouncer returns a new provider with a customer index space debouncer
+func NewWithDebouncer(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, machineAuthAPIKey string, eventsChan <-chan interface{}, logger log.Logger, debouncer *SpaceDebouncer) *Provider {
+	p := New(gwClient, indexClient, machineAuthAPIKey, eventsChan, logger)
+	p.indexSpaceDebouncer = debouncer
 	return p
 }
 
@@ -241,52 +258,70 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 }
 
 func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequest) (*searchsvc.IndexSpaceResponse, error) {
-	// get user
-	res, err := p.gwClient.GetUserByClaim(context.Background(), &user.GetUserByClaimRequest{
-		Claim: "username",
-		Value: req.UserId,
-	})
-	if err != nil || res.Status.Code != rpc.Code_CODE_OK {
-		fmt.Println("error: Could not get user by userid")
+	err := p.doIndexSpace(ctx, &provider.StorageSpaceId{OpaqueId: req.SpaceId}, &user.UserId{OpaqueId: req.UserId})
+	if err != nil {
 		return nil, err
 	}
+	return &searchsvc.IndexSpaceResponse{}, nil
+}
 
-	// Get auth context
-	ownerCtx := ctxpkg.ContextSetUser(context.Background(), res.User)
-	authRes, err := p.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
+func (p *Provider) doIndexSpace(ctx context.Context, spaceID *provider.StorageSpaceId, userID *user.UserId) error {
+	authRes, err := p.gwClient.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "machine",
-		ClientId:     "userid:" + res.User.Id.OpaqueId,
+		ClientId:     "userid:" + userID.OpaqueId,
 		ClientSecret: p.machineAuthAPIKey,
 	})
 	if err != nil || authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, err
+		return err
 	}
 
 	if authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("could not get authenticated context for user")
+		return fmt.Errorf("could not get authenticated context for user")
 	}
-	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
+	ownerCtx := metadata.AppendToOutgoingContext(ctx, ctxpkg.TokenHeader, authRes.Token)
 
 	// Walk the space and index all files
 	walker := walker.NewWalker(p.gwClient)
-	rootId, err := storagespace.ParseID(req.SpaceId)
+	rootID, err := storagespace.ParseID(spaceID.OpaqueId)
 	if err != nil {
-		p.logger.Error().Err(err).Msg(err.Error())
-		return nil, err
+		p.logger.Error().Err(err).Msg("invalid space id")
+		return err
 	}
-	err = walker.Walk(ownerCtx, &rootId, func(wd string, info *provider.ResourceInfo, err error) error {
+	if rootID.StorageId == "" || rootID.SpaceId == "" {
+		p.logger.Error().Err(err).Msg("invalid space id")
+		return fmt.Errorf("invalid space id")
+	}
+	rootID.OpaqueId = rootID.SpaceId
+
+	err = walker.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error walking the tree")
+			return err
 		}
-		ref := &provider.Reference{
-			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
-			ResourceId: &rootId,
-		}
-		ref, err = p.resolveReference(ownerCtx, ref, info)
-		if err != nil {
-			p.logger.Error().Err(err).Msg("error resolving reference")
+
+		if info == nil {
 			return nil
 		}
+
+		ref := &provider.Reference{
+			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
+			ResourceId: &rootID,
+		}
+		p.logger.Debug().Str("path", ref.Path).Msg("Walking tree")
+
+		// Has this item/subtree changed?
+		searchRes, err := p.indexClient.Search(ownerCtx, &searchsvc.SearchIndexRequest{
+			Query: "+ID:" + storagespace.FormatResourceID(*info.Id) + ` +Mtime:>="` + utils.TSToTime(info.Mtime).Format(time.RFC3339Nano) + `"`,
+		})
+		if err == nil && len(searchRes.Matches) >= 1 {
+			if info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+				p.logger.Debug().Str("path", ref.Path).Msg("subtree hasn't changed. Skipping.")
+				return filepath.SkipDir
+			}
+			p.logger.Debug().Str("path", ref.Path).Msg("element hasn't changed. Skipping.")
+			return nil
+		}
+
 		err = p.indexClient.Add(ref, info)
 		if err != nil {
 			p.logger.Error().Err(err).Msg("error adding resource to the index")
@@ -296,32 +331,11 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	p.logDocCount()
-	return &searchsvc.IndexSpaceResponse{}, nil
-}
-
-func (p *Provider) resolveReference(ctx context.Context, ref *provider.Reference, ri *provider.ResourceInfo) (*provider.Reference, error) {
-	if ref.GetResourceId().GetOpaqueId() == ref.GetResourceId().GetSpaceId() {
-		return ref, nil
-	}
-
-	gpRes, err := p.gwClient.GetPath(ctx, &provider.GetPathRequest{
-		ResourceId: ri.Id,
-	})
-	if err != nil || gpRes.Status.Code != rpcv1beta1.Code_CODE_OK {
-		return nil, err
-	}
-	return &provider.Reference{
-		ResourceId: &provider.ResourceId{
-			StorageId: ref.GetResourceId().GetStorageId(),
-			SpaceId:   ref.GetResourceId().GetSpaceId(),
-			OpaqueId:  ref.GetResourceId().GetSpaceId(),
-		},
-		Path: utils.MakeRelativePath(gpRes.Path),
-	}, nil
+	return nil
 }
 
 func (p *Provider) logDocCount() {
