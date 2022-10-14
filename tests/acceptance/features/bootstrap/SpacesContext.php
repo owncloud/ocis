@@ -344,10 +344,10 @@ class SpacesContext implements Context {
 	 */
 	public function getFolderId(string $user, string $spaceName, string $folderName): string {
 		$space = $this->getSpaceByName($user, $spaceName);
-    // For a level 1 folder, the parent is space so $folderName = ''
-    if ($folderName === $space["name"]) {
-      $folderName = '';
-    }
+		// For a level 1 folder, the parent is space so $folderName = ''
+		if ($folderName === $space["name"]) {
+			$folderName = '';
+		}
 		$fullUrl = $this->baseUrl . $this->davSpacesUrl . $space["id"] . "/" . $folderName;
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
