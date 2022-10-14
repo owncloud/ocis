@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 	"os"
 	"os/signal"
@@ -202,7 +201,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 	}
 
 	sharerDisplayName := sharerUserResponse.GetUser().DisplayName
-	msg, err := email.RenderEmailTemplate("sharedSpace.email.tmpl", map[string]string{
+	msg, err := email.RenderEmailTemplate("spaces/sharedSpace.email.body.tmpl", map[string]string{
 		"SpaceGrantee": spaceGrantee,
 		"SpaceSharer":  sharerDisplayName,
 		"SpaceName":    md.GetInfo().GetSpace().Name,
@@ -213,10 +212,21 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		s.logger.Error().
 			Err(err).
 			Str("event", "SpaceCreated").
-			Msg("Could not render E-Mail template for spaces")
+			Msg("Could not render E-Mail body template for spaces")
 	}
 
-	emailSubject := fmt.Sprintf("%s invited you to join %s", sharerUserResponse.GetUser().DisplayName, md.GetInfo().GetSpace().Name)
+	emailSubject, err := email.RenderEmailTemplate("spaces/sharedSpace.email.subject.tmpl", map[string]string{
+		"SpaceSharer": sharerDisplayName,
+		"SpaceName":   md.GetInfo().GetSpace().Name,
+	}, s.emailTemplatePath)
+
+	if err != nil {
+		s.logger.Error().
+			Err(err).
+			Str("event", "SpaceCreated").
+			Msg("Could not render E-Mail subject template for spaces")
+	}
+
 	if e.GranteeUserID != nil {
 		err = s.channel.SendMessage(ownerCtx, []string{e.GranteeUserID.OpaqueId}, msg, emailSubject, sharerDisplayName)
 	} else if e.GranteeGroupID != nil {
@@ -340,7 +350,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 	}
 
 	sharerDisplayName := sharerUserResponse.GetUser().DisplayName
-	msg, err := email.RenderEmailTemplate("shareCreated.email.tmpl", map[string]string{
+	msg, err := email.RenderEmailTemplate("shares/shareCreated.email.body.tmpl", map[string]string{
 		"ShareGrantee": shareGrantee,
 		"ShareSharer":  sharerDisplayName,
 		"ShareFolder":  md.GetInfo().Name,
@@ -351,10 +361,21 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		s.logger.Error().
 			Err(err).
 			Str("event", "ShareCreated").
-			Msg("Could not render E-Mail template for shares")
+			Msg("Could not render E-Mail body template for shares")
 	}
 
-	emailSubject := fmt.Sprintf("%s shared '%s' with you", sharerUserResponse.GetUser().DisplayName, md.GetInfo().Name)
+	emailSubject, err := email.RenderEmailTemplate("shares/shareCreated.email.subject.tmpl", map[string]string{
+		"ShareSharer": sharerDisplayName,
+		"ShareFolder": md.GetInfo().Name,
+	}, s.emailTemplatePath)
+
+	if err != nil {
+		s.logger.Error().
+			Err(err).
+			Str("event", "SpaceCreated").
+			Msg("Could not render E-Mail subject template for shares")
+	}
+
 	if e.GranteeUserID != nil {
 		err = s.channel.SendMessage(ownerCtx, []string{e.GranteeUserID.OpaqueId}, msg, emailSubject, sharerDisplayName)
 	} else if e.GranteeGroupID != nil {

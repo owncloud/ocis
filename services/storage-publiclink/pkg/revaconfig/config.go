@@ -23,6 +23,10 @@ func StoragePublicLinkConfigFromStruct(cfg *config.Config) map[string]interface{
 			"address": cfg.GRPC.Addr,
 			"interceptors": map[string]interface{}{
 				"log": map[string]interface{}{},
+				"prometheus": map[string]interface{}{
+					"namespace": "ocis",
+					"subsystem": "storage_publiclink",
+				},
 			},
 			"services": map[string]interface{}{
 				"publicstorageprovider": map[string]interface{}{

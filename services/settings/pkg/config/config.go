@@ -20,7 +20,7 @@ type Config struct {
 	GRPC GRPC `yaml:"grpc"`
 
 	StoreType string   `yaml:"store_type" env:"SETTINGS_STORE_TYPE" desc:"Store type configures the persistency driver. Supported values are \"metadata\" and \"filesystem\"."`
-	DataPath  string   `yaml:"data_path" env:"SETTINGS_DATA_PATH" desc:"Path for the persistence directory."`
+	DataPath  string   `yaml:"data_path" env:"SETTINGS_DATA_PATH" desc:"The directory where the filesystem storage will store ocis settings. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/settings."`
 	Metadata  Metadata `yaml:"metadata_config"`
 
 	AdminUserID string `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID;SETTINGS_ADMIN_USER_ID" desc:"ID of the user that should receive admin privileges."`

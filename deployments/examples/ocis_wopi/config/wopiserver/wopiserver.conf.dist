@@ -114,7 +114,7 @@ chunksize = 4194304
 # Path to a recovery space in case of I/O errors when reaching to the remote storage.
 # This is expected to be a local path, and it is provided in order to ease user support.
 # Defaults to the indicated spool folder.
-#recoverypath = /var/spool/wopirecovery
+recoverypath = /var/spool/wopirecovery
 
 [cs3]
 # Host and port of the Reva(-like) CS3-compliant GRPC gateway endpoint

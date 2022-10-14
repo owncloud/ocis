@@ -16,12 +16,14 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the OIDC provider cache: [#4600](https://github.com/owncloud/ocis/pull/4600)
 * Bugfix - Render webdav permissions as string in search report: [#4575](https://github.com/owncloud/ocis/issues/4575)
 * Bugfix - Mail notifications for group shares: [#4714](https://github.com/owncloud/ocis/pull/4714)
+* Bugfix - Disable cache for selected static web assets: [#4809](https://github.com/owncloud/ocis/pull/4809)
 * Bugfix - Fix unfindable entities from shares/publicshares: [#4651](https://github.com/owncloud/ocis/pull/4651)
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
 * Bugfix - Make tokeninfo endpoint unprotected: [#4715](https://github.com/owncloud/ocis/pull/4715)
 * Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
 * Enhancement - Add curl to the oCIS OCI image: [#4751](https://github.com/owncloud/ocis/pull/4751)
 * Enhancement - Add Email templating: [#4564](https://github.com/owncloud/ocis/pull/4564)
+* Enhancement - We added e-mail subject templating: [#4799](https://github.com/owncloud/ocis/pull/4799)
 * Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
 * Enhancement - Allow to configuring the reva cache store: [#4627](https://github.com/owncloud/ocis/pull/4627)
 * Enhancement - Add support for REPORT requests to /dav/spaces URLs: [#4661](https://github.com/owncloud/ocis/pull/4661)
@@ -119,6 +121,14 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/4688
    https://github.com/owncloud/ocis/pull/4714
 
+* Bugfix - Disable cache for selected static web assets: [#4809](https://github.com/owncloud/ocis/pull/4809)
+
+   We've disabled caching for some static web assets. Files like the web index.html,
+   oidc-callback.html or similar contain paths to timestamped resources and should not be
+   cached.
+
+   https://github.com/owncloud/ocis/pull/4809
+
 * Bugfix - Fix unfindable entities from shares/publicshares: [#4651](https://github.com/owncloud/ocis/pull/4651)
 
    We fixed a problem where directories or empty files weren't findable because they were to the
@@ -160,6 +170,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/4303
    https://github.com/owncloud/ocis/pull/4564
    https://github.com/cs3org/reva/pull/3252
+
+* Enhancement - We added e-mail subject templating: [#4799](https://github.com/owncloud/ocis/pull/4799)
+
+   We have added e-mail subject templating.
+
+   https://github.com/owncloud/ocis/pull/4799
 
 * Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
 
