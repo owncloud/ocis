@@ -87,7 +87,7 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 		logger:            logger,
 	}
 
-	p.indexSpaceDebouncer = NewSpaceDebouncer(1*time.Second, func(id *provider.StorageSpaceId, userID *user.UserId) {
+	p.indexSpaceDebouncer = NewSpaceDebouncer(50*time.Millisecond, func(id *provider.StorageSpaceId, userID *user.UserId) {
 		err := p.doIndexSpace(context.Background(), id, userID)
 		if err != nil {
 			p.logger.Error().Err(err).Interface("spaceID", id).Interface("userID", userID).Msg("error while indexing a space")
