@@ -9,8 +9,8 @@ require (
 	github.com/armon/go-radix v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.4
 	github.com/coreos/go-oidc/v3 v3.4.0
-	github.com/cs3org/go-cs3apis v0.0.0-20221005085457-19ea8088a512
-	github.com/cs3org/reva/v2 v2.10.1-0.20221013080708-11cc78add8ba
+	github.com/cs3org/go-cs3apis v0.0.0-20221012090518-ef2996678965
+	github.com/cs3org/reva/v2 v2.10.1-0.20221013183308-560ba925a814
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
