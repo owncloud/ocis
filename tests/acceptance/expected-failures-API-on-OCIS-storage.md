@@ -566,8 +566,6 @@ _ocdav: api compatibility, return correct status code_
 
 - [apiAuthWebDav/webDavSpecialURLs.feature:13](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavSpecialURLs.feature#L13)
 - [apiAuthWebDav/webDavSpecialURLs.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavSpecialURLs.feature#L24)
-- [apiAuthWebDav/webDavSpecialURLs.feature:34](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavSpecialURLs.feature#L34)
-- [apiAuthWebDav/webDavSpecialURLs.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavSpecialURLs.feature#L45)
 - [apiAuthWebDav/webDavSpecialURLs.feature:55](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavSpecialURLs.feature#L55)
 - [apiAuthWebDav/webDavSpecialURLs.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavSpecialURLs.feature#L66)
 - [apiAuthWebDav/webDavSpecialURLs.feature:76](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavSpecialURLs.feature#L76)
