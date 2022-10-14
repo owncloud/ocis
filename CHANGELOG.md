@@ -19,6 +19,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Disable cache for selected static web assets: [#4809](https://github.com/owncloud/ocis/pull/4809)
 * Bugfix - Fix unfindable entities from shares/publicshares: [#4651](https://github.com/owncloud/ocis/pull/4651)
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
+* Bugfix - Remove the storage-users event configuration: [#4825](https://github.com/owncloud/ocis/pull/4825)
 * Bugfix - Make tokeninfo endpoint unprotected: [#4715](https://github.com/owncloud/ocis/pull/4715)
 * Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
 * Enhancement - Add curl to the oCIS OCI image: [#4751](https://github.com/owncloud/ocis/pull/4751)
@@ -140,6 +141,13 @@ The following sections list the changes for unreleased.
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
 
    https://github.com/owncloud/ocis/pull/4582
+
+* Bugfix - Remove the storage-users event configuration: [#4825](https://github.com/owncloud/ocis/pull/4825)
+
+   We've removed the events configuration from the storage-users section because it is not
+   needed.
+
+   https://github.com/owncloud/ocis/pull/4825
 
 * Bugfix - Make tokeninfo endpoint unprotected: [#4715](https://github.com/owncloud/ocis/pull/4715)
 
