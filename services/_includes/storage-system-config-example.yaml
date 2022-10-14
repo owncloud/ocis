@@ -22,9 +22,6 @@ grpc:
 http:
   addr: 127.0.0.1:9216
   protocol: tcp
-events:
-  endpoint: ""
-  cluster: ""
 token_manager:
   jwt_secret: ""
 reva:
