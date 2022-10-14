@@ -146,7 +146,7 @@ services:
     volumes:
       - ./config/wopiserver/entrypoint-override.sh:/entrypoint-override.sh
       - ./config/wopiserver/wopiserver.conf.dist:/etc/wopi/wopiserver.conf.dist
-      - wopi-data:/var/wopi_local_storage
+      - wopi-recovery:/var/spool/wopirecovery
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.wopiserver.entrypoints=https"
@@ -206,7 +206,7 @@ volumes:
   certs:
   ocis-config:
   ocis-data:
-  wopi-data:
+  wopi-recovery:
 
 networks:
   ocis-net:
