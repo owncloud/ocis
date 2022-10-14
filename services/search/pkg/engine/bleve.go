@@ -167,11 +167,7 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 			return nil, err
 		}
 
-		pID, err := storagespace.ParseID(getValue[string](hit.Fields, "ParentID"))
-		if err != nil {
-			return nil, err
-		}
-
+		pID, _ := storagespace.ParseID(getValue[string](hit.Fields, "ParentID"))
 		match := &searchMessage.Match{
 			Score: float32(hit.Score),
 			Entity: &searchMessage.Entity{

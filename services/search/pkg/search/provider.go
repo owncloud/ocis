@@ -265,9 +265,18 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 			p.logger.Error().Err(err).Msg("error extracting content")
 		}
 
+		var pid string
+		if info.ParentId != nil {
+			pid = storagespace.FormatResourceID(*info.ParentId)
+		}
 		r := engine.Resource{
-			ID:       storagespace.FormatResourceID(*info.Id),
-			RootID:   storagespace.FormatResourceID(*ref.ResourceId),
+			ID: storagespace.FormatResourceID(*info.Id),
+			RootID: storagespace.FormatResourceID(provider.ResourceId{
+				StorageId: info.Id.StorageId,
+				OpaqueId:  info.Id.SpaceId,
+				SpaceId:   info.Id.SpaceId,
+			}),
+			ParentID: pid,
 			Path:     ref.Path,
 			Type:     uint64(info.Type),
 			Document: doc,
