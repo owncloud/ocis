@@ -27,6 +27,12 @@ func StorageSharesConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"mount_id":             cfg.MountID,
 				},
 			},
+			"interceptors": map[string]interface{}{
+				"prometheus": map[string]interface{}{
+					"namespace": "ocis",
+					"subsystem": "storage_shares",
+				},
+			},
 		},
 	}
 	if cfg.ReadOnly {

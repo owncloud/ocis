@@ -10,8 +10,8 @@ require (
 	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.4
 	github.com/coreos/go-oidc/v3 v3.4.0
-	github.com/cs3org/go-cs3apis v0.0.0-20221005085457-19ea8088a512
-	github.com/cs3org/reva/v2 v2.10.1-0.20221013135444-5b30dc35a35b
+	github.com/cs3org/go-cs3apis v0.0.0-20221012090518-ef2996678965
+	github.com/cs3org/reva/v2 v2.10.1-0.20221014075706-038ce42f3741
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
@@ -51,8 +51,8 @@ require (
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/ginkgo/v2 v2.2.0
-	github.com/onsi/gomega v1.21.1
+	github.com/onsi/ginkgo/v2 v2.3.1
+	github.com/onsi/gomega v1.22.1
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v0.17.0
 	github.com/pkg/errors v0.9.1

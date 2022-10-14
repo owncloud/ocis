@@ -3,7 +3,6 @@ package svc
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -90,7 +89,7 @@ func (p Web) getPayload() (payload []byte, err error) {
 			Msg("web config doesn't exist")
 	}
 
-	payload, err = ioutil.ReadFile(p.config.Web.Path)
+	payload, err = os.ReadFile(p.config.Web.Path)
 
 	if err != nil {
 		p.logger.Fatal().
@@ -102,7 +101,7 @@ func (p Web) getPayload() (payload []byte, err error) {
 }
 
 // Config implements the Service interface.
-func (p Web) Config(w http.ResponseWriter, r *http.Request) {
+func (p Web) Config(w http.ResponseWriter, _ *http.Request) {
 
 	payload, err := p.getPayload()
 	if err != nil {

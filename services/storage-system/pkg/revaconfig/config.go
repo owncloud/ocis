@@ -98,6 +98,12 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 					"data_server_url": cfg.DataServerURL,
 				},
 			},
+			"interceptors": map[string]interface{}{
+				"prometheus": map[string]interface{}{
+					"namespace": "ocis",
+					"subsystem": "storage_system",
+				},
+			},
 		},
 		"http": map[string]interface{}{
 			"network": cfg.HTTP.Protocol,
@@ -125,6 +131,12 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 							"cache_table":    "stat",
 						},
 					},
+				},
+			},
+			"middlewares": map[string]interface{}{
+				"prometheus": map[string]interface{}{
+					"namespace": "ocis",
+					"subsystem": "storage_system",
 				},
 			},
 		},

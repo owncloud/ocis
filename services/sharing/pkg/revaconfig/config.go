@@ -109,6 +109,10 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"tls-insecure":     cfg.Events.TLSInsecure,
 					"tls-root-ca-cert": cfg.Events.TLSRootCaCertPath,
 				},
+				"prometheus": map[string]interface{}{
+					"namespace": "ocis",
+					"subsystem": "sharing",
+				},
 			},
 		},
 	}

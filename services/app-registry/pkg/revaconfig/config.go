@@ -33,6 +33,12 @@ func AppRegistryConfigFromStruct(cfg *config.Config, logger log.Logger) map[stri
 					},
 				},
 			},
+			"interceptors": map[string]interface{}{
+				"prometheus": map[string]interface{}{
+					"namespace": "ocis",
+					"subsystem": "app_registry",
+				},
+			},
 		},
 	}
 	return rcfg
