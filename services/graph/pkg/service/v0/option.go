@@ -23,7 +23,7 @@ type Options struct {
 	IdentityBackend identity.Backend
 	RoleService     settingssvc.RoleService
 	RoleManager     *roles.Manager
-	EventsPublisher events.Publisher
+	EventsPublisher events.Stream
 }
 
 // newOptions initializes the available default options.
@@ -87,7 +87,7 @@ func RoleManager(val *roles.Manager) Option {
 }
 
 // EventsPublisher provides a function to set the EventsPublisher option.
-func EventsPublisher(val events.Publisher) Option {
+func EventsPublisher(val events.Stream) Option {
 	return func(o *Options) {
 		o.EventsPublisher = val
 	}
