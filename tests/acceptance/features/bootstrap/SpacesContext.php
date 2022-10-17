@@ -333,6 +333,38 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * The method returns folderId
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $folderName
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 */
+	public function getFolderId(string $user, string $spaceName, string $folderName): string {
+		$space = $this->getSpaceByName($user, $spaceName);
+		// For a level 1 folder, the parent is space so $folderName = ''
+		if ($folderName === $space["name"]) {
+			$folderName = '';
+		}
+		$fullUrl = $this->baseUrl . $this->davSpacesUrl . $space["id"] . "/" . $folderName;
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				$this->featureContext->getStepLineRef(),
+				'PROPFIND',
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				['Depth' => '0'],
+			)
+		);
+		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml()->xpath("//d:response/d:propstat/d:prop/oc:fileid")), true, 512, JSON_THROW_ON_ERROR);
+		Assert::assertNotEmpty($responseArray, "the PROPFIND response for $folderName is empty");
+		return $responseArray[0][0];
+	}
+
+	/**
 	 * The method returns eTag
 	 *
 	 * @param string $user
@@ -2960,5 +2992,22 @@ class SpacesContext implements Context {
 			}
 		}
 		Assert::assertTrue($spaceFound, "response does not contain the space '$spaceName'");
+	}
+
+	/**
+	 * @Then /^for user "([^"]*)" the response should contains the parent "([^"]*)" from (?:space|mountpoint) "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $parent
+	 * @param string $space
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function responseShouldContainParent(string $user, string $parent, string $space): void {
+		// get a response after a Report request (called in the core)
+		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml()->xpath("//d:response/d:propstat/d:prop/oc:file-parent")), true, 512, JSON_THROW_ON_ERROR);
+		Assert::assertNotEmpty($responseArray, "search result is empty");
+		Assert::assertEquals($this->getFolderId($user, $space, $parent), $responseArray[0][0], 'wrong file-parentId');
 	}
 }
