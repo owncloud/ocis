@@ -7,6 +7,7 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	opkgm "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	gmmetadata "go-micro.dev/v4/metadata"
@@ -66,7 +67,7 @@ func Auth(opts ...account.Option) func(http.Handler) http.Handler {
 				return
 			}
 			if ok, err := scope.VerifyScope(ctx, tokenScope, r); err != nil || !ok {
-				opt.Logger.Error().Err(err).Msg("verifying scope failed")
+				opt.Logger.Error().Str(log.RequestIDString, r.Header.Get("X-Request-ID")).Err(err).Msg("verifying scope failed")
 				errorcode.InvalidAuthenticationToken.Render(w, r, http.StatusUnauthorized, "verifying scope failed")
 				return
 			}

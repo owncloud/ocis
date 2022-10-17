@@ -3,6 +3,8 @@ package svc
 import (
 	"context"
 	"net/http"
+	"net/url"
+	"path"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -103,14 +105,20 @@ func (g Graph) publishEvent(ev interface{}) {
 	}
 }
 
+func (g Graph) getWebDavBaseURL() (*url.URL, error) {
+	webDavBaseURL, err := url.Parse(g.config.Spaces.WebDavBase)
+	if err != nil {
+		return nil, err
+	}
+	webDavBaseURL.Path = path.Join(webDavBaseURL.Path, g.config.Spaces.WebDavPath)
+	return webDavBaseURL, nil
+}
+
 type listResponse struct {
 	Value interface{} `json:"value,omitempty"`
 }
 
 const (
-	NoSpaceFoundMessage           = "space with id `%s` not found"
-	ListStorageSpacesTransportErr = "transport error sending list storage spaces grpc request"
-	ListStorageSpacesReturnsErr   = "list storage spaces grpc request returns an errorcode in the response"
-	ReadmeSpecialFolderName       = "readme"
-	SpaceImageSpecialFolderName   = "image"
+	ReadmeSpecialFolderName     = "readme"
+	SpaceImageSpecialFolderName = "image"
 )

@@ -73,11 +73,12 @@ func (s Thumbnails) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GetThumbnail implements the Service interface.
 func (s Thumbnails) GetThumbnail(w http.ResponseWriter, r *http.Request) {
+	logger := s.logger.SubloggerWithRequestID(r.Context())
 	key := r.Context().Value(keyContextKey).(string)
 
 	thumbnail, err := s.manager.GetThumbnail(key)
 	if err != nil {
-		s.logger.Error().
+		logger.Debug().
 			Err(err).
 			Str("key", key).
 			Msg("could not get the thumbnail")
@@ -88,7 +89,7 @@ func (s Thumbnails) GetThumbnail(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Length", strconv.Itoa(len(thumbnail)))
 	if _, err = w.Write(thumbnail); err != nil {
-		s.logger.Error().
+		logger.Error().
 			Err(err).
 			Str("key", key).
 			Msg("could not write the thumbnail response")
@@ -97,6 +98,7 @@ func (s Thumbnails) GetThumbnail(w http.ResponseWriter, r *http.Request) {
 
 func (s Thumbnails) TransferTokenValidator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		logger := s.logger.SubloggerWithRequestID(r.Context())
 		tokenString := r.Header.Get("Transfer-Token")
 		token, err := jwt.ParseWithClaims(tokenString, &tjwt.ThumbnailClaims{}, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -105,7 +107,7 @@ func (s Thumbnails) TransferTokenValidator(next http.Handler) http.Handler {
 			return []byte(s.config.Thumbnail.TransferSecret), nil
 		})
 		if err != nil {
-			s.logger.Error().
+			logger.Debug().
 				Err(err).
 				Str("transfer-token", tokenString).
 				Msg("failed to parse transfer token")
@@ -118,6 +120,7 @@ func (s Thumbnails) TransferTokenValidator(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r.WithContext(ctx))
 			return
 		}
+		logger.Debug().Msg("invalid transfer token")
 		w.WriteHeader(http.StatusUnauthorized)
 	})
 }

@@ -210,9 +210,10 @@ func (g Webdav) WebDAVContext() func(next http.Handler) http.Handler {
 
 // SpacesThumbnail is the endpoint for retrieving thumbnails inside of spaces.
 func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
+	logger := g.log.SubloggerWithRequestID(r.Context())
 	tr, err := requests.ParseThumbnailRequest(r)
 	if err != nil {
-		g.log.Error().Err(err).Msg("could not create Request")
+		logger.Debug().Err(err).Msg("could not create Request")
 		renderError(w, r, errBadRequest(err.Error()))
 		return
 	}
@@ -243,7 +244,7 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
-		g.log.Error().Err(err).Msg("could not get thumbnail")
+		logger.Debug().Err(err).Msg("could not get thumbnail")
 		return
 	}
 
@@ -252,9 +253,10 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 
 // Thumbnail implements the Service interface.
 func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
+	logger := g.log.SubloggerWithRequestID(r.Context())
 	tr, err := requests.ParseThumbnailRequest(r)
 	if err != nil {
-		g.log.Error().Err(err).Msg("could not create Request")
+		logger.Debug().Err(err).Msg("could not create Request")
 		renderError(w, r, errBadRequest(err.Error()))
 		return
 	}
@@ -268,8 +270,13 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 		userRes, err := g.revaClient.WhoAmI(r.Context(), &gatewayv1beta1.WhoAmIRequest{
 			Token: t,
 		})
-		if err != nil || userRes.Status.Code != rpcv1beta1.Code_CODE_OK {
-			g.log.Error().Err(err).Msg("could not get user")
+		if err != nil {
+			logger.Error().Err(err).Msg("could not get user: transport error")
+			renderError(w, r, errInternalError("could not get user"))
+			return
+		}
+		if userRes.Status.Code != rpcv1beta1.Code_CODE_OK {
+			logger.Debug().Str("grpcmessage", userRes.GetStatus().GetMessage()).Msg("could not get user")
 			renderError(w, r, errInternalError("could not get user"))
 			return
 		}
@@ -281,8 +288,13 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 			Claim: "username",
 			Value: tr.Identifier,
 		})
-		if err != nil || userRes.Status.Code != rpcv1beta1.Code_CODE_OK {
-			g.log.Error().Err(err).Msg("could not get user")
+		if err != nil {
+			logger.Error().Err(err).Msg("could not get user: transport error")
+			renderError(w, r, errInternalError("could not get user"))
+			return
+		}
+		if userRes.Status.Code != rpcv1beta1.Code_CODE_OK {
+			logger.Debug().Str("grpcmessage", userRes.GetStatus().GetMessage()).Msg("could not get user")
 			renderError(w, r, errInternalError("could not get user"))
 			return
 		}
@@ -322,9 +334,10 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
+	logger := g.log.SubloggerWithRequestID(r.Context())
 	tr, err := requests.ParseThumbnailRequest(r)
 	if err != nil {
-		g.log.Error().Err(err).Msg("could not create Request")
+		logger.Debug().Err(err).Msg("could not create Request")
 		renderError(w, r, errBadRequest(err.Error()))
 		return
 	}
@@ -362,9 +375,10 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
+	logger := g.log.SubloggerWithRequestID(r.Context())
 	tr, err := requests.ParseThumbnailRequest(r)
 	if err != nil {
-		g.log.Error().Err(err).Msg("could not create Request")
+		logger.Debug().Err(err).Msg("could not create Request")
 		renderError(w, r, errBadRequest(err.Error()))
 		return
 	}
@@ -394,7 +408,7 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
-		g.log.Error().Err(err).Msg("could not get thumbnail")
+		logger.Debug().Err(err).Msg("could not get thumbnail")
 		return
 	}
 
@@ -402,6 +416,7 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w http.ResponseWriter, r *http.Request) {
+	logger := g.log.SubloggerWithRequestID(r.Context())
 	client := &http.Client{
 		// Timeout: time.Second * 5,
 	}
@@ -409,7 +424,7 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 	dlReq, err := http.NewRequest(http.MethodGet, rsp.DataEndpoint, http.NoBody)
 	if err != nil {
 		renderError(w, r, errInternalError(err.Error()))
-		g.log.Error().Err(err).Msg("could not download thumbnail")
+		logger.Error().Err(err).Msg("could not create download thumbnail request")
 		return
 	}
 	dlReq.Header.Set("Transfer-Token", rsp.TransferToken)
@@ -417,13 +432,13 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 	dlRsp, err := client.Do(dlReq)
 	if err != nil {
 		renderError(w, r, errInternalError(err.Error()))
-		g.log.Error().Err(err).Msg("could not download thumbnail")
+		logger.Error().Err(err).Msg("could not download thumbnail: transport error")
 		return
 	}
 	defer dlRsp.Body.Close()
 
 	if dlRsp.StatusCode != http.StatusOK {
-		g.log.Error().
+		logger.Debug().
 			Str("transfer_token", rsp.TransferToken).
 			Str("data_endpoint", rsp.DataEndpoint).
 			Str("response_status", dlRsp.Status).
@@ -436,7 +451,7 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 	w.Header().Set("Content-Type", rsp.Mimetype)
 	_, err = io.Copy(w, dlRsp.Body)
 	if err != nil {
-		g.log.Error().Err(err).Msg("failed to write thumbnail to response writer")
+		logger.Error().Err(err).Msg("failed to write thumbnail to response writer")
 	}
 }
 

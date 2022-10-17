@@ -50,6 +50,8 @@ const (
 	QuotaLimitReached
 	// Unauthenticated the caller is not authenticated.
 	Unauthenticated
+	// PreconditionFailed the request cannot be made and this error response is sent back
+	PreconditionFailed
 )
 
 var errorCodes = [...]string{
@@ -69,6 +71,7 @@ var errorCodes = [...]string{
 	"serviceNotAvailable",
 	"quotaLimitReached",
 	"unauthenticated",
+	"preconditionFailed",
 }
 
 func New(e ErrorCode, msg string) Error {
@@ -82,7 +85,6 @@ func New(e ErrorCode, msg string) Error {
 func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int, msg string) {
 	innererror := map[string]interface{}{
 		"date": time.Now().UTC().Format(time.RFC3339),
-		// TODO return client-request-id?
 	}
 
 	innererror["request-id"] = middleware.GetReqID(r.Context())

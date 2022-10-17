@@ -40,9 +40,11 @@ func (i *CS3) UpdateUser(ctx context.Context, nameOrID string, user libregraph.U
 }
 
 func (i *CS3) GetUser(ctx context.Context, userID string, queryParam url.Values) (*libregraph.User, error) {
+	logger := i.Logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "cs3").Msg("GetUser")
 	client, err := pool.GetGatewayServiceClient(i.Config.Address)
 	if err != nil {
-		i.Logger.Error().Err(err).Msg("could not get client")
+		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get client")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	}
 
@@ -53,22 +55,24 @@ func (i *CS3) GetUser(ctx context.Context, userID string, queryParam url.Values)
 
 	switch {
 	case err != nil:
-		i.Logger.Error().Err(err).Str("userid", userID).Msg("error sending get user by claim id grpc request")
+		logger.Error().Str("backend", "cs3").Err(err).Str("userid", userID).Msg("error sending get user by claim id grpc request: transport error")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
 			return nil, errorcode.New(errorcode.ItemNotFound, res.Status.Message)
 		}
-		i.Logger.Error().Err(err).Str("userid", userID).Msg("error sending get user by claim id grpc request")
+		logger.Debug().Str("backend", "cs3").Err(err).Str("userid", userID).Msg("error sending get user by claim id grpc request")
 		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
 	}
 	return CreateUserModelFromCS3(res.User), nil
 }
 
 func (i *CS3) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error) {
+	logger := i.Logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "cs3").Msg("GetUsers")
 	client, err := pool.GetGatewayServiceClient(i.Config.Address)
 	if err != nil {
-		i.Logger.Error().Err(err).Msg("could not get client")
+		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get client")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	}
 
@@ -84,13 +88,13 @@ func (i *CS3) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregrap
 	})
 	switch {
 	case err != nil:
-		i.Logger.Error().Err(err).Str("search", search).Msg("error sending find users grpc request")
+		logger.Error().Str("backend", "cs3").Err(err).Str("search", search).Msg("error sending find users grpc request: transport error")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
 			return nil, errorcode.New(errorcode.ItemNotFound, res.Status.Message)
 		}
-		i.Logger.Error().Err(err).Str("search", search).Msg("error sending find users grpc request")
+		logger.Debug().Str("backend", "cs3").Err(err).Str("search", search).Msg("error sending find users grpc request")
 		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
 	}
 
@@ -104,9 +108,11 @@ func (i *CS3) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregrap
 }
 
 func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error) {
+	logger := i.Logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "cs3").Msg("GetGroups")
 	client, err := pool.GetGatewayServiceClient(i.Config.Address)
 	if err != nil {
-		i.Logger.Error().Err(err).Msg("could not get client")
+		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get client")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	}
 
@@ -123,13 +129,13 @@ func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregra
 
 	switch {
 	case err != nil:
-		i.Logger.Error().Err(err).Str("search", search).Msg("error sending find groups grpc request")
+		logger.Error().Str("backend", "cs3").Err(err).Str("search", search).Msg("error sending find groups grpc request: transport error")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
 			return nil, errorcode.New(errorcode.ItemNotFound, res.Status.Message)
 		}
-		i.Logger.Error().Err(err).Str("search", search).Msg("error sending find groups grpc request")
+		logger.Debug().Str("backend", "cs3").Err(err).Str("search", search).Msg("error sending find groups grpc request")
 		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
 	}
 
@@ -148,9 +154,11 @@ func (i *CS3) CreateGroup(ctx context.Context, group libregraph.Group) (*libregr
 }
 
 func (i *CS3) GetGroup(ctx context.Context, groupID string, queryParam url.Values) (*libregraph.Group, error) {
+	logger := i.Logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "cs3").Msg("GetGroup")
 	client, err := pool.GetGatewayServiceClient(i.Config.Address)
 	if err != nil {
-		i.Logger.Error().Err(err).Msg("could not get client")
+		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get client")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	}
 
@@ -161,13 +169,13 @@ func (i *CS3) GetGroup(ctx context.Context, groupID string, queryParam url.Value
 
 	switch {
 	case err != nil:
-		i.Logger.Error().Err(err).Str("groupid", groupID).Msg("error sending get group by claim id grpc request")
+		logger.Error().Str("backend", "cs3").Err(err).Str("groupid", groupID).Msg("error sending get group by claim id grpc request: transport error")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	case res.Status.Code != cs3rpc.Code_CODE_OK:
 		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
 			return nil, errorcode.New(errorcode.ItemNotFound, res.Status.Message)
 		}
-		i.Logger.Error().Err(err).Str("groupid", groupID).Msg("error sending get group by claim id grpc request")
+		logger.Debug().Str("backend", "cs3").Err(err).Str("groupid", groupID).Msg("error sending get group by claim id grpc request")
 		return nil, errorcode.New(errorcode.GeneralException, res.Status.Message)
 	}
 
