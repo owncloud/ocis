@@ -401,20 +401,28 @@ func (s eventsNotifier) handleVirusscanFinished(e events.VirusscanFinished) {
 		return
 	}
 
-	msg, err := email.RenderEmailTemplate("virusdetected.email.tmpl", map[string]string{
+	msg, err := email.RenderEmailTemplate("antivir/virusdetected.email.body.tmpl", map[string]string{
 		"ExecutingUser": e.ExecutingUser.Username,
 		"Virus":         e.Description,
 		"Outcome":       string(e.Outcome),
 		"Filename":      e.Filename,
 	}, s.emailTemplatePath)
 	if err != nil {
-		s.logger.Error().Str("events", "VirusscanFinished").Interface("resourceid", e.ResourceID).Str("uploadid", e.UploadID).Msg("can't render email template")
+		s.logger.Error().Str("events", "VirusscanFinished").Interface("resourceid", e.ResourceID).Str("uploadid", e.UploadID).Msg("can't render email body template")
 		return
 	}
 
 	ctx := ctxpkg.ContextSetUser(context.Background(), e.ExecutingUser)
 	senderDisplayName := "Owncloud"
-	emailSubject := "Virus detected"
+	emailSubject, err := email.RenderEmailTemplate("antivir/virusdetected.email.subject.tmpl", map[string]string{
+		"ExecutingUser": e.ExecutingUser.Username,
+		"Filename":      e.Filename,
+	}, s.emailTemplatePath)
+	if err != nil {
+		s.logger.Error().Str("events", "VirusscanFinished").Interface("resourceid", e.ResourceID).Str("uploadid", e.UploadID).Msg("can't render email subject template")
+		return
+	}
+
 	if err := s.channel.SendMessage(ctx, []string{e.ExecutingUser.GetId().GetOpaqueId()}, msg, emailSubject, senderDisplayName); err != nil {
 		s.logger.Error().Err(err).Str("event", "VirusScanFinished").Msg("failed to send a message")
 	}
