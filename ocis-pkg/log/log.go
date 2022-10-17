@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	RequestIDString = "request"
+	RequestIDString = "request-id"
 )
 
 func init() {

@@ -78,7 +78,7 @@ func (s Thumbnails) GetThumbnail(w http.ResponseWriter, r *http.Request) {
 
 	thumbnail, err := s.manager.GetThumbnail(key)
 	if err != nil {
-		logger.Error().
+		logger.Debug().
 			Err(err).
 			Str("key", key).
 			Msg("could not get the thumbnail")
