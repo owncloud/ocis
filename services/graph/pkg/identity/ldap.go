@@ -113,6 +113,8 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 // LDAP User Entry (using the inetOrgPerson LDAP Objectclass) add adds that to the
 // configured LDAP server
 func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregraph.User, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("CreateUser")
 	if !i.writeEnabled {
 		return nil, errReadOnly
 	}
@@ -165,7 +167,7 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 
 	if err := i.conn.Add(&ar); err != nil {
 		var lerr *ldap.Error
-		i.logger.Debug().Err(err).Msg("error adding user")
+		logger.Debug().Err(err).Msg("error adding user")
 		if errors.As(err, &lerr) {
 			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
 				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
@@ -175,7 +177,7 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 	}
 
 	if i.usePwModifyExOp && user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
-		if err := i.updateUserPassowrd(ar.DN, user.PasswordProfile.GetPassword()); err != nil {
+		if err := i.updateUserPassowrd(ctx, ar.DN, user.PasswordProfile.GetPassword()); err != nil {
 			return nil, err
 		}
 	}
@@ -191,6 +193,8 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 // DeleteUser implements the Backend Interface. It permanently deletes a User identified
 // by name or id from the LDAP server
 func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("DeleteUser")
 	if !i.writeEnabled {
 		return errReadOnly
 	}
@@ -209,13 +213,13 @@ func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 		return err
 	}
 	for _, group := range groupEntries {
-		i.logger.Debug().Str("group", group.DN).Str("user", e.DN).Msg("Cleaning up group membership")
+		logger.Debug().Str("group", group.DN).Str("user", e.DN).Msg("Cleaning up group membership")
 
 		if mr, err := i.removeMemberFromGroupEntry(group, e.DN); err == nil && mr != nil {
 			if err = i.conn.Modify(mr); err != nil {
 				// Errors when deleting the memberships are only logged as warnings but not returned
 				// to the user as we already successfully deleted the users itself
-				i.logger.Warn().Str("group", group.DN).Str("user", e.DN).Err(err).Msg("failed to remove member")
+				logger.Warn().Str("group", group.DN).Str("user", e.DN).Err(err).Msg("failed to remove member")
 			}
 		}
 	}
@@ -224,6 +228,8 @@ func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 
 // UpdateUser implements the Backend Interface for the LDAP Backend
 func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.User) (*libregraph.User, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("UpdateUser")
 	if !i.writeEnabled {
 		return nil, errReadOnly
 	}
@@ -264,7 +270,7 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	}
 	if user.PasswordProfile != nil && user.PasswordProfile.Password != nil && *user.PasswordProfile.Password != "" {
 		if i.usePwModifyExOp {
-			if err := i.updateUserPassowrd(e.DN, user.PasswordProfile.GetPassword()); err != nil {
+			if err := i.updateUserPassowrd(ctx, e.DN, user.PasswordProfile.GetPassword()); err != nil {
 				return nil, err
 			}
 		} else {
@@ -387,7 +393,8 @@ func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
 }
 
 func (i *LDAP) GetUser(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.User, error) {
-	i.logger.Debug().Str("backend", "ldap").Msg("GetUser")
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("GetUser")
 	e, err := i.getLDAPUserByNameOrID(nameOrID)
 	if err != nil {
 		return nil, err
@@ -412,7 +419,8 @@ func (i *LDAP) GetUser(ctx context.Context, nameOrID string, queryParam url.Valu
 }
 
 func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error) {
-	i.logger.Debug().Str("backend", "ldap").Msg("GetUsers")
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("GetUsers")
 
 	search := queryParam.Get("search")
 	if search == "" {
@@ -440,7 +448,7 @@ func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregra
 		},
 		nil,
 	)
-	i.logger.Debug().Str("backend", "ldap").
+	logger.Debug().Str("backend", "ldap").
 		Str("base", searchRequest.BaseDN).
 		Str("filter", searchRequest.Filter).
 		Int("scope", searchRequest.Scope).
@@ -494,7 +502,8 @@ func (i *LDAP) getGroupsForUser(dn string) ([]*ldap.Entry, error) {
 }
 
 func (i *LDAP) GetGroup(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.Group, error) {
-	i.logger.Debug().Str("backend", "ldap").Msg("GetGroup")
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("GetGroup")
 	e, err := i.getLDAPGroupByNameOrID(nameOrID, true)
 	if err != nil {
 		return nil, err
@@ -632,7 +641,8 @@ func (i *LDAP) removeMemberFromGroupEntry(group *ldap.Entry, memberDN string) (*
 }
 
 func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error) {
-	i.logger.Debug().Str("backend", "ldap").Msg("GetGroups")
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("GetGroups")
 
 	search := queryParam.Get("search")
 	if search == "" {
@@ -671,7 +681,7 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 		groupAttrs,
 		nil,
 	)
-	i.logger.Debug().Str("backend", "ldap").
+	logger.Debug().Str("backend", "ldap").
 		Str("base", searchRequest.BaseDN).
 		Str("filter", searchRequest.Filter).
 		Int("scope", searchRequest.Scope).
@@ -712,6 +722,8 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 
 // GetGroupMembers implements the Backend Interface for the LDAP Backend
 func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string) ([]*libregraph.User, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("GetGroupMembers")
 	e, err := i.getLDAPGroupByNameOrID(groupID, true)
 	if err != nil {
 		return nil, err
@@ -732,17 +744,19 @@ func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string) ([]*libregra
 }
 
 func (i *LDAP) expandLDAPGroupMembers(ctx context.Context, e *ldap.Entry) ([]*ldap.Entry, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("expandLDAPGroupMembers")
 	result := []*ldap.Entry{}
 
 	for _, memberDN := range e.GetEqualFoldAttributeValues(i.groupAttributeMap.member) {
 		if memberDN == "" {
 			continue
 		}
-		i.logger.Debug().Str("memberDN", memberDN).Msg("lookup")
+		logger.Debug().Str("memberDN", memberDN).Msg("lookup")
 		ue, err := i.getUserByDN(memberDN)
 		if err != nil {
 			// Ignore errors when reading a specific member fails, just log them and continue
-			i.logger.Warn().Err(err).Str("member", memberDN).Msg("error reading group member")
+			logger.Debug().Err(err).Str("member", memberDN).Msg("error reading group member")
 			continue
 		}
 		result = append(result, ue)
@@ -756,6 +770,8 @@ func (i *LDAP) expandLDAPGroupMembers(ctx context.Context, e *ldap.Entry) ([]*ld
 // As "groupOfNames" requires a "member" Attribute to be present. Empty Groups (groups
 // without a member) a represented by adding an empty DN as the single member.
 func (i *LDAP) CreateGroup(ctx context.Context, group libregraph.Group) (*libregraph.Group, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("create group")
 	if !i.writeEnabled {
 		return nil, errorcode.New(errorcode.NotAllowed, "server is configured read-only")
 	}
@@ -803,6 +819,8 @@ func (i *LDAP) CreateGroup(ctx context.Context, group libregraph.Group) (*libreg
 
 // DeleteGroup implements the Backend Interface.
 func (i *LDAP) DeleteGroup(ctx context.Context, id string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("DeleteGroup")
 	if !i.writeEnabled {
 		return errorcode.New(errorcode.NotAllowed, "server is configured read-only")
 	}
@@ -821,6 +839,8 @@ func (i *LDAP) DeleteGroup(ctx context.Context, id string) error {
 // Currently it is limited to adding Users as Group members. Adding other groups
 // as members is not yet implemented
 func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs []string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("AddMembersToGroup")
 	ge, err := i.getLDAPGroupByID(groupID, true)
 	if err != nil {
 		return err
@@ -843,7 +863,7 @@ func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs 
 		nCurrentMember, err := ldapdn.ParseNormalize(currentMember)
 		if err != nil {
 			// We couldn't parse the member value as a DN. Let's skip it, but log a warning
-			i.logger.Warn().Str("memberDN", currentMember).Err(err).Msg("Couldn't parse DN")
+			logger.Warn().Str("memberDN", currentMember).Err(err).Msg("Couldn't parse DN")
 			continue
 		}
 		currentSet[nCurrentMember] = struct{}{}
@@ -857,13 +877,13 @@ func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs 
 		}
 		nDN, err := ldapdn.ParseNormalize(me.DN)
 		if err != nil {
-			i.logger.Error().Str("new member", me.DN).Err(err).Msg("Couldn't parse DN")
+			logger.Error().Str("new member", me.DN).Err(err).Msg("Couldn't parse DN")
 			return err
 		}
 		if _, present := currentSet[nDN]; !present {
 			newMemberDNs = append(newMemberDNs, me.DN)
 		} else {
-			i.logger.Debug().Str("memberDN", me.DN).Msg("Member already present in group. Skipping")
+			logger.Debug().Str("memberDN", me.DN).Msg("Member already present in group. Skipping")
 		}
 	}
 
@@ -879,17 +899,19 @@ func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs 
 
 // RemoveMemberFromGroup implements the Backend Interface.
 func (i *LDAP) RemoveMemberFromGroup(ctx context.Context, groupID string, memberID string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("RemoveMemberFromGroup")
 	ge, err := i.getLDAPGroupByID(groupID, true)
 	if err != nil {
-		i.logger.Warn().Str("backend", "ldap").Str("groupID", groupID).Msg("Error looking up group")
+		logger.Debug().Str("backend", "ldap").Str("groupID", groupID).Msg("Error looking up group")
 		return err
 	}
 	me, err := i.getLDAPUserByID(memberID)
 	if err != nil {
-		i.logger.Warn().Str("backend", "ldap").Str("memberID", memberID).Msg("Error looking up group member")
+		logger.Debug().Str("backend", "ldap").Str("memberID", memberID).Msg("Error looking up group member")
 		return err
 	}
-	i.logger.Debug().Str("backend", "ldap").Str("groupdn", ge.DN).Str("member", me.DN).Msg("remove member")
+	logger.Debug().Str("backend", "ldap").Str("groupdn", ge.DN).Str("member", me.DN).Msg("remove member")
 
 	if mr, err := i.removeMemberFromGroupEntry(ge, me.DN); err == nil && mr != nil {
 		return i.conn.Modify(mr)
@@ -897,7 +919,9 @@ func (i *LDAP) RemoveMemberFromGroup(ctx context.Context, groupID string, member
 	return nil
 }
 
-func (i *LDAP) updateUserPassowrd(dn, password string) error {
+func (i *LDAP) updateUserPassowrd(ctx context.Context, dn, password string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("updateUserPassowrd")
 	pwMod := ldap.PasswordModifyRequest{
 		UserIdentity: dn,
 		NewPassword:  password,
@@ -907,7 +931,7 @@ func (i *LDAP) updateUserPassowrd(dn, password string) error {
 	_, err := i.conn.PasswordModify(&pwMod)
 	if err != nil {
 		var lerr *ldap.Error
-		i.logger.Debug().Err(err).Msg("error setting password for user")
+		logger.Debug().Err(err).Msg("error setting password for user")
 		if errors.As(err, &lerr) {
 			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
 				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())

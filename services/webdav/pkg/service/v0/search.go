@@ -31,16 +31,17 @@ const (
 
 // Search is the endpoint for retrieving search results for REPORT requests
 func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
+	logger := g.log.SubloggerWithRequestID(r.Context())
 	rep, err := readReport(r.Body)
 	if err != nil {
 		renderError(w, r, errBadRequest(err.Error()))
-		g.log.Error().Err(err).Msg("error reading report")
+		logger.Debug().Err(err).Msg("error reading report")
 		return
 	}
 
 	if rep.SearchFiles == nil {
 		renderError(w, r, errBadRequest("missing search-files tag"))
-		g.log.Error().Err(err).Msg("error reading report")
+		logger.Debug().Err(err).Msg("error reading report")
 		return
 	}
 
@@ -58,7 +59,7 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 		space := strings.TrimPrefix(r.URL.Path, "/dav/spaces/")
 		rid, err := storagespace.ParseID(space)
 		if err != nil {
-			g.log.Error().Err(err).Msg("error parsing the space id for filtering")
+			logger.Debug().Err(err).Msg("error parsing the space id for filtering")
 		} else {
 			req.Ref = &searchmsg.Reference{
 				ResourceId: &searchmsg.ResourceID{
@@ -79,7 +80,7 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
-		g.log.Error().Err(err).Msg("could not get search results")
+		logger.Error().Err(err).Msg("could not get search results")
 		return
 	}
 
@@ -87,9 +88,10 @@ func (g Webdav) Search(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.ResponseWriter, r *http.Request) {
+	logger := g.log.SubloggerWithRequestID(r.Context())
 	responsesXML, err := multistatusResponse(r.Context(), rsp.Matches)
 	if err != nil {
-		g.log.Error().Err(err).Msg("error formatting propfind")
+		logger.Error().Err(err).Msg("error formatting propfind")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -100,7 +102,7 @@ func (g Webdav) sendSearchResponse(rsp *searchsvc.SearchResponse, w http.Respons
 	}
 	w.WriteHeader(http.StatusMultiStatus)
 	if _, err := w.Write(responsesXML); err != nil {
-		g.log.Err(err).Msg("error writing response")
+		logger.Err(err).Msg("error writing response")
 	}
 }
 
