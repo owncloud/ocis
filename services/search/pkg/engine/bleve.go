@@ -114,9 +114,6 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 // Returns a SearchIndexResponse object or an error.
 func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error) {
 	q := bleve.NewConjunctionQuery(
-		&query.QueryStringQuery{
-			Query: b.buildQuery(sir.Query),
-		},
 		// Skip documents that have been marked as deleted
 		&query.BoolFieldQuery{
 			Bool:     false,
@@ -132,9 +129,13 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 				},
 			),
 		},
-		// Limit search to this directory in the space
+		// investigate what's wrong and why this is slow, see filter in for loop workaround
+		//&query.PrefixQuery{
+		//	Prefix:   escapeQuery(utils.MakeRelativePath(path.Join(sir.Ref.Path, "/"))),
+		//	FieldVal: "Path",
+		//},
 		&query.QueryStringQuery{
-			Query: fmt.Sprintf("Path:%s*", escapeQuery(utils.MakeRelativePath(path.Join(sir.Ref.Path, "/")))),
+			Query: b.buildQuery(sir.Query),
 		},
 	)
 
@@ -157,6 +158,14 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 
 	matches := []*searchMessage.Match{}
 	for _, hit := range res.Hits {
+		// Limit search to this directory in the space
+		if !strings.HasPrefix(
+			getValue[string](hit.Fields, "Path"),
+			escapeQuery(utils.MakeRelativePath(path.Join(sir.Ref.Path, "/"))),
+		) {
+			continue
+		}
+
 		rootID, err := storagespace.ParseID(getValue[string](hit.Fields, "RootID"))
 		if err != nil {
 			return nil, err
