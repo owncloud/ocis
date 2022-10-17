@@ -724,6 +724,7 @@ Feature: copy file
     When user "Alice" downloads version of the file "/newfolder/insideSpace.txt" with the index "1" of the space "Project" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded content should be "old content version 2"
+    And as "Alice" file "insideSpace.txt" should not exist in the trashbin of the space "Project"
 
 
   Scenario: Copying a file from Personal to Shares Jail with an option "keep both"
@@ -766,3 +767,4 @@ Feature: copy file
     When user "Brian" downloads version of the file "/newfolder/personal.txt" with the index "2" of the space "Shares Jail" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded content should be "old content version 1"
+    And as "Brian" file "insideSpace.txt" should not exist in the trashbin of the space "Personal"
