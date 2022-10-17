@@ -28,7 +28,8 @@ Feature:
 
 
   Scenario: overwrite a received file share
-    Given user "Alice" has uploaded file with content "this is the old content" to "/textfile1.txt"
+    Given user "Alice" has uploaded file with content "old content version 1" to "/textfile1.txt"
+    And user "Alice" has uploaded file with content "old content version 2" to "/textfile1.txt"
     And user "Alice" has shared file "/textfile1.txt" with user "Brian"
     And user "Brian" has accepted share "/textfile1.txt" offered by user "Alice"
     When user "Brian" uploads a file inside space "Shares Jail" with content "this is a new content" to "textfile1.txt" using the WebDAV API
@@ -37,3 +38,9 @@ Feature:
       | textfile1.txt |
     And for user "Brian" the content of the file "/textfile1.txt" of the space "Shares Jail" should be "this is a new content"
     And for user "Alice" the content of the file "/textfile1.txt" of the space "Personal" should be "this is a new content"
+    When user "Alice" downloads version of the file "/textfile1.txt" with the index "2" of the space "Personal" using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "old content version 1"
+    When user "Brian" downloads version of the file "/textfile1.txt" with the index "1" of the space "Shares Jail" using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "old content version 2"

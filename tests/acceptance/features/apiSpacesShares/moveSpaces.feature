@@ -300,3 +300,21 @@ Feature: move (rename) file
       | testsubfolder |
     And for user "Brian" the space "Personal" should not contain these entries:
       | /testshare/testsubfolder |
+
+   Scenario: Overwriting a file while moving
+    Given user "Brian" has created folder "/folder"
+    And user "Brian" has uploaded file with content "old content version 1" to "/folder/testfile.txt"
+    And user "Brian" has uploaded file with content "old content version 2" to "/folder/testfile.txt"
+    And user "Brian" has uploaded file with content "new data" to "/testfile.txt"
+    When user "Brian" overwrites file "/testfile.txt" from space "Personal" to "folder/testfile.txt" inside space "Personal" while moving using the WebDAV API
+    Then the HTTP status code should be "204"
+    And the content of file "/folder/testfile.txt" for user "Brian" should be "new data"
+    And for user "Brian" the space "Personal" should not contain these entries:
+      | /testfile.txt |
+    When user "Brian" downloads version of the file "/folder/testfile.txt" with the index "1" of the space "Personal" using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "old content version 2"
+    When user "Brian" downloads version of the file "/folder/testfile.txt" with the index "2" of the space "Personal" using the WebDAV API
+    Then the HTTP status code should be "200"
+    And the downloaded content should be "old content version 1"
+

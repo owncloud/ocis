@@ -1674,6 +1674,38 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" overwrites file "([^"]*)" from space "([^"]*)" to "([^"]*)" inside space "([^"]*)" while (copying|moving)\s? using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $fileSource
+	 * @param string $fromSpaceName
+	 * @param string $fileDestination
+	 * @param string $toSpaceName
+	 * @param string $action
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userOverwritesFileFromAndToSpaceBetweenSpaces(
+		string $user,
+		string $fileSource,
+		string $fromSpaceName,
+		string $fileDestination,
+		string $toSpaceName,
+		string $action
+	):void {
+		$space = $this->getSpaceByName($user, $fromSpaceName);
+		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
+		$headers['Overwrite'] = 'T';
+		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
+		if ($action === 'copying') {
+			$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
+		} else {
+			$this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+		}
+	}
+
+	/**
 	 * @Then /^user "([^"]*)" should not be able to download file "([^"]*)" from space "([^"]*)"$/
 	 *
 	 * @param string $user
