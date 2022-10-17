@@ -31,6 +31,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add support for REPORT requests to /dav/spaces URLs: [#4661](https://github.com/owncloud/ocis/pull/4661)
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
 * Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
+* Enhancement - Logging improvements: [#4815](https://github.com/owncloud/ocis/pull/4815)
 * Enhancement - Secure the nats connectin with TLS: [#4781](https://github.com/owncloud/ocis/pull/4781)
 * Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
 * Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
@@ -227,6 +228,13 @@ The following sections list the changes for unreleased.
    available in the system anymore
 
    https://github.com/owncloud/ocis/issues/3713
+
+* Enhancement - Logging improvements: [#4815](https://github.com/owncloud/ocis/pull/4815)
+
+   We improved the logging of several http services. If possible and present, we now log the
+   `X-Request-Id`.
+
+   https://github.com/owncloud/ocis/pull/4815
 
 * Enhancement - Secure the nats connectin with TLS: [#4781](https://github.com/owncloud/ocis/pull/4781)
 
