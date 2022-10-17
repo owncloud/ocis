@@ -161,7 +161,7 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 		// Limit search to this directory in the space
 		if !strings.HasPrefix(
 			getValue[string](hit.Fields, "Path"),
-			escapeQuery(utils.MakeRelativePath(path.Join(sir.Ref.Path, "/"))),
+			utils.MakeRelativePath(path.Join(sir.Ref.Path, "/")),
 		) {
 			continue
 		}
