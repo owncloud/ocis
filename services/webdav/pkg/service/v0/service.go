@@ -243,7 +243,7 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
-		logger.Error().Err(err).Msg("could not get thumbnail")
+		logger.Debug().Err(err).Msg("could not get thumbnail")
 		return
 	}
 
@@ -407,7 +407,7 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 		default:
 			renderError(w, r, errInternalError(err.Error()))
 		}
-		logger.Error().Err(err).Msg("could not get thumbnail")
+		logger.Debug().Err(err).Msg("could not get thumbnail")
 		return
 	}
 
@@ -423,7 +423,7 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 	dlReq, err := http.NewRequest(http.MethodGet, rsp.DataEndpoint, http.NoBody)
 	if err != nil {
 		renderError(w, r, errInternalError(err.Error()))
-		logger.Error().Err(err).Msg("could not download thumbnail")
+		logger.Error().Err(err).Msg("could not create download thumbnail request")
 		return
 	}
 	dlReq.Header.Set("Transfer-Token", rsp.TransferToken)
@@ -431,13 +431,13 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 	dlRsp, err := client.Do(dlReq)
 	if err != nil {
 		renderError(w, r, errInternalError(err.Error()))
-		logger.Error().Err(err).Msg("could not download thumbnail")
+		logger.Error().Err(err).Msg("could not download thumbnail: transport error")
 		return
 	}
 	defer dlRsp.Body.Close()
 
 	if dlRsp.StatusCode != http.StatusOK {
-		logger.Error().
+		logger.Debug().
 			Str("transfer_token", rsp.TransferToken).
 			Str("data_endpoint", rsp.DataEndpoint).
 			Str("response_status", dlRsp.Status).

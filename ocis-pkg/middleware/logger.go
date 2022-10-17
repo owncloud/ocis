@@ -17,7 +17,7 @@ func Logger(logger log.Logger) func(http.Handler) http.Handler {
 			next.ServeHTTP(wrap, r)
 
 			logger.Debug().
-				Str("request", r.Header.Get("X-Request-ID")).
+				Str(log.RequestIDString, r.Header.Get("X-Request-ID")).
 				Str("proto", r.Proto).
 				Str("method", r.Method).
 				Int("status", wrap.Status()).

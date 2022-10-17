@@ -399,7 +399,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	logger.Debug().Interface("request", updateSpaceRequest).Msg("calling update space on backend")
+	logger.Debug().Interface("payload", updateSpaceRequest).Msg("calling update space on backend")
 	resp, err := client.UpdateStorageSpace(r.Context(), updateSpaceRequest)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not update drive: transport error")
