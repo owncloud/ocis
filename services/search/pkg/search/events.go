@@ -48,43 +48,49 @@ func HandleEvents(eng engine.Engine, extractor content.Extractor, gw gateway.Gat
 		return err
 	}
 
-	go func(eh *eventHandler, ch <-chan interface{}) {
-		for e := range ch {
-			eh.logger.Debug().Interface("event", e).Msg("updating index")
+	if cfg.Events.NumConsumers == 0 {
+		cfg.Events.NumConsumers = 1
+	}
 
-			switch ev := e.(type) {
-			case events.ItemTrashed:
-				eh.trashItem(ev.ID)
-			case events.ItemMoved:
-				eh.moveItem(ev.Ref, ev.Executant)
-			case events.ItemRestored:
-				eh.restoreItem(ev.Ref, ev.Executant)
-			case events.ContainerCreated:
-				eh.upsertItem(ev.Ref, ev.Executant)
-			case events.FileTouched:
-				eh.upsertItem(ev.Ref, ev.Executant)
-			case events.FileVersionRestored:
-				eh.upsertItem(ev.Ref, ev.Executant)
-			case events.FileUploaded:
-				eh.upsertItem(ev.Ref, ev.Executant)
-			case events.UploadReady:
-				eh.upsertItem(ev.FileRef, ev.ExecutingUser.Id)
-			case events.TagsAdded:
-				eh.upsertItem(ev.Ref, ev.Executant)
-			case events.TagsRemoved:
-				eh.upsertItem(ev.Ref, ev.Executant)
+	for i := 0; i < cfg.Events.NumConsumers; i++ {
+		go func(eh *eventHandler, ch <-chan interface{}) {
+			for e := range ch {
+				eh.logger.Debug().Interface("event", e).Msg("updating index")
+
+				switch ev := e.(type) {
+				case events.ItemTrashed:
+					eh.trashItem(ev.ID)
+				case events.ItemMoved:
+					eh.moveItem(ev.Ref, ev.Executant)
+				case events.ItemRestored:
+					eh.restoreItem(ev.Ref, ev.Executant)
+				case events.ContainerCreated:
+					eh.upsertItem(ev.Ref, ev.Executant)
+				case events.FileTouched:
+					eh.upsertItem(ev.Ref, ev.Executant)
+				case events.FileVersionRestored:
+					eh.upsertItem(ev.Ref, ev.Executant)
+				case events.FileUploaded:
+					eh.upsertItem(ev.Ref, ev.Executant)
+				case events.UploadReady:
+					eh.upsertItem(ev.FileRef, ev.ExecutingUser.Id)
+				case events.TagsAdded:
+					eh.upsertItem(ev.Ref, ev.Executant)
+				case events.TagsRemoved:
+					eh.upsertItem(ev.Ref, ev.Executant)
+				}
 			}
-		}
-	}(
-		&eventHandler{
-			logger:    logger,
-			engine:    eng,
-			secret:    cfg.MachineAuthAPIKey,
-			gateway:   gw,
-			extractor: extractor,
-		},
-		ch,
-	)
+		}(
+			&eventHandler{
+				logger:    logger,
+				engine:    eng,
+				secret:    cfg.MachineAuthAPIKey,
+				gateway:   gw,
+				extractor: extractor,
+			},
+			ch,
+		)
+	}
 
 	return nil
 }
