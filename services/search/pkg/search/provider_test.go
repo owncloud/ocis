@@ -2,22 +2,25 @@ package search_test
 
 import (
 	"context"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
-	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	contentMocks "github.com/owncloud/ocis/v2/services/search/pkg/content/mocks"
 	engineMocks "github.com/owncloud/ocis/v2/services/search/pkg/engine/mocks"
+	indexerMocks "github.com/owncloud/ocis/v2/services/search/pkg/indexer/mocks"
 	"github.com/owncloud/ocis/v2/services/search/pkg/search"
+
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -27,6 +30,7 @@ var _ = Describe("Searchprovider", func() {
 		extractor   *contentMocks.Extractor
 		gw          *cs3mocks.GatewayAPIClient
 		indexClient *engineMocks.Engine
+		indexer     *indexerMocks.Indexer
 		ctx         context.Context
 		logger      = log.NewLogger()
 		user        = &userv1beta1.User{
@@ -62,8 +66,9 @@ var _ = Describe("Searchprovider", func() {
 				StorageId: "storageid",
 				OpaqueId:  "parentopaqueid",
 			},
-			Path: "foo.pdf",
-			Size: 12345,
+			Path:  "foo.pdf",
+			Size:  12345,
+			Mtime: utils.TimeToTS(time.Now().Add(-time.Hour)),
 		}
 	)
 
@@ -72,8 +77,9 @@ var _ = Describe("Searchprovider", func() {
 		gw = &cs3mocks.GatewayAPIClient{}
 		indexClient = &engineMocks.Engine{}
 		extractor = &contentMocks.Extractor{}
+		indexer = &indexerMocks.Indexer{}
 
-		p = search.NewProvider(gw, indexClient, extractor, logger, "")
+		p = search.NewProvider(gw, indexClient, extractor, indexer, logger)
 
 		gw.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
 			Status: status.NewOK(ctx),
@@ -94,7 +100,7 @@ var _ = Describe("Searchprovider", func() {
 
 	Describe("New", func() {
 		It("returns a new instance", func() {
-			p := search.NewProvider(gw, indexClient, extractor, logger, "")
+			p := search.NewProvider(gw, indexClient, extractor, indexer, logger)
 			Expect(p).ToNot(BeNil())
 		})
 	})
@@ -105,8 +111,7 @@ var _ = Describe("Searchprovider", func() {
 				Status: status.NewOK(context.Background()),
 				User:   user,
 			}, nil)
-			extractor.Mock.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
-			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
+			indexer.On("IndexSpace", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 			res, err := p.IndexSpace(ctx, &searchsvc.IndexSpaceRequest{
 				SpaceId: "storageid$spaceid!spaceid",

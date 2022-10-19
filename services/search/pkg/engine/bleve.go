@@ -159,7 +159,7 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 	matches := []*searchMessage.Match{}
 	for _, hit := range res.Hits {
 		// Limit search to this directory in the space
-		if !strings.HasPrefix(
+		if sir.Ref != nil && !strings.HasPrefix(
 			getValue[string](hit.Fields, "Path"),
 			utils.MakeRelativePath(path.Join(sir.Ref.Path, "/")),
 		) {
@@ -195,7 +195,7 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 			},
 		}
 
-		if mtime, err := time.Parse(time.RFC3339, getValue[string](hit.Fields, "Mtime")); err == nil {
+		if mtime, err := time.Parse(time.RFC3339Nano, getValue[string](hit.Fields, "Mtime")); err == nil {
 			match.Entity.LastModifiedTime = &timestamppb.Timestamp{Seconds: mtime.Unix(), Nanos: int32(mtime.Nanosecond())}
 		}
 

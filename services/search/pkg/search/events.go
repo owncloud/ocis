@@ -82,6 +82,13 @@ func HandleEvents(eng engine.Engine, extractor content.Extractor, gw gateway.Gat
 			secret:    cfg.MachineAuthAPIKey,
 			gateway:   gw,
 			extractor: extractor,
+			indexer:   indexer,
+			indexSpaceDebouncer: NewSpaceDebouncer(50*time.Millisecond, func(id *provider.StorageSpaceId, userID *user.UserId) {
+				err := indexer.IndexSpace(context.Background(), id, userID)
+				if err != nil {
+					logger.Error().Err(err).Interface("spaceID", id).Interface("userID", userID).Msg("error while indexing a space")
+				}
+			}),
 		},
 		ch,
 	)
@@ -96,35 +103,18 @@ func (eh *eventHandler) trashItem(rid *provider.ResourceId) {
 	}
 }
 
-func (eh *eventHandler) upsertItem(ref *provider.Reference, uid *user.UserId) {
-	ctx, stat, path := eh.resInfo(uid, ref)
-	if ctx == nil || stat == nil || path == "" {
-		return
-	}
-
-	doc, err := eh.extractor.Extract(ctx, stat.Info)
-	if err != nil {
-		eh.logger.Error().Err(err).Msg("failed to extract resource content")
-		return
-	}
-
-	r := engine.Resource{
-		ID: storagespace.FormatResourceID(*stat.Info.Id),
-		RootID: storagespace.FormatResourceID(provider.ResourceId{
-			StorageId: stat.Info.Id.StorageId,
-			OpaqueId:  stat.Info.Id.SpaceId,
-			SpaceId:   stat.Info.Id.SpaceId,
+func (eh *eventHandler) reindexSpace(ev interface{}, ref *provider.Reference, executant, owner *user.UserId) {
+	eh.logger.Debug().Interface("event", ev).Msg("resource has been changed, scheduling a space resync")
+	spaceID := &provider.StorageSpaceId{
+		OpaqueId: storagespace.FormatResourceID(provider.ResourceId{
+			StorageId: ref.GetResourceId().GetStorageId(),
+			SpaceId:   ref.GetResourceId().GetSpaceId(),
 		}),
-		ParentID: storagespace.FormatResourceID(*stat.GetInfo().GetParentId()),
-		Path:     utils.MakeRelativePath(path),
-		Type:     uint64(stat.Info.Type),
-		Document: doc,
 	}
-
-	if err = eh.engine.Upsert(r.ID, r); err != nil {
-		eh.logger.Error().Err(err).Msg("error adding updating the resource in the index")
+	if owner != nil {
+		eh.indexSpaceDebouncer.Debounce(spaceID, owner)
 	} else {
-		logDocCount(eh.engine, eh.logger)
+		eh.indexSpaceDebouncer.Debounce(spaceID, executant)
 	}
 }
 

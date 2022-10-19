@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/urfave/cli/v2"
+	"go-micro.dev/v4/client"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
@@ -35,7 +37,7 @@ func Index(cfg *config.Config) *cli.Command {
 			},
 		},
 		Before: func(c *cli.Context) error {
-			return parser.ParseConfig(cfg)
+			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
 			client := searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.Client(grpc.RequestTimeout(60*time.Second)))

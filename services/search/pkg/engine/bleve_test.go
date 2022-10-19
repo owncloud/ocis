@@ -3,9 +3,11 @@ package engine_test
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/blevesearch/bleve/v2"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
@@ -78,16 +80,23 @@ var _ = Describe("Bleve", func() {
 
 	Describe("Search", func() {
 		Context("by other fields than filename", func() {
-			It("finds files by tags", func() {
-				rid := sprovider.ResourceId{
+			var rid sprovider.ResourceId
+
+			BeforeEach(func() {
+				rid = sprovider.ResourceId{
 					StorageId: "1",
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				r := createEntity(rid, "p", content.Document{Tags: []string{"foo", "bar"}})
+				r := createEntity(rid, "p", content.Document{
+					Mtime: time.Now().Format(time.RFC3339Nano),
+					Tags:  []string{"foo", "bar"},
+				})
 				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
+			})
 
+			It("finds files by tags", func() {
 				assertDocCount(rid, `Tags:foo`, 1)
 				assertDocCount(rid, `Tags:bar`, 1)
 				assertDocCount(rid, `Tags:foo Tags:bar`, 1)

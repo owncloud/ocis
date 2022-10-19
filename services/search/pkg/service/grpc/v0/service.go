@@ -17,6 +17,7 @@ import (
 	"github.com/jellydator/ttlcache/v2"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
+	"github.com/owncloud/ocis/v2/services/search/pkg/indexer"
 	"github.com/owncloud/ocis/v2/services/search/pkg/search"
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
@@ -103,8 +104,10 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, err
 	}
 
+	indexer := indexer.NewIndexer(gw, eng, extractor, logger, cfg.MachineAuthAPIKey)
+
 	// setup event handling
-	if err := search.HandleEvents(eng, extractor, gw, bus, logger, cfg); err != nil {
+	if err := search.HandleEvents(eng, extractor, gw, bus, indexer, logger, cfg); err != nil {
 		return nil, teardown, err
 	}
 
@@ -116,7 +119,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 	return &Service{
 		id:       cfg.GRPC.Namespace + "." + cfg.Service.Name,
 		log:      logger,
-		provider: search.NewProvider(gw, eng, extractor, logger, cfg.MachineAuthAPIKey),
+		provider: search.NewProvider(gw, eng, extractor, indexer, logger),
 		cache:    cache,
 	}, teardown, nil
 }

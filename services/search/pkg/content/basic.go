@@ -34,7 +34,7 @@ func (b Basic) Extract(_ context.Context, ri *storageProvider.ResourceInfo) (Doc
 	}
 
 	if ri.Mtime != nil {
-		doc.Mtime = time.Unix(int64(ri.Mtime.Seconds), int64(ri.Mtime.Nanos)).UTC().Format(time.RFC3339)
+		doc.Mtime = time.Unix(int64(ri.Mtime.Seconds), int64(ri.Mtime.Nanos)).UTC().Format(time.RFC3339Nano)
 	}
 
 	return doc, nil

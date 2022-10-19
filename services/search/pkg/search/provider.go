@@ -3,25 +3,22 @@ package search
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 	"sort"
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
 	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
-	"google.golang.org/grpc/metadata"
+	"github.com/owncloud/ocis/v2/services/search/pkg/indexer"
 
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
@@ -64,21 +61,20 @@ type Provider struct {
 	gateway   gateway.GatewayAPIClient
 	engine    engine.Engine
 	extractor content.Extractor
-	secret    string
+	indexer   indexer.Indexer
 }
 
 // NewProvider creates a new Provider instance.
-func NewProvider(gw gateway.GatewayAPIClient, eng engine.Engine, extractor content.Extractor, logger log.Logger, secret string) *Provider {
+func NewProvider(gw gateway.GatewayAPIClient, eng engine.Engine, extractor content.Extractor, indexer indexer.Indexer, logger log.Logger) *Provider {
 	return &Provider{
 		gateway:   gw,
 		engine:    eng,
-		secret:    secret,
 		logger:    logger,
 		extractor: extractor,
+		indexer:   indexer,
 	}
 }
 
-// Search processes a search request and passes it down to the engine.
 func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error) {
 	if req.Query == "" {
 		return nil, errtypes.BadRequest("empty query provided")
@@ -224,76 +220,10 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 
 // IndexSpace (re)indexes all resources of a given space.
 func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequest) (*searchsvc.IndexSpaceResponse, error) {
-	// Get auth context
-	authRes, err := p.gateway.Authenticate(ctx, &gateway.AuthenticateRequest{
-		Type:         "machine",
-		ClientId:     "userid:" + req.UserId,
-		ClientSecret: p.secret,
-	})
-	if err != nil || authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, err
-	}
-
-	if authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("could not get authenticated context for user")
-	}
-	ownerCtx := ctxpkg.ContextSetUser(context.Background(), authRes.User)
-	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
-
-	// Walk the space and index all files
-	w := walker.NewWalker(p.gateway)
-	rootID, err := storagespace.ParseID(req.SpaceId)
-	if err != nil {
-		p.logger.Error().Err(err).Msg(err.Error())
-		return nil, err
-	}
-	err = w.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
-		if err != nil {
-			p.logger.Error().Err(err).Msg("error walking the tree")
-		}
-		ref, err := ResolveReference(ownerCtx, &provider.Reference{
-			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
-			ResourceId: &rootID,
-		}, info, p.gateway)
-		if err != nil {
-			p.logger.Error().Err(err).Msg("error resolving reference")
-			return nil
-		}
-
-		doc, err := p.extractor.Extract(ownerCtx, info)
-		if err != nil {
-			p.logger.Error().Err(err).Msg("error extracting content")
-		}
-
-		var pid string
-		if info.ParentId != nil {
-			pid = storagespace.FormatResourceID(*info.ParentId)
-		}
-		r := engine.Resource{
-			ID: storagespace.FormatResourceID(*info.Id),
-			RootID: storagespace.FormatResourceID(provider.ResourceId{
-				StorageId: info.Id.StorageId,
-				OpaqueId:  info.Id.SpaceId,
-				SpaceId:   info.Id.SpaceId,
-			}),
-			ParentID: pid,
-			Path:     ref.Path,
-			Type:     uint64(info.Type),
-			Document: doc,
-		}
-
-		err = p.engine.Upsert(r.ID, r)
-		if err != nil {
-			p.logger.Error().Err(err).Msg("error adding resource to the index")
-		} else {
-			p.logger.Debug().Interface("ref", ref).Msg("added resource to index")
-		}
-		return nil
-	})
+	err := p.indexer.IndexSpace(ctx, &provider.StorageSpaceId{OpaqueId: req.SpaceId}, &user.UserId{OpaqueId: req.UserId})
 	if err != nil {
 		return nil, err
 	}
-
 	return &searchsvc.IndexSpaceResponse{}, nil
 }
 

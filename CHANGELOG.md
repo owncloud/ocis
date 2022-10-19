@@ -19,6 +19,8 @@ The following sections list the changes for unreleased.
 * Bugfix - Disable cache for selected static web assets: [#4809](https://github.com/owncloud/ocis/pull/4809)
 * Bugfix - Fix unfindable entities from shares/publicshares: [#4651](https://github.com/owncloud/ocis/pull/4651)
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
+* Bugfix - Remove the storage-users event configuration: [#4825](https://github.com/owncloud/ocis/pull/4825)
+* Bugfix - Trigger a rescan of spaces in the search index when items have changed: [#4777](https://github.com/owncloud/ocis/pull/4777)
 * Bugfix - Make tokeninfo endpoint unprotected: [#4715](https://github.com/owncloud/ocis/pull/4715)
 * Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
 * Enhancement - Add curl to the oCIS OCI image: [#4751](https://github.com/owncloud/ocis/pull/4751)
@@ -29,6 +31,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add support for REPORT requests to /dav/spaces URLs: [#4661](https://github.com/owncloud/ocis/pull/4661)
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
 * Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
+* Enhancement - Logging improvements: [#4815](https://github.com/owncloud/ocis/pull/4815)
 * Enhancement - Secure the nats connectin with TLS: [#4781](https://github.com/owncloud/ocis/pull/4781)
 * Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
 * Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
@@ -141,6 +144,21 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4582
 
+* Bugfix - Remove the storage-users event configuration: [#4825](https://github.com/owncloud/ocis/pull/4825)
+
+   We've removed the events configuration from the storage-users section because it is not
+   needed.
+
+   https://github.com/owncloud/ocis/pull/4825
+
+* Bugfix - Trigger a rescan of spaces in the search index when items have changed: [#4777](https://github.com/owncloud/ocis/pull/4777)
+
+   The search service now scans spaces when items have been changed. This fixes the problem that
+   mtime and treesize propagation was not reflected in the search index properly.
+
+   https://github.com/owncloud/ocis/issues/4410
+   https://github.com/owncloud/ocis/pull/4777
+
 * Bugfix - Make tokeninfo endpoint unprotected: [#4715](https://github.com/owncloud/ocis/pull/4715)
 
    Make the tokeninfo endpoint unprotected as it is supposed to be available to the public.
@@ -210,6 +228,13 @@ The following sections list the changes for unreleased.
    available in the system anymore
 
    https://github.com/owncloud/ocis/issues/3713
+
+* Enhancement - Logging improvements: [#4815](https://github.com/owncloud/ocis/pull/4815)
+
+   We improved the logging of several http services. If possible and present, we now log the
+   `X-Request-Id`.
+
+   https://github.com/owncloud/ocis/pull/4815
 
 * Enhancement - Secure the nats connectin with TLS: [#4781](https://github.com/owncloud/ocis/pull/4781)
 
