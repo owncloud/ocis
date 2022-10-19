@@ -264,6 +264,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/4716
    https://github.com/owncloud/ocis/pull/4719
    https://github.com/owncloud/ocis/pull/4750
+   https://github.com/owncloud/ocis/pull/4833
 
 * Enhancement - Update ownCloud Web to v6.0.0-rc.2: [#4786](https://github.com/owncloud/ocis/pull/4786)
 
