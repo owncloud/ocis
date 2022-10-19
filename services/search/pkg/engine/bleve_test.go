@@ -104,6 +104,24 @@ var _ = Describe("Bleve", func() {
 				assertDocCount(rid, `Tags:foo Tags:bar Tags:baz`, 1)
 				assertDocCount(rid, `Tags:baz`, 0)
 			})
+
+			It("finds files by their id", func() {
+				assertDocCount(rid, "ID:"+storagespace.FormatResourceID(rid), 1)
+				assertDocCount(rid, "+ID:"+storagespace.FormatResourceID(rid), 1)
+
+				assertDocCount(rid, "+ID:"+storagespace.FormatResourceID(sprovider.ResourceId{
+					StorageId: "1",
+					SpaceId:   "2",
+					OpaqueId:  "doesnotexist",
+				}), 0)
+			})
+
+			It("finds files by their ID and Mtime", func() {
+				assertDocCount(rid, "ID:"+storagespace.FormatResourceID(rid)+" Mtime:>=\"2000-01-01T10:35:21.064277496+02:00\"", 1)
+				assertDocCount(rid, "+ID:"+storagespace.FormatResourceID(rid)+" +Mtime:>=\"2000-01-01T10:35:21.064277496+02:00\"", 1)
+
+				assertDocCount(rid, "+ID:"+storagespace.FormatResourceID(rid)+" +Mtime:>=\"2200-01-01T10:35:21.064277496+02:00\"", 0)
+			})
 		})
 
 		Context("by filename", func() {

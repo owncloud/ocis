@@ -171,7 +171,7 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 		}
 
 		res, err := p.engine.Search(ctx, &searchsvc.SearchIndexRequest{
-			Query: req.Query,
+			Query: formatQuery(req.Query),
 			Ref: &searchmsg.Reference{
 				ResourceId: searchRootID,
 				Path:       mountpointPrefix,
@@ -225,6 +225,24 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 		return nil, err
 	}
 	return &searchsvc.IndexSpaceResponse{}, nil
+}
+
+func formatQuery(q string) string {
+	query := q
+	fields := []string{"RootID:", "Path:", "ID:", "Name:", "Size:", "Mtime:", "MimeType:", "Type:"}
+	for _, field := range fields {
+		query = strings.ReplaceAll(query, strings.ToLower(field), field)
+	}
+
+	for _, f := range fields {
+		if strings.Contains(query, f) {
+			return query // Sophisticated field based search
+		}
+	}
+
+	wildcardTerm := "*" + strings.ReplaceAll(strings.ToLower(query), " ", `\ `) + "*"
+	// this is a basic filename search
+	return "Name:" + wildcardTerm + " Tags:" + wildcardTerm + " Content:" + query
 }
 
 // NOTE: this converts CS3 to WebDAV permissions
