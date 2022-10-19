@@ -2,30 +2,67 @@ package search
 
 import (
 	"context"
+	"sync"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
+	"github.com/owncloud/ocis/v2/services/search/pkg/indexer"
 )
+
+// SpaceDebouncer debounces operations on spaces for a configurable amount of time
+type SpaceDebouncer struct {
+	after   time.Duration
+	f       func(id *provider.StorageSpaceId, userID *user.UserId)
+	pending map[string]*time.Timer
+
+	mutex sync.Mutex
+}
+
+// NewSpaceDebouncer returns a new SpaceDebouncer instance
+func NewSpaceDebouncer(d time.Duration, f func(id *provider.StorageSpaceId, userID *user.UserId)) *SpaceDebouncer {
+	return &SpaceDebouncer{
+		after:   d,
+		f:       f,
+		pending: map[string]*time.Timer{},
+	}
+}
+
+// Debounce restars the debounce timer for the given space
+func (d *SpaceDebouncer) Debounce(id *provider.StorageSpaceId, userID *user.UserId) {
+	d.mutex.Lock()
+	defer d.mutex.Unlock()
+
+	if t := d.pending[id.OpaqueId]; t != nil {
+		t.Stop()
+	}
+
+	d.pending[id.OpaqueId] = time.AfterFunc(d.after, func() {
+		d.f(id, userID)
+	})
+}
 
 type eventHandler struct {
 	logger    log.Logger
 	engine    engine.Engine
 	gateway   gateway.GatewayAPIClient
 	extractor content.Extractor
+	indexer   indexer.Indexer
 	secret    string
+
+	indexSpaceDebouncer *SpaceDebouncer
 }
 
 // HandleEvents listens to the needed events,
 // it handles the whole resource indexing livecycle.
-func HandleEvents(eng engine.Engine, extractor content.Extractor, gw gateway.GatewayAPIClient, bus events.Consumer, logger log.Logger, cfg *config.Config) error {
+func HandleEvents(eng engine.Engine, extractor content.Extractor, gw gateway.GatewayAPIClient, bus events.Consumer, indexer indexer.Indexer, logger log.Logger, cfg *config.Config) error {
 	evts := []events.Unmarshaller{
 		events.ItemTrashed{},
 		events.ItemRestored{},

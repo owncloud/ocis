@@ -115,25 +115,30 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 			Bool:     false,
 			FieldVal: "Deleted",
 		},
-		&query.TermQuery{
-			FieldVal: "RootID",
-			Term: storagespace.FormatResourceID(
-				storageProvider.ResourceId{
-					StorageId: sir.Ref.GetResourceId().GetStorageId(),
-					SpaceId:   sir.Ref.GetResourceId().GetSpaceId(),
-					OpaqueId:  sir.Ref.GetResourceId().GetOpaqueId(),
-				},
-			),
-		},
-		// investigate what's wrong and why this is slow, see filter in for loop workaround
-		//&query.PrefixQuery{
-		//	Prefix:   escapeQuery(utils.MakeRelativePath(path.Join(sir.Ref.Path, "/"))),
-		//	FieldVal: "Path",
-		//},
 		&query.QueryStringQuery{
-			Query: b.buildQuery(sir.Query),
+			Query: sir.Query,
 		},
 	)
+	if sir.Ref != nil {
+		q = bleve.NewConjunctionQuery(
+			q,
+			&query.TermQuery{
+				FieldVal: "RootID",
+				Term: storagespace.FormatResourceID(
+					storageProvider.ResourceId{
+						StorageId: sir.Ref.GetResourceId().GetStorageId(),
+						SpaceId:   sir.Ref.GetResourceId().GetSpaceId(),
+						OpaqueId:  sir.Ref.GetResourceId().GetOpaqueId(),
+					},
+				),
+			},
+			// investigate what's wrong and why this is slow, see filter in for loop workaround
+			//&query.PrefixQuery{
+			//	Prefix:   escapeQuery(utils.MakeRelativePath(path.Join(sir.Ref.Path, "/"))),
+			//	FieldVal: "Path",
+			//},
+		)
+	}
 
 	bleveReq := bleve.NewSearchRequest(q)
 
