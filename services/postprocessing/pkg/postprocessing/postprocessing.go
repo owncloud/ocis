@@ -13,6 +13,7 @@ import (
 type Postprocessing struct {
 	id         string
 	url        string
+	spaceOwner *user.UserId
 	u          *user.User
 	m          map[events.Postprocessingstep]interface{}
 	filename   string
@@ -23,10 +24,11 @@ type Postprocessing struct {
 }
 
 // New returns a new postprocessing instance
-func New(uploadID string, uploadURL string, user *user.User, filename string, filesize uint64, resourceId *provider.ResourceId, c config.Postprocessing) *Postprocessing {
+func New(uploadID string, uploadURL string, spaceOwner *user.UserId, user *user.User, filename string, filesize uint64, resourceId *provider.ResourceId, c config.Postprocessing) *Postprocessing {
 	return &Postprocessing{
 		id:         uploadID,
 		url:        uploadURL,
+		spaceOwner: spaceOwner,
 		u:          user,
 		m:          make(map[events.Postprocessingstep]interface{}),
 		c:          c,
@@ -94,6 +96,7 @@ func (pp *Postprocessing) finished(outcome events.PostprocessingOutcome) events.
 	return events.PostprocessingFinished{
 		UploadID:      pp.id,
 		Result:        pp.m,
+		SpaceOwner:    pp.spaceOwner,
 		ExecutingUser: pp.u,
 		Filename:      pp.filename,
 		Outcome:       outcome,

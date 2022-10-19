@@ -55,24 +55,27 @@ func HandleEvents(eng engine.Engine, extractor content.Extractor, gw gateway.Gat
 			switch ev := e.(type) {
 			case events.ItemTrashed:
 				eh.trashItem(ev.ID)
+				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
 			case events.ItemMoved:
 				eh.moveItem(ev.Ref, ev.Executant)
+				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
 			case events.ItemRestored:
 				eh.restoreItem(ev.Ref, ev.Executant)
+				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
 			case events.ContainerCreated:
-				eh.upsertItem(ev.Ref, ev.Executant)
+				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
 			case events.FileTouched:
-				eh.upsertItem(ev.Ref, ev.Executant)
+				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
 			case events.FileVersionRestored:
-				eh.upsertItem(ev.Ref, ev.Executant)
+				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
 			case events.FileUploaded:
-				eh.upsertItem(ev.Ref, ev.Executant)
+				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
 			case events.UploadReady:
-				eh.upsertItem(ev.FileRef, ev.ExecutingUser.Id)
+				eh.reindexSpace(ev, ev.FileRef, ev.ExecutingUser.Id, ev.SpaceOwner)
 			case events.TagsAdded:
-				eh.upsertItem(ev.Ref, ev.Executant)
+				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
 			case events.TagsRemoved:
-				eh.upsertItem(ev.Ref, ev.Executant)
+				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
 			}
 		}
 	}(
