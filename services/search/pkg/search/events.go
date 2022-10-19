@@ -85,53 +85,59 @@ func HandleEvents(eng engine.Engine, extractor content.Extractor, gw gateway.Gat
 		return err
 	}
 
-	go func(eh *eventHandler, ch <-chan interface{}) {
-		for e := range ch {
-			eh.logger.Debug().Interface("event", e).Msg("updating index")
+	if cfg.Events.NumConsumers == 0 {
+		cfg.Events.NumConsumers = 1
+	}
 
-			switch ev := e.(type) {
-			case events.ItemTrashed:
-				eh.trashItem(ev.ID)
-				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
-			case events.ItemMoved:
-				eh.moveItem(ev.Ref, ev.Executant)
-				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
-			case events.ItemRestored:
-				eh.restoreItem(ev.Ref, ev.Executant)
-				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
-			case events.ContainerCreated:
-				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
-			case events.FileTouched:
-				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
-			case events.FileVersionRestored:
-				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
-			case events.FileUploaded:
-				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
-			case events.UploadReady:
-				eh.reindexSpace(ev, ev.FileRef, ev.ExecutingUser.Id, ev.SpaceOwner)
-			case events.TagsAdded:
-				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
-			case events.TagsRemoved:
-				eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
-			}
-		}
-	}(
-		&eventHandler{
-			logger:    logger,
-			engine:    eng,
-			secret:    cfg.MachineAuthAPIKey,
-			gateway:   gw,
-			extractor: extractor,
-			indexer:   indexer,
-			indexSpaceDebouncer: NewSpaceDebouncer(50*time.Millisecond, func(id *provider.StorageSpaceId, userID *user.UserId) {
-				err := indexer.IndexSpace(context.Background(), id, userID)
-				if err != nil {
-					logger.Error().Err(err).Interface("spaceID", id).Interface("userID", userID).Msg("error while indexing a space")
+	for i := 0; i < cfg.Events.NumConsumers; i++ {
+		go func(eh *eventHandler, ch <-chan interface{}) {
+			for e := range ch {
+				eh.logger.Debug().Interface("event", e).Msg("updating index")
+
+				switch ev := e.(type) {
+				case events.ItemTrashed:
+					eh.trashItem(ev.ID)
+					eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
+				case events.ItemMoved:
+					eh.moveItem(ev.Ref, ev.Executant)
+					eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
+				case events.ItemRestored:
+					eh.restoreItem(ev.Ref, ev.Executant)
+					eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
+				case events.ContainerCreated:
+					eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
+				case events.FileTouched:
+					eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
+				case events.FileVersionRestored:
+					eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
+				case events.FileUploaded:
+					eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
+				case events.UploadReady:
+					eh.reindexSpace(ev, ev.FileRef, ev.ExecutingUser.Id, ev.SpaceOwner)
+				case events.TagsAdded:
+					eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
+				case events.TagsRemoved:
+					eh.reindexSpace(ev, ev.Ref, ev.Executant, ev.SpaceOwner)
 				}
-			}),
-		},
-		ch,
-	)
+			}
+		}(
+			&eventHandler{
+				logger:    logger,
+				engine:    eng,
+				secret:    cfg.MachineAuthAPIKey,
+				gateway:   gw,
+				extractor: extractor,
+				indexer:   indexer,
+				indexSpaceDebouncer: NewSpaceDebouncer(50*time.Millisecond, func(id *provider.StorageSpaceId, userID *user.UserId) {
+					err := indexer.IndexSpace(context.Background(), id, userID)
+					if err != nil {
+						logger.Error().Err(err).Interface("spaceID", id).Interface("userID", userID).Msg("error while indexing a space")
+					}
+				}),
+			},
+			ch,
+		)
+	}
 
 	return nil
 }
