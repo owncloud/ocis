@@ -30,7 +30,7 @@ const (
 
 	// LanguageReadWriteID is the hardcoded setting UUID for the language read write permission
 	LanguageReadWriteID string = "7d81f103-0488-4853-bce5-98dcce36d649"
-	// LanguageReadWriteID is the hardcoded setting name for the language read write permission
+	// LanguageReadWriteName is the hardcoded setting name for the language read write permission
 	LanguageReadWriteName string = "language-readwrite"
 
 	// SetSpaceQuotaPermissionID is the hardcoded setting UUID for the set space quota permission
