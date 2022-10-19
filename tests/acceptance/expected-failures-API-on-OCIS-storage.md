@@ -157,7 +157,7 @@ Synchronization features like etag propagation, setting mtime and locking files
 
 File and sync features in a shared scenario
 
-#### [Searching sharee with displayname](https://github.com/owncloud/ocis/issues/547)
+#### [ocs sharing api always returns an empty exact list while searching for a sharee](https://github.com/owncloud/ocis/issues/4265)
 
 - [apiSharees/sharees.feature:350](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L350)
 - [apiSharees/sharees.feature:351](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharees/sharees.feature#L351)
@@ -506,10 +506,6 @@ _ocs: api compatibility, return correct status code_
 
 API, search, favorites, config, capabilities, not existing endpoints, CORS and others
 
-#### [no robots.txt available](https://github.com/owncloud/ocis/issues/1314)
-
-- [apiMain/main.feature:5](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiMain/main.feature#L5)
-
 #### [Ability to return error messages in Webdav response bodies](https://github.com/owncloud/ocis/issues/1293)
 
 - [apiAuthOcs/ocsDELETEAuth.feature:10](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsDELETEAuth.feature#L10)
@@ -580,14 +576,11 @@ _ocdav: api compatibility, return correct status code_
 #### [[old/new/spaces] In ocis and oc10, REPORT request response differently](https://github.com/owncloud/ocis/issues/4712)
 
 - [apiWebdavOperations/search.feature:207](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L207)
+- [apiWebdavOperations/search.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L208)
 - [apiWebdavOperations/search.feature:213](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L213)
 - [apiWebdavOperations/search.feature:239](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L239)
-- [apiWebdavOperations/search.feature:245](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L245)
-
-### [No permissions property in response while searching for files and folders on ocis with new webdav](https://github.com/owncloud/ocis/issues/4009)
-
-- [apiWebdavOperations/search.feature:208](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L208)
 - [apiWebdavOperations/search.feature:240](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L240)
+- [apiWebdavOperations/search.feature:245](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/search.feature#L245)
 
 #### [Support for favorites](https://github.com/owncloud/ocis/issues/1228)
 
@@ -935,26 +928,20 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [Cannot disable the dav propfind depth infinity for resources](https://github.com/owncloud/ocis/issues/3720)
 
-- [apiWebdavOperations/listFiles.feature:398](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L398)
-- [apiWebdavOperations/listFiles.feature:399](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L399)
-- [apiWebdavOperations/listFiles.feature:404](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L404)
-- [apiWebdavOperations/listFiles.feature:423](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L423)
+- [apiWebdavOperations/listFiles.feature:384](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L384)
+- [apiWebdavOperations/listFiles.feature:385](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L385)
+- [apiWebdavOperations/listFiles.feature:390](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L390)
+- [apiWebdavOperations/listFiles.feature:409](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L409)
+- [apiWebdavOperations/listFiles.feature:414](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L414)
+- [apiWebdavOperations/listFiles.feature:429](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L429)
 - [apiWebdavOperations/listFiles.feature:428](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L428)
-- [apiWebdavOperations/listFiles.feature:443](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L443)
-- [apiWebdavOperations/listFiles.feature:442](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L442)
-- [apiWebdavOperations/listFiles.feature:448](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L448)
+- [apiWebdavOperations/listFiles.feature:434](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L434)
 
 #### [Renaming resource to excluded directory name is allowed in spaces webdav](https://github.com/owncloud/ocis/issues/3102)
 
 - [apiWebdavMove2/moveFileToExcludedDirectory.feature:26](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFileToExcludedDirectory.feature#L26)
 - [apiWebdavMove2/moveFileToExcludedDirectory.feature:43](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFileToExcludedDirectory.feature#L43)
 - [apiWebdavMove2/moveFileToExcludedDirectory.feature:84](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveFileToExcludedDirectory.feature#L84)
-
-#### [can't access public link resources with spaces webdav API](https://github.com/owncloud/ocis/issues/3085)
-
-- [apiWebdavOperations/listFiles.feature:218](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L218)
-- [apiWebdavOperations/listFiles.feature:256](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L256)
-- [apiWebdavOperations/listFiles.feature:293](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/listFiles.feature#L293)
 
 ### [graph/users: enable/disable users](https://github.com/owncloud/ocis/issues/3064)
 
