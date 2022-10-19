@@ -28,6 +28,11 @@ const (
 	// SettingsManagementPermissionName is the hardcoded setting name for the settings management permission
 	SettingsManagementPermissionName string = "settings-management"
 
+	// LanguageReadWriteID is the hardcoded setting UUID for the language read write permission
+	LanguageReadWriteID string = "7d81f103-0488-4853-bce5-98dcce36d649"
+	// LanguageReadWriteID is the hardcoded setting name for the language read write permission
+	LanguageReadWriteName string = "language-readwrite"
+
 	// SetSpaceQuotaPermissionID is the hardcoded setting UUID for the set space quota permission
 	SetSpaceQuotaPermissionID string = "4e6f9709-f9e7-44f1-95d4-b762d27b7896"
 	// SetSpaceQuotaPermissionName is the hardcoded setting name for the set space quota permission
@@ -124,8 +129,8 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				},
 			},
 			{
-				Id:          "7d81f103-0488-4853-bce5-98dcce36d649",
-				Name:        "language-readwrite",
+				Id:          LanguageReadWriteID,
+				Name:        LanguageReadWriteName,
 				DisplayName: "Permission to read and set the language (anyone)",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SETTING,
