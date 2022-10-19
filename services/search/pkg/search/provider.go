@@ -3,6 +3,7 @@ package search
 import (
 	"context"
 	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -229,7 +230,7 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 
 func formatQuery(q string) string {
 	query := q
-	fields := []string{"RootID:", "Path:", "ID:", "Name:", "Size:", "Mtime:", "MimeType:", "Type:"}
+	fields := []string{"Tags:", "RootID:", "Path:", "ID:", "Name:", "Size:", "Mtime:", "MimeType:", "Type:"}
 	for _, field := range fields {
 		query = strings.ReplaceAll(query, strings.ToLower(field), field)
 	}
@@ -240,9 +241,11 @@ func formatQuery(q string) string {
 		}
 	}
 
-	wildcardTerm := "*" + strings.ReplaceAll(strings.ToLower(query), " ", `\ `) + "*"
+	r := regexp.MustCompile(`([` + regexp.QuoteMeta("+-=&|><!(){}[]^\"~*?:\\/ ") + `])`)
+	term := r.ReplaceAllString(strings.ToLower(query), `\$1`)
+	wildcardTerm := "*" + term + "*"
 	// this is a basic filename search
-	return "Name:" + wildcardTerm + " Tags:" + wildcardTerm + " Content:" + query
+	return "Name:" + wildcardTerm + " Tags:" + wildcardTerm + " Content:" + term
 }
 
 // NOTE: this converts CS3 to WebDAV permissions
