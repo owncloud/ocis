@@ -8,6 +8,8 @@ const (
 	TEof Token = iota
 	// TUnknown unknown token type
 	TUnknown
+	// TAddition addition token type
+	TAddition
 	// TNegation negation token type
 	TNegation
 	// TQuotationMark quotation-mark token type, e.g. not of type - "-"

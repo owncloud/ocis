@@ -10,7 +10,8 @@ import (
 
 // Lexer is responsible for lexing the query.
 type Lexer struct {
-	r *bufio.Reader
+	r     *bufio.Reader
+	plain bool
 }
 
 // NewLexer creates a new Lexer
@@ -33,11 +34,16 @@ func (l *Lexer) Scan() (Token, string) {
 		}
 
 		if r == '"' {
+			l.plain = !l.plain
 			return TQuotationMark, ""
 		}
 
 		if r == '-' {
 			return TNegation, ""
+		}
+
+		if r == '+' {
+			return TAddition, ""
 		}
 
 		if r != ':' {
@@ -68,7 +74,7 @@ func (l *Lexer) scanUnknown(t Token) (Token, string) {
 			break
 		}
 
-		if r == ':' {
+		if r == ':' && !l.plain {
 			return TField, buf.String()
 		}
 
