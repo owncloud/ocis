@@ -41,4 +41,4 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 ### [Copy or move on an existing resource doesn't create a new version but deletes instead](https://github.com/owncloud/ocis/issues/4797)
 - [apiSpacesShares/moveSpaces.feature:304](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L304)
 - [apiSpacesShares/copySpaces.feature:711](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L711)
-- [apiSpacesShares/copySpaces.feature:748](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L748)
+- [apiSpacesShares/copySpaces.feature:749](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L749)
