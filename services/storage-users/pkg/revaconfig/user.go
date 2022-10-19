@@ -106,6 +106,7 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 				"natsclusterid":        cfg.Events.ClusterID,
 				"tlsinsecure":          cfg.Events.TLSInsecure,
 				"tlsrootcacertificate": cfg.Events.TLSRootCaCertPath,
+				"numconsumers":         cfg.Events.NumConsumers,
 			},
 			"tokens": map[string]interface{}{
 				"transfer_shared_secret": cfg.Commons.TransferSecret,
@@ -148,6 +149,7 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 				"natsclusterid":        cfg.Events.ClusterID,
 				"tlsinsecure":          cfg.Events.TLSInsecure,
 				"tlsrootcacertificate": cfg.Events.TLSRootCaCertPath,
+				"numconsumers":         cfg.Events.NumConsumers,
 			},
 			"tokens": map[string]interface{}{
 				"transfer_shared_secret": cfg.Commons.TransferSecret,
