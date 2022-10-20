@@ -196,6 +196,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 								"api_enabled":                       true,
 								"resharing":                         cfg.EnableResharing,
 								"group_sharing":                     true,
+								"sharing_roles":                     true,
 								"auto_accept_share":                 true,
 								"share_with_group_members_only":     true,
 								"share_with_membership_groups_only": true,
@@ -238,8 +239,8 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 									"group_members_only": true,
 								},
 								"federation": map[string]interface{}{
-									"outgoing": true,
-									"incoming": true,
+									"outgoing": cfg.EnableFederatedSharingOutgoing,
+									"incoming": cfg.EnableFederatedSharingIncoming,
 								},
 							},
 							"spaces": map[string]interface{}{
