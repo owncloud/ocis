@@ -57,6 +57,9 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 		"http": map[string]interface{}{
 			"network": cfg.HTTP.Protocol,
 			"address": cfg.HTTP.Addr,
+			"middlewares": map[string]interface{}{
+				"requestid": map[string]interface{}{},
+			},
 			// TODO build services dynamically
 			"services": map[string]interface{}{
 				"dataprovider": map[string]interface{}{

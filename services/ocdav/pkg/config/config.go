@@ -71,12 +71,18 @@ type HTTPConfig struct {
 
 // Middleware configures reva middlewares.
 type Middleware struct {
-	Auth Auth `yaml:"auth"`
+	Auth      Auth      `yaml:"auth"`
+	RequestID RequestID `yaml:"request_id"`
 }
 
 // Auth configures reva http auth middleware.
 type Auth struct {
 	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agent"`
+}
+
+// RequestID configures reva http auth middleware.
+type RequestID struct {
+	RequestID map[string]string `yaml:"requestid"`
 }
 
 // Status holds the configurable values for the status.php
