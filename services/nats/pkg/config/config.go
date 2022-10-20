@@ -29,4 +29,5 @@ type Nats struct {
 	TLSCert                 string `yaml:"tls_cert" env:"NATS_TLS_CERT" desc:"File name of the TLS server certificate for the nats listener."`
 	TLSKey                  string `yaml:"tls_key" env:"NATS_TLS_KEY" desc:"File name for the TLS certificate key for the server certificate."`
 	TLSSkipVerifyClientCert bool   `yaml:"tls_skip_verify_client_cert" env:"OCIS_INSECURE;NATS_TLS_SKIP_VERIFY_CLIENT_CERT" desc:"Whether the NATS server should skip the client certificate verification during the TLS handshake."`
+	EnableTLS               bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;NATS_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker."`
 }

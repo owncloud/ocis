@@ -38,23 +38,27 @@ func Server(opts ...Option) (http.Service, error) {
 
 	if options.Config.Events.Endpoint != "" {
 		var err error
-		var rootCAPool *x509.CertPool
-		if options.Config.Events.TLSRootCACertificate != "" {
-			rootCrtFile, err := os.Open(options.Config.Events.TLSRootCACertificate)
-			if err != nil {
-				return http.Service{}, err
+
+		var tlsConf *tls.Config
+		if options.Config.Events.EnableTLS {
+			var rootCAPool *x509.CertPool
+			if options.Config.Events.TLSRootCACertificate != "" {
+				rootCrtFile, err := os.Open(options.Config.Events.TLSRootCACertificate)
+				if err != nil {
+					return http.Service{}, err
+				}
+
+				rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
+				if err != nil {
+					return http.Service{}, err
+				}
+				options.Config.Events.TLSInsecure = false
 			}
 
-			rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
-			if err != nil {
-				return http.Service{}, err
+			tlsConf = &tls.Config{
+				InsecureSkipVerify: options.Config.Events.TLSInsecure, //nolint:gosec
+				RootCAs:            rootCAPool,
 			}
-			options.Config.Events.TLSInsecure = false
-		}
-
-		tlsConf := &tls.Config{
-			InsecureSkipVerify: options.Config.Events.TLSInsecure, //nolint:gosec
-			RootCAs:            rootCAPool,
 		}
 		publisher, err = server.NewNatsStream(
 			natsjs.TLSConfig(tlsConf),

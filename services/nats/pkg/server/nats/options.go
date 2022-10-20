@@ -43,3 +43,10 @@ func TLSConfig(c *tls.Config) NatsOption {
 		o.TLSConfig = c
 	}
 }
+
+// AllowNonTLS sets the allow non tls options for the nats server
+func AllowNonTLS(v bool) NatsOption {
+	return func(o *nserver.Options) {
+		o.AllowNonTLS = v
+	}
+}

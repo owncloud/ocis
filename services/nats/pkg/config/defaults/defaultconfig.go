@@ -32,6 +32,7 @@ func DefaultConfig() *config.Config {
 			StoreDir:  filepath.Join(defaults.BaseDataPath(), "nats"),
 			TLSCert:   filepath.Join(defaults.BaseDataPath(), "nats/tls.crt"),
 			TLSKey:    filepath.Join(defaults.BaseDataPath(), "nats/tls.key"),
+			EnableTLS: false,
 		},
 	}
 }

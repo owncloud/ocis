@@ -36,6 +36,7 @@ func DefaultConfig() *config.Config {
 			Endpoint:      "127.0.0.1:9233",
 			Cluster:       "ocis-cluster",
 			ConsumerGroup: "search",
+			EnableTLS:     false,
 		},
 		MachineAuthAPIKey: "",
 	}
