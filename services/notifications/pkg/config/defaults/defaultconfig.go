@@ -37,7 +37,9 @@ func DefaultConfig() *config.Config {
 				ConsumerGroup: "notifications",
 				EnableTLS:     false,
 			},
-			Reva: *shared.DefaultRevaConfig(),
+			RevaGateway:          shared.DefaultRevaConfig().Address,
+			RevaGatewayTLSMode:   shared.DefaultRevaConfig().TLSMode,
+			RevaGatewayTLSCACert: shared.DefaultRevaConfig().TLSCACert,
 		},
 	}
 }

@@ -41,10 +41,12 @@ func DefaultConfig() *config.Config {
 			FileSystemStorage: config.FileSystemStorage{
 				RootDirectory: path.Join(defaults.BaseDataPath(), "thumbnails"),
 			},
-			WebdavAllowInsecure: false,
-			Reva:                *shared.DefaultRevaConfig(),
-			CS3AllowInsecure:    false,
-			DataEndpoint:        "http://127.0.0.1:9186/thumbnails/data",
+			WebdavAllowInsecure:  false,
+			RevaGateway:          shared.DefaultRevaConfig().Address,
+			RevaGatewayTLSMode:   shared.DefaultRevaConfig().TLSMode,
+			RevaGatewayTLSCACert: shared.DefaultRevaConfig().TLSCACert,
+			CS3AllowInsecure:     false,
+			DataEndpoint:         "http://127.0.0.1:9186/thumbnails/data",
 		},
 	}
 }

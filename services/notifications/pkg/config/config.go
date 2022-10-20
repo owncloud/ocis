@@ -22,11 +22,13 @@ type Config struct {
 
 // Notifications defines the config options for the notifications service.
 type Notifications struct {
-	SMTP              SMTP        `yaml:"SMTP"`
-	Events            Events      `yaml:"events"`
-	MachineAuthAPIKey string      `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;NOTIFICATIONS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
-	Reva              shared.Reva `yaml:"reva"`
-	EmailTemplatePath string      `yaml:"email_template_path" env:"OCIS_EMAIL_TEMPLATE_PATH;NOTIFICATIONS_EMAIL_TEMPLATE_PATH" desc:"Path to Email notification templates overriding embedded ones."`
+	SMTP                 SMTP   `yaml:"SMTP"`
+	Events               Events `yaml:"events"`
+	MachineAuthAPIKey    string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;NOTIFICATIONS_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
+	EmailTemplatePath    string `yaml:"email_template_path" env:"OCIS_EMAIL_TEMPLATE_PATH;NOTIFICATIONS_EMAIL_TEMPLATE_PATH" desc:"Path to Email notification templates overriding embedded ones."`
+	RevaGateway          string `yaml:"reva_gateway" env:"REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata"`
+	RevaGatewayTLSMode   string `yaml:"reva_gateway_tls_mode" env:"REVA_GATEWAY_TLS_MODE"`
+	RevaGatewayTLSCACert string `yaml:"reva_gateway_tls_cacert" env:"REVA_GATEWAY_TLS_CACERT"`
 }
 
 // SMTP combines the smtp configuration options.
