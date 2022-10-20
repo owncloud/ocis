@@ -26,7 +26,15 @@ func NewService(opts ...Option) grpc.Service {
 		grpc.Version(version.GetString()),
 	)
 	tconf := options.Config.Thumbnail
-	gc, err := pool.GetGatewayServiceClient(tconf.Reva.Address, tconf.Reva.GetRevaOptions()...)
+	tm, err := pool.StringToTLSMode(tconf.RevaGatewayTLSMode)
+	if err != nil {
+		options.Logger.Error().Err(err).Msg("could not get gateway client tls mode")
+		return grpc.Service{}
+	}
+	gc, err := pool.GetGatewayServiceClient(tconf.RevaGateway,
+		pool.WithTLSCACert(tconf.RevaGatewayTLSCACert),
+		pool.WithTLSMode(tm),
+	)
 	if err != nil {
 		options.Logger.Error().Err(err).Msg("could not get gateway client")
 		return grpc.Service{}

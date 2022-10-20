@@ -77,12 +77,17 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
+			tm, err := pool.StringToTLSMode(cfg.Notifications.RevaGatewayTLSMode)
+			if err != nil {
+				return err
+			}
 			gwclient, err := pool.GetGatewayServiceClient(
-				cfg.Notifications.Reva.Address,
-				cfg.Notifications.Reva.GetRevaOptions()...,
+				cfg.Notifications.RevaGateway,
+				pool.WithTLSCACert(cfg.Notifications.RevaGatewayTLSCACert),
+				pool.WithTLSMode(tm),
 			)
 			if err != nil {
-				logger.Fatal().Err(err).Str("addr", cfg.Notifications.Reva.Address).Msg("could not get reva client")
+				logger.Fatal().Err(err).Str("addr", cfg.Notifications.RevaGateway).Msg("could not get reva client")
 			}
 
 			svc := service.NewEventsNotifier(evts, channel, logger, gwclient, cfg.Notifications.MachineAuthAPIKey, cfg.Notifications.EmailTemplatePath, cfg.Commons.OcisURL)
