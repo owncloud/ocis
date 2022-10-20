@@ -47,7 +47,7 @@ func DefaultConfig() *config.Config {
 					ResponseType: "code",
 					Scope:        "openid profile email",
 				},
-				Apps: []string{}},
+				Apps: []string{},
 				ExternalApps: []config.ExternalApp{
 					{
 						ID:   "settings",
@@ -97,7 +97,7 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
-	if len(cfg.Web.Config.Apps) == 0{
+	if len(cfg.Web.Config.Apps) == 0 {
 		cfg.Web.Config.Apps = []string{"files", "search", "text-editor", "pdf-viewer", "external", "user-management"}
 	}
 }
