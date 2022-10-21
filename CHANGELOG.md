@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Disable federation capabilities: [#4864](https://github.com/owncloud/ocis/pull/4864)
 * Bugfix - Fix authentication for autoprovisioned users: [#4616](https://github.com/owncloud/ocis/issues/4616)
 * Bugfix - Bring back the settings UI in Web: [#4691](https://github.com/owncloud/ocis/pull/4691)
 * Bugfix - Fix cache stat table config: [#4732](https://github.com/owncloud/ocis/pull/4732)
@@ -41,6 +42,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Make it possible to configure a WOPI folderurl: [#4716](https://github.com/owncloud/ocis/pull/4716)
 
 ## Details
+
+* Bugfix - Disable federation capabilities: [#4864](https://github.com/owncloud/ocis/pull/4864)
+
+   We disabled the federation support in the capabilities because it is currently not supported.
+
+   https://github.com/owncloud/ocis/pull/4864
 
 * Bugfix - Fix authentication for autoprovisioned users: [#4616](https://github.com/owncloud/ocis/issues/4616)
 
