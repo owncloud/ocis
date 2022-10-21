@@ -3,6 +3,7 @@ package search
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
