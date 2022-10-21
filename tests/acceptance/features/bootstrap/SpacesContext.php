@@ -2995,19 +2995,41 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^for user "([^"]*)" the response should contains the parent "([^"]*)" from (?:space|mountpoint) "([^"]*)"$/
+	 * @Then /^for user "([^"]*)" the REPORT response should contain a (?:space|mountpoint) "([^"]*)" with these key and value pairs:$/
 	 *
 	 * @param string $user
-	 * @param string $parent
 	 * @param string $space
+	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function responseShouldContainParent(string $user, string $parent, string $space): void {
-		// get a response after a Report request (called in the core)
-		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml()->xpath("//d:response/d:propstat/d:prop/oc:file-parent")), true, 512, JSON_THROW_ON_ERROR);
-		Assert::assertNotEmpty($responseArray, "search result is empty");
-		Assert::assertEquals($this->getFolderId($user, $space, $parent), $responseArray[0][0], 'wrong file-parentId');
+	public function reportResponseShouldContain(string $user, string $space, TableNode $table): void {
+ 		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
+		$xmlRes = $this->featureContext->getResponseXml();
+    $resourceType = $xmlRes->xpath("//d:response/d:propstat/d:prop/d:getcontenttype")[0]->__toString();
+
+		foreach ($table->getHash() as $row) {
+			$findItem = $row['key'];
+      $responseValue = $xmlRes->xpath("//d:response/d:propstat/d:prop/$findItem")[0]->__toString();
+			Assert::assertNotEmpty($responseValue, "response doesn't contain $findItem or empty");
+			$value = str_replace('UUIDof:', '', $row['value']);
+
+			switch ($findItem) {
+				case "oc:fileid":
+					if ($resourceType === 'httpd/unix-directory') {
+						Assert::assertEquals($this->getFolderId($user, $space, $value), $responseValue, 'wrong fileId in the response');
+					} else {
+						Assert::assertEquals($this->getFileId($user, $space, $value), $responseValue, 'wrong fileId in the response');
+					}
+					break;
+				case "oc:file-parent":
+					Assert::assertEquals($this->getFolderId($user, $space, $value), $responseValue, 'wrong file-parentId in the response');
+					break;
+				default:
+					Assert::assertEquals($value, $responseValue, "wrong $findItem in the response");
+					break;
+			}
+		}
 	}
 }

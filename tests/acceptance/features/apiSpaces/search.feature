@@ -97,32 +97,3 @@ Feature: Search
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries
     And for user "Alice" the search result should contain space "find data"
-
-
-  Scenario Outline: search result for project space contains resource parentID
-    When user "Alice" searches for "<searchObject>" using the WebDAV API
-    Then the HTTP status code should be "207"
-    And the search result should contain "1" entries
-    And the search result of user "Alice" should contain these entries:
-      | /<searchObject> |
-    And for user "Alice" the response should contains the parent "<parentFolder>" from space "find data"
-    Examples:
-      | searchObject        | parentFolder                     |
-      | SubFolder1          | folderMain                       |
-      | insideTheFolder.txt | folderMain/SubFolder1/subFOLDER2 |
-      | folderMain          | find data                        |
-
-
-  Scenario Outline: search result for Shares contains resource parentID
-    Given user "Alice" shares the following entity "folderMain" inside of space "find data" with user "Brian" with role "viewer"
-    And user "Brian" has accepted share "/folderMain" offered by user "Alice"
-    When user "Brian" searches for "<searchObject>" using the WebDAV API
-    Then the HTTP status code should be "207"
-    And the search result should contain "1" entries
-    And the search result of user "Brian" should contain these entries:
-      | /<searchObject> |
-    And for user "Brian" the response should contains the parent "<parentFolder>" from mountpoint "folderMain"
-    Examples:
-      | searchObject        | parentFolder          |
-      | insideTheFolder.txt | SubFolder1/subFOLDER2 |
-      | SubFolder1          | folderMain            |
