@@ -34,7 +34,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
 * Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
 * Enhancement - Logging improvements: [#4815](https://github.com/owncloud/ocis/pull/4815)
-* Enhancement - Secure the nats connectin with TLS: [#4781](https://github.com/owncloud/ocis/pull/4781)
+* Enhancement - Secure the nats connection with TLS: [#4781](https://github.com/owncloud/ocis/pull/4781)
 * Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
 * Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
 * Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
@@ -252,12 +252,20 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4815
 
-* Enhancement - Secure the nats connectin with TLS: [#4781](https://github.com/owncloud/ocis/pull/4781)
+* Enhancement - Secure the nats connection with TLS: [#4781](https://github.com/owncloud/ocis/pull/4781)
 
-   Encyrpted the connection to the event broker using TLS.
+   Encyrpted the connection to the event broker using TLS. Per default TLS is not enabled but can be
+   enabled by setting either `OCIS_EVENTS_ENABLE_TLS=true` or the respective service
+   configs:
+
+   - `AUDIT_EVENTS_ENABLE_TLS=true` - `GRAPH_EVENTS_ENABLE_TLS=true` -
+   `NATS_EVENTS_ENABLE_TLS=true` - `NOTIFICATIONS_EVENTS_ENABLE_TLS=true` -
+   `SEARCH_EVENTS_ENABLE_TLS=true` - `SHARING_EVENTS_ENABLE_TLS=true` -
+   `STORAGE_USERS_EVENTS_ENABLE_TLS=true`
 
    https://github.com/owncloud/ocis/pull/4781
    https://github.com/owncloud/ocis/pull/4800
+   https://github.com/owncloud/ocis/pull/4867
 
 * Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
 
@@ -281,6 +289,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/4719
    https://github.com/owncloud/ocis/pull/4750
    https://github.com/owncloud/ocis/pull/4833
+   https://github.com/owncloud/ocis/pull/4867
 
 * Enhancement - Update ownCloud Web to v6.0.0-rc.2: [#4786](https://github.com/owncloud/ocis/pull/4786)
 
