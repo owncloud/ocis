@@ -317,4 +317,5 @@ Feature: move (rename) file
     When user "Brian" downloads version of the file "/folder/testfile.txt" with the index "2" of the space "Personal" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded content should be "old content version 1"
+    And as "Brian" file "testfile.txt" should exist in the trashbin of the space "Personal"
 

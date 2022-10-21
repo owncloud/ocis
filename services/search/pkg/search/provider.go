@@ -164,7 +164,8 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 				SpaceId:   spid,
 				OpaqueId:  oid,
 			}
-			rootName = space.GetRootInfo().GetPath()
+
+			rootName = filepath.Join("/", filepath.Base(gpRes.GetPath()))
 			permissions = space.GetRootInfo().GetPermissionSet()
 			p.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootID).Msg("searching a grant")
 		case "personal":
