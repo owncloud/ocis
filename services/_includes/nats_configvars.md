@@ -17,3 +17,4 @@
 | NATS_TLS_CERT | string | ~/.ocis/nats/tls.crt | File name of the TLS server certificate for the nats listener.|
 | NATS_TLS_KEY | string | ~/.ocis/nats/tls.key | File name for the TLS certificate key for the server certificate.|
 | OCIS_INSECURE<br/>NATS_TLS_SKIP_VERIFY_CLIENT_CERT | bool | false | Whether the NATS server should skip the client certificate verification during the TLS handshake.|
+| OCIS_EVENTS_ENABLE_TLS<br/>NATS_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|

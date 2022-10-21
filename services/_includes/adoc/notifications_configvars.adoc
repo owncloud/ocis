@@ -158,6 +158,14 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.
+|`OCIS_EVENTS_ENABLE_TLS` +
+`NOTIFICATIONS_EVENTS_ENABLE_TLS`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
 |`REVA_GATEWAY` +
 `NOTIFICATIONS_REVA_GATEWAY`
 a| [subs=-attributes]

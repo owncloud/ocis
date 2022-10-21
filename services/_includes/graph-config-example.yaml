@@ -62,3 +62,4 @@ events:
   cluster: ocis-cluster
   tls_insecure: false
   tls_root_ca_certificate: ""
+  enable_tls: false

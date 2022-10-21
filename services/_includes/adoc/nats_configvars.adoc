@@ -116,6 +116,14 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Whether the NATS server should skip the client certificate verification during the TLS handshake.
+|`OCIS_EVENTS_ENABLE_TLS` +
+`NATS_EVENTS_ENABLE_TLS`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
 |===
 
 Since Version: `+` added, `-` deprecated

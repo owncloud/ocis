@@ -27,4 +27,5 @@ events:
   group: search
   tls_insecure: false
   tls_root_ca_certificate: ""
+  enable_tls: false
 machine_auth_api_key: ""

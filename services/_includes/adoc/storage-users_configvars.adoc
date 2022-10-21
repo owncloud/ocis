@@ -371,7 +371,7 @@ The clusterID of the event system. The event system is the message queuing servi
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
-++true ++
+++false ++
 a| [subs=-attributes]
 Whether to verify the server TLS certificates.
 |`STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT`
@@ -381,6 +381,14 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false.
+|`OCIS_EVENTS_ENABLE_TLS` +
+`STORAGE_USERS_EVENTS_ENABLE_TLS`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
 |`STORAGE_USERS_CACHE_STORE`
 a| [subs=-attributes]
 ++string ++

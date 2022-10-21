@@ -27,6 +27,7 @@ notifications:
     group: notifications
     tls_insecure: false
     tls_root_ca_certificate: ""
+    enable_tls: false
   reva_gateway: 127.0.0.1:9142
   machine_auth_api_key: ""
   email_template_path: ""

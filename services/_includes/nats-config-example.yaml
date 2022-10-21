@@ -19,3 +19,4 @@ nats:
   tls_cert: ~/.ocis/nats/tls.crt
   tls_key: ~/.ocis/nats/tls.key
   tls_skip_verify_client_cert: false
+  enable_tls: false
