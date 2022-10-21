@@ -131,10 +131,10 @@ var _ = Describe("Bleve", func() {
 					SpaceId:   "2",
 					OpaqueId:  "3",
 				}
-				r := createEntity(rid, "p", content.Document{Name: "Foo oo.pdf"})
+				r := createEntity(rid, "p", content.Document{Name: "foo oo.pdf"})
 				err := eng.Upsert(r.ID, r)
 				Expect(err).ToNot(HaveOccurred())
-				assertDocCount(rid, `Name:foo o*`, 1)
+				assertDocCount(rid, `Name:foo\ o*`, 1)
 			})
 
 			It("finds files by digits in the filename", func() {
@@ -245,23 +245,6 @@ var _ = Describe("Bleve", func() {
 					Expect(matches[0].Entity.Name).To(Equal(r.Name))
 					Expect(matches[0].Entity.Size).To(Equal(r.Size))
 				}
-			})
-
-			It("ignores case", func() {
-				rid := sprovider.ResourceId{
-					StorageId: "1",
-					SpaceId:   "2",
-					OpaqueId:  "3",
-				}
-				r := createEntity(rid, "p", content.Document{Name: "foo.pdf"})
-				r.Type = 3
-				r.MimeType = "application/pdf"
-
-				err := eng.Upsert(r.ID, r)
-				Expect(err).ToNot(HaveOccurred())
-
-				assertDocCount(rid, "Name:foo*", 1)
-				assertDocCount(rid, "Name:Foo*", 1)
 			})
 
 			Context("and an additional file in a subdirectory", func() {

@@ -16,6 +16,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	contentMocks "github.com/owncloud/ocis/v2/services/search/pkg/content/mocks"
 	engineMocks "github.com/owncloud/ocis/v2/services/search/pkg/engine/mocks"
+	indexerMocks "github.com/owncloud/ocis/v2/services/search/pkg/indexer/mocks"
 	"github.com/owncloud/ocis/v2/services/search/pkg/search"
 	"github.com/stretchr/testify/mock"
 	mEvents "go-micro.dev/v4/events"
@@ -26,6 +27,7 @@ var _ = Describe("Events", func() {
 		gw        *cs3mocks.GatewayAPIClient
 		engine    *engineMocks.Engine
 		extractor *contentMocks.Extractor
+		indexer   *indexerMocks.Indexer
 		bus       events.Stream
 		ctx       context.Context
 
@@ -63,8 +65,9 @@ var _ = Describe("Events", func() {
 		engine = &engineMocks.Engine{}
 		bus, _ = mEvents.NewStream()
 		extractor = &contentMocks.Extractor{}
+		indexer = &indexerMocks.Indexer{}
 
-		_ = search.HandleEvents(engine, extractor, gw, bus, logger, &config.Config{})
+		_ = search.HandleEvents(engine, extractor, gw, bus, indexer, logger, &config.Config{})
 
 		gw.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
 			Status: status.NewOK(ctx),
@@ -80,11 +83,12 @@ var _ = Describe("Events", func() {
 		}, nil)
 		engine.On("DocCount").Return(uint64(1), nil)
 	})
+
 	Describe("events", func() {
 		It("triggers an index update when a file has been uploaded", func() {
 			called := false
 			extractor.Mock.On("Extract", mock.Anything, mock.Anything).Return(content.Document{}, nil)
-			engine.On("Upsert", mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
+			indexer.On("IndexSpace", mock.Anything, mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 				called = true
 			})
 
@@ -101,7 +105,7 @@ var _ = Describe("Events", func() {
 		It("triggers an index update when a file has been touched", func() {
 			called := false
 			extractor.Mock.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
-			engine.On("Upsert", mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
+			indexer.On("IndexSpace", mock.Anything, mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 				called = true
 			})
 			_ = events.Publish(bus, events.FileTouched{
@@ -122,6 +126,7 @@ var _ = Describe("Events", func() {
 			engine.On("Delete", mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 				called = true
 			})
+			indexer.On("IndexSpace", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 			_ = events.Publish(bus, events.ItemTrashed{
 				Ref:       ref,
@@ -139,6 +144,7 @@ var _ = Describe("Events", func() {
 			engine.On("Restore", mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 				called = true
 			})
+			indexer.On("IndexSpace", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 			_ = events.Publish(bus, events.ItemRestored{
 				Ref:       ref,
@@ -153,7 +159,7 @@ var _ = Describe("Events", func() {
 		It("indexes items when a version has been restored", func() {
 			called := false
 			extractor.Mock.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
-			engine.On("Upsert", mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
+			indexer.On("IndexSpace", mock.Anything, mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 				called = true
 			})
 
@@ -172,6 +178,7 @@ var _ = Describe("Events", func() {
 			engine.On("Move", mock.Anything, mock.Anything, mock.Anything).Return(nil).Run(func(args mock.Arguments) {
 				called = true
 			})
+			indexer.On("IndexSpace", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 			_ = events.Publish(bus, events.ItemMoved{
 				Ref:       ref,

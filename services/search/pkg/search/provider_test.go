@@ -2,6 +2,7 @@ package search_test
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -185,6 +186,17 @@ var _ = Describe("Searchprovider", func() {
 				Expect(match.Entity.Name).To(Equal("Foo.pdf"))
 				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(personalSpace.Root.OpaqueId))
 				Expect(match.Entity.Ref.Path).To(Equal("./path/to/Foo.pdf"))
+			})
+
+			It("lowercases the search term", func() {
+				_, err := p.Search(ctx, &searchsvc.SearchRequest{
+					Query: "Foo",
+				})
+				Expect(err).ToNot(HaveOccurred())
+
+				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
+					return strings.Contains(req.Query, "Name:*foo*")
+				}))
 			})
 		})
 
