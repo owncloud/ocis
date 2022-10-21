@@ -162,28 +162,28 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Enables the support for favorites in the frontend.
+Enables the support for favorites in the clients.
 |`FRONTEND_ENABLE_PROJECT_SPACES`
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
-Indicates to clients that project spaces are supposed to be made available.
+Changing this value is NOT supported. Indicates to clients that project spaces are supposed to be made available.
 |`FRONTEND_ENABLE_SHARE_JAIL`
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
-Indicates to clients that the share jail is supposed to be used.
+Changing this value is NOT supported. Indicates to clients that the share jail is supposed to be used.
 |`FRONTEND_UPLOAD_MAX_CHUNK_SIZE`
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++100000000 ++
 a| [subs=-attributes]
-Sets the max chunk sizes in bytes for uploads via the frontend.
+Sets the max chunk sizes in bytes for uploads via the clients.
 |`FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE`
 a| [subs=-attributes]
 ++string ++
@@ -197,21 +197,35 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++tus ++
 a| [subs=-attributes]
-The default upload protocol to use in the frontend (e.g. tus).
+The default upload protocol to use in the clients (e.g. tus).
 |`FRONTEND_ENABLE_RESHARING`
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
-Enables the support for resharing in the frontend.
+Changing this value is NOT supported. Enables the support for resharing in the clients.
+|`FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed.
+|`FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Changing this value is NOT supported. Enables support for outgoing federated sharing for clients. The backend behaviour is not changed.
 |`FRONTEND_SEARCH_MIN_LENGTH`
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++3 ++
 a| [subs=-attributes]
-Minimum number of characters to enter before starting a search for Sharees.
+Minimum number of characters to enter before a client should start a search for Share receivers. This setting can be used to customize the user experience if e.g too many results are displayed.
 |`OCIS_URL` +
 `FRONTEND_PUBLIC_URL`
 a| [subs=-attributes]

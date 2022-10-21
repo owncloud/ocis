@@ -22,14 +22,16 @@
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
 | OCIS_MACHINE_AUTH_API_KEY<br/>FRONTEND_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary to access resources from other services.|
 | FRONTEND_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
-| FRONTEND_ENABLE_FAVORITES | bool | false | Enables the support for favorites in the frontend.|
-| FRONTEND_ENABLE_PROJECT_SPACES | bool | true | Indicates to clients that project spaces are supposed to be made available.|
-| FRONTEND_ENABLE_SHARE_JAIL | bool | true | Indicates to clients that the share jail is supposed to be used.|
-| FRONTEND_UPLOAD_MAX_CHUNK_SIZE | int | 100000000 | Sets the max chunk sizes in bytes for uploads via the frontend.|
+| FRONTEND_ENABLE_FAVORITES | bool | false | Enables the support for favorites in the clients.|
+| FRONTEND_ENABLE_PROJECT_SPACES | bool | true | Changing this value is NOT supported. Indicates to clients that project spaces are supposed to be made available.|
+| FRONTEND_ENABLE_SHARE_JAIL | bool | true | Changing this value is NOT supported. Indicates to clients that the share jail is supposed to be used.|
+| FRONTEND_UPLOAD_MAX_CHUNK_SIZE | int | 100000000 | Sets the max chunk sizes in bytes for uploads via the clients.|
 | FRONTEND_UPLOAD_HTTP_METHOD_OVERRIDE | string |  | Advise TUS to replace PATCH requests by POST requests.|
-| FRONTEND_DEFAULT_UPLOAD_PROTOCOL | string | tus | The default upload protocol to use in the frontend (e.g. tus).|
-| FRONTEND_ENABLE_RESHARING | bool | true | Enables the support for resharing in the frontend.|
-| FRONTEND_SEARCH_MIN_LENGTH | int | 3 | Minimum number of characters to enter before starting a search for Sharees.|
+| FRONTEND_DEFAULT_UPLOAD_PROTOCOL | string | tus | The default upload protocol to use in the clients (e.g. tus).|
+| FRONTEND_ENABLE_RESHARING | bool | true | Changing this value is NOT supported. Enables the support for resharing in the clients.|
+| FRONTEND_ENABLE_FEDERATED_SHARING_INCOMING | bool | false | Changing this value is NOT supported. Enables support for incoming federated sharing for clients. The backend behaviour is not changed.|
+| FRONTEND_ENABLE_FEDERATED_SHARING_OUTGOING | bool | false | Changing this value is NOT supported. Enables support for outgoing federated sharing for clients. The backend behaviour is not changed.|
+| FRONTEND_SEARCH_MIN_LENGTH | int | 3 | Minimum number of characters to enter before a client should start a search for Share receivers. This setting can be used to customize the user experience if e.g too many results are displayed.|
 | OCIS_URL<br/>FRONTEND_PUBLIC_URL | string | https://localhost:9200 | The public facing URL of the oCIS frontend.|
 | OCIS_INSECURE<br/>FRONTEND_APP_HANDLER_INSECURE | bool | false | Allow insecure connections to the frontend.|
 | FRONTEND_ARCHIVER_MAX_NUM_FILES | int64 | 10000 | Max number of files that can be packed into an archive.|
