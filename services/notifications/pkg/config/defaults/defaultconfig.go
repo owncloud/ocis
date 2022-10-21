@@ -34,6 +34,7 @@ func DefaultConfig() *config.Config {
 				Endpoint:      "127.0.0.1:9233",
 				Cluster:       "ocis-cluster",
 				ConsumerGroup: "notifications",
+				EnableTLS:     false,
 			},
 			RevaGateway: "127.0.0.1:9142",
 		},

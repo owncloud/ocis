@@ -37,23 +37,26 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 	// Connect to nats to listen for changes that need to trigger an index update
 	evtsCfg := cfg.Events
 
-	var rootCAPool *x509.CertPool
-	if evtsCfg.TLSRootCACertificate != "" {
-		rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
-		if err != nil {
-			return nil, err
+	var tlsConf *tls.Config
+	if evtsCfg.EnableTLS {
+		var rootCAPool *x509.CertPool
+		if evtsCfg.TLSRootCACertificate != "" {
+			rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
+			if err != nil {
+				return nil, err
+			}
+
+			rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
+			if err != nil {
+				return nil, err
+			}
+			evtsCfg.TLSInsecure = false
 		}
 
-		rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
-		if err != nil {
-			return nil, err
+		tlsConf = &tls.Config{
+			InsecureSkipVerify: evtsCfg.TLSInsecure, //nolint:gosec
+			RootCAs:            rootCAPool,
 		}
-		evtsCfg.TLSInsecure = false
-	}
-
-	tlsConf := &tls.Config{
-		InsecureSkipVerify: evtsCfg.TLSInsecure, //nolint:gosec
-		RootCAs:            rootCAPool,
 	}
 	client, err := server.NewNatsStream(
 		natsjs.TLSConfig(tlsConf),

@@ -40,6 +40,7 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"clusterID":        cfg.Events.ClusterID,
 					"tls-insecure":     cfg.Events.TLSInsecure,
 					"tls-root-ca-cert": cfg.Events.TLSRootCaCertPath,
+					"enable-tls":       cfg.Events.EnableTLS,
 				},
 				"prometheus": map[string]interface{}{
 					"namespace": "ocis",
@@ -60,6 +61,7 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"nats_clusterID":         cfg.Events.ClusterID,
 					"nats_tls_insecure":      cfg.Events.TLSInsecure,
 					"nats_root_ca_cert_path": cfg.Events.TLSRootCaCertPath,
+					"nats_enable_tls":        cfg.Events.EnableTLS,
 					"data_txs": map[string]interface{}{
 						"simple": map[string]interface{}{
 							"cache_store":    cfg.Cache.Store,

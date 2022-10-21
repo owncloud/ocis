@@ -69,9 +69,9 @@ func DefaultConfig() *config.Config {
 			// TODO implement and add owncloudsql publicshare driver
 		},
 		Events: config.Events{
-			Addr:        "127.0.0.1:9233",
-			ClusterID:   "ocis-cluster",
-			TLSInsecure: true,
+			Addr:      "127.0.0.1:9233",
+			ClusterID: "ocis-cluster",
+			EnableTLS: false,
 		},
 	}
 }
