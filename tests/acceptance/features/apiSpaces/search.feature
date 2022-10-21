@@ -1,6 +1,6 @@
 @api @skipOnOcV10
 Feature: Search
-  It is possible to search files in the shares jail and the project space
+  It is possible to search files in the Shares and the project space
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -40,7 +40,7 @@ Feature: Search
       | /folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
 
 
-  Scenario: Brian can find data from the shares jail
+  Scenario: Brian can find data from the Shares
     Given user "Alice" shares the following entity "folderMain" inside of space "find data" with user "Brian" with role "viewer"
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "folder" using the WebDAV API
@@ -113,7 +113,7 @@ Feature: Search
       | folderMain          | find data                        |
 
 
-  Scenario Outline: search result for shares jail contains resource parentID
+  Scenario Outline: search result for Shares contains resource parentID
     Given user "Alice" shares the following entity "folderMain" inside of space "find data" with user "Brian" with role "viewer"
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "<searchObject>" using the WebDAV API

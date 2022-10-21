@@ -19,11 +19,11 @@ Feature:
     And user "Brian" has shared folder "/PARENT" with user "Carol"
     And user "Carol" has accepted share "/PARENT" offered by user "Alice"
     And user "Carol" has accepted share "/PARENT" offered by user "Brian"
-    When user "Carol" moves file "PARENT/from_alice.txt" to "PARENT (1)/from_alice.txt" in space "Shares Jail" using the WebDAV API
+    When user "Carol" moves file "PARENT/from_alice.txt" to "PARENT (1)/from_alice.txt" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Carol" folder "PARENT" of the space "Shares Jail" should not contain these entries:
+    And for user "Carol" folder "PARENT" of the space "Shares" should not contain these entries:
       | from_alice.txt |
-    And for user "Carol" folder "PARENT (1)" of the space "Shares Jail" should contain these entries:
+    And for user "Carol" folder "PARENT (1)" of the space "Shares" should contain these entries:
       | from_alice.txt |
 
 
@@ -32,15 +32,15 @@ Feature:
     And user "Alice" has uploaded file with content "old content version 2" to "/textfile1.txt"
     And user "Alice" has shared file "/textfile1.txt" with user "Brian"
     And user "Brian" has accepted share "/textfile1.txt" offered by user "Alice"
-    When user "Brian" uploads a file inside space "Shares Jail" with content "this is a new content" to "textfile1.txt" using the WebDAV API
+    When user "Brian" uploads a file inside space "Shares" with content "this is a new content" to "textfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
-    And for user "Brian" the space "Shares Jail" should contain these entries:
+    And for user "Brian" the space "Shares" should contain these entries:
       | textfile1.txt |
-    And for user "Brian" the content of the file "/textfile1.txt" of the space "Shares Jail" should be "this is a new content"
+    And for user "Brian" the content of the file "/textfile1.txt" of the space "Shares" should be "this is a new content"
     And for user "Alice" the content of the file "/textfile1.txt" of the space "Personal" should be "this is a new content"
     When user "Alice" downloads version of the file "/textfile1.txt" with the index "2" of the space "Personal" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded content should be "old content version 1"
-    When user "Brian" downloads version of the file "/textfile1.txt" with the index "1" of the space "Shares Jail" using the WebDAV API
+    When user "Brian" downloads version of the file "/textfile1.txt" with the index "1" of the space "Shares" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded content should be "old content version 2"

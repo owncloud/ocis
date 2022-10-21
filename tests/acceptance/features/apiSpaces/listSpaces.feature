@@ -29,11 +29,11 @@ Feature: List and create spaces
     And user "Brian" has created folder "folder"
     And user "Brian" has shared folder "folder" with user "Alice" with permissions "31"
     And user "Alice" has accepted share "/folder" offered by user "Brian"
-    Then the user "Alice" should have a space called "Shares Jail" with these key and value pairs:
+    Then the user "Alice" should have a space called "Shares" with these key and value pairs:
       | key       | value       |
       | driveType | virtual     |
       | id        | %space_id%  |
-      | name      | Shares Jail |
+      | name      | Shares |
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"
     Then the HTTP status code should be "200"
     And the json responded should contain a space "Alice Hansen" with these key and value pairs:
@@ -43,7 +43,7 @@ Feature: List and create spaces
       | name             | Alice Hansen                     |
       | quota@@@state    | normal                           |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
-    And the json responded should not contain a space with name "Shares Jail"
+    And the json responded should not contain a space with name "Shares"
     And the json responded should only contain spaces of type "personal"
 
 

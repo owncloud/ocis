@@ -101,7 +101,7 @@ class SpacesContext implements Context {
 	 *     "Personal" => [
 	 *       "file1.txt": "etag1",
 	 *     ],
-	 *     "Shares Jail" => []
+	 *     "Shares" => []
 	 *   ],
 	 *   "user2" => [
 	 *     ...

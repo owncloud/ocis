@@ -95,7 +95,7 @@ Feature: copy file
       | viewer  |
 
 
-  Scenario Outline: User copies a file from space project with different role to space shares jail with editor role
+  Scenario Outline: User copies a file from space project with different role to space Shares with editor role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created folder "/testshare"
@@ -103,11 +103,11 @@ Feature: copy file
     And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "31"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
-    When user "Alice" copies file "/project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies file "/project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Alice" folder "testshare" of the space "Shares Jail" should contain these files:
+    And for user "Alice" folder "testshare" of the space "Shares" should contain these files:
       | /project.txt |
-    And for user "Alice" the content of the file "/testshare/project.txt" of the space "Shares Jail" should be "Project content"
+    And for user "Alice" the content of the file "/testshare/project.txt" of the space "Shares" should be "Project content"
     Examples:
       | role    |
       | manager |
@@ -115,7 +115,7 @@ Feature: copy file
       | viewer  |
 
 
-  Scenario Outline: User copies a file from space project with different role to shares jail with viewer role
+  Scenario Outline: User copies a file from space project with different role to Shares with viewer role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created folder "/testshare"
@@ -123,9 +123,9 @@ Feature: copy file
     And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "17"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
-    When user "Alice" copies file "/project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies file "/project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Alice" the space "Shares Jail" should not contain these entries:
+    And for user "Alice" the space "Shares" should not contain these entries:
       | /testshare/project.txt |
     Examples:
       | role    |
@@ -161,36 +161,36 @@ Feature: copy file
       | /personal.txt |
 
 
-  Scenario: User copies a file from space personal to space shares jail with role editor
+  Scenario: User copies a file from space personal to space Shares with role editor
     Given user "Brian" has created folder "/testshare"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "31"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     And user "Alice" has uploaded file with content "personal content" to "personal.txt"
-    When user "Alice" copies file "/personal.txt" from space "Personal" to "/testshare/personal.txt" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies file "/personal.txt" from space "Personal" to "/testshare/personal.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Alice" folder "testshare" of the space "Shares Jail" should contain these files:
+    And for user "Alice" folder "testshare" of the space "Shares" should contain these files:
       | personal.txt |
-    And for user "Alice" the content of the file "/testshare/personal.txt" of the space "Shares Jail" should be "personal content"
+    And for user "Alice" the content of the file "/testshare/personal.txt" of the space "Shares" should be "personal content"
 
 
-  Scenario: User copies a file from space personal to space shares jail with role viewer
+  Scenario: User copies a file from space personal to space Shares with role viewer
     Given user "Brian" has created folder "/testshare"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "17"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     And user "Alice" has uploaded file with content "personal content" to "/personal.txt"
-    When user "Alice" copies file "/personal.txt" from space "Personal" to "/testshare/personal.txt" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies file "/personal.txt" from space "Personal" to "/testshare/personal.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Alice" the space "Shares Jail" should not contain these entries:
+    And for user "Alice" the space "Shares" should not contain these entries:
       | /testshare/personal.txt |
 
 
-  Scenario Outline: User copies a file from space shares jail with different role to space personal
+  Scenario Outline: User copies a file from space Shares with different role to space personal
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
-    When user "Alice" copies file "/testshare/testshare.txt" from space "Shares Jail" to "/testshare.txt" inside space "Personal" using the WebDAV API
+    When user "Alice" copies file "/testshare/testshare.txt" from space "Shares" to "/testshare.txt" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
       | /testshare.txt |
@@ -201,7 +201,7 @@ Feature: copy file
       | 17          |
 
 
-  Scenario Outline: User copies a file from space shares jail with different role to space project with different role
+  Scenario Outline: User copies a file from space Shares with different role to space project with different role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
@@ -209,7 +209,7 @@ Feature: copy file
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
-    When user "Alice" copies file "/testshare/testshare.txt" from space "Shares Jail" to "/testshare.txt" inside space "Project" using the WebDAV API
+    When user "Alice" copies file "/testshare/testshare.txt" from space "Shares" to "/testshare.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Project" should contain these entries:
       | /testshare.txt |
@@ -222,7 +222,7 @@ Feature: copy file
       | editor  | 17          |
 
 
-  Scenario Outline: User copies a file from space shares jail with different role to space project with role viewer
+  Scenario Outline: User copies a file from space Shares with different role to space project with role viewer
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has shared a space "Project" to user "Alice" with role "viewer"
@@ -230,7 +230,7 @@ Feature: copy file
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
-    When user "Alice" copies file "/testshare/testshare.txt" from space "Shares Jail" to "/testshare.txt" inside space "Project" using the WebDAV API
+    When user "Alice" copies file "/testshare/testshare.txt" from space "Shares" to "/testshare.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" the space "Project" should not contain these entries:
       | /testshare.txt |
@@ -240,7 +240,7 @@ Feature: copy file
       | 17          |
 
 
-  Scenario Outline: User copies a file from space shares jail with different role to space shares jail with role editor
+  Scenario Outline: User copies a file from space Shares with different role to space Shares with role editor
     Given user "Brian" has created folder "/testshare1"
     And user "Brian" has created folder "/testshare2"
     And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
@@ -248,13 +248,13 @@ Feature: copy file
     And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "31"
     And user "Alice" has accepted share "/testshare1" offered by user "Brian"
     And user "Alice" has accepted share "/testshare2" offered by user "Brian"
-    When user "Alice" copies file "/testshare1/testshare1.txt" from space "Shares Jail" to "/testshare2/testshare1.txt" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Alice" folder "testshare2" of the space "Shares Jail" should contain these files:
+    And for user "Alice" folder "testshare2" of the space "Shares" should contain these files:
       | /testshare1.txt |
     And for user "Brian" the space "Personal" should contain these entries:
       | /testshare2/testshare1.txt |
-    And for user "Alice" the content of the file "/testshare2/testshare1.txt" of the space "Shares Jail" should be "testshare1 content"
+    And for user "Alice" the content of the file "/testshare2/testshare1.txt" of the space "Shares" should be "testshare1 content"
     And for user "Brian" the content of the file "/testshare1/testshare1.txt" of the space "Personal" should be "testshare1 content"
     Examples:
       | permissions |
@@ -262,7 +262,7 @@ Feature: copy file
       | 17          |
 
 
-  Scenario Outline: User copies a file from space shares jail with different role to space shares jail with role editor
+  Scenario Outline: User copies a file from space Shares with different role to space Shares with role editor
     Given user "Brian" has created folder "/testshare1"
     And user "Brian" has created folder "/testshare2"
     And user "Brian" has uploaded file with content "testshare1 content" to "/testshare1/testshare1.txt"
@@ -270,9 +270,9 @@ Feature: copy file
     And user "Brian" has shared folder "/testshare2" with user "Alice" with permissions "17"
     And user "Alice" has accepted share "/testshare1" offered by user "Brian"
     And user "Alice" has accepted share "/testshare2" offered by user "Brian"
-    When user "Alice" copies file "/testshare1/testshare1.txt" from space "Shares Jail" to "/testshare2/testshare1.txt" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies file "/testshare1/testshare1.txt" from space "Shares" to "/testshare2/testshare1.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Alice" the space "Shares Jail" should not contain these entries:
+    And for user "Alice" the space "Shares" should not contain these entries:
       | /testshare2/testshare1.txt |
     And for user "Brian" the space "Personal" should not contain these entries:
       | /testshare2/testshare1.txt |
@@ -341,7 +341,7 @@ Feature: copy file
       | viewer  |
 
 
-  Scenario Outline: User copies a folder from space project with different role to space shares jail with different role
+  Scenario Outline: User copies a folder from space project with different role to space Shares with different role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created folder "/testshare"
@@ -350,9 +350,9 @@ Feature: copy file
     And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
-    When user "Alice" copies folder "/folder1" from space "Project" to "/testshare/folder1" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies folder "/folder1" from space "Project" to "/testshare/folder1" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
-    And for user "Alice" folder "testshare" of the space "Shares Jail" <shouldOrNot> contain these files:
+    And for user "Alice" folder "testshare" of the space "Shares" <shouldOrNot> contain these files:
       | /folder1/demo.txt |
     Examples:
       | role    | shouldOrNot | permissions | status-code |
@@ -381,15 +381,15 @@ Feature: copy file
       | viewer  | should not  | 403         |
 
 
-  Scenario Outline: User copies a folder from space personal to space shares jail with different permmissions
+  Scenario Outline: User copies a folder from space personal to space Shares with different permmissions
     Given user "Brian" has created folder "/testshare"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     And user "Alice" has created folder "folder1"
     And user "Alice" has uploaded file with content "some content" to "folder1/demo.txt"
-    When user "Alice" copies folder "/folder1" from space "Personal" to "/testshare/folder1" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies folder "/folder1" from space "Personal" to "/testshare/folder1" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
-    And for user "Alice" folder "testshare" of the space "Shares Jail" <shouldOrNot> contain these files:
+    And for user "Alice" folder "testshare" of the space "Shares" <shouldOrNot> contain these files:
       | folder1/demo.txt |
     Examples:
       | permissions | shouldOrNot | status-code |
@@ -397,13 +397,13 @@ Feature: copy file
       | 17          | should not  | 403         |
 
 
-  Scenario Outline: User copies a folder from space shares jail with different role to space personal
+  Scenario Outline: User copies a folder from space Shares with different role to space personal
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
-    When user "Alice" copies file "/testshare/testshare.txt" from space "Shares Jail" to "/testshare.txt" inside space "Personal" using the WebDAV API
+    When user "Alice" copies file "/testshare/testshare.txt" from space "Shares" to "/testshare.txt" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
       | /testshare.txt |
@@ -414,7 +414,7 @@ Feature: copy file
       | 17          |
 
 
-  Scenario Outline: User copies a folder from space shares jail with different role to space project with different role
+  Scenario Outline: User copies a folder from space Shares with different role to space project with different role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
@@ -423,7 +423,7 @@ Feature: copy file
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/folder1/testshare.txt"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
-    When user "Alice" copies folder "/testshare/folder1" from space "Shares Jail" to "folder1" inside space "Project" using the WebDAV API
+    When user "Alice" copies folder "/testshare/folder1" from space "Shares" to "folder1" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Project" should contain these entries:
       | /folder1/testshare.txt |
@@ -435,7 +435,7 @@ Feature: copy file
       | editor  | 17          |
 
 
-  Scenario Outline: User copies a folder from space shares jail with different role to space project with role viewer
+  Scenario Outline: User copies a folder from space Shares with different role to space project with role viewer
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has shared a space "Project" to user "Alice" with role "viewer"
@@ -444,7 +444,7 @@ Feature: copy file
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/folder1/testshare.txt"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
-    When user "Alice" copies folder "/testshare/folder1" from space "Shares Jail" to "folder1" inside space "Project" using the WebDAV API
+    When user "Alice" copies folder "/testshare/folder1" from space "Shares" to "folder1" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" the space "Project" should not contain these entries:
       | /folder1/testshare.txt |
@@ -464,9 +464,9 @@ Feature: copy file
       | shareWith   | Alice     |
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
-    When user "Alice" copies file "/textfile0.txt" from space "Personal" to "/testshare/textfile0.txt" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies file "/textfile0.txt" from space "Personal" to "/testshare/textfile0.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
-    And user "Alice" should not be able to download file "/testshare/textfile0.txt" from space "Shares Jail"
+    And user "Alice" should not be able to download file "/testshare/textfile0.txt" from space "Shares"
 
 
   Scenario: Copying a file to overwrite a file into a folder with no permissions
@@ -480,9 +480,9 @@ Feature: copy file
       | permissions | read      |
       | shareWith   | Alice     |
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
-    When user "Alice" copies file "/textfile0.txt" from space "Personal" to "/testshare/overwritethis.txt" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies file "/textfile0.txt" from space "Personal" to "/testshare/overwritethis.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
-    And for user "Alice" the content of the file "/testshare/overwritethis.txt" of the space "Shares Jail" should be "ownCloud test text file 1"
+    And for user "Alice" the content of the file "/testshare/overwritethis.txt" of the space "Shares" should be "ownCloud test text file 1"
 
 
   Scenario: copy a file over the top of an existing folder received as a user share
@@ -492,9 +492,9 @@ Feature: copy file
     And user "Brian" has created folder "BRIAN-Folder/sample-folder"
     And user "Brian" has shared folder "BRIAN-Folder" with user "Alice"
     And user "Alice" has accepted share "/BRIAN-Folder" offered by user "Brian"
-    When user "Alice" copies file "/textfile1.txt" from space "Personal" to "/BRIAN-Folder" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies file "/textfile1.txt" from space "Personal" to "/BRIAN-Folder" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
-    And for user "Alice" the content of the file "/BRIAN-Folder" of the space "Shares Jail" should be "ownCloud test text file 1"
+    And for user "Alice" the content of the file "/BRIAN-Folder" of the space "Shares" should be "ownCloud test text file 1"
     And as "Alice" file "/textfile1.txt" should exist
     And user "Alice" should not have any received shares
 
@@ -506,10 +506,10 @@ Feature: copy file
     And user "Brian" has uploaded file with content "file to share" to "/sharedfile1.txt"
     And user "Brian" has shared file "/sharedfile1.txt" with user "Alice"
     And user "Alice" has accepted share "/sharedfile1.txt" offered by user "Brian"
-    When user "Alice" copies folder "/FOLDER" from space "Personal" to "/sharedfile1.txt" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies folder "/FOLDER" from space "Personal" to "/sharedfile1.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" folder "/FOLDER/sample-folder" should exist
-    And for user "Alice" folder "/sharedfile1.txt" of the space "Shares Jail" should contain these files:
+    And for user "Alice" folder "/sharedfile1.txt" of the space "Shares" should contain these files:
       | /sample-folder |
     And user "Alice" should not have any received shares
 
@@ -524,10 +524,10 @@ Feature: copy file
     And user "Alice" has created folder "/Sample-Folder-A"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b/sample-folder-c"
-    When user "Alice" copies folder "/Sample-Folder-A/sample-folder-b" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-folder" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies folder "/Sample-Folder-A/sample-folder-b" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-folder" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" folder "/Sample-Folder-A/sample-folder-b/sample-folder-c" should exist
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these entries:
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should contain these entries:
       | /second-level-folder/third-level-folder/sample-folder-c/ |
     And for user "Brian" folder "BRIAN-FOLDER" of the space "Personal" should contain these files:
       | /second-level-folder/third-level-folder/sample-folder-c/ |
@@ -545,14 +545,14 @@ Feature: copy file
     And user "Alice" has created folder "/Sample-Folder-A"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "/Sample-Folder-A/sample-folder-b/textfile-c.txt"
-    When user "Alice" copies file "/Sample-Folder-A/sample-folder-b/textfile-c.txt" from space "Personal" to "/BRIAN-FOLDER/second-level-folder" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies file "/Sample-Folder-A/sample-folder-b/textfile-c.txt" from space "Personal" to "/BRIAN-FOLDER/second-level-folder" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should not contain these files:
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should not contain these files:
       | /second-level-folder/third-level-folder |
     And as "Alice" file "Sample-Folder-A/sample-folder-b/textfile-c.txt" should exist
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these files:
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should contain these files:
       | /second-level-folder |
-    And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-folder" of the space "Shares Jail" should be "sample file-c"
+    And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-folder" of the space "Shares" should be "sample file-c"
     And for user "Brian" the content of the file "/BRIAN-FOLDER/second-level-folder" of the space "Personal" should be "sample file-c"
     And the response when user "Alice" gets the info of the last share should include
       | file_target | /Shares/BRIAN-FOLDER |
@@ -567,14 +567,14 @@ Feature: copy file
     And user "Alice" has created folder "/Sample-Folder-A"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "/Sample-Folder-A/sample-folder-b/textfile-c.txt"
-    When user "Alice" copies file "/Sample-Folder-A/sample-folder-b/textfile-c.txt" from space "Personal" to "/BRIAN-FOLDER/second-level-file.txt" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies file "/Sample-Folder-A/sample-folder-b/textfile-c.txt" from space "Personal" to "/BRIAN-FOLDER/second-level-file.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" file "Sample-Folder-A/sample-folder-b/textfile-c.txt" should exist
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these files:
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should contain these files:
       | /second-level-file.txt |
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should not contain these files:
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should not contain these files:
       | /textfile-c.txt |
-    And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-file.txt" of the space "Shares Jail" should be "sample file-c"
+    And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-file.txt" of the space "Shares" should be "sample file-c"
     And for user "Brian" the content of the file "/BRIAN-FOLDER/second-level-file.txt" of the space "Personal" should be "sample file-c"
     And the response when user "Alice" gets the info of the last share should include
       | file_target | /Shares/BRIAN-FOLDER |
@@ -590,11 +590,11 @@ Feature: copy file
     And user "Brian" has uploaded file with content "file at third level" to "BRIAN-FOLDER/second-level-folder/third-level-file.txt"
     And user "Brian" has shared folder "/BRIAN-FOLDER" with user "Alice"
     And user "Alice" has accepted share "/BRIAN-FOLDER" offered by user "Brian"
-    When user "Alice" copies folder "/FOLDER/second-level-folder" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-file.txt" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies folder "/FOLDER/second-level-folder" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-file.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these entries:
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should contain these entries:
       | /second-level-folder/third-level-file.txt/third-level-folder |
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should not contain these entries:
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should not contain these entries:
       | /second-level-folder/second-level-folder/ |
     And the response when user "Alice" gets the info of the last share should include
       | file_target | /Shares/BRIAN-FOLDER |
@@ -613,10 +613,10 @@ Feature: copy file
     And user "Alice" has created folder "/Sample-Folder-A"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b/sample-folder-c"
-    When user "Alice" copies folder "/Sample-Folder-A/sample-folder-b" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-folder" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies folder "/Sample-Folder-A/sample-folder-b" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-folder" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" folder "/Sample-Folder-A/sample-folder-b/sample-folder-c" should exist
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these files:
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should contain these files:
       | /second-level-folder/third-level-folder/sample-folder-c/ |
     And the response when user "Alice" gets the info of the last share should include
       | file_target | /Shares/BRIAN-FOLDER |
@@ -635,11 +635,11 @@ Feature: copy file
     And user "Alice" has created folder "/Sample-Folder-A"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "/Sample-Folder-A/sample-folder-b/textfile-c.txt"
-    When user "Alice" copies file "/Sample-Folder-A/sample-folder-b/textfile-c.txt" from space "Personal" to "/BRIAN-FOLDER/second-level-folder" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies file "/Sample-Folder-A/sample-folder-b/textfile-c.txt" from space "Personal" to "/BRIAN-FOLDER/second-level-folder" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should not contain these entries:
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should not contain these entries:
       | /second-level-folder/third-level-folder |
-    And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-folder" of the space "Shares Jail" should be "sample file-c"
+    And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-folder" of the space "Shares" should be "sample file-c"
     And for user "Brian" the content of the file "/BRIAN-FOLDER/second-level-folder" of the space "Personal" should be "sample file-c"
     And the response when user "Alice" gets the info of the last share should include
       | file_target | /Shares/BRIAN-FOLDER |
@@ -657,13 +657,13 @@ Feature: copy file
     And user "Alice" has created folder "/Sample-Folder-A"
     And user "Alice" has created folder "/Sample-Folder-A/sample-folder-b"
     And user "Alice" has uploaded file with content "sample file-c" to "/Sample-Folder-A/sample-folder-b/textfile-c.txt"
-    When user "Alice" copies file "/Sample-Folder-A/sample-folder-b/textfile-c.txt" from space "Personal" to "/BRIAN-FOLDER/second-level-file.txt" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies file "/Sample-Folder-A/sample-folder-b/textfile-c.txt" from space "Personal" to "/BRIAN-FOLDER/second-level-file.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
     And as "Alice" file "/Sample-Folder-A/sample-folder-b/textfile-c.txt" should exist
-    And for user "Alice" folder "/BRIAN-FOLDER" of the space "Shares Jail" should not contain these files:
+    And for user "Alice" folder "/BRIAN-FOLDER" of the space "Shares" should not contain these files:
       | /textfile-c.txt |
     And as "Alice" file "/Sample-Folder-A/sample-folder-b/textfile-c.txt" should exist
-    And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-file.txt" of the space "Shares Jail" should be "sample file-c"
+    And for user "Alice" the content of the file "/BRIAN-FOLDER/second-level-file.txt" of the space "Shares" should be "sample file-c"
     And for user "Brian" the content of the file "/BRIAN-FOLDER/second-level-file.txt" of the space "Personal" should be "sample file-c"
     And the response when user "Alice" gets the info of the last share should include
       | file_target | /Shares/BRIAN-FOLDER |
@@ -682,13 +682,13 @@ Feature: copy file
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has created folder "/FOLDER/second-level-folder"
     And user "Alice" has created folder "/FOLDER/second-level-folder/third-level-folder"
-    When user "Alice" copies folder "/FOLDER/second-level-folder" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-file.txt" inside space "Shares Jail" using the WebDAV API
+    When user "Alice" copies folder "/FOLDER/second-level-folder" from space "Personal" to "/BRIAN-FOLDER/second-level-folder/third-level-file.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "204"
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should contain these files:
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should contain these files:
       | /second-level-folder/third-level-file.txt/                    |
       | /second-level-folder/third-level-file.txt/third-level-folder/ |
     And as "Alice" folder "FOLDER/second-level-folder/third-level-folder" should exist
-    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares Jail" should not contain these files:
+    And for user "Alice" folder "BRIAN-FOLDER" of the space "Shares" should not contain these files:
       | /second-level-folder/second-level-folder |
     And the response when user "Alice" gets the info of the last share should include
       | file_target | /Shares/BRIAN-FOLDER |
@@ -706,7 +706,7 @@ Feature: copy file
       | newfolder/insideSpace.txt     |
       | newfolder/insideSpace (1).txt |
     And for user "Alice" the content of the file "/newfolder/insideSpace (1).txt" of the space "Project" should be "new content"
-    
+
 
   Scenario: Copying a file with an option "replace" inside of the project space
     Given the administrator has given "Alice" the role "Space Admin" using the settings api
@@ -727,7 +727,7 @@ Feature: copy file
     And as "Alice" file "insideSpace.txt" should not exist in the trashbin of the space "Project"
 
 
-  Scenario: Copying a file from Personal to Shares Jail with an option "keep both"
+  Scenario: Copying a file from Personal to Shares with an option "keep both"
     Given the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "Project" with the default quota using the GraphApi
     And user "Alice" has created a folder "/newfolder" in space "Project"
@@ -735,18 +735,18 @@ Feature: copy file
     And user "Alice" shares the following entity "newfolder" inside of space "Project" with user "Brian" with role "editor"
     And user "Brian" has accepted share "/newfolder" offered by user "Alice"
     And user "Brian" has uploaded file with content "new content" to "/personal.txt"
-    When user "Brian" copies file "/personal.txt" from space "Personal" to "/newfolder/personal (1).txt" inside space "Shares Jail" using the WebDAV API
+    When user "Brian" copies file "/personal.txt" from space "Personal" to "/newfolder/personal (1).txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Project" should contain these entries:
       | newfolder/personal.txt     |
       | newfolder/personal (1).txt |
     And for user "Alice" the content of the file "/newfolder/personal (1).txt" of the space "Project" should be "new content"
-    And for user "Brian" the space "Shares Jail" should contain these entries:
+    And for user "Brian" the space "Shares" should contain these entries:
       | newfolder/personal.txt     |
       | newfolder/personal (1).txt |
 
 
-  Scenario: Copying a file from Personal to Shares Jail with an option "replace"
+  Scenario: Copying a file from Personal to Shares with an option "replace"
     Given the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "Project" with the default quota using the GraphApi
     And user "Alice" has created a folder "/newfolder" in space "Project"
@@ -755,7 +755,7 @@ Feature: copy file
     And user "Alice" shares the following entity "newfolder" inside of space "Project" with user "Brian" with role "editor"
     And user "Brian" has accepted share "/newfolder" offered by user "Alice"
     And user "Brian" has uploaded file with content "new content" to "/personal.txt"
-    When user "Brian" overwrites file "/personal.txt" from space "Personal" to "/newfolder/personal.txt" inside space "Shares Jail" while copying using the WebDAV API
+    When user "Brian" overwrites file "/personal.txt" from space "Personal" to "/newfolder/personal.txt" inside space "Shares" while copying using the WebDAV API
     Then the HTTP status code should be "204"
     And for user "Alice" the space "Project" should contain these entries:
       | newfolder/personal.txt     |
@@ -763,8 +763,8 @@ Feature: copy file
     When user "Alice" downloads version of the file "/newfolder/personal.txt" with the index "1" of the space "Project" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded content should be "old content version 2"
-    And for user "Brian" the content of the file "/newfolder/personal.txt" of the space "Shares Jail" should be "new content"
-    When user "Brian" downloads version of the file "/newfolder/personal.txt" with the index "2" of the space "Shares Jail" using the WebDAV API
+    And for user "Brian" the content of the file "/newfolder/personal.txt" of the space "Shares" should be "new content"
+    When user "Brian" downloads version of the file "/newfolder/personal.txt" with the index "2" of the space "Shares" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded content should be "old content version 1"
     And as "Brian" file "insideSpace.txt" should not exist in the trashbin of the space "Personal"

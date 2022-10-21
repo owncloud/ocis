@@ -32,7 +32,7 @@ Feature: create file or folder named similar to Shares folder
     And the content of file "<file_name>" for user "Brian" should be "some text"
     And for user "Brian" the space "Personal" should contain these entries:
       | <file_name> |
-    And for user "Brian" the space "Shares Jail" should contain these entries:
+    And for user "Brian" the space "Shares" should contain these entries:
       | FOLDER/ |
     Examples:
       | file_name |
@@ -44,12 +44,12 @@ Feature: create file or folder named similar to Shares folder
     Given using spaces DAV path
     When user "Brian" creates folder "/Shares" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Brian" the space "Shares Jail" should contain these entries:
+    And for user "Brian" the space "Shares" should contain these entries:
       | FOLDER/ |
 
   Scenario: try to create a file named Shares
     Given using spaces DAV path
     When user "Brian" uploads file with content "some text" to "/Shares" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Brian" the space "Shares Jail" should contain these entries:
+    And for user "Brian" the space "Shares" should contain these entries:
       | FOLDER/ |
