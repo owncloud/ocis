@@ -10,7 +10,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.4
 	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/cs3org/go-cs3apis v0.0.0-20221012090518-ef2996678965
-	github.com/cs3org/reva/v2 v2.10.1-0.20221020120219-2482ef11bdef
+	github.com/cs3org/reva/v2 v2.10.1-0.20221021085610-dafcf7b27a1e
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
@@ -287,5 +287,3 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	stash.kopano.io/kgol/kcc-go/v5 v5.0.1 // indirect
 )
-
-replace github.com/cs3org/reva/v2 => github.com/c0rby/reva/v2 v2.0.0-20221020150403-9582e39cd8e8
