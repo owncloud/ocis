@@ -22,24 +22,21 @@ func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	upath := path.Clean(path.Join("/", r.URL.Path))
 	r.URL.Path = upath
 
-	disableCache := func() {
-		w.Header().Set("Cache-Control", "no-cache")
-	}
-	handleIndex := func() {
-		disableCache()
+	fallbackIndex := func() {
 		r.URL.Path = "/index.html"
 		f.ServeHTTP(w, r)
 	}
+
 	asset, err := f.root.Open(upath)
 	if err != nil {
-		handleIndex()
+		fallbackIndex()
 		return
 	}
 	defer asset.Close()
 
 	s, _ := asset.Stat()
 	if s.IsDir() {
-		handleIndex()
+		fallbackIndex()
 		return
 	}
 
@@ -49,7 +46,8 @@ func (f *fileServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch s.Name() {
 	case "index.html", "oidc-callback.html", "oidc-silent-redirect.html":
-		disableCache()
+		w.Header().Del("Expires")
+		w.Header().Set("Cache-Control", "no-cache")
 		_ = withBase(buf, asset, "/")
 	default:
 		_, _ = buf.ReadFrom(asset)
