@@ -17,7 +17,7 @@ So we are trying to reflect this in the tooling. It should be kept simple and qu
 Besides standard development tools like git and a text editor, you need the following software for development:
 
 - Go >= v1.18 ([install instructions](https://golang.org/doc/install))
-- Yarn ([install instructions](https://classic.yarnpkg.com/en/docs/install))
+- pnpm ([install instructions](https://pnpm.io/installation))
 - docker ([install instructions](https://docs.docker.com/get-docker/))
 - docker-compose ([install instructions](https://docs.docker.com/compose/install/))
 

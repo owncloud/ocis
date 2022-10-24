@@ -1,0 +1,9 @@
+Change: Build service frontends with pnpm instead of yarn
+
+We changed the Node.js packager from Yarn to pnpm to make it more consistent with the main Web repo.
+pnpm offers better package isolation and prevents a whole class of errors.
+This is only relevant for developers.
+
+
+https://github.com/owncloud/ocis/pull/4878
+https://github.com/owncloud/web/pull/7835

@@ -1,4 +1,3 @@
-import 'regenerator-runtime/runtime'
 import SettingsApp from './components/SettingsApp.vue'
 import store from './store'
 import translations from './../l10n/translations.json'

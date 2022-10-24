@@ -10,7 +10,7 @@ geekdocFilePath: tests.md
 
 ## Requirements
 
-You need a working installation of [the Go programming language](https://golang.org/), [the Node runtime](https://nodejs.org/) and [the Yarn package manager](https://yarnpkg.com/) installed to run the acceptance tests. You may also want to use [Docker](https://www.docker.com/) to start the necessary services in their respective containers.
+You need a working installation of [the Go programming language](https://golang.org/), [the Node runtime](https://nodejs.org/) and [the pnpm package manager](https://pnpm.io/) installed to run the acceptance tests. You may also want to use [Docker](https://www.docker.com/) to start the necessary services in their respective containers.
 
 ## Acceptance Tests
 
@@ -23,7 +23,7 @@ Make sure you've cloned the [web frontend repo](https://github.com/owncloud/web/
 Install dependencies and bundle the frontend with a watcher by running
 
 ```bash
-yarn && yarn build:w
+pnpm install && pnpm build:w
 ```
 
 If you skip the step above, the currently bundled frontend from the oCIS binary will be used.
@@ -43,7 +43,7 @@ docker compose up selenium middleware-ocis vnc
 Navigate into the settings service via `cd ../settings/` and install dependencies and build the bundled settings UI with a watcher by running
 
 ```bash
-yarn && yarn watch
+pnpm install && pnpm watch
 ```
 
 #### Start oCIS from binary

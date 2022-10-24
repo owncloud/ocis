@@ -1089,7 +1089,8 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                              # TODO: settings/package.json has all the acceptance test dependencies
                              # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
                              "cd %s/services/settings" % dirs["base"],
-                             "retry -t 3 'yarn install --immutable'",
+                             "pnpm config set store-dir ./.pnpm-store",
+                             "retry -t 3 'pnpm install'",
                              "make test-acceptance-webui",
                          ],
                          "volumes": [{

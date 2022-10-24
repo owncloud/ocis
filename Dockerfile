@@ -1,6 +1,6 @@
 # Please use this Dockerfile only if
 # you want to build an image from source without
-# Yarn and Go installed on your dev machine.
+# pnpm and Go installed on your dev machine.
 
 # You can build oCIS using this Dockerfile
 # by running following command:
@@ -10,7 +10,7 @@
 # following command instead:
 # `make -C ocis dev-docker`
 # It will build a `owncloud/ocis:dev` image for you
-# and use your local Yarn and Go caches and therefore
+# and use your local pnpm and Go caches and therefore
 # is a lot faster than the build steps below.
 
 
