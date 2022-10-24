@@ -955,6 +955,7 @@ def e2eTests(ctx):
         },
         "commands": [
             "cd %s" % dirs["web"],
+            "cat tests/e2e/support/objects/app-files/resource/actions.ts",
             "sleep 10 && yarn test:e2e:cucumber tests/e2e/cucumber/**/*[!.oc10].feature",
         ],
     }]
