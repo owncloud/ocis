@@ -45,8 +45,7 @@ dirs = {
     "web": "/drone/src/webTestRunner",
     "zip": "/drone/src/zip",
     "webZip": "/drone/src/zip/web.tar.gz",
-    "e2eYarnZip": "/drone/src/zip/e2e.tar.gz",
-    "acceptanceYarnZip": "/drone/src/zip/acceptance.tar.gz",
+    "webPnpmZip": "/drone/src/zip/pnpm-store.tar.gz",
     "ocisConfig": "tests/config/drone/ocis-config.json",
     "ocis": "/srv/app/tmp/ocis",
     "ocisRevaDataRoot": "/srv/app/tmp/ocis/owncloud/data",
@@ -299,8 +298,7 @@ def cachePipeline(name, steps):
 def buildWebCache(ctx):
     return [
         cachePipeline("web", generateWebCache(ctx)),
-        cachePipeline("web-acceptance", generateWebAcceptanceCache(ctx)),
-        cachePipeline("web-e2e", generateWebE2ECache(ctx)),
+        cachePipeline("web-pnpm", generateWebPnpmCache(ctx)),
     ]
 
 def testOcisModules(ctx):
@@ -880,7 +878,7 @@ def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, 
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  restoreWebCache() +
-                 restoreWebAcceptanceYarnCache() +
+                 restoreWebPnpmCache() +
                  ocisServer(storage, accounts_hash_difficulty) +
                  waitForSeleniumService() +
                  waitForMiddlewareService() +
@@ -955,7 +953,7 @@ def e2eTests(ctx):
         },
         "commands": [
             "cd %s" % dirs["web"],
-            "sleep 10 && yarn test:e2e:cucumber tests/e2e/cucumber/**/*[!.oc10].feature",
+            "sleep 10 && pnpm test:e2e:cucumber tests/e2e/cucumber/**/*[!.oc10].feature",
         ],
     }]
 
@@ -963,7 +961,7 @@ def e2eTests(ctx):
         skipIfUnchanged(ctx, "e2e-tests") + \
         restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin/ocis") + \
         restoreWebCache() + \
-        restoreWebE2EYarnCache() + \
+        restoreWebPnpmCache() + \
         ocisServer("ocis", 4, []) + \
         e2e_test_ocis + \
         uploadTracingResult(ctx) + \
@@ -1069,7 +1067,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                  waitForSeleniumService() +
                  waitForMiddlewareService() +
                  restoreWebCache() +
-                 restoreWebAcceptanceYarnCache() +
+                 restoreWebPnpmCache() +
                  [
                      {
                          "name": "WebUIAcceptanceTests",
@@ -2915,76 +2913,39 @@ def cloneWeb():
         ],
     }
 
-def generateWebAcceptanceCache(ctx):
+def generateWebPnpmCache(ctx):
     return [
         getDroneEnvAndCheckScript(ctx),
-        checkForWebCache("acceptance"),
+        checkForWebCache("web-pnpm"),
         cloneWeb(),
         {
-            "name": "install-yarn",
+            "name": "install-pnpm",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
             "commands": [
                 "cd %s" % dirs["web"],
-                "cd tests/acceptance",
-                "retry -t 3 'yarn install --immutable --frozen-lockfile'",
+                "pnpm config set store-dir ./.pnpm-store",
+                "retry -t 3 'pnpm install'",
             ],
         },
         {
-            "name": "zip-yarn",
+            "name": "zip-pnpm",
             "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
             "commands": [
-                # zip the yarn deps before caching
+                # zip the pnpm deps before caching
                 "if [ ! -d '%s' ]; then mkdir -p %s; fi" % (dirs["zip"], dirs["zip"]),
                 "cd %s" % dirs["web"],
-                "cd tests/acceptance",
-                "tar -czvf %s .yarn" % dirs["acceptanceYarnZip"],
+                "tar -czvf %s .pnpm-store" % dirs["webPnpmZip"],
             ],
         },
         {
-            "name": "cache-yarn",
+            "name": "cache-pnpm",
             "image": MINIO_MC,
             "environment": MINIO_MC_ENV,
             "commands": [
                 "source ./.drone.env",
                 # cache using the minio/mc client to the public bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["acceptanceYarnZip"],
-            ],
-        },
-    ]
-
-def generateWebE2ECache(ctx):
-    return [
-        getDroneEnvAndCheckScript(ctx),
-        checkForWebCache("e2e"),
-        cloneWeb(),
-        {
-            "name": "install-yarn",
-            "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-            "commands": [
-                "cd %s" % dirs["web"],
-                "retry -t 3 'yarn install --immutable --frozen-lockfile'",
-            ],
-        },
-        {
-            "name": "zip-yarn",
-            "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-            "commands": [
-                # zip the yarn deps before caching
-                "if [ ! -d '%s' ]; then mkdir -p %s; fi" % (dirs["zip"], dirs["zip"]),
-                "cd %s" % dirs["web"],
-                "tar -czvf %s .yarn" % dirs["e2eYarnZip"],
-            ],
-        },
-        {
-            "name": "cache-yarn",
-            "image": MINIO_MC,
-            "environment": MINIO_MC_ENV,
-            "commands": [
-                "source ./.drone.env",
-                # cache using the minio/mc client to the public bucket (long term bucket)
-                "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["e2eYarnZip"],
+                "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID" % dirs["webPnpmZip"],
             ],
         },
     ]
@@ -3035,46 +2996,25 @@ def restoreWebCache():
         ],
     }]
 
-def restoreWebE2EYarnCache():
+def restoreWebPnpmCache():
     return [{
-        "name": "restore-web-e2e-yarn-cache",
+        "name": "restore-web-pnpm-cache",
         "image": MINIO_MC,
         "environment": MINIO_MC_ENV,
         "commands": [
             "source ./.drone.env",
             "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-            "mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/e2e.tar.gz %s" % dirs["zip"],
+            "mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/pnpm-store.tar.gz %s" % dirs["zip"],
         ],
     }, {
         # we need to install again because the node_modules are not cached
-        "name": "unzip-and-install-yarn-e2e",
+        "name": "unzip-and-install-pnpm",
         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
         "commands": [
             "cd %s" % dirs["web"],
-            "rm -rf .yarn",
-            "tar -xvf %s" % dirs["e2eYarnZip"],
-            "retry -t 3 'yarn install --immutable'",
-        ],
-    }]
-
-def restoreWebAcceptanceYarnCache():
-    return [{
-        "name": "restore-web-acceptance-yarn-cache",
-        "image": MINIO_MC,
-        "environment": MINIO_MC_ENV,
-        "commands": [
-            "source ./.drone.env",
-            "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-            "mc cp -r -a s3/$CACHE_BUCKET/ocis/web-test-runner/$WEB_COMMITID/acceptance.tar.gz %s" % dirs["zip"],
-        ],
-    }, {
-        # we need to install again because the node_modules are not cached
-        "name": "unzip-and-install-yarn-acceptance",
-        "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-        "commands": [
-            "cd %s/tests/acceptance" % dirs["web"],
-            "rm -rf .yarn",
-            "tar -xvf %s -C ." % dirs["acceptanceYarnZip"],
-            "retry -t 3 'yarn install --immutable'",
+            "rm -rf .pnpm-store",
+            "tar -xvf %s" % dirs["webPnpmZip"],
+            "pnpm config set store-dir ./.pnpm-store",
+            "retry -t 3 'pnpm install'",
         ],
     }]

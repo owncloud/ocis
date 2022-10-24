@@ -11,6 +11,7 @@ services/*/checkstyle.xml
 node_modules/
 yarn-error.log
 yarn.lock
+.pnpm-store/
 
 # build artifacts
 */bin
