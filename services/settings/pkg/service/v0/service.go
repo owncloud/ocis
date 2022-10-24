@@ -556,7 +556,20 @@ func (g Service) hasStaticPermission(ctx context.Context, permissionID string) b
 		// - at least the proxy needs to look up account info
 		// - glauth needs to make bind requests
 		// tracked as OCIS-454
-		return true
+
+		accountID, ok := metadata.Get(ctx, middleware.AccountID)
+		if !ok {
+			return false
+		}
+		assignments, err := g.manager.ListRoleAssignments(accountID)
+		if err != nil {
+			return false
+		}
+
+		roleIDs = make([]string, 0, len(assignments))
+		for _, a := range assignments {
+			roleIDs = append(roleIDs, a.GetRoleId())
+		}
 	}
 	p, err := g.manager.ReadPermissionByID(permissionID, roleIDs)
 	return err == nil && p != nil

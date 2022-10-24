@@ -66,6 +66,19 @@ func TestGetValidatedAccountUUID(t *testing.T) {
 
 func TestEditOwnRoleAssignment(t *testing.T) {
 	manager := &mocks.Manager{}
+	a := []*settingsmsg.UserRoleAssignment{
+		{
+			Id:          "00000000-0000-0000-0000-000000000001",
+			AccountUuid: "61445573-4dbe-4d56-88dc-88ab47aceba7",
+			RoleId:      "aceb15b8-7486-479f-ae32-c91118e07a39",
+		},
+	}
+	editRolePermission := &settingsmsg.Permission{
+		Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+		Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+	}
+	manager.On("ListRoleAssignments", mock.Anything).Return(a, nil)
+	manager.On("ReadPermissionByID", mock.Anything, mock.Anything).Return(editRolePermission, nil)
 	svc := Service{
 		manager: manager,
 	}
@@ -99,6 +112,11 @@ func TestRemoveOwnRoleAssignment(t *testing.T) {
 			RoleId:      "aceb15b8-7486-479f-ae32-c91118e07a39",
 		},
 	}
+	editRolePermission := &settingsmsg.Permission{
+		Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+		Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+	}
+	manager.On("ReadPermissionByID", mock.Anything, mock.Anything).Return(editRolePermission, nil)
 	manager.On("ListRoleAssignments", mock.Anything).Return(a, nil)
 	svc := Service{
 		manager: manager,
@@ -114,6 +132,7 @@ func TestRemoveOwnRoleAssignment(t *testing.T) {
 	manager = &mocks.Manager{}
 	manager.On("ListRoleAssignments", mock.Anything).Return(nil, nil)
 	manager.On("RemoveRoleAssignment", mock.Anything).Return(nil)
+	manager.On("ReadPermissionByID", mock.Anything, mock.Anything).Return(editRolePermission, nil)
 	svc = Service{
 		manager: manager,
 	}
