@@ -15,15 +15,19 @@ import (
 )
 
 type cs3 struct {
-	client   gateway.GatewayAPIClient
-	logger   log.Logger
-	insecure bool
+	httpClient http.Client
+	gwClient   gateway.GatewayAPIClient
+	logger     log.Logger
 }
 
 func newCS3Retriever(client gateway.GatewayAPIClient, logger log.Logger, insecure bool) cs3 {
 	return cs3{
-		client:   client,
-		insecure: insecure,
+		httpClient: http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
+			},
+		},
+		gwClient: client,
 		logger:   logger,
 	}
 }
@@ -36,7 +40,7 @@ func (s cs3) Retrieve(ctx context.Context, rid *provider.ResourceId) (io.ReadClo
 		return nil, fmt.Errorf("context without %s", revactx.TokenHeader)
 	}
 
-	res, err := s.client.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: &provider.Reference{ResourceId: rid, Path: "."}})
+	res, err := s.gwClient.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: &provider.Reference{ResourceId: rid, Path: "."}})
 	if err != nil {
 		return nil, err
 	}
@@ -63,13 +67,7 @@ func (s cs3) Retrieve(ctx context.Context, rid *provider.ResourceId) (io.ReadClo
 	req.Header.Set(revactx.TokenHeader, at)
 	req.Header.Set("X-Reva-Transfer", tt)
 
-	client := http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: s.insecure},
-		},
-	}
-
-	cres, err := client.Do(req)
+	cres, err := s.httpClient.Do(req)
 	if err != nil {
 		return nil, err
 	}
