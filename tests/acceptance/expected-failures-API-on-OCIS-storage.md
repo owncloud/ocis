@@ -176,8 +176,8 @@ File and sync features in a shared scenario
 - [apiShareManagementToShares/acceptShares.feature:366](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L366)
 - [apiShareManagementToShares/acceptShares.feature:402](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L402)
 - [apiShareManagementToShares/acceptShares.feature:304](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L304)
-- [apiShareManagementToShares/acceptShares.feature:594](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L594)
-- [apiShareManagementToShares/acceptShares.feature:659](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L659)
+- [apiShareManagementToShares/acceptShares.feature:592](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L592)
+- [apiShareManagementToShares/acceptShares.feature:657](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L657)
 - [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:162](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L162)
 - [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:163](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L163)
 - [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:202](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L202)
@@ -322,7 +322,7 @@ cannot share a folder with create permission
 
 #### [restoring an older version of a shared file deletes the share](https://github.com/owncloud/ocis/issues/765)
 
-- [apiShareManagementToShares/acceptShares.feature:583](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L583)
+- [apiShareManagementToShares/acceptShares.feature:581](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L581)
 
 #### [Expiration date for shares is not implemented](https://github.com/owncloud/ocis/issues/1250)
 
@@ -880,7 +880,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiShareManagementToShares/acceptShares.feature:295](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L295)
 - [apiShareManagementToShares/acceptShares.feature:335](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L335)
 - [apiShareManagementToShares/acceptShares.feature:572](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L572)
-- [apiShareManagementToShares/acceptShares.feature:573](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L573)
 - [apiShareOperationsToShares2/shareAccessByID.feature:124](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L124)
 - [apiShareOperationsToShares2/shareAccessByID.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L125)
 - [apiShareManagementBasicToShares/deleteShareFromShares.feature:185](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L185)
@@ -997,10 +996,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiAuthWebDav/webDavDELETEAuth.feature:199](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavDELETEAuth.feature#L199)
 - [apiAuthWebDav/webDavCOPYAuth.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavCOPYAuth.feature#L166)
 - [apiAuthWebDav/webDavCOPYAuth.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavCOPYAuth.feature#L178)
-
-#### [Identical shares have different naming convention in oc10 and ocis](https://github.com/owncloud/ocis/issues/4674)
-#### [different url encoding pattern used in oc10 and ocis for identical share ](https://github.com/owncloud/ocis/issues/4676)
-- [apiShareCreateSpecialToShares1/createShareUniqueReceivedNames.feature:15](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares1/createShareUniqueReceivedNames.feature#L15)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
