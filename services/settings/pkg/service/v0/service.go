@@ -51,6 +51,8 @@ func NewService(cfg *config.Config, logger log.Logger) Service {
 	return service
 }
 
+// CheckPermission implements the CS3 API Permssions service.
+// It's used to check if a subject (user or group) has a permission.
 func (g Service) CheckPermission(ctx context.Context, req *permissions.CheckPermissionRequest) (*permissions.CheckPermissionResponse, error) {
 	spec := req.SubjectRef.Spec
 
@@ -390,13 +392,13 @@ func (g Service) ListRoleAssignments(ctx context.Context, req *settingssvc.ListR
 
 // AssignRoleToUser implements the RoleServiceHandler interface
 func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRoleToUserRequest, res *settingssvc.AssignRoleToUserResponse) error {
-	if err := g.checkStaticPermissionsByBundleType(ctx, settingsmsg.Bundle_TYPE_ROLE); err != nil {
-		return err
+	if !g.canManageRoles(ctx) {
+		return merrors.Forbidden(g.id, "user has no role management permission")
 	}
 
 	req.AccountUuid = getValidatedAccountUUID(ctx, req.AccountUuid)
 	if validationError := validateAssignRoleToUser(req); validationError != nil {
-		return merrors.BadRequest(g.id, "%s", validationError)
+		return merrors.BadRequest(g.id, validationError.Error())
 	}
 
 	ownAccountUUID, ok := metadata.Get(ctx, middleware.AccountID)
@@ -406,12 +408,12 @@ func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRo
 	}
 	if ownAccountUUID == req.AccountUuid {
 		g.logger.Debug().Str("id", g.id).Msg("Changing own role assignment forbidden")
-		return merrors.Forbidden(g.id, "%s", "Changing own role assignment forbidden")
+		return merrors.Forbidden(g.id, "Changing own role assignment forbidden")
 	}
 
 	r, err := g.manager.WriteRoleAssignment(req.AccountUuid, req.RoleId)
 	if err != nil {
-		return merrors.BadRequest(g.id, "%s", err)
+		return merrors.BadRequest(g.id, err.Error())
 	}
 	res.Assignment = r
 	return nil
@@ -419,8 +421,12 @@ func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRo
 
 // RemoveRoleFromUser implements the RoleServiceHandler interface
 func (g Service) RemoveRoleFromUser(ctx context.Context, req *settingssvc.RemoveRoleFromUserRequest, _ *emptypb.Empty) error {
-	if err := g.checkStaticPermissionsByBundleType(ctx, settingsmsg.Bundle_TYPE_ROLE); err != nil {
-		return err
+	if !g.canManageRoles(ctx) {
+		return merrors.Forbidden(g.id, "user has no role management permission")
+	}
+
+	if validationError := validateRemoveRoleFromUser(req); validationError != nil {
+		return merrors.BadRequest(g.id, validationError.Error())
 	}
 
 	ownAccountUUID, ok := metadata.Get(ctx, middleware.AccountID)
@@ -432,22 +438,18 @@ func (g Service) RemoveRoleFromUser(ctx context.Context, req *settingssvc.Remove
 	al, err := g.manager.ListRoleAssignments(ownAccountUUID)
 	if err != nil {
 		g.logger.Debug().Err(err).Str("id", g.id).Msg("ListRoleAssignments failed")
-		return merrors.InternalServerError(g.id, "%s", err)
+		return merrors.InternalServerError(g.id, err.Error())
 	}
 
 	for _, a := range al {
 		if a.Id == req.Id {
 			g.logger.Debug().Str("id", g.id).Msg("Removing own role assignment forbidden")
-			return merrors.Forbidden(g.id, "%s", "Removing own role assignment forbidden")
+			return merrors.Forbidden(g.id, "Removing own role assignment forbidden")
 		}
 	}
 
-	if validationError := validateRemoveRoleFromUser(req); validationError != nil {
-		return merrors.BadRequest(g.id, "%s", validationError)
-	}
-
 	if err := g.manager.RemoveRoleAssignment(req.Id); err != nil {
-		return merrors.BadRequest(g.id, "%s", err)
+		return merrors.BadRequest(g.id, err.Error())
 	}
 	return nil
 }
@@ -547,11 +549,6 @@ func (g Service) getValueWithIdentifier(value *settingsmsg.Value) (*settingsmsg.
 func (g Service) hasStaticPermission(ctx context.Context, permissionID string) bool {
 	roleIDs, ok := roles.ReadRoleIDsFromContext(ctx)
 	if !ok {
-		/**
-		* FIXME: with this we are skipping permission checks on all requests that are coming in without roleIDs in the
-		* metadata context. This is a huge security impairment, as that's the case not only for grpc requests but also
-		* for unauthenticated http requests and http requests coming in without hitting the ocis-proxy first.
-		 */
 		// TODO add system role for internal requests.
 		// - at least the proxy needs to look up account info
 		// - glauth needs to make bind requests
@@ -602,4 +599,8 @@ func (g Service) isCurrentUser(ctx context.Context, accountID string) bool {
 		return false
 	}
 	return accountID == ownAccountID
+}
+
+func (g Service) canManageRoles(ctx context.Context) bool {
+	return g.hasStaticPermission(ctx, RoleManagementPermissionID)
 }
