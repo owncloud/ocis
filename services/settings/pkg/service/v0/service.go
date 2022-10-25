@@ -270,18 +270,23 @@ func (g Service) RemoveSettingFromBundle(ctx context.Context, req *settingssvc.R
 // SaveValue implements the ValueServiceHandler interface
 func (g Service) SaveValue(ctx context.Context, req *settingssvc.SaveValueRequest, res *settingssvc.SaveValueResponse) error {
 	req.Value.AccountUuid = getValidatedAccountUUID(ctx, req.Value.AccountUuid)
+
+	if !g.isCurrentUser(ctx, req.Value.AccountUuid) {
+		return merrors.Forbidden(g.id, "can't save value for another user")
+	}
+
 	cleanUpResource(ctx, req.Value.Resource)
 	// TODO: we need to check, if the authenticated user has permission to write the value for the specified resource (e.g. global, file with id xy, ...)
 	if validationError := validateSaveValue(req); validationError != nil {
-		return merrors.BadRequest(g.id, "%s", validationError)
+		return merrors.BadRequest(g.id, validationError.Error())
 	}
 	r, err := g.manager.WriteValue(req.Value)
 	if err != nil {
-		return merrors.BadRequest(g.id, "%s", err)
+		return merrors.BadRequest(g.id, err.Error())
 	}
 	valueWithIdentifier, err := g.getValueWithIdentifier(r)
 	if err != nil {
-		return merrors.NotFound(g.id, "%s", err)
+		return merrors.NotFound(g.id, err.Error())
 	}
 	res.Value = valueWithIdentifier
 	return nil
@@ -306,18 +311,22 @@ func (g Service) GetValue(ctx context.Context, req *settingssvc.GetValueRequest,
 
 // GetValueByUniqueIdentifiers implements the ValueService interface
 func (g Service) GetValueByUniqueIdentifiers(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, res *settingssvc.GetValueResponse) error {
+	req.AccountUuid = getValidatedAccountUUID(ctx, req.AccountUuid)
+	if !g.isCurrentUser(ctx, req.AccountUuid) {
+		return merrors.Forbidden(g.id, "can't get value of another user")
+	}
 	if validationError := validateGetValueByUniqueIdentifiers(req); validationError != nil {
-		return merrors.BadRequest(g.id, "%s", validationError)
+		return merrors.BadRequest(g.id, validationError.Error())
 	}
 	v, err := g.manager.ReadValueByUniqueIdentifiers(req.AccountUuid, req.SettingId)
 	if err != nil {
-		return merrors.NotFound(g.id, "%s", err)
+		return merrors.NotFound(g.id, err.Error())
 	}
 
 	if v.BundleId != "" {
 		valueWithIdentifier, err := g.getValueWithIdentifier(v)
 		if err != nil {
-			return merrors.NotFound(g.id, "%s", err)
+			return merrors.NotFound(g.id, err.Error())
 		}
 
 		res.Value = valueWithIdentifier
@@ -328,15 +337,19 @@ func (g Service) GetValueByUniqueIdentifiers(ctx context.Context, req *settingss
 // ListValues implements the ValueServiceHandler interface
 func (g Service) ListValues(ctx context.Context, req *settingssvc.ListValuesRequest, res *settingssvc.ListValuesResponse) error {
 	req.AccountUuid = getValidatedAccountUUID(ctx, req.AccountUuid)
+	if !g.isCurrentUser(ctx, req.AccountUuid) {
+		return merrors.Forbidden(g.id, "can't list values of another user")
+	}
+
 	if validationError := validateListValues(req); validationError != nil {
-		return merrors.BadRequest(g.id, "%s", validationError)
+		return merrors.BadRequest(g.id, validationError.Error())
 	}
-	r, err := g.manager.ListValues(req.BundleId, req.AccountUuid)
+	values, err := g.manager.ListValues(req.BundleId, req.AccountUuid)
 	if err != nil {
-		return merrors.NotFound(g.id, "%s", err)
+		return merrors.NotFound(g.id, err.Error())
 	}
-	var result []*settingsmsg.ValueWithIdentifier
-	for _, value := range r {
+	result := make([]*settingsmsg.ValueWithIdentifier, 0, len(values))
+	for _, value := range values {
 		valueWithIdentifier, err := g.getValueWithIdentifier(value)
 		if err == nil {
 			result = append(result, valueWithIdentifier)
@@ -492,7 +505,6 @@ func getValidatedAccountUUID(ctx context.Context, accountUUID string) string {
 
 // getRoleIDs extracts the roleIDs of the authenticated user from the context.
 func (g Service) getRoleIDs(ctx context.Context) []string {
-	var ownRoleIDs []string
 	if ownRoleIDs, ok := roles.ReadRoleIDsFromContext(ctx); ok {
 		return ownRoleIDs
 	}
@@ -500,16 +512,17 @@ func (g Service) getRoleIDs(ctx context.Context) []string {
 		assignments, err := g.manager.ListRoleAssignments(accountID)
 		if err != nil {
 			g.logger.Info().Err(err).Str("userid", accountID).Msg("failed to get roles for user")
-			return []string{}
+			return nil
 		}
 
+		ownRoleIDs := make([]string, 0, len(assignments))
 		for _, a := range assignments {
 			ownRoleIDs = append(ownRoleIDs, a.RoleId)
 		}
 		return ownRoleIDs
 	}
 	g.logger.Info().Msg("failed to get accountID from context")
-	return []string{}
+	return nil
 }
 
 func (g Service) getValueWithIdentifier(value *settingsmsg.Value) (*settingsmsg.ValueWithIdentifier, error) {
@@ -568,4 +581,12 @@ func (g Service) checkStaticPermissionsByBundleType(ctx context.Context, bundleT
 		return merrors.Forbidden(g.id, "user has no settings management permission")
 	}
 	return nil
+}
+
+func (g Service) isCurrentUser(ctx context.Context, accountID string) bool {
+	ownAccountID, ok := metadata.Get(ctx, middleware.AccountID)
+	if !ok {
+		return false
+	}
+	return accountID == ownAccountID
 }
