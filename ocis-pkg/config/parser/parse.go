@@ -51,6 +51,13 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.CacheStore == nil {
 		cfg.CacheStore = &shared.CacheStore{}
 	}
+	if cfg.MicroGRPCClient == nil {
+		cfg.MicroGRPCClient = &shared.MicroGRPCClient{}
+	}
+	if cfg.MicroGRPCService == nil {
+		cfg.MicroGRPCService = &shared.MicroGRPCService{}
+	}
+
 }
 
 // EnsureCommons copies applicable parts of the oCIS config into the commons part
@@ -92,6 +99,14 @@ func EnsureCommons(cfg *config.Config) {
 		}
 	} else {
 		cfg.Commons.CacheStore = &shared.CacheStore{}
+	}
+
+	if cfg.MicroGRPCClient != nil {
+		cfg.Commons.MicroGRPCClient = cfg.MicroGRPCClient
+	}
+
+	if cfg.MicroGRPCService != nil {
+		cfg.Commons.MicroGRPCService = cfg.MicroGRPCService
 	}
 
 	// copy token manager to the commons part if set

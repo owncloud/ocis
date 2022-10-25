@@ -17,6 +17,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
@@ -41,7 +42,9 @@ var _ = Describe("Graph", func() {
 		cfg.Identity.LDAP.CACert = "" // skip the startup checks, we don't use LDAP at all in this tests
 		cfg.TokenManager.JWTSecret = "loremipsum"
 		cfg.Commons = &shared.Commons{}
+		cfg.MicroGRPCClient = &shared.MicroGRPCClient{}
 
+		_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.MicroGRPCClient)...)
 		gatewayClient = &mocks.GatewayClient{}
 		eventsPublisher = mocks.Publisher{}
 		svc = service.NewService(

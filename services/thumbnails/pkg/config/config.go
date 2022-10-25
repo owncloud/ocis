@@ -19,6 +19,9 @@ type Config struct {
 	GRPC GRPC `yaml:"grpc"`
 	HTTP HTTP `yaml:"http"`
 
+	MicroGRPCClient  *shared.MicroGRPCClient  `yaml:"micro_grpc_client"`
+	MicroGRPCService *shared.MicroGRPCService `yaml:"micro_grpc_service"`
+
 	Thumbnail Thumbnail `yaml:"thumbnail"`
 
 	Context context.Context `yaml:"-"`

@@ -79,6 +79,21 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.Reva == nil {
 		cfg.Reva = &shared.Reva{}
 	}
+	if cfg.MicroGRPCClient == nil {
+		cfg.MicroGRPCClient = &shared.MicroGRPCClient{}
+		if cfg.Commons != nil && cfg.Commons.MicroGRPCClient != nil {
+			cfg.MicroGRPCClient.TLSMode = cfg.Commons.MicroGRPCClient.TLSMode
+			cfg.MicroGRPCClient.TLSCACert = cfg.Commons.MicroGRPCClient.TLSCACert
+		}
+	}
+	if cfg.MicroGRPCService == nil {
+		cfg.MicroGRPCService = &shared.MicroGRPCService{}
+		if cfg.Commons != nil && cfg.Commons.MicroGRPCService != nil {
+			cfg.MicroGRPCService.TLSEnabled = cfg.Commons.MicroGRPCService.TLSEnabled
+			cfg.MicroGRPCService.TLSCert = cfg.Commons.MicroGRPCService.TLSCert
+			cfg.MicroGRPCService.TLSKey = cfg.Commons.MicroGRPCService.TLSKey
+		}
+	}
 }
 
 // Sanitize sanitizes the configuration

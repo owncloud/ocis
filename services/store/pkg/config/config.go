@@ -18,6 +18,9 @@ type Config struct {
 
 	GRPC GRPC `yaml:"grpc"`
 
+	MicroGRPCClient  *shared.MicroGRPCClient  `yaml:"micro_grpc_client"`
+	MicroGRPCService *shared.MicroGRPCService `yaml:"micro_grpc_service"`
+
 	Datapath string `yaml:"data_path" env:"STORE_DATA_PATH" desc:"The directory where the filesystem storage will store ocis settings. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/store."`
 
 	Context context.Context `yaml:"-"`

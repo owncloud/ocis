@@ -56,9 +56,11 @@ type Runtime struct {
 type Config struct {
 	*shared.Commons `yaml:"shared"`
 
-	Tracing    *shared.Tracing    `yaml:"tracing"`
-	Log        *shared.Log        `yaml:"log"`
-	CacheStore *shared.CacheStore `yaml:"cache_store"`
+	Tracing          *shared.Tracing          `yaml:"tracing"`
+	Log              *shared.Log              `yaml:"log"`
+	CacheStore       *shared.CacheStore       `yaml:"cache_store"`
+	MicroGRPCClient  *shared.MicroGRPCClient  `yaml:"micro_grpc_client"`
+	MicroGRPCService *shared.MicroGRPCService `yaml:"micro_grpc_service"`
 
 	Mode    Mode // DEPRECATED
 	File    string

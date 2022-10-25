@@ -11,7 +11,12 @@ import (
 func Server(opts ...Option) grpc.Service {
 	options := newOptions(opts...)
 
-	service := grpc.NewService(
+	service, err := grpc.NewService(
+		grpc.TLSEnabled(options.Config.MicroGRPCService.TLSEnabled),
+		grpc.TLSCert(
+			options.Config.MicroGRPCService.TLSCert,
+			options.Config.MicroGRPCService.TLSKey,
+		),
 		grpc.Name(options.Config.Service.Name),
 		grpc.Context(options.Context),
 		grpc.Address(options.Config.GRPC.Addr),
@@ -20,6 +25,10 @@ func Server(opts ...Option) grpc.Service {
 		grpc.Flags(options.Flags...),
 		grpc.Version(version.GetString()),
 	)
+	if err != nil {
+		options.Logger.Fatal().Err(err).Msg("Error creating search service")
+		return grpc.Service{}
+	}
 
 	handle, err := svc.NewHandler(
 		svc.Config(options.Config),

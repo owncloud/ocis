@@ -1,6 +1,7 @@
-Enhancement: Allow to setup TLS for the reva grpc services
+Enhancement: Allow to setup TLS for grpc services
 
-We added config options to allow enabling TLS encrption for all reva backed
+We added config options to allow enabling TLS encrption for all reva and go-micro backed
 grpc services.
 
 https://github.com/owncloud/ocis/pull/4798
+https://github.com/owncloud/ocis/pull/4901

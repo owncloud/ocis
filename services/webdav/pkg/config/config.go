@@ -16,6 +16,8 @@ type Config struct {
 	Log     *Log     `yaml:"log"`
 	Debug   Debug    `yaml:"debug"`
 
+	MicroGRPCClient *shared.MicroGRPCClient `yaml:"micro_grpc_client"`
+
 	HTTP HTTP `yaml:"http"`
 
 	OcisPublicURL        string          `yaml:"ocis_public_url" env:"OCIS_URL;OCIS_PUBLIC_URL" desc:"URL, where oCIS is reachable for users."`

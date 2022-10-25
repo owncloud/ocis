@@ -67,6 +67,14 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
 	}
+
+	if cfg.MicroGRPCClient == nil {
+		cfg.MicroGRPCClient = &shared.MicroGRPCClient{}
+		if cfg.Commons != nil && cfg.Commons.MicroGRPCClient != nil {
+			cfg.MicroGRPCClient.TLSMode = cfg.Commons.MicroGRPCClient.TLSMode
+			cfg.MicroGRPCClient.TLSCACert = cfg.Commons.MicroGRPCClient.TLSCACert
+		}
+	}
 }
 
 func Sanitize(cfg *config.Config) {

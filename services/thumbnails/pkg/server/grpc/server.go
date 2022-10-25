@@ -15,7 +15,12 @@ import (
 func NewService(opts ...Option) grpc.Service {
 	options := newOptions(opts...)
 
-	service := grpc.NewService(
+	service, err := grpc.NewService(
+		grpc.TLSEnabled(options.Config.MicroGRPCService.TLSEnabled),
+		grpc.TLSCert(
+			options.Config.MicroGRPCService.TLSCert,
+			options.Config.MicroGRPCService.TLSKey,
+		),
 		grpc.Logger(options.Logger),
 		grpc.Namespace(options.Namespace),
 		grpc.Name(options.Name),
@@ -25,6 +30,11 @@ func NewService(opts ...Option) grpc.Service {
 		grpc.Flags(options.Flags...),
 		grpc.Version(version.GetString()),
 	)
+	if err != nil {
+		options.Logger.Fatal().Err(err).Msg("Error creating thumbnail service")
+		return grpc.Service{}
+	}
+
 	tconf := options.Config.Thumbnail
 	tm, err := pool.StringToTLSMode(tconf.RevaGatewayTLSMode)
 	if err != nil {
