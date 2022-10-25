@@ -3005,13 +3005,13 @@ class SpacesContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function reportResponseShouldContain(string $user, string $space, TableNode $table): void {
- 		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
+		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
 		$xmlRes = $this->featureContext->getResponseXml();
-    $resourceType = $xmlRes->xpath("//d:response/d:propstat/d:prop/d:getcontenttype")[0]->__toString();
+		$resourceType = $xmlRes->xpath("//d:response/d:propstat/d:prop/d:getcontenttype")[0]->__toString();
 
 		foreach ($table->getHash() as $row) {
 			$findItem = $row['key'];
-      $responseValue = $xmlRes->xpath("//d:response/d:propstat/d:prop/$findItem")[0]->__toString();
+			$responseValue = $xmlRes->xpath("//d:response/d:propstat/d:prop/$findItem")[0]->__toString();
 			Assert::assertNotEmpty($responseValue, "response doesn't contain $findItem or empty");
 			$value = str_replace('UUIDof:', '', $row['value']);
 
