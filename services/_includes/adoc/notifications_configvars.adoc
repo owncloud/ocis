@@ -166,14 +166,6 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
-|`REVA_GATEWAY` +
-`NOTIFICATIONS_REVA_GATEWAY`
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++127.0.0.1:9142 ++
-a| [subs=-attributes]
-CS3 gateway used to look up user metadata
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `NOTIFICATIONS_MACHINE_AUTH_API_KEY`
 a| [subs=-attributes]
@@ -190,6 +182,27 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Path to Email notification templates overriding embedded ones.
+|`REVA_GATEWAY`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9142 ++
+a| [subs=-attributes]
+CS3 gateway used to look up user metadata
+|`REVA_GATEWAY_TLS_MODE`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+
+|`REVA_GATEWAY_TLS_CACERT`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+
 |===
 
 Since Version: `+` added, `-` deprecated

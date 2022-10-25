@@ -155,7 +155,21 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 a| [subs=-attributes]
-The CS3 gateway endpoint.
+CS3 gateway used to look up user metadata
+|`REVA_GATEWAY_TLS_MODE`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+
+|`REVA_GATEWAY_TLS_CACERT`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+
 |`THUMBNAILS_TXT_FONTMAP_FILE`
 a| [subs=-attributes]
 ++string ++

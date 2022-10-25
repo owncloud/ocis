@@ -18,11 +18,16 @@ debug:
   zpages: false
 grpc:
   addr: 127.0.0.1:9242
+  tls_enabled: false
+  tls_cert: ""
+  tls_key: ""
   protocol: tcp
 token_manager:
   jwt_secret: ""
 reva:
   address: 127.0.0.1:9142
+  tls_mode: ""
+  tls_cacert: ""
 app_registry:
   mimetypes:
   - mime_type: application/pdf

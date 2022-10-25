@@ -24,6 +24,8 @@ http:
   tls: false
 reva:
   address: 127.0.0.1:9142
+  tls_mode: ""
+  tls_cacert: ""
 machine_auth_api_key: ""
 asset:
   asset: ""

@@ -21,6 +21,8 @@ grpc:
 data_path: ~/.ocis/search
 reva:
   address: 127.0.0.1:9142
+  tls_mode: ""
+  tls_cacert: ""
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster

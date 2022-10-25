@@ -24,6 +24,8 @@ http:
   tls: true
 reva:
   address: 127.0.0.1:9142
+  tls_mode: ""
+  tls_cacert: ""
 policies:
 - name: ocis
   routes:

@@ -24,6 +24,8 @@
 | OCIS_INSECURE<br/>NOTIFICATIONS_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | NOTIFICATIONS_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>NOTIFICATIONS_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
-| REVA_GATEWAY<br/>NOTIFICATIONS_REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to look up user metadata|
 | OCIS_MACHINE_AUTH_API_KEY<br/>NOTIFICATIONS_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary to access resources from other services.|
 | OCIS_EMAIL_TEMPLATE_PATH<br/>NOTIFICATIONS_EMAIL_TEMPLATE_PATH | string |  | Path to Email notification templates overriding embedded ones.|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to look up user metadata|
+| REVA_GATEWAY_TLS_MODE | string |  | |
+| REVA_GATEWAY_TLS_CACERT | string |  | |

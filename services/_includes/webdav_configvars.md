@@ -22,4 +22,6 @@
 | OCIS_CORS_ALLOW_CREDENTIALS<br/>WEBDAV_CORS_ALLOW_CREDENTIALS | bool | true | Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
 | OCIS_URL<br/>OCIS_PUBLIC_URL | string | https://127.0.0.1:9200 | URL, where oCIS is reachable for users.|
 | WEBDAV_WEBDAV_NAMESPACE | string | /users/{{.Id.OpaqueId}} | CS3 path layout to use when forwarding /webdav requests|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
+| REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to look up user metadata|
+| REVA_GATEWAY_TLS_MODE | string |  | |
+| REVA_GATEWAY_TLS_CACERT | string |  | |

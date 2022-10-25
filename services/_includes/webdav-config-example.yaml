@@ -39,3 +39,5 @@ http:
 ocis_public_url: https://127.0.0.1:9200
 webdav_namespace: /users/{{.Id.OpaqueId}}
 reva_gateway: 127.0.0.1:9142
+reva_gateway_tls_mode: ""
+reva_gateway_tls_cacert: ""
