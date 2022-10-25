@@ -70,6 +70,26 @@ default:
         - WebDavPropertiesContext:
         - TUSContext:
         - SpacesTUSContext:
+    
+    apiContract:
+      paths:
+        - '%paths.base%/../features/apiContract'
+      context: *common_ldap_suite_context
+      contexts:
+        - SpacesContext:
+        - OccContext:
+        - FeatureContext: *common_feature_context_params
+        - CapabilitiesContext:
+        - ChecksumContext:
+        - FavoritesContext:
+        - FilesVersionsContext:
+        - OCSContext:
+        - PublicWebDavContext:
+        - SearchContext:
+        - TrashbinContext:
+        - WebDavPropertiesContext:
+        - TUSContext:
+        - SpacesTUSContext:
 
     apiArchiver:
       paths:

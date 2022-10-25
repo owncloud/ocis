@@ -348,6 +348,7 @@ def testPipelines(ctx):
             localApiTests(ctx, "ocis", "apiAccountsHashDifficulty"),
             localApiTests(ctx, "ocis", "apiSpaces"),
             localApiTests(ctx, "ocis", "apiSpacesShares"),
+            localApiTests(ctx, "ocis", "apiContract"),
             localApiTests(ctx, "ocis", "apiArchiver"),
             localApiTests(ctx, "ocis", "apiGraph"),
         ]
