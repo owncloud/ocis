@@ -3,6 +3,7 @@ package svc
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"github.com/owncloud/ocis/v2/services/experimental/pkg/activities"
 	"net/http"
 	"os"
 
@@ -12,7 +13,6 @@ import (
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	searchSvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
-	"github.com/owncloud/ocis/v2/services/experimental/pkg/activities"
 	"github.com/owncloud/ocis/v2/services/experimental/pkg/tags"
 )
 
@@ -63,8 +63,11 @@ func NewService(opts ...Option) (Experimental, error) {
 		logger,
 	)
 
-	if err := activities.NewActivitiesService(r, bus, logger, cfg.Activities); err != nil {
-		return svc, err
+	if cfg.Activities.Enabled {
+		err := activities.NewActivitiesService(r, bus, logger, cfg.Activities)
+		if err != nil {
+			return svc, err
+		}
 	}
 
 	r.Mount(cfg.HTTP.Root, r)
