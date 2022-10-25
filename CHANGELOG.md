@@ -37,6 +37,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Logging improvements: [#4815](https://github.com/owncloud/ocis/pull/4815)
 * Enhancement - Secure the nats connection with TLS: [#4781](https://github.com/owncloud/ocis/pull/4781)
 * Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
+* Enhancement - Prohibit users from setting or listing other user's values: [#4897](https://github.com/owncloud/ocis/pull/4897)
 * Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
 * Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
 * Enhancement - Update ownCloud Web to v6.0.0-rc.2: [#4786](https://github.com/owncloud/ocis/pull/4786)
@@ -280,6 +281,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4727
    https://github.com/owncloud/ocis/pull/4757
+
+* Enhancement - Prohibit users from setting or listing other user's values: [#4897](https://github.com/owncloud/ocis/pull/4897)
+
+   Added checks that users can only set and list their own settings.
+
+   https://github.com/owncloud/ocis/pull/4897
 
 * Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
 
