@@ -33,6 +33,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add support for REPORT requests to /dav/spaces URLs: [#4661](https://github.com/owncloud/ocis/pull/4661)
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
 * Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
+* Enhancement - Allow to setup TLS for the reva grpc services: [#4798](https://github.com/owncloud/ocis/pull/4798)
 * Enhancement - Logging improvements: [#4815](https://github.com/owncloud/ocis/pull/4815)
 * Enhancement - Secure the nats connection with TLS: [#4781](https://github.com/owncloud/ocis/pull/4781)
 * Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
@@ -244,6 +245,12 @@ The following sections list the changes for unreleased.
    available in the system anymore
 
    https://github.com/owncloud/ocis/issues/3713
+
+* Enhancement - Allow to setup TLS for the reva grpc services: [#4798](https://github.com/owncloud/ocis/pull/4798)
+
+   We added config options to allow enabling TLS encrption for all reva backed grpc services.
+
+   https://github.com/owncloud/ocis/pull/4798
 
 * Enhancement - Logging improvements: [#4815](https://github.com/owncloud/ocis/pull/4815)
 
