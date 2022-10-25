@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /**
  * ownCloud
  *
@@ -396,6 +398,41 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @When /^the user "([^"]*)" creates a new user using GraphAPI with the following settings:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function theUserCreatesNewUser(string $user, TableNode $table): void {
+		$rows = $table->getRowsHash();
+		$response = GraphHelper::createUser(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$rows["userName"],
+			$rows["password"],
+			$rows["email"],
+			$rows["displayName"]
+		);
+
+		// add created user to list except for the user with an empty name
+		// because reguest /graph/v1.0/users/emptyUserName get 200 and all users
+		if (!empty($rows["userName"])) {
+			$this->featureContext->addUserToCreatedUsersList(
+				$rows["userName"],
+				$rows["password"],
+				$rows["displayName"],
+				$rows["email"]
+			);
+		}
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * adds a user to a group
 	 *
 	 * @Given /^the administrator has added a user "([^"]*)" to the group "([^"]*)" using GraphApi$/
@@ -549,7 +586,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function userChangesOwnPassword(string $user, string $currentPassword, $newPassword): void {
+	public function userChangesOwnPassword(string $user, string $currentPassword, string $newPassword): void {
 		$response = GraphHelper::changeOwnPassword(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),

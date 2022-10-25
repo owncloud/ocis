@@ -115,7 +115,20 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - GraphContext:
+        - SpacesContext:
+        - OccContext:
         - FeatureContext: *common_feature_context_params
+        - CapabilitiesContext:
+        - ChecksumContext:
+        - FavoritesContext:
+        - FilesVersionsContext:
+        - OCSContext:
+        - PublicWebDavContext:
+        - SearchContext:
+        - TrashbinContext:
+        - WebDavPropertiesContext:
+        - TUSContext:
+        - SpacesTUSContext:
 
   extensions:
     Cjm\Behat\StepThroughExtension: ~
