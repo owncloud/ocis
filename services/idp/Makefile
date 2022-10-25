@@ -58,7 +58,6 @@ pnpm-build: node_modules
 
 .PHONY: node_modules
 node_modules:
-	pnpm config set store-dir ./.pnpm-store
 	pnpm install
 
 ############ licenses ############

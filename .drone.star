@@ -1817,6 +1817,7 @@ def makeNodeGenerate(module):
                 "CHROMEDRIVER_SKIP_DOWNLOAD": "true",  # install fails on arm and chromedriver is a test only dependency
             },
             "commands": [
+                "pnpm config set store-dir ./.pnpm-store",
                 "retry -t 3 '%s ci-node-generate'" % (make),
             ],
             "volumes": [stepVolumeGo],
