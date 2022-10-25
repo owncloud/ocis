@@ -32,13 +32,10 @@ function loginReducer(state = {
 
     case RECEIVE_CONSENT:
     case RECEIVE_LOGON:
-      if (!action.success) {
-        return Object.assign({}, state, {
-          errors: action.errors ? action.errors : {},
-          loading: ''
-        });
-      }
-      return state;
+      return Object.assign({}, state, {
+        errors: !action.success && action.errors ? action.errors : {},
+        loading: ''
+      });
 
     case RECEIVE_LOGOFF:
       return Object.assign({}, state, {
