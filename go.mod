@@ -3,7 +3,7 @@ module github.com/owncloud/ocis/v2
 go 1.18
 
 require (
-	github.com/CiscoM31/godata v1.0.5
+	github.com/CiscoM31/godata v1.0.6
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.5.1
 	github.com/armon/go-radix v1.0.0
@@ -36,7 +36,7 @@ require (
 	github.com/gofrs/uuid v4.3.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/golang/protobuf v1.5.2
-	github.com/gookit/config/v2 v2.1.6
+	github.com/gookit/config/v2 v2.1.7
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.12.0
 	github.com/jellydator/ttlcache/v2 v2.11.1
@@ -57,12 +57,12 @@ require (
 	github.com/prometheus/client_golang v1.13.0
 	github.com/rs/zerolog v1.28.0
 	github.com/sirupsen/logrus v1.9.0
-	github.com/spf13/cobra v1.6.0
-	github.com/stretchr/testify v1.8.0
+	github.com/spf13/cobra v1.6.1
+	github.com/stretchr/testify v1.8.1
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.2
 	github.com/tus/tusd v1.10.0
-	github.com/urfave/cli/v2 v2.20.2
+	github.com/urfave/cli/v2 v2.20.3
 	github.com/xhit/go-simple-mail/v2 v2.12.0
 	go-micro.dev/v4 v4.9.0
 	go.etcd.io/bbolt v1.3.6
@@ -183,7 +183,7 @@ require (
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
-	github.com/gookit/goutil v0.5.12 // indirect
+	github.com/gookit/goutil v0.5.15 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
@@ -260,7 +260,7 @@ require (
 	github.com/sony/gobreaker v0.5.0 // indirect
 	github.com/spacewander/go-suffix-tree v0.0.0-20191010040751-0865e368c784 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/objx v0.4.0 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/toorop/go-dkim v0.0.0-20201103131630-e1cd1a0a5208 // indirect
 	github.com/trustelem/zxcvbn v1.0.1 // indirect
 	github.com/wk8/go-ordered-map v1.0.0 // indirect
