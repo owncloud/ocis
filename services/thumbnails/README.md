@@ -10,7 +10,7 @@ The relevant environment variables defining file locations are:
 -   (2) `STORAGE_USERS_OCIS_ROOT`
 -   (3) `THUMBNAILS_FILESYSTEMSTORAGE_ROOT`
 
-(1) ... Having a default set by the ocis code, but if defined, used as base path for other services.  
+(1) ... Having a default set by the Infinite Scale code, but if defined, used as base path for other services.  
 (2) ... Source files, defaults to (1) plus path component, but can be freely defined if required.  
 (3) ... Target files, defaults to (1) plus path component, but can be freely defined if required.  
 
