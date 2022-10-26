@@ -1,8 +1,7 @@
 package registry
 
 import (
-	"os"
-	"strings"
+	"errors"
 	"sync"
 	"time"
 
@@ -17,63 +16,65 @@ import (
 	"go-micro.dev/v4/registry/cache"
 )
 
-const (
-	registryEnv        = "MICRO_REGISTRY"
-	registryAddressEnv = "MICRO_REGISTRY_ADDRESS"
-)
-
 var (
 	once      sync.Once
 	regPlugin string
 	reg       registry.Registry
 )
 
-func Configure(plugin string) {
-	if reg == nil {
-		regPlugin = plugin
-	}
+// Registry defines the parameters for a go micro registry
+type Registry struct {
+	Type      string
+	Addresses []string
 }
 
-// GetRegistry returns a configured micro registry based on Micro env vars.
-// It defaults to mDNS, so mind that systems with mDNS disabled by default (i.e SUSE) will have a hard time
-// and it needs to explicitly use etcd. Os awareness for providing a working registry out of the box should be done.
-func GetRegistry() registry.Registry {
-	once.Do(func() {
-		addresses := strings.Split(os.Getenv(registryAddressEnv), ",")
-		// prefer env of setting from Configure()
-		plugin := os.Getenv(registryEnv)
-		if plugin == "" {
-			plugin = regPlugin
-		}
+// GetRegistry returns a configured micro registry based on the given function parameters.
+func GetRegistry(r Registry) (registry.Registry, error) {
+	if regPlugin != "" && regPlugin != r.Type {
+		return nil, errors.New("registry has already been configured to a different registry")
+	}
 
-		switch plugin {
+	once.Do(func() {
+		switch r.Type {
 		case "nats":
 			reg = natsr.NewRegistry(
-				registry.Addrs(addresses...),
+				registry.Addrs(r.Addresses...),
 			)
+			regPlugin = "nats"
 		case "kubernetes":
 			reg = kubernetesr.NewRegistry(
-				registry.Addrs(addresses...),
+				registry.Addrs(r.Addresses...),
 			)
+			regPlugin = "kubernetes"
 		case "etcd":
 			reg = etcdr.NewRegistry(
-				registry.Addrs(addresses...),
+				registry.Addrs(r.Addresses...),
 			)
+			regPlugin = "etcd"
 		case "consul":
 			reg = consulr.NewRegistry(
-				registry.Addrs(addresses...),
+				registry.Addrs(r.Addresses...),
 			)
+			regPlugin = "consul"
 		case "memory":
 			reg = memr.NewRegistry()
-		default:
+			regPlugin = "memory"
+		case "mdns":
 			reg = mdnsr.NewRegistry()
+			regPlugin = "mdns"
+		default:
+			reg = nil
 		}
 		// No cache needed for in-memory registry
-		if plugin != "memory" {
+		if r.Type != "memory" {
+			// otherwise use cached registry to prevent registry
+			// lookup for every request
 			reg = cache.New(reg, cache.WithTTL(20*time.Second))
 		}
 	})
-	// always use cached registry to prevent registry
-	// lookup for every request
-	return reg
+	if reg == nil {
+		return nil, errors.New("unknown registry")
+	}
+
+	return reg, nil
 }

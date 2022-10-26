@@ -23,7 +23,14 @@ func Version(cfg *config.Config) *cli.Command {
 			fmt.Printf("Compiled: %s\n", version.Compiled())
 			fmt.Println("")
 
-			reg := registry.GetRegistry()
+			reg, err := registry.GetRegistry(registry.Registry{
+				Type:      cfg.Registry.Type,
+				Addresses: cfg.Registry.Addresses,
+			})
+			if err != nil {
+				fmt.Println(fmt.Errorf("could not initialize the registry: %v", err))
+				return err
+			}
 			services, err := reg.GetService(cfg.GRPC.Namespace + "." + cfg.Service.Name)
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not get %s services from the registry: %v", cfg.Service.Name, err))

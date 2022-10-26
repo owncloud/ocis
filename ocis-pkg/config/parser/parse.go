@@ -84,6 +84,13 @@ func EnsureCommons(cfg *config.Config) {
 		cfg.Commons.Tracing = &shared.Tracing{}
 	}
 
+	if cfg.Registry != nil {
+		cfg.Commons.Registry = &shared.Registry{
+			Type:      cfg.Registry.Type,
+			Addresses: cfg.Registry.Addresses,
+		}
+	}
+
 	if cfg.CacheStore != nil {
 		cfg.Commons.CacheStore = &shared.CacheStore{
 			Type:    cfg.CacheStore.Type,

@@ -42,12 +42,18 @@ type CacheStore struct {
 	Size    int    `yaml:"size" env:"OCIS_CACHE_STORE_SIZE" desc:"Maximum size for the cache store. Only ocmem will use this option, in number of items per table. The rest will ignore the option and can grow indefinitely"`
 }
 
+type Registry struct {
+	Type      string   `yaml:"type" env:"MICRO_REGISTRY"`
+	Addresses []string `yaml:"addresses" env:"MICRO_REGISTRY_ADDRESSES"`
+}
+
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether
 // to overwrite its values.
 type Commons struct {
 	Log               *Log          `yaml:"log"`
 	Tracing           *Tracing      `yaml:"tracing"`
 	CacheStore        *CacheStore   `yaml:"cache_store"`
+	Registry          *Registry     `yaml:"registry"`
 	OcisURL           string        `yaml:"ocis_url" env:"OCIS_URL" desc:"URL, where oCIS is reachable for users."`
 	TokenManager      *TokenManager `mask:"struct" yaml:"token_manager"`
 	Reva              *Reva         `yaml:"reva"`

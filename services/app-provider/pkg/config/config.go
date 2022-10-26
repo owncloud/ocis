@@ -7,11 +7,12 @@ import (
 )
 
 type Config struct {
-	Commons *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
-	Service Service         `yaml:"-"`
-	Tracing *Tracing        `yaml:"tracing"`
-	Log     *Log            `yaml:"log"`
-	Debug   Debug           `yaml:"debug"`
+	Commons  *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
+	Service  Service         `yaml:"-"`
+	Tracing  *Tracing        `yaml:"tracing"`
+	Log      *Log            `yaml:"log"`
+	Registry *Registry       `yaml:"registry"`
+	Debug    Debug           `yaml:"debug"`
 
 	GRPC GRPCConfig `yaml:"grpc"`
 
@@ -24,6 +25,11 @@ type Config struct {
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
+}
+
+type Registry struct {
+	Type      string   `yaml:"type" env:"MICRO_REGISTRY"`
+	Addresses []string `yaml:"addresses" env:"MICRO_REGISTRY_ADDRESSES"`
 }
 
 type Tracing struct {

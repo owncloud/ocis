@@ -10,6 +10,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/external"
 	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -84,6 +85,10 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.GRPC.Addr,
 				version.GetString(),
 				logger,
+				registry.Registry{
+					Type:      cfg.Registry.Type,
+					Addresses: cfg.Registry.Addresses,
+				},
 			); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the grpc endpoint")
 			}

@@ -10,7 +10,7 @@ import (
 	mbreaker "github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker"
 	"github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus"
 	"github.com/go-micro/plugins/v4/wrapper/trace/opencensus"
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	oregistry "github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/client"
 )
@@ -21,20 +21,23 @@ var (
 	once          sync.Once
 )
 
-func DefaultClient() client.Client {
-	return getDefaultGrpcClient()
+func DefaultClient(registry oregistry.Registry) (client.Client, error) {
+	return getDefaultGrpcClient(registry)
 }
 
-func getDefaultGrpcClient() client.Client {
-	once.Do(func() {
-		reg := registry.GetRegistry()
+func getDefaultGrpcClient(registry oregistry.Registry) (client.Client, error) {
+	reg, err := oregistry.GetRegistry(registry)
+	if err != nil {
+		return nil, err
+	}
 
+	once.Do(func() {
 		defaultClient = mgrpcc.NewClient(
 			client.Registry(reg),
 			client.Wrap(mbreaker.NewClientWrapper()),
 		)
 	})
-	return defaultClient
+	return defaultClient, nil
 }
 
 // Service simply wraps the go-micro grpc service.
@@ -43,20 +46,29 @@ type Service struct {
 }
 
 // NewService initializes a new grpc service.
-func NewService(opts ...Option) Service {
+func NewService(registry oregistry.Registry, opts ...Option) (Service, error) {
 	sopts := newOptions(opts...)
+
+	client, err := DefaultClient(registry)
+	if err != nil {
+		return Service{}, err
+	}
+	reg, err := oregistry.GetRegistry(registry)
+	if err != nil {
+		return Service{}, err
+	}
 
 	mopts := []micro.Option{
 		// first add a server because it will reset any options
 		micro.Server(mgrpcs.NewServer()),
 		// also add a client that can be used after initializing the service
-		micro.Client(DefaultClient()),
+		micro.Client(client),
 		micro.Address(sopts.Address),
 		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
 		micro.Version(sopts.Version),
 		micro.Context(sopts.Context),
 		micro.Flags(sopts.Flags...),
-		micro.Registry(registry.GetRegistry()),
+		micro.Registry(reg),
 		micro.RegisterTTL(time.Second * 30),
 		micro.RegisterInterval(time.Second * 10),
 		micro.WrapHandler(prometheus.NewHandlerWrapper()),
@@ -65,5 +77,5 @@ func NewService(opts ...Option) Service {
 		micro.WrapSubscriber(opencensus.NewSubscriberWrapper()),
 	}
 
-	return Service{micro.NewService(mopts...)}
+	return Service{micro.NewService(mopts...)}, nil
 }

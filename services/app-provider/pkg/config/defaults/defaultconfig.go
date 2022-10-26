@@ -80,6 +80,17 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
 	}
+
+	if cfg.Registry == nil && cfg.Commons != nil && cfg.Commons.Registry != nil {
+		cfg.Registry = &config.Registry{
+			Type:      cfg.Commons.Registry.Type,
+			Addresses: cfg.Commons.Registry.Addresses,
+		}
+	} else if cfg.Registry == nil {
+		cfg.Registry = &config.Registry{
+			Type: "memory",
+		}
+	}
 }
 
 func Sanitize(cfg *config.Config) {

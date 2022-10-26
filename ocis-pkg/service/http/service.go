@@ -6,6 +6,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/broker"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	oregistry "github.com/owncloud/ocis/v2/ocis-pkg/registry"
 
 	mhttps "github.com/go-micro/plugins/v4/server/http"
 	"go-micro.dev/v4"
@@ -18,7 +19,13 @@ type Service struct {
 }
 
 // NewService initializes a new http service.
-func NewService(opts ...Option) Service {
+func NewService(registry registry.Registry, opts ...Option) (Service, error) {
+
+	reg, err := oregistry.GetRegistry(registry)
+	if err != nil {
+		return Service{}, err
+	}
+
 	noopBroker := broker.NoOp{}
 	sopts := newOptions(opts...)
 	wopts := []micro.Option{
@@ -29,10 +36,10 @@ func NewService(opts ...Option) Service {
 		micro.Version(sopts.Version),
 		micro.Context(sopts.Context),
 		micro.Flags(sopts.Flags...),
-		micro.Registry(registry.GetRegistry()),
+		micro.Registry(reg),
 		micro.RegisterTTL(time.Second * 30),
 		micro.RegisterInterval(time.Second * 10),
 	}
 
-	return Service{micro.NewService(wopts...)}
+	return Service{micro.NewService(wopts...)}, nil
 }

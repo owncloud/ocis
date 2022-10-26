@@ -24,7 +24,14 @@ func VersionCommand(cfg *config.Config) *cli.Command {
 			fmt.Printf("Compiled: %s\n", version.Compiled())
 			fmt.Println("")
 
-			reg := registry.GetRegistry()
+			reg, err := registry.GetRegistry(registry.Registry{
+				Type:      cfg.Registry.Type,
+				Addresses: cfg.Registry.Addresses,
+			})
+			if err != nil {
+				fmt.Println(fmt.Errorf("could not initialize registry: %v", err))
+				return err
+			}
 			serviceList, err := reg.ListServices()
 			if err != nil {
 				fmt.Println(fmt.Errorf("could not list services: %v", err))
