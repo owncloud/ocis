@@ -317,6 +317,21 @@ func TestLexer(t *testing.T) {
 				{k: TEof},
 			},
 		},
+		{
+			input: "+ID:1284d238-aa92-42ce-bdc4-0b0000009157$4c510ada-c86b-4815-8820-42cdf82c3d51!4c510ada-c86b-4815-8820-42cdf82c3d51 +Mtime:>=\"2022-10-19T10:35:21.064277496+02:00\"",
+			exp: []kv[Token, string]{
+				{k: TAddition},
+				{k: TField, v: "ID"},
+				{k: TValue, v: "1284d238-aa92-42ce-bdc4-0b0000009157$4c510ada-c86b-4815-8820-42cdf82c3d51!4c510ada-c86b-4815-8820-42cdf82c3d51"},
+				{k: TAddition},
+				{k: TField, v: "Mtime"},
+				{k: TValue, v: ">="},
+				{k: TQuotationMark},
+				{k: TValue, v: "2022-10-19T10:35:21.064277496+02:00"},
+				{k: TQuotationMark},
+				{k: TEof},
+			},
+		},
 	}
 
 	for _, c := range cases {
