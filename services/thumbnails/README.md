@@ -1,6 +1,6 @@
 # Thumbnails Service
 
-The thumbnails service provides methods to generate thumbnails for various files and resolutions based on requests. It retrieves the sources at the location where the user files are stored and saves the tumbnails where system files are stored. Those locations have defaults but can be manually defined via environment variables.
+The thumbnails service provides methods to generate thumbnails for various files and resolutions based on requests. It retrieves the sources at the location where the user files are stored and saves the thumbnails where system files are stored. Those locations have defaults but can be manually defined via environment variables.
 
 ## File Locations Overview
 
@@ -18,7 +18,7 @@ For details and defaults for these environment variables see the ocis admin docu
 
 ## Thumbnail Location
 
-It may be benificial to define the location of the thumbnails other than at system files. This is due the fact that storing thumbnails can consume a lot of space over time which not necessarily needs to reside on the same partition or mount or expensive drives.
+It may be beneficial to define the location of the thumbnails to be other than the default (with system files). This is due the fact that storing thumbnails can consume a lot of space over time which not necessarily needs to reside on the same partition or mount or expensive drives.
 
 ## Thumbnail Source File Types
 
@@ -37,11 +37,11 @@ If a file type was not properly assigned or the type identification failed, thum
 
 ## Thumbnail Target File Types
 
-Thumbnails can either be generated as `png`, `jpg` or `gif` files. These types are hardcoded and no other types can be requested. A requestor like another service or a client can request one of the avialable types to be generated. If more than one type is required, each type must be requested individaully.
+Thumbnails can either be generated as `png`, `jpg` or `gif` files. These types are hardcoded and no other types can be requested. A requestor, like another service or a client, can request one of the available types to be generated. If more than one type is required, each type must be requested individually.
 
 ## Thumbnail Resolution
 
-Various resolutions can be defined via `THUMBNAILS_RESOLUTIONS`. A requestor can request any arbitrary resolution and the thumbnail service will use the one closest to the requested resolution. If more than one resolution is required, each resolution must be requested individaully.
+Various resolutions can be defined via `THUMBNAILS_RESOLUTIONS`. A requestor can request any arbitrary resolution and the thumbnail service will use the one closest to the requested resolution. If more than one resolution is required, each resolution must be requested individually.
 
 **Example:**
 
@@ -51,8 +51,8 @@ Returned: 15x10
 
 ## Deleting Thumbnails
 
-As of now, there is no automatism deleting thumbnails automatically. This is especially true when a source file gets deleted or moved. This situation will be solved in a later stage. For the time being, if you run short on physical thumbnails space, you have to manually delete the thumbnail store to free space. Thumbnails will then be recreated on request.
+As of now, there is no automated thumbnail deletion. This is especially true when a source file gets deleted or moved. This situation will be solved at a later stage. For the time being, if you run short on physical thumbnails space, you have to manually delete the thumbnail store to free space. Thumbnails will then be recreated on request.
 
 ## Memory Considerations
 
-Since source files need to be loaded into memory when generating thumbnails, large source files could potentially crash this service if there is insufficient memory available. For bigger instances when using container orchestration deployment methods, this service can be dedicated to own servers with more memory.
+Since source files need to be loaded into memory when generating thumbnails, large source files could potentially crash this service if there is insufficient memory available. For bigger instances when using container orchestration deployment methods, this service can be dedicated to its own server(s) with more memory.
