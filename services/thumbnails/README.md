@@ -43,7 +43,7 @@ Thumbnails can either be generated as `png`, `jpg` or `gif` files. These types a
 
 Various resolutions can be defined via `THUMBNAILS_RESOLUTIONS`. A requestor can request any arbitrary resolution and the thumbnail service will use the one closest to the requested resolution. If more than one resolution is required, each resolution must be requested individually.
 
-**Example:**
+Example:
 
 Requested: 18x12  
 Available: 30x20, 15x10, 9x6  
