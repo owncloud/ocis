@@ -37,9 +37,7 @@ func DefaultConfig() *config.Config {
 				ConsumerGroup: "notifications",
 				EnableTLS:     false,
 			},
-			RevaGateway:          shared.DefaultRevaConfig().Address,
-			RevaGatewayTLSMode:   shared.DefaultRevaConfig().TLSMode,
-			RevaGatewayTLSCACert: shared.DefaultRevaConfig().TLSCACert,
+			RevaGateway: shared.DefaultRevaConfig().Address,
 		},
 	}
 }
@@ -59,6 +57,12 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.Notifications.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
 		cfg.Notifications.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	}
+	if cfg.Notifications.GRPCClientTLS == nil {
+		cfg.Notifications.GRPCClientTLS = &shared.GRPCClientTLS{}
+		if cfg.Commons != nil && cfg.Commons.GRPCClientTLS != nil {
+			cfg.Notifications.GRPCClientTLS = cfg.Commons.GRPCClientTLS
+		}
 	}
 }
 

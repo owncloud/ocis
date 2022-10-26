@@ -51,11 +51,11 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.CacheStore == nil {
 		cfg.CacheStore = &shared.CacheStore{}
 	}
-	if cfg.MicroGRPCClient == nil {
-		cfg.MicroGRPCClient = &shared.MicroGRPCClient{}
+	if cfg.GRPCClientTLS == nil {
+		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 	}
-	if cfg.MicroGRPCService == nil {
-		cfg.MicroGRPCService = &shared.MicroGRPCService{}
+	if cfg.GRPCServiceTLS == nil {
+		cfg.GRPCServiceTLS = &shared.GRPCServiceTLS{}
 	}
 
 }
@@ -101,12 +101,12 @@ func EnsureCommons(cfg *config.Config) {
 		cfg.Commons.CacheStore = &shared.CacheStore{}
 	}
 
-	if cfg.MicroGRPCClient != nil {
-		cfg.Commons.MicroGRPCClient = cfg.MicroGRPCClient
+	if cfg.GRPCClientTLS != nil {
+		cfg.Commons.GRPCClientTLS = cfg.GRPCClientTLS
 	}
 
-	if cfg.MicroGRPCService != nil {
-		cfg.Commons.MicroGRPCService = cfg.MicroGRPCService
+	if cfg.GRPCServiceTLS != nil {
+		cfg.Commons.GRPCServiceTLS = cfg.GRPCServiceTLS
 	}
 
 	// copy token manager to the commons part if set

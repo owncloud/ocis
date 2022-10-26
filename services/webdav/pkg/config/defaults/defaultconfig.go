@@ -36,11 +36,9 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "webdav",
 		},
-		OcisPublicURL:        "https://127.0.0.1:9200",
-		WebdavNamespace:      "/users/{{.Id.OpaqueId}}",
-		RevaGateway:          shared.DefaultRevaConfig().Address,
-		RevaGatewayTLSMode:   shared.DefaultRevaConfig().TLSMode,
-		RevaGatewayTLSCACert: shared.DefaultRevaConfig().TLSCACert,
+		OcisPublicURL:   "https://127.0.0.1:9200",
+		WebdavNamespace: "/users/{{.Id.OpaqueId}}",
+		RevaGateway:     shared.DefaultRevaConfig().Address,
 	}
 }
 
@@ -68,11 +66,11 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
-	if cfg.MicroGRPCClient == nil {
-		cfg.MicroGRPCClient = &shared.MicroGRPCClient{}
-		if cfg.Commons != nil && cfg.Commons.MicroGRPCClient != nil {
-			cfg.MicroGRPCClient.TLSMode = cfg.Commons.MicroGRPCClient.TLSMode
-			cfg.MicroGRPCClient.TLSCACert = cfg.Commons.MicroGRPCClient.TLSCACert
+	if cfg.GRPCClientTLS == nil {
+		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
+		if cfg.Commons != nil && cfg.Commons.GRPCClientTLS != nil {
+			cfg.GRPCClientTLS.Mode = cfg.Commons.GRPCClientTLS.Mode
+			cfg.GRPCClientTLS.CACert = cfg.Commons.GRPCClientTLS.CACert
 		}
 	}
 }

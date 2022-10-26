@@ -27,13 +27,13 @@ type Channel interface {
 
 // NewMailChannel instantiates a new mail communication channel.
 func NewMailChannel(cfg config.Config, logger log.Logger) (Channel, error) {
-	tm, err := pool.StringToTLSMode(cfg.Notifications.RevaGatewayTLSMode)
+	tm, err := pool.StringToTLSMode(cfg.Notifications.GRPCClientTLS.Mode)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not get gateway client tls mode")
 		return nil, err
 	}
 	gc, err := pool.GetGatewayServiceClient(cfg.Notifications.RevaGateway,
-		pool.WithTLSCACert(cfg.Notifications.RevaGatewayTLSCACert),
+		pool.WithTLSCACert(cfg.Notifications.GRPCClientTLS.CACert),
 		pool.WithTLSMode(tm),
 	)
 	if err != nil {

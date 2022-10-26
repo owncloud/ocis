@@ -42,9 +42,9 @@ var _ = Describe("Graph", func() {
 		cfg.Identity.LDAP.CACert = "" // skip the startup checks, we don't use LDAP at all in this tests
 		cfg.TokenManager.JWTSecret = "loremipsum"
 		cfg.Commons = &shared.Commons{}
-		cfg.MicroGRPCClient = &shared.MicroGRPCClient{}
+		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 
-		_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.MicroGRPCClient)...)
+		_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
 		gatewayClient = &mocks.GatewayClient{}
 		eventsPublisher = mocks.Publisher{}
 		svc = service.NewService(

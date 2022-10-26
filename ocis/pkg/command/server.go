@@ -23,7 +23,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			// Prefer the in-memory registry as the default when running in single-binary mode
 			registry.Configure("memory")
-			err := grpc.Configure(grpc.GetClientOptions(cfg.MicroGRPCClient)...)
+			err := grpc.Configure(grpc.GetClientOptions(cfg.GRPCClientTLS)...)
 			if err != nil {
 				return err
 			}

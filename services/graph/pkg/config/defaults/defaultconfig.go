@@ -114,11 +114,11 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 
-	if cfg.MicroGRPCClient == nil {
-		cfg.MicroGRPCClient = &shared.MicroGRPCClient{}
-		if cfg.Commons != nil && cfg.Commons.MicroGRPCClient != nil {
-			cfg.MicroGRPCClient.TLSMode = cfg.Commons.MicroGRPCClient.TLSMode
-			cfg.MicroGRPCClient.TLSCACert = cfg.Commons.MicroGRPCClient.TLSCACert
+	if cfg.GRPCClientTLS == nil {
+		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
+		if cfg.Commons != nil && cfg.Commons.GRPCClientTLS != nil {
+			cfg.GRPCClientTLS.Mode = cfg.Commons.GRPCClientTLS.Mode
+			cfg.GRPCClientTLS.CACert = cfg.Commons.GRPCClientTLS.CACert
 		}
 	}
 }

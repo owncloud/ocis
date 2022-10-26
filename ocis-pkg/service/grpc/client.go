@@ -92,10 +92,10 @@ func DefaultClient() client.Client {
 	return defaultClient
 }
 
-func GetClientOptions(mc *shared.MicroGRPCClient) []ClientOption {
+func GetClientOptions(t *shared.GRPCClientTLS) []ClientOption {
 	opts := []ClientOption{
-		WithTLSMode(mc.TLSMode),
-		WithTLSCACert(mc.TLSCACert),
+		WithTLSMode(t.Mode),
+		WithTLSCACert(t.CACert),
 	}
 	return opts
 }

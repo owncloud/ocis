@@ -30,9 +30,9 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
 			"tls_settings": map[string]interface{}{
-				"enabled":     cfg.GRPC.TLSEnabled,
-				"certificate": cfg.GRPC.TLSCert,
-				"key":         cfg.GRPC.TLSKey,
+				"enabled":     cfg.GRPC.TLS.Enabled,
+				"certificate": cfg.GRPC.TLS.Cert,
+				"key":         cfg.GRPC.TLS.Key,
 			},
 			// TODO build services dynamically
 			"services": map[string]interface{}{

@@ -40,7 +40,7 @@ func DefaultConfig() *config.Config {
 				AllowCredentials: true,
 			},
 		},
-		GRPC: config.GRPC{
+		GRPC: config.GRPCConfig{
 			Addr:      "127.0.0.1:9191",
 			Namespace: "com.owncloud.api",
 		},
@@ -102,19 +102,19 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.AdminUserID = cfg.Commons.AdminUserID
 	}
 
-	if cfg.MicroGRPCClient == nil {
-		cfg.MicroGRPCClient = &shared.MicroGRPCClient{}
-		if cfg.Commons != nil && cfg.Commons.MicroGRPCClient != nil {
-			cfg.MicroGRPCClient.TLSMode = cfg.Commons.MicroGRPCClient.TLSMode
-			cfg.MicroGRPCClient.TLSCACert = cfg.Commons.MicroGRPCClient.TLSCACert
+	if cfg.GRPCClientTLS == nil {
+		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
+		if cfg.Commons != nil && cfg.Commons.GRPCClientTLS != nil {
+			cfg.GRPCClientTLS.Mode = cfg.Commons.GRPCClientTLS.Mode
+			cfg.GRPCClientTLS.CACert = cfg.Commons.GRPCClientTLS.CACert
 		}
 	}
-	if cfg.MicroGRPCService == nil {
-		cfg.MicroGRPCService = &shared.MicroGRPCService{}
-		if cfg.Commons != nil && cfg.Commons.MicroGRPCService != nil {
-			cfg.MicroGRPCService.TLSEnabled = cfg.Commons.MicroGRPCService.TLSEnabled
-			cfg.MicroGRPCService.TLSCert = cfg.Commons.MicroGRPCService.TLSCert
-			cfg.MicroGRPCService.TLSKey = cfg.Commons.MicroGRPCService.TLSKey
+	if cfg.GRPC.TLS == nil {
+		cfg.GRPC.TLS = &shared.GRPCServiceTLS{}
+		if cfg.Commons != nil && cfg.Commons.GRPCServiceTLS != nil {
+			cfg.GRPC.TLS.Enabled = cfg.Commons.GRPCServiceTLS.Enabled
+			cfg.GRPC.TLS.Cert = cfg.Commons.GRPCServiceTLS.Cert
+			cfg.GRPC.TLS.Key = cfg.Commons.GRPCServiceTLS.Key
 		}
 	}
 }

@@ -25,9 +25,9 @@ func AppRegistryConfigFromStruct(cfg *config.Config, logger log.Logger) map[stri
 			"network": cfg.GRPC.Protocol,
 			"address": cfg.GRPC.Addr,
 			"tls_settings": map[string]interface{}{
-				"enabled":     cfg.GRPC.TLSEnabled,
-				"certificate": cfg.GRPC.TLSCert,
-				"key":         cfg.GRPC.TLSKey,
+				"enabled":     cfg.GRPC.TLS.Enabled,
+				"certificate": cfg.GRPC.TLS.Cert,
+				"key":         cfg.GRPC.TLS.Key,
 			},
 			"services": map[string]interface{}{
 				"appregistry": map[string]interface{}{

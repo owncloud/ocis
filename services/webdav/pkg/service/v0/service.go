@@ -60,12 +60,12 @@ func NewService(opts ...Option) (Service, error) {
 	// chi.RegisterMethod("REPORT")
 	m.Use(options.Middleware...)
 
-	tm, err := pool.StringToTLSMode(conf.RevaGatewayTLSMode)
+	tm, err := pool.StringToTLSMode(conf.GRPCClientTLS.Mode)
 	if err != nil {
 		return nil, err
 	}
 	gwc, err := pool.GetGatewayServiceClient(conf.RevaGateway,
-		pool.WithTLSCACert(conf.RevaGatewayTLSCACert),
+		pool.WithTLSCACert(conf.GRPCClientTLS.CACert),
 		pool.WithTLSMode(tm),
 	)
 	if err != nil {

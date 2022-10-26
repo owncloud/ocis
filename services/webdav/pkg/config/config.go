@@ -16,7 +16,7 @@ type Config struct {
 	Log     *Log     `yaml:"log"`
 	Debug   Debug    `yaml:"debug"`
 
-	MicroGRPCClient *shared.MicroGRPCClient `yaml:"micro_grpc_client"`
+	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 
 	HTTP HTTP `yaml:"http"`
 

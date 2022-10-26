@@ -33,7 +33,7 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			err = ogrpc.Configure(ogrpc.GetClientOptions(cfg.MicroGRPCClient)...)
+			err = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
 			if err != nil {
 				return err
 			}
