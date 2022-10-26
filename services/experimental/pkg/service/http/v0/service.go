@@ -3,7 +3,6 @@ package svc
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"github.com/owncloud/ocis/v2/services/experimental/pkg/activities"
 	"net/http"
 	"os"
 
@@ -13,6 +12,7 @@ import (
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	searchSvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
+	"github.com/owncloud/ocis/v2/services/experimental/pkg/activities"
 	"github.com/owncloud/ocis/v2/services/experimental/pkg/tags"
 )
 
