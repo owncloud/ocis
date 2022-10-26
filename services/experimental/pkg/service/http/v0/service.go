@@ -63,8 +63,11 @@ func NewService(opts ...Option) (Experimental, error) {
 		logger,
 	)
 
-	if err := activities.NewActivitiesService(r, bus, logger, cfg.Activities); err != nil {
-		return svc, err
+	if cfg.Activities.Enabled {
+		err := activities.NewActivitiesService(r, bus, logger, cfg.Activities)
+		if err != nil {
+			return svc, err
+		}
 	}
 
 	r.Mount(cfg.HTTP.Root, r)

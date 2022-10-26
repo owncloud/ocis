@@ -2,6 +2,7 @@ package config
 
 // Activities defines the available activities configuration.
 type Activities struct {
+	Enabled bool              `yaml:"enabled" env:"EXPERIMENTAL_ACTIVITIES_ENABLED" desc:"enable activities app."`
 	Storage ActivitiesStorage `yaml:"storage" env:"EXPERIMENTAL_ACTIVITIES_STORAGE" desc:"activities storage."`
 }
 
