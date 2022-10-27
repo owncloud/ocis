@@ -32,7 +32,7 @@ const paths = require('../ui_config/paths');
 const configFactory = require('../ui_config/webpack.config');
 const createDevServerConfig = require('../ui_config/webpackDevServer.config');
 
-const useYarn = fs.existsSync(paths.yarnLockFile);
+const usePnpm = fs.existsSync(paths.pnpmLockFile);
 const isInteractive = process.stdout.isTTY;
 
 // Warn and crash if required files are missing
@@ -93,7 +93,7 @@ checkBrowsers(paths.appPath, isInteractive)
       config,
       devSocket,
       urls,
-      useYarn,
+      usePnpm,
       useTypeScript,
       tscCompileOnError,
       webpack,

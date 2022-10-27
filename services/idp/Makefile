@@ -30,7 +30,7 @@ ci-go-generate: # CI runs ci-node-generate automatically before this target
 ci-node-generate: assets
 
 .PHONY: assets
-assets: yarn-build \
+assets: pnpm-build \
 		assets/identifier/static \
 		assets/identifier/static/logo.svg \
 		assets/identifier/static/favicon.ico
@@ -50,22 +50,22 @@ FAVICON_URL = https://raw.githubusercontent.com/owncloud/assets/main/favicon.ico
 assets/identifier/static/favicon.ico:
 	curl --fail -o assets/identifier/static/favicon.ico ${FAVICON_URL}
 
-.PHONY: yarn-build
-yarn-build: node_modules
-	#yarn lint #TODO: activate
-	#yarn test #TODO: activate
-	yarn build
+.PHONY: pnpm-build
+pnpm-build: node_modules
+	#pnpm lint #TODO: activate
+	#pnpm test #TODO: activate
+	pnpm build
 
 .PHONY: node_modules
 node_modules:
-	yarn install --immutable
+	pnpm install
 
 ############ licenses ############
 .PHONY: ci-node-check-licenses
 ci-node-check-licenses: node_modules
-	yarn licenses:check
+	pnpm licenses:check
 
 .PHONY: ci-node-save-licenses
 ci-node-save-licenses: node_modules
-	yarn licenses:csv
-	yarn licenses:save
+	pnpm licenses:csv
+	pnpm licenses:save

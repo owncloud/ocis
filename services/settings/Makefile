@@ -37,17 +37,17 @@ include ../../.make/generate.mk
 ci-go-generate: protobuf # CI runs ci-node-generate automatically before this target
 
 .PHONY: ci-node-generate
-ci-node-generate: yarn-build
+ci-node-generate: pnpm-build
 
-.PHONY: yarn-build
-yarn-build: node_modules
-	yarn lint
-	yarn test
-	yarn build
+.PHONY: pnpm-build
+pnpm-build: node_modules
+	pnpm lint
+	pnpm test
+	pnpm build
 
 .PHONY: node_modules
 node_modules:
-	yarn install --immutable
+	pnpm install
 
 ############ protobuf ############
 include ../../.make/protobuf.mk
@@ -58,9 +58,9 @@ protobuf: buf-generate
 ############ licenses ############
 .PHONY: ci-node-check-licenses
 ci-node-check-licenses: node_modules
-	yarn licenses:check
+	pnpm licenses:check
 
 .PHONY: ci-node-save-licenses
 ci-node-save-licenses: node_modules
-	yarn licenses:csv
-	yarn licenses:save
+	pnpm licenses:csv
+	pnpm licenses:save

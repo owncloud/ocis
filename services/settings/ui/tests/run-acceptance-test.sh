@@ -46,7 +46,7 @@ export SERVER_HOST=${SERVER_HOST:-https://localhost:9200}
 export BACKEND_HOST=${BACKEND_HOST:-https://localhost:9200}
 export TEST_TAGS=${TEST_TAGS:-"not @skip"}
 
-yarn run acceptance-tests "$1"
+pnpm run acceptance-tests "$1"
 
 status=$?
 exit $status

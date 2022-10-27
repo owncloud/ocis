@@ -43,7 +43,7 @@ Every image placed in `idp/ui/src/images` can be directly import into components
 If you need to edit or add new locales, you can do so with json files in the `idp/ui/src/locales` folder. If adding new locale, make sure to add it also in the `index.js` file in the same folder.
 
 ## Building assets
-In order to build all assets, run `yarn build` in the `idp` folder. This script will compile all assets and output them into `idp/assets` folder.
+In order to build all assets, run `pnpm build` in the `idp` folder. This script will compile all assets and output them into `idp/assets` folder.
 
 At this point, you have two possible ways how to deploy your new theme:
 - run `make generate` in the root folder of your oCIS clone and generate the new assets
