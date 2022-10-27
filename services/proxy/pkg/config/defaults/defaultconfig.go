@@ -70,47 +70,47 @@ func DefaultPolicies() []config.Policy {
 			Routes: []config.Route{
 				{
 					Endpoint:    "/",
-					Backend:     "http://localhost:9100",
+					Service:     "com.owncloud.web.web",
 					Unprotected: true,
 				},
 				{
 					Endpoint:    "/.well-known/",
-					Backend:     "http://localhost:9130",
+					Service:     "com.owncloud.web.idp",
 					Unprotected: true,
 				},
 				{
 					Endpoint:    "/konnect/",
-					Backend:     "http://localhost:9130",
+					Service:     "com.owncloud.web.idp",
 					Unprotected: true,
 				},
 				{
 					Endpoint:    "/signin/",
-					Backend:     "http://localhost:9130",
+					Service:     "com.owncloud.web.idp",
 					Unprotected: true,
 				},
 				{
 					Endpoint: "/archiver",
-					Backend:  "http://localhost:9140",
+					Service:  "com.owncloud.web.frontend",
 				},
 				{
 					Type:     config.RegexRoute,
 					Endpoint: "/ocs/v[12].php/cloud/user/signing-key", // only `user/signing-key` is left in ocis-ocs
-					Backend:  "http://localhost:9110",
+					Service:  "com.owncloud.web.ocs",
 				},
 				{
 					Type:        config.RegexRoute,
 					Endpoint:    "/ocs/v[12].php/config",
-					Backend:     "http://localhost:9140",
+					Service:     "com.owncloud.web.frontend",
 					Unprotected: true,
 				},
 				{
 					Endpoint: "/ocs/",
-					Backend:  "http://localhost:9140",
+					Service:  "com.owncloud.web.frontend",
 				},
 				{
 					Type:     config.QueryRoute,
 					Endpoint: "/remote.php/?preview=1",
-					Backend:  "http://localhost:9115",
+					Service:  "com.owncloud.web.webdav",
 				},
 				// TODO the actual REPORT goes to /dav/files/{username}, which is user specific ... how would this work in a spaces world?
 				// TODO what paths are returned? the href contains the full path so it should be possible to return urls from other spaces?
@@ -119,27 +119,27 @@ func DefaultPolicies() []config.Policy {
 				{
 					Method:   "REPORT",
 					Endpoint: "/remote.php/dav/",
-					Backend:  "http://localhost:9115", // TODO use registry?
+					Service:  "com.owncloud.web.webdav",
 				},
 				{
 					Method:   "REPORT",
 					Endpoint: "/remote.php/webdav",
-					Backend:  "http://localhost:9115", // TODO use registry?
+					Service:  "com.owncloud.web.webdav",
 				},
 				{
 					Method:   "REPORT",
 					Endpoint: "/dav/spaces",
-					Backend:  "http://localhost:9115",
+					Service:  "com.owncloud.web.webdav",
 				},
 				{
 					Type:     config.QueryRoute,
 					Endpoint: "/dav/?preview=1",
-					Backend:  "http://localhost:9115",
+					Service:  "com.owncloud.web.webdav",
 				},
 				{
 					Type:     config.QueryRoute,
 					Endpoint: "/webdav/?preview=1",
-					Backend:  "http://localhost:9115",
+					Service:  "com.owncloud.web.webdav",
 				},
 				{
 					Endpoint: "/remote.php/",
@@ -173,29 +173,29 @@ func DefaultPolicies() []config.Policy {
 				},
 				{
 					Endpoint:    "/data",
-					Backend:     "http://localhost:9140",
+					Service:     "com.owncloud.web.frontend",
 					Unprotected: true,
 				},
 				{
 					Endpoint:    "/app/list",
-					Backend:     "http://localhost:9140",
+					Service:     "com.owncloud.web.frontend",
 					Unprotected: true,
 				},
 				{
 					Endpoint: "/app/", // /app or /apps? ocdav only handles /apps
-					Backend:  "http://localhost:9140",
+					Service:  "com.owncloud.web.frontend",
 				},
 				{
 					Endpoint: "/graph/",
-					Backend:  "http://localhost:9120",
+					Service:  "com.owncloud.graph.graph",
 				},
 				{
 					Endpoint: "/api/v0/settings",
-					Backend:  "http://localhost:9190",
+					Service:  "com.owncloud.web.settings",
 				},
 				{
 					Endpoint:    "/settings.js",
-					Backend:     "http://localhost:9190",
+					Service:     "com.owncloud.web.settings",
 					Unprotected: true,
 				},
 			},
