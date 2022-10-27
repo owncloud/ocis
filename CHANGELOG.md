@@ -25,6 +25,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Trigger a rescan of spaces in the search index when items have changed: [#4777](https://github.com/owncloud/ocis/pull/4777)
 * Bugfix - Make tokeninfo endpoint unprotected: [#4715](https://github.com/owncloud/ocis/pull/4715)
 * Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
+* Change - Build service frontends with pnpm instead of yarn: [#4878](https://github.com/owncloud/ocis/pull/4878)
 * Enhancement - Add curl to the oCIS OCI image: [#4751](https://github.com/owncloud/ocis/pull/4751)
 * Enhancement - Add Email templating: [#4564](https://github.com/owncloud/ocis/pull/4564)
 * Enhancement - We added e-mail subject templating: [#4799](https://github.com/owncloud/ocis/pull/4799)
@@ -190,6 +191,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4382
    https://github.com/owncloud/ocis/pull/4631
+
+* Change - Build service frontends with pnpm instead of yarn: [#4878](https://github.com/owncloud/ocis/pull/4878)
+
+   We changed the Node.js packager from Yarn to pnpm to make it more consistent with the main Web
+   repo. pnpm offers better package isolation and prevents a whole class of errors. This is only
+   relevant for developers.
+
+   https://github.com/owncloud/ocis/pull/4878
+   https://github.com/owncloud/web/pull/7835
 
 * Enhancement - Add curl to the oCIS OCI image: [#4751](https://github.com/owncloud/ocis/pull/4751)
 
