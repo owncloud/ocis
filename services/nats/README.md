@@ -1,8 +1,8 @@
 # Nats Service
 
-The nats service is the event broker of the system. It distributes events among all other services and enables other services to communicate asynchrounos.
+The nats service is the event broker of the system. It distributes events among all other services and enables other services to communicate asynchronous.
 
-Services can `Publish` events to the nats service and nats will store these events on disk respectively distribute these events to other services eventually. Services can `Consume` events from the nats services by registering to a `ConsumerGroup`. Each `ConsumerGroup` is guaranteed to get each event exactly once. In most cases, each service will register its own `ConsumerGroup`. When there are multiple instances of a service, those instances will usually use that `ConsumerGroup` as common ressource.
+Services can `Publish` events to the nats service and nats will store these events on disk and distribute these events to other services eventually. Services can `Consume` events from the nats service by registering to a `ConsumerGroup`. Each `ConsumerGroup` is guaranteed to get each event exactly once. In most cases, each service will register its own `ConsumerGroup`. When there are multiple instances of a service, those instances will usually use that `ConsumerGroup` as common resource.
 
 ## Underlying technology
 
