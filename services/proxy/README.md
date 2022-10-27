@@ -13,6 +13,6 @@ The following request authentication schemes are implemented:
 -   Signed URL
 -   Public Share Token
 
-## Recommendations for production deployments
+## Recommendations for Production Deployments
 
 In a production deployment, you want to have basic authentication disabled which is the default state. You also want to setup a firewall to only allow requests to the proxy service or the reverse proxy if you have one. Requests to the other services should be blocked by the firewall.
