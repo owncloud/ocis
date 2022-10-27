@@ -61,7 +61,7 @@ type GRPCConfig struct {
 }
 
 type Drivers struct {
-	WOPI WOPIDriver `yaml:"wopi" desc:"driver for the CS3org WOPI server"`
+	WOPI WOPIDriver `yaml:"wopi" desc:"Driver for the CS3org WOPI server"`
 }
 
 type WOPIDriver struct {
