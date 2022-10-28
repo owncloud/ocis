@@ -348,6 +348,13 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Redis password
+|`FRONTEND_OCS_ENABLE_DENIALS`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+EXPERIMENTAL: enable the feature to deny access on folders.
 |`FRONTEND_CHECKSUMS_SUPPORTED_TYPES`
 a| [subs=-attributes]
 ++[]string ++

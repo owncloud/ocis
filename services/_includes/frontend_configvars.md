@@ -49,5 +49,6 @@
 | FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_ADDR | string |  | Redis service address|
 | FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_USERNAME | string |  | Redis username|
 | FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_PASSWORD | string |  | Redis password|
+| FRONTEND_OCS_ENABLE_DENIALS | bool | false | EXPERIMENTAL: enable the feature to deny access on folders.|
 | FRONTEND_CHECKSUMS_SUPPORTED_TYPES | []string | [sha1 md5 adler32] | Supported checksum types to be announced to the client. You can provide multiple types separated by blank or comma.|
 | FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPES | string |  | Preferred checksum types to be announced to the client for uploads (e.g. md5)|

@@ -55,6 +55,7 @@ ocs:
   additional_info_attribute: '{{.Mail}}'
   resource_info_cache_ttl: 0
   resource_info_cache_type: memory
+  enable_denials: false
 checksums:
   supported_types:
   - sha1
