@@ -1,5 +1,5 @@
 [caption=]
-.Environment variables for the store extension
+.Environment variables for the store service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name

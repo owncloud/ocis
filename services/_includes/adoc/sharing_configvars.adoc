@@ -1,5 +1,5 @@
 [caption=]
-.Environment variables for the sharing extension
+.Environment variables for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name

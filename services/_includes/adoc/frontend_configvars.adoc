@@ -1,5 +1,5 @@
 [caption=]
-.Environment variables for the frontend extension
+.Environment variables for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name

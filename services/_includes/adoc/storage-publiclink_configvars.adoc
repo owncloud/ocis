@@ -1,5 +1,5 @@
 [caption=]
-.Environment variables for the storage-publiclink extension
+.Environment variables for the storage-publiclink service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name

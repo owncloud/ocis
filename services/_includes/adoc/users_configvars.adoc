@@ -1,5 +1,5 @@
 [caption=]
-.Environment variables for the users extension
+.Environment variables for the users service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name

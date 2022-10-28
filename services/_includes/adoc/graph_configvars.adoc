@@ -1,5 +1,5 @@
 [caption=]
-.Environment variables for the graph extension
+.Environment variables for the graph service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name

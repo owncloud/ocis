@@ -1,5 +1,5 @@
 [caption=]
-.Environment variables for the auth-basic extension
+.Environment variables for the auth-basic service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name

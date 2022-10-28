@@ -1,5 +1,5 @@
 [caption=]
-.Environment variables for the auth-machine extension
+.Environment variables for the auth-machine service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name

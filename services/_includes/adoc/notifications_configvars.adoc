@@ -1,5 +1,5 @@
 [caption=]
-.Environment variables for the notifications extension
+.Environment variables for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name

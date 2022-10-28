@@ -1,5 +1,5 @@
 [caption=]
-.Environment variables for the auth-bearer extension
+.Environment variables for the auth-bearer service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name

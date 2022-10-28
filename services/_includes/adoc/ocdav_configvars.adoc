@@ -1,5 +1,5 @@
 [caption=]
-.Environment variables for the ocdav extension
+.Environment variables for the ocdav service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
