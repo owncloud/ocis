@@ -194,13 +194,9 @@ File and sync features in a shared scenario
 - [apiShareManagementBasicToShares/createShareToSharesFolder.feature:802](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L802)
 - [apiShareManagementBasicToShares/createShareToSharesFolder.feature:803](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L803)
 
-#### [different webdav permissions in ocis](https://github.com/owncloud/ocis/issues/4929)
-
-- [apiShareManagementToShares/mergeShare.feature:93](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L93)
-
 #### [file_target of an auto-renamed file is not correct directly after sharing](https://github.com/owncloud/core/issues/32322)
 
-- [apiShareManagementToShares/mergeShare.feature:105](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L105)
+- [apiShareManagementToShares/mergeShare.feature:113](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L113)
 
 #### [File deletion using dav gives unique string in filename in the trashbin](https://github.com/owncloud/product/issues/178)
 
@@ -455,7 +451,7 @@ cannot share a folder with create permission
 
 - [apiShareUpdateToShares/updateShare.feature:242](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L242)
 - [apiShareUpdateToShares/updateShare.feature:196](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L196)
-- [apiShareManagementToShares/mergeShare.feature:124](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L124)
+- [apiShareManagementToShares/mergeShare.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L132)
 
 #### [Sharing folder and sub-folder with same user but different permission,the permission of sub-folder is not obeyed ](https://github.com/owncloud/ocis/issues/2440)
 
