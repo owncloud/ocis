@@ -36,6 +36,12 @@ type Reva struct {
 	TLSCACert string `yaml:"tls_cacert" env:"REVA_GATEWAY_TLS_CACERT" desc:"The root CA certificate used to validate the gateway's TLS certificate."`
 }
 
+type MemLimit struct {
+	Enabled bool    `yaml:"enabled" env:"OCIS_MEMORY_LIMIT_ENABLED" desc:"Enables the memory limit mode."`
+	Ratio   float32 `yaml:"ratio" env:"OCIS_MEMORY_LIMIT_RATIO" desc:"Percentage of the available memory from cgroups to use as memory limit for oCIS."`
+	Amount  string  `yaml:"amount" env:"OCIS_MEMORY_LIMIT_AMOUNT" desc:"Absolute amount of memory to use as memory limit for oCIS."`
+}
+
 type CacheStore struct {
 	Type    string `yaml:"type" env:"OCIS_CACHE_STORE_TYPE" desc:"The type of the cache store. Valid options are \"noop\", \"ocmem\", \"etcd\" and \"memory\""`
 	Address string `yaml:"address" env:"OCIS_CACHE_STORE_ADDRESS" desc:"A comma-separated list of addresses to connect to. Only valid if the above setting is set to \"etcd\""`
@@ -48,6 +54,7 @@ type Commons struct {
 	Log               *Log          `yaml:"log"`
 	Tracing           *Tracing      `yaml:"tracing"`
 	CacheStore        *CacheStore   `yaml:"cache_store"`
+	MemLimit          *MemLimit     `yaml:"memory_limit"`
 	OcisURL           string        `yaml:"ocis_url" env:"OCIS_URL" desc:"URL, where oCIS is reachable for users."`
 	TokenManager      *TokenManager `mask:"struct" yaml:"token_manager"`
 	Reva              *Reva         `yaml:"reva"`

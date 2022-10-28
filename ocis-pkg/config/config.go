@@ -59,6 +59,7 @@ type Config struct {
 	Tracing    *shared.Tracing    `yaml:"tracing"`
 	Log        *shared.Log        `yaml:"log"`
 	CacheStore *shared.CacheStore `yaml:"cache_store"`
+	MemLimit   *shared.MemLimit   `yaml:"memory_limit"`
 
 	Mode    Mode // DEPRECATED
 	File    string
