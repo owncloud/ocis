@@ -1,21 +1,18 @@
 # Auth-Basic Service
 
-The `auth-basic` service is responsible for validating authentication of incoming requests. To do so it will forward the call to an `auth manager`
-(see `Auth Managers` section). Almost every request to the server will involve the `auth-basic` service as access tokens need to be verified.
+The `auth-basic` service is responsible for validating authentication of incoming requests. To do so, it will forward the call to an `auth manager`, see the `Auth Managers` section. Almost every request to ocis will involve the `auth-basic` service, as access tokens need to be verified.
 
 ## Auth Managers
 
-Since the `auth-basic` service does not do any validation itself, it needs to be configured with an auth manager. One can use the `AUTH_BASIC_AUTH_PROVIDER` envvar to configure this.
+Since the `auth-basic` service does not do any validation itself, it needs to be configured with an authentication manager. One can use the `AUTH_BASIC_AUTH_PROVIDER` environment variable to configure this.
 
 ### LDAP Auth Manager
 
-Setting `AUTH_BASIC_AUTH_PROVIDER` to `"ldap"` will configure the `auth-basic` service to use ldap as auth manager. This is the recommended option for productive and testing deployments. 
-More details on how to configure ldap with ocis can be found in the admin docs.
+Setting `AUTH_BASIC_AUTH_PROVIDER` to `"ldap"` will configure the `auth-basic` service to use ldap as auth manager. This is the recommended option for running in a production and testing environment. More details on how to configure LDAP with ocis can be found in the admin docs.
 
 ### Other Auth Managers
 
-There are a number of other possible auth mangers, including `"json"` and `"owncloudsql"`. Those are tested and usable, but we recommend using ldap. 
-Refer to the admin docs for additional information about these.
+The possible auth mangers which can be selected are `"ldap"` and `"owncloudsql"`. Those are tested and usable though `"ldap"` is the recommend manager. Refer to the admin docs for additional information about those.
 
 ## Scalability
 
