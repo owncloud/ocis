@@ -32,6 +32,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
 * Enhancement - Allow to configuring the reva cache store: [#4627](https://github.com/owncloud/ocis/pull/4627)
 * Enhancement - Add support for REPORT requests to /dav/spaces URLs: [#4661](https://github.com/owncloud/ocis/pull/4661)
+* Enhancement - Deny access to resources: [#4903](https://github.com/owncloud/ocis/pull/4903)
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
 * Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
 * Enhancement - Allow to setup TLS for the reva grpc services: [#4798](https://github.com/owncloud/ocis/pull/4798)
@@ -243,6 +244,17 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/4034
    https://github.com/owncloud/ocis/pull/4661
 
+* Enhancement - Deny access to resources: [#4903](https://github.com/owncloud/ocis/pull/4903)
+
+   We added an experimental feature to deny access to a certain resource. This feature is disabled
+   by default and considered as EXPERIMENTAL. You can enable it by setting
+   FRONTEND_OCS_ENABLE_DENIALS to `true`. It announces an available deny access permission
+   via WebDAV on each resource. By convention it is only possible to deny access on folders. The
+   clients can check the presence of the feature by the capability `deny_access` in the
+   `files_sharing` section.
+
+   https://github.com/owncloud/ocis/pull/4903
+
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
 
    We've added the possibility to configure applications in the Web configuration.
@@ -314,6 +326,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/4750
    https://github.com/owncloud/ocis/pull/4833
    https://github.com/owncloud/ocis/pull/4867
+   https://github.com/owncloud/ocis/pull/4903
    https://github.com/owncloud/ocis/pull/4908
    https://github.com/owncloud/ocis/pull/4915
 
