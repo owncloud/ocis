@@ -19,7 +19,7 @@ type Config struct {
 	Reva         *shared.Reva  `yaml:"reva"`
 
 	SkipUserGroupsInToken bool          `yaml:"skip_user_groups_in_token" env:"AUTH_BASIC_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the encoding of the user's group memberships in the reva access token. This reduces the token size, especially when users are members of a large number of groups."`
-	AuthProvider          string        `yaml:"auth_provider" env:"AUTH_BASIC_AUTH_PROVIDER" desc:"The authentication manager to check if credentials are valid. Supported values are 'ldap' and 'owncloudsql'."`
+	AuthProvider          string        `yaml:"auth_provider" env:"AUTH_BASIC_AUTH_PROVIDER" desc:"The authentication provider to check if credentials are valid. Supported values are 'ldap' and 'owncloudsql'."`
 	AuthProviders         AuthProviders `yaml:"auth_providers"`
 
 	Supervised bool            `yaml:"-"`

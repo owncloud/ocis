@@ -20,7 +20,7 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"GROUPS_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token."`
 
-	Driver  string  `yaml:"driver" env:"GROUPS_DRIVER" desc:"The authentication manager to check if credentials are valid. Supported values are 'ldap' and 'owncloudsql'."`
+	Driver  string  `yaml:"driver" env:"GROUPS_DRIVER" desc:"The driver which should be used by the groups service. Supported values are 'ldap' and 'owncloudsql'."`
 	Drivers Drivers `yaml:"drivers"`
 
 	Supervised bool            `yaml:"-"`
