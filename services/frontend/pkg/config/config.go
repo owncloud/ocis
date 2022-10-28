@@ -117,6 +117,7 @@ type OCS struct {
 	ResourceInfoCaches      ResourceInfoCaches `yaml:"resource_info_caches,omitempty"` // only used for redis
 	CacheWarmupDriver       string             `yaml:"cache_warmup_driver,omitempty"`  // not supported by the oCIS product, therefore not part of docs
 	CacheWarmupDrivers      CacheWarmupDrivers `yaml:"cache_warmup_drivers,omitempty"` // not supported by the oCIS product, therefore not part of docs
+	EnableDenials           bool               `yaml:"enable_denials" env:"FRONTEND_OCS_ENABLE_DENIALS" desc:"EXPERIMENTAL: enable the feature to deny access on folders."`
 }
 
 // ResourceInfoCaches holds resource info cache configurations
