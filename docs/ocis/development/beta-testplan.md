@@ -174,7 +174,7 @@ Prerequisite:
 
 | Test Case                                                                                                          | Expected Result                                                                       | Comment |
 |--------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|---------|
-| Login with the created user                                                                                        | Admin logs in.                                                                        |         |
+| Login with the created user                                                                                        | User logs in.                                                                        |         |
 | Create a text file.                                                                                                | Text editor can open, file is saved.                                                  |         |
 | Create a text file with special characters as name                                                                 | file is created if the name is legal otherwise an error is displayed                  |         |
 | Modify a text file.                                                                                                | File can be modified, no problems found.                                              |         |
