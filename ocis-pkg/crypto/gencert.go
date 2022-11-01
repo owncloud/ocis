@@ -4,6 +4,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 	"path/filepath"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	mtls "go-micro.dev/v4/util/tls"
 )
 
 var (
@@ -48,6 +50,16 @@ func GenCert(certName string, keyName string, l log.Logger) error {
 	}
 
 	return nil
+}
+
+// GenTempCertForAddr generates temporary TLS-Certificates in memory.
+func GenTempCertForAddr(addr string) (tls.Certificate, error) {
+	subjects := defaultHosts
+
+	if host, _, err := net.SplitHostPort(addr); err == nil && host != "" {
+		subjects = []string{host}
+	}
+	return mtls.Certificate(subjects...)
 }
 
 // persistCertificate generates a certificate using pk as private key and proceeds to store it into a file named certName.
