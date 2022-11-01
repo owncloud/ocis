@@ -19,6 +19,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Mail notifications for group shares: [#4714](https://github.com/owncloud/ocis/pull/4714)
 * Bugfix - Disable cache for selected static web assets: [#4809](https://github.com/owncloud/ocis/pull/4809)
 * Bugfix - Fix unfindable entities from shares/publicshares: [#4651](https://github.com/owncloud/ocis/pull/4651)
+* Bugfix - Fix CORS in frontend service: [#4948](https://github.com/owncloud/ocis/pull/4948)
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
 * Bugfix - Fix the shareroot path in REPORT responses: [#4859](https://github.com/owncloud/ocis/pull/4859)
 * Bugfix - Remove the storage-users event configuration: [#4825](https://github.com/owncloud/ocis/pull/4825)
@@ -151,6 +152,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4489
    https://github.com/owncloud/ocis/pull/4651
+
+* Bugfix - Fix CORS in frontend service: [#4948](https://github.com/owncloud/ocis/pull/4948)
+
+   We now pass CORS config to the frontend reva service middleware.
+
+   https://github.com/owncloud/ocis/issues/1340
+   https://github.com/owncloud/ocis/pull/4948
 
 * Bugfix - Graph service now forwards trace context: [#4582](https://github.com/owncloud/ocis/pull/4582)
 
