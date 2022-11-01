@@ -17,6 +17,10 @@
 | FRONTEND_HTTP_ADDR | string | 127.0.0.1:9140 | The bind address of the HTTP service.|
 | FRONTEND_HTTP_PROTOCOL | string | tcp | The transport protocol of the HTTP service.|
 | FRONTEND_HTTP_PREFIX | string |  | The Path prefix where the frontend can be accessed (defaults to /).|
+| OCIS_CORS_ALLOW_ORIGINS<br/>FRONTEND_CORS_ALLOW_ORIGINS | []string | [*] | A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin|
+| OCIS_CORS_ALLOW_METHODS<br/>FRONTEND_CORS_ALLOW_METHODS | []string | [OPTIONS HEAD GET PUT POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] | A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method|
+| OCIS_CORS_ALLOW_HEADERS<br/>FRONTEND_CORS_ALLOW_HEADERS | []string | [Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override] | A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.|
+| OCIS_CORS_ALLOW_CREDENTIALS<br/>FRONTEND_CORS_ALLOW_CREDENTIALS | bool | true | Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
 | STORAGE_TRANSFER_SECRET | string |  | Transfer secret for signing file up- and download requests.|
 | OCIS_JWT_SECRET<br/>FRONTEND_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|
