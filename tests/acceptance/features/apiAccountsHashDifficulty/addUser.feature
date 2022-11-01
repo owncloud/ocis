@@ -7,6 +7,7 @@ Feature: add user
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
+
   Scenario Outline: admin creates a user
     Given using OCS API version "<ocs_api_version>"
     And user "brand-new-user" has been deleted
