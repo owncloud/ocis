@@ -80,7 +80,16 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 			"address": cfg.HTTP.Addr,
 			"middlewares": map[string]interface{}{
 				"cors": map[string]interface{}{
-					"allow_credentials": true,
+					"allowed_origins":   cfg.HTTP.CORS.AllowedOrigins,
+					"allowed_methods":   cfg.HTTP.CORS.AllowedMethods,
+					"allowed_headers":   cfg.HTTP.CORS.AllowedHeaders,
+					"allow_credentials": cfg.HTTP.CORS.AllowCredentials,
+					// currently unused
+					//"options_passthrough": ,
+					//"debug": ,
+					//"max_age": ,
+					//"priority": ,
+					//"exposed_headers": ,
 				},
 				"auth": map[string]interface{}{
 					"credentials_by_user_agent": cfg.Middleware.Auth.CredentialsByUserAgent,
