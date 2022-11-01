@@ -7,6 +7,7 @@ Feature: sharing
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
+
   Scenario Outline: Creating a share of a file with a user
     Given the administrator has set the default folder for received shares to "Shares"
     And auto-accept shares has been disabled

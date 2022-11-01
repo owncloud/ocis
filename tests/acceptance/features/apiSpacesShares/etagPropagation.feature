@@ -9,6 +9,7 @@ Feature: check etag propagation after different file alterations
     And using spaces DAV path
     And user "Alice" has created folder "/upload"
 
+
   Scenario: copying a file inside a folder as a share receiver changes its etag for all collaborators
     Given user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -35,6 +36,7 @@ Feature: check etag propagation after different file alterations
       | user  | path             | space       |
       | Alice | /upload/file.txt | Personal    |
       | Brian | /upload/file.txt | Shares |
+
 
   Scenario: copying a file inside a folder as a sharer changes its etag for all collaborators
     Given user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"

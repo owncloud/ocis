@@ -13,6 +13,7 @@ Feature: create file or folder named similar to Shares folder
     And user "Alice" has shared folder "/FOLDER" with user "Brian" with permissions "read,update"
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
 
+
   Scenario Outline: create a folder with a name similar to Shares
     Given using spaces DAV path
     When user "Brian" creates folder "<folder_name>" using the WebDAV API
@@ -24,6 +25,7 @@ Feature: create file or folder named similar to Shares folder
       | Share       |
       | shares      |
       | Share1      |
+
 
   Scenario Outline: create a file with a name similar to Shares
     Given using spaces DAV path
@@ -40,12 +42,14 @@ Feature: create file or folder named similar to Shares folder
       | shares   |
       | Share1   |
 
+
   Scenario: try to create a folder named Shares
     Given using spaces DAV path
     When user "Brian" creates folder "/Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Brian" the space "Shares" should contain these entries:
       | FOLDER/ |
+
 
   Scenario: try to create a file named Shares
     Given using spaces DAV path

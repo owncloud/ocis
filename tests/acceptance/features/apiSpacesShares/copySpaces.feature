@@ -300,7 +300,6 @@ Feature: copy file
       | viewer  | should not  | 403         |
 
 
-
   Scenario Outline: User copies a folder from a space project with different role to a space project with different role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project1" with the default quota using the GraphApi

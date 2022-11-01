@@ -11,6 +11,7 @@ Feature: move (rename) file
       | Brian    |
     And using spaces DAV path
 
+
   Scenario Outline: Moving a file within same space project with role manager and editor
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
@@ -301,7 +302,8 @@ Feature: move (rename) file
     And for user "Brian" the space "Personal" should not contain these entries:
       | /testshare/testsubfolder |
 
-   Scenario: Overwriting a file while moving
+
+  Scenario: Overwriting a file while moving
     Given user "Brian" has created folder "/folder"
     And user "Brian" has uploaded file with content "old content version 1" to "/folder/testfile.txt"
     And user "Brian" has uploaded file with content "old content version 2" to "/folder/testfile.txt"

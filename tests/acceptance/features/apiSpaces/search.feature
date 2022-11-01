@@ -17,6 +17,7 @@ Feature: Search
     And user "Alice" has uploaded a file inside space "find data" with content "some content" to "folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt"
     And using new DAV path
 
+
   Scenario: Alice can find data from the project space
     When user "Alice" searches for "fol" using the WebDAV API
     Then the HTTP status code should be "207"
