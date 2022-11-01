@@ -61,6 +61,7 @@ type Config struct {
 	CacheStore     *shared.CacheStore     `yaml:"cache_store"`
 	GRPCClientTLS  *shared.GRPCClientTLS  `yaml:"grpc_client_tls"`
 	GRPCServiceTLS *shared.GRPCServiceTLS `yaml:"grpc_service_tls"`
+	HTTPServiceTLS shared.HTTPServiceTLS  `yaml:"http_service_tls"`
 
 	Mode    Mode // DEPRECATED
 	File    string

@@ -106,6 +106,9 @@ func EnsureDefaults(cfg *config.Config) {
 			cfg.GRPCClientTLS.CACert = cfg.Commons.GRPCClientTLS.CACert
 		}
 	}
+	if cfg.Commons != nil {
+		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
+	}
 }
 
 func Sanitize(cfg *config.Config) {

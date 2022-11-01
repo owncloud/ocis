@@ -1,6 +1,8 @@
 package http
 
 import (
+	"fmt"
+
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
@@ -15,7 +17,8 @@ import (
 func Server(opts ...Option) (http.Service, error) {
 	options := newOptions(opts...)
 
-	service := http.NewService(
+	service, err := http.NewService(
+		http.TLSConfig(options.Config.HTTP.TLS),
 		http.Logger(options.Logger),
 		http.Name(options.Config.Service.Name),
 		http.Version(version.GetString()),
@@ -24,6 +27,12 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Context(options.Context),
 		http.Flags(options.Flags...),
 	)
+	if err != nil {
+		options.Logger.Error().
+			Err(err).
+			Msg("Error initializing http service")
+		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
+	}
 
 	handle := svc.NewService(
 		svc.Logger(options.Logger),

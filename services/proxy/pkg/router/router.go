@@ -148,7 +148,9 @@ func (rt Router) addHost(policy string, target *url.URL, route config.Route) {
 				}
 				req.URL.Host = node.Address
 				req.URL.Scheme = node.Metadata["protocol"] // TODO check property exists?
-
+				if node.Metadata["use_tls"] == "true" {
+					req.URL.Scheme = "https"
+				}
 			} else {
 				req.URL.Host = target.Host
 				req.URL.Scheme = target.Scheme

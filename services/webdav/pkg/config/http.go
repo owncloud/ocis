@@ -1,5 +1,7 @@
 package config
 
+import "github.com/owncloud/ocis/v2/ocis-pkg/shared"
+
 // CORS defines the available cors configuration.
 type CORS struct {
 	AllowedOrigins   []string `yaml:"allow_origins" env:"OCIS_CORS_ALLOW_ORIGINS;WEBDAV_CORS_ALLOW_ORIGINS" desc:"A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin"`
@@ -10,8 +12,9 @@ type CORS struct {
 
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string `yaml:"addr" env:"WEBDAV_HTTP_ADDR" desc:"The bind address of the HTTP service."`
-	Namespace string `yaml:"-"`
-	Root      string `yaml:"root" env:"WEBDAV_HTTP_ROOT" desc:"Subdirectory that serves as the root for this HTTP service."`
-	CORS      CORS   `yaml:"cors"`
+	Addr      string                `yaml:"addr" env:"WEBDAV_HTTP_ADDR" desc:"The bind address of the HTTP service."`
+	Namespace string                `yaml:"-"`
+	Root      string                `yaml:"root" env:"WEBDAV_HTTP_ROOT" desc:"Subdirectory that serves as the root for this HTTP service."`
+	CORS      CORS                  `yaml:"cors"`
+	TLS       shared.HTTPServiceTLS `yaml:"tls"`
 }

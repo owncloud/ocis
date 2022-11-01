@@ -109,6 +109,8 @@ func EnsureCommons(cfg *config.Config) {
 		cfg.Commons.GRPCServiceTLS = cfg.GRPCServiceTLS
 	}
 
+	cfg.Commons.HTTPServiceTLS = cfg.HTTPServiceTLS
+
 	// copy token manager to the commons part if set
 	if cfg.TokenManager != nil {
 		cfg.Commons.TokenManager = cfg.TokenManager

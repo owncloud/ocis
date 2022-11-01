@@ -72,10 +72,13 @@ func Server(cfg *config.Config) *cli.Command {
 
 			m.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
-			rp := proxy.NewMultiHostReverseProxy(
+			rp, err := proxy.NewMultiHostReverseProxy(
 				proxy.Logger(logger),
 				proxy.Config(cfg),
 			)
+			if err != nil {
+				return fmt.Errorf("Failed to initialize reverse proxy: %w", err)
+			}
 
 			{
 				server, err := proxyHTTP.Server(

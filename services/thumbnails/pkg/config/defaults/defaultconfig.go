@@ -88,6 +88,10 @@ func EnsureDefaults(cfg *config.Config) {
 			cfg.GRPC.TLS.Key = cfg.Commons.GRPCServiceTLS.Key
 		}
 	}
+
+	if cfg.Commons != nil {
+		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
+	}
 }
 
 func Sanitize(cfg *config.Config) {

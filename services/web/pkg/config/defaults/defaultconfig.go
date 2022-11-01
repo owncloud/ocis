@@ -96,6 +96,10 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
 	}
+
+	if cfg.Commons != nil {
+		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
+	}
 }
 
 func Sanitize(cfg *config.Config) {

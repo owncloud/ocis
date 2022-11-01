@@ -52,13 +52,19 @@ func Server(cfg *config.Config) *cli.Command {
 			mtrcs.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
 			// prepare an HTTP server and add it to the group run.
-			httpServer := http.Server(
+			httpServer, err := http.Server(
 				http.Name(cfg.Service.Name),
 				http.Logger(logger),
 				http.Context(ctx),
 				http.Config(cfg),
 				http.Metrics(mtrcs),
 			)
+			if err != nil {
+				logger.Error().
+					Err(err).
+					Msg("Error initializing http service")
+				return fmt.Errorf("could not initialize http service: %w", err)
+			}
 			servers.Add(httpServer.Run, func(_ error) {
 				logger.Info().Str("server", "http").Msg("Shutting down server")
 				cancel()

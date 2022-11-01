@@ -1,11 +1,14 @@
 package config
 
+import "github.com/owncloud/ocis/v2/ocis-pkg/shared"
+
 // HTTP defines the available http configuration.
 type HTTP struct {
-	Addr      string `yaml:"addr" env:"OCS_HTTP_ADDR" desc:"The bind address of the HTTP service."`
-	Root      string `yaml:"root" env:"OCS_HTTP_ROOT" desc:"Subdirectory that serves as the root for this HTTP service."`
-	Namespace string `yaml:"-"`
-	CORS      CORS   `yaml:"cors"`
+	Addr      string                `yaml:"addr" env:"OCS_HTTP_ADDR" desc:"The bind address of the HTTP service."`
+	Root      string                `yaml:"root" env:"OCS_HTTP_ROOT" desc:"Subdirectory that serves as the root for this HTTP service."`
+	Namespace string                `yaml:"-"`
+	CORS      CORS                  `yaml:"cors"`
+	TLS       shared.HTTPServiceTLS `yaml:"tls"`
 }
 
 // CORS defines the available cors configuration.

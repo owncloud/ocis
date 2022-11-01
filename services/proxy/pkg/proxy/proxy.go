@@ -2,7 +2,10 @@ package proxy
 
 import (
 	"crypto/tls"
+	"crypto/x509"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -33,7 +36,7 @@ type MultiHostReverseProxy struct {
 }
 
 // NewMultiHostReverseProxy creates a new MultiHostReverseProxy
-func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
+func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 	options := newOptions(opts...)
 
 	rp := &MultiHostReverseProxy{
@@ -47,6 +50,20 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 		ri.Director()(r)
 	}
 
+	tlsConf := &tls.Config{
+		InsecureSkipVerify: options.Config.InsecureBackends, //nolint:gosec
+	}
+	if options.Config.BackendHTTPSCACert != "" {
+		certs := x509.NewCertPool()
+		pemData, err := ioutil.ReadFile(options.Config.BackendHTTPSCACert)
+		if err != nil {
+			return nil, err
+		}
+		if !certs.AppendCertsFromPEM(pemData) {
+			return nil, errors.New("Error initializing LDAP Backend. Adding CA cert failed")
+		}
+		tlsConf.RootCAs = certs
+	}
 	// equals http.DefaultTransport except TLSClientConfig
 	rp.Transport = &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
@@ -60,11 +77,9 @@ func NewMultiHostReverseProxy(opts ...Option) *MultiHostReverseProxy {
 		IdleConnTimeout:       90 * time.Second,
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: options.Config.InsecureBackends, //nolint:gosec
-		},
+		TLSClientConfig:       tlsConf,
 	}
-	return rp
+	return rp, nil
 }
 
 func (p *MultiHostReverseProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
