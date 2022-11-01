@@ -70,9 +70,9 @@ documentation resources:
 
 | Test Case                                                                             | Expected Result                                                       | Comment                                                   |
 |---------------------------------------------------------------------------------------|-----------------------------------------------------------------------|-----------------------------------------------------------|
-| share a file/folder with the same name from different users                           | receiver can accept and access both file/folders and distinguish them | [known bug](https://github.com/owncloud/ocis/issues/2131) |
-| share a file/folder with the same name but different permissions from different users | receiver can access both file/folders according to the permissions    | [known bug](https://github.com/owncloud/ocis/issues/2131) |
-| share a file/folder with the same name but different locations from one user          | receiver can accept and access both file/folders and distinguish them | [known bug](https://github.com/owncloud/ocis/issues/2131) |
+| share a file/folder with the same name from different users                           | receiver can accept and access both file/folders and distinguish them |  |
+| share a file/folder with the same name but different permissions from different users | receiver can access both file/folders according to the permissions    |  |
+| share a file/folder with the same name but different locations from one user          | receiver can accept and access both file/folders and distinguish them |  |
 | share a file/folder back to the sharer                                                | sharing back should not be possible                                   |                                                           |
 | re-share a file/folder with different permissions                                     | sharing with lower permissions is possible, but not with higher       |                                                           |
 | decline received share                                                                | shared resource should not be shown to the receiver                   |                                                           |
