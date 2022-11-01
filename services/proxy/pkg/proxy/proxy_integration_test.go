@@ -164,7 +164,7 @@ func TestProxyIntegration(t *testing.T) {
 }
 
 func newTestProxy(cfg *config.Config, fn RoundTripFunc) *MultiHostReverseProxy {
-	rp := NewMultiHostReverseProxy(Config(cfg))
+	rp, _ := NewMultiHostReverseProxy(Config(cfg))
 	rp.Transport = fn
 	return rp
 }

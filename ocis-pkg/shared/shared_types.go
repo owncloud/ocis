@@ -46,6 +46,12 @@ type GRPCServiceTLS struct {
 	Key     string `yaml:"key" env:"OCIS_GRPC_TLS_KEY" desc:"Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the grpc services."`
 }
 
+type HTTPServiceTLS struct {
+	Enabled bool   `yaml:"enabled" env:"OCIS_HTTP_TLS_ENABLED"`
+	Cert    string `yaml:"cert" env:"OCIS_HTTP_TLS_CERTIFICATE" desc:"Path/File name of the TLS server certificate (in PEM format) for the http services."`
+	Key     string `yaml:"key" env:"OCIS_HTTP_TLS_KEY" desc:"Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services."`
+}
+
 type CacheStore struct {
 	Type    string `yaml:"type" env:"OCIS_CACHE_STORE_TYPE" desc:"The type of the cache store. Valid options are \"noop\", \"ocmem\", \"etcd\" and \"memory\""`
 	Address string `yaml:"address" env:"OCIS_CACHE_STORE_ADDRESS" desc:"A comma-separated list of addresses to connect to. Only valid if the above setting is set to \"etcd\""`
@@ -60,6 +66,7 @@ type Commons struct {
 	CacheStore        *CacheStore     `yaml:"cache_store"`
 	GRPCClientTLS     *GRPCClientTLS  `yaml:"grpc_client_tls"`
 	GRPCServiceTLS    *GRPCServiceTLS `yaml:"grpc_service_tls"`
+	HTTPServiceTLS    HTTPServiceTLS  `yaml:"http_service_tls"`
 	OcisURL           string          `yaml:"ocis_url" env:"OCIS_URL" desc:"URL, where oCIS is reachable for users."`
 	TokenManager      *TokenManager   `mask:"struct" yaml:"token_manager"`
 	Reva              *Reva           `yaml:"reva"`

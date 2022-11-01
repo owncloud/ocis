@@ -2,10 +2,10 @@ package http
 
 import (
 	"context"
-	"crypto/tls"
 	"net/http"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/urfave/cli/v2"
 )
 
@@ -15,7 +15,7 @@ type Option func(o *Options)
 // Options defines the available options for this package.
 type Options struct {
 	Logger    log.Logger
-	TLSConfig *tls.Config
+	TLSConfig shared.HTTPServiceTLS
 	Namespace string
 	Name      string
 	Version   string
@@ -88,7 +88,7 @@ func Flags(flags ...cli.Flag) Option {
 }
 
 // TLSConfig provides a function to set the TLSConfig option.
-func TLSConfig(config *tls.Config) Option {
+func TLSConfig(config shared.HTTPServiceTLS) Option {
 	return func(o *Options) {
 		o.TLSConfig = config
 	}

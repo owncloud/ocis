@@ -1,13 +1,14 @@
 package http
 
 import (
-	"crypto/tls"
+	"fmt"
 	"os"
 
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	pkgcrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	svc "github.com/owncloud/ocis/v2/services/idp/pkg/service/v0"
 	"go-micro.dev/v4"
@@ -17,7 +18,6 @@ import (
 func Server(opts ...Option) (http.Service, error) {
 	options := newOptions(opts...)
 
-	var tlsConfig *tls.Config
 	if options.Config.HTTP.TLS {
 		_, certErr := os.Stat(options.Config.HTTP.TLSCert)
 		_, keyErr := os.Stat(options.Config.HTTP.TLSKey)
@@ -29,17 +29,9 @@ func Server(opts ...Option) (http.Service, error) {
 				os.Exit(1)
 			}
 		}
-
-		cer, err := tls.LoadX509KeyPair(options.Config.HTTP.TLSCert, options.Config.HTTP.TLSKey)
-		if err != nil {
-			options.Logger.Fatal().Err(err).Msg("Could not setup TLS")
-			os.Exit(1)
-		}
-
-		tlsConfig = &tls.Config{MinVersion: tls.VersionTLS12, Certificates: []tls.Certificate{cer}}
 	}
 
-	service := http.NewService(
+	service, err := http.NewService(
 		http.Logger(options.Logger),
 		http.Namespace(options.Config.HTTP.Namespace),
 		http.Name(options.Config.Service.Name),
@@ -47,8 +39,18 @@ func Server(opts ...Option) (http.Service, error) {
 		http.Address(options.Config.HTTP.Addr),
 		http.Context(options.Context),
 		http.Flags(options.Flags...),
-		http.TLSConfig(tlsConfig),
+		http.TLSConfig(shared.HTTPServiceTLS{
+			Enabled: options.Config.HTTP.TLS,
+			Cert:    options.Config.HTTP.TLSCert,
+			Key:     options.Config.HTTP.TLSKey,
+		}),
 	)
+	if err != nil {
+		options.Logger.Error().
+			Err(err).
+			Msg("Error initializing http service")
+		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
+	}
 
 	handle := svc.NewService(
 		svc.Logger(options.Logger),

@@ -1,6 +1,8 @@
 package http
 
 import (
+	"crypto/tls"
+	"fmt"
 	"strings"
 	"time"
 
@@ -8,6 +10,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 
 	mhttps "github.com/go-micro/plugins/v4/server/http"
+	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/server"
 )
@@ -18,11 +21,42 @@ type Service struct {
 }
 
 // NewService initializes a new http service.
-func NewService(opts ...Option) Service {
+func NewService(opts ...Option) (Service, error) {
 	noopBroker := broker.NoOp{}
 	sopts := newOptions(opts...)
+	var mServer server.Server
+	if sopts.TLSConfig.Enabled {
+		var cert tls.Certificate
+		var err error
+		if sopts.TLSConfig.Cert != "" {
+			cert, err = tls.LoadX509KeyPair(sopts.TLSConfig.Cert, sopts.TLSConfig.Key)
+			if err != nil {
+				sopts.Logger.Error().Err(err).
+					Str("cert", sopts.TLSConfig.Cert).
+					Str("key", sopts.TLSConfig.Key).
+					Msg("error loading server certifcate and key")
+				return Service{}, fmt.Errorf("error loading server certificate and key: %w", err)
+			}
+		} else {
+			// Generate a self-signed server certificate on the fly. This requires the clients
+			// to connect with InsecureSkipVerify.
+			sopts.Logger.Warn().Str("address", sopts.Address).
+				Msg("No server certificate configured. Generating a temporary self-signed certificate")
+			cert, err = ociscrypto.GenTempCertForAddr(sopts.Address)
+			if err != nil {
+				return Service{}, fmt.Errorf("error creating temporary self-signed certificate: %w", err)
+			}
+		}
+		tlsConfig := &tls.Config{
+			Certificates: []tls.Certificate{cert},
+		}
+		mServer = mhttps.NewServer(server.TLSConfig(tlsConfig))
+	} else {
+		mServer = mhttps.NewServer()
+	}
+
 	wopts := []micro.Option{
-		micro.Server(mhttps.NewServer(server.TLSConfig(sopts.TLSConfig))),
+		micro.Server(mServer),
 		micro.Broker(noopBroker),
 		micro.Address(sopts.Address),
 		micro.Name(strings.Join([]string{sopts.Namespace, sopts.Name}, ".")),
@@ -33,6 +67,9 @@ func NewService(opts ...Option) Service {
 		micro.RegisterTTL(time.Second * 30),
 		micro.RegisterInterval(time.Second * 10),
 	}
+	if sopts.TLSConfig.Enabled {
+		wopts = append(wopts, micro.Metadata(map[string]string{"use_tls": "true"}))
+	}
 
-	return Service{micro.NewService(wopts...)}
+	return Service{micro.NewService(wopts...)}, nil
 }
