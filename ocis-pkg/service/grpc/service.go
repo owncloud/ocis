@@ -3,17 +3,16 @@ package grpc
 import (
 	"crypto/tls"
 	"fmt"
-	"net"
 	"strings"
 	"time"
 
 	mgrpcs "github.com/go-micro/plugins/v4/server/grpc"
 	"github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus"
 	"github.com/go-micro/plugins/v4/wrapper/trace/opencensus"
+	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/server"
-	mtls "go-micro.dev/v4/util/tls"
 )
 
 // Service simply wraps the go-micro grpc service.
@@ -38,15 +37,7 @@ func NewService(opts ...Option) (Service, error) {
 		} else {
 			// Generate a self-signed server certificate on the fly. This requires the clients
 			// to connect with InsecureSkipVerify.
-			subj := []string{sopts.Address}
-			if host, _, err := net.SplitHostPort(sopts.Address); err == nil && host != "" {
-				subj = []string{host}
-			}
-
-			sopts.Logger.Warn().Str("address", sopts.Address).
-				Msg("GRPC: No server certificate configured. Generating a temporary self-signed certificate")
-
-			cert, err = mtls.Certificate(subj...)
+			cert, err = ociscrypto.GenTempCertForAddr(sopts.Address)
 			if err != nil {
 				return Service{}, fmt.Errorf("grpc service error creating temporary self-signed certificate: %w", err)
 			}
