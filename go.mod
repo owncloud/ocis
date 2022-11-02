@@ -30,7 +30,7 @@ require (
 	github.com/go-micro/plugins/v4/server/grpc v1.1.1
 	github.com/go-micro/plugins/v4/server/http v1.1.1
 	github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.1.0
-	github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.1.0
+	github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.2.0
 	github.com/go-micro/plugins/v4/wrapper/trace/opencensus v1.1.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/gofrs/uuid v4.3.1+incompatible
