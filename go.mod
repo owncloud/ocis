@@ -38,7 +38,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/gookit/config/v2 v2.1.7
 	github.com/gorilla/mux v1.8.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.12.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.13.0
 	github.com/jellydator/ttlcache/v2 v2.11.1
 	github.com/justinas/alice v1.2.0
 	github.com/libregraph/idm v0.3.1-0.20220808071235-17bb032176de
@@ -79,7 +79,7 @@ require (
 	golang.org/x/oauth2 v0.1.0
 	golang.org/x/term v0.1.0
 	golang.org/x/text v0.4.0
-	google.golang.org/genproto v0.0.0-20221025140454-527a21cfbd71
+	google.golang.org/genproto v0.0.0-20221027153422-115e99e71e1c
 	google.golang.org/grpc v1.50.1
 	google.golang.org/protobuf v1.28.1
 	gopkg.in/yaml.v2 v2.4.0
