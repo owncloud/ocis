@@ -1,6 +1,6 @@
 # Auth-Basic Service
 
-The `auth-basic` service is responsible for validating authentication of incoming requests. To do so, it will forward the call to an `auth manager`, see the `Auth Managers` section. Almost every request to ocis will involve the `auth-basic` service, as access tokens need to be verified.
+The `auth-basic` service is responsible for validating authentication of incoming requests. To do so, it will use the configured `auth manager`, see the `Auth Managers` section. Only HTTP basic auth requests to ocis will involve the `auth-basic` service.
 
 ## Auth Managers
 
@@ -8,7 +8,7 @@ Since the `auth-basic` service does not do any validation itself, it needs to be
 
 ### LDAP Auth Manager
 
-Setting `AUTH_BASIC_AUTH_PROVIDER` to `"ldap"` will configure the `auth-basic` service to use ldap as auth manager. This is the recommended option for running in a production and testing environment. More details on how to configure LDAP with ocis can be found in the admin docs.
+Setting `AUTH_BASIC_AUTH_PROVIDER` to `"ldap"` will configure the `auth-basic` service to use LDAP as auth manager. This is the recommended option for running in a production and testing environment. More details on how to configure LDAP with ocis can be found in the admin docs.
 
 ### Other Auth Managers
 
