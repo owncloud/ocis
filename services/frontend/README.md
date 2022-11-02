@@ -4,7 +4,7 @@ The frontend service translates various owncloud related HTTP APIs to CS3 reques
 
 ## Endpoints Overview
 
-Currently, the frontend service handles request for three functionalities, which are `appprovider`, `archiver`, `datagateway` and `ocs`.
+Currently, the frontend service handles requests for three functionalities, which are `appprovider`, `archiver`, `datagateway` and `ocs`.
 
 ### appprovider
 
@@ -16,7 +16,7 @@ The archiver endpoint, by default `/archiver`, implements zip and tar download f
 
 ### datagateway
 
-The datagateway endpoint, by default `/data`, forwards file up and download requests to the correct CS3 data provider. OCIS starts a dataprovider as part of the storage-* services. The routing happens based on the JWT that was created by a storage provider in response to an `InitiateFileDownload` or `InitiateFileUpload` request.
+The datagateway endpoint, by default `/data`, forwards file up- and download requests to the correct CS3 data provider. OCIS starts a dataprovider as part of the storage-* services. The routing happens based on the JWT that was created by a storage provider in response to an `InitiateFileDownload` or `InitiateFileUpload` request.
 
 ### ocs
 
