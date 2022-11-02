@@ -7,6 +7,7 @@ import (
 	"github.com/CiscoM31/godata"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/stretchr/testify/assert"
+	"github.com/test-go/testify/require"
 )
 
 type sortTest struct {
@@ -119,5 +120,37 @@ func TestSort(t *testing.T) {
 		sorted, err := sortSpaces(&test.Query, test.Drives)
 		assert.NoError(t, err)
 		assert.Equal(t, test.DrivesSorted, sorted)
+	}
+}
+
+func TestSpaceNameValidation(t *testing.T) {
+	// set max length
+	_maxSpaceNameLength = 10
+
+	testCases := []struct {
+		Alias         string
+		SpaceName     string
+		ExpectedError error
+	}{
+		{"Happy Path", "Space", nil},
+		{"Just not too Long", "abcdefghij", nil},
+		{"Too Long", "abcdefghijk", ErrNameTooLong},
+		{"Empty", "", ErrNameEmpty},
+		{"Contains /", "Space/", ErrForbiddenCharacter},
+		{`Contains \`, `Space\`, ErrForbiddenCharacter},
+		{`Contains \\`, `Space\\`, ErrForbiddenCharacter},
+		{"Contains .", "Space.", ErrForbiddenCharacter},
+		{"Contains :", "Space:", ErrForbiddenCharacter},
+		{"Contains ?", "Sp?ace", ErrForbiddenCharacter},
+		{"Contains *", "Spa*ce", ErrForbiddenCharacter},
+		{`Contains "`, `"Space"`, ErrForbiddenCharacter},
+		{`Contains >`, `Sp>ce`, ErrForbiddenCharacter},
+		{`Contains <`, `S<pce`, ErrForbiddenCharacter},
+		{`Contains |`, `S|p|e`, ErrForbiddenCharacter},
+	}
+
+	for _, tc := range testCases {
+		err := validateSpaceName(tc.SpaceName)
+		require.Equal(t, tc.ExpectedError, err, tc.Alias)
 	}
 }
