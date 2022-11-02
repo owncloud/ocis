@@ -75,6 +75,7 @@ func DefaultConfig() *config.Config {
 				GeneralSpaceAliasTemplate:  "{{.SpaceType}}/{{.SpaceName | replace \" \" \"-\" | lower}}",
 				PermissionsEndpoint:        "127.0.0.1:9191",
 				AsyncUploads:               false,
+				MaxAcquireLockCycles:       25,
 			},
 		},
 		Events: config.Events{
