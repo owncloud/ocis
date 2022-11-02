@@ -96,6 +96,7 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 			"treesize_accounting":         true,
 			"permissionssvc":              cfg.Drivers.OCIS.PermissionsEndpoint,
 			"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
+			"max_acquire_lock_cycles":     cfg.Drivers.OCIS.MaxAcquireLockCycles,
 			"statcache": map[string]interface{}{
 				"cache_store":    cfg.Cache.Store,
 				"cache_nodes":    cfg.Cache.Nodes,
@@ -139,6 +140,7 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 			"s3.endpoint":                 cfg.Drivers.S3NG.Endpoint,
 			"s3.bucket":                   cfg.Drivers.S3NG.Bucket,
 			"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
+			"max_acquire_lock_cycles":     cfg.Drivers.OCIS.MaxAcquireLockCycles,
 			"statcache": map[string]interface{}{
 				"cache_store":    cfg.Cache.Store,
 				"cache_nodes":    cfg.Cache.Nodes,
