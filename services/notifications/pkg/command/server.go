@@ -57,6 +57,7 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 
 				tlsConf = &tls.Config{
+					MinVersion:         tls.VersionTLS12,
 					InsecureSkipVerify: evtsCfg.TLSInsecure, //nolint:gosec
 					RootCAs:            rootCAPool,
 				}
