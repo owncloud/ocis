@@ -37,5 +37,5 @@ Apache-2.0
 ## Copyright
 
 ```console
-Copyright (c) 2020-2021 ownCloud GmbH <https://owncloud.com>
+Copyright (c) 2020-2022 ownCloud GmbH <https://owncloud.com>
 ```
