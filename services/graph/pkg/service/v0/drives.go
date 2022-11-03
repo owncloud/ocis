@@ -40,7 +40,7 @@ var (
 	// ErrNameTooLong is thrown when the spacename is too long
 	ErrNameTooLong = fmt.Errorf("spacename must be smaller than %d", _maxSpaceNameLength)
 
-	// ErrNameEmpty is thrown when the spacename is too long
+	// ErrNameEmpty is thrown when the spacename is empty
 	ErrNameEmpty = errors.New("spacename must not be empty")
 
 	// ErrForbiddenCharacter is thrown when the spacename contains an invalid character
