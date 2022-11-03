@@ -4,6 +4,7 @@ import (
 	"path"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/store/pkg/config"
 )
 
@@ -22,7 +23,7 @@ func DefaultConfig() *config.Config {
 			Pprof:  false,
 			Zpages: false,
 		},
-		GRPC: config.GRPC{
+		GRPC: config.GRPCConfig{
 			Addr:      "127.0.0.1:9460",
 			Namespace: "com.owncloud.api",
 		},
@@ -55,6 +56,22 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.GRPCClientTLS == nil {
+		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
+		if cfg.Commons != nil && cfg.Commons.GRPCClientTLS != nil {
+			cfg.GRPCClientTLS.Mode = cfg.Commons.GRPCClientTLS.Mode
+			cfg.GRPCClientTLS.CACert = cfg.Commons.GRPCClientTLS.CACert
+		}
+	}
+	if cfg.GRPC.TLS == nil {
+		cfg.GRPC.TLS = &shared.GRPCServiceTLS{}
+		if cfg.Commons != nil && cfg.Commons.GRPCServiceTLS != nil {
+			cfg.GRPC.TLS.Enabled = cfg.Commons.GRPCServiceTLS.Enabled
+			cfg.GRPC.TLS.Cert = cfg.Commons.GRPCServiceTLS.Cert
+			cfg.GRPC.TLS.Key = cfg.Commons.GRPCServiceTLS.Key
+		}
 	}
 }
 

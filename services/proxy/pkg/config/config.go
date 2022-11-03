@@ -18,7 +18,8 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
-	Reva *shared.Reva `yaml:"reva"`
+	Reva          *shared.Reva          `yaml:"reva"`
+	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 
 	Policies              []Policy        `yaml:"policies"`
 	OIDC                  OIDC            `yaml:"oidc"`

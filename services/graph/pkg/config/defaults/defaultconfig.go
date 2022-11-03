@@ -113,6 +113,14 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
 	}
+
+	if cfg.GRPCClientTLS == nil {
+		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
+		if cfg.Commons != nil && cfg.Commons.GRPCClientTLS != nil {
+			cfg.GRPCClientTLS.Mode = cfg.Commons.GRPCClientTLS.Mode
+			cfg.GRPCClientTLS.CACert = cfg.Commons.GRPCClientTLS.CACert
+		}
+	}
 }
 
 func Sanitize(cfg *config.Config) {

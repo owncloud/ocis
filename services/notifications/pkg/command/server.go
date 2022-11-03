@@ -77,13 +77,13 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			tm, err := pool.StringToTLSMode(cfg.Notifications.RevaGatewayTLSMode)
+			tm, err := pool.StringToTLSMode(cfg.Notifications.GRPCClientTLS.Mode)
 			if err != nil {
 				return err
 			}
 			gwclient, err := pool.GetGatewayServiceClient(
 				cfg.Notifications.RevaGateway,
-				pool.WithTLSCACert(cfg.Notifications.RevaGatewayTLSCACert),
+				pool.WithTLSCACert(cfg.Notifications.GRPCClientTLS.CACert),
 				pool.WithTLSMode(tm),
 			)
 			if err != nil {

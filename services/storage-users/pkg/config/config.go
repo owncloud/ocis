@@ -60,12 +60,10 @@ type Debug struct {
 }
 
 type GRPCConfig struct {
-	Addr       string `yaml:"addr" env:"STORAGE_USERS_GRPC_ADDR" desc:"The bind address of the GRPC service."`
-	TLSEnabled bool   `yaml:"tls_enabled" env:"OCIS_GRPC_TLS_ENABLED"`
-	TLSCert    string `yaml:"tls_cert" env:"OCIS_GRPC_TLS_CERTIFICATE" desc:"Path/File name of the TLS server certificate (in PEM format) for the reva grpc services."`
-	TLSKey     string `yaml:"tls_key" env:"OCIS_GRPC_TLS_KEY" desc:"Path/File name for the TLS certificate key (in PEM format) for the server certificate."`
-	Namespace  string `yaml:"-"`
-	Protocol   string `yaml:"protocol" env:"STORAGE_USERS_GRPC_PROTOCOL" desc:"The transport protocol of the GPRC service."`
+	Addr      string                 `yaml:"addr" env:"STORAGE_USERS_GRPC_ADDR" desc:"The bind address of the GRPC service."`
+	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
+	Namespace string                 `yaml:"-"`
+	Protocol  string                 `yaml:"protocol" env:"STORAGE_USERS_GRPC_PROTOCOL" desc:"The transport protocol of the GPRC service."`
 }
 
 type HTTPConfig struct {

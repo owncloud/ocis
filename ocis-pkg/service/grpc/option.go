@@ -12,13 +12,16 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger    log.Logger
-	Namespace string
-	Name      string
-	Version   string
-	Address   string
-	Context   context.Context
-	Flags     []cli.Flag
+	Logger     log.Logger
+	Namespace  string
+	Name       string
+	Version    string
+	Address    string
+	TLSEnabled bool
+	TLSCert    string
+	TLSKey     string
+	Context    context.Context
+	Flags      []cli.Flag
 }
 
 // newOptions initializes the available default options.
@@ -66,6 +69,21 @@ func Version(v string) Option {
 func Address(a string) Option {
 	return func(o *Options) {
 		o.Address = a
+	}
+}
+
+// TLSEnabled provides a function to enable/disable TLS
+func TLSEnabled(v bool) Option {
+	return func(o *Options) {
+		o.TLSEnabled = v
+	}
+}
+
+// TLSCert provides a function to set the TLS server certificate and key
+func TLSCert(c string, k string) Option {
+	return func(o *Options) {
+		o.TLSCert = c
+		o.TLSKey = k
 	}
 }
 

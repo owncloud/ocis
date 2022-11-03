@@ -15,7 +15,12 @@ import (
 func NewService(opts ...Option) grpc.Service {
 	options := newOptions(opts...)
 
-	service := grpc.NewService(
+	service, err := grpc.NewService(
+		grpc.TLSEnabled(options.Config.GRPC.TLS.Enabled),
+		grpc.TLSCert(
+			options.Config.GRPC.TLS.Cert,
+			options.Config.GRPC.TLS.Key,
+		),
 		grpc.Logger(options.Logger),
 		grpc.Namespace(options.Namespace),
 		grpc.Name(options.Name),
@@ -25,14 +30,19 @@ func NewService(opts ...Option) grpc.Service {
 		grpc.Flags(options.Flags...),
 		grpc.Version(version.GetString()),
 	)
+	if err != nil {
+		options.Logger.Fatal().Err(err).Msg("Error creating thumbnail service")
+		return grpc.Service{}
+	}
+
 	tconf := options.Config.Thumbnail
-	tm, err := pool.StringToTLSMode(tconf.RevaGatewayTLSMode)
+	tm, err := pool.StringToTLSMode(options.Config.GRPCClientTLS.Mode)
 	if err != nil {
 		options.Logger.Error().Err(err).Msg("could not get gateway client tls mode")
 		return grpc.Service{}
 	}
 	gc, err := pool.GetGatewayServiceClient(tconf.RevaGateway,
-		pool.WithTLSCACert(tconf.RevaGatewayTLSCACert),
+		pool.WithTLSCACert(options.Config.GRPCClientTLS.CACert),
 		pool.WithTLSMode(tm),
 	)
 	if err != nil {

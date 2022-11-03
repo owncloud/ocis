@@ -13,7 +13,7 @@ func DefaultRevaConfig() *Reva {
 }
 
 func (r *Reva) GetRevaOptions() []pool.Option {
-	tm, _ := pool.StringToTLSMode(r.TLSMode)
+	tm, _ := pool.StringToTLSMode(r.TLS.Mode)
 	opts := []pool.Option{
 		pool.WithTLSMode(tm),
 	}
@@ -22,7 +22,7 @@ func (r *Reva) GetRevaOptions() []pool.Option {
 
 func (r *Reva) GetGRPCClientConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"tls_mode":   r.TLSMode,
-		"tls_cacert": r.TLSCACert,
+		"tls_mode":   r.TLS.Mode,
+		"tls_cacert": r.TLS.CACert,
 	}
 }

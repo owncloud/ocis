@@ -24,7 +24,7 @@ func DefaultConfig() *config.Config {
 			Pprof:  false,
 			Zpages: false,
 		},
-		GRPC: config.GRPC{
+		GRPC: config.GRPCConfig{
 			Addr:      "127.0.0.1:9185",
 			Namespace: "com.owncloud.api",
 		},
@@ -41,12 +41,10 @@ func DefaultConfig() *config.Config {
 			FileSystemStorage: config.FileSystemStorage{
 				RootDirectory: path.Join(defaults.BaseDataPath(), "thumbnails"),
 			},
-			WebdavAllowInsecure:  false,
-			RevaGateway:          shared.DefaultRevaConfig().Address,
-			RevaGatewayTLSMode:   shared.DefaultRevaConfig().TLSMode,
-			RevaGatewayTLSCACert: shared.DefaultRevaConfig().TLSCACert,
-			CS3AllowInsecure:     false,
-			DataEndpoint:         "http://127.0.0.1:9186/thumbnails/data",
+			WebdavAllowInsecure: false,
+			RevaGateway:         shared.DefaultRevaConfig().Address,
+			CS3AllowInsecure:    false,
+			DataEndpoint:        "http://127.0.0.1:9186/thumbnails/data",
 		},
 	}
 }
@@ -73,6 +71,22 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.GRPCClientTLS == nil {
+		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
+		if cfg.Commons != nil && cfg.Commons.GRPCClientTLS != nil {
+			cfg.GRPCClientTLS.Mode = cfg.Commons.GRPCClientTLS.Mode
+			cfg.GRPCClientTLS.CACert = cfg.Commons.GRPCClientTLS.CACert
+		}
+	}
+	if cfg.GRPC.TLS == nil {
+		cfg.GRPC.TLS = &shared.GRPCServiceTLS{}
+		if cfg.Commons != nil && cfg.Commons.GRPCServiceTLS != nil {
+			cfg.GRPC.TLS.Enabled = cfg.Commons.GRPCServiceTLS.Enabled
+			cfg.GRPC.TLS.Cert = cfg.Commons.GRPCServiceTLS.Cert
+			cfg.GRPC.TLS.Key = cfg.Commons.GRPCServiceTLS.Key
+		}
 	}
 }
 

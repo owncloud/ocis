@@ -19,8 +19,9 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
-	TokenManager *TokenManager `yaml:"token_manager"`
-	Reva         *shared.Reva  `yaml:"reva"`
+	TokenManager  *TokenManager         `yaml:"token_manager"`
+	Reva          *shared.Reva          `yaml:"reva"`
+	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 
 	IdentityManagement IdentityManagement `yaml:"identity_management"`
 

@@ -16,7 +16,12 @@ import (
 func Server(opts ...Option) grpc.Service {
 	options := newOptions(opts...)
 
-	service := grpc.NewService(
+	service, err := grpc.NewService(
+		grpc.TLSEnabled(options.Config.GRPC.TLS.Enabled),
+		grpc.TLSCert(
+			options.Config.GRPC.TLS.Cert,
+			options.Config.GRPC.TLS.Key,
+		),
 		grpc.Logger(options.Logger),
 		grpc.Name(options.Name),
 		grpc.Version(version.GetString()),
@@ -25,6 +30,9 @@ func Server(opts ...Option) grpc.Service {
 		grpc.Context(options.Context),
 		grpc.Flags(options.Flags...),
 	)
+	if err != nil {
+		options.Logger.Fatal().Err(err).Msg("Error creating settings service")
+	}
 
 	handle := svc.NewService(options.Config, options.Logger)
 	if err := settingssvc.RegisterBundleServiceHandler(service.Server(), handle); err != nil {

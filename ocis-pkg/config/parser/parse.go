@@ -51,6 +51,13 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.CacheStore == nil {
 		cfg.CacheStore = &shared.CacheStore{}
 	}
+	if cfg.GRPCClientTLS == nil {
+		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
+	}
+	if cfg.GRPCServiceTLS == nil {
+		cfg.GRPCServiceTLS = &shared.GRPCServiceTLS{}
+	}
+
 }
 
 // EnsureCommons copies applicable parts of the oCIS config into the commons part
@@ -92,6 +99,14 @@ func EnsureCommons(cfg *config.Config) {
 		}
 	} else {
 		cfg.Commons.CacheStore = &shared.CacheStore{}
+	}
+
+	if cfg.GRPCClientTLS != nil {
+		cfg.Commons.GRPCClientTLS = cfg.GRPCClientTLS
+	}
+
+	if cfg.GRPCServiceTLS != nil {
+		cfg.Commons.GRPCServiceTLS = cfg.GRPCServiceTLS
 	}
 
 	// copy token manager to the commons part if set

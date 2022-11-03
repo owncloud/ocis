@@ -14,7 +14,7 @@ import (
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-micro/plugins/v4/client/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
 	ocstracing "github.com/owncloud/ocis/v2/services/ocs/pkg/tracing"
@@ -166,7 +166,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	// use the user's UUID
 	userID := u.Id.OpaqueId
 
-	c := storesvc.NewStoreService("com.owncloud.api.store", grpc.NewClient())
+	c := storesvc.NewStoreService("com.owncloud.api.store", grpc.DefaultClient())
 	res, err := c.Read(r.Context(), &storesvc.ReadRequest{
 		Options: &storemsg.ReadOptions{
 			Database: "proxy",
@@ -186,6 +186,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 		if e.Code == http.StatusNotFound {
 			// not found is ok, so we can continue and generate the key on the fly
 		} else {
+			o.logger.Error().Err(err).Msg("error reading from server")
 			o.mustRender(w, r, response.ErrRender(data.MetaServerError.StatusCode, "error reading from store"))
 			return
 		}

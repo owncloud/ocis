@@ -73,9 +73,8 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
 		cfg.Reva = &shared.Reva{
-			Address:   cfg.Commons.Reva.Address,
-			TLSMode:   cfg.Commons.Reva.TLSMode,
-			TLSCACert: cfg.Commons.Reva.TLSCACert,
+			Address: cfg.Commons.Reva.Address,
+			TLS:     cfg.Commons.Reva.TLS,
 		}
 	} else if cfg.Reva == nil {
 		cfg.Reva = &shared.Reva{}
@@ -95,6 +94,15 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.SystemUserID == "" && cfg.Commons != nil && cfg.Commons.SystemUserID != "" {
 		cfg.SystemUserID = cfg.Commons.SystemUserID
+	}
+
+	if cfg.GRPC.TLS == nil {
+		cfg.GRPC.TLS = &shared.GRPCServiceTLS{}
+		if cfg.Commons != nil && cfg.Commons.GRPCServiceTLS != nil {
+			cfg.GRPC.TLS.Enabled = cfg.Commons.GRPCServiceTLS.Enabled
+			cfg.GRPC.TLS.Cert = cfg.Commons.GRPCServiceTLS.Cert
+			cfg.GRPC.TLS.Key = cfg.Commons.GRPCServiceTLS.Key
+		}
 	}
 
 }

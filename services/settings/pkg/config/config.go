@@ -16,8 +16,10 @@ type Config struct {
 	Log     *Log     `yaml:"log"`
 	Debug   Debug    `yaml:"debug"`
 
-	HTTP HTTP `yaml:"http"`
-	GRPC GRPC `yaml:"grpc"`
+	HTTP HTTP       `yaml:"http"`
+	GRPC GRPCConfig `yaml:"grpc"`
+
+	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 
 	StoreType string   `yaml:"store_type" env:"SETTINGS_STORE_TYPE" desc:"Store type configures the persistency driver. Supported values are \"metadata\" and \"filesystem\"."`
 	DataPath  string   `yaml:"data_path" env:"SETTINGS_DATA_PATH" desc:"The directory where the filesystem storage will store ocis settings. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/settings."`

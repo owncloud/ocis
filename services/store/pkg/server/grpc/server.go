@@ -11,7 +11,12 @@ import (
 func Server(opts ...Option) grpc.Service {
 	options := newOptions(opts...)
 
-	service := grpc.NewService(
+	service, err := grpc.NewService(
+		grpc.TLSEnabled(options.Config.GRPC.TLS.Enabled),
+		grpc.TLSCert(
+			options.Config.GRPC.TLS.Cert,
+			options.Config.GRPC.TLS.Key,
+		),
 		grpc.Namespace(options.Config.GRPC.Namespace),
 		grpc.Name(options.Config.Service.Name),
 		grpc.Version(version.GetString()),
@@ -20,6 +25,10 @@ func Server(opts ...Option) grpc.Service {
 		grpc.Logger(options.Logger),
 		grpc.Flags(options.Flags...),
 	)
+	if err != nil {
+		options.Logger.Fatal().Err(err).Msg("Error creating store service")
+		return grpc.Service{}
+	}
 
 	hdlr, err := svc.New(
 		svc.Logger(options.Logger),
