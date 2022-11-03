@@ -24,6 +24,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the shareroot path in REPORT responses: [#4859](https://github.com/owncloud/ocis/pull/4859)
 * Bugfix - Remove the storage-users event configuration: [#4825](https://github.com/owncloud/ocis/pull/4825)
 * Bugfix - Trigger a rescan of spaces in the search index when items have changed: [#4777](https://github.com/owncloud/ocis/pull/4777)
+* Bugfix - Fix permission check in settings service: [#4890](https://github.com/owncloud/ocis/pull/4890)
 * Bugfix - Make tokeninfo endpoint unprotected: [#4715](https://github.com/owncloud/ocis/pull/4715)
 * Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
 * Change - Build service frontends with pnpm instead of yarn: [#4878](https://github.com/owncloud/ocis/pull/4878)
@@ -187,6 +188,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4410
    https://github.com/owncloud/ocis/pull/4777
+
+* Bugfix - Fix permission check in settings service: [#4890](https://github.com/owncloud/ocis/pull/4890)
+
+   Added a check of the stored roles as a fallback if no roles are contained in the context.
+
+   https://github.com/owncloud/ocis/pull/4890
 
 * Bugfix - Make tokeninfo endpoint unprotected: [#4715](https://github.com/owncloud/ocis/pull/4715)
 
