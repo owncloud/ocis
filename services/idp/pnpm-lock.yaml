@@ -41,7 +41,7 @@ specifiers:
   eslint-webpack-plugin: ^2.5.2
   file-loader: 6.1.1
   html-webpack-plugin: 4.5.0
-  i18next: ^21.6.13
+  i18next: ^22.0.4
   i18next-browser-languagedetector: ^6.1.3
   i18next-conv: ^12.1.0
   i18next-http-backend: ^1.3.2
@@ -97,7 +97,7 @@ dependencies:
   '@types/redux-logger': 3.0.9
   axios: 0.27.2
   classnames: 2.3.1
-  i18next: 21.8.11
+  i18next: 22.0.4
   i18next-browser-languagedetector: 6.1.4
   i18next-http-backend: 1.4.1
   i18next-resources-to-backend: 1.0.0
@@ -106,7 +106,7 @@ dependencies:
   react: 17.0.2
   react-app-polyfill: 2.0.0
   react-dom: 17.0.2_react@17.0.2
-  react-i18next: 11.17.4_iunkfnprfsbsde3j2gf563wwwi
+  react-i18next: 11.17.4_lbe2taj3rsyaxmdd4qnhuc5z6q
   react-redux: 7.2.8_sfoxds7t5ydpegc3knd667wn6m
   react-router: 5.3.3_react@17.0.2
   react-router-dom: 5.2.1_react@17.0.2
@@ -6346,6 +6346,13 @@ packages:
     resolution: {integrity: sha512-+s8N6kQShwNK+Ua/+VsS/Sji24NUJJLBk9QIucygj1f97f4hPNDWmLP9fQCI4d5+XLfXJ3JctX4g+zJla967Vw==}
     dependencies:
       '@babel/runtime': 7.18.6
+    dev: true
+
+  /i18next/22.0.4:
+    resolution: {integrity: sha512-TOp7BTMKDbUkOHMzDlVsCYWpyaFkKakrrO3HNXfSz4EeJaWwnBScRmgQSTaWHScXVHBUFXTvShrCW8uryBYFcg==}
+    dependencies:
+      '@babel/runtime': 7.18.6
+    dev: false
 
   /iconv-lite/0.4.24:
     resolution: {integrity: sha512-v3MXnZAcvnywkTUEZomIActle7RXXeedOR31wwl7VlyoXO4Qi9arvSenNQWne1TcRwhCL1HwLI21bEqdpj8/rA==}
@@ -9806,7 +9813,7 @@ packages:
     resolution: {integrity: sha512-/6UZ2qgEyH2aqzYZgQPxEnz33NJ2gNsnHA2o5+o4wW9bLM/JYQitNP9xPhsXwC08hMMovfGe/8retsdDsczPRg==}
     dev: true
 
-  /react-i18next/11.17.4_iunkfnprfsbsde3j2gf563wwwi:
+  /react-i18next/11.17.4_lbe2taj3rsyaxmdd4qnhuc5z6q:
     resolution: {integrity: sha512-LswEIl8KNDTP4Wk3c22XDstbR++Vc4BZyNwvGFGaYbYDjdDLkHDLwrgd7DN28f8jufFHaYhQvCG5YWLxFhRt/g==}
     peerDependencies:
       i18next: '>= 19.0.0'
@@ -9822,7 +9829,7 @@ packages:
       '@babel/runtime': 7.18.6
       html-escaper: 2.0.2
       html-parse-stringify: 3.0.1
-      i18next: 21.8.11
+      i18next: 22.0.4
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
     dev: false
