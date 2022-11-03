@@ -36,7 +36,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Deny access to resources: [#4903](https://github.com/owncloud/ocis/pull/4903)
 * Enhancement - Allow to configure applications in Web: [#4578](https://github.com/owncloud/ocis/pull/4578)
 * Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
-* Enhancement - Allow to setup TLS for the reva grpc services: [#4798](https://github.com/owncloud/ocis/pull/4798)
+* Enhancement - Allow to setup TLS for grpc services: [#4798](https://github.com/owncloud/ocis/pull/4798)
 * Enhancement - Logging improvements: [#4815](https://github.com/owncloud/ocis/pull/4815)
 * Enhancement - Secure the nats connection with TLS: [#4781](https://github.com/owncloud/ocis/pull/4781)
 * Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
@@ -277,11 +277,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3713
 
-* Enhancement - Allow to setup TLS for the reva grpc services: [#4798](https://github.com/owncloud/ocis/pull/4798)
+* Enhancement - Allow to setup TLS for grpc services: [#4798](https://github.com/owncloud/ocis/pull/4798)
 
-   We added config options to allow enabling TLS encrption for all reva backed grpc services.
+   We added config options to allow enabling TLS encrption for all reva and go-micro backed grpc
+   services.
 
    https://github.com/owncloud/ocis/pull/4798
+   https://github.com/owncloud/ocis/pull/4901
 
 * Enhancement - Logging improvements: [#4815](https://github.com/owncloud/ocis/pull/4815)
 
