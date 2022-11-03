@@ -28,6 +28,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Make tokeninfo endpoint unprotected: [#4715](https://github.com/owncloud/ocis/pull/4715)
 * Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
 * Change - Build service frontends with pnpm instead of yarn: [#4878](https://github.com/owncloud/ocis/pull/4878)
+* Change - Enable privatelinks by default: [#4599](https://github.com/owncloud/ocis/pull/4599/)
 * Enhancement - Add curl to the oCIS OCI image: [#4751](https://github.com/owncloud/ocis/pull/4751)
 * Enhancement - Add Email templating: [#4564](https://github.com/owncloud/ocis/pull/4564)
 * Enhancement - We added e-mail subject templating: [#4799](https://github.com/owncloud/ocis/pull/4799)
@@ -219,6 +220,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4878
    https://github.com/owncloud/web/pull/7835
+
+* Change - Enable privatelinks by default: [#4599](https://github.com/owncloud/ocis/pull/4599/)
+
+   Enable privatelinks by default in the capabilities.
+
+   https://github.com/owncloud/ocis/pull/4599/
 
 * Enhancement - Add curl to the oCIS OCI image: [#4751](https://github.com/owncloud/ocis/pull/4751)
 
