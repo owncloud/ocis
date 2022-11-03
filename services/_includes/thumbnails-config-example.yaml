@@ -18,9 +18,16 @@ debug:
   zpages: false
 grpc:
   addr: 127.0.0.1:9185
+  tls:
+    enabled: false
+    cert: ""
+    key: ""
 http:
   addr: 127.0.0.1:9186
   root: /thumbnails
+grpc_client_tls:
+  mode: ""
+  'cacert env:': ""
 thumbnail:
   resolutions:
   - 16x16
@@ -35,8 +42,6 @@ thumbnail:
   webdav_allow_insecure: false
   cs3_allow_insecure: false
   reva_gateway: 127.0.0.1:9142
-  reva_gateway_tls_mode: ""
-  reva_gateway_tls_cacert: ""
   font_map_file: ""
   transfer_secret: ""
   data_endpoint: http://127.0.0.1:9186/thumbnails/data

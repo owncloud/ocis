@@ -25,10 +25,14 @@ http:
   root: /graph
 reva:
   address: 127.0.0.1:9142
-  tls_mode: ""
-  tls_cacert: ""
+  tls:
+    mode: ""
+    'cacert env:': ""
 token_manager:
   jwt_secret: ""
+grpc_client_tls:
+  mode: ""
+  'cacert env:': ""
 spaces:
   webdav_base: https://localhost:9200
   webdav_path: /dav/spaces/

@@ -18,11 +18,19 @@ debug:
   zpages: false
 grpc:
   addr: 127.0.0.1:9220
+  tls:
+    enabled: false
+    cert: ""
+    key: ""
 data_path: ~/.ocis/search
 reva:
   address: 127.0.0.1:9142
-  tls_mode: ""
-  tls_cacert: ""
+  tls:
+    mode: ""
+    'cacert env:': ""
+grpc_client_tls:
+  mode: ""
+  'cacert env:': ""
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster

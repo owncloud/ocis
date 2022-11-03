@@ -24,8 +24,12 @@ http:
   tls: true
 reva:
   address: 127.0.0.1:9142
-  tls_mode: ""
-  tls_cacert: ""
+  tls:
+    mode: ""
+    'cacert env:': ""
+grpc_client_tls:
+  mode: ""
+  'cacert env:': ""
 policies:
 - name: ocis
   routes:

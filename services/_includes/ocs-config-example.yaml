@@ -44,8 +44,12 @@ token_manager:
   jwt_secret: ""
 reva:
   address: 127.0.0.1:9142
-  tls_mode: ""
-  tls_cacert: ""
+  tls:
+    mode: ""
+    'cacert env:': ""
+grpc_client_tls:
+  mode: ""
+  'cacert env:': ""
 identity_management:
   address: https://localhost:9200
 machine_auth_api_key: ""
