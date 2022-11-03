@@ -41,6 +41,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
 * Enhancement - Allow to setup TLS for grpc services: [#4798](https://github.com/owncloud/ocis/pull/4798)
 * Enhancement - Logging improvements: [#4815](https://github.com/owncloud/ocis/pull/4815)
+* Enhancement - Default to tls 1.2: [#4969](https://github.com/owncloud/ocis/pull/4969)
 * Enhancement - Secure the nats connection with TLS: [#4781](https://github.com/owncloud/ocis/pull/4781)
 * Enhancement - Rename AUTH_BASIC_AUTH_PROVIDER envvar: [#4966](https://github.com/owncloud/ocis/pull/4966)
 * Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
@@ -314,6 +315,10 @@ The following sections list the changes for unreleased.
    `X-Request-Id`.
 
    https://github.com/owncloud/ocis/pull/4815
+
+* Enhancement - Default to tls 1.2: [#4969](https://github.com/owncloud/ocis/pull/4969)
+
+   https://github.com/owncloud/ocis/pull/4969
 
 * Enhancement - Secure the nats connection with TLS: [#4781](https://github.com/owncloud/ocis/pull/4781)
 
