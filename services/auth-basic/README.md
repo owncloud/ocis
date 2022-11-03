@@ -16,7 +16,5 @@ The possible auth mangers which can be selected are `"ldap"` and `"owncloudsql"`
 
 ## Scalability
 
-Scalability, just like memory and cpu consumption, are highly dependent on the configured auth manager. When using the recommended one (`"ldap"`) there is no persistance as requests will just be 
-forwarded to the ldap-server. Therefore multiple instances of the `auth-basic` service can be started without further configuration. Be aware that other auth managers might not allow that. `"json"`
-auth managers for example persist to the disc and can therefore not be scaled to multiple instances easily.
+Scalability, just like memory and CPU consumption, are highly dependent on the configured auth manager. When using the recommended one which is `"ldap"`, there is no persistance as requests will just be forwarded to the LDAP server. Therefore, multiple instances of the `auth-basic` service can be started without further configuration. Be aware, that other auth managers might not allow that.
 
