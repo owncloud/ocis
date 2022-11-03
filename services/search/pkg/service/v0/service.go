@@ -93,7 +93,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 		logger.Fatal().Err(err).Str("addr", cfg.Reva.Address).Msg("could not get reva client")
 	}
 
-	provider := searchprovider.New(gwclient, index, cfg.MachineAuthAPIKey, evts, logger)
+	provider := searchprovider.New(gwclient, index, cfg.MachineAuthAPIKey, evts, cfg.DebounceDuration, logger)
 
 	return &Service{
 		id:       cfg.GRPC.Namespace + "." + cfg.Service.Name,

@@ -79,7 +79,7 @@ func (s MatchArray) Less(i, j int) bool {
 	return s[i].Score > s[j].Score
 }
 
-func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, machineAuthAPIKey string, eventsChan <-chan interface{}, logger log.Logger) *Provider {
+func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, machineAuthAPIKey string, eventsChan <-chan interface{}, debounceDuration int, logger log.Logger) *Provider {
 	p := &Provider{
 		gwClient:          gwClient,
 		indexClient:       indexClient,
@@ -87,7 +87,7 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 		logger:            logger,
 	}
 
-	p.indexSpaceDebouncer = NewSpaceDebouncer(50*time.Millisecond, func(id *provider.StorageSpaceId, userID *user.UserId) {
+	p.indexSpaceDebouncer = NewSpaceDebouncer(time.Duration(debounceDuration)*time.Millisecond, func(id *provider.StorageSpaceId, userID *user.UserId) {
 		err := p.doIndexSpace(context.Background(), id, userID)
 		if err != nil {
 			p.logger.Error().Err(err).Interface("spaceID", id).Interface("userID", userID).Msg("error while indexing a space")
@@ -109,7 +109,7 @@ func New(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, mach
 
 // NewWithDebouncer returns a new provider with a customer index space debouncer
 func NewWithDebouncer(gwClient gateway.GatewayAPIClient, indexClient search.IndexClient, machineAuthAPIKey string, eventsChan <-chan interface{}, logger log.Logger, debouncer *SpaceDebouncer) *Provider {
-	p := New(gwClient, indexClient, machineAuthAPIKey, eventsChan, logger)
+	p := New(gwClient, indexClient, machineAuthAPIKey, eventsChan, 0, logger)
 	p.indexSpaceDebouncer = debouncer
 	return p
 }

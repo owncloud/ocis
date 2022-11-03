@@ -84,7 +84,7 @@ var _ = Describe("Searchprovider", func() {
 
 	Describe("New", func() {
 		It("returns a new instance", func() {
-			p = provider.New(gwClient, indexClient, "", eventsChan, logger)
+			p = provider.New(gwClient, indexClient, "", eventsChan, 1000, logger)
 			Expect(p).ToNot(BeNil())
 		})
 	})
