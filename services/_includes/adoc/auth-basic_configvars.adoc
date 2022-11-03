@@ -162,13 +162,13 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disables the encoding of the user's group memberships in the reva access token. This reduces the token size, especially when users are members of a large number of groups.
-|`AUTH_BASIC_AUTH_PROVIDER`
+|`AUTH_BASIC_AUTH_MANAGER`
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ldap ++
 a| [subs=-attributes]
-The authentication provider to check if credentials are valid. Supported values are 'ldap' and 'owncloudsql'.
+The authentication provider to check if credentials are valid. Supported value is 'ldap'.
 |`LDAP_URI` +
 `AUTH_BASIC_LDAP_URI`
 a| [subs=-attributes]
