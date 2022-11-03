@@ -32,6 +32,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add Email templating: [#4564](https://github.com/owncloud/ocis/pull/4564)
 * Enhancement - We added e-mail subject templating: [#4799](https://github.com/owncloud/ocis/pull/4799)
 * Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
+* Enhancement - Configurable max lock cycles: [#4964](https://github.com/owncloud/ocis/pull/4964)
 * Enhancement - Allow to configuring the reva cache store: [#4627](https://github.com/owncloud/ocis/pull/4627)
 * Enhancement - Add support for REPORT requests to /dav/spaces URLs: [#4661](https://github.com/owncloud/ocis/pull/4661)
 * Enhancement - Deny access to resources: [#4903](https://github.com/owncloud/ocis/pull/4903)
@@ -246,6 +247,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4588
 
+* Enhancement - Configurable max lock cycles: [#4964](https://github.com/owncloud/ocis/pull/4964)
+
+   Adds config option for max lock cycles. Also bumps reva
+
+   https://github.com/owncloud/ocis/pull/4964
+
 * Enhancement - Allow to configuring the reva cache store: [#4627](https://github.com/owncloud/ocis/pull/4627)
 
    We have added the possibility to configure the cache store implementation for the users
@@ -347,6 +354,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/4903
    https://github.com/owncloud/ocis/pull/4908
    https://github.com/owncloud/ocis/pull/4915
+   https://github.com/owncloud/ocis/pull/4964
 
 * Enhancement - Update ownCloud Web to v6.0.0-rc.2: [#4786](https://github.com/owncloud/ocis/pull/4786)
 
