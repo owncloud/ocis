@@ -133,6 +133,13 @@ a| [subs=-attributes]
 ++~/.ocis/search ++
 a| [subs=-attributes]
 The directory where the filesystem storage will store search data. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/search.
+|`SEARCH_REINDEX_DEBOUNCE_DURATION`
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1000 ++
+a| [subs=-attributes]
+The duration in milliseconds the reindex debouncer waits before triggering a reindex of a space that was modified.
 |`REVA_GATEWAY`
 a| [subs=-attributes]
 ++string ++

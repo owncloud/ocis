@@ -23,6 +23,7 @@ grpc:
     cert: ""
     key: ""
 data_path: ~/.ocis/search
+debounce_duration: 1000
 reva:
   address: 127.0.0.1:9142
   tls:
