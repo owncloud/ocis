@@ -41,6 +41,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow to setup TLS for grpc services: [#4798](https://github.com/owncloud/ocis/pull/4798)
 * Enhancement - Logging improvements: [#4815](https://github.com/owncloud/ocis/pull/4815)
 * Enhancement - Secure the nats connection with TLS: [#4781](https://github.com/owncloud/ocis/pull/4781)
+* Enhancement - Rename AUTH_BASIC_AUTH_PROVIDER envvar: [#4966](https://github.com/owncloud/ocis/pull/4966)
 * Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
 * Enhancement - Prohibit users from setting or listing other user's values: [#4897](https://github.com/owncloud/ocis/pull/4897)
 * Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
@@ -321,6 +322,12 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/4781
    https://github.com/owncloud/ocis/pull/4800
    https://github.com/owncloud/ocis/pull/4867
+
+* Enhancement - Rename AUTH_BASIC_AUTH_PROVIDER envvar: [#4966](https://github.com/owncloud/ocis/pull/4966)
+
+   Rename the `AUTH_BASIC_AUTH_PROVIDER` envvar to `AUTH_BASIC_AUTH_MANAGER`
+
+   https://github.com/owncloud/ocis/pull/4966
 
 * Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
 
