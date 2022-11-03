@@ -4,7 +4,7 @@ The `auth-basic` service is responsible for validating authentication of incomin
 
 ## Auth Managers
 
-Since the `auth-basic` service does not do any validation itself, it needs to be configured with an authentication manager. One can use the `AUTH_BASIC_AUTH_PROVIDER` environment variable to configure this.
+Since the `auth-basic` service does not do any validation itself, it needs to be configured with an authentication manager. One can use the `AUTH_BASIC_AUTH_MANAGER` environment variable to configure this. Currently only one auth manager is supported: `"ldap"`
 
 ### LDAP Auth Manager
 
@@ -12,9 +12,9 @@ Setting `AUTH_BASIC_AUTH_PROVIDER` to `"ldap"` will configure the `auth-basic` s
 
 ### Other Auth Managers
 
-The possible auth mangers which can be selected are `"ldap"` and `"owncloudsql"`. Those are tested and usable though `"ldap"` is the recommend manager. Refer to the admin docs for additional information about those.
+oCIS currently supports no other auth manager
 
 ## Scalability
 
-Scalability, just like memory and CPU consumption, are highly dependent on the configured auth manager. When using the recommended one which is `"ldap"`, there is no persistance as requests will just be forwarded to the LDAP server. Therefore, multiple instances of the `auth-basic` service can be started without further configuration. Be aware, that other auth managers might not allow that.
+When using `"ldap"` as auth manager, there is no persistance as requests will just be forwarded to the LDAP server. Therefore, multiple instances of the `auth-basic` service can be started without further configuration. Be aware, that other auth managers might not allow that.
 
