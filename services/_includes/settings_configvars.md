@@ -15,6 +15,9 @@
 | SETTINGS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | SETTINGS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | SETTINGS_HTTP_ADDR | string | 127.0.0.1:9190 | The bind address of the HTTP service.|
+| OCIS_HTTP_TLS_ENABLED | bool | false | |
+| OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|
+| OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
 | SETTINGS_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
 | SETTINGS_CACHE_TTL | int | 604800 | Browser cache control max-age value in seconds for settings Web UI assets.|
 | OCIS_CORS_ALLOW_ORIGINS<br/>SETTINGS_CORS_ALLOW_ORIGINS | []string | [*] | A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin|

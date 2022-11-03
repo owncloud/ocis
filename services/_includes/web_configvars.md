@@ -15,6 +15,9 @@
 | WEB_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | WEB_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | WEB_HTTP_ADDR | string | 127.0.0.1:9100 | The bind address of the HTTP service.|
+| OCIS_HTTP_TLS_ENABLED | bool | false | |
+| OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|
+| OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
 | WEB_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
 | WEB_CACHE_TTL | int | 604800 | Cache policy in seconds for ownCloud Web assets.|
 | WEB_ASSET_PATH | string |  | Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets.|

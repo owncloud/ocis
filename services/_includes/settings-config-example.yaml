@@ -18,6 +18,10 @@ debug:
   zpages: false
 http:
   addr: 127.0.0.1:9190
+  tls:
+    enabled: false
+    cert: ""
+    key: ""
   root: /
   cache_ttl: 604800
   cors:

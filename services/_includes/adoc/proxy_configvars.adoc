@@ -292,6 +292,13 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disable TLS certificate validation for all HTTP backend connections.
+|`PROXY_HTTPS_CACERT`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The root CA certificate used to validate TLS server certificates of https enabled backend services.
 |===
 
 Since Version: `+` added, `-` deprecated

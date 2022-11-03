@@ -21,6 +21,9 @@
 | OCIS_CORS_ALLOW_METHODS<br/>WEBDAV_CORS_ALLOW_METHODS | []string | [GET POST PUT PATCH DELETE OPTIONS] | A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method|
 | OCIS_CORS_ALLOW_HEADERS<br/>WEBDAV_CORS_ALLOW_HEADERS | []string | [Authorization Origin Content-Type Accept X-Requested-With] | A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.|
 | OCIS_CORS_ALLOW_CREDENTIALS<br/>WEBDAV_CORS_ALLOW_CREDENTIALS | bool | true | Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
+| OCIS_HTTP_TLS_ENABLED | bool | false | |
+| OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|
+| OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
 | OCIS_URL<br/>OCIS_PUBLIC_URL | string | https://127.0.0.1:9200 | URL, where oCIS is reachable for users.|
 | WEBDAV_WEBDAV_NAMESPACE | string | /users/{{.Id.OpaqueId}} | CS3 path layout to use when forwarding /webdav requests|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to look up user metadata|

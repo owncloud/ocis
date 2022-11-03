@@ -136,6 +136,27 @@ a| [subs=-attributes]
 ++/graph ++
 a| [subs=-attributes]
 Subdirectory that serves as the root for this HTTP service.
+|`OCIS_HTTP_TLS_ENABLED`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+
+|`OCIS_HTTP_TLS_CERTIFICATE`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name of the TLS server certificate (in PEM format) for the http services.
+|`OCIS_HTTP_TLS_KEY`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.
 |`REVA_GATEWAY`
 a| [subs=-attributes]
 ++string ++

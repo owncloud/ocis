@@ -168,6 +168,27 @@ a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
+|`OCIS_HTTP_TLS_ENABLED`
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+
+|`OCIS_HTTP_TLS_CERTIFICATE`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name of the TLS server certificate (in PEM format) for the http services.
+|`OCIS_HTTP_TLS_KEY`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.
 |`OCIS_JWT_SECRET` +
 `OCS_JWT_SECRET`
 a| [subs=-attributes]

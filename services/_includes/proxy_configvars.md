@@ -41,3 +41,4 @@
 | PROXY_AUTOPROVISION_ACCOUNTS | bool | false | Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running.|
 | PROXY_ENABLE_BASIC_AUTH | bool | false | Set this to true to enable 'basic authentication' (username/password).|
 | PROXY_INSECURE_BACKENDS | bool | false | Disable TLS certificate validation for all HTTP backend connections.|
+| PROXY_HTTPS_CACERT | string |  | The root CA certificate used to validate TLS server certificates of https enabled backend services.|

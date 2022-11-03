@@ -24,6 +24,10 @@ grpc:
     key: ""
 http:
   addr: 127.0.0.1:9186
+  tls:
+    enabled: false
+    cert: ""
+    key: ""
   root: /thumbnails
 grpc_client_tls:
   mode: ""

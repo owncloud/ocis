@@ -40,6 +40,10 @@ http:
     - Accept
     - X-Requested-With
     allow_credentials: true
+  tls:
+    enabled: false
+    cert: ""
+    key: ""
 token_manager:
   jwt_secret: ""
 reva:
