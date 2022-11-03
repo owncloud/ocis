@@ -42,7 +42,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 	}
 
 	filesCfg := map[string]interface{}{
-		"private_links":     false,
+		"private_links":     true,
 		"bigfilechunking":   false,
 		"blacklisted_files": []string{},
 		"undelete":          true,
