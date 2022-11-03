@@ -44,6 +44,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add thumbnails support for tiff and bmp files: [#4634](https://github.com/owncloud/ocis/pull/4634)
 * Enhancement - Update reva: [#4588](https://github.com/owncloud/ocis/pull/4588)
 * Enhancement - Update ownCloud Web to v6.0.0-rc.2: [#4786](https://github.com/owncloud/ocis/pull/4786)
+* Enhancement - Validate space names: [#4955](https://github.com/owncloud/ocis/pull/4955)
 * Enhancement - Make it possible to configure a WOPI folderurl: [#4716](https://github.com/owncloud/ocis/pull/4716)
 
 ## Details
@@ -415,6 +416,15 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/4786
    https://github.com/owncloud/web/releases/tag/v6.0.0-rc.2
+
+* Enhancement - Validate space names: [#4955](https://github.com/owncloud/ocis/pull/4955)
+
+   We now return `BAD REQUEST` when space names are - too long (max 255 characters) - containing
+   evil characters (`/`, `\`, `.`, `\\`, `:`, `?`, `*`, `"`, `>`, `<`, `|`)
+
+   Additionally leading and trailing spaces will be removed silently.
+
+   https://github.com/owncloud/ocis/pull/4955
 
 * Enhancement - Make it possible to configure a WOPI folderurl: [#4716](https://github.com/owncloud/ocis/pull/4716)
 
