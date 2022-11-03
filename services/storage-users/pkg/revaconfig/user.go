@@ -96,6 +96,7 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 			"treesize_accounting":         true,
 			"permissionssvc":              cfg.Drivers.OCIS.PermissionsEndpoint,
 			"permissionssvc_tls_mode":     cfg.Commons.GRPCClientTLS.Mode,
+			"max_acquire_lock_cycles":     cfg.Drivers.OCIS.MaxAcquireLockCycles,
 		},
 		"s3": map[string]interface{}{
 			"enable_home": false,
@@ -121,6 +122,7 @@ func UserDrivers(cfg *config.Config) map[string]interface{} {
 			"s3.secret_key":               cfg.Drivers.S3NG.SecretKey,
 			"s3.endpoint":                 cfg.Drivers.S3NG.Endpoint,
 			"s3.bucket":                   cfg.Drivers.S3NG.Bucket,
+			"max_acquire_lock_cycles":     cfg.Drivers.OCIS.MaxAcquireLockCycles,
 		},
 	}
 }
