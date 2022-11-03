@@ -33,6 +33,20 @@ import (
 	merrors "go-micro.dev/v4/errors"
 )
 
+var (
+	_invalidSpaceNameCharacters = []string{`/`, `\`, `.`, `:`, `?`, `*`, `"`, `>`, `<`, `|`}
+	_maxSpaceNameLength         = 255
+
+	// ErrNameTooLong is thrown when the spacename is too long
+	ErrNameTooLong = fmt.Errorf("spacename must be smaller than %d", _maxSpaceNameLength)
+
+	// ErrNameEmpty is thrown when the spacename is empty
+	ErrNameEmpty = errors.New("spacename must not be empty")
+
+	// ErrForbiddenCharacter is thrown when the spacename contains an invalid character
+	ErrForbiddenCharacter = fmt.Errorf("spacenames must not contain %v", _invalidSpaceNameCharacters)
+)
+
 // GetDrives lists all drives the current user has access to
 func (g Graph) GetDrives(w http.ResponseWriter, r *http.Request) {
 	g.getDrives(w, r, false)
@@ -229,10 +243,10 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid body schema definition")
 		return
 	}
-	spaceName := *drive.Name
-	if spaceName == "" {
-		logger.Debug().Str("name", spaceName).Msg("could not create drive: invalid name")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid name")
+	spaceName := strings.TrimSpace(*drive.Name)
+	if err := validateSpaceName(spaceName); err != nil {
+		logger.Debug().Str("name", spaceName).Err(err).Msg("could not create drive: name validation failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid spacename: %s", err.Error()))
 		return
 	}
 
@@ -376,7 +390,14 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if drive.Name != nil {
-		updateSpaceRequest.StorageSpace.Name = *drive.Name
+		spacename := strings.TrimSpace(*drive.Name)
+		if err := validateSpaceName(spacename); err != nil {
+			logger.Info().Err(err).Msg("could not update drive: spacename invalid")
+			errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
+			return
+		}
+
+		updateSpaceRequest.StorageSpace.Name = spacename
 	}
 
 	if drive.Quota.HasTotal() {
@@ -900,4 +921,22 @@ func sortSpaces(req *godata.GoDataRequest, spaces []*libregraph.Drive) ([]*libre
 	}
 	sort.Sort(sorter)
 	return spaces, nil
+}
+
+func validateSpaceName(name string) error {
+	if name == "" {
+		return ErrNameEmpty
+	}
+
+	if len(name) > _maxSpaceNameLength {
+		return ErrNameTooLong
+	}
+
+	for _, c := range _invalidSpaceNameCharacters {
+		if strings.Contains(name, c) {
+			return ErrForbiddenCharacter
+		}
+	}
+
+	return nil
 }
