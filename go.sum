@@ -499,8 +499,8 @@ github.com/go-micro/plugins/v4/store/nats-js v1.1.0/go.mod h1:jJf7Gm39OafZlT3s3U
 github.com/go-micro/plugins/v4/store/redis v1.1.0 h1:QWl5FAfMaekppZGNcj0mSyi8vCkjZGvHoGdaBNeKNm4=
 github.com/go-micro/plugins/v4/store/redis v1.1.0/go.mod h1:yXFv4vhmr1ccxRfHxvuSetIBZDOJvRA404PZk5z6/bc=
 github.com/go-micro/plugins/v4/transport/grpc v1.1.0 h1:mXfDYfFQLnVDzjGY3o84oe4prfux9h8txsnA19dKsj8=
-github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.1.0 h1:X+j/pAJV9sfOYzMrjMDYdtAKiJ1vozw8p98ZsBDmVAc=
-github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.1.0/go.mod h1:+Z5TSrTYBaoruuGsgqpzjK/Jc2pnRF5nV5sMwmjqTM4=
+github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.2.0 h1:EQj4l7fuOSz8ueUYhFlpZPp9+tN4JeONL32ARRKXW/U=
+github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.2.0/go.mod h1:JR9Ox/iJIrcXm8nCWdAEBsyG7Q7lyMLzsTZPfXrqvwo=
 github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.2.0 h1:UWBUYtMXCxQ9bIGOYcbLOjtPv8ovvCRjWWM6tHhB4S8=
 github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.2.0/go.mod h1:8BYxs/wEE4ZJayHZQffw4A8s9rcPumyoNms0hYoNocM=
 github.com/go-micro/plugins/v4/wrapper/trace/opencensus v1.1.0 h1:ITm1vEP8BPEccWFAu6/tMFHrxHfwYzE4GdkCy6PlF6A=
