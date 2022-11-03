@@ -44,6 +44,7 @@ drivers:
     personalspacealias_template: '{{.SpaceType}}/{{.User.Username | lower}}'
     generalspacealias_template: '{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}'
     share_folder: /Shares
+    max_acquire_lock_cycles: 25
   s3ng:
     root: ~/.ocis/storage/users
     user_layout: '{{.Id.OpaqueId}}'
