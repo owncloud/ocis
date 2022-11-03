@@ -54,6 +54,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, error) {
 		}
 
 		tlsConf = &tls.Config{
+			MinVersion:         tls.VersionTLS12,
 			InsecureSkipVerify: evtsCfg.TLSInsecure, //nolint:gosec
 			RootCAs:            rootCAPool,
 		}

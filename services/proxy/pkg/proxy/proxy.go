@@ -51,6 +51,7 @@ func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 	}
 
 	tlsConf := &tls.Config{
+		MinVersion:         tls.VersionTLS12,
 		InsecureSkipVerify: options.Config.InsecureBackends, //nolint:gosec
 	}
 	if options.Config.BackendHTTPSCACert != "" {

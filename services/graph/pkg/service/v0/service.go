@@ -89,6 +89,7 @@ func NewService(opts ...Option) Service {
 				// When insecure is set to true then we don't need a certificate.
 				options.Config.Identity.LDAP.CACert = ""
 				tlsConf = &tls.Config{
+					MinVersion: tls.VersionTLS12,
 					//nolint:gosec // We need the ability to run with "insecure" (dev/testing)
 					InsecureSkipVerify: options.Config.Identity.LDAP.Insecure,
 				}
@@ -101,7 +102,9 @@ func NewService(opts ...Option) Service {
 					options.Logger.Fatal().Err(err).Msg("The configured LDAP CA cert does not exist")
 				}
 				if tlsConf == nil {
-					tlsConf = &tls.Config{}
+					tlsConf = &tls.Config{
+						MinVersion: tls.VersionTLS12,
+					}
 				}
 				certs := x509.NewCertPool()
 				pemData, err := ioutil.ReadFile(options.Config.Identity.LDAP.CACert)

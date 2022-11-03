@@ -34,7 +34,10 @@ func (s WebDav) Get(ctx context.Context, url string) (io.ReadCloser, error) {
 		return nil, errors.Wrapf(err, `could not get the image "%s"`, url)
 	}
 
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: s.insecure} //nolint:gosec
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{
+		MinVersion:         tls.VersionTLS12,
+		InsecureSkipVerify: s.insecure, //nolint:gosec
+	}
 
 	if auth, ok := ContextGetAuthorization(ctx); ok {
 		req.Header.Add("Authorization", auth)

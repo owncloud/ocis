@@ -64,6 +64,7 @@ func Server(opts ...Option) (http.Service, error) {
 			}
 
 			tlsConf = &tls.Config{
+				MinVersion:         tls.VersionTLS12,
 				InsecureSkipVerify: options.Config.Events.TLSInsecure, //nolint:gosec
 				RootCAs:            rootCAPool,
 			}

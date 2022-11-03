@@ -66,7 +66,9 @@ func (m Mail) getMailClient() (*mail.SMTPClient, error) {
 	}
 	server.Password = m.conf.Notifications.SMTP.Password
 	if server.TLSConfig == nil {
-		server.TLSConfig = &tls.Config{}
+		server.TLSConfig = &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		}
 	}
 	server.TLSConfig.InsecureSkipVerify = m.conf.Notifications.SMTP.Insecure
 
