@@ -168,7 +168,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ldap ++
 a| [subs=-attributes]
-The auth provider which should be used by the service like 'ldap'.
+The authentication provider to check if credentials are valid. Supported values are 'ldap' and 'owncloudsql'.
 |`LDAP_URI` +
 `AUTH_BASIC_LDAP_URI`
 a| [subs=-attributes]

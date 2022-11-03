@@ -162,6 +162,13 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disables the loading of user's group memberships from the reva access token.
+|`GROUPS_DRIVER`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ldap ++
+a| [subs=-attributes]
+The driver which should be used by the groups service. Supported values are 'ldap' and 'owncloudsql'.
 |`LDAP_URI` +
 `GROUPS_LDAP_URI`
 a| [subs=-attributes]

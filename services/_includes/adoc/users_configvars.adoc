@@ -168,7 +168,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ldap ++
 a| [subs=-attributes]
-The user driver which should be used by the users service. Supported values are 'ldap', 'owncloudsql', 'json' and 'rest'.
+The driver which should be used by the users service. Supported values are 'ldap' and 'owncloudsql'.
 |`LDAP_URI` +
 `USERS_LDAP_URI`
 a| [subs=-attributes]
