@@ -19,6 +19,8 @@ type Config struct {
 	GRPC GRPCConfig `yaml:"grpc"`
 
 	Datapath      string                `yaml:"data_path" env:"SEARCH_DATA_PATH" desc:"The directory where the filesystem storage will store search data. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/search."`
+	DebounceDuration int          `yaml:"debounce_duration" env:"SEARCH_REINDEX_DEBOUNCE_DURATION" desc:"The duration in milliseconds the reindex debouncer waits before triggering a reindex of a space that was modified."`
+
 	Reva          *shared.Reva          `yaml:"reva"`
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 	Events        Events                `yaml:"events"`

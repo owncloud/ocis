@@ -29,8 +29,9 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "search",
 		},
-		Datapath: path.Join(defaults.BaseDataPath(), "search"),
-		Reva:     shared.DefaultRevaConfig(),
+		Datapath:         path.Join(defaults.BaseDataPath(), "search"),
+		DebounceDuration: 1000,
+		Reva:             shared.DefaultRevaConfig(),
 		Events: config.Events{
 			Endpoint:      "127.0.0.1:9233",
 			Cluster:       "ocis-cluster",
