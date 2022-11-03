@@ -155,6 +155,6 @@ type CBOXDriver struct {
 }
 
 type Checksums struct {
-	SupportedTypes      []string `yaml:"supported_types" env:"FRONTEND_CHECKSUMS_SUPPORTED_TYPES" desc:"Define the checksum types that indicate clients which hashes the server can use to verify upload integrity. You can provide multiple types separated by blank or comma. Supported types are 'sha1', 'md5' and 'adler32'."`
-	PreferredUploadType string   `yaml:"preferred_upload_type" env:"FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPES" desc:"The supported checksum type for uploads that indicate clients supporting multiple hash algorythms which one is preferred by the server. Must be one out of the defined list of SUPPORTED_TYPES."`
+	SupportedTypes      []string `yaml:"supported_types" env:"FRONTEND_CHECKSUMS_SUPPORTED_TYPES" desc:"Define the checksum types that indicate to clients which hashes the server can use to verify upload integrity. You can provide multiple types separated by blank or comma. Supported types are 'sha1', 'md5' and 'adler32'."`
+	PreferredUploadType string   `yaml:"preferred_upload_type" env:"FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPE" desc:"The supported checksum type for uploads that indicates to clients supporting multiple hash algorythms which one is preferred by the server. Must be one out of the defined list of SUPPORTED_TYPES."`
 }
