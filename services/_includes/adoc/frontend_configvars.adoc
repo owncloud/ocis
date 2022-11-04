@@ -187,7 +187,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary to access resources from other services.
+The machine auth API key used to validate internal requests necessary to access resources from other services.
 |`FRONTEND_SKIP_USER_GROUPS_IN_TOKEN`
 a| [subs=-attributes]
 ++bool ++
@@ -294,7 +294,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++1073741824 ++
 a| [subs=-attributes]
-Max size of the zip archive the archiver can create.
+Max size in bytes of the zip archive the archiver can create.
 |`OCIS_INSECURE` +
 `FRONTEND_ARCHIVER_INSECURE`
 a| [subs=-attributes]
@@ -344,14 +344,14 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-Max TTL for the resource info cache. 0 disables the cache.
+Max TTL in seconds for the resource info cache. 0 disables the cache.
 |`FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE`
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++memory ++
 a| [subs=-attributes]
-Resource info cache type ('memory' or 'redis').
+Resource info cache type. Supported values are 'memory' and 'redis'.
 |`FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_ADDR`
 a| [subs=-attributes]
 ++string ++
@@ -386,14 +386,14 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[sha1 md5 adler32] ++
 a| [subs=-attributes]
-Supported checksum types to be announced to the client. You can provide multiple types separated by blank or comma.
-|`FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPES`
+Define the checksum types that indicate to clients which hashes the server can use to verify upload integrity. You can provide multiple types separated by blank or comma. Supported types are 'sha1', 'md5' and 'adler32'.
+|`FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPE`
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ ++
+++sha1 ++
 a| [subs=-attributes]
-Preferred checksum types to be announced to the client for uploads (e.g. md5)
+The supported checksum type for uploads that indicates to clients supporting multiple hash algorithms which one is preferred by the server. Must be one out of the defined list of SUPPORTED_TYPES.
 |===
 
 Since Version: `+` added, `-` deprecated
