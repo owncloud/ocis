@@ -420,7 +420,8 @@ class GraphContext implements Context {
 		);
 
 		// add created user to list except for the user with an empty name
-		// because reguest /graph/v1.0/users/emptyUserName get 200 and all users
+		// because request /graph/v1.0/users/emptyUserName exits with 200 
+    // and we cannot check that the user with empty name doesn't exist
 		if (!empty($rows["userName"])) {
 			$this->featureContext->addUserToCreatedUsersList(
 				$rows["userName"],
