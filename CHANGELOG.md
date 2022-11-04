@@ -315,6 +315,7 @@ The following sections list the changes for unreleased.
    `X-Request-Id`.
 
    https://github.com/owncloud/ocis/pull/4815
+   https://github.com/owncloud/ocis/pull/4974
 
 * Enhancement - Default to tls 1.2: [#4969](https://github.com/owncloud/ocis/pull/4969)
 
