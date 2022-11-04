@@ -30,18 +30,13 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "ocdav",
 		},
-		Reva:            shared.DefaultRevaConfig(),
-		WebdavNamespace: "/users/{{.Id.OpaqueId}}",
-		FilesNamespace:  "/users/{{.Id.OpaqueId}}",
-		SharesNamespace: "/Shares",
-		PublicURL:       "https://localhost:9200",
-		Insecure:        false,
-		Timeout:         84300,
-		Middleware: config.Middleware{
-			Auth: config.Auth{
-				CredentialsByUserAgent: map[string]string{},
-			},
-		},
+		Reva:              shared.DefaultRevaConfig(),
+		WebdavNamespace:   "/users/{{.Id.OpaqueId}}",
+		FilesNamespace:    "/users/{{.Id.OpaqueId}}",
+		SharesNamespace:   "/Shares",
+		PublicURL:         "https://localhost:9200",
+		Insecure:          false,
+		Timeout:           84300,
 		MachineAuthAPIKey: "",
 		Status: config.Status{
 			Version:        version.Legacy,

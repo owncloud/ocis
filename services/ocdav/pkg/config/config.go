@@ -29,8 +29,7 @@ type Config struct {
 	// Insecure certificates allowed when making requests to the gateway
 	Insecure bool `yaml:"insecure" env:"OCIS_INSECURE;OCDAV_INSECURE" desc:"Allow insecure connections to the GATEWAY service."`
 	// Timeout in seconds when making requests to the gateway
-	Timeout    int64      `yaml:"gateway_request_timeout" env:"OCDAV_GATEWAY_REQUEST_TIMEOUT" desc:"Request timeout in seconds for requests from the oCDAV service to the GATEWAY service."`
-	Middleware Middleware `yaml:"middleware"`
+	Timeout int64 `yaml:"gateway_request_timeout" env:"OCDAV_GATEWAY_REQUEST_TIMEOUT" desc:"Request timeout in seconds for requests from the oCDAV service to the GATEWAY service."`
 
 	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;OCDAV_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services."`
 
@@ -67,22 +66,6 @@ type HTTPConfig struct {
 	Namespace string `yaml:"-"`
 	Protocol  string `yaml:"protocol" env:"OCDAV_HTTP_PROTOCOL" desc:"The transport protocol of the HTTP service."`
 	Prefix    string `yaml:"prefix" env:"OCDAV_HTTP_PREFIX" desc:"A URL path prefix for the handler."`
-}
-
-// Middleware configures reva middlewares.
-type Middleware struct {
-	Auth      Auth      `yaml:"auth"`
-	RequestID RequestID `yaml:"request_id"`
-}
-
-// Auth configures reva http auth middleware.
-type Auth struct {
-	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agent"`
-}
-
-// RequestID configures reva requestid middleware.
-type RequestID struct {
-	RequestID map[string]string `yaml:"requestid"`
 }
 
 // Status holds the configurable values for the status.php
