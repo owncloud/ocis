@@ -80,7 +80,7 @@ type Auth struct {
 	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agent"`
 }
 
-// RequestID configures reva http auth middleware.
+// RequestID configures reva requestid middleware.
 type RequestID struct {
 	RequestID map[string]string `yaml:"requestid"`
 }
