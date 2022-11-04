@@ -168,7 +168,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ldap ++
 a| [subs=-attributes]
-The authentication provider to check if credentials are valid. Supported value is 'ldap'.
+The authentication manager to check if credentials are valid. Supported value is 'ldap'.
 |`LDAP_URI` +
 `AUTH_BASIC_LDAP_URI`
 a| [subs=-attributes]
