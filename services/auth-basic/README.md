@@ -12,7 +12,7 @@ Since the `auth-basic` service does not do any validation itself, it needs to be
 
 ### LDAP Auth Manager
 
-Setting `AUTH_BASIC_AUTH_PROVIDER` to `"ldap"` will configure the `auth-basic` service to use LDAP as auth manager. This is the recommended option for running in a production and testing environment. More details on how to configure LDAP with ocis can be found in the admin docs.
+Setting `AUTH_BASIC_AUTH_MANAGER` to `"ldap"` will configure the `auth-basic` service to use LDAP as auth manager. This is the recommended option for running in a production and testing environment. More details on how to configure LDAP with ocis can be found in the admin docs.
 
 ### Other Auth Managers
 
