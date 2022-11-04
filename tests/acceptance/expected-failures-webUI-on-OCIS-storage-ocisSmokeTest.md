@@ -11,5 +11,3 @@ Other free text and Markdown formatting can be used elsewhere in the document if
 
 Only the web scenarios tagged ocisSmokeTest are run by default in OCIS CI. This file lists the expected-failures of those ocisSmokeTest scenarios.
 
-### [Copy private link option not available](https://github.com/owncloud/ocis/issues/1409)
-- [webUIPrivateLinks/accessingPrivateLinks.feature:9](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUIPrivateLinks/accessingPrivateLinks.feature#L9)
