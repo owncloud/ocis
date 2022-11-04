@@ -21,7 +21,7 @@ type Config struct {
 
 	TokenManager      *TokenManager `yaml:"token_manager"`
 	Reva              *shared.Reva  `yaml:"reva"`
-	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;FRONTEND_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
+	MachineAuthAPIKey string        `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;FRONTEND_MACHINE_AUTH_API_KEY" desc:"The machine auth API key used to validate internal requests necessary to access resources from other services."`
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"FRONTEND_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token."`
 
@@ -107,7 +107,7 @@ type AppHandler struct {
 
 type Archiver struct {
 	MaxNumFiles int64  `yaml:"max_num_files" env:"FRONTEND_ARCHIVER_MAX_NUM_FILES" desc:"Max number of files that can be packed into an archive."`
-	MaxSize     int64  `yaml:"max_size" env:"FRONTEND_ARCHIVER_MAX_SIZE" desc:"Max size of the zip archive the archiver can create."`
+	MaxSize     int64  `yaml:"max_size" env:"FRONTEND_ARCHIVER_MAX_SIZE" desc:"Max size in bytes of the zip archive the archiver can create."`
 	Prefix      string `yaml:"-"`
 	Insecure    bool   `yaml:"insecure" env:"OCIS_INSECURE;FRONTEND_ARCHIVER_INSECURE" desc:"Allow insecure connections to the archiver."`
 }
@@ -121,8 +121,8 @@ type OCS struct {
 	SharePrefix             string             `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX" desc:"Path prefix for shares."`
 	HomeNamespace           string             `yaml:"home_namespace" env:"FRONTEND_OCS_HOME_NAMESPACE" desc:"Homespace namespace identifier."`
 	AdditionalInfoAttribute string             `yaml:"additional_info_attribute" env:"FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE" desc:"Additional information attribute for the user like {{.Mail}}."`
-	ResourceInfoCacheTTL    int                `yaml:"resource_info_cache_ttl" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL" desc:"Max TTL for the resource info cache. 0 disables the cache."`
-	ResourceInfoCacheType   string             `yaml:"resource_info_cache_type" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE" desc:"Resource info cache type ('memory' or 'redis')."`
+	ResourceInfoCacheTTL    int                `yaml:"resource_info_cache_ttl" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL" desc:"Max TTL in seconds for the resource info cache. 0 disables the cache."`
+	ResourceInfoCacheType   string             `yaml:"resource_info_cache_type" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE" desc:"Resource info cache type. Supported values are 'memory' and 'redis'."`
 	ResourceInfoCaches      ResourceInfoCaches `yaml:"resource_info_caches,omitempty"` // only used for redis
 	CacheWarmupDriver       string             `yaml:"cache_warmup_driver,omitempty"`  // not supported by the oCIS product, therefore not part of docs
 	CacheWarmupDrivers      CacheWarmupDrivers `yaml:"cache_warmup_drivers,omitempty"` // not supported by the oCIS product, therefore not part of docs
@@ -155,6 +155,6 @@ type CBOXDriver struct {
 }
 
 type Checksums struct {
-	SupportedTypes      []string `yaml:"supported_types" env:"FRONTEND_CHECKSUMS_SUPPORTED_TYPES" desc:"Supported checksum types to be announced to the client. You can provide multiple types separated by blank or comma."`
-	PreferredUploadType string   `yaml:"preferred_upload_type" env:"FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPES" desc:"Preferred checksum types to be announced to the client for uploads (e.g. md5)"`
+	SupportedTypes      []string `yaml:"supported_types" env:"FRONTEND_CHECKSUMS_SUPPORTED_TYPES" desc:"Define the checksum types that indicate to clients which hashes the server can use to verify upload integrity. You can provide multiple types separated by blank or comma. Supported types are 'sha1', 'md5' and 'adler32'."`
+	PreferredUploadType string   `yaml:"preferred_upload_type" env:"FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPE" desc:"The supported checksum type for uploads that indicates to clients supporting multiple hash algorithms which one is preferred by the server. Must be one out of the defined list of SUPPORTED_TYPES."`
 }

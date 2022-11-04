@@ -84,7 +84,7 @@ func DefaultConfig() *config.Config {
 		SearchMinLength:          3,
 		Checksums: config.Checksums{
 			SupportedTypes:      []string{"sha1", "md5", "adler32"},
-			PreferredUploadType: "",
+			PreferredUploadType: "sha1",
 		},
 		AppHandler: config.AppHandler{
 			Prefix: "app",
