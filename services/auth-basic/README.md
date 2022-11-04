@@ -1,6 +1,6 @@
 # Auth-Basic Service
 
-The oCIS Auth Basic service provides basic authentication for those clients who cannot handle OIDC. This is a rare case, is usually not necessary and mainly used for tests or development.
+The oCIS Auth Basic service provides basic authentication for those clients who cannot handle OpenID Connect. This is a rare case, is usually not necessary and mainly used for tests or development.
 
 The `auth-basic` service is responsible for validating authentication of incoming requests. To do so, it will use the configured `auth manager`, see the `Auth Managers` section. Only HTTP basic auth requests to ocis will involve the `auth-basic` service.
 
