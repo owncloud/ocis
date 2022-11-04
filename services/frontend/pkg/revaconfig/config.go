@@ -99,6 +99,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 					"namespace": "ocis",
 					"subsystem": "frontend",
 				},
+				"requestid": map[string]interface{}{},
 			},
 			// TODO build services dynamically
 			"services": map[string]interface{}{
