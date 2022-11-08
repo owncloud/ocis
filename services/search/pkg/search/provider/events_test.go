@@ -204,6 +204,9 @@ var _ = Describe("SpaceDebouncer", func() {
 		userId = &user.UserId{
 			OpaqueId: "user",
 		}
+		spaceid = &sprovider.StorageSpaceId{
+			OpaqueId: "spaceid",
+		}
 	)
 
 	BeforeEach(func() {
@@ -214,9 +217,6 @@ var _ = Describe("SpaceDebouncer", func() {
 	})
 
 	It("debounces", func() {
-		spaceid := &sprovider.StorageSpaceId{
-			OpaqueId: "spaceid",
-		}
 		debouncer.Debounce(spaceid, userId)
 		debouncer.Debounce(spaceid, userId)
 		debouncer.Debounce(spaceid, userId)
@@ -226,9 +226,6 @@ var _ = Describe("SpaceDebouncer", func() {
 	})
 
 	It("works multiple times", func() {
-		spaceid := &sprovider.StorageSpaceId{
-			OpaqueId: "spaceid",
-		}
 		debouncer.Debounce(spaceid, userId)
 		debouncer.Debounce(spaceid, userId)
 		debouncer.Debounce(spaceid, userId)
@@ -240,5 +237,22 @@ var _ = Describe("SpaceDebouncer", func() {
 		Eventually(func() int {
 			return callCount["spaceid"]
 		}, "200ms").Should(Equal(2))
+	})
+
+	It("doesn't trigger twice simultaneously", func() {
+		debouncer = provider.NewSpaceDebouncer(50*time.Millisecond, func(id *sprovider.StorageSpaceId, _ *user.UserId) {
+			callCount[id.OpaqueId] += 1
+			time.Sleep(300 * time.Millisecond)
+		})
+		debouncer.Debounce(spaceid, userId)
+		time.Sleep(100 * time.Millisecond) // Let it trigger once
+
+		debouncer.Debounce(spaceid, userId)
+		time.Sleep(100 * time.Millisecond) // shouldn't trigger as the other run is still in progress
+		Expect(callCount["spaceid"]).To(Equal(1))
+
+		Eventually(func() int {
+			return callCount["spaceid"]
+		}, "500ms").Should(Equal(2))
 	})
 })

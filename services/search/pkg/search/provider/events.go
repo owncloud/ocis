@@ -19,9 +19,10 @@ import (
 
 // SpaceDebouncer debounces operations on spaces for a configurable amount of time
 type SpaceDebouncer struct {
-	after   time.Duration
-	f       func(id *provider.StorageSpaceId, userID *user.UserId)
-	pending map[string]*time.Timer
+	after      time.Duration
+	f          func(id *provider.StorageSpaceId, userID *user.UserId)
+	pending    map[string]*time.Timer
+	inProgress sync.Map
 
 	mutex sync.Mutex
 }
@@ -29,9 +30,10 @@ type SpaceDebouncer struct {
 // NewSpaceDebouncer returns a new SpaceDebouncer instance
 func NewSpaceDebouncer(d time.Duration, f func(id *provider.StorageSpaceId, userID *user.UserId)) *SpaceDebouncer {
 	return &SpaceDebouncer{
-		after:   d,
-		f:       f,
-		pending: map[string]*time.Timer{},
+		after:      d,
+		f:          f,
+		pending:    map[string]*time.Timer{},
+		inProgress: sync.Map{},
 	}
 }
 
@@ -45,6 +47,16 @@ func (d *SpaceDebouncer) Debounce(id *provider.StorageSpaceId, userID *user.User
 	}
 
 	d.pending[id.OpaqueId] = time.AfterFunc(d.after, func() {
+		if _, ok := d.inProgress.Load(id.OpaqueId); ok {
+			// Reschedule this run for when the previous run has finished
+			d.mutex.Lock()
+			d.pending[id.OpaqueId].Reset(d.after)
+			d.mutex.Unlock()
+			return
+		}
+
+		d.inProgress.Store(id.OpaqueId, true)
+		defer d.inProgress.Delete(id.OpaqueId)
 		d.f(id, userID)
 	})
 }
