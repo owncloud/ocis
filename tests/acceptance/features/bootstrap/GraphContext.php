@@ -318,9 +318,9 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param array $groups
-	 * 
+	 *
 	 * @return void
 	 * @throws Exception
 	 */
@@ -339,9 +339,9 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param array $users
-	 * 
+	 *
 	 * @return void
 	 * @throws Exception
 	 */
@@ -362,7 +362,7 @@ class GraphContext implements Context {
 	/**
 	 *
 	 * @param string|null $user
-	 * 
+	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
@@ -386,7 +386,7 @@ class GraphContext implements Context {
 	 * returns list of groups
 	 *
 	 * @param ResponseInterface $response
-	 * 
+	 *
 	 * @return array
 	 * @throws Exception
 	 */
@@ -413,7 +413,7 @@ class GraphContext implements Context {
 	 *
 	 * @param string $group
 	 * @param string|null $user
-	 * 
+	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
@@ -438,7 +438,7 @@ class GraphContext implements Context {
 	 * returns list of users of a group
 	 *
 	 * @param ResponseInterface $response
-	 * 
+	 *
 	 * @return array
 	 * @throws Exception
 	 */
@@ -718,9 +718,9 @@ class GraphContext implements Context {
 
 	/**
 	 * @When user :user gets all the groups using the Graph API
-	 * 
+	 *
 	 * @param string $user
-	 * 
+	 *
 	 * @return void
 	 */
 	public function userGetsAllTheGroupsUsingTheGraphApi(string $user): void {
@@ -728,14 +728,14 @@ class GraphContext implements Context {
 	}
 
 	/**
-     * @When user :user gets all the members of group :group using the Graph API
-	 * 
+	 * @When user :user gets all the members of group :group using the Graph API
+	 *
 	 * @param string $user
 	 * @param string $group
-	 * 
+	 *
 	 * @return void
-     */
-    public function userGetsAllTheMembersOfGroupUsingTheGraphApi($user, $group): void {
-        $this->featureContext->setResponse($this->listGroupMembers($group, $user));
-    }
+	 */
+	public function userGetsAllTheMembersOfGroupUsingTheGraphApi($user, $group): void {
+		$this->featureContext->setResponse($this->listGroupMembers($group, $user));
+	}
 }
