@@ -318,24 +318,135 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * returns list of all groups
+	 * 
+	 * @param array $groups
+	 * 
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theseExtraGroupsShouldBeInTheResponse(array $groups): void {
+		$respondedGroups = $this->getArrayOfGroupsResponded($this->featureContext->getResponse());
+		foreach ($groups as $group) {
+			$found = false;
+			foreach ($respondedGroups as $respondedGroup) {
+				if ($respondedGroup["displayName"] === $group) {
+					$found = true;
+					break;
+				}
+			}
+			Assert::assertTrue($found, "Group '$group' not found in the list");
+		}
+	}
+
+	/**
+	 * 
+	 * @param array $users
+	 * 
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theseUsersShouldBeInTheResponse(array $users): void {
+		$respondedUsers = $this->getArrayOfUsersResponded($this->featureContext->getResponse());
+		foreach ($users as $user) {
+			$found = false;
+			foreach ($respondedUsers as $respondedUser) {
+				if ($respondedUser["onPremisesSamAccountName"] === $user) {
+					$found = true;
+					break;
+				}
+			}
+			Assert::assertTrue($found, "User '$user' not found in the list");
+		}
+	}
+
+	/**
+	 *
+	 * @param string|null $user
+	 * 
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function listGroups(?string $user = null): ResponseInterface {
+		if ($user) {
+			$username = $user;
+			$password = $this->featureContext->getPasswordForUser($user);
+		} else {
+			$username = $this->featureContext->getAdminUsername();
+			$password = $this->featureContext->getAdminPassword();
+		}
+		return GraphHelper::getGroups(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$username,
+			$password
+		);
+	}
+
+	/**
+	 * returns list of groups
+	 *
+	 * @param ResponseInterface $response
+	 * 
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getArrayOfGroupsResponded(ResponseInterface $response): array {
+		if ($response->getStatusCode() === 200) {
+			$jsonResponseBody = $this->featureContext->getJsonDecodedResponse($response);
+			return $jsonResponseBody["value"];
+		} else {
+			$this->throwHttpException($response, "Could not retrieve groups list.");
+		}
+	}
+
+	/**
 	 *
 	 * @return array
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
 	public function adminHasRetrievedGroupListUsingTheGraphApi(): array {
-		$response =  GraphHelper::getGroups(
+		return  $this->getArrayOfGroupsResponded($this->listGroups());
+	}
+
+	/**
+	 *
+	 * @param string $group
+	 * @param string|null $user
+	 * 
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function listGroupMembers(string $group, ?string $user = null): ResponseInterface {
+		if ($user) {
+			$username = $user;
+			$password = $this->featureContext->getPasswordForUser($user);
+		} else {
+			$username = $this->featureContext->getAdminUsername();
+			$password = $this->featureContext->getAdminPassword();
+		}
+		return GraphHelper::getMembersList(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword()
+			$username,
+			$password,
+			$this->featureContext->getAttributeOfCreatedGroup($group, 'id')
 		);
+	}
+
+	/**
+	 * returns list of users of a group
+	 *
+	 * @param ResponseInterface $response
+	 * 
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getArrayOfUsersResponded(ResponseInterface $response): array {
 		if ($response->getStatusCode() === 200) {
-			$jsonResponseBody = $this->featureContext->getJsonDecodedResponse($response);
-			return $jsonResponseBody["value"];
+			return $this->featureContext->getJsonDecodedResponse($response);
 		} else {
-			$this->throwHttpException($response, "Could not retrieve groups list.");
+			$this->throwHttpException($response, "Could not retrieve group members list.");
 		}
 	}
 
@@ -349,18 +460,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function theAdminHasRetrievedMembersListOfGroupUsingTheGraphApi(string $group): array {
-		$response = GraphHelper::getMembersList(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$this->featureContext->getAttributeOfCreatedGroup($group, 'id')
-		);
-		if ($response->getStatusCode() === 200) {
-			return $this->featureContext->getJsonDecodedResponse($response);
-		} else {
-			$this->throwHttpException($response, "Could not retrieve members list for group $group.");
-		}
+		return $this->getArrayOfUsersResponded($this->listGroupMembers($group));
 	}
 
 	/**
@@ -615,4 +715,27 @@ class GraphContext implements Context {
 		);
 		$this->featureContext->setResponse($response);
 	}
+
+	/**
+	 * @When user :user gets all the groups using the Graph API
+	 * 
+	 * @param string $user
+	 * 
+	 * @return void
+	 */
+	public function userGetsAllTheGroupsUsingTheGraphApi(string $user): void {
+		$this->featureContext->setResponse($this->listGroups($user));
+	}
+
+	/**
+     * @When user :user gets all the members of group :group using the Graph API
+	 * 
+	 * @param string $user
+	 * @param string $group
+	 * 
+	 * @return void
+     */
+    public function userGetsAllTheMembersOfGroupUsingTheGraphApi($user, $group): void {
+        $this->featureContext->setResponse($this->listGroupMembers($group, $user));
+    }
 }
