@@ -7,32 +7,59 @@
 [![Go Report](https://goreportcard.com/badge/github.com/owncloud/ocis)](https://goreportcard.com/report/github.com/owncloud/ocis)
 [![Go Doc](https://godoc.org/github.com/owncloud/ocis?status.svg)](http://godoc.org/github.com/owncloud/ocis)
 [![oCIS docker image](https://img.shields.io/docker/v/owncloud/ocis?label=oCIS%20docker%20image&logo=docker&sort=semver)](https://hub.docker.com/r/owncloud/ocis)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-**ownCloud Infinite Scale is currently in a technical preview state. It will be subject to a lot of changes and is not yet ready for general production deployments.**
+**We are preparing for general availability. For now, we consider the feature set complete and are concentrating on bug fixes and performance improvements.**
+
+ownCloud Infinite Scale (oCIS) is the foundation of your data platform. It allows [web](https://github.com/owncloud/web), [Android](https://github.com/owncloud/android), [iOS](https://github.com/owncloud/ios-app) and [desktop](https://github.com/owncloud/client/) clients to synchronize and share file spaces with a scalable server side based on [reva](https://reva.link/) using open and well defined APIs like [WebDAV](http://www.webdav.org/) and [CS3](https://github.com/cs3org/cs3apis/). External applications like [Collabora Online](https://github.com/CollaboraOnline/online), [OnlyOffice Docs](https://github.com/ONLYOFFICE/DocumentServer) or [Microsoft Office Online Server](https://owncloud.com/microsoft-office-online-integration-with-wopi/) can be used to collaborate using a [WOPI application gateway](https://github.com/cs3org/wopiserver). Users are authenticated using [OpenID Connect](https://openid.net/connect/) and the embedded [LibreGraph Connect](https://github.com/libregraph/lico) identity provider. 
+
+The single binary allows scaling oCIS from a [Raspberry Pi](https://owncloud.dev/ocis/deployment/basic-remote-setup/) to [Kubernetes cluster](https://owncloud.dev/ocis/deployment/kubernetes/) by [changing the configuration and starting multiple services as needed](https://owncloud.dev/ocis/deployment/). The multiservice architecture allows tailoring the functionality to your needs and reusing services that may already be in place like [Keycloak](https://www.keycloak.org/) as the identity provider.
 
 ## Run ownCloud Infinite Scale
 
-Please see [Getting Started](https://owncloud.dev/ocis/getting-started/)
+Please see [Binary Setup](https://doc.owncloud.com/ocis/next/deployment/binary/binary-setup.html) for a single node bare metal deployment like on a Raspberry Pi or learn how to [deploy to Kubernetes](https://doc.owncloud.com/ocis/next/deployment/container/orchestration/orchestration.html).
+
+To build and run a local instance with demo users:
+
+```console
+# get the source
+git clone git@github.com:owncloud/ocis.git
+
+# enter the ocis dir
+cd ocis
+
+# generate assets
+make generate
+
+# build the binary
+make -C ocis build
+
+# initialize a minimal oCIS configuration
+./ocis/bin/ocis init
+
+# run with demo users
+IDM_CREATE_DEMO_USERS=true ./ocis/bin/ocis server
+```
+
+All batteries included: no external database, no external IDP needed!
 
 ## Documentation
 
-*   **Development Documentation**  
-Please see [Development Documentation - Getting Started](https://owncloud.dev/ocis/development/getting-started/)
+### Development Documentation
+Please see [Development Documentation - Getting Started](https://owncloud.dev/ocis/development/getting-started/) to get an overview of [Requirements](https://owncloud.dev/ocis/development/getting-started/#requirements), the [repository structure](https://owncloud.dev/ocis/development/getting-started/#repository-structure) and [other starting points](https://owncloud.dev/ocis/development/getting-started/#starting-points).
 
-*   **Admin Documentation**  
-Please see [Admin Documentation - Introduction to Infinite Scale](https://doc.owncloud.com/ocis/next/)
+### Admin Documentation
+Please see [Admin Documentation - Introduction to Infinite Scale](https://doc.owncloud.com/ocis/next/) to get started with running oCIS in production.
 
 ## Security
 
-If you find a security issue please contact [security@owncloud.com](mailto:security@owncloud.com) first
+If you find a security issue please contact [security@owncloud.com](mailto:security@owncloud.com) first.
 
 ## Contributing
 
+We are _very_ happy that oCIS does not require a CLA as it is [Apache 2.0 licensed](LICENSE). We hope this will make it easier to contribute code. If you want to get in touch, most of the developers hang out in our [rocket chat channel](https://talk.owncloud.com/channel/infinitescale). There are other ways to contribute, like the [ownCloud central forum](https://central.owncloud.org/) or [Transifex for ownCloud web](https://explore.transifex.com/owncloud-org/owncloud-web/).
+
 Please refer to our [Contribution Guidelines](CONTRIBUTING.md).
-
-## License
-
-Apache-2.0
 
 ## Copyright
 
