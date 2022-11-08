@@ -480,8 +480,8 @@ github.com/go-micro/plugins/v4/logger/zerolog v1.1.0 h1:sG20ktK9YN/h0TlmQXTuL4/y
 github.com/go-micro/plugins/v4/logger/zerolog v1.1.0/go.mod h1:lUEQAHt8I+gJDmx3DbpU7aqwM3+MwFmFRnATxlp650w=
 github.com/go-micro/plugins/v4/registry/consul v1.1.0 h1:YZQ4ddLOK7YsfyjIHiA0SEDzaDYc6vVXrV+8Z6oF5aY=
 github.com/go-micro/plugins/v4/registry/consul v1.1.0/go.mod h1:57TUMkEggnfVEFoWA5JH/nCYCW/c4oRZHC+Ureecgs8=
-github.com/go-micro/plugins/v4/registry/etcd v1.1.0 h1:edKcQMnZc0N7b+PXw796vfoev3Xzj8ZQMLb1s6ptKsg=
-github.com/go-micro/plugins/v4/registry/etcd v1.1.0/go.mod h1:E9Yv0D0Vvhrmz1RhhageTaXVrdqnFZxM7nMY0Kc+7Gc=
+github.com/go-micro/plugins/v4/registry/etcd v1.2.0 h1:tcHlU1GzvX3oZa8WQH8ylMCGie5qD5g98YWTESJjeqQ=
+github.com/go-micro/plugins/v4/registry/etcd v1.2.0/go.mod h1:CQeTHkjN3xMtIQsynaTTquMz2sHEdsTfRIfFzrX7aug=
 github.com/go-micro/plugins/v4/registry/kubernetes v1.1.0 h1:JfkrimhACDviPtKT7Fhqms7oeM9sgy0I37bzvn4AsI4=
 github.com/go-micro/plugins/v4/registry/kubernetes v1.1.0/go.mod h1:6SNUr4g/JTzmR8OWU1KaIOS+lCFaqDnCRvbH3L5uUro=
 github.com/go-micro/plugins/v4/registry/mdns v1.1.0 h1:qRB93cviMeY4n3/r9T/5zJF3PF+Ol5tw/VW5e6TSG4s=
