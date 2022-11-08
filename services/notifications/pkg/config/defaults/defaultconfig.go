@@ -23,7 +23,7 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "notifications",
 		},
-		WebUiURL: "https://localhost:9200",
+		WebUIURL: "https://localhost:9200",
 		Notifications: config.Notifications{
 			SMTP: config.SMTP{
 				Host:           "",
