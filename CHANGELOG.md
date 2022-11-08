@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Do not reindex a space twice at the same time: [#5001](https://github.com/owncloud/ocis/pull/5001)
+* Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
 
 ## Details
 
@@ -16,6 +17,15 @@ The following sections list the changes for unreleased.
    still in progress.
 
    https://github.com/owncloud/ocis/pull/5001
+
+* Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
+
+   We've fixed the configuration of the notification service's Web UI url that appears in emails.
+
+   Previously it was only configurable via the global "OCIS_URL" and is now also configurable via
+   "NOTIFICATIONS_WEB_UI_URL".
+
+   https://github.com/owncloud/ocis/pull/4998
 # Changelog for [2.0.0-rc.1] (2022-11-05)
 
 The following sections list the changes for 2.0.0-rc.1.
