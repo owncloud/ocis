@@ -17,7 +17,7 @@ The single binary allows scaling oCIS from a [Raspberry Pi](https://owncloud.dev
 
 ## Run ownCloud Infinite Scale
 
-Please see [Basic Remote Setup](https://owncloud.dev/ocis/deployment/basic-remote-setup/) for a single node bare metal deployment like on a Raspberry Pi or learn how to [deploy to Kubernetes](https://owncloud.dev/ocis/deployment/kubernetes/).
+Please see [Binary Setup](https://doc.owncloud.com/ocis/next/deployment/binary/binary-setup.html) for a single node bare metal deployment like on a Raspberry Pi or learn how to [deploy to Kubernetes](https://doc.owncloud.com/ocis/next/deployment/container/orchestration/orchestration.html).
 
 To build and run a local instance with demo users:
 
@@ -57,7 +57,7 @@ If you find a security issue please contact [security@owncloud.com](mailto:secur
 
 ## Contributing
 
-We are _very_ happy that oCIS does not require a CLA as it is [Apache 2.0 licensed](LICENSE). We hope this will make it easier to contribute code. If you want to get in touch, most of the developers hang out in our [rocket chat channel](https://talk.owncloud.com/channel/infinitescale). There are other ways to contribute, like the [owwnCloud central forum](https://central.owncloud.org/) or [Transifex for ownCloud web](https://explore.transifex.com/owncloud-org/owncloud-web/).
+We are _very_ happy that oCIS does not require a CLA as it is [Apache 2.0 licensed](LICENSE). We hope this will make it easier to contribute code. If you want to get in touch, most of the developers hang out in our [rocket chat channel](https://talk.owncloud.com/channel/infinitescale). There are other ways to contribute, like the [ownCloud central forum](https://central.owncloud.org/) or [Transifex for ownCloud web](https://explore.transifex.com/owncloud-org/owncloud-web/).
 
 Please refer to our [Contribution Guidelines](CONTRIBUTING.md).
 
