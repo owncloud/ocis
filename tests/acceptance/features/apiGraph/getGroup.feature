@@ -44,7 +44,7 @@ Feature: get groups and their members
       | Carol |
 
 
-  Scenario: normal user tries to get users in their group
+  Scenario: normal user tries to get users of a group
     Given user "Brian" has been created with default attributes and without skeleton files
     And group "tea-lover" has been created
     When user "Brian" gets all the members of group "tea-lover" using the Graph API
