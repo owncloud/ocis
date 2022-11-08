@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
+
+## Summary
+
+* Bugfix - Do not reindex a space twice at the same time: [#5001](https://github.com/owncloud/ocis/pull/5001)
+
+## Details
+
+* Bugfix - Do not reindex a space twice at the same time: [#5001](https://github.com/owncloud/ocis/pull/5001)
+
+   We fixed a problem where the search service reindexed a space while another reindex process was
+   still in progress.
+
+   https://github.com/owncloud/ocis/pull/5001
 # Changelog for [2.0.0-rc.1] (2022-11-05)
 
 The following sections list the changes for 2.0.0-rc.1.
