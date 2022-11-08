@@ -10,6 +10,7 @@
 | NOTIFICATIONS_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | NOTIFICATIONS_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | NOTIFICATIONS_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
+| OCIS_URL<br/>NOTIFICATIONS_WEB_UI_URL | string | https://localhost:9200 | The public facing URL of the oCIS Web UI, used e.g. when sending notification eMails|
 | NOTIFICATIONS_SMTP_HOST | string |  | SMTP host to connect to.|
 | NOTIFICATIONS_SMTP_PORT | int | 1025 | Port of the SMTP host to connect to.|
 | NOTIFICATIONS_SMTP_SENDER | string | ownCloud &lt;noreply@example.com&gt; | Sender address of emails that will be sent.|

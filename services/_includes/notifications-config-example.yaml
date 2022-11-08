@@ -11,6 +11,7 @@ debug:
   token: ""
   pprof: false
   zpages: false
+ocis_url: https://localhost:9200
 notifications:
   SMTP:
     smtp_host: ""

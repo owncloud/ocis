@@ -66,6 +66,14 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
+|`OCIS_URL` +
+`NOTIFICATIONS_WEB_UI_URL`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++https://localhost:9200 ++
+a| [subs=-attributes]
+The public facing URL of the oCIS Web UI, used e.g. when sending notification eMails
 |`NOTIFICATIONS_SMTP_HOST`
 a| [subs=-attributes]
 ++string ++
