@@ -176,6 +176,15 @@ var _ = Describe("Index", func() {
 				assertDocCount(ref.ResourceId, `Name:1234*`, 1)
 			})
 
+			It("filters hidden files", func() {
+				ri.Path = ".hidden.pdf"
+				ref.Path = "./" + ri.Path
+				err := i.Add(ref, ri)
+				Expect(err).ToNot(HaveOccurred())
+
+				assertDocCount(ref.ResourceId, `Name:*hidden*`, 0)
+			})
+
 			Context("with a file in the root of the space", func() {
 				JustBeforeEach(func() {
 					err := i.Add(ref, ri)
