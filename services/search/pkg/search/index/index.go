@@ -220,12 +220,9 @@ func (i *Index) Move(id, newParentID *sprovider.ResourceId, fullPath string) err
 func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (*searchsvc.SearchIndexResponse, error) {
 	deletedQuery := bleve.NewBoolFieldQuery(false)
 	deletedQuery.SetField("Deleted")
-	hiddenQuery := bleve.NewBoolFieldQuery(false)
-	hiddenQuery.SetField("Hidden")
 	query := bleve.NewConjunctionQuery(
 		bleve.NewQueryStringQuery(req.Query),
 		deletedQuery, // Skip documents that have been marked as deleted
-		hiddenQuery,  // Skip documents that are hidden
 	)
 	if req.Ref != nil {
 		query = bleve.NewConjunctionQuery(
