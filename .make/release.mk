@@ -91,18 +91,6 @@ release-linux: release-dirs
 	@# https://github.com/golang/go/issues/50405
 	@# -buildmode=pie not easily doable for arm
 
-.PHONY: release-windows
-release-windows: release-dirs
-	GOOS=windows \
-	GOARCH=amd64 \
-	go build \
-		-tags 'netgo $(TAGS)' \
-		-buildmode=pie \
-		-trimpath \
-		-ldflags '-extldflags "-static" $(LDFLAGS)' \
-		-o '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-windows-amd64' \
-		./cmd/$(NAME)
-
 .PHONY: release-darwin
 release-darwin: release-dirs
 	GOOS=darwin \
