@@ -504,7 +504,7 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function adminCreatesGroupUsingTheGraphApi(string $group, ?string $user = null): void {
+	public function userCreatesGroupUsingTheGraphApi(string $group, ?string $user = null): void {
 		$response = $this->createGroup($group, $user);
 		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastHttpStatusCodesArray((string) $response->getStatusCode());
