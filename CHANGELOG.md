@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Do not reindex a space twice at the same time: [#5001](https://github.com/owncloud/ocis/pull/5001)
 * Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
+* Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
 
 ## Details
 
@@ -26,6 +27,13 @@ The following sections list the changes for unreleased.
    "NOTIFICATIONS_WEB_UI_URL".
 
    https://github.com/owncloud/ocis/pull/4998
+
+* Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
+
+   We changed the search service to store the "hidden" state of entries in the search index. That
+   will allow for filtering/searching hidden files in the future.
+
+   https://github.com/owncloud/ocis/pull/5018
 # Changelog for [2.0.0-rc.1] (2022-11-05)
 
 The following sections list the changes for 2.0.0-rc.1.
