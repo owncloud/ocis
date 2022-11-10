@@ -320,6 +320,7 @@ func fieldsToEntity(fields map[string]interface{}) *indexDocument {
 		MimeType: fields["MimeType"].(string),
 		Type:     uint64(fields["Type"].(float64)),
 		Deleted:  fields["Deleted"].(bool),
+		Hidden:   fields["Hidden"].(bool),
 	}
 	return doc
 }
