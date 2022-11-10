@@ -50,17 +50,17 @@ With focus on easy install and operation, Infinite Scale is delivered as single 
 
 ## Important Readings
 
-Before starting to setup an instance, we **highly** recommend reading the  [Prerequisites](https://doc.owncloud.com/ocis/next/prerequisites/prerequisites.html), the [Deployment](https://doc.owncloud.com/ocis/next/deployment/) section and especially the [General Information](https://doc.owncloud.com/ocis/next/deployment/general/general-info.html) page describing and explaining information that is valid for all deployment types.
+Before starting to set up an instance, we **highly** recommend reading the  [Prerequisites](https://doc.owncloud.com/ocis/next/prerequisites/prerequisites.html), the [Deployment](https://doc.owncloud.com/ocis/next/deployment/) section and especially the [General Information](https://doc.owncloud.com/ocis/next/deployment/general/general-info.html) page describing and explaining information that is valid for all deployment types.
 
 ## Run ownCloud Infinite Scale
 
 ### Use the Official Documentation
 
-See the [Quick Guide](https://doc.owncloud.com/ocis/next/quickguide/quickguide.html) or the [Binary Setup](https://doc.owncloud.com/ocis/next/deployment/binary/binary-setup.html) for a single node bare metal deployment starting with a Raspberry Pi or single server, the [Container Setup](https://doc.owncloud.com/ocis/next/deployment/container/container-setup.html) for classic container environments like docker respectively learn how to [deploy to Kubernetes](https://doc.owncloud.com/ocis/next/deployment/container/orchestration/orchestration.html).
+See the [Quick Guide](https://doc.owncloud.com/ocis/next/quickguide/quickguide.html) or the [Binary Setup](https://doc.owncloud.com/ocis/next/deployment/binary/binary-setup.html) for a single-node bare-metal deployment starting with a Raspberry Pi or single server, the [Container Setup](https://doc.owncloud.com/ocis/next/deployment/container/container-setup.html) for classic container environments like docker or learn how to [deploy to Kubernetes](https://doc.owncloud.com/ocis/next/deployment/container/orchestration/orchestration.html).
 
 ### Use the ocis Repo as Source
 
-Use this method when running a instance that has the latest code and is recommended for development purposes  only. To build and run a local instance with demo users:
+Use this method to run an instance with the latest code. This is only recommended for development purposes. To build and run a local instance with demo users:
 
 ```console
 # get the source
@@ -87,10 +87,10 @@ All batteries included: no external database, no external IDP needed!
 ## Documentation
 
 ### Admin Documentation
-Please see [Admin Documentation - Introduction to Infinite Scale](https://doc.owncloud.com/ocis/next/) to get started with running oCIS in production.
+Refer to the [Admin Documentation - Introduction to Infinite Scale](https://doc.owncloud.com/ocis/next/) to get started with running oCIS in production.
 
 ### Development Documentation
-Please see [Development Documentation - Getting Started](https://owncloud.dev/ocis/development/getting-started/) to get an overview of [Requirements](https://owncloud.dev/ocis/development/getting-started/#requirements), the [repository structure](https://owncloud.dev/ocis/development/getting-started/#repository-structure) and [other starting points](https://owncloud.dev/ocis/development/getting-started/#starting-points).
+See the [Development Documentation - Getting Started](https://owncloud.dev/ocis/development/getting-started/) to get an overview of [Requirements](https://owncloud.dev/ocis/development/getting-started/#requirements), the [repository structure](https://owncloud.dev/ocis/development/getting-started/#repository-structure) and [other starting points](https://owncloud.dev/ocis/development/getting-started/#starting-points).
 
 ## Security
 
@@ -99,7 +99,7 @@ If you find a security issue, please contact [security@owncloud.com](mailto:secu
 
 ## Contributing
 
-We are _very_ happy that oCIS does not require a CLA as it is [Apache 2.0 licensed](LICENSE). We hope this will make it easier to contribute code. If you want to get in touch, most of the developers hang out in our [rocket chat channel](https://talk.owncloud.com/channel/infinitescale) or reach out to the  the [ownCloud central forum](https://central.owncloud.org/).
+We are _very_ happy that oCIS does not require a Contributor License Agreement (CLA) as it is [Apache 2.0 licensed](LICENSE). We hope this will make it easier to contribute code. If you want to get in touch, most of the developers hang out in our [rocket chat channel](https://talk.owncloud.com/channel/infinitescale) or reach out to the  the [ownCloud central forum](https://central.owncloud.org/).
 
 Infinite Scale is carefully internationalized so that everyone, no matter what language they speak, has a great experience. To achieve this we rely on the help of volunteer translators. If you want to help, you can find the project behind this link:
  or [Transifex for ownCloud web](https://explore.transifex.com/owncloud-org/owncloud-web/).
