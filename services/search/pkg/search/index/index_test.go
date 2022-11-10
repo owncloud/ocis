@@ -182,7 +182,8 @@ var _ = Describe("Index", func() {
 				err := i.Add(ref, ri)
 				Expect(err).ToNot(HaveOccurred())
 
-				assertDocCount(ref.ResourceId, `Name:*hidden* +Hidden:true`, 0)
+				assertDocCount(ref.ResourceId, `Name:*hidden* +Hidden:T`, 1)
+				assertDocCount(ref.ResourceId, `Name:*hidden* +Hidden:F`, 0)
 			})
 
 			Context("with a file in the root of the space", func() {
