@@ -3,7 +3,7 @@ changelog: $(CALENS) ## generate changelog
 	$(CALENS) -i ../changelog -t ../changelog/CHANGELOG.tmpl >| ../CHANGELOG.md
 
 .PHONY: release
-release: release-dirs release-linux release-windows release-darwin release-copy release-check
+release: release-dirs release-linux release-darwin release-copy release-check
 
 .PHONY: release-dirs
 release-dirs:

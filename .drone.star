@@ -143,7 +143,7 @@ config = {
         "from_secret": "private_rocketchat",
     },
     "binaryReleases": {
-        "os": ["linux", "darwin", "windows"],
+        "os": ["linux", "darwin"],
     },
     "dockerReleases": {
         "architectures": ["arm", "arm64", "amd64"],
