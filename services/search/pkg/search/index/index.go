@@ -56,6 +56,7 @@ type indexDocument struct {
 	Type     uint64
 
 	Deleted bool
+	Hidden  bool
 }
 
 // Index represents a bleve based search index
@@ -297,6 +298,7 @@ func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *indexDocume
 		MimeType: ri.MimeType,
 		Type:     uint64(ri.Type),
 		Deleted:  false,
+		Hidden:   strings.HasPrefix(ri.Path, "."),
 	}
 
 	if ri.Mtime != nil {
@@ -318,6 +320,7 @@ func fieldsToEntity(fields map[string]interface{}) *indexDocument {
 		MimeType: fields["MimeType"].(string),
 		Type:     uint64(fields["Type"].(float64)),
 		Deleted:  fields["Deleted"].(bool),
+		Hidden:   fields["Hidden"].(bool),
 	}
 	return doc
 }
