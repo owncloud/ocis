@@ -94,7 +94,7 @@
         "GIF"
       ],
       "default": "PNG",
-      "description": "The file types to which the thumbnail can be encoded to."
+      "description": "The file types to which the thumbnail can be encoded to.\n\n - PNG: Represents PNG type\n - JPG: Represents JPG type\n - GIF: Represents GIF type"
     },
     "v0WebdavSource": {
       "type": "object",

@@ -14,7 +14,7 @@
 # is a lot faster than the build steps below.
 
 
-FROM owncloudci/nodejs:14 as generate
+FROM owncloudci/nodejs:16 as generate
 
 COPY ./ /ocis/
 
