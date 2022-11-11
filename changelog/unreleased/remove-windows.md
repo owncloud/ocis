@@ -1,4 +1,4 @@
-Enhancement: Remove windows from ci & relase makefile
+Enhancement: Remove windows from ci & release makefile
 
 We have removed windows from the ci & release makefile
 
