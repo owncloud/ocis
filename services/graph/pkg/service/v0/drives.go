@@ -708,7 +708,7 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 		return nil, nil
 	case res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
 		logger.Debug().Str("grpc", res.GetStatus().GetMessage()).Msg("error sending get quota grpc request")
-		return nil, err
+		return nil, errors.New(res.GetStatus().GetMessage())
 	}
 
 	var remaining int64

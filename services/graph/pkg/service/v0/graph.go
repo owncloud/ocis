@@ -78,6 +78,7 @@ type Graph struct {
 	identityBackend      identity.Backend
 	gatewayClient        GatewayClient
 	roleService          settingssvc.RoleService
+	permissionsService   settingssvc.PermissionService
 	spacePropertiesCache *ttlcache.Cache
 	eventsPublisher      events.Publisher
 }

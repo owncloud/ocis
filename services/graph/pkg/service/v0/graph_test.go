@@ -1,18 +1,20 @@
 package svc_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	userprovider "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -24,6 +26,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -37,7 +40,7 @@ var _ = Describe("Graph", func() {
 	)
 
 	JustBeforeEach(func() {
-		ctx = context.Background()
+		ctx = ctxpkg.ContextSetUser(context.Background(), &userprovider.User{Id: &userprovider.UserId{Type: userprovider.UserType_USER_TYPE_PRIMARY, OpaqueId: "testuser"}, Username: "testuser"})
 		cfg = defaults.FullDefaultConfig()
 		cfg.Identity.LDAP.CACert = "" // skip the startup checks, we don't use LDAP at all in this tests
 		cfg.TokenManager.JWTSecret = "loremipsum"
@@ -60,7 +63,7 @@ var _ = Describe("Graph", func() {
 		})
 	})
 
-	Describe("drive", func() {
+	Describe("List drives", func() {
 		It("can list an empty list of spaces", func() {
 			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
 				Status:        status.NewOK(ctx),
@@ -70,6 +73,17 @@ var _ = Describe("Graph", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
 			rr := httptest.NewRecorder()
 			svc.GetDrives(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusOK))
+		})
+		It("can list an empty list of all spaces", func() {
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status:        status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{},
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil)
+			rr := httptest.NewRecorder()
+			svc.GetAllDrives(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 		})
 
@@ -256,12 +270,11 @@ var _ = Describe("Graph", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(response["value"])).To(Equal(1))
 			value := response["value"][0]
-			webdavURL, _ := url.PathUnescape(*value.Root.WebDavUrl)
 			Expect(*value.DriveAlias).To(Equal("mountpoint/new-folder"))
 			Expect(*value.DriveType).To(Equal("mountpoint"))
 			Expect(*value.Id).To(Equal("prID$aID!differentID"))
 			Expect(*value.Name).To(Equal("New Folder"))
-			Expect(webdavURL).To(Equal("https://localhost:9200/dav/spaces/prID$aID!differentID"))
+			Expect(*value.Root.WebDavUrl).To(Equal("https://localhost:9200/dav/spaces/prID$aID%21differentID"))
 			Expect(*value.Root.ETag).To(Equal("101112131415"))
 			Expect(*value.Root.Id).To(Equal("prID$aID!differentID"))
 			Expect(*value.Root.RemoteItem.ETag).To(Equal("123456789"))
@@ -296,16 +309,6 @@ var _ = Describe("Graph", func() {
 			Expect(libreError.Error.Code).To(Equal(errorcode.InvalidRequest.String()))
 		})
 		It("can list a spaces with invalid query parameter", func() {
-			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
-				Status:        status.NewOK(ctx),
-				StorageSpaces: []*provider.StorageSpace{}}, nil)
-			gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Return(&gateway.InitiateFileDownloadResponse{
-				Status: status.NewNotFound(ctx, "not found"),
-			}, nil)
-			gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
-				Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
-			}, nil)
-
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?§orderby=owner%20asc", nil)
 			rr := httptest.NewRecorder()
 			svc.GetDrives(rr, r)
@@ -317,6 +320,142 @@ var _ = Describe("Graph", func() {
 			Expect(err).To(Not(HaveOccurred()))
 			Expect(libreError.Error.Message).To(Equal("Query parameter '§orderby' is not supported. Cause: Query parameter '§orderby' is not supported"))
 			Expect(libreError.Error.Code).To(Equal(errorcode.InvalidRequest.String()))
+		})
+		It("can list a spaces with an unsupported operand", func() {
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?$filter=contains(driveType,personal)", nil)
+			rr := httptest.NewRecorder()
+			svc.GetDrives(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusNotImplemented))
+
+			body, _ := io.ReadAll(rr.Body)
+			var libreError libregraph.OdataError
+			err := json.Unmarshal(body, &libreError)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(libreError.Error.Message).To(Equal("unsupported filter operand: contains"))
+			Expect(libreError.Error.Code).To(Equal(errorcode.NotSupported.String()))
+		})
+		It("transport error", func() {
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(nil, errors.New("transport error"))
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives)", nil)
+			rr := httptest.NewRecorder()
+			svc.GetDrives(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+
+			body, _ := io.ReadAll(rr.Body)
+			var libreError libregraph.OdataError
+			err := json.Unmarshal(body, &libreError)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(libreError.Error.Message).To(Equal("transport error"))
+			Expect(libreError.Error.Code).To(Equal(errorcode.GeneralException.String()))
+		})
+		It("grpc error", func() {
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status:        status.NewInternal(ctx, "internal error"),
+				StorageSpaces: []*provider.StorageSpace{}}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives)", nil)
+			rr := httptest.NewRecorder()
+			svc.GetDrives(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+
+			body, _ := io.ReadAll(rr.Body)
+			var libreError libregraph.OdataError
+			err := json.Unmarshal(body, &libreError)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(libreError.Error.Message).To(Equal("internal error"))
+			Expect(libreError.Error.Code).To(Equal(errorcode.GeneralException.String()))
+		})
+		It("grpc not found", func() {
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status:        status.NewNotFound(ctx, "no spaces found"),
+				StorageSpaces: []*provider.StorageSpace{}}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives)", nil)
+			rr := httptest.NewRecorder()
+			svc.GetDrives(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			body, _ := io.ReadAll(rr.Body)
+
+			var response map[string][]libregraph.Drive
+			err := json.Unmarshal(body, &response)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(len(response)).To(Equal(0))
+		})
+		It("quota error", func() {
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status: status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{
+					{
+						Id:        &provider.StorageSpaceId{OpaqueId: "sameID"},
+						SpaceType: "aspacetype",
+						Root: &provider.ResourceId{
+							StorageId: "pro-1",
+							SpaceId:   "sameID",
+							OpaqueId:  "sameID",
+						},
+						Name: "aspacename",
+					},
+				},
+			}, nil)
+			gatewayClient.On("InitiateFileDownload", mock.Anything, mock.Anything).Return(&gateway.InitiateFileDownloadResponse{
+				Status: status.NewNotFound(ctx, "not found"),
+			}, nil)
+			gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+				Status: status.NewInternal(ctx, "internal quota error"),
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+			rr := httptest.NewRecorder()
+			svc.GetDrives(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
+
+			body, _ := io.ReadAll(rr.Body)
+			var libreError libregraph.OdataError
+			err := json.Unmarshal(body, &libreError)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(libreError.Error.Message).To(Equal("internal quota error"))
+			Expect(libreError.Error.Code).To(Equal(errorcode.GeneralException.String()))
+		})
+	})
+	Describe("Create Drive", func() {
+		It("cannot create a space without permission", func() {
+			jsonBody := []byte(`{"Name": "Test Space"}`)
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
+			rr := httptest.NewRecorder()
+			svc.CreateDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusUnauthorized))
+
+			body, _ := io.ReadAll(rr.Body)
+			var libreError libregraph.OdataError
+			err := json.Unmarshal(body, &libreError)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(libreError.Error.Message).To(Equal("insufficient permissions to create a space."))
+			Expect(libreError.Error.Code).To(Equal(errorcode.NotAllowed.String()))
+		})
+		It("can create a space", func() {
+			gatewayClient.On("CreateStorageSpaces", mock.Anything, mock.Anything).Return(&provider.CreateStorageSpaceResponse{
+				Status: status.NewOK(ctx),
+				StorageSpace: &provider.StorageSpace{
+					Name:      "Test Space",
+					SpaceType: "project",
+				},
+			}, nil)
+
+			jsonBody := []byte(`{"Name": "Test Space"}`)
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
+			rr := httptest.NewRecorder()
+			svc.CreateDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusUnauthorized))
+
+			body, _ := io.ReadAll(rr.Body)
+			var libreError libregraph.OdataError
+			err := json.Unmarshal(body, &libreError)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(libreError.Error.Message).To(Equal("insufficient permissions to create a space."))
+			Expect(libreError.Error.Code).To(Equal(errorcode.NotAllowed.String()))
 		})
 	})
 })
