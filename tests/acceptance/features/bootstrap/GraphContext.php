@@ -14,6 +14,7 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
+use TestHelpers\WebDavHelper;
 use PHPUnit\Framework\Assert;
 
 require_once 'bootstrap.php';
@@ -467,22 +468,44 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^the administrator creates a group "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $group
+	 * @param ?string $user
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function createGroup(string $group, ?string $user = null): ResponseInterface {
+		if ($user) {
+			$username = $user;
+			$password = $this->featureContext->getPasswordForUser($user);
+		} else {
+			$username = $this->featureContext->getAdminUsername();
+			$password = $this->featureContext->getAdminPassword();
+		}
+		return GraphHelper::createGroup(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$username,
+			$password,
+			$group,
+		);
+	}
+
+	/**
+	 * @When /^the administrator creates a group "([^"]*)" using the Graph API$/
+	 * @When user :user creates a group :group using the Graph API
+	 * @When user :user tries to create a group :group using the Graph API
+	 *
+	 * @param string $group
+	 * @param ?string $user
 	 *
 	 * @return void
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function adminCreatesGroupUsingTheGraphApi(string $group): void {
-		$response = GraphHelper::createGroup(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$group,
-		);
+	public function userCreatesGroupUsingTheGraphApi(string $group, ?string $user = null): void {
+		$response = $this->createGroup($group, $user);
 		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastHttpStatusCodesArray((string) $response->getStatusCode());
 
@@ -502,13 +525,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function adminHasCreatedGroupUsingTheGraphApi(string $group): array {
-		$result = GraphHelper::createGroup(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$group,
-		);
+		$result = $this->createGroup($group);
 		if ($result->getStatusCode() === 200) {
 			return $this->featureContext->getJsonDecodedResponse($result);
 		} else {
