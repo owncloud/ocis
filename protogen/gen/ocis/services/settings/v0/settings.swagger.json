@@ -109,6 +109,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
+              "type": "object",
               "properties": {}
             }
           },
@@ -269,6 +270,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
+              "type": "object",
               "properties": {}
             }
           },
@@ -929,7 +931,8 @@
         "OPERATION_WRITE",
         "OPERATION_READWRITE"
       ],
-      "default": "OPERATION_UNKNOWN"
+      "default": "OPERATION_UNKNOWN",
+      "title": "- OPERATION_WRITE: WRITE is a combination of CREATE and UPDATE\n - OPERATION_READWRITE: READWRITE is a combination of READ and WRITE"
     },
     "v0RemoveRoleFromUserRequest": {
       "type": "object",
