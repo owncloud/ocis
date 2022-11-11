@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Do not reindex a space twice at the same time: [#5001](https://github.com/owncloud/ocis/pull/5001)
 * Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
 * Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
+* Enhancement - Remove windows from ci & release makefile: [#5026](https://github.com/owncloud/ocis/pull/5026)
 
 ## Details
 
@@ -34,6 +35,13 @@ The following sections list the changes for unreleased.
    will allow for filtering/searching hidden files in the future.
 
    https://github.com/owncloud/ocis/pull/5018
+
+* Enhancement - Remove windows from ci & release makefile: [#5026](https://github.com/owncloud/ocis/pull/5026)
+
+   We have removed windows from the ci & release makefile
+
+   https://github.com/owncloud/ocis/issues/5011
+   https://github.com/owncloud/ocis/pull/5026
 # Changelog for [2.0.0-rc.1] (2022-11-05)
 
 The following sections list the changes for 2.0.0-rc.1.
