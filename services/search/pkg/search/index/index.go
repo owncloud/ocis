@@ -293,7 +293,7 @@ func toEntity(ref *sprovider.Reference, ri *sprovider.ResourceInfo) *indexDocume
 		Path:     ref.Path,
 		ID:       idToBleveId(ri.Id),
 		ParentID: idToBleveId(ri.ParentId),
-		Name:     ri.Path,
+		Name:     ri.Name,
 		Size:     ri.Size,
 		MimeType: ri.MimeType,
 		Type:     uint64(ri.Type),
