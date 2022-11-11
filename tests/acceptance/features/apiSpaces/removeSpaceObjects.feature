@@ -73,7 +73,7 @@ Feature: Remove files, folder
 
   Scenario: An user is unable to delete a Space via the webDav API
     When user "Alice" removes the folder "" from space "delete objects"
-    Then the HTTP status code should be "400"
+    Then the HTTP status code should be "405"
     And the user "Alice" should have a space called "delete objects" with these key and value pairs:
       | key  | value          |
       | name | delete objects |
