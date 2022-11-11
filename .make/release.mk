@@ -3,7 +3,7 @@ changelog: $(CALENS) ## generate changelog
 	$(CALENS) -i ../changelog -t ../changelog/CHANGELOG.tmpl >| ../CHANGELOG.md
 
 .PHONY: release
-release: release-dirs release-linux release-windows release-darwin release-copy release-check
+release: release-dirs release-linux release-darwin release-copy release-check
 
 .PHONY: release-dirs
 release-dirs:
@@ -90,18 +90,6 @@ release-linux: release-dirs
 
 	@# https://github.com/golang/go/issues/50405
 	@# -buildmode=pie not easily doable for arm
-
-.PHONY: release-windows
-release-windows: release-dirs
-	GOOS=windows \
-	GOARCH=amd64 \
-	go build \
-		-tags 'netgo $(TAGS)' \
-		-buildmode=pie \
-		-trimpath \
-		-ldflags '-extldflags "-static" $(LDFLAGS)' \
-		-o '$(DIST)/binaries/$(EXECUTABLE)-$(OUTPUT)-windows-amd64' \
-		./cmd/$(NAME)
 
 .PHONY: release-darwin
 release-darwin: release-dirs
