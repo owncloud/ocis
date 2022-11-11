@@ -13,7 +13,7 @@
 
 ownCloud Infinite Scale (oCIS) is the new file sync & share platform that will be the foundation of your data management platform. 
 
-**Inifinite Scale is currently in code freeze for general availability of version 2.0. Feature completeness was reached and the community is concentrating on bug fixes and performance improvements.**
+**Infinite Scale is currently in code freeze for general availability of version 2.0. Feature completeness was reached and the community is concentrating on bug fixes and performance improvements.**
 
 Make sure to download the [latest release candidate build](https://download.owncloud.com/ocis/ocis/testing/) today!
 
@@ -21,7 +21,7 @@ Make sure to download the [latest release candidate build](https://download.ownc
 
 ### Clients
 
-Infinite Scale allows following ownCloud clients:
+Infinite Scale allows the following ownCloud clients:
 
 * [web](https://github.com/owncloud/web),
 * [Android](https://github.com/owncloud/android),
@@ -99,10 +99,10 @@ If you find a security issue, please contact [security@owncloud.com](mailto:secu
 
 ## Contributing
 
-We are _very_ happy that oCIS does not require a Contributor License Agreement (CLA) as it is [Apache 2.0 licensed](LICENSE). We hope this will make it easier to contribute code. If you want to get in touch, most of the developers hang out in our [rocket chat channel](https://talk.owncloud.com/channel/infinitescale) or reach out to the  the [ownCloud central forum](https://central.owncloud.org/).
+We are _very_ happy that oCIS does not require a Contributor License Agreement (CLA) as it is [Apache 2.0 licensed](LICENSE). We hope this will make it easier to contribute code. If you want to get in touch, most of the developers hang out in our [rocket chat channel](https://talk.owncloud.com/channel/infinitescale) or reach out to  the [ownCloud central forum](https://central.owncloud.org/).
 
 Infinite Scale is carefully internationalized so that everyone, no matter what language they speak, has a great experience. To achieve this we rely on the help of volunteer translators. If you want to help, you can find the project behind this link:
- or [Transifex for ownCloud web](https://explore.transifex.com/owncloud-org/owncloud-web/).
+ [Transifex for ownCloud web](https://explore.transifex.com/owncloud-org/owncloud-web/).
 
 Please always refer to our [Contribution Guidelines](CONTRIBUTING.md).
 
