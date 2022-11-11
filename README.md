@@ -11,7 +11,7 @@
 
 ## Introduction
 
-ownCloud Infinite Scale (oCIS) is the new file sync & share platform that will be the foundation of your data management platform. 
+ownCloud Infinite Scale (oCIS) is the new file sync & share platform that will be the foundation of your data management platform.
 
 **Infinite Scale is currently in code freeze for general availability of version 2.0. Feature completeness was reached and the community is concentrating on bug fixes and performance improvements.**
 
@@ -30,19 +30,19 @@ Infinite Scale allows the following ownCloud clients:
 
 to synchronize and share file spaces with a scalable server backend based on [reva](https://reva.link/) using open and well defined APIs like [WebDAV](http://www.webdav.org/) and [CS3](https://github.com/cs3org/cs3apis/).
 
-### External Office Applications
+### Web Office Applications
 
-External office applications like:
+Infinite Scale can integrate web office applications such as:
 
 *   [Collabora Online](https://github.com/CollaboraOnline/online),
 *   [OnlyOffice Docs](https://github.com/ONLYOFFICE/DocumentServer) or
 *   [Microsoft Office Online Server](https://owncloud.com/microsoft-office-online-integration-with-wopi/)
 
-can be used to collaborate using a [WOPI application gateway](https://github.com/cs3org/wopiserver).
+Collaborative editing is supported by the [WOPI application gateway](https://github.com/cs3org/wopiserver).
 
 ### Authentication
 
-Users are authenticated via [OpenID Connect](https://openid.net/connect/) using either an external IdP like [Keycloak](https://www.keycloak.org/) or the embedded [LibreGraph Connect](https://github.com/libregraph/lico) identity provider. 
+Users are authenticated via [OpenID Connect](https://openid.net/connect/) using either an external IdP like [Keycloak](https://www.keycloak.org/) or the embedded [LibreGraph Connect](https://github.com/libregraph/lico) identity provider.
 
 ### Installation
 
@@ -94,7 +94,7 @@ See the [Development Documentation - Getting Started](https://owncloud.dev/ocis/
 
 ## Security
 
-See the [Security Aspects](https://doc.owncloud.com/ocis/next/security/security.html) for a general overview of security related topics.  
+See the [Security Aspects](https://doc.owncloud.com/ocis/next/security/security.html) for a general overview of security related topics.
 If you find a security issue, please contact [security@owncloud.com](mailto:security@owncloud.com) first.
 
 ## Contributing
