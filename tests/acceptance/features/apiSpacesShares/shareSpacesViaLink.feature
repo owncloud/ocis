@@ -91,3 +91,13 @@ Feature: Share spaces via link
         Then the HTTP status code should be "200"
         And the OCS status code should be "200"
         And for user "Alice" the space "share space" should contain the last created public link
+
+
+    Scenario: A user cannot share a disabled space to public via link
+        Given user "Alice" has disabled a space "share space"
+        When user "Alice" creates a public link share of the space "share space" with settings:
+            | permissions | 1 |
+        Then the HTTP status code should be "404"
+        And the OCS status code should be "404"
+        And the OCS status message should be "Wrong path, file/folder doesn't exist"
+        And for user "Alice" the space "share space" should not contain the last created public link
