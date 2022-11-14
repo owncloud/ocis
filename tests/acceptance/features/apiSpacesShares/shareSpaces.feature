@@ -17,7 +17,7 @@ Feature: Share spaces
     And using spaces DAV path
 
 
-  Scenario Outline:: A user can share a space to another user
+  Scenario Outline:: A Space Admin can share a space to another user
     When user "Alice" shares a space "share space" to user "Brian" with role "<role>"
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
@@ -101,3 +101,20 @@ Feature: Share spaces
       | manager |
       | editor  |
       | viewer  |
+
+
+  Scenario Outline: A user without manager role cannot share a space to another user
+    Given user "Alice" has shared a space "share space" to user "Brian" with role "<role>"
+    When user "Brian" shares a space "share space" to user "Bob" with role "<new_role>"
+    Then the HTTP status code should be "404"
+    And the OCS status code should be "404"
+    And the OCS status message should be "No share permission"
+    And the user "Bob" should not have a space called "share space"
+    Examples:
+      | role   | new_role |
+      | editor | manager  |
+      | editor | editor   |
+      | editor | viewer   |
+      | viewer | manager  |
+      | viewer | editor   |
+      | viewer | viewer   |
