@@ -35,3 +35,8 @@ Feature: create group
     When user "Brian" tries to create a group "mygroup" using the Graph API
     And the HTTP status code should be "401"
     And group "mygroup" should not exist
+
+
+  Scenario: admin user tries to create a group that is the empty string
+    When user "Alice" tries to create a group "" using the Graph API
+    Then the HTTP status code should be "500"

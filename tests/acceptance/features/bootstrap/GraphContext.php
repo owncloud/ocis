@@ -324,7 +324,7 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theseExtraGroupsShouldBeInTheResponse(array $groups): void {
+	public function theseGroupsShouldBeInTheResponse(array $groups): void {
 		$respondedGroups = $this->getArrayOfGroupsResponded($this->featureContext->getResponse());
 		foreach ($groups as $group) {
 			$found = false;
