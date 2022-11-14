@@ -36,6 +36,7 @@ const (
 	ActionSpaceDisabled = "space_disabled"
 	ActionSpaceEnabled  = "space_enabled"
 	ActionSpaceDeleted  = "space_deleted"
+	ActionSpaceShared   = "space_shared"
 
 	// Users
 	ActionUserCreated        = "user_created"
@@ -157,6 +158,11 @@ func MessageSpaceEnabled(executant, spaceID string) string {
 // MessageSpaceDeleted returns the human readable string that describes the action
 func MessageSpaceDeleted(executant, spaceID string) string {
 	return fmt.Sprintf("user '%s' deleted the space '%s'", executant, spaceID)
+}
+
+// MessageSpaceShared returns the human readable string that describes the action
+func MessageSpaceShared(executant, spaceID, grantee string) string {
+	return fmt.Sprintf("user '%s' shared the space '%s' with '%s'", executant, spaceID, grantee)
 }
 
 // MessageUserCreated returns the human readable string that describes the action

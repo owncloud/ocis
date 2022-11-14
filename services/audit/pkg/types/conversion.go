@@ -380,6 +380,25 @@ func SpaceDeleted(ev events.SpaceDeleted) AuditEventSpaceDeleted {
 	}
 }
 
+// SpaceShared converts a SpaceShared event to an AuditEventSpaceShared
+func SpaceShared(ev events.SpaceShared) AuditEventSpaceShared {
+	sse := AuditEventSpaceShared{}
+
+	sid := ev.ID.GetOpaqueId()
+	grantee := "N/A"
+	if ev.GranteeUserID != nil {
+		sse.GranteeUserID = ev.GranteeUserID.OpaqueId
+		grantee = "user:" + ev.GranteeUserID.OpaqueId
+	} else if ev.GranteeGroupID != nil {
+		sse.GranteeGroupID = ev.GranteeGroupID.OpaqueId
+		grantee = "group:" + ev.GranteeGroupID.OpaqueId
+	}
+	base := BasicAuditEvent("", "", MessageSpaceShared(ev.Executant.GetOpaqueId(), sid, grantee), ActionSpaceShared)
+	sse.AuditEventSpaces = SpacesAuditEvent(base, sid)
+
+	return sse
+}
+
 // UserCreated converts a UserCreated event to an AuditEventUserCreated
 func UserCreated(ev events.UserCreated) AuditEventUserCreated {
 	base := BasicAuditEvent("", "", MessageUserCreated(ev.Executant.GetOpaqueId(), ev.UserID), ActionUserCreated)

@@ -205,6 +205,14 @@ type AuditEventSpaceDeleted struct {
 	AuditEventSpaces
 }
 
+// AuditEventSpaceShared is the event logged when a space is shared
+type AuditEventSpaceShared struct {
+	AuditEventSpaces
+
+	GranteeUserID  string
+	GranteeGroupID string
+}
+
 // AuditEventUserCreated is the event logged when a user is created
 type AuditEventUserCreated struct {
 	AuditEvent
