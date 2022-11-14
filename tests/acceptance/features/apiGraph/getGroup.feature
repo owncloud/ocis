@@ -14,7 +14,8 @@ Feature: get groups and their members
     And group "coffee-lover" has been created
     And group "h2o-lover" has been created
     When user "Alice" gets all the groups using the Graph API
-    Then the extra groups returned by the API should be
+    Then the HTTP status code should be "200"
+    And the extra groups returned by the API should be
       | tea-lover    |
       | coffee-lover |
       | h2o-lover    |
@@ -27,6 +28,7 @@ Feature: get groups and their members
     And group "h2o-lover" has been created
     When user "Brian" gets all the groups using the Graph API
     Then the HTTP status code should be "401"
+    And the last response should be an unauthorized response
 
 
   Scenario: admin user gets users of a group
@@ -49,3 +51,4 @@ Feature: get groups and their members
     And group "tea-lover" has been created
     When user "Brian" gets all the members of group "tea-lover" using the Graph API
     Then the HTTP status code should be "401"
+    And the last response should be an unauthorized response

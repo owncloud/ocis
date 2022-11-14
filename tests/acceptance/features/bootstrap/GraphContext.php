@@ -738,4 +738,21 @@ class GraphContext implements Context {
 	public function userGetsAllTheMembersOfGroupUsingTheGraphApi($user, $group): void {
 		$this->featureContext->setResponse($this->listGroupMembers($group, $user));
 	}
+
+	/**
+	 * @Then the last response should be an unauthorized response
+	 *
+	 * @return void
+	 */
+	public function theLastResponseShouldBeUnauthorizedReponse(): void {
+		$response = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
+		$errorText = $response['error']['message'];
+
+		Assert::assertEquals(
+			'Unauthorized',
+			$errorText,
+			__METHOD__
+			. " Expected text 'Unauthorized' but got '". $errorText . "'"
+		);
+	}
 }
