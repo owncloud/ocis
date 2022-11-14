@@ -39,4 +39,4 @@ Feature: create group
 
   Scenario: admin user tries to create a group that is the empty string
     When user "Alice" tries to create a group "" using the Graph API
-    Then the HTTP status code should be "200"
+    Then the HTTP status code should be "400"

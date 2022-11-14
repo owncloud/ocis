@@ -752,7 +752,7 @@ class GraphContext implements Context {
 			'Unauthorized',
 			$errorText,
 			__METHOD__
-			. " Expected text 'Unauthorized' but got '". $errorText . "'"
+			. " Expected text 'Unauthorized' but got '" . $errorText . "'"
 		);
 	}
 }
