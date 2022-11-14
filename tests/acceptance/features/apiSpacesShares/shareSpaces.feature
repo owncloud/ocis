@@ -87,3 +87,17 @@ Feature: Share spaces
     Then the user "Bob" should have a space called "share space" granted to "Bob" with role "viewer"
     And for user "Bob" the space "share space" should contain these entries:
       | test.txt |
+
+
+  Scenario Outline: A user cannot share a disabled space to another user
+    Given user "Alice" has disabled a space "share space"
+    When user "Alice" shares a space "share space" to user "Brian" with role "<role>"
+    Then the HTTP status code should be "404"
+    And the OCS status code should be "404"
+    And the OCS status message should be "Wrong path, file/folder doesn't exist"
+    And the user "Brian" should not have a space called "share space"
+    Examples:
+      | role    |
+      | manager |
+      | editor  |
+      | viewer  |
