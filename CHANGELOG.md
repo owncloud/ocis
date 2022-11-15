@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Do not reindex a space twice at the same time: [#5001](https://github.com/owncloud/ocis/pull/5001)
+* Bugfix - Find spaces by their name: [#5044](https://github.com/owncloud/ocis/pull/5044)
 * Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
 * Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
 * Enhancement - Remove windows from ci & release makefile: [#5026](https://github.com/owncloud/ocis/pull/5026)
@@ -19,6 +20,13 @@ The following sections list the changes for unreleased.
    still in progress.
 
    https://github.com/owncloud/ocis/pull/5001
+
+* Bugfix - Find spaces by their name: [#5044](https://github.com/owncloud/ocis/pull/5044)
+
+   We've fixed finding spaces by their name in the search service.
+
+   https://github.com/owncloud/ocis/issues/4506
+   https://github.com/owncloud/ocis/pull/5044
 
 * Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
 
