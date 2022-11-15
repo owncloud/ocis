@@ -9,15 +9,10 @@ import (
 
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 )
 
 // ListBundles returns all bundles in the dataPath folder that match the given type.
 func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []string) ([]*settingsmsg.Bundle, error) {
-	// TODO: this is needed for initialization - we need to find a better way to fix this
-	if s.mdc == nil && len(bundleIDs) == 1 {
-		return defaultBundle(bundleType, bundleIDs[0]), nil
-	}
 	s.Init()
 	ctx := context.TODO()
 
@@ -52,9 +47,6 @@ func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []stri
 
 // ReadBundle tries to find a bundle by the given id from the metadata service
 func (s *Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
-	if s.mdc == nil {
-		return defaultBundle(settingsmsg.Bundle_TYPE_ROLE, bundleID)[0], nil
-	}
 	s.Init()
 	ctx := context.TODO()
 	b, err := s.mdc.SimpleDownload(ctx, bundlePath(bundleID))
@@ -133,14 +125,4 @@ func (s *Store) RemoveSettingFromBundle(bundleID string, settingID string) error
 
 func bundlePath(id string) string {
 	return fmt.Sprintf("%s/%s", bundleFolderLocation, id)
-}
-
-func defaultBundle(bundleType settingsmsg.Bundle_Type, bundleID string) []*settingsmsg.Bundle {
-	var bundles []*settingsmsg.Bundle
-	for _, b := range defaults.GenerateBundlesDefaultRoles() {
-		if b.Type == bundleType && b.Id == bundleID {
-			bundles = append(bundles, b)
-		}
-	}
-	return bundles
 }
