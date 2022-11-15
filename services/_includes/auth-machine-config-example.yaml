@@ -29,6 +29,6 @@ reva:
   address: 127.0.0.1:9142
   tls:
     mode: ""
-    'cacert env:': ""
+    cacert: ""
 skip_user_groups_in_token: false
 machine_auth_api_key: ""

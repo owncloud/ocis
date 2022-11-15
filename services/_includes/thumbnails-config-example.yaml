@@ -31,7 +31,7 @@ http:
   root: /thumbnails
 grpc_client_tls:
   mode: ""
-  'cacert env:': ""
+  cacert: ""
 thumbnail:
   resolutions:
   - 16x16

@@ -29,7 +29,7 @@ reva:
   address: 127.0.0.1:9142
   tls:
     mode: ""
-    'cacert env:': ""
+    cacert: ""
 external_addr: ""
 driver: ""
 drivers:

@@ -34,4 +34,4 @@ notifications:
   reva_gateway: 127.0.0.1:9142
   grpc_client_tls:
     mode: ""
-    'cacert env:': ""
+    cacert: ""

@@ -26,10 +26,10 @@ reva:
   address: 127.0.0.1:9142
   tls:
     mode: ""
-    'cacert env:': ""
+    cacert: ""
 grpc_client_tls:
   mode: ""
-  'cacert env:': ""
+  cacert: ""
 policies:
 - name: ocis
   routes:

@@ -49,7 +49,7 @@ grpc:
     key: ""
 grpc_client_tls:
   mode: ""
-  'cacert env:': ""
+  cacert: ""
 store_type: metadata
 data_path: ~/.ocis/settings
 metadata_config:

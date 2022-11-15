@@ -18,7 +18,7 @@ debug:
   zpages: false
 grpc_client_tls:
   mode: ""
-  'cacert env:': ""
+  cacert: ""
 http:
   addr: 127.0.0.1:9115
   root: /

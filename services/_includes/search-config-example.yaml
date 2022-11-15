@@ -28,10 +28,10 @@ reva:
   address: 127.0.0.1:9142
   tls:
     mode: ""
-    'cacert env:': ""
+    cacert: ""
 grpc_client_tls:
   mode: ""
-  'cacert env:': ""
+  cacert: ""
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster
