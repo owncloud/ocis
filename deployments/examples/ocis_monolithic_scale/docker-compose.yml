@@ -64,7 +64,7 @@ services:
     networks:
       ocis-net:
     environment:
-      OCIS_EXCLUDE_RUN_SERVICES: "store,search,nats,idm"
+      OCIS_EXCLUDE_RUN_SERVICES: "store,search,nats,idm,idp"
 
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-false}"
@@ -76,12 +76,15 @@ services:
       # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
       PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
 
+      # cache
+      OCIS_CACHE_STORE_TYPE: redis
+      OCIS_CACHE_STORE_ADDRESS: redis:6379
 
-      # TODO: cache
+      # registry
+      MICRO_REGISTRY: nats
+      MICRO_REGISTRY_ADDRESS: nonscalable:9233
 
-      # TODO: registry
-
-      # configure non-scalable services
+      # service discovery
       AUDIT_EVENTS_ENDPOINT: nonscalable:9233
       GRAPH_EVENTS_ENDPOINT: nonscalable:9233
       NOTIFICATIONS_EVENTS_ENDPOINT: nonscalable:9233
@@ -90,7 +93,10 @@ services:
       STORAGE_USERS_EVENTS_ENDPOINT: nonscalable:9233
       LDAP_URI: ldaps://nonscalable:9235
 
-      # TODO: x509: certificate is valid for localhost, not
+      # bind configuration
+      OCDAV_HTTP_ADDR: 127.0.0.1:8010 #TODO: service discovery works across all services / containers, but ocdav ports are random and therefore different in each container
+
+      # TODO: x509: certificate is valid for localhost, not for internal network ips
       LDAP_INSECURE: true
 
     volumes:
@@ -114,7 +120,7 @@ services:
     networks:
       ocis-net:
     environment:
-      OCIS_RUN_SERVICES: "store,search,nats,idm"
+      OCIS_RUN_SERVICES: "store,search,nats,idm,idp"
 
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
@@ -125,12 +131,20 @@ services:
       # demo users
       IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
 
-      # expose ports
+      # registry
+      MICRO_REGISTRY: nats
+      MICRO_REGISTRY_ADDRESS: 127.0.0.1:9233
+
+      # service discovery
+      REVA_GATEWAY: scalable:9142
+
+      # bind configuration
       NATS_NATS_HOST: "0.0.0.0"
       NATS_NATS_PORT: "9233"
       SEARCH_GRPC_ADDR: 0.0.0.0:9220
       IDM_LDAPS_ADDR: 0.0.0.0:9235
       STORE_GRPC_ADDR: 0.0.0.0:9460
+      IDP_HTTP_ADDR: 0.0.0.0:9130
 
     volumes:
       - ocis-config:/etc/ocis
@@ -139,10 +153,27 @@ services:
       driver: "local"
     restart: always
 
+  redis:
+    networks:
+      ocis-net:
+    image: redis:7
+    command: ["--databases", "1"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - redis-data:/data
+    logging:
+      driver: "local"
+    restart: always
+
 volumes:
   certs:
   ocis-config:
   ocis-data:
+  redis-data:
 
 networks:
   ocis-net:
