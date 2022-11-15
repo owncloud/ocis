@@ -478,8 +478,8 @@ github.com/go-micro/plugins/v4/events/natsjs v1.1.0 h1:eQ3JbN0mnLuiExBM29pRi/Ehl
 github.com/go-micro/plugins/v4/events/natsjs v1.1.0/go.mod h1:ibNwJyP1Z5y8unW4sryIn8EkdwGkrcaURGwm0DVeMcY=
 github.com/go-micro/plugins/v4/logger/zerolog v1.1.0 h1:sG20ktK9YN/h0TlmQXTuL4/yavxBy5QbzifcVARN5ww=
 github.com/go-micro/plugins/v4/logger/zerolog v1.1.0/go.mod h1:lUEQAHt8I+gJDmx3DbpU7aqwM3+MwFmFRnATxlp650w=
-github.com/go-micro/plugins/v4/registry/consul v1.1.0 h1:YZQ4ddLOK7YsfyjIHiA0SEDzaDYc6vVXrV+8Z6oF5aY=
-github.com/go-micro/plugins/v4/registry/consul v1.1.0/go.mod h1:57TUMkEggnfVEFoWA5JH/nCYCW/c4oRZHC+Ureecgs8=
+github.com/go-micro/plugins/v4/registry/consul v1.2.0 h1:nqrTzfWUTWKAy+M+i2FazbHnQn4m77EOtoch57kbCH4=
+github.com/go-micro/plugins/v4/registry/consul v1.2.0/go.mod h1:wTat7/K9XQ+i64VbbcMYFcEwipYfSgJM51HcA/sgsM4=
 github.com/go-micro/plugins/v4/registry/etcd v1.2.0 h1:tcHlU1GzvX3oZa8WQH8ylMCGie5qD5g98YWTESJjeqQ=
 github.com/go-micro/plugins/v4/registry/etcd v1.2.0/go.mod h1:CQeTHkjN3xMtIQsynaTTquMz2sHEdsTfRIfFzrX7aug=
 github.com/go-micro/plugins/v4/registry/kubernetes v1.1.0 h1:JfkrimhACDviPtKT7Fhqms7oeM9sgy0I37bzvn4AsI4=

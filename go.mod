@@ -21,7 +21,7 @@ require (
 	github.com/go-micro/plugins/v4/client/grpc v1.1.0
 	github.com/go-micro/plugins/v4/events/natsjs v1.1.0
 	github.com/go-micro/plugins/v4/logger/zerolog v1.1.0
-	github.com/go-micro/plugins/v4/registry/consul v1.1.0
+	github.com/go-micro/plugins/v4/registry/consul v1.2.0
 	github.com/go-micro/plugins/v4/registry/etcd v1.2.0
 	github.com/go-micro/plugins/v4/registry/kubernetes v1.1.0
 	github.com/go-micro/plugins/v4/registry/mdns v1.1.0
