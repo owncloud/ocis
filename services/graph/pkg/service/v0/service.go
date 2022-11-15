@@ -147,6 +147,12 @@ func NewService(opts ...Option) Service {
 		svc.roleService = options.RoleService
 	}
 
+	if options.PermissionService == nil {
+		svc.permissionsService = settingssvc.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient())
+	} else {
+		svc.permissionsService = options.PermissionService
+	}
+
 	roleManager := options.RoleManager
 	if roleManager == nil {
 		storeOptions := store.OcisStoreOptions{

@@ -15,6 +15,7 @@ import (
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
+	"go-micro.dev/v4/client"
 	mevents "go-micro.dev/v4/events"
 	"google.golang.org/grpc"
 )
@@ -60,6 +61,11 @@ type GatewayClient interface {
 // Publisher is the interface for events publisher
 type Publisher interface {
 	Publish(string, interface{}, ...mevents.PublishOption) error
+}
+
+type Permissions interface {
+	GetPermissionByID(ctx context.Context, request *settingssvc.GetPermissionByIDRequest, opts ...client.CallOption) (*settingssvc.GetPermissionByIDResponse, error)
+	ListPermissionsByResource(ctx context.Context, in *settingssvc.ListPermissionsByResourceRequest, opts ...client.CallOption) (*settingssvc.ListPermissionsByResourceResponse, error)
 }
 
 // HTTPClient is the subset of the http.Client that is being used to interact with the download gateway

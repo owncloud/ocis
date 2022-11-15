@@ -21,6 +21,8 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
@@ -32,11 +34,12 @@ import (
 
 var _ = Describe("Graph", func() {
 	var (
-		svc             service.Service
-		gatewayClient   *mocks.GatewayClient
-		eventsPublisher mocks.Publisher
-		ctx             context.Context
-		cfg             *config.Config
+		svc               service.Service
+		gatewayClient     *mocks.GatewayClient
+		eventsPublisher   mocks.Publisher
+		permissionService mocks.Permissions
+		ctx               context.Context
+		cfg               *config.Config
 	)
 
 	JustBeforeEach(func() {
@@ -54,6 +57,7 @@ var _ = Describe("Graph", func() {
 			service.Config(cfg),
 			service.WithGatewayClient(gatewayClient),
 			service.EventsPublisher(&eventsPublisher),
+			service.PermissionService(&permissionService),
 		)
 	})
 
@@ -76,7 +80,7 @@ var _ = Describe("Graph", func() {
 			Expect(rr.Code).To(Equal(http.StatusOK))
 		})
 		It("can list an empty list of all spaces", func() {
-			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Times(1).Return(&provider.ListStorageSpacesResponse{
 				Status:        status.NewOK(ctx),
 				StorageSpaces: []*provider.StorageSpace{},
 			}, nil)
@@ -88,7 +92,7 @@ var _ = Describe("Graph", func() {
 		})
 
 		It("can list a space without owner", func() {
-			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Times(1).Return(&provider.ListStorageSpacesResponse{
 				Status: status.NewOK(ctx),
 				StorageSpaces: []*provider.StorageSpace{
 					{
@@ -422,6 +426,12 @@ var _ = Describe("Graph", func() {
 	})
 	Describe("Create Drive", func() {
 		It("cannot create a space without permission", func() {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Times(1).Return(&settingssvc.GetPermissionByIDResponse{
+				Permission: &v0.Permission{
+					Operation:  v0.Permission_OPERATION_UNKNOWN,
+					Constraint: v0.Permission_CONSTRAINT_OWN,
+				},
+			}, nil)
 			jsonBody := []byte(`{"Name": "Test Space"}`)
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 			rr := httptest.NewRecorder()
@@ -435,27 +445,139 @@ var _ = Describe("Graph", func() {
 			Expect(libreError.Error.Message).To(Equal("insufficient permissions to create a space."))
 			Expect(libreError.Error.Code).To(Equal(errorcode.NotAllowed.String()))
 		})
-		It("can create a space", func() {
-			gatewayClient.On("CreateStorageSpaces", mock.Anything, mock.Anything).Return(&provider.CreateStorageSpaceResponse{
-				Status: status.NewOK(ctx),
-				StorageSpace: &provider.StorageSpace{
-					Name:      "Test Space",
-					SpaceType: "project",
+		It("cannot create a space with wrong request body", func() {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Times(1).Return(&settingssvc.GetPermissionByIDResponse{
+				Permission: &v0.Permission{
+					Operation:  v0.Permission_OPERATION_READWRITE,
+					Constraint: v0.Permission_CONSTRAINT_ALL,
 				},
 			}, nil)
-
-			jsonBody := []byte(`{"Name": "Test Space"}`)
+			jsonBody := []byte(`{"Name": "Test Space"`)
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 			rr := httptest.NewRecorder()
 			svc.CreateDrive(rr, r)
-			Expect(rr.Code).To(Equal(http.StatusUnauthorized))
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 
 			body, _ := io.ReadAll(rr.Body)
 			var libreError libregraph.OdataError
 			err := json.Unmarshal(body, &libreError)
 			Expect(err).To(Not(HaveOccurred()))
-			Expect(libreError.Error.Message).To(Equal("insufficient permissions to create a space."))
-			Expect(libreError.Error.Code).To(Equal(errorcode.NotAllowed.String()))
+			Expect(libreError.Error.Message).To(Equal("invalid body schema definition"))
+			Expect(libreError.Error.Code).To(Equal(errorcode.InvalidRequest.String()))
+		})
+		It("cannot create a space with empty name", func() {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Times(1).Return(&settingssvc.GetPermissionByIDResponse{
+				Permission: &v0.Permission{
+					Operation:  v0.Permission_OPERATION_READWRITE,
+					Constraint: v0.Permission_CONSTRAINT_ALL,
+				},
+			}, nil)
+			jsonBody := []byte(`{"Name": ""}`)
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
+			rr := httptest.NewRecorder()
+			svc.CreateDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+
+			body, _ := io.ReadAll(rr.Body)
+			var libreError libregraph.OdataError
+			err := json.Unmarshal(body, &libreError)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(libreError.Error.Message).To(Equal("invalid spacename: spacename must not be empty"))
+			Expect(libreError.Error.Code).To(Equal(errorcode.InvalidRequest.String()))
+		})
+		It("cannot create a space with a name that exceeds 255 chars", func() {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Times(1).Return(&settingssvc.GetPermissionByIDResponse{
+				Permission: &v0.Permission{
+					Operation:  v0.Permission_OPERATION_READWRITE,
+					Constraint: v0.Permission_CONSTRAINT_ALL,
+				},
+			}, nil)
+			jsonBody := []byte(`{"Name": "uufZ2MEUjUMJa84RkPsjJ1zf4XXRTdVMxRsJGfevwHuUBojo5JEdNU22O1FGgzXXTi9tl5ZKWaluIef8pPmEAxn9lHGIjyDVYeRQPiX5PCAZ7rVszrpLJryY5x1p6fFGQ6WQsPpNaqnKnfMliJDsbkAwMf7rCpzo0GUuadgHY9s2mfoXHDnpxqEmDsheucqVAFcNlFZNbNHoZAebHfv78KYc8C0WnhWvqvSPGBkNPQbZUkFCOAIlqpQ2Q3MubgI2"}`)
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
+			rr := httptest.NewRecorder()
+			svc.CreateDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+
+			body, _ := io.ReadAll(rr.Body)
+			var libreError libregraph.OdataError
+			err := json.Unmarshal(body, &libreError)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(libreError.Error.Message).To(Equal("invalid spacename: spacename must be smaller than 255"))
+			Expect(libreError.Error.Code).To(Equal(errorcode.InvalidRequest.String()))
+		})
+		It("cannot create a space with a wrong type", func() {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Times(1).Return(&settingssvc.GetPermissionByIDResponse{
+				Permission: &v0.Permission{
+					Operation:  v0.Permission_OPERATION_READWRITE,
+					Constraint: v0.Permission_CONSTRAINT_ALL,
+				},
+			}, nil)
+			jsonBody := []byte(`{"Name": "Test", "DriveType": "media"}`)
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
+			rr := httptest.NewRecorder()
+			svc.CreateDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+
+			body, _ := io.ReadAll(rr.Body)
+			var libreError libregraph.OdataError
+			err := json.Unmarshal(body, &libreError)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(libreError.Error.Message).To(Equal("drives of this type cannot be created via this api"))
+			Expect(libreError.Error.Code).To(Equal(errorcode.InvalidRequest.String()))
+		})
+		It("cannot create a space with a name that contains invalid chars", func() {
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Times(1).Return(&settingssvc.GetPermissionByIDResponse{
+				Permission: &v0.Permission{
+					Operation:  v0.Permission_OPERATION_READWRITE,
+					Constraint: v0.Permission_CONSTRAINT_ALL,
+				},
+			}, nil)
+			jsonBody := []byte(`{"Name": "Space / Name"}`)
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
+			rr := httptest.NewRecorder()
+			svc.CreateDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+
+			body, _ := io.ReadAll(rr.Body)
+			var libreError libregraph.OdataError
+			err := json.Unmarshal(body, &libreError)
+			Expect(err).To(Not(HaveOccurred()))
+			Expect(libreError.Error.Message).To(Equal("invalid spacename: spacenames must not contain [/ \\ . : ? * \" > < |]"))
+			Expect(libreError.Error.Code).To(Equal(errorcode.InvalidRequest.String()))
+		})
+		It("can create a space", func() {
+			gatewayClient.On("CreateStorageSpace", mock.Anything, mock.Anything).Return(&provider.CreateStorageSpaceResponse{
+				Status: status.NewOK(ctx),
+				StorageSpace: &provider.StorageSpace{
+					Id:        &provider.StorageSpaceId{OpaqueId: "newID"},
+					Name:      "Test Space",
+					SpaceType: "project",
+					Root: &provider.ResourceId{
+						StorageId: "pro-1",
+						SpaceId:   "newID",
+						OpaqueId:  "newID",
+					},
+				},
+			}, nil)
+
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Times(1).Return(&settingssvc.GetPermissionByIDResponse{
+				Permission: &v0.Permission{
+					Operation:  v0.Permission_OPERATION_READWRITE,
+					Constraint: v0.Permission_CONSTRAINT_ALL,
+				},
+			}, nil)
+			jsonBody := []byte(`{"Name": "Test Space", "DriveType": "project"}`)
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
+			rr := httptest.NewRecorder()
+			svc.CreateDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusCreated))
+
+			body, _ := io.ReadAll(rr.Body)
+			var response libregraph.Drive
+			err := json.Unmarshal(body, &response)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(*response.Name).To(Equal("Test Space"))
+			Expect(*response.DriveType).To(Equal("project"))
 		})
 	})
 })
