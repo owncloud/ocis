@@ -44,3 +44,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesShares/moveSpaces.feature:306](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L306)
 - [apiSpacesShares/copySpaces.feature:710](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L710)
 - [apiSpacesShares/copySpaces.feature:748](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L748)
+
+### [Creating group with empty name returns status code 200](https://github.com/owncloud/ocis/issues/5050)
+- [apiGraph/createGroup.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroup.feature#L40)
