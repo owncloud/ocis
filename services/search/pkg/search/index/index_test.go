@@ -44,6 +44,7 @@ var _ = Describe("Index", func() {
 				OpaqueId:  "myopaqueid",
 			},
 			Path:  "sub d!r",
+			Name:  "sub d!r",
 			Size:  12345,
 			Type:  sprovider.ResourceType_RESOURCE_TYPE_CONTAINER,
 			Mtime: &typesv1beta1.Timestamp{Seconds: 4000},
@@ -64,6 +65,7 @@ var _ = Describe("Index", func() {
 				OpaqueId:  "parentopaqueid",
 			},
 			Path:  "child.pdf",
+			Name:  "child.pdf",
 			Size:  12345,
 			Type:  sprovider.ResourceType_RESOURCE_TYPE_FILE,
 			Mtime: &typesv1beta1.Timestamp{Seconds: 4000},
@@ -116,6 +118,7 @@ var _ = Describe("Index", func() {
 				OpaqueId:  "someopaqueid",
 			},
 			Path:     filename,
+			Name:     filename,
 			Size:     12345,
 			Type:     sprovider.ResourceType_RESOURCE_TYPE_FILE,
 			MimeType: "application/pdf",
@@ -159,7 +162,7 @@ var _ = Describe("Index", func() {
 
 		Context("by filename", func() {
 			It("finds files with spaces in the filename", func() {
-				ri.Path = "Foo oo.pdf"
+				ri.Name = "Foo oo.pdf"
 				ref.Path = "./" + ri.Path
 				err := i.Add(ref, ri)
 				Expect(err).ToNot(HaveOccurred())
@@ -168,7 +171,7 @@ var _ = Describe("Index", func() {
 			})
 
 			It("finds files by digits in the filename", func() {
-				ri.Path = "12345.pdf"
+				ri.Name = "12345.pdf"
 				ref.Path = "./" + ri.Path
 				err := i.Add(ref, ri)
 				Expect(err).ToNot(HaveOccurred())
@@ -178,6 +181,7 @@ var _ = Describe("Index", func() {
 
 			It("filters hidden files", func() {
 				ri.Path = ".hidden.pdf"
+				ri.Name = ".hidden.pdf"
 				ref.Path = "./" + ri.Path
 				err := i.Add(ref, ri)
 				Expect(err).ToNot(HaveOccurred())
@@ -273,6 +277,7 @@ var _ = Describe("Index", func() {
 								OpaqueId:  "nestedopaqueid",
 							},
 							Path: "nestedpdf.pdf",
+							Name: "nestedpdf.pdf",
 							Size: 12345,
 						}
 						err := i.Add(nestedRef, nestedRI)
