@@ -363,22 +363,28 @@ class GraphContext implements Context {
 	 *
 	 * @param string|null $user
 	 *
+	 * @return array
+	 */
+	public function getAdminOrUserCredentials(?string $user): array {
+		$credentials["username"] = $user ? $this->featureContext->getActualUsername($user) : $this->featureContext->getAdminUsername();
+		$credentials["password"] = $user ? $this->featureContext->getPasswordForUser($user) : $this->featureContext->getAdminPassword();
+		return $credentials;
+	}
+	/**
+	 *
+	 * @param string|null $user
+	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public function listGroups(?string $user = null): ResponseInterface {
-		if ($user) {
-			$username = $user;
-			$password = $this->featureContext->getPasswordForUser($user);
-		} else {
-			$username = $this->featureContext->getAdminUsername();
-			$password = $this->featureContext->getAdminPassword();
-		}
+		$credentials = $this->getAdminOrUserCredentials($user);
+
 		return GraphHelper::getGroups(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
-			$username,
-			$password
+			$credentials["username"],
+			$credentials["password"]
 		);
 	}
 
@@ -418,18 +424,13 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function listGroupMembers(string $group, ?string $user = null): ResponseInterface {
-		if ($user) {
-			$username = $user;
-			$password = $this->featureContext->getPasswordForUser($user);
-		} else {
-			$username = $this->featureContext->getAdminUsername();
-			$password = $this->featureContext->getAdminPassword();
-		}
+		$credentials = $this->getAdminOrUserCredentials($user);
+
 		return GraphHelper::getMembersList(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
-			$username,
-			$password,
+			$credentials["username"],
+			$credentials["password"],
 			$this->featureContext->getAttributeOfCreatedGroup($group, 'id')
 		);
 	}
@@ -576,18 +577,13 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function createGroup(string $group, ?string $user = null): ResponseInterface {
-		if ($user) {
-			$username = $user;
-			$password = $this->featureContext->getPasswordForUser($user);
-		} else {
-			$username = $this->featureContext->getAdminUsername();
-			$password = $this->featureContext->getAdminPassword();
-		}
+		$credentials = $this->getAdminOrUserCredentials($user);
+
 		return GraphHelper::createGroup(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
-			$username,
-			$password,
+			$credentials["username"],
+			$credentials["password"],
 			$group,
 		);
 	}
@@ -752,7 +748,7 @@ class GraphContext implements Context {
 			'Unauthorized',
 			$errorText,
 			__METHOD__
-			. " Expected text 'Unauthorized' but got '" . $errorText . "'"
+			. "\nExpected unauthorized message but got '" . $errorText . "'"
 		);
 	}
 }
