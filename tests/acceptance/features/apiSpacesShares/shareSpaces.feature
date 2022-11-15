@@ -103,7 +103,25 @@ Feature: Share spaces
       | viewer  |
 
 
-  Scenario Outline: A user without manager role cannot share a space to another user
+  Scenario Outline: A user with manager role can share a space to another user
+    Given user "Alice" has shared a space "share space" to user "Brian" with role "manager"
+    When user "Brian" shares a space "share space" to user "Bob" with role "<role>"
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "200"
+    And the OCS status message should be "OK"
+    And the user "Bob" should have a space called "share space" with these key and value pairs:
+      | key       | value       |
+      | driveType | project     |
+      | id        | %space_id%  |
+      | name      | share space |
+    Examples:
+      | role    |
+      | manager |
+      | editor  |
+      | viewer  |
+
+
+  Scenario Outline: A user with editor or viewer role cannot share a space to another user
     Given user "Alice" has shared a space "share space" to user "Brian" with role "<role>"
     When user "Brian" shares a space "share space" to user "Bob" with role "<new_role>"
     Then the HTTP status code should be "404"
