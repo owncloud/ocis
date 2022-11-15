@@ -153,7 +153,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		return
 	}
 
-	shareLink, err := urlJoinPath(s.ocisURL, "f", storagespace.FormatResourceID(*e.ID))
+	shareLink, err := urlJoinPath(s.ocisURL, "f", e.ID.OpaqueId)
 
 	if err != nil {
 		s.logger.Error().
