@@ -563,9 +563,14 @@ func (g Service) hasStaticPermission(ctx context.Context, permissionID string) b
 			return false
 		}
 
-		roleIDs = make([]string, 0, len(assignments))
+		// deduplicate roleids
+		uniqueRoleIds := make(map[string]struct{})
 		for _, a := range assignments {
-			roleIDs = append(roleIDs, a.GetRoleId())
+			uniqueRoleIds[a.GetRoleId()] = struct{}{}
+		}
+		roleIDs = make([]string, 0, len(uniqueRoleIds))
+		for a := range uniqueRoleIds {
+			roleIDs = append(roleIDs, a)
 		}
 	}
 	p, err := g.manager.ReadPermissionByID(permissionID, roleIDs)

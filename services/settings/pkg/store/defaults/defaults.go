@@ -24,7 +24,7 @@ const (
 	RoleManagementPermissionName string = "role-management"
 
 	// SettingsManagementPermissionID is the hardcoded setting UUID for the settings management permission
-	SettingsManagementPermissionID string = "79e13b30-3e22-11eb-bc51-0b9f0bad9a58"
+	SettingsManagementPermissionID string = "3d58f441-4a05-42f8-9411-ef5874528ae1"
 	// SettingsManagementPermissionName is the hardcoded setting name for the settings management permission
 	SettingsManagementPermissionName string = "settings-management"
 
