@@ -399,6 +399,25 @@ func SpaceShared(ev events.SpaceShared) AuditEventSpaceShared {
 	return sse
 }
 
+// SpaceUnshared converts a SpaceUnshared event to an AuditEventSpaceUnshared
+func SpaceUnshared(ev events.SpaceUnshared) AuditEventSpaceUnshared {
+	sue := AuditEventSpaceUnshared{}
+
+	sid := ev.ID.GetOpaqueId()
+	grantee := "N/A"
+	if ev.GranteeUserID != nil {
+		sue.GranteeUserID = ev.GranteeUserID.OpaqueId
+		grantee = "user:" + ev.GranteeUserID.OpaqueId
+	} else if ev.GranteeGroupID != nil {
+		sue.GranteeGroupID = ev.GranteeGroupID.OpaqueId
+		grantee = "group:" + ev.GranteeGroupID.OpaqueId
+	}
+	base := BasicAuditEvent("", "", MessageSpaceUnshared(ev.Executant.GetOpaqueId(), sid, grantee), ActionSpaceUnshared)
+	sue.AuditEventSpaces = SpacesAuditEvent(base, sid)
+
+	return sue
+}
+
 // UserCreated converts a UserCreated event to an AuditEventUserCreated
 func UserCreated(ev events.UserCreated) AuditEventUserCreated {
 	base := BasicAuditEvent("", "", MessageUserCreated(ev.Executant.GetOpaqueId(), ev.UserID), ActionUserCreated)

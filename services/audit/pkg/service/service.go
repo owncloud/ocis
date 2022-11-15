@@ -89,6 +89,8 @@ func StartAuditLogger(ctx context.Context, ch <-chan interface{}, log log.Logger
 				auditEvent = types.SpaceDeleted(ev)
 			case events.SpaceShared:
 				auditEvent = types.SpaceShared(ev)
+			case events.SpaceUnshared:
+				auditEvent = types.SpaceUnshared(ev)
 			case events.UserCreated:
 				auditEvent = types.UserCreated(ev)
 			case events.UserDeleted:

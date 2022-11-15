@@ -213,6 +213,14 @@ type AuditEventSpaceShared struct {
 	GranteeGroupID string
 }
 
+// AuditEventSpaceUnshared is the event logged when a space is unshared
+type AuditEventSpaceUnshared struct {
+	AuditEventSpaces
+
+	GranteeUserID  string
+	GranteeGroupID string
+}
+
 // AuditEventUserCreated is the event logged when a user is created
 type AuditEventUserCreated struct {
 	AuditEvent
