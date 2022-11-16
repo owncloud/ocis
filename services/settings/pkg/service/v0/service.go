@@ -15,6 +15,7 @@ import (
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	filestore "github.com/owncloud/ocis/v2/services/settings/pkg/store/filesystem"
 	metastore "github.com/owncloud/ocis/v2/services/settings/pkg/store/metadata"
 	merrors "go-micro.dev/v4/errors"
@@ -392,10 +393,6 @@ func (g Service) ListRoleAssignments(ctx context.Context, req *settingssvc.ListR
 
 // AssignRoleToUser implements the RoleServiceHandler interface
 func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRoleToUserRequest, res *settingssvc.AssignRoleToUserResponse) error {
-	if !g.canManageRoles(ctx) {
-		return merrors.Forbidden(g.id, "user has no role management permission")
-	}
-
 	req.AccountUuid = getValidatedAccountUUID(ctx, req.AccountUuid)
 	if validationError := validateAssignRoleToUser(req); validationError != nil {
 		return merrors.BadRequest(g.id, validationError.Error())
@@ -406,9 +403,21 @@ func (g Service) AssignRoleToUser(ctx context.Context, req *settingssvc.AssignRo
 		g.logger.Debug().Str("id", g.id).Msg("user not in context")
 		return merrors.InternalServerError(g.id, "user not in context")
 	}
-	if ownAccountUUID == req.AccountUuid {
-		g.logger.Debug().Str("id", g.id).Msg("Changing own role assignment forbidden")
-		return merrors.Forbidden(g.id, "Changing own role assignment forbidden")
+
+	switch {
+	case ownAccountUUID == req.AccountUuid:
+		// Allow users to assign themself to the user role
+		// deny any other attempt to change	the user's own assignment
+		if r, err := g.manager.ListRoleAssignments(req.AccountUuid); err == nil && len(r) > 0 {
+			return merrors.Forbidden(g.id, "Changing own role assignment forbidden")
+		}
+		if req.RoleId != defaults.BundleUUIDRoleUser {
+			return merrors.Forbidden(g.id, "Changing own role assignment forbidden")
+		}
+		g.logger.Debug().Str("userid", ownAccountUUID).Msg("Self-assignment for default 'user' role permitted")
+	case g.canManageRoles(ctx):
+	default:
+		return merrors.Forbidden(g.id, "user has no role management permission")
 	}
 
 	r, err := g.manager.WriteRoleAssignment(req.AccountUuid, req.RoleId)

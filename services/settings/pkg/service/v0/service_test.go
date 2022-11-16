@@ -8,6 +8,7 @@ import (
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/settings/mocks"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/stretchr/testify/assert"
 	"github.com/test-go/testify/mock"
 	"go-micro.dev/v4/metadata"
@@ -66,7 +67,35 @@ func TestGetValidatedAccountUUID(t *testing.T) {
 
 func TestEditOwnRoleAssignment(t *testing.T) {
 	manager := &mocks.Manager{}
-	a := []*settingsmsg.UserRoleAssignment{
+	svc := Service{
+		manager: manager,
+	}
+	a := []*settingsmsg.UserRoleAssignment{}
+	manager.On("ListRoleAssignments", mock.Anything).Return(a, nil)
+	manager.On("WriteRoleAssignment", mock.Anything, mock.Anything).Return(nil, nil)
+	// Creating an initial self assignment is expected to succeed for UserRole when no assignment exists yet
+	req := v0.AssignRoleToUserRequest{
+		AccountUuid: "61445573-4dbe-4d56-88dc-88ab47aceba7",
+		RoleId:      defaults.BundleUUIDRoleUser,
+	}
+	res := v0.AssignRoleToUserResponse{}
+	err := svc.AssignRoleToUser(ctxWithUUID, &req, &res)
+	assert.Nil(t, err)
+
+	// Creating an initial self assignment is expected to fail for non UserRole when no assignment exists yet
+	req = v0.AssignRoleToUserRequest{
+		AccountUuid: "61445573-4dbe-4d56-88dc-88ab47aceba7",
+		RoleId:      defaults.BundleUUIDRoleAdmin,
+	}
+	res = v0.AssignRoleToUserResponse{}
+	err = svc.AssignRoleToUser(ctxWithUUID, &req, &res)
+	assert.NotNil(t, err)
+
+	manager = &mocks.Manager{}
+	svc = Service{
+		manager: manager,
+	}
+	a = []*settingsmsg.UserRoleAssignment{
 		{
 			Id:          "00000000-0000-0000-0000-000000000001",
 			AccountUuid: "61445573-4dbe-4d56-88dc-88ab47aceba7",
@@ -79,21 +108,18 @@ func TestEditOwnRoleAssignment(t *testing.T) {
 	}
 	manager.On("ListRoleAssignments", mock.Anything).Return(a, nil)
 	manager.On("ReadPermissionByID", mock.Anything, mock.Anything).Return(editRolePermission, nil)
-	svc := Service{
-		manager: manager,
-	}
 
-	// Creating an self assignment is expect to fail
-	req := v0.AssignRoleToUserRequest{
+	// Creating an self assignment is expect to fail if there is already an assingment
+	req = v0.AssignRoleToUserRequest{
 		AccountUuid: "61445573-4dbe-4d56-88dc-88ab47aceba7",
-		RoleId:      "aceb15b8-7486-479f-ae32-c91118e07a39",
+		RoleId:      defaults.BundleUUIDRoleUser,
 	}
-	res := v0.AssignRoleToUserResponse{}
-	err := svc.AssignRoleToUser(ctxWithUUID, &req, &res)
+	res = v0.AssignRoleToUserResponse{}
+	err = svc.AssignRoleToUser(ctxWithUUID, &req, &res)
 	assert.NotNil(t, err)
 
 	manager.On("WriteRoleAssignment", mock.Anything, mock.Anything).Return(nil, nil)
-	// Creating an self assignment is expect to fail
+	// Creating an assignment for somebody else is expected to succeed, give the right permissions
 	req = v0.AssignRoleToUserRequest{
 		AccountUuid: "00000000-0000-0000-0000-000000000000",
 		RoleId:      "aceb15b8-7486-479f-ae32-c91118e07a39",
