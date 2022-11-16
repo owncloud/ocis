@@ -490,8 +490,8 @@ github.com/go-micro/plugins/v4/registry/memory v1.1.0 h1:omyL8l12mzNCjNSDxMkAReE
 github.com/go-micro/plugins/v4/registry/memory v1.1.0/go.mod h1:7gsV2dwpFr+1rFhncmnxA9Tjv/NjQr9Zy8KpVKS7/jQ=
 github.com/go-micro/plugins/v4/registry/nats v1.1.0 h1:oqQzP5P2FkfoYZiBRuCWsKqh4BCJG6MQkxYmLw2lNrU=
 github.com/go-micro/plugins/v4/registry/nats v1.1.0/go.mod h1:4tTfa958PiYUOZNBBNoY1awmgfxFcqQOmix8cR3UM+E=
-github.com/go-micro/plugins/v4/server/grpc v1.1.1 h1:7V5K8RTQhzzFsJCPkKXTJr4YrWyIw5xebUTtDY27l3k=
-github.com/go-micro/plugins/v4/server/grpc v1.1.1/go.mod h1:GntDOa4zIHmyBLAvSXP05gK6im+Fw+Dh8fxUk/yiwaI=
+github.com/go-micro/plugins/v4/server/grpc v1.2.0 h1:lXfM+/0oE/u1g0hVBYsvbP4lYOYXYOmwf5qH7ghi7Cc=
+github.com/go-micro/plugins/v4/server/grpc v1.2.0/go.mod h1:+Ah9Pf/vMSXxBM3fup/hc3N+zN2as3nIpcRaR4sBjnY=
 github.com/go-micro/plugins/v4/server/http v1.2.0 h1:7wgXxdTMSwCfxpUdmOdllyJQRZk9ZtMK5WhankTdKcs=
 github.com/go-micro/plugins/v4/server/http v1.2.0/go.mod h1:YuAjaSPxcn3LI8j2FUsqx0Rxunrj4YwDV41Ax76rLl0=
 github.com/go-micro/plugins/v4/store/nats-js v1.1.0 h1:6Fe1/eLtg8kRyaGvMILp4olYtTDGwYNBXyb1sYfAWGk=
