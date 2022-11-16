@@ -63,6 +63,7 @@ type Publisher interface {
 	Publish(string, interface{}, ...mevents.PublishOption) error
 }
 
+// Permissions is the interface used to access the permissions service
 type Permissions interface {
 	GetPermissionByID(ctx context.Context, request *settingssvc.GetPermissionByIDRequest, opts ...client.CallOption) (*settingssvc.GetPermissionByIDResponse, error)
 	ListPermissionsByResource(ctx context.Context, in *settingssvc.ListPermissionsByResourceRequest, opts ...client.CallOption) (*settingssvc.ListPermissionsByResourceResponse, error)
@@ -84,7 +85,7 @@ type Graph struct {
 	identityBackend      identity.Backend
 	gatewayClient        GatewayClient
 	roleService          settingssvc.RoleService
-	permissionsService   settingssvc.PermissionService
+	permissionsService   Permissions
 	spacePropertiesCache *ttlcache.Cache
 	eventsPublisher      events.Publisher
 }

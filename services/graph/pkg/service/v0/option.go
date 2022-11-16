@@ -22,7 +22,7 @@ type Options struct {
 	GatewayClient     GatewayClient
 	IdentityBackend   identity.Backend
 	RoleService       settingssvc.RoleService
-	PermissionService settingssvc.PermissionService
+	PermissionService Permissions
 	RoleManager       *roles.Manager
 	EventsPublisher   events.Publisher
 }
