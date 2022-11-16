@@ -24,6 +24,10 @@ services:
       # docker provider (get configuration from container labels)
       - "--providers.docker.endpoint=unix:///var/run/docker.sock"
       - "--providers.docker.exposedByDefault=false"
+      # access log
+      - "--accessLog=true"
+      - "--accessLog.format=json"
+      - "--accessLog.fields.headers.names.X-Request-Id=keep"
     ports:
       - "80:80"
       - "443:443"
@@ -77,7 +81,7 @@ services:
       OCIS_RUN_SERVICES: app-registry,app-provider,audit,auth-basic,auth-machine,frontend,gateway,graph,groups,idp,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav
       # General oCIS config
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
-      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-error} # make oCIS less verbose
+      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
       OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
