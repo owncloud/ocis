@@ -52,7 +52,7 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &listResponse{Value: groups})
+	render.JSON(w, r, &ListResponse{Value: groups})
 }
 
 // PostGroup implements the Service interface.

@@ -74,7 +74,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &listResponse{Value: files})
+	render.JSON(w, r, &ListResponse{Value: files})
 }
 
 func (g Graph) getDriveItem(ctx context.Context, root storageprovider.ResourceId) (*libregraph.DriveItem, error) {

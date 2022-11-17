@@ -119,7 +119,7 @@ func (g Graph) getWebDavBaseURL() (*url.URL, error) {
 	return webDavBaseURL, nil
 }
 
-type listResponse struct {
+type ListResponse struct {
 	Value interface{} `json:"value,omitempty"`
 }
 
