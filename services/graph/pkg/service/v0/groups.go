@@ -42,6 +42,7 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		} else {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
+		return
 	}
 
 	groups, err = sortGroups(odataReq, groups)
