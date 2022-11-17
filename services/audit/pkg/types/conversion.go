@@ -11,6 +11,7 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
 )
 
 const _linktype = "link"
@@ -413,6 +414,21 @@ func SpaceUnshared(ev events.SpaceUnshared) AuditEventSpaceUnshared {
 		grantee = "group:" + ev.GranteeGroupID.OpaqueId
 	}
 	base := BasicAuditEvent("", "", MessageSpaceUnshared(ev.Executant.GetOpaqueId(), sid, grantee), ActionSpaceUnshared)
+	sue.AuditEventSpaces = SpacesAuditEvent(base, sid)
+
+	return sue
+}
+
+// SpaceUpdated converts a SpaceUpdated event to an AuditEventSpaceUpdated
+func SpaceUpdated(ev events.SpaceUpdated) AuditEventSpaceUpdated {
+	sid := ev.ID.GetOpaqueId()
+	opaqueMap := sdk.DecodeOpaqueMap(ev.Space.Opaque)
+	sue := AuditEventSpaceUpdated{
+		Name:   ev.Space.Name,
+		Opqaue: opaqueMap,
+	}
+
+	base := BasicAuditEvent("", "", MessageSpaceUpdated(ev.Executant.GetOpaqueId(), sid, ev.Space.Name, ev.Space.Quota.QuotaMaxBytes, opaqueMap), ActionSpaceUpdated)
 	sue.AuditEventSpaces = SpacesAuditEvent(base, sid)
 
 	return sue

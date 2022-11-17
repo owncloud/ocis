@@ -31,6 +31,7 @@ func RegisteredEvents() []events.Unmarshaller {
 		events.SpaceDeleted{},
 		events.SpaceShared{},
 		events.SpaceUnshared{},
+		events.SpaceUpdated{},
 		events.UserCreated{},
 		events.UserDeleted{},
 		events.UserFeatureChanged{},

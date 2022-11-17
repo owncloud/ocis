@@ -221,6 +221,15 @@ type AuditEventSpaceUnshared struct {
 	GranteeGroupID string
 }
 
+// AuditEventSpaceUpdated is the event logged when a space is updated
+type AuditEventSpaceUpdated struct {
+	AuditEventSpaces
+
+	Name          string
+	Opqaue        map[string]string
+	QuotaMaxBytes uint64
+}
+
 // AuditEventUserCreated is the event logged when a user is created
 type AuditEventUserCreated struct {
 	AuditEvent
