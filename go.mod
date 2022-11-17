@@ -19,7 +19,7 @@ require (
 	github.com/go-ldap/ldap/v3 v3.4.4
 	github.com/go-ldap/ldif v0.0.0-20200320164324-fd88d9b715b3
 	github.com/go-micro/plugins/v4/client/grpc v1.1.0
-	github.com/go-micro/plugins/v4/events/natsjs v1.1.0
+	github.com/go-micro/plugins/v4/events/natsjs v1.2.0
 	github.com/go-micro/plugins/v4/logger/zerolog v1.1.0
 	github.com/go-micro/plugins/v4/registry/consul v1.2.0
 	github.com/go-micro/plugins/v4/registry/etcd v1.2.0
