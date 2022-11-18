@@ -33,10 +33,6 @@ _ocdav: double-check the webdav property parsing when custom namespaces are used
 - [apiWebdavProperties2/getFileProperties.feature:405](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L405)
 - [apiWebdavProperties2/getFileProperties.feature:410](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavProperties2/getFileProperties.feature#L410)
 
-#### [Downloading the older version of shared file gives 404](https://github.com/owncloud/ocis/issues/3868)
-
-- [apiVersions/fileVersionsSharingToShares.feature:306](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionsSharingToShares.feature#L306)
-
 #### [file versions do not report the version author](https://github.com/owncloud/ocis/issues/2914)
 
 - [apiVersions/fileVersionAuthor.feature:14](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiVersions/fileVersionAuthor.feature#L14)
@@ -319,10 +315,6 @@ cannot share a folder with create permission
 - [apiWebdavMove2/moveShareOnOcis.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L100)
 - [apiWebdavMove2/moveShareOnOcis.feature:169](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L169)
 - [apiWebdavMove2/moveShareOnOcis.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavMove2/moveShareOnOcis.feature#L170)
-
-#### [restoring an older version of a shared file deletes the share](https://github.com/owncloud/ocis/issues/765)
-
-- [apiShareManagementToShares/acceptShares.feature:579](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L579)
 
 #### [Expiration date for shares is not implemented](https://github.com/owncloud/ocis/issues/1250)
 
