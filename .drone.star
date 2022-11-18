@@ -697,6 +697,7 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                              "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
                              "EXPECTED_FAILURES_FILE": "%s/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (dirs["base"], storage.upper()),
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
+                             "DEBUG_ACCEPTANCE_API_CALLS": "1" if storage == "ocis" else 0,
                          },
                          "commands": [
                              "pwd",
