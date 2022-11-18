@@ -35,7 +35,7 @@ Feature: delete groups
       | staff?group         | Question mark                         |
 
   @cannot-create-group
-  Scenario Outline: admin deletes a group
+  Scenario Outline: admin user deletes a group
     Given group "<group_id>" has been created
     When user "Alice" deletes group "<group_id>" using the Graph API
     And the HTTP status code should be "204"
@@ -47,7 +47,7 @@ Feature: delete groups
       | 50%2Fix             | %2F literal looks like an escaped slash |
 
 
-  Scenario Outline: admin deletes a group that has a forward-slash in the group name
+  Scenario Outline: admin user deletes a group that has a forward-slash in the group name
     Given group "<group_id>" has been created
     When user "Alice" deletes group "<group_id>" using the Graph API
     And the HTTP status code should be "204"

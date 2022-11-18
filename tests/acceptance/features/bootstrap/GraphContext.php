@@ -141,7 +141,7 @@ class GraphContext implements Context {
 
 	/**
 	 * @param string $groupId
-	 * @param bool $checkResult
+	 * @param string|null $user
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -769,15 +769,18 @@ class GraphContext implements Context {
 	}
 
 	/**
-     * @When user :user deletes group :group using the Graph API
+	 * @When user :user deletes group :group using the Graph API
 	 * @When the administrator deletes group :group using the Graph API
-     * @When user :user tries to delete group :group using the Graph API
-	 * 
+	 * @When user :user tries to delete group :group using the Graph API
+	 *
+	 * @param string $group
+	 * @param string|null $user
+	 *
 	 * @return void
-     */
-    public function userDeletesGroupUsingTheGraphApi(string $group, ?string $user): void {
+	 */
+	public function userDeletesGroupUsingTheGraphApi(string $group, ?string $user): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$response = $this->userDeletesGroupWithGroupId($groupId, $user);
 		$this->featureContext->setResponse($response);
-    }
+	}
 }
