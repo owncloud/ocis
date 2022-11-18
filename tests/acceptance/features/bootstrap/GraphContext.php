@@ -143,6 +143,28 @@ class GraphContext implements Context {
 	 * @param string $groupId
 	 * @param bool $checkResult
 	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function userDeletesGroupWithGroupId(
+		string $groupId,
+		?string $user = null
+	): ResponseInterface {
+		$credentials = $this->getAdminOrUserCredentials($user);
+
+		return GraphHelper::deleteGroup(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials["username"],
+			$credentials["password"],
+			$groupId
+		);
+	}
+
+	/**
+	 * @param string $groupId
+	 * @param bool $checkResult
+	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
@@ -151,13 +173,7 @@ class GraphContext implements Context {
 		bool $checkResult = false
 	): void {
 		$this->featureContext->setResponse(
-			GraphHelper::deleteGroup(
-				$this->featureContext->getBaseUrl(),
-				$this->featureContext->getStepLineRef(),
-				$this->featureContext->getAdminUsername(),
-				$this->featureContext->getAdminPassword(),
-				$groupId
-			)
+			$this->userDeletesGroupWithGroupId($groupId)
 		);
 		if ($checkResult) {
 			$this->featureContext->thenTheHTTPStatusCodeShouldBe(204);
@@ -751,4 +767,17 @@ class GraphContext implements Context {
 			. "\nExpected unauthorized message but got '" . $errorText . "'"
 		);
 	}
+
+	/**
+     * @When user :user deletes group :group using the Graph API
+	 * @When the administrator deletes group :group using the Graph API
+     * @When user :user tries to delete group :group using the Graph API
+	 * 
+	 * @return void
+     */
+    public function userDeletesGroupUsingTheGraphApi(string $group, ?string $user): void {
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$response = $this->userDeletesGroupWithGroupId($groupId, $user);
+		$this->featureContext->setResponse($response);
+    }
 }
