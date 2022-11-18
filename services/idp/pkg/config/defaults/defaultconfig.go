@@ -61,9 +61,9 @@ func DefaultConfig() *config.Config {
 			ValidationKeysPath:                "",
 			CookieBackendURI:                  "",
 			CookieNames:                       nil,
-			AccessTokenDurationSeconds:        60 * 60 * 24,           // 1 day
-			IDTokenDurationSeconds:            60 * 60,                // 1 hour
-			RefreshTokenDurationSeconds:       60 * 60 * 24 * 365 * 3, // 1 year
+			AccessTokenDurationSeconds:        60 * 5,            // 5 minutes
+			IDTokenDurationSeconds:            60 * 5,            // 5 minutes
+			RefreshTokenDurationSeconds:       60 * 60 * 24 * 30, // 30 days
 			DyamicClientSecretDurationSeconds: 0,
 		},
 		Clients: []config.Client{
