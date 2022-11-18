@@ -13,6 +13,7 @@ default:
           ldapGroupsOU: TestGroups
           ldapInitialUserFilePath: /../../config/ldap-users.ldif
       contexts:
+        - RoleAssignmentContext:
         - GraphContext:
         - SpacesContext:
         - OccContext:
@@ -36,6 +37,7 @@ default:
         - '%paths.base%/../features/apiSpaces'
       context: *common_ldap_suite_context
       contexts:
+        - RoleAssignmentContext:
         - SpacesContext:
         - OccContext:
         - FeatureContext: *common_feature_context_params
@@ -56,6 +58,7 @@ default:
         - '%paths.base%/../features/apiSpacesShares'
       context: *common_ldap_suite_context
       contexts:
+        - RoleAssignmentContext:
         - SpacesContext:
         - OccContext:
         - FeatureContext: *common_feature_context_params
@@ -76,6 +79,7 @@ default:
         - '%paths.base%/../features/apiContract'
       context: *common_ldap_suite_context
       contexts:
+        - RoleAssignmentContext:
         - SpacesContext:
         - OccContext:
         - FeatureContext: *common_feature_context_params
@@ -96,6 +100,7 @@ default:
         - '%paths.base%/../features/apiArchiver'
       context: *common_ldap_suite_context
       contexts:
+        - RoleAssignmentContext:
         - ArchiverContext:
         - SpacesContext:
         - OccContext:
@@ -114,6 +119,7 @@ default:
         - '%paths.base%/../features/apiGraph'
       context: *common_ldap_suite_context
       contexts:
+        - RoleAssignmentContext:
         - GraphContext:
         - SpacesContext:
         - OccContext:

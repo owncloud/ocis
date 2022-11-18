@@ -44,3 +44,11 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 ### [Creating group with empty name returns status code 200](https://github.com/owncloud/ocis/issues/5050)
 - [apiGraph/createGroup.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroup.feature#L40)
+
+### [Settings service user can list other peoples assignments](https://github.com/owncloud/ocis/issues/5032)
+- [apiAccountsHashDifficulty/assignRole.feature:27](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L27)
+- [apiAccountsHashDifficulty/assignRole.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L28)
+
+### [Settings service user can see roles list](https://github.com/owncloud/ocis/issues/5079)
+- [apiAccountsHashDifficulty/assignRole.feature:15](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L15)
+- [apiAccountsHashDifficulty/assignRole.feature:16](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L16)
