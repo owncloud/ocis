@@ -48,6 +48,8 @@ type Service interface {
 	DeleteGroupMember(http.ResponseWriter, *http.Request)
 
 	GetDrives(w http.ResponseWriter, r *http.Request)
+	GetAllDrives(w http.ResponseWriter, r *http.Request)
+	CreateDrive(w http.ResponseWriter, r *http.Request)
 }
 
 // NewService returns a service implementation for Service.
@@ -143,6 +145,12 @@ func NewService(opts ...Option) Service {
 		svc.roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
 	} else {
 		svc.roleService = options.RoleService
+	}
+
+	if options.PermissionService == nil {
+		svc.permissionsService = settingssvc.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient())
+	} else {
+		svc.permissionsService = options.PermissionService
 	}
 
 	roleManager := options.RoleManager

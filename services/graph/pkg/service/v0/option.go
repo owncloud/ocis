@@ -16,14 +16,15 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger          log.Logger
-	Config          *config.Config
-	Middleware      []func(http.Handler) http.Handler
-	GatewayClient   GatewayClient
-	IdentityBackend identity.Backend
-	RoleService     settingssvc.RoleService
-	RoleManager     *roles.Manager
-	EventsPublisher events.Publisher
+	Logger            log.Logger
+	Config            *config.Config
+	Middleware        []func(http.Handler) http.Handler
+	GatewayClient     GatewayClient
+	IdentityBackend   identity.Backend
+	RoleService       settingssvc.RoleService
+	PermissionService Permissions
+	RoleManager       *roles.Manager
+	EventsPublisher   events.Publisher
 }
 
 // newOptions initializes the available default options.
@@ -76,6 +77,13 @@ func WithIdentityBackend(val identity.Backend) Option {
 func RoleService(val settingssvc.RoleService) Option {
 	return func(o *Options) {
 		o.RoleService = val
+	}
+}
+
+// PermissionService provides a function to set the PermissionService option.
+func PermissionService(val settingssvc.PermissionService) Option {
+	return func(o *Options) {
+		o.PermissionService = val
 	}
 }
 

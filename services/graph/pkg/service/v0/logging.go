@@ -103,3 +103,13 @@ func (l logging) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 func (l logging) GetDrives(w http.ResponseWriter, r *http.Request) {
 	l.next.GetDrives(w, r)
 }
+
+// GetAllDrives implements the Service interface.
+func (l logging) GetAllDrives(w http.ResponseWriter, r *http.Request) {
+	l.next.GetAllDrives(w, r)
+}
+
+// CreateDrive implements the Service interface.
+func (l logging) CreateDrive(w http.ResponseWriter, r *http.Request) {
+	l.next.CreateDrive(w, r)
+}

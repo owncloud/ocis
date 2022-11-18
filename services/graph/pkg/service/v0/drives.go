@@ -200,10 +200,8 @@ func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func canCreateSpace(ctx context.Context, ownPersonalHome bool) bool {
-	s := settingssvc.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient())
-
-	pr, err := s.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{
+func (g Graph) canCreateSpace(ctx context.Context, ownPersonalHome bool) bool {
+	pr, err := g.permissionsService.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{
 		PermissionId: settingsServiceExt.CreateSpacePermissionID,
 	})
 	if err != nil || pr.Permission == nil {
@@ -228,7 +226,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO determine if the user tries to create his own personal space and pass that as a boolean
-	canCreateSpace := canCreateSpace(r.Context(), false)
+	canCreateSpace := g.canCreateSpace(r.Context(), false)
 	if !canCreateSpace {
 		logger.Debug().Bool("cancreatespace", canCreateSpace).Msg("could not create drive: insufficient permissions")
 		// if the permission is not existing for the user in context we can assume we don't have it. Return 401.
@@ -708,7 +706,7 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 		return nil, nil
 	case res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
 		logger.Debug().Str("grpc", res.GetStatus().GetMessage()).Msg("error sending get quota grpc request")
-		return nil, err
+		return nil, errors.New(res.GetStatus().GetMessage())
 	}
 
 	var remaining int64

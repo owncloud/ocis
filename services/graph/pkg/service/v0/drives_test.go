@@ -153,4 +153,7 @@ func TestSpaceNameValidation(t *testing.T) {
 		err := validateSpaceName(tc.SpaceName)
 		require.Equal(t, tc.ExpectedError, err, tc.Alias)
 	}
+
+	// set max length back to protect other tests
+	_maxSpaceNameLength = 255
 }
