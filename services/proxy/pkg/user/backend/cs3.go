@@ -87,9 +87,7 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 				// https://github.com/owncloud/ocis/v2/issues/1825 for more context.
 				if user.Id.Type == cs3.UserType_USER_TYPE_PRIMARY {
 					c.logger.Info().Str("userid", user.Id.OpaqueId).Msg("user has no role assigned, assigning default user role")
-					// Updating context to have the Account-ID field and suffixing with _init
-					// so that the safety check for setting users' own role doesn't fail
-					ctx = metadata.Set(ctx, middleware.AccountID, user.Id.OpaqueId+"_init")
+					ctx = metadata.Set(ctx, middleware.AccountID, user.Id.OpaqueId)
 					_, err := c.settingsRoleService.AssignRoleToUser(ctx, &settingssvc.AssignRoleToUserRequest{
 						AccountUuid: user.Id.OpaqueId,
 						RoleId:      settingsService.BundleUUIDRoleUser,
