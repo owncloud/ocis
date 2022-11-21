@@ -34,7 +34,7 @@ Feature: delete groups
       | 50%25=0             | %25 literal looks like an escaped "%" |
       | staff?group         | Question mark                         |
 
-  @cannot-create-group
+  @issue-5083
   Scenario Outline: admin user deletes a group
     Given group "<group_id>" has been created
     When user "Alice" deletes group "<group_id>" using the Graph API
@@ -66,3 +66,16 @@ Feature: delete groups
     When user "Brian" tries to delete group "new-group" using the Graph API
     And the HTTP status code should be "401"
     And group "new-group" should exist
+
+  @issue-903
+  Scenario: deleted group should not be listed in the sharees list
+    Given group "grp1" has been created
+    And group "grp2" has been created
+    And user "Alice" has uploaded file with content "sample text" to "lorem.txt"
+    And user "Alice" has shared file "lorem.txt" with group "grp1"
+    And user "Alice" has shared file "lorem.txt" with group "grp2"
+    And group "grp1" has been deleted
+    When user "Alice" gets all the shares from the file "lorem.txt" using the sharing API
+    Then the HTTP status code should be "200"
+    And group "grp2" should be included in the response
+    But group "grp1" should not be included in the response
