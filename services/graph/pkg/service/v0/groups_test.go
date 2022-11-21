@@ -133,5 +133,23 @@ var _ = Describe("Groups", func() {
 			Expect(len(res.Value)).To(Equal(1))
 			Expect(res.Value[0].GetId()).To(Equal("group1"))
 		})
+
+		It("handles invalid sorting queries", func() {
+			group1 := libregraph.NewGroup()
+			group1.SetId("group1")
+			identityBackend.On("GetGroups", ctx, mock.Anything).Return([]*libregraph.Group{group1}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups?$orderby=invalid", nil)
+			svc.GetGroups(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			data, err := ioutil.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			odataerr := libregraph.OdataError{}
+			err = json.Unmarshal(data, &odataerr)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(odataerr.Error.Code).To(Equal("invalidRequest"))
+		})
 	})
 })
