@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Do not reindex a space twice at the same time: [#5001](https://github.com/owncloud/ocis/pull/5001)
 * Bugfix - Find spaces by their name: [#5044](https://github.com/owncloud/ocis/pull/5044)
+* Bugfix - Adjust cache related configuration options: [#5087](https://github.com/owncloud/ocis/pull/5087)
 * Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
 * Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
 * Enhancement - Remove windows from ci & release makefile: [#5026](https://github.com/owncloud/ocis/pull/5026)
@@ -27,6 +28,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/4506
    https://github.com/owncloud/ocis/pull/5044
+
+* Bugfix - Adjust cache related configuration options: [#5087](https://github.com/owncloud/ocis/pull/5087)
+
+   We've adjusted cache related configuration options of the gateway and storage-users service
+   to the other services.
+
+   https://github.com/owncloud/ocis/pull/5087
 
 * Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
 
