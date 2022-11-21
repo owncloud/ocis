@@ -61,8 +61,8 @@
 | OCIS_INSECURE<br/>STORAGE_USERS_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT | string |  | The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>STORAGE_USERS_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
-| STORAGE_USERS_CACHE_STORE | string | memory | Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".|
-| STORAGE_USERS_CACHE_NODES | []string | [] | Node addresses to use for the cache store.|
+| OCIS_CACHE_STORE_TYPE<br/>STORAGE_USERS_CACHE_STORE_TYPE<br/>STORAGE_USERS_CACHE_STORE | string | memory | Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".|
+| OCIS_CACHE_STORE_ADDRESS<br/>STORAGE_USERS_CACHE_STORE_ADDRESS<br/>STORAGE_USERS_CACHE_NODES | []string | [] | Node addresses to use for the cache store.|
 | STORAGE_USERS_CACHE_DATABASE | string | users | Database name of the cache.|
 | STORAGE_USERS_MOUNT_ID | string | 1284d238-aa92-42ce-bdc4-0b0000009157 | Mount ID of this storage.|
 | STORAGE_USERS_EXPOSE_DATA_SERVER | bool | false | Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users.|

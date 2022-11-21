@@ -204,14 +204,18 @@ a| [subs=-attributes]
 ++86400 ++
 a| [subs=-attributes]
 Expiry for the gateway tokens.
-|`GATEWAY_CACHE_STORE`
+|`OCIS_CACHE_STORE_TYPE` +
+`GATEWAY_CACHE_STORE_TYPE` +
+`GATEWAY_CACHE_STORE`
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++memory ++
 a| [subs=-attributes]
 Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
-|`GATEWAY_CACHE_NODES`
+|`OCIS_CACHE_STORE_ADDRESS` +
+`GATEWAY_CACHE_STORE_ADDRESS` +
+`GATEWAY_CACHE_NODES`
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]

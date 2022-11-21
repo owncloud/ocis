@@ -431,14 +431,18 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
-|`STORAGE_USERS_CACHE_STORE`
+|`OCIS_CACHE_STORE_TYPE` +
+`STORAGE_USERS_CACHE_STORE_TYPE` +
+`STORAGE_USERS_CACHE_STORE`
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++memory ++
 a| [subs=-attributes]
 Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
-|`STORAGE_USERS_CACHE_NODES`
+|`OCIS_CACHE_STORE_ADDRESS` +
+`STORAGE_USERS_CACHE_STORE_ADDRESS` +
+`STORAGE_USERS_CACHE_NODES`
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
