@@ -110,7 +110,16 @@ type Sharing struct {
 }
 
 type StorageUsers struct {
-	Events Events
+	Events  Events
+	MountID string `yaml:"mount_id"`
+}
+
+type Gateway struct {
+	StorageRegistry StorageRegistry `yaml:"storage_registry"`
+}
+
+type StorageRegistry struct {
+	StorageUsersMountID string `yaml:"storage_users_mount_id"`
 }
 
 type Notifications struct {
@@ -160,6 +169,7 @@ type OcisConfig struct {
 	StorageUsers      StorageUsers `yaml:"storage_users"`
 	Notifications     Notifications
 	Nats              Nats
+	Gateway           Gateway
 }
 
 func checkConfigPath(configPath string) error {
@@ -210,6 +220,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 
 	systemUserID := uuid.Must(uuid.NewV4()).String()
 	adminUserID := uuid.Must(uuid.NewV4()).String()
+	storageUsersMountID := uuid.Must(uuid.NewV4()).String()
 
 	idmServicePassword, err := generators.GenerateRandomPassword(passwordLength)
 	if err != nil {
@@ -306,6 +317,14 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 			Thumbnail: ThumbnailSettings{
 				TransferSecret: thumbnailsTransferSecret,
 			},
+		},
+		Gateway: Gateway{
+			StorageRegistry: StorageRegistry{
+				StorageUsersMountID: storageUsersMountID,
+			},
+		},
+		StorageUsers: StorageUsers{
+			MountID: storageUsersMountID,
 		},
 	}
 

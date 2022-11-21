@@ -2,13 +2,14 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
+	defaults2 "github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/gateway/pkg/config"
 	"github.com/owncloud/ocis/v2/services/gateway/pkg/config/defaults"
-
-	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 )
 
 // ParseConfig loads configuration from known paths.
@@ -40,6 +41,14 @@ func Validate(cfg *config.Config) error {
 
 	if cfg.TransferSecret == "" {
 		return shared.MissingRevaTransferSecretError(cfg.Service.Name)
+	}
+
+	if cfg.StorageRegistry.StorageUsersMountID == "" {
+		return fmt.Errorf("The storage users mount ID has not been configured for %s. "+
+			"Make sure your %s config contains the proper values "+
+			"(e.g. by running ocis init or setting it manually in "+
+			"the config/corresponding environment variable).",
+			"gateway", defaults2.BaseConfigPath())
 	}
 
 	return nil

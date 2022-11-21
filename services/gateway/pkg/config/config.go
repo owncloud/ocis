@@ -80,9 +80,10 @@ type GRPCConfig struct {
 }
 
 type StorageRegistry struct {
-	Driver string   `yaml:"driver"` //TODO: configure via env?
-	Rules  []string `yaml:"rules"`  //TODO: configure via env?
-	JSON   string   `yaml:"json"`   //TODO: configure via env?
+	Driver              string   `yaml:"driver"` //TODO: configure via env?
+	Rules               []string `yaml:"rules"`  //TODO: configure via env?
+	JSON                string   `yaml:"json"`   //TODO: configure via env?
+	StorageUsersMountID string   `yaml:"storage_users_mount_id" env:"GATEWAY_STORAGE_USERS_MOUNT_ID" desc:"Mount ID of this storage. This ID needs to be unique."`
 }
 
 // Cache holds cache config
