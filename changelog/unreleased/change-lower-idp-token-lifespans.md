@@ -1,4 +1,4 @@
-Fix: Lower IDP token lifespans
+Bugfix: Lower IDP token lifespans
 
 We've lowered the IDP token lifespans to more reasonable durations.
 
