@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Lower IDP token lifespans: [#5077](https://github.com/owncloud/ocis/pull/5077)
 * Bugfix - Do not reindex a space twice at the same time: [#5001](https://github.com/owncloud/ocis/pull/5001)
 * Bugfix - Find spaces by their name: [#5044](https://github.com/owncloud/ocis/pull/5044)
 * Bugfix - Adjust cache related configuration options: [#5087](https://github.com/owncloud/ocis/pull/5087)
@@ -16,6 +17,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Update ownCloud Web to v6.0.0-rc.6: [#5086](https://github.com/owncloud/ocis/pull/5086)
 
 ## Details
+
+* Bugfix - Lower IDP token lifespans: [#5077](https://github.com/owncloud/ocis/pull/5077)
+
+   We've lowered the IDP token lifespans to more reasonable durations.
+
+   https://github.com/owncloud/ocis/pull/5077
 
 * Bugfix - Do not reindex a space twice at the same time: [#5001](https://github.com/owncloud/ocis/pull/5001)
 
