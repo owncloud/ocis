@@ -5,5 +5,5 @@ import (
 )
 
 //go:generate make generate
-//go:embed assets/*
+//go:embed all:assets/*
 var Assets embed.FS
