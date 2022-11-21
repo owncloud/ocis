@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Find spaces by their name: [#5044](https://github.com/owncloud/ocis/pull/5044)
 * Bugfix - Adjust cache related configuration options: [#5087](https://github.com/owncloud/ocis/pull/5087)
 * Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
+* Bugfix - Initial role assingment with external IDM: [#5045](https://github.com/owncloud/ocis/issues/5045)
 * Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
 * Enhancement - Remove windows from ci & release makefile: [#5026](https://github.com/owncloud/ocis/pull/5026)
 
@@ -44,6 +45,12 @@ The following sections list the changes for unreleased.
    "NOTIFICATIONS_WEB_UI_URL".
 
    https://github.com/owncloud/ocis/pull/4998
+
+* Bugfix - Initial role assingment with external IDM: [#5045](https://github.com/owncloud/ocis/issues/5045)
+
+   We've the initial user role assignment when using an external LDAP server.
+
+   https://github.com/owncloud/ocis/issues/5045
 
 * Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
 
