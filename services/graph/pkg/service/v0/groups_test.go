@@ -1,6 +1,7 @@
 package svc_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -8,6 +9,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/test-go/testify/mock"
@@ -37,10 +40,15 @@ var _ = Describe("Groups", func() {
 		identityBackend *identitymocks.Backend
 
 		rr *httptest.ResponseRecorder
+
+		newGroup *libregraph.Group
 	)
 
 	BeforeEach(func() {
 		identityBackend = &identitymocks.Backend{}
+		newGroup = libregraph.NewGroup()
+		newGroup.SetId("group1")
+
 		rr = httptest.NewRecorder()
 		ctx = context.Background()
 
@@ -65,6 +73,22 @@ var _ = Describe("Groups", func() {
 			svc.GetGroups(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("handles invalid sorting queries", func() {
+			identityBackend.On("GetGroups", ctx, mock.Anything).Return([]*libregraph.Group{newGroup}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups?$orderby=invalid", nil)
+			svc.GetGroups(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			data, err := ioutil.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			odataerr := libregraph.OdataError{}
+			err = json.Unmarshal(data, &odataerr)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(odataerr.Error.Code).To(Equal("invalidRequest"))
 		})
 
 		It("handles unknown backend errors", func() {
@@ -115,9 +139,7 @@ var _ = Describe("Groups", func() {
 		})
 
 		It("renders a list of groups", func() {
-			group1 := libregraph.NewGroup()
-			group1.SetId("group1")
-			identityBackend.On("GetGroups", ctx, mock.Anything).Return([]*libregraph.Group{group1}, nil)
+			identityBackend.On("GetGroups", ctx, mock.Anything).Return([]*libregraph.Group{newGroup}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups", nil)
 			svc.GetGroups(rr, r)
@@ -133,23 +155,74 @@ var _ = Describe("Groups", func() {
 			Expect(len(res.Value)).To(Equal(1))
 			Expect(res.Value[0].GetId()).To(Equal("group1"))
 		})
+	})
 
-		It("handles invalid sorting queries", func() {
-			group1 := libregraph.NewGroup()
-			group1.SetId("group1")
-			identityBackend.On("GetGroups", ctx, mock.Anything).Return([]*libregraph.Group{group1}, nil)
-
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups?$orderby=invalid", nil)
-			svc.GetGroups(rr, r)
+	Describe("GetGroup", func() {
+		It("handles missing or empty group id", func() {
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups", nil)
+			svc.GetGroup(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
-			data, err := ioutil.ReadAll(rr.Body)
-			Expect(err).ToNot(HaveOccurred())
 
-			odataerr := libregraph.OdataError{}
-			err = json.Unmarshal(data, &odataerr)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(odataerr.Error.Code).To(Equal("invalidRequest"))
+			r = httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups?groupID=", nil)
+			svc.GetGroup(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		Context("with an existing group", func() {
+			BeforeEach(func() {
+				identityBackend.On("GetGroup", mock.Anything, mock.Anything, mock.Anything).Return(newGroup, nil)
+			})
+
+			It("gets the group", func() {
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups/"+*newGroup.Id, nil)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("groupID", *newGroup.Id)
+
+				r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+
+				svc.GetGroup(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+			})
 		})
 	})
+
+	Describe("PostGroup", func() {
+		It("disallows user create ids", func() {
+			newGroup = libregraph.NewGroup()
+			newGroup.SetId("disallowed")
+			newGroup.SetDisplayName("New Group")
+			newGroupJson, err := json.Marshal(newGroup)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/", bytes.NewBuffer(newGroupJson))
+
+			svc.PostGroup(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("creates the group", func() {
+			newGroup = libregraph.NewGroup()
+			newGroup.SetDisplayName("New Group")
+			newGroupJson, err := json.Marshal(newGroup)
+			Expect(err).ToNot(HaveOccurred())
+
+			identityBackend.On("CreateGroup", mock.Anything, mock.Anything).Return(newGroup, nil)
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/", bytes.NewBuffer(newGroupJson))
+
+			svc.PostGroup(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+		})
+	})
+
+	PDescribe("PatchGroup", func() {})
+	PDescribe("DeleteGroup", func() {})
+
+	PDescribe("GetGroupMembers", func() {})
+	PDescribe("PostGroupMembers", func() {})
+	PDescribe("DeleteGroupMembers", func() {})
 })
