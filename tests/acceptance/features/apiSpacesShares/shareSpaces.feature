@@ -136,3 +136,34 @@ Feature: Share spaces
       | viewer | manager  |
       | viewer | editor   |
       | viewer | viewer   |
+
+
+  Scenario Outline: space manager can change the role of space members
+    Given user "Alice" has shared a space "share space" to user "Brian" with role "<role>"
+    When user "Alice" updates the space "share space" for user "Brian" changing the role to "<new_role>"
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "200"
+    And the user "Alice" should have a space called "share space" granted to "Brian" with role "<new_role>"
+    Examples:
+      | role    | new_role |
+      | editor  | manager  |
+      | editor  | viewer   |
+      | viewer  | manager  |
+      | viewer  | editor   |
+      | manager | editor   |
+      | manager | viewer   |
+
+
+  Scenario Outline: user without manager role cannot change the role of space members
+    Given user "Alice" has shared a space "share space" to user "Brian" with role "<role>"
+    And user "Alice" has shared a space "share space" to user "Bob" with role "viewer"
+    When user "Brian" updates the space "share space" for user "Bob" changing the role to "<new_role>"
+    Then the HTTP status code should be "404"
+    And the OCS status code should be "404"
+    And the user "Alice" should have a space called "share space" granted to "Bob" with role "viewer"
+    Examples:
+      | role   | new_role |
+      | editor | manager  |
+      | editor | viewer   |
+      | viewer | manager  |
+      | viewer | editor   |

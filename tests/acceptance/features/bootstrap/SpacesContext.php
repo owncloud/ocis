@@ -1682,8 +1682,7 @@ class SpacesContext implements Context {
 		string $fileName,
 		string $spaceName
 	):void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileName, "/");
+		$this->setSpaceIDByName($user, $spaceName);
 		$this->featureContext->downloadFileAsUserUsingPassword($user, $fileName, $this->featureContext->getPasswordForUser($user));
 		Assert::assertGreaterThanOrEqual(
 			400,
@@ -1790,6 +1789,7 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" shares a space "([^"]*)" to user "([^"]*)" with role "([^"]*)"$/
+	 * @When /^user "([^"]*)" updates the space "([^"]*)" for user "([^"]*)" changing the role to "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
