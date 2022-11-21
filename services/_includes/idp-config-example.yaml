@@ -55,9 +55,9 @@ idp:
   validation_keys_path: ""
   cookiebackenduri: ""
   cookienames: []
-  access_token_duration_seconds: 86400
-  id_token_duration_seconds: 3600
-  refresh_token_duration_seconds: 94608000
+  access_token_duration_seconds: 300
+  id_token_duration_seconds: 300
+  refresh_token_duration_seconds: 2592000
   dynamic_client_secret_duration_seconds: 0
 clients:
 - id: web

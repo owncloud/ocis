@@ -39,10 +39,10 @@
 | IDP_SIGNING_METHOD | string | PS256 | Signing method of IDP requests like 'PS256'|
 | IDP_SIGNING_PRIVATE_KEY_FILES | []string | [~/.ocis/idp/private-key.pem] | Private key files for signing IDP requests.|
 | IDP_VALIDATION_KEYS_PATH | string |  | Path to validation keys for IDP requests.|
-| IDP_ACCESS_TOKEN_EXPIRATION | uint64 | 86400 | Expiration time in seconds for IDP access token.|
-| IDP_ID_TOKEN_EXPIRATION | uint64 | 3600 | Expiration time in seconds for IDP ID tokens.|
-| IDP_REFRESH_TOKEN_EXPIRATION | uint64 | 94608000 | Expiration time in seconds for refresh tokens.|
-| IDP_DYNAMIC_CLIENT_SECRET_DURATION | uint64 | 0 | Expiration time in seconds for dynamic clients.|
+| IDP_ACCESS_TOKEN_EXPIRATION | uint64 | 300 | 'Access token lifespan in seconds (time before an access token is expired).'|
+| IDP_ID_TOKEN_EXPIRATION | uint64 | 300 | ID token lifespan in seconds (time before an ID token is expired).|
+| IDP_REFRESH_TOKEN_EXPIRATION | uint64 | 2592000 | Refresh token lifespan in seconds (time before an refresh token is expired). This also limits the duration of an idle offline session.|
+| IDP_DYNAMIC_CLIENT_SECRET_DURATION | uint64 | 0 | Lifespan in seconds of a dynamically registered OIDC client.|
 | LDAP_URI<br/>IDP_LDAP_URI | string | ldaps://localhost:9235 | Url of the LDAP service to use as IDP.|
 | LDAP_CACERT<br/>IDP_LDAP_TLS_CACERT | string | ~/.ocis/idm/ldap.crt | Path to the TLS cert for the LDAP service.|
 | LDAP_BIND_DN<br/>IDP_LDAP_BIND_DN | string | uid=idp,ou=sysusers,o=libregraph-idm | LDAP DN to use for simple bind authentication with the target LDAP server.|

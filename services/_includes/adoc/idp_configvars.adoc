@@ -281,30 +281,30 @@ Path to validation keys for IDP requests.
 a| [subs=-attributes]
 ++uint64 ++
 a| [subs=-attributes]
-++86400 ++
+++300 ++
 a| [subs=-attributes]
-Expiration time in seconds for IDP access token.
+'Access token lifespan in seconds (time before an access token is expired).'
 |`IDP_ID_TOKEN_EXPIRATION`
 a| [subs=-attributes]
 ++uint64 ++
 a| [subs=-attributes]
-++3600 ++
+++300 ++
 a| [subs=-attributes]
-Expiration time in seconds for IDP ID tokens.
+ID token lifespan in seconds (time before an ID token is expired).
 |`IDP_REFRESH_TOKEN_EXPIRATION`
 a| [subs=-attributes]
 ++uint64 ++
 a| [subs=-attributes]
-++94608000 ++
+++2592000 ++
 a| [subs=-attributes]
-Expiration time in seconds for refresh tokens.
+Refresh token lifespan in seconds (time before an refresh token is expired). This also limits the duration of an idle offline session.
 |`IDP_DYNAMIC_CLIENT_SECRET_DURATION`
 a| [subs=-attributes]
 ++uint64 ++
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-Expiration time in seconds for dynamic clients.
+Lifespan in seconds of a dynamically registered OIDC client.
 |`LDAP_URI` +
 `IDP_LDAP_URI`
 a| [subs=-attributes]
