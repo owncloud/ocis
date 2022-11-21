@@ -535,6 +535,31 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse($response);
 	}
 
+
+	/**
+	 * admin adds a user to a group
+	 * 
+	 * @param string $group
+	 * @param string $user
+	 * @param string|null $byUser
+	 * 
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function addUserToGroup(string $group, string $user, ?string $byUser = null): ResponseInterface {
+		$credentials = $this->getAdminOrUserCredentials($byUser);
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+
+		return GraphHelper::addUserToGroup(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password'],
+			$userId,
+			$groupId
+		);
+	}
 	/**
 	 * adds a user to a group
 	 *
@@ -553,19 +578,52 @@ class GraphContext implements Context {
 		string $group,
 		bool $checkResult = true
 	): void {
-		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		$result = GraphHelper::addUserToGroup(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$userId,
-			$groupId
-		);
+		$result = $this->addUserToGroup($group, $user);
 		if ($checkResult && ($result->getStatusCode() !== 204)) {
 			$this->throwHttpException($result, "Could not add user '$user' to group '$group'.");
 		}
+	}
+
+	/**
+	 * @When the administrator adds the following users to the following groups using the Graph API
+	 * 
+	 * @param TableNode $table
+	 * 
+	 * @return void
+	 */
+	public function theAdministratorAddsTheFollowingUsersToTheFollowingGroupsUsingTheGraphAPI(TableNode $table): void {
+		$this->featureContext->verifyTableNodeColumns($table, ['username', 'groupname']);
+		$userGroupList = $table->getColumnsHash();
+
+		foreach($userGroupList as $userGroup) {
+			$this->featureContext->setResponse($this->addUserToGroup($userGroup['groupname'], $userGroup['username']));
+			$this->featureContext->pushToLastHttpStatusCodesArray();
+		}
+	}
+
+	/**
+	 * @When user :user tries to add himself to group :group using the Graph API
+	 * 
+	 * @param string $user
+	 * @param string $group
+	 * 
+	 * @return void
+	 */
+	public function theUserTriesToAddHimselfToGroupUsingTheGraphAPI(string $user, string $group): void {
+		$this->featureContext->setResponse($this->addUserToGroup($group, $user, $user));
+	}
+
+	/**
+	 * @When user :byUser tries to add user :user to group :group using the Graph API
+	 * 
+	 * @param string $byUser
+	 * @param string $group
+	 * @param string $user
+	 * 
+	 * @return void
+	 */
+	public function theUserTriesToAddAnotherUserToGroupUsingTheGraphAPI(string $byUser, string $user, string $group): void {
+		$this->featureContext->setResponse($this->addUserToGroup($group, $byUser, $user));
 	}
 
 	/**
