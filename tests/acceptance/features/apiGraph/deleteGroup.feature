@@ -33,6 +33,10 @@ Feature: delete groups
       | maintenance#123     | Hash sign                             |
       | 50%25=0             | %25 literal looks like an escaped "%" |
       | staff?group         | Question mark                         |
+      | Mgmt/Sydney         | Slash (special escaping happens)      |
+      | Mgmt//NSW/Sydney    | Multiple slash                        |
+      | priv/subadmins/1    | Subadmins mentioned not at the end    |
+      | var/../etc          | using slash-dot-dot                   |
 
   @issue-5083
   Scenario Outline: admin user deletes a group
@@ -45,19 +49,6 @@ Feature: delete groups
       | 50%pass             | Percent sign (special escaping happens) |
       | 50%2Eagle           | %2E literal looks like an escaped "."   |
       | 50%2Fix             | %2F literal looks like an escaped slash |
-
-
-  Scenario Outline: admin user deletes a group that has a forward-slash in the group name
-    Given group "<group_id>" has been created
-    When user "Alice" deletes group "<group_id>" using the Graph API
-    And the HTTP status code should be "204"
-    And group "<group_id>" should not exist
-    Examples:
-      | group_id         | comment                            |
-      | Mgmt/Sydney      | Slash (special escaping happens)   |
-      | Mgmt//NSW/Sydney | Multiple slash                     |
-      | priv/subadmins/1 | Subadmins mentioned not at the end |
-      | var/../etc       | using slash-dot-dot                |
 
 
   Scenario: normal user tries to delete a group
