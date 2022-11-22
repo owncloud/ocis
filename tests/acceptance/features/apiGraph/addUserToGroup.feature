@@ -1,4 +1,4 @@
-@api
+@api @skipOnOcV10
 Feature: add users to group
   As a admin
   I want to be able to add users to a group
@@ -78,11 +78,13 @@ Feature: add users to group
       | Mgmt/Sydney      | Slash (special escaping happens)   |
       | Mgmt//NSW/Sydney | Multiple slash                     |
       | priv/subadmins/1 | Subadmins mentioned not at the end |
+      | var/../etc       | using slash-dot-dot                |
     When the administrator adds the following users to the following groups using the Graph API
       | username | groupname        |
       | Alice    | Mgmt/Sydney      |
       | Alice    | Mgmt//NSW/Sydney |
       | Alice    | priv/subadmins/1 |
+      | Alice    | var/../etc       |
     And the HTTP status code of responses on all endpoints should be "204"
 
 
@@ -100,83 +102,18 @@ Feature: add users to group
     Then the HTTP status code should be "401"
     And the last response should be an unauthorized response
 
-  @skipOnLDAP
-  Scenario: admin tries to add user to a group which does not exist
-    Given user "Alice" has been created with default attributes and without skeleton files
-    And group "nonexistentgroup" has been deleted
-    When the administrator tries to add user "Alice" to group "nonexistentgroup" using the provisioning API
-    Then the OCS status code should be "400"
-    And the HTTP status code should be "400"
-    And the API should not return any data
 
-  @skipOnLDAP
+  Scenario: admin tries to add user to a non-existing group
+    When the administrator tries to add user "Alice" to group "nonexistentgroup" using the Graph API
+    Then the HTTP status code should be "404"
+
+
+  Scenario: admin tries to add a non-existing user to a group
+    Given group "groupA" has been created
+    When the administrator tries to add user "nonexistentuser" to group "groupA" using the provisioning API
+    Then the HTTP status code should be "405"
+
+
   Scenario: admin tries to add user to a group without sending the group
-    Given user "Alice" has been created with default attributes and without skeleton files
-    When the administrator tries to add user "Alice" to group "" using the provisioning API
-    Then the OCS status code should be "400"
-    And the HTTP status code should be "400"
-    And the API should not return any data
-
-  @skipOnLDAP
-  Scenario: admin tries to add a user which does not exist to a group
-    Given user "nonexistentuser" has been deleted
-    And group "brand-new-group" has been created
-    When the administrator tries to add user "nonexistentuser" to group "brand-new-group" using the provisioning API
-    Then the OCS status code should be "400"
-    And the HTTP status code should be "400"
-    And the API should not return any data
-
-  @skipOnLDAP @notToImplementOnOCIS
-  Scenario: subadmin adds users to groups the subadmin is responsible for
-    Given these users have been created with default attributes and without skeleton files:
-      | username       |
-      | Alice |
-      | subadmin       |
-    And group "brand-new-group" has been created
-    And user "subadmin" has been made a subadmin of group "brand-new-group"
-    When user "subadmin" tries to add user "Alice" to group "brand-new-group" using the provisioning API
-    Then the OCS status code should be "403"
-    And the HTTP status code should be "403"
-    And user "Alice" should not belong to group "brand-new-group"
-
-  @skipOnLDAP @notToImplementOnOCIS
-  Scenario: subadmin tries to add user to groups the subadmin is not responsible for
-    Given these users have been created with default attributes and without skeleton files:
-      | username         |
-      | Alice   |
-      | another-subadmin |
-    And group "brand-new-group" has been created
-    And group "another-new-group" has been created
-    And user "another-subadmin" has been made a subadmin of group "another-new-group"
-    When user "another-subadmin" tries to add user "Alice" to group "brand-new-group" using the provisioning API
-    Then the OCS status code should be "403"
-    And the HTTP status code should be "403"
-    And user "Alice" should not belong to group "brand-new-group"
-
-  @skipOnLDAP @skipOnOcV10.6 @skipOnOcV10.7 @skipOnOcV10.8.0 @notToImplementOnOCIS
-  Scenario: a subadmin can add users to other groups the subadmin is responsible for
-    Given these users have been created with default attributes and without skeleton files:
-      | username         |
-      | Alice   |
-      | another-subadmin |
-    And group "brand-new-group" has been created
-    And group "another-new-group" has been created
-    And user "Alice" has been added to group "brand-new-group"
-    And user "another-subadmin" has been made a subadmin of group "brand-new-group"
-    And user "another-subadmin" has been made a subadmin of group "another-new-group"
-    When user "another-subadmin" tries to add user "Alice" to group "another-new-group" using the provisioning API
-    Then the OCS status code should be "200"
-    And the HTTP status code should be "200"
-    And user "Alice" should belong to group "brand-new-group"
-
-  # merge this with scenario on line 62 once the issue is fixed
-  @issue-31015 @skipOnLDAP @toImplementOnOCIS @issue-product-284
-  Scenario Outline: adding a user to a group that has a forward-slash and dot in the group name
-    Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator sends a group creation request for group "<group_id>" using the provisioning API
-    When the administrator adds user "Alice" to group "<group_id>" using the provisioning API
-    Then the OCS status code should be "200"
-    And the HTTP status code should be "200"
-    Examples:
-      | group_id         | comment                            |
-      | var/../etc       | using slash-dot-dot                |
+    When the administrator tries to add user "Alice" to group "" using the Graph API
+    Then the HTTP status code should be "404"

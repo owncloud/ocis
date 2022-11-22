@@ -548,8 +548,16 @@ class GraphContext implements Context {
 	 */
 	public function addUserToGroup(string $group, string $user, ?string $byUser = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
-		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		try {
+			$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		} catch (Exception $e) {
+			$groupId = WebDavHelper::generateUUIDv4();
+		}
+		try {
+			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		} catch (Exception $e) {
+			$userId = WebDavHelper::generateUUIDv4();
+		}
 
 		return GraphHelper::addUserToGroup(
 			$this->featureContext->getBaseUrl(),
@@ -560,6 +568,7 @@ class GraphContext implements Context {
 			$groupId
 		);
 	}
+
 	/**
 	 * adds a user to a group
 	 *
@@ -601,6 +610,20 @@ class GraphContext implements Context {
 		}
 	}
 
+	/**
+	* adds a user to a group
+	*
+	* @When the administrator tries to add user :user to group :group using the Graph API
+	*
+	* @param string $user
+	* @param string $group
+	*
+	* @return void
+	*/
+	public function theAdministratorTriesToAddUserToGroupUsingTheGraphAPI(string $user, string $group): void {
+		$this->featureContext->setResponse($this->addUserToGroup($group, $user));
+	}
+ 
 	/**
 	 * @When user :user tries to add himself to group :group using the Graph API
 	 * 
