@@ -184,6 +184,31 @@ class GraphHelper {
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $userPassword
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getUserInformation(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $userPassword
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'me/?%24expand=memberOf');
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$userPassword,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
 	 * @param string $adminUser
 	 * @param string $adminPassword
 	 * @param string $userName
