@@ -39,7 +39,7 @@ Feature: delete groups
       | var/../etc          | using slash-dot-dot                   |
 
   @issue-5083
-  Scenario Outline: admin user deletes a group
+  Scenario Outline: admin user deletes a group having % (as only special char) in its name
     Given group "<group_id>" has been created
     When user "Alice" deletes group "<group_id>" using the Graph API
     And the HTTP status code should be "204"
@@ -70,3 +70,14 @@ Feature: delete groups
     Then the HTTP status code should be "200"
     And group "grp2" should be included in the response
     But group "grp1" should not be included in the response
+
+
+  Scenario: user should not see share received via deleted group
+    Given user "Alice" has uploaded file with content "sample text" to "lorem.txt"
+    And user "Brian" has been created with default attributes and without skeleton files
+    And group "grp1" has been created
+    And user "Brian" has been added to group "grp1"
+    And user "Alice" has shared file "lorem.txt" with group "grp1"
+    And user "Brian" has accepted share "/lorem.txt" offered by user "Alice"
+    And group "grp1" has been deleted
+    Then user "Brian" should not have any received shares
