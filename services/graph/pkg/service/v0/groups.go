@@ -372,14 +372,14 @@ func (g Graph) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 	memberID := chi.URLParam(r, "memberID")
 	memberID, err = url.PathUnescape(memberID)
 	if err != nil {
-		logger.Debug().Err(err).Str("id", memberID).Msg("could not delete group member: unescaping group id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping group id failed")
+		logger.Debug().Err(err).Str("id", memberID).Msg("could not delete group member: unescaping member id failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping member id failed")
 		return
 	}
 
 	if memberID == "" {
-		logger.Debug().Msg("could not delete group member: missing group id")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing group id")
+		logger.Debug().Msg("could not delete group member: missing member id")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing member id")
 		return
 	}
 	logger.Debug().Str("groupID", groupID).Str("memberID", memberID).Msg("calling delete member on backend")
