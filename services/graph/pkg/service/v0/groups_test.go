@@ -55,6 +55,7 @@ var _ = Describe("Groups", func() {
 
 		identityBackend = &identitymocks.Backend{}
 		newGroup = libregraph.NewGroup()
+		newGroup.SetMembersodataBind([]string{"/users/user1"})
 		newGroup.SetId("group1")
 
 		rr = httptest.NewRecorder()
@@ -200,10 +201,31 @@ var _ = Describe("Groups", func() {
 	})
 
 	Describe("PostGroup", func() {
+		It("handles invalid body", func() {
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/", bytes.NewBufferString("{invalid"))
+
+			svc.PostGroup(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("handles missing display name", func() {
+			newGroup = libregraph.NewGroup()
+			newGroup.SetId("disallowed")
+			newGroup.SetMembersodataBind([]string{"/non-users/user"})
+			newGroupJson, err := json.Marshal(newGroup)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/", bytes.NewBuffer(newGroupJson))
+
+			svc.PostGroup(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
 		It("disallows user create ids", func() {
 			newGroup = libregraph.NewGroup()
 			newGroup.SetId("disallowed")
 			newGroup.SetDisplayName("New Group")
+			newGroup.SetMembersodataBind([]string{"/non-users/user"})
 			newGroupJson, err := json.Marshal(newGroup)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -229,6 +251,15 @@ var _ = Describe("Groups", func() {
 		})
 	})
 	Describe("PatchGroup", func() {
+		It("handles invalid body", func() {
+			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups/", bytes.NewBufferString("{invalid"))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("groupID", *newGroup.Id)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.PatchGroup(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
 		It("handles missing or empty group id", func() {
 			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", nil)
 			svc.PatchGroup(rr, r)
@@ -340,7 +371,116 @@ var _ = Describe("Groups", func() {
 		})
 	})
 
-	PDescribe("GetGroupMembers", func() {})
-	PDescribe("PostGroupMembers", func() {})
-	PDescribe("DeleteGroupMembers", func() {})
+	Describe("GetGroupMembers", func() {
+		It("gets the list of members", func() {
+			user := libregraph.NewUser()
+			user.SetId("user")
+			identityBackend.On("GetGroupMembers", mock.Anything, mock.Anything, mock.Anything).Return([]*libregraph.User{user}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups/{groupID}/members", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("groupID", *newGroup.Id)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.GetGroupMembers(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			data, err := ioutil.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			var members []*libregraph.User
+			err = json.Unmarshal(data, &members)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(len(members)).To(Equal(1))
+			Expect(members[0].GetId()).To(Equal("user"))
+		})
+	})
+
+	Describe("PostGroupMembers", func() {
+		It("fails on invalid body", func() {
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/{groupID}/members", bytes.NewBufferString("{invalid"))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("groupID", *newGroup.Id)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.PostGroupMember(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("fails on missing member refs", func() {
+			member := libregraph.NewMemberReference()
+			data, err := json.Marshal(member)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/{groupID}/members", bytes.NewBuffer(data))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("groupID", *newGroup.Id)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.PostGroupMember(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("fails on invalid member refs", func() {
+			member := libregraph.NewMemberReference()
+			member.SetOdataId("/invalidtype/user")
+			data, err := json.Marshal(member)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/{groupID}/members", bytes.NewBuffer(data))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("groupID", *newGroup.Id)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.PostGroupMember(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("adds a new member", func() {
+			member := libregraph.NewMemberReference()
+			member.SetOdataId("/users/user")
+			data, err := json.Marshal(member)
+			Expect(err).ToNot(HaveOccurred())
+			identityBackend.On("AddMembersToGroup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/{groupID}/members", bytes.NewBuffer(data))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("groupID", *newGroup.Id)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.PostGroupMember(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusNoContent))
+
+			identityBackend.AssertNumberOfCalls(GinkgoT(), "AddMembersToGroup", 1)
+		})
+	})
+
+	Describe("DeleteGroupMembers", func() {
+		It("handles missing or empty member id", func() {
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/groups/{groupID}/members/{memberID}/$ref", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("groupID", *newGroup.Id)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.DeleteGroupMember(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+		It("handles missing or empty member id", func() {
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/groups/{groupID}/members/{memberID}/$ref", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("memberID", "/users/user")
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.DeleteGroupMember(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("deletes members", func() {
+			identityBackend.On("RemoveMemberFromGroup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/groups/{groupID}/members/{memberID}/$ref", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("groupID", *newGroup.Id)
+			rctx.URLParams.Add("memberID", "/users/user1")
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.DeleteGroupMember(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusNoContent))
+
+			identityBackend.AssertNumberOfCalls(GinkgoT(), "RemoveMemberFromGroup", 1)
+		})
+	})
 })
