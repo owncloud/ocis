@@ -226,7 +226,7 @@ type AuditEventSpaceUpdated struct {
 	AuditEventSpaces
 
 	Name          string
-	Opqaue        map[string]string
+	Opaque        map[string]string
 	QuotaMaxBytes uint64
 }
 

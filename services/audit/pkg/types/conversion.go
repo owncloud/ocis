@@ -425,7 +425,7 @@ func SpaceUpdated(ev events.SpaceUpdated) AuditEventSpaceUpdated {
 	opaqueMap := sdk.DecodeOpaqueMap(ev.Space.Opaque)
 	sue := AuditEventSpaceUpdated{
 		Name:   ev.Space.Name,
-		Opqaue: opaqueMap,
+		Opaque: opaqueMap,
 	}
 
 	base := BasicAuditEvent("", "", MessageSpaceUpdated(ev.Executant.GetOpaqueId(), sid, ev.Space.Name, ev.Space.Quota.QuotaMaxBytes, opaqueMap), ActionSpaceUpdated)
