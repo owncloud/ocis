@@ -535,14 +535,13 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse($response);
 	}
 
-
 	/**
 	 * admin adds a user to a group
-	 * 
+	 *
 	 * @param string $group
 	 * @param string $user
 	 * @param string|null $byUser
-	 * 
+	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
@@ -595,41 +594,41 @@ class GraphContext implements Context {
 
 	/**
 	 * @When the administrator adds the following users to the following groups using the Graph API
-	 * 
+	 *
 	 * @param TableNode $table
-	 * 
+	 *
 	 * @return void
 	 */
 	public function theAdministratorAddsTheFollowingUsersToTheFollowingGroupsUsingTheGraphAPI(TableNode $table): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['username', 'groupname']);
 		$userGroupList = $table->getColumnsHash();
 
-		foreach($userGroupList as $userGroup) {
+		foreach ($userGroupList as $userGroup) {
 			$this->featureContext->setResponse($this->addUserToGroup($userGroup['groupname'], $userGroup['username']));
 			$this->featureContext->pushToLastHttpStatusCodesArray();
 		}
 	}
 
 	/**
-	* adds a user to a group
-	*
-	* @When the administrator tries to add user :user to group :group using the Graph API
-	*
-	* @param string $user
-	* @param string $group
-	*
-	* @return void
-	*/
+	 * adds a user to a group
+	 *
+	 * @When the administrator tries to add user :user to group :group using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $group
+	 *
+	 * @return void
+	 */
 	public function theAdministratorTriesToAddUserToGroupUsingTheGraphAPI(string $user, string $group): void {
 		$this->featureContext->setResponse($this->addUserToGroup($group, $user));
 	}
  
 	/**
 	 * @When user :user tries to add himself to group :group using the Graph API
-	 * 
+	 *
 	 * @param string $user
 	 * @param string $group
-	 * 
+	 *
 	 * @return void
 	 */
 	public function theUserTriesToAddHimselfToGroupUsingTheGraphAPI(string $user, string $group): void {
@@ -638,11 +637,11 @@ class GraphContext implements Context {
 
 	/**
 	 * @When user :byUser tries to add user :user to group :group using the Graph API
-	 * 
+	 *
 	 * @param string $byUser
-	 * @param string $group
 	 * @param string $user
-	 * 
+	 * @param string $group
+	 *
 	 * @return void
 	 */
 	public function theUserTriesToAddAnotherUserToGroupUsingTheGraphAPI(string $byUser, string $user, string $group): void {
