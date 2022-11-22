@@ -634,7 +634,7 @@ class GraphContext implements Context {
 	public function theAdministratorTriesToAddUserToGroupUsingTheGraphAPI(string $user, string $group): void {
 		$this->featureContext->setResponse($this->addUserToGroup($group, $user));
 	}
- 
+
 	/**
 	 * @When user :user tries to add himself/herself to group :group using the Graph API
 	 *
@@ -859,7 +859,7 @@ class GraphContext implements Context {
 		$response = $this->userDeletesGroupWithGroupId($groupId, $user);
 		$this->featureContext->setResponse($response);
 	}
-  
+
 	/**
 	 * @Then the following users should be listed in the following groups
 	 *
@@ -925,5 +925,83 @@ class GraphContext implements Context {
 	 */
 	public function userRenamesGroupUsingTheGraphApi(string $user, string $oldGroup, string $newGroup): void {
 		$this->featureContext->setResponse($this->renameGroup($oldGroup, $newGroup, $user));
+	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return ResponseInterface
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function retrieveUserInformationUsingGraphApi(
+		string $user
+	):ResponseInterface {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		return GraphHelper::getUserInformation(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials["username"],
+			$credentials["password"],
+		);
+	}
+
+	/**
+	 * @When /^the user "([^"]*)" retrives (:?her|his) information using the Graph API$/
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function userRetrievesHisorHerInformationOfUserUsingGraphApi(
+		string $user
+	):void {
+		$response = $this->retrieveUserInformationUsingGraphApi($user);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then /^the api response for user "([^"]*)" should contains the following information:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theApiResponseForUserShouldContainsTheFollowingInformation(string $user, TableNode $table): void {
+		$rows = $table->getRowsHash();
+		$apiResponse = \json_decode((string)$this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
+		// assertion of the user is member of groups
+		if ($rows['memberOf']) {
+			// collect memberOf from response
+			$memberOfFromApiReponse = [];
+			$memberOf = preg_split('/\s*,\s*/', trim($rows['memberOf']));
+			foreach ($apiResponse['memberOf'] as $member) {
+				$memberOfFromApiReponse[] = $member['displayName'];
+			}
+			Assert::assertEqualsCanonicalizing($memberOf, $memberOfFromApiReponse);
+		}
+		// get user_id for the given user
+		$rows['id'] = $this->featureContext->substituteInLineCodes(
+			$rows['id'],
+			$this->featureContext->getCurrentUser(),
+			[],
+			[
+				[
+					"code" => "%user_id%",
+					"function" =>
+						[$this->spacesContext, "getUserIdByUserName"],
+					"parameter" => [$user]
+				],
+			]
+		);
+
+		// assertion for remaining key other than 'memberOf'
+		foreach (array_keys($rows) as $keyName) {
+			if ($keyName !== 'memberOf') {
+				Assert::assertEquals($rows[$keyName], $apiResponse[$keyName]);
+			}
+		}
 	}
 }
