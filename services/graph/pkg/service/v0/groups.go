@@ -313,20 +313,20 @@ func (g Graph) PostGroupMember(w http.ResponseWriter, r *http.Request) {
 	memberRefURL, ok := memberRef.GetOdataIdOk()
 	if !ok {
 		logger.Debug().Msg("could not add group member: @odata.id reference is missing")
-		errorcode.InvalidRequest.Render(w, r, http.StatusInternalServerError, "@odata.id reference is missing")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "@odata.id reference is missing")
 		return
 	}
 	memberType, id, err := g.parseMemberRef(*memberRefURL)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not add group member: error parsing @odata.id url")
-		errorcode.InvalidRequest.Render(w, r, http.StatusInternalServerError, "Error parsing @odata.id url")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Error parsing @odata.id url")
 		return
 	}
 	// The MS Graph spec allows "directoryObject", "user", "group" and "organizational Contact"
 	// we restrict this to users for now. Might add Groups as members later
 	if memberType != "users" {
 		logger.Debug().Str("type", memberType).Msg("could not add group member: Only users are allowed as group members")
-		errorcode.InvalidRequest.Render(w, r, http.StatusInternalServerError, "Only users are allowed as group members")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Only users are allowed as group members")
 		return
 	}
 
