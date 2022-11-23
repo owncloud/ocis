@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Adjust cache related configuration options: [#5087](https://github.com/owncloud/ocis/pull/5087)
 * Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
 * Bugfix - Initial role assingment with external IDM: [#5045](https://github.com/owncloud/ocis/issues/5045)
+* Bugfix - Update reva: [#5092](https://github.com/owncloud/ocis/pull/5092)
 * Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
 * Enhancement - Remove windows from ci & release makefile: [#5026](https://github.com/owncloud/ocis/pull/5026)
 * Enhancement - Update ownCloud Web to v6.0.0-rc.6: [#5086](https://github.com/owncloud/ocis/pull/5086)
@@ -59,6 +60,20 @@ The following sections list the changes for unreleased.
    We've the initial user role assignment when using an external LDAP server.
 
    https://github.com/owncloud/ocis/issues/5045
+
+* Bugfix - Update reva: [#5092](https://github.com/owncloud/ocis/pull/5092)
+
+   Tags: reva
+
+   We updated reva to pull in several Bugfixes: * Bugfix
+   [owncloud/ocis#5061](https://github.com/owncloud/ocis/issues/5061): [Performance]
+   Upload speed drops while uploading 1k files in a folder * Bugfix
+   [owncloud/ocis#3868](https://github.com/owncloud/ocis/issues/3868): Downloading
+   the older version of shared file as share receiver gives 403 * Bugfix
+   [owncloud/ocis#765](https://github.com/owncloud/ocis/issues/765): [OCIS-storage]
+   Restoring an older version of a shared file deletes the share
+
+   https://github.com/owncloud/ocis/pull/5092
 
 * Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
 
