@@ -256,6 +256,31 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @When /^the user "([^"]*)" deletes a user "([^"]*)" using GraphAPI$/
+	 *
+	 * @param string $userAsAdmin
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function theUserDeletesAUserUsingGraphapi(string $userAsAdmin, string $user): void {
+		$username = $this->featureContext->getActualUsername($userAsAdmin);
+		$password = $this->featureContext->getPasswordForUser($userAsAdmin);
+
+		$this->featureContext->setResponse(
+			GraphHelper::deleteUser(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$username,
+				$password,
+				$user
+			)
+		);
+	}
+
+	/**
 	 * @param string $user
 	 * @param string $group
 	 *
