@@ -836,7 +836,7 @@ class GraphContext implements Context {
 	 * @Then the following users should be listed in the following groups
 	 *
 	 * @param TableNode $table
-	 * 
+	 *
 	 * @return void
 	 * @throws Exception
 	 */
@@ -854,7 +854,7 @@ class GraphContext implements Context {
 					break;
 				}
 			}
-			if (!$exists){
+			if (!$exists) {
 				Assert::assertEquals(
 					true,
 					$exists,
