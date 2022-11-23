@@ -35,6 +35,8 @@ func AuditLoggerFromConfig(ctx context.Context, cfg config.Auditlog, ch <-chan i
 }
 
 // StartAuditLogger will block. run in separate go routine
+//
+//nolint:gocyclo
 func StartAuditLogger(ctx context.Context, ch <-chan interface{}, log log.Logger, marshaller Marshaller, logto ...Log) {
 	for {
 		select {
@@ -87,6 +89,12 @@ func StartAuditLogger(ctx context.Context, ch <-chan interface{}, log log.Logger
 				auditEvent = types.SpaceEnabled(ev)
 			case events.SpaceDeleted:
 				auditEvent = types.SpaceDeleted(ev)
+			case events.SpaceShared:
+				auditEvent = types.SpaceShared(ev)
+			case events.SpaceUnshared:
+				auditEvent = types.SpaceUnshared(ev)
+			case events.SpaceUpdated:
+				auditEvent = types.SpaceUpdated(ev)
 			case events.UserCreated:
 				auditEvent = types.UserCreated(ev)
 			case events.UserDeleted:

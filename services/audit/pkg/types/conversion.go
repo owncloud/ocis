@@ -11,6 +11,7 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
 )
 
 const _linktype = "link"
@@ -378,6 +379,59 @@ func SpaceDeleted(ev events.SpaceDeleted) AuditEventSpaceDeleted {
 	return AuditEventSpaceDeleted{
 		AuditEventSpaces: SpacesAuditEvent(base, sid),
 	}
+}
+
+// SpaceShared converts a SpaceShared event to an AuditEventSpaceShared
+func SpaceShared(ev events.SpaceShared) AuditEventSpaceShared {
+	sse := AuditEventSpaceShared{}
+
+	sid := ev.ID.GetOpaqueId()
+	grantee := "N/A"
+	if ev.GranteeUserID != nil {
+		sse.GranteeUserID = ev.GranteeUserID.OpaqueId
+		grantee = "user:" + ev.GranteeUserID.OpaqueId
+	} else if ev.GranteeGroupID != nil {
+		sse.GranteeGroupID = ev.GranteeGroupID.OpaqueId
+		grantee = "group:" + ev.GranteeGroupID.OpaqueId
+	}
+	base := BasicAuditEvent("", "", MessageSpaceShared(ev.Executant.GetOpaqueId(), sid, grantee), ActionSpaceShared)
+	sse.AuditEventSpaces = SpacesAuditEvent(base, sid)
+
+	return sse
+}
+
+// SpaceUnshared converts a SpaceUnshared event to an AuditEventSpaceUnshared
+func SpaceUnshared(ev events.SpaceUnshared) AuditEventSpaceUnshared {
+	sue := AuditEventSpaceUnshared{}
+
+	sid := ev.ID.GetOpaqueId()
+	grantee := "N/A"
+	if ev.GranteeUserID != nil {
+		sue.GranteeUserID = ev.GranteeUserID.OpaqueId
+		grantee = "user:" + ev.GranteeUserID.OpaqueId
+	} else if ev.GranteeGroupID != nil {
+		sue.GranteeGroupID = ev.GranteeGroupID.OpaqueId
+		grantee = "group:" + ev.GranteeGroupID.OpaqueId
+	}
+	base := BasicAuditEvent("", "", MessageSpaceUnshared(ev.Executant.GetOpaqueId(), sid, grantee), ActionSpaceUnshared)
+	sue.AuditEventSpaces = SpacesAuditEvent(base, sid)
+
+	return sue
+}
+
+// SpaceUpdated converts a SpaceUpdated event to an AuditEventSpaceUpdated
+func SpaceUpdated(ev events.SpaceUpdated) AuditEventSpaceUpdated {
+	sid := ev.ID.GetOpaqueId()
+	opaqueMap := sdk.DecodeOpaqueMap(ev.Space.Opaque)
+	sue := AuditEventSpaceUpdated{
+		Name:   ev.Space.Name,
+		Opaque: opaqueMap,
+	}
+
+	base := BasicAuditEvent("", "", MessageSpaceUpdated(ev.Executant.GetOpaqueId(), sid, ev.Space.Name, ev.Space.Quota.QuotaMaxBytes, opaqueMap), ActionSpaceUpdated)
+	sue.AuditEventSpaces = SpacesAuditEvent(base, sid)
+
+	return sue
 }
 
 // UserCreated converts a UserCreated event to an AuditEventUserCreated
