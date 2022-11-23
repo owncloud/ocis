@@ -95,7 +95,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &listResponse{Value: users})
+	render.JSON(w, r, &ListResponse{Value: users})
 }
 
 func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {

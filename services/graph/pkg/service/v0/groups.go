@@ -42,6 +42,7 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		} else {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
+		return
 	}
 
 	groups, err = sortGroups(odataReq, groups)
@@ -51,7 +52,7 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &listResponse{Value: groups})
+	render.JSON(w, r, &ListResponse{Value: groups})
 }
 
 // PostGroup implements the Service interface.
@@ -312,20 +313,20 @@ func (g Graph) PostGroupMember(w http.ResponseWriter, r *http.Request) {
 	memberRefURL, ok := memberRef.GetOdataIdOk()
 	if !ok {
 		logger.Debug().Msg("could not add group member: @odata.id reference is missing")
-		errorcode.InvalidRequest.Render(w, r, http.StatusInternalServerError, "@odata.id reference is missing")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "@odata.id reference is missing")
 		return
 	}
 	memberType, id, err := g.parseMemberRef(*memberRefURL)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not add group member: error parsing @odata.id url")
-		errorcode.InvalidRequest.Render(w, r, http.StatusInternalServerError, "Error parsing @odata.id url")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Error parsing @odata.id url")
 		return
 	}
 	// The MS Graph spec allows "directoryObject", "user", "group" and "organizational Contact"
 	// we restrict this to users for now. Might add Groups as members later
 	if memberType != "users" {
 		logger.Debug().Str("type", memberType).Msg("could not add group member: Only users are allowed as group members")
-		errorcode.InvalidRequest.Render(w, r, http.StatusInternalServerError, "Only users are allowed as group members")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Only users are allowed as group members")
 		return
 	}
 
@@ -371,14 +372,14 @@ func (g Graph) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 	memberID := chi.URLParam(r, "memberID")
 	memberID, err = url.PathUnescape(memberID)
 	if err != nil {
-		logger.Debug().Err(err).Str("id", memberID).Msg("could not delete group member: unescaping group id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping group id failed")
+		logger.Debug().Err(err).Str("id", memberID).Msg("could not delete group member: unescaping member id failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping member id failed")
 		return
 	}
 
 	if memberID == "" {
-		logger.Debug().Msg("could not delete group member: missing group id")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing group id")
+		logger.Debug().Msg("could not delete group member: missing member id")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing member id")
 		return
 	}
 	logger.Debug().Str("groupID", groupID).Str("memberID", memberID).Msg("calling delete member on backend")

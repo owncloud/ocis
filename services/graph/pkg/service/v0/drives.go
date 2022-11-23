@@ -96,7 +96,7 @@ func (g Graph) getDrives(w http.ResponseWriter, r *http.Request, unrestricted bo
 		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
 			// return an empty list
 			render.Status(r, http.StatusOK)
-			render.JSON(w, r, &listResponse{})
+			render.JSON(w, r, &ListResponse{})
 			return
 		}
 		logger.Debug().Str("message", res.GetStatus().GetMessage()).Msg("could not get drives: grpc error")
@@ -126,7 +126,7 @@ func (g Graph) getDrives(w http.ResponseWriter, r *http.Request, unrestricted bo
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &listResponse{Value: spaces})
+	render.JSON(w, r, &ListResponse{Value: spaces})
 }
 
 // GetSingleDrive does a lookup of a single space by spaceId
