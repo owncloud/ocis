@@ -268,7 +268,7 @@ cannot share a folder with create permission
 - [apiSharePublicLink3/updatePublicLinkShare.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L45)
 - [apiSharePublicLink3/updatePublicLinkShare.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/updatePublicLinkShare.feature#L46)
 
-#### [Upload-only shares must not overwrite but create a separate file](https://github.com/owncloud/ocis-reva/issues/286)
+#### [Upload-only shares must not overwrite but create a separate file](https://github.com/owncloud/ocis/issues/1267)
 
 - [apiSharePublicLink3/uploadToPublicLinkShare.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/uploadToPublicLinkShare.feature#L24)
 - [apiSharePublicLink3/uploadToPublicLinkShare.feature:273](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/uploadToPublicLinkShare.feature#L273)
