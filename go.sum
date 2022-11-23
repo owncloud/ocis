@@ -476,8 +476,8 @@ github.com/go-micro/plugins/v4/client/grpc v1.1.0 h1:1MlhnyLxlZpzYY7gepj5zGJNn06
 github.com/go-micro/plugins/v4/client/grpc v1.1.0/go.mod h1:7mskyLlKoKT2V5mC4mdBcrpDx+CiLZxXtTMD+jpFuRY=
 github.com/go-micro/plugins/v4/events/natsjs v1.2.0 h1:c+iG3FholfRJI27QkIVPWOERazwDZro4GLl6Odx2g1c=
 github.com/go-micro/plugins/v4/events/natsjs v1.2.0/go.mod h1:lYuiEYKQTpbE2LA8HEcC8D6kQ29M7ILfEak3dzeucEg=
-github.com/go-micro/plugins/v4/logger/zerolog v1.1.0 h1:sG20ktK9YN/h0TlmQXTuL4/yavxBy5QbzifcVARN5ww=
-github.com/go-micro/plugins/v4/logger/zerolog v1.1.0/go.mod h1:lUEQAHt8I+gJDmx3DbpU7aqwM3+MwFmFRnATxlp650w=
+github.com/go-micro/plugins/v4/logger/zerolog v1.2.0 h1:JZ516VQ9zekRoi868XG7x0EWxZ2AMq/euHIBChITsTI=
+github.com/go-micro/plugins/v4/logger/zerolog v1.2.0/go.mod h1:AieYOIeOxobYa5B8WGEqxXM3Ndi26tDIu9fZ4RYkCvQ=
 github.com/go-micro/plugins/v4/registry/consul v1.2.0 h1:nqrTzfWUTWKAy+M+i2FazbHnQn4m77EOtoch57kbCH4=
 github.com/go-micro/plugins/v4/registry/consul v1.2.0/go.mod h1:wTat7/K9XQ+i64VbbcMYFcEwipYfSgJM51HcA/sgsM4=
 github.com/go-micro/plugins/v4/registry/etcd v1.2.0 h1:tcHlU1GzvX3oZa8WQH8ylMCGie5qD5g98YWTESJjeqQ=
