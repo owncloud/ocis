@@ -257,6 +257,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			d, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, sp)
 			if err != nil {
 				logger.Debug().Err(err).Interface("id", sp.Id).Msg("error converting space to drive")
+				continue
 			}
 			quota, err := g.getDriveQuota(r.Context(), sp)
 			if err != nil {
