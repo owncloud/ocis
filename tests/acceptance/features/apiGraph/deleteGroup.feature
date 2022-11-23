@@ -12,7 +12,7 @@ Feature: delete groups
   Scenario Outline: admin user deletes a group
     Given group "<group_id>" has been created
     When user "Alice" deletes group "<group_id>" using the Graph API
-    And the HTTP status code should be "204"
+    Then the HTTP status code should be "204"
     And group "<group_id>" should not exist
     Examples:
       | group_id            | comment                               |
@@ -42,7 +42,7 @@ Feature: delete groups
   Scenario Outline: admin user deletes a group having % (as only special char) in its name
     Given group "<group_id>" has been created
     When user "Alice" deletes group "<group_id>" using the Graph API
-    And the HTTP status code should be "204"
+    Then the HTTP status code should be "204"
     And group "<group_id>" should not exist
     Examples:
       | group_id            | comment                                 |
@@ -55,7 +55,7 @@ Feature: delete groups
     Given user "Brian" has been created with default attributes and without skeleton files
     And group "new-group" has been created
     When user "Brian" tries to delete group "new-group" using the Graph API
-    And the HTTP status code should be "401"
+    Then the HTTP status code should be "401"
     And group "new-group" should exist
 
   @issue-903
@@ -79,5 +79,6 @@ Feature: delete groups
     And user "Brian" has been added to group "grp1"
     And user "Alice" has shared file "lorem.txt" with group "grp1"
     And user "Brian" has accepted share "/lorem.txt" offered by user "Alice"
-    And group "grp1" has been deleted
-    Then user "Brian" should not have any received shares
+    When user "Alice" deletes group "grp1" using the Graph API
+    Then the HTTP status code should be "204"
+    And user "Brian" should not have any received shares
