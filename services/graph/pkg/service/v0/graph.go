@@ -18,6 +18,7 @@ import (
 	"go-micro.dev/v4/client"
 	mevents "go-micro.dev/v4/events"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 //go:generate make -C ../../.. generate
@@ -77,6 +78,14 @@ type HTTPClient interface {
 // GetGatewayServiceClientFunc is a callback used to pass in a mock during testing
 type GetGatewayServiceClientFunc func() (GatewayClient, error)
 
+// RoleService is the interface used to access the role service
+type RoleService interface {
+	ListRoles(ctx context.Context, in *settingssvc.ListBundlesRequest, opts ...client.CallOption) (*settingssvc.ListBundlesResponse, error)
+	ListRoleAssignments(ctx context.Context, in *settingssvc.ListRoleAssignmentsRequest, opts ...client.CallOption) (*settingssvc.ListRoleAssignmentsResponse, error)
+	AssignRoleToUser(ctx context.Context, in *settingssvc.AssignRoleToUserRequest, opts ...client.CallOption) (*settingssvc.AssignRoleToUserResponse, error)
+	RemoveRoleFromUser(ctx context.Context, in *settingssvc.RemoveRoleFromUserRequest, opts ...client.CallOption) (*emptypb.Empty, error)
+}
+
 // Graph defines implements the business logic for Service.
 type Graph struct {
 	config               *config.Config
@@ -84,7 +93,7 @@ type Graph struct {
 	logger               *log.Logger
 	identityBackend      identity.Backend
 	gatewayClient        GatewayClient
-	roleService          settingssvc.RoleService
+	roleService          RoleService
 	permissionsService   Permissions
 	spacePropertiesCache *ttlcache.Cache
 	eventsPublisher      events.Publisher
