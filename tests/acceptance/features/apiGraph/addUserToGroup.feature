@@ -19,7 +19,12 @@ Feature: add users to group
       | Alice    | simplegroup |
       | Alice    | España§àôœ€ |
       | Alice    | नेपाली        |
-    And the HTTP status code of responses on all endpoints should be "204"
+    Then the HTTP status code of responses on all endpoints should be "204"
+    And the following users should be listed in the following groups
+      | username | groupname   |
+      | Alice    | simplegroup |
+      | Alice    | España§àôœ€ |
+      | Alice    | नेपाली        |
 
 
   Scenario: adding a user to a group with special character in its name
@@ -47,7 +52,19 @@ Feature: add users to group
       | Alice    | $x<=>[y*z^2]!       |
       | Alice    | 😁 😂               |
       | Alice    | admin:Pokhara@Nepal |
-    And the HTTP status code of responses on all endpoints should be "204"
+    Then the HTTP status code of responses on all endpoints should be "204"
+    And the following users should be listed in the following groups
+      | username | groupname           |
+      | Alice    | brand-new-group     |
+      | Alice    | the.group           |
+      | Alice    | left,right          |
+      | Alice    | 0                   |
+      | Alice    | Finance (NP)        |
+      | Alice    | Admin&Finance       |
+      | Alice    | maint+eng           |
+      | Alice    | $x<=>[y*z^2]!       |
+      | Alice    | 😁 😂               |
+      | Alice    | admin:Pokhara@Nepal |
 
 
   Scenario: adding a user to a group with % and # in its name
@@ -69,7 +86,16 @@ Feature: add users to group
       | Alice    | 50%2Fix         |
       | Alice    | Mgmt\Middle     |
       | Alice    | staff?group     |
-    And the HTTP status code of responses on all endpoints should be "204"
+    Then the HTTP status code of responses on all endpoints should be "204"
+    And the following users should be listed in the following groups
+      | username | groupname       |
+      | Alice    | maintenance#123 |
+      | Alice    | 50%pass         |
+      | Alice    | 50%25=0         |
+      | Alice    | 50%2Eagle       |
+      | Alice    | 50%2Fix         |
+      | Alice    | Mgmt\Middle     |
+      | Alice    | staff?group     |
 
 
   Scenario: adding a user to a group that has a forward-slash in the group name
@@ -85,7 +111,13 @@ Feature: add users to group
       | Alice    | Mgmt//NSW/Sydney |
       | Alice    | priv/subadmins/1 |
       | Alice    | var/../etc       |
-    And the HTTP status code of responses on all endpoints should be "204"
+    Then the HTTP status code of responses on all endpoints should be "204"
+    And the following users should be listed in the following groups
+      | username | groupname        |
+      | Alice    | Mgmt/Sydney      |
+      | Alice    | Mgmt//NSW/Sydney |
+      | Alice    | priv/subadmins/1 |
+      | Alice    | var/../etc       |
 
 
   Scenario: normal user tries to add himself to a group

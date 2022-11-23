@@ -831,4 +831,37 @@ class GraphContext implements Context {
 			. "\nExpected unauthorized message but got '" . $errorText . "'"
 		);
 	}
+
+	/**
+	 * @Then the following users should be listed in the following groups
+	 *
+	 * @param TableNode $table
+	 * 
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theFollowingUsersShouldBeListedInFollowingGroups(TableNode $table): void {
+		$this->featureContext->verifyTableNodeColumns($table, ['username', 'groupname']);
+		$usersGroups = $table->getColumnsHash();
+		foreach ($usersGroups as $userGroup) {
+			$members = $this->listGroupMembers($userGroup['groupname']);
+			$members = $this->featureContext->getJsonDecodedResponse($members);
+
+			$exists = false;
+			foreach ($members as $member) {
+				if ($member['onPremisesSamAccountName'] === $userGroup['username']) {
+					$exists = true;
+					break;
+				}
+			}
+			if (!$exists){
+				Assert::assertEquals(
+					true,
+					$exists,
+					__METHOD__
+					. "\nExpected user '" . $userGroup['username'] . "' to be in group '" . $userGroup['groupname'] . "'. But not found."
+				);
+			}
+		}
+	}
 }
