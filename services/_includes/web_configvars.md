@@ -15,7 +15,7 @@
 | WEB_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | WEB_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | WEB_HTTP_ADDR | string | 127.0.0.1:9100 | The bind address of the HTTP service.|
-| OCIS_HTTP_TLS_ENABLED | bool | false | |
+| OCIS_HTTP_TLS_ENABLED | bool | false | Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.|
 | OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|
 | OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
 | WEB_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|

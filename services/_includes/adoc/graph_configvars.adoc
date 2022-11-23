@@ -142,7 +142,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-
+Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.
 |`OCIS_HTTP_TLS_CERTIFICATE`
 a| [subs=-attributes]
 ++string ++
@@ -177,7 +177,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The root CA certificate used to validate TLS server certificates of the go-micro based grpc services.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
 |`OCIS_JWT_SECRET` +
 `GRAPH_JWT_SECRET`
 a| [subs=-attributes]
@@ -199,7 +199,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The root CA certificate used to validate TLS server certificates of the go-micro based grpc services.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
 |`OCIS_URL` +
 `GRAPH_SPACES_WEBDAV_BASE`
 a| [subs=-attributes]
@@ -251,7 +251,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/idm/ldap.crt ++
 a| [subs=-attributes]
-The certificate to verify TLS connections.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service.
 |`LDAP_INSECURE` +
 `GRAPH_LDAP_INSECURE`
 a| [subs=-attributes]

@@ -210,7 +210,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The root CA certificate used to validate TLS server certificates of the go-micro based grpc services.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
 |===
 
 Since Version: `+` added, `-` deprecated

@@ -118,21 +118,21 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/proxy/server.crt ++
 a| [subs=-attributes]
-File name of the TLS server certificate for the HTTPS server.
+Path/File name of the TLS server certificate (in PEM format) for the external http services.
 |`PROXY_TRANSPORT_TLS_KEY`
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++~/.ocis/proxy/server.key ++
 a| [subs=-attributes]
-File name of the TLS server certificate key for the HTTPS server.
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the external http services.
 |`PROXY_TLS`
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
-Use the HTTPS server instead of the HTTP server.
+Enable/Disable HTTPS for the external HTTP services.
 |`REVA_GATEWAY`
 a| [subs=-attributes]
 ++string ++
@@ -153,7 +153,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The root CA certificate used to validate TLS server certificates of the go-micro based grpc services.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
 |`OCIS_GRPC_CLIENT_TLS_MODE`
 a| [subs=-attributes]
 ++string ++
@@ -167,7 +167,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The root CA certificate used to validate TLS server certificates of the go-micro based grpc services.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
 |`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
 `PROXY_OIDC_ISSUER`

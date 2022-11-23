@@ -125,21 +125,21 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/idp/server.crt ++
 a| [subs=-attributes]
-File name of the TLS server certificate for the HTTPS server.
+Path/File name of the TLS server certificate (in PEM format) for the IDP service.
 |`IDP_TRANSPORT_TLS_KEY`
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++~/.ocis/idp/server.key ++
 a| [subs=-attributes]
-File name of the TLS server certificate key for the HTTPS server.
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the IDP service.
 |`IDP_TLS`
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Use the HTTPS server instead of the HTTP server.
+Enable/Disable HTTPS for the IDP service.
 |`REVA_GATEWAY`
 a| [subs=-attributes]
 ++string ++
@@ -160,7 +160,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The root CA certificate used to validate TLS server certificates of the go-micro based grpc services.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
 |`OCIS_MACHINE_AUTH_API_KEY` +
 `IDP_MACHINE_AUTH_API_KEY`
 a| [subs=-attributes]
@@ -320,7 +320,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/idm/ldap.crt ++
 a| [subs=-attributes]
-Path to the TLS cert for the LDAP service.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service.
 |`LDAP_BIND_DN` +
 `IDP_LDAP_BIND_DN`
 a| [subs=-attributes]

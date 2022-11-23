@@ -111,7 +111,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The root CA certificate used to validate TLS server certificates of the go-micro based grpc services.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
 |`WEBDAV_HTTP_ADDR`
 a| [subs=-attributes]
 ++string ++
@@ -164,7 +164,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-
+Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.
 |`OCIS_HTTP_TLS_CERTIFICATE`
 a| [subs=-attributes]
 ++string ++
