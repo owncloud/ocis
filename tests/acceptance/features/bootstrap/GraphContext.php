@@ -536,7 +536,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * admin adds a user to a group
+	 * adds a user to a group
 	 *
 	 * @param string $group
 	 * @param string $user
@@ -569,8 +569,6 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * adds a user to a group
-	 *
 	 * @Given /^the administrator has added a user "([^"]*)" to the group "([^"]*)" using GraphApi$/
 	 *
 	 * @param string $user
@@ -610,8 +608,6 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * adds a user to a group
-	 *
 	 * @When the administrator tries to add user :user to group :group using the Graph API
 	 *
 	 * @param string $user
@@ -624,7 +620,7 @@ class GraphContext implements Context {
 	}
  
 	/**
-	 * @When user :user tries to add himself to group :group using the Graph API
+	 * @When user :user tries to add himself/herself to group :group using the Graph API
 	 *
 	 * @param string $user
 	 * @param string $group
@@ -854,14 +850,11 @@ class GraphContext implements Context {
 					break;
 				}
 			}
-			if (!$exists) {
-				Assert::assertEquals(
-					true,
-					$exists,
-					__METHOD__
-					. "\nExpected user '" . $userGroup['username'] . "' to be in group '" . $userGroup['groupname'] . "'. But not found."
-				);
-			}
+			Assert::assertTrue(
+				$exists,
+				__METHOD__
+				. "\nExpected user '" . $userGroup['username'] . "' to be in group '" . $userGroup['groupname'] . "'. But not found."
+			);
 		}
 	}
 }
