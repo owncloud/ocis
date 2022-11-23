@@ -860,7 +860,8 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse($response);
 	}
   
-  * @Then the following users should be listed in the following groups
+	/**
+	 * @Then the following users should be listed in the following groups
 	 *
 	 * @param TableNode $table
 	 *
@@ -887,4 +888,5 @@ class GraphContext implements Context {
 				. "\nExpected user '" . $userGroup['username'] . "' to be in group '" . $userGroup['groupname'] . "'. But not found."
 			);
 		}
+	}
 }
