@@ -66,7 +66,7 @@ services:
       LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
       LDAP_GROUP_BASE_DN: "dc=owncloud,dc=com"
       LDAP_GROUP_FILTER: "(objectclass=owncloud)"
-      LDAP_GROUP_OBJECTCLASS: "groupOfUniqueNames"
+      LDAP_GROUP_OBJECTCLASS: "groupOfNames"
       LDAP_USER_BASE_DN: "dc=owncloud,dc=com"
       LDAP_USER_FILTER: "(objectclass=owncloud)"
       LDAP_USER_OBJECTCLASS: "inetOrgPerson"
