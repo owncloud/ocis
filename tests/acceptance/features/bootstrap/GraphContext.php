@@ -538,6 +538,37 @@ class GraphContext implements Context {
 	/**
 	 * adds a user to a group
 	 *
+	 * @param string $group
+	 * @param string $user
+	 * @param string|null $byUser
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function addUserToGroup(string $group, string $user, ?string $byUser = null): ResponseInterface {
+		$credentials = $this->getAdminOrUserCredentials($byUser);
+		try {
+			$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		} catch (Exception $e) {
+			$groupId = WebDavHelper::generateUUIDv4();
+		}
+		try {
+			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		} catch (Exception $e) {
+			$userId = WebDavHelper::generateUUIDv4();
+		}
+
+		return GraphHelper::addUserToGroup(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password'],
+			$userId,
+			$groupId
+		);
+	}
+
+	/**
 	 * @Given /^the administrator has added a user "([^"]*)" to the group "([^"]*)" using GraphApi$/
 	 *
 	 * @param string $user
@@ -553,19 +584,64 @@ class GraphContext implements Context {
 		string $group,
 		bool $checkResult = true
 	): void {
-		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		$result = GraphHelper::addUserToGroup(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$userId,
-			$groupId
-		);
+		$result = $this->addUserToGroup($group, $user);
 		if ($checkResult && ($result->getStatusCode() !== 204)) {
 			$this->throwHttpException($result, "Could not add user '$user' to group '$group'.");
 		}
+	}
+
+	/**
+	 * @When the administrator adds the following users to the following groups using the Graph API
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theAdministratorAddsTheFollowingUsersToTheFollowingGroupsUsingTheGraphAPI(TableNode $table): void {
+		$this->featureContext->verifyTableNodeColumns($table, ['username', 'groupname']);
+		$userGroupList = $table->getColumnsHash();
+
+		foreach ($userGroupList as $userGroup) {
+			$this->featureContext->setResponse($this->addUserToGroup($userGroup['groupname'], $userGroup['username']));
+			$this->featureContext->pushToLastHttpStatusCodesArray();
+		}
+	}
+
+	/**
+	 * @When the administrator tries to add user :user to group :group using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $group
+	 *
+	 * @return void
+	 */
+	public function theAdministratorTriesToAddUserToGroupUsingTheGraphAPI(string $user, string $group): void {
+		$this->featureContext->setResponse($this->addUserToGroup($group, $user));
+	}
+ 
+	/**
+	 * @When user :user tries to add himself/herself to group :group using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $group
+	 *
+	 * @return void
+	 */
+	public function theUserTriesToAddHimselfToGroupUsingTheGraphAPI(string $user, string $group): void {
+		$this->featureContext->setResponse($this->addUserToGroup($group, $user, $user));
+	}
+
+	/**
+	 * @When user :byUser tries to add user :user to group :group using the Graph API
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 * @param string $group
+	 *
+	 * @return void
+	 */
+	public function theUserTriesToAddAnotherUserToGroupUsingTheGraphAPI(string $byUser, string $user, string $group): void {
+		$this->featureContext->setResponse($this->addUserToGroup($group, $byUser, $user));
 	}
 
 	/**
@@ -750,5 +826,35 @@ class GraphContext implements Context {
 			__METHOD__
 			. "\nExpected unauthorized message but got '" . $errorText . "'"
 		);
+	}
+
+	/**
+	 * @Then the following users should be listed in the following groups
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theFollowingUsersShouldBeListedInFollowingGroups(TableNode $table): void {
+		$this->featureContext->verifyTableNodeColumns($table, ['username', 'groupname']);
+		$usersGroups = $table->getColumnsHash();
+		foreach ($usersGroups as $userGroup) {
+			$members = $this->listGroupMembers($userGroup['groupname']);
+			$members = $this->featureContext->getJsonDecodedResponse($members);
+
+			$exists = false;
+			foreach ($members as $member) {
+				if ($member['onPremisesSamAccountName'] === $userGroup['username']) {
+					$exists = true;
+					break;
+				}
+			}
+			Assert::assertTrue(
+				$exists,
+				__METHOD__
+				. "\nExpected user '" . $userGroup['username'] . "' to be in group '" . $userGroup['groupname'] . "'. But not found."
+			);
+		}
 	}
 }
