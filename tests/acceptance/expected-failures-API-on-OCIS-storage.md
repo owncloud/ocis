@@ -270,13 +270,13 @@ cannot share a folder with create permission
 
 #### [Upload-only shares must not overwrite but create a separate file](https://github.com/owncloud/ocis/issues/1267)
 
-- [apiSharePublicLink3/uploadToPublicLinkShare.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/uploadToPublicLinkShare.feature#L24)
-- [apiSharePublicLink3/uploadToPublicLinkShare.feature:273](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/uploadToPublicLinkShare.feature#L273)
+- [apiSharePublicLink3/uploadToPublicLinkShare.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/uploadToPublicLinkShare.feature#L45)
+- [apiSharePublicLink3/uploadToPublicLinkShare.feature:304](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/uploadToPublicLinkShare.feature#L304)
 
 #### [Set quota over settings](https://github.com/owncloud/ocis/issues/1290)
 
-- [apiSharePublicLink3/uploadToPublicLinkShare.feature:160](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/uploadToPublicLinkShare.feature#L160)
-- [apiSharePublicLink3/uploadToPublicLinkShare.feature:179](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/uploadToPublicLinkShare.feature#L179)
+- [apiSharePublicLink3/uploadToPublicLinkShare.feature:170](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/uploadToPublicLinkShare.feature#L170)
+- [apiSharePublicLink3/uploadToPublicLinkShare.feature:189](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink3/uploadToPublicLinkShare.feature#L189)
 
 
 #### [deleting a file inside a received shared folder is moved to the trash-bin of the sharer not the receiver](https://github.com/owncloud/ocis/issues/1124)
