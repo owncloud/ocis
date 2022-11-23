@@ -68,7 +68,7 @@ type Drivers struct {
 
 type LDAPDriver struct {
 	URI                      string          `yaml:"uri" env:"LDAP_URI;GROUPS_LDAP_URI" desc:"URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'"`
-	CACert                   string          `yaml:"ca_cert" env:"LDAP_CACERT;GROUPS_LDAP_CACERT" desc:"Path to a CA certificate file for validating the LDAP server's TLS certificate. If empty, the system default CA bundle will be used."`
+	CACert                   string          `yaml:"ca_cert" env:"LDAP_CACERT;GROUPS_LDAP_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service."`
 	Insecure                 bool            `yaml:"insecure" env:"LDAP_INSECURE;GROUPS_LDAP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments."`
 	BindDN                   string          `yaml:"bind_dn" env:"LDAP_BIND_DN;GROUPS_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server."`
 	BindPassword             string          `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;GROUPS_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'."`

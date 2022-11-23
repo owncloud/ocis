@@ -33,7 +33,7 @@ type Config struct {
 // Ldap defines the available LDAP configuration.
 type Ldap struct {
 	URI       string `yaml:"uri" env:"LDAP_URI;IDP_LDAP_URI" desc:"Url of the LDAP service to use as IDP."`
-	TLSCACert string `yaml:"cacert" env:"LDAP_CACERT;IDP_LDAP_TLS_CACERT" desc:"Path to the TLS cert for the LDAP service."`
+	TLSCACert string `yaml:"cacert" env:"LDAP_CACERT;IDP_LDAP_TLS_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service."`
 
 	BindDN       string `yaml:"bind_dn" env:"LDAP_BIND_DN;IDP_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server."`
 	BindPassword string `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;IDP_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'."`
