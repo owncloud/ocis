@@ -5,15 +5,17 @@ Feature: Share a file or folder that is inside a space via public link
 
       folder permissions:
       | role        | permissions |
+      | internal    | 0           |
       | viewer      | 1           |
       | uploader    | 4           |
       | contributor | 5           |
       | editor      | 15          |
 
       file permissions:
-      | role   | permissions |
-      | viewer | 1           |
-      | editor | 3           |
+      | role     | permissions |
+      | internal | 0           |
+      | viewer   | 1           |
+      | editor   | 3           |
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -45,10 +47,12 @@ Feature: Share a file or folder that is inside a space via public link
       | path | <path> |
     Examples:
       | entity          | path     | permissions | password | name | expireDate               |
+      | folder          | /folder   |0           |          | link |                          |
       | folder          | /folder   |1           | 123      | link | 2042-03-25T23:59:59+0100 |
       | folder          | /folder   |4           |          |      |                          |
       | folder          | /folder   |5           | 200      |      | 2042-03-25T23:59:59+0100 |
       | folder          | /folder   |15          |          | link |                          |
+      | folder/file.txt | /file.txt |0           | 123      | link | 2042-03-25T23:59:59+0100 |
       | folder/file.txt | /file.txt |1           | 123      | link | 2042-03-25T23:59:59+0100 |
       | folder/file.txt | /file.txt |3           | 123      | link | 2042-03-25T23:59:59+0100 |
 
