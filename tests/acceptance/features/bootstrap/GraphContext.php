@@ -202,6 +202,20 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * This method check if the userUUIDv4 is in correct pattern or not
+	 *
+	 * @param string $userUUIDv4
+	 *
+	 * @return int
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function checkUUIDv4PatternForUserId(string $userUUIDv4): int {
+		$UUIDv4Regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
+		return preg_match($UUIDv4Regex, $userUUIDv4);
+	}
+
+	/**
 	 * @param string $group
 	 *
 	 * @return void
@@ -1034,14 +1048,13 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then /^the api response for user "([^"]*)" should contains the following information:$/
+	 * @Then /^the api response should contains the following information:$/
 	 *
-	 * @param string $user
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 */
-	public function theApiResponseForUserShouldContainsTheFollowingInformation(string $user, TableNode $table): void {
+	public function theApiResponseForUserShouldContainsTheFollowingInformation(TableNode $table): void {
 		$rows = $table->getRowsHash();
 		$apiResponse = \json_decode((string)$this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
 		// assertion of the user is member of groups
@@ -1054,25 +1067,36 @@ class GraphContext implements Context {
 			}
 			Assert::assertEqualsCanonicalizing($memberOf, $memberOfFromApiReponse);
 		}
-		// get user_id for the given user
-		$rows['id'] = $this->featureContext->substituteInLineCodes(
+		// check if the user_if from response is in format UUIDv4
+		$isUUIDv4 = $this->featureContext->substituteInLineCodes(
 			$rows['id'],
 			$this->featureContext->getCurrentUser(),
 			[],
 			[
 				[
-					"code" => "%user_id%",
+					"code" => "%UUIDv4%",
 					"function" =>
-						[$this->spacesContext, "getUserIdByUserName"],
-					"parameter" => [$user]
+						[$this, "checkUUIDv4PatternForUserId"],
+					"parameter" => [$apiResponse['id']]
 				],
 			]
 		);
+		Assert::assertEquals(
+			1,
+			$isUUIDv4,
+			__METHOD__ .
+			$apiResponse['id'] . ' ID is not in the format of UUIDv4'
+		);
 
-		// assertion for remaining key other than 'memberOf'
+		// assertion for remaining key other than 'memberOf' and
 		foreach (array_keys($rows) as $keyName) {
-			if ($keyName !== 'memberOf') {
-				Assert::assertEquals($rows[$keyName], $apiResponse[$keyName]);
+			if ($keyName !== 'memberOf' && $keyName !== 'id') {
+				Assert::assertEquals(
+					$rows[$keyName],
+					$apiResponse[$keyName],
+					__METHOD__ .
+					' Expected ' . $rows[$keyName] . ' but got ' . $apiResponse[$keyName]
+				);
 			}
 		}
 	}
