@@ -12,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	graphMiddleware "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
@@ -24,6 +25,7 @@ import (
 // Server initializes the http service and server.
 func Server(opts ...Option) (http.Service, error) {
 	options := newOptions(opts...)
+	handler := options.Handler
 
 	service, err := http.NewService(
 		http.TLSConfig(options.Config.HTTP.TLS),
@@ -82,11 +84,17 @@ func Server(opts ...Option) (http.Service, error) {
 		}
 	}
 
+	{
+		handle = svc.NewInstrument(handle, options.Metrics)
+		handle = svc.NewLogging(handle, options.Logger)
+		handle = svc.NewTracing(handle)
+	}
+
 	handle := svc.NewService(
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(
-			middleware.TraceContext,
+			pkgmiddleware.TraceContext,
 			chimiddleware.RequestID,
 			middleware.Version(
 				"graph",
@@ -105,12 +113,6 @@ func Server(opts ...Option) (http.Service, error) {
 
 	if handle == nil {
 		return http.Service{}, errors.New("could not initialize graph service")
-	}
-
-	{
-		handle = svc.NewInstrument(handle, options.Metrics)
-		handle = svc.NewLogging(handle, options.Logger)
-		handle = svc.NewTracing(handle)
 	}
 
 	if err := micro.RegisterHandler(service.Server(), handle); err != nil {

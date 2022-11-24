@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/metrics"
+	gsvc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 	"github.com/urfave/cli/v2"
 )
 
@@ -20,6 +21,7 @@ type Options struct {
 	Metrics   *metrics.Metrics
 	Flags     []cli.Flag
 	Namespace string
+	Handler   gsvc.Service
 }
 
 // newOptions initializes the available default options.
@@ -72,5 +74,12 @@ func Flags(val []cli.Flag) Option {
 func Namespace(val string) Option {
 	return func(o *Options) {
 		o.Namespace = val
+	}
+}
+
+// Handler provides a function to set the handler option.
+func Handler(val gsvc.Service) Option {
+	return func(o *Options) {
+		o.Handler = val
 	}
 }
