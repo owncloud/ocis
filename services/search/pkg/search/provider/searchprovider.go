@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/grpc/metadata"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -24,6 +25,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/search/pkg/search"
+	searchTracing "github.com/owncloud/ocis/v2/services/search/pkg/tracing"
 
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
@@ -115,6 +117,9 @@ func NewWithDebouncer(gwClient gateway.GatewayAPIClient, indexClient search.Inde
 }
 
 func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error) {
+	ctx, span := searchTracing.TraceProvider.Tracer("search").Start(ctx, "search")
+	defer span.End()
+	span.SetAttributes(attribute.String("query", req.GetQuery()))
 	if req.Query == "" {
 		return nil, errtypes.BadRequest("empty query provided")
 	}
@@ -244,6 +249,8 @@ func (p *Provider) Search(ctx context.Context, req *searchsvc.SearchRequest) (*s
 
 	// compile one sorted list of matches from all spaces and apply the limit if needed
 	sort.Sort(matches)
+	span.SetAttributes(attribute.Int("num_matches", len(matches)))
+	span.SetAttributes(attribute.Int("total_matches", int(total)))
 	limit := req.PageSize
 	if limit == 0 {
 		limit = 200
@@ -267,6 +274,8 @@ func (p *Provider) IndexSpace(ctx context.Context, req *searchsvc.IndexSpaceRequ
 }
 
 func (p *Provider) doIndexSpace(ctx context.Context, spaceID *provider.StorageSpaceId, userID *user.UserId) error {
+	ctx, span := searchTracing.TraceProvider.Tracer("search").Start(ctx, "index space")
+	defer span.End()
 	authRes, err := p.gwClient.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + userID.OpaqueId,
@@ -275,6 +284,8 @@ func (p *Provider) doIndexSpace(ctx context.Context, spaceID *provider.StorageSp
 	if err != nil || authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		return err
 	}
+	span.SetAttributes(attribute.String("user_id", userID.GetOpaqueId()))
+	span.SetAttributes(attribute.String("space_id", spaceID.GetOpaqueId()))
 
 	if authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		return fmt.Errorf("could not get authenticated context for user")

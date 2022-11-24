@@ -35,6 +35,8 @@ import (
 	"github.com/blevesearch/bleve/v2/mapping"
 	"github.com/blevesearch/bleve/v2/search"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	searchTracing "github.com/owncloud/ocis/v2/services/search/pkg/tracing"
+	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -218,12 +220,16 @@ func (i *Index) Move(id, newParentID *sprovider.ResourceId, fullPath string) err
 
 // Search searches the index according to the criteria specified in the given SearchIndexRequest
 func (i *Index) Search(ctx context.Context, req *searchsvc.SearchIndexRequest) (*searchsvc.SearchIndexResponse, error) {
+	_, span := searchTracing.TraceProvider.Tracer("search").Start(ctx, "search index")
+	defer span.End()
 	deletedQuery := bleve.NewBoolFieldQuery(false)
 	deletedQuery.SetField("Deleted")
 	query := bleve.NewConjunctionQuery(
 		bleve.NewQueryStringQuery(req.Query),
 		deletedQuery, // Skip documents that have been marked as deleted
 	)
+	span.SetAttributes(attribute.String("query", req.GetQuery()))
+	span.SetAttributes(attribute.String("reference", req.GetRef().String()))
 	if req.Ref != nil {
 		query = bleve.NewConjunctionQuery(
 			query,
