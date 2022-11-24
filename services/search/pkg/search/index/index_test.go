@@ -89,6 +89,7 @@ var _ = Describe("Index", func() {
 	)
 
 	BeforeEach(func() {
+		ctx = context.Background()
 		filename = "Foo.pdf"
 
 		mapping, err := index.BuildMapping()
