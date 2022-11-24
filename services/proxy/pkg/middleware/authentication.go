@@ -30,9 +30,6 @@ var (
 		"/ocs/v2.php/apps/files_sharing/api/v1/tokeninfo/unprotected",
 		"/ocs/v1.php/cloud/capabilities",
 	}
-
-	// TODO: expose me in the configuration
-	limit int64 = 10 ^ 9
 )
 
 const (
@@ -116,11 +113,7 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 				// https://github.com/golang/go/issues/15527
 
 				defer r.Body.Close()
-				var reader io.Reader = r.Body
-				if limit > 0 {
-					reader = io.LimitReader(r.Body, limit)
-				}
-				io.Copy(ioutil.Discard, reader)
+				io.Copy(ioutil.Discard, r.Body)
 			}
 		})
 	}
