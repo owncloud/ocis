@@ -17,6 +17,15 @@ Feature: delete user
     And user "Brian" should not exist
 
 
+  Scenario: the admin user tries to delete another admin user
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has given "Brian" the role "Admin" using the settings api
+    When the user "Alice" deletes a user "Brian" using GraphAPI
+    Then the HTTP status code should be "204"
+    And user "Brian" should exist
+
+
   Scenario: the admin user tries to delete self
     Given the administrator has given "Alice" the role "Admin" using the settings api
     When the user "Alice" deletes a user "Alice" using GraphAPI
