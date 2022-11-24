@@ -202,20 +202,6 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * This method check if the userUUIDv4 is in correct pattern or not
-	 *
-	 * @param string $userUUIDv4
-	 *
-	 * @return int
-	 * @throws Exception
-	 * @throws GuzzleException
-	 */
-	public function checkUUIDv4PatternForUserId(string $userUUIDv4): int {
-		$UUIDv4Regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
-		return preg_match($UUIDv4Regex, $userUUIDv4);
-	}
-
-	/**
 	 * @param string $group
 	 *
 	 * @return void
@@ -1024,7 +1010,7 @@ class GraphContext implements Context {
 		string $user
 	):ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($user);
-		return GraphHelper::getUserInformation(
+		return GraphHelper::getOwnInformationAndGroupMemberships(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
@@ -1033,7 +1019,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^the user "([^"]*)" retrives (:?her|his) information using the Graph API$/
+	 * @When /^the user "([^"]*)" retrieves (her|his) information using the Graph API$/
 	 *
 	 * @param string $user
 	 *
@@ -1048,55 +1034,62 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then /^the api response should contains the following information:$/
+	 * @Then /^the user retrieve API response should contain the following information:$/
 	 *
 	 * @param TableNode $table
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
-	public function theApiResponseForUserShouldContainsTheFollowingInformation(TableNode $table): void {
-		$rows = $table->getRowsHash();
-		$apiResponse = \json_decode((string)$this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
-		// assertion of the user is member of groups
-		if ($rows['memberOf']) {
-			// collect memberOf from response
-			$memberOfFromApiReponse = [];
-			$memberOf = preg_split('/\s*,\s*/', trim($rows['memberOf']));
-			foreach ($apiResponse['memberOf'] as $member) {
-				$memberOfFromApiReponse[] = $member['displayName'];
-			}
-			Assert::assertEqualsCanonicalizing($memberOf, $memberOfFromApiReponse);
+	public function theUserRetrieveApiResponseShouldContainTheFollowingInformation(TableNode $table): void {
+		$rows = $table->getHash();
+		$apiResponse = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
+		foreach ($rows as $row) {
+			$this->checkUserInformation($row, $apiResponse);
 		}
-		// check if the user_if from response is in format UUIDv4
-		$isUUIDv4 = $this->featureContext->substituteInLineCodes(
-			$rows['id'],
-			$this->featureContext->getCurrentUser(),
-			[],
-			[
-				[
-					"code" => "%UUIDv4%",
-					"function" =>
-						[$this, "checkUUIDv4PatternForUserId"],
-					"parameter" => [$apiResponse['id']]
-				],
-			]
-		);
-		Assert::assertEquals(
-			1,
-			$isUUIDv4,
-			__METHOD__ .
-			$apiResponse['id'] . ' ID is not in the format of UUIDv4'
-		);
+	}
 
-		// assertion for remaining key other than 'memberOf' and
-		foreach (array_keys($rows) as $keyName) {
-			if ($keyName !== 'memberOf' && $keyName !== 'id') {
-				Assert::assertEquals(
-					$rows[$keyName],
-					$apiResponse[$keyName],
-					__METHOD__ .
-					' Expected ' . $rows[$keyName] . ' but got ' . $apiResponse[$keyName]
-				);
+	/**
+	 * @param array $expectedValue
+	 * @param array $actualValue
+	 *
+	 * @throws GuzzleException
+	 * @return void
+	 */
+	public function checkUserInformation(array $expectedValue, array  $actualValue):void {
+		foreach (array_keys($expectedValue) as $keyName) {
+			switch ($keyName) {
+				case "memberOf":
+					$memberOfFromApiReponse = [];
+					$memberOf = preg_split('/\s*,\s*/', trim($expectedValue['memberOf']));
+					foreach ($actualValue['memberOf'] as $member) {
+						$memberOfFromApiReponse[] = $member['displayName'];
+					}
+					Assert::assertEqualsCanonicalizing($memberOf, $memberOfFromApiReponse);
+					break;
+				case "id":
+					if ($expectedValue[$keyName] !== '%uuid_v4%') {
+						throw new Error(
+							'Only UUIDv4 patterned user id can be checked' . ' but got '
+							. trim($expectedValue[$keyName], '%')
+						);
+					}
+					Assert::assertEquals(
+						1,
+						GraphHelper::isUUIDv4($actualValue['id']),
+						__METHOD__ .
+						' Expected user_id to have UUIDv4 pattern but found: ' . $actualValue['id']
+					);
+					break;
+				default:
+					Assert::assertEquals(
+						$expectedValue[$keyName],
+						$actualValue[$keyName],
+						__METHOD__ .
+						' Expected ' . $keyName . 'to have value' . $expectedValue[$keyName]
+						. ' but got ' . $actualValue[$keyName]
+					);
+					break;
 			}
 		}
 	}
