@@ -33,7 +33,7 @@ type Config struct {
 	AutoprovisionAccounts bool            `yaml:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS" desc:"Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running."`
 	EnableBasicAuth       bool            `yaml:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH" desc:"Set this to true to enable 'basic authentication' (username/password)."`
 	InsecureBackends      bool            `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS" desc:"Disable TLS certificate validation for all HTTP backend connections."`
-	BackendHTTPSCACert    string          `yaml:"backend_https_cacert" env:"PROXY_HTTPS_CACERT" desc:"The root CA certificate used to validate TLS server certificates of https enabled backend services."`
+	BackendHTTPSCACert    string          `yaml:"backend_https_cacert" env:"PROXY_HTTPS_CACERT" desc:"Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services."`
 	AuthMiddleware        AuthMiddleware  `yaml:"auth_middleware"`
 
 	Context context.Context `yaml:"-" json:"-"`
