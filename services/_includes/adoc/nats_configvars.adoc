@@ -100,14 +100,14 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/nats/tls.crt ++
 a| [subs=-attributes]
-File name of the TLS server certificate for the nats listener.
+Path/File name of the TLS server certificate (in PEM format) for the NATS listener.
 |`NATS_TLS_KEY`
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++~/.ocis/nats/tls.key ++
 a| [subs=-attributes]
-File name for the TLS certificate key for the server certificate.
+Path/File name for the TLS certificate key (in PEM format) for the NATS listener.
 |`OCIS_INSECURE` +
 `NATS_TLS_SKIP_VERIFY_CLIENT_CERT`
 a| [subs=-attributes]

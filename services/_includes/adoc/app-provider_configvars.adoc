@@ -224,7 +224,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Allow insecure connections to the app.
+Disable TLS certificate validation for requests to the WOPI server and the web office application. Do not set this in production environments.
 |`APP_PROVIDER_WOPI_WOPI_SERVER_IOP_SECRET`
 a| [subs=-attributes]
 ++string ++

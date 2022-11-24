@@ -312,7 +312,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The root CA certificate used to validate TLS server certificates of https enabled backend services.
+Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services.
 |===
 
 Since Version: `+` added, `-` deprecated

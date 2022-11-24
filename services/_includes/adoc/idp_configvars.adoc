@@ -227,7 +227,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Allow insecure connections to the user backend like LDAP, CS3 api, ...
+Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.
 |`IDP_ALLOW_CLIENT_GUESTS`
 a| [subs=-attributes]
 ++bool ++
