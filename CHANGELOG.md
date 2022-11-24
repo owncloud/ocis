@@ -13,6 +13,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
 * Bugfix - Initial role assingment with external IDM: [#5045](https://github.com/owncloud/ocis/issues/5045)
 * Bugfix - Update reva: [#5092](https://github.com/owncloud/ocis/pull/5092)
+* Enhancement - Add tracing to search: [#5113](https://github.com/owncloud/ocis/pull/5113)
 * Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
 * Enhancement - Remove windows from ci & release makefile: [#5026](https://github.com/owncloud/ocis/pull/5026)
 * Enhancement - Update ownCloud Web to v6.0.0-rc.6: [#5086](https://github.com/owncloud/ocis/pull/5086)
@@ -74,6 +75,13 @@ The following sections list the changes for unreleased.
    Restoring an older version of a shared file deletes the share
 
    https://github.com/owncloud/ocis/pull/5092
+
+* Enhancement - Add tracing to search: [#5113](https://github.com/owncloud/ocis/pull/5113)
+
+   We added tracing to search and its indexer
+
+   https://github.com/owncloud/ocis/issues/5063
+   https://github.com/owncloud/ocis/pull/5113
 
 * Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
 
