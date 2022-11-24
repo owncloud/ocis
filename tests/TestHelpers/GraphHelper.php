@@ -190,7 +190,7 @@ class GraphHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function getUserInformation(
+	public static function getOwnInformationWithGroups(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,

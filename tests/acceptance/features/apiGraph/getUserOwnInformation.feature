@@ -1,5 +1,5 @@
-@api
-Feature: get user own information
+@api @skipOnOcV10
+Feature: get user's own information
   As user
   I want to be able to retrieve my own information
   So that I can see my information
@@ -9,14 +9,11 @@ Feature: get user own information
 
 
   Scenario: user gets his/her own information with no group involvement
-    When the user "Alice" retrives her information using the Graph API
+    When the user "Alice" retrieves her information using the Graph API
     Then the HTTP status code should be "200"
-    And the api response should contains the following information:
-      | displayName              | Alice Hansen      |
-      | id                       | %UUIDv4%          |
-      | mail                     | alice@example.org |
-      | onPremisesSamAccountName | Alice             |
-      | memberOf                 |                   |
+    And the user retrieved API response should contain the following information:
+      | displayName  | id       | mail              | onPremisesSamAccountName |
+      | Alice Hansen | %UUIDv4% | alice@example.org | Alice                    |
 
 
   Scenario: user gets his/her own information with group involvement
@@ -24,13 +21,8 @@ Feature: get user own information
     And group "coffee-lover" has been created
     And user "Alice" has been added to group "tea-lover"
     And user "Alice" has been added to group "coffee-lover"
-    When the user "Alice" retrives her information using the Graph API
-    And the api response should contains the following information:
-      | displayName              | Alice Hansen            |
-      | id                       | %UUIDv4%                |
-      | onPremisesSamAccountName | Alice                   |
-      | mail                     | alice@example.org       |
-      | memberOf                 | tea-lover, coffee-lover |
-
-
-
+    When the user "Alice" retrieves her information using the Graph API
+    Then the HTTP status code should be "200"
+    And the user retrieved API response should contain the following information:
+      | displayName  | id       | mail              | onPremisesSamAccountName | memberOf                |
+      | Alice Hansen | %UUIDv4% | alice@example.org | Alice                    | tea-lover, coffee-lover |
