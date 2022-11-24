@@ -2,6 +2,8 @@ package middleware
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strings"
@@ -28,6 +30,9 @@ var (
 		"/ocs/v2.php/apps/files_sharing/api/v1/tokeninfo/unprotected",
 		"/ocs/v1.php/cloud/capabilities",
 	}
+
+	// TODO: expose me in the configuration
+	limit int64 = 10 ^ 9
 )
 
 const (
@@ -103,6 +108,19 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 				})
 
 				webdav.HandleWebdavError(w, b, err)
+			}
+
+			if r.ProtoMajor == 1 {
+				// https://github.com/owncloud/ocis/issues/5066
+				// https://github.com/golang/go/blob/d5de62df152baf4de6e9fe81933319b86fd95ae4/src/net/http/server.go#L1357-L1417
+				// https://github.com/golang/go/issues/15527
+
+				defer r.Body.Close()
+				var reader io.Reader = r.Body
+				if limit > 0 {
+					reader = io.LimitReader(r.Body, limit)
+				}
+				io.Copy(ioutil.Discard, reader)
 			}
 		})
 	}
