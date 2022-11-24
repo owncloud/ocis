@@ -96,6 +96,10 @@ config = {
         "skip": False,
         "earlyFail": True,
     },
+    "wopiValidatorTests": {
+        "skip": False,
+        "earlyFail": True,
+    },
     "localApiTests": {
         "skip": False,
         "earlyFail": True,
@@ -343,6 +347,8 @@ def testPipelines(ctx):
 
     if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
         pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
+    if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
+        pipelines.append(wopiValidatorTests(ctx, "ocis", "default"))
     if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
         pipelines += [
             localApiTests(ctx, "ocis", "apiAccountsHashDifficulty"),
@@ -740,6 +746,100 @@ def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
                          ],
                      },
                  ] +
+                 failEarly(ctx, early_fail),
+        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/pull/**",
+            ],
+        },
+    }
+
+def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
+    early_fail = config["wopiValidatorTests"]["earlyFail"] if "earlyFail" in config["wopiValidatorTests"] else False
+
+    testgroups = [
+        "BaseWopiViewing",
+        "CheckFileInfoSchema",
+        "EditFlows",
+        "Locks",
+        "AccessTokens",
+        "GetLock",
+        "ExtendedLockLength",
+        "FileVersion",
+        "Features",
+    ]
+
+    validatorTests = []
+
+    for testgroup in testgroups:
+        validatorTests.append({
+            "name": "wopiValidatorTests-%s-%s" % (storage, testgroup),
+            "image": "owncloudci/wopi-validator",
+            "commands": [
+                "export WOPI_TOKEN=$(cat accesstoken)",
+                "echo $WOPI_TOKEN",
+                "export WOPI_TTL=$(cat accesstokenttl)",
+                "echo $WOPI_TTL",
+                "export WOPI_SRC=$(cat wopisrc)",
+                "echo $WOPI_SRC",
+                "cd /app",
+                "/app/Microsoft.Office.WopiValidator -s -t $WOPI_TOKEN -w $WOPI_SRC -l $WOPI_TTL --testgroup %s" % testgroup,
+            ],
+        })
+
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "wopiValidatorTests-%s" % (storage),
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": skipIfUnchanged(ctx, "acceptance-tests") +
+                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
+                 [
+                     {
+                         "name": "fakeoffice",
+                         "image": OC_CI_ALPINE,
+                         "detach": True,
+                         "environment": {},
+                         "commands": [
+                             "sh %s/tests/config/drone/serve-hosting-discovery.sh" % (dirs["base"]),
+                         ],
+                     },
+                     {
+                         "name": "wopiserver",
+                         "image": "cs3org/wopiserver:v9.2.5",
+                         "detach": True,
+                         "commands": [
+                             "cp %s/tests/config/drone/wopiserver.conf /etc/wopi/wopiserver.conf" % (dirs["base"]),
+                             "echo 123 > /etc/wopi/wopisecret",
+                             "/app/wopiserver.py",
+                         ],
+                     },
+                 ] +
+                 ocisServer(storage, accounts_hash_difficulty, [], [], "wopi_validator") +
+                 [
+                     {
+                         "name": "prepare-test-file-%s" % (storage),
+                         "image": OC_CI_ALPINE,
+                         "environment": {},
+                         "commands": [
+                             "curl -k 'https://ocis-server:9200/remote.php/webdav/test.wopitest' --fail --retry-connrefused --retry 7 --retry-all-errors -X PUT -u admin:admin -D headers.txt",
+                             "export FILE_ID=$(cat headers.txt | sed -n -e 's/^.*Oc-Fileid: //p')",
+                             "export URL=\"https://ocis-server:9200/app/open?app_name=FakeOffice&file_id=$FILE_ID\"",
+                             "export URL=$(echo $URL | tr -d '[:cntrl:]')",
+                             "curl -k -X POST \"$URL\" -u admin:admin -v > open.json",
+                             "cat open.json | jq .form_parameters.access_token | tr -d '\"' > accesstoken",
+                             "cat open.json | jq .form_parameters.access_token_ttl | tr -d '\"' > accesstokenttl",
+                             "echo -n 'http://wopiserver:8880/wopi/files/' > wopisrc",
+                             "cat open.json | jq .app_url | sed -n -e 's/^.*files%2F//p' | tr -d '\"' >> wopisrc",
+                         ],
+                     },
+                 ] +
+                 validatorTests +
                  failEarly(ctx, early_fail),
         "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
@@ -1874,8 +1974,8 @@ def notify():
         },
     }
 
-def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], testing_parallel_deploy = False):
-    if not testing_parallel_deploy:
+def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = ""):
+    if deploy_type == "":
         user = "0:0"
         environment = {
             "OCIS_URL": OCIS_URL,
@@ -1902,7 +2002,43 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             ],
             "depends_on": depends_on,
         }
-    else:
+
+    if deploy_type == "wopi_validator":
+        user = "0:0"
+        environment = {
+            "OCIS_URL": OCIS_URL,
+            "OCIS_CONFIG_DIR": "/root/.ocis/config",
+            "STORAGE_USERS_DRIVER": "%s" % (storage),
+            "STORAGE_USERS_DRIVER_LOCAL_ROOT": "%s/local/root" % dirs["ocis"],
+            "STORAGE_USERS_DRIVER_OCIS_ROOT": "%s/storage/users" % dirs["ocis"],
+            "STORAGE_SYSTEM_DRIVER_OCIS_ROOT": "%s/storage/metadata" % dirs["ocis"],
+            "SHARING_USER_JSON_FILE": "%s/shares.json" % dirs["ocis"],
+            "PROXY_ENABLE_BASIC_AUTH": True,
+            "WEB_UI_CONFIG": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
+            "OCIS_LOG_LEVEL": "error",
+            "SETTINGS_DATA_PATH": "%s/settings" % dirs["ocis"],
+            "IDM_CREATE_DEMO_USERS": True,
+            "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
+            "FRONTEND_SEARCH_MIN_LENGTH": "2",
+            "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # make gateway available to wopi server
+            "APP_PROVIDER_EXTERNAL_ADDR": "127.0.0.1:9164",
+            "APP_PROVIDER_DRIVER": "wopi",
+            "APP_PROVIDER_WOPI_APP_NAME": "FakeOffice",
+            "APP_PROVIDER_WOPI_APP_URL": "http://fakeoffice:8080",
+            "APP_PROVIDER_WOPI_INSECURE": "true",
+            "APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL": "http://wopiserver:8880",
+            "APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL": "https://ocis-server:9200",
+        }
+        wait_for_ocis = {
+            "name": "wait-for-ocis-server",
+            "image": OC_CI_WAIT_FOR,
+            "commands": [
+                "wait-for -it ocis-server:9200 -t 300",
+            ],
+            "depends_on": depends_on,
+        }
+
+    if deploy_type == "parallel":
         user = "33:33"
         environment = {
             # Keycloak IDP specific configuration
@@ -2527,7 +2663,7 @@ def parallelDeployAcceptancePipeline(ctx):
                              4,
                              [stepVolumeOC10OCISData, stepVolumeOCISConfig],
                              ["fix-shared-data-permissions"],
-                             True,
+                             "parallel",
                          ) +
                          parallelAcceptance(environment) +
                          failEarly(ctx, early_fail),
