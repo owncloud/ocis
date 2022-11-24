@@ -38,7 +38,7 @@ ifndef DATE
 endif
 
 LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -s -w -X "$(OCIS_REPO)/ocis-pkg/version.String=$(STRING)" -X "$(OCIS_REPO)/ocis-pkg/version.Tag=$(VERSION)" -X "$(OCIS_REPO)/ocis-pkg/version.Date=$(DATE)"
-DEBUG_LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -X "$(OCIS_REPO)/ocis-pkg/version.String=$(STRING)" -X "$(OCIS_REPO)/ocis-pkg/version.Tag=$(VERSION)"-X "$(OCIS_REPO)/ocis-pkg/version.Date=$(DATE)"
+DEBUG_LDFLAGS += -X google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn -X "$(OCIS_REPO)/ocis-pkg/version.String=$(STRING)" -X "$(OCIS_REPO)/ocis-pkg/version.Tag=$(VERSION)" -X "$(OCIS_REPO)/ocis-pkg/version.Date=$(DATE)"
 
 GCFLAGS += all=-N -l
 
