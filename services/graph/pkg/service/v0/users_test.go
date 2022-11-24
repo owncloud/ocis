@@ -10,6 +10,7 @@ import (
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/go-chi/chi/v5"
@@ -134,6 +135,87 @@ var _ = Describe("Users", func() {
 			Expect(len(res.Value)).To(Equal(1))
 			Expect(res.Value[0].GetId()).To(Equal("user1"))
 		})
+
+		It("sorts", func() {
+			user := &libregraph.User{}
+			user.SetId("user1")
+			user.SetMail("z@example.com")
+			user.SetDisplayName("9")
+			user.SetOnPremisesSamAccountName("9")
+			user2 := &libregraph.User{}
+			user2.SetId("user2")
+			user2.SetMail("a@example.com")
+			user2.SetDisplayName("1")
+			user2.SetOnPremisesSamAccountName("1")
+			users := []*libregraph.User{user, user2}
+
+			identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(users, nil)
+
+			getUsers := func(path string) []*libregraph.User {
+				r := httptest.NewRequest(http.MethodGet, path, nil)
+				rec := httptest.NewRecorder()
+				svc.GetUsers(rec, r)
+
+				Expect(rec.Code).To(Equal(http.StatusOK))
+				data, err := ioutil.ReadAll(rec.Body)
+				Expect(err).ToNot(HaveOccurred())
+
+				res := userList{}
+				err = json.Unmarshal(data, &res)
+				Expect(err).ToNot(HaveOccurred())
+				return res.Value
+			}
+
+			unsorted := getUsers("/graph/v1.0/me/users")
+			Expect(len(unsorted)).To(Equal(2))
+			Expect(unsorted[0].GetId()).To(Equal("user1"))
+			Expect(unsorted[1].GetId()).To(Equal("user2"))
+
+			byMail := getUsers("/graph/v1.0/me/users?$orderby=mail")
+			Expect(len(byMail)).To(Equal(2))
+			Expect(byMail[0].GetId()).To(Equal("user2"))
+			Expect(byMail[1].GetId()).To(Equal("user1"))
+			byMail = getUsers("/graph/v1.0/me/users?$orderby=mail%20asc")
+			Expect(len(byMail)).To(Equal(2))
+			Expect(byMail[0].GetId()).To(Equal("user2"))
+			Expect(byMail[1].GetId()).To(Equal("user1"))
+			byMail = getUsers("/graph/v1.0/me/users?$orderby=mail%20desc")
+			Expect(len(byMail)).To(Equal(2))
+			Expect(byMail[0].GetId()).To(Equal("user1"))
+			Expect(byMail[1].GetId()).To(Equal("user2"))
+
+			byDisplayName := getUsers("/graph/v1.0/me/users?$orderby=displayName")
+			Expect(len(byDisplayName)).To(Equal(2))
+			Expect(byDisplayName[0].GetId()).To(Equal("user2"))
+			Expect(byDisplayName[1].GetId()).To(Equal("user1"))
+			byDisplayName = getUsers("/graph/v1.0/me/users?$orderby=displayName%20asc")
+			Expect(len(byDisplayName)).To(Equal(2))
+			Expect(byDisplayName[0].GetId()).To(Equal("user2"))
+			Expect(byDisplayName[1].GetId()).To(Equal("user1"))
+			byDisplayName = getUsers("/graph/v1.0/me/users?$orderby=displayName%20desc")
+			Expect(len(byDisplayName)).To(Equal(2))
+			Expect(byDisplayName[0].GetId()).To(Equal("user1"))
+			Expect(byDisplayName[1].GetId()).To(Equal("user2"))
+
+			byOnPremisesSamAccountName := getUsers("/graph/v1.0/me/users?$orderby=onPremisesSamAccountName")
+			Expect(len(byOnPremisesSamAccountName)).To(Equal(2))
+			Expect(byOnPremisesSamAccountName[0].GetId()).To(Equal("user2"))
+			Expect(byOnPremisesSamAccountName[1].GetId()).To(Equal("user1"))
+			byOnPremisesSamAccountName = getUsers("/graph/v1.0/me/users?$orderby=onPremisesSamAccountName%20asc")
+			Expect(len(byOnPremisesSamAccountName)).To(Equal(2))
+			Expect(byOnPremisesSamAccountName[0].GetId()).To(Equal("user2"))
+			Expect(byOnPremisesSamAccountName[1].GetId()).To(Equal("user1"))
+			byOnPremisesSamAccountName = getUsers("/graph/v1.0/me/users?$orderby=onPremisesSamAccountName%20desc")
+			Expect(len(byOnPremisesSamAccountName)).To(Equal(2))
+			Expect(byOnPremisesSamAccountName[0].GetId()).To(Equal("user1"))
+			Expect(byOnPremisesSamAccountName[1].GetId()).To(Equal("user2"))
+
+			// Handles invalid sort field
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/users?$orderby=invalid", nil)
+			svc.GetUsers(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
 	})
 
 	Describe("GetUser", func() {
@@ -163,6 +245,47 @@ var _ = Describe("Users", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(responseUser.GetId()).To(Equal("user1"))
 			Expect(len(responseUser.GetDrives())).To(Equal(0))
+		})
+
+		It("includes the personal space if requested", func() {
+			user := &libregraph.User{}
+			user.SetId("user1")
+
+			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
+			gatewayClient.On("GetQuota", mock.Anything, mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+				Status:     status.NewOK(ctx),
+				TotalBytes: 10,
+			}, nil)
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status: status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{
+					{
+						Id:        &provider.StorageSpaceId{OpaqueId: "drive1"},
+						Root:      &provider.ResourceId{SpaceId: "space", OpaqueId: "space"},
+						SpaceType: "project",
+					},
+					{
+						Id:        &provider.StorageSpaceId{OpaqueId: "personal"},
+						Root:      &provider.ResourceId{SpaceId: "personal", OpaqueId: "personal"},
+						SpaceType: "personal",
+					},
+				},
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/users?$expand=drive", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", *user.Id)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.GetUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := ioutil.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+			responseUser := &libregraph.User{}
+			err = json.Unmarshal(data, &responseUser)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(responseUser.GetId()).To(Equal("user1"))
+			Expect(*responseUser.GetDrive().Id).To(Equal("personal"))
 		})
 
 		It("includes the drives if requested", func() {
@@ -271,6 +394,136 @@ var _ = Describe("Users", func() {
 			svc.PostUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
+		})
+	})
+
+	Describe("DeleteUser", func() {
+		It("handles missing userids", func() {
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/users/{userid}", nil)
+			svc.DeleteUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("prevents a user from deleting themselves", func() {
+			lu := libregraph.User{}
+			lu.SetId(currentUser.Id.OpaqueId)
+			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(&lu, nil)
+
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/users/{userid}", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", currentUser.Id.OpaqueId)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.DeleteUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusForbidden))
+		})
+
+		It("deletes a user from deleting themselves", func() {
+			otheruser := &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					OpaqueId: "otheruser",
+				},
+			}
+
+			lu := libregraph.User{}
+			lu.SetId(otheruser.Id.OpaqueId)
+			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(&lu, nil)
+			identityBackend.On("DeleteUser", mock.Anything, mock.Anything).Return(nil)
+			gatewayClient.On("DeleteStorageSpace", mock.Anything, mock.Anything).Return(&provider.DeleteStorageSpaceResponse{
+				Status: status.NewOK(ctx),
+			}, nil)
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status: status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{
+					{
+						Opaque:    &typesv1beta1.Opaque{},
+						Id:        &provider.StorageSpaceId{OpaqueId: "drive1"},
+						Root:      &provider.ResourceId{SpaceId: "space", OpaqueId: "space"},
+						SpaceType: "personal",
+						Owner:     otheruser,
+					},
+				},
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/users/{userid}", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", lu.GetId())
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.DeleteUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusNoContent))
+			gatewayClient.AssertNumberOfCalls(GinkgoT(), "DeleteStorageSpace", 2) // 2 calls for the home space. first trash, then purge
+		})
+	})
+
+	Describe("PatchUser", func() {
+		var (
+			user *libregraph.User
+		)
+
+		BeforeEach(func() {
+			user = &libregraph.User{}
+			user.SetDisplayName("Display Name")
+			user.SetOnPremisesSamAccountName("user")
+			user.SetMail("user@example.com")
+			user.SetId("/users/user")
+
+			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(&user, nil)
+		})
+
+		It("handles missing userids", func() {
+			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/users/{userid}", nil)
+			svc.PatchUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("handles invalid bodies", func() {
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users?$invalid=true", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", user.GetId())
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.PatchUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("handles invalid email", func() {
+			user.SetMail("invalid")
+			data, err := json.Marshal(user)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users?$invalid=true", bytes.NewBuffer(data))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", user.GetId())
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.PatchUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("updates attributes", func() {
+			identityBackend.On("UpdateUser", mock.Anything, user.GetId(), mock.Anything).Return(user, nil)
+
+			user.SetDisplayName("New Display Name")
+			data, err := json.Marshal(user)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users?$invalid=true", bytes.NewBuffer(data))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", user.GetId())
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.PatchUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err = ioutil.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			updatedUser := libregraph.User{}
+			err = json.Unmarshal(data, &updatedUser)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(updatedUser.GetDisplayName()).To(Equal("New Display Name"))
 		})
 	})
 })
