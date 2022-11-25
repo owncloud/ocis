@@ -1021,4 +1021,21 @@ class GraphContext implements Context {
             }
         }
     }
+
+    /**
+     * @When user :user tries to get information of user :ofUser
+     */
+    public function userTriesToGetInformationOfUser($user, $ofUser)
+    {
+        $credentials = $this->getAdminOrUserCredentials($user);
+        $response = GraphHelper::getUser(
+            $this->featureContext->getBaseUrl(),
+            $this->featureContext->getStepLineRef(),
+            $credentials['username'],
+            $credentials['password'],
+            $ofUser
+        );
+        $this->featureContext->setResponse($response);
+    }
+
 }
