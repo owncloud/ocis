@@ -41,5 +41,5 @@ ci-node-check-licenses: # ownCloud Web does the check on it's own
 
 .PHONY: ci-node-save-licenses
 ci-node-save-licenses:
-	@mkdir -p ../third-party-licenses/node/web
-	@curl --fail -slL -o- https://github.com/owncloud/web/releases/download/$(WEB_ASSETS_VERSION)/third-party-licenses.tar.gz | tar xzf - -C ../third-party-licenses/node/web
+	@mkdir -p ../../third-party-licenses/node/web
+	@curl --fail -slL -o- https://github.com/owncloud/web/releases/download/$(WEB_ASSETS_VERSION)/third-party-licenses.tar.gz | tar xzf - -C ../../third-party-licenses/node/web
