@@ -28,7 +28,7 @@ COPY --from=generate /ocis /ocis
 WORKDIR /ocis/ocis
 RUN make ci-go-generate build
 
-FROM alpine:3.15
+FROM alpine:3.17
 
 RUN apk add --no-cache ca-certificates mailcap tree attr curl && \
 	echo 'hosts: files dns' >| /etc/nsswitch.conf
