@@ -136,6 +136,7 @@ services:
     logging:
       driver: "local"
     restart: always
+
   wopiserver:
     image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v9.3.0}
     networks:
