@@ -62,6 +62,8 @@ func DefaultConfig() *config.Config {
 				PersonalSpaceAliasTemplate: "{{.SpaceType}}/{{.User.Username | lower}}",
 				GeneralSpaceAliasTemplate:  "{{.SpaceType}}/{{.SpaceName | replace \" \" \"-\" | lower}}",
 				PermissionsEndpoint:        "127.0.0.1:9191",
+				MaxAcquireLockCycles:       20,
+				LockCycleDurationFactor:    30,
 			},
 			OCIS: config.OCISDriver{
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),
@@ -70,7 +72,8 @@ func DefaultConfig() *config.Config {
 				PersonalSpaceAliasTemplate: "{{.SpaceType}}/{{.User.Username | lower}}",
 				GeneralSpaceAliasTemplate:  "{{.SpaceType}}/{{.SpaceName | replace \" \" \"-\" | lower}}",
 				PermissionsEndpoint:        "127.0.0.1:9191",
-				MaxAcquireLockCycles:       25,
+				MaxAcquireLockCycles:       20,
+				LockCycleDurationFactor:    30,
 			},
 		},
 		Events: config.Events{

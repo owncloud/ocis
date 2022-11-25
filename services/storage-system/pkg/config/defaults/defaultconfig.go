@@ -41,7 +41,9 @@ func DefaultConfig() *config.Config {
 		Driver:        "ocis",
 		Drivers: config.Drivers{
 			OCIS: config.OCISDriver{
-				Root: filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
+				Root:                    filepath.Join(defaults.BaseDataPath(), "storage", "metadata"),
+				MaxAcquireLockCycles:    20,
+				LockCycleDurationFactor: 30,
 			},
 		},
 	}

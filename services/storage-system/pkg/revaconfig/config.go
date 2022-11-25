@@ -153,11 +153,13 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 func metadataDrivers(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"ocis": map[string]interface{}{
-			"root":                cfg.Drivers.OCIS.Root,
-			"user_layout":         "{{.Id.OpaqueId}}",
-			"treetime_accounting": false,
-			"treesize_accounting": false,
-			"permissionssvc":      cfg.GRPC.Addr,
+			"root":                       cfg.Drivers.OCIS.Root,
+			"user_layout":                "{{.Id.OpaqueId}}",
+			"treetime_accounting":        false,
+			"treesize_accounting":        false,
+			"permissionssvc":             cfg.GRPC.Addr,
+			"max_acquire_lock_cycles":    cfg.Drivers.OCIS.MaxAcquireLockCycles,
+			"lock_cycle_duration_factor": cfg.Drivers.OCIS.LockCycleDurationFactor,
 		},
 	}
 }
