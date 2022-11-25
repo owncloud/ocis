@@ -811,12 +811,19 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                      },
                      {
                          "name": "wopiserver",
-                         "image": "cs3org/wopiserver:v9.2.5",
+                         "image": "cs3org/wopiserver:v9.3.0",
                          "detach": True,
                          "commands": [
                              "cp %s/tests/config/drone/wopiserver.conf /etc/wopi/wopiserver.conf" % (dirs["base"]),
                              "echo 123 > /etc/wopi/wopisecret",
                              "/app/wopiserver.py",
+                         ],
+                     },
+                     {
+                         "name": "wait-for-wopi-server",
+                         "image": OC_CI_ALPINE,
+                         "commands": [
+                             "curl -k --fail --retry-connrefused --retry 7 --retry-all-errors 'http://wopiserver:8880/wopi'",
                          ],
                      },
                  ] +
