@@ -202,7 +202,6 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * This method check if the userUUIDv4 is in correct pattern or not
 	 *
 	 * @param string $userUUIDv4
 	 *
@@ -961,7 +960,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^the user "([^"]*)" retrives (:?her|his) information using the Graph API$/
+	 * @When /^the user "([^"]*)" retrieves (her|his) information using the Graph API$/
 	 *
 	 * @param string $user
 	 *
