@@ -52,7 +52,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.4.0
 	github.com/onsi/gomega v1.23.0
 	github.com/orcaman/concurrent-map v1.0.0
-	github.com/owncloud/libre-graph-api-go v0.17.0
+	github.com/owncloud/libre-graph-api-go v1.0.0
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.13.0
 	github.com/rs/zerolog v1.28.0
