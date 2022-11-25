@@ -123,11 +123,10 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 		}
 		return rules
 	}
-
 	// generate rules based on default config
 	return map[string]map[string]interface{}{
 		cfg.StorageUsersEndpoint: {
-			"providerid": "1284d238-aa92-42ce-bdc4-0b0000009157",
+			"providerid": cfg.StorageRegistry.StorageUsersMountID,
 			"spaces": map[string]interface{}{
 				"personal": map[string]interface{}{
 					"mount_point":   "/users",

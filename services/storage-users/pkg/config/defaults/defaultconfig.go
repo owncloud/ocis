@@ -39,7 +39,6 @@ func DefaultConfig() *config.Config {
 		},
 		Reva:             shared.DefaultRevaConfig(),
 		DataServerURL:    "http://localhost:9158/data",
-		MountID:          "1284d238-aa92-42ce-bdc4-0b0000009157",
 		UploadExpiration: 24 * 60 * 60,
 		Driver:           "ocis",
 		Drivers: config.Drivers{
