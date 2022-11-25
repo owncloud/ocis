@@ -49,8 +49,8 @@ require (
 	github.com/oklog/run v1.1.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/ginkgo/v2 v2.4.0
-	github.com/onsi/gomega v1.23.0
+	github.com/onsi/ginkgo/v2 v2.5.0
+	github.com/onsi/gomega v1.24.1
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.0
 	github.com/pkg/errors v0.9.1
@@ -75,9 +75,9 @@ require (
 	golang.org/x/crypto v0.1.0
 	golang.org/x/exp v0.0.0-20221026004748-78e5e7837ae6
 	golang.org/x/image v0.1.0
-	golang.org/x/net v0.1.0
+	golang.org/x/net v0.2.0
 	golang.org/x/oauth2 v0.1.0
-	golang.org/x/term v0.1.0
+	golang.org/x/term v0.2.0
 	golang.org/x/text v0.4.0
 	google.golang.org/genproto v0.0.0-20221027153422-115e99e71e1c
 	google.golang.org/grpc v1.50.1
@@ -273,7 +273,7 @@ require (
 	go.uber.org/zap v1.23.0 // indirect
 	golang.org/x/mod v0.6.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/sys v0.2.0 // indirect
 	golang.org/x/time v0.1.0 // indirect
 	golang.org/x/tools v0.2.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
