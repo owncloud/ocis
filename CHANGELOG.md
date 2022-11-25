@@ -14,7 +14,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
 * Bugfix - Initial role assingment with external IDM: [#5045](https://github.com/owncloud/ocis/issues/5045)
 * Bugfix - Make storage users mount ids unique by default: [#5091](https://github.com/owncloud/ocis/pull/5091)
-* Bugfix - Update reva: [#5092](https://github.com/owncloud/ocis/pull/5092)
+* Bugfix - Update reva to version 2.12.0: [#5092](https://github.com/owncloud/ocis/pull/5092)
 * Enhancement - Add tracing to search: [#5113](https://github.com/owncloud/ocis/pull/5113)
 * Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
 * Enhancement - Remove windows from ci & release makefile: [#5026](https://github.com/owncloud/ocis/pull/5026)
@@ -80,17 +80,25 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/5091
 
-* Bugfix - Update reva: [#5092](https://github.com/owncloud/ocis/pull/5092)
+* Bugfix - Update reva to version 2.12.0: [#5092](https://github.com/owncloud/ocis/pull/5092)
 
-   Tags: reva
+   Changelog for reva 2.12.0 (2022-11-25)  2 ✘  14:57:56 
+   =======================================
 
-   We updated reva to pull in several Bugfixes: * Bugfix
-   [owncloud/ocis#5061](https://github.com/owncloud/ocis/issues/5061): [Performance]
-   Upload speed drops while uploading 1k files in a folder * Bugfix
-   [owncloud/ocis#3868](https://github.com/owncloud/ocis/issues/3868): Downloading
-   the older version of shared file as share receiver gives 403 * Bugfix
-   [owncloud/ocis#765](https://github.com/owncloud/ocis/issues/765): [OCIS-storage]
-   Restoring an older version of a shared file deletes the share
+  *   Bugfix [cs3org/reva#3436](https://github.com/cs3org/reva/pull/3436): Allow updating to internal link
+  *   Bugfix [cs3org/reva#3473](https://github.com/cs3org/reva/pull/3473): Decomposedfs fix revision download
+  *   Bugfix [cs3org/reva#3482](https://github.com/cs3org/reva/pull/3482): Decomposedfs propagate sizediff
+  *   Bugfix [cs3org/reva#3449](https://github.com/cs3org/reva/pull/3449): Don't leak space information on update drive
+  *   Bugfix [cs3org/reva#3470](https://github.com/cs3org/reva/pull/3470): Add missing events for managing spaces
+  *   Bugfix [cs3org/reva#3472](https://github.com/cs3org/reva/pull/3472): Fix an oCDAV error message
+  *   Bugfix [cs3org/reva#3452](https://github.com/cs3org/reva/pull/3452): Fix access to spaces shared via public link
+  *   Bugfix [cs3org/reva#3440](https://github.com/cs3org/reva/pull/3440): Set proper names and paths for space roots
+  *   Bugfix [cs3org/reva#3437](https://github.com/cs3org/reva/pull/3437): Refactor delete error handling
+  *   Bugfix [cs3org/reva#3432](https://github.com/cs3org/reva/pull/3432): Remove share jail fix
+  *   Bugfix [cs3org/reva#3458](https://github.com/cs3org/reva/pull/3458): Set the Oc-Fileid header when copying items
+  *   Enhancement [cs3org/reva#3441](https://github.com/cs3org/reva/pull/3441): Cover ocdav with more unit tests
+  *   Enhancement [cs3org/reva#3493](https://github.com/cs3org/reva/pull/3493): Configurable filelock duration factor in decomposedfs
+  *   Enhancement [cs3org/reva#3397](https://github.com/cs3org/reva/pull/3397): Reduce lock contention issues
 
    https://github.com/owncloud/ocis/pull/5092
 
@@ -383,7 +391,7 @@ The following sections list the changes for 2.0.0-rc.1.
 * Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 * Enhancement - Add acting user to the audit log: [#3753](https://github.com/owncloud/ocis/issues/3753)
-* Enhancement - Configurable max lock cycles: [#4964](https://github.com/owncloud/ocis/pull/4964)
+* Enhancement - Configurable max lock cycles: [#4965](https://github.com/owncloud/ocis/pull/4965)
 * Enhancement - Allow to configuring the reva cache store: [#4627](https://github.com/owncloud/ocis/pull/4627)
 * Enhancement - Add audit events for created containers: [#3941](https://github.com/owncloud/ocis/pull/3941)
 * Enhancement - Add support for REPORT requests to /dav/spaces URLs: [#4661](https://github.com/owncloud/ocis/pull/4661)
@@ -1305,11 +1313,11 @@ The following sections list the changes for 2.0.0-rc.1.
    https://github.com/owncloud/ocis/issues/3753
    https://github.com/owncloud/ocis/pull/3992
 
-* Enhancement - Configurable max lock cycles: [#4964](https://github.com/owncloud/ocis/pull/4964)
+* Enhancement - Configurable max lock cycles: [#4965](https://github.com/owncloud/ocis/pull/4965)
 
    Adds config option for max lock cycles. Also bumps reva
 
-   https://github.com/owncloud/ocis/pull/4964
+   https://github.com/owncloud/ocis/pull/4965
 
 * Enhancement - Allow to configuring the reva cache store: [#4627](https://github.com/owncloud/ocis/pull/4627)
 
