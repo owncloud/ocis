@@ -236,9 +236,16 @@ Name of the folder jailing all shares.
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++25 ++
+++20 ++
 a| [subs=-attributes]
-When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 25 will be used
+When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used.
+|`STORAGE_USERS_OCIS_LOCK_CYCLE_DURATION_FACTOR`
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++30 ++
+a| [subs=-attributes]
+When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.
 |`STORAGE_USERS_S3NG_ROOT`
 a| [subs=-attributes]
 ++string ++
@@ -317,6 +324,20 @@ a| [subs=-attributes]
 ++/Shares ++
 a| [subs=-attributes]
 Name of the folder jailing all shares.
+|`STORAGE_USERS_S3NG_MAX_ACQUIRE_LOCK_CYCLES`
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++20 ++
+a| [subs=-attributes]
+When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used.
+|`STORAGE_USERS_S3NG_LOCK_CYCLE_DURATION_FACTOR`
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++30 ++
+a| [subs=-attributes]
+When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.
 |`STORAGE_USERS_OWNCLOUDSQL_DATADIR`
 a| [subs=-attributes]
 ++string ++

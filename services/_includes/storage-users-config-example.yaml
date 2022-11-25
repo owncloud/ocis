@@ -44,7 +44,8 @@ drivers:
     personalspacealias_template: '{{.SpaceType}}/{{.User.Username | lower}}'
     generalspacealias_template: '{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}'
     share_folder: /Shares
-    max_acquire_lock_cycles: 25
+    max_acquire_lock_cycles: 20
+    lock_cycle_duration_factor: 30
   s3ng:
     root: ~/.ocis/storage/users
     user_layout: '{{.Id.OpaqueId}}'
@@ -57,6 +58,8 @@ drivers:
     personalspacealias_template: '{{.SpaceType}}/{{.User.Username | lower}}'
     generalspacealias_template: '{{.SpaceType}}/{{.SpaceName | replace " " "-" | lower}}'
     share_folder: /Shares
+    max_acquire_lock_cycles: 20
+    lock_cycle_duration_factor: 30
   owncloudsql:
     root: ~/.ocis/storage/owncloud
     share_folder: /Shares
