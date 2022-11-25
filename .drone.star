@@ -819,6 +819,13 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                              "/app/wopiserver.py",
                          ],
                      },
+                     {
+                         "name": "wait-for-wopi-server",
+                         "image": OC_CI_ALPINE,
+                         "commands": [
+                             "curl -k --fail --retry-connrefused --retry 7 --retry-all-errors 'http://wopiserver:8880/wopi'",
+                         ],
+                     },
                  ] +
                  ocisServer(storage, accounts_hash_difficulty, [], [], "wopi_validator") +
                  [
