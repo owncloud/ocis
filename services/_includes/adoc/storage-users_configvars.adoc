@@ -460,7 +460,7 @@ Database name of the cache.
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++1284d238-aa92-42ce-bdc4-0b0000009157 ++
+++ ++
 a| [subs=-attributes]
 Mount ID of this storage.
 |`STORAGE_USERS_EXPOSE_DATA_SERVER`

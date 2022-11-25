@@ -335,6 +335,13 @@ a| [subs=-attributes]
 ++localhost:9242 ++
 a| [subs=-attributes]
 The APP REGISTRY API endpoint.
+|`GATEWAY_STORAGE_USERS_MOUNT_ID`
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Mount ID of this storage. This ID needs to be unique.
 |===
 
 Since Version: `+` added, `-` deprecated
