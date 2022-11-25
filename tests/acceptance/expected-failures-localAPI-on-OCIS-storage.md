@@ -68,3 +68,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/editGroup.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L23)
 - [apiGraph/editGroup.feature:24](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L24)
 - [apiGraph/editGroup.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L25)
+
+#### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
+- [apiGraph/getUser.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L21)
