@@ -137,7 +137,7 @@ services:
       driver: "local"
     restart: always
   wopiserver:
-    image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v9.1.1}
+    image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v9.3.0}
     networks:
       ocis-net:
     entrypoint:
