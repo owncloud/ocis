@@ -982,12 +982,5 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiTrashbin/trashbinFilesFolders.feature:442](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L442)
 - [apiTrashbin/trashbinFilesFolders.feature:479](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiTrashbin/trashbinFilesFolders.feature#L479)
 
-#### [valid WebDAV (DELETE, COPY or MOVE) requests with body must exit with 415](https://github.com/owncloud/ocis/issues/4332)
-
-- [apiAuthWebDav/webDavDELETEAuth.feature:187](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavDELETEAuth.feature#L187)
-- [apiAuthWebDav/webDavDELETEAuth.feature:198](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavDELETEAuth.feature#L198)
-- [apiAuthWebDav/webDavCOPYAuth.feature:166](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavCOPYAuth.feature#L166)
-- [apiAuthWebDav/webDavCOPYAuth.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavCOPYAuth.feature#L178)
-
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

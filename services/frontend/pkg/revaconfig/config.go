@@ -257,7 +257,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 								},
 							},
 							"spaces": map[string]interface{}{
-								"version":    "0.0.1",
+								"version":    "1.0.0",
 								"enabled":    cfg.EnableProjectSpaces || cfg.EnableShareJail,
 								"projects":   cfg.EnableProjectSpaces,
 								"share_jail": cfg.EnableShareJail,
