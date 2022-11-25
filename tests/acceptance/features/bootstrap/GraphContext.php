@@ -1038,4 +1038,32 @@ class GraphContext implements Context {
         $this->featureContext->setResponse($response);
     }
 
+    /**
+     * @Then the API response should contain all user with following information:
+     *
+     * @param TableNode $table
+     *
+     * @throws Exception
+     */
+    public function theApiResponseShouldContainAllUserWithFollowingInformation(TableNode $table)
+    {
+        $values = $table->getHash();
+        $apiResponse = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'];
+        foreach ($values as $expectedValue){
+            $found = false;
+            foreach ($apiResponse as $key => $actualResponse) {
+                if($actualResponse["displayName"] === $expectedValue["displayName"]) {
+                    $found = true;
+                    unset($apiResponse[$key]);
+                    $this->checkUserInfromation($expectedValue, $actualResponse);
+                    break;
+                }
+            }
+            if(!$found) {
+                throw new Exception('User ' . $expectedValue["displayName"] . ' could not be found');
+            }
+        }
+    }
+
+
 }

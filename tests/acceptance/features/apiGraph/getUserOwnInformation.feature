@@ -1,5 +1,5 @@
-@api
-Feature: get user own information
+@api @skipOnOcV10
+Feature: get user's own information
   As user
   I want to be able to retrieve my own information
   So that I can see my information
