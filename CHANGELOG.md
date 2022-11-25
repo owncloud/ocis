@@ -16,7 +16,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add tracing to search: [#5113](https://github.com/owncloud/ocis/pull/5113)
 * Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
 * Enhancement - Remove windows from ci & release makefile: [#5026](https://github.com/owncloud/ocis/pull/5026)
-* Enhancement - Update ownCloud Web to v6.0.0-rc.6: [#5086](https://github.com/owncloud/ocis/pull/5086)
+* Enhancement - Update ownCloud Web to v6.0.0-rc.8: [#5120](https://github.com/owncloud/ocis/pull/5120)
 
 ## Details
 
@@ -97,11 +97,11 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/5011
    https://github.com/owncloud/ocis/pull/5026
 
-* Enhancement - Update ownCloud Web to v6.0.0-rc.6: [#5086](https://github.com/owncloud/ocis/pull/5086)
+* Enhancement - Update ownCloud Web to v6.0.0-rc.8: [#5120](https://github.com/owncloud/ocis/pull/5120)
 
    Tags: web
 
-   We updated ownCloud Web to v6.0.0-rc.6. Please refer to the changelog (linked) for details on
+   We updated ownCloud Web to v6.0.0-rc.8. Please refer to the changelog (linked) for details on
    the web release.
 
    ### Breaking changes * BREAKING CHANGE for users in
@@ -112,51 +112,59 @@ The following sections list the changes for unreleased.
    instead of webdav paths. If you use the appDefaults composables in your application it's
    likely that your code needs to be adapted.
 
-   ### Changes * Bugfix [owncloud/web#7731](https://github.com/owncloud/web/pull/7731):
-   "Copy Quicklink"-translations * Bugfix
+   ### Changes * Bugfix
    [owncloud/web#7419](https://github.com/owncloud/web/issues/7419): Add language
    param opening external app * Bugfix
+   [owncloud/web#7731](https://github.com/owncloud/web/pull/7731): "Copy
+   Quicklink"-translations * Bugfix
    [owncloud/web#7830](https://github.com/owncloud/web/pull/7830): "Cut" and "Copy"
    actions for current folder * Bugfix
-   [owncloud/web#7739](https://github.com/owncloud/web/pull/7739): Disable shares
-   loading on public and trash locations * Bugfix
    [owncloud/web#7652](https://github.com/owncloud/web/pull/7652): Disable copy/move
    overwrite on self * Bugfix
+   [owncloud/web#7739](https://github.com/owncloud/web/pull/7739): Disable shares
+   loading on public and trash locations * Bugfix
    [owncloud/web#7740](https://github.com/owncloud/web/pull/7740): Disappearing
    quicklink in sidebar * Bugfix
-   [owncloud/web#7936](https://github.com/owncloud/web/pull/7936): Editing text files
-   on public pages * Bugfix
+   [owncloud/web#7946](https://github.com/owncloud/web/issues/7946): Prevent shares
+   from disappearing after sharing with groups * Bugfix
    [owncloud/web#7820](https://github.com/owncloud/web/pull/7820): Edit new created
    user in user management * Bugfix
+   [owncloud/web#7936](https://github.com/owncloud/web/pull/7936): Editing text files
+   on public pages * Bugfix
    [owncloud/web#7861](https://github.com/owncloud/web/pull/7861): Handle non 2xx
    external app responses * Bugfix
-   [owncloud/web#7975](https://github.com/owncloud/web/pull/7975): Prevent file upload
-   when folder creation failed * Bugfix
    [owncloud/web#7734](https://github.com/owncloud/web/pull/7734): File name
-   reactivity * Bugfix [owncloud/web#7724](https://github.com/owncloud/web/pull/7724):
-   Folder conflict dialog * Bugfix
+   reactivity * Bugfix [owncloud/web#7975](https://github.com/owncloud/web/pull/7975):
+   Prevent file upload when folder creation failed * Bugfix
+   [owncloud/web#7724](https://github.com/owncloud/web/pull/7724): Folder conflict
+   dialog * Bugfix [owncloud/web#7603](https://github.com/owncloud/web/issues/7603):
+   Hide search bar in public link context * Bugfix
    [owncloud/web#7889](https://github.com/owncloud/web/pull/7889): Hide share
    indicators on public page * Bugfix
-   [owncloud/web#7603](https://github.com/owncloud/web/issues/7603): Hide search bar in
-   public link context * Bugfix
    [owncloud/web#7903](https://github.com/owncloud/web/issues/7903): "Keep
    both"-conflict option * Bugfix
-   [owncloud/web#7652](https://github.com/owncloud/web/pull/7652): Inhibit move files
-   between spaces * Bugfix
    [owncloud/web#7697](https://github.com/owncloud/web/issues/7697): Link indicator on
    "Shared with me"-page * Bugfix
+   [owncloud/web#8007](https://github.com/owncloud/web/pull/8007): Missing password
+   form on public drop page * Bugfix
+   [owncloud/web#7652](https://github.com/owncloud/web/pull/7652): Inhibit move files
+   between spaces * Bugfix
    [owncloud/web#7985](https://github.com/owncloud/web/pull/7985): Prevent retrying
    uploads with status code 5xx * Bugfix
-   [owncloud/web#7941](https://github.com/owncloud/web/pull/7941): Add origin check to
-   Draw.io events * Bugfix
    [owncloud/web#7811](https://github.com/owncloud/web/pull/7811): Do not load files
    from cache in public links * Bugfix
+   [owncloud/web#7941](https://github.com/owncloud/web/pull/7941): Add origin check to
+   Draw.io events * Bugfix
    [owncloud/web#7916](https://github.com/owncloud/web/pull/7916): Prefer alias links
    over private links * Bugfix
-   [owncloud/web#7748](https://github.com/owncloud/web/pull/7748): Reload file list
-   after last share removal * Bugfix
    [owncloud/web#7640](https://github.com/owncloud/web/pull/7640): "Private
    link"-button alignment * Bugfix
+   [owncloud/web#8006](https://github.com/owncloud/web/pull/8006): Public link loading
+   on role change * Bugfix
+   [owncloud/web#7962](https://github.com/owncloud/web/issues/7962): Quota check when
+   replacing files * Bugfix
+   [owncloud/web#7748](https://github.com/owncloud/web/pull/7748): Reload file list
+   after last share removal * Bugfix
    [owncloud/web#7699](https://github.com/owncloud/web/issues/7699): Remove the "close
    sidebar"-calls on delete * Bugfix
    [owncloud/web#7504](https://github.com/owncloud/web/pull/7504): Resolve upload
@@ -183,14 +191,19 @@ The following sections list the changes for unreleased.
    via link"-page * Bugfix
    [owncloud/web#7521](https://github.com/owncloud/web/issues/7521): Spaces
    reactivity on update * Bugfix
+   [owncloud/web#7960](https://github.com/owncloud/web/issues/7960): Display error
+   messages in text editor * Bugfix
    [owncloud/web#7778](https://github.com/owncloud/web/issues/7778): Trash bin sidebar
    * Bugfix [owncloud/web#7956](https://github.com/owncloud/web/issues/7956):
    Introduce "upload finalizing"-state in upload overlay * Bugfix
    [owncloud/web#7630](https://github.com/owncloud/web/pull/7630): Upload modify time *
-   Change [owncloud/web#6648](https://github.com/owncloud/web/issues/6648): Drive
-   aliases in URLs * Change
-   [owncloud/web#7935](https://github.com/owncloud/web/pull/7935): Remove mediaSource
-   and v-image-source * Enhancement
+   Bugfix [owncloud/web#8011](https://github.com/owncloud/web/issues/8011): Prevent
+   unnecessary request when saving a user * Bugfix
+   [owncloud/web#7989](https://github.com/owncloud/web/pull/7989): Versions on the
+   "Shared with me"-page * Change
+   [owncloud/web#6648](https://github.com/owncloud/web/issues/6648): Drive aliases in
+   URLs * Change [owncloud/web#7935](https://github.com/owncloud/web/pull/7935): Remove
+   mediaSource and v-image-source * Enhancement
    [owncloud/web#7635](https://github.com/owncloud/web/pull/7635): Add restore
    conflict dialog * Enhancement
    [owncloud/web#7901](https://github.com/owncloud/web/pull/7901): Add search field for
@@ -238,8 +251,8 @@ The following sections list the changes for unreleased.
    [owncloud/web#7900](https://github.com/owncloud/web/issues/7900): XHR upload
    timeout
 
-   https://github.com/owncloud/ocis/pull/5086
-   https://github.com/owncloud/web/releases/tag/v6.0.0-rc.7
+   https://github.com/owncloud/ocis/pull/5120
+   https://github.com/owncloud/web/releases/tag/v6.0.0-rc.8
 # Changelog for [2.0.0-rc.1] (2022-11-05)
 
 The following sections list the changes for 2.0.0-rc.1.
