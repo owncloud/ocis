@@ -85,7 +85,7 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 
 				if cfg.Tracing.Enabled {
-					opts = append(opts, ocdav.Tracing(cfg.Tracing.Endpoint, cfg.Tracing.Collector))
+					opts = append(opts, ocdav.Tracing(cfg.Tracing.Type, cfg.Tracing.Endpoint, cfg.Tracing.Collector))
 				}
 
 				s, err := ocdav.Service(opts...)
