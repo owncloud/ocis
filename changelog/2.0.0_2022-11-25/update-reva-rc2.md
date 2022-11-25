@@ -19,3 +19,4 @@ Changelog for reva 2.12.0 (2022-11-25)                                          
 *   Enhancement [cs3org/reva#3397](https://github.com/cs3org/reva/pull/3397): Reduce lock contention issues
 
 https://github.com/owncloud/ocis/pull/5092
+https://github.com/owncloud/ocis/pull/5131
