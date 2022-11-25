@@ -1,26 +1,4 @@
-# Changelog for [unreleased] (UNRELEASED)
-
-The following sections list the changes for unreleased.
-
-[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
-
-## Summary
-
-* Bugfix - Lower IDP token lifespans: [#5077](https://github.com/owncloud/ocis/pull/5077)
-* Bugfix - Do not reindex a space twice at the same time: [#5001](https://github.com/owncloud/ocis/pull/5001)
-* Bugfix - Decomposedfs increase filelock duration factor: [#5130](https://github.com/owncloud/ocis/pull/5130)
-* Bugfix - Find spaces by their name: [#5044](https://github.com/owncloud/ocis/pull/5044)
-* Bugfix - Adjust cache related configuration options: [#5087](https://github.com/owncloud/ocis/pull/5087)
-* Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
-* Bugfix - Initial role assingment with external IDM: [#5045](https://github.com/owncloud/ocis/issues/5045)
-* Bugfix - Make storage users mount ids unique by default: [#5091](https://github.com/owncloud/ocis/pull/5091)
-* Bugfix - Update reva to version 2.12.0: [#5092](https://github.com/owncloud/ocis/pull/5092)
-* Enhancement - Add tracing to search: [#5113](https://github.com/owncloud/ocis/pull/5113)
-* Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
-* Enhancement - Remove windows from ci & release makefile: [#5026](https://github.com/owncloud/ocis/pull/5026)
-* Enhancement - Update ownCloud Web to v6.0.0-rc.8: [#5120](https://github.com/owncloud/ocis/pull/5120)
-
-# Changelog for [2.0.0-rc.2] (2022-11-05)
+# Changelog for [2.0.0-rc.2] (2022-11-25)
 
 The following sections list the changes for 2.0.0-rc.2.
 
@@ -35,15 +13,20 @@ The following sections list the changes for 2.0.0-rc.2.
 * Bugfix - Autocreate IDP private key also if file exists but is empty: [#4394](https://github.com/owncloud/ocis/pull/4394)
 * Bugfix - Rename extensions to services (leftover occurences): [#4407](https://github.com/owncloud/ocis/pull/4407)
 * Bugfix - Fix DN parsing issues and sizelimit handling in libregraph/idm: [#3631](https://github.com/owncloud/ocis/issues/3631)
+* Bugfix - Lower IDP token lifespans: [#5077](https://github.com/owncloud/ocis/pull/5077)
 * Bugfix - Remove runtime kill and run commands: [#3740](https://github.com/owncloud/ocis/pull/3740)
 * Bugfix - Check permissions when deleting Space: [#3709](https://github.com/owncloud/ocis/pull/3709)
+* Bugfix - Do not reindex a space twice at the same time: [#5001](https://github.com/owncloud/ocis/pull/5001)
 * Bugfix - Disable federation capabilities: [#4864](https://github.com/owncloud/ocis/pull/4864)
+* Bugfix - Decomposedfs increase filelock duration factor: [#5130](https://github.com/owncloud/ocis/pull/5130)
+* Bugfix - Find spaces by their name: [#5044](https://github.com/owncloud/ocis/pull/5044)
 * Bugfix - Logging in on the wrong account when an email address is not unique: [#4039](https://github.com/owncloud/ocis/issues/4039)
 * Bugfix - Allow empty environment variables: [#3892](https://github.com/owncloud/ocis/pull/3892)
 * Bugfix - Remove unused transfer secret from app provider: [#3798](https://github.com/owncloud/ocis/pull/3798)
 * Bugfix - Fix authentication for autoprovisioned users: [#4616](https://github.com/owncloud/ocis/issues/4616)
 * Bugfix - Bring back the settings UI in Web: [#4691](https://github.com/owncloud/ocis/pull/4691)
 * Bugfix - Fix cache stat table config: [#4732](https://github.com/owncloud/ocis/pull/4732)
+* Bugfix - Adjust cache related configuration options: [#5087](https://github.com/owncloud/ocis/pull/5087)
 * Bugfix - Make IDP secrets configurable via environment variables: [#3744](https://github.com/owncloud/ocis/pull/3744)
 * Bugfix - CSP rules for silent token refresh in iframe: [#4031](https://github.com/owncloud/ocis/pull/4031)
 * Bugfix - Enable debug server by default: [#3827](https://github.com/owncloud/ocis/pull/3827)
@@ -57,6 +40,7 @@ The following sections list the changes for 2.0.0-rc.2.
 * Bugfix - Fix logging levels: [#4102](https://github.com/owncloud/ocis/pull/4102)
 * Bugfix - Don't run auth-bearer service by default: [#4692](https://github.com/owncloud/ocis/issues/4692)
 * Bugfix - Fix notifications service settings: [#4652](https://github.com/owncloud/ocis/pull/4652)
+* Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
 * Bugfix - Fix `OCIS_RUN_SERVICES`: [#4133](https://github.com/owncloud/ocis/pull/4133)
 * Bugfix - Fix the OIDC provider cache: [#4600](https://github.com/owncloud/ocis/pull/4600)
 * Bugfix - Fix permissions in REPORT: [#4520](https://github.com/owncloud/ocis/pull/4520)
@@ -90,9 +74,11 @@ The following sections list the changes for 2.0.0-rc.2.
 * Bugfix - Fix the webdav URL of drive roots: [#3706](https://github.com/owncloud/ocis/issues/3706)
 * Bugfix - Idp: Check if CA certificate if present: [#3623](https://github.com/owncloud/ocis/issues/3623)
 * Bugfix - Fix graph endpoint: [#3925](https://github.com/owncloud/ocis/issues/3925)
+* Bugfix - Initial role assingment with external IDM: [#5045](https://github.com/owncloud/ocis/issues/5045)
 * Bugfix - Escape DN attribute value: [#4117](https://github.com/owncloud/ocis/pull/4117)
 * Bugfix - Make IDP only wait for certs when using LDAP: [#3965](https://github.com/owncloud/ocis/pull/3965)
 * Bugfix - Make ocdav service behave properly: [#3957](https://github.com/owncloud/ocis/pull/3957)
+* Bugfix - Make storage users mount ids unique by default: [#5091](https://github.com/owncloud/ocis/pull/5091)
 * Bugfix - Return proper errors when ocs/cloud/users is using the cs3 backend: [#3483](https://github.com/owncloud/ocis/issues/3483)
 * Bugfix - Polish search: [#4094](https://github.com/owncloud/ocis/pull/4094)
 * Bugfix - Fix the shareroot path in REPORT responses: [#4859](https://github.com/owncloud/ocis/pull/4859)
@@ -103,6 +89,7 @@ The following sections list the changes for 2.0.0-rc.2.
 * Bugfix - Fix Thumbnails for IDs without a trailing path: [#3791](https://github.com/owncloud/ocis/pull/3791)
 * Bugfix - Space Creators can hand over spaces: [#4244](https://github.com/owncloud/ocis/pull/4244)
 * Bugfix - Make tokeninfo endpoint unprotected: [#4715](https://github.com/owncloud/ocis/pull/4715)
+* Bugfix - Update reva to version 2.12.0: [#5092](https://github.com/owncloud/ocis/pull/5092)
 * Bugfix - URL encode the webdav url in the graph API: [#3597](https://github.com/owncloud/ocis/pull/3597)
 * Bugfix - Store user passwords hashed in idm: [#3778](https://github.com/owncloud/ocis/issues/3778)
 * Bugfix - Fix wopi access to public shares: [#4631](https://github.com/owncloud/ocis/pull/4631)
@@ -129,6 +116,7 @@ The following sections list the changes for 2.0.0-rc.2.
 * Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
 * Enhancement - We added e-mail subject templating: [#4799](https://github.com/owncloud/ocis/pull/4799)
 * Enhancement - Add number of total matches to the search result: [#4189](https://github.com/owncloud/ocis/issues/4189)
+* Enhancement - Add tracing to search: [#5113](https://github.com/owncloud/ocis/pull/5113)
 * Enhancement - Add webURL to space root: [#4588](https://github.com/owncloud/ocis/pull/4588)
 * Enhancement - Align service naming: [#3606](https://github.com/owncloud/ocis/pull/3606)
 * Enhancement - Add acting user to the audit log: [#3753](https://github.com/owncloud/ocis/issues/3753)
@@ -155,6 +143,7 @@ The following sections list the changes for 2.0.0-rc.2.
 * Enhancement - Introduce insecure flag for smtp email notifications: [#4279](https://github.com/owncloud/ocis/pull/4279)
 * Enhancement - Optional events in graph service: [#55555](https://github.com/owncloud/ocis/pull/55555)
 * Enhancement - Fix behavior for foobar (in present tense): [#4346](https://github.com/owncloud/ocis/pull/4346)
+* Enhancement - Add the "hidden" state to the search index: [#5018](https://github.com/owncloud/ocis/pull/5018)
 * Enhancement - Restrict admins from self-removal: [#3713](https://github.com/owncloud/ocis/issues/3713)
 * Enhancement - OCS get share now also handle received shares: [#4322](https://github.com/owncloud/ocis/issues/4322)
 * Enhancement - Add config option to provide TLS certificate: [#3818](https://github.com/owncloud/ocis/issues/3818)
@@ -173,6 +162,7 @@ The following sections list the changes for 2.0.0-rc.2.
 * Enhancement - Automatically orientate photos when generating thumbnails: [#4477](https://github.com/owncloud/ocis/issues/4477)
 * Enhancement - Refactor extensions to services: [#3980](https://github.com/owncloud/ocis/pull/3980)
 * Enhancement - Refactor the proxy service: [#4401](https://github.com/owncloud/ocis/issues/4401)
+* Enhancement - Remove windows from ci & release makefile: [#5026](https://github.com/owncloud/ocis/pull/5026)
 * Enhancement - Rename AUTH_BASIC_AUTH_PROVIDER envvar: [#4966](https://github.com/owncloud/ocis/pull/4966)
 * Enhancement - Report parent id: [#4757](https://github.com/owncloud/ocis/pull/4757)
 * Enhancement - Allow resharing: [#3904](https://github.com/owncloud/ocis/pull/3904)
@@ -200,6 +190,7 @@ The following sections list the changes for 2.0.0-rc.2.
 * Enhancement - Update ownCloud Web to v5.5.0-rc.6: [#6854](https://github.com/owncloud/web/pull/6854)
 * Enhancement - Update ownCloud Web to v5.7.0-rc.1: [#4005](https://github.com/owncloud/ocis/pull/4005)
 * Enhancement - Update ownCloud Web to v6.0.0-rc.6: [#4970](https://github.com/owncloud/ocis/pull/4970)
+* Enhancement - Update ownCloud Web to v6.0.0-rc.8: [#5120](https://github.com/owncloud/ocis/pull/5120)
 * Enhancement - Update ownCloud Web to v5.7.0-rc.4: [#4140](https://github.com/owncloud/ocis/pull/4140)
 * Enhancement - Update ownCloud Web to v5.7.0-rc.8: [#4314](https://github.com/owncloud/ocis/pull/4314)
 * Enhancement - Update ownCloud Web to v5.7.0-rc.10: [#4439](https://github.com/owncloud/ocis/pull/4439)
@@ -214,7 +205,7 @@ The following sections list the changes for 2.0.0-rc.2.
 
 The following sections list the changes for 1.20.0.
 
-[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.20.0
+[1.20.0]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.20.0
 
 ## Summary
 
@@ -234,21 +225,11 @@ The following sections list the changes for 1.20.0.
 * Enhancement - Update ownCloud Web to v5.4.0: [#6709](https://github.com/owncloud/web/pull/6709)
 * Enhancement - Implement audit events for user and groups: [#3467](https://github.com/owncloud/ocis/pull/3467)
 
-# Changelog for [1.19.1] (2022-03-29)
-
-The following sections list the changes for 1.19.1.
-
-[1.19.1]: https://github.com/owncloud/ocis/compare/v1.19.0...v1.19.1
-
-## Summary
-
-* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
-
 # Changelog for [1.19.0] (2022-03-29)
 
 The following sections list the changes for 1.19.0.
 
-[1.19.0]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.0
+[1.19.0]: https://github.com/owncloud/ocis/compare/v1.19.1...v1.19.0
 
 ## Summary
 
@@ -269,6 +250,16 @@ The following sections list the changes for 1.19.0.
 * Enhancement - Improve thumbnails API: [#3272](https://github.com/owncloud/ocis/pull/3272)
 * Enhancement - Update reva to v2.1.0: [#3330](https://github.com/owncloud/ocis/pull/3330)
 * Enhancement - Update ownCloud Web to v5.3.0: [#6561](https://github.com/owncloud/web/pull/6561)
+
+# Changelog for [1.19.1] (2022-03-29)
+
+The following sections list the changes for 1.19.1.
+
+[1.19.1]: https://github.com/owncloud/ocis/compare/v1.18.0...v1.19.1
+
+## Summary
+
+* Bugfix - Return correct special item urls: [#3419](https://github.com/owncloud/ocis/pull/3419)
 
 # Changelog for [1.18.0] (2022-03-03)
 
