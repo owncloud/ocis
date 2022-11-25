@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Lower IDP token lifespans: [#5077](https://github.com/owncloud/ocis/pull/5077)
 * Bugfix - Do not reindex a space twice at the same time: [#5001](https://github.com/owncloud/ocis/pull/5001)
+* Bugfix - Decomposedfs increase filelock duration factor: [#5130](https://github.com/owncloud/ocis/pull/5130)
 * Bugfix - Find spaces by their name: [#5044](https://github.com/owncloud/ocis/pull/5044)
 * Bugfix - Adjust cache related configuration options: [#5087](https://github.com/owncloud/ocis/pull/5087)
 * Bugfix - Fix notifications Web UI url: [#4998](https://github.com/owncloud/ocis/pull/4998)
@@ -33,6 +34,14 @@ The following sections list the changes for unreleased.
    still in progress.
 
    https://github.com/owncloud/ocis/pull/5001
+
+* Bugfix - Decomposedfs increase filelock duration factor: [#5130](https://github.com/owncloud/ocis/pull/5130)
+
+   We made the file lock duration per lock cycle for decomposedfs configurable and increased it to
+   make locks work on top of NFS.
+
+   https://github.com/owncloud/ocis/issues/5024
+   https://github.com/owncloud/ocis/pull/5130
 
 * Bugfix - Find spaces by their name: [#5044](https://github.com/owncloud/ocis/pull/5044)
 
