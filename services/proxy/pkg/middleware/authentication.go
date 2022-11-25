@@ -2,6 +2,8 @@ package middleware
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strings"
@@ -103,6 +105,15 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 				})
 
 				webdav.HandleWebdavError(w, b, err)
+			}
+
+			if r.ProtoMajor == 1 {
+				// https://github.com/owncloud/ocis/issues/5066
+				// https://github.com/golang/go/blob/d5de62df152baf4de6e9fe81933319b86fd95ae4/src/net/http/server.go#L1357-L1417
+				// https://github.com/golang/go/issues/15527
+
+				defer r.Body.Close()
+				_, _ = io.Copy(ioutil.Discard, r.Body)
 			}
 		})
 	}
