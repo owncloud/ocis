@@ -217,21 +217,20 @@ class GraphContext implements Context {
 	 * sends a request to delete a user using the Graph API
 	 *
 	 * @param string $user username is used as the id
-	 * @param string|null $userAsAdmin
+	 * @param string|null $byUser
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function adminDeletesUserUsingTheGraphApi(string $user, string $userAsAdmin = null): void {
-		$adminUsername = $userAsAdmin ? $this->featureContext->getActualUsername($userAsAdmin) : $this->featureContext->getAdminUsername();
-		$adminPassword = $userAsAdmin ? $this->featureContext->getPasswordForUser($userAsAdmin) : $this->featureContext->getAdminPassword();
+	public function adminDeletesUserUsingTheGraphApi(string $user, ?string $byUser = null): void {
+		$credentials = $this->getAdminOrUserCredentials($byUser);
 
 		$this->featureContext->setResponse(
 			GraphHelper::deleteUser(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
-				$adminUsername,
-				$adminPassword,
+				$credentials["username"],
+				$credentials["password"],
 				$user
 			)
 		);
@@ -260,17 +259,17 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^the user "([^"]*)" deletes a user "([^"]*)" using GraphAPI$/
+	 * @When /^the user "([^"]*)" deletes a user "([^"]*)" using the Graph API$/
 	 *
-	 * @param string $userAsAdmin
+	 * @param string $byUser
 	 * @param string $user
 	 *
 	 * @return void
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function theUserDeletesAUserUsingGraphapi(string $userAsAdmin, string $user): void {
-		$this->adminDeletesUserUsingTheGraphApi($user, $userAsAdmin);
+	public function theUserDeletesAUserUsingTheGraphAPI(string $byUser, string $user): void {
+		$this->adminDeletesUserUsingTheGraphApi($user, $byUser);
 	}
 
 	/**
@@ -521,7 +520,6 @@ class GraphContext implements Context {
 	 * @param string $password
 	 * @param string $email
 	 * @param string $displayName
-	 * @param string|null $userAsAdmin
 	 *
 	 * @return void
 	 * @throws Exception|GuzzleException
@@ -530,16 +528,13 @@ class GraphContext implements Context {
 		string $user,
 		string $password,
 		string $email,
-		string $displayName,
-		string $userAsAdmin = null
+		string $displayName
 	): void {
-		$adminUsername = $userAsAdmin ? $this->featureContext->getActualUsername($userAsAdmin) : $this->featureContext->getAdminUsername();
-		$adminPassword = $userAsAdmin ? $this->featureContext->getPasswordForUser($userAsAdmin) : $this->featureContext->getAdminPassword();
 		$response = GraphHelper::createUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
-			$adminUsername,
-			$adminPassword,
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
 			$user,
 			$password,
 			$email,
@@ -589,23 +584,25 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Given /^the user "([^"]*)" has created a new user using GraphAPI with the following settings:$/
+	 * @Given /^the user "([^"]*)" has created a new user using the Graph API with the following settings:$/
 	 *
-	 * @param string $userAsAdmin
+	 * @param string $user
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws Exception|GuzzleException
 	 */
-	public function theUserHasCreatedANewUserUsingGraphapiWithTheFollowingSettings(string $userAsAdmin, TableNode $table): void {
-		$rows = $table->getRowsHash();
-		$this->theAdminHasCreatedUser(
-			$rows["userName"],
-			$rows["password"],
-			$rows["email"],
-			$rows["displayName"],
-			$userAsAdmin
+	public function theUserHasCreatedANewUserUsingGraphapiWithTheFollowingSettings(string $user, TableNode $table): void {
+		$this->theUserCreatesNewUser(
+			$user,
+			$table
 		);
+		$rows = $table->getRowsHash();
+		$response = $this->featureContext->getResponse();
+
+		if ($response->getStatusCode() !== 200) {
+			$this->throwHttpException($response, "Could not create user '$rows[userName]'");
+		}
 	}
 
 	/**
