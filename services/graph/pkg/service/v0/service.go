@@ -48,6 +48,7 @@ type Service interface {
 	DeleteGroupMember(http.ResponseWriter, *http.Request)
 
 	GetDrives(w http.ResponseWriter, r *http.Request)
+	GetSingleDrive(w http.ResponseWriter, r *http.Request)
 	GetAllDrives(w http.ResponseWriter, r *http.Request)
 	CreateDrive(w http.ResponseWriter, r *http.Request)
 }

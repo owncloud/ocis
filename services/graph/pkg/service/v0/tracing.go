@@ -100,6 +100,11 @@ func (t tracing) GetDrives(w http.ResponseWriter, r *http.Request) {
 	t.next.GetDrives(w, r)
 }
 
+// GetSingleDrive implements the Service interface.
+func (t tracing) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
+	t.next.GetDrives(w, r)
+}
+
 // GetAllDrives implements the Service interface.
 func (t tracing) GetAllDrives(w http.ResponseWriter, r *http.Request) {
 	t.next.GetAllDrives(w, r)
