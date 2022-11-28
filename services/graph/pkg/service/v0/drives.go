@@ -337,8 +337,6 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	root := &storageprovider.ResourceId{}
-
 	rid, err := storagespace.ParseID(driveID)
 	if err != nil {
 		logger.Debug().Err(err).Interface("id", rid).Msg("could not update drive, invalid resource id")
@@ -346,7 +344,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	root = &rid
+	root := &rid
 
 	client := g.GetGatewayClient()
 
