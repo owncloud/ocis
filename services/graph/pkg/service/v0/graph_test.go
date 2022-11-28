@@ -13,10 +13,12 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userprovider "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -32,6 +34,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc"
 )
 
 var _ = Describe("Graph", func() {
@@ -43,6 +46,12 @@ var _ = Describe("Graph", func() {
 		ctx               context.Context
 		cfg               *config.Config
 		rr                *httptest.ResponseRecorder
+
+		currentUser = &userv1beta1.User{
+			Id: &userv1beta1.UserId{
+				OpaqueId: "user",
+			},
+		}
 	)
 
 	BeforeEach(func() {
@@ -862,6 +871,174 @@ var _ = Describe("Graph", func() {
 			err = json.Unmarshal(data, &drive)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(*drive.GetQuota().Total).To(Equal(int64(500)))
+		})
+	})
+
+	Describe("Update a drive", func() {
+		BeforeEach(func() {
+			gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
+				Status:     status.NewOK(ctx),
+				TotalBytes: 500,
+			}, nil)
+		})
+
+		It("fails on missing drive id", func() {
+			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/drives/{driveID}/", nil)
+			svc.UpdateDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+
+			r = httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/drives/{driveID}/", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "")
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			svc.UpdateDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("fails on bad payload", func() {
+			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/drives/{driveID}/", bytes.NewBufferString("{invalid"))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "spaceid")
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			svc.UpdateDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("sets the description, alias and name", func() {
+			drive := libregraph.NewDrive()
+			drive.SetDriveAlias("thealias")
+			drive.SetDescription("thedescription")
+			drive.SetName("thename")
+			driveJson, err := json.Marshal(drive)
+			Expect(err).ToNot(HaveOccurred())
+
+			gatewayClient.On("UpdateStorageSpace", mock.Anything, mock.Anything).Return(func(_ context.Context, req *provider.UpdateStorageSpaceRequest, _ ...grpc.CallOption) *provider.UpdateStorageSpaceResponse {
+				return &provider.UpdateStorageSpaceResponse{
+					Status:       status.NewOK(ctx),
+					StorageSpace: req.StorageSpace,
+				}
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/drives/{driveID}/", bytes.NewBuffer(driveJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "spaceid")
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			svc.UpdateDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			gatewayClient.AssertCalled(GinkgoT(), "UpdateStorageSpace", mock.Anything, mock.MatchedBy(func(req *provider.UpdateStorageSpaceRequest) bool {
+				return req.StorageSpace.Id.OpaqueId == "spaceid" &&
+					utils.ReadPlainFromOpaque(req.StorageSpace.Opaque, "description") == drive.GetDescription() &&
+					utils.ReadPlainFromOpaque(req.StorageSpace.Opaque, "spaceAlias") == drive.GetDriveAlias()
+			}))
+		})
+
+		It("restores", func() {
+			drive := libregraph.NewDrive()
+			driveJson, err := json.Marshal(drive)
+			Expect(err).ToNot(HaveOccurred())
+
+			gatewayClient.On("UpdateStorageSpace", mock.Anything, mock.Anything).Return(func(_ context.Context, req *provider.UpdateStorageSpaceRequest, _ ...grpc.CallOption) *provider.UpdateStorageSpaceResponse {
+				return &provider.UpdateStorageSpaceResponse{
+					Status:       status.NewOK(ctx),
+					StorageSpace: req.StorageSpace,
+				}
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/drives/{driveID}/", bytes.NewBuffer(driveJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "spaceid")
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			r.Header.Add("Restore", "1")
+			svc.UpdateDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			gatewayClient.AssertCalled(GinkgoT(), "UpdateStorageSpace", mock.Anything, mock.MatchedBy(func(req *provider.UpdateStorageSpaceRequest) bool {
+				return req.StorageSpace.Id.OpaqueId == "spaceid" && utils.ReadPlainFromOpaque(req.Opaque, "restore") == "true"
+			}))
+		})
+
+		It("sets the quota", func() {
+			drive := libregraph.NewDrive()
+			quota := libregraph.Quota{}
+			quota.SetTotal(1000)
+			drive.SetQuota(quota)
+			driveJson, err := json.Marshal(drive)
+			Expect(err).ToNot(HaveOccurred())
+
+			gatewayClient.On("UpdateStorageSpace", mock.Anything, mock.Anything).Return(func(_ context.Context, req *provider.UpdateStorageSpaceRequest, _ ...grpc.CallOption) *provider.UpdateStorageSpaceResponse {
+				return &provider.UpdateStorageSpaceResponse{
+					Status:       status.NewOK(ctx),
+					StorageSpace: req.StorageSpace,
+				}
+			}, nil)
+			permissionService.On("GetPermissionByID", mock.Anything, mock.Anything).Return(&settingssvc.GetPermissionByIDResponse{
+				Permission: &v0.Permission{
+					Operation:  v0.Permission_OPERATION_UNKNOWN,
+					Constraint: v0.Permission_CONSTRAINT_OWN,
+				},
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/drives/{driveID}/", bytes.NewBuffer(driveJson))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "spaceid")
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.UpdateDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			gatewayClient.AssertCalled(GinkgoT(), "UpdateStorageSpace", mock.Anything, mock.MatchedBy(func(req *provider.UpdateStorageSpaceRequest) bool {
+				return req.StorageSpace.Id.OpaqueId == "spaceid" && req.StorageSpace.Quota.QuotaMaxBytes == uint64(1000)
+			}))
+		})
+	})
+
+	Describe("Delete a drive", func() {
+		It("fails on invalid drive ids", func() {
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/drives/{driveID}/", nil)
+			svc.DeleteDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+
+			r = httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/drives/{driveID}/", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "")
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			svc.DeleteDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("deletes", func() {
+			gatewayClient.On("DeleteStorageSpace", mock.Anything, mock.Anything).Return(&provider.DeleteStorageSpaceResponse{
+				Status: status.NewOK(ctx),
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/drives/{driveID}/", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "spaceid")
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.DeleteDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusNoContent))
+
+			gatewayClient.AssertCalled(GinkgoT(), "DeleteStorageSpace", mock.Anything, mock.MatchedBy(func(req *provider.DeleteStorageSpaceRequest) bool {
+				return req.Id.OpaqueId == "spaceid"
+			}))
+		})
+
+		It("purges", func() {
+			gatewayClient.On("DeleteStorageSpace", mock.Anything, mock.Anything).Return(&provider.DeleteStorageSpaceResponse{
+				Status: status.NewOK(ctx),
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/drives/{driveID}/", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "spaceid")
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r.Header.Add("Purge", "1")
+			svc.DeleteDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusNoContent))
+
+			gatewayClient.AssertCalled(GinkgoT(), "DeleteStorageSpace", mock.Anything, mock.MatchedBy(func(req *provider.DeleteStorageSpaceRequest) bool {
+				return req.Id.OpaqueId == "spaceid" && utils.ExistsInOpaque(req.Opaque, "purge")
+			}))
 		})
 	})
 })
