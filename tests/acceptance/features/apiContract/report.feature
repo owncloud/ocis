@@ -23,7 +23,7 @@ Feature: Report test
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "SubFolder1" using the WebDAV API
     Then the HTTP status code should be "207"
-    And for user "Brian" the REPORT response should contain a mountpoint "folderMain" with these key and value pairs:
+    And for user "Brian" the "REPORT" response should contain a mountpoint "folderMain" with these key and value pairs:
       | key              | value                |
       | oc:fileid        | UUIDof:SubFolder1    |
       | oc:file-parent   | UUIDof:folderMain    |
@@ -39,7 +39,7 @@ Feature: Report test
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "insideTheFolder.txt" using the WebDAV API
     Then the HTTP status code should be "207"
-    And for user "Brian" the REPORT response should contain a mountpoint "folderMain" with these key and value pairs:
+    And for user "Brian" the "REPORT" response should contain a mountpoint "folderMain" with these key and value pairs:
       | key                | value                                            |
       | oc:fileid          | UUIDof:SubFolder1/subFOLDER2/insideTheFolder.txt |
       | oc:file-parent     | UUIDof:SubFolder1/subFOLDER2                     |

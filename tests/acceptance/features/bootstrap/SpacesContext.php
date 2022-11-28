@@ -365,6 +365,32 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function getPrivateLink(string $user, string $spaceName): string {
+		$this->setSpaceIDByName($user, $spaceName);
+		$response = WebDavHelper::propfind(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			"",
+			['oc:privatelink'],
+			"",
+			"0",
+			"files",
+			WebDavHelper::DAV_VERSION_SPACES
+		);
+		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml($response)->xpath("//d:response/d:propstat/d:prop/oc:privatelink")), true, 512, JSON_THROW_ON_ERROR);
+		Assert::assertNotEmpty($responseArray, "the PROPFIND response for $spaceName is empty");
+		return $responseArray[0][0];
+	}
+
+	/**
 	 * The method returns eTag
 	 *
 	 * @param string $user
@@ -1091,7 +1117,7 @@ class SpacesContext implements Context {
 	 * Verify that the tableNode contains expected number of columns
 	 *
 	 * @param TableNode $table
-	 * @param int       $count
+	 * @param int $count
 	 *
 	 * @return void
 	 *
@@ -2926,36 +2952,75 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^for user "([^"]*)" the REPORT response should contain a (?:space|mountpoint) "([^"]*)" with these key and value pairs:$/
+	 * @When /^user "([^"]*)" sends PROPFIND request to space "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @throws GuzzleException
+	 *
+	 * @return void
+	 */
+	public function userSendsPropfindRequestToSpace(string $user, string $spaceName): void {
+		$this->setSpaceIDByName($user, $spaceName);
+		$properties = ['oc:permissions','oc:fileid','oc:share-types','oc:privatelink','d:resourcetype','oc:size','oc:name','d:getcontenttype'];
+		$this->featureContext->setResponse(
+			WebDavHelper::propfind(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
+				"",
+				$properties,
+				"",
+				"0",
+				"files",
+				WebDavHelper::DAV_VERSION_SPACES
+			)
+		);
+	}
+
+	/**
+	 * @Then /^for user "([^"]*)" the "([^"]*)" response should contain a (?:space|mountpoint) "([^"]*)" with these key and value pairs:$/
+	 *
+	 * @param string $user
+	 * @param string $method # method should be either PROPFIND or REPORT
 	 * @param string $space
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
+	 * @throws JsonException
 	 */
-	public function reportResponseShouldContain(string $user, string $space, TableNode $table): void {
+	public function theResponseShouldContain(string $user, string $method, string $space, TableNode $table): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
 		$xmlRes = $this->featureContext->getResponseXml();
-		$resourceType = $xmlRes->xpath("//d:response/d:propstat/d:prop/d:getcontenttype")[0]->__toString();
-
 		foreach ($table->getHash() as $row) {
 			$findItem = $row['key'];
 			$responseValue = $xmlRes->xpath("//d:response/d:propstat/d:prop/$findItem")[0]->__toString();
 			Assert::assertNotEmpty($responseValue, "response doesn't contain $findItem or empty");
 			$value = str_replace('UUIDof:', '', $row['value']);
-
 			switch ($findItem) {
 				case "oc:fileid":
-					if ($resourceType === 'httpd/unix-directory') {
-						Assert::assertEquals($this->getFolderId($user, $space, $value), $responseValue, 'wrong fileId in the response');
+					$resourceType = $xmlRes->xpath("//d:response/d:propstat/d:prop/d:getcontenttype")[0]->__toString();
+					if ($method === 'PROPFIND') {
+						if (!$resourceType) {
+							Assert::assertEquals($this->getFolderId($user, $space, $value), $responseValue, 'wrong fileId in the response');
+						} else {
+							Assert::assertEquals($this->getFileId($user, $space, $value), $responseValue, 'wrong fileId in the response');
+						}
 					} else {
-						Assert::assertEquals($this->getFileId($user, $space, $value), $responseValue, 'wrong fileId in the response');
+						if ($resourceType === 'httpd/unix-directory') {
+							Assert::assertEquals($this->getFolderId($user, $space, $value), $responseValue, 'wrong fileId in the response');
+						} else {
+							Assert::assertEquals($this->getFileId($user, $space, $value), $responseValue, 'wrong fileId in the response');
+						}
 					}
 					break;
 				case "oc:file-parent":
 					Assert::assertEquals($this->getFolderId($user, $space, $value), $responseValue, 'wrong file-parentId in the response');
+					break;
+				case "oc:privatelink":
+					Assert::assertEquals($this->getPrivateLink($user, $space), $responseValue, 'cannot find private link for space or resource in the response');
 					break;
 				default:
 					Assert::assertEquals($value, $responseValue, "wrong $findItem in the response");
