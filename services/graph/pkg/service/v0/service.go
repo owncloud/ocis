@@ -51,6 +51,8 @@ type Service interface {
 	GetSingleDrive(w http.ResponseWriter, r *http.Request)
 	GetAllDrives(w http.ResponseWriter, r *http.Request)
 	CreateDrive(w http.ResponseWriter, r *http.Request)
+	UpdateDrive(w http.ResponseWriter, r *http.Request)
+	DeleteDrive(w http.ResponseWriter, r *http.Request)
 }
 
 // NewService returns a service implementation for Service.

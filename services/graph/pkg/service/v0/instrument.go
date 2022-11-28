@@ -109,6 +109,16 @@ func (i instrument) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 	i.next.GetDrives(w, r)
 }
 
+// UpdateDrive implements the Service interface.
+func (i instrument) UpdateDrive(w http.ResponseWriter, r *http.Request) {
+	i.next.GetDrives(w, r)
+}
+
+// DeleteDrive implements the Service interface.
+func (i instrument) DeleteDrive(w http.ResponseWriter, r *http.Request) {
+	i.next.GetDrives(w, r)
+}
+
 // GetAllDrives implements the Service interface.
 func (i instrument) GetAllDrives(w http.ResponseWriter, r *http.Request) {
 	i.next.GetAllDrives(w, r)
