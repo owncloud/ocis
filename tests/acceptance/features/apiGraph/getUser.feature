@@ -13,7 +13,7 @@ Feature: get users
     Given user "Brian" has been created with default attributes and without skeleton files
     When user "Alice" tries to get information of user "Brian" using Graph API
     Then the HTTP status code should be "200"
-    And the API response should contain the following information:
+    And the user retrieved API response should contain the following information:
       | displayName  | id       | mail              | onPremisesSamAccountName |
       | Brian Murphy | %UUIDv4% | brian@example.org | Brian                    |
 

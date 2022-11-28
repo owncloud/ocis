@@ -974,96 +974,108 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse($response);
 	}
 
-    /**
-     * @Then /^the user retrieved API response should contain the following information:$/
-     *
-     * @param TableNode $table
-     *
-     * @return void
-     * @throws GuzzleException
-     */
-	public function theUserRetrieveApiResponseShouldContainTheFollowingInformation(TableNode $table): void
-    {
-        $rows = $table->getHash();
-        $apiResponse = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
-        foreach ($rows as $row) {
-            $this->checkUserInfromation($row, $apiResponse);
-        }
-    }
+	/**
+	 * @Then /^the user retrieved API response should contain the following information:$/
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theUserRetrieveApiResponseShouldContainTheFollowingInformation(TableNode $table): void {
+		$rows = $table->getHash();
+		$apiResponse = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
+		foreach ($rows as $row) {
+			$this->checkUserInfromation($row, $apiResponse);
+		}
+	}
 
-    /**
-     * @param array $expectedValue
-     * @param array $actualValue
-     *
-     * @throws GuzzleException
-     * @return void
-     */
-    public function checkUserInfromation(array $expectedValue, array  $actualValue):void {
-        foreach (array_keys($expectedValue) as $keyName) {
-            if ($keyName === 'memberOf') {
-                $memberOfFromApiReponse = [];
-                $memberOf = preg_split('/\s*,\s*/', trim($expectedValue['memberOf']));
-                foreach ($actualValue['memberOf'] as $member) {
-                    $memberOfFromApiReponse[] = $member['displayName'];
-                }
-                Assert::assertEqualsCanonicalizing($memberOf, $memberOfFromApiReponse);
-            }
-            else if ($keyName === 'id') {
-                // check user_id
-                Assert::assertEquals(1, $this->checkUUIDv4PatternForUserId($actualValue['id']) , __METHOD__ . ' User id is not in UUIDv4 pattern !!');
-            } else {
-                Assert::assertEquals(
-                    $expectedValue[$keyName],
-                    $actualValue[$keyName],
-                    __METHOD__ .
-                    ' Expected ' . $expectedValue[$keyName] . ' but got ' . $actualValue[$keyName]
-                );
-            }
-        }
-    }
+	/**
+	 * @param array $expectedValue
+	 * @param array $actualValue
+	 *
+	 * @throws GuzzleException
+	 * @return void
+	 */
+	public function checkUserInfromation(array $expectedValue, array  $actualValue):void {
+		foreach (array_keys($expectedValue) as $keyName) {
+			if ($keyName === 'memberOf') {
+				$memberOfFromApiReponse = [];
+				$memberOf = preg_split('/\s*,\s*/', trim($expectedValue['memberOf']));
+				foreach ($actualValue['memberOf'] as $member) {
+					$memberOfFromApiReponse[] = $member['displayName'];
+				}
+				Assert::assertEqualsCanonicalizing($memberOf, $memberOfFromApiReponse);
+			} elseif ($keyName === 'id') {
+				// check user_id
+				Assert::assertEquals(1, $this->checkUUIDv4PatternForUserId($actualValue['id']), __METHOD__ . ' User id is not in UUIDv4 pattern !!');
+			} else {
+				Assert::assertEquals(
+					$expectedValue[$keyName],
+					$actualValue[$keyName],
+					__METHOD__ .
+					' Expected ' . $expectedValue[$keyName] . ' but got ' . $actualValue[$keyName]
+				);
+			}
+		}
+	}
 
-    /**
-     * @When user :user tries to get information of user :ofUser
-     */
-    public function userTriesToGetInformationOfUser($user, $ofUser)
-    {
-        $credentials = $this->getAdminOrUserCredentials($user);
-        $response = GraphHelper::getUser(
-            $this->featureContext->getBaseUrl(),
-            $this->featureContext->getStepLineRef(),
-            $credentials['username'],
-            $credentials['password'],
-            $ofUser
-        );
-        $this->featureContext->setResponse($response);
-    }
+	/**
+	 * @When user :user tries to get information of user :ofUser using Graph API
+	 */
+	public function userTriesToGetInformationOfUser($user, $ofUser) {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$response = GraphHelper::getUser(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password'],
+			$ofUser
+		);
+		$this->featureContext->setResponse($response);
+	}
 
-    /**
-     * @Then the API response should contain all user with following information:
-     *
-     * @param TableNode $table
-     *
-     * @throws Exception
-     */
-    public function theApiResponseShouldContainAllUserWithFollowingInformation(TableNode $table)
-    {
-        $values = $table->getHash();
-        $apiResponse = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'];
-        foreach ($values as $expectedValue){
-            $found = false;
-            foreach ($apiResponse as $key => $actualResponse) {
-                if($actualResponse["displayName"] === $expectedValue["displayName"]) {
-                    $found = true;
-                    unset($apiResponse[$key]);
-                    $this->checkUserInfromation($expectedValue, $actualResponse);
-                    break;
-                }
-            }
-            if(!$found) {
-                throw new Exception('User ' . $expectedValue["displayName"] . ' could not be found');
-            }
-        }
-    }
+	/**
+	 * @When user :user tries to get all user using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userGetsAllUserUsingTheGraphApi(string $user) {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$response = GraphHelper::getUsers(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password'],
+		);
+		$this->featureContext->setResponse($response);
+	}
 
-
+	/**
+	 * @Then the API response should contain all user with following information:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @throws Exception
+	 */
+	public function theApiResponseShouldContainAllUserWithFollowingInformation(TableNode $table) {
+		$values = $table->getHash();
+		$apiResponse = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'];
+		foreach ($values as $expectedValue) {
+			$found = false;
+			foreach ($apiResponse as $key => $actualResponseValue) {
+				if ($expectedValue["displayName"] === $actualResponseValue["displayName"]) {
+					$found = true;
+					$this->checkUserInfromation($expectedValue, $actualResponseValue);
+					unset($apiResponse[$key]);
+					break;
+				}
+			}
+			if (!$found) {
+				throw new Exception('User ' . $expectedValue["displayName"] . ' could not be found in the response.');
+			}
+		}
+	}
 }
