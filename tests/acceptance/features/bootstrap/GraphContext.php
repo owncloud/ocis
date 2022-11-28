@@ -234,6 +234,28 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * remove user from group
+	 *
+	 * @param string $groupId
+	 * @param string $userId
+	 * @param string|null $byUser
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function removeUserFromGroup(string $groupId, string $userId, ?string $byUser = null): ResponseInterface {
+		$credentials = $this->getAdminOrUserCredentials($byUser);
+		return GraphHelper::removeUserFromGroup(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password'],
+			$userId,
+			$groupId,
+		);
+	}
+
+	/**
 	 * @param string $user
 	 * @param string $group
 	 *
@@ -243,16 +265,9 @@ class GraphContext implements Context {
 	 */
 	public function adminHasRemovedUserFromGroupUsingTheGraphApi(string $user, string $group): void {
 		$user = $this->featureContext->getActualUsername($user);
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
-		$response = GraphHelper::removeUserFromGroup(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$userId,
-			$groupId,
-		);
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		$response = $this->removeUserFromGroup($groupId, $userId);
 		$this->featureContext->setResponse($response);
 		$this->featureContext->thenTheHTTPStatusCodeShouldBe(204);
 	}
@@ -925,5 +940,62 @@ class GraphContext implements Context {
 	 */
 	public function userRenamesGroupUsingTheGraphApi(string $user, string $oldGroup, string $newGroup): void {
 		$this->featureContext->setResponse($this->renameGroup($oldGroup, $newGroup, $user));
+	}
+
+	/**
+	 * @When the administrator removes the following users from the following groups using the Graph API
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theAdministratorRemovesTheFollowingUsersFromTheFollowingGroupsUsingTheGraphApi(TableNode $table): void {
+		$this->featureContext->verifyTableNodeColumns($table, ['username', 'groupname']);
+		$usersGroups = $table->getColumnsHash();
+
+		foreach ($usersGroups as $userGroup) {
+			$groupId = $this->featureContext->getAttributeOfCreatedGroup($userGroup['groupname'], "id");
+			$userId = $this->featureContext->getAttributeOfCreatedUser($userGroup['username'], "id");
+			$this->featureContext->setResponse($this->removeUserFromGroup($groupId, $userId));
+			$this->featureContext->pushToLastHttpStatusCodesArray();
+		}
+	}
+
+	/**
+	 * @When the administrator removes user :user from group :group using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $group
+	 *
+	 * @return void
+	 */
+	public function theAdministratorTriesToRemoveUserFromGroupUsingTheGraphAPI(string $user, string $group): void {
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		$this->featureContext->setResponse($this->removeUserFromGroup($groupId, $userId));
+	}
+
+	/**
+	 * @When the administrator tries to remove user :user from group :group using the Graph API
+	 * @When user :byUser tries to remove user :user from group :group using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $group
+	 * @param string|null $byUser
+	 *
+	 * @return void
+	 */
+	public function theUserTriesToRemoveAnotherUserFromGroupUsingTheGraphAPI(string $user, string $group, ?string $byUser = null): void {
+		try {
+			$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		} catch (Exception $e) {
+			$groupId = WebDavHelper::generateUUIDv4();
+		}
+		try {
+			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		} catch (Exception $e) {
+			$userId = WebDavHelper::generateUUIDv4();
+		}
+		$this->featureContext->setResponse($this->removeUserFromGroup($groupId, $userId, $byUser));
 	}
 }
