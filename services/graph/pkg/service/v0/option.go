@@ -21,7 +21,7 @@ type Options struct {
 	Middleware        []func(http.Handler) http.Handler
 	GatewayClient     GatewayClient
 	IdentityBackend   identity.Backend
-	RoleService       settingssvc.RoleService
+	RoleService       RoleService
 	PermissionService Permissions
 	RoleManager       *roles.Manager
 	EventsPublisher   events.Publisher
@@ -73,8 +73,8 @@ func WithIdentityBackend(val identity.Backend) Option {
 	}
 }
 
-// RoleService provides a function to set the RoleService option.
-func RoleService(val settingssvc.RoleService) Option {
+// WithRoleService provides a function to set the RoleService option.
+func WithRoleService(val RoleService) Option {
 	return func(o *Options) {
 		o.RoleService = val
 	}
