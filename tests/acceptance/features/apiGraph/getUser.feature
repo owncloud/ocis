@@ -51,12 +51,39 @@ Feature: get users
     And the last response should be an unauthorized response
 
 
-  Scenario: admin user tries to get drive data of another user
+  Scenario: admin user tries to get drive information of a user
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
-    When the user "Alice" tries to get information of user "Brian" along with his drive data using Graph API
+    When the user "Alice" tries to get user "Brian" along with his drive information using Graph API
     Then the HTTP status code should be "200"
     And the user retrieve API response should contain the following information:
       | displayName  | id        | mail              | onPremisesSamAccountName |
       | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
+#    And the drive information of user "Brian" should contain:
+#      | key              | value                            |
+#      | driveType        | personal                         |
+#      | driveAlias       | personal/alice                   |
+#      | id               | %space_id%                       |
+#      | name             | Brian Murphy                     |
+#      | quota@@@state    | normal                           |
+#      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+
+
+  Scenario: normal user tries to get hid/her own drive information
+    Given these users have been created with default attributes and without skeleton files:
+      | username |
+      | Brian    |
+    When the user "Brian" tries to get his drive information using Graph API
+    Then the HTTP status code should be "200"
+    And the user retrieve API response should contain the following information:
+      | displayName  | id        | mail              | onPremisesSamAccountName |
+      | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
+#    And the drive information of user "Brian" should contain:
+#      | key              | value                            |
+#      | driveType        | personal                         |
+#      | driveAlias       | personal/brian                   |
+#      | id               | %space_id%                       |
+#      | name             | Brian Murphy                     |
+#      | quota@@@state    | normal                           |
+#      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
