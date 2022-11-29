@@ -32,7 +32,7 @@ There are four different annotation variables that need to be filled:
 | depreactionVersion| The version the variable will be deprecated| semver (e.g. 1.6.2)|
 | removalVersion| The version the variable will be removed from the codebase| semver (e.g. 1.7.3)|
 | deprecationInfo| Information why the variable is deprecated, must start with the name of the variable in order to avoid confusion, when there are multiple options in the `env:`-field | string (e.g. NATS_NATS_HOST is confusing) |
-| depreactionReplacement | The name of the variable that is going to replace the deprecated on.| string (e.g. NATS_HOST_ADDRESS)|
+| depreactionReplacement | The name of the variable that is going to replace the deprecated one.| string (e.g. NATS_HOST_ADDRESS)|
 
 ### What happens next?
 
