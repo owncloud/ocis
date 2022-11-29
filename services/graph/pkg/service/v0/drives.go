@@ -337,8 +337,6 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	root := &storageprovider.ResourceId{}
-
 	rid, err := storagespace.ParseID(driveID)
 	if err != nil {
 		logger.Debug().Err(err).Interface("id", rid).Msg("could not update drive, invalid resource id")
@@ -346,7 +344,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	root = &rid
+	root := &rid
 
 	client := g.GetGatewayClient()
 
@@ -400,7 +398,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 
 	if drive.Quota.HasTotal() {
 		user := ctxpkg.ContextMustGetUser(r.Context())
-		canSetSpaceQuota, err := canSetSpaceQuota(r.Context(), user)
+		canSetSpaceQuota, err := g.canSetSpaceQuota(r.Context(), user)
 		if err != nil {
 			logger.Error().Err(err).Msg("could not update drive: failed to check if the user can set space quota")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -771,9 +769,8 @@ func getQuota(quota *libregraph.Quota, defaultQuota string) *storageprovider.Quo
 	}
 }
 
-func canSetSpaceQuota(ctx context.Context, user *userv1beta1.User) (bool, error) {
-	settingsService := settingssvc.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient())
-	_, err := settingsService.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{PermissionId: settingsServiceExt.SetSpaceQuotaPermissionID})
+func (g Graph) canSetSpaceQuota(ctx context.Context, user *userv1beta1.User) (bool, error) {
+	_, err := g.permissionsService.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{PermissionId: settingsServiceExt.SetSpaceQuotaPermissionID})
 	if err != nil {
 		merror := merrors.FromError(err)
 		if merror.Status == http.StatusText(http.StatusNotFound) {

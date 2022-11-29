@@ -104,6 +104,21 @@ func (l logging) GetDrives(w http.ResponseWriter, r *http.Request) {
 	l.next.GetDrives(w, r)
 }
 
+// GetSingleDrive implements the Service interface.
+func (l logging) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
+	l.next.GetDrives(w, r)
+}
+
+// UpdateDrive implements the Service interface.
+func (l logging) UpdateDrive(w http.ResponseWriter, r *http.Request) {
+	l.next.GetDrives(w, r)
+}
+
+// DeleteDrive implements the Service interface.
+func (l logging) DeleteDrive(w http.ResponseWriter, r *http.Request) {
+	l.next.GetDrives(w, r)
+}
+
 // GetAllDrives implements the Service interface.
 func (l logging) GetAllDrives(w http.ResponseWriter, r *http.Request) {
 	l.next.GetAllDrives(w, r)
