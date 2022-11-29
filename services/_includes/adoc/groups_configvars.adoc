@@ -1,3 +1,21 @@
+// set the attribute to true or leave empty, true without any quotes.
+
+:show-deprecation: false
+
+ifeval::[{show-deprecation} == true]
+
+[[deprecation-note]]
+[caption=]
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Deprecation Info
+| Deprecation Version
+| Removal Version
+| Deprecation Replacment
+|===
+
+endif::[]
+
 [caption=]
 .Environment variables for the groups service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -6,449 +24,567 @@
 | Type
 | Default Value
 | Description
-|`OCIS_TRACING_ENABLED` +
-`GROUPS_TRACING_ENABLED`
+
+a|`OCIS_TRACING_ENABLED` +
+`GROUPS_TRACING_ENABLED` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Activates tracing.
-|`OCIS_TRACING_TYPE` +
-`GROUPS_TRACING_TYPE`
+
+a|`OCIS_TRACING_TYPE` +
+`GROUPS_TRACING_TYPE` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
-|`OCIS_TRACING_ENDPOINT` +
-`GROUPS_TRACING_ENDPOINT`
+
+a|`OCIS_TRACING_ENDPOINT` +
+`GROUPS_TRACING_ENDPOINT` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The endpoint of the tracing agent.
-|`OCIS_TRACING_COLLECTOR` +
-`GROUPS_TRACING_COLLECTOR`
+
+a|`OCIS_TRACING_COLLECTOR` +
+`GROUPS_TRACING_COLLECTOR` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
-|`OCIS_LOG_LEVEL` +
-`GROUPS_LOG_LEVEL`
+
+a|`OCIS_LOG_LEVEL` +
+`GROUPS_LOG_LEVEL` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
-|`OCIS_LOG_PRETTY` +
-`GROUPS_LOG_PRETTY`
+
+a|`OCIS_LOG_PRETTY` +
+`GROUPS_LOG_PRETTY` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Activates pretty log output.
-|`OCIS_LOG_COLOR` +
-`GROUPS_LOG_COLOR`
+
+a|`OCIS_LOG_COLOR` +
+`GROUPS_LOG_COLOR` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Activates colorized log output.
-|`OCIS_LOG_FILE` +
-`GROUPS_LOG_FILE`
+
+a|`OCIS_LOG_FILE` +
+`GROUPS_LOG_FILE` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
-|`GROUPS_DEBUG_ADDR`
+
+a|`GROUPS_DEBUG_ADDR` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9161 ++
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
-|`GROUPS_DEBUG_TOKEN`
+
+a|`GROUPS_DEBUG_TOKEN` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
-|`GROUPS_DEBUG_PPROF`
+
+a|`GROUPS_DEBUG_PPROF` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
-|`GROUPS_DEBUG_ZPAGES`
+
+a|`GROUPS_DEBUG_ZPAGES` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
-|`GROUPS_GRPC_ADDR`
+
+a|`GROUPS_GRPC_ADDR` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9160 ++
 a| [subs=-attributes]
 The bind address of the GRPC service.
-|`OCIS_GRPC_TLS_ENABLED`
+
+a|`OCIS_GRPC_TLS_ENABLED` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Activates TLS for the grpc based services using the server certifcate and key configured via OCIS_GRPC_TLS_CERTIFICATE and OCIS_GRPC_TLS_KEY. If OCIS_GRPC_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with OCIS_GRPC_CLIENT_TLS_MODE=insecure.
-|`OCIS_GRPC_TLS_CERTIFICATE`
+
+a|`OCIS_GRPC_TLS_CERTIFICATE` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Path/File name of the TLS server certificate (in PEM format) for the grpc services.
-|`OCIS_GRPC_TLS_KEY`
+
+a|`OCIS_GRPC_TLS_KEY` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the grpc services.
-|`GROUPS_GRPC_PROTOCOL`
+
+a|`GROUPS_GRPC_PROTOCOL` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++tcp ++
 a| [subs=-attributes]
 The transport protocol of the GRPC service.
-|`OCIS_JWT_SECRET` +
-`GROUPS_JWT_SECRET`
+
+a|`OCIS_JWT_SECRET` +
+`GROUPS_JWT_SECRET` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
-|`REVA_GATEWAY`
+
+a|`REVA_GATEWAY` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 a| [subs=-attributes]
 The CS3 gateway endpoint.
-|`OCIS_GRPC_CLIENT_TLS_MODE`
+
+a|`OCIS_GRPC_CLIENT_TLS_MODE` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 TLS mode for grpc connection to the go-micro based grpc services. Possible values are 'off', 'insecure' and 'on'. 'off': disables transport security for the clients. 'insecure' allows to use transport security, but disables certificate verification (to be used with the autogenerated self-signed certificates). 'on' enables transport security, including server ceritificate verification.
-|`OCIS_GRPC_CLIENT_TLS_CACERT`
+
+a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
-|`GROUPS_SKIP_USER_GROUPS_IN_TOKEN`
+
+a|`GROUPS_SKIP_USER_GROUPS_IN_TOKEN` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disables the loading of user's group memberships from the reva access token.
-|`GROUPS_DRIVER`
+
+a|`GROUPS_DRIVER` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ldap ++
 a| [subs=-attributes]
 The driver which should be used by the groups service. Supported values are 'ldap' and 'owncloudsql'.
-|`LDAP_URI` +
-`GROUPS_LDAP_URI`
+
+a|`LDAP_URI` +
+`GROUPS_LDAP_URI` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
 a| [subs=-attributes]
 URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
-|`LDAP_CACERT` +
-`GROUPS_LDAP_CACERT`
+
+a|`LDAP_CACERT` +
+`GROUPS_LDAP_CACERT` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++~/.ocis/idm/ldap.crt ++
 a| [subs=-attributes]
 Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service.
-|`LDAP_INSECURE` +
-`GROUPS_LDAP_INSECURE`
+
+a|`LDAP_INSECURE` +
+`GROUPS_LDAP_INSECURE` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.
-|`LDAP_BIND_DN` +
-`GROUPS_LDAP_BIND_DN`
+
+a|`LDAP_BIND_DN` +
+`GROUPS_LDAP_BIND_DN` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++uid=reva,ou=sysusers,o=libregraph-idm ++
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
-|`LDAP_BIND_PASSWORD` +
-`GROUPS_LDAP_BIND_PASSWORD`
+
+a|`LDAP_BIND_PASSWORD` +
+`GROUPS_LDAP_BIND_PASSWORD` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Password to use for authenticating the 'bind_dn'.
-|`LDAP_USER_BASE_DN` +
-`GROUPS_LDAP_USER_BASE_DN`
+
+a|`LDAP_USER_BASE_DN` +
+`GROUPS_LDAP_USER_BASE_DN` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ou=users,o=libregraph-idm ++
 a| [subs=-attributes]
 Search base DN for looking up LDAP users.
-|`LDAP_GROUP_BASE_DN` +
-`GROUPS_LDAP_GROUP_BASE_DN`
+
+a|`LDAP_GROUP_BASE_DN` +
+`GROUPS_LDAP_GROUP_BASE_DN` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ou=groups,o=libregraph-idm ++
 a| [subs=-attributes]
 Search base DN for looking up LDAP groups.
-|`LDAP_USER_SCOPE` +
-`GROUPS_LDAP_USER_SCOPE`
+
+a|`LDAP_USER_SCOPE` +
+`GROUPS_LDAP_USER_SCOPE` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++sub ++
 a| [subs=-attributes]
 LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
-|`LDAP_GROUP_SCOPE` +
-`GROUPS_LDAP_GROUP_SCOPE`
+
+a|`LDAP_GROUP_SCOPE` +
+`GROUPS_LDAP_GROUP_SCOPE` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++sub ++
 a| [subs=-attributes]
 LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
-|`LDAP_GROUP_SUBSTRING_FILTER_TYPE` +
-`GROUP_LDAP_GROUP_SUBSTRING_FILTER_TYPE`
+
+a|`LDAP_GROUP_SUBSTRING_FILTER_TYPE` +
+`GROUP_LDAP_GROUP_SUBSTRING_FILTER_TYPE` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++any ++
 a| [subs=-attributes]
 Type of substring search filter to use for substring searches for groups. Possible values: 'initial' for doing prefix only searches, 'final' for doing suffix only searches or 'any' for doing full substring searches
-|`LDAP_USER_FILTER` +
-`GROUPS_LDAP_USER_FILTER`
+
+a|`LDAP_USER_FILTER` +
+`GROUPS_LDAP_USER_FILTER` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.
-|`LDAP_GROUP_FILTER` +
-`GROUPS_LDAP_GROUP_FILTER`
+
+a|`LDAP_GROUP_FILTER` +
+`GROUPS_LDAP_GROUP_FILTER` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 LDAP filter to add to the default filters for group searches.
-|`LDAP_USER_OBJECTCLASS` +
-`GROUPS_LDAP_USER_OBJECTCLASS`
+
+a|`LDAP_USER_OBJECTCLASS` +
+`GROUPS_LDAP_USER_OBJECTCLASS` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++inetOrgPerson ++
 a| [subs=-attributes]
 The object class to use for users in the default user search filter ('inetOrgPerson').
-|`LDAP_GROUP_OBJECTCLASS` +
-`GROUPS_LDAP_GROUP_OBJECTCLASS`
+
+a|`LDAP_GROUP_OBJECTCLASS` +
+`GROUPS_LDAP_GROUP_OBJECTCLASS` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++groupOfNames ++
 a| [subs=-attributes]
 The object class to use for groups in the default group search filter ('groupOfNames').
-|`OCIS_URL` +
+
+a|`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
-`GROUPS_IDP_URL`
+`GROUPS_IDP_URL` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9200 ++
 a| [subs=-attributes]
 The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
-|`LDAP_USER_SCHEMA_ID` +
-`GROUPS_LDAP_USER_SCHEMA_ID`
+
+a|`LDAP_USER_SCHEMA_ID` +
+`GROUPS_LDAP_USER_SCHEMA_ID` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ownclouduuid ++
 a| [subs=-attributes]
 LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
-|`LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
-`GROUPS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
+
+a|`LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
+`GROUPS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user id's.
-|`LDAP_USER_SCHEMA_MAIL` +
-`GROUPS_LDAP_USER_SCHEMA_MAIL`
+
+a|`LDAP_USER_SCHEMA_MAIL` +
+`GROUPS_LDAP_USER_SCHEMA_MAIL` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++mail ++
 a| [subs=-attributes]
 LDAP Attribute to use for the email address of users.
-|`LDAP_USER_SCHEMA_DISPLAYNAME` +
-`GROUPS_LDAP_USER_SCHEMA_DISPLAYNAME`
+
+a|`LDAP_USER_SCHEMA_DISPLAYNAME` +
+`GROUPS_LDAP_USER_SCHEMA_DISPLAYNAME` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++displayname ++
 a| [subs=-attributes]
 LDAP Attribute to use for the displayname of users.
-|`LDAP_USER_SCHEMA_USERNAME` +
-`GROUPS_LDAP_USER_SCHEMA_USERNAME`
+
+a|`LDAP_USER_SCHEMA_USERNAME` +
+`GROUPS_LDAP_USER_SCHEMA_USERNAME` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++uid ++
 a| [subs=-attributes]
 LDAP Attribute to use for username of users.
-|`LDAP_GROUP_SCHEMA_ID` +
-`GROUPS_LDAP_GROUP_SCHEMA_ID`
+
+a|`LDAP_GROUP_SCHEMA_ID` +
+`GROUPS_LDAP_GROUP_SCHEMA_ID` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ownclouduuid ++
 a| [subs=-attributes]
 LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
-|`LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
-`GROUPS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
+
+a|`LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
+`GROUPS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
-|`LDAP_GROUP_SCHEMA_MAIL` +
-`GROUPS_LDAP_GROUP_SCHEMA_MAIL`
+
+a|`LDAP_GROUP_SCHEMA_MAIL` +
+`GROUPS_LDAP_GROUP_SCHEMA_MAIL` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++mail ++
 a| [subs=-attributes]
 LDAP Attribute to use for the email address of groups (can be empty).
-|`LDAP_GROUP_SCHEMA_DISPLAYNAME` +
-`GROUPS_LDAP_GROUP_SCHEMA_DISPLAYNAME`
+
+a|`LDAP_GROUP_SCHEMA_DISPLAYNAME` +
+`GROUPS_LDAP_GROUP_SCHEMA_DISPLAYNAME` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++cn ++
 a| [subs=-attributes]
 LDAP Attribute to use for the displayname of groups (often the same as groupname attribute).
-|`LDAP_GROUP_SCHEMA_GROUPNAME` +
-`GROUPS_LDAP_GROUP_SCHEMA_GROUPNAME`
+
+a|`LDAP_GROUP_SCHEMA_GROUPNAME` +
+`GROUPS_LDAP_GROUP_SCHEMA_GROUPNAME` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++cn ++
 a| [subs=-attributes]
 LDAP Attribute to use for the name of groups.
-|`LDAP_GROUP_SCHEMA_MEMBER` +
-`GROUPS_LDAP_GROUP_SCHEMA_MEMBER`
+
+a|`LDAP_GROUP_SCHEMA_MEMBER` +
+`GROUPS_LDAP_GROUP_SCHEMA_MEMBER` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++member ++
 a| [subs=-attributes]
 LDAP Attribute that is used for group members.
-|`GROUPS_OWNCLOUDSQL_DB_USERNAME`
+
+a|`GROUPS_OWNCLOUDSQL_DB_USERNAME` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++owncloud ++
 a| [subs=-attributes]
 Database user to use for authenticating with the owncloud database.
-|`GROUPS_OWNCLOUDSQL_DB_PASSWORD`
+
+a|`GROUPS_OWNCLOUDSQL_DB_PASSWORD` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Password for the database user.
-|`GROUPS_OWNCLOUDSQL_DB_HOST`
+
+a|`GROUPS_OWNCLOUDSQL_DB_HOST` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++mysql ++
 a| [subs=-attributes]
 Hostname of the database server.
-|`GROUPS_OWNCLOUDSQL_DB_PORT`
+
+a|`GROUPS_OWNCLOUDSQL_DB_PORT` +
+
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
 ++3306 ++
 a| [subs=-attributes]
 Network port to use for the database connection.
-|`GROUPS_OWNCLOUDSQL_DB_NAME`
+
+a|`GROUPS_OWNCLOUDSQL_DB_NAME` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++owncloud ++
 a| [subs=-attributes]
 Name of the owncloud database.
-|`GROUPS_OWNCLOUDSQL_IDP`
+
+a|`GROUPS_OWNCLOUDSQL_IDP` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++https://localhost:9200 ++
 a| [subs=-attributes]
 The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
-|`GROUPS_OWNCLOUDSQL_NOBODY`
+
+a|`GROUPS_OWNCLOUDSQL_NOBODY` +
+
 a| [subs=-attributes]
 ++int64 ++
 a| [subs=-attributes]
 ++90 ++
 a| [subs=-attributes]
 Fallback number if no numeric UID and GID properties are provided.
-|`GROUPS_OWNCLOUDSQL_JOIN_USERNAME`
+
+a|`GROUPS_OWNCLOUDSQL_JOIN_USERNAME` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Join the user properties table to read usernames.
-|`GROUPS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID`
+
+a|`GROUPS_OWNCLOUDSQL_JOIN_OWNCLOUD_UUID` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Join the user properties table to read user IDs.
-|`GROUPS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH`
+
+a|`GROUPS_OWNCLOUDSQL_ENABLE_MEDIAL_SEARCH` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -457,4 +593,3 @@ a| [subs=-attributes]
 Allow 'medial search' when searching for users instead of just doing a prefix search. This allows finding 'Alice' when searching for 'lic'.
 |===
 
-Since Version: `+` added, `-` deprecated

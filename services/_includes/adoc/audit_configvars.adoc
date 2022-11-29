@@ -1,3 +1,21 @@
+// set the attribute to true or leave empty, true without any quotes.
+
+:show-deprecation: false
+
+ifeval::[{show-deprecation} == true]
+
+[[deprecation-note]]
+[caption=]
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Deprecation Info
+| Deprecation Version
+| Removal Version
+| Deprecation Replacment
+|===
+
+endif::[]
+
 [caption=]
 .Environment variables for the audit service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -6,132 +24,168 @@
 | Type
 | Default Value
 | Description
-|`OCIS_LOG_LEVEL` +
-`AUDIT_LOG_LEVEL`
+
+a|`OCIS_LOG_LEVEL` +
+`AUDIT_LOG_LEVEL` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
-|`OCIS_LOG_PRETTY` +
-`AUDIT_LOG_PRETTY`
+
+a|`OCIS_LOG_PRETTY` +
+`AUDIT_LOG_PRETTY` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Activates pretty log output.
-|`OCIS_LOG_COLOR` +
-`AUDIT_LOG_COLOR`
+
+a|`OCIS_LOG_COLOR` +
+`AUDIT_LOG_COLOR` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Activates colorized log output.
-|`OCIS_LOG_FILE` +
-`AUDIT_LOG_FILE`
+
+a|`OCIS_LOG_FILE` +
+`AUDIT_LOG_FILE` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
-|`AUDIT_DEBUG_ADDR`
+
+a|`AUDIT_DEBUG_ADDR` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9234 ++
 a| [subs=-attributes]
 Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
-|`AUDIT_DEBUG_TOKEN`
+
+a|`AUDIT_DEBUG_TOKEN` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Token to secure the metrics endpoint.
-|`AUDIT_DEBUG_PPROF`
+
+a|`AUDIT_DEBUG_PPROF` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Enables pprof, which can be used for profiling.
-|`AUDIT_DEBUG_ZPAGES`
+
+a|`AUDIT_DEBUG_ZPAGES` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Enables zpages, which can be used for collecting and viewing in-memory traces.
-|`AUDIT_EVENTS_ENDPOINT`
+
+a|`AUDIT_EVENTS_ENDPOINT` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++127.0.0.1:9233 ++
 a| [subs=-attributes]
 The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
-|`AUDIT_EVENTS_CLUSTER`
+
+a|`AUDIT_EVENTS_CLUSTER` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ocis-cluster ++
 a| [subs=-attributes]
 The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
-|`AUDIT_EVENTS_GROUP`
+
+a|`AUDIT_EVENTS_GROUP` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++audit ++
 a| [subs=-attributes]
 The consumergroup of the service. One group will only get one copy of an event.
-|`OCIS_INSECURE` +
-`AUDIT_EVENTS_TLS_INSECURE`
+
+a|`OCIS_INSECURE` +
+`AUDIT_EVENTS_TLS_INSECURE` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Whether to verify the server TLS certificates.
-|`AUDIT_EVENTS_TLS_ROOT_CA_CERTIFICATE`
+
+a|`AUDIT_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The root CA certificate used to validate the server's TLS certificate. If provided AUDIT_EVENTS_TLS_INSECURE will be seen as false.
-|`OCIS_EVENTS_ENABLE_TLS` +
-`AUDIT_EVENTS_ENABLE_TLS`
+
+a|`OCIS_EVENTS_ENABLE_TLS` +
+`AUDIT_EVENTS_ENABLE_TLS` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
-|`AUDIT_LOG_TO_CONSOLE`
+
+a|`AUDIT_LOG_TO_CONSOLE` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
 Logs to Stdout if true. Independent of the log to file option.
-|`AUDIT_LOG_TO_FILE`
+
+a|`AUDIT_LOG_TO_FILE` +
+
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Logs to file if true. Independent of the log to Stdout file option.
-|`AUDIT_FILEPATH`
+
+a|`AUDIT_FILEPATH` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Filepath to the logfile. Mandatory if LogToFile is true.
-|`AUDIT_FORMAT`
+
+a|`AUDIT_FORMAT` +
+
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -140,4 +194,3 @@ a| [subs=-attributes]
 Log format. Using json is advised.
 |===
 
-Since Version: `+` added, `-` deprecated
