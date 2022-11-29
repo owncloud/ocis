@@ -107,22 +107,10 @@ func GetAnnotatedVariables(s interface{}) ([]ConfigField, []DeprecationField) {
 			if !ok {
 				continue
 			}
-			deprecationVersion, ok := field.Tag.Lookup("deprecationVersion")
-			if !ok {
-				deprecationVersion = ""
-			}
-			removalVersion, ok := field.Tag.Lookup("removalVersion")
-			if !ok {
-				removalVersion = ""
-			}
-			deprecationInfo, ok := field.Tag.Lookup("deprecationInfo")
-			if !ok {
-				deprecationInfo = ""
-			}
-			deprecationReplacement, ok := field.Tag.Lookup("deprecationReplacement")
-			if !ok {
-				deprecationReplacement = ""
-			}
+			deprecationVersion, _ := field.Tag.Lookup("deprecationVersion")
+			removalVersion, _ := field.Tag.Lookup("removalVersion")
+			deprecationInfo, _ := field.Tag.Lookup("deprecationInfo")
+			deprecationReplacement, _ := field.Tag.Lookup("deprecationReplacement")
 			if deprecationVersion != "" ||
 				removalVersion != "" ||
 				deprecationInfo != "" ||
