@@ -46,6 +46,6 @@
           NETWORK_NAME: ocis-net
           TELEMETRY_SERVE_DOMAIN: telemetry.ocis-wopi.latest.owncloud.works
           JAEGER_COLLECTOR: jaeger-collector.infra.owncloud.works:443
-          TELEGRAF_SPECIFIC_CONFIG: ocis_single_container
+          TELEGRAF_SPECIFIC_CONFIG: ocis_wopi
           OCIS_URL: ocis.ocis-wopi.latest.owncloud.works
           OCIS_DEPLOYMENT_ID: continuous-deployment-ocis-wopi-latest
