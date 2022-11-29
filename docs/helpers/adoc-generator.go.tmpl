@@ -16,12 +16,12 @@ import (
     {{- end}})
 
 type ConfigField struct {
-	EnvVars      []string
-	DefaultValue string
-	Type         string
-	Description  string
-	VersionInfo  string
-	IsDeprecated bool
+	EnvVars         []string
+	DefaultValue    string
+	Type            string
+	Description     string
+	VersionInfo     string
+	DeprecationLink string
 }
 
 type DeprecationField struct {
@@ -103,7 +103,7 @@ func GetAnnotatedVariables(s interface{}) ([]ConfigField, []DeprecationField) {
 		default:
 			desc := field.Tag.Get("desc")
 			env, ok := field.Tag.Lookup("env")
-			isDeprecated := false
+			deprecationLink := ""
 			if !ok {
 				continue
 			}
@@ -115,7 +115,7 @@ func GetAnnotatedVariables(s interface{}) ([]ConfigField, []DeprecationField) {
 				removalVersion != "" ||
 				deprecationInfo != "" ||
 				deprecationReplacement != "" {
-				isDeprecated = true
+				deprecationLink = "xref:deprecation-note[Deprecation Note]"
 			}
 			v := fmt.Sprintf("%v", value.Interface())
 			td := strings.Split(env, ";")
@@ -131,13 +131,13 @@ func GetAnnotatedVariables(s interface{}) ([]ConfigField, []DeprecationField) {
 			}
 			fields = append(fields,
 				ConfigField{
-					EnvVars:      td,
-					DefaultValue: v,
-					Description:  desc,
-					Type:         typeName,
-					IsDeprecated: isDeprecated,
+					EnvVars:         td,
+					DefaultValue:    v,
+					Description:     desc,
+					Type:            typeName,
+					DeprecationLink: deprecationLink,
 				})
-			if isDeprecated {
+			if deprecationLink != "" {
 				deprecations = append(deprecations,
 					DeprecationField{
 						DeprecationVersion:     deprecationVersion,

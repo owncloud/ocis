@@ -38,10 +38,7 @@ a| {{- range $i, $value := .EnvVars }}{{- if $i }} +
 {{ end -}}
 `{{- $value }}`
 {{- end }} +
-:is-deprecated: {{ .IsDeprecated }}
-ifeval::[{is-deprecated} == true] 
-xref:deprecation-note[Deprecation Note] 
-endif::[]
+{{ .DeprecationLink }}
 a| [subs=-attributes]
 ++{{.Type}} ++
 a| [subs=-attributes]
