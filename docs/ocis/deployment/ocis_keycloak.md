@@ -45,7 +45,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
 * Go to the deployment example
 
-  `cd ocis/deployment/examples/ocis_keycloak`
+  `cd ocis/deployments/examples/ocis_keycloak`
 
 * Open the `.env` file in a text editor
   The file by default looks like this:
