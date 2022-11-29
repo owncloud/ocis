@@ -1,3 +1,13 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
+
+## Summary
+
+* Enhancement - Add deprecation annotation: [#3917](https://github.com/owncloud/ocis/issues/3917)
+
 # Changelog for [2.0.0-rc.2] (2022-11-25)
 
 The following sections list the changes for 2.0.0-rc.2.
