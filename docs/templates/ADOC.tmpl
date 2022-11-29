@@ -14,9 +14,9 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Replacment
 
 {{- range .Deprecations }}
+| {{ .DeprecationInfo }}
 | {{ .DeprecationVersion }}
 | {{ .RemovalVersion }}
-| {{ .DeprecationInfo }}
 | {{ .DeprecationReplacement }}
 {{- end }}
 |===
