@@ -649,7 +649,7 @@ class GraphContext implements Context {
 	public function theAdministratorTriesToAddUserToGroupUsingTheGraphAPI(string $user, string $group): void {
 		$this->featureContext->setResponse($this->addUserToGroup($group, $user));
 	}
- 
+
 	/**
 	 * @When user :user tries to add himself/herself to group :group using the Graph API
 	 *
@@ -874,7 +874,7 @@ class GraphContext implements Context {
 		$response = $this->userDeletesGroupWithGroupId($groupId, $user);
 		$this->featureContext->setResponse($response);
 	}
-  
+
 	/**
 	 * @Then the following users should be listed in the following groups
 	 *
@@ -997,5 +997,100 @@ class GraphContext implements Context {
 			$userId = WebDavHelper::generateUUIDv4();
 		}
 		$this->featureContext->setResponse($this->removeUserFromGroup($groupId, $userId, $byUser));
+	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return ResponseInterface
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function retrieveUserInformationUsingGraphApi(
+		string $user
+	):ResponseInterface {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		return GraphHelper::getOwnInformationAndGroupMemberships(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials["username"],
+			$credentials["password"],
+		);
+	}
+
+	/**
+	 * @When /^the user "([^"]*)" retrieves (her|his) information using the Graph API$/
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function userRetrievesHisorHerInformationOfUserUsingGraphApi(
+		string $user
+	):void {
+		$response = $this->retrieveUserInformationUsingGraphApi($user);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then /^the user retrieve API response should contain the following information:$/
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theUserRetrieveApiResponseShouldContainTheFollowingInformation(TableNode $table): void {
+		$rows = $table->getHash();
+		$apiResponse = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
+		foreach ($rows as $row) {
+			$this->checkUserInformation($row, $apiResponse);
+		}
+	}
+
+	/**
+	 * @param array $expectedValue
+	 * @param array $actualValue
+	 *
+	 * @throws GuzzleException
+	 * @return void
+	 */
+	public function checkUserInformation(array $expectedValue, array  $actualValue):void {
+		foreach (array_keys($expectedValue) as $keyName) {
+			switch ($keyName) {
+				case "memberOf":
+					$memberOfFromApiReponse = [];
+					$memberOf = preg_split('/\s*,\s*/', trim($expectedValue['memberOf']));
+					foreach ($actualValue['memberOf'] as $member) {
+						$memberOfFromApiReponse[] = $member['displayName'];
+					}
+					Assert::assertEqualsCanonicalizing($memberOf, $memberOfFromApiReponse);
+					break;
+				case "id":
+					if ($expectedValue[$keyName] !== '%uuid_v4%') {
+						throw new Error(
+							'Only UUIDv4 patterned user id can be checked' . ' but got '
+							. trim($expectedValue[$keyName], '%')
+						);
+					}
+					Assert::assertEquals(
+						1,
+						GraphHelper::isUUIDv4($actualValue['id']),
+						__METHOD__ .
+						' Expected user_id to have UUIDv4 pattern but found: ' . $actualValue['id']
+					);
+					break;
+				default:
+					Assert::assertEquals(
+						$expectedValue[$keyName],
+						$actualValue[$keyName],
+						__METHOD__ .
+						' Expected ' . $keyName . 'to have value' . $expectedValue[$keyName]
+						. ' but got ' . $actualValue[$keyName]
+					);
+					break;
+			}
+		}
 	}
 }

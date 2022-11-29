@@ -27,6 +27,16 @@ class GraphHelper {
 	}
 
 	/**
+	 * @param string $id
+	 *
+	 * @return int (1 = true | 0 = false)
+	 */
+	public static function isUUIDv4(string $id): int {
+		$regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
+		return preg_match($regex, $id);
+	}
+
+	/**
 	 * @param string $baseUrl
 	 * @param string $path
 	 *
@@ -177,6 +187,31 @@ class GraphHelper {
 			$xRequestId,
 			$adminUser,
 			$adminPassword,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $userPassword
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getOwnInformationAndGroupMemberships(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $userPassword
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'me/?%24expand=memberOf');
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$userPassword,
 			self::getRequestHeaders()
 		);
 	}
