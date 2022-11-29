@@ -20,7 +20,7 @@ when it is going to be removed and why.
 ```golang
 // Nats is the nats config
 type Nats struct {
-Host string `yaml:"host" env:"NATS_HOST_ADDRESS,NATS_NATS_HOST" desc:"Bind address." deprecationVersion:"1.6.2" removalVersion:"1.7.5" deprecationInfo:"NATS_NATS_HOST is confusing" deprecationReplacement:"NATS_HOST_ADDRESS"`
+Host string `yaml:"host" env:"NATS_HOST_ADDRESS;NATS_NATS_HOST" desc:"Bind address." deprecationVersion:"1.6.2" removalVersion:"1.7.5" deprecationInfo:"NATS_NATS_HOST is confusing" deprecationReplacement:"NATS_HOST_ADDRESS"`
 ...
 }
 ```
@@ -33,3 +33,7 @@ There are four different annotation variables that need to be filled:
 | removalVersion| The version the variable will be removed from the codebase| semver (e.g. 1.7.3)|
 | deprecationInfo| Information why the variable is deprecated, must start with the name of the variable in order to avoid confusion, when there are multiple options in the `env:`-field | string (e.g. NATS_NATS_HOST is confusing) |
 | depreactionReplacement | The name of the variable that is going to replace the deprecated on.| string (e.g. NATS_HOST_ADDRESS)|
+
+### What happens next?
+
+Once a variable has been finally removed, the annotations must be removed again from the code, since they do not serve any purpose from this point.
