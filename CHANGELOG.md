@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Add deprecation annotation: [#3917](https://github.com/owncloud/ocis/issues/3917)
+* Enhancement - Update ownCloud Web to v6.0.0: [#5153](https://github.com/owncloud/ocis/pull/5153)
 
 # Changelog for [2.0.0-rc.2] (2022-11-25)
 
