@@ -1241,100 +1241,120 @@ class GraphContext implements Context {
 		}
 	}
 
-    /**
-     * @When user :user tries to get information of user :ofUser using Graph API
-     */
-    public function userTriesToGetInformationOfUser($user, $ofUser) {
-        $credentials = $this->getAdminOrUserCredentials($user);
-        $response = GraphHelper::getUser(
-            $this->featureContext->getBaseUrl(),
-            $this->featureContext->getStepLineRef(),
-            $credentials['username'],
-            $credentials['password'],
-            $ofUser
-        );
-        $this->featureContext->setResponse($response);
-    }
+	/**
+	 * @When user :user tries to get information of user :ofUser using Graph API
+	 *
+	 * @param string $user
+	 * @param string $ofUser
+	 *
+	 * @return void
+	 */
+	public function userTriesToGetInformationOfUser($user, $ofUser): void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$response = GraphHelper::getUser(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password'],
+			$ofUser
+		);
+		$this->featureContext->setResponse($response);
+	}
 
+	/**
+	 * @When user :user tries to get all user using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userGetsAllUserUsingTheGraphApi(string $user) {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$response = GraphHelper::getUsers(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password'],
+		);
+		$this->featureContext->setResponse($response);
+	}
 
-    /**
-     * @When user :user tries to get all user using the Graph API
-     *
-     * @param string $user
-     *
-     * @return void
-     */
-    public function userGetsAllUserUsingTheGraphApi(string $user) {
-        $credentials = $this->getAdminOrUserCredentials($user);
-        $response = GraphHelper::getUsers(
-            $this->featureContext->getBaseUrl(),
-            $this->featureContext->getStepLineRef(),
-            $credentials['username'],
-            $credentials['password'],
-        );
-        $this->featureContext->setResponse($response);
-    }
+	/**
+	 * @Then the API response should contain all user with following information:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @throws Exception
+	 * @return void
+	 */
+	public function theApiResponseShouldContainAllUserWithFollowingInformation(TableNode $table): void {
+		$values = $table->getHash();
+		$apiResponse = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'];
+		foreach ($values as $expectedValue) {
+			$found = false;
+			foreach ($apiResponse as $key => $actualResponseValue) {
+				if ($expectedValue["displayName"] === $actualResponseValue["displayName"]) {
+					$found = true;
+					$this->checkUserInformation($expectedValue, $actualResponseValue);
+					unset($apiResponse[$key]);
+					break;
+				}
+			}
+			if (!$found) {
+				throw new Exception('User ' . $expectedValue["displayName"] . ' could not be found in the response.');
+			}
+		}
+	}
 
-    /**
-     * @Then the API response should contain all user with following information:
-     *
-     * @param TableNode $table
-     *
-     * @throws Exception
-     */
-    public function theApiResponseShouldContainAllUserWithFollowingInformation(TableNode $table) {
-        $values = $table->getHash();
-        $apiResponse = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'];
-        foreach ($values as $expectedValue) {
-            $found = false;
-            foreach ($apiResponse as $key => $actualResponseValue) {
-                if ($expectedValue["displayName"] === $actualResponseValue["displayName"]) {
-                    $found = true;
-                    $this->checkUserInformation($expectedValue, $actualResponseValue);
-                    unset($apiResponse[$key]);
-                    break;
-                }
-            }
-            if (!$found) {
-                throw new Exception('User ' . $expectedValue["displayName"] . ' could not be found in the response.');
-            }
-        }
-    }
+	/**
+	 * @param string $user
+	 * @param string|null $ofUser
+	 *
+	 * @return ResponseInterface
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function retrieveUserInformationAlongWithDriveUsingGraphApi(
+		string $user,
+		?string $ofUser = null
+	):ResponseInterface {
+		if ($ofUser === null) {
+			$ofUser = $user;
+		}
+		$credentials = $this->getAdminOrUserCredentials($user);
+		return GraphHelper::getUserWithDriveInformation(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials["username"],
+			$credentials["password"],
+			$ofUser
+		);
+	}
 
-    /**
-     * @param string $user
-     * @param string $ofUser
-     *
-     * @return ResponseInterface
-     * @throws JsonException
-     * @throws GuzzleException
-     */
-    public function retrieveUserInformationAlongWithDriveUsingGraphApi(
-        string $user,
-        string $ofUser
-    ):ResponseInterface {
-        $credentials = $this->getAdminOrUserCredentials($user);
-        return GraphHelper::getUserWithDriveInformation(
-            $this->featureContext->getBaseUrl(),
-            $this->featureContext->getStepLineRef(),
-            $credentials["username"],
-            $credentials["password"],
-            $ofUser
-        );
-    }
+	/**
+	 *
+	 * @When /^the user "([^"]*)" tries to get user "([^"]*)" along with (his|her) drive information using Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $ofUser
+	 *
+	 * @return void
+	 */
+	public function userTriesToGetInformationOfUserAlongWithHisDriveData(string $user, $ofUser) {
+		$response = $this->retrieveUserInformationAlongWithDriveUsingGraphApi($user, $ofUser);
+		$this->featureContext->setResponse($response);
+	}
 
-    /**
-     *
-     * @When /^the user "([^"]*)" tries to get information of user "([^"]*)" along with (his|her) drive data using Graph API$/
-     *
-     * @param string $user
-     * @param string $ofUser
-     *
-     * @return void
-     */
-    public function userTriesToGetInformationOfUserAlongWithHisDriveData(string $user, string $ofUser)
-    {
-        $response = $this->retrieveUserInformationAlongWithDriveUsingGraphApi($user,  $ofUser);
-        $this->featureContext->setResponse($response);
-    }
+	/**
+	 *
+	 * @When /^the user "([^"]*)" tries to get (his|her) drive information using Graph API$/
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userTriesToGetOwnDriveInformation(string $user) {
+		$response = $this->retrieveUserInformationAlongWithDriveUsingGraphApi($user);
+		$this->featureContext->setResponse($response);
+	}
 }
