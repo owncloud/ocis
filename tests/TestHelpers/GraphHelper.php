@@ -242,6 +242,32 @@ class GraphHelper {
 		);
 	}
 
+    /**
+     * @param string $baseUrl
+     * @param string $xRequestId
+     * @param string $adminUser
+     * @param string $adminPassword
+     * @param string $ofUser
+     *
+     * @return ResponseInterface
+     * @throws GuzzleException
+     */
+    public static function getUserWithDriveInformation(
+        string $baseUrl,
+        string $xRequestId,
+        string $user,
+        string $userPassword,
+        string $ofUser
+    ): ResponseInterface {
+        $url = self::getFullUrl($baseUrl, 'users/'. $ofUser . '?%24select=&%24expand=drive');
+        return HttpRequestHelper::get(
+            $url,
+            $xRequestId,
+            $user,
+            $userPassword,
+        );
+    }
+
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
