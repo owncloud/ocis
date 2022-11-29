@@ -146,7 +146,6 @@ github.com/Azure/go-ntlmssp v0.0.0-20200615164410-66371956d46c/go.mod h1:chxPXzS
 github.com/Azure/go-ntlmssp v0.0.0-20220621081337-cb9428e4ac1e h1:NeAW1fUYUEWhft7pkxDf6WoUvEZJ/uOKsvtpjLnn8MU=
 github.com/Azure/go-ntlmssp v0.0.0-20220621081337-cb9428e4ac1e/go.mod h1:chxPXzSsl7ZWRAuOIE23GDNzjWuZquvFlgA8xmpunjU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/BurntSushi/toml v1.2.0/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/BurntSushi/toml v1.2.1 h1:9F2/+DoOYIOksmaJFPw1tGFy1eDnIJXg+UHjuD8lTak=
 github.com/BurntSushi/toml v1.2.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
@@ -701,8 +700,8 @@ github.com/googleapis/gax-go/v2 v2.5.1/go.mod h1:h6B0KMMFNtI2ddbGJn3T3ZbwkeT6yqE
 github.com/googleapis/go-type-adapters v1.0.0/go.mod h1:zHW75FOG2aur7gAO2B+MLby+cLsWGBF62rFAi7WjWO4=
 github.com/gookit/color v1.5.2 h1:uLnfXcaFjlrDnQDT+NCBcfhrXqYTx/rcCa6xn01Y8yI=
 github.com/gookit/color v1.5.2/go.mod h1:w8h4bGiHeeBpvQVePTutdbERIUf3oJE5lZ8HM0UgXyg=
-github.com/gookit/config/v2 v2.1.7 h1:pxIXnHEoeUv6DtbUl4qj8gE3YxgWPjuuB9wiKur9JE0=
-github.com/gookit/config/v2 v2.1.7/go.mod h1:Rlm83qfFCyrJ+8O3iTx2xUvflOTBrCuLcaT65fytENA=
+github.com/gookit/config/v2 v2.1.8 h1:fH8NKzOLlQ2Ud65Czy5Tq+t1I8U7M9BmIPgVFQ4T9UQ=
+github.com/gookit/config/v2 v2.1.8/go.mod h1:AP8Obh1AKx1pFkBNE2EghDb1ei2/fG33ULfkzuw4s0c=
 github.com/gookit/goutil v0.5.14/go.mod h1:ozPE16eJS9f89aVbVk05ocEJsia3KPrYUqPTs8GvUTw=
 github.com/gookit/goutil v0.5.15 h1:FaRyj0uVqi7j92QHsG+2Sc1VZ7/7ma77UD3/wBpwyTc=
 github.com/gookit/goutil v0.5.15/go.mod h1:ozPE16eJS9f89aVbVk05ocEJsia3KPrYUqPTs8GvUTw=

@@ -36,7 +36,7 @@ require (
 	github.com/gofrs/uuid v4.3.1+incompatible
 	github.com/golang-jwt/jwt/v4 v4.4.2
 	github.com/golang/protobuf v1.5.2
-	github.com/gookit/config/v2 v2.1.7
+	github.com/gookit/config/v2 v2.1.8
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.13.0
 	github.com/jellydator/ttlcache/v2 v2.11.1
