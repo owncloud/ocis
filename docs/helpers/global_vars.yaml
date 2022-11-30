@@ -1,31 +1,31 @@
 variables:
 - name: CS3_GATEWAY
   type: ""
-  default: ""
+  default_value: ""
   description: ""
   dependend_services: []
   do_ignore: false
 - name: CS3_MACHINE_AUTH_API_KEY
   type: ""
-  default: ""
+  default_value: ""
   description: ""
   dependend_services: []
   do_ignore: false
 - name: OCIS_BASE_DATA_PATH
   type: ""
-  default: ""
+  default_value: ""
   description: ""
   dependend_services: []
   do_ignore: false
 - name: OCIS_CONFIG_DIR
   type: ""
-  default: ""
+  default_value: ""
   description: ""
   dependend_services: []
   do_ignore: false
 - name: MICRO_LOG_LEVEL
   type: ""
-  default: ""
+  default_value: ""
   description: ""
   dependend_services: []
   do_ignore: false

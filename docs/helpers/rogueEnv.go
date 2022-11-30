@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"text/template"
 
 	"gopkg.in/yaml.v2"
 )
@@ -22,7 +23,7 @@ type ConfigVars struct {
 type Variable struct {
 	Name              string    `yaml:"name"`
 	Type              string    `yaml:"type"`
-	Default           string    `yaml:"default"`
+	DefaultValue      string    `yaml:"default_value"`
 	Description       string    `yaml:"description"`
 	DependendServices []Service `yaml:"dependend_services"`
 	DoIgnore          bool      `yaml:"do_ignore"`
@@ -46,7 +47,7 @@ func GetRogueEnvs() {
 	if err == nil {
 		err := yaml.Unmarshal(yfile, &vars)
 		if err != nil {
-			log.Fatalf("could not unmarshall %s", fullYamlPath)
+			log.Fatal(err)
 		}
 	}
 
@@ -89,4 +90,41 @@ func AddUniqueToStruct(variables *ConfigVars, variable Variable) {
 		}
 	}
 	variables.Variables = append(variables.Variables, variable)
+}
+
+func RenderGlobalVarsTemplate() {
+	curdir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fullYamlPath := filepath.Join(curdir, yamlSource)
+
+	content, err := ioutil.ReadFile("../../docs/templates/ADOC_global.tmpl")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	targetFolder := "../../docs/services/_includes/adoc/"
+
+	vars := &ConfigVars{}
+	fmt.Printf("Reading existing variable definitions from %s\n", fullYamlPath)
+	yfile, err := ioutil.ReadFile(fullYamlPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = yaml.Unmarshal(yfile, &vars)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	targetFile, err := os.Create(filepath.Join(targetFolder, "global_configvars.adoc"))
+	if err != nil {
+		log.Fatalf("Failed to create target file: %s", err)
+	}
+	defer targetFile.Close()
+
+	tpl := template.Must(template.New("").Parse(string(content)))
+	if err = tpl.Execute(targetFile, *vars); err != nil {
+		log.Fatalf("Failed to execute template: %s", err)
+	}
 }

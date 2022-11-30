@@ -1,0 +1,23 @@
+// set the attribute to true or leave empty, true without any quotes.
+
+[caption=]
+.Global environment Variables
+[width="100%",cols="~,~,~,~",options="header"]
+| ===           |
+| Name          |
+| Type          |
+| Default Value |
+| Description   |
+
+{{- range .Variables}}
+
+a| `{{- .Name }}` +
+a| [subs=-attributes]
+++{{ .Type }} ++
+a| [subs=-attributes]
+++{{.DefaultValue}} ++
+a| [subs=-attributes]
+{{.Description}}
+
+{{- end }}
+| === |
