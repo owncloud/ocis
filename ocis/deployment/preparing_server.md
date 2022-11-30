@@ -50,7 +50,7 @@ geekdocFilePath: preparing_server.md
 * Add users pub key to 
     ```
     mkdir /home/admin/.ssh
-    echo "<pubkey>" >> /home/admin/.ssh/authorized_keys`
+    echo "<pubkey>" >> /home/admin/.ssh/authorized_keys
     chown admin:admin -R /home/admin/.ssh
     ```
 
