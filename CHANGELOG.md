@@ -1,19 +1,8 @@
-# Changelog for [unreleased] (UNRELEASED)
+# Changelog for [2.0.0] (2022-11-30)
 
-The following sections list the changes for unreleased.
+The following sections list the changes for 2.0.0.
 
-[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
-
-## Summary
-
-* Enhancement - Add deprecation annotation: [#3917](https://github.com/owncloud/ocis/issues/3917)
-* Enhancement - Update ownCloud Web to v6.0.0: [#5153](https://github.com/owncloud/ocis/pull/5153)
-
-# Changelog for [2.0.0-rc.2] (2022-11-25)
-
-The following sections list the changes for 2.0.0-rc.2.
-
-[2.0.0-rc.2]: https://github.com/owncloud/ocis/compare/v1.20.0...v2.0.0-rc.2
+[2.0.0]: https://github.com/owncloud/ocis/compare/v1.20.0...v2.0.0
 
 ## Summary
 
@@ -122,6 +111,7 @@ The following sections list the changes for 2.0.0-rc.2.
 * Change - Split MachineAuth from SystemUser: [#3672](https://github.com/owncloud/ocis/pull/3672)
 * Enhancement - Add capability for alias links: [#3983](https://github.com/owncloud/ocis/issues/3983)
 * Enhancement - Add curl to the oCIS OCI image: [#4751](https://github.com/owncloud/ocis/pull/4751)
+* Enhancement - Add deprecation annotation: [#3917](https://github.com/owncloud/ocis/issues/3917)
 * Enhancement - Add drives field to users endpoint: [#4072](https://github.com/owncloud/ocis/pull/4072)
 * Enhancement - Add Email templating: [#4564](https://github.com/owncloud/ocis/pull/4564)
 * Enhancement - Add FRONTEND_ENABLE_RESHARING env variable: [#4023](https://github.com/owncloud/ocis/pull/4023)
@@ -200,8 +190,7 @@ The following sections list the changes for 2.0.0-rc.2.
 * Enhancement - Update ownCloud Web to v5.5.0-rc.9: [#6854](https://github.com/owncloud/web/pull/6854)
 * Enhancement - Update ownCloud Web to v5.5.0-rc.6: [#6854](https://github.com/owncloud/web/pull/6854)
 * Enhancement - Update ownCloud Web to v5.7.0-rc.1: [#4005](https://github.com/owncloud/ocis/pull/4005)
-* Enhancement - Update ownCloud Web to v6.0.0-rc.6: [#4970](https://github.com/owncloud/ocis/pull/4970)
-* Enhancement - Update ownCloud Web to v6.0.0-rc.8: [#5120](https://github.com/owncloud/ocis/pull/5120)
+* Enhancement - Update ownCloud Web to v6.0.0: [#5153](https://github.com/owncloud/ocis/pull/5153)
 * Enhancement - Update ownCloud Web to v5.7.0-rc.4: [#4140](https://github.com/owncloud/ocis/pull/4140)
 * Enhancement - Update ownCloud Web to v5.7.0-rc.8: [#4314](https://github.com/owncloud/ocis/pull/4314)
 * Enhancement - Update ownCloud Web to v5.7.0-rc.10: [#4439](https://github.com/owncloud/ocis/pull/4439)
