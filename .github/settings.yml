@@ -66,6 +66,25 @@ branches:
           - ci
           - employees
           - ocis-contractors
+  - name: stable-*
+    protection:
+      required_pull_request_reviews:
+        required_approving_review_count: 2
+        dismiss_stale_reviews: false
+        require_code_owner_reviews: false
+      required_status_checks:
+        strict: false
+        contexts:
+          - continuous-integration/drone/pr
+      enforce_admins: null
+      restrictions:
+        apps: []
+        users:
+          - dependabot
+        teams:
+          - ci
+          - employees
+          - ocis-contractors
 
 ...
 
