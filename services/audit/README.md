@@ -6,7 +6,7 @@ With audit logs you are able to prove compliance with corporate guidelines as we
 
 The service is not started automatically when running as single binary started via `ocis server` or when running as docker container and must be started and stopped manually on demand.
 
-Specifically, the audit service logs:
+The audit service logs:
 
 -   File system operations (create/delete/move; including actions on the trash bin and versioning)
 -   User management operations (creation/deletion of users)
