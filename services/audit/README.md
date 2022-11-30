@@ -1,6 +1,11 @@
 # Audit service
 
-The audit service logs all events of the system as an audit log. Per default, it will be logged to standard out, but can also be configured to a file output. Supported log formats are json or a simple key-value pair ("key1=value1 key2=value2").
+The audit service logs all events of the system as an audit log. Per default, it will be logged to standard out, but can also be configured to a file output. Supported log formats are json or a simple key-value pair like:
+
+file_delete)
+   user 'user_id' trashed file 'item_id'
+file_trash_delete)
+   user 'user_id' removed file 'item_id' from trashbin
 
 With audit logs you are able to prove compliance with corporate guidelines as well as to enable reporting and auditing of operations. The audit service takes note of actions conducted by users and administrators.
 
