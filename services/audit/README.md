@@ -1,11 +1,13 @@
 # Audit service
 
-The audit service logs all events of the system into an audit log. To be able to prove compliance with corporate guidelines as well as to enable reporting and auditing of operations, the Auditing extension takes note of actions conducted by users and administrators. Per default it will be logged to standard out but can also be configured to a file output. Supported log formats are json or a simple key value ("key1=value1 key2=value2").
+The audit service logs all events of the system as an audit log. Per default, it will be logged to standard out, but can also be configured to a file output. Supported log formats are json or a simple key-value pair ("key1=value1 key2=value2").
 
-The service is not started automatically when running `ocis server` (single binary setup), it has to be started explicitly.
+With audit logs you are able to prove compliance with corporate guidelines as well as to enable reporting and auditing of operations. The audit service takes note of actions conducted by users and administrators.
 
-Specifically, the application logs
+The service is not started automatically when running as single binary started via `ocis server` or when running as docker container and must be started and stopped manually on demand.
 
--   file system operations (create/delete/move; including actions on the trash bin and versioning)
--   user management operations (creation/deletion of users)
--   sharing operations (user/group sharing, sharing via link, changing permissions, calls to sharing API from clients)
+Specifically, the audit service logs:
+
+-   File system operations (create/delete/move; including actions on the trash bin and versioning)
+-   User management operations (creation/deletion of users)
+-   Sharing operations (user/group sharing, sharing via link, changing permissions, calls to sharing API from clients)
