@@ -60,14 +60,10 @@ Feature: get users
     And the user retrieve API response should contain the following information:
       | displayName  | id        | mail              | onPremisesSamAccountName |
       | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
-#    And the drive information of user "Brian" should contain:
-#      | key              | value                            |
-#      | driveType        | personal                         |
-#      | driveAlias       | personal/alice                   |
-#      | id               | %space_id%                       |
-#      | name             | Brian Murphy                     |
-#      | quota@@@state    | normal                           |
-#      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+    And the response should contain the following drive information:
+      | driveType        | personal                         |
+      | driveAlias       | personal/brian                   |
+      | name             | Brian Murphy                     |
 
 
   Scenario: normal user tries to get hid/her own drive information
@@ -79,11 +75,7 @@ Feature: get users
     And the user retrieve API response should contain the following information:
       | displayName  | id        | mail              | onPremisesSamAccountName |
       | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
-#    And the drive information of user "Brian" should contain:
-#      | key              | value                            |
-#      | driveType        | personal                         |
-#      | driveAlias       | personal/brian                   |
-#      | id               | %space_id%                       |
-#      | name             | Brian Murphy                     |
-#      | quota@@@state    | normal                           |
-#      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+    And the response should contain the following drive information:
+      | driveType        | personal                         |
+      | driveAlias       | personal/brian                   |
+      | name             | Brian Murphy                     |

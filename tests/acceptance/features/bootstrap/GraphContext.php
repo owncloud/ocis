@@ -28,6 +28,11 @@ class GraphContext implements Context {
 	 */
 	private FeatureContext $featureContext;
 
+    /**
+     * @var SpacesContext
+     */
+    private SpacesContext $spacesContext;
+
 	/**
 	 * This will run before EVERY scenario.
 	 * It will set the properties for this object.
@@ -43,6 +48,7 @@ class GraphContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context from here
 		$this->featureContext = $environment->getContext('FeatureContext');
+        $this->spacesContext = $environment->getContext('SpacesContext');
 	}
 
 	/**
@@ -1357,4 +1363,25 @@ class GraphContext implements Context {
 		$response = $this->retrieveUserInformationAlongWithDriveUsingGraphApi($user);
 		$this->featureContext->setResponse($response);
 	}
+
+
+
+    /**
+     * @Then the response should contain the following drive information:
+     */
+    public function theResponseShouldContainTheFollowingDriveInformation(TableNode $table)
+    {
+        $rows = $table->getRowsHash();
+        $responseAPI = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['drive'];
+        foreach (array_keys($rows) as $keyName) {
+            Assert::assertEquals(
+                $rows[$keyName],
+                $responseAPI[$keyName],
+                __METHOD__ .
+                ' Expected ' . $keyName . 'to have value' . $responseAPI[$keyName]
+                . ' but got ' . $rows[$keyName]
+            );
+        }
+    }
+
 }
