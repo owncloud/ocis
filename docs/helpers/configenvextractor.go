@@ -17,7 +17,7 @@ var targets = map[string]string{
 	"environment-variable-docs-generator.go.tmpl": "output/env/environment-variable-docs-generator.go",
 }
 
-func main() {
+func RenderTemplates() {
 	fmt.Println("Getting relevant packages")
 	paths, err := filepath.Glob("../../services/*/pkg/config/defaults/defaultconfig.go")
 	if err != nil {
