@@ -217,17 +217,20 @@ class GraphContext implements Context {
 	 * sends a request to delete a user using the Graph API
 	 *
 	 * @param string $user username is used as the id
+	 * @param string|null $byUser
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function adminDeletesUserUsingTheGraphApi(string $user): void {
+	public function adminDeletesUserUsingTheGraphApi(string $user, ?string $byUser = null): void {
+		$credentials = $this->getAdminOrUserCredentials($byUser);
+
 		$this->featureContext->setResponse(
 			GraphHelper::deleteUser(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
-				$this->featureContext->getAdminUsername(),
-				$this->featureContext->getAdminPassword(),
+				$credentials["username"],
+				$credentials["password"],
 				$user
 			)
 		);
@@ -253,6 +256,20 @@ class GraphContext implements Context {
 			$userId,
 			$groupId,
 		);
+	}
+
+	/**
+	 * @When /^the user "([^"]*)" deletes a user "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function theUserDeletesAUserUsingTheGraphAPI(string $byUser, string $user): void {
+		$this->adminDeletesUserUsingTheGraphApi($user, $byUser);
 	}
 
 	/**
@@ -564,6 +581,28 @@ class GraphContext implements Context {
 			);
 		}
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given /^the user "([^"]*)" has created a new user using the Graph API with the following settings:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function theUserHasCreatedANewUserUsingGraphapiWithTheFollowingSettings(string $user, TableNode $table): void {
+		$this->theUserCreatesNewUser(
+			$user,
+			$table
+		);
+		$rows = $table->getRowsHash();
+		$response = $this->featureContext->getResponse();
+
+		if ($response->getStatusCode() !== 200) {
+			$this->throwHttpException($response, "Could not create user '$rows[userName]'");
+		}
 	}
 
 	/**
