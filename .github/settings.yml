@@ -4,7 +4,7 @@ _extends: gh-labels
 repository:
   name: ocis
   description: ':atom_symbol: ownCloud Infinite Scale Stack'
-  homepage: https://doc.owncloud.com/ocis/next/
+  homepage: 'https://doc.owncloud.com/ocis/next/'
   topics: reva, ocis
 
   private: false
@@ -66,7 +66,7 @@ branches:
           - ci
           - employees
           - ocis-contractors
-  - name: 'stable-*'
+  - name: stable-*
     protection:
       required_pull_request_reviews:
         required_approving_review_count: 2
