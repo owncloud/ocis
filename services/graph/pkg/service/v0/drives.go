@@ -481,8 +481,8 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 			quota, err := g.getDriveQuota(ctx, storageSpace)
 			res.Quota = &quota
 			if err != nil {
-				//logger.Debug().Err(err).Interface("id", sp.Id).Msg("error calling get quota on drive")
-				return nil, err
+				//TODO: Handle error
+				//return nil, err
 			}
 		}
 		responses = append(responses, res)
