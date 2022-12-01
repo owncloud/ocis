@@ -872,6 +872,69 @@ var _ = Describe("Graph", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(*drive.GetQuota().Total).To(Equal(int64(500)))
 		})
+
+		It("gets the special drive items", func() {
+			gatewayClient.On("GetPath", mock.Anything, mock.Anything).Return(&provider.GetPathResponse{
+				Status: status.NewOK(ctx),
+				Path:   "thepath",
+			}, nil)
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
+				Status: status.NewOK(ctx),
+				Info: &provider.ResourceInfo{
+					Id: &provider.ResourceId{
+						StorageId: "pro-1",
+						SpaceId:   "spaceID",
+						OpaqueId:  "specialID",
+					},
+				},
+			}, nil)
+			gatewayClient.On("ListStorageSpaces",
+				mock.Anything,
+				mock.MatchedBy(
+					func(req *provider.ListStorageSpacesRequest) bool {
+						return len(req.Filters) == 1 && req.Filters[0].Term.(*provider.ListStorageSpacesRequest_Filter_Id).Id.OpaqueId == "spaceid"
+					})).
+				Return(&provider.ListStorageSpacesResponse{
+					Status: status.NewOK(ctx),
+					StorageSpaces: []*provider.StorageSpace{
+						{
+							Opaque: &typesv1beta1.Opaque{
+								Map: map[string]*typesv1beta1.OpaqueEntry{
+									service.ReadmeSpecialFolderName: {
+										Decoder: "plain",
+										Value:   []byte("readme"),
+									},
+								},
+							},
+							Id:        &provider.StorageSpaceId{OpaqueId: "spaceid"},
+							SpaceType: "aspacetype",
+							Root: &provider.ResourceId{
+								StorageId: "pro-1",
+								SpaceId:   "sameID",
+								OpaqueId:  "sameID",
+							},
+							Name: "aspacename",
+						},
+					},
+				}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives/{driveID}/", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("driveID", "spaceid")
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			svc.GetSingleDrive(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			data, err := ioutil.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			drive := libregraph.Drive{}
+			err = json.Unmarshal(data, &drive)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(*drive.GetQuota().Total).To(Equal(int64(500)))
+			Expect(len(drive.GetSpecial())).To(Equal(1))
+			Expect(drive.GetSpecial()[0].GetId()).To(Equal("pro-1$spaceID!specialID"))
+		})
 	})
 
 	Describe("Update a drive", func() {

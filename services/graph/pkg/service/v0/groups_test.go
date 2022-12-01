@@ -54,6 +54,7 @@ var _ = Describe("Groups", func() {
 		eventsPublisher.On("Publish", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 		identityBackend = &identitymocks.Backend{}
+		gatewayClient = &mocks.GatewayClient{}
 		newGroup = libregraph.NewGroup()
 		newGroup.SetMembersodataBind([]string{"/users/user1"})
 		newGroup.SetId("group1")
