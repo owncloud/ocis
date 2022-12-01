@@ -514,7 +514,7 @@ API, search, favorites, config, capabilities, not existing endpoints, CORS and o
 _ocdav: api compatibility, return correct status code_
 
 - [apiAuthWebDav/webDavMKCOLAuth.feature:52](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavMKCOLAuth.feature#L52)
-- [apiAuthWebDav/webDavMKCOLAuth.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavMKCOLAuth.feature#L66)
+- [apiAuthWebDav/webDavMKCOLAuth.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavMKCOLAuth.feature#L63)
 
 #### [trying to lock file of another user gives http 200](https://github.com/owncloud/ocis/issues/2176)
 
