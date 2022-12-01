@@ -124,3 +124,8 @@ func (t tracing) GetAllDrives(w http.ResponseWriter, r *http.Request) {
 func (t tracing) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	t.next.CreateDrive(w, r)
 }
+
+// GetRootDriveChildren implements the Service interface.
+func (t tracing) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
+	t.next.GetRootDriveChildren(w, r)
+}
