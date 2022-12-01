@@ -1,13 +1,13 @@
-// set the attribute to true or leave empty, true without any quotes.
+// collected through docs/helpers/rougeEnv.go
 
 [caption=]
-.Global environment Variables
+.Environment variables with global scope not included in a service
 [width="100%",cols="~,~,~,~",options="header"]
-| ===           |
-| Name          |
-| Type          |
-| Default Value |
-| Description   |
+|===
+| Name
+| Type
+| Default Value
+| Description
 
 {{- range .Variables}}
 
@@ -20,4 +20,4 @@ a| [subs=-attributes]
 {{.Description}}
 
 {{- end }}
-| === |
+|===

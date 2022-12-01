@@ -55,14 +55,15 @@ func GetRogueEnvs() {
 		log.Fatal(err)
 	}
 	fmt.Println("Gathering variable definitions from source")
-	out, err := exec.Command("bash", "-c", "grep -R os.Getenv | grep -v rogue-env.go").Output()
+	out, err := exec.Command("bash", "-c", "grep -R os.Getenv | grep -v rogue-env.go |grep \\.go").Output()
 	if err != nil {
 		log.Fatal(err)
 	}
 	lines := strings.Split(string(out), "\n")
 	for _, l := range lines {
 		r := strings.SplitN(l, ":\t", 2)
-		if r[0] != "" && r[1] != "" {
+		if len(r) == 2 && r[0] != "" && r[1] != "" {
+			fmt.Printf("Parsing %s\n", r[0])
 			res := re.FindAll([]byte(r[1]), -1)
 			for _, item := range res {
 				AddUniqueToStruct(vars, Variable{Name: strings.Trim(string(item), "\""), Type: ""})
@@ -76,7 +77,7 @@ func GetRogueEnvs() {
 	fmt.Printf("Writing new variable definitions to %s\n", fullYamlPath)
 	err = ioutil.WriteFile(fullYamlPath, output, 0666)
 	if err != nil {
-		log.Fatal("could not write %s", fullYamlPath)
+		log.Fatalf("could not write %s", fullYamlPath)
 	}
 	if err := os.Chdir(curdir); err != nil {
 		log.Fatal(err)
