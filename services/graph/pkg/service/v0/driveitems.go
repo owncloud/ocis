@@ -215,8 +215,8 @@ func (g Graph) getPathForResource(ctx context.Context, id storageprovider.Resour
 	return res.Path, err
 }
 
-// GetExtendedSpaceProperties reads properties from the opaque and transforms them into driveItems
-func (g Graph) GetExtendedSpaceProperties(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace) []libregraph.DriveItem {
+// getExtendedSpaceProperties reads properties from the opaque and transforms them into driveItems
+func (g Graph) getExtendedSpaceProperties(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace) []libregraph.DriveItem {
 	var spaceItems []libregraph.DriveItem
 	if space.Opaque == nil {
 		return nil

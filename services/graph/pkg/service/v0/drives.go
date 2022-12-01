@@ -469,7 +469,7 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 
 		// can't access disabled space
 		if utils.ReadPlainFromOpaque(storageSpace.Opaque, "trashed") != "trashed" {
-			res.Special = g.GetExtendedSpaceProperties(ctx, baseURL, storageSpace)
+			res.Special = g.getExtendedSpaceProperties(ctx, baseURL, storageSpace)
 			res.Quota, err = g.getDriveQuota(ctx, storageSpace)
 			if err != nil {
 				return nil, err
