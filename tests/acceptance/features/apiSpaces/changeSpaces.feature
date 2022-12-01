@@ -72,9 +72,10 @@ Feature: Change data of space
     When user "Alice" uploads a file inside space "Project Jupiter" with content "some content" to "file.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the user "Alice" should have a space called "Project Jupiter" with these key and value pairs:
-      | key          | value           |
-      | name         | Project Jupiter |
-      | quota@@@used | 12              |
+      | key           | value           |
+      | name          | Project Jupiter |
+      | quota@@@used  | 12              |
+      | quota@@@total | 0               |
     Examples:
       | quotaValue |
       | 0          |
@@ -217,9 +218,13 @@ Feature: Change data of space
     Then the HTTP status code should be "200"
     When user "Brian" uploads a file inside space "Brian Murphy" with content "file is more than 15 bytes" to "file.txt" using the WebDAV API
     Then the HTTP status code should be <code>
+    Then the user "Brian" should have a space called "Brian Murphy" with these key and value pairs:
+      | key           | value   |
+      | quota@@@total | <total> |
+      | quota@@@used  | <used>  |
     Examples:
-      | quotaValue | code                    |
-      | 15         | "507"                   |
-      | 10000      | between "201" and "204" |
-      | 0          | between "201" and "204" |
-      | -1         | between "201" and "204" |
+      | quotaValue | code                    | total | used |
+      | 15         | "507"                   | 15    | 0    |
+      | 10000      | between "201" and "204" | 10000 | 26   |
+      | 0          | between "201" and "204" | 0     | 26   |
+      | -1         | between "201" and "204" | 0     | 26   |
