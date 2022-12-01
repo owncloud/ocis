@@ -472,7 +472,8 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 			res.Special = g.getExtendedSpaceProperties(ctx, baseURL, storageSpace)
 			res.Quota, err = g.getDriveQuota(ctx, storageSpace)
 			if err != nil {
-				return nil, err
+				//TODO: Handle error
+				//return nil, err
 			}
 		}
 		responses = append(responses, res)
