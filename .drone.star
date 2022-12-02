@@ -1777,7 +1777,7 @@ def changelog():
                         "push",
                     ],
                     "message": "Automated changelog update [skip ci]",
-                    "branch": "master",
+                    "branch": "stable-2.0",
                     "author_email": "devops@owncloud.com",
                     "author_name": "ownClouders",
                     "netrc_machine": "github.com",
