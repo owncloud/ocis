@@ -672,6 +672,8 @@ class SpacesContext implements Context {
 	/**
 	 * Remember the available Spaces
 	 *
+	 * @param ResponseInterface|null $response
+	 *
 	 * @return void
 	 *
 	 * @throws Exception
