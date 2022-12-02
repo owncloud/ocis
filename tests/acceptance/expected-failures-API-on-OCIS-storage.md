@@ -509,7 +509,7 @@ API, search, favorites, config, capabilities, not existing endpoints, CORS and o
 - [apiAuthOcs/ocsPOSTAuth.feature:8](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPOSTAuth.feature#L8)
 - [apiAuthOcs/ocsPUTAuth.feature:8](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthOcs/ocsPUTAuth.feature#L8)
 
-#### [sending MKCOL requests to another user's webDav endpoints as normal user gives 404 instead of 403 ](https://github.com/owncloud/ocis/issues/3872)
+#### [sending MKCOL requests to another or non-existing user's webDav endpoints as normal user should return 404](https://github.com/owncloud/ocis/issues/5049)
 
 _ocdav: api compatibility, return correct status code_
 
