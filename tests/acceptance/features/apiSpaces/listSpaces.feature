@@ -14,14 +14,17 @@ Feature: List and create spaces
   Scenario: An ordinary user can request information about their Space via the Graph API
     When user "Alice" lists all available spaces via the GraphApi
     Then the HTTP status code should be "200"
-    And the json responded should contain a space "Alice Hansen" with these key and value pairs:
-      | key              | value                            |
-      | driveType        | personal                         |
-      | driveAlias       | personal/alice                   |
-      | id               | %space_id%                       |
-      | name             | Alice Hansen                     |
-      | quota@@@state    | normal                           |
-      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+    And the json responded should contain a space "Alice Hansen" owned by "Alice" with these key and value pairs:
+      | key               | value                            |
+      | driveType         | personal                         |
+      | driveAlias        | personal/alice                   |
+      | id                | %space_id%                       |
+      | name              | Alice Hansen                     |
+      | owner@@@user@@@id | %user_id%                        |
+      | quota@@@state     | normal                           |
+      | root@@@id         | %space_id%                       |
+      | root@@@webDavUrl  | %base_url%/dav/spaces/%space_id% |
+      | webUrl            | %base_url%/f/%space_id%          |
 
 
   Scenario: An ordinary user can request information about their Space via the Graph API using a filter
@@ -33,7 +36,7 @@ Feature: List and create spaces
       | key       | value       |
       | driveType | virtual     |
       | id        | %space_id%  |
-      | name      | Shares |
+      | name      | Shares      |
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"
     Then the HTTP status code should be "200"
     And the json responded should contain a space "Alice Hansen" with these key and value pairs:
@@ -43,6 +46,7 @@ Feature: List and create spaces
       | name             | Alice Hansen                     |
       | quota@@@state    | normal                           |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+      | webUrl           | %base_url%/f/%space_id%          |
     And the json responded should not contain a space with name "Shares"
     And the json responded should only contain spaces of type "personal"
 
@@ -82,6 +86,7 @@ Feature: List and create spaces
       | name             | Project Mars                     |
       | quota@@@total    | 1000000000                       |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+      | webUrl           | %base_url%/f/%space_id%          |
 
 
   Scenario: An admin user can create a Space via the Graph API with certain quota
@@ -94,6 +99,7 @@ Feature: List and create spaces
       | name             | Project Venus                    |
       | quota@@@total    | 2000                             |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+      | webUrl           | %base_url%/f/%space_id%          |
 
 
   Scenario: A user can list his personal space via multiple endpoints
@@ -104,12 +110,14 @@ Feature: List and create spaces
       | name              | Alice Hansen                     |
       | root@@@webDavUrl  | %base_url%/dav/spaces/%space_id% |
       | owner@@@user@@@id | %user_id%                        |
+      | webUrl            | %base_url%/f/%space_id%          |
     When user "Alice" looks up the single space "Alice Hansen" via the GraphApi by using its id
     Then the json responded should contain a space "Alice Hansen" with these key and value pairs:
       | key              | value                            |
       | driveType        | personal                         |
       | name             | Alice Hansen                     |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+      | webUrl           | %base_url%/f/%space_id%          |
 
 
   Scenario: A user can list his created spaces via multiple endpoints
@@ -123,6 +131,7 @@ Feature: List and create spaces
       | name             | Project Venus                    |
       | quota@@@total    | 2000                             |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+      | webUrl           | %base_url%/f/%space_id%          |
     When user "Alice" looks up the single space "Project Venus" via the GraphApi by using its id
     Then the json responded should contain a space "Project Venus" with these key and value pairs:
       | key              | value                            |
@@ -131,3 +140,4 @@ Feature: List and create spaces
       | name             | Project Venus                    |
       | quota@@@total    | 2000                             |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
+      | webUrl           | %base_url%/f/%space_id%          |
