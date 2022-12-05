@@ -42,7 +42,8 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   `cd ocis/deployment/examples/ocis_ldap`
 
-- Open the `.env` file in a text editor
+- Open the `.env` file in a text editor.
+
   The file by default looks like this:
 
   ```bash
