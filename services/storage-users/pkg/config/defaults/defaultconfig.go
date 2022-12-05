@@ -83,7 +83,7 @@ func DefaultConfig() *config.Config {
 				MasterURL: "http://localhost:9158/data",
 				//SingleUsername:      "3f44740b-f40f-4f05-a1d4-d6f3bbc1677e",
 				//ForceSingleUserMode: true,
-				Root: "ocis",
+				Root: "/ocis",
 			},
 		},
 		Events: config.Events{
