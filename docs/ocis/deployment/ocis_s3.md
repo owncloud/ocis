@@ -47,7 +47,8 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   `cd ocis/deployments/examples/ocis_s3`
 
-* Open the `.env` file in a text editor
+* Open the `.env` file in a text editor.
+
   The file by default looks like this:
 
   ```bash
