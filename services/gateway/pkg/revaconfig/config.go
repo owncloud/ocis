@@ -129,8 +129,8 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 			"providerid": cfg.StorageRegistry.StorageUsersMountID,
 			"spaces": map[string]interface{}{
 				"personal": map[string]interface{}{
-					"mount_point":   "/users",
-					"path_template": "/users/{{.Space.Owner.Id.OpaqueId}}",
+					"mount_point":   "/",
+					"path_template": "/{{.Space.Owner.Id.OpaqueId}}",
 				},
 				"project": map[string]interface{}{
 					"mount_point":   "/projects",
