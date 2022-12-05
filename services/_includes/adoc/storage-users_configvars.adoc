@@ -1,0 +1,665 @@
+// set the attribute to true or leave empty, true without any quotes.
+
+:show-deprecation: false
+
+ifeval::[{show-deprecation} == true]
+
+[[deprecation-note]]
+[caption=]
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Deprecation Info
+| Deprecation Version
+| Removal Version
+| Deprecation Replacment
+|===
+
+endif::[]
+
+[caption=]
+.Environment variables for the storage-users service
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Name
+| Type
+| Default Value
+| Description
+
+a|`OCIS_TRACING_ENABLED` +
+`STORAGE_USERS_TRACING_ENABLED` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates tracing.
+
+a|`OCIS_TRACING_TYPE` +
+`STORAGE_USERS_TRACING_TYPE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+
+a|`OCIS_TRACING_ENDPOINT` +
+`STORAGE_USERS_TRACING_ENDPOINT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The endpoint of the tracing agent.
+
+a|`OCIS_TRACING_COLLECTOR` +
+`STORAGE_USERS_TRACING_COLLECTOR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+
+a|`OCIS_LOG_LEVEL` +
+`STORAGE_USERS_LOG_LEVEL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+
+a|`OCIS_LOG_PRETTY` +
+`STORAGE_USERS_LOG_PRETTY` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates pretty log output.
+
+a|`OCIS_LOG_COLOR` +
+`STORAGE_USERS_LOG_COLOR` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates colorized log output.
+
+a|`OCIS_LOG_FILE` +
+`STORAGE_USERS_LOG_FILE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
+
+a|`STORAGE_USERS_DEBUG_ADDR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9159 ++
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+
+a|`STORAGE_USERS_DEBUG_TOKEN` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Token to secure the metrics endpoint.
+
+a|`STORAGE_USERS_DEBUG_PPROF` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling.
+
+a|`STORAGE_USERS_DEBUG_ZPAGES` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
+
+a|`STORAGE_USERS_GRPC_ADDR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9157 ++
+a| [subs=-attributes]
+The bind address of the GRPC service.
+
+a|`OCIS_GRPC_TLS_ENABLED` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates TLS for the grpc based services using the server certifcate and key configured via OCIS_GRPC_TLS_CERTIFICATE and OCIS_GRPC_TLS_KEY. If OCIS_GRPC_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with OCIS_GRPC_CLIENT_TLS_MODE=insecure.
+
+a|`OCIS_GRPC_TLS_CERTIFICATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name of the TLS server certificate (in PEM format) for the grpc services.
+
+a|`OCIS_GRPC_TLS_KEY` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the grpc services.
+
+a|`STORAGE_USERS_GRPC_PROTOCOL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++tcp ++
+a| [subs=-attributes]
+The transport protocol of the GPRC service.
+
+a|`STORAGE_USERS_HTTP_ADDR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9158 ++
+a| [subs=-attributes]
+The bind address of the HTTP service.
+
+a|`STORAGE_USERS_HTTP_PROTOCOL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++tcp ++
+a| [subs=-attributes]
+The transport protocol of the HTTP service.
+
+a|`OCIS_JWT_SECRET` +
+`STORAGE_USERS_JWT_SECRET` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The secret to mint and validate jwt tokens.
+
+a|`REVA_GATEWAY` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9142 ++
+a| [subs=-attributes]
+The CS3 gateway endpoint.
+
+a|`OCIS_GRPC_CLIENT_TLS_MODE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+TLS mode for grpc connection to the go-micro based grpc services. Possible values are 'off', 'insecure' and 'on'. 'off': disables transport security for the clients. 'insecure' allows to use transport security, but disables certificate verification (to be used with the autogenerated self-signed certificates). 'on' enables transport security, including server ceritificate verification.
+
+a|`OCIS_GRPC_CLIENT_TLS_CACERT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
+
+a|`STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disables the loading of user's group memberships from the reva access token.
+
+a|`STORAGE_USERS_DRIVER` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ocis ++
+a| [subs=-attributes]
+The storage driver which should be used by the service
+
+a|`STORAGE_USERS_OCIS_ROOT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++~/.ocis/storage/users ++
+a| [subs=-attributes]
+The directory where the filesystem storage will store user files. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.
+
+a|`STORAGE_USERS_OCIS_USER_LAYOUT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++{{.Id.OpaqueId}} ++
+a| [subs=-attributes]
+Template string for the user storage layout in the user directory.
+
+a|`STORAGE_USERS_PERMISSION_ENDPOINT,STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9191 ++
+a| [subs=-attributes]
+Endpoint of the permissions service.
+
+a|`STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++{{.SpaceType}}/{{.User.Username \| lower}} ++
+a| [subs=-attributes]
+Template string to construct personal space aliases.
+
+a|`STORAGE_USERS_OCIS_GENERAL_SPACE_ALIAS_TEMPLATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++{{.SpaceType}}/{{.SpaceName \| replace " " "-" \| lower}} ++
+a| [subs=-attributes]
+Template string to construct general space aliases.
+
+a|`STORAGE_USERS_OCIS_SHARE_FOLDER` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/Shares ++
+a| [subs=-attributes]
+Name of the folder jailing all shares.
+
+a|`STORAGE_USERS_OCIS_MAX_ACQUIRE_LOCK_CYCLES` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++20 ++
+a| [subs=-attributes]
+When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used.
+
+a|`STORAGE_USERS_OCIS_LOCK_CYCLE_DURATION_FACTOR` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++30 ++
+a| [subs=-attributes]
+When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.
+
+a|`STORAGE_USERS_S3NG_ROOT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++~/.ocis/storage/users ++
+a| [subs=-attributes]
+The directory where the filesystem storage will store user files. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.
+
+a|`STORAGE_USERS_S3NG_USER_LAYOUT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++{{.Id.OpaqueId}} ++
+a| [subs=-attributes]
+Template string for the user storage layout in the user directory.
+
+a|`STORAGE_USERS_PERMISSION_ENDPOINT` +
+`STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9191 ++
+a| [subs=-attributes]
+Endpoint of the permissions service.
+
+a|`STORAGE_USERS_S3NG_REGION` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++default ++
+a| [subs=-attributes]
+Region of the S3 bucket.
+
+a|`STORAGE_USERS_S3NG_ACCESS_KEY` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Access key for the S3 bucket.
+
+a|`STORAGE_USERS_S3NG_SECRET_KEY` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Secret key for the S3 bucket.
+
+a|`STORAGE_USERS_S3NG_ENDPOINT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Endpoint for the S3 bucket.
+
+a|`STORAGE_USERS_S3NG_BUCKET` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Name of the S3 bucket.
+
+a|`STORAGE_USERS_S3NG_PERSONAL_SPACE_ALIAS_TEMPLATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++{{.SpaceType}}/{{.User.Username \| lower}} ++
+a| [subs=-attributes]
+Template string to construct personal space aliases.
+
+a|`STORAGE_USERS_S3NG_GENERAL_SPACE_ALIAS_TEMPLATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++{{.SpaceType}}/{{.SpaceName \| replace " " "-" \| lower}} ++
+a| [subs=-attributes]
+Template string to construct general space aliases.
+
+a|`STORAGE_USERS_S3NG_SHARE_FOLDER` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/Shares ++
+a| [subs=-attributes]
+Name of the folder jailing all shares.
+
+a|`STORAGE_USERS_S3NG_MAX_ACQUIRE_LOCK_CYCLES` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++20 ++
+a| [subs=-attributes]
+When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used.
+
+a|`STORAGE_USERS_S3NG_LOCK_CYCLE_DURATION_FACTOR` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++30 ++
+a| [subs=-attributes]
+When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.
+
+a|`STORAGE_USERS_OWNCLOUDSQL_DATADIR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++~/.ocis/storage/owncloud ++
+a| [subs=-attributes]
+The directory where the filesystem storage will store SQL migration data. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/owncloud.
+
+a|`STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++/Shares ++
+a| [subs=-attributes]
+Name of the folder jailing all shares.
+
+a|`STORAGE_USERS_OWNCLOUDSQL_LAYOUT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++{{.Username}} ++
+a| [subs=-attributes]
+Path layout to use to navigate into a users folder in an owncloud data directory
+
+a|`STORAGE_USERS_OWNCLOUDSQL_UPLOADINFO_DIR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++~/.ocis/storage/uploadinfo ++
+a| [subs=-attributes]
+Path to a directory, where uploads will be stored temporarily.
+
+a|`STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++owncloud ++
+a| [subs=-attributes]
+Username for the database.
+
+a|`STORAGE_USERS_OWNCLOUDSQL_DB_PASSWORD` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++owncloud ++
+a| [subs=-attributes]
+Password for the database.
+
+a|`STORAGE_USERS_OWNCLOUDSQL_DB_HOST` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Hostname or IP of the database server.
+
+a|`STORAGE_USERS_OWNCLOUDSQL_DB_PORT` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++3306 ++
+a| [subs=-attributes]
+Port that the database server is listening on.
+
+a|`STORAGE_USERS_OWNCLOUDSQL_DB_NAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++owncloud ++
+a| [subs=-attributes]
+Name of the database to be used.
+
+a|`STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++localhost:9144 ++
+a| [subs=-attributes]
+Endpoint of the users provider.
+
+a|`STORAGE_USERS_DATA_SERVER_URL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++http://localhost:9158/data ++
+a| [subs=-attributes]
+URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.
+
+a|`STORAGE_USERS_EVENTS_ENDPOINT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9233 ++
+a| [subs=-attributes]
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
+
+a|`STORAGE_USERS_EVENTS_CLUSTER` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ocis-cluster ++
+a| [subs=-attributes]
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
+
+a|`OCIS_INSECURE` +
+`STORAGE_USERS_EVENTS_TLS_INSECURE` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Whether to verify the server TLS certificates.
+
+a|`STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false.
+
+a|`OCIS_EVENTS_ENABLE_TLS` +
+`STORAGE_USERS_EVENTS_ENABLE_TLS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+
+a|`OCIS_CACHE_STORE_TYPE` +
+`STORAGE_USERS_CACHE_STORE_TYPE` +
+`STORAGE_USERS_CACHE_STORE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++memory ++
+a| [subs=-attributes]
+Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
+
+a|`OCIS_CACHE_STORE_ADDRESS` +
+`STORAGE_USERS_CACHE_STORE_ADDRESS` +
+`STORAGE_USERS_CACHE_NODES` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+Node addresses to use for the cache store.
+
+a|`STORAGE_USERS_CACHE_DATABASE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++users ++
+a| [subs=-attributes]
+Database name of the cache.
+
+a|`STORAGE_USERS_MOUNT_ID` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Mount ID of this storage.
+
+a|`STORAGE_USERS_EXPOSE_DATA_SERVER` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users.
+
+a|`STORAGE_USERS_READ_ONLY` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Set this storage to be read-only.
+
+a|`STORAGE_USERS_UPLOAD_EXPIRATION` +
+
+a| [subs=-attributes]
+++int64 ++
+a| [subs=-attributes]
+++86400 ++
+a| [subs=-attributes]
+Duration after which uploads will expire.
+|===
+

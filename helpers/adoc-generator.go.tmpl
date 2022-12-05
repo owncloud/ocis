@@ -1,0 +1,166 @@
+package main
+
+import (
+	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"path/filepath"
+	"reflect"
+	"regexp"
+	"strings"
+	"text/template"
+
+    {{- range $key, $value := .}}
+    pkg{{$key}} "{{$value}}"
+    {{- end}})
+
+type ConfigField struct {
+	EnvVars         []string
+	DefaultValue    string
+	Type            string
+	Description     string
+	VersionInfo     string
+	DeprecationLink string
+}
+
+type DeprecationField struct {
+	DeprecationVersion     string
+	DeprecationInfo        string
+	DeprecationReplacement string
+	RemovalVersion         string
+}
+
+type templateData struct {
+	ExtensionName   string
+	Fields          []ConfigField
+	Deprecations    []DeprecationField
+	HasDeprecations bool
+}
+
+func main() {
+fmt.Println("Generating adoc documentation for environment variables:")
+content, err := ioutil.ReadFile("../../docs/templates/ADOC.tmpl")
+if err != nil {
+    log.Fatal(err)
+}
+replacer := strings.NewReplacer(
+		"github.com/owncloud/ocis/v2/services/", "",
+		"/pkg/config/defaults", "",
+	)
+var fields []ConfigField
+var deprecations []DeprecationField
+var targetFile *os.File
+tpl := template.Must(template.New("").Parse(string(content)))
+
+m := map[string]interface{}{
+{{- range $key, $value := .}}
+	"{{$value}}": *pkg{{$key}}.FullDefaultConfig(),
+{{- end }}
+}
+
+    targetFolder := "../../docs/services/_includes/adoc/"
+    for pkg, conf := range m {
+	fields, deprecations = GetAnnotatedVariables(conf)
+	var hasDeprecations bool
+	if len(deprecations) > 0 {
+		hasDeprecations = true
+	}
+
+	if len(fields) > 0 || len(deprecations) > 0 {
+	fmt.Printf("... %s\n", pkg)
+		targetFile, err = os.Create(filepath.Join(targetFolder, replacer.Replace(pkg) + "_configvars.adoc"))
+		if err != nil {
+			log.Fatalf("Failed to create target file: %s", err)
+		}
+		defer targetFile.Close()
+
+		td := templateData{
+			ExtensionName: replacer.Replace(pkg),
+			Fields:        fields,
+			Deprecations: deprecations,
+			HasDeprecations: hasDeprecations ,
+		}
+		if err := tpl.Execute(targetFile, td); err != nil {
+			log.Fatalf("Failed to execute template: %s", err)
+		}
+	}
+    }
+	fmt.Println("done")
+}
+
+func GetAnnotatedVariables(s interface{}) ([]ConfigField, []DeprecationField) {
+	t := reflect.TypeOf(s)
+	v := reflect.ValueOf(s)
+
+	var fields []ConfigField
+	var deprecations []DeprecationField
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		value := v.Field(i)
+
+		switch value.Kind() {
+		default:
+			desc := field.Tag.Get("desc")
+			env, ok := field.Tag.Lookup("env")
+			deprecationLink := ""
+			if !ok {
+				continue
+			}
+			deprecationVersion, _ := field.Tag.Lookup("deprecationVersion")
+			removalVersion, _ := field.Tag.Lookup("removalVersion")
+			deprecationInfo, _ := field.Tag.Lookup("deprecationInfo")
+			deprecationReplacement, _ := field.Tag.Lookup("deprecationReplacement")
+			if deprecationVersion != "" ||
+				removalVersion != "" ||
+				deprecationInfo != "" ||
+				deprecationReplacement != "" {
+				deprecationLink = "xref:deprecation-note[Deprecation Note]"
+			}
+			v := fmt.Sprintf("%v", value.Interface())
+			td := strings.Split(env, ";")
+			// re := regexp.MustCompile(`^(https?:\/\/)`)
+			// v = re.ReplaceAllString(v,"\\$1")
+			re := regexp.MustCompile(`(https?:\/\/)`)
+			desc = re.ReplaceAllString(desc, "\\$1")
+			re = regexp.MustCompile(`(\|)`)
+			v = re.ReplaceAllString(v, "\\$1")
+			typeName := value.Type().Name()
+			if typeName == "" {
+				typeName = value.Type().String()
+			}
+			fields = append(fields,
+				ConfigField{
+					EnvVars:         td,
+					DefaultValue:    v,
+					Description:     desc,
+					Type:            typeName,
+					DeprecationLink: deprecationLink,
+				})
+			if deprecationLink != "" {
+				deprecations = append(deprecations,
+					DeprecationField{
+						DeprecationVersion:     deprecationVersion,
+						DeprecationInfo:        deprecationInfo,
+						DeprecationReplacement: deprecationReplacement,
+						RemovalVersion:         removalVersion,
+					})
+			}
+		case reflect.Ptr:
+			// PolicySelectors in the Proxy are being skipped atm
+			// they are not configurable via env vars, if that changes
+			// they are probably added to the Sanitize() function
+			// and this should not be an issue then
+			if !value.IsZero() && value.Elem().CanInterface() {
+				f, d := GetAnnotatedVariables(value.Elem().Interface())
+				fields = append(fields, f...)
+				deprecations = append(deprecations, d...)
+			}
+		case reflect.Struct:
+			f, d := GetAnnotatedVariables(value.Interface())
+			fields = append(fields, f...)
+			deprecations = append(deprecations, d...)
+		}
+	}
+	return fields, deprecations
+}
