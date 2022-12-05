@@ -266,7 +266,7 @@ def main(ctx):
             pipelines + \
             pipelinesDependsOn(
                 example_deploys(ctx),
-                pipelines,
+                [purgeBuildArtifactCache(ctx)],
             )
 
     # always append notification step
@@ -1322,7 +1322,7 @@ def dockerRelease(ctx, arch):
         "REVISION=%s" % (ctx.build.commit),
         "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "latest"),
     ]
-    depends_on = getPipelineNames(testOcisModules(ctx) + testPipelines(ctx))
+    depends_on = getPipelineNames([purgeBuildArtifactCache(ctx)])
 
     if ctx.build.event == "tag":
         depends_on = []
@@ -1411,7 +1411,7 @@ def binaryReleases(ctx):
 def binaryRelease(ctx, name):
     # uploads binary to https://download.owncloud.com/ocis/ocis/daily/
     target = "/ocis/%s/daily" % (ctx.repo.name.replace("ocis-", ""))
-    depends_on = getPipelineNames(testOcisModules(ctx) + testPipelines(ctx))
+    depends_on = getPipelineNames([purgeBuildArtifactCache(ctx)])
     if ctx.build.event == "tag":
         # uploads binary to eg. https://download.owncloud.com/ocis/ocis/1.0.0-beta9/
         folder = "stable"
