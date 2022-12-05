@@ -169,7 +169,7 @@ A naive driver that treats the keys in an S3 capable storage as `/` delimited pa
 
 ## Data Providers
 
-Clients using the CS3 API use an [InitiateFileDownload](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.InitiateFileDownloadRequest) and ]InitiateUpload](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.InitiateFileUploadRequest) request at the [storage gateway](https://cs3org.github.io/cs3apis/#cs3.gateway.v1beta1.GatewayAPI) to obtain a URL endpoint that can be used to either GET the file content or upload content using the resumable [tus.io](https://tus.io) protocol.
+Clients using the CS3 API use an [InitiateFileDownload](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.InitiateFileDownloadRequest) and [InitiateUpload](https://cs3org.github.io/cs3apis/#cs3.storage.provider.v1beta1.InitiateFileUploadRequest) request at the [storage gateway](https://cs3org.github.io/cs3apis/#cs3.gateway.v1beta1.GatewayAPI) to obtain a URL endpoint that can be used to either GET the file content or upload content using the resumable [tus.io](https://tus.io) protocol.
 
 The *data provider* uses the same *storage driver* as the *storage provider* but can be scaled independently.
 
