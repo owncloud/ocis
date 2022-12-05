@@ -4,7 +4,7 @@ date: 2020-04-27T18:46:00+01:00
 weight: 12
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/storage
-geekdocFilePath: storages.md
+geekdocFilePath: storagedrivers.md
 ---
 
 A *storage driver* implements access to a [*storage system*]({{< ref "#storage-systems" >}}):
