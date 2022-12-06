@@ -144,7 +144,7 @@ The *minimal* storage driver for a POSIX based filesystem. It literally supports
   - design new freedesktop spec, basically what is done in oc10 without the limitations or borrow ideas from the freedesktop trash spec
   - fuse filesystem overlay
 
-To provide the other storage aspects we plan to implement a FUSE overlay filesystem which will add the different aspects on top of local filesystems like ext4, btrfs or xfs. It should work on NFSv45 as well, although NFSv4 supports RichACLs and we will explore how to leverage them to implement sharing at a future date. The idea is to use the storages native capabilities to deliver the best user experience. But again: that means making the right tradeoffs.
+To provide the other storage aspects we plan to implement a FUSE overlay filesystem which will add the different aspects on top of local filesystems like ext4, btrfs or xfs. It should work on NFSv4 as well, although NFSv4 supports RichACLs and we will explore how to leverage them to implement sharing at a future date. The idea is to use the storages native capabilities to deliver the best user experience. But again: that means making the right tradeoffs.
 
 ### EOS Storage Driver
 
