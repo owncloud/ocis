@@ -158,26 +158,27 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// All users get the user role by default currently.
-	// to all new users for now, as create Account request does not have any role field
-	if g.roleService == nil {
-		// log as error, admin needs to do something about it
-		logger.Error().Str("id", *u.Id).Msg("could not create user: role service not configured")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not assign role to account: roleService not configured")
-		return
-	}
-	if _, err = g.roleService.AssignRoleToUser(r.Context(), &settings.AssignRoleToUserRequest{
-		AccountUuid: *u.Id,
-		RoleId:      settingssvc.BundleUUIDRoleUser,
-	}); err != nil {
-		// log as error, admin eventually needs to do something
-		logger.Error().Err(err).Str("id", *u.Id).Str("role", settingssvc.BundleUUIDRoleUser).Msg("could not create user: role assignment failed")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "role assignment failed")
-		return
+	// assign roles if possible
+	if g.roleService != nil {
+		// All users get the user role by default currently.
+		// to all new users for now, as create Account request does not have any role field
+		if _, err = g.roleService.AssignRoleToUser(r.Context(), &settings.AssignRoleToUserRequest{
+			AccountUuid: *u.Id,
+			RoleId:      settingssvc.BundleUUIDRoleUser,
+		}); err != nil {
+			// log as error, admin eventually needs to do something
+			logger.Error().Err(err).Str("id", *u.Id).Str("role", settingssvc.BundleUUIDRoleUser).Msg("could not create user: role assignment failed")
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "role assignment failed")
+			return
+		}
 	}
 
-	currentUser := revactx.ContextMustGetUser(r.Context())
-	g.publishEvent(events.UserCreated{Executant: currentUser.Id, UserID: *u.Id})
+	e := events.UserCreated{UserID: *u.Id}
+	currentUser, ok := revactx.ContextGetUser(r.Context())
+	if ok {
+		e.Executant = currentUser.GetId()
+	}
+	g.publishEvent(e)
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, u)
