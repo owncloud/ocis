@@ -23,7 +23,7 @@ import (
 
 var _ = Describe("Searchprovider", func() {
 	var (
-		p           *search.Provider
+		s           search.Searcher
 		extractor   *contentMocks.Extractor
 		gw          *cs3mocks.GatewayAPIClient
 		indexClient *engineMocks.Engine
@@ -73,7 +73,7 @@ var _ = Describe("Searchprovider", func() {
 		indexClient = &engineMocks.Engine{}
 		extractor = &contentMocks.Extractor{}
 
-		p = search.NewProvider(gw, indexClient, extractor, logger, "")
+		s = search.NewService(gw, indexClient, extractor, logger, "")
 
 		gw.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
 			Status: status.NewOK(ctx),
@@ -94,8 +94,8 @@ var _ = Describe("Searchprovider", func() {
 
 	Describe("New", func() {
 		It("returns a new instance", func() {
-			p := search.NewProvider(gw, indexClient, extractor, logger, "")
-			Expect(p).ToNot(BeNil())
+			s := search.NewService(gw, indexClient, extractor, logger, "")
+			Expect(s).ToNot(BeNil())
 		})
 	})
 
@@ -107,19 +107,16 @@ var _ = Describe("Searchprovider", func() {
 			}, nil)
 			extractor.Mock.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
 			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
+			indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{}, nil)
 
-			res, err := p.IndexSpace(ctx, &searchsvc.IndexSpaceRequest{
-				SpaceId: "storageid$spaceid!spaceid",
-				UserId:  "user",
-			})
-			Expect(err).ToNot(HaveOccurred())
-			Expect(res).ToNot(BeNil())
+			err := s.IndexSpace(&sprovider.ResourceId{}, user.Id)
+			Expect(err).ShouldNot(HaveOccurred())
 		})
 	})
 
 	Describe("Search", func() {
 		It("fails when an empty query is given", func() {
-			res, err := p.Search(ctx, &searchsvc.SearchRequest{
+			res, err := s.Search(ctx, &searchsvc.SearchRequest{
 				Query: "",
 			})
 			Expect(err).To(HaveOccurred())
@@ -158,7 +155,7 @@ var _ = Describe("Searchprovider", func() {
 			})
 
 			It("does not mess with field-based searches", func() {
-				_, err := p.Search(ctx, &searchsvc.SearchRequest{
+				_, err := s.Search(ctx, &searchsvc.SearchRequest{
 					Query: "Size:<10",
 				})
 				Expect(err).ToNot(HaveOccurred())
@@ -168,7 +165,7 @@ var _ = Describe("Searchprovider", func() {
 			})
 
 			It("searches the personal user space", func() {
-				res, err := p.Search(ctx, &searchsvc.SearchRequest{
+				res, err := s.Search(ctx, &searchsvc.SearchRequest{
 					Query: "foo",
 				})
 				Expect(err).ToNot(HaveOccurred())
@@ -245,7 +242,7 @@ var _ = Describe("Searchprovider", func() {
 					},
 				}, nil)
 
-				res, err := p.Search(ctx, &searchsvc.SearchRequest{
+				res, err := s.Search(ctx, &searchsvc.SearchRequest{
 					Query: "Foo",
 				})
 				Expect(err).ToNot(HaveOccurred())
@@ -337,7 +334,7 @@ var _ = Describe("Searchprovider", func() {
 				})
 
 				It("considers the search Ref parameter", func() {
-					res, err := p.Search(ctx, &searchsvc.SearchRequest{
+					res, err := s.Search(ctx, &searchsvc.SearchRequest{
 						Query: "foo",
 						Ref: &searchmsg.Reference{
 							ResourceId: &searchmsg.ResourceID{
@@ -354,7 +351,7 @@ var _ = Describe("Searchprovider", func() {
 				})
 
 				It("finds matches in both the personal space AND the grant", func() {
-					res, err := p.Search(ctx, &searchsvc.SearchRequest{
+					res, err := s.Search(ctx, &searchsvc.SearchRequest{
 						Query: "foo",
 					})
 					Expect(err).ToNot(HaveOccurred())
@@ -365,7 +362,7 @@ var _ = Describe("Searchprovider", func() {
 				})
 
 				It("sorts and limits the combined results from all spaces", func() {
-					res, err := p.Search(ctx, &searchsvc.SearchRequest{
+					res, err := s.Search(ctx, &searchsvc.SearchRequest{
 						Query:    "foo",
 						PageSize: 2,
 					})

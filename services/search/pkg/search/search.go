@@ -3,6 +3,8 @@ package search
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -92,4 +94,48 @@ func statResource(ctx context.Context, ref *provider.Reference, gw gateway.Gatew
 	}
 
 	return res, nil
+}
+
+// NOTE: this converts CS3 to WebDAV permissions
+// since conversions pkg is reva internal we have no other choice than to duplicate the logic
+func convertToWebDAVPermissions(isShared, isMountpoint, isDir bool, p *provider.ResourcePermissions) string {
+	if p == nil {
+		return ""
+	}
+	var b strings.Builder
+	if isShared {
+		fmt.Fprintf(&b, "S")
+	}
+	if p.ListContainer &&
+		p.ListFileVersions &&
+		p.ListRecycle &&
+		p.Stat &&
+		p.GetPath &&
+		p.GetQuota &&
+		p.InitiateFileDownload {
+		fmt.Fprintf(&b, "R")
+	}
+	if isMountpoint {
+		fmt.Fprintf(&b, "M")
+	}
+	if p.Delete &&
+		p.PurgeRecycle {
+		fmt.Fprintf(&b, "D")
+	}
+	if p.InitiateFileUpload &&
+		p.RestoreFileVersion &&
+		p.RestoreRecycleItem {
+		fmt.Fprintf(&b, "NV")
+		if !isDir {
+			fmt.Fprintf(&b, "W")
+		}
+	}
+	if isDir &&
+		p.ListContainer &&
+		p.Stat &&
+		p.CreateContainer &&
+		p.InitiateFileUpload {
+		fmt.Fprintf(&b, "CK")
+	}
+	return b.String()
 }

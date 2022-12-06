@@ -6,6 +6,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"os"
 	"time"
 
@@ -103,8 +104,10 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, err
 	}
 
+	ss := search.NewService(gw, eng, extractor, logger, cfg.MachineAuthAPIKey)
+
 	// setup event handling
-	if err := search.HandleEvents(eng, extractor, gw, bus, logger, cfg); err != nil {
+	if err := search.HandleEvents(ss, bus, logger, cfg); err != nil {
 		return nil, teardown, err
 	}
 
@@ -116,7 +119,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 	return &Service{
 		id:       cfg.GRPC.Namespace + "." + cfg.Service.Name,
 		log:      logger,
-		provider: search.NewProvider(gw, eng, extractor, logger, cfg.MachineAuthAPIKey),
+		searcher: ss,
 		cache:    cache,
 	}, teardown, nil
 }
@@ -125,7 +128,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 type Service struct {
 	id       string
 	log      log.Logger
-	provider *search.Provider
+	searcher search.Searcher
 	cache    *ttlcache.Cache
 }
 
@@ -144,7 +147,7 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 	res, ok := s.FromCache(key)
 	if !ok {
 		var err error
-		res, err = s.provider.Search(ctx, &searchsvc.SearchRequest{
+		res, err = s.searcher.Search(ctx, &searchsvc.SearchRequest{
 			Query:    in.Query,
 			PageSize: in.PageSize,
 			Ref:      in.Ref,
@@ -169,8 +172,12 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 
 // IndexSpace (re)indexes all resources of a given space.
 func (s Service) IndexSpace(ctx context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
-	_, err := s.provider.IndexSpace(ctx, in)
-	return err
+	rid, err := storagespace.ParseID(in.SpaceId)
+	if err != nil {
+		return err
+	}
+
+	return s.searcher.IndexSpace(&rid, &user.UserId{OpaqueId: in.UserId})
 }
 
 // FromCache pulls a search result from cache
