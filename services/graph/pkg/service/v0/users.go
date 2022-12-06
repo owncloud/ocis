@@ -174,8 +174,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	e := events.UserCreated{UserID: *u.Id}
-	currentUser, ok := revactx.ContextGetUser(r.Context())
-	if ok {
+	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
 	g.publishEvent(e)
@@ -308,12 +307,14 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser := revactx.ContextMustGetUser(r.Context())
-
-	if currentUser.GetId().GetOpaqueId() == user.GetId() {
-		logger.Debug().Msg("could not delete user: self deletion forbidden")
-		errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "self deletion forbidden")
-		return
+	e := events.UserDeleted{UserID: user.GetId()}
+	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
+		if currentUser.GetId().GetOpaqueId() == user.GetId() {
+			logger.Debug().Msg("could not delete user: self deletion forbidden")
+			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "self deletion forbidden")
+			return
+		}
+		e.Executant = currentUser.GetId()
 	}
 
 	logger.Debug().
@@ -383,7 +384,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	g.publishEvent(events.UserDeleted{Executant: currentUser.Id, UserID: user.GetId()})
+	g.publishEvent(e)
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
@@ -444,14 +445,14 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser := revactx.ContextMustGetUser(r.Context())
-	g.publishEvent(
-		events.UserFeatureChanged{
-			Executant: currentUser.Id,
-			UserID:    nameOrID,
-			Features:  features,
-		},
-	)
+	e := events.UserFeatureChanged{
+		UserID:   nameOrID,
+		Features: features,
+	}
+	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
+		e.Executant = currentUser.GetId()
+	}
+	g.publishEvent(e)
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, u)
 
