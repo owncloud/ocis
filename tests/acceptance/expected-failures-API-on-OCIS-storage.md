@@ -600,18 +600,6 @@ And other missing implementation of favorites
 - [apiWebdavOperations/refuseAccess.feature:22](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L22)
 - [apiWebdavOperations/refuseAccess.feature:23](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavOperations/refuseAccess.feature#L23)
 
-#### [CORS headers are not identical with oC10 headers](https://github.com/owncloud/ocis/issues/5195)
-
-- [apiAuth/cors.feature:24](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L24)
-- [apiAuth/cors.feature:25](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L25)
-- [apiAuth/cors.feature:56](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L56)
-- [apiAuth/cors.feature:57](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L57)
-
-#### [Requests with invalid credentials do not return CORS headers](https://github.com/owncloud/ocis/issues/5194)
-
-- [apiAuth/cors.feature:204](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L204)
-- [apiAuth/cors.feature:205](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuth/cors.feature#L205)
-
 #### [App Passwords/Tokens for legacy WebDAV clients](https://github.com/owncloud/ocis/issues/197)
 
 - [apiAuthWebDav/webDavDELETEAuth.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiAuthWebDav/webDavDELETEAuth.feature#L135)
