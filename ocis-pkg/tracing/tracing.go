@@ -59,7 +59,15 @@ func GetTraceProvider(endpoint, collector, serviceName, traceType string) (*sdkt
 			return nil, err
 		}
 
-		rtrace.InitDefaultTracerProvider(traceType, collector, endpoint)
+		tp := rtrace.NewTracerProvider(
+			rtrace.WithEnabled(),
+			rtrace.WithExporter(traceType),
+			rtrace.WithInsecure(),
+			rtrace.WithCollector(collector),
+			rtrace.WithEndpoint(endpoint),
+			rtrace.WithServiceName(serviceName),
+		)
+		rtrace.SetDefaultTracerProvider(tp)
 		return sdktrace.NewTracerProvider(
 			sdktrace.WithBatcher(exp),
 			sdktrace.WithResource(resource.NewWithAttributes(
@@ -95,7 +103,15 @@ func GetTraceProvider(endpoint, collector, serviceName, traceType string) (*sdkt
 			return nil, err
 		}
 
-		rtrace.InitDefaultTracerProvider(traceType, collector, endpoint)
+		tp := rtrace.NewTracerProvider(
+			rtrace.WithEnabled(),
+			rtrace.WithExporter(traceType),
+			rtrace.WithInsecure(),
+			rtrace.WithCollector(collector),
+			rtrace.WithEndpoint(endpoint),
+			rtrace.WithServiceName(serviceName),
+		)
+		rtrace.SetDefaultTracerProvider(tp)
 		return sdktrace.NewTracerProvider(
 			sdktrace.WithSampler(sdktrace.AlwaysSample()),
 			sdktrace.WithBatcher(exporter),
