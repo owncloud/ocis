@@ -101,8 +101,28 @@ config = {
         "earlyFail": True,
     },
     "localApiTests": {
-        "skip": False,
-        "earlyFail": True,
+        "basic": {
+            "suites": [
+                "apiAccountsHashDifficulty",
+                "apiArchiver",
+                "apiContract",
+                "apiGraph",
+                "apiSpaces",
+                "apiSpacesShares",
+            ],
+            "skip": False,
+            "earlyFail": True,
+        },
+        "apiCors": {
+            "suites": [
+                "apiCors",
+            ],
+            "skip": False,
+            "earlyFail": True,
+            "extraServerEnvironment": {
+                "OCIS_CORS_ALLOW_ORIGINS": "https://aphno.badal",
+            },
+        },
     },
     "apiTests": {
         "numberOfParts": 10,
@@ -350,15 +370,8 @@ def testPipelines(ctx):
         pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
     if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
         pipelines.append(wopiValidatorTests(ctx, "ocis", "default"))
-    if "skip" not in config["localApiTests"] or not config["localApiTests"]["skip"]:
-        pipelines += [
-            localApiTests(ctx, "ocis", "apiAccountsHashDifficulty"),
-            localApiTests(ctx, "ocis", "apiSpaces"),
-            localApiTests(ctx, "ocis", "apiSpacesShares"),
-            localApiTests(ctx, "ocis", "apiContract"),
-            localApiTests(ctx, "ocis", "apiArchiver"),
-            localApiTests(ctx, "ocis", "apiGraph"),
-        ]
+
+    pipelines += localApiTestPipeline(ctx)
 
     if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
         pipelines += apiTests(ctx)
@@ -676,9 +689,10 @@ def codestyle(ctx):
 
     return pipelines
 
-def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
-    early_fail = config["localApiTests"]["earlyFail"] if "earlyFail" in config["localApiTests"] else False
+def localApiTestPipeline(ctx):
+    pipelines = []
 
+<<<<<<< HEAD
     return {
         "kind": "pipeline",
         "type": "docker",
@@ -727,7 +741,82 @@ def localApiTests(ctx, storage, suite, accounts_hash_difficulty = 4):
                 "refs/pull/**",
             ],
         },
+=======
+    defaults = {
+        "suites": {},
+        "skip": False,
+        "earlyFail": False,
+        "extraEnvironment": {},
+        "extraServerEnvironment": {},
+        "storages": ["ocis"],
+        "accounts_hash_difficulty": 4,
+>>>>>>> 616ab07f4 (add cors tests pipeline in drone config)
     }
+
+    if "localApiTests" in config:
+        for name, matrix in config["localApiTests"].items():
+            if "skip" not in matrix or not matrix["skip"]:
+                params = {}
+                for item in defaults:
+                    params[item] = matrix[item] if item in matrix else defaults[item]
+                for suite in params["suites"]:
+                    early_fail = params["earlyFail"] if "earlyFail" in params else False
+                    for storage in params["storages"]:
+                        pipeline = {
+                            "kind": "pipeline",
+                            "type": "docker",
+                            "name": "localApiTests-%s-%s" % (suite, storage),
+                            "platform": {
+                                "os": "linux",
+                                "arch": "amd64",
+                            },
+                            "steps": skipIfUnchanged(ctx, "acceptance-tests") +
+                                     restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
+                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"]) +
+                                     restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
+                                     localApiTests(suite, storage, params["extraEnvironment"]) +
+                                     failEarly(ctx, early_fail),
+                            "services": redisForOCStorage(storage),
+                            "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]) +
+                                          getPipelineNames(cacheCoreReposForTesting(ctx)),
+                            "trigger": {
+                                "ref": [
+                                    "refs/heads/master",
+                                    "refs/pull/**",
+                                ],
+                            },
+                        }
+                        pipelines.append(pipeline)
+    return pipelines
+
+def localApiTests(suite, storage, extra_environment = {}):
+    environment = {
+        "TEST_WITH_GRAPH_API": "true",
+        "PATH_TO_OCIS": dirs["base"],
+        "PATH_TO_CORE": "%s/%s" % (dirs["base"], dirs["core"]),
+        "TEST_SERVER_URL": "https://ocis-server:9200",
+        "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
+        "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
+        "TEST_OCIS": "true",
+        "SEND_SCENARIO_LINE_REFERENCES": "true",
+        "STORAGE_DRIVER": storage,
+        "BEHAT_SUITE": suite,
+        "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
+        "EXPECTED_FAILURES_FILE": "%s/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (dirs["base"], storage.upper()),
+        "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
+    }
+
+    for item in extra_environment:
+        environment[item] = extra_environment[item]
+
+    return [{
+        "name": "localApiTests-%s-%s" % (suite, storage),
+        "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+        "environment": environment,
+        "commands": [
+            "make test-acceptance-api",
+        ],
+    }]
 
 def cs3ApiTests(ctx, storage, accounts_hash_difficulty = 4):
     early_fail = config["cs3ApiTests"]["earlyFail"] if "earlyFail" in config["cs3ApiTests"] else False
@@ -1998,7 +2087,7 @@ def notify():
         },
     }
 
-def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = ""):
+def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}):
     if deploy_type == "":
         user = "0:0"
         environment = {
@@ -2130,6 +2219,9 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
     # The high values cause lots of CPU to be used when hashing passwords, and really slow down the tests.
     if (accounts_hash_difficulty != "default"):
         environment["ACCOUNTS_HASH_DIFFICULTY"] = accounts_hash_difficulty
+
+    for item in extra_server_environment:
+        environment[item] = extra_server_environment[item]
 
     return [
         {

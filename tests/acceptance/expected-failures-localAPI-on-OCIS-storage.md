@@ -70,11 +70,11 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/editGroup.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L25)
 
 #### [CORS headers are not identical with oC10 headers](https://github.com/owncloud/ocis/issues/5195)
+- [apiCors/cors.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L23)
 - [apiCors/cors.feature:24](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L24)
 - [apiCors/cors.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L25)
 - [apiCors/cors.feature:26](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L26)
-- [apiCors/cors.feature:27](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L27)
 
 #### [Requests with invalid credentials do not return CORS headers](https://github.com/owncloud/ocis/issues/5194)
-- [apiCors/cors.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L68)
-- [apiCors/cors.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L69)
+- [apiCors/cors.feature:65](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L65)
+- [apiCors/cors.feature:66](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L66)
