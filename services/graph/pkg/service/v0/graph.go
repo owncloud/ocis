@@ -2,9 +2,11 @@ package svc
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
 	"path"
+	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -90,16 +92,17 @@ type RoleService interface {
 
 // Graph defines implements the business logic for Service.
 type Graph struct {
-	config               *config.Config
-	mux                  *chi.Mux
-	logger               *log.Logger
-	identityBackend      identity.Backend
-	gatewayClient        GatewayClient
-	roleService          RoleService
-	permissionsService   Permissions
-	spacePropertiesCache *ttlcache.Cache
-	eventsPublisher      events.Publisher
-	searchService        searchsvc.SearchProviderService
+	config                   *config.Config
+	mux                      *chi.Mux
+	logger                   *log.Logger
+	identityBackend          identity.Backend
+	identityEducationBackend identity.EducationBackend
+	gatewayClient            GatewayClient
+	roleService              RoleService
+	permissionsService       Permissions
+	spacePropertiesCache     *ttlcache.Cache
+	eventsPublisher          events.Publisher
+	searchService            searchsvc.SearchProviderService
 }
 
 // ServeHTTP implements the Service interface.
@@ -107,7 +110,7 @@ func (g Graph) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
 }
 
-// GetClient returns a gateway client to talk to reva
+// GetGatewayClient returns a gateway client to talk to reva
 func (g Graph) GetGatewayClient() GatewayClient {
 	return g.gatewayClient
 }
@@ -131,6 +134,7 @@ func (g Graph) getWebDavBaseURL() (*url.URL, error) {
 	return webDavBaseURL, nil
 }
 
+// ListResponse is used for proper marshalling of Graph list responses
 type ListResponse struct {
 	Value interface{} `json:"value,omitempty"`
 }
@@ -139,3 +143,18 @@ const (
 	ReadmeSpecialFolderName     = "readme"
 	SpaceImageSpecialFolderName = "image"
 )
+
+// TODO might be different for /education/users vs /users
+func (g Graph) parseMemberRef(ref string) (string, string, error) {
+	memberURL, err := url.ParseRequestURI(ref)
+	if err != nil {
+		return "", "", err
+	}
+	segments := strings.Split(memberURL.Path, "/")
+	if len(segments) < 2 {
+		return "", "", errors.New("invalid member reference")
+	}
+	id := segments[len(segments)-1]
+	memberType := segments[len(segments)-2]
+	return memberType, id, nil
+}

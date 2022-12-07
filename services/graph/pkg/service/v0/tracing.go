@@ -95,6 +95,46 @@ func (t tracing) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 	t.next.DeleteGroupMember(w, r)
 }
 
+// GetSchools implements the Service interface.
+func (t tracing) GetSchools(w http.ResponseWriter, r *http.Request) {
+	t.next.GetSchools(w, r)
+}
+
+// GetSchool implements the Service interface.
+func (t tracing) GetSchool(w http.ResponseWriter, r *http.Request) {
+	t.next.GetSchool(w, r)
+}
+
+// PostSchool implements the Service interface.
+func (t tracing) PostSchool(w http.ResponseWriter, r *http.Request) {
+	t.next.PostSchool(w, r)
+}
+
+// PatchSchool implements the Service interface.
+func (t tracing) PatchSchool(w http.ResponseWriter, r *http.Request) {
+	t.next.PatchSchool(w, r)
+}
+
+// DeleteSchool implements the Service interface.
+func (t tracing) DeleteSchool(w http.ResponseWriter, r *http.Request) {
+	t.next.DeleteSchool(w, r)
+}
+
+// GetSchoolMembers implements the Service interface.
+func (t tracing) GetSchoolMembers(w http.ResponseWriter, r *http.Request) {
+	t.next.GetSchoolMembers(w, r)
+}
+
+// PostSchoolMember implements the Service interface.
+func (t tracing) PostSchoolMember(w http.ResponseWriter, r *http.Request) {
+	t.next.PostSchoolMember(w, r)
+}
+
+// DeleteSchoolMember implements the Service interface.
+func (t tracing) DeleteSchoolMember(w http.ResponseWriter, r *http.Request) {
+	t.next.DeleteSchoolMember(w, r)
+}
+
 // GetDrives implements the Service interface.
 func (t tracing) GetDrives(w http.ResponseWriter, r *http.Request) {
 	t.next.GetDrives(w, r)

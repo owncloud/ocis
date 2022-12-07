@@ -8,6 +8,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
+// Backend defines the Interface for an IdentityBackend implementation
 type Backend interface {
 	// CreateUser creates a given user in the identity backend.
 	CreateUser(ctx context.Context, user libregraph.User) (*libregraph.User, error)
@@ -29,6 +30,23 @@ type Backend interface {
 	AddMembersToGroup(ctx context.Context, groupID string, memberID []string) error
 	// RemoveMemberFromGroup removes a single member (by ID) from a group
 	RemoveMemberFromGroup(ctx context.Context, groupID string, memberID string) error
+}
+
+// EducationBackend defines the Interface for an EducationBackend implementation
+type EducationBackend interface {
+	// CreateSchool creates the supplied school in the identity backend.
+	CreateSchool(ctx context.Context, group libregraph.EducationSchool) (*libregraph.EducationSchool, error)
+	// DeleteSchool deletes a given school, identified by id
+	DeleteSchool(ctx context.Context, id string) error
+	// GetSchool reads a given school by id
+	GetSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error)
+	// GetSchools lists all	schools
+	GetSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error)
+	GetSchoolMembers(ctx context.Context, id string) ([]*libregraph.User, error)
+	// AddMembersToSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
+	AddMembersToSchool(ctx context.Context, schoolID string, memberID []string) error
+	// RemoveMemberFromSchool removes a single member (by ID) from a school
+	RemoveMemberFromSchool(ctx context.Context, schoolID string, memberID string) error
 }
 
 func CreateUserModelFromCS3(u *cs3.User) *libregraph.User {
