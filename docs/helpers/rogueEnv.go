@@ -16,31 +16,45 @@ import (
 
 const yamlSource = "global_vars.yaml"
 
+// ConfigVars is the main yaml source
 type ConfigVars struct {
 	Variables []Variable `yaml:"variables"`
 }
 
+// Variable contains all information about one rogue envvar
 type Variable struct {
-	Name              string    `yaml:"name"`
-	Type              string    `yaml:"type"`
-	DefaultValue      string    `yaml:"default_value"`
-	Description       string    `yaml:"description"`
-	DependendServices []Service `yaml:"dependend_services"`
-	DoIgnore          bool      `yaml:"do_ignore"`
-}
-
-type Service struct {
-	Name string `yaml:"name"`
+	// These field structs are automatically filled:
+	// RawName can be the name of the envvar or the name of its var
+	RawName string `yaml:"rawname"`
+	// Path to the envvar with linenumber
 	Path string `yaml:"path"`
+	// FoundInCode indicates if the variable is still found in the codebase. TODO: delete immediately?
+	FoundInCode bool `yaml:"foundincode"`
+	// Name is equal to RawName but will not be overwritten in consecutive runs
+	Name string `yaml:"name"`
+
+	// These field structs need manual filling:
+	// Type of the envvar
+	Type string `yaml:"type"`
+	// DefaultValue of the envvar
+	DefaultValue string `yaml:"default_value"`
+	// Description of what this envvar does
+	Description string `yaml:"description"`
+	// Ignore this envvar when creating docs?
+	Ignore bool `yaml:"do_ignore"`
+
+	// For simplicity ignored for now:
+	// DependendServices []Service `yaml:"dependend_services"`
 }
 
+// GetRogueEnvs extracts the rogue envs from the code
 func GetRogueEnvs() {
 	curdir, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 	}
 	fullYamlPath := filepath.Join(curdir, yamlSource)
-	re := regexp.MustCompile(`"[A-z0-9_]{1,}"`)
+	re := regexp.MustCompile(`os.Getenv\(([^\)]+)\)`)
 	vars := &ConfigVars{}
 	fmt.Printf("Reading existing variable definitions from %s\n", fullYamlPath)
 	yfile, err := ioutil.ReadFile(fullYamlPath)
@@ -55,21 +69,54 @@ func GetRogueEnvs() {
 		log.Fatal(err)
 	}
 	fmt.Println("Gathering variable definitions from source")
-	out, err := exec.Command("bash", "-c", "grep -R os.Getenv | grep -v rogue-env.go |grep \\.go").Output()
+	out, err := exec.Command("bash", "-c", "grep -RHn os.Getenv | grep -v rogueEnv.go |grep \\.go").Output()
 	if err != nil {
 		log.Fatal(err)
 	}
 	lines := strings.Split(string(out), "\n")
+
+	// find current vars
+	currentVars := make(map[string]Variable)
 	for _, l := range lines {
+		fmt.Printf("Parsing %s\n", l)
 		r := strings.SplitN(l, ":\t", 2)
-		if len(r) == 2 && r[0] != "" && r[1] != "" {
-			fmt.Printf("Parsing %s\n", r[0])
-			res := re.FindAll([]byte(r[1]), -1)
-			for _, item := range res {
-				AddUniqueToStruct(vars, Variable{Name: strings.Trim(string(item), "\""), Type: ""})
-			}
+		if len(r) != 2 || r[0] == "" || r[1] == "" {
+			continue
+		}
+
+		res := re.FindAllSubmatch([]byte(r[1]), -1)
+		if len(res) != 1 || len(res[0]) < 2 {
+			fmt.Printf("Error envvar not matching pattern: %s", r[1])
+			continue
+		}
+
+		path := r[0]
+		name := strings.Trim(string(res[0][1]), "\"")
+		currentVars[path+name] = Variable{
+			RawName:     name,
+			Path:        path,
+			FoundInCode: true,
+			Name:        name,
 		}
 	}
+
+	// adjust existing vars
+	for i, v := range vars.Variables {
+		_, ok := currentVars[v.Path+v.RawName]
+		if !ok {
+			vars.Variables[i].FoundInCode = false
+			continue
+		}
+
+		vars.Variables[i].FoundInCode = true
+		delete(currentVars, v.Path+v.RawName)
+	}
+
+	// add new envvars
+	for _, v := range currentVars {
+		vars.Variables = append(vars.Variables, v)
+	}
+
 	output, err := yaml.Marshal(vars)
 	if err != nil {
 		log.Fatal(err)
@@ -84,15 +131,7 @@ func GetRogueEnvs() {
 	}
 }
 
-func AddUniqueToStruct(variables *ConfigVars, variable Variable) {
-	for _, itm := range variables.Variables {
-		if itm.Name == variable.Name {
-			return
-		}
-	}
-	variables.Variables = append(variables.Variables, variable)
-}
-
+// RenderGlobalVarsTemplate renders the global vars template
 func RenderGlobalVarsTemplate() {
 	curdir, err := os.Getwd()
 	if err != nil {

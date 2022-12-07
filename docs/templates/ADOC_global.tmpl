@@ -11,6 +11,9 @@
 
 {{- range .Variables}}
 
+{{- if .Ignore }}
+    {{ continue }}
+{{- end }}
 a| `{{- .Name }}` +
 a| [subs=-attributes]
 ++{{ .Type }} ++
