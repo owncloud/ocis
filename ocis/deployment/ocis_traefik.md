@@ -16,18 +16,21 @@ geekdocFilePath: ocis_traefik.md
 
 [Find this example on GitHub](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_traefik)
 
-The docker stack consists of two containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
+The docker stack consists of three containers. One of them is Traefik, a proxy which is terminating ssl and forwards the requests to oCIS in the internal docker network.
 
 The other one is oCIS itself running all extensions in one container. In this example, oCIS uses its internal IDP [LibreGraph Connect]({{< ref "../../services/idp" >}}) and the [oCIS storage driver]({{< ref "../storage/storagedrivers" >}})
+
+The last one is [Inbucket](https://inbucket.org) a mail service to view the notification mails oCIS generates.
 
 ## Server Deployment
 
 ### Requirements
 
 * Linux server with docker and docker-compose installed
-* Two domains set up and pointing to your server
+* Three domains set up and pointing to your server
   - ocis.* for serving oCIS
   - traefik.* for serving the Traefik dashboard
+  - mail.* for serving the Inbucket mail service
 
 See also [example server setup]({{< ref "preparing_server" >}})
 
@@ -71,6 +74,10 @@ See also [example server setup]({{< ref "preparing_server" >}})
   # The demo users should not be created on a production instance
   # because their passwords are public. Defaults to "false".
   DEMO_USERS=
+
+  ### Email / Inbucket settings ###
+  # Inbucket / Mail domain. Defaults to "mail.owncloud.test"
+  INBUCKET_DOMAIN=
   ```
 
   You are installing oCIS on a server and Traefik will obtain valid certificates for you so please remove `INSECURE=true` or set it to `false`.
@@ -93,7 +100,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
   `docker-compose up -d`
 
-* You now can visit oCIS and Traefik dashboard on your configured domains. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
+* You now can visit oCIS, Traefik dashboard and Inbucket on your configured domains. You may need to wait some minutes until all services are fully ready, so make sure that you try to reload the pages from time to time.
 
 ## Local setup
 For a more simple local ocis setup see [Getting started]({{< ref "../getting-started" >}})
@@ -105,6 +112,7 @@ On Linux and macOS you can add them to your `/etc/hosts` file and on Windows to 
 ```
 127.0.0.1 ocis.owncloud.test
 127.0.0.1 traefik.owncloud.test
+127.0.0.1 mail.owncloud.test
 ```
 
 After that you're ready to start the application stack:
