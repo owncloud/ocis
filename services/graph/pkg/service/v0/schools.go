@@ -13,8 +13,6 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 )
@@ -86,6 +84,7 @@ func (g Graph) PostSchool(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	/* TODO requires reva changes
 	if school != nil && school.Id != nil {
 		e := events.SchoolCreated{SchoolID: *school.Id}
 		if currentUser, ok := ctxpkg.ContextGetUser(r.Context()); ok {
@@ -93,6 +92,7 @@ func (g Graph) PostSchool(w http.ResponseWriter, r *http.Request) {
 		}
 		g.publishEvent(e)
 	}
+	*/
 
 	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, school)
@@ -123,11 +123,13 @@ func (g Graph) PatchSchool(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	/* TODO requires reva changes
 	e := events.SchoolFeatureChanged{SchoolID: schoolID}
 	if currentUser, ok := ctxpkg.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
 	g.publishEvent(e)
+	*/
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
@@ -201,11 +203,13 @@ func (g Graph) DeleteSchool(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	/* TODO requires reva changes
 	e := events.SchoolDeleted{SchoolID: schoolID}
 	if currentUser, ok := ctxpkg.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
 	g.publishEvent(e)
+	*/
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
@@ -311,11 +315,13 @@ func (g Graph) PostSchoolMember(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	/* TODO requires reva changes
 	e := events.SchoolMemberAdded{SchoolID: schoolID, UserID: id}
 	if currentUser, ok := ctxpkg.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
 	g.publishEvent(e)
+	*/
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
@@ -367,11 +373,13 @@ func (g Graph) DeleteSchoolMember(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	/* TODO requires reva changes
 	e := events.SchoolMemberRemoved{SchoolID: schoolID, UserID: memberID}
 	if currentUser, ok := ctxpkg.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}
 	g.publishEvent(e)
+	*/
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
