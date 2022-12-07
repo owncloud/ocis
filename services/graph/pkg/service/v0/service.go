@@ -7,7 +7,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jellydator/ttlcache/v2"
@@ -69,17 +68,9 @@ func NewService(opts ...Option) Service {
 		logger:               &options.Logger,
 		spacePropertiesCache: ttlcache.NewCache(),
 		eventsPublisher:      options.EventsPublisher,
+		gatewayClient:        options.GatewayClient,
 	}
-	if options.GatewayClient == nil {
-		var err error
-		svc.gatewayClient, err = pool.GetGatewayServiceClient(options.Config.Reva.Address, options.Config.Reva.GetRevaOptions()...)
-		if err != nil {
-			options.Logger.Error().Err(err).Msg("Could not get gateway client")
-			return nil
-		}
-	} else {
-		svc.gatewayClient = options.GatewayClient
-	}
+
 	if options.IdentityBackend == nil {
 		switch options.Config.Identity.Backend {
 		case "cs3":

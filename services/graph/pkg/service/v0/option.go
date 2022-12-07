@@ -60,8 +60,8 @@ func Middleware(val ...func(http.Handler) http.Handler) Option {
 	}
 }
 
-// RequireAdminMiddleware provides a function to set the RequireAdminMiddleware option.
-func RequireAdminMiddleware(val func(http.Handler) http.Handler) Option {
+// WithRequireAdminMiddleware provides a function to set the RequireAdminMiddleware option.
+func WithRequireAdminMiddleware(val func(http.Handler) http.Handler) Option {
 	return func(o *Options) {
 		o.RequireAdminMiddleware = val
 	}

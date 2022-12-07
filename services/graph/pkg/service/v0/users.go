@@ -179,7 +179,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	}
 	g.publishEvent(e)
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, u)
 }
 
@@ -317,57 +317,59 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		e.Executant = currentUser.GetId()
 	}
 
-	logger.Debug().
-		Str("user", user.GetId()).
-		Msg("calling list spaces with user filter to fetch the personal space for deletion")
-	opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
-	f := listStorageSpacesUserFilter(user.GetId())
-	lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
-		Opaque:  opaque,
-		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
-	})
-	if err != nil {
-		// transport error, log as error
-		logger.Error().Err(err).Msg("could not fetch spaces: transport error")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not fetch spaces for deletion, aborting")
-		return
-	}
-	for _, sp := range lspr.GetStorageSpaces() {
-		if !(sp.SpaceType == "personal" && sp.Owner.Id.OpaqueId == user.GetId()) {
-			continue
+	if g.gatewayClient != nil {
+		logger.Debug().
+			Str("user", user.GetId()).
+			Msg("calling list spaces with user filter to fetch the personal space for deletion")
+		opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
+		f := listStorageSpacesUserFilter(user.GetId())
+		lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
+			Opaque:  opaque,
+			Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
+		})
+		if err != nil {
+			// transport error, log as error
+			logger.Error().Err(err).Msg("could not fetch spaces: transport error")
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not fetch spaces for deletion, aborting")
+			return
 		}
-		// TODO: check if request contains a homespace and if, check if requesting user has the privilege to
-		// delete it and make sure it is not deleting its own homespace
-		// needs modification of the cs3api
+		for _, sp := range lspr.GetStorageSpaces() {
+			if !(sp.SpaceType == "personal" && sp.Owner.Id.OpaqueId == user.GetId()) {
+				continue
+			}
+			// TODO: check if request contains a homespace and if, check if requesting user has the privilege to
+			// delete it and make sure it is not deleting its own homespace
+			// needs modification of the cs3api
 
-		// Deleting a space a two step process (1. disabling/trashing, 2. purging)
-		// Do the "disable/trash" step only if the space is not marked as trashed yet:
-		if _, ok := sp.Opaque.Map["trashed"]; !ok {
+			// Deleting a space a two step process (1. disabling/trashing, 2. purging)
+			// Do the "disable/trash" step only if the space is not marked as trashed yet:
+			if _, ok := sp.Opaque.Map["trashed"]; !ok {
+				_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+					Id: &storageprovider.StorageSpaceId{
+						OpaqueId: sp.Id.OpaqueId,
+					},
+				})
+				if err != nil {
+					logger.Error().Err(err).Msg("could not disable homespace: transport error")
+					errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not disable homespace, aborting")
+					return
+				}
+			}
+			purgeFlag := utils.AppendPlainToOpaque(nil, "purge", "")
 			_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+				Opaque: purgeFlag,
 				Id: &storageprovider.StorageSpaceId{
 					OpaqueId: sp.Id.OpaqueId,
 				},
 			})
 			if err != nil {
-				logger.Error().Err(err).Msg("could not disable homespace: transport error")
-				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not disable homespace, aborting")
+				// transport error, log as error
+				logger.Error().Err(err).Msg("could not delete homespace: transport error")
+				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not delete homespace, aborting")
 				return
 			}
+			break
 		}
-		purgeFlag := utils.AppendPlainToOpaque(nil, "purge", "")
-		_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
-			Opaque: purgeFlag,
-			Id: &storageprovider.StorageSpaceId{
-				OpaqueId: sp.Id.OpaqueId,
-			},
-		})
-		if err != nil {
-			// transport error, log as error
-			logger.Error().Err(err).Msg("could not delete homespace: transport error")
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not delete homespace, aborting")
-			return
-		}
-		break
 	}
 
 	logger.Debug().Str("id", user.GetId()).Msg("calling delete user on backend")
@@ -432,6 +434,14 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		features = append(features, events.UserFeature{Name: "displayname", Value: *name})
 	}
 
+	if enabled, ok := changes.GetAccountEnabledOk(); ok {
+		e := events.UserFeature{Name: "enabled", Value: "false"}
+		if *enabled {
+			e.Value = "true"
+		}
+		features = append(features, e)
+	}
+
 	logger.Debug().Str("nameid", nameOrID).Interface("changes", *changes).Msg("calling update user on backend")
 	u, err := g.identityBackend.UpdateUser(r.Context(), nameOrID, *changes)
 	if err != nil {
@@ -453,7 +463,7 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		e.Executant = currentUser.GetId()
 	}
 	g.publishEvent(e)
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusNoContent)
 	render.JSON(w, r, u)
 
 }

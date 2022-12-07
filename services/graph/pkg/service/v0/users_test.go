@@ -393,7 +393,7 @@ var _ = Describe("Users", func() {
 			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.PostUser(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusOK))
+			Expect(rr.Code).To(Equal(http.StatusCreated))
 		})
 	})
 
@@ -516,7 +516,7 @@ var _ = Describe("Users", func() {
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.PatchUser(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusOK))
+			Expect(rr.Code).To(Equal(http.StatusNoContent))
 			data, err = io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
