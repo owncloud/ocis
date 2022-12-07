@@ -1364,23 +1364,43 @@ class GraphContext implements Context {
 	}
 
 
+    /**
+     * @param array $expectedDriveInformation
+     * @param array $actualValueDriveInformation
+     *
+     * @throws GuzzleException
+     * @return void
+     */
+    public function checkUserDriveInformation(array $expectedDriveInformation, array  $actualValueDriveInformation):void {
+        foreach (array_keys($expectedDriveInformation) as $keyName) {
+            // break the segment with @@@ here
+            $separatedKey = explode("@@@",$keyName);
+            $actualKeyAvalue = null;
+            $actualKeyAvalue = $actualValueDriveInformation['owner'];
+            var_dump(
+                $actualKeyAvalue
+            );
+            foreach ($separatedKey as $key) {
+                // this loop sets and get the actual keyvalue from the actual API response
+                $actualKeyAvalue = $actualValueDriveInformation[$key];
+            }
+            var_dump(
+                $actualKeyAvalue
+            );
+        }
+    }
+
+
 
     /**
-     * @Then the response should contain the following drive information:
+     * @Then the user retrieve API response should contain the following drive information:
      */
     public function theResponseShouldContainTheFollowingDriveInformation(TableNode $table)
     {
-        $rows = $table->getRowsHash();
-        $responseAPI = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['drive'];
-        foreach (array_keys($rows) as $keyName) {
-            Assert::assertEquals(
-                $rows[$keyName],
-                $responseAPI[$keyName],
-                __METHOD__ .
-                ' Expected ' . $keyName . 'to have value' . $responseAPI[$keyName]
-                . ' but got ' . $rows[$keyName]
-            );
-        }
+        $expectedDriveInformation = $table->getRowsHash();
+        // array of user drive information (Personal Drive Information Only)
+        $actualDriveInformation = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['drive'];
+        $this->checkUserDriveInformation($expectedDriveInformation, $actualDriveInformation);
     }
 
 }
