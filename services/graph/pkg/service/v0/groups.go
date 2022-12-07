@@ -20,6 +20,7 @@ import (
 )
 
 const memberRefsLimit = 20
+const memberTypeUsers = "users"
 
 // GetGroups implements the Service interface.
 func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
@@ -145,7 +146,7 @@ func (g Graph) PatchGroup(w http.ResponseWriter, r *http.Request) {
 			logger.Debug().Str("membertype", memberType).Str("memberid", id).Msg("add group member")
 			// The MS Graph spec allows "directoryObject", "user", "group" and "organizational Contact"
 			// we restrict this to users for now. Might add Groups as members later
-			if memberType != "users" {
+			if memberType != memberTypeUsers {
 				logger.Debug().
 					Str("type", memberType).
 					Msg("could not change group: could not add member, only user type is allowed")
@@ -324,7 +325,7 @@ func (g Graph) PostGroupMember(w http.ResponseWriter, r *http.Request) {
 	}
 	// The MS Graph spec allows "directoryObject", "user", "group" and "organizational Contact"
 	// we restrict this to users for now. Might add Groups as members later
-	if memberType != "users" {
+	if memberType != memberTypeUsers {
 		logger.Debug().Str("type", memberType).Msg("could not add group member: Only users are allowed as group members")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Only users are allowed as group members")
 		return
@@ -399,20 +400,6 @@ func (g Graph) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 	g.publishEvent(events.GroupMemberRemoved{Executant: currentUser.Id, GroupID: groupID, UserID: memberID})
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
-}
-
-func (g Graph) parseMemberRef(ref string) (string, string, error) {
-	memberURL, err := url.ParseRequestURI(ref)
-	if err != nil {
-		return "", "", err
-	}
-	segments := strings.Split(memberURL.Path, "/")
-	if len(segments) < 2 {
-		return "", "", errors.New("invalid member reference")
-	}
-	id := segments[len(segments)-1]
-	memberType := segments[len(segments)-2]
-	return memberType, id, nil
 }
 
 func sortGroups(req *godata.GoDataRequest, groups []*libregraph.Group) ([]*libregraph.Group, error) {

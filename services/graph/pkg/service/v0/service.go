@@ -46,6 +46,15 @@ type Service interface {
 	PostGroupMember(http.ResponseWriter, *http.Request)
 	DeleteGroupMember(http.ResponseWriter, *http.Request)
 
+	GetSchools(http.ResponseWriter, *http.Request)
+	GetSchool(http.ResponseWriter, *http.Request)
+	PostSchool(http.ResponseWriter, *http.Request)
+	PatchSchool(http.ResponseWriter, *http.Request)
+	DeleteSchool(http.ResponseWriter, *http.Request)
+	GetSchoolMembers(http.ResponseWriter, *http.Request)
+	PostSchoolMember(http.ResponseWriter, *http.Request)
+	DeleteSchoolMember(http.ResponseWriter, *http.Request)
+
 	GetDrives(w http.ResponseWriter, r *http.Request)
 	GetSingleDrive(w http.ResponseWriter, r *http.Request)
 	GetAllDrives(w http.ResponseWriter, r *http.Request)
@@ -67,13 +76,14 @@ func NewService(opts ...Option) Service {
 	m.Use(options.Middleware...)
 
 	svc := Graph{
-		config:               options.Config,
-		mux:                  m,
-		logger:               &options.Logger,
-		spacePropertiesCache: ttlcache.NewCache(),
-		eventsPublisher:      options.EventsPublisher,
-		gatewayClient:        options.GatewayClient,
-		searchService:        options.SearchService,
+		config:                   options.Config,
+		mux:                      m,
+		logger:                   &options.Logger,
+		spacePropertiesCache:     ttlcache.NewCache(),
+		eventsPublisher:          options.EventsPublisher,
+		gatewayClient:            options.GatewayClient,
+		searchService:            options.SearchService,
+		identityEducationBackend: options.IdentityEducationBackend,
 	}
 
 	if options.IdentityBackend == nil {
@@ -129,9 +139,14 @@ func NewService(opts ...Option) Service {
 					TLSConfig:    tlsConf,
 				},
 			)
-			if svc.identityBackend, err = identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger); err != nil {
+			lb, err := identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger)
+			if err != nil {
 				options.Logger.Error().Msgf("Error initializing LDAP Backend: '%s'", err)
 				return nil
+			}
+			svc.identityBackend = lb
+			if options.IdentityEducationBackend == nil {
+				svc.identityEducationBackend = lb
 			}
 		default:
 			options.Logger.Error().Msgf("Unknown Identity Backend: '%s'", options.Config.Identity.Backend)
@@ -213,6 +228,45 @@ func NewService(opts ...Option) Service {
 					r.Patch("/", svc.UpdateDrive)
 					r.Get("/", svc.GetSingleDrive)
 					r.Delete("/", svc.DeleteDrive)
+				})
+			})
+			r.With(requireAdmin).Route("/education", func(r chi.Router) {
+				r.Route("/schools", func(r chi.Router) {
+					r.Get("/", svc.GetSchools)
+					r.Post("/", svc.PostSchool)
+					r.Route("/{schoolID}", func(r chi.Router) {
+						r.Get("/", svc.GetSchool)
+						r.Delete("/", svc.DeleteSchool)
+						r.Patch("/", svc.PatchSchool)
+						r.Route("/members", func(r chi.Router) {
+							r.Get("/", svc.GetSchoolMembers)
+							r.Post("/$ref", svc.PostSchoolMember)
+							r.Delete("/{memberID}/$ref", svc.DeleteSchoolMember)
+						})
+					})
+				})
+				r.Route("/users", func(r chi.Router) {
+					r.Get("/", svc.GetUsers)
+					r.Post("/", svc.PostUser)
+					r.Route("/{userID}", func(r chi.Router) {
+						r.Get("/", svc.GetUser)
+						r.Delete("/", svc.DeleteUser)
+						r.Patch("/", svc.PatchUser)
+					})
+				})
+				r.Route("/classes", func(r chi.Router) {
+					r.Get("/", svc.GetGroups)
+					r.Post("/", svc.PostGroup)
+					r.Route("/{groupID}", func(r chi.Router) {
+						r.Get("/", svc.GetGroup)
+						r.Delete("/", svc.DeleteGroup)
+						r.Patch("/", svc.PatchGroup)
+						r.Route("/members", func(r chi.Router) {
+							r.Get("/", svc.GetGroupMembers)
+							r.Post("/$ref", svc.PostGroupMember)
+							r.Delete("/{memberID}/$ref", svc.DeleteGroupMember)
+						})
+					})
 				})
 			})
 		})

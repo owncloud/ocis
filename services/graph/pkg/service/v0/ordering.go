@@ -101,3 +101,21 @@ type groupsByDisplayName struct {
 func (g groupsByDisplayName) Less(i, j int) bool {
 	return strings.ToLower(g.groupSlice[i].GetDisplayName()) < strings.ToLower(g.groupSlice[j].GetDisplayName())
 }
+
+type schoolSlice []*libregraph.EducationSchool
+
+// Len is the number of elements in the collection.
+func (d schoolSlice) Len() int { return len(d) }
+
+// Swap swaps the elements with indexes i and j.
+func (d schoolSlice) Swap(i, j int) { d[i], d[j] = d[j], d[i] }
+
+type schoolsByDisplayName struct {
+	schoolSlice
+}
+
+// Less reports whether the element with index i
+// must sort before the element with index j.
+func (g schoolsByDisplayName) Less(i, j int) bool {
+	return strings.ToLower(g.schoolSlice[i].GetDisplayName()) < strings.ToLower(g.schoolSlice[j].GetDisplayName())
+}

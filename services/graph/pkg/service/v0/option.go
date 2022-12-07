@@ -17,17 +17,18 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger                 log.Logger
-	Config                 *config.Config
-	Middleware             []func(http.Handler) http.Handler
-	RequireAdminMiddleware func(http.Handler) http.Handler
-	GatewayClient          GatewayClient
-	IdentityBackend        identity.Backend
-	RoleService            RoleService
-	PermissionService      Permissions
-	RoleManager            *roles.Manager
-	EventsPublisher        events.Publisher
-	SearchService          searchsvc.SearchProviderService
+	Logger                   log.Logger
+	Config                   *config.Config
+	Middleware               []func(http.Handler) http.Handler
+	RequireAdminMiddleware   func(http.Handler) http.Handler
+	GatewayClient            GatewayClient
+	IdentityBackend          identity.Backend
+	IdentityEducationBackend identity.EducationBackend
+	RoleService              RoleService
+	PermissionService        Permissions
+	RoleManager              *roles.Manager
+	EventsPublisher          events.Publisher
+	SearchService            searchsvc.SearchProviderService
 }
 
 // newOptions initializes the available default options.
@@ -80,6 +81,13 @@ func WithGatewayClient(val GatewayClient) Option {
 func WithIdentityBackend(val identity.Backend) Option {
 	return func(o *Options) {
 		o.IdentityBackend = val
+	}
+}
+
+// WithIdentityEducationBackend provides a function to set the IdentityEducationBackend option.
+func WithIdentityEducationBackend(val identity.EducationBackend) Option {
+	return func(o *Options) {
+		o.IdentityEducationBackend = val
 	}
 }
 
