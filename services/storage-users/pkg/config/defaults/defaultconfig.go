@@ -80,7 +80,7 @@ func DefaultConfig() *config.Config {
 			},
 			EOS: config.EOSDriver{
 				GRPCURI:   "localhost:50051",
-				MasterURL: "http://localhost:9158/data",
+				MasterURL: "http://localhost:8000",
 				//SingleUsername:      "3f44740b-f40f-4f05-a1d4-d6f3bbc1677e",
 				//ForceSingleUserMode: true,
 				Root: "/ocis",
