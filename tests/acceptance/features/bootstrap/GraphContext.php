@@ -84,7 +84,7 @@ class GraphContext implements Context {
 			$displayName
 		);
 		$this->featureContext->setResponse($response);
-		$this->featureContext->theHttpStatusCodeShouldBe(200);
+		$this->featureContext->theHttpStatusCodeShouldBe(204);
 	}
 
 	/**
@@ -540,7 +540,7 @@ class GraphContext implements Context {
 			$email,
 			$displayName
 		);
-		if ($response->getStatusCode() !== 200) {
+		if ($response->getStatusCode() !== 201) {
 			$this->throwHttpException($response, "Could not create user $user");
 		} else {
 			$this->featureContext->setResponse($response);
@@ -600,7 +600,7 @@ class GraphContext implements Context {
 		$rows = $table->getRowsHash();
 		$response = $this->featureContext->getResponse();
 
-		if ($response->getStatusCode() !== 200) {
+		if ($response->getStatusCode() !== 201) {
 			$this->throwHttpException($response, "Could not create user '$rows[userName]'");
 		}
 	}
@@ -751,7 +751,7 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse($response);
 		$this->featureContext->pushToLastHttpStatusCodesArray((string) $response->getStatusCode());
 
-		if ($response->getStatusCode() === 200) {
+		if ($response->getStatusCode() === 201) {
 			$groupId = $this->featureContext->getJsonDecodedResponse($response)["id"];
 			$this->featureContext->addGroupToCreatedGroupsList($group, true, true, $groupId);
 		}
@@ -768,7 +768,7 @@ class GraphContext implements Context {
 	 */
 	public function adminHasCreatedGroupUsingTheGraphApi(string $group): array {
 		$result = $this->createGroup($group);
-		if ($result->getStatusCode() === 200) {
+		if ($result->getStatusCode() === 201) {
 			return $this->featureContext->getJsonDecodedResponse($result);
 		} else {
 			$this->throwHttpException($result, "Could not create group '$group'.");
