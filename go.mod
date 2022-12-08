@@ -24,7 +24,7 @@ require (
 	github.com/go-micro/plugins/v4/registry/consul v1.2.0
 	github.com/go-micro/plugins/v4/registry/etcd v1.2.0
 	github.com/go-micro/plugins/v4/registry/kubernetes v1.1.0
-	github.com/go-micro/plugins/v4/registry/mdns v1.1.0
+	github.com/go-micro/plugins/v4/registry/mdns v1.2.0
 	github.com/go-micro/plugins/v4/registry/memory v1.1.0
 	github.com/go-micro/plugins/v4/registry/nats v1.1.0
 	github.com/go-micro/plugins/v4/server/grpc v1.2.0

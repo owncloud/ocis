@@ -483,8 +483,8 @@ github.com/go-micro/plugins/v4/registry/etcd v1.2.0 h1:tcHlU1GzvX3oZa8WQH8ylMCGi
 github.com/go-micro/plugins/v4/registry/etcd v1.2.0/go.mod h1:CQeTHkjN3xMtIQsynaTTquMz2sHEdsTfRIfFzrX7aug=
 github.com/go-micro/plugins/v4/registry/kubernetes v1.1.0 h1:JfkrimhACDviPtKT7Fhqms7oeM9sgy0I37bzvn4AsI4=
 github.com/go-micro/plugins/v4/registry/kubernetes v1.1.0/go.mod h1:6SNUr4g/JTzmR8OWU1KaIOS+lCFaqDnCRvbH3L5uUro=
-github.com/go-micro/plugins/v4/registry/mdns v1.1.0 h1:qRB93cviMeY4n3/r9T/5zJF3PF+Ol5tw/VW5e6TSG4s=
-github.com/go-micro/plugins/v4/registry/mdns v1.1.0/go.mod h1:k71V05hytGwaO3jqKKf8NmBPo07NFlCLmeIwPNr6n50=
+github.com/go-micro/plugins/v4/registry/mdns v1.2.0 h1:BsGnco+PgycvSX+HS0XbeUQEPoPT3a+dDiHWV6dbVDs=
+github.com/go-micro/plugins/v4/registry/mdns v1.2.0/go.mod h1:re0JvO5F56n59WEDaAKj2jtboKa2dklAd6iWyz5xa54=
 github.com/go-micro/plugins/v4/registry/memory v1.1.0 h1:omyL8l12mzNCjNSDxMkAReEWOiv58j62X7sIa6aRCj8=
 github.com/go-micro/plugins/v4/registry/memory v1.1.0/go.mod h1:7gsV2dwpFr+1rFhncmnxA9Tjv/NjQr9Zy8KpVKS7/jQ=
 github.com/go-micro/plugins/v4/registry/nats v1.1.0 h1:oqQzP5P2FkfoYZiBRuCWsKqh4BCJG6MQkxYmLw2lNrU=
