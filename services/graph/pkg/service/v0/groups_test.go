@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 
@@ -92,7 +92,7 @@ var _ = Describe("Groups", func() {
 			svc.GetGroups(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			odataerr := libregraph.OdataError{}
@@ -107,7 +107,7 @@ var _ = Describe("Groups", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups", nil)
 			svc.GetGroups(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			odataerr := libregraph.OdataError{}
@@ -123,7 +123,7 @@ var _ = Describe("Groups", func() {
 			svc.GetGroups(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			odataerr := libregraph.OdataError{}
@@ -139,7 +139,7 @@ var _ = Describe("Groups", func() {
 			svc.GetGroups(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			res := service.ListResponse{}
@@ -155,7 +155,7 @@ var _ = Describe("Groups", func() {
 			svc.GetGroups(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			res := groupList{}
@@ -385,7 +385,7 @@ var _ = Describe("Groups", func() {
 			svc.GetGroupMembers(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			var members []*libregraph.User

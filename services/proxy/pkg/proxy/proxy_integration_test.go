@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -133,7 +132,7 @@ func TestProxyIntegration(t *testing.T) {
 
 				return &http.Response{
 					StatusCode: 200,
-					Body:       ioutil.NopCloser(bytes.NewBufferString(`OK`)),
+					Body:       io.NopCloser(bytes.NewBufferString(`OK`)),
 					Header:     make(http.Header),
 				}
 			})
@@ -146,7 +145,7 @@ func TestProxyIntegration(t *testing.T) {
 				t.Errorf("Expected status 200 from proxy-response got %v", rsp.StatusCode)
 			}
 
-			resultBody, err := ioutil.ReadAll(rsp.Body)
+			resultBody, err := io.ReadAll(rsp.Body)
 			if err != nil {
 				t.Fatal("Error reading result body")
 			}

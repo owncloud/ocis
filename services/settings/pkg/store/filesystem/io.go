@@ -1,7 +1,7 @@
 package store
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/errortypes"
@@ -22,7 +22,7 @@ func (s Store) parseRecordFromFile(record proto.Message, filePath string) error 
 	}
 	defer file.Close()
 
-	b, err := ioutil.ReadAll(file)
+	b, err := io.ReadAll(file)
 	if err != nil {
 		return err
 	}

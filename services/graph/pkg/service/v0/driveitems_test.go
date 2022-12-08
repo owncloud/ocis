@@ -3,7 +3,7 @@ package svc_test
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"time"
@@ -113,7 +113,7 @@ var _ = Describe("Driveitems", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drive/root/children", nil)
 			svc.GetRootDriveChildren(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			res := itemsList{}

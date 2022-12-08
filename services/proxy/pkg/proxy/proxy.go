@@ -5,10 +5,10 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httputil"
+	"os"
 	"time"
 
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
@@ -56,7 +56,7 @@ func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 	}
 	if options.Config.BackendHTTPSCACert != "" {
 		certs := x509.NewCertPool()
-		pemData, err := ioutil.ReadFile(options.Config.BackendHTTPSCACert)
+		pemData, err := os.ReadFile(options.Config.BackendHTTPSCACert)
 		if err != nil {
 			return nil, err
 		}

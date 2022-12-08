@@ -3,7 +3,7 @@ package store
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/gofrs/uuid"
@@ -16,7 +16,7 @@ import (
 // If the accountUUID is not empty, values with an empty or with a matching accountUUID are returned.
 func (s Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, error) {
 	valuesFolder := s.buildFolderPathForValues(false)
-	valueFiles, err := ioutil.ReadDir(valuesFolder)
+	valueFiles, err := os.ReadDir(valuesFolder)
 	if err != nil {
 		return []*settingsmsg.Value{}, nil
 	}
@@ -61,7 +61,7 @@ func (s Store) ReadValue(valueID string) (*settingsmsg.Value, error) {
 // ReadValueByUniqueIdentifiers tries to find a value given a set of unique identifiers
 func (s Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*settingsmsg.Value, error) {
 	valuesFolder := s.buildFolderPathForValues(false)
-	files, err := ioutil.ReadDir(valuesFolder)
+	files, err := os.ReadDir(valuesFolder)
 	if err != nil {
 		return nil, err
 	}

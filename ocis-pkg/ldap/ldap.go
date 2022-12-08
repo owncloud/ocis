@@ -3,7 +3,6 @@ package ldap
 import (
 	"crypto/x509"
 	"errors"
-	"io/ioutil"
 	"os"
 	"strings"
 	"time"
@@ -39,7 +38,7 @@ func WaitForCA(log log.Logger, insecure bool, caCert string) error {
 			// Check if this actually is a CA cert. We need to retry here as well
 			// as the file might exist already, but have no contents yet.
 			certs := x509.NewCertPool()
-			pemData, err := ioutil.ReadFile(caCert)
+			pemData, err := os.ReadFile(caCert)
 			if err != nil {
 				log.Debug().Err(err).Str("LDAP CACert", caCert).Msg("Error reading CA")
 			} else if !certs.AppendCertsFromPEM(pemData) {

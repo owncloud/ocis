@@ -1,7 +1,7 @@
 package log
 
 import (
-	"io/ioutil"
+	"io"
 
 	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
@@ -28,7 +28,7 @@ type LogrusWrapper struct {
 // underlying zerolog via hooks.
 func LogrusWrap(zr zerolog.Logger) *logrus.Logger {
 	lr := logrus.New()
-	lr.SetOutput(ioutil.Discard)
+	lr.SetOutput(io.Discard)
 	lr.SetLevel(logrusLevel(zr.GetLevel()))
 	lr.AddHook(&LogrusWrapper{
 		zeroLog:  &zr,
@@ -52,7 +52,7 @@ func (h *LogrusWrapper) Fire(entry *logrus.Entry) error {
 	return nil
 }
 
-//Convert logrus fields to zerolog
+// Convert logrus fields to zerolog
 func zeroLogFields(fields logrus.Fields) map[string]interface{} {
 	fm := make(map[string]interface{})
 	for k, v := range fields {

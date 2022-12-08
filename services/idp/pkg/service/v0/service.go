@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 	"path"
@@ -143,7 +143,7 @@ func createTemporaryClientsConfig(filePath, ocisURL string, clients []config.Cli
 
 	defer confOnDisk.Close()
 
-	err = ioutil.WriteFile(filePath, conf, 0600)
+	err = os.WriteFile(filePath, conf, 0600)
 	if err != nil {
 		return err
 	}
@@ -253,7 +253,7 @@ func (idp IDP) Index() http.HandlerFunc {
 		idp.logger.Fatal().Err(err).Msg("Could not open index template")
 	}
 
-	template, err := ioutil.ReadAll(f)
+	template, err := io.ReadAll(f)
 	if err != nil {
 		idp.logger.Fatal().Err(err).Msg("Could not read index template")
 	}

@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"time"
@@ -825,7 +824,7 @@ var _ = Describe("Graph", func() {
 			svc.GetSingleDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			drive := libregraph.Drive{}
@@ -864,7 +863,7 @@ var _ = Describe("Graph", func() {
 			svc.GetSingleDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			drive := libregraph.Drive{}
@@ -925,7 +924,7 @@ var _ = Describe("Graph", func() {
 			svc.GetSingleDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			drive := libregraph.Drive{}

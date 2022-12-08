@@ -2,7 +2,7 @@ package revaconfig
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -111,7 +111,7 @@ func spacesProviders(cfg *config.Config, logger log.Logger) map[string]map[strin
 
 	// check if the rules have to be read from a json file
 	if cfg.StorageRegistry.JSON != "" {
-		data, err := ioutil.ReadFile(cfg.StorageRegistry.JSON)
+		data, err := os.ReadFile(cfg.StorageRegistry.JSON)
 		if err != nil {
 			logger.Error().Err(err).Msg("Failed to read storage registry rules from JSON file: " + cfg.StorageRegistry.JSON)
 			return nil

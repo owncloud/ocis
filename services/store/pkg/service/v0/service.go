@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -85,7 +84,7 @@ func (s *Service) Read(c context.Context, rreq *storesvc.ReadRequest, rres *stor
 
 		var data []byte
 		rec := &storemsg.Record{}
-		data, err := ioutil.ReadFile(file)
+		data, err := os.ReadFile(file)
 		if err != nil {
 			return merrors.NotFound(s.id, "could not read record")
 		}
@@ -129,7 +128,7 @@ func (s *Service) Read(c context.Context, rreq *storesvc.ReadRequest, rres *stor
 			dest := filepath.Join(s.Config.Datapath, "databases", hit.ID)
 
 			var data []byte
-			data, err := ioutil.ReadFile(dest)
+			data, err := os.ReadFile(dest)
 			s.log.Info().Str("path", dest).Interface("hit", hit).Msgf("hit info")
 			if err != nil {
 				s.log.Info().Str("path", dest).Interface("hit", hit).Msgf("file not found")
@@ -163,7 +162,7 @@ func (s *Service) Write(c context.Context, wreq *storesvc.WriteRequest, wres *st
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(file, bytes, 0600)
+	err = os.WriteFile(file, bytes, 0600)
 	if err != nil {
 		return merrors.InternalServerError(s.id, "could not write record")
 	}
@@ -302,7 +301,7 @@ func (s Service) indexRecords(recordsDir string) (err error) {
 				// read record
 				var data []byte
 				rec := &storemsg.Record{}
-				data, err = ioutil.ReadFile(kp)
+				data, err = os.ReadFile(kp)
 				if err != nil {
 					s.log.Error().Err(err).Str("id", id).Msg("could not read record")
 					continue

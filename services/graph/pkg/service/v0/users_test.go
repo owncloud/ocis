@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 
@@ -125,7 +125,7 @@ var _ = Describe("Users", func() {
 			svc.GetUsers(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			res := userList{}
@@ -157,7 +157,7 @@ var _ = Describe("Users", func() {
 				svc.GetUsers(rec, r)
 
 				Expect(rec.Code).To(Equal(http.StatusOK))
-				data, err := ioutil.ReadAll(rec.Body)
+				data, err := io.ReadAll(rec.Body)
 				Expect(err).ToNot(HaveOccurred())
 
 				res := userList{}
@@ -238,7 +238,7 @@ var _ = Describe("Users", func() {
 			svc.GetUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 			responseUser := &libregraph.User{}
 			err = json.Unmarshal(data, &responseUser)
@@ -279,7 +279,7 @@ var _ = Describe("Users", func() {
 			svc.GetUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 			responseUser := &libregraph.User{}
 			err = json.Unmarshal(data, &responseUser)
@@ -314,7 +314,7 @@ var _ = Describe("Users", func() {
 			svc.GetUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 			responseUser := &libregraph.User{}
 			err = json.Unmarshal(data, &responseUser)
@@ -517,7 +517,7 @@ var _ = Describe("Users", func() {
 			svc.PatchUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err = ioutil.ReadAll(rr.Body)
+			data, err = io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			updatedUser := libregraph.User{}
