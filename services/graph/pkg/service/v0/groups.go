@@ -92,7 +92,7 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 		currentUser := revactx.ContextMustGetUser(r.Context())
 		g.publishEvent(events.GroupCreated{Executant: currentUser.Id, GroupID: *grp.Id})
 	}
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusCreated)
 	render.JSON(w, r, grp)
 }
 
