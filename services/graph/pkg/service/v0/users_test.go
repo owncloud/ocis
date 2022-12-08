@@ -11,7 +11,7 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
@@ -88,7 +88,7 @@ var _ = Describe("Users", func() {
 
 		It("gets the information", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me", nil)
-			r = r.WithContext(ctxpkg.ContextSetUser(ctx, currentUser))
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.GetMe(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
@@ -99,7 +99,7 @@ var _ = Describe("Users", func() {
 			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me?$expand=memberOf", nil)
-			r = r.WithContext(ctxpkg.ContextSetUser(ctx, currentUser))
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.GetMe(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
@@ -234,7 +234,7 @@ var _ = Describe("Users", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/users", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", *user.Id)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.GetUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
@@ -275,7 +275,7 @@ var _ = Describe("Users", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/users?$expand=drive", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", *user.Id)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.GetUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
@@ -310,7 +310,7 @@ var _ = Describe("Users", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/users?$expand=drives", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", *user.Id)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.GetUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
@@ -390,7 +390,7 @@ var _ = Describe("Users", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users", bytes.NewBuffer(userJson))
-			r = r.WithContext(ctxpkg.ContextSetUser(ctx, currentUser))
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.PostUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
@@ -413,7 +413,7 @@ var _ = Describe("Users", func() {
 			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/users/{userid}", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", currentUser.Id.OpaqueId)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.DeleteUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusForbidden))
@@ -449,7 +449,7 @@ var _ = Describe("Users", func() {
 			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/users/{userid}", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", lu.GetId())
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.DeleteUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
@@ -483,7 +483,7 @@ var _ = Describe("Users", func() {
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users?$invalid=true", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", user.GetId())
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.PatchUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -497,7 +497,7 @@ var _ = Describe("Users", func() {
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users?$invalid=true", bytes.NewBuffer(data))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", user.GetId())
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.PatchUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -513,7 +513,7 @@ var _ = Describe("Users", func() {
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users?$invalid=true", bytes.NewBuffer(data))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", user.GetId())
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.PatchUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))

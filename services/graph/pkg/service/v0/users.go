@@ -13,7 +13,6 @@ import (
 	"github.com/CiscoM31/godata"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
@@ -177,7 +176,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser := ctxpkg.ContextMustGetUser(r.Context())
+	currentUser := revactx.ContextMustGetUser(r.Context())
 	g.publishEvent(events.UserCreated{Executant: currentUser.Id, UserID: *u.Id})
 
 	render.Status(r, http.StatusOK)
@@ -308,7 +307,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser := ctxpkg.ContextMustGetUser(r.Context())
+	currentUser := revactx.ContextMustGetUser(r.Context())
 
 	if currentUser.GetId().GetOpaqueId() == user.GetId() {
 		logger.Debug().Msg("could not delete user: self deletion forbidden")
@@ -444,7 +443,7 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser := ctxpkg.ContextMustGetUser(r.Context())
+	currentUser := revactx.ContextMustGetUser(r.Context())
 	g.publishEvent(
 		events.UserFeatureChanged{
 			Executant: currentUser.Id,

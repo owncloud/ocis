@@ -16,7 +16,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
 	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
@@ -290,7 +290,7 @@ func (p *Provider) doIndexSpace(ctx context.Context, spaceID *provider.StorageSp
 	if authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
 		return fmt.Errorf("could not get authenticated context for user")
 	}
-	ownerCtx := metadata.AppendToOutgoingContext(ctx, ctxpkg.TokenHeader, authRes.Token)
+	ownerCtx := metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, authRes.Token)
 
 	// Walk the space and index all files
 	walker := walker.NewWalker(p.gwClient)
