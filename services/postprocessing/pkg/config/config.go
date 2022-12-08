@@ -24,7 +24,6 @@ type Config struct {
 type Postprocessing struct {
 	Events          Events        `yaml:"events"`
 	Virusscan       bool          `yaml:"virusscan" env:"POSTPROCESSING_VIRUSSCAN" desc:"should the system do a virusscan? Needs antivirus service"`
-	FTSIndex        bool          `yaml:"fulltextsearch" env:"POSTPROCESSING_FTS" desc:"should the system index files for fts? Needs search service"`
 	Delayprocessing time.Duration `yaml:"delayprocessing" env:"POSTPROCESSING_DELAY" desc:"the sytem sleeps for this time while postprocessing"`
 }
 

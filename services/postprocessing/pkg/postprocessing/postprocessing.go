@@ -17,13 +17,13 @@ type Postprocessing struct {
 	m          map[events.Postprocessingstep]interface{}
 	filename   string
 	filesize   uint64
-	resourceId *provider.ResourceId
+	resourceID *provider.ResourceId
 	c          config.Postprocessing
 	steps      []events.Postprocessingstep
 }
 
 // New returns a new postprocessing instance
-func New(uploadID string, uploadURL string, user *user.User, filename string, filesize uint64, resourceId *provider.ResourceId, c config.Postprocessing) *Postprocessing {
+func New(uploadID string, uploadURL string, user *user.User, filename string, filesize uint64, resourceID *provider.ResourceId, c config.Postprocessing) *Postprocessing {
 	return &Postprocessing{
 		id:         uploadID,
 		url:        uploadURL,
@@ -32,7 +32,7 @@ func New(uploadID string, uploadURL string, user *user.User, filename string, fi
 		c:          c,
 		filename:   filename,
 		filesize:   filesize,
-		resourceId: resourceId,
+		resourceID: resourceID,
 		steps:      getSteps(c),
 	}
 }
@@ -85,7 +85,7 @@ func (pp *Postprocessing) nextStep(next events.Postprocessingstep) events.StartP
 		ExecutingUser: pp.u,
 		Filename:      pp.filename,
 		Filesize:      pp.filesize,
-		ResourceID:    pp.resourceId,
+		ResourceID:    pp.resourceID,
 		StepToStart:   next,
 	}
 }
@@ -112,10 +112,6 @@ func getSteps(c config.Postprocessing) []events.Postprocessingstep {
 
 	if c.Virusscan {
 		steps = append(steps, events.PPStepAntivirus)
-	}
-
-	if c.FTSIndex {
-		steps = append(steps, events.PPStepFTS)
 	}
 
 	return steps
