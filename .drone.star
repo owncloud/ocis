@@ -692,56 +692,6 @@ def codestyle(ctx):
 def localApiTestPipeline(ctx):
     pipelines = []
 
-<<<<<<< HEAD
-    return {
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "localApiTests-%s-%s" % (suite, storage),
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 ocisServer(storage, accounts_hash_difficulty) +
-                 restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
-                 [
-                     {
-                         "name": "localApiTests-%s-%s" % (suite, storage),
-                         "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-                         "environment": {
-                             "TEST_WITH_GRAPH_API": "true",
-                             "PATH_TO_OCIS": dirs["base"],
-                             "PATH_TO_CORE": "%s/%s" % (dirs["base"], dirs["core"]),
-                             "TEST_SERVER_URL": "https://ocis-server:9200",
-                             "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
-                             "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
-                             "TEST_OCIS": "true",
-                             "SEND_SCENARIO_LINE_REFERENCES": "true",
-                             "STORAGE_DRIVER": storage,
-                             "BEHAT_SUITE": suite,
-                             "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
-                             "EXPECTED_FAILURES_FILE": "%s/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (dirs["base"], storage.upper()),
-                             "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
-                         },
-                         "commands": [
-                             "pwd",
-                             "ls -la",
-                             "make test-acceptance-api",
-                         ],
-                     },
-                 ] + failEarly(ctx, early_fail),
-        "services": redisForOCStorage(storage),
-        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]) +
-                      getPipelineNames(cacheCoreReposForTesting(ctx)),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/heads/stable-*",
-                "refs/pull/**",
-            ],
-        },
-=======
     defaults = {
         "suites": {},
         "skip": False,
@@ -750,7 +700,6 @@ def localApiTestPipeline(ctx):
         "extraServerEnvironment": {},
         "storages": ["ocis"],
         "accounts_hash_difficulty": 4,
->>>>>>> 616ab07f4 (add cors tests pipeline in drone config)
     }
 
     if "localApiTests" in config:
