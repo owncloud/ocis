@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -40,7 +39,7 @@ type templateData struct {
 
 func main() {
 fmt.Println("Generating adoc documentation for environment variables:")
-content, err := ioutil.ReadFile("../../docs/templates/ADOC.tmpl")
+content, err := os.ReadFile("../../docs/templates/ADOC.tmpl")
 if err != nil {
     log.Fatal(err)
 }
