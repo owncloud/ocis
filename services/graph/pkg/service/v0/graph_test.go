@@ -15,7 +15,7 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
@@ -56,7 +56,7 @@ var _ = Describe("Graph", func() {
 	BeforeEach(func() {
 		rr = httptest.NewRecorder()
 
-		ctx = ctxpkg.ContextSetUser(context.Background(), &userprovider.User{Id: &userprovider.UserId{Type: userprovider.UserType_USER_TYPE_PRIMARY, OpaqueId: "testuser"}, Username: "testuser"})
+		ctx = revactx.ContextSetUser(context.Background(), &userprovider.User{Id: &userprovider.UserId{Type: userprovider.UserType_USER_TYPE_PRIMARY, OpaqueId: "testuser"}, Username: "testuser"})
 		cfg = defaults.FullDefaultConfig()
 		cfg.Identity.LDAP.CACert = "" // skip the startup checks, we don't use LDAP at all in this tests
 		cfg.TokenManager.JWTSecret = "loremipsum"
@@ -740,7 +740,7 @@ var _ = Describe("Graph", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives/{driveID}/", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "spaceid")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
 			svc.GetSingleDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusNotFound))
 		})
@@ -770,7 +770,7 @@ var _ = Describe("Graph", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives/{driveID}/", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "spaceid")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
 			svc.GetSingleDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 		})
@@ -784,7 +784,7 @@ var _ = Describe("Graph", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives/{driveID}/", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "spaceid")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
 			svc.GetSingleDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusNotFound))
 		})
@@ -820,7 +820,7 @@ var _ = Describe("Graph", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives/{driveID}/", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "spaceid")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
 			svc.GetSingleDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
@@ -859,7 +859,7 @@ var _ = Describe("Graph", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives/{driveID}/", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "spaceid")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
 			svc.GetSingleDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
@@ -920,7 +920,7 @@ var _ = Describe("Graph", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives/{driveID}/", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "spaceid")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
 			svc.GetSingleDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
@@ -952,7 +952,7 @@ var _ = Describe("Graph", func() {
 			r = httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/drives/{driveID}/", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
 			svc.UpdateDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
@@ -961,7 +961,7 @@ var _ = Describe("Graph", func() {
 			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/drives/{driveID}/", bytes.NewBufferString("{invalid"))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "spaceid")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
 			svc.UpdateDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
@@ -984,7 +984,7 @@ var _ = Describe("Graph", func() {
 			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/drives/{driveID}/", bytes.NewBuffer(driveJson))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "spaceid")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
 			svc.UpdateDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
@@ -1010,7 +1010,7 @@ var _ = Describe("Graph", func() {
 			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/drives/{driveID}/", bytes.NewBuffer(driveJson))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "spaceid")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
 			r.Header.Add("Restore", "1")
 			svc.UpdateDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
@@ -1044,7 +1044,7 @@ var _ = Describe("Graph", func() {
 			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/drives/{driveID}/", bytes.NewBuffer(driveJson))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "spaceid")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.UpdateDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
@@ -1063,7 +1063,7 @@ var _ = Describe("Graph", func() {
 			r = httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/drives/{driveID}/", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
 			svc.DeleteDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
@@ -1076,7 +1076,7 @@ var _ = Describe("Graph", func() {
 			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/drives/{driveID}/", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "spaceid")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.DeleteDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 
@@ -1093,7 +1093,7 @@ var _ = Describe("Graph", func() {
 			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/drives/{driveID}/", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("driveID", "spaceid")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			r.Header.Add("Purge", "1")
 			svc.DeleteDrive(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusNoContent))

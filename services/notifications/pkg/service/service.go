@@ -13,7 +13,7 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -93,7 +93,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 	}
 
 	// Get auth context
-	ownerCtx := ctxpkg.ContextSetUser(context.Background(), sharerUserResponse.User)
+	ownerCtx := revactx.ContextSetUser(context.Background(), sharerUserResponse.User)
 	authRes, err := s.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + e.Executant.OpaqueId,
@@ -114,7 +114,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 			Msg("could not get authenticated context for user")
 		return
 	}
-	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
+	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, revactx.TokenHeader, authRes.Token)
 
 	resourceID, err := storagespace.ParseID(e.ID.OpaqueId)
 	if err != nil {
@@ -251,7 +251,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 	}
 
 	// Get auth context
-	ownerCtx := ctxpkg.ContextSetUser(context.Background(), sharerUserResponse.User)
+	ownerCtx := revactx.ContextSetUser(context.Background(), sharerUserResponse.User)
 	authRes, err := s.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + e.Sharer.OpaqueId,
@@ -272,7 +272,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 			Msg("could not get authenticated context for user")
 		return
 	}
-	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token)
+	ownerCtx = metadata.AppendToOutgoingContext(ownerCtx, revactx.TokenHeader, authRes.Token)
 
 	// TODO: maybe cache this stat to reduce storage iops
 	md, err := s.gwClient.Stat(ownerCtx, &providerv1beta1.StatRequest{

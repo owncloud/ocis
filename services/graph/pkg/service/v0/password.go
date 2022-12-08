@@ -8,7 +8,6 @@ import (
 	"github.com/CiscoM31/godata"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/render"
@@ -91,7 +90,7 @@ func (g Graph) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser := ctxpkg.ContextMustGetUser(r.Context())
+	currentUser := revactx.ContextMustGetUser(r.Context())
 	g.publishEvent(
 		events.UserFeatureChanged{
 			Executant: currentUser.Id,

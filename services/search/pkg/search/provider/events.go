@@ -10,7 +10,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -185,7 +185,7 @@ func (p *Provider) getPath(ctx context.Context, id *provider.ResourceId, owner *
 }
 
 func (p *Provider) getAuthContext(owner *user.User) (context.Context, error) {
-	ownerCtx := ctxpkg.ContextSetUser(context.Background(), owner)
+	ownerCtx := revactx.ContextSetUser(context.Background(), owner)
 	authRes, err := p.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + owner.GetId().GetOpaqueId(),
@@ -198,5 +198,5 @@ func (p *Provider) getAuthContext(owner *user.User) (context.Context, error) {
 		p.logger.Error().Err(err).Interface("owner", owner).Interface("authRes", authRes).Msg("error using machine auth")
 		return nil, err
 	}
-	return metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token), nil
+	return metadata.AppendToOutgoingContext(ownerCtx, revactx.TokenHeader, authRes.Token), nil
 }

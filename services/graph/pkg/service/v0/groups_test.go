@@ -10,7 +10,7 @@ import (
 	"net/http/httptest"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -177,7 +177,7 @@ var _ = Describe("Groups", func() {
 			r = httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", "")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
 			svc.GetGroup(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -192,7 +192,7 @@ var _ = Describe("Groups", func() {
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups/"+*newGroup.Id, nil)
 				rctx := chi.NewRouteContext()
 				rctx.URLParams.Add("groupID", *newGroup.Id)
-				r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
 
 				svc.GetGroup(rr, r)
 
@@ -256,7 +256,7 @@ var _ = Describe("Groups", func() {
 			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups/", bytes.NewBufferString("{invalid"))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.PatchGroup(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
@@ -270,7 +270,7 @@ var _ = Describe("Groups", func() {
 			r = httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", "")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.PatchGroup(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -292,7 +292,7 @@ var _ = Describe("Groups", func() {
 				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", bytes.NewBuffer(updatedGroupJson))
 				rctx := chi.NewRouteContext()
 				rctx.URLParams.Add("groupID", *newGroup.Id)
-				r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 				svc.PatchGroup(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -308,7 +308,7 @@ var _ = Describe("Groups", func() {
 				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", bytes.NewBuffer(updatedGroupJson))
 				rctx := chi.NewRouteContext()
 				rctx.URLParams.Add("groupID", *newGroup.Id)
-				r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 				svc.PatchGroup(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -324,7 +324,7 @@ var _ = Describe("Groups", func() {
 				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", bytes.NewBuffer(updatedGroupJson))
 				rctx := chi.NewRouteContext()
 				rctx.URLParams.Add("groupID", *newGroup.Id)
-				r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 				svc.PatchGroup(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -342,7 +342,7 @@ var _ = Describe("Groups", func() {
 				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", bytes.NewBuffer(updatedGroupJson))
 				rctx := chi.NewRouteContext()
 				rctx.URLParams.Add("groupID", *newGroup.Id)
-				r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 				svc.PatchGroup(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusNoContent))
@@ -363,7 +363,7 @@ var _ = Describe("Groups", func() {
 			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.DeleteGroup(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
@@ -381,7 +381,7 @@ var _ = Describe("Groups", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups/{groupID}/members", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.GetGroupMembers(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
@@ -402,7 +402,7 @@ var _ = Describe("Groups", func() {
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/{groupID}/members", bytes.NewBufferString("{invalid"))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.PostGroupMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
@@ -415,7 +415,7 @@ var _ = Describe("Groups", func() {
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/{groupID}/members", bytes.NewBuffer(data))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.PostGroupMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
@@ -429,7 +429,7 @@ var _ = Describe("Groups", func() {
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/{groupID}/members", bytes.NewBuffer(data))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.PostGroupMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
@@ -444,7 +444,7 @@ var _ = Describe("Groups", func() {
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/{groupID}/members", bytes.NewBuffer(data))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.PostGroupMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 
@@ -457,7 +457,7 @@ var _ = Describe("Groups", func() {
 			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/groups/{groupID}/members/{memberID}/$ref", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.DeleteGroupMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
@@ -465,7 +465,7 @@ var _ = Describe("Groups", func() {
 			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/groups/{groupID}/members/{memberID}/$ref", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("memberID", "/users/user")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.DeleteGroupMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
@@ -477,7 +477,7 @@ var _ = Describe("Groups", func() {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
 			rctx.URLParams.Add("memberID", "/users/user1")
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 			svc.DeleteGroupMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 

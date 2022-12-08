@@ -13,7 +13,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -89,7 +89,7 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if grp != nil && grp.Id != nil {
-		currentUser := ctxpkg.ContextMustGetUser(r.Context())
+		currentUser := revactx.ContextMustGetUser(r.Context())
 		g.publishEvent(events.GroupCreated{Executant: currentUser.Id, GroupID: *grp.Id})
 	}
 	render.Status(r, http.StatusOK)
@@ -239,7 +239,7 @@ func (g Graph) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser := ctxpkg.ContextMustGetUser(r.Context())
+	currentUser := revactx.ContextMustGetUser(r.Context())
 	g.publishEvent(events.GroupDeleted{Executant: currentUser.Id, GroupID: groupID})
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
@@ -344,7 +344,7 @@ func (g Graph) PostGroupMember(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser := ctxpkg.ContextMustGetUser(r.Context())
+	currentUser := revactx.ContextMustGetUser(r.Context())
 	g.publishEvent(events.GroupMemberAdded{Executant: currentUser.Id, GroupID: groupID, UserID: id})
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
@@ -395,7 +395,7 @@ func (g Graph) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	currentUser := ctxpkg.ContextMustGetUser(r.Context())
+	currentUser := revactx.ContextMustGetUser(r.Context())
 	g.publishEvent(events.GroupMemberRemoved{Executant: currentUser.Id, GroupID: groupID, UserID: memberID})
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)

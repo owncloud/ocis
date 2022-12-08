@@ -18,7 +18,7 @@ import (
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
@@ -218,7 +218,7 @@ func (g Graph) canCreateSpace(ctx context.Context, ownPersonalHome bool) bool {
 func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling create drive")
-	us, ok := ctxpkg.ContextGetUser(r.Context())
+	us, ok := revactx.ContextGetUser(r.Context())
 	if !ok {
 		logger.Debug().Msg("could not create drive: invalid user")
 		errorcode.NotAllowed.Render(w, r, http.StatusUnauthorized, "invalid user")
@@ -397,7 +397,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if drive.Quota.HasTotal() {
-		user := ctxpkg.ContextMustGetUser(r.Context())
+		user := revactx.ContextMustGetUser(r.Context())
 		canSetSpaceQuota, err := g.canSetSpaceQuota(r.Context(), user)
 		if err != nil {
 			logger.Error().Err(err).Msg("could not update drive: failed to check if the user can set space quota")
