@@ -34,24 +34,28 @@ func Server(cfg *config.Config) *cli.Command {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
 			evtsCfg := cfg.Postprocessing.Events
-			var rootCAPool *x509.CertPool
-			if evtsCfg.TLSRootCACertificate != "" {
-				rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
-				if err != nil {
-					return err
+			var tlsConf *tls.Config
+
+			if !evtsCfg.TLSInsecure {
+				var rootCAPool *x509.CertPool
+				if evtsCfg.TLSRootCACertificate != "" {
+					rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
+					if err != nil {
+						return err
+					}
+
+					rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
+					if err != nil {
+						return err
+					}
+					evtsCfg.TLSInsecure = false
 				}
 
-				rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
-				if err != nil {
-					return err
+				tlsConf = &tls.Config{
+					RootCAs: rootCAPool,
 				}
-				evtsCfg.TLSInsecure = false
 			}
 
-			tlsConf := &tls.Config{
-				InsecureSkipVerify: evtsCfg.TLSInsecure, //nolint:gosec
-				RootCAs:            rootCAPool,
-			}
 			bus, err := server.NewNatsStream(
 				natsjs.TLSConfig(tlsConf),
 				natsjs.Address(evtsCfg.Endpoint),
