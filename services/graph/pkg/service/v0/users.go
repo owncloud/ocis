@@ -179,7 +179,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	}
 	g.publishEvent(e)
 
-	render.Status(r, http.StatusCreated)
+	render.Status(r, http.StatusOK)
 	render.JSON(w, r, u)
 }
 

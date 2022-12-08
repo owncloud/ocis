@@ -20,9 +20,9 @@ Feature: create user
     And user "<userName>" <shouldOrNot> exist
     Examples:
       | userName                     | displayName      | email               | password                     | code | shouldOrNot |
-      | SameDisplayName              | Alice Hansen     | new@example.org     | containsCharacters(*:!;_+-&) | 201  | should     |
-      | withoutPassSameEmail         | without pass     | alice@example.org   |                              | 201  | should     |
-      | name                         | pass with space  | example@example.org | my pass                      | 201  | should     |
+      | SameDisplayName              | Alice Hansen     | new@example.org     | containsCharacters(*:!;_+-&) | 200  | should     |
+      | withoutPassSameEmail         | without pass     | alice@example.org   |                              | 200  | should     |
+      | name                         | pass with space  | example@example.org | my pass                      | 200  | should     |
       | nameWithCharacters(*:!;_+-&) | user             | new@example.org     | 123                          | 400  | should not |
       | withoutEmail                 | without email    |                     | 123                          | 400  | should not |
       | Alice                        | same userName    | new@example.org     | 123                          | 400  | should     |

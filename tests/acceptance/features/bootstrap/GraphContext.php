@@ -540,7 +540,7 @@ class GraphContext implements Context {
 			$email,
 			$displayName
 		);
-		if ($response->getStatusCode() !== 201) {
+		if ($response->getStatusCode() !== 200) {
 			$this->throwHttpException($response, "Could not create user $user");
 		} else {
 			$this->featureContext->setResponse($response);
@@ -600,7 +600,7 @@ class GraphContext implements Context {
 		$rows = $table->getRowsHash();
 		$response = $this->featureContext->getResponse();
 
-		if ($response->getStatusCode() !== 201) {
+		if ($response->getStatusCode() !== 200) {
 			$this->throwHttpException($response, "Could not create user '$rows[userName]'");
 		}
 	}

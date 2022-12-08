@@ -393,7 +393,7 @@ var _ = Describe("Users", func() {
 			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.PostUser(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusCreated))
+			Expect(rr.Code).To(Equal(http.StatusOK))
 		})
 	})
 
