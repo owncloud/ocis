@@ -434,14 +434,6 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		features = append(features, events.UserFeature{Name: "displayname", Value: *name})
 	}
 
-	if enabled, ok := changes.GetAccountEnabledOk(); ok {
-		e := events.UserFeature{Name: "enabled", Value: "false"}
-		if *enabled {
-			e.Value = "true"
-		}
-		features = append(features, e)
-	}
-
 	logger.Debug().Str("nameid", nameOrID).Interface("changes", *changes).Msg("calling update user on backend")
 	u, err := g.identityBackend.UpdateUser(r.Context(), nameOrID, *changes)
 	if err != nil {
