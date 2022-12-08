@@ -1370,6 +1370,7 @@ class SpacesContext implements Context {
 
 	/**
 	 * @Given /^user "([^"]*)" has changed the quota of the personal space of "([^"]*)" space to "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has changed the quota of the "([^"]*)" space to "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
@@ -1390,7 +1391,7 @@ class SpacesContext implements Context {
 			"Expected response status code should be 200"
 		);
 	}
-
+  
 	/**
 	 * @When /^user "([^"]*)" sets the file "([^"]*)" as a (description|space image)\s? in a special section of the "([^"]*)" space$/
 	 *
