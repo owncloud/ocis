@@ -455,7 +455,8 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		e.Executant = currentUser.GetId()
 	}
 	g.publishEvent(e)
-	render.Status(r, http.StatusNoContent)
+
+	render.Status(r, http.StatusOK) // TODO StatusNoContent when prefer=minimal is used
 	render.JSON(w, r, u)
 
 }
