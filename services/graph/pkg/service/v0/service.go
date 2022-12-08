@@ -3,8 +3,8 @@ package svc
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
@@ -113,7 +113,7 @@ func NewService(opts ...Option) Service {
 					}
 				}
 				certs := x509.NewCertPool()
-				pemData, err := ioutil.ReadFile(options.Config.Identity.LDAP.CACert)
+				pemData, err := os.ReadFile(options.Config.Identity.LDAP.CACert)
 				if err != nil {
 					options.Logger.Error().Err(err).Msgf("Error initializing LDAP Backend")
 					return nil

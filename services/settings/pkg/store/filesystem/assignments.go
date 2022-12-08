@@ -2,7 +2,6 @@
 package store
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -14,7 +13,7 @@ import (
 func (s Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleAssignment, error) {
 	var records []*settingsmsg.UserRoleAssignment
 	assignmentsFolder := s.buildFolderPathForRoleAssignments(false)
-	assignmentFiles, err := ioutil.ReadDir(assignmentsFolder)
+	assignmentFiles, err := os.ReadDir(assignmentsFolder)
 	if err != nil {
 		return records, nil
 	}

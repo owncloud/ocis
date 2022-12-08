@@ -3,7 +3,6 @@ package init
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -359,7 +358,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 		return fmt.Errorf("could not marshall config into yaml: %s", err)
 	}
 	targetPath := path.Join(configPath, configFilename)
-	err = ioutil.WriteFile(targetPath, yamlOutput, 0600)
+	err = os.WriteFile(targetPath, yamlOutput, 0600)
 	if err != nil {
 		return err
 	}

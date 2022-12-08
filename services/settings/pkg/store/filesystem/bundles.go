@@ -3,7 +3,7 @@ package store
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"sync"
 
@@ -21,7 +21,7 @@ func (s Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []strin
 	defer m.RUnlock()
 
 	bundlesFolder := s.buildFolderPathForBundles(false)
-	bundleFiles, err := ioutil.ReadDir(bundlesFolder)
+	bundleFiles, err := os.ReadDir(bundlesFolder)
 	if err != nil {
 		return []*settingsmsg.Bundle{}, nil
 	}

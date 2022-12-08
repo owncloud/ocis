@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
@@ -36,7 +36,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			// actually read the contents of the config file and override defaults
 			if cfg.File != "" {
-				contents, err := ioutil.ReadFile(cfg.File)
+				contents, err := os.ReadFile(cfg.File)
 				if err != nil {
 					logger.Err(err).Msg("error opening config file")
 					return err

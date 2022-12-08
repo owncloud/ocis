@@ -3,7 +3,6 @@ package middleware
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strings"
@@ -113,7 +112,7 @@ func Authentication(auths []Authenticator, opts ...Option) func(next http.Handle
 				// https://github.com/golang/go/issues/15527
 
 				defer r.Body.Close()
-				_, _ = io.Copy(ioutil.Discard, r.Body)
+				_, _ = io.Copy(io.Discard, r.Body)
 			}
 		})
 	}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -41,7 +40,7 @@ func main() {
 }
 
 func GenerateIntermediateCode(templatePath string, intermediateCodePath string, paths []string) {
-	content, err := ioutil.ReadFile(templatePath)
+	content, err := os.ReadFile(templatePath)
 	if err != nil {
 		log.Fatal(err)
 	}

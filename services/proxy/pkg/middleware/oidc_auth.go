@@ -3,7 +3,7 @@ package middleware
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"sync"
@@ -181,7 +181,7 @@ func (m *OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
 		}
 		defer resp.Body.Close()
 
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			m.Logger.Error().Err(err).Msg("unable to read discovery response body")
 			return nil

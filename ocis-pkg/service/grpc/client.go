@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"errors"
-	"io/ioutil"
+	"os"
 	"sync"
 
 	mgrpcc "github.com/go-micro/plugins/v4/client/grpc"
@@ -68,7 +68,7 @@ func Configure(opts ...ClientOption) error {
 			// Note: If caCert is empty we use the system's default set of trusted CAs
 			if options.caCert != "" {
 				certs := x509.NewCertPool()
-				pemData, err := ioutil.ReadFile(options.caCert)
+				pemData, err := os.ReadFile(options.caCert)
 				if err != nil {
 					outerr = err
 					return
