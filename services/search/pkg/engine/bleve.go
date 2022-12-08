@@ -360,7 +360,7 @@ func (b *Bleve) buildQuery(si string) string {
 	var queries [][]string
 	var so []string
 	lexer := sq.NewLexer(strings.NewReader(si))
-	allowedFields := []string{"content", "title", "tags"}
+	allowedFields := []string{"content", "title", "tags", "size"}
 
 	for {
 		tok, lit := lexer.Scan()
@@ -399,7 +399,7 @@ func (b *Bleve) buildQuery(si string) string {
 		for _, field := range fields {
 			ss := strings.ToLower(strings.Join(q[1:], `\ `))
 
-			if !strings.Contains(ss, "*") && field != "Content" {
+			if !strings.Contains(ss, "*") && field != "Content" && field != "Size" {
 				ss = "*" + ss + "*"
 			}
 

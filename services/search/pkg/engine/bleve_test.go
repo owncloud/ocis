@@ -3,6 +3,7 @@ package engine_test
 import (
 	"context"
 	"fmt"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 
 	"github.com/blevesearch/bleve/v2"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -20,42 +21,35 @@ var _ = Describe("Bleve", func() {
 		idx bleve.Index
 		ctx context.Context
 
-		createEntity = func(id sprovider.ResourceId, parentOpaque string, doc content.Document) engine.Resource {
-			name := doc.Name
-
-			if name == "" {
-				name = "default.pdf"
+		_doSearch = func(id string, query string) (*searchsvc.SearchIndexResponse, error) {
+			rid, err := storagespace.ParseID(id)
+			if err != nil {
+				return nil, err
 			}
 
-			return engine.Resource{
-				ID:       fmt.Sprintf("%s$%s!%s", id.StorageId, id.SpaceId, id.OpaqueId),
-				RootID:   fmt.Sprintf("%s$%s!%s", id.StorageId, id.SpaceId, id.OpaqueId),
-				ParentID: fmt.Sprintf("%s$%s!%s", id.StorageId, id.SpaceId, parentOpaque),
-				Path:     fmt.Sprintf("./%s", name),
-				Document: doc,
-			}
-		}
-
-		doSearch = func(id sprovider.ResourceId, query string) (*searchsvc.SearchIndexResponse, error) {
 			return eng.Search(ctx, &searchsvc.SearchIndexRequest{
 				Query: query,
 				Ref: &searchmsg.Reference{
 					ResourceId: &searchmsg.ResourceID{
-						StorageId: id.StorageId,
-						SpaceId:   id.SpaceId,
-						OpaqueId:  id.OpaqueId,
+						StorageId: rid.StorageId,
+						SpaceId:   rid.SpaceId,
+						OpaqueId:  rid.OpaqueId,
 					},
 				},
 			})
 		}
 
-		assertDocCount = func(id sprovider.ResourceId, query string, expectedCount int) []*searchmsg.Match {
-			res, err := doSearch(id, query)
+		_assertDocCount = func(id string, query string, expectedCount int) []*searchmsg.Match {
+			res, err := _doSearch(id, query)
 
 			ExpectWithOffset(1, err).ToNot(HaveOccurred())
 			ExpectWithOffset(1, len(res.Matches)).To(Equal(expectedCount), "query returned unexpected number of results: "+query)
 			return res.Matches
 		}
+
+		rootResource   engine.Resource
+		parentResource engine.Resource
+		childResource  engine.Resource
 	)
 
 	BeforeEach(func() {
@@ -67,6 +61,31 @@ var _ = Describe("Bleve", func() {
 
 		eng = engine.NewBleveEngine(idx)
 		Expect(err).ToNot(HaveOccurred())
+
+		rootResource = engine.Resource{
+			ID:       "1$2!2",
+			RootID:   "1$2!2",
+			Path:     ".",
+			Document: content.Document{},
+		}
+
+		parentResource = engine.Resource{
+			ID:       "1$2!3",
+			ParentID: rootResource.ID,
+			RootID:   rootResource.ID,
+			Path:     "./parent d!r",
+			Type:     uint64(sprovider.ResourceType_RESOURCE_TYPE_CONTAINER),
+			Document: content.Document{Name: "parent d!r"},
+		}
+
+		childResource = engine.Resource{
+			ID:       "1$2!4",
+			ParentID: parentResource.ID,
+			RootID:   rootResource.ID,
+			Path:     "./parent d!r/child.pdf",
+			Type:     uint64(sprovider.ResourceType_RESOURCE_TYPE_FILE),
+			Document: content.Document{Name: "child.pdf"},
+		}
 	})
 
 	Describe("New", func() {
@@ -79,215 +98,279 @@ var _ = Describe("Bleve", func() {
 	Describe("Search", func() {
 		Context("by other fields than filename", func() {
 			It("finds files by tags", func() {
-				rid := sprovider.ResourceId{
-					StorageId: "1",
-					SpaceId:   "2",
-					OpaqueId:  "3",
-				}
-				r := createEntity(rid, "p", content.Document{Tags: []string{"foo", "bar"}})
-				err := eng.Upsert(r.ID, r)
+				parentResource.Document.Tags = []string{"foo", "bar"}
+				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				assertDocCount(rid, `Tags:foo`, 1)
-				assertDocCount(rid, `Tags:bar`, 1)
-				assertDocCount(rid, `Tags:foo Tags:bar`, 1)
-				assertDocCount(rid, `Tags:foo Tags:bar Tags:baz`, 1)
-				assertDocCount(rid, `Tags:foo Tags:bar Tags:baz`, 1)
-				assertDocCount(rid, `Tags:baz`, 0)
+				_assertDocCount(rootResource.ID, "Tags:foo", 1)
+				_assertDocCount(rootResource.ID, "Tags:bar", 1)
+				_assertDocCount(rootResource.ID, "Tags:foo Tags:bar", 1)
+				_assertDocCount(rootResource.ID, "Tags:foo Tags:bar Tags:baz", 1)
+				_assertDocCount(rootResource.ID, "Tags:foo Tags:bar Tags:baz", 1)
+				_assertDocCount(rootResource.ID, "Tags:baz", 0)
+			})
+
+			It("finds files by size", func() {
+				parentResource.Document.Size = 12345
+				err := eng.Upsert(parentResource.ID, parentResource)
+				Expect(err).ToNot(HaveOccurred())
+
+				_assertDocCount(rootResource.ID, "Size:12345", 1)
+				_assertDocCount(rootResource.ID, "Size:>1000", 1)
+				_assertDocCount(rootResource.ID, "Size:<100000", 1)
+				_assertDocCount(rootResource.ID, "Size:12344", 0)
+				_assertDocCount(rootResource.ID, "Size:<1000", 0)
+				_assertDocCount(rootResource.ID, "Size:>100000", 0)
 			})
 		})
 
 		Context("by filename", func() {
 			It("finds files with spaces in the filename", func() {
-				rid := sprovider.ResourceId{
-					StorageId: "1",
-					SpaceId:   "2",
-					OpaqueId:  "3",
-				}
-				r := createEntity(rid, "p", content.Document{Name: "Foo oo.pdf"})
-				err := eng.Upsert(r.ID, r)
+				parentResource.Document.Name = "Foo oo.pdf"
+				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
-				assertDocCount(rid, `Name:foo o*`, 1)
+
+				_assertDocCount(rootResource.ID, "Name:foo o*", 1)
 			})
 
 			It("finds files by digits in the filename", func() {
-				rid := sprovider.ResourceId{
-					StorageId: "1",
-					SpaceId:   "2",
-					OpaqueId:  "3",
-				}
-				r := createEntity(rid, "p", content.Document{Name: "12345.pdf"})
-				err := eng.Upsert(r.ID, r)
+				parentResource.Document.Name = "12345.pdf"
+				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				assertDocCount(rid, `Name:1234*`, 1)
+				_assertDocCount(rootResource.ID, "Name:1234*", 1)
+			})
+
+			It("filters hidden files", func() {
+				parentResource.Document.Name = "12345.pdf"
+				err := eng.Upsert(parentResource.ID, parentResource)
+				Expect(err).ToNot(HaveOccurred())
+
+				//TODO: needed?
+				//assertDocCount(rid, "Name:*hidden* +Hidden:T", 1)
+				//assertDocCount(rid, "Name:*hidden* +Hidden:F", 0)
 			})
 
 			Context("with a file in the root of the space", func() {
 				It("scopes the search to the specified space", func() {
-					rid := sprovider.ResourceId{
-						StorageId: "1",
-						SpaceId:   "2",
-						OpaqueId:  "3",
-					}
-					r := createEntity(rid, "p", content.Document{Name: "foo.pdf"})
-					err := eng.Upsert(r.ID, r)
+					parentResource.Document.Name = "foo.pdf"
+					err := eng.Upsert(parentResource.ID, parentResource)
 					Expect(err).ToNot(HaveOccurred())
 
-					assertDocCount(rid, `Name:foo.pdf`, 1)
-					assertDocCount(sprovider.ResourceId{
-						StorageId: "9",
-						SpaceId:   "8",
-						OpaqueId:  "7",
-					}, `Name:foo.pdf`, 0)
+					_assertDocCount(rootResource.ID, "Name:foo.pdf", 1)
+					_assertDocCount("9$8!7", "Name:foo.pdf", 0)
 				})
 			})
 
 			It("limits the search to the specified fields", func() {
-				rid := sprovider.ResourceId{
-					StorageId: "1",
-					SpaceId:   "2",
-					OpaqueId:  "3",
-				}
-				r := createEntity(rid, "p", content.Document{Name: "bar.pdf", Size: 789})
-				err := eng.Upsert(r.ID, r)
+				parentResource.Document.Name = "bar.pdf"
+				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				assertDocCount(rid, `Name:bar.pdf`, 1)
-				assertDocCount(rid, `Unknown:field`, 0)
+				_assertDocCount(rootResource.ID, "Name:bar.pdf", 1)
+				_assertDocCount(rootResource.ID, "Unknown:field", 0)
 			})
 
 			It("returns the total number of hits", func() {
-				rid := sprovider.ResourceId{
-					StorageId: "1",
-					SpaceId:   "2",
-					OpaqueId:  "3",
-				}
-				r := createEntity(rid, "p", content.Document{Name: "bar.pdf"})
-				err := eng.Upsert(r.ID, r)
+				parentResource.Document.Name = "bar.pdf"
+				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				res, err := doSearch(rid, "Name:bar*")
+				res, err := _doSearch(rootResource.ID, "Name:bar*")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res.TotalMatches).To(Equal(int32(1)))
 			})
 
 			It("returns all desired fields", func() {
-				rid := sprovider.ResourceId{
-					StorageId: "1",
-					SpaceId:   "2",
-					OpaqueId:  "3",
-				}
-				r := createEntity(rid, "p", content.Document{Name: "bar.pdf"})
-				r.Type = 3
-				r.MimeType = "application/pdf"
+				parentResource.Document.Name = "bar.pdf"
+				parentResource.Type = 3
+				parentResource.MimeType = "application/pdf"
 
-				err := eng.Upsert(r.ID, r)
+				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				matches := assertDocCount(rid, fmt.Sprintf("Name:%s", r.Name), 1)
+				matches := _assertDocCount(rootResource.ID, fmt.Sprintf("Name:%s", parentResource.Name), 1)
 				match := matches[0]
-				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(rid.OpaqueId))
-				Expect(match.Entity.Ref.Path).To(Equal(r.Path))
-				Expect(match.Entity.Name).To(Equal(r.Name))
-				Expect(match.Entity.Size).To(Equal(r.Size))
-				Expect(match.Entity.Type).To(Equal(r.Type))
-				Expect(match.Entity.MimeType).To(Equal(r.MimeType))
+				Expect(match.Entity.Ref.Path).To(Equal(parentResource.Path))
+				Expect(match.Entity.Name).To(Equal(parentResource.Name))
+				Expect(match.Entity.Size).To(Equal(parentResource.Size))
+				Expect(match.Entity.Type).To(Equal(parentResource.Type))
+				Expect(match.Entity.MimeType).To(Equal(parentResource.MimeType))
 				Expect(match.Entity.Deleted).To(BeFalse())
 				Expect(match.Score > 0).To(BeTrue())
 			})
 
 			It("finds files by name, prefix or substring match", func() {
-				queries := []string{"foo.pdf", "foo*", "*oo.p*"}
-				for i, query := range queries {
-					rid := sprovider.ResourceId{
-						StorageId: string(rune(i + 1)),
-						SpaceId:   string(rune(i + 2)),
-						OpaqueId:  string(rune(i + 3)),
-					}
+				parentResource.Document.Name = "foo.pdf"
 
-					r := createEntity(rid, "p", content.Document{Name: "foo.pdf"})
-					r.Size = uint64(i + 250)
-					err := eng.Upsert(r.ID, r)
+				err := eng.Upsert(parentResource.ID, parentResource)
+				Expect(err).ToNot(HaveOccurred())
+
+				queries := []string{"foo.pdf", "foo*", "*oo.p*"}
+				for _, query := range queries {
+					err := eng.Upsert(parentResource.ID, parentResource)
 					Expect(err).ToNot(HaveOccurred())
 
-					matches := assertDocCount(rid, query, 1)
-					Expect(matches[0].Entity.Ref.ResourceId.OpaqueId).To(Equal(rid.OpaqueId))
-					Expect(matches[0].Entity.Ref.Path).To(Equal(r.Path))
-					Expect(matches[0].Entity.Id.OpaqueId).To(Equal(rid.OpaqueId))
-					Expect(matches[0].Entity.Name).To(Equal(r.Name))
-					Expect(matches[0].Entity.Size).To(Equal(r.Size))
+					_assertDocCount(rootResource.ID, query, 1)
 				}
 			})
 
-			It("ignores case", func() {
-				rid := sprovider.ResourceId{
-					StorageId: "1",
-					SpaceId:   "2",
-					OpaqueId:  "3",
-				}
-				r := createEntity(rid, "p", content.Document{Name: "foo.pdf"})
-				r.Type = 3
-				r.MimeType = "application/pdf"
+			It("is case sensitive", func() {
+				parentResource.Document.Name = "foo.pdf"
 
-				err := eng.Upsert(r.ID, r)
+				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				assertDocCount(rid, "Name:foo*", 1)
-				assertDocCount(rid, "Name:Foo*", 1)
+				_assertDocCount(rootResource.ID, "Name:foo*", 1)
+				_assertDocCount(rootResource.ID, "Name:Foo*", 1)
 			})
 
 			Context("and an additional file in a subdirectory", func() {
-				var (
-					ridT sprovider.ResourceId
-					entT engine.Resource
-					ridD sprovider.ResourceId
-					entD engine.Resource
-				)
-
 				BeforeEach(func() {
-					ridT = sprovider.ResourceId{
-						StorageId: "1",
-						SpaceId:   "2",
-						OpaqueId:  "3",
-					}
-					entT = createEntity(ridT, "p", content.Document{Name: "top.pdf"})
-					Expect(eng.Upsert(entT.ID, entT)).ToNot(HaveOccurred())
+					err := eng.Upsert(parentResource.ID, parentResource)
+					Expect(err).ToNot(HaveOccurred())
 
-					ridD = sprovider.ResourceId{
-						StorageId: "1",
-						SpaceId:   "2",
-						OpaqueId:  "4",
-					}
-					entD = createEntity(ridD, "p", content.Document{Name: "deep.pdf"})
-					entD.Path = "./nested/deep.pdf"
-					Expect(eng.Upsert(entD.ID, entD)).ToNot(HaveOccurred())
+					err = eng.Upsert(childResource.ID, childResource)
+					Expect(err).ToNot(HaveOccurred())
 				})
 
 				It("finds files living deeper in the tree by filename, prefix or substring match", func() {
-					queries := []string{"deep.pdf", "dee*", "*ep.*"}
+					queries := []string{"child.pdf", "child*", "*ld.*"}
 					for _, query := range queries {
-						assertDocCount(ridD, query, 1)
+						_assertDocCount(rootResource.ID, query, 1)
 					}
 				})
-
-				It("does not find the higher levels when limiting the searched directory", func() {
-					res, err := eng.Search(ctx, &searchsvc.SearchIndexRequest{
-						Ref: &searchmsg.Reference{
-							ResourceId: &searchmsg.ResourceID{
-								StorageId: ridT.StorageId,
-								SpaceId:   ridT.SpaceId,
-								OpaqueId:  ridT.OpaqueId,
-							},
-							Path: "./nested/",
-						},
-						Query: "Name:top.pdf",
-					})
-					Expect(err).ToNot(HaveOccurred())
-					Expect(res).ToNot(BeNil())
-					Expect(len(res.Matches)).To(Equal(0))
-				})
 			})
+		})
+	})
+
+	Describe("Upsert", func() {
+		It("adds a resourceInfo to the index", func() {
+			err := eng.Upsert(childResource.ID, childResource)
+			Expect(err).ToNot(HaveOccurred())
+
+			count, err := idx.DocCount()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(count).To(Equal(uint64(1)))
+
+			query := bleve.NewMatchQuery("child.pdf")
+			res, err := idx.Search(bleve.NewSearchRequest(query))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(res.Hits.Len()).To(Equal(1))
+		})
+
+		It("updates an existing resource in the index", func() {
+
+			err := eng.Upsert(childResource.ID, childResource)
+			Expect(err).ToNot(HaveOccurred())
+
+			countA, err := idx.DocCount()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(countA).To(Equal(uint64(1)))
+
+			err = eng.Upsert(childResource.ID, childResource)
+			Expect(err).ToNot(HaveOccurred())
+
+			countB, err := idx.DocCount()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(countB).To(Equal(uint64(1)))
+		})
+	})
+
+	Describe("Delete", func() {
+		It("marks a resource as deleted", func() {
+			err := eng.Upsert(childResource.ID, childResource)
+			Expect(err).ToNot(HaveOccurred())
+
+			_assertDocCount(rootResource.ID, "Name:child", 1)
+
+			err = eng.Delete(childResource.ID)
+			Expect(err).ToNot(HaveOccurred())
+
+			_assertDocCount(rootResource.ID, "Name:child", 0)
+		})
+
+		It("marks a child resources as deleted", func() {
+			err := eng.Upsert(parentResource.ID, parentResource)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = eng.Upsert(childResource.ID, childResource)
+			Expect(err).ToNot(HaveOccurred())
+
+			_assertDocCount(rootResource.ID, parentResource.Document.Name, 1)
+			_assertDocCount(rootResource.ID, childResource.Document.Name, 1)
+
+			err = eng.Delete(parentResource.ID)
+			Expect(err).ToNot(HaveOccurred())
+
+			_assertDocCount(rootResource.ID, parentResource.Document.Name, 0)
+			_assertDocCount(rootResource.ID, childResource.Document.Name, 0)
+		})
+	})
+
+	Describe("Restore", func() {
+		It("also marks child resources as restored", func() {
+			err := eng.Upsert(parentResource.ID, parentResource)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = eng.Upsert(childResource.ID, childResource)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = eng.Delete(parentResource.ID)
+			Expect(err).ToNot(HaveOccurred())
+
+			_assertDocCount(rootResource.ID, parentResource.Name, 0)
+			_assertDocCount(rootResource.ID, childResource.Name, 0)
+
+			err = eng.Restore(parentResource.ID)
+			Expect(err).ToNot(HaveOccurred())
+
+			_assertDocCount(rootResource.ID, parentResource.Name, 1)
+			_assertDocCount(rootResource.ID, childResource.Name, 1)
+		})
+	})
+
+	Describe("Move", func() {
+		It("renames the parent and its child resources", func() {
+			err := eng.Upsert(parentResource.ID, parentResource)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = eng.Upsert(childResource.ID, childResource)
+			Expect(err).ToNot(HaveOccurred())
+
+			parentResource.Path = "newname"
+			err = eng.Move(parentResource.ID, parentResource.ParentID, "./my/newname")
+			Expect(err).ToNot(HaveOccurred())
+
+			_assertDocCount(rootResource.ID, parentResource.Name, 0)
+
+			matches := _assertDocCount(rootResource.ID, "Name:child.pdf", 1)
+			Expect(matches[0].Entity.ParentId.OpaqueId).To(Equal("3"))
+			Expect(matches[0].Entity.Ref.Path).To(Equal("./my/newname/child.pdf"))
+		})
+
+		It("moves the parent and its child resources", func() {
+			err := eng.Upsert(parentResource.ID, parentResource)
+			Expect(err).ToNot(HaveOccurred())
+
+			err = eng.Upsert(childResource.ID, childResource)
+			Expect(err).ToNot(HaveOccurred())
+
+			parentResource.Path = " "
+			parentResource.ParentID = "1$2!somewhereopaqueid"
+
+			err = eng.Move(parentResource.ID, parentResource.ParentID, "./somewhere/else/newname")
+			Expect(err).ToNot(HaveOccurred())
+			_assertDocCount(rootResource.ID, `parent d!r`, 0)
+
+			matches := _assertDocCount(rootResource.ID, "Name:child.pdf", 1)
+			Expect(matches[0].Entity.ParentId.OpaqueId).To(Equal("3"))
+			Expect(matches[0].Entity.Ref.Path).To(Equal("./somewhere/else/newname/child.pdf"))
+
+			matches = _assertDocCount(rootResource.ID, `newname`, 1)
+			Expect(matches[0].Entity.ParentId.OpaqueId).To(Equal("somewhereopaqueid"))
+			Expect(matches[0].Entity.Ref.Path).To(Equal("./somewhere/else/newname"))
+
 		})
 	})
 })

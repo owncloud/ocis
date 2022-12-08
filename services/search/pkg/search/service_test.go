@@ -105,7 +105,7 @@ var _ = Describe("Searchprovider", func() {
 				Status: status.NewOK(context.Background()),
 				User:   user,
 			}, nil)
-			extractor.Mock.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
 			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
 			indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{}, nil)
 
