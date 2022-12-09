@@ -63,18 +63,24 @@ func (g Graph) PostSchool(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, ok := school.GetDisplayNameOk(); !ok {
-		logger.Debug().Err(err).Interface("school", school).Msg("could not create school: missing required attribute")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Missing Required Attribute")
-		return
-	}
-
 	// Disallow user-supplied IDs. It's supposed to be readonly. We're either
 	// generating them in the backend ourselves or rely on the Backend's
 	// storage (e.g. LDAP) to provide a unique ID.
 	if _, ok := school.GetIdOk(); ok {
 		logger.Debug().Msg("could not create school: id is a read-only attribute")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "school id is a read-only attribute")
+		return
+	}
+
+	if _, ok := school.GetDisplayNameOk(); !ok {
+		logger.Debug().Err(err).Interface("school", school).Msg("could not create school: missing required attribute")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Missing Required Attribute")
+		return
+	}
+
+	if _, ok := school.GetSchoolNumberOk(); !ok {
+		logger.Debug().Err(err).Interface("school", school).Msg("could not create school: missing required attribute")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Missing Required Attribute")
 		return
 	}
 
@@ -391,7 +397,7 @@ func sortSchools(req *godata.GoDataRequest, schools []*libregraph.EducationSchoo
 		return schools, nil
 	}
 	switch req.Query.OrderBy.OrderByItems[0].Field.Value {
-	case "displayName":
+	case displayNameAttr:
 		sorter = schoolsByDisplayName{schools}
 	default:
 		return nil, fmt.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)

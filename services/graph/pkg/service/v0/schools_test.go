@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 
@@ -37,7 +37,6 @@ var _ = Describe("Schools", func() {
 		ctx                      context.Context
 		cfg                      *config.Config
 		gatewayClient            *mocks.GatewayClient
-		eventsPublisher          mocks.Publisher
 		identityEducationBackend *identitymocks.EducationBackend
 
 		rr *httptest.ResponseRecorder
@@ -51,7 +50,6 @@ var _ = Describe("Schools", func() {
 	)
 
 	BeforeEach(func() {
-		eventsPublisher.On("Publish", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 		identityEducationBackend = &identitymocks.EducationBackend{}
 		gatewayClient = &mocks.GatewayClient{}
@@ -71,7 +69,6 @@ var _ = Describe("Schools", func() {
 		svc = service.NewService(
 			service.Config(cfg),
 			service.WithGatewayClient(gatewayClient),
-			service.EventsPublisher(&eventsPublisher),
 			service.WithIdentityEducationBackend(identityEducationBackend),
 		)
 	})
@@ -91,7 +88,7 @@ var _ = Describe("Schools", func() {
 			svc.GetSchools(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			odataerr := libregraph.OdataError{}
@@ -106,7 +103,7 @@ var _ = Describe("Schools", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools", nil)
 			svc.GetSchools(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			odataerr := libregraph.OdataError{}
@@ -122,7 +119,7 @@ var _ = Describe("Schools", func() {
 			svc.GetSchools(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			odataerr := libregraph.OdataError{}
@@ -138,7 +135,7 @@ var _ = Describe("Schools", func() {
 			svc.GetSchools(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			res := service.ListResponse{}
@@ -154,7 +151,7 @@ var _ = Describe("Schools", func() {
 			svc.GetSchools(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			res := schoolList{}
@@ -265,6 +262,7 @@ var _ = Describe("Schools", func() {
 		It("creates the school", func() {
 			newSchool = libregraph.NewEducationSchool()
 			newSchool.SetDisplayName("New School")
+			newSchool.SetSchoolNumber("0034")
 			newSchoolJson, err := json.Marshal(newSchool)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -346,15 +344,14 @@ var _ = Describe("Schools", func() {
 
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "DeleteSchool", 1)
-			eventsPublisher.AssertNumberOfCalls(GinkgoT(), "Publish", 1)
 		})
 	})
 
 	Describe("GetSchoolMembers", func() {
 		It("gets the list of members", func() {
-			user := libregraph.NewUser()
+			user := libregraph.NewEducationUser()
 			user.SetId("user")
-			identityEducationBackend.On("GetSchoolMembers", mock.Anything, mock.Anything, mock.Anything).Return([]*libregraph.User{user}, nil)
+			identityEducationBackend.On("GetSchoolMembers", mock.Anything, mock.Anything, mock.Anything).Return([]*libregraph.EducationUser{user}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools/{schoolID}/members", nil)
 			rctx := chi.NewRouteContext()
@@ -363,7 +360,7 @@ var _ = Describe("Schools", func() {
 			svc.GetSchoolMembers(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
-			data, err := ioutil.ReadAll(rr.Body)
+			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
 
 			var members []*libregraph.User

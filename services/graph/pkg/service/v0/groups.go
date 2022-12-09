@@ -246,6 +246,7 @@ func (g Graph) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	render.NoContent(w, r)
 }
 
+// GetGroupMembers implements the Service interface.
 func (g Graph) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling get group members")
@@ -408,7 +409,7 @@ func sortGroups(req *godata.GoDataRequest, groups []*libregraph.Group) ([]*libre
 		return groups, nil
 	}
 	switch req.Query.OrderBy.OrderByItems[0].Field.Value {
-	case "displayName":
+	case displayNameAttr:
 		sorter = groupsByDisplayName{groups}
 	default:
 		return nil, fmt.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)

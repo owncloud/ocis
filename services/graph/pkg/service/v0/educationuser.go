@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"regexp"
 	"sort"
 	"strings"
 
@@ -21,63 +20,27 @@ import (
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	settingssvc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 	"golang.org/x/exp/slices"
 )
 
-// GetMe implements the Service interface.
-func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
+// GetEducationUsers implements the Service interface.
+func (g Graph) GetEducationUsers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling get user in /me")
-
-	u, ok := revactx.ContextGetUser(r.Context())
-	if !ok {
-		logger.Debug().Msg("could not get user: user not in context")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "user not in context")
-		return
-	}
-	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
-	var me *libregraph.User
-	// We can just return the user from context unless we need to expand the group memberships
-	if !slices.Contains(exp, "memberOf") {
-		me = identity.CreateUserModelFromCS3(u)
-	} else {
-		var err error
-		logger.Debug().Msg("calling get user on backend")
-		me, err = g.identityBackend.GetUser(r.Context(), u.GetId().GetOpaqueId(), r.URL.Query())
-		if err != nil {
-			logger.Debug().Err(err).Interface("user", u).Msg("could not get user from backend")
-			var errcode errorcode.Error
-			if errors.As(err, &errcode) {
-				errcode.Render(w, r)
-			} else {
-				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			}
-			return
-		}
-	}
-	render.Status(r, http.StatusOK)
-	render.JSON(w, r, me)
-}
-
-// GetUsers implements the Service interface.
-func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
-	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Interface("query", r.URL.Query()).Msg("calling get users")
+	logger.Info().Interface("query", r.URL.Query()).Msg("calling get education users")
 	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
 	if err != nil {
-		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: query error")
+		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get education users: query error")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	logger.Debug().Interface("query", r.URL.Query()).Msg("calling get users on backend")
-	users, err := g.identityBackend.GetUsers(r.Context(), r.URL.Query())
+	logger.Debug().Interface("query", r.URL.Query()).Msg("calling get education users on backend")
+	users, err := g.identityEducationBackend.GetEducationUsers(r.Context(), r.URL.Query())
 	if err != nil {
-		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users from backend")
+		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get education users from backend")
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
 			errcode.Render(w, r)
@@ -87,9 +50,9 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users, err = sortUsers(odataReq, users)
+	users, err = sortEducationUsers(odataReq, users)
 	if err != nil {
-		logger.Debug().Interface("query", odataReq).Msg("error while sorting users according to query")
+		logger.Debug().Interface("query", odataReq).Msg("error while sorting education users according to query")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
@@ -97,44 +60,15 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &ListResponse{Value: users})
 }
 
-// PostUser implements the Service interface.
-func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
+// PostEducationUser implements the Service interface.
+func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Interface("body", r.Body).Msg("calling create user")
-	u := libregraph.NewUser()
+	logger.Info().Interface("body", r.Body).Msg("calling create education user")
+	u := libregraph.NewEducationUser()
 	err := json.NewDecoder(r.Body).Decode(u)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create user: invalid request body")
+		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create education user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %v", err.Error()))
-		return
-	}
-
-	if _, ok := u.GetDisplayNameOk(); !ok {
-		logger.Debug().Err(err).Interface("user", u).Msg("could not create user: missing required Attribute: 'displayName'")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'displayName'")
-		return
-	}
-	if accountName, ok := u.GetOnPremisesSamAccountNameOk(); ok {
-		if !isValidUsername(*accountName) {
-			logger.Debug().Str("username", *accountName).Msg("could not create user: username must be at least the local part of an email")
-			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("username %s must be at least the local part of an email", *u.OnPremisesSamAccountName))
-			return
-		}
-	} else {
-		logger.Debug().Interface("user", u).Msg("could not create user: missing required Attribute: 'onPremisesSamAccountName'")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'onPremisesSamAccountName'")
-		return
-	}
-
-	if mail, ok := u.GetMailOk(); ok {
-		if !isValidEmail(*mail) {
-			logger.Debug().Str("mail", *u.Mail).Msg("could not create user: invalid email address")
-			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("%v is not a valid email address", *u.Mail))
-			return
-		}
-	} else {
-		logger.Debug().Interface("user", u).Msg("could not create user: missing required Attribute: 'mail'")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'mail'")
 		return
 	}
 
@@ -142,14 +76,74 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	// generating them in the backend ourselves or rely on the Backend's
 	// storage (e.g. LDAP) to provide a unique ID.
 	if _, ok := u.GetIdOk(); ok {
-		logger.Debug().Interface("user", u).Msg("could not create user: user id is a read-only attribute")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user id is a read-only attribute")
+		logger.Debug().Interface("user", u).Msg("could not create education user: id is a read-only attribute")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "education user id is a read-only attribute")
 		return
 	}
 
-	logger.Debug().Interface("user", u).Msg("calling create user on backend")
-	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {
-		logger.Debug().Err(err).Msg("could not create user: backend error")
+	if _, ok := u.GetDisplayNameOk(); !ok {
+		logger.Debug().Err(err).Interface("user", u).Msg("could not create education user: missing required Attribute: 'displayName'")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'displayName'")
+		return
+	}
+
+	identities, ok := u.GetIdentitiesOk()
+	if !ok {
+		logger.Debug().Err(err).Interface("user", u).Msg("could not create education user: missing required Collection: 'identities'")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'identities'")
+		return
+	}
+	if len(identities) < 1 {
+		logger.Debug().Err(err).Interface("user", u).Msg("could not create education user: missing entry in Collection: 'identities'")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Collection: 'identities'")
+		return
+	}
+	for i, identity := range identities {
+		if _, ok := identity.GetIssuerOk(); !ok {
+			logger.Debug().Err(err).Interface("user", u).Msgf("could not create education user: missing Attribute in 'identities' Collection Entry %d: 'issuer'", i)
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("missing Attribute in 'identities' Collection Entry %d: 'issuer'", i))
+			return
+		}
+		if _, ok := identity.GetIssuerAssignedIdOk(); !ok {
+			logger.Debug().Err(err).Interface("user", u).Msgf("could not create education user: missing Attribute in 'identities' Collection Entry %d: 'issuerAssignedId'", i)
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("missing Attribute in 'identities' Collection Entry %d: 'issuerAssignedId'", i))
+			return
+		}
+	}
+
+	if accountName, ok := u.GetOnPremisesSamAccountNameOk(); ok {
+		if !isValidUsername(*accountName) {
+			logger.Debug().Str("username", *accountName).Msg("could not create education user: username must be at least the local part of an email")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("username %s must be at least the local part of an email", *u.OnPremisesSamAccountName))
+			return
+		}
+	} else {
+		logger.Debug().Interface("user", u).Msg("could not create education user: missing required Attribute: 'onPremisesSamAccountName'")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'onPremisesSamAccountName'")
+		return
+	}
+
+	if mail, ok := u.GetMailOk(); ok {
+		if !isValidEmail(*mail) {
+			logger.Debug().Str("mail", *u.Mail).Msg("could not create education user: invalid email address")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("%v is not a valid email address", *u.Mail))
+			return
+		}
+	} else {
+		logger.Debug().Interface("user", u).Msg("could not create education user: missing required Attribute: 'mail'")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'mail'")
+		return
+	}
+
+	if _, ok := u.GetPrimaryRoleOk(); !ok {
+		logger.Debug().Err(err).Interface("user", u).Msg("could not create education user: missing required Attribute: 'primaryRole'")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'primaryRole'")
+		return
+	}
+
+	logger.Debug().Interface("user", u).Msg("calling create education user on backend")
+	if u, err = g.identityEducationBackend.CreateEducationUser(r.Context(), *u); err != nil {
+		logger.Debug().Err(err).Msg("could not create education user: backend error")
 		var ecErr errorcode.Error
 		if errors.As(err, &ecErr) {
 			ecErr.Render(w, r)
@@ -168,7 +162,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 			RoleId:      settingssvc.BundleUUIDRoleUser,
 		}); err != nil {
 			// log as error, admin eventually needs to do something
-			logger.Error().Err(err).Str("id", *u.Id).Str("role", settingssvc.BundleUUIDRoleUser).Msg("could not create user: role assignment failed")
+			logger.Error().Err(err).Str("id", *u.Id).Str("role", settingssvc.BundleUUIDRoleUser).Msg("could not create education user: role assignment failed")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "role assignment failed")
 			return
 		}
@@ -180,33 +174,33 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	}
 	g.publishEvent(e)
 
-	render.Status(r, http.StatusOK) // FIXME 201 should return 201 created
+	render.Status(r, http.StatusOK)
 	render.JSON(w, r, u)
 }
 
-// GetUser implements the Service interface.
-func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
+// GetEducationUser implements the Service interface.
+func (g Graph) GetEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling get user")
+	logger.Info().Msg("calling get education user")
 	userID := chi.URLParam(r, "userID")
 	userID, err := url.PathUnescape(userID)
 	if err != nil {
-		logger.Debug().Err(err).Str("id", userID).Msg("could not get user: unescaping user id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
+		logger.Debug().Err(err).Str("id", userID).Msg("could not get education user: unescaping education user id failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping education user id failed")
 		return
 	}
 
 	if userID == "" {
-		logger.Debug().Msg("could not get user: missing user id")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
+		logger.Debug().Msg("could not get user: missing education user id")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing education user id")
 		return
 	}
 
-	logger.Debug().Str("id", userID).Msg("calling get user from backend")
-	user, err := g.identityBackend.GetUser(r.Context(), userID, r.URL.Query())
+	logger.Debug().Str("id", userID).Msg("calling get education user from backend")
+	user, err := g.identityEducationBackend.GetEducationUser(r.Context(), userID, r.URL.Query())
 
 	if err != nil {
-		logger.Debug().Err(err).Msg("could not get user: error fetching user from backend")
+		logger.Debug().Err(err).Msg("could not get education user: error fetching education user from backend")
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
 			errcode.Render(w, r)
@@ -229,7 +223,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			render.Status(r, http.StatusInternalServerError)
 			return
 		}
-		logger.Debug().Str("id", user.GetId()).Msg("calling list storage spaces with user id filter")
+		logger.Debug().Str("id", user.GetId()).Msg("calling list storage spaces with education user id filter")
 		f := listStorageSpacesUserFilter(user.GetId())
 		// use the unrestricted flag to get all possible spaces
 		// users with the canListAllSpaces permission should see all spaces
@@ -246,7 +240,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if lspr.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
-			logger.Debug().Str("grpc", lspr.GetStatus().GetMessage()).Msg("could not get drive for user")
+			logger.Debug().Str("grpc", lspr.GetStatus().GetMessage()).Msg("could not get drive for education user")
 			// in case of NOT_OK, we can just return the user object with empty drives
 			render.Status(r, status.HTTPStatusFromCode(http.StatusOK))
 			render.JSON(w, r, user)
@@ -279,27 +273,27 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, user)
 }
 
-// DeleteUser implements the Service interface.
-func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
+// DeleteEducationUser implements the Service interface.
+func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling delete user")
+	logger.Info().Msg("calling delete education user")
 	userID := chi.URLParam(r, "userID")
 	userID, err := url.PathUnescape(userID)
 	if err != nil {
-		logger.Debug().Err(err).Str("id", userID).Msg("could not delete user: unescaping user id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
+		logger.Debug().Err(err).Str("id", userID).Msg("could not delete education user: unescaping education user id failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping education user id failed")
 		return
 	}
 
 	if userID == "" {
-		logger.Debug().Msg("could not delete user: missing user id")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
+		logger.Debug().Msg("could not delete education user: missing education user id")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing education user id")
 		return
 	}
-	logger.Debug().Str("id", userID).Msg("calling get user on user backend")
-	user, err := g.identityBackend.GetUser(r.Context(), userID, r.URL.Query())
+	logger.Debug().Str("id", userID).Msg("calling get education user on user backend")
+	user, err := g.identityEducationBackend.GetEducationUser(r.Context(), userID, r.URL.Query())
 	if err != nil {
-		logger.Debug().Err(err).Str("userID", userID).Msg("failed to get user from backend")
+		logger.Debug().Err(err).Str("userID", userID).Msg("failed to get education user from backend")
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
 			errcode.Render(w, r)
@@ -312,7 +306,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	e := events.UserDeleted{UserID: user.GetId()}
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		if currentUser.GetId().GetOpaqueId() == user.GetId() {
-			logger.Debug().Msg("could not delete user: self deletion forbidden")
+			logger.Debug().Msg("could not delete education user: self deletion forbidden")
 			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "self deletion forbidden")
 			return
 		}
@@ -374,11 +368,11 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	logger.Debug().Str("id", user.GetId()).Msg("calling delete user on backend")
-	err = g.identityBackend.DeleteUser(r.Context(), user.GetId())
+	logger.Debug().Str("id", user.GetId()).Msg("calling delete education user on backend")
+	err = g.identityEducationBackend.DeleteEducationUser(r.Context(), user.GetId())
 
 	if err != nil {
-		logger.Debug().Err(err).Msg("could not delete user: backend error")
+		logger.Debug().Err(err).Msg("could not delete education user: backend error")
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
 			errcode.Render(w, r)
@@ -394,28 +388,28 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	render.NoContent(w, r)
 }
 
-// PatchUser implements the Service Interface. Updates the specified attributes of an
+// PatchEducationUser implements the Service Interface. Updates the specified attributes of an
 // ExistingUser
-func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
+func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling patch user")
+	logger.Info().Msg("calling patch education user")
 	nameOrID := chi.URLParam(r, "userID")
 	nameOrID, err := url.PathUnescape(nameOrID)
 	if err != nil {
-		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not update user: unescaping user id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
+		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not update education user: unescaping education user id failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping education user id failed")
 		return
 	}
 
 	if nameOrID == "" {
-		logger.Debug().Msg("could not update user: missing user id")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
+		logger.Debug().Msg("could not update education user: missing education user id")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing education user id")
 		return
 	}
-	changes := libregraph.NewUser()
+	changes := libregraph.NewEducationUser()
 	err = json.NewDecoder(r.Body).Decode(changes)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update user: invalid request body")
+		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update education user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
 			fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
@@ -424,7 +418,7 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	var features []events.UserFeature
 	if mail, ok := changes.GetMailOk(); ok {
 		if !isValidEmail(*mail) {
-			logger.Debug().Str("mail", *mail).Msg("could not update user: email is not a valid email address")
+			logger.Debug().Str("mail", *mail).Msg("could not update education user: email is not a valid email address")
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
 				fmt.Sprintf("'%s' is not a valid email address", *mail))
 			return
@@ -436,10 +430,10 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		features = append(features, events.UserFeature{Name: "displayname", Value: *name})
 	}
 
-	logger.Debug().Str("nameid", nameOrID).Interface("changes", *changes).Msg("calling update user on backend")
-	u, err := g.identityBackend.UpdateUser(r.Context(), nameOrID, *changes)
+	logger.Debug().Str("nameid", nameOrID).Interface("changes", *changes).Msg("calling update education user on backend")
+	u, err := g.identityEducationBackend.UpdateEducationUser(r.Context(), nameOrID, *changes)
 	if err != nil {
-		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not update user: backend error")
+		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not update education user: backend error")
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
 			errcode.Render(w, r)
@@ -463,40 +457,18 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow integration with our glauth LDAP service
-// so we are adding a few restrictions from https://stackoverflow.com/questions/6949667/what-are-the-real-rules-for-linux-usernames-on-centos-6-and-rhel-6
-// names should not start with numbers
-var usernameRegex = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*(@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)*$")
-
-func isValidUsername(e string) bool {
-	if len(e) < 1 && len(e) > 254 {
-		return false
-	}
-	return usernameRegex.MatchString(e)
-}
-
-// regex from https://www.w3.org/TR/2016/REC-html51-20161101/sec-forms.html#valid-e-mail-address
-var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
-
-func isValidEmail(e string) bool {
-	if len(e) < 3 && len(e) > 254 {
-		return false
-	}
-	return emailRegex.MatchString(e)
-}
-
-func sortUsers(req *godata.GoDataRequest, users []*libregraph.User) ([]*libregraph.User, error) {
+func sortEducationUsers(req *godata.GoDataRequest, users []*libregraph.EducationUser) ([]*libregraph.EducationUser, error) {
 	var sorter sort.Interface
 	if req.Query.OrderBy == nil || len(req.Query.OrderBy.OrderByItems) != 1 {
 		return users, nil
 	}
 	switch req.Query.OrderBy.OrderByItems[0].Field.Value {
 	case displayNameAttr:
-		sorter = usersByDisplayName{users}
+		sorter = educationUsersByDisplayName{users}
 	case "mail":
-		sorter = usersByMail{users}
+		sorter = educationUsersByMail{users}
 	case "onPremisesSamAccountName":
-		sorter = usersByOnPremisesSamAccountName{users}
+		sorter = educationUsersByOnPremisesSamAccountName{users}
 	default:
 		return nil, fmt.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
 	}

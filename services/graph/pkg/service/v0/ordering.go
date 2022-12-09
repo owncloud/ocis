@@ -119,3 +119,41 @@ type schoolsByDisplayName struct {
 func (g schoolsByDisplayName) Less(i, j int) bool {
 	return strings.ToLower(g.schoolSlice[i].GetDisplayName()) < strings.ToLower(g.schoolSlice[j].GetDisplayName())
 }
+
+type educationUserSlice []*libregraph.EducationUser
+
+// Len is the number of elements in the collection.
+func (d educationUserSlice) Len() int { return len(d) }
+
+// Swap swaps the elements with indexes i and j.
+func (d educationUserSlice) Swap(i, j int) { d[i], d[j] = d[j], d[i] }
+
+type educationUsersByDisplayName struct {
+	educationUserSlice
+}
+
+type educationUsersByMail struct {
+	educationUserSlice
+}
+
+type educationUsersByOnPremisesSamAccountName struct {
+	educationUserSlice
+}
+
+// Less reports whether the element with index i
+// must sort before the element with index j.
+func (u educationUsersByDisplayName) Less(i, j int) bool {
+	return strings.ToLower(u.educationUserSlice[i].GetDisplayName()) < strings.ToLower(u.educationUserSlice[j].GetDisplayName())
+}
+
+// Less reports whether the element with index i
+// must sort before the element with index j.
+func (u educationUsersByMail) Less(i, j int) bool {
+	return strings.ToLower(u.educationUserSlice[i].GetMail()) < strings.ToLower(u.educationUserSlice[j].GetMail())
+}
+
+// Less reports whether the element with index i
+// must sort before the element with index j.
+func (u educationUsersByOnPremisesSamAccountName) Less(i, j int) bool {
+	return strings.ToLower(u.educationUserSlice[i].GetOnPremisesSamAccountName()) < strings.ToLower(u.educationUserSlice[j].GetOnPremisesSamAccountName())
+}
