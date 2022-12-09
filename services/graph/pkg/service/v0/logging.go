@@ -139,6 +139,31 @@ func (l logging) DeleteSchoolMember(w http.ResponseWriter, r *http.Request) {
 	l.next.DeleteSchoolMember(w, r)
 }
 
+// GetEducationUsers implements the Service interface.
+func (l logging) GetEducationUsers(w http.ResponseWriter, r *http.Request) {
+	l.next.GetEducationUsers(w, r)
+}
+
+// GetEducationUser implements the Service interface.
+func (l logging) GetEducationUser(w http.ResponseWriter, r *http.Request) {
+	l.next.GetEducationUser(w, r)
+}
+
+// PostEducationUser implements the Service interface.
+func (l logging) PostEducationUser(w http.ResponseWriter, r *http.Request) {
+	l.next.PostEducationUser(w, r)
+}
+
+// DeleteEducationUser implements the Service interface.
+func (l logging) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
+	l.next.DeleteEducationUser(w, r)
+}
+
+// PatchEducationUser implements the Service interface.
+func (l logging) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
+	l.next.PatchEducationUser(w, r)
+}
+
 // GetDrives implements the Service interface.
 func (l logging) GetDrives(w http.ResponseWriter, r *http.Request) {
 	l.next.GetDrives(w, r)

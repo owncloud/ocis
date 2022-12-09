@@ -42,11 +42,20 @@ type EducationBackend interface {
 	GetSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error)
 	// GetSchools lists all	schools
 	GetSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error)
-	GetSchoolMembers(ctx context.Context, id string) ([]*libregraph.User, error)
+	GetSchoolMembers(ctx context.Context, id string) ([]*libregraph.EducationUser, error)
 	// AddMembersToSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
 	AddMembersToSchool(ctx context.Context, schoolID string, memberID []string) error
 	// RemoveMemberFromSchool removes a single member (by ID) from a school
 	RemoveMemberFromSchool(ctx context.Context, schoolID string, memberID string) error
+
+	// CreateEducationUser creates a given education user in the identity backend.
+	CreateEducationUser(ctx context.Context, user libregraph.EducationUser) (*libregraph.EducationUser, error)
+	// DeleteEducationUser deletes a given educationuser, identified by username or id, from the backend
+	DeleteEducationUser(ctx context.Context, nameOrID string) error
+	// UpdateEducationUser applies changes to given education user, identified by username or id
+	UpdateEducationUser(ctx context.Context, nameOrID string, user libregraph.EducationUser) (*libregraph.EducationUser, error)
+	GetEducationUser(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationUser, error)
+	GetEducationUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationUser, error)
 }
 
 func CreateUserModelFromCS3(u *cs3.User) *libregraph.User {

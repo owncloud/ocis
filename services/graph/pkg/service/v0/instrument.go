@@ -139,6 +139,31 @@ func (i instrument) DeleteSchoolMember(w http.ResponseWriter, r *http.Request) {
 	i.next.DeleteSchoolMember(w, r)
 }
 
+// GetEducationUsers implements the Service interface.
+func (i instrument) GetEducationUsers(w http.ResponseWriter, r *http.Request) {
+	i.next.GetEducationUsers(w, r)
+}
+
+// GetEducationUser implements the Service interface.
+func (i instrument) GetEducationUser(w http.ResponseWriter, r *http.Request) {
+	i.next.GetEducationUser(w, r)
+}
+
+// PostEducationUser implements the Service interface.
+func (i instrument) PostEducationUser(w http.ResponseWriter, r *http.Request) {
+	i.next.PostEducationUser(w, r)
+}
+
+// DeleteEducationUser implements the Service interface.
+func (i instrument) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
+	i.next.DeleteEducationUser(w, r)
+}
+
+// PatchEducationUser implements the Service interface.
+func (i instrument) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
+	i.next.PatchEducationUser(w, r)
+}
+
 // GetDrives implements the Service interface.
 func (i instrument) GetDrives(w http.ResponseWriter, r *http.Request) {
 	i.next.GetDrives(w, r)

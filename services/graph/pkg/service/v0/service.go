@@ -23,7 +23,8 @@ import (
 
 const (
 	// HeaderPurge defines the header name for the purge header.
-	HeaderPurge = "Purge"
+	HeaderPurge     = "Purge"
+	displayNameAttr = "displayName"
 )
 
 // Service defines the service handlers.
@@ -54,6 +55,12 @@ type Service interface {
 	GetSchoolMembers(http.ResponseWriter, *http.Request)
 	PostSchoolMember(http.ResponseWriter, *http.Request)
 	DeleteSchoolMember(http.ResponseWriter, *http.Request)
+
+	GetEducationUsers(http.ResponseWriter, *http.Request)
+	GetEducationUser(http.ResponseWriter, *http.Request)
+	PostEducationUser(http.ResponseWriter, *http.Request)
+	DeleteEducationUser(http.ResponseWriter, *http.Request)
+	PatchEducationUser(http.ResponseWriter, *http.Request)
 
 	GetDrives(w http.ResponseWriter, r *http.Request)
 	GetSingleDrive(w http.ResponseWriter, r *http.Request)
@@ -251,12 +258,12 @@ func NewService(opts ...Option) Service {
 					})
 				})
 				r.Route("/users", func(r chi.Router) {
-					r.Get("/", svc.GetUsers)
-					r.Post("/", svc.PostUser)
+					r.Get("/", svc.GetEducationUsers)
+					r.Post("/", svc.PostEducationUser)
 					r.Route("/{userID}", func(r chi.Router) {
-						r.Get("/", svc.GetUser)
-						r.Delete("/", svc.DeleteUser)
-						r.Patch("/", svc.PatchUser)
+						r.Get("/", svc.GetEducationUser)
+						r.Delete("/", svc.DeleteEducationUser)
+						r.Patch("/", svc.PatchEducationUser)
 					})
 				})
 				r.Route("/classes", func(r chi.Router) {

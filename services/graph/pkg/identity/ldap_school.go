@@ -177,7 +177,7 @@ func (i *LDAP) GetSchools(ctx context.Context, queryParam url.Values) ([]*libreg
 }
 
 // GetSchoolMembers implements the EducationBackend interface for the LDAP backend.
-func (i *LDAP) GetSchoolMembers(ctx context.Context, id string) ([]*libregraph.User, error) {
+func (i *LDAP) GetSchoolMembers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
 	return nil, errNotImplemented
 }
 

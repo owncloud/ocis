@@ -135,6 +135,31 @@ func (t tracing) DeleteSchoolMember(w http.ResponseWriter, r *http.Request) {
 	t.next.DeleteSchoolMember(w, r)
 }
 
+// GetEducationUsers implements the Service interface.
+func (t tracing) GetEducationUsers(w http.ResponseWriter, r *http.Request) {
+	t.next.GetEducationUsers(w, r)
+}
+
+// GetEducationUser implements the Service interface.
+func (t tracing) GetEducationUser(w http.ResponseWriter, r *http.Request) {
+	t.next.GetEducationUser(w, r)
+}
+
+// PostEducationUser implements the Service interface.
+func (t tracing) PostEducationUser(w http.ResponseWriter, r *http.Request) {
+	t.next.PostEducationUser(w, r)
+}
+
+// DeleteEducationUser implements the Service interface.
+func (t tracing) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
+	t.next.DeleteEducationUser(w, r)
+}
+
+// PatchEducationUser implements the Service interface.
+func (t tracing) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
+	t.next.PatchEducationUser(w, r)
+}
+
 // GetDrives implements the Service interface.
 func (t tracing) GetDrives(w http.ResponseWriter, r *http.Request) {
 	t.next.GetDrives(w, r)
