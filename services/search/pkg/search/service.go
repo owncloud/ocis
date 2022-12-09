@@ -2,6 +2,12 @@ package search
 
 import (
 	"context"
+	"fmt"
+	"path/filepath"
+	"sort"
+	"strings"
+	"time"
+
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -16,10 +22,6 @@ import (
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
-	"path/filepath"
-	"sort"
-	"strings"
-	"time"
 )
 
 //go:generate mockery --name=Searcher
@@ -27,7 +29,7 @@ import (
 // Searcher is the interface to the SearchService
 type Searcher interface {
 	Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error)
-	IndexSpace(rid *provider.ResourceId, uId *user.UserId) error
+	IndexSpace(rid *provider.StorageSpaceId, uId *user.UserId) error
 	TrashItem(rid *provider.ResourceId)
 	UpsertItem(ref *provider.Reference, uid *user.UserId)
 	RestoreItem(ref *provider.Reference, uid *user.UserId)
@@ -200,14 +202,25 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 }
 
 // IndexSpace (re)indexes all resources of a given space.
-func (s *Service) IndexSpace(rid *provider.ResourceId, uId *user.UserId) error {
+func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, uId *user.UserId) error {
 	ownerCtx, err := getAuthContext(&user.User{Id: uId}, s.gateway, s.secret, s.logger)
 	if err != nil {
 		return err
 	}
 
+	rootID, err := storagespace.ParseID(spaceID.OpaqueId)
+	if err != nil {
+		s.logger.Error().Err(err).Msg("invalid space id")
+		return err
+	}
+	if rootID.StorageId == "" || rootID.SpaceId == "" {
+		s.logger.Error().Err(err).Msg("invalid space id")
+		return fmt.Errorf("invalid space id")
+	}
+	rootID.OpaqueId = rootID.SpaceId
+
 	w := walker.NewWalker(s.gateway)
-	err = w.Walk(ownerCtx, rid, func(wd string, info *provider.ResourceInfo, err error) error {
+	err = w.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
 			s.logger.Error().Err(err).Msg("error walking the tree")
 			return err
@@ -219,7 +232,7 @@ func (s *Service) IndexSpace(rid *provider.ResourceId, uId *user.UserId) error {
 
 		ref := &provider.Reference{
 			Path:       utils.MakeRelativePath(filepath.Join(wd, info.Path)),
-			ResourceId: rid,
+			ResourceId: &rootID,
 		}
 		s.logger.Debug().Str("path", ref.Path).Msg("Walking tree")
 
@@ -236,14 +249,18 @@ func (s *Service) IndexSpace(rid *provider.ResourceId, uId *user.UserId) error {
 			return nil
 		}
 
-		s.UpsertItem(ref, info.Owner)
+		s.UpsertItem(ref, uId)
 
 		return nil
 	})
 
+	if err != nil {
+		return err
+	}
+
 	logDocCount(s.engine, s.logger)
 
-	return err
+	return nil
 }
 
 func (s *Service) TrashItem(rid *provider.ResourceId) {

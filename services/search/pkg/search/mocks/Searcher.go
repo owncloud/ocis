@@ -19,11 +19,11 @@ type Searcher struct {
 }
 
 // IndexSpace provides a mock function with given fields: rid, uId
-func (_m *Searcher) IndexSpace(rid *providerv1beta1.ResourceId, uId *userv1beta1.UserId) error {
+func (_m *Searcher) IndexSpace(rid *providerv1beta1.StorageSpaceId, uId *userv1beta1.UserId) error {
 	ret := _m.Called(rid, uId)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*providerv1beta1.ResourceId, *userv1beta1.UserId) error); ok {
+	if rf, ok := ret.Get(0).(func(*providerv1beta1.StorageSpaceId, *userv1beta1.UserId) error); ok {
 		r0 = rf(rid, uId)
 	} else {
 		r0 = ret.Error(0)

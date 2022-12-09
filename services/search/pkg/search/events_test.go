@@ -13,7 +13,7 @@ import (
 	mEvents "go-micro.dev/v4/events"
 )
 
-var _ = DescribeTable("eevents",
+var _ = DescribeTable("events",
 	func(mcks []string, e interface{}, asyncUploads bool) {
 		var (
 			s     = &searchMocks.Searcher{}

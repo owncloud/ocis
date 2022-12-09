@@ -109,7 +109,7 @@ var _ = Describe("Searchprovider", func() {
 			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
 			indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{}, nil)
 
-			err := s.IndexSpace(&sprovider.ResourceId{}, user.Id)
+			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"}, user.Id)
 			Expect(err).ShouldNot(HaveOccurred())
 		})
 	})

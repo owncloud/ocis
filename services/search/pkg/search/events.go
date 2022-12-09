@@ -3,6 +3,7 @@ package search
 import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 )
@@ -36,17 +37,21 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 		cfg.Events.NumConsumers = 1
 	}
 
+	spaceId := func(ref *provider.Reference) *provider.StorageSpaceId {
+		return &provider.StorageSpaceId{
+			OpaqueId: storagespace.FormatResourceID(
+				provider.ResourceId{
+					StorageId: ref.GetResourceId().GetStorageId(),
+					SpaceId:   ref.GetResourceId().GetSpaceId(),
+				},
+			),
+		}
+	}
+
 	for i := 0; i < cfg.Events.NumConsumers; i++ {
 		go func(s Searcher, ch <-chan interface{}) {
 			for e := range ch {
 				logger.Debug().Interface("event", e).Msg("updating index")
-
-				spaceId := func(ref *provider.Reference) *provider.ResourceId {
-					return &provider.ResourceId{
-						StorageId: ref.GetResourceId().GetStorageId(),
-						SpaceId:   ref.GetResourceId().GetSpaceId(),
-					}
-				}
 
 				switch ev := e.(type) {
 				case events.ItemTrashed:

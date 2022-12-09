@@ -3,6 +3,7 @@ package engine_test
 import (
 	"context"
 	"fmt"
+
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 
 	"github.com/blevesearch/bleve/v2"
@@ -130,7 +131,7 @@ var _ = Describe("Bleve", func() {
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				_assertDocCount(rootResource.ID, "Name:foo o*", 1)
+				_assertDocCount(rootResource.ID, `Name:foo\ o*`, 1)
 			})
 
 			It("finds files by digits in the filename", func() {
@@ -215,14 +216,14 @@ var _ = Describe("Bleve", func() {
 				}
 			})
 
-			It("is case sensitive", func() {
+			It("uses a lower-case index", func() {
 				parentResource.Document.Name = "foo.pdf"
 
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
 				_assertDocCount(rootResource.ID, "Name:foo*", 1)
-				_assertDocCount(rootResource.ID, "Name:Foo*", 1)
+				_assertDocCount(rootResource.ID, "Name:Foo*", 0)
 			})
 
 			Context("and an additional file in a subdirectory", func() {
@@ -282,12 +283,12 @@ var _ = Describe("Bleve", func() {
 			err := eng.Upsert(childResource.ID, childResource)
 			Expect(err).ToNot(HaveOccurred())
 
-			_assertDocCount(rootResource.ID, "Name:child", 1)
+			_assertDocCount(rootResource.ID, "Name:*child*", 1)
 
 			err = eng.Delete(childResource.ID)
 			Expect(err).ToNot(HaveOccurred())
 
-			_assertDocCount(rootResource.ID, "Name:child", 0)
+			_assertDocCount(rootResource.ID, "Name:*child*", 0)
 		})
 
 		It("marks a child resources as deleted", func() {

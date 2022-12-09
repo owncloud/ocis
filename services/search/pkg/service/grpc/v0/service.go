@@ -6,29 +6,28 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"os"
 	"time"
 
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events/server"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/jellydator/ttlcache/v2"
+	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
+	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 	"github.com/owncloud/ocis/v2/services/search/pkg/engine"
 	"github.com/owncloud/ocis/v2/services/search/pkg/search"
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 	grpcmetadata "google.golang.org/grpc/metadata"
-
-	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
-	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
-	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 )
 
 // NewHandler returns a service implementation for Service.
@@ -172,12 +171,7 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 
 // IndexSpace (re)indexes all resources of a given space.
 func (s Service) IndexSpace(ctx context.Context, in *searchsvc.IndexSpaceRequest, _ *searchsvc.IndexSpaceResponse) error {
-	rid, err := storagespace.ParseID(in.SpaceId)
-	if err != nil {
-		return err
-	}
-
-	return s.searcher.IndexSpace(&rid, &user.UserId{OpaqueId: in.UserId})
+	return s.searcher.IndexSpace(&provider.StorageSpaceId{OpaqueId: in.SpaceId}, &user.UserId{OpaqueId: in.UserId})
 }
 
 // FromCache pulls a search result from cache
