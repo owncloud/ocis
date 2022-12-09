@@ -63,7 +63,7 @@ require (
 	github.com/thejerf/suture/v4 v4.0.2
 	github.com/tus/tusd v1.10.0
 	github.com/urfave/cli/v2 v2.23.6
-	github.com/xhit/go-simple-mail/v2 v2.12.0
+	github.com/xhit/go-simple-mail/v2 v2.13.0
 	go-micro.dev/v4 v4.9.0
 	go.etcd.io/bbolt v1.3.6
 	go.etcd.io/etcd/client/v3 v3.5.6
