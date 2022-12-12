@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 	"text/template"
 
@@ -116,6 +117,12 @@ func GetRogueEnvs() {
 	for _, v := range currentVars {
 		vars.Variables = append(vars.Variables, v)
 	}
+
+	less := func(i, j int) bool {
+		return vars.Variables[i].Name < vars.Variables[j].Name
+	}
+
+	sort.Slice(vars.Variables, less)
 
 	output, err := yaml.Marshal(vars)
 	if err != nil {

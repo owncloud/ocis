@@ -7,10 +7,10 @@ variables:
   default_value: ""
   description: ""
   do_ignore: false
-- rawname: registryAddressEnv
-  path: ocis-pkg/registry/registry.go:42
+- rawname: CS3_MACHINE_AUTH_API_KEY
+  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:77
   foundincode: true
-  name: registryAddressEnv
+  name: CS3_MACHINE_AUTH_API_KEY
   type: ""
   default_value: ""
   description: ""
@@ -23,18 +23,10 @@ variables:
   default_value: ""
   description: ""
   do_ignore: false
-- rawname: CS3_MACHINE_AUTH_API_KEY
-  path: services/idp/pkg/backends/cs3/bootstrap/cs3.go:77
+- rawname: MICRO_LOG_LEVEL
+  path: ocis-pkg/log/log.go:30
   foundincode: true
-  name: CS3_MACHINE_AUTH_API_KEY
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: registryEnv
-  path: ocis-pkg/registry/registry.go:44
-  foundincode: true
-  name: registryEnv
+  name: MICRO_LOG_LEVEL
   type: ""
   default_value: ""
   description: ""
@@ -63,10 +55,18 @@ variables:
   default_value: ""
   description: ""
   do_ignore: false
-- rawname: MICRO_LOG_LEVEL
-  path: ocis-pkg/log/log.go:30
+- rawname: registryAddressEnv
+  path: ocis-pkg/registry/registry.go:42
   foundincode: true
-  name: MICRO_LOG_LEVEL
+  name: registryAddressEnv
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: registryEnv
+  path: ocis-pkg/registry/registry.go:44
+  foundincode: true
+  name: registryEnv
   type: ""
   default_value: ""
   description: ""

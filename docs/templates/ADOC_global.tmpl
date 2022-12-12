@@ -14,13 +14,15 @@
 {{- if .Ignore }}
     {{ continue }}
 {{- end }}
+
 a| `{{- .Name }}` +
 a| [subs=-attributes]
 ++{{ .Type }} ++
 a| [subs=-attributes]
 ++{{.DefaultValue}} ++
 a| [subs=-attributes]
-{{.Description}}
+++{{.Description}} ++
+a| [subs=-attributes]
 
 {{- end }}
 |===
