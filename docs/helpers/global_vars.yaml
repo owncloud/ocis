@@ -31,6 +31,22 @@ variables:
   default_value: ""
   description: ""
   do_ignore: false
+- rawname: registryEnv
+  path: ocis-pkg/registry/registry.go:44
+  foundincode: true
+  name: MICRO_REGISTRY
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: registryAddressEnv
+  path: ocis-pkg/registry/registry.go:42
+  foundincode: true
+  name: MICRO_REGISTRY_ADDRESS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: OCIS_BASE_DATA_PATH
   path: ocis-pkg/config/defaults/paths.go:23
   foundincode: true
@@ -53,21 +69,5 @@ variables:
   name: parts[0]
   type: ""
   default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: registryAddressEnv
-  path: ocis-pkg/registry/registry.go:42
-  foundincode: true
-  name: registryAddressEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: registryEnv
-  path: ocis-pkg/registry/registry.go:44
-  foundincode: true
-  name: registryEnv
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
+  description: false positive - code that extract envvars for config structs
+  do_ignore: true
