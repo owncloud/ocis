@@ -27,6 +27,7 @@ http:
     enabled: false
     cert: ""
     key: ""
+  apitoken: ""
 reva:
   address: 127.0.0.1:9142
   tls:

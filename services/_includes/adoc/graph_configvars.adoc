@@ -216,6 +216,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.
 
+a|`GRAPH_HTTP_API_TOKEN` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+An optional API bearer token
+
 a|`REVA_GATEWAY` +
 
 a| [subs=-attributes]
