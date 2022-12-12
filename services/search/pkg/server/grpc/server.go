@@ -4,11 +4,11 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
-	svc "github.com/owncloud/ocis/v2/services/search/pkg/service/v0"
+	svc "github.com/owncloud/ocis/v2/services/search/pkg/service/grpc/v0"
 )
 
 // Server initializes a new go-micro service ready to run
-func Server(opts ...Option) grpc.Service {
+func Server(opts ...Option) (grpc.Service, func(), error) {
 	options := newOptions(opts...)
 
 	service, err := grpc.NewService(
@@ -27,10 +27,10 @@ func Server(opts ...Option) grpc.Service {
 	)
 	if err != nil {
 		options.Logger.Fatal().Err(err).Msg("Error creating search service")
-		return grpc.Service{}
+		return grpc.Service{}, func() {}, err
 	}
 
-	handle, err := svc.NewHandler(
+	handle, teardown, err := svc.NewHandler(
 		svc.Config(options.Config),
 		svc.Logger(options.Logger),
 	)
@@ -38,11 +38,18 @@ func Server(opts ...Option) grpc.Service {
 		options.Logger.Error().
 			Err(err).
 			Msg("Error initializing search service")
-		return grpc.Service{}
+		return grpc.Service{}, teardown, err
 	}
-	_ = searchsvc.RegisterSearchProviderHandler(
+
+	if err := searchsvc.RegisterSearchProviderHandler(
 		service.Server(),
 		handle,
-	)
-	return service
+	); err != nil {
+		options.Logger.Error().
+			Err(err).
+			Msg("Error registering search provider handler")
+		return grpc.Service{}, teardown, err
+	}
+
+	return service, teardown, nil
 }

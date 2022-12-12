@@ -25,8 +25,10 @@ include ../../.make/generate.mk
 
 .PHONY: ci-go-generate
 ci-go-generate:  $(MOCKERY) # CI runs ci-node-generate automatically before this target
-	$(MOCKERY) --dir pkg/search --output pkg/search/mocks --case underscore --name IndexClient
-	$(MOCKERY) --dir pkg/search --output pkg/search/mocks --case underscore --name ProviderClient
+	$(MOCKERY) --dir pkg/engine --output pkg/engine/mocks --case underscore --name Engine
+	$(MOCKERY) --dir pkg/content --output pkg/content/mocks --case underscore --name Extractor
+	$(MOCKERY) --dir pkg/content --output pkg/content/mocks --case underscore --name Retriever
+	$(MOCKERY) --dir pkg/search --output pkg/search/mocks --case underscore --name Searcher
 
 .PHONY: ci-node-generate
 ci-node-generate:
