@@ -92,7 +92,7 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 		currentUser := revactx.ContextMustGetUser(r.Context())
 		g.publishEvent(events.GroupCreated{Executant: currentUser.Id, GroupID: *grp.Id})
 	}
-	render.Status(r, http.StatusCreated)
+	render.Status(r, http.StatusOK) // FIXME 201 should return 201 created
 	render.JSON(w, r, grp)
 }
 
@@ -167,7 +167,7 @@ func (g Graph) PatchGroup(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	render.Status(r, http.StatusNoContent)
+	render.Status(r, http.StatusNoContent) // TODO StatusNoContent when prefer=minimal is used, otherwise OK and the resource in the body
 	render.NoContent(w, r)
 }
 

@@ -179,7 +179,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	}
 	g.publishEvent(e)
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusOK) // FIXME 201 should return 201 created
 	render.JSON(w, r, u)
 }
 
