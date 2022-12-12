@@ -128,6 +128,7 @@ class RoleAssignmentContext implements Context {
 		$admin = $this->featureContext->getAdminUserName();
 		$roleId = $this->userGetRoleIdByRoleName($admin, $role);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
+		$userId = $userId ?? $user;
 		$this->setRoleToUser($admin, $userId, $roleId);
 	}
 
