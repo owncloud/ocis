@@ -487,8 +487,8 @@ github.com/go-micro/plugins/v4/registry/mdns v1.2.0 h1:BsGnco+PgycvSX+HS0XbeUQEP
 github.com/go-micro/plugins/v4/registry/mdns v1.2.0/go.mod h1:re0JvO5F56n59WEDaAKj2jtboKa2dklAd6iWyz5xa54=
 github.com/go-micro/plugins/v4/registry/memory v1.1.0 h1:omyL8l12mzNCjNSDxMkAReEWOiv58j62X7sIa6aRCj8=
 github.com/go-micro/plugins/v4/registry/memory v1.1.0/go.mod h1:7gsV2dwpFr+1rFhncmnxA9Tjv/NjQr9Zy8KpVKS7/jQ=
-github.com/go-micro/plugins/v4/registry/nats v1.1.0 h1:oqQzP5P2FkfoYZiBRuCWsKqh4BCJG6MQkxYmLw2lNrU=
-github.com/go-micro/plugins/v4/registry/nats v1.1.0/go.mod h1:4tTfa958PiYUOZNBBNoY1awmgfxFcqQOmix8cR3UM+E=
+github.com/go-micro/plugins/v4/registry/nats v1.2.1 h1:YsGmSYxhdu9NK7d8NYMY/xhaYMB4AhcCWoSrk7YGdEY=
+github.com/go-micro/plugins/v4/registry/nats v1.2.1/go.mod h1:RDsrDhcjJggCzAvvUzo/Bzy68d9s9+tu0KOfofXVCog=
 github.com/go-micro/plugins/v4/server/grpc v1.2.0 h1:lXfM+/0oE/u1g0hVBYsvbP4lYOYXYOmwf5qH7ghi7Cc=
 github.com/go-micro/plugins/v4/server/grpc v1.2.0/go.mod h1:+Ah9Pf/vMSXxBM3fup/hc3N+zN2as3nIpcRaR4sBjnY=
 github.com/go-micro/plugins/v4/server/http v1.2.0 h1:7wgXxdTMSwCfxpUdmOdllyJQRZk9ZtMK5WhankTdKcs=
