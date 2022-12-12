@@ -16,15 +16,16 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger            log.Logger
-	Config            *config.Config
-	Middleware        []func(http.Handler) http.Handler
-	GatewayClient     GatewayClient
-	IdentityBackend   identity.Backend
-	RoleService       RoleService
-	PermissionService Permissions
-	RoleManager       *roles.Manager
-	EventsPublisher   events.Publisher
+	Logger                 log.Logger
+	Config                 *config.Config
+	Middleware             []func(http.Handler) http.Handler
+	RequireAdminMiddleware func(http.Handler) http.Handler
+	GatewayClient          GatewayClient
+	IdentityBackend        identity.Backend
+	RoleService            RoleService
+	PermissionService      Permissions
+	RoleManager            *roles.Manager
+	EventsPublisher        events.Publisher
 }
 
 // newOptions initializes the available default options.
@@ -56,6 +57,13 @@ func Config(val *config.Config) Option {
 func Middleware(val ...func(http.Handler) http.Handler) Option {
 	return func(o *Options) {
 		o.Middleware = val
+	}
+}
+
+// WithRequireAdminMiddleware provides a function to set the RequireAdminMiddleware option.
+func WithRequireAdminMiddleware(val func(http.Handler) http.Handler) Option {
+	return func(o *Options) {
+		o.RequireAdminMiddleware = val
 	}
 }
 

@@ -158,28 +158,28 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// All users get the user role by default currently.
-	// to all new users for now, as create Account request does not have any role field
-	if g.roleService == nil {
-		// log as error, admin needs to do something about it
-		logger.Error().Str("id", *u.Id).Msg("could not create user: role service not configured")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not assign role to account: roleService not configured")
-		return
-	}
-	if _, err = g.roleService.AssignRoleToUser(r.Context(), &settings.AssignRoleToUserRequest{
-		AccountUuid: *u.Id,
-		RoleId:      settingssvc.BundleUUIDRoleUser,
-	}); err != nil {
-		// log as error, admin eventually needs to do something
-		logger.Error().Err(err).Str("id", *u.Id).Str("role", settingssvc.BundleUUIDRoleUser).Msg("could not create user: role assignment failed")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "role assignment failed")
-		return
+	// assign roles if possible
+	if g.roleService != nil {
+		// All users get the user role by default currently.
+		// to all new users for now, as create Account request does not have any role field
+		if _, err = g.roleService.AssignRoleToUser(r.Context(), &settings.AssignRoleToUserRequest{
+			AccountUuid: *u.Id,
+			RoleId:      settingssvc.BundleUUIDRoleUser,
+		}); err != nil {
+			// log as error, admin eventually needs to do something
+			logger.Error().Err(err).Str("id", *u.Id).Str("role", settingssvc.BundleUUIDRoleUser).Msg("could not create user: role assignment failed")
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "role assignment failed")
+			return
+		}
 	}
 
-	currentUser := revactx.ContextMustGetUser(r.Context())
-	g.publishEvent(events.UserCreated{Executant: currentUser.Id, UserID: *u.Id})
+	e := events.UserCreated{UserID: *u.Id}
+	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
+		e.Executant = currentUser.GetId()
+	}
+	g.publishEvent(e)
 
-	render.Status(r, http.StatusOK)
+	render.Status(r, http.StatusOK) // FIXME 201 should return 201 created
 	render.JSON(w, r, u)
 }
 
@@ -307,65 +307,69 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser := revactx.ContextMustGetUser(r.Context())
-
-	if currentUser.GetId().GetOpaqueId() == user.GetId() {
-		logger.Debug().Msg("could not delete user: self deletion forbidden")
-		errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "self deletion forbidden")
-		return
-	}
-
-	logger.Debug().
-		Str("user", user.GetId()).
-		Msg("calling list spaces with user filter to fetch the personal space for deletion")
-	opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
-	f := listStorageSpacesUserFilter(user.GetId())
-	lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
-		Opaque:  opaque,
-		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
-	})
-	if err != nil {
-		// transport error, log as error
-		logger.Error().Err(err).Msg("could not fetch spaces: transport error")
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not fetch spaces for deletion, aborting")
-		return
-	}
-	for _, sp := range lspr.GetStorageSpaces() {
-		if !(sp.SpaceType == "personal" && sp.Owner.Id.OpaqueId == user.GetId()) {
-			continue
+	e := events.UserDeleted{UserID: user.GetId()}
+	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
+		if currentUser.GetId().GetOpaqueId() == user.GetId() {
+			logger.Debug().Msg("could not delete user: self deletion forbidden")
+			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "self deletion forbidden")
+			return
 		}
-		// TODO: check if request contains a homespace and if, check if requesting user has the privilege to
-		// delete it and make sure it is not deleting its own homespace
-		// needs modification of the cs3api
+		e.Executant = currentUser.GetId()
+	}
 
-		// Deleting a space a two step process (1. disabling/trashing, 2. purging)
-		// Do the "disable/trash" step only if the space is not marked as trashed yet:
-		if _, ok := sp.Opaque.Map["trashed"]; !ok {
+	if g.gatewayClient != nil {
+		logger.Debug().
+			Str("user", user.GetId()).
+			Msg("calling list spaces with user filter to fetch the personal space for deletion")
+		opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
+		f := listStorageSpacesUserFilter(user.GetId())
+		lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
+			Opaque:  opaque,
+			Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
+		})
+		if err != nil {
+			// transport error, log as error
+			logger.Error().Err(err).Msg("could not fetch spaces: transport error")
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not fetch spaces for deletion, aborting")
+			return
+		}
+		for _, sp := range lspr.GetStorageSpaces() {
+			if !(sp.SpaceType == "personal" && sp.Owner.Id.OpaqueId == user.GetId()) {
+				continue
+			}
+			// TODO: check if request contains a homespace and if, check if requesting user has the privilege to
+			// delete it and make sure it is not deleting its own homespace
+			// needs modification of the cs3api
+
+			// Deleting a space a two step process (1. disabling/trashing, 2. purging)
+			// Do the "disable/trash" step only if the space is not marked as trashed yet:
+			if _, ok := sp.Opaque.Map["trashed"]; !ok {
+				_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+					Id: &storageprovider.StorageSpaceId{
+						OpaqueId: sp.Id.OpaqueId,
+					},
+				})
+				if err != nil {
+					logger.Error().Err(err).Msg("could not disable homespace: transport error")
+					errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not disable homespace, aborting")
+					return
+				}
+			}
+			purgeFlag := utils.AppendPlainToOpaque(nil, "purge", "")
 			_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+				Opaque: purgeFlag,
 				Id: &storageprovider.StorageSpaceId{
 					OpaqueId: sp.Id.OpaqueId,
 				},
 			})
 			if err != nil {
-				logger.Error().Err(err).Msg("could not disable homespace: transport error")
-				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not disable homespace, aborting")
+				// transport error, log as error
+				logger.Error().Err(err).Msg("could not delete homespace: transport error")
+				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not delete homespace, aborting")
 				return
 			}
+			break
 		}
-		purgeFlag := utils.AppendPlainToOpaque(nil, "purge", "")
-		_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
-			Opaque: purgeFlag,
-			Id: &storageprovider.StorageSpaceId{
-				OpaqueId: sp.Id.OpaqueId,
-			},
-		})
-		if err != nil {
-			// transport error, log as error
-			logger.Error().Err(err).Msg("could not delete homespace: transport error")
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not delete homespace, aborting")
-			return
-		}
-		break
 	}
 
 	logger.Debug().Str("id", user.GetId()).Msg("calling delete user on backend")
@@ -382,7 +386,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	g.publishEvent(events.UserDeleted{Executant: currentUser.Id, UserID: user.GetId()})
+	g.publishEvent(e)
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
@@ -443,15 +447,16 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser := revactx.ContextMustGetUser(r.Context())
-	g.publishEvent(
-		events.UserFeatureChanged{
-			Executant: currentUser.Id,
-			UserID:    nameOrID,
-			Features:  features,
-		},
-	)
-	render.Status(r, http.StatusOK)
+	e := events.UserFeatureChanged{
+		UserID:   nameOrID,
+		Features: features,
+	}
+	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
+		e.Executant = currentUser.GetId()
+	}
+	g.publishEvent(e)
+
+	render.Status(r, http.StatusOK) // TODO StatusNoContent when prefer=minimal is used
 	render.JSON(w, r, u)
 
 }

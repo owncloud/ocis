@@ -222,7 +222,7 @@ var _ = Describe("Groups", func() {
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
-		It("disallows user create ids", func() {
+		It("disallows group create ids", func() {
 			newGroup = libregraph.NewGroup()
 			newGroup.SetId("disallowed")
 			newGroup.SetDisplayName("New Group")

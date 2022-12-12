@@ -280,6 +280,7 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 			updateNeeded = true
 		}
 	}
+	// TODO implement account disabled/enabled
 
 	if updateNeeded {
 		if err := i.conn.Modify(&mr); err != nil {

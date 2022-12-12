@@ -7,7 +7,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jellydator/ttlcache/v2"
@@ -69,17 +68,9 @@ func NewService(opts ...Option) Service {
 		logger:               &options.Logger,
 		spacePropertiesCache: ttlcache.NewCache(),
 		eventsPublisher:      options.EventsPublisher,
+		gatewayClient:        options.GatewayClient,
 	}
-	if options.GatewayClient == nil {
-		var err error
-		svc.gatewayClient, err = pool.GetGatewayServiceClient(options.Config.Reva.Address, options.Config.Reva.GetRevaOptions()...)
-		if err != nil {
-			options.Logger.Error().Err(err).Msg("Could not get gateway client")
-			return nil
-		}
-	} else {
-		svc.gatewayClient = options.GatewayClient
-	}
+
 	if options.IdentityBackend == nil {
 		switch options.Config.Identity.Backend {
 		case "cs3":
@@ -145,12 +136,6 @@ func NewService(opts ...Option) Service {
 		svc.identityBackend = options.IdentityBackend
 	}
 
-	if options.RoleService == nil {
-		svc.roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
-	} else {
-		svc.roleService = options.RoleService
-	}
-
 	if options.PermissionService == nil {
 		svc.permissionsService = settingssvc.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient())
 	} else {
@@ -167,12 +152,17 @@ func NewService(opts ...Option) Service {
 		m := roles.NewManager(
 			roles.StoreOptions(storeOptions),
 			roles.Logger(options.Logger),
-			roles.RoleService(svc.roleService),
+			roles.RoleService(options.RoleService),
 		)
 		roleManager = &m
 	}
 
-	requireAdmin := graphm.RequireAdmin(roleManager, options.Logger)
+	var requireAdmin func(http.Handler) http.Handler
+	if options.RequireAdminMiddleware == nil {
+		requireAdmin = graphm.RequireAdmin(roleManager, options.Logger)
+	} else {
+		requireAdmin = options.RequireAdminMiddleware
+	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)

@@ -4,16 +4,20 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	stdhttp "net/http"
 	"os"
 
 	"github.com/cs3org/reva/v2/pkg/events/server"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	graphMiddleware "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 	svc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 	"github.com/pkg/errors"
@@ -82,25 +86,49 @@ func Server(opts ...Option) (http.Service, error) {
 		}
 	}
 
-	handle := svc.NewService(
-		svc.Logger(options.Logger),
-		svc.Config(options.Config),
-		svc.Middleware(
-			middleware.TraceContext,
-			chimiddleware.RequestID,
-			middleware.Version(
-				"graph",
-				version.GetString(),
-			),
-			middleware.Logger(
-				options.Logger,
-			),
+	middlewares := []func(stdhttp.Handler) stdhttp.Handler{
+		middleware.TraceContext,
+		chimiddleware.RequestID,
+		middleware.Version(
+			"graph",
+			version.GetString(),
+		),
+		middleware.Logger(
+			options.Logger,
+		),
+	}
+	// how do we secure the api?
+	var requireAdminMiddleware func(stdhttp.Handler) stdhttp.Handler
+	var roleService svc.RoleService
+	var gatewayClient svc.GatewayClient
+	if options.Config.HTTP.APIToken == "" {
+		middlewares = append(middlewares,
 			graphMiddleware.Auth(
 				account.Logger(options.Logger),
 				account.JWTSecret(options.Config.TokenManager.JWTSecret),
-			),
-		),
+			))
+		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
+		gatewayClient, err = pool.GetGatewayServiceClient(options.Config.Reva.Address, options.Config.Reva.GetRevaOptions()...)
+		if err != nil {
+			return http.Service{}, errors.Wrap(err, "could not initialize gateway client")
+		}
+	} else {
+		middlewares = append(middlewares, middleware.Token(options.Config.HTTP.APIToken))
+		// use a dummy admin middleware for the chi router
+		requireAdminMiddleware = func(next stdhttp.Handler) stdhttp.Handler {
+			return next
+		}
+		// no gatewayclient needed
+	}
+
+	handle := svc.NewService(
+		svc.Logger(options.Logger),
+		svc.Config(options.Config),
+		svc.Middleware(middlewares...),
 		svc.EventsPublisher(publisher),
+		svc.WithRoleService(roleService),
+		svc.WithRequireAdminMiddleware(requireAdminMiddleware),
+		svc.WithGatewayClient(gatewayClient),
 	)
 
 	if handle == nil {
