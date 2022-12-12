@@ -37,7 +37,7 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 		cfg.Events.NumConsumers = 1
 	}
 
-	spaceId := func(ref *provider.Reference) *provider.StorageSpaceId {
+	spaceID := func(ref *provider.Reference) *provider.StorageSpaceId {
 		return &provider.StorageSpaceId{
 			OpaqueId: storagespace.FormatResourceID(
 				provider.ResourceId{
@@ -53,30 +53,36 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 			for e := range ch {
 				logger.Debug().Interface("event", e).Msg("updating index")
 
+				var err error
+
 				switch ev := e.(type) {
 				case events.ItemTrashed:
 					s.TrashItem(ev.ID)
-					s.IndexSpace(spaceId(ev.Ref), ev.Executant)
+					err = s.IndexSpace(spaceID(ev.Ref), ev.Executant)
 				case events.ItemMoved:
 					s.MoveItem(ev.Ref, ev.Executant)
-					s.IndexSpace(spaceId(ev.Ref), ev.Executant)
+					err = s.IndexSpace(spaceID(ev.Ref), ev.Executant)
 				case events.ItemRestored:
 					s.RestoreItem(ev.Ref, ev.Executant)
-					s.IndexSpace(spaceId(ev.Ref), ev.Executant)
+					err = s.IndexSpace(spaceID(ev.Ref), ev.Executant)
 				case events.ContainerCreated:
-					s.IndexSpace(spaceId(ev.Ref), ev.Executant)
+					err = s.IndexSpace(spaceID(ev.Ref), ev.Executant)
 				case events.FileTouched:
-					s.IndexSpace(spaceId(ev.Ref), ev.Executant)
+					err = s.IndexSpace(spaceID(ev.Ref), ev.Executant)
 				case events.FileVersionRestored:
-					s.IndexSpace(spaceId(ev.Ref), ev.Executant)
+					err = s.IndexSpace(spaceID(ev.Ref), ev.Executant)
 				case events.TagsAdded:
-					s.IndexSpace(spaceId(ev.Ref), ev.Executant)
+					err = s.IndexSpace(spaceID(ev.Ref), ev.Executant)
 				case events.TagsRemoved:
-					s.IndexSpace(spaceId(ev.Ref), ev.Executant)
+					err = s.IndexSpace(spaceID(ev.Ref), ev.Executant)
 				case events.FileUploaded:
-					s.IndexSpace(spaceId(ev.Ref), ev.Executant)
+					err = s.IndexSpace(spaceID(ev.Ref), ev.Executant)
 				case events.UploadReady:
-					s.IndexSpace(spaceId(ev.FileRef), ev.ExecutingUser.Id)
+					err = s.IndexSpace(spaceID(ev.FileRef), ev.ExecutingUser.Id)
+				}
+
+				if err != nil {
+					logger.Error().Err(err).Interface("event", e)
 				}
 			}
 		}(

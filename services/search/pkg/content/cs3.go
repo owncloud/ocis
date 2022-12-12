@@ -34,13 +34,13 @@ func newCS3Retriever(client gateway.GatewayAPIClient, logger log.Logger, insecur
 
 // Retrieve downloads the file from a cs3 service
 // The caller MUST make sure to close the returned ReadCloser
-func (s cs3) Retrieve(ctx context.Context, rid *provider.ResourceId) (io.ReadCloser, error) {
+func (s cs3) Retrieve(ctx context.Context, rID *provider.ResourceId) (io.ReadCloser, error) {
 	at, ok := contextGet(ctx, revactx.TokenHeader)
 	if !ok {
 		return nil, fmt.Errorf("context without %s", revactx.TokenHeader)
 	}
 
-	res, err := s.gwClient.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: &provider.Reference{ResourceId: rid, Path: "."}})
+	res, err := s.gwClient.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: &provider.Reference{ResourceId: rID, Path: "."}})
 	if err != nil {
 		return nil, err
 	}

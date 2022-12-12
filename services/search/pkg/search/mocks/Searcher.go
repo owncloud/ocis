@@ -18,13 +18,13 @@ type Searcher struct {
 	mock.Mock
 }
 
-// IndexSpace provides a mock function with given fields: rid, uId
-func (_m *Searcher) IndexSpace(rid *providerv1beta1.StorageSpaceId, uId *userv1beta1.UserId) error {
-	ret := _m.Called(rid, uId)
+// IndexSpace provides a mock function with given fields: rID, uID
+func (_m *Searcher) IndexSpace(rID *providerv1beta1.StorageSpaceId, uID *userv1beta1.UserId) error {
+	ret := _m.Called(rID, uID)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(*providerv1beta1.StorageSpaceId, *userv1beta1.UserId) error); ok {
-		r0 = rf(rid, uId)
+		r0 = rf(rID, uID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -32,14 +32,14 @@ func (_m *Searcher) IndexSpace(rid *providerv1beta1.StorageSpaceId, uId *userv1b
 	return r0
 }
 
-// MoveItem provides a mock function with given fields: ref, uid
-func (_m *Searcher) MoveItem(ref *providerv1beta1.Reference, uid *userv1beta1.UserId) {
-	_m.Called(ref, uid)
+// MoveItem provides a mock function with given fields: ref, uID
+func (_m *Searcher) MoveItem(ref *providerv1beta1.Reference, uID *userv1beta1.UserId) {
+	_m.Called(ref, uID)
 }
 
-// RestoreItem provides a mock function with given fields: ref, uid
-func (_m *Searcher) RestoreItem(ref *providerv1beta1.Reference, uid *userv1beta1.UserId) {
-	_m.Called(ref, uid)
+// RestoreItem provides a mock function with given fields: ref, uID
+func (_m *Searcher) RestoreItem(ref *providerv1beta1.Reference, uID *userv1beta1.UserId) {
+	_m.Called(ref, uID)
 }
 
 // Search provides a mock function with given fields: ctx, req
@@ -65,14 +65,14 @@ func (_m *Searcher) Search(ctx context.Context, req *v0.SearchRequest) (*v0.Sear
 	return r0, r1
 }
 
-// TrashItem provides a mock function with given fields: rid
-func (_m *Searcher) TrashItem(rid *providerv1beta1.ResourceId) {
-	_m.Called(rid)
+// TrashItem provides a mock function with given fields: rID
+func (_m *Searcher) TrashItem(rID *providerv1beta1.ResourceId) {
+	_m.Called(rID)
 }
 
-// UpsertItem provides a mock function with given fields: ref, uid
-func (_m *Searcher) UpsertItem(ref *providerv1beta1.Reference, uid *userv1beta1.UserId) {
-	_m.Called(ref, uid)
+// UpsertItem provides a mock function with given fields: ref, uID
+func (_m *Searcher) UpsertItem(ref *providerv1beta1.Reference, uID *userv1beta1.UserId) {
+	_m.Called(ref, uID)
 }
 
 type mockConstructorTestingTNewSearcher interface {

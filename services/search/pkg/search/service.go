@@ -29,14 +29,14 @@ import (
 // Searcher is the interface to the SearchService
 type Searcher interface {
 	Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error)
-	IndexSpace(rid *provider.StorageSpaceId, uId *user.UserId) error
-	TrashItem(rid *provider.ResourceId)
-	UpsertItem(ref *provider.Reference, uid *user.UserId)
-	RestoreItem(ref *provider.Reference, uid *user.UserId)
-	MoveItem(ref *provider.Reference, uid *user.UserId)
+	IndexSpace(rID *provider.StorageSpaceId, uID *user.UserId) error
+	TrashItem(rID *provider.ResourceId)
+	UpsertItem(ref *provider.Reference, uID *user.UserId)
+	RestoreItem(ref *provider.Reference, uID *user.UserId)
+	MoveItem(ref *provider.Reference, uID *user.UserId)
 }
 
-// SearchService is responsible for indexing spaces and pass on a search
+// Service is responsible for indexing spaces and pass on a search
 // to it's underlying engine.
 type Service struct {
 	logger    log.Logger
@@ -202,8 +202,8 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 }
 
 // IndexSpace (re)indexes all resources of a given space.
-func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, uId *user.UserId) error {
-	ownerCtx, err := getAuthContext(&user.User{Id: uId}, s.gateway, s.secret, s.logger)
+func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, uID *user.UserId) error {
+	ownerCtx, err := getAuthContext(&user.User{Id: uID}, s.gateway, s.secret, s.logger)
 	if err != nil {
 		return err
 	}
@@ -249,7 +249,7 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, uId *user.UserId)
 			return nil
 		}
 
-		s.UpsertItem(ref, uId)
+		s.UpsertItem(ref, uID)
 
 		return nil
 	})
@@ -263,15 +263,17 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, uId *user.UserId)
 	return nil
 }
 
-func (s *Service) TrashItem(rid *provider.ResourceId) {
-	err := s.engine.Delete(storagespace.FormatResourceID(*rid))
+// TrashItem marks the item as deleted.
+func (s *Service) TrashItem(rID *provider.ResourceId) {
+	err := s.engine.Delete(storagespace.FormatResourceID(*rID))
 	if err != nil {
-		s.logger.Error().Err(err).Interface("Id", rid).Msg("failed to remove item from index")
+		s.logger.Error().Err(err).Interface("Id", rID).Msg("failed to remove item from index")
 	}
 }
 
-func (s *Service) UpsertItem(ref *provider.Reference, uid *user.UserId) {
-	ctx, stat, path := s.resInfo(uid, ref)
+// UpsertItem indexes or stores Resource data fields.
+func (s *Service) UpsertItem(ref *provider.Reference, uID *user.UserId) {
+	ctx, stat, path := s.resInfo(uID, ref)
 	if ctx == nil || stat == nil || path == "" {
 		return
 	}
@@ -293,9 +295,10 @@ func (s *Service) UpsertItem(ref *provider.Reference, uid *user.UserId) {
 		Type:     uint64(stat.Info.Type),
 		Document: doc,
 	}
+	r.Hidden = strings.HasPrefix(r.Path, ".")
 
-	if parentId := stat.GetInfo().GetParentId(); parentId != nil {
-		r.ParentID = storagespace.FormatResourceID(*parentId)
+	if parentID := stat.GetInfo().GetParentId(); parentID != nil {
+		r.ParentID = storagespace.FormatResourceID(*parentID)
 	}
 
 	if err = s.engine.Upsert(r.ID, r); err != nil {
@@ -305,8 +308,9 @@ func (s *Service) UpsertItem(ref *provider.Reference, uid *user.UserId) {
 	}
 }
 
-func (s *Service) RestoreItem(ref *provider.Reference, uid *user.UserId) {
-	ctx, stat, path := s.resInfo(uid, ref)
+// RestoreItem makes the item available again.
+func (s *Service) RestoreItem(ref *provider.Reference, uID *user.UserId) {
+	ctx, stat, path := s.resInfo(uID, ref)
 	if ctx == nil || stat == nil || path == "" {
 		return
 	}
@@ -316,8 +320,9 @@ func (s *Service) RestoreItem(ref *provider.Reference, uid *user.UserId) {
 	}
 }
 
-func (s *Service) MoveItem(ref *provider.Reference, uid *user.UserId) {
-	ctx, stat, path := s.resInfo(uid, ref)
+// MoveItem updates the resource location and all of its necessary fields.
+func (s *Service) MoveItem(ref *provider.Reference, uID *user.UserId) {
+	ctx, stat, path := s.resInfo(uID, ref)
 	if ctx == nil || stat == nil || path == "" {
 		return
 	}
@@ -327,8 +332,8 @@ func (s *Service) MoveItem(ref *provider.Reference, uid *user.UserId) {
 	}
 }
 
-func (s *Service) resInfo(uid *user.UserId, ref *provider.Reference) (context.Context, *provider.StatResponse, string) {
-	ownerCtx, err := getAuthContext(&user.User{Id: uid}, s.gateway, s.secret, s.logger)
+func (s *Service) resInfo(uID *user.UserId, ref *provider.Reference) (context.Context, *provider.StatResponse, string) {
+	ownerCtx, err := getAuthContext(&user.User{Id: uID}, s.gateway, s.secret, s.logger)
 	if err != nil {
 		return nil, nil, ""
 	}

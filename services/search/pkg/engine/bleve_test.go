@@ -22,8 +22,8 @@ var _ = Describe("Bleve", func() {
 		idx bleve.Index
 		ctx context.Context
 
-		_doSearch = func(id string, query string) (*searchsvc.SearchIndexResponse, error) {
-			rid, err := storagespace.ParseID(id)
+		doSearch = func(id string, query string) (*searchsvc.SearchIndexResponse, error) {
+			rID, err := storagespace.ParseID(id)
 			if err != nil {
 				return nil, err
 			}
@@ -32,16 +32,16 @@ var _ = Describe("Bleve", func() {
 				Query: query,
 				Ref: &searchmsg.Reference{
 					ResourceId: &searchmsg.ResourceID{
-						StorageId: rid.StorageId,
-						SpaceId:   rid.SpaceId,
-						OpaqueId:  rid.OpaqueId,
+						StorageId: rID.StorageId,
+						SpaceId:   rID.SpaceId,
+						OpaqueId:  rID.OpaqueId,
 					},
 				},
 			})
 		}
 
-		_assertDocCount = func(id string, query string, expectedCount int) []*searchmsg.Match {
-			res, err := _doSearch(id, query)
+		assertDocCount = func(id string, query string, expectedCount int) []*searchmsg.Match {
+			res, err := doSearch(id, query)
 
 			ExpectWithOffset(1, err).ToNot(HaveOccurred())
 			ExpectWithOffset(1, len(res.Matches)).To(Equal(expectedCount), "query returned unexpected number of results: "+query)
@@ -103,12 +103,12 @@ var _ = Describe("Bleve", func() {
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				_assertDocCount(rootResource.ID, "Tags:foo", 1)
-				_assertDocCount(rootResource.ID, "Tags:bar", 1)
-				_assertDocCount(rootResource.ID, "Tags:foo Tags:bar", 1)
-				_assertDocCount(rootResource.ID, "Tags:foo Tags:bar Tags:baz", 1)
-				_assertDocCount(rootResource.ID, "Tags:foo Tags:bar Tags:baz", 1)
-				_assertDocCount(rootResource.ID, "Tags:baz", 0)
+				assertDocCount(rootResource.ID, "Tags:foo", 1)
+				assertDocCount(rootResource.ID, "Tags:bar", 1)
+				assertDocCount(rootResource.ID, "Tags:foo Tags:bar", 1)
+				assertDocCount(rootResource.ID, "Tags:foo Tags:bar Tags:baz", 1)
+				assertDocCount(rootResource.ID, "Tags:foo Tags:bar Tags:baz", 1)
+				assertDocCount(rootResource.ID, "Tags:baz", 0)
 			})
 
 			It("finds files by size", func() {
@@ -116,12 +116,12 @@ var _ = Describe("Bleve", func() {
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				_assertDocCount(rootResource.ID, "Size:12345", 1)
-				_assertDocCount(rootResource.ID, "Size:>1000", 1)
-				_assertDocCount(rootResource.ID, "Size:<100000", 1)
-				_assertDocCount(rootResource.ID, "Size:12344", 0)
-				_assertDocCount(rootResource.ID, "Size:<1000", 0)
-				_assertDocCount(rootResource.ID, "Size:>100000", 0)
+				assertDocCount(rootResource.ID, "Size:12345", 1)
+				assertDocCount(rootResource.ID, "Size:>1000", 1)
+				assertDocCount(rootResource.ID, "Size:<100000", 1)
+				assertDocCount(rootResource.ID, "Size:12344", 0)
+				assertDocCount(rootResource.ID, "Size:<1000", 0)
+				assertDocCount(rootResource.ID, "Size:>100000", 0)
 			})
 		})
 
@@ -131,7 +131,7 @@ var _ = Describe("Bleve", func() {
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				_assertDocCount(rootResource.ID, `Name:foo\ o*`, 1)
+				assertDocCount(rootResource.ID, `Name:foo\ o*`, 1)
 			})
 
 			It("finds files by digits in the filename", func() {
@@ -139,17 +139,16 @@ var _ = Describe("Bleve", func() {
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				_assertDocCount(rootResource.ID, "Name:1234*", 1)
+				assertDocCount(rootResource.ID, "Name:1234*", 1)
 			})
 
 			It("filters hidden files", func() {
-				parentResource.Document.Name = "12345.pdf"
-				err := eng.Upsert(parentResource.ID, parentResource)
+				childResource.Hidden = true
+				err := eng.Upsert(childResource.ID, childResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				//TODO: needed?
-				//assertDocCount(rid, "Name:*hidden* +Hidden:T", 1)
-				//assertDocCount(rid, "Name:*hidden* +Hidden:F", 0)
+				assertDocCount(rootResource.ID, "Hidden:T", 1)
+				assertDocCount(rootResource.ID, "Hidden:F", 0)
 			})
 
 			Context("with a file in the root of the space", func() {
@@ -158,8 +157,8 @@ var _ = Describe("Bleve", func() {
 					err := eng.Upsert(parentResource.ID, parentResource)
 					Expect(err).ToNot(HaveOccurred())
 
-					_assertDocCount(rootResource.ID, "Name:foo.pdf", 1)
-					_assertDocCount("9$8!7", "Name:foo.pdf", 0)
+					assertDocCount(rootResource.ID, "Name:foo.pdf", 1)
+					assertDocCount("9$8!7", "Name:foo.pdf", 0)
 				})
 			})
 
@@ -168,8 +167,8 @@ var _ = Describe("Bleve", func() {
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				_assertDocCount(rootResource.ID, "Name:bar.pdf", 1)
-				_assertDocCount(rootResource.ID, "Unknown:field", 0)
+				assertDocCount(rootResource.ID, "Name:bar.pdf", 1)
+				assertDocCount(rootResource.ID, "Unknown:field", 0)
 			})
 
 			It("returns the total number of hits", func() {
@@ -177,7 +176,7 @@ var _ = Describe("Bleve", func() {
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				res, err := _doSearch(rootResource.ID, "Name:bar*")
+				res, err := doSearch(rootResource.ID, "Name:bar*")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res.TotalMatches).To(Equal(int32(1)))
 			})
@@ -190,7 +189,7 @@ var _ = Describe("Bleve", func() {
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				matches := _assertDocCount(rootResource.ID, fmt.Sprintf("Name:%s", parentResource.Name), 1)
+				matches := assertDocCount(rootResource.ID, fmt.Sprintf("Name:%s", parentResource.Name), 1)
 				match := matches[0]
 				Expect(match.Entity.Ref.Path).To(Equal(parentResource.Path))
 				Expect(match.Entity.Name).To(Equal(parentResource.Name))
@@ -212,7 +211,7 @@ var _ = Describe("Bleve", func() {
 					err := eng.Upsert(parentResource.ID, parentResource)
 					Expect(err).ToNot(HaveOccurred())
 
-					_assertDocCount(rootResource.ID, query, 1)
+					assertDocCount(rootResource.ID, query, 1)
 				}
 			})
 
@@ -222,8 +221,8 @@ var _ = Describe("Bleve", func() {
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
-				_assertDocCount(rootResource.ID, "Name:foo*", 1)
-				_assertDocCount(rootResource.ID, "Name:Foo*", 0)
+				assertDocCount(rootResource.ID, "Name:foo*", 1)
+				assertDocCount(rootResource.ID, "Name:Foo*", 0)
 			})
 
 			Context("and an additional file in a subdirectory", func() {
@@ -238,7 +237,7 @@ var _ = Describe("Bleve", func() {
 				It("finds files living deeper in the tree by filename, prefix or substring match", func() {
 					queries := []string{"child.pdf", "child*", "*ld.*"}
 					for _, query := range queries {
-						_assertDocCount(rootResource.ID, query, 1)
+						assertDocCount(rootResource.ID, query, 1)
 					}
 				})
 			})
@@ -283,12 +282,12 @@ var _ = Describe("Bleve", func() {
 			err := eng.Upsert(childResource.ID, childResource)
 			Expect(err).ToNot(HaveOccurred())
 
-			_assertDocCount(rootResource.ID, "Name:*child*", 1)
+			assertDocCount(rootResource.ID, "Name:*child*", 1)
 
 			err = eng.Delete(childResource.ID)
 			Expect(err).ToNot(HaveOccurred())
 
-			_assertDocCount(rootResource.ID, "Name:*child*", 0)
+			assertDocCount(rootResource.ID, "Name:*child*", 0)
 		})
 
 		It("marks a child resources as deleted", func() {
@@ -298,14 +297,14 @@ var _ = Describe("Bleve", func() {
 			err = eng.Upsert(childResource.ID, childResource)
 			Expect(err).ToNot(HaveOccurred())
 
-			_assertDocCount(rootResource.ID, parentResource.Document.Name, 1)
-			_assertDocCount(rootResource.ID, childResource.Document.Name, 1)
+			assertDocCount(rootResource.ID, parentResource.Document.Name, 1)
+			assertDocCount(rootResource.ID, childResource.Document.Name, 1)
 
 			err = eng.Delete(parentResource.ID)
 			Expect(err).ToNot(HaveOccurred())
 
-			_assertDocCount(rootResource.ID, parentResource.Document.Name, 0)
-			_assertDocCount(rootResource.ID, childResource.Document.Name, 0)
+			assertDocCount(rootResource.ID, parentResource.Document.Name, 0)
+			assertDocCount(rootResource.ID, childResource.Document.Name, 0)
 		})
 	})
 
@@ -320,14 +319,14 @@ var _ = Describe("Bleve", func() {
 			err = eng.Delete(parentResource.ID)
 			Expect(err).ToNot(HaveOccurred())
 
-			_assertDocCount(rootResource.ID, parentResource.Name, 0)
-			_assertDocCount(rootResource.ID, childResource.Name, 0)
+			assertDocCount(rootResource.ID, parentResource.Name, 0)
+			assertDocCount(rootResource.ID, childResource.Name, 0)
 
 			err = eng.Restore(parentResource.ID)
 			Expect(err).ToNot(HaveOccurred())
 
-			_assertDocCount(rootResource.ID, parentResource.Name, 1)
-			_assertDocCount(rootResource.ID, childResource.Name, 1)
+			assertDocCount(rootResource.ID, parentResource.Name, 1)
+			assertDocCount(rootResource.ID, childResource.Name, 1)
 		})
 	})
 
@@ -343,9 +342,9 @@ var _ = Describe("Bleve", func() {
 			err = eng.Move(parentResource.ID, parentResource.ParentID, "./my/newname")
 			Expect(err).ToNot(HaveOccurred())
 
-			_assertDocCount(rootResource.ID, parentResource.Name, 0)
+			assertDocCount(rootResource.ID, parentResource.Name, 0)
 
-			matches := _assertDocCount(rootResource.ID, "Name:child.pdf", 1)
+			matches := assertDocCount(rootResource.ID, "Name:child.pdf", 1)
 			Expect(matches[0].Entity.ParentId.OpaqueId).To(Equal("3"))
 			Expect(matches[0].Entity.Ref.Path).To(Equal("./my/newname/child.pdf"))
 		})
@@ -362,13 +361,13 @@ var _ = Describe("Bleve", func() {
 
 			err = eng.Move(parentResource.ID, parentResource.ParentID, "./somewhere/else/newname")
 			Expect(err).ToNot(HaveOccurred())
-			_assertDocCount(rootResource.ID, `parent d!r`, 0)
+			assertDocCount(rootResource.ID, `parent d!r`, 0)
 
-			matches := _assertDocCount(rootResource.ID, "Name:child.pdf", 1)
+			matches := assertDocCount(rootResource.ID, "Name:child.pdf", 1)
 			Expect(matches[0].Entity.ParentId.OpaqueId).To(Equal("3"))
 			Expect(matches[0].Entity.Ref.Path).To(Equal("./somewhere/else/newname/child.pdf"))
 
-			matches = _assertDocCount(rootResource.ID, `newname`, 1)
+			matches = assertDocCount(rootResource.ID, `newname`, 1)
 			Expect(matches[0].Entity.ParentId.OpaqueId).To(Equal("somewhereopaqueid"))
 			Expect(matches[0].Entity.Ref.Path).To(Equal("./somewhere/else/newname"))
 

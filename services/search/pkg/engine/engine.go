@@ -33,6 +33,7 @@ type Resource struct {
 	ParentID string
 	Type     uint64
 	Deleted  bool
+	Hidden   bool
 }
 
 func resourceIDtoSearchID(id storageProvider.ResourceId) *searchMessage.ResourceID {

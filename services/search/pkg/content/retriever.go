@@ -13,7 +13,7 @@ import (
 //
 //go:generate mockery --name=Retriever
 type Retriever interface {
-	Retrieve(ctx context.Context, rid *provider.ResourceId) (io.ReadCloser, error)
+	Retrieve(ctx context.Context, rID *provider.ResourceId) (io.ReadCloser, error)
 }
 
 func contextGet(ctx context.Context, k string) (string, bool) {
