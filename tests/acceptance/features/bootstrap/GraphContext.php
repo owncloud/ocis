@@ -162,7 +162,7 @@ class GraphContext implements Context {
 	public function editUserUsingTheGraphApi(string $byUser, string $user, string $userName = null, string $password = null, string $email = null, string $displayName = null): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
-		$userId = $userId ?: $user;
+		$userId = $userId ?? $user;
 		return GraphHelper::editUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -446,7 +446,7 @@ class GraphContext implements Context {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		$userId = $userId ?: $user;
+		$userId = $userId ?? $user;
 		$response = GraphHelper::editUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
