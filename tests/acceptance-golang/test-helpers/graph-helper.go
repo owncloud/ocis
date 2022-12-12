@@ -6,21 +6,16 @@ import (
 	"strings"
 )
 
-func CreateUser(
+func GetUser(
 	baseUrl string,
 	xRequestId string,
 	adminUser string,
 	adminPassword string,
 	userName string,
-	password string,
-	email string,
-	displayName string,
-) *http.Response {
-	payload := prepareCreateUserPayload(userName, password, email, displayName)
-
-	url := getFullUrl(baseUrl, "users")
-
-	return post(
+) (*http.Response, error) {
+	url := getFullUrl(baseUrl, "users/"+userName)
+	payload := strings.NewReader(``)
+	response, err := get(
 		url,
 		xRequestId,
 		adminUser,
@@ -31,6 +26,46 @@ func CreateUser(
 		nil,
 		false,
 	)
+
+	if err != nil {
+		return nil, err
+
+	} else {
+		return response, nil
+	}
+
+}
+
+func CreateUser(
+	baseUrl string,
+	xRequestId string,
+	adminUser string,
+	adminPassword string,
+	userName string,
+	password string,
+	email string,
+	displayName string,
+) (*http.Response, error) {
+	payload := prepareCreateUserPayload(userName, password, email, displayName)
+
+	url := getFullUrl(baseUrl, "users")
+
+	response, err := post(
+		url,
+		xRequestId,
+		adminUser,
+		adminPassword,
+		getRequestHeaders(),
+		payload,
+		nil,
+		nil,
+		false,
+	)
+	if err != nil {
+		return nil, err
+	} else {
+		return response, nil
+	}
 }
 
 func prepareCreateUserPayload(userName string, password string, email string, displayName string) *strings.Reader {

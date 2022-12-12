@@ -2,7 +2,10 @@ module goAcceptanceTest
 
 go 1.18
 
-require github.com/cucumber/godog v0.12.5
+require (
+	github.com/cucumber/godog v0.12.5
+	github.com/rdumont/assistdog v0.0.0-20201106100018-168b06230d14
+)
 
 require (
 	github.com/cucumber/gherkin-go/v19 v19.0.3 // indirect

@@ -7,6 +7,37 @@ import (
 	"strings"
 )
 
+func get(
+	url string,
+	xRequestId string,
+	user string,
+	password string,
+	headers map[string]string,
+	body *strings.Reader,
+	config []string,
+	cookies []string,
+	stream bool,
+) (*http.Response, error) {
+	response, err := sendRequest(
+		url,
+		xRequestId,
+		"GET",
+		user,
+		password,
+		headers,
+		body,
+		config,
+		cookies,
+		stream,
+		0,
+		nil)
+	if err != nil {
+		return nil, err
+	} else {
+		return response, nil
+	}
+}
+
 func post(
 	url string,
 	xRequestId string,
@@ -17,8 +48,8 @@ func post(
 	config []string,
 	cookies []string,
 	stream bool,
-) *http.Response {
-	response := sendRequest(
+) (*http.Response, error) {
+	response, err := sendRequest(
 		url,
 		xRequestId,
 		"POST",
@@ -31,7 +62,11 @@ func post(
 		stream,
 		0,
 		nil)
-	return response
+	if err != nil {
+		return nil, err
+	} else {
+		return response, nil
+	}
 }
 
 func sendRequest(
@@ -46,7 +81,7 @@ func sendRequest(
 	cookies []string,
 	stream bool,
 	timeout int,
-	client *http.Client) *http.Response {
+	client *http.Client) (*http.Response, error) {
 	if client == nil {
 		client = createClient(
 			user,
@@ -70,11 +105,11 @@ func sendRequest(
 
 	if err != nil {
 		fmt.Println(err)
+		return nil, err
 	}
 
 	defer response.Body.Close()
-
-	return response
+	return response, nil
 }
 
 func createClient(
@@ -88,8 +123,7 @@ func createClient(
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	}
-	// ClientAuth
-	// options := make(map[string]string)
+	// options for the client go here
 	client := &http.Client{Transport: tr}
 	return client
 }
@@ -110,7 +144,13 @@ func createRequest(
 
 	request.SetBasicAuth(GetAdminUsername(), GetAdminPassword())
 
-	request.Header.Add("Content-Type", headers["Content-Type"])
-	request.Header.Add("X-Request-Id", xRequestId)
+	if headers == nil {
+		headers = make(map[string]string)
+	} else {
+		request.Header.Add("Content-Type", headers["Content-Type"])
+	}
+	if xRequestId != "" {
+		request.Header.Add("X-Request-Id", xRequestId)
+	}
 	return request
 }

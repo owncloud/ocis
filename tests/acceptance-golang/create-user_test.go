@@ -10,13 +10,14 @@ import (
 	setupHelper "goAcceptanceTest/test-helpers"
 
 	"github.com/cucumber/godog"
+	"github.com/rdumont/assistdog"
 )
 
 var statusCode int
 var responseBody string
 
 func adminCreatesUser(username, password, email, displayName string) error {
-	response := graphHelper.CreateUser(
+	response, err := graphHelper.CreateUser(
 		setupHelper.GetBaseUrl(),
 		"",
 		"",
@@ -27,16 +28,45 @@ func adminCreatesUser(username, password, email, displayName string) error {
 		displayName,
 	)
 
+	if err != nil {
+		return err
+	}
 	statusCode = response.StatusCode
 	json.NewDecoder(response.Body).Decode(&responseBody)
 	return nil
 }
 
-func theAdministratorCreatesUserUsingTheGraphAPIWithTheFollowingSettings() error {
-	username := "alice"
-	password := "123456"
-	email := "alice@example.com"
-	displayName := "Alice Hansen"
+func userExists(username string) bool {
+	response, err := graphHelper.GetUser(
+		setupHelper.GetBaseUrl(),
+		"",
+		"",
+		"",
+		username,
+	)
+	statusCode = response.StatusCode
+
+	if err != nil {
+		return false
+	}
+
+	if statusCode >= 400 {
+		return false
+	}
+	return true
+}
+
+func theAdministratorCreatesUserUsingTheGraphAPIWithTheFollowingSettings(table *godog.Table) error {
+
+	assist := assistdog.NewDefault()
+	userInfo, err := assist.ParseMap(table)
+	if err != nil {
+		return err
+	}
+	username := userInfo["userName"]
+	password := userInfo["password"]
+	email := userInfo["email"]
+	displayName := userInfo["displayName"]
 	adminCreatesUser(username, password, email, displayName)
 	return nil
 }
@@ -50,7 +80,9 @@ func theHTTPStatusCodeShouldBe(expectedStatusCode string) error {
 }
 
 func userShouldExist(username string) error {
-	// TODO Implement
+	if !userExists(username) {
+		return fmt.Errorf("User '%s' should exist but does not exist", username)
+	}
 	return nil
 }
 
