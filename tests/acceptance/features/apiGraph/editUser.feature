@@ -31,7 +31,7 @@ Feature: edit user
 
 
   Scenario: the admin user cannot clear an existing user email
-    When the user "Alice" changes the email of user "Brian" to "" using the Graph API
+    When the user "Alice" tries to change the email of user "Brian" to "" using the Graph API
     Then the HTTP status code should be "400"
     And the user "Brian" should have information with these key and value pairs:
       | key  | value             |
@@ -40,7 +40,7 @@ Feature: edit user
 
   Scenario Outline: a normal user should not be able to change their email address
     Given the administrator has given "Brian" the role "<role>" using the settings api
-    When the user "Brian" changes the email of user "Brian" to "newemail@example.com" using the Graph API
+    When the user "Brian" tries to change the email of user "Brian" to "newemail@example.com" using the Graph API
     Then the HTTP status code should be "401"
     And the user "Brian" should have information with these key and value pairs:
       | key  | value             |
@@ -78,7 +78,7 @@ Feature: edit user
 
 
   Scenario: the admin user cannot clear another user display name
-    When the user "Alice" changes the display name of user "Brian" to "" using the Graph API
+    When the user "Alice" tries to change the display name of user "Brian" to "" using the Graph API
     Then the HTTP status code should be "400"
     And the user "Brian" should have information with these key and value pairs:
       | key         | value        |
@@ -87,7 +87,7 @@ Feature: edit user
 
   Scenario Outline: a normal user should not be able to change his/her own display name
     Given the administrator has given "Brian" the role "<role>" using the settings api
-    When the user "Brian" changes the display name of user "Brian" to "Brian Murphy" using the Graph API
+    When the user "Brian" tries to change the display name of user "Brian" to "Brian Murphy" using the Graph API
     Then the HTTP status code should be "401"
     And the user "Alice" should have information with these key and value pairs:
       | key         | value        |
