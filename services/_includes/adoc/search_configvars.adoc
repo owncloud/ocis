@@ -177,24 +177,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the grpc services.
 
-a|`SEARCH_DATA_PATH` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++~/.ocis/search ++
-a| [subs=-attributes]
-The directory where the filesystem storage will store search data. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/search.
-
-a|`SEARCH_REINDEX_DEBOUNCE_DURATION` +
-
-a| [subs=-attributes]
-++int ++
-a| [subs=-attributes]
-++1000 ++
-a| [subs=-attributes]
-The duration in milliseconds the reindex debouncer waits before triggering a reindex of a space that was modified.
-
 a|`REVA_GATEWAY` +
 
 a| [subs=-attributes]
@@ -258,14 +240,33 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
 
-a|`SEARCH_EVENTS_GROUP` +
+a|`STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
+`SEARCH_EVENTS_ASYNC_UPLOADS` +
 
 a| [subs=-attributes]
-++string ++
+++bool ++
 a| [subs=-attributes]
-++search ++
+++false ++
 a| [subs=-attributes]
-The customer group of the service. One group will only get one copy of an event
+Enable asynchronous file uploads.
+
+a|`SEARCH_EVENTS_NUM_CONSUMERS` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+number of event consumers per service instance
+
+a|`SEARCH_EVENTS_REINDEX_DEBOUNCE_DURATION` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1000 ++
+a| [subs=-attributes]
+The duration in milliseconds the reindex debouncer waits before triggering a reindex of a space that was modified.
 
 a|`OCIS_INSECURE` +
 `SEARCH_EVENTS_TLS_INSECURE` +
@@ -295,6 +296,52 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+
+a|`SEARCH_ENGINE_TYPE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++bleve ++
+a| [subs=-attributes]
+Defines which search engine to use.
+
+a|`SEARCH_ENGINE_BLEVE_DATA_PATH` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++~/.ocis/search ++
+a| [subs=-attributes]
+Path for the search persistence directory.
+
+a|`SEARCH_EXTRACTOR_TYPE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++basic ++
+a| [subs=-attributes]
+Defines the content extraction engine.
+
+a|`OCIS_INSECURE` +
+`SEARCH_EXTRACTOR_CS3SOURCE_INSECURE` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Ignore untrusted SSL certificates when connecting to the CS3 source.
+
+a|`SEARCH_EXTRACTOR_TIKA_TIKA_URL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++http://127.0.0.1:9998 ++
+a| [subs=-attributes]
+URL of the tika server.
 
 a|`OCIS_MACHINE_AUTH_API_KEY` +
 `SEARCH_MACHINE_AUTH_API_KEY` +

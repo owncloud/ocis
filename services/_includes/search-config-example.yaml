@@ -22,8 +22,6 @@ grpc:
     enabled: false
     cert: ""
     key: ""
-data_path: ~/.ocis/search
-debounce_duration: 1000
 reva:
   address: 127.0.0.1:9142
   tls:
@@ -35,8 +33,19 @@ grpc_client_tls:
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster
-  group: search
+  async_uploads: false
+  num_consumers: 0
+  debounce_duration: 1000
   tls_insecure: false
   tls_root_ca_certificate: ""
   enable_tls: false
+engine:
+  type: bleve
+  bleve:
+    data_path: ~/.ocis/search
+extractor:
+  type: basic
+  cs3_allow_insecure: false
+  tika:
+    tika_url: http://127.0.0.1:9998
 machine_auth_api_key: ""
