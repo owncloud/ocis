@@ -9,7 +9,6 @@ import (
 )
 
 // SpaceDebouncer debounces operations on spaces for a configurable amount of time
-
 type SpaceDebouncer struct {
 	after      time.Duration
 	f          func(id *provider.StorageSpaceId, userID *user.UserId)
