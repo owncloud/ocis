@@ -12,9 +12,9 @@ Output:
 - The generated adoc files can be found at: `docs/services/_includes/adoc` when running locally respectively in the docs branch after the CI has finished.
 - The file name for rouge envvars is named: `global_configvars.adoc`.
 
-Doc process:
+Admin doc process:
 
-Whenever a build from the admin documentation is triggered, the files are included into the build process and added in a proper manner defined by the admin documentation.
+Whenever a build from the admin documentation is triggered, the files generated here are included into the build process and added in a proper manner defined by the admin documentation.
 
 Genreal info:
 
