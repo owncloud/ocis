@@ -25,6 +25,7 @@ var _ = Describe("Basic", func() {
 	Describe("extract", func() {
 		It("basic fields", func() {
 			ri := &storageProvider.ResourceInfo{
+				Name:     "bar.pdf",
 				Path:     "./foo/bar.pdf",
 				Size:     1024,
 				MimeType: "application/pdf",
@@ -34,7 +35,7 @@ var _ = Describe("Basic", func() {
 
 			Expect(err).To(BeNil())
 			Expect(doc).ToNot(BeNil())
-			Expect(doc.Name).To(Equal(ri.Path))
+			Expect(doc.Name).To(Equal(ri.Name))
 			Expect(doc.Size).To(Equal(ri.Size))
 			Expect(doc.MimeType).To(Equal(ri.MimeType))
 		})

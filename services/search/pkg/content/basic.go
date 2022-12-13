@@ -22,7 +22,7 @@ func NewBasicExtractor(logger log.Logger) (*Basic, error) {
 // Extract literally just rearranges the inputs and processes them into a Document.
 func (b Basic) Extract(_ context.Context, ri *storageProvider.ResourceInfo) (Document, error) {
 	doc := Document{
-		Name:     ri.Path,
+		Name:     ri.Name,
 		Size:     ri.Size,
 		MimeType: ri.MimeType,
 	}

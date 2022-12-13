@@ -158,7 +158,7 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 		return nil, err
 	}
 
-	matches := []*searchMessage.Match{}
+	matches := make([]*searchMessage.Match, 0, len(res.Hits))
 	for _, hit := range res.Hits {
 		rootID, err := storagespace.ParseID(getValue[string](hit.Fields, "RootID"))
 		if err != nil {

@@ -24,7 +24,7 @@ func newCS3Retriever(client gateway.GatewayAPIClient, logger log.Logger, insecur
 	return cs3{
 		httpClient: http.Client{
 			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure},
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}, //nolint:gosec
 			},
 		},
 		gwClient: client,
@@ -59,7 +59,7 @@ func (s cs3) Retrieve(ctx context.Context, rID *provider.ResourceId) (io.ReadClo
 		ep, tt = res.Protocols[0].DownloadEndpoint, res.Protocols[0].Token
 	}
 
-	req, err := http.NewRequest("GET", ep, nil)
+	req, err := http.NewRequest(http.MethodGet, ep, nil)
 	if err != nil {
 		return nil, err
 	}

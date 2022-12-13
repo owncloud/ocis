@@ -10,6 +10,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 )
 
+var queryEscape = regexp.MustCompile(`([` + regexp.QuoteMeta(`+=&|><!(){}[]^\"~*?:\/`) + `\-\s])`)
+
 //go:generate mockery --name=Engine
 
 // Engine is the interface to the search engine
@@ -44,8 +46,7 @@ func resourceIDtoSearchID(id storageProvider.ResourceId) *searchMessage.Resource
 }
 
 func escapeQuery(s string) string {
-	re := regexp.MustCompile(`([` + regexp.QuoteMeta(`+=&|><!(){}[]^\"~*?:\/`) + `\-\s])`)
-	return re.ReplaceAllString(s, "\\$1")
+	return queryEscape.ReplaceAllString(s, "\\$1")
 }
 
 func getValue[T any](m map[string]interface{}, key string) (out T) {

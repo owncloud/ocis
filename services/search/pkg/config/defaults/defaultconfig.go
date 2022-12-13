@@ -1,7 +1,7 @@
 package defaults
 
 import (
-	"path"
+	"path/filepath"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -33,7 +33,7 @@ func DefaultConfig() *config.Config {
 		Engine: config.Engine{
 			Type: "bleve",
 			Bleve: config.EngineBleve{
-				Datapath: path.Join(defaults.BaseDataPath(), "search"),
+				Datapath: filepath.Join(defaults.BaseDataPath(), "search"),
 			},
 		},
 		Extractor: config.Extractor{

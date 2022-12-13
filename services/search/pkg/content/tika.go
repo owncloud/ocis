@@ -33,7 +33,7 @@ func NewTikaExtractor(gw gateway.GatewayAPIClient, logger log.Logger, cfg *confi
 	if err != nil {
 		return nil, err
 	}
-	logger.Info().Msg(fmt.Sprintf("Tika version: %s", tkv))
+	logger.Info().Msgf("Tika version: %s", tkv)
 
 	return &Tika{
 		Basic:     basic,
