@@ -46,7 +46,8 @@ OCIS_MODULES = \
 	services/web \
 	services/webdav\
 	ocis \
-	ocis-pkg
+	ocis-pkg \
+	docs
 
 # bin file definitions
 PHP_CS_FIXER=php -d zend.enable_gc=0 vendor-bin/owncloud-codestyle/vendor/bin/php-cs-fixer

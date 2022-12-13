@@ -9,7 +9,6 @@ help:
 .PHONY: docs-generate
 docs-generate: ## run docs-generate for all oCIS services
 	@pushd helpers && go run .; popd
-	@$(MAKE) --no-print-directory -C ../ docs-generate
 
 .PHONY: docs-init
 docs-init:
