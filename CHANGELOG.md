@@ -1,3 +1,13 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v2.0.0...master
+
+## Summary
+
+* Enhancement - Add global env variable extractor: [#4916](https://github.com/owncloud/ocis/issues/4916)
+
 # Changelog for [2.0.0] (2022-11-30)
 
 The following sections list the changes for 2.0.0.
