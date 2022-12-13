@@ -46,8 +46,7 @@ OCIS_MODULES = \
 	services/web \
 	services/webdav\
 	ocis \
-	ocis-pkg \
-	docs
+	ocis-pkg
 
 # bin file definitions
 PHP_CS_FIXER=php -d zend.enable_gc=0 vendor-bin/owncloud-codestyle/vendor/bin/php-cs-fixer
@@ -147,6 +146,7 @@ docs-generate:
 	@for mod in $(OCIS_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod docs-generate || exit 1; \
     done
+	$(MAKE) --no-print-directory -C docs docs-generate || exit 1
 
 .PHONY: ci-go-generate
 ci-go-generate:
