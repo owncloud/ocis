@@ -40,6 +40,8 @@ type LDAP struct {
 	groupScope        int
 	groupAttributeMap groupAttributeMap
 
+	educationConfig educationConfig
+
 	logger *log.Logger
 	conn   ldap.Client
 }
@@ -90,6 +92,11 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		return nil, fmt.Errorf("error configuring group scope: %w", err)
 	}
 
+	var educationConfig educationConfig
+	if educationConfig, err = newEducationConfig(config); err != nil {
+		return nil, fmt.Errorf("error setting up education resource config: %w", err)
+	}
+
 	return &LDAP{
 		useServerUUID:     config.UseServerUUID,
 		usePwModifyExOp:   config.UsePasswordModExOp,
@@ -103,6 +110,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		groupObjectClass:  config.GroupObjectClass,
 		groupScope:        groupScope,
 		groupAttributeMap: gam,
+		educationConfig:   educationConfig,
 		logger:            logger,
 		conn:              lc,
 		writeEnabled:      config.WriteEnabled,
