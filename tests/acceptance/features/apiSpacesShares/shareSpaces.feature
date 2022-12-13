@@ -169,7 +169,7 @@ Feature: Share spaces
       | viewer | editor   |
 
 
-  Scenario Outline: A user share a space to group with any role
+  Scenario Outline: A user shares a space with a group
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using GraphApi
     And the administrator has added a user "Bob" to the group "group2" using GraphApi
