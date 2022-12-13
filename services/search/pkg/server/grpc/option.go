@@ -6,7 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 	"github.com/owncloud/ocis/v2/services/search/pkg/metrics"
-	svc "github.com/owncloud/ocis/v2/services/search/pkg/service/v0"
+	svc "github.com/owncloud/ocis/v2/services/search/pkg/service/grpc/v0"
 	"github.com/urfave/cli/v2"
 )
 

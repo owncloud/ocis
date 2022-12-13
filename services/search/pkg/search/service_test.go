@@ -1,38 +1,36 @@
-package provider_test
+package search_test
 
 import (
 	"context"
-	"time"
-
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/mock"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
-	"github.com/owncloud/ocis/v2/services/search/pkg/search/mocks"
-	provider "github.com/owncloud/ocis/v2/services/search/pkg/search/provider"
+	"github.com/owncloud/ocis/v2/services/search/pkg/config"
+	"github.com/owncloud/ocis/v2/services/search/pkg/content"
+	contentMocks "github.com/owncloud/ocis/v2/services/search/pkg/content/mocks"
+	engineMocks "github.com/owncloud/ocis/v2/services/search/pkg/engine/mocks"
+	"github.com/owncloud/ocis/v2/services/search/pkg/search"
+	"github.com/stretchr/testify/mock"
 )
 
 var _ = Describe("Searchprovider", func() {
 	var (
-		p           *provider.Provider
-		gwClient    *cs3mocks.GatewayAPIClient
-		indexClient *mocks.IndexClient
-
-		ctx        context.Context
-		eventsChan chan interface{}
-
-		logger = log.NewLogger()
-		user   = &userv1beta1.User{
+		s           search.Searcher
+		extractor   *contentMocks.Extractor
+		gw          *cs3mocks.GatewayAPIClient
+		indexClient *engineMocks.Engine
+		ctx         context.Context
+		logger      = log.NewLogger()
+		user        = &userv1beta1.User{
 			Id: &userv1beta1.UserId{
 				OpaqueId: "user",
 			},
@@ -61,29 +59,33 @@ var _ = Describe("Searchprovider", func() {
 				StorageId: "storageid",
 				OpaqueId:  "opaqueid",
 			},
+			ParentId: &sprovider.ResourceId{
+				StorageId: "storageid",
+				OpaqueId:  "parentopaqueid",
+			},
 			Path:  "foo.pdf",
 			Size:  12345,
-			Mtime: utils.TimeToTS(time.Now().Add(-time.Hour)),
+			Mtime: &typesv1beta1.Timestamp{Seconds: 4000},
 		}
 	)
 
 	BeforeEach(func() {
 		ctx = context.Background()
-		eventsChan = make(chan interface{})
-		gwClient = &cs3mocks.GatewayAPIClient{}
-		indexClient = &mocks.IndexClient{}
+		gw = &cs3mocks.GatewayAPIClient{}
+		indexClient = &engineMocks.Engine{}
+		extractor = &contentMocks.Extractor{}
 
-		p = provider.New(gwClient, indexClient, "", eventsChan, 1000, logger)
+		s = search.NewService(gw, indexClient, extractor, logger, &config.Config{})
 
-		gwClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
+		gw.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{
 			Status: status.NewOK(ctx),
 			Token:  "authtoken",
 		}, nil)
-		gwClient.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
+		gw.On("Stat", mock.Anything, mock.Anything).Return(&sprovider.StatResponse{
 			Status: status.NewOK(context.Background()),
 			Info:   ri,
 		}, nil)
-		gwClient.On("GetPath", mock.Anything, mock.MatchedBy(func(req *sprovider.GetPathRequest) bool {
+		gw.On("GetPath", mock.Anything, mock.MatchedBy(func(req *sprovider.GetPathRequest) bool {
 			return req.ResourceId.OpaqueId == ri.Id.OpaqueId
 		})).Return(&sprovider.GetPathResponse{
 			Status: status.NewOK(context.Background()),
@@ -94,34 +96,29 @@ var _ = Describe("Searchprovider", func() {
 
 	Describe("New", func() {
 		It("returns a new instance", func() {
-			p := provider.New(gwClient, indexClient, "", eventsChan, 1000, logger)
-			Expect(p).ToNot(BeNil())
+			s := search.NewService(gw, indexClient, extractor, logger, &config.Config{})
+			Expect(s).ToNot(BeNil())
 		})
 	})
 
 	Describe("IndexSpace", func() {
 		It("walks the space and indexes all files", func() {
-			gwClient.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
+			gw.On("GetUserByClaim", mock.Anything, mock.Anything).Return(&userv1beta1.GetUserByClaimResponse{
 				Status: status.NewOK(context.Background()),
 				User:   user,
 			}, nil)
-			indexClient.On("Add", mock.Anything, mock.MatchedBy(func(riToIndex *sprovider.ResourceInfo) bool {
-				return riToIndex.Id.OpaqueId == ri.Id.OpaqueId
-			})).Return(nil)
+			extractor.On("Extract", mock.Anything, mock.Anything, mock.Anything).Return(content.Document{}, nil)
+			indexClient.On("Upsert", mock.Anything, mock.Anything).Return(nil)
 			indexClient.On("Search", mock.Anything, mock.Anything).Return(&searchsvc.SearchIndexResponse{}, nil)
 
-			res, err := p.IndexSpace(ctx, &searchsvc.IndexSpaceRequest{
-				SpaceId: "storageid$spaceid!spaceid",
-				UserId:  "user",
-			})
-			Expect(err).ToNot(HaveOccurred())
-			Expect(res).ToNot(BeNil())
+			err := s.IndexSpace(&sprovider.StorageSpaceId{OpaqueId: "storageid$spaceid!spaceid"}, user.Id)
+			Expect(err).ShouldNot(HaveOccurred())
 		})
 	})
 
 	Describe("Search", func() {
 		It("fails when an empty query is given", func() {
-			res, err := p.Search(ctx, &searchsvc.SearchRequest{
+			res, err := s.Search(ctx, &searchsvc.SearchRequest{
 				Query: "",
 			})
 			Expect(err).To(HaveOccurred())
@@ -130,7 +127,7 @@ var _ = Describe("Searchprovider", func() {
 
 		Context("with a personal space", func() {
 			BeforeEach(func() {
-				gwClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
+				gw.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
 					StorageSpaces: []*sprovider.StorageSpace{personalSpace},
 				}, nil)
@@ -159,52 +156,18 @@ var _ = Describe("Searchprovider", func() {
 				}, nil)
 			})
 
-			It("lowercases the filename", func() {
-				p.Search(ctx, &searchsvc.SearchRequest{
-					Query: "Foo.pdf",
-				})
-				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
-					return req.Query == "Name:*foo.pdf*"
-				}))
-			})
-
 			It("does not mess with field-based searches", func() {
-				p.Search(ctx, &searchsvc.SearchRequest{
+				_, err := s.Search(ctx, &searchsvc.SearchRequest{
 					Query: "Size:<10",
 				})
+				Expect(err).ToNot(HaveOccurred())
 				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
 					return req.Query == "Size:<10"
 				}))
 			})
 
-			It("uppercases field names", func() {
-				tests := []struct {
-					Original string
-					Expected string
-				}{
-					{Original: "size:<100", Expected: "Size:<100"},
-				}
-				for _, test := range tests {
-					p.Search(ctx, &searchsvc.SearchRequest{
-						Query: test.Original,
-					})
-					indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
-						return req.Query == test.Expected
-					}))
-				}
-			})
-
-			It("escapes special characters", func() {
-				p.Search(ctx, &searchsvc.SearchRequest{
-					Query: "Foo oo.pdf",
-				})
-				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
-					return req.Query == `Name:*foo\ oo.pdf*`
-				}))
-			})
-
 			It("searches the personal user space", func() {
-				res, err := p.Search(ctx, &searchsvc.SearchRequest{
+				res, err := s.Search(ctx, &searchsvc.SearchRequest{
 					Query: "foo",
 				})
 				Expect(err).ToNot(HaveOccurred())
@@ -216,10 +179,6 @@ var _ = Describe("Searchprovider", func() {
 				Expect(match.Entity.Name).To(Equal("Foo.pdf"))
 				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(personalSpace.Root.OpaqueId))
 				Expect(match.Entity.Ref.Path).To(Equal("./path/to/Foo.pdf"))
-
-				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
-					return req.Query == "Name:*foo*" && req.Ref.ResourceId.OpaqueId == personalSpace.Root.OpaqueId && req.Ref.Path == ""
-				}))
 			})
 		})
 
@@ -251,14 +210,14 @@ var _ = Describe("Searchprovider", func() {
 						},
 					},
 				}
-				gwClient.On("GetPath", mock.Anything, mock.Anything).Return(&sprovider.GetPathResponse{
+				gw.On("GetPath", mock.Anything, mock.Anything).Return(&sprovider.GetPathResponse{
 					Status: status.NewOK(ctx),
 					Path:   "/grant/path",
 				}, nil)
 			})
 
 			It("searches the received spaces", func() {
-				gwClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
+				gw.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
 					Status:        status.NewOK(ctx),
 					StorageSpaces: []*sprovider.StorageSpace{grantSpace, mountpointSpace},
 				}, nil)
@@ -285,7 +244,7 @@ var _ = Describe("Searchprovider", func() {
 					},
 				}, nil)
 
-				res, err := p.Search(ctx, &searchsvc.SearchRequest{
+				res, err := s.Search(ctx, &searchsvc.SearchRequest{
 					Query: "Foo",
 				})
 				Expect(err).ToNot(HaveOccurred())
@@ -296,15 +255,11 @@ var _ = Describe("Searchprovider", func() {
 				Expect(match.Entity.Name).To(Equal("Shared.pdf"))
 				Expect(match.Entity.Ref.ResourceId.OpaqueId).To(Equal(mountpointSpace.Root.OpaqueId))
 				Expect(match.Entity.Ref.Path).To(Equal("./to/Shared.pdf"))
-
-				indexClient.AssertCalled(GinkgoT(), "Search", mock.Anything, mock.MatchedBy(func(req *searchsvc.SearchIndexRequest) bool {
-					return req.Query == "Name:*foo*" && req.Ref.ResourceId.StorageId == grantSpace.Root.StorageId && req.Ref.Path == "./grant/path"
-				}))
 			})
 
 			Context("when searching both spaces", func() {
 				BeforeEach(func() {
-					gwClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
+					gw.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&sprovider.ListStorageSpacesResponse{
 						Status:        status.NewOK(ctx),
 						StorageSpaces: []*sprovider.StorageSpace{personalSpace, grantSpace, mountpointSpace},
 					}, nil)
@@ -381,7 +336,7 @@ var _ = Describe("Searchprovider", func() {
 				})
 
 				It("considers the search Ref parameter", func() {
-					res, err := p.Search(ctx, &searchsvc.SearchRequest{
+					res, err := s.Search(ctx, &searchsvc.SearchRequest{
 						Query: "foo",
 						Ref: &searchmsg.Reference{
 							ResourceId: &searchmsg.ResourceID{
@@ -398,7 +353,7 @@ var _ = Describe("Searchprovider", func() {
 				})
 
 				It("finds matches in both the personal space AND the grant", func() {
-					res, err := p.Search(ctx, &searchsvc.SearchRequest{
+					res, err := s.Search(ctx, &searchsvc.SearchRequest{
 						Query: "foo",
 					})
 					Expect(err).ToNot(HaveOccurred())
@@ -409,7 +364,7 @@ var _ = Describe("Searchprovider", func() {
 				})
 
 				It("sorts and limits the combined results from all spaces", func() {
-					res, err := p.Search(ctx, &searchsvc.SearchRequest{
+					res, err := s.Search(ctx, &searchsvc.SearchRequest{
 						Query:    "foo",
 						PageSize: 2,
 					})
