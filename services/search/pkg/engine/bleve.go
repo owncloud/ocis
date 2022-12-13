@@ -213,12 +213,12 @@ func (b *Bleve) Move(id string, parentid string, target string) error {
 	if err != nil {
 		return err
 	}
-	oldName := r.Path
-	newName := utils.MakeRelativePath(target)
+	currentPath := r.Path
+	nextPath := utils.MakeRelativePath(target)
 
 	r, err = b.updateEntity(id, func(r *Resource) {
-		r.Path = newName
-		r.Name = path.Base(newName)
+		r.Path = nextPath
+		r.Name = path.Base(nextPath)
 		r.ParentID = parentid
 	})
 	if err != nil {
@@ -228,7 +228,7 @@ func (b *Bleve) Move(id string, parentid string, target string) error {
 	if r.Type == uint64(storageProvider.ResourceType_RESOURCE_TYPE_CONTAINER) {
 		q := bleve.NewConjunctionQuery(
 			bleve.NewQueryStringQuery("RootID:"+r.RootID),
-			bleve.NewQueryStringQuery("Path:"+escapeQuery(oldName+"/*")),
+			bleve.NewQueryStringQuery("Path:"+escapeQuery(currentPath+"/*")),
 		)
 		bleveReq := bleve.NewSearchRequest(q)
 		bleveReq.Size = math.MaxInt
@@ -240,7 +240,7 @@ func (b *Bleve) Move(id string, parentid string, target string) error {
 
 		for _, h := range res.Hits {
 			_, err := b.updateEntity(h.ID, func(r *Resource) {
-				r.Path = strings.Replace(r.Path, oldName, newName, 1)
+				r.Path = strings.Replace(r.Path, currentPath, nextPath, 1)
 			})
 			if err != nil {
 				return err
@@ -297,9 +297,11 @@ func (b *Bleve) getResource(id string) (*Resource, error) {
 		Deleted:  getValue[bool](fields, "Deleted"),
 		Document: content.Document{
 			Name:     getValue[string](fields, "Name"),
+			Title:    getValue[string](fields, "Title"),
 			Size:     uint64(getValue[float64](fields, "Size")),
 			Mtime:    getValue[string](fields, "Mtime"),
 			MimeType: getValue[string](fields, "MimeType"),
+			Content:  getValue[string](fields, "Content"),
 			//Tags:     getSliceValue[string](fields, "Tags"),
 		},
 	}, nil

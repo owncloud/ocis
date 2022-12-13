@@ -6,7 +6,7 @@ import (
 
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
-	searchSearvice "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
+	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
 )
 
@@ -16,7 +16,7 @@ var queryEscape = regexp.MustCompile(`([` + regexp.QuoteMeta(`+=&|><!(){}[]^\"~*
 
 // Engine is the interface to the search engine
 type Engine interface {
-	Search(ctx context.Context, req *searchSearvice.SearchIndexRequest) (*searchSearvice.SearchIndexResponse, error)
+	Search(ctx context.Context, req *searchService.SearchIndexRequest) (*searchService.SearchIndexResponse, error)
 	Upsert(id string, r Resource) error
 	Move(id string, parentid string, target string) error
 	Delete(id string) error
