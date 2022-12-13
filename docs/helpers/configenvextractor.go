@@ -17,7 +17,8 @@ var targets = map[string]string{
 	"environment-variable-docs-generator.go.tmpl": "output/env/environment-variable-docs-generator.go",
 }
 
-func main() {
+// RenderTemplates does something with templates
+func RenderTemplates() {
 	fmt.Println("Getting relevant packages")
 	paths, err := filepath.Glob("../../services/*/pkg/config/defaults/defaultconfig.go")
 	if err != nil {
@@ -32,14 +33,14 @@ func main() {
 	}
 
 	for template, output := range targets {
-		GenerateIntermediateCode(template, output, paths)
-		RunIntermediateCode(output)
+		generateIntermediateCode(template, output, paths)
+		runIntermediateCode(output)
 	}
 	fmt.Println("Cleaning up")
 	os.RemoveAll("output")
 }
 
-func GenerateIntermediateCode(templatePath string, intermediateCodePath string, paths []string) {
+func generateIntermediateCode(templatePath string, intermediateCodePath string, paths []string) {
 	content, err := os.ReadFile(templatePath)
 	if err != nil {
 		log.Fatal(err)
@@ -60,7 +61,7 @@ func GenerateIntermediateCode(templatePath string, intermediateCodePath string, 
 	}
 }
 
-func RunIntermediateCode(intermediateCodePath string) {
+func runIntermediateCode(intermediateCodePath string) {
 	fmt.Println("Running intermediate go code for " + intermediateCodePath)
 	defaultPath := "~/.ocis"
 	os.Setenv("OCIS_BASE_DATA_PATH", defaultPath)

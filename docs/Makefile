@@ -8,8 +8,7 @@ help:
 
 .PHONY: docs-generate
 docs-generate: ## run docs-generate for all oCIS services
-	@pushd helpers && go run configenvextractor.go; popd
-	@$(MAKE) --no-print-directory -C ../ docs-generate
+	@pushd helpers && go run .; popd
 
 .PHONY: docs-init
 docs-init:

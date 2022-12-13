@@ -146,6 +146,7 @@ docs-generate:
 	@for mod in $(OCIS_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod docs-generate || exit 1; \
     done
+	$(MAKE) --no-print-directory -C docs docs-generate || exit 1
 
 .PHONY: ci-go-generate
 ci-go-generate:
