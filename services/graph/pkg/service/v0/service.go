@@ -146,7 +146,12 @@ func NewService(opts ...Option) Service {
 			}
 			svc.identityBackend = lb
 			if options.IdentityEducationBackend == nil {
-				svc.identityEducationBackend = lb
+				if options.Config.Identity.LDAP.EducationResourcesEnabled {
+					svc.identityEducationBackend = lb
+				} else {
+					noop := &identity.NOOP{}
+					svc.identityEducationBackend = noop
+				}
 			}
 		default:
 			options.Logger.Error().Msgf("Unknown Identity Backend: '%s'", options.Config.Identity.Backend)

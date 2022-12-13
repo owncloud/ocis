@@ -62,6 +62,21 @@ type LDAP struct {
 	GroupObjectClass   string `yaml:"group_objectclass" env:"LDAP_GROUP_OBJECTCLASS;GRAPH_LDAP_GROUP_OBJECTCLASS" desc:"The object class to use for groups in the default group search filter ('groupOfNames'). "`
 	GroupNameAttribute string `yaml:"group_name_attribute" env:"LDAP_GROUP_SCHEMA_GROUPNAME;GRAPH_LDAP_GROUP_NAME_ATTRIBUTE" desc:"LDAP Attribute to use for the name of groups."`
 	GroupIDAttribute   string `yaml:"group_id_attribute" env:"LDAP_GROUP_SCHEMA_ID;GRAPH_LDAP_GROUP_ID_ATTRIBUTE" desc:"LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID."`
+
+	EducationResourcesEnabled bool `yaml:"education_resources_enabled" env:"LDAP_EDUCATION_RESOURCES_ENABLE;GRAPH_LDAP_EDUCATION_RESOURCES_ENABLED" desc:"enable LDAP support for managin education related resources"`
+	EducationConfig           LDAPEducationConfig
+}
+
+// LDAPEducationConfig represents the LDAP configuration for education related resources
+type LDAPEducationConfig struct {
+	SchoolBaseDN      string `yaml:"school_base_dn" env:"LDAP_SCHOOL_BASE_DN;GRAPH_LDAP_SCHOOL_BASE_DN" desc:"Search base DN for looking up LDAP schools."`
+	SchoolSearchScope string `yaml:"school_search_scope" env:"LDAP_SCHOOL_SCOPE;GRAPH_LDAP_SCHOOL_SEARCH_SCOPE" desc:"LDAP search scope to use when looking up schools. Supported scopes are 'base', 'one' and 'sub'."`
+
+	SchoolFilter      string `yaml:"school_filter" env:"LDAP_SCHOOL_FILTER;GRAPH_LDAP_SCHOOL_FILTER" desc:"LDAP filter to add to the default filters for school searches."`
+	SchoolObjectClass string `yaml:"school_objectclass" env:"LDAP_SCHOOL_OBJECTCLASS;GRAPH_LDAP_SCHOOL_OBJECTCLASS" desc:"The object class to use for schools in the default school search filter."`
+
+	SchoolNameAttribute string `yaml:"school_name_attribute" env:"LDAP_SCHOOL_SCHEMA_SCHOOLNAME;GRAPH_LDAP_SCHOOL_NAME_ATTRIBUTE" desc:"LDAP Attribute to use for the name of schools."`
+	SchoolIDAttribute   string `yaml:"school_id_attribute" env:"LDAP_SCHOOL_SCHEMA_ID;GRAPH_LDAP_SCHOOL_ID_ATTRIBUTE" desc:"LDAP Attribute to use as the unique id for schools. This should be a stable globally unique ID like a UUID."`
 }
 
 type Identity struct {

@@ -55,13 +55,14 @@ func DefaultConfig() *config.Config {
 				UserNameAttribute:        "uid",
 				// FIXME: switch this to some more widely available attribute by default
 				//        ideally this needs to	be constant for the lifetime of a users
-				UserIDAttribute:    "owncloudUUID",
-				GroupBaseDN:        "ou=groups,o=libregraph-idm",
-				GroupSearchScope:   "sub",
-				GroupFilter:        "",
-				GroupObjectClass:   "groupOfNames",
-				GroupNameAttribute: "cn",
-				GroupIDAttribute:   "owncloudUUID",
+				UserIDAttribute:           "owncloudUUID",
+				GroupBaseDN:               "ou=groups,o=libregraph-idm",
+				GroupSearchScope:          "sub",
+				GroupFilter:               "",
+				GroupObjectClass:          "groupOfNames",
+				GroupNameAttribute:        "cn",
+				GroupIDAttribute:          "owncloudUUID",
+				EducationResourcesEnabled: false,
 			},
 		},
 		Events: config.Events{

@@ -2,12 +2,15 @@ package identity
 
 import (
 	"context"
+	"fmt"
 	"net/url"
 
+	"github.com/go-ldap/ldap/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 )
 
-type schoolConfig struct {
+type educationConfig struct {
 	schoolBaseDN       string
 	schoolFilter       string
 	schoolObjectClass  string
@@ -16,14 +19,37 @@ type schoolConfig struct {
 }
 
 type schoolAttributeMap struct {
-	displayname  string
+	displayName  string
 	schoolNumber string
 	id           string
 }
 
+func defaultEducationConfig() educationConfig {
+	return educationConfig{
+		schoolObjectClass:  "ocEducationSchool",
+		schoolScope:        ldap.ScopeWholeSubtree,
+		schoolAttributeMap: newSchoolAttributeMap(),
+	}
+}
+
+func newEducationConfig(config config.LDAP) (educationConfig, error) {
+	if config.EducationResourcesEnabled {
+		var err error
+		eduCfg := defaultEducationConfig()
+		eduCfg.schoolBaseDN = config.EducationConfig.SchoolBaseDN
+		if config.EducationConfig.SchoolSearchScope != "" {
+			if eduCfg.schoolScope, err = stringToScope(config.EducationConfig.SchoolSearchScope); err != nil {
+				return educationConfig{}, fmt.Errorf("error configuring school search scope: %w", err)
+			}
+		}
+		return eduCfg, nil
+	}
+	return educationConfig{}, nil
+}
+
 func newSchoolAttributeMap() schoolAttributeMap {
 	return schoolAttributeMap{
-		displayname:  "ou",
+		displayName:  "ou",
 		schoolNumber: "ocEducationSchoolNumber",
 		id:           "owncloudUUID",
 	}
