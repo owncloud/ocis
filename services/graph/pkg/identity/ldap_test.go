@@ -318,14 +318,14 @@ func TestGetGroup(t *testing.T) {
 	sr2 := &ldap.SearchRequest{
 		BaseDN:     "uid=user,ou=people,dc=test",
 		SizeLimit:  1,
-		Filter:     "(objectclass=*)",
+		Filter:     "(objectClass=inetOrgPerson)",
 		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
 		Controls:   []ldap.Control(nil),
 	}
 	sr3 := &ldap.SearchRequest{
 		BaseDN:     "uid=invalid,ou=people,dc=test",
 		SizeLimit:  1,
-		Filter:     "(objectclass=*)",
+		Filter:     "(objectClass=inetOrgPerson)",
 		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
 		Controls:   []ldap.Control(nil),
 	}
@@ -413,14 +413,14 @@ func TestGetGroups(t *testing.T) {
 	sr2 := &ldap.SearchRequest{
 		BaseDN:     "uid=user,ou=people,dc=test",
 		SizeLimit:  1,
-		Filter:     "(objectclass=*)",
+		Filter:     "(objectClass=inetOrgPerson)",
 		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
 		Controls:   []ldap.Control(nil),
 	}
 	sr3 := &ldap.SearchRequest{
 		BaseDN:     "uid=invalid,ou=people,dc=test",
 		SizeLimit:  1,
-		Filter:     "(objectclass=*)",
+		Filter:     "(objectClass=inetOrgPerson)",
 		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
 		Controls:   []ldap.Control(nil),
 	}
