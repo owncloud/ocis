@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/jellydator/ttlcache/v2"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
@@ -57,6 +58,7 @@ type GatewayClient interface {
 	// MUST return CODE_NOT_FOUND if the reference does not exist
 	// MUST return CODE_RESOURCE_EXHAUSTED on exceeded quota limits.
 	GetQuota(ctx context.Context, in *gateway.GetQuotaRequest, opts ...grpc.CallOption) (*provider.GetQuotaResponse, error)
+	SetArbitraryMetadata(ctx context.Context, request *provider.SetArbitraryMetadataRequest, opts ...grpc.CallOption) (*provider.SetArbitraryMetadataResponse, error)
 }
 
 // Publisher is the interface for events publisher
@@ -97,6 +99,7 @@ type Graph struct {
 	permissionsService   Permissions
 	spacePropertiesCache *ttlcache.Cache
 	eventsPublisher      events.Publisher
+	searchService        searchsvc.SearchProviderService
 }
 
 // ServeHTTP implements the Service interface.

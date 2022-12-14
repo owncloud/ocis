@@ -30,6 +30,7 @@ message Entity {
 	bool deleted = 10;
 	string shareRootName = 11;
 	ResourceID parent_id = 12;
+	repeated string tags = 13;
 }
 
 message Match {

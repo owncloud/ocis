@@ -40,7 +40,7 @@ var _ = Describe("Basic", func() {
 			Expect(doc.MimeType).To(Equal(ri.MimeType))
 		})
 
-		/*It("adds tags", func() {
+		It("adds tags", func() {
 			for _, data := range []struct {
 				tags   string
 				expect []string
@@ -63,7 +63,7 @@ var _ = Describe("Basic", func() {
 				Expect(doc).ToNot(BeNil())
 				Expect(doc.Tags).To(Equal(data.expect))
 			}
-		})*/
+		})
 
 		It("RFC3339 mtime", func() {
 			for _, data := range []struct {

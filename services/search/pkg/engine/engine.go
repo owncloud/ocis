@@ -60,29 +60,28 @@ func getValue[T any](m map[string]interface{}, key string) (out T) {
 	return
 }
 
-// TODO comment back in when re-adding the tags features
-// func getSliceValue[T any](m map[string]interface{}, key string) (out []T) {
-// 	iv := getValue[interface{}](m, key)
-// 	add := func(v interface{}) {
-// 		cv, ok := v.(T)
-// 		if !ok {
-// 			return
-// 		}
-//
-// 		out = append(out, cv)
-// 	}
-//
-// 	// bleve tend to convert []string{"foo"} to type string if slice contains only one value
-// 	// bleve: []string{"foo"} -> "foo"
-// 	// bleve: []string{"foo", "bar"} -> []string{"foo", "bar"}
-// 	switch v := iv.(type) {
-// 	case T:
-// 		add(v)
-// 	case []interface{}:
-// 		for _, rv := range v {
-// 			add(rv)
-// 		}
-// 	}
-//
-// 	return
-// }
+func getSliceValue[T any](m map[string]interface{}, key string) (out []T) {
+	iv := getValue[interface{}](m, key)
+	add := func(v interface{}) {
+		cv, ok := v.(T)
+		if !ok {
+			return
+		}
+
+		out = append(out, cv)
+	}
+
+	// bleve tend to convert []string{"foo"} to type string if slice contains only one value
+	// bleve: []string{"foo"} -> "foo"
+	// bleve: []string{"foo", "bar"} -> []string{"foo", "bar"}
+	switch v := iv.(type) {
+	case T:
+		add(v)
+	case []interface{}:
+		for _, rv := range v {
+			add(rv)
+		}
+	}
+
+	return
+}

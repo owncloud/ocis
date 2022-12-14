@@ -1,6 +1,7 @@
 package search_test
 
 import (
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -46,8 +47,8 @@ var _ = DescribeTable("events",
 	Entry("ContainerCreated", []string{"IndexSpace"}, events.ContainerCreated{}, false),
 	Entry("FileTouched", []string{"IndexSpace"}, events.FileTouched{}, false),
 	Entry("FileVersionRestored", []string{"IndexSpace"}, events.FileVersionRestored{}, false),
-	//Entry("TagsAdded", []string{"IndexSpace"}, events.TagsAdded{}, false),
-	//Entry("TagsRemoved", []string{"IndexSpace"}, events.TagsRemoved{}, false),
+	Entry("TagsAdded", []string{"UpsertItem"}, events.TagsAdded{}, false),
+	Entry("TagsRemoved", []string{"UpsertItem"}, events.TagsRemoved{}, false),
 	Entry("FileUploaded", []string{"IndexSpace"}, events.FileUploaded{}, false),
-	//Entry("UploadReady", []string{"IndexSpace"}, events.UploadReady{ExecutingUser: &userv1beta1.User{}}, true),
+	Entry("UploadReady", []string{"IndexSpace"}, events.UploadReady{ExecutingUser: &userv1beta1.User{}}, true),
 )

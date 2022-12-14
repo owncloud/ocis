@@ -71,7 +71,7 @@ func BuildBleveMapping() (mapping.IndexMapping, error) {
 
 	docMapping := bleve.NewDocumentMapping()
 	docMapping.AddFieldMappingsAt("Name", lowercaseMapping)
-	//docMapping.AddFieldMappingsAt("Tags", lowercaseMapping)
+	docMapping.AddFieldMappingsAt("Tags", lowercaseMapping)
 	docMapping.AddFieldMappingsAt("Content", fulltextFieldMapping)
 
 	indexMapping := bleve.NewIndexMapping()
@@ -185,7 +185,7 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 				Type:     uint64(getValue[float64](hit.Fields, "Type")),
 				MimeType: getValue[string](hit.Fields, "MimeType"),
 				Deleted:  getValue[bool](hit.Fields, "Deleted"),
-				//Tags:     getSliceValue[string](hit.Fields, "Tags"),
+				Tags:     getSliceValue[string](hit.Fields, "Tags"),
 			},
 		}
 
@@ -302,7 +302,7 @@ func (b *Bleve) getResource(id string) (*Resource, error) {
 			Mtime:    getValue[string](fields, "Mtime"),
 			MimeType: getValue[string](fields, "MimeType"),
 			Content:  getValue[string](fields, "Content"),
-			//Tags:     getSliceValue[string](fields, "Tags"),
+			Tags:     getSliceValue[string](fields, "Tags"),
 		},
 	}, nil
 }

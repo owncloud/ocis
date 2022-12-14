@@ -6,6 +6,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
+	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
@@ -26,6 +27,7 @@ type Options struct {
 	PermissionService      Permissions
 	RoleManager            *roles.Manager
 	EventsPublisher        events.Publisher
+	SearchService          searchsvc.SearchProviderService
 }
 
 // newOptions initializes the available default options.
@@ -85,6 +87,13 @@ func WithIdentityBackend(val identity.Backend) Option {
 func WithRoleService(val RoleService) Option {
 	return func(o *Options) {
 		o.RoleService = val
+	}
+}
+
+// WithRoleService provides a function to set the RoleService option.
+func WithSearchService(val searchsvc.SearchProviderService) Option {
+	return func(o *Options) {
+		o.SearchService = val
 	}
 }
 

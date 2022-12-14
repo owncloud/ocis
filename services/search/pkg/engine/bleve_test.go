@@ -98,7 +98,7 @@ var _ = Describe("Bleve", func() {
 
 	Describe("Search", func() {
 		Context("by other fields than filename", func() {
-			/*It("finds files by tags", func() {
+			It("finds files by tags", func() {
 				parentResource.Document.Tags = []string{"foo", "bar"}
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
@@ -109,7 +109,7 @@ var _ = Describe("Bleve", func() {
 				assertDocCount(rootResource.ID, "Tags:foo Tags:bar Tags:baz", 1)
 				assertDocCount(rootResource.ID, "Tags:foo Tags:bar Tags:baz", 1)
 				assertDocCount(rootResource.ID, "Tags:baz", 0)
-			})*/
+			})
 
 			It("finds files by size", func() {
 				parentResource.Document.Size = 12345

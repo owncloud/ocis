@@ -5,7 +5,7 @@ import (
 	"time"
 
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	//"github.com/cs3org/reva/v2/pkg/tags"
+	"github.com/cs3org/reva/v2/pkg/tags"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
@@ -27,11 +27,11 @@ func (b Basic) Extract(_ context.Context, ri *storageProvider.ResourceInfo) (Doc
 		MimeType: ri.MimeType,
 	}
 
-	//if m := ri.ArbitraryMetadata.GetMetadata(); m != nil {
-	//if t, ok := m["tags"]; ok {
-	//doc.Tags = tags.FromList(t).AsSlice()
-	//}
-	//}
+	if m := ri.ArbitraryMetadata.GetMetadata(); m != nil {
+		if t, ok := m["tags"]; ok {
+			doc.Tags = tags.FromList(t).AsSlice()
+		}
+	}
 
 	if ri.Mtime != nil {
 		doc.Mtime = time.Unix(int64(ri.Mtime.Seconds), int64(ri.Mtime.Nanos)).UTC().Format(time.RFC3339)
