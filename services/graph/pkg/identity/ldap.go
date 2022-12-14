@@ -303,7 +303,14 @@ func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
 		i.userAttributeMap.mail,
 		i.userAttributeMap.userName,
 	}
-	return i.getEntryByDN(dn, attrs)
+
+	filter := fmt.Sprintf("(objectClass=%s)", i.userObjectClass)
+
+	if i.userFilter != "" {
+		filter = fmt.Sprintf("(&%s(%s))", filter, i.userFilter)
+	}
+
+	return i.getEntryByDN(dn, attrs, filter)
 }
 
 func (i *LDAP) getGroupByDN(dn string) (*ldap.Entry, error) {
@@ -311,13 +318,22 @@ func (i *LDAP) getGroupByDN(dn string) (*ldap.Entry, error) {
 		i.groupAttributeMap.id,
 		i.groupAttributeMap.name,
 	}
-	return i.getEntryByDN(dn, attrs)
+	filter := fmt.Sprintf("(objectClass=%s)", i.groupObjectClass)
+
+	if i.groupFilter != "" {
+		filter = fmt.Sprintf("(&%s(%s))", filter, i.groupFilter)
+	}
+	return i.getEntryByDN(dn, attrs, filter)
 }
 
-func (i *LDAP) getEntryByDN(dn string, attrs []string) (*ldap.Entry, error) {
+func (i *LDAP) getEntryByDN(dn string, attrs []string, filter string) (*ldap.Entry, error) {
+	if filter == "" {
+		filter = "(objectclass=*)"
+	}
+
 	searchRequest := ldap.NewSearchRequest(
 		dn, ldap.ScopeBaseObject, ldap.NeverDerefAliases, 1, 0, false,
-		"(objectclass=*)",
+		filter,
 		attrs,
 		nil,
 	)
