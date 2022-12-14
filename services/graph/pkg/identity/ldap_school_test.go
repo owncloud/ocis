@@ -39,6 +39,12 @@ var schoolEntry = ldap.NewEntry("ou=Test School",
 		"ocEducationSchoolNumber": {"0123"},
 		"owncloudUUID":            {"abcd-defg"},
 	})
+var schoolEntry1 = ldap.NewEntry("ou=Test School1",
+	map[string][]string{
+		"ou":                      {"Test School1"},
+		"ocEducationSchoolNumber": {"0042"},
+		"owncloudUUID":            {"hijk-defg"},
+	})
 
 func TestCreateSchool(t *testing.T) {
 	lm := &mocks.Client{}
@@ -141,4 +147,23 @@ func TestGetSchool(t *testing.T) {
 	lm.AssertNumberOfCalls(t, "Search", 2)
 	assert.NotNil(t, err)
 	assert.Equal(t, "itemNotFound", err.Error())
+}
+
+func TestGetSchools(t *testing.T) {
+	lm := &mocks.Client{}
+	sr1 := &ldap.SearchRequest{
+		BaseDN:     "",
+		Scope:      2,
+		SizeLimit:  0,
+		Filter:     "(objectClass=ocEducationSchool)",
+		Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+		Controls:   []ldap.Control(nil),
+	}
+	lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry, schoolEntry1}}, nil)
+	//	lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
+	b, err := getMockedBackend(lm, eduConfig, &logger)
+	assert.Nil(t, err)
+	_, err = b.GetSchools(context.Background(), nil)
+	lm.AssertNumberOfCalls(t, "Search", 1)
+	assert.Nil(t, err)
 }

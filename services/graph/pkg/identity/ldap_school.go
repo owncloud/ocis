@@ -133,7 +133,47 @@ func (i *LDAP) GetSchool(ctx context.Context, nameOrID string, queryParam url.Va
 
 // GetSchools implements the EducationBackend interface for the LDAP backend.
 func (i *LDAP) GetSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error) {
-	return nil, errNotImplemented
+	var filter string
+	filter = fmt.Sprintf("(objectClass=%s)", i.educationConfig.schoolObjectClass)
+
+	if i.educationConfig.schoolFilter != "" {
+		filter = fmt.Sprintf("(&%s%s)", i.educationConfig.schoolFilter, filter)
+	}
+
+	searchRequest := ldap.NewSearchRequest(
+		i.educationConfig.schoolBaseDN,
+		i.educationConfig.schoolScope,
+		ldap.NeverDerefAliases, 0, 0, false,
+		filter,
+		[]string{
+			i.educationConfig.schoolAttributeMap.displayName,
+			i.educationConfig.schoolAttributeMap.id,
+			i.educationConfig.schoolAttributeMap.schoolNumber,
+		},
+		nil,
+	)
+	i.logger.Debug().Str("backend", "ldap").
+		Str("base", searchRequest.BaseDN).
+		Str("filter", searchRequest.Filter).
+		Int("scope", searchRequest.Scope).
+		Int("sizelimit", searchRequest.SizeLimit).
+		Interface("attributes", searchRequest.Attributes).
+		Msg("GetSchools")
+	res, err := i.conn.Search(searchRequest)
+	if err != nil {
+		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
+	}
+
+	schools := make([]*libregraph.EducationSchool, 0, len(res.Entries))
+	for _, e := range res.Entries {
+		school := i.createSchoolModelFromLDAP(e)
+		// Skip invalid LDAP entries
+		if school == nil {
+			continue
+		}
+		schools = append(schools, school)
+	}
+	return schools, nil
 }
 
 // GetSchoolMembers implements the EducationBackend interface for the LDAP backend.
