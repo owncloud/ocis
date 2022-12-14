@@ -167,3 +167,24 @@ Feature: Share spaces
       | editor | viewer   |
       | viewer | manager  |
       | viewer | editor   |
+
+
+  Scenario Outline: A user shares a space with a group
+    Given group "group2" has been created
+    And the administrator has added a user "Brian" to the group "group2" using GraphApi
+    And the administrator has added a user "Bob" to the group "group2" using GraphApi
+    When user "Alice" shares a space "share space" to group "group2" with role "<role>"
+    Then the HTTP status code should be "200"
+    And the user "Brian" should have a space called "share space" with these key and value pairs:
+      | key       | value       |
+      | driveType | project     |
+      | name      | share space |
+    And the user "Bob" should have a space called "share space" with these key and value pairs:
+      | key       | value       |
+      | driveType | project     |
+      | name      | share space |
+    Examples:
+      | role    |
+      | manager |
+      | editor  |
+      | viewer  |
