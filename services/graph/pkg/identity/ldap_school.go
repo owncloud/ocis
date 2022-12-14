@@ -102,7 +102,21 @@ func (i *LDAP) CreateSchool(ctx context.Context, school libregraph.EducationScho
 
 // DeleteSchool deletes a given school, identified by id
 func (i *LDAP) DeleteSchool(ctx context.Context, id string) error {
-	return errNotImplemented
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("DeleteSchool")
+	if !i.writeEnabled {
+		return errReadOnly
+	}
+	e, err := i.getSchoolByID(id)
+	if err != nil {
+		return err
+	}
+
+	dr := ldap.DelRequest{DN: e.DN}
+	if err = i.conn.Del(&dr); err != nil {
+		return err
+	}
+	return nil
 }
 
 // GetSchool implements the EducationBackend interface for the LDAP backend.
@@ -142,6 +156,57 @@ func (i *LDAP) getSchoolByDN(dn string) (*ldap.Entry, error) {
 		filter = fmt.Sprintf("(&%s(%s))", filter, i.educationConfig.schoolFilter)
 	}
 	return i.getEntryByDN(dn, attrs, filter)
+}
+
+func (i *LDAP) getSchoolByID(id string) (*ldap.Entry, error) {
+	id = ldap.EscapeFilter(id)
+	filter := fmt.Sprintf("(%s=%s)", i.educationConfig.schoolAttributeMap.id, id)
+	return i.getSchoolByFilter(filter)
+}
+
+func (i *LDAP) getSchoolByFilter(filter string) (*ldap.Entry, error) {
+	filter = fmt.Sprintf("(&%s(objectClass=%s)%s)",
+		i.educationConfig.schoolFilter,
+		i.educationConfig.schoolObjectClass,
+		filter,
+	)
+	searchRequest := ldap.NewSearchRequest(
+		i.educationConfig.schoolBaseDN,
+		i.educationConfig.schoolScope,
+		ldap.NeverDerefAliases, 1, 0, false,
+		filter,
+		[]string{
+			i.educationConfig.schoolAttributeMap.displayName,
+			i.educationConfig.schoolAttributeMap.id,
+			i.educationConfig.schoolAttributeMap.schoolNumber,
+		},
+		nil,
+	)
+	i.logger.Debug().Str("backend", "ldap").
+		Str("base", searchRequest.BaseDN).
+		Str("filter", searchRequest.Filter).
+		Int("scope", searchRequest.Scope).
+		Int("sizelimit", searchRequest.SizeLimit).
+		Interface("attributes", searchRequest.Attributes).
+		Msg("getSchoolByFilter")
+	res, err := i.conn.Search(searchRequest)
+
+	if err != nil {
+		var errmsg string
+		if lerr, ok := err.(*ldap.Error); ok {
+			if lerr.ResultCode == ldap.LDAPResultSizeLimitExceeded {
+				errmsg = fmt.Sprintf("too many results searching for school '%s'", filter)
+				i.logger.Debug().Str("backend", "ldap").Err(lerr).
+					Str("schoolfilter", filter).Msg("too many results searching for school")
+			}
+		}
+		return nil, errorcode.New(errorcode.ItemNotFound, errmsg)
+	}
+	if len(res.Entries) == 0 {
+		return nil, errNotFound
+	}
+
+	return res.Entries[0], nil
 }
 
 func (i *LDAP) createSchoolModelFromLDAP(e *ldap.Entry) *libregraph.EducationSchool {

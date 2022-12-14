@@ -68,3 +68,42 @@ func TestCreateSchool(t *testing.T) {
 	assert.Equal(t, res_school.GetId(), school.GetId())
 	assert.Equal(t, res_school.GetSchoolNumber(), school.GetSchoolNumber())
 }
+
+func TestDeleteSchool(t *testing.T) {
+	lm := &mocks.Client{}
+	sr1 := &ldap.SearchRequest{
+		BaseDN:     "",
+		Scope:      2,
+		SizeLimit:  1,
+		Filter:     "(&(objectClass=ocEducationSchool)(owncloudUUID=abcd-defg))",
+		Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+		Controls:   []ldap.Control(nil),
+	}
+	sr2 := &ldap.SearchRequest{
+		BaseDN:     "",
+		Scope:      2,
+		SizeLimit:  1,
+		Filter:     "(&(objectClass=ocEducationSchool)(owncloudUUID=xxxx-xxxx))",
+		Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+		Controls:   []ldap.Control(nil),
+	}
+	lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry}}, nil)
+	lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
+	dr1 := &ldap.DelRequest{
+		DN: "ou=Test School",
+	}
+	lm.On("Del", dr1).Return(nil)
+	b, err := getMockedBackend(lm, eduConfig, &logger)
+	assert.Nil(t, err)
+
+	err = b.DeleteSchool(context.Background(), "abcd-defg")
+	lm.AssertNumberOfCalls(t, "Search", 1)
+	lm.AssertNumberOfCalls(t, "Del", 1)
+	assert.Nil(t, err)
+
+	err = b.DeleteSchool(context.Background(), "xxxx-xxxx")
+	lm.AssertNumberOfCalls(t, "Search", 2)
+	lm.AssertNumberOfCalls(t, "Del", 1)
+	assert.NotNil(t, err)
+	assert.Equal(t, "itemNotFound", err.Error())
+}
