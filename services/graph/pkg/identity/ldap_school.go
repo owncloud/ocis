@@ -2,12 +2,16 @@ package identity
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 
 	"github.com/go-ldap/ldap/v3"
+	"github.com/gofrs/uuid"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	oldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
 
 type educationConfig struct {
@@ -57,7 +61,43 @@ func newSchoolAttributeMap() schoolAttributeMap {
 
 // CreateSchool creates the supplied school in the identity backend.
 func (i *LDAP) CreateSchool(ctx context.Context, school libregraph.EducationSchool) (*libregraph.EducationSchool, error) {
-	return nil, errNotImplemented
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("CreateSchool")
+	if !i.writeEnabled {
+		return nil, errReadOnly
+	}
+
+	dn := fmt.Sprintf("%s=%s,%s",
+		i.educationConfig.schoolAttributeMap.displayName,
+		oldap.EscapeDNAttributeValue(school.GetDisplayName()),
+		i.educationConfig.schoolBaseDN,
+	)
+	ar := ldap.NewAddRequest(dn, nil)
+	ar.Attribute(i.educationConfig.schoolAttributeMap.displayName, []string{school.GetDisplayName()})
+	ar.Attribute(i.educationConfig.schoolAttributeMap.schoolNumber, []string{school.GetSchoolNumber()})
+	if !i.useServerUUID {
+		ar.Attribute(i.educationConfig.schoolAttributeMap.id, []string{uuid.Must(uuid.NewV4()).String()})
+	}
+	objectClasses := []string{"organizationalUnit", i.educationConfig.schoolObjectClass, "top"}
+	ar.Attribute("objectClass", objectClasses)
+
+	if err := i.conn.Add(ar); err != nil {
+		var lerr *ldap.Error
+		logger.Debug().Err(err).Msg("error adding school")
+		if errors.As(err, &lerr) {
+			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
+				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
+			}
+		}
+		return nil, err
+	}
+
+	// Read	back school from LDAP to get the generated UUID
+	e, err := i.getSchoolByDN(ar.DN)
+	if err != nil {
+		return nil, err
+	}
+	return i.createSchoolModelFromLDAP(e), nil
 }
 
 // DeleteSchool deletes a given school, identified by id
@@ -88,4 +128,38 @@ func (i *LDAP) AddMembersToSchool(ctx context.Context, schoolID string, memberID
 // RemoveMemberFromSchool removes a single member (by ID) from a school
 func (i *LDAP) RemoveMemberFromSchool(ctx context.Context, schoolID string, memberID string) error {
 	return errNotImplemented
+}
+
+func (i *LDAP) getSchoolByDN(dn string) (*ldap.Entry, error) {
+	attrs := []string{
+		i.educationConfig.schoolAttributeMap.displayName,
+		i.educationConfig.schoolAttributeMap.id,
+		i.educationConfig.schoolAttributeMap.schoolNumber,
+	}
+	filter := fmt.Sprintf("(objectClass=%s)", i.educationConfig.schoolObjectClass)
+
+	if i.educationConfig.schoolFilter != "" {
+		filter = fmt.Sprintf("(&%s(%s))", filter, i.educationConfig.schoolFilter)
+	}
+	return i.getEntryByDN(dn, attrs, filter)
+}
+
+func (i *LDAP) createSchoolModelFromLDAP(e *ldap.Entry) *libregraph.EducationSchool {
+	if e == nil {
+		return nil
+	}
+
+	displayName := e.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.displayName)
+	id := e.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.id)
+	schoolNumber := e.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.schoolNumber)
+
+	if id != "" && displayName != "" && schoolNumber != "" {
+		school := libregraph.NewEducationSchool()
+		school.SetDisplayName(displayName)
+		school.SetSchoolNumber(schoolNumber)
+		school.SetId(id)
+		return school
+	}
+	i.logger.Warn().Str("dn", e.DN).Str("id", id).Str("displayName", displayName).Str("schoolNumber", schoolNumber).Msg("Invalid School. Missing required attribute")
+	return nil
 }
