@@ -14,7 +14,7 @@ import (
 )
 
 func getMockedBackend(l ldap.Client, lc config.LDAP, logger *log.Logger) (*LDAP, error) {
-	return NewLDAPBackend(l, lconfig, logger)
+	return NewLDAPBackend(l, lc, logger)
 }
 
 var lconfig = config.LDAP{
@@ -33,6 +33,8 @@ var lconfig = config.LDAP{
 	GroupFilter:        "",
 	GroupNameAttribute: "cn",
 	GroupIDAttribute:   "entryUUID",
+
+	WriteEnabled: true,
 }
 
 var userEntry = ldap.NewEntry("uid=user",
