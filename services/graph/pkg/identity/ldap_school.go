@@ -121,7 +121,14 @@ func (i *LDAP) DeleteSchool(ctx context.Context, id string) error {
 
 // GetSchool implements the EducationBackend interface for the LDAP backend.
 func (i *LDAP) GetSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error) {
-	return nil, errNotImplemented
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("GetSchool")
+	e, err := i.getSchoolByID(nameOrID)
+	if err != nil {
+		return nil, err
+	}
+
+	return i.createSchoolModelFromLDAP(e), nil
 }
 
 // GetSchools implements the EducationBackend interface for the LDAP backend.

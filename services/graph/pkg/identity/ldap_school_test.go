@@ -107,3 +107,38 @@ func TestDeleteSchool(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, "itemNotFound", err.Error())
 }
+
+func TestGetSchool(t *testing.T) {
+	lm := &mocks.Client{}
+	sr1 := &ldap.SearchRequest{
+		BaseDN:     "",
+		Scope:      2,
+		SizeLimit:  1,
+		Filter:     "(&(objectClass=ocEducationSchool)(owncloudUUID=abcd-defg))",
+		Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+		Controls:   []ldap.Control(nil),
+	}
+	sr2 := &ldap.SearchRequest{
+		BaseDN:     "",
+		Scope:      2,
+		SizeLimit:  1,
+		Filter:     "(&(objectClass=ocEducationSchool)(owncloudUUID=xxxx-xxxx))",
+		Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+		Controls:   []ldap.Control(nil),
+	}
+	lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry}}, nil)
+	lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
+	b, err := getMockedBackend(lm, eduConfig, &logger)
+	assert.Nil(t, err)
+	school, err := b.GetSchool(context.Background(), "abcd-defg", nil)
+	lm.AssertNumberOfCalls(t, "Search", 1)
+	assert.Nil(t, err)
+	assert.Equal(t, "Test School", school.GetDisplayName())
+	assert.Equal(t, "abcd-defg", school.GetId())
+	assert.Equal(t, "0123", school.GetSchoolNumber())
+
+	school, err = b.GetSchool(context.Background(), "xxxx-xxxx", nil)
+	lm.AssertNumberOfCalls(t, "Search", 2)
+	assert.NotNil(t, err)
+	assert.Equal(t, "itemNotFound", err.Error())
+}
