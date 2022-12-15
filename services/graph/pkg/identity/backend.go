@@ -34,19 +34,20 @@ type Backend interface {
 
 // EducationBackend defines the Interface for an EducationBackend implementation
 type EducationBackend interface {
-	// CreateSchool creates the supplied school in the identity backend.
-	CreateSchool(ctx context.Context, group libregraph.EducationSchool) (*libregraph.EducationSchool, error)
+	// CreateEducationSchool creates the supplied school in the identity backend.
+	CreateEducationSchool(ctx context.Context, group libregraph.EducationSchool) (*libregraph.EducationSchool, error)
 	// DeleteSchool deletes a given school, identified by id
-	DeleteSchool(ctx context.Context, id string) error
-	// GetSchool reads a given school by id
-	GetSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error)
-	// GetSchools lists all	schools
-	GetSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error)
-	GetSchoolMembers(ctx context.Context, id string) ([]*libregraph.EducationUser, error)
-	// AddMembersToSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
-	AddMembersToSchool(ctx context.Context, schoolID string, memberID []string) error
-	// RemoveMemberFromSchool removes a single member (by ID) from a school
-	RemoveMemberFromSchool(ctx context.Context, schoolID string, memberID string) error
+	DeleteEducationSchool(ctx context.Context, id string) error
+	// GetEducationSchool reads a given school by id
+	GetEducationSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error)
+	// GetEducationSchools lists all schools
+	GetEducationSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error)
+	// GetEducationSchoolMembers lists all members of a school
+	GetEducationSchoolMembers(ctx context.Context, id string) ([]*libregraph.EducationUser, error)
+	// AddMembersToEducationSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
+	AddMembersToEducationSchool(ctx context.Context, schoolID string, memberID []string) error
+	// RemoveMemberFromEducationSchool removes a single member (by ID) from a school
+	RemoveMemberFromEducationSchool(ctx context.Context, schoolID string, memberID string) error
 
 	// CreateEducationUser creates a given education user in the identity backend.
 	CreateEducationUser(ctx context.Context, user libregraph.EducationUser) (*libregraph.EducationUser, error)

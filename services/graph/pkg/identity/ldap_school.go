@@ -77,10 +77,10 @@ func newSchoolAttributeMap() schoolAttributeMap {
 	}
 }
 
-// CreateSchool creates the supplied school in the identity backend.
-func (i *LDAP) CreateSchool(ctx context.Context, school libregraph.EducationSchool) (*libregraph.EducationSchool, error) {
+// CreateEducationSchool creates the supplied school in the identity backend.
+func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.EducationSchool) (*libregraph.EducationSchool, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
-	logger.Debug().Str("backend", "ldap").Msg("CreateSchool")
+	logger.Debug().Str("backend", "ldap").Msg("CreateEducationSchool")
 	if !i.writeEnabled {
 		return nil, errReadOnly
 	}
@@ -118,10 +118,10 @@ func (i *LDAP) CreateSchool(ctx context.Context, school libregraph.EducationScho
 	return i.createSchoolModelFromLDAP(e), nil
 }
 
-// DeleteSchool deletes a given school, identified by id
-func (i *LDAP) DeleteSchool(ctx context.Context, id string) error {
+// DeleteEducationSchool deletes a given school, identified by id
+func (i *LDAP) DeleteEducationSchool(ctx context.Context, id string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
-	logger.Debug().Str("backend", "ldap").Msg("DeleteSchool")
+	logger.Debug().Str("backend", "ldap").Msg("DeleteEducationSchool")
 	if !i.writeEnabled {
 		return errReadOnly
 	}
@@ -137,10 +137,10 @@ func (i *LDAP) DeleteSchool(ctx context.Context, id string) error {
 	return nil
 }
 
-// GetSchool implements the EducationBackend interface for the LDAP backend.
-func (i *LDAP) GetSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error) {
+// GetEducationSchool implements the EducationBackend interface for the LDAP backend.
+func (i *LDAP) GetEducationSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
-	logger.Debug().Str("backend", "ldap").Msg("GetSchool")
+	logger.Debug().Str("backend", "ldap").Msg("GetEducationSchool")
 	e, err := i.getSchoolByID(nameOrID)
 	if err != nil {
 		return nil, err
@@ -149,8 +149,8 @@ func (i *LDAP) GetSchool(ctx context.Context, nameOrID string, queryParam url.Va
 	return i.createSchoolModelFromLDAP(e), nil
 }
 
-// GetSchools implements the EducationBackend interface for the LDAP backend.
-func (i *LDAP) GetSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error) {
+// GetEducationSchools implements the EducationBackend interface for the LDAP backend.
+func (i *LDAP) GetEducationSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error) {
 	var filter string
 	filter = fmt.Sprintf("(objectClass=%s)", i.educationConfig.schoolObjectClass)
 
@@ -176,7 +176,7 @@ func (i *LDAP) GetSchools(ctx context.Context, queryParam url.Values) ([]*libreg
 		Int("scope", searchRequest.Scope).
 		Int("sizelimit", searchRequest.SizeLimit).
 		Interface("attributes", searchRequest.Attributes).
-		Msg("GetSchools")
+		Msg("GetEducationSchools")
 	res, err := i.conn.Search(searchRequest)
 	if err != nil {
 		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
@@ -194,18 +194,18 @@ func (i *LDAP) GetSchools(ctx context.Context, queryParam url.Values) ([]*libreg
 	return schools, nil
 }
 
-// GetSchoolMembers implements the EducationBackend interface for the LDAP backend.
-func (i *LDAP) GetSchoolMembers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
+// GetEducationSchoolMembers implements the EducationBackend interface for the LDAP backend.
+func (i *LDAP) GetEducationSchoolMembers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
 	return nil, errNotImplemented
 }
 
-// AddMembersToSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
-func (i *LDAP) AddMembersToSchool(ctx context.Context, schoolID string, memberID []string) error {
+// AddMembersToEducationSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
+func (i *LDAP) AddMembersToEducationSchool(ctx context.Context, schoolID string, memberID []string) error {
 	return errNotImplemented
 }
 
-// RemoveMemberFromSchool removes a single member (by ID) from a school
-func (i *LDAP) RemoveMemberFromSchool(ctx context.Context, schoolID string, memberID string) error {
+// RemoveMemberFromEducationSchool removes a single member (by ID) from a school
+func (i *LDAP) RemoveMemberFromEducationSchool(ctx context.Context, schoolID string, memberID string) error {
 	return errNotImplemented
 }
 

@@ -17,8 +17,8 @@ type EducationBackend struct {
 	mock.Mock
 }
 
-// AddMembersToSchool provides a mock function with given fields: ctx, schoolID, memberID
-func (_m *EducationBackend) AddMembersToSchool(ctx context.Context, schoolID string, memberID []string) error {
+// AddMembersToEducationSchool provides a mock function with given fields: ctx, schoolID, memberID
+func (_m *EducationBackend) AddMembersToEducationSchool(ctx context.Context, schoolID string, memberID []string) error {
 	ret := _m.Called(ctx, schoolID, memberID)
 
 	var r0 error
@@ -29,6 +29,29 @@ func (_m *EducationBackend) AddMembersToSchool(ctx context.Context, schoolID str
 	}
 
 	return r0
+}
+
+// CreateEducationSchool provides a mock function with given fields: ctx, group
+func (_m *EducationBackend) CreateEducationSchool(ctx context.Context, group libregraph.EducationSchool) (*libregraph.EducationSchool, error) {
+	ret := _m.Called(ctx, group)
+
+	var r0 *libregraph.EducationSchool
+	if rf, ok := ret.Get(0).(func(context.Context, libregraph.EducationSchool) *libregraph.EducationSchool); ok {
+		r0 = rf(ctx, group)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*libregraph.EducationSchool)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, libregraph.EducationSchool) error); ok {
+		r1 = rf(ctx, group)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // CreateEducationUser provides a mock function with given fields: ctx, user
@@ -54,27 +77,18 @@ func (_m *EducationBackend) CreateEducationUser(ctx context.Context, user libreg
 	return r0, r1
 }
 
-// CreateSchool provides a mock function with given fields: ctx, group
-func (_m *EducationBackend) CreateSchool(ctx context.Context, group libregraph.EducationSchool) (*libregraph.EducationSchool, error) {
-	ret := _m.Called(ctx, group)
+// DeleteEducationSchool provides a mock function with given fields: ctx, id
+func (_m *EducationBackend) DeleteEducationSchool(ctx context.Context, id string) error {
+	ret := _m.Called(ctx, id)
 
-	var r0 *libregraph.EducationSchool
-	if rf, ok := ret.Get(0).(func(context.Context, libregraph.EducationSchool) *libregraph.EducationSchool); ok {
-		r0 = rf(ctx, group)
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(ctx, id)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*libregraph.EducationSchool)
-		}
+		r0 = ret.Error(0)
 	}
 
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, libregraph.EducationSchool) error); ok {
-		r1 = rf(ctx, group)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
+	return r0
 }
 
 // DeleteEducationUser provides a mock function with given fields: ctx, nameOrID
@@ -91,18 +105,73 @@ func (_m *EducationBackend) DeleteEducationUser(ctx context.Context, nameOrID st
 	return r0
 }
 
-// DeleteSchool provides a mock function with given fields: ctx, id
-func (_m *EducationBackend) DeleteSchool(ctx context.Context, id string) error {
-	ret := _m.Called(ctx, id)
+// GetEducationSchool provides a mock function with given fields: ctx, nameOrID, queryParam
+func (_m *EducationBackend) GetEducationSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error) {
+	ret := _m.Called(ctx, nameOrID, queryParam)
 
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
-		r0 = rf(ctx, id)
+	var r0 *libregraph.EducationSchool
+	if rf, ok := ret.Get(0).(func(context.Context, string, url.Values) *libregraph.EducationSchool); ok {
+		r0 = rf(ctx, nameOrID, queryParam)
 	} else {
-		r0 = ret.Error(0)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*libregraph.EducationSchool)
+		}
 	}
 
-	return r0
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, url.Values) error); ok {
+		r1 = rf(ctx, nameOrID, queryParam)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetEducationSchoolMembers provides a mock function with given fields: ctx, id
+func (_m *EducationBackend) GetEducationSchoolMembers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
+	ret := _m.Called(ctx, id)
+
+	var r0 []*libregraph.EducationUser
+	if rf, ok := ret.Get(0).(func(context.Context, string) []*libregraph.EducationUser); ok {
+		r0 = rf(ctx, id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*libregraph.EducationUser)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetEducationSchools provides a mock function with given fields: ctx, queryParam
+func (_m *EducationBackend) GetEducationSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error) {
+	ret := _m.Called(ctx, queryParam)
+
+	var r0 []*libregraph.EducationSchool
+	if rf, ok := ret.Get(0).(func(context.Context, url.Values) []*libregraph.EducationSchool); ok {
+		r0 = rf(ctx, queryParam)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*libregraph.EducationSchool)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, url.Values) error); ok {
+		r1 = rf(ctx, queryParam)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // GetEducationUser provides a mock function with given fields: ctx, nameOrID, queryParam
@@ -151,77 +220,8 @@ func (_m *EducationBackend) GetEducationUsers(ctx context.Context, queryParam ur
 	return r0, r1
 }
 
-// GetSchool provides a mock function with given fields: ctx, nameOrID, queryParam
-func (_m *EducationBackend) GetSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error) {
-	ret := _m.Called(ctx, nameOrID, queryParam)
-
-	var r0 *libregraph.EducationSchool
-	if rf, ok := ret.Get(0).(func(context.Context, string, url.Values) *libregraph.EducationSchool); ok {
-		r0 = rf(ctx, nameOrID, queryParam)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*libregraph.EducationSchool)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, url.Values) error); ok {
-		r1 = rf(ctx, nameOrID, queryParam)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// GetSchoolMembers provides a mock function with given fields: ctx, id
-func (_m *EducationBackend) GetSchoolMembers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
-	ret := _m.Called(ctx, id)
-
-	var r0 []*libregraph.EducationUser
-	if rf, ok := ret.Get(0).(func(context.Context, string) []*libregraph.EducationUser); ok {
-		r0 = rf(ctx, id)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*libregraph.EducationUser)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, id)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// GetSchools provides a mock function with given fields: ctx, queryParam
-func (_m *EducationBackend) GetSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error) {
-	ret := _m.Called(ctx, queryParam)
-
-	var r0 []*libregraph.EducationSchool
-	if rf, ok := ret.Get(0).(func(context.Context, url.Values) []*libregraph.EducationSchool); ok {
-		r0 = rf(ctx, queryParam)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*libregraph.EducationSchool)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, url.Values) error); ok {
-		r1 = rf(ctx, queryParam)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// RemoveMemberFromSchool provides a mock function with given fields: ctx, schoolID, memberID
-func (_m *EducationBackend) RemoveMemberFromSchool(ctx context.Context, schoolID string, memberID string) error {
+// RemoveMemberFromEducationSchool provides a mock function with given fields: ctx, schoolID, memberID
+func (_m *EducationBackend) RemoveMemberFromEducationSchool(ctx context.Context, schoolID string, memberID string) error {
 	ret := _m.Called(ctx, schoolID, memberID)
 
 	var r0 error
