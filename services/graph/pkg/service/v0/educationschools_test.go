@@ -73,10 +73,10 @@ var _ = Describe("Schools", func() {
 		)
 	})
 
-	Describe("GetSchools", func() {
+	Describe("GetEducationSchools", func() {
 		It("handles invalid ODATA parameters", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools?§foo=bar", nil)
-			svc.GetSchools(rr, r)
+			svc.GetEducationSchools(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
@@ -85,7 +85,7 @@ var _ = Describe("Schools", func() {
 			identityEducationBackend.On("GetSchools", ctx, mock.Anything).Return([]*libregraph.EducationSchool{newSchool}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools?$orderby=invalid", nil)
-			svc.GetSchools(rr, r)
+			svc.GetEducationSchools(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 			data, err := io.ReadAll(rr.Body)
@@ -101,7 +101,7 @@ var _ = Describe("Schools", func() {
 			identityEducationBackend.On("GetSchools", ctx, mock.Anything).Return(nil, errors.New("failed"))
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools", nil)
-			svc.GetSchools(rr, r)
+			svc.GetEducationSchools(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 			data, err := io.ReadAll(rr.Body)
 			Expect(err).ToNot(HaveOccurred())
@@ -116,7 +116,7 @@ var _ = Describe("Schools", func() {
 			identityEducationBackend.On("GetSchools", ctx, mock.Anything).Return(nil, errorcode.New(errorcode.AccessDenied, "access denied"))
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools", nil)
-			svc.GetSchools(rr, r)
+			svc.GetEducationSchools(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 			data, err := io.ReadAll(rr.Body)
@@ -132,7 +132,7 @@ var _ = Describe("Schools", func() {
 			identityEducationBackend.On("GetSchools", ctx, mock.Anything).Return([]*libregraph.EducationSchool{}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools", nil)
-			svc.GetSchools(rr, r)
+			svc.GetEducationSchools(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
 			data, err := io.ReadAll(rr.Body)
@@ -148,7 +148,7 @@ var _ = Describe("Schools", func() {
 			identityEducationBackend.On("GetSchools", ctx, mock.Anything).Return([]*libregraph.EducationSchool{newSchool}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools", nil)
-			svc.GetSchools(rr, r)
+			svc.GetEducationSchools(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
 			data, err := io.ReadAll(rr.Body)
@@ -163,10 +163,10 @@ var _ = Describe("Schools", func() {
 		})
 	})
 
-	Describe("GetSchool", func() {
+	Describe("GetEducationSchool", func() {
 		It("handles missing or empty school id", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools", nil)
-			svc.GetSchool(rr, r)
+			svc.GetEducationSchool(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 
@@ -174,7 +174,7 @@ var _ = Describe("Schools", func() {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", "")
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
-			svc.GetSchool(rr, r)
+			svc.GetEducationSchool(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
@@ -190,18 +190,18 @@ var _ = Describe("Schools", func() {
 				rctx.URLParams.Add("schoolID", *newSchool.Id)
 				r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
 
-				svc.GetSchool(rr, r)
+				svc.GetEducationSchool(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusOK))
 			})
 		})
 	})
 
-	Describe("PostSchool", func() {
+	Describe("PostEducationSchool", func() {
 		It("handles invalid body", func() {
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/", bytes.NewBufferString("{invalid"))
 
-			svc.PostSchool(rr, r)
+			svc.PostEducationSchool(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
@@ -213,7 +213,7 @@ var _ = Describe("Schools", func() {
 
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/", bytes.NewBuffer(newSchoolJson))
 
-			svc.PostSchool(rr, r)
+			svc.PostEducationSchool(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
@@ -225,7 +225,7 @@ var _ = Describe("Schools", func() {
 
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/", bytes.NewBuffer(newSchoolJson))
 
-			svc.PostSchool(rr, r)
+			svc.PostEducationSchool(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
@@ -239,7 +239,7 @@ var _ = Describe("Schools", func() {
 
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/", bytes.NewBuffer(newSchoolJson))
 
-			svc.PostSchool(rr, r)
+			svc.PostEducationSchool(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
@@ -254,7 +254,7 @@ var _ = Describe("Schools", func() {
 
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/", bytes.NewBuffer(newSchoolJson))
 
-			svc.PostSchool(rr, r)
+			svc.PostEducationSchool(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 		})
@@ -270,24 +270,24 @@ var _ = Describe("Schools", func() {
 
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/", bytes.NewBuffer(newSchoolJson))
 
-			svc.PostSchool(rr, r)
+			svc.PostEducationSchool(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusCreated))
 		})
 	})
-	Describe("PatchSchool", func() {
+	Describe("PatchEducationSchool", func() {
 		It("handles invalid body", func() {
 			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/education/schools/", bytes.NewBufferString("{invalid"))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.PatchSchool(rr, r)
+			svc.PatchEducationSchool(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
 		It("handles missing or empty school id", func() {
 			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/education/schools", nil)
-			svc.PatchSchool(rr, r)
+			svc.PatchEducationSchool(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 
@@ -295,7 +295,7 @@ var _ = Describe("Schools", func() {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", "")
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.PatchSchool(rr, r)
+			svc.PatchEducationSchool(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
@@ -305,7 +305,7 @@ var _ = Describe("Schools", func() {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", "school%id")
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.PatchSchool(rr, r)
+			svc.PatchEducationSchool(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
@@ -321,13 +321,13 @@ var _ = Describe("Schools", func() {
 			rctx.URLParams.Add("schoolID", "school-id")
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 
-			svc.PatchSchool(rr, r)
+			svc.PatchEducationSchool(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 		})
 	})
 
-	Describe("DeleteSchool", func() {
+	Describe("DeleteEducationSchool", func() {
 		Context("with an existing school", func() {
 			BeforeEach(func() {
 				identityEducationBackend.On("GetSchool", mock.Anything, mock.Anything, mock.Anything).Return(newSchool, nil)
@@ -340,14 +340,14 @@ var _ = Describe("Schools", func() {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.DeleteSchool(rr, r)
+			svc.DeleteEducationSchool(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "DeleteSchool", 1)
 		})
 	})
 
-	Describe("GetSchoolMembers", func() {
+	Describe("GetEducationSchoolMembers", func() {
 		It("gets the list of members", func() {
 			user := libregraph.NewEducationUser()
 			user.SetId("user")
@@ -357,7 +357,7 @@ var _ = Describe("Schools", func() {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.GetSchoolMembers(rr, r)
+			svc.GetEducationSchoolMembers(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
 			data, err := io.ReadAll(rr.Body)
@@ -372,13 +372,13 @@ var _ = Describe("Schools", func() {
 		})
 	})
 
-	Describe("PostSchoolMembers", func() {
+	Describe("PostEducationSchoolMembers", func() {
 		It("fails on invalid body", func() {
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/{schoolID}/members", bytes.NewBufferString("{invalid"))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.PostSchoolMember(rr, r)
+			svc.PostEducationSchoolMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
@@ -391,7 +391,7 @@ var _ = Describe("Schools", func() {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.PostSchoolMember(rr, r)
+			svc.PostEducationSchoolMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
@@ -405,7 +405,7 @@ var _ = Describe("Schools", func() {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.PostSchoolMember(rr, r)
+			svc.PostEducationSchoolMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
@@ -420,20 +420,20 @@ var _ = Describe("Schools", func() {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.PostSchoolMember(rr, r)
+			svc.PostEducationSchoolMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 
 			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "AddMembersToSchool", 1)
 		})
 	})
 
-	Describe("DeleteSchoolMembers", func() {
+	Describe("DeleteEducationSchoolMembers", func() {
 		It("handles missing or empty member id", func() {
 			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/education/schools/{schoolID}/members/{memberID}/$ref", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.DeleteSchoolMember(rr, r)
+			svc.DeleteEducationSchoolMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 		It("handles missing or empty member id", func() {
@@ -441,7 +441,7 @@ var _ = Describe("Schools", func() {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("memberID", "/users/user")
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.DeleteSchoolMember(rr, r)
+			svc.DeleteEducationSchoolMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
@@ -453,7 +453,7 @@ var _ = Describe("Schools", func() {
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			rctx.URLParams.Add("memberID", "/users/user1")
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.DeleteSchoolMember(rr, r)
+			svc.DeleteEducationSchoolMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 
 			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "RemoveMemberFromSchool", 1)

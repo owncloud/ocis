@@ -17,8 +17,8 @@ import (
 	"github.com/go-chi/render"
 )
 
-// GetSchools implements the Service interface.
-func (g Graph) GetSchools(w http.ResponseWriter, r *http.Request) {
+// GetEducationSchools implements the Service interface.
+func (g Graph) GetEducationSchools(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Interface("query", r.URL.Query()).Msg("calling get schools")
 	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
@@ -41,7 +41,7 @@ func (g Graph) GetSchools(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	schools, err = sortSchools(odataReq, schools)
+	schools, err = sortEducationSchools(odataReq, schools)
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("cannot get schools: could not sort schools according to query")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
@@ -51,8 +51,8 @@ func (g Graph) GetSchools(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &ListResponse{Value: schools})
 }
 
-// PostSchool implements the Service interface.
-func (g Graph) PostSchool(w http.ResponseWriter, r *http.Request) {
+// PostEducationSchool implements the Service interface.
+func (g Graph) PostEducationSchool(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling post school")
 	school := libregraph.NewEducationSchool()
@@ -104,8 +104,8 @@ func (g Graph) PostSchool(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, school)
 }
 
-// PatchSchool implements the Service interface.
-func (g Graph) PatchSchool(w http.ResponseWriter, r *http.Request) {
+// PatchEducationSchool implements the Service interface.
+func (g Graph) PatchEducationSchool(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling patch school")
 	schoolID := chi.URLParam(r, "schoolID")
@@ -141,8 +141,8 @@ func (g Graph) PatchSchool(w http.ResponseWriter, r *http.Request) {
 	render.NoContent(w, r)
 }
 
-// GetSchool implements the Service interface.
-func (g Graph) GetSchool(w http.ResponseWriter, r *http.Request) {
+// GetEducationSchool implements the Service interface.
+func (g Graph) GetEducationSchool(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling get school")
 	schoolID := chi.URLParam(r, "schoolID")
@@ -177,8 +177,8 @@ func (g Graph) GetSchool(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, school)
 }
 
-// DeleteSchool implements the Service interface.
-func (g Graph) DeleteSchool(w http.ResponseWriter, r *http.Request) {
+// DeleteEducationSchool implements the Service interface.
+func (g Graph) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling delete school")
 	schoolID := chi.URLParam(r, "schoolID")
@@ -221,8 +221,8 @@ func (g Graph) DeleteSchool(w http.ResponseWriter, r *http.Request) {
 	render.NoContent(w, r)
 }
 
-// GetSchoolMembers implements the Service interface.
-func (g Graph) GetSchoolMembers(w http.ResponseWriter, r *http.Request) {
+// GetEducationSchoolMembers implements the Service interface.
+func (g Graph) GetEducationSchoolMembers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling get school members")
 	schoolID := chi.URLParam(r, "schoolID")
@@ -256,8 +256,8 @@ func (g Graph) GetSchoolMembers(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, members)
 }
 
-// PostSchoolMember implements the Service interface.
-func (g Graph) PostSchoolMember(w http.ResponseWriter, r *http.Request) {
+// PostEducationSchoolMember implements the Service interface.
+func (g Graph) PostEducationSchoolMember(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("Calling post school member")
 
@@ -333,8 +333,8 @@ func (g Graph) PostSchoolMember(w http.ResponseWriter, r *http.Request) {
 	render.NoContent(w, r)
 }
 
-// DeleteSchoolMember implements the Service interface.
-func (g Graph) DeleteSchoolMember(w http.ResponseWriter, r *http.Request) {
+// DeleteEducationSchoolMember implements the Service interface.
+func (g Graph) DeleteEducationSchoolMember(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling delete school member")
 
@@ -391,7 +391,7 @@ func (g Graph) DeleteSchoolMember(w http.ResponseWriter, r *http.Request) {
 	render.NoContent(w, r)
 }
 
-func sortSchools(req *godata.GoDataRequest, schools []*libregraph.EducationSchool) ([]*libregraph.EducationSchool, error) {
+func sortEducationSchools(req *godata.GoDataRequest, schools []*libregraph.EducationSchool) ([]*libregraph.EducationSchool, error) {
 	var sorter sort.Interface
 	if req.Query.OrderBy == nil || len(req.Query.OrderBy.OrderByItems) != 1 {
 		return schools, nil
