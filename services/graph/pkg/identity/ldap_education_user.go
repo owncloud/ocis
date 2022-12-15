@@ -249,6 +249,7 @@ func (i *LDAP) getEducationUserAttrTypes() []string {
 		i.userAttributeMap.userName,
 		i.educationConfig.userAttributeMap.identities,
 		i.educationConfig.userAttributeMap.primaryRole,
+		i.educationConfig.memberOfSchoolAttribute,
 	}
 }
 

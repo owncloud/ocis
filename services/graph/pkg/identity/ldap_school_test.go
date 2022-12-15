@@ -168,45 +168,64 @@ func TestGetEducationSchools(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestAddMembersToEducationSchool(t *testing.T) {
+var schoolByIDSearch1 *ldap.SearchRequest = &ldap.SearchRequest{
+	BaseDN:     "",
+	Scope:      2,
+	SizeLimit:  1,
+	Filter:     "(&(objectClass=ocEducationSchool)(owncloudUUID=abcd-defg))",
+	Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+	Controls:   []ldap.Control(nil),
+}
+var userByIDSearch1 *ldap.SearchRequest = &ldap.SearchRequest{
+	BaseDN:     "ou=people,dc=test",
+	Scope:      2,
+	SizeLimit:  1,
+	Filter:     "(&(objectClass=ocEducationUser)(|(uid=abcd-defg)(entryUUID=abcd-defg)))",
+	Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass", "ocMemberOfSchool"},
+	Controls:   []ldap.Control(nil),
+}
+var userByIDSearch2 *ldap.SearchRequest = &ldap.SearchRequest{
+	BaseDN:     "ou=people,dc=test",
+	Scope:      2,
+	SizeLimit:  1,
+	Filter:     "(&(objectClass=ocEducationUser)(|(uid=does-not-exist)(entryUUID=does-not-exist)))",
+	Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass", "ocMemberOfSchool"},
+	Controls:   []ldap.Control(nil),
+}
+
+func TestAddUsersToEducationSchool(t *testing.T) {
 	lm := &mocks.Client{}
-	sr1 := &ldap.SearchRequest{
-		BaseDN:     "",
-		Scope:      2,
-		SizeLimit:  1,
-		Filter:     "(&(objectClass=ocEducationSchool)(owncloudUUID=abcd-defg))",
-		Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
-		Controls:   []ldap.Control(nil),
-	}
-	sr2 := &ldap.SearchRequest{
-		BaseDN:     "ou=people,dc=test",
-		Scope:      2,
-		SizeLimit:  1,
-		Filter:     "(&(objectClass=ocEducationUser)(|(uid=abcd-defg)(entryUUID=abcd-defg)))",
-		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass"},
-		Controls:   []ldap.Control(nil),
-	}
-	sr3 := &ldap.SearchRequest{
-		BaseDN:     "ou=people,dc=test",
-		Scope:      2,
-		SizeLimit:  1,
-		Filter:     "(&(objectClass=ocEducationUser)(|(uid=does-not-exist)(entryUUID=does-not-exist)))",
-		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass"},
-		Controls:   []ldap.Control(nil),
-	}
-	lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry, schoolEntry1}}, nil)
-	lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntry}}, nil)
-	lm.On("Search", sr3).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
+	lm.On("Search", schoolByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry, schoolEntry1}}, nil)
+	lm.On("Search", userByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntry}}, nil)
+	lm.On("Search", userByIDSearch2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
 	lm.On("Modify", mock.Anything).Return(nil)
 	b, err := getMockedBackend(lm, eduConfig, &logger)
 	assert.Nil(t, err)
-	err = b.AddMembersToEducationSchool(context.Background(), "abcd-defg", []string{"does-not-exist"})
+	err = b.AddUsersToEducationSchool(context.Background(), "abcd-defg", []string{"does-not-exist"})
 	lm.AssertNumberOfCalls(t, "Search", 2)
 	assert.NotNil(t, err)
-	err = b.AddMembersToEducationSchool(context.Background(), "abcd-defg", []string{"abcd-defg", "does-not-exist"})
+	err = b.AddUsersToEducationSchool(context.Background(), "abcd-defg", []string{"abcd-defg", "does-not-exist"})
 	lm.AssertNumberOfCalls(t, "Search", 5)
 	assert.NotNil(t, err)
-	err = b.AddMembersToEducationSchool(context.Background(), "abcd-defg", []string{"abcd-defg"})
+	err = b.AddUsersToEducationSchool(context.Background(), "abcd-defg", []string{"abcd-defg"})
 	lm.AssertNumberOfCalls(t, "Search", 7)
+	assert.Nil(t, err)
+}
+
+func TestRemoveMemberFromEducationSchoo(t *testing.T) {
+	lm := &mocks.Client{}
+	lm.On("Search", schoolByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry, schoolEntry1}}, nil)
+	lm.On("Search", userByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntryWithSchool}}, nil)
+	lm.On("Search", userByIDSearch2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
+	lm.On("Modify", mock.Anything).Return(nil)
+	b, err := getMockedBackend(lm, eduConfig, &logger)
+	assert.Nil(t, err)
+	err = b.RemoveUserFromEducationSchool(context.Background(), "abcd-defg", "does-not-exist")
+	lm.AssertNumberOfCalls(t, "Search", 2)
+	assert.NotNil(t, err)
+	assert.Equal(t, "itemNotFound", err.Error())
+	err = b.RemoveUserFromEducationSchool(context.Background(), "abcd-defg", "abcd-defg")
+	lm.AssertNumberOfCalls(t, "Search", 4)
+	lm.AssertNumberOfCalls(t, "Modify", 1)
 	assert.Nil(t, err)
 }
