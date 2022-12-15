@@ -208,7 +208,52 @@ func (i *LDAP) GetEducationSchools(ctx context.Context, queryParam url.Values) (
 
 // GetEducationSchoolUsers implements the EducationBackend interface for the LDAP backend.
 func (i *LDAP) GetEducationSchoolUsers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
-	return nil, errNotImplemented
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("GetEducationSchoolUsers")
+
+	schoolEntry, err := i.getSchoolByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if schoolEntry == nil {
+		return nil, errNotFound
+	}
+	id = ldap.EscapeFilter(id)
+	idFilter := fmt.Sprintf("(%s=%s)", i.educationConfig.memberOfSchoolAttribute, id)
+	userFilter := fmt.Sprintf("(&%s(objectClass=%s)%s)", i.userFilter, i.educationConfig.userObjectClass, idFilter)
+
+	searchRequest := ldap.NewSearchRequest(
+		i.userBaseDN,
+		i.userScope,
+		ldap.NeverDerefAliases, 0, 0, false,
+		userFilter,
+		i.getEducationUserAttrTypes(),
+		nil,
+	)
+	logger.Debug().Str("backend", "ldap").
+		Str("base", searchRequest.BaseDN).
+		Str("filter", searchRequest.Filter).
+		Int("scope", searchRequest.Scope).
+		Int("sizelimit", searchRequest.SizeLimit).
+		Interface("attributes", searchRequest.Attributes).
+		Msg("GetEducationUsers")
+	res, err := i.conn.Search(searchRequest)
+	if err != nil {
+		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
+	}
+
+	users := make([]*libregraph.EducationUser, 0, len(res.Entries))
+
+	for _, e := range res.Entries {
+		u := i.createEducationUserModelFromLDAP(e)
+		// Skip invalid LDAP users
+		if u == nil {
+			continue
+		}
+		users = append(users, u)
+	}
+	return users, nil
 }
 
 // AddUsersToEducationSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
