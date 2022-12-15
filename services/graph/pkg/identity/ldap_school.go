@@ -20,6 +20,9 @@ type educationConfig struct {
 	schoolObjectClass  string
 	schoolScope        int
 	schoolAttributeMap schoolAttributeMap
+
+	userObjectClass  string
+	userAttributeMap educationUserAttributeMap
 }
 
 type schoolAttributeMap struct {
@@ -33,6 +36,9 @@ func defaultEducationConfig() educationConfig {
 		schoolObjectClass:  "ocEducationSchool",
 		schoolScope:        ldap.ScopeWholeSubtree,
 		schoolAttributeMap: newSchoolAttributeMap(),
+
+		userObjectClass:  "ocEducationUser",
+		userAttributeMap: newEducationUserAttributeMap(),
 	}
 }
 
