@@ -140,7 +140,9 @@ type ListResponse struct {
 }
 
 const (
-	ReadmeSpecialFolderName     = "readme"
+	// ReadmeSpecialFolderName for the drive specialFolder property
+	ReadmeSpecialFolderName = "readme"
+	// SpaceImageSpecialFolderName for the drive specialFolder property
 	SpaceImageSpecialFolderName = "image"
 )
 
