@@ -256,9 +256,36 @@ func (i *LDAP) AddUsersToEducationSchool(ctx context.Context, schoolID string, m
 	return nil
 }
 
-// RemoveMemberFromEducationSchool removes a single member (by ID) from a school
-func (i *LDAP) RemoveMemberFromEducationSchool(ctx context.Context, schoolID string, memberID string) error {
-	return errNotImplemented
+// RemoveUserFromEducationSchool removes a single member (by ID) from a school
+func (i *LDAP) RemoveUserFromEducationSchool(ctx context.Context, schoolID string, memberID string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("RemoveUserFromEducationSchool")
+
+	schoolEntry, err := i.getSchoolByID(schoolID)
+	if err != nil {
+		return err
+	}
+
+	if schoolEntry == nil {
+		return errNotFound
+	}
+	user, err := i.getEducationUserByNameOrID(memberID)
+	if err != nil {
+		i.logger.Warn().Str("userid", memberID).Msg("User does not exist")
+		return err
+	}
+	currentSchools := user.GetEqualFoldAttributeValues(i.educationConfig.memberOfSchoolAttribute)
+	for _, currentSchool := range currentSchools {
+		if currentSchool == schoolID {
+			mr := ldap.ModifyRequest{DN: user.DN}
+			mr.Delete(i.educationConfig.memberOfSchoolAttribute, []string{schoolID})
+			if err := i.conn.Modify(&mr); err != nil {
+				return err
+			}
+			break
+		}
+	}
+	return nil
 }
 
 func (i *LDAP) getSchoolByDN(dn string) (*ldap.Entry, error) {

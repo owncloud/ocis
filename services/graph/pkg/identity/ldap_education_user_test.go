@@ -23,13 +23,26 @@ var eduUserEntry = ldap.NewEntry("uid=user,ou=people,dc=test",
 			"xxx $ http://idpnew $ xxxxx-xxxxx-xxxxx",
 		},
 	})
+var eduUserEntryWithSchool = ldap.NewEntry("uid=user,ou=people,dc=test",
+	map[string][]string{
+		"uid":              {"testuser"},
+		"displayname":      {"Test User"},
+		"mail":             {"user@example"},
+		"entryuuid":        {"abcd-defg"},
+		"userClass":        {"student"},
+		"ocMemberOfSchool": {"abcd-defg"},
+		"oCExternalIdentity": {
+			"$ http://idp $ testuser",
+			"xxx $ http://idpnew $ xxxxx-xxxxx-xxxxx",
+		},
+	})
 
 var sr1 *ldap.SearchRequest = &ldap.SearchRequest{
 	BaseDN:     "ou=people,dc=test",
 	Scope:      2,
 	SizeLimit:  1,
 	Filter:     "(&(objectClass=ocEducationUser)(|(uid=abcd-defg)(entryUUID=abcd-defg)))",
-	Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass"},
+	Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass", "ocMemberOfSchool"},
 	Controls:   []ldap.Control(nil),
 }
 var sr2 *ldap.SearchRequest = &ldap.SearchRequest{
@@ -37,7 +50,7 @@ var sr2 *ldap.SearchRequest = &ldap.SearchRequest{
 	Scope:      2,
 	SizeLimit:  1,
 	Filter:     "(&(objectClass=ocEducationUser)(|(uid=xxxx-xxxx)(entryUUID=xxxx-xxxx)))",
-	Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass"},
+	Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass", "ocMemberOfSchool"},
 	Controls:   []ldap.Control(nil),
 }
 
@@ -120,7 +133,7 @@ func TestGetEducationUsers(t *testing.T) {
 		Scope:      2,
 		SizeLimit:  0,
 		Filter:     "(objectClass=ocEducationUser)",
-		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass"},
+		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass", "ocMemberOfSchool"},
 		Controls:   []ldap.Control(nil),
 	}
 	lm.On("Search", sr).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntry}}, nil)
