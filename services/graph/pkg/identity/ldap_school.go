@@ -46,6 +46,24 @@ func newEducationConfig(config config.LDAP) (educationConfig, error) {
 				return educationConfig{}, fmt.Errorf("error configuring school search scope: %w", err)
 			}
 		}
+		if config.EducationConfig.SchoolFilter != "" {
+			eduCfg.schoolFilter = config.EducationConfig.SchoolFilter
+		}
+		if config.EducationConfig.SchoolObjectClass != "" {
+			eduCfg.schoolObjectClass = config.EducationConfig.SchoolObjectClass
+		}
+
+		// Attribute mapping config
+		if config.EducationConfig.SchoolNameAttribute != "" {
+			eduCfg.schoolAttributeMap.displayName = config.EducationConfig.SchoolNameAttribute
+		}
+		if config.EducationConfig.SchoolNumberAttribute != "" {
+			eduCfg.schoolAttributeMap.schoolNumber = config.EducationConfig.SchoolNumberAttribute
+		}
+		if config.EducationConfig.SchoolIDAttribute != "" {
+			eduCfg.schoolAttributeMap.id = config.EducationConfig.SchoolIDAttribute
+		}
+
 		return eduCfg, nil
 	}
 	return educationConfig{}, nil
