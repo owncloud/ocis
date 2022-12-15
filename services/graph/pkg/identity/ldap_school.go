@@ -206,15 +206,15 @@ func (i *LDAP) GetEducationSchools(ctx context.Context, queryParam url.Values) (
 	return schools, nil
 }
 
-// GetEducationSchoolMembers implements the EducationBackend interface for the LDAP backend.
-func (i *LDAP) GetEducationSchoolMembers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
+// GetEducationSchoolUsers implements the EducationBackend interface for the LDAP backend.
+func (i *LDAP) GetEducationSchoolUsers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
 	return nil, errNotImplemented
 }
 
-// AddMembersToEducationSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
-func (i *LDAP) AddMembersToEducationSchool(ctx context.Context, schoolID string, memberIDs []string) error {
+// AddUsersToEducationSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
+func (i *LDAP) AddUsersToEducationSchool(ctx context.Context, schoolID string, memberIDs []string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
-	logger.Debug().Str("backend", "ldap").Msg("AddMembersToEducationSchool")
+	logger.Debug().Str("backend", "ldap").Msg("AddUsersToEducationSchool")
 
 	schoolEntry, err := i.getSchoolByID(schoolID)
 	if err != nil {

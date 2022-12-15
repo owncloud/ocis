@@ -124,19 +124,19 @@ func (i instrument) DeleteEducationSchool(w http.ResponseWriter, r *http.Request
 	i.next.DeleteEducationSchool(w, r)
 }
 
-// GetEducationSchoolMembers implements the Service interface.
-func (i instrument) GetEducationSchoolMembers(w http.ResponseWriter, r *http.Request) {
-	i.next.GetEducationSchoolMembers(w, r)
+// GetEducationSchoolUsers implements the Service interface.
+func (i instrument) GetEducationSchoolUsers(w http.ResponseWriter, r *http.Request) {
+	i.next.GetEducationSchoolUsers(w, r)
 }
 
-// PostEducationSchoolMember implements the Service interface.
-func (i instrument) PostEducationSchoolMember(w http.ResponseWriter, r *http.Request) {
-	i.next.PostEducationSchoolMember(w, r)
+// PostEducationSchoolUser implements the Service interface.
+func (i instrument) PostEducationSchoolUser(w http.ResponseWriter, r *http.Request) {
+	i.next.PostEducationSchoolUser(w, r)
 }
 
-// DeleteEducationSchoolMember implements the Service interface.
-func (i instrument) DeleteEducationSchoolMember(w http.ResponseWriter, r *http.Request) {
-	i.next.DeleteEducationSchoolMember(w, r)
+// DeleteEducationSchoolUser implements the Service interface.
+func (i instrument) DeleteEducationSchoolUser(w http.ResponseWriter, r *http.Request) {
+	i.next.DeleteEducationSchoolUser(w, r)
 }
 
 // GetEducationUsers implements the Service interface.

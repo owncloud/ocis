@@ -17,8 +17,8 @@ type EducationBackend struct {
 	mock.Mock
 }
 
-// AddMembersToEducationSchool provides a mock function with given fields: ctx, schoolID, memberID
-func (_m *EducationBackend) AddMembersToEducationSchool(ctx context.Context, schoolID string, memberID []string) error {
+// AddUsersToEducationSchool provides a mock function with given fields: ctx, schoolID, memberID
+func (_m *EducationBackend) AddUsersToEducationSchool(ctx context.Context, schoolID string, memberID []string) error {
 	ret := _m.Called(ctx, schoolID, memberID)
 
 	var r0 error
@@ -128,8 +128,8 @@ func (_m *EducationBackend) GetEducationSchool(ctx context.Context, nameOrID str
 	return r0, r1
 }
 
-// GetEducationSchoolMembers provides a mock function with given fields: ctx, id
-func (_m *EducationBackend) GetEducationSchoolMembers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
+// GetEducationSchoolUsers provides a mock function with given fields: ctx, id
+func (_m *EducationBackend) GetEducationSchoolUsers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
 	ret := _m.Called(ctx, id)
 
 	var r0 []*libregraph.EducationUser
@@ -220,8 +220,8 @@ func (_m *EducationBackend) GetEducationUsers(ctx context.Context, queryParam ur
 	return r0, r1
 }
 
-// RemoveMemberFromEducationSchool provides a mock function with given fields: ctx, schoolID, memberID
-func (_m *EducationBackend) RemoveMemberFromEducationSchool(ctx context.Context, schoolID string, memberID string) error {
+// RemoveUserFromEducationSchool provides a mock function with given fields: ctx, schoolID, memberID
+func (_m *EducationBackend) RemoveUserFromEducationSchool(ctx context.Context, schoolID string, memberID string) error {
 	ret := _m.Called(ctx, schoolID, memberID)
 
 	var r0 error
