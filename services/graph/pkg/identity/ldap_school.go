@@ -15,11 +15,14 @@ import (
 )
 
 type educationConfig struct {
-	schoolBaseDN       string
-	schoolFilter       string
-	schoolObjectClass  string
-	schoolScope        int
-	schoolAttributeMap schoolAttributeMap
+	schoolBaseDN      string
+	schoolFilter      string
+	schoolObjectClass string
+	schoolScope       int
+	// memberOfSchoolAttribute defines the AttributeType on the user/group objects
+	// which contains the school Id to which the user/group is assigned
+	memberOfSchoolAttribute string
+	schoolAttributeMap      schoolAttributeMap
 
 	userObjectClass  string
 	userAttributeMap educationUserAttributeMap
@@ -33,9 +36,10 @@ type schoolAttributeMap struct {
 
 func defaultEducationConfig() educationConfig {
 	return educationConfig{
-		schoolObjectClass:  "ocEducationSchool",
-		schoolScope:        ldap.ScopeWholeSubtree,
-		schoolAttributeMap: newSchoolAttributeMap(),
+		schoolObjectClass:       "ocEducationSchool",
+		schoolScope:             ldap.ScopeWholeSubtree,
+		memberOfSchoolAttribute: "ocMemberOfSchool",
+		schoolAttributeMap:      newSchoolAttributeMap(),
 
 		userObjectClass:  "ocEducationUser",
 		userAttributeMap: newEducationUserAttributeMap(),
@@ -140,6 +144,8 @@ func (i *LDAP) DeleteEducationSchool(ctx context.Context, id string) error {
 	if err = i.conn.Del(&dr); err != nil {
 		return err
 	}
+
+	// TODO update any users that are member of this school
 	return nil
 }
 
@@ -206,8 +212,48 @@ func (i *LDAP) GetEducationSchoolMembers(ctx context.Context, id string) ([]*lib
 }
 
 // AddMembersToEducationSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
-func (i *LDAP) AddMembersToEducationSchool(ctx context.Context, schoolID string, memberID []string) error {
-	return errNotImplemented
+func (i *LDAP) AddMembersToEducationSchool(ctx context.Context, schoolID string, memberIDs []string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("AddMembersToEducationSchool")
+
+	schoolEntry, err := i.getSchoolByID(schoolID)
+	if err != nil {
+		return err
+	}
+
+	if schoolEntry == nil {
+		return errNotFound
+	}
+
+	userEntries := make([]*ldap.Entry, 0, len(memberIDs))
+	for _, memberID := range memberIDs {
+		user, err := i.getEducationUserByNameOrID(memberID)
+		if err != nil {
+			i.logger.Warn().Str("userid", memberID).Msg("User does not exist")
+			return err
+		}
+		userEntries = append(userEntries, user)
+	}
+
+	for _, userEntry := range userEntries {
+		currentSchools := userEntry.GetEqualFoldAttributeValues(i.educationConfig.memberOfSchoolAttribute)
+		found := false
+		for _, currentSchool := range currentSchools {
+			if currentSchool == schoolID {
+				found = true
+				break
+			}
+		}
+		if !found {
+			mr := ldap.ModifyRequest{DN: userEntry.DN}
+			mr.Add(i.educationConfig.memberOfSchoolAttribute, []string{schoolID})
+			if err := i.conn.Modify(&mr); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 // RemoveMemberFromEducationSchool removes a single member (by ID) from a school
