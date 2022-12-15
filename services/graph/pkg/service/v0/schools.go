@@ -73,19 +73,19 @@ func (g Graph) PostSchool(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, ok := school.GetDisplayNameOk(); !ok {
-		logger.Debug().Err(err).Interface("school", school).Msg("could not create school: missing required attribute")
+		logger.Debug().Interface("school", school).Msg("could not create school: missing required attribute")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Missing Required Attribute")
 		return
 	}
 
 	if _, ok := school.GetSchoolNumberOk(); !ok {
-		logger.Debug().Err(err).Interface("school", school).Msg("could not create school: missing required attribute")
+		logger.Debug().Interface("school", school).Msg("could not create school: missing required attribute")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Missing Required Attribute")
 		return
 	}
 
 	if school, err = g.identityEducationBackend.CreateSchool(r.Context(), *school); err != nil {
-		logger.Debug().Interface("school", school).Msg("could not create school: backend error")
+		logger.Debug().Err(err).Interface("school", school).Msg("could not create school: backend error")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}

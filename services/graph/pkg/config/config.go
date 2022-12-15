@@ -63,7 +63,7 @@ type LDAP struct {
 	GroupNameAttribute string `yaml:"group_name_attribute" env:"LDAP_GROUP_SCHEMA_GROUPNAME;GRAPH_LDAP_GROUP_NAME_ATTRIBUTE" desc:"LDAP Attribute to use for the name of groups."`
 	GroupIDAttribute   string `yaml:"group_id_attribute" env:"LDAP_GROUP_SCHEMA_ID;GRAPH_LDAP_GROUP_ID_ATTRIBUTE" desc:"LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID."`
 
-	EducationResourcesEnabled bool `yaml:"education_resources_enabled" env:"LDAP_EDUCATION_RESOURCES_ENABLE;GRAPH_LDAP_EDUCATION_RESOURCES_ENABLED" desc:"enable LDAP support for managin education related resources"`
+	EducationResourcesEnabled bool `yaml:"education_resources_enabled" env:"LDAP_EDUCATION_RESOURCES_ENABLED;GRAPH_LDAP_EDUCATION_RESOURCES_ENABLED" desc:"Enable LDAP support for managing education related resources"`
 	EducationConfig           LDAPEducationConfig
 }
 
@@ -75,8 +75,9 @@ type LDAPEducationConfig struct {
 	SchoolFilter      string `yaml:"school_filter" env:"LDAP_SCHOOL_FILTER;GRAPH_LDAP_SCHOOL_FILTER" desc:"LDAP filter to add to the default filters for school searches."`
 	SchoolObjectClass string `yaml:"school_objectclass" env:"LDAP_SCHOOL_OBJECTCLASS;GRAPH_LDAP_SCHOOL_OBJECTCLASS" desc:"The object class to use for schools in the default school search filter."`
 
-	SchoolNameAttribute string `yaml:"school_name_attribute" env:"LDAP_SCHOOL_SCHEMA_SCHOOLNAME;GRAPH_LDAP_SCHOOL_NAME_ATTRIBUTE" desc:"LDAP Attribute to use for the name of schools."`
-	SchoolIDAttribute   string `yaml:"school_id_attribute" env:"LDAP_SCHOOL_SCHEMA_ID;GRAPH_LDAP_SCHOOL_ID_ATTRIBUTE" desc:"LDAP Attribute to use as the unique id for schools. This should be a stable globally unique ID like a UUID."`
+	SchoolNameAttribute   string `yaml:"school_name_attribute" env:"LDAP_SCHOOL_SCHEMA_SCHOOL_NAME;GRAPH_LDAP_SCHOOL_NAME_ATTRIBUTE" desc:"LDAP Attribute to use for the name of a school."`
+	SchoolNumberAttribute string `yaml:"school_number_attribute" env:"LDAP_SCHOOL_SCHEMA_SCHOOL_NUMBER;GRAPH_LDAP_SCHOOL_NUMBER_ATTRIBUTE" desc:"LDAP Attribute to use for the number of a school."`
+	SchoolIDAttribute     string `yaml:"school_id_attribute" env:"LDAP_SCHOOL_SCHEMA_ID;GRAPH_LDAP_SCHOOL_ID_ATTRIBUTE" desc:"LDAP Attribute to use as the unique id for schools. This should be a stable globally unique ID like a UUID."`
 }
 
 type Identity struct {
