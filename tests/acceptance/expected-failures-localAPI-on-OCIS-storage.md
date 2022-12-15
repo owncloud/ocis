@@ -87,3 +87,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:160](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L160)
 - [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:161](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L161)
 - [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:162](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L162)
+
+#### [Public cannot download folder via the public link of the folder inside the project space](https://github.com/owncloud/ocis/issues/5229)
+- [apiSpacesShares/publicLinkDownload.feature:31](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/publicLinkDownload.feature#L31)
