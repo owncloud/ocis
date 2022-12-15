@@ -99,44 +99,44 @@ func (l logging) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 	l.next.DeleteGroupMember(w, r)
 }
 
-// GetSchools implements the Service interface.
-func (l logging) GetSchools(w http.ResponseWriter, r *http.Request) {
-	l.next.GetSchools(w, r)
+// GetEducationSchools implements the Service interface.
+func (l logging) GetEducationSchools(w http.ResponseWriter, r *http.Request) {
+	l.next.GetEducationSchools(w, r)
 }
 
-// GetSchool implements the Service interface.
-func (l logging) GetSchool(w http.ResponseWriter, r *http.Request) {
-	l.next.GetSchool(w, r)
+// GetEducationSchool implements the Service interface.
+func (l logging) GetEducationSchool(w http.ResponseWriter, r *http.Request) {
+	l.next.GetEducationSchool(w, r)
 }
 
-// PostSchool implements the Service interface.
-func (l logging) PostSchool(w http.ResponseWriter, r *http.Request) {
-	l.next.PostSchool(w, r)
+// PostEducationSchool implements the Service interface.
+func (l logging) PostEducationSchool(w http.ResponseWriter, r *http.Request) {
+	l.next.PostEducationSchool(w, r)
 }
 
-// PatchSchool implements the Service interface.
-func (l logging) PatchSchool(w http.ResponseWriter, r *http.Request) {
-	l.next.PatchSchool(w, r)
+// PatchEducationSchool implements the Service interface.
+func (l logging) PatchEducationSchool(w http.ResponseWriter, r *http.Request) {
+	l.next.PatchEducationSchool(w, r)
 }
 
-// DeleteSchool implements the Service interface.
-func (l logging) DeleteSchool(w http.ResponseWriter, r *http.Request) {
-	l.next.DeleteSchool(w, r)
+// DeleteEducationSchool implements the Service interface.
+func (l logging) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
+	l.next.DeleteEducationSchool(w, r)
 }
 
-// GetSchoolMembers implements the Service interface.
-func (l logging) GetSchoolMembers(w http.ResponseWriter, r *http.Request) {
-	l.next.GetSchoolMembers(w, r)
+// GetEducationSchoolMembers implements the Service interface.
+func (l logging) GetEducationSchoolMembers(w http.ResponseWriter, r *http.Request) {
+	l.next.GetEducationSchoolMembers(w, r)
 }
 
-// PostSchoolMember implements the Service interface.
-func (l logging) PostSchoolMember(w http.ResponseWriter, r *http.Request) {
-	l.next.PostSchoolMember(w, r)
+// PostEducationSchoolMember implements the Service interface.
+func (l logging) PostEducationSchoolMember(w http.ResponseWriter, r *http.Request) {
+	l.next.PostEducationSchoolMember(w, r)
 }
 
-// DeleteSchoolMember implements the Service interface.
-func (l logging) DeleteSchoolMember(w http.ResponseWriter, r *http.Request) {
-	l.next.DeleteSchoolMember(w, r)
+// DeleteEducationSchoolMember implements the Service interface.
+func (l logging) DeleteEducationSchoolMember(w http.ResponseWriter, r *http.Request) {
+	l.next.DeleteEducationSchoolMember(w, r)
 }
 
 // GetEducationUsers implements the Service interface.
