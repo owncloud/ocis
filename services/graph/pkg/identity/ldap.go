@@ -60,6 +60,8 @@ type groupAttributeMap struct {
 	memberSyntax string
 }
 
+type ldapAttributeValues map[string][]string
+
 func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LDAP, error) {
 	if config.UserDisplayNameAttribute == "" || config.UserIDAttribute == "" ||
 		config.UserEmailAttribute == "" || config.UserNameAttribute == "" {
@@ -126,54 +128,13 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 	if !i.writeEnabled {
 		return nil, errReadOnly
 	}
-	ar := ldap.AddRequest{
-		DN: fmt.Sprintf("uid=%s,%s", oldap.EscapeDNAttributeValue(*user.OnPremisesSamAccountName), i.userBaseDN),
-		Attributes: []ldap.Attribute{
-			// inetOrgPerson requires "cn"
-			{
-				Type: "cn",
-				Vals: []string{*user.OnPremisesSamAccountName},
-			},
-			{
-				Type: i.userAttributeMap.mail,
-				Vals: []string{*user.Mail},
-			},
-			{
-				Type: i.userAttributeMap.userName,
-				Vals: []string{*user.OnPremisesSamAccountName},
-			},
-			{
-				Type: i.userAttributeMap.displayName,
-				Vals: []string{*user.DisplayName},
-			},
-		},
+
+	ar, err := i.userToAddRequest(user)
+	if err != nil {
+		return nil, err
 	}
 
-	objectClasses := []string{"inetOrgPerson", "organizationalPerson", "person", "top"}
-
-	if !i.usePwModifyExOp && user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
-		// Depending on the LDAP server implementation this might cause the
-		// password to be stored in cleartext in the LDAP database. Using the
-		// "Password Modify LDAP Extended Operation" is recommended.
-		ar.Attribute("userPassword", []string{*user.PasswordProfile.Password})
-	}
-	if !i.useServerUUID {
-		ar.Attribute("owncloudUUID", []string{uuid.Must(uuid.NewV4()).String()})
-		objectClasses = append(objectClasses, "owncloud")
-	}
-	ar.Attribute("objectClass", objectClasses)
-
-	// inetOrgPerson requires "sn" to be set. Set it to the Username if
-	// Surname is not set in the Request
-	var sn string
-	if user.Surname != nil && *user.Surname != "" {
-		sn = *user.Surname
-	} else {
-		sn = *user.OnPremisesSamAccountName
-	}
-	ar.Attribute("sn", []string{sn})
-
-	if err := i.conn.Add(&ar); err != nil {
+	if err := i.conn.Add(ar); err != nil {
 		var lerr *ldap.Error
 		logger.Debug().Err(err).Msg("error adding user")
 		if errors.As(err, &lerr) {
@@ -366,6 +327,40 @@ func (i *LDAP) getEntryByDN(dn string, attrs []string, filter string) (*ldap.Ent
 	return res.Entries[0], nil
 }
 
+func (i *LDAP) searchLDAPEntryByFilter(basedn string, attrs []string, filter string) (*ldap.Entry, error) {
+	if filter == "" {
+		filter = "(objectclass=*)"
+	}
+
+	searchRequest := ldap.NewSearchRequest(
+		basedn,
+		ldap.ScopeWholeSubtree,
+		ldap.NeverDerefAliases, 1, 0, false,
+		filter,
+		attrs,
+		nil,
+	)
+
+	i.logger.Debug().Str("backend", "ldap").
+		Str("base", searchRequest.BaseDN).
+		Str("filter", searchRequest.Filter).
+		Int("scope", searchRequest.Scope).
+		Int("sizelimit", searchRequest.SizeLimit).
+		Interface("attributes", searchRequest.Attributes).
+		Msg("getEntryByFilter")
+	res, err := i.conn.Search(searchRequest)
+
+	if err != nil {
+		i.logger.Error().Err(err).Str("backend", "ldap").Str("dn", basedn).Str("filter", filter).Msg("Search user by filter failed")
+		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
+	}
+	if len(res.Entries) == 0 {
+		return nil, errNotFound
+	}
+
+	return res.Entries[0], nil
+}
+
 func (i *LDAP) getLDAPUserByID(id string) (*ldap.Entry, error) {
 	id = ldap.EscapeFilter(id)
 	filter := fmt.Sprintf("(%s=%s)", i.userAttributeMap.id, id)
@@ -379,42 +374,14 @@ func (i *LDAP) getLDAPUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
 }
 
 func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
-	searchRequest := ldap.NewSearchRequest(
-		i.userBaseDN, i.userScope, ldap.NeverDerefAliases, 1, 0, false,
-		fmt.Sprintf("(&%s(objectClass=%s)%s)", i.userFilter, i.userObjectClass, filter),
-		[]string{
-			i.userAttributeMap.displayName,
-			i.userAttributeMap.id,
-			i.userAttributeMap.mail,
-			i.userAttributeMap.userName,
-		},
-		nil,
-	)
-	i.logger.Debug().Str("backend", "ldap").
-		Str("base", searchRequest.BaseDN).
-		Str("filter", searchRequest.Filter).
-		Int("scope", searchRequest.Scope).
-		Int("sizelimit", searchRequest.SizeLimit).
-		Interface("attributes", searchRequest.Attributes).
-		Msg("getLDAPUserByFilter")
-	res, err := i.conn.Search(searchRequest)
-
-	if err != nil {
-		var errmsg string
-		if lerr, ok := err.(*ldap.Error); ok {
-			if lerr.ResultCode == ldap.LDAPResultSizeLimitExceeded {
-				errmsg = fmt.Sprintf("too many results searching for user '%s'", filter)
-				i.logger.Debug().Str("backend", "ldap").Err(lerr).
-					Str("userfilter", filter).Msg("too many results searching for user")
-			}
-		}
-		return nil, errorcode.New(errorcode.ItemNotFound, errmsg)
+	filter = fmt.Sprintf("(&%s(objectClass=%s)%s)", i.userFilter, i.userObjectClass, filter)
+	attrs := []string{
+		i.userAttributeMap.displayName,
+		i.userAttributeMap.id,
+		i.userAttributeMap.mail,
+		i.userAttributeMap.userName,
 	}
-	if len(res.Entries) == 0 {
-		return nil, errNotFound
-	}
-
-	return res.Entries[0], nil
+	return i.searchLDAPEntryByFilter(i.userBaseDN, attrs, filter)
 }
 
 func (i *LDAP) GetUser(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.User, error) {
@@ -1008,6 +975,56 @@ func (i *LDAP) groupsFromLDAPEntries(e []*ldap.Entry) []libregraph.Group {
 		}
 	}
 	return groups
+}
+
+func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, error) {
+	attrs := map[string][]string{
+		i.userAttributeMap.displayName: {user.GetDisplayName()},
+		i.userAttributeMap.userName:    {user.GetOnPremisesSamAccountName()},
+		i.userAttributeMap.mail:        {user.GetMail()},
+		"objectClass":                  {"inetOrgPerson", "organizationalPerson", "person", "top"},
+		"cn":                           {user.GetOnPremisesSamAccountName()},
+	}
+
+	if !i.useServerUUID {
+		attrs["owncloudUUID"] = []string{uuid.Must(uuid.NewV4()).String()}
+		attrs["objectClass"] = append(attrs["objectClass"], "owncloud")
+	}
+
+	// inetOrgPerson requires "sn" to be set. Set it to the Username if
+	// Surname is not set in the Request
+	var sn string
+	if user.Surname != nil && *user.Surname != "" {
+		sn = *user.Surname
+	} else {
+		sn = *user.OnPremisesSamAccountName
+	}
+	attrs["sn"] = []string{sn}
+
+	if !i.usePwModifyExOp && user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
+		// Depending on the LDAP server implementation this might cause the
+		// password to be stored in cleartext in the LDAP database. Using the
+		// "Password Modify LDAP Extended Operation" is recommended.
+		attrs["userPassword"] = []string{*user.PasswordProfile.Password}
+	}
+	return attrs, nil
+}
+
+func (i *LDAP) getUserLDAPDN(user libregraph.User) string {
+	return fmt.Sprintf("uid=%s,%s", oldap.EscapeDNAttributeValue(*user.OnPremisesSamAccountName), i.userBaseDN)
+}
+
+func (i *LDAP) userToAddRequest(user libregraph.User) (*ldap.AddRequest, error) {
+	ar := ldap.NewAddRequest(i.getUserLDAPDN(user), nil)
+
+	attrMap, err := i.userToLDAPAttrValues(user)
+	if err != nil {
+		return nil, err
+	}
+	for attrType, values := range attrMap {
+		ar.Attribute(attrType, values)
+	}
+	return ar, nil
 }
 
 func pointerOrNil(val string) *string {
