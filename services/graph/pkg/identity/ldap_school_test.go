@@ -212,7 +212,7 @@ func TestAddUsersToEducationSchool(t *testing.T) {
 	assert.Nil(t, err)
 }
 
-func TestRemoveMemberFromEducationSchoo(t *testing.T) {
+func TestRemoveMemberFromEducationSchool(t *testing.T) {
 	lm := &mocks.Client{}
 	lm.On("Search", schoolByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry, schoolEntry1}}, nil)
 	lm.On("Search", userByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntryWithSchool}}, nil)
@@ -228,4 +228,23 @@ func TestRemoveMemberFromEducationSchoo(t *testing.T) {
 	lm.AssertNumberOfCalls(t, "Search", 4)
 	lm.AssertNumberOfCalls(t, "Modify", 1)
 	assert.Nil(t, err)
+}
+
+var usersBySchoolIDSearch *ldap.SearchRequest = &ldap.SearchRequest{
+	BaseDN:     "ou=people,dc=test",
+	Scope:      2,
+	SizeLimit:  0,
+	Filter:     "(&(objectClass=ocEducationUser)(ocMemberOfSchool=abcd-defg))",
+	Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass", "ocMemberOfSchool"},
+	Controls:   []ldap.Control(nil),
+}
+
+func TestGetEducationSchoolUsers(t *testing.T) {
+	lm := &mocks.Client{}
+	lm.On("Search", schoolByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry, schoolEntry1}}, nil)
+	lm.On("Search", usersBySchoolIDSearch).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntryWithSchool}}, nil)
+	b, err := getMockedBackend(lm, eduConfig, &logger)
+	users, err := b.GetEducationSchoolUsers(context.Background(), "abcd-defg")
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(users))
 }
