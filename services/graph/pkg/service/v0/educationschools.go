@@ -221,28 +221,28 @@ func (g Graph) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
 	render.NoContent(w, r)
 }
 
-// GetEducationSchoolMembers implements the Service interface.
-func (g Graph) GetEducationSchoolMembers(w http.ResponseWriter, r *http.Request) {
+// GetEducationSchoolUsers implements the Service interface.
+func (g Graph) GetEducationSchoolUsers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling get school members")
+	logger.Info().Msg("calling get school users")
 	schoolID := chi.URLParam(r, "schoolID")
 	schoolID, err := url.PathUnescape(schoolID)
 	if err != nil {
-		logger.Debug().Str("id", schoolID).Msg("could not get school members: unescaping school id failed")
+		logger.Debug().Str("id", schoolID).Msg("could not get school users: unescaping school id failed")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping school id failed")
 		return
 	}
 
 	if schoolID == "" {
-		logger.Debug().Msg("could not get school members: missing school id")
+		logger.Debug().Msg("could not get school users: missing school id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing school id")
 		return
 	}
 
-	logger.Debug().Str("id", schoolID).Msg("calling get school members on backend")
-	members, err := g.identityEducationBackend.GetEducationSchoolMembers(r.Context(), schoolID)
+	logger.Debug().Str("id", schoolID).Msg("calling get school users on backend")
+	users, err := g.identityEducationBackend.GetEducationSchoolUsers(r.Context(), schoolID)
 	if err != nil {
-		logger.Debug().Err(err).Msg("could not get school members: backend error")
+		logger.Debug().Err(err).Msg("could not get school users: backend error")
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
 			errcode.Render(w, r)
@@ -253,13 +253,13 @@ func (g Graph) GetEducationSchoolMembers(w http.ResponseWriter, r *http.Request)
 	}
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, members)
+	render.JSON(w, r, users)
 }
 
-// PostEducationSchoolMember implements the Service interface.
-func (g Graph) PostEducationSchoolMember(w http.ResponseWriter, r *http.Request) {
+// PostEducationSchoolUser implements the Service interface.
+func (g Graph) PostEducationSchoolUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("Calling post school member")
+	logger.Info().Msg("Calling post school user")
 
 	schoolID := chi.URLParam(r, "schoolID")
 	schoolID, err := url.PathUnescape(schoolID)
@@ -267,13 +267,13 @@ func (g Graph) PostEducationSchoolMember(w http.ResponseWriter, r *http.Request)
 		logger.Debug().
 			Err(err).
 			Str("id", schoolID).
-			Msg("could not add member to school: unescaping school id failed")
+			Msg("could not add user to school: unescaping school id failed")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping school id failed")
 		return
 	}
 
 	if schoolID == "" {
-		logger.Debug().Msg("could not add school member: missing school id")
+		logger.Debug().Msg("could not add school user: missing school id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing school id")
 		return
 	}
@@ -283,35 +283,35 @@ func (g Graph) PostEducationSchoolMember(w http.ResponseWriter, r *http.Request)
 		logger.Debug().
 			Err(err).
 			Interface("body", r.Body).
-			Msg("could not add school member: invalid request body")
+			Msg("could not add school user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
 		return
 	}
 	memberRefURL, ok := memberRef.GetOdataIdOk()
 	if !ok {
-		logger.Debug().Msg("could not add school member: @odata.id reference is missing")
+		logger.Debug().Msg("could not add school user: @odata.id reference is missing")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "@odata.id reference is missing")
 		return
 	}
 	memberType, id, err := g.parseMemberRef(*memberRefURL)
 	if err != nil {
-		logger.Debug().Err(err).Msg("could not add school member: error parsing @odata.id url")
+		logger.Debug().Err(err).Msg("could not add school user: error parsing @odata.id url")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Error parsing @odata.id url")
 		return
 	}
 	// The MS Graph spec allows "directoryObject", "user", "school" and "organizational Contact"
 	// we restrict this to users for now. Might add Schools as members later
 	if memberType != "users" {
-		logger.Debug().Str("type", memberType).Msg("could not add school member: Only users are allowed as school members")
+		logger.Debug().Str("type", memberType).Msg("could not add school user: Only users are allowed as school members")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Only users are allowed as school members")
 		return
 	}
 
-	logger.Debug().Str("memberType", memberType).Str("id", id).Msg("calling add member on backend")
-	err = g.identityEducationBackend.AddMembersToEducationSchool(r.Context(), schoolID, []string{id})
+	logger.Debug().Str("memberType", memberType).Str("id", id).Msg("calling add user on backend")
+	err = g.identityEducationBackend.AddUsersToEducationSchool(r.Context(), schoolID, []string{id})
 
 	if err != nil {
-		logger.Debug().Err(err).Msg("could not add school member: backend error")
+		logger.Debug().Err(err).Msg("could not add school user: backend error")
 		var errcode errorcode.Error
 		if errors.As(err, &errcode) {
 			errcode.Render(w, r)
@@ -333,8 +333,8 @@ func (g Graph) PostEducationSchoolMember(w http.ResponseWriter, r *http.Request)
 	render.NoContent(w, r)
 }
 
-// DeleteEducationSchoolMember implements the Service interface.
-func (g Graph) DeleteEducationSchoolMember(w http.ResponseWriter, r *http.Request) {
+// DeleteEducationSchoolUser implements the Service interface.
+func (g Graph) DeleteEducationSchoolUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling delete school member")
 
@@ -352,21 +352,21 @@ func (g Graph) DeleteEducationSchoolMember(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	memberID := chi.URLParam(r, "memberID")
-	memberID, err = url.PathUnescape(memberID)
+	userID := chi.URLParam(r, "userID")
+	userID, err = url.PathUnescape(userID)
 	if err != nil {
-		logger.Debug().Err(err).Str("id", memberID).Msg("could not delete school member: unescaping member id failed")
+		logger.Debug().Err(err).Str("id", userID).Msg("could not delete school member: unescaping member id failed")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping member id failed")
 		return
 	}
 
-	if memberID == "" {
+	if userID == "" {
 		logger.Debug().Msg("could not delete school member: missing member id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing member id")
 		return
 	}
-	logger.Debug().Str("schoolID", schoolID).Str("memberID", memberID).Msg("calling delete member on backend")
-	err = g.identityEducationBackend.RemoveMemberFromEducationSchool(r.Context(), schoolID, memberID)
+	logger.Debug().Str("schoolID", schoolID).Str("userID", userID).Msg("calling delete member on backend")
+	err = g.identityEducationBackend.RemoveUserFromEducationSchool(r.Context(), schoolID, userID)
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete school member: backend error")
@@ -380,7 +380,7 @@ func (g Graph) DeleteEducationSchoolMember(w http.ResponseWriter, r *http.Reques
 	}
 
 	/* TODO requires reva changes
-	e := events.SchoolMemberRemoved{SchoolID: schoolID, UserID: memberID}
+	e := events.SchoolMemberRemoved{SchoolID: schoolID, UserID: userID}
 	if currentUser, ok := ctxpkg.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()
 	}

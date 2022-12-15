@@ -52,9 +52,9 @@ type Service interface {
 	PostEducationSchool(http.ResponseWriter, *http.Request)
 	PatchEducationSchool(http.ResponseWriter, *http.Request)
 	DeleteEducationSchool(http.ResponseWriter, *http.Request)
-	GetEducationSchoolMembers(http.ResponseWriter, *http.Request)
-	PostEducationSchoolMember(http.ResponseWriter, *http.Request)
-	DeleteEducationSchoolMember(http.ResponseWriter, *http.Request)
+	GetEducationSchoolUsers(http.ResponseWriter, *http.Request)
+	PostEducationSchoolUser(http.ResponseWriter, *http.Request)
+	DeleteEducationSchoolUser(http.ResponseWriter, *http.Request)
 
 	GetEducationUsers(http.ResponseWriter, *http.Request)
 	GetEducationUser(http.ResponseWriter, *http.Request)
@@ -250,10 +250,10 @@ func NewService(opts ...Option) Service {
 						r.Get("/", svc.GetEducationSchool)
 						r.Delete("/", svc.DeleteEducationSchool)
 						r.Patch("/", svc.PatchEducationSchool)
-						r.Route("/members", func(r chi.Router) {
-							r.Get("/", svc.GetEducationSchoolMembers)
-							r.Post("/$ref", svc.PostEducationSchoolMember)
-							r.Delete("/{memberID}/$ref", svc.DeleteEducationSchoolMember)
+						r.Route("/users", func(r chi.Router) {
+							r.Get("/", svc.GetEducationSchoolUsers)
+							r.Post("/$ref", svc.PostEducationSchoolUser)
+							r.Delete("/{userID}/$ref", svc.DeleteEducationSchoolUser)
 						})
 					})
 				})

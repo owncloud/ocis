@@ -30,18 +30,18 @@ func (i *ErrEducationBackend) GetEducationSchools(ctx context.Context, queryPara
 	return nil, errNotImplemented
 }
 
-// GetEducationSchoolMembers implements the EducationBackend interface for the ErrEducationBackend backend.
-func (i *ErrEducationBackend) GetEducationSchoolMembers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
+// GetEducationSchoolUsers implements the EducationBackend interface for the ErrEducationBackend backend.
+func (i *ErrEducationBackend) GetEducationSchoolUsers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
 	return nil, errNotImplemented
 }
 
-// AddMembersToEducationSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
-func (i *ErrEducationBackend) AddMembersToEducationSchool(ctx context.Context, schoolID string, memberID []string) error {
+// AddUsersToEducationSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
+func (i *ErrEducationBackend) AddUsersToEducationSchool(ctx context.Context, schoolID string, memberID []string) error {
 	return errNotImplemented
 }
 
-// RemoveMemberFromEducationSchool removes a single member (by ID) from a school
-func (i *ErrEducationBackend) RemoveMemberFromEducationSchool(ctx context.Context, schoolID string, memberID string) error {
+// RemoveUserFromEducationSchool removes a single member (by ID) from a school
+func (i *ErrEducationBackend) RemoveUserFromEducationSchool(ctx context.Context, schoolID string, memberID string) error {
 	return errNotImplemented
 }
 

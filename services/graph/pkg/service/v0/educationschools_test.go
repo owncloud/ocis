@@ -347,17 +347,17 @@ var _ = Describe("Schools", func() {
 		})
 	})
 
-	Describe("GetEducationSchoolMembers", func() {
+	Describe("GetEducationSchoolUsers", func() {
 		It("gets the list of members", func() {
 			user := libregraph.NewEducationUser()
 			user.SetId("user")
-			identityEducationBackend.On("GetEducationSchoolMembers", mock.Anything, mock.Anything, mock.Anything).Return([]*libregraph.EducationUser{user}, nil)
+			identityEducationBackend.On("GetEducationSchoolUsers", mock.Anything, mock.Anything, mock.Anything).Return([]*libregraph.EducationUser{user}, nil)
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools/{schoolID}/members", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools/{schoolID}/users", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.GetEducationSchoolMembers(rr, r)
+			svc.GetEducationSchoolUsers(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusOK))
 
 			data, err := io.ReadAll(rr.Body)
@@ -372,13 +372,13 @@ var _ = Describe("Schools", func() {
 		})
 	})
 
-	Describe("PostEducationSchoolMembers", func() {
+	Describe("PostEducationSchoolUsers", func() {
 		It("fails on invalid body", func() {
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/{schoolID}/members", bytes.NewBufferString("{invalid"))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.PostEducationSchoolMember(rr, r)
+			svc.PostEducationSchoolUser(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
@@ -391,7 +391,7 @@ var _ = Describe("Schools", func() {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.PostEducationSchoolMember(rr, r)
+			svc.PostEducationSchoolUser(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
@@ -405,7 +405,7 @@ var _ = Describe("Schools", func() {
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.PostEducationSchoolMember(rr, r)
+			svc.PostEducationSchoolUser(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
@@ -414,49 +414,49 @@ var _ = Describe("Schools", func() {
 			member.SetOdataId("/users/user")
 			data, err := json.Marshal(member)
 			Expect(err).ToNot(HaveOccurred())
-			identityEducationBackend.On("AddMembersToEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+			identityEducationBackend.On("AddUsersToEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/{schoolID}/members", bytes.NewBuffer(data))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.PostEducationSchoolMember(rr, r)
+			svc.PostEducationSchoolUser(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 
-			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "AddMembersToEducationSchool", 1)
+			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "AddUsersToEducationSchool", 1)
 		})
 	})
 
-	Describe("DeleteEducationSchoolMembers", func() {
+	Describe("DeleteEducationSchoolUsers", func() {
 		It("handles missing or empty member id", func() {
-			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/education/schools/{schoolID}/members/{memberID}/$ref", nil)
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/education/schools/{schoolID}/members/{userID}/$ref", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.DeleteEducationSchoolMember(rr, r)
+			svc.DeleteEducationSchoolUser(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 		It("handles missing or empty member id", func() {
-			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/education/schools/{schoolID}/members/{memberID}/$ref", nil)
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/education/schools/{schoolID}/members/{userID}/$ref", nil)
 			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("memberID", "/users/user")
+			rctx.URLParams.Add("userID", "/users/user")
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.DeleteEducationSchoolMember(rr, r)
+			svc.DeleteEducationSchoolUser(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
 		It("deletes members", func() {
-			identityEducationBackend.On("RemoveMemberFromEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+			identityEducationBackend.On("RemoveUserFromEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
-			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/education/schools/{schoolID}/members/{memberID}/$ref", nil)
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/education/schools/{schoolID}/members/{userID}/$ref", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
-			rctx.URLParams.Add("memberID", "/users/user1")
+			rctx.URLParams.Add("userID", "/users/user1")
 			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.DeleteEducationSchoolMember(rr, r)
+			svc.DeleteEducationSchoolUser(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 
-			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "RemoveMemberFromEducationSchool", 1)
+			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "RemoveUserFromEducationSchool", 1)
 		})
 	})
 })
