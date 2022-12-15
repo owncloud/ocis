@@ -88,6 +88,95 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @When /^the user "([^"]*)" changes the email of user "([^"]*)" to "([^"]*)" using the Graph API$/
+	 * @When /^the user "([^"]*)" tries to change the email of user "([^"]*)" to "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 * @param string $email
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserChangesTheEmailOfUserToUsingTheGraphApi(string $byUser, string $user, string $email): void {
+		$response = $this->editUserUsingTheGraphApi($byUser, $user, null, null, $email);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When /^the user "([^"]*)" changes the display name of user "([^"]*)" to "([^"]*)" using the Graph API$/
+	 * @When /^the user "([^"]*)" tries to change the display name of user "([^"]*)" to "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 * @param string $displayName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserChangesTheDisplayNameOfUserToUsingTheGraphApi(string $byUser, string $user, string $displayName): void {
+		$response = $this->editUserUsingTheGraphApi($byUser, $user, null, null, null, $displayName);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then /^the user "([^"]*)" should have information with these key and value pairs:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function theUserShouldHaveInformationWithTheseKeyAndValuePairs(string $user, TableNode $table): void {
+		$rows = $table->getHash();
+		$this->adminHasRetrievedUserUsingTheGraphApi($user);
+		foreach ($rows as $row) {
+			$key = $row['key'];
+			$expectedValue = $row['value'];
+			$responseValue = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())[$key];
+			Assert::assertEquals(
+				$expectedValue,
+				$responseValue
+			);
+		}
+	}
+
+	/**
+	 * Edits the user information
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 * @param string|null $userName
+	 * @param string|null $password
+	 * @param string|null $email
+	 * @param string|null $displayName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function editUserUsingTheGraphApi(string $byUser, string $user, string $userName = null, string $password = null, string $email = null, string $displayName = null): ResponseInterface {
+		$user = $this->featureContext->getActualUsername($user);
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
+		$userId = $userId ?? $user;
+		return GraphHelper::editUser(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$byUser,
+			$this->featureContext->getPasswordForUser($byUser),
+			$userId,
+			$userName,
+			$password,
+			$email,
+			$displayName
+		);
+	}
+
+	/**
 	 * @param string $user
 	 *
 	 * @return void
@@ -98,6 +187,7 @@ class GraphContext implements Context {
 		$user = $this->featureContext->getActualUsername($user);
 		try {
 			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+			$userId = $userId ?? $user;
 		} catch (Exception $e) {
 			$userId = $user;
 		}
@@ -217,17 +307,20 @@ class GraphContext implements Context {
 	 * sends a request to delete a user using the Graph API
 	 *
 	 * @param string $user username is used as the id
+	 * @param string|null $byUser
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function adminDeletesUserUsingTheGraphApi(string $user): void {
+	public function adminDeletesUserUsingTheGraphApi(string $user, ?string $byUser = null): void {
+		$credentials = $this->getAdminOrUserCredentials($byUser);
+
 		$this->featureContext->setResponse(
 			GraphHelper::deleteUser(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
-				$this->featureContext->getAdminUsername(),
-				$this->featureContext->getAdminPassword(),
+				$credentials["username"],
+				$credentials["password"],
 				$user
 			)
 		);
@@ -253,6 +346,20 @@ class GraphContext implements Context {
 			$userId,
 			$groupId,
 		);
+	}
+
+	/**
+	 * @When /^the user "([^"]*)" deletes a user "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function theUserDeletesAUserUsingTheGraphAPI(string $byUser, string $user): void {
+		$this->adminDeletesUserUsingTheGraphApi($user, $byUser);
 	}
 
 	/**
@@ -326,26 +433,44 @@ class GraphContext implements Context {
 	/**
 	 * @param string $user
 	 * @param string $password
+	 * @param string|null $byUser
 	 *
 	 * @return void
 	 * @throws JsonException
 	 */
 	public function adminChangesPasswordOfUserToUsingTheGraphApi(
 		string $user,
-		string $password
+		string $password,
+		?string $byUser = null
 	): void {
+		$credentials = $this->getAdminOrUserCredentials($byUser);
 		$user = $this->featureContext->getActualUsername($user);
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		$userId = $userId ?? $user;
 		$response = GraphHelper::editUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
+			$credentials["username"],
+			$credentials["password"],
 			$userId,
 			null,
 			$password
 		);
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When /^the user "([^"]*)" resets the password of user "([^"]*)" to "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 * @param string $password
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theUserResetsThePasswordOfUserToUsingTheGraphApi(string $byUser, string $user, string $password) {
+		$this->adminChangesPasswordOfUserToUsingTheGraphApi($user, $password, $byUser);
 	}
 
 	/**
@@ -564,6 +689,28 @@ class GraphContext implements Context {
 			);
 		}
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given /^the user "([^"]*)" has created a new user using the Graph API with the following settings:$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function theUserHasCreatedANewUserUsingGraphapiWithTheFollowingSettings(string $user, TableNode $table): void {
+		$this->theUserCreatesNewUser(
+			$user,
+			$table
+		);
+		$rows = $table->getRowsHash();
+		$response = $this->featureContext->getResponse();
+
+		if ($response->getStatusCode() !== 200) {
+			$this->throwHttpException($response, "Could not create user '$rows[userName]'");
+		}
 	}
 
 	/**

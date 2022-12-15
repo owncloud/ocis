@@ -1789,11 +1789,12 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" shares a space "([^"]*)" to user "([^"]*)" with role "([^"]*)"$/
+	 * @When /^user "([^"]*)" shares a space "([^"]*)" to group "([^"]*)" with role "([^"]*)"$/
 	 * @When /^user "([^"]*)" updates the space "([^"]*)" for user "([^"]*)" changing the role to "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
-	 * @param  string $userRecipient
+	 * @param  string $recipient
 	 * @param  string $role
 	 *
 	 * @return void
@@ -1802,7 +1803,7 @@ class SpacesContext implements Context {
 	public function sendShareSpaceRequest(
 		string $user,
 		string $spaceName,
-		string $userRecipient,
+		string $recipient,
 		string $role
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
@@ -1813,7 +1814,7 @@ class SpacesContext implements Context {
 		$body = [
 			"space_ref" => $space['id'],
 			"shareType" => 7,
-			"shareWith" => $userRecipient,
+			"shareWith" => $recipient,
 			"role" => $role // role overrides the permissions parameter
 		];
 
