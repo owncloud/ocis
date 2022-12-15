@@ -136,5 +136,20 @@ default:
         - TUSContext:
         - SpacesTUSContext:
 
+    apiCors:
+      paths:
+        - '%paths.base%/../features/apiCors'
+      context: *common_ldap_suite_context
+      contexts:
+        - SpacesContext:
+        - FeatureContext: *common_feature_context_params
+        - OccContext:
+        - WebDavPropertiesContext:
+        - FavoritesContext:
+        - ChecksumContext:
+        - FilesVersionsContext:
+        - OCSContext:
+        - TrashbinContext:
+
   extensions:
     Cjm\Behat\StepThroughExtension: ~
