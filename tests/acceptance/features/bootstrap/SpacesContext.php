@@ -73,6 +73,12 @@ class SpacesContext implements Context {
 	 * @var FilesVersionsContext
 	 */
 	private FilesVersionsContext $filesVersionsContext;
+
+    /**
+     * @var ArchiverContext
+     */
+    private ArchiverContext $archiverContext;
+
 	/**
 	 * @var string
 	 */
@@ -457,6 +463,7 @@ class SpacesContext implements Context {
 		$this->favoritesContext = $environment->getContext('FavoritesContext');
 		$this->checksumContext = $environment->getContext('ChecksumContext');
 		$this->filesVersionsContext = $environment->getContext('FilesVersionsContext');
+        $this->archiverContext = $environment->getContext('ArchiverContext');
 		// Run the BeforeScenario function in OCSContext to set it up correctly
 		$this->ocsContext->before($scope);
 		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
@@ -3088,4 +3095,29 @@ class SpacesContext implements Context {
 			}
 		}
 	}
+
+    /**
+     * @When /^public downloads the folder "([^"]*)" of space "([^"]*)" from the last created public link of "([^"]*)" using the resource id$/
+     * @param string $resource
+     * @param string $space
+     * @param string $owner
+     *
+     * @return void
+     * @throws GuzzleException
+     */
+    public function publicDownloadsTheFolderFromTheLastCreatedPublicLink(string $resource, string $space, string $owner)
+    {
+        $token = $this->featureContext->getLastPublicShareToken();
+        $resourceId = $this->getFolderId($owner, $space, $resource);
+        $queryString = 'public-token='.$token.'&id='.$resourceId;
+        $this->featureContext->setResponse(
+            HttpRequestHelper::get(
+                $this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
+                '',
+                '',
+               '',
+            )
+        );
+    }
+
 }

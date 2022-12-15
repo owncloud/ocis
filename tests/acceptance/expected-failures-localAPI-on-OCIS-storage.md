@@ -79,5 +79,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiCors/cors.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L67)
 - [apiCors/cors.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L68)
 
+#### [Public cannot download folder via the public link of the folder inside the project space](https://github.com/owncloud/ocis/issues/5229)
+- [apiSpacesShares/publicLinkDownload.feature:31](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/publicLinkDownload.feature#L31)
+
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
 - [apiGraph/getUser.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L23)

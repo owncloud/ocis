@@ -73,6 +73,7 @@ default:
         - WebDavPropertiesContext:
         - TUSContext:
         - SpacesTUSContext:
+        - ArchiverContext:
 
     apiContract:
       paths:
