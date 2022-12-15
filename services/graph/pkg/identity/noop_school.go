@@ -10,38 +10,38 @@ import (
 // NOOP is a dummy EducationBackend, doing nothing
 type NOOP struct{}
 
-// CreateSchool creates the supplied school in the identity backend.
-func (i *NOOP) CreateSchool(ctx context.Context, school libregraph.EducationSchool) (*libregraph.EducationSchool, error) {
+// CreateEducationSchool creates the supplied school in the identity backend.
+func (i *NOOP) CreateEducationSchool(ctx context.Context, school libregraph.EducationSchool) (*libregraph.EducationSchool, error) {
 	return nil, errNotImplemented
 }
 
-// DeleteSchool deletes a given school, identified by id
-func (i *NOOP) DeleteSchool(ctx context.Context, id string) error {
+// DeleteEducationSchool deletes a given school, identified by id
+func (i *NOOP) DeleteEducationSchool(ctx context.Context, id string) error {
 	return errNotImplemented
 }
 
-// GetSchool implements the EducationBackend interface for the NOOP backend.
-func (i *NOOP) GetSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error) {
+// GetEducationSchool implements the EducationBackend interface for the NOOP backend.
+func (i *NOOP) GetEducationSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error) {
 	return nil, errNotImplemented
 }
 
-// GetSchools implements the EducationBackend interface for the NOOP backend.
-func (i *NOOP) GetSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error) {
+// GetEducationSchools implements the EducationBackend interface for the NOOP backend.
+func (i *NOOP) GetEducationSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error) {
 	return nil, errNotImplemented
 }
 
-// GetSchoolMembers implements the EducationBackend interface for the NOOP backend.
-func (i *NOOP) GetSchoolMembers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
+// GetEducationSchoolMembers implements the EducationBackend interface for the NOOP backend.
+func (i *NOOP) GetEducationSchoolMembers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
 	return nil, errNotImplemented
 }
 
-// AddMembersToSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
-func (i *NOOP) AddMembersToSchool(ctx context.Context, schoolID string, memberID []string) error {
+// AddMembersToEducationSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
+func (i *NOOP) AddMembersToEducationSchool(ctx context.Context, schoolID string, memberID []string) error {
 	return errNotImplemented
 }
 
-// RemoveMemberFromSchool removes a single member (by ID) from a school
-func (i *NOOP) RemoveMemberFromSchool(ctx context.Context, schoolID string, memberID string) error {
+// RemoveMemberFromEducationSchool removes a single member (by ID) from a school
+func (i *NOOP) RemoveMemberFromEducationSchool(ctx context.Context, schoolID string, memberID string) error {
 	return errNotImplemented
 }
 

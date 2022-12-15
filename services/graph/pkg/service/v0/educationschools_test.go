@@ -82,7 +82,7 @@ var _ = Describe("Schools", func() {
 		})
 
 		It("handles invalid sorting queries", func() {
-			identityEducationBackend.On("GetSchools", ctx, mock.Anything).Return([]*libregraph.EducationSchool{newSchool}, nil)
+			identityEducationBackend.On("GetEducationSchools", ctx, mock.Anything).Return([]*libregraph.EducationSchool{newSchool}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools?$orderby=invalid", nil)
 			svc.GetEducationSchools(rr, r)
@@ -98,7 +98,7 @@ var _ = Describe("Schools", func() {
 		})
 
 		It("handles unknown backend errors", func() {
-			identityEducationBackend.On("GetSchools", ctx, mock.Anything).Return(nil, errors.New("failed"))
+			identityEducationBackend.On("GetEducationSchools", ctx, mock.Anything).Return(nil, errors.New("failed"))
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools", nil)
 			svc.GetEducationSchools(rr, r)
@@ -113,7 +113,7 @@ var _ = Describe("Schools", func() {
 		})
 
 		It("handles backend errors", func() {
-			identityEducationBackend.On("GetSchools", ctx, mock.Anything).Return(nil, errorcode.New(errorcode.AccessDenied, "access denied"))
+			identityEducationBackend.On("GetEducationSchools", ctx, mock.Anything).Return(nil, errorcode.New(errorcode.AccessDenied, "access denied"))
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools", nil)
 			svc.GetEducationSchools(rr, r)
@@ -129,7 +129,7 @@ var _ = Describe("Schools", func() {
 		})
 
 		It("renders an empty list of schools", func() {
-			identityEducationBackend.On("GetSchools", ctx, mock.Anything).Return([]*libregraph.EducationSchool{}, nil)
+			identityEducationBackend.On("GetEducationSchools", ctx, mock.Anything).Return([]*libregraph.EducationSchool{}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools", nil)
 			svc.GetEducationSchools(rr, r)
@@ -145,7 +145,7 @@ var _ = Describe("Schools", func() {
 		})
 
 		It("renders a list of schools", func() {
-			identityEducationBackend.On("GetSchools", ctx, mock.Anything).Return([]*libregraph.EducationSchool{newSchool}, nil)
+			identityEducationBackend.On("GetEducationSchools", ctx, mock.Anything).Return([]*libregraph.EducationSchool{newSchool}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools", nil)
 			svc.GetEducationSchools(rr, r)
@@ -181,7 +181,7 @@ var _ = Describe("Schools", func() {
 
 		Context("with an existing school", func() {
 			BeforeEach(func() {
-				identityEducationBackend.On("GetSchool", mock.Anything, mock.Anything, mock.Anything).Return(newSchool, nil)
+				identityEducationBackend.On("GetEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(newSchool, nil)
 			})
 
 			It("gets the school", func() {
@@ -250,7 +250,7 @@ var _ = Describe("Schools", func() {
 			newSchoolJson, err := json.Marshal(newSchool)
 			Expect(err).ToNot(HaveOccurred())
 
-			identityEducationBackend.On("CreateSchool", mock.Anything, mock.Anything).Return(nil, errorcode.New(errorcode.AccessDenied, "access denied"))
+			identityEducationBackend.On("CreateEducationSchool", mock.Anything, mock.Anything).Return(nil, errorcode.New(errorcode.AccessDenied, "access denied"))
 
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/", bytes.NewBuffer(newSchoolJson))
 
@@ -266,7 +266,7 @@ var _ = Describe("Schools", func() {
 			newSchoolJson, err := json.Marshal(newSchool)
 			Expect(err).ToNot(HaveOccurred())
 
-			identityEducationBackend.On("CreateSchool", mock.Anything, mock.Anything).Return(newSchool, nil)
+			identityEducationBackend.On("CreateEducationSchool", mock.Anything, mock.Anything).Return(newSchool, nil)
 
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/", bytes.NewBuffer(newSchoolJson))
 
@@ -330,12 +330,12 @@ var _ = Describe("Schools", func() {
 	Describe("DeleteEducationSchool", func() {
 		Context("with an existing school", func() {
 			BeforeEach(func() {
-				identityEducationBackend.On("GetSchool", mock.Anything, mock.Anything, mock.Anything).Return(newSchool, nil)
+				identityEducationBackend.On("GetEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(newSchool, nil)
 			})
 		})
 
 		It("deletes the school", func() {
-			identityEducationBackend.On("DeleteSchool", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+			identityEducationBackend.On("DeleteEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/education/schools", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", *newSchool.Id)
@@ -343,7 +343,7 @@ var _ = Describe("Schools", func() {
 			svc.DeleteEducationSchool(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
-			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "DeleteSchool", 1)
+			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "DeleteEducationSchool", 1)
 		})
 	})
 
@@ -351,7 +351,7 @@ var _ = Describe("Schools", func() {
 		It("gets the list of members", func() {
 			user := libregraph.NewEducationUser()
 			user.SetId("user")
-			identityEducationBackend.On("GetSchoolMembers", mock.Anything, mock.Anything, mock.Anything).Return([]*libregraph.EducationUser{user}, nil)
+			identityEducationBackend.On("GetEducationSchoolMembers", mock.Anything, mock.Anything, mock.Anything).Return([]*libregraph.EducationUser{user}, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools/{schoolID}/members", nil)
 			rctx := chi.NewRouteContext()
@@ -414,7 +414,7 @@ var _ = Describe("Schools", func() {
 			member.SetOdataId("/users/user")
 			data, err := json.Marshal(member)
 			Expect(err).ToNot(HaveOccurred())
-			identityEducationBackend.On("AddMembersToSchool", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+			identityEducationBackend.On("AddMembersToEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/{schoolID}/members", bytes.NewBuffer(data))
 			rctx := chi.NewRouteContext()
@@ -423,7 +423,7 @@ var _ = Describe("Schools", func() {
 			svc.PostEducationSchoolMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 
-			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "AddMembersToSchool", 1)
+			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "AddMembersToEducationSchool", 1)
 		})
 	})
 
@@ -446,7 +446,7 @@ var _ = Describe("Schools", func() {
 		})
 
 		It("deletes members", func() {
-			identityEducationBackend.On("RemoveMemberFromSchool", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+			identityEducationBackend.On("RemoveMemberFromEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/education/schools/{schoolID}/members/{memberID}/$ref", nil)
 			rctx := chi.NewRouteContext()
@@ -456,7 +456,7 @@ var _ = Describe("Schools", func() {
 			svc.DeleteEducationSchoolMember(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 
-			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "RemoveMemberFromSchool", 1)
+			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "RemoveMemberFromEducationSchool", 1)
 		})
 	})
 })
