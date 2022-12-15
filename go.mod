@@ -35,7 +35,7 @@ require (
 	github.com/go-micro/plugins/v4/wrapper/trace/opencensus v1.1.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
 	github.com/gofrs/uuid v4.3.1+incompatible
-	github.com/golang-jwt/jwt/v4 v4.4.2
+	github.com/golang-jwt/jwt/v4 v4.4.3
 	github.com/golang/protobuf v1.5.2
 	github.com/google/go-tika v0.2.0
 	github.com/gookit/config/v2 v2.1.8
