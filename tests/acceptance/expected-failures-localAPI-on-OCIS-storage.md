@@ -79,6 +79,15 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiCors/cors.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L67)
 - [apiCors/cors.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L68)
 
+#### [POST response does not return correct path when creating public link](https://github.com/owncloud/ocis/issues/5139)
+- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:62](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L62)
+- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L63)
+- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:64](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L64)
+- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L90)
+- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:160](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L160)
+- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:161](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L161)
+- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:162](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L162)
+
 #### [Public cannot download folder via the public link of the folder inside the project space](https://github.com/owncloud/ocis/issues/5229)
 - [apiSpacesShares/publicLinkDownload.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/publicLinkDownload.feature#L30)
 
