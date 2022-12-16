@@ -27,13 +27,40 @@ class GraphHelper {
 	}
 
 	/**
+	 *
+	 * @return string
+	 */
+	public static function getUUIDv4Regex(): string {
+		return '[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}';
+	}
+
+	/**
 	 * @param string $id
 	 *
 	 * @return int (1 = true | 0 = false)
 	 */
 	public static function isUUIDv4(string $id): int {
-		$regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
+		$regex = "/^" . self::getUUIDv4Regex() . "/i";
 		return preg_match($regex, $id);
+	}
+
+	/**
+	 * @param string $spaceId
+	 *
+	 * @return int (1 = true | 0 = false)
+	 */
+	public static function isSpaceId(string $spaceId): int {
+		$regex = "/^" . self::getUUIDv4Regex() . '\\$' . self::getUUIDv4Regex() . "/i";
+		return preg_match($regex, $spaceId);
+	}
+
+	/**
+	 * @param string $id
+	 *
+	 * @return string
+	 */
+	public static function isUUIDv44(string $id): string {
+		return "hello";
 	}
 
 	/**

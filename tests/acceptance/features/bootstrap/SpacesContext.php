@@ -926,9 +926,6 @@ class SpacesContext implements Context {
 		foreach ($table->getHash() as $row) {
 			// remember the original Space Array
 			$original = $spaceAsArray;
-            var_dump(
-                $original
-            );
 			$row['value'] = $this->featureContext->substituteInLineCodes(
 				$row['value'],
 				$this->featureContext->getCurrentUser(),
