@@ -15,11 +15,11 @@ Feature: Public can download folders from project space public link
 
 
   Scenario: download a folder from public link of a space
-    Given user "Alice" has created a public link share of the space "new-space" with settings:
-      | permissions | 1                        |
-      | name        | someName                 |
-    And user "Alice" has created a folder "NewFolder" in space "new-space"
+    Given user "Alice" has created a folder "NewFolder" in space "new-space"
     And user "Alice" has uploaded a file inside space "new-space" with content "some content" to "NewFolder/test.txt"
+    And user "Alice" has created a public link share of the space "new-space" with settings:
+      | permissions | 1        |
+      | name        | someName |
     When public downloads the folder "NewFolder" of space "new-space" from the last created public link of "Alice" using the resource id
     Then the HTTP status code should be "200"
     And the downloaded tar archive should contain these files:
