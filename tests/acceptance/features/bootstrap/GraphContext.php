@@ -28,10 +28,10 @@ class GraphContext implements Context {
 	 */
 	private FeatureContext $featureContext;
 
-    /**
-     * @var SpacesContext
-     */
-    private SpacesContext $spacesContext;
+	/**
+	 * @var SpacesContext
+	 */
+	private SpacesContext $spacesContext;
 
 	/**
 	 * This will run before EVERY scenario.
@@ -1363,44 +1363,82 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse($response);
 	}
 
+	/**
+	 * @param array $driveInformation
+	 *
+	 * @return string
+	 */
+	public static function getSpaceIdFromActualDriveinformation(array $driveInformation): string {
+		return $driveInformation['id'];
+	}
 
-    /**
-     * @param array $expectedDriveInformation
-     * @param array $actualValueDriveInformation
-     *
-     * @throws GuzzleException
-     * @return void
-     */
-    public function checkUserDriveInformation(array $expectedDriveInformation, array  $actualValueDriveInformation):void {
-        foreach (array_keys($expectedDriveInformation) as $keyName) {
-            // break the segment with @@@ here
-            $separatedKey = explode("@@@",$keyName);
-            $actualKeyAvalue = null;
-            $actualKeyAvalue = $actualValueDriveInformation['owner'];
-            var_dump(
-                $actualKeyAvalue
-            );
-            foreach ($separatedKey as $key) {
-                // this loop sets and get the actual keyvalue from the actual API response
-                $actualKeyAvalue = $actualValueDriveInformation[$key];
-            }
-            var_dump(
-                $actualKeyAvalue
-            );
-        }
-    }
+	/**
+	 * check if single drive information is correct
+	 *
+	 * @param array $expectedDriveInformation
+	 * @param array $actualValueDriveInformation
+	 *
+	 * @return void
+	 */
+	public function checkUserDriveInformation(array $expectedDriveInformation, array  $actualValueDriveInformation):void {
+		foreach (array_keys($expectedDriveInformation) as $keyName) {
+			// break the segment with @@@  to find the actual value from the drive infromation from response
+			$separatedKey = explode("@@@", $keyName);
+			// this stores the actual value of each key from drive information response used for assertion
+			$actualKeyValueFromDriveInformation = null;
+			$tempDriveInfo = $actualValueDriveInformation;
 
+			foreach ($separatedKey as $key) {
+				$actualKeyValueFromDriveInformation = $tempDriveInfo[$key];
+				$tempDriveInfo = $actualKeyValueFromDriveInformation;
+			}
+			switch ($expectedDriveInformation[$keyName]) {
+				case '%user_id%':
+					Assert::assertEquals(
+						1,
+						GraphHelper::isUUIDv4($actualKeyValueFromDriveInformation),
+						__METHOD__ .
+						' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValueFromDriveInformation
+					);
+					break;
+				case '%space_id%':
+					Assert::assertEquals(
+						1,
+						GraphHelper::isSpaceId($actualKeyValueFromDriveInformation),
+						__METHOD__ .
+						' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValueFromDriveInformation
+					);
+					break;
+				default:
+					$expectedDriveInformation[$keyName] = $this->featureContext->substituteInLineCodes(
+						$expectedDriveInformation[$keyName],
+						$this->featureContext->getCurrentUser(),
+						[],
+						[
+							[
+								"code" => "%space_id%",
+								"function" =>
+									[$this, "getSpaceIdFromActualDriveinformation"],
+								"parameter" => [$actualValueDriveInformation]
+							],
+						]
+					);
+					Assert::assertEquals($expectedDriveInformation[$keyName], $actualKeyValueFromDriveInformation);
+			}
+		}
+	}
 
-
-    /**
-     * @Then the user retrieve API response should contain the following drive information:
-     */
-    public function theResponseShouldContainTheFollowingDriveInformation(TableNode $table)
-    {
-        $expectedDriveInformation = $table->getRowsHash();
-        // array of user drive information (Personal Drive Information Only)
-        $actualDriveInformation = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['drive'];
-        $this->checkUserDriveInformation($expectedDriveInformation, $actualDriveInformation);
-    }
-
+	/**
+	 * @param TableNode $table
+	 *
+	 * @Then the user retrieve API response should contain the following drive information:
+	 *
+	 * @return void
+	 */
+	public function theResponseShouldContainTheFollowingDriveInformation(TableNode $table): void {
+		$expectedDriveInformation = $table->getRowsHash();
+		// array of user drive information (Personal Drive Information Only)
+		$actualDriveInformation = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['drive'];
+		$this->checkUserDriveInformation($expectedDriveInformation, $actualDriveInformation);
+	}
 }
