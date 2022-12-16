@@ -46,6 +46,7 @@ drivers:
     share_folder: /Shares
     max_acquire_lock_cycles: 20
     lock_cycle_duration_factor: 30
+    async_uploads: false
   s3ng:
     root: ~/.ocis/storage/users
     user_layout: '{{.Id.OpaqueId}}'
@@ -72,12 +73,15 @@ drivers:
     db_name: owncloud
     users_provider_endpoint: localhost:9144
 data_server_url: http://localhost:9158/data
+data_gateway_url: https://localhost:9200/data
+transfer_expires: 86400
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster
   tls_insecure: false
   tls_root_ca_cert_path: ""
   enable_tls: false
+  num_consumers: 0
 cache:
   store: memory
   nodes: []

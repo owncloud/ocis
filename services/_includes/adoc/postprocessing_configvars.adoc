@@ -1,0 +1,123 @@
+// set the attribute to true or leave empty, true without any quotes.
+
+:show-deprecation: false
+
+ifeval::[{show-deprecation} == true]
+
+[[deprecation-note]]
+[caption=]
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Deprecation Info
+| Deprecation Version
+| Removal Version
+| Deprecation Replacment
+|===
+
+endif::[]
+
+[caption=]
+.Environment variables for the postprocessing service
+[width="100%",cols="~,~,~,~",options="header"]
+|===
+| Name
+| Type
+| Default Value
+| Description
+
+a|`OCIS_LOG_LEVEL` +
+`POSTPROCESSING_LOG_LEVEL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+
+a|`OCIS_LOG_PRETTY` +
+`POSTPROCESSING_LOG_PRETTY` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates pretty log output.
+
+a|`OCIS_LOG_COLOR` +
+`POSTPROCESSING_LOG_COLOR` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates colorized log output.
+
+a|`OCIS_LOG_FILE` +
+`POSTPROCESSING_LOG_FILE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
+
+a|`POSTPROCESSING_EVENTS_ENDPOINT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9233 ++
+a| [subs=-attributes]
+Endpoint of the event system.
+
+a|`POSTPROCESSING_EVENTS_CLUSTER` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ocis-cluster ++
+a| [subs=-attributes]
+Cluster ID of the event system.
+
+a|`OCIS_INSECURE` +
+`SEARCH_EVENTS_TLS_INSECURE` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Whether to verify the server TLS certificates.
+
+a|`SEARCH_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The root CA certificate used to validate the server's TLS certificate. If provided SEARCH_EVENTS_TLS_INSECURE will be seen as false.
+
+a|`POSTPROCESSING_VIRUSSCAN` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+should the system do a virusscan? Needs antivirus service
+
+a|`POSTPROCESSING_DELAY` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++0s ++
+a| [subs=-attributes]
+the sytem sleeps for this time while postprocessing
+|===
+

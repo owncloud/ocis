@@ -331,6 +331,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.
 
+a|`STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable asynchronous file uploads.
+
 a|`STORAGE_USERS_S3NG_ROOT` +
 
 a| [subs=-attributes]
@@ -548,6 +557,24 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.
 
+a|`STORAGE_USERS_DATA_GATEWAY_URL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++https://localhost:9200/data ++
+a| [subs=-attributes]
+URL of the data gateway server
+
+a|`STORAGE_USERS_TRANSFER_EXPIRES` +
+
+a| [subs=-attributes]
+++int64 ++
+a| [subs=-attributes]
+++86400 ++
+a| [subs=-attributes]
+the time after which the token for upload postprocessing expires
+
 a|`STORAGE_USERS_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
@@ -594,6 +621,15 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+
+a|`STORAGE_USERS_EVENTS_NUM_CONSUMERS` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+The amount of concurrent event consumers to start. Event consumers are used for post-processing files. Multiple consumers increase parallelisation, but will also increase CPU and memory demands. The setting has no effect when the STORAGE_USERS_OCIS_ASYNC_UPLOADS is set to false. The default and minimum value is 1.
 
 a|`OCIS_CACHE_STORE_TYPE` +
 `STORAGE_USERS_CACHE_STORE_TYPE` +

@@ -35,6 +35,7 @@
 | STORAGE_USERS_OCIS_SHARE_FOLDER | string | /Shares | Name of the folder jailing all shares.|
 | STORAGE_USERS_OCIS_MAX_ACQUIRE_LOCK_CYCLES | int | 20 | When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used.|
 | STORAGE_USERS_OCIS_LOCK_CYCLE_DURATION_FACTOR | int | 30 | When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.|
+| STORAGE_USERS_OCIS_ASYNC_UPLOADS | bool | false | Enable asynchronous file uploads.|
 | STORAGE_USERS_S3NG_ROOT | string | ~/.ocis/storage/users | The directory where the filesystem storage will store user files. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.|
 | STORAGE_USERS_S3NG_USER_LAYOUT | string | {{.Id.OpaqueId}} | Template string for the user storage layout in the user directory.|
 | STORAGE_USERS_PERMISSION_ENDPOINT<br/>STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT | string | 127.0.0.1:9191 | Endpoint of the permissions service.|
@@ -59,11 +60,14 @@
 | STORAGE_USERS_OWNCLOUDSQL_DB_NAME | string | owncloud | Name of the database to be used.|
 | STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT | string | localhost:9144 | Endpoint of the users provider.|
 | STORAGE_USERS_DATA_SERVER_URL | string | http://localhost:9158/data | URL of the data server, needs to be reachable by the data gateway provided by the frontend service or the user if directly exposed.|
+| STORAGE_USERS_DATA_GATEWAY_URL | string | https://localhost:9200/data | URL of the data gateway server|
+| STORAGE_USERS_TRANSFER_EXPIRES | int64 | 86400 | the time after which the token for upload postprocessing expires|
 | STORAGE_USERS_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | STORAGE_USERS_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>STORAGE_USERS_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT | string |  | The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>STORAGE_USERS_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
+| STORAGE_USERS_EVENTS_NUM_CONSUMERS | int | 0 | The amount of concurrent event consumers to start. Event consumers are used for post-processing files. Multiple consumers increase parallelisation, but will also increase CPU and memory demands. The setting has no effect when the STORAGE_USERS_OCIS_ASYNC_UPLOADS is set to false. The default and minimum value is 1.|
 | OCIS_CACHE_STORE_TYPE<br/>STORAGE_USERS_CACHE_STORE_TYPE<br/>STORAGE_USERS_CACHE_STORE | string | memory | Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".|
 | OCIS_CACHE_STORE_ADDRESS<br/>STORAGE_USERS_CACHE_STORE_ADDRESS<br/>STORAGE_USERS_CACHE_NODES | []string | [] | Node addresses to use for the cache store.|
 | STORAGE_USERS_CACHE_DATABASE | string | users | Database name of the cache.|
