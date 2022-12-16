@@ -208,6 +208,7 @@ type EOSDriver struct {
 	//ShareFolder defines the name of the folder jailing all shares
 	ShareFolder string `yaml:"share_folder"`
 	GRPCURI     string
+	GRPCAuthKey string `yaml:"grpc_authkey" env:"STORAGE_USERS_EOSFS_GRPC_AUTHKEY" desc:"The token used to authenticate the grpc requests."`
 	UserLayout  string
 }
 
