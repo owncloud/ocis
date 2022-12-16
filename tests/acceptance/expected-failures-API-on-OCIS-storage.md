@@ -223,8 +223,8 @@ cannot share a folder with create permission
 - [apiSharePublicLink1/accessToPublicLinkShare.feature:21](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L21)
 - [apiSharePublicLink1/accessToPublicLinkShare.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L31)
 - [apiSharePublicLink1/accessToPublicLinkShare.feature:47](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/accessToPublicLinkShare.feature#L47)
-- [apiSharePublicLink1/createPublicLinkShare.feature:581](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L581)
-- [apiSharePublicLink1/createPublicLinkShare.feature:602](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L602)
+- [apiSharePublicLink1/createPublicLinkShare.feature:531](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L531)
+- [apiSharePublicLink1/createPublicLinkShare.feature:552](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiSharePublicLink1/createPublicLinkShare.feature#L552)
 
 #### [download previews of other users file](https://github.com/owncloud/ocis/issues/2071)
 
