@@ -17,12 +17,21 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
+// FileConverter
+// FIXME: nolint
+// nolint: revive
 type FileConverter interface {
 	Convert(r io.Reader) (interface{}, error)
 }
 
+// ImageDecoder
+// FIXME: nolint
+// nolint: revive
 type ImageDecoder struct{}
 
+// Convert
+// FIXME: nolint
+// nolint: revive
 func (i ImageDecoder) Convert(r io.Reader) (interface{}, error) {
 	img, err := imaging.Decode(r, imaging.AutoOrientation(true))
 	if err != nil {
@@ -31,8 +40,14 @@ func (i ImageDecoder) Convert(r io.Reader) (interface{}, error) {
 	return img, nil
 }
 
+// GifDecoder
+// FIXME: nolint
+// nolint: revive
 type GifDecoder struct{}
 
+// Convert
+// FIXME: nolint
+// nolint: revive
 func (i GifDecoder) Convert(r io.Reader) (interface{}, error) {
 	img, err := gif.DecodeAll(r)
 	if err != nil {
@@ -41,10 +56,16 @@ func (i GifDecoder) Convert(r io.Reader) (interface{}, error) {
 	return img, nil
 }
 
+// TxtToImageConverter
+// FIXME: nolint
+// nolint: revive
 type TxtToImageConverter struct {
 	fontLoader *FontLoader
 }
 
+// Convert
+// FIXME: nolint
+// nolint: revive
 func (t TxtToImageConverter) Convert(r io.Reader) (interface{}, error) {
 	img := image.NewRGBA(image.Rect(0, 0, 640, 480))
 
@@ -161,6 +182,9 @@ func drawWord(canvas *font.Drawer, word string, minX, maxX, incY, maxY fixed.Int
 	}
 }
 
+// ForType
+// FIXME: nolint
+// nolint: revive
 func ForType(mimeType string, opts map[string]interface{}) FileConverter {
 	// We can ignore the error here because we parse it in IsMimeTypeSupported before and if it fails
 	// return the service call. So we should only get here when the mimeType parses fine.

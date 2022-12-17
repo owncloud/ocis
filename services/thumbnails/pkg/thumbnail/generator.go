@@ -12,18 +12,27 @@ import (
 )
 
 var (
-	// ErrInvalidType represents the error when a type can't be encoded.
+	// ErrInvalidType2 represents the error when a type can't be encoded.
 	ErrInvalidType2 = errors.New("can't encode this type")
 	// ErrNoGeneratorForType represents the error when no generator could be found for a type.
 	ErrNoGeneratorForType = errors.New("no generator for this type found")
 )
 
+// Generator
+// FIXME: nolint
+// nolint: revive
 type Generator interface {
 	GenerateThumbnail(image.Rectangle, interface{}) (interface{}, error)
 }
 
+// SimpleGenerator
+// FIXME: nolint
+// nolint: revive
 type SimpleGenerator struct{}
 
+// GenerateThumbnail
+// FIXME: nolint
+// nolint: revive
 func (g SimpleGenerator) GenerateThumbnail(size image.Rectangle, img interface{}) (interface{}, error) {
 	m, ok := img.(image.Image)
 	if !ok {
@@ -33,8 +42,14 @@ func (g SimpleGenerator) GenerateThumbnail(size image.Rectangle, img interface{}
 	return imaging.Thumbnail(m, size.Dx(), size.Dy(), imaging.Lanczos), nil
 }
 
+// GifGenerator
+// FIXME: nolint
+// nolint: revive
 type GifGenerator struct{}
 
+// GenerateThumbnail
+// FIXME: nolint
+// nolint: revive
 func (g GifGenerator) GenerateThumbnail(size image.Rectangle, img interface{}) (interface{}, error) {
 	// Code inspired by https://github.com/willnorris/gifresize/blob/db93a7e1dcb1c279f7eeb99cc6d90b9e2e23e871/gifresize.go
 

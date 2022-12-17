@@ -30,6 +30,9 @@ func RoleService(rs settingssvc.RoleService) Option {
 	}
 }
 
+// StoreOptions
+// FIXME: nolint
+// nolint: revive
 func StoreOptions(storeOpts ocisstore.OcisStoreOptions) Option {
 	return func(o *Options) {
 		o.storeOptions = storeOpts

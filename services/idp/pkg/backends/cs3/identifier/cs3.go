@@ -22,14 +22,16 @@ import (
 
 const cs3BackendName = "identifier-cs3"
 
-var cs3SpportedScopes = []string{
+var cs3SupportedScopes = []string{
 	oidc.ScopeProfile,
 	oidc.ScopeEmail,
 	lico.ScopeUniqueUserID,
 	lico.ScopeRawSubject,
 }
 
-// CS3 Backend holds the data for the CS3 identifier backend
+// CS3Backend holds the data for the CS3 identifier backend
+// FIXME: nolint
+// nolint: revive
 type CS3Backend struct {
 	supportedScopes []string
 
@@ -40,8 +42,6 @@ type CS3Backend struct {
 	insecure          bool
 
 	sessions cmap.ConcurrentMap
-
-	gateway cs3gateway.GatewayAPIClient
 }
 
 // NewCS3Backend creates a new CS3 backend identifier backend
@@ -54,8 +54,8 @@ func NewCS3Backend(
 ) (*CS3Backend, error) {
 
 	// Build supported scopes based on default scopes.
-	supportedScopes := make([]string, len(cs3SpportedScopes))
-	copy(supportedScopes, cs3SpportedScopes)
+	supportedScopes := make([]string, len(cs3SupportedScopes))
+	copy(supportedScopes, cs3SupportedScopes)
 
 	b := &CS3Backend{
 		supportedScopes: supportedScopes,
@@ -222,6 +222,8 @@ func (b *CS3Backend) connect(ctx context.Context) (*grpc.ClientConn, error) {
 
 func (b *CS3Backend) getSessionForUser(ctx context.Context, userEntryID string, sessionRef *string, register bool, refresh bool, removeIfRegistered bool) (*cs3Session, error) {
 	if sessionRef == nil {
+		// FIXME: nolint
+		// nolint: nilnil
 		return nil, nil
 	}
 

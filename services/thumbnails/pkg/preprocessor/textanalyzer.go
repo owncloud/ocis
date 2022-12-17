@@ -5,11 +5,11 @@ import (
 	"unicode/utf8"
 )
 
-// Default list of scripts to be analyzed within the string.
+// DefaultScripts list of scripts to be analyzed within the string.
 //
 // Scripts that aren't present in the list will be considered as part
 // of the last "known" script. For example, if "Avestan" script (which isn't
-// present) is preceeded by "Arabic" script, then the "Avestan" script will
+// present) is preceded by "Arabic" script, then the "Avestan" script will
 // be considered as "Arabic"
 //
 // Punctuation symbols are usually considered part of the "Common" script
@@ -25,7 +25,7 @@ var DefaultScripts = []string{
 	"Latin",
 }
 
-// Convenient map[string]map[string]string type used to merge multiple
+// MergeMap map[string]map[string]string type used to merge multiple
 // scripts into one. This is mainly used for japanese language which uses
 // "Han", "Hiragana" and "Katakana" scripts.
 //
@@ -34,7 +34,7 @@ var DefaultScripts = []string{
 // match) as value
 type MergeMap map[string]map[string]string
 
-// The default mergeMap containing info for the japanese scripts
+// DefaultMergeMap containing info for the japanese scripts
 var DefaultMergeMap = MergeMap{
 	"Han": map[string]string{
 		"Hiragana": "Hiragana",
@@ -50,13 +50,13 @@ var DefaultMergeMap = MergeMap{
 	},
 }
 
-// Analysis options.
+// AnalysisOpts options.
 type AnalysisOpts struct {
 	UseMergeMap bool
 	MergeMap    MergeMap
 }
 
-// A script range. The range should be attached to a string which could contain
+// ScriptRange should be attached to a string which could contain
 // multiple scripts. The "TargetScript" will go from bytes "Low" to "High"
 // (both inclusive), and contains a "RuneCount" number of runes or chars
 // (mostly for debugging purposes).
@@ -69,7 +69,7 @@ type ScriptRange struct {
 	RuneCount    int
 }
 
-// The result of a text analysis. It contains the analyzed text, a list of
+// TextAnalysis contains the analyzed text, a list of
 // script ranges (see the ScriptRange type) and a map containing how many
 // runes have been detected for a particular script.
 type TextAnalysis struct {
@@ -78,14 +78,14 @@ type TextAnalysis struct {
 	Text         string
 }
 
-// The TextAnalyzer object contains private members. It should be created via
+// TextAnalyzer contains private members. It should be created via
 // "NewTextAnalyzer" function.
 type TextAnalyzer struct {
 	scripts         map[string]*unicode.RangeTable
 	scriptListCache []string
 }
 
-// Create a new TextAnalyzer. A list of scripts must be provided.
+// NewTextAnalyzer creates a new TextAnalyzer. A list of scripts must be provided.
 // You can use the "DefaultScripts" variable for a default list,
 // although it doesn't contain all the available scripts.
 // See the unicode.Scripts variable (in the unicode package) for a
@@ -102,7 +102,7 @@ func NewTextAnalyzer(scriptList []string) TextAnalyzer {
 	}
 }
 
-// Analyze the target string using the specified options.
+// AnalyzeString analyzes the target string using the specified options.
 // A TextAnalysis will be returned with the result of the analysis.
 func (ta *TextAnalyzer) AnalyzeString(word string, opts AnalysisOpts) TextAnalysis {
 	analysis := TextAnalysis{
@@ -225,7 +225,7 @@ func (ta *TextAnalyzer) getMergeMapValue(opts AnalysisOpts, previous, current st
 	return "", false
 }
 
-// Change the "Common" script to the one used in the previous script range.
+// MergeCommon change the "Common" script to the one used in the previous script range.
 // The ranges will be readjusted and merged if they're adjacent.
 // This naive approach should be good enough for normal use cases
 //

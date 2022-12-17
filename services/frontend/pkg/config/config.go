@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
 
+// Config combines all available configuration parts.
 type Config struct {
 	Commons *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
 	Service Service         `yaml:"-"`
@@ -49,6 +50,8 @@ type Config struct {
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
 }
+
+// Tracing defines the available tracing configuration.
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;FRONTEND_TRACING_ENABLED" desc:"Activates tracing."`
 	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;FRONTEND_TRACING_TYPE" desc:"The type of tracing. Defaults to \"\", which is the same as \"jaeger\". Allowed tracing types are \"jaeger\" and \"\" as of now."`
@@ -56,6 +59,7 @@ type Tracing struct {
 	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;FRONTEND_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset."`
 }
 
+// Log defines the available log configuration.
 type Log struct {
 	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;FRONTEND_LOG_LEVEL" desc:"The log level. Valid values are: \"panic\", \"fatal\", \"error\", \"warn\", \"info\", \"debug\", \"trace\"."`
 	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;FRONTEND_LOG_PRETTY" desc:"Activates pretty log output."`
@@ -63,10 +67,12 @@ type Log struct {
 	File   string `yaml:"file" env:"OCIS_LOG_FILE;FRONTEND_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set."`
 }
 
+// Service defines the available service configuration.
 type Service struct {
 	Name string `yaml:"-"`
 }
 
+// Debug defines the available debug configuration.
 type Debug struct {
 	Addr   string `yaml:"addr" env:"FRONTEND_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed."`
 	Token  string `yaml:"token" env:"FRONTEND_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint."`
@@ -74,6 +80,7 @@ type Debug struct {
 	Zpages bool   `yaml:"zpages" env:"FRONTEND_DEBUG_ZPAGES" desc:"Enables zpages, which can be used for collecting and viewing in-memory traces."`
 }
 
+// HTTPConfig defines the available http configuration.
 type HTTPConfig struct {
 	Addr      string `yaml:"addr" env:"FRONTEND_HTTP_ADDR" desc:"The bind address of the HTTP service."`
 	Namespace string `yaml:"-"`
@@ -100,11 +107,13 @@ type Auth struct {
 	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agent"`
 }
 
+// AppHandler defines the available AppHandler configuration.
 type AppHandler struct {
 	Prefix   string `yaml:"-"`
 	Insecure bool   `yaml:"insecure" env:"OCIS_INSECURE;FRONTEND_APP_HANDLER_INSECURE" desc:"Allow insecure connections to the frontend."`
 }
 
+// Archiver defines the available Archiver configuration.
 type Archiver struct {
 	MaxNumFiles int64  `yaml:"max_num_files" env:"FRONTEND_ARCHIVER_MAX_NUM_FILES" desc:"Max number of files that can be packed into an archive."`
 	MaxSize     int64  `yaml:"max_size" env:"FRONTEND_ARCHIVER_MAX_SIZE" desc:"Max size in bytes of the zip archive the archiver can create."`
@@ -112,10 +121,12 @@ type Archiver struct {
 	Insecure    bool   `yaml:"insecure" env:"OCIS_INSECURE;FRONTEND_ARCHIVER_INSECURE" desc:"Allow insecure connections to the archiver."`
 }
 
+// DataGateway defines the available DataGateway configuration.
 type DataGateway struct {
 	Prefix string `yaml:"prefix" env:"FRONTEND_DATA_GATEWAY_PREFIX" desc:"Path prefix for the data gateway."`
 }
 
+// OCS defines the available OCS configuration.
 type OCS struct {
 	Prefix                  string             `yaml:"prefix" env:"FRONTEND_OCS_PREFIX" desc:"Path prefix for the OCS service"`
 	SharePrefix             string             `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX" desc:"Path prefix for shares."`
@@ -141,10 +152,12 @@ type RedisDriver struct {
 	Password string `yaml:"password" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_PASSWORD" desc:"Redis password"`
 }
 
+// CacheWarmupDrivers defines the available CacheWarmupDrivers configuration.
 type CacheWarmupDrivers struct {
 	CBOX CBOXDriver `yaml:"cbox,omitempty"`
 }
 
+// CBOXDriver defines the available CBOXDriver configuration.
 type CBOXDriver struct {
 	DBUsername string `yaml:"db_username,omitempty"`
 	DBPassword string `yaml:"db_password,omitempty"`
@@ -154,6 +167,7 @@ type CBOXDriver struct {
 	Namespace  string `yaml:"namespace,omitempty"`
 }
 
+// Checksums defines the available Checksums configuration.
 type Checksums struct {
 	SupportedTypes      []string `yaml:"supported_types" env:"FRONTEND_CHECKSUMS_SUPPORTED_TYPES" desc:"Define the checksum types that indicate to clients which hashes the server can use to verify upload integrity. You can provide multiple types separated by blank or comma. Supported types are 'sha1', 'md5' and 'adler32'."`
 	PreferredUploadType string   `yaml:"preferred_upload_type" env:"FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPE" desc:"The supported checksum type for uploads that indicates to clients supporting multiple hash algorithms which one is preferred by the server. Must be one out of the defined list of SUPPORTED_TYPES."`

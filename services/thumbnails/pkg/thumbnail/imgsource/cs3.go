@@ -19,16 +19,20 @@ import (
 )
 
 const (
-	// "github.com/cs3org/reva/v2/internal/http/services/datagateway" is internal so we redeclare it here
 	// TokenTransportHeader holds the header key for the reva transfer token
+	// "github.com/cs3org/reva/v2/internal/http/services/datagateway" is internal so we redeclare it here
 	TokenTransportHeader = "X-Reva-Transfer"
 )
 
+// CS3
+// FIXME: nolint
+// nolint: revive
 type CS3 struct {
 	client   gateway.GatewayAPIClient
 	insecure bool
 }
 
+// NewCS3Source initializes a new CS3 service.
 func NewCS3Source(cfg config.Thumbnail, c gateway.GatewayAPIClient) CS3 {
 	return CS3{
 		client:   c,
@@ -85,7 +89,7 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 	}
 	client := &http.Client{}
 
-	resp, err := client.Do(httpReq) // nolint:bodyclose
+	resp, err := client.Do(httpReq)
 	if err != nil {
 		return nil, err
 	}

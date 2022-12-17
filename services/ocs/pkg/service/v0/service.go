@@ -4,23 +4,25 @@ import (
 	"net/http"
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
-	"github.com/owncloud/ocis/v2/ocis-pkg/store"
-
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
-
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	opkgm "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/config"
 	ocsm "github.com/owncloud/ocis/v2/services/ocs/pkg/middleware"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
+)
+
+const (
+	_backendCS3 = "cs3"
 )
 
 // Service defines the service handlers.
@@ -63,7 +65,7 @@ func NewService(opts ...Option) Service {
 	}
 
 	if svc.config.AccountBackend == "" {
-		svc.config.AccountBackend = "cs3"
+		svc.config.AccountBackend = _backendCS3
 	}
 
 	requireUser := ocsm.RequireUser(

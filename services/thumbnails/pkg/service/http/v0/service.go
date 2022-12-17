@@ -96,6 +96,9 @@ func (s Thumbnails) GetThumbnail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// TransferTokenValidator
+// FIXME: nolint
+// nolint: revive
 func (s Thumbnails) TransferTokenValidator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		logger := s.logger.SubloggerWithRequestID(r.Context())

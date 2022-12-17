@@ -36,6 +36,7 @@ var (
 	}
 )
 
+// Exception represents a ocdav exception
 type Exception struct {
 	Code    code
 	Message string
@@ -68,6 +69,9 @@ type errorXML struct {
 	Header    string   `xml:"s:Header,omitempty"`
 }
 
+// HandleWebdavError
+// FIXME: nolint
+// nolint: revive
 func HandleWebdavError(w http.ResponseWriter, b []byte, err error) {
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

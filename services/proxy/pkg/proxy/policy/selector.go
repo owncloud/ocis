@@ -21,34 +21,37 @@ var (
 )
 
 const (
+	// FIXME: nolint
+	// nolint: revive
 	SelectorCookieName = "owncloud-selector"
 )
 
 // Selector is a function which selects a proxy-policy based on the request.
 //
 // A policy is a random name which identifies a set of proxy-routes:
-//{
-//  "policies": [
-//    {
-//      "name": "us-east-1",
-//      "routes": [
-//        {
-//          "endpoint": "/",
-//          "backend": "https://backend.us.example.com:8080/app"
-//        }
-//      ]
-//    },
-//    {
-//      "name": "eu-ams-1",
-//      "routes": [
-//        {
-//          "endpoint": "/",
-//          "backend": "https://backend.eu.example.com:8080/app"
-//        }
-//      ]
-//    }
-//  ]
-//}
+//
+//	{
+//	 "policies": [
+//	   {
+//	     "name": "us-east-1",
+//	     "routes": [
+//	       {
+//	         "endpoint": "/",
+//	         "backend": "https://backend.us.example.com:8080/app"
+//	       }
+//	     ]
+//	   },
+//	   {
+//	     "name": "eu-ams-1",
+//	     "routes": [
+//	       {
+//	         "endpoint": "/",
+//	         "backend": "https://backend.eu.example.com:8080/app"
+//	       }
+//	     ]
+//	   }
+//	 ]
+//	}
 type Selector func(r *http.Request) (string, error)
 
 // LoadSelector constructs a specific policy-selector from a given configuration
@@ -97,9 +100,9 @@ func LoadSelector(cfg *config.PolicySelector) (Selector, error) {
 //
 // Configuration:
 //
-// "policy_selector": {
-//    "static": {"policy" : "ocis"}
-//  },
+//	"policy_selector": {
+//	   "static": {"policy" : "ocis"}
+//	 },
 func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
 	return func(r *http.Request) (s string, err error) {
 		return cfg.Policy, nil
@@ -108,12 +111,13 @@ func NewStaticSelector(cfg *config.StaticSelectorConf) Selector {
 
 // NewClaimsSelector selects the policy based on the "ocis.routing.policy" claim
 // The policy for corner cases is configurable:
-// "policy_selector": {
-//    "migration": {
-//      "default_policy" : "ocis",
-//      "unauthenticated_policy": "oc10"
-//    }
-//  },
+//
+//	"policy_selector": {
+//	   "migration": {
+//	     "default_policy" : "ocis",
+//	     "unauthenticated_policy": "oc10"
+//	   }
+//	 },
 //
 // This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
 func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
@@ -154,19 +158,20 @@ func NewClaimsSelector(cfg *config.ClaimsSelectorConf) Selector {
 
 // NewRegexSelector selects the policy based on a user property
 // The policy for each case is configurable:
-// "policy_selector": {
-//    "regex": {
-//      "matches_policies": [
-//        {"priority": 10, "property": "mail", "match": "marie@example.org", "policy": "ocis"},
-//        {"priority": 20, "property": "mail", "match": "[^@]+@example.org", "policy": "oc10"},
-//        {"priority": 30, "property": "username", "match": "(einstein|feynman)", "policy": "ocis"},
-//        {"priority": 40, "property": "username", "match": ".+", "policy": "oc10"},
-//        {"priority": 50, "property": "id", "match": "4c510ada-c86b-4815-8820-42cdf82c3d51", "policy": "ocis"},
-//        {"priority": 60, "property": "id", "match": "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", "policy": "oc10"}
-//      ],
-//      "unauthenticated_policy": "oc10"
-//    }
-//  },
+//
+//	"policy_selector": {
+//	   "regex": {
+//	     "matches_policies": [
+//	       {"priority": 10, "property": "mail", "match": "marie@example.org", "policy": "ocis"},
+//	       {"priority": 20, "property": "mail", "match": "[^@]+@example.org", "policy": "oc10"},
+//	       {"priority": 30, "property": "username", "match": "(einstein|feynman)", "policy": "ocis"},
+//	       {"priority": 40, "property": "username", "match": ".+", "policy": "oc10"},
+//	       {"priority": 50, "property": "id", "match": "4c510ada-c86b-4815-8820-42cdf82c3d51", "policy": "ocis"},
+//	       {"priority": 60, "property": "id", "match": "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c", "policy": "oc10"}
+//	     ],
+//	     "unauthenticated_policy": "oc10"
+//	   }
+//	 },
 //
 // This selector can be used in migration-scenarios where some users have already migrated from ownCloud10 to OCIS and
 func NewRegexSelector(cfg *config.RegexSelectorConf) Selector {

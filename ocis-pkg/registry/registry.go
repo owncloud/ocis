@@ -28,6 +28,9 @@ var (
 	reg       registry.Registry
 )
 
+// Configure
+// FIXME: nolint
+// nolint: revive
 func Configure(plugin string) {
 	if reg == nil {
 		regPlugin = plugin

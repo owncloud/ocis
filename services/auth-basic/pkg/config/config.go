@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
 
+// Config combines all available configuration parts.
 type Config struct {
 	Commons *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
 	Service Service         `yaml:"-"`
@@ -25,6 +26,8 @@ type Config struct {
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
 }
+
+// Tracing defines the available tracing configuration.
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;AUTH_BASIC_TRACING_ENABLED" desc:"Activates tracing."`
 	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;AUTH_BASIC_TRACING_TYPE" desc:"The type of tracing. Defaults to \"\", which is the same as \"jaeger\". Allowed tracing types are \"jaeger\" and \"\" as of now."`
@@ -32,6 +35,7 @@ type Tracing struct {
 	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;AUTH_BASIC_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset."`
 }
 
+// Log defines the available log configuration.
 type Log struct {
 	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;AUTH_BASIC_LOG_LEVEL" desc:"The log level. Valid values are: \"panic\", \"fatal\", \"error\", \"warn\", \"info\", \"debug\", \"trace\"."`
 	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;AUTH_BASIC_LOG_PRETTY" desc:"Activates pretty log output."`
@@ -39,10 +43,12 @@ type Log struct {
 	File   string `yaml:"file" env:"OCIS_LOG_FILE;AUTH_BASIC_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set."`
 }
 
+// Service defines the available service configuration.
 type Service struct {
 	Name string `yaml:"-"`
 }
 
+// Debug defines the available debug configuration.
 type Debug struct {
 	Addr   string `yaml:"addr" env:"AUTH_BASIC_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed."`
 	Token  string `yaml:"token" env:"AUTH_BASIC_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint."`
@@ -50,6 +56,7 @@ type Debug struct {
 	Zpages bool   `yaml:"zpages" env:"AUTH_BASIC_DEBUG_ZPAGES" desc:"Enables zpages, which can  be used for collecting and viewing traces in-memory."`
 }
 
+// GRPCConfig defines the available grpc configuration.
 type GRPCConfig struct {
 	Addr      string                 `yaml:"addr" env:"AUTH_BASIC_GRPC_ADDR" desc:"The bind address of the GRPC service."`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
@@ -57,16 +64,19 @@ type GRPCConfig struct {
 	Protocol  string                 `yaml:"protocol" env:"AUTH_BASIC_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service."`
 }
 
+// AuthProviders defines the available AuthProviders configuration.
 type AuthProviders struct {
 	LDAP        LDAPProvider        `yaml:"ldap"`
 	OwnCloudSQL OwnCloudSQLProvider `yaml:"owncloudsql"`
 	JSON        JSONProvider        `yaml:"json,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 
+// JSONProvider defines the available JSONProvider configuration.
 type JSONProvider struct {
 	File string `yaml:"file,omitempty"`
 }
 
+// LDAPProvider defines the available LDAPProvider configuration.
 type LDAPProvider struct {
 	URI              string          `yaml:"uri" env:"LDAP_URI;AUTH_BASIC_LDAP_URI" desc:"URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'"`
 	CACert           string          `yaml:"ca_cert" env:"LDAP_CACERT;AUTH_BASIC_LDAP_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service."`
@@ -87,6 +97,7 @@ type LDAPProvider struct {
 	GroupSchema      LDAPGroupSchema `yaml:"group_schema"`
 }
 
+// LDAPUserSchema defines the available LDAPUserSchema configuration.
 type LDAPUserSchema struct {
 	ID              string `yaml:"id" env:"LDAP_USER_SCHEMA_ID;AUTH_BASIC_LDAP_USER_SCHEMA_ID" desc:"LDAP Attribute to use as the unique id for users. This should be a stable globally unique ID like a UUID."`
 	IDIsOctetString bool   `yaml:"id_is_octet_string" env:"LDAP_USER_SCHEMA_ID_IS_OCTETSTRING;AUTH_BASIC_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING" desc:"Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs."`
@@ -95,6 +106,7 @@ type LDAPUserSchema struct {
 	Username        string `yaml:"user_name" env:"LDAP_USER_SCHEMA_USERNAME;AUTH_BASIC_LDAP_USER_SCHEMA_USERNAME" desc:"LDAP Attribute to use for username of users."`
 }
 
+// LDAPGroupSchema defines the available LDAPGroupSchema configuration.
 type LDAPGroupSchema struct {
 	ID              string `yaml:"id" env:"LDAP_GROUP_SCHEMA_ID;AUTH_BASIC_LDAP_GROUP_SCHEMA_ID" desc:"LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID)."`
 	IDIsOctetString bool   `yaml:"id_is_octet_string" env:"LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING;AUTH_BASIC_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING" desc:"Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs."`
@@ -104,6 +116,7 @@ type LDAPGroupSchema struct {
 	Member          string `yaml:"member" env:"LDAP_GROUP_SCHEMA_MEMBER;AUTH_BASIC_LDAP_GROUP_SCHEMA_MEMBER" desc:"LDAP Attribute that is used for group members."`
 }
 
+// OwnCloudSQLProvider defines the available OwnCloudSQLProvider configuration.
 type OwnCloudSQLProvider struct {
 	DBUsername       string `yaml:"db_username" env:"AUTH_BASIC_OWNCLOUDSQL_DB_USERNAME" desc:"Database user to use for authenticating with the owncloud database."`
 	DBPassword       string `yaml:"db_password" env:"AUTH_BASIC_OWNCLOUDSQL_DB_PASSWORD" desc:"Password for the database user."`

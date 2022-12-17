@@ -23,108 +23,186 @@ var (
 	_insecureEvents  = Events{TLSInsecure: true}
 )
 
+// TokenManager
+// FIXME: nolint
+// nolint: revive
 type TokenManager struct {
 	JWTSecret string `yaml:"jwt_secret"`
 }
 
+// InsecureService
+// FIXME: nolint
+// nolint: revive
 type InsecureService struct {
 	Insecure bool
 }
 
+// InsecureProxyService
+// FIXME: nolint
+// nolint: revive
 type InsecureProxyService struct {
 	OIDC             InsecureProxyOIDC `yaml:"oidc"`
 	InsecureBackends bool              `yaml:"insecure_backends"`
 }
 
+// InsecureProxyOIDC
+// FIXME: nolint
+// nolint: revive
 type InsecureProxyOIDC struct {
 	Insecure bool `yaml:"insecure"`
 }
 
+// LdapSettings
+// FIXME: nolint
+// nolint: revive
 type LdapSettings struct {
 	BindPassword string `yaml:"bind_password"`
 }
+
+// LdapBasedService
+// FIXME: nolint
+// nolint: revive
 type LdapBasedService struct {
 	Ldap LdapSettings
 }
 
+// Events
+// FIXME: nolint
+// nolint: revive
 type Events struct {
 	TLSInsecure bool `yaml:"tls_insecure"`
 }
 
+// GraphService
+// FIXME: nolint
+// nolint: revive
 type GraphService struct {
 	Events   Events
 	Spaces   InsecureService
 	Identity LdapBasedService
 }
 
+// ServiceUserPasswordsSettings
+// FIXME: nolint
+// nolint: revive
 type ServiceUserPasswordsSettings struct {
 	AdminPassword string `yaml:"admin_password"`
 	IdmPassword   string `yaml:"idm_password"`
 	RevaPassword  string `yaml:"reva_password"`
 	IdpPassword   string `yaml:"idp_password"`
 }
+
+// IdmService
+// FIXME: nolint
+// nolint: revive
 type IdmService struct {
 	ServiceUserPasswords ServiceUserPasswordsSettings `yaml:"service_user_passwords"`
 }
 
+// FrontendService
+// FIXME: nolint
+// nolint: revive
 type FrontendService struct {
 	Archiver InsecureService
 }
 
+// AuthbasicService
+// FIXME: nolint
+// nolint: revive
 type AuthbasicService struct {
 	AuthProviders LdapBasedService `yaml:"auth_providers"`
 }
 
+// AuthProviderSettings
+// FIXME: nolint
+// nolint: revive
 type AuthProviderSettings struct {
 	Oidc InsecureService
 }
+
+// AuthbearerService
+// FIXME: nolint
+// nolint: revive
 type AuthbearerService struct {
 	AuthProviders AuthProviderSettings `yaml:"auth_providers"`
 }
 
+// UsersAndGroupsService
+// FIXME: nolint
+// nolint: revive
 type UsersAndGroupsService struct {
 	Drivers LdapBasedService
 }
 
+// ThumbnailSettings
+// FIXME: nolint
+// nolint: revive
 type ThumbnailSettings struct {
 	TransferSecret      string `yaml:"transfer_secret"`
 	WebdavAllowInsecure bool   `yaml:"webdav_allow_insecure"`
 	Cs3AllowInsecure    bool   `yaml:"cs3_allow_insecure"`
 }
 
+// ThumbnailService
+// FIXME: nolint
+// nolint: revive
 type ThumbnailService struct {
 	Thumbnail ThumbnailSettings
 }
 
+// Search
+// FIXME: nolint
+// nolint: revive
 type Search struct {
 	Events Events
 }
 
+// Audit
+// FIXME: nolint
+// nolint: revive
 type Audit struct {
 	Events Events
 }
 
+// Sharing
+// FIXME: nolint
+// nolint: revive
 type Sharing struct {
 	Events Events
 }
 
+// StorageUsers
+// FIXME: nolint
+// nolint: revive
 type StorageUsers struct {
 	Events  Events
 	MountID string `yaml:"mount_id"`
 }
 
+// Gateway
+// FIXME: nolint
+// nolint: revive
 type Gateway struct {
 	StorageRegistry StorageRegistry `yaml:"storage_registry"`
 }
 
+// StorageRegistry
+// FIXME: nolint
+// nolint: revive
 type StorageRegistry struct {
 	StorageUsersMountID string `yaml:"storage_users_mount_id"`
 }
 
+// Notifications
+// FIXME: nolint
+// nolint: revive
 type Notifications struct {
 	Notifications struct{ Events Events } // The notifications config has a field called notifications
 }
 
+// Nats
+// FIXME: nolint
+// nolint: revive
 type Nats struct {
 	// The nats config has a field called nats
 	Nats struct {
@@ -132,7 +210,7 @@ type Nats struct {
 	}
 }
 
-// TODO: use the oCIS config struct instead of this custom struct
+// OcisConfig
 // We can't use it right now, because it would need  "omitempty" on
 // all elements, in order to produce a slim config file with `ocis init`.
 // We can't just add these "omitempty" tags, since we want to generate
@@ -144,6 +222,9 @@ type Nats struct {
 // - unmarshal it into yaml.Node
 // - recurse through the nodes and delete empty / default ones
 // - marshal it to yaml
+// TODO: use the oCIS config struct instead of this custom struct
+// FIXME: nolint
+// nolint: revive
 type OcisConfig struct {
 	TokenManager      TokenManager `yaml:"token_manager"`
 	MachineAuthAPIKey string       `yaml:"machine_auth_api_key"`

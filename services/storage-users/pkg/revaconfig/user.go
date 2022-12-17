@@ -2,6 +2,9 @@ package revaconfig
 
 import "github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 
+// UserDrivers
+// FIXME: nolint
+// nolint: revive
 func UserDrivers(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"eos": map[string]interface{}{

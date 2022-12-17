@@ -78,8 +78,14 @@ func (e JpegEncoder) MimeType() string {
 	return "image/jpeg"
 }
 
+// GifEncoder
+// FIXME: nolint
+// nolint: revive
 type GifEncoder struct{}
 
+// Encode
+// FIXME: nolint
+// nolint: revive
 func (e GifEncoder) Encode(w io.Writer, img interface{}) error {
 	g, ok := img.(*gif.GIF)
 	if !ok {
@@ -88,10 +94,16 @@ func (e GifEncoder) Encode(w io.Writer, img interface{}) error {
 	return gif.EncodeAll(w, g)
 }
 
+// Types
+// FIXME: nolint
+// nolint: revive
 func (e GifEncoder) Types() []string {
 	return []string{typeGif}
 }
 
+// MimeType
+// FIXME: nolint
+// nolint: revive
 func (e GifEncoder) MimeType() string {
 	return "image/gif"
 }

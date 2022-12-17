@@ -97,6 +97,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &ListResponse{Value: users})
 }
 
+// PostUser validates and create a User if valid.
 func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Interface("body", r.Body).Msg("calling create user")
@@ -264,7 +265,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			}
 			d.Quota = quota
 			if slices.Contains(sel, "drive") || slices.Contains(exp, "drive") {
-				if *d.DriveType == "personal" {
+				if *d.DriveType == _driveTypePersonal {
 					user.Drive = d
 				}
 			} else {
@@ -278,6 +279,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, user)
 }
 
+// DeleteUser deletes the requested User.
 func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling delete user")
@@ -334,14 +336,14 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for _, sp := range lspr.GetStorageSpaces() {
-			if !(sp.SpaceType == "personal" && sp.Owner.Id.OpaqueId == user.GetId()) {
+			if !(sp.SpaceType == _driveTypePersonal && sp.Owner.Id.OpaqueId == user.GetId()) {
 				continue
 			}
 			// TODO: check if request contains a homespace and if, check if requesting user has the privilege to
 			// delete it and make sure it is not deleting its own homespace
 			// needs modification of the cs3api
 
-			// Deleting a space a two step process (1. disabling/trashing, 2. purging)
+			// Deleting a space a two-step process (1. disabling/trashing, 2. purging)
 			// Do the "disable/trash" step only if the space is not marked as trashed yet:
 			if _, ok := sp.Opaque.Map["trashed"]; !ok {
 				_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
@@ -499,7 +501,7 @@ func sortUsers(req *godata.GoDataRequest, users []*libregraph.User) ([]*libregra
 		return nil, fmt.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
 	}
 
-	if req.Query.OrderBy.OrderByItems[0].Order == "desc" {
+	if req.Query.OrderBy.OrderByItems[0].Order == _orderDesc {
 		sorter = sort.Reverse(sorter)
 	}
 	sort.Sort(sorter)

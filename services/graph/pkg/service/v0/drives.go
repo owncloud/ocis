@@ -275,7 +275,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		csr.Opaque = utils.AppendPlainToOpaque(csr.Opaque, "spaceAlias", *drive.DriveAlias)
 	}
 
-	if driveType == "personal" {
+	if driveType == _driveTypePersonal {
 		csr.Owner = us
 	}
 
@@ -314,6 +314,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, newDrive)
 }
 
+// UpdateDrive updates a storage drive (space).
 func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling update drive")
@@ -698,9 +699,13 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	switch {
 	case err != nil:
 		logger.Error().Err(err).Interface("ref", req.Ref).Msg("could not call GetQuota: transport error")
+		// FIXME: nolint
+		// nolint: nilnil
 		return nil, nil
 	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_UNIMPLEMENTED:
 		logger.Debug().Msg("get quota is not implemented on the storage driver")
+		// FIXME: nolint
+		// nolint: nilnil
 		return nil, nil
 	case res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
 		logger.Debug().Str("grpc", res.GetStatus().GetMessage()).Msg("error sending get quota grpc request")
@@ -830,6 +835,7 @@ func listStorageSpacesTypeFilter(spaceType string) *storageprovider.ListStorageS
 	}
 }
 
+// DeleteDrive deletes a storage drive (space).
 func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling delete drive")
@@ -911,7 +917,7 @@ func sortSpaces(req *godata.GoDataRequest, spaces []*libregraph.Drive) ([]*libre
 		return nil, errors.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
 	}
 
-	if req.Query.OrderBy.OrderByItems[0].Order == "desc" {
+	if req.Query.OrderBy.OrderByItems[0].Order == _orderDesc {
 		sorter = sort.Reverse(sorter)
 	}
 	sort.Sort(sorter)

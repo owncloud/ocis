@@ -150,6 +150,8 @@ func (s *Store) initMetadataClient(mdc MetadataClient) error {
 	return nil
 }
 
+// FIXME: nolint
+// nolint: gochecknoinits
 func init() {
 	settings.Registry[managerName] = New
 }

@@ -6,7 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
-// NewLogging returns a service that logs messages.
+// NewLoggingHandler returns a service that logs messages.
 func NewLoggingHandler(next Service, logger log.Logger) Service {
 	return loggingHandler{
 		next:   next,

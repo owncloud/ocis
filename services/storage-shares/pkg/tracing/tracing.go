@@ -12,6 +12,7 @@ var (
 	TraceProvider = trace.NewNoopTracerProvider()
 )
 
+// Configure checks all necessary settings and returns an error if something is wrong.
 func Configure(cfg *config.Config, logger log.Logger) error {
 	tracing.Configure(cfg.Tracing.Enabled, cfg.Tracing.Type, logger)
 	return nil

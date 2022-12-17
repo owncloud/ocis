@@ -69,6 +69,9 @@ type Thumbnail struct {
 	preprocessorOpts PreprocessorOpts
 }
 
+// PreprocessorOpts
+// FIXME: nolint
+// nolint: revive
 type PreprocessorOpts struct {
 	TxtFontFileMap string
 }
@@ -83,11 +86,15 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumb
 	generator, err := thumbnail.GeneratorForType(tType)
 	if err != nil {
 		g.logger.Debug().Str("thumbnail_type", tType).Msg("unsupported thumbnail type")
+		// FIXME: nolint
+		// nolint: nilerr
 		return nil
 	}
 	encoder, err := thumbnail.EncoderForType(tType)
 	if err != nil {
 		g.logger.Debug().Str("thumbnail_type", tType).Msg("unsupported thumbnail type")
+		// FIXME: nolint
+		// nolint: nilerr
 		return nil
 	}
 
@@ -153,7 +160,7 @@ func (g Thumbnail) handleCS3Source(ctx context.Context,
 	if err != nil {
 		return "", merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
-	defer r.Close() // nolint:errcheck
+	defer r.Close()
 	ppOpts := map[string]interface{}{
 		"fontFileMap": g.preprocessorOpts.TxtFontFileMap,
 	}
@@ -236,7 +243,7 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context,
 	if err != nil {
 		return "", merrors.InternalServerError(g.serviceID, "could not get image from source: %s", err.Error())
 	}
-	defer r.Close() // nolint:errcheck
+	defer r.Close()
 	ppOpts := map[string]interface{}{
 		"fontFileMap": g.preprocessorOpts.TxtFontFileMap,
 	}

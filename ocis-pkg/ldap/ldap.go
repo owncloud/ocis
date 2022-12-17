@@ -29,6 +29,9 @@ var (
 	)
 )
 
+// WaitForCA
+// FIXME: nolint
+// nolint: revive
 func WaitForCA(log log.Logger, insecure bool, caCert string) error {
 	if !insecure && caCert != "" {
 		for i := 0; i < caCheckRetries; i++ {

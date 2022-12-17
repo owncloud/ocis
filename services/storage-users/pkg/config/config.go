@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
 
+// Config combines all available configuration parts.
 type Config struct {
 	Commons *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
 	Service Service         `yaml:"-"`
@@ -36,6 +37,8 @@ type Config struct {
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
 }
+
+// Tracing defines the available tracing configuration.
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;STORAGE_USERS_TRACING_ENABLED" desc:"Activates tracing."`
 	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;STORAGE_USERS_TRACING_TYPE" desc:"The type of tracing. Defaults to \"\", which is the same as \"jaeger\". Allowed tracing types are \"jaeger\" and \"\" as of now."`
@@ -43,6 +46,7 @@ type Tracing struct {
 	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;STORAGE_USERS_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset."`
 }
 
+// Log defines the available log configuration.
 type Log struct {
 	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;STORAGE_USERS_LOG_LEVEL" desc:"The log level. Valid values are: \"panic\", \"fatal\", \"error\", \"warn\", \"info\", \"debug\", \"trace\"."`
 	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;STORAGE_USERS_LOG_PRETTY" desc:"Activates pretty log output."`
@@ -50,10 +54,12 @@ type Log struct {
 	File   string `yaml:"file" env:"OCIS_LOG_FILE;STORAGE_USERS_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set."`
 }
 
+// Service defines the available service configuration.
 type Service struct {
 	Name string `yaml:"-"`
 }
 
+// Debug defines the available debug configuration.
 type Debug struct {
 	Addr   string `yaml:"addr" env:"STORAGE_USERS_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed."`
 	Token  string `yaml:"token" env:"STORAGE_USERS_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint."`
@@ -61,6 +67,7 @@ type Debug struct {
 	Zpages bool   `yaml:"zpages" env:"STORAGE_USERS_DEBUG_ZPAGES" desc:"Enables zpages, which can be used for collecting and viewing in-memory traces."`
 }
 
+// GRPCConfig defines the available grpc configuration.
 type GRPCConfig struct {
 	Addr      string                 `yaml:"addr" env:"STORAGE_USERS_GRPC_ADDR" desc:"The bind address of the GRPC service."`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
@@ -68,6 +75,7 @@ type GRPCConfig struct {
 	Protocol  string                 `yaml:"protocol" env:"STORAGE_USERS_GRPC_PROTOCOL" desc:"The transport protocol of the GPRC service."`
 }
 
+// HTTPConfig defines the available http configuration.
 type HTTPConfig struct {
 	Addr      string `yaml:"addr" env:"STORAGE_USERS_HTTP_ADDR" desc:"The bind address of the HTTP service."`
 	Namespace string `yaml:"-"`
@@ -75,6 +83,7 @@ type HTTPConfig struct {
 	Prefix    string
 }
 
+// Drivers defines the available drivers configuration.
 type Drivers struct {
 	OCIS        OCISDriver        `yaml:"ocis"`
 	S3NG        S3NGDriver        `yaml:"s3ng"`
@@ -85,6 +94,7 @@ type Drivers struct {
 	Local LocalDriver `yaml:",omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 
+// OCISDriver defines the available OCISDriver configuration.
 type OCISDriver struct {
 	// Root is the absolute path to the location of the data
 	Root                string `yaml:"root" env:"STORAGE_USERS_OCIS_ROOT" desc:"The directory where the filesystem storage will store user files. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users."`
@@ -103,6 +113,7 @@ type OCISDriver struct {
 	AsyncUploads            bool   `yaml:"async_uploads" env:"STORAGE_USERS_OCIS_ASYNC_UPLOADS" desc:"Enable asynchronous file uploads."`
 }
 
+// S3NGDriver defines the available S3NGDriver configuration.
 type S3NGDriver struct {
 	// Root is the absolute path to the location of the data
 	Root                string `yaml:"root" env:"STORAGE_USERS_S3NG_ROOT" desc:"The directory where the filesystem storage will store user files. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users."`
@@ -125,6 +136,7 @@ type S3NGDriver struct {
 	LockCycleDurationFactor int    `yaml:"lock_cycle_duration_factor" env:"STORAGE_USERS_S3NG_LOCK_CYCLE_DURATION_FACTOR" desc:"When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used."`
 }
 
+// OwnCloudSQLDriver defines the available OwnCloudSQLDriver configuration.
 type OwnCloudSQLDriver struct {
 	// Root is the absolute path to the location of the data
 	Root string `yaml:"root" env:"STORAGE_USERS_OWNCLOUDSQL_DATADIR" desc:"The directory where the filesystem storage will store SQL migration data. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/owncloud."`
@@ -140,6 +152,7 @@ type OwnCloudSQLDriver struct {
 	UsersProviderEndpoint string `yaml:"users_provider_endpoint" env:"STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT" desc:"Endpoint of the users provider."`
 }
 
+// Events defines the available Events configuration.
 type Events struct {
 	Addr              string `yaml:"endpoint" env:"STORAGE_USERS_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture."`
 	ClusterID         string `yaml:"cluster" env:"STORAGE_USERS_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system."`
@@ -156,6 +169,7 @@ type Cache struct {
 	Database string   `yaml:"database" env:"STORAGE_USERS_CACHE_DATABASE" desc:"Database name of the cache."`
 }
 
+// S3Driver defines the available S3Driver configuration.
 type S3Driver struct {
 	// Root is the absolute path to the location of the data
 	Root      string `yaml:"root"`
@@ -165,6 +179,8 @@ type S3Driver struct {
 	Endpoint  string `yaml:"endpoint"`
 	Bucket    string `yaml:"bucket"`
 }
+
+// EOSDriver defines the available EOSDriver configuration.
 type EOSDriver struct {
 	// Root is the absolute path to the location of the data
 	Root string `yaml:"root"`
@@ -203,7 +219,7 @@ type EOSDriver struct {
 	ForceSingleUserMode bool `yaml:"force_single_user_mode"`
 	// UseKeyTabAuth changes will authenticate requests by using an EOS keytab.
 	UseKeytab bool `yaml:"user_keytab"`
-	// gateway service to use for uid lookups
+	// GatewaySVC service to use for uid lookups
 	GatewaySVC string `yaml:"gateway_svc"`
 	//ShareFolder defines the name of the folder jailing all shares
 	ShareFolder string `yaml:"share_folder"`
@@ -211,6 +227,7 @@ type EOSDriver struct {
 	UserLayout  string
 }
 
+// LocalDriver defines the available LocalDriver configuration.
 type LocalDriver struct {
 	// Root is the absolute path to the location of the data
 	Root string `yaml:"root"`

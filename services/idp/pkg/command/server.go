@@ -36,6 +36,8 @@ func Server(cfg *config.Config) *cli.Command {
 		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
 		Before: func(c *cli.Context) error {
+			// FIXME: nolint
+			// nolint: errcheck
 			configlog.ReturnFatal(parser.ParseConfig(cfg))
 
 			if cfg.IDP.EncryptionSecretFile != "" {
@@ -139,6 +141,8 @@ func ensureEncryptionSecretExists(path string) error {
 
 	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
+		// FIXME: nolint
+		// nolint: nilerr
 		return nil
 	}
 	defer f.Close()
@@ -175,6 +179,8 @@ func ensureSigningPrivateKeyExists(paths []string) error {
 
 		f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0600)
 		if err != nil {
+			// FIXME: nolint
+			// nolint: nilerr
 			return nil
 		}
 		defer f.Close()

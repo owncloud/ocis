@@ -1,11 +1,12 @@
 package sync
 
 import (
-	"github.com/stretchr/testify/assert"
 	"strconv"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func cacheRunner(size int) (*Cache, func(f func(v string))) {

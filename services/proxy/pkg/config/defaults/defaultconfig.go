@@ -9,13 +9,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 )
 
-func FullDefaultConfig() *config.Config {
-	cfg := DefaultConfig()
-	EnsureDefaults(cfg)
-	Sanitize(cfg)
-	return cfg
-}
-
+// DefaultConfig returns a basic default configuration
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
@@ -63,6 +57,9 @@ func DefaultConfig() *config.Config {
 	}
 }
 
+// DefaultPolicies
+// FIXME: nolint
+// nolint: revive
 func DefaultPolicies() []config.Policy {
 	return []config.Policy{
 		{

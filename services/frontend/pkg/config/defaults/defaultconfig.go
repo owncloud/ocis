@@ -5,13 +5,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
 )
 
-func FullDefaultConfig() *config.Config {
-	cfg := DefaultConfig()
-	EnsureDefaults(cfg)
-	Sanitize(cfg)
-	return cfg
-}
-
+// DefaultConfig returns a basic default configuration
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
@@ -114,6 +108,7 @@ func DefaultConfig() *config.Config {
 	}
 }
 
+// EnsureDefaults adds default values to the configuration if they are not set yet
 func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for "envdecode".
 	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
@@ -163,8 +158,4 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
 
-}
-
-func Sanitize(cfg *config.Config) {
-	// nothing to sanitize here atm
 }

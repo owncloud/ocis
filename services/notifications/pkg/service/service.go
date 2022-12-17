@@ -23,6 +23,7 @@ import (
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
+// Service defines the service handlers.
 type Service interface {
 	Run() error
 }

@@ -56,6 +56,7 @@ type Asset struct {
 	Path string `yaml:"asset" env:"IDP_ASSET_PATH" desc:"Serve IDP assets from a path on the filesystem instead of the builtin assets."`
 }
 
+// Client defines the available Client configuration.
 type Client struct {
 	ID              string   `yaml:"id"`
 	Name            string   `yaml:"name"`
@@ -66,6 +67,7 @@ type Client struct {
 	ApplicationType string   `yaml:"application_type"`
 }
 
+// Settings defines the available Settings configuration.
 type Settings struct {
 	// don't change the order of elements in this struct
 	// it needs to match github.com/libregraph/lico/bootstrap.Settings

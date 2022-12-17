@@ -11,7 +11,7 @@ import (
 	"go-micro.dev/v4/store"
 )
 
-// In-memory store implementation using radix tree for fast prefix and suffix
+// MemStore implements in-memory store using radix tree for fast prefix and suffix
 // searches.
 // Insertions are expected to be a bit slow due to the data structures, but
 // searches are expected to be fast, including exact key search, as well as
@@ -53,20 +53,22 @@ type contextKey string
 
 var targetContextKey contextKey
 
-// Prepare a context to be used with the memory implementation. The context
+// NewContext prepares a context to be used with the memory implementation. The context
 // is used to set up custom parameters to the specific implementation.
 // In this case, you can configure the maximum capacity for the MemStore
 // implementation as shown below.
 // ```
 // cache := NewMemStore(
-//   store.WithContext(
-//     NewContext(
-//       ctx,
-//       map[string]interface{}{
-//         "maxCap": 50,
-//       },
-//     ),
-//   ),
+//
+//	store.WithContext(
+//	  NewContext(
+//	    ctx,
+//	    map[string]interface{}{
+//	      "maxCap": 50,
+//	    },
+//	  ),
+//	),
+//
 // )
 // ```
 //
@@ -80,7 +82,7 @@ func NewContext(ctx context.Context, storeParams map[string]interface{}) context
 	return context.WithValue(ctx, targetContextKey, storeParams)
 }
 
-// Create a new MemStore instance
+// NewMemStore initializes a new store.Store instance.
 func NewMemStore(opts ...store.Option) store.Store {
 	m := &MemStore{}
 	_ = m.Init(opts...)
@@ -110,7 +112,7 @@ func (m *MemStore) getMaxCap() int {
 	return maxCap
 }
 
-// Initialize the MemStore. If the MemStore was used, this will reset
+// Init initializes the MemStore. If the MemStore was used, this will reset
 // all the internal structures and the new options (passed as parameters)
 // will be used.
 func (m *MemStore) Init(opts ...store.Option) error {
@@ -130,7 +132,7 @@ func (m *MemStore) Init(opts ...store.Option) error {
 	return nil
 }
 
-// Get the options being used
+// Options returns used store.Options
 func (m *MemStore) Options() store.Options {
 	m.lockGlob.RLock()
 	defer m.lockGlob.RUnlock()
@@ -288,8 +290,7 @@ func (m *MemStore) Read(key string, opts ...store.ReadOption) ([]*store.Record, 
 	return records, nil
 }
 
-// Remove the record based on the key. It won't return any error if it's missing
-//
+// Delete removes the record based on the key. It won't return any error if it's missing
 // Database and Table options aren't supported
 func (m *MemStore) Delete(key string, opts ...store.DeleteOption) error {
 	m.lockGlob.Lock()
@@ -307,7 +308,7 @@ func (m *MemStore) Delete(key string, opts ...store.DeleteOption) error {
 
 // List the keys currently used in the MemStore
 //
-// All options are supported except Database and Table
+// # All options are supported except Database and Table
 //
 // For prefix and prefix+suffix options, the keys will be returned in
 // alphabetical order.
@@ -373,14 +374,21 @@ func (m *MemStore) List(opts ...store.ListOption) ([]string, error) {
 	return records, nil
 }
 
+// Close
+// FIXME: nolint
+// nolint: revive
 func (m *MemStore) Close() error {
 	return nil
 }
 
+// String implements stringer interface.
 func (m *MemStore) String() string {
 	return "RadixMemStore"
 }
 
+// Len
+// FIXME: nolint
+// nolint: revive
 func (m *MemStore) Len() (int, bool) {
 	eLen := m.evictionList.Len()
 	pLen := m.preRadix.Len()

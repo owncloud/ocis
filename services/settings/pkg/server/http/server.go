@@ -88,6 +88,8 @@ func Server(opts ...Option) (http.Service, error) {
 		settingssvc.RegisterPermissionServiceWeb(r, handle)
 	})
 
+	// FIXME: nolint
+	// nolint: errcheck
 	micro.RegisterHandler(service.Server(), mux)
 
 	return service, nil

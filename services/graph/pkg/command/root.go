@@ -49,6 +49,7 @@ func NewSutureService(cfg *ociscfg.Config) suture.Service {
 	}
 }
 
+// Serve implements Server interface
 func (s SutureService) Serve(ctx context.Context) error {
 	s.cfg.Context = ctx
 	if err := Execute(s.cfg); err != nil {

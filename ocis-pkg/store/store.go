@@ -9,21 +9,18 @@ import (
 	"go-micro.dev/v4/store"
 )
 
-var (
-	storeEnv        = "OCIS_STORE"
-	storeAddressEnv = "OCIS_STORE_ADDRESS"
-	storeOCMemSize  = "OCIS_STORE_OCMEM_SIZE"
-)
-
 var ocMemStore *store.Store
 
+// OcisStoreOptions
+// FIXME: nolint
+// nolint: revive
 type OcisStoreOptions struct {
 	Type    string
 	Address string
 	Size    int
 }
 
-// Get the configured key-value store to be used.
+// GetStore gets the configured key-value store to be used.
 //
 // Each microservice (or whatever piece is using the store) should use the
 // options available in the interface's operations to choose the right database

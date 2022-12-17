@@ -215,6 +215,8 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 	}
 }
 
+// FIXME: nolint
+// nolint: maintidx
 func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 	return []*settingssvc.AddSettingToBundleRequest{
 		{

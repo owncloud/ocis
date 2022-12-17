@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
 
+// Config combines all available configuration parts.
 type Config struct {
 	Commons *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
 
@@ -47,6 +48,8 @@ type Config struct {
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
 }
+
+// Tracing defines the available tracing configuration.
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;GATEWAY_TRACING_ENABLED" desc:"Activates tracing."`
 	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;GATEWAY_TRACING_TYPE" desc:"The type of tracing. Defaults to \"\", which is the same as \"jaeger\". Allowed tracing types are \"jaeger\" and \"\" as of now."`
@@ -54,6 +57,7 @@ type Tracing struct {
 	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;GATEWAY_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset."`
 }
 
+// Log defines the available log configuration.
 type Log struct {
 	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;GATEWAY_LOG_LEVEL" desc:"The log level. Valid values are: \"panic\", \"fatal\", \"error\", \"warn\", \"info\", \"debug\", \"trace\"."`
 	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;GATEWAY_LOG_PRETTY" desc:"Activates pretty log output."`
@@ -61,10 +65,12 @@ type Log struct {
 	File   string `yaml:"file" env:"OCIS_LOG_FILE;GATEWAY_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set."`
 }
 
+// Service defines the available service configuration.
 type Service struct {
 	Name string `yaml:"-"`
 }
 
+// Debug defines the available debug configuration.
 type Debug struct {
 	Addr   string `yaml:"addr" env:"GATEWAY_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed."`
 	Token  string `yaml:"token" env:"GATEWAY_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint."`
@@ -72,6 +78,7 @@ type Debug struct {
 	Zpages bool   `yaml:"zpages" env:"GATEWAY_DEBUG_ZPAGES" desc:"Enables zpages, which can be used for collecting and viewing in-memory traces."`
 }
 
+// GRPCConfig defines the available grpc configuration.
 type GRPCConfig struct {
 	Addr      string                 `yaml:"addr" env:"GATEWAY_GRPC_ADDR" desc:"The bind address of the GRPC service."`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
@@ -79,6 +86,7 @@ type GRPCConfig struct {
 	Protocol  string                 `yaml:"protocol" env:"GATEWAY_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service."`
 }
 
+// StorageRegistry defines the available StorageRegistry configuration.
 type StorageRegistry struct {
 	Driver              string   `yaml:"driver"` //TODO: configure via env?
 	Rules               []string `yaml:"rules"`  //TODO: configure via env?
@@ -86,7 +94,7 @@ type StorageRegistry struct {
 	StorageUsersMountID string   `yaml:"storage_users_mount_id" env:"GATEWAY_STORAGE_USERS_MOUNT_ID" desc:"Mount ID of this storage. This ID needs to be unique."`
 }
 
-// Cache holds cache config
+// Cache defines the available Cache configuration.
 type Cache struct {
 	Store              string   `yaml:"store" env:"OCIS_CACHE_STORE_TYPE;GATEWAY_CACHE_STORE_TYPE;GATEWAY_CACHE_STORE" desc:"Store implementation for the cache. Valid values are \"memory\" (default), \"redis\", and \"etcd\"."`
 	Nodes              []string `yaml:"nodes" env:"OCIS_CACHE_STORE_ADDRESS;GATEWAY_CACHE_STORE_ADDRESS;GATEWAY_CACHE_NODES" desc:"Node addresses to use for the cache store."`

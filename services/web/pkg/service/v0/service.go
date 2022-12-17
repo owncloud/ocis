@@ -97,6 +97,9 @@ func (p Web) getPayload() (payload []byte, err error) {
 			Str("config", p.config.Web.Path).
 			Msg("failed to read custom config")
 	}
+
+	// FIXME: nolint
+	// nolint: nakedret
 	return
 }
 

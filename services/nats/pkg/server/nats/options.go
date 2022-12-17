@@ -7,6 +7,8 @@ import (
 )
 
 // NatsOption configures the nats server
+// FIXME: nolint
+// nolint: revive
 type NatsOption func(*nserver.Options)
 
 // Host sets the host URL for the nats server

@@ -4,14 +4,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/audit/pkg/config"
 )
 
-// FullDefaultConfig returns a fully initialized default configuration
-func FullDefaultConfig() *config.Config {
-	cfg := DefaultConfig()
-	EnsureDefaults(cfg)
-	Sanitize(cfg)
-	return cfg
-}
-
 // DefaultConfig returns a basic default configuration
 func DefaultConfig() *config.Config {
 	return &config.Config{
@@ -47,9 +39,4 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.Log == nil {
 		cfg.Log = &config.Log{}
 	}
-}
-
-// Sanitize sanitized the configuration
-func Sanitize(cfg *config.Config) {
-	// sanitize config
 }

@@ -34,10 +34,15 @@ func Migrate(cfg *config.Config) *cli.Command {
 	}
 }
 
+// FIXME: nolint
+// nolint: gochecknoinits
 func init() {
 	register.AddCommand(Migrate)
 }
 
+// MigrateShares
+// FIXME: nolint
+// nolint: revive
 func MigrateShares(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "shares",
@@ -133,6 +138,9 @@ func MigrateShares(cfg *config.Config) *cli.Command {
 	}
 }
 
+// MigratePublicShares
+// FIXME: nolint
+// nolint: revive
 func MigratePublicShares(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "publicshares",

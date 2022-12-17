@@ -35,14 +35,9 @@ import (
 	webdav "github.com/owncloud/ocis/v2/services/webdav/pkg/config"
 )
 
-const (
-	// SUPERVISED sets the runtime mode as supervised threads.
-	SUPERVISED = iota
-
-	// UNSUPERVISED sets the runtime mode as a single thread.
-	UNSUPERVISED
-)
-
+// Mode
+// FIXME: nolint
+// nolint: revive
 type Mode int
 
 // Runtime configures the oCIS runtime when running in supervised mode.

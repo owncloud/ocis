@@ -53,7 +53,7 @@ func (g Graph) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if newPw == currentPw {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "new password must be differnt from current password")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "new password must be different from current password")
 		return
 	}
 

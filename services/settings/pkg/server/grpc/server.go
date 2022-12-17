@@ -55,6 +55,9 @@ func Server(opts ...Option) grpc.Service {
 	return service
 }
 
+// RegisterCS3PermissionsServiceHandler
+// FIXME: nolint
+// nolint: revive
 func RegisterCS3PermissionsServiceHandler(s server.Server, hdlr permissions.PermissionsAPIServer, opts ...server.HandlerOption) error {
 	type permissionsService interface {
 		CheckPermission(context.Context, *permissions.CheckPermissionRequest, *permissions.CheckPermissionResponse) error

@@ -15,6 +15,8 @@ func (s Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleA
 	assignmentsFolder := s.buildFolderPathForRoleAssignments(false)
 	assignmentFiles, err := os.ReadDir(assignmentsFolder)
 	if err != nil {
+		// FIXME: nolint
+		// nolint: nilerr
 		return records, nil
 	}
 

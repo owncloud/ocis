@@ -21,7 +21,7 @@ type Options struct {
 	AllowCredentials bool
 }
 
-// newAccountOptions initializes the available default options.
+// NewOptions initializes the available default options.
 func NewOptions(opts ...Option) Options {
 	opt := Options{}
 
@@ -60,7 +60,7 @@ func AllowedHeaders(headers []string) Option {
 	}
 }
 
-// AlloweCredentials provides a function to set the AllowCredentials option.
+// AllowCredentials provides a function to set the AllowCredentials option.
 func AllowCredentials(allow bool) Option {
 	return func(o *Options) {
 		o.AllowCredentials = allow

@@ -8,7 +8,8 @@ import (
 
 // Config combines all available configuration parts.
 type Config struct {
-	Commons *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
+	// don't use this directly as configuration for a service
+	Commons *shared.Commons `yaml:"-"`
 
 	Service Service `yaml:"-"`
 
@@ -60,13 +61,14 @@ type Application struct {
 }
 
 // ExternalApp defines an external web app.
-// {
-//	"name": "hello",
-//	"path": "http://localhost:9105/hello.js",
-//	  "config": {
-//	    "url": "http://localhost:9105"
-//	  }
-//  }
+//
+//	{
+//		"name": "hello",
+//		"path": "http://localhost:9105/hello.js",
+//		  "config": {
+//		    "url": "http://localhost:9105"
+//		  }
+//	 }
 type ExternalApp struct {
 	ID   string `json:"id,omitempty" yaml:"id"`
 	Path string `json:"path,omitempty" yaml:"path"`

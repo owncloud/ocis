@@ -36,7 +36,7 @@ func OIDCWellKnownRewrite(logger log.Logger, oidcISS string, rewrite bool, oidcC
 
 				copyHeader(w.Header(), wellKnownRes.Header)
 				w.WriteHeader(wellKnownRes.StatusCode)
-				io.Copy(w, wellKnownRes.Body)
+				_, _ = io.Copy(w, wellKnownRes.Body)
 
 				return
 			}

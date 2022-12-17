@@ -10,10 +10,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/prop"
 )
 
-const (
-	_spaceTypeProject = "project"
-)
-
 type countingReader struct {
 	n int
 	r io.Reader

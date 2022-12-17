@@ -33,6 +33,7 @@ func ParseConfig(cfg *config.Config) error {
 	return Validate(cfg)
 }
 
+// Validate validates the configuration
 func Validate(cfg *config.Config) error {
 	if cfg.TokenManager.JWTSecret == "" {
 		return shared.MissingJWTTokenError(cfg.Service.Name)
@@ -45,7 +46,7 @@ func Validate(cfg *config.Config) error {
 	if cfg.OIDC.AccessTokenVerifyMethod != config.AccessTokenVerificationNone &&
 		cfg.OIDC.AccessTokenVerifyMethod != config.AccessTokenVerificationJWT {
 		return fmt.Errorf(
-			"Invalid value '%s' for 'access_token_verify_method' in service %s. Possible values are: '%s' or '%s'.",
+			"Invalid value '%s' for 'access_token_verify_method' in service %s. Possible values are: '%s' or '%s'",
 			cfg.OIDC.AccessTokenVerifyMethod, cfg.Service.Name,
 			config.AccessTokenVerificationJWT, config.AccessTokenVerificationNone,
 		)

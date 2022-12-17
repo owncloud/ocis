@@ -22,6 +22,8 @@ var (
 )
 
 // UserBackend allows the proxy to retrieve users from different user-backends (accounts-service, CS3)
+//
+//go:generate mockery --name=UserBackend
 type UserBackend interface {
 	GetUserByClaims(ctx context.Context, claim, value string, withRoles bool) (*cs3.User, string, error)
 	Authenticate(ctx context.Context, username string, password string) (*cs3.User, string, error)

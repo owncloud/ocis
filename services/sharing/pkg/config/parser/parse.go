@@ -28,29 +28,29 @@ func ParseConfig(cfg *config.Config) error {
 		}
 	}
 
-	defaults.Sanitize(cfg)
-
 	return Validate(cfg)
 }
 
+// Validate validates the configuration
 func Validate(cfg *config.Config) error {
 	if cfg.TokenManager.JWTSecret == "" {
 		return shared.MissingJWTTokenError(cfg.Service.Name)
 	}
 
-	if cfg.PublicSharingDriver == "cs3" && cfg.PublicSharingDrivers.CS3.SystemUserAPIKey == "" {
+	const cs3Driver = "cs3"
+	if cfg.PublicSharingDriver == cs3Driver && cfg.PublicSharingDrivers.CS3.SystemUserAPIKey == "" {
 		return shared.MissingSystemUserApiKeyError(cfg.Service.Name)
 	}
 
-	if cfg.PublicSharingDriver == "cs3" && cfg.PublicSharingDrivers.CS3.SystemUserID == "" {
+	if cfg.PublicSharingDriver == cs3Driver && cfg.PublicSharingDrivers.CS3.SystemUserID == "" {
 		return shared.MissingSystemUserID(cfg.Service.Name)
 	}
 
-	if cfg.UserSharingDriver == "cs3" && cfg.UserSharingDrivers.CS3.SystemUserAPIKey == "" {
+	if cfg.UserSharingDriver == cs3Driver && cfg.UserSharingDrivers.CS3.SystemUserAPIKey == "" {
 		return shared.MissingSystemUserApiKeyError(cfg.Service.Name)
 	}
 
-	if cfg.UserSharingDriver == "cs3" && cfg.UserSharingDrivers.CS3.SystemUserID == "" {
+	if cfg.UserSharingDriver == cs3Driver && cfg.UserSharingDrivers.CS3.SystemUserID == "" {
 		return shared.MissingSystemUserID(cfg.Service.Name)
 	}
 

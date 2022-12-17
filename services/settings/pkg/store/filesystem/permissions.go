@@ -36,6 +36,9 @@ func (s Store) ReadPermissionByID(permissionID string, roleIDs []string) (*setti
 			}
 		}
 	}
+
+	// FIXME: nolint
+	// nolint: nilnil
 	return nil, nil
 }
 

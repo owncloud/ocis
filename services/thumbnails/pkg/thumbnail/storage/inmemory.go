@@ -17,6 +17,9 @@ type InMemory struct {
 	store map[string][]byte
 }
 
+// Stat
+// FIXME: nolint
+// nolint: revive
 func (s InMemory) Stat(key string) bool {
 	_, exists := s.store[key]
 	return exists
@@ -27,7 +30,7 @@ func (s InMemory) Get(key string) ([]byte, error) {
 	return s.store[key], nil
 }
 
-// Set stores the thumbnail in memory.
+// Put stores the thumbnail in memory.
 func (s InMemory) Put(key string, thumbnail []byte) error {
 	s.store[key] = thumbnail
 	return nil

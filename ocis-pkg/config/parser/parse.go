@@ -36,8 +36,7 @@ func ParseConfig(cfg *config.Config, skipValidate bool) error {
 	return Validate(cfg)
 }
 
-// EnsureDefaults, ensures that all pointers in the
-// oCIS config (not the services configs) are initialized
+// EnsureDefaults adds default values to the configuration if they are not set yet
 func EnsureDefaults(cfg *config.Config) {
 	if cfg.Tracing == nil {
 		cfg.Tracing = &shared.Tracing{}
@@ -147,6 +146,7 @@ func EnsureCommons(cfg *config.Config) {
 	}
 }
 
+// Validate validates the configuration
 func Validate(cfg *config.Config) error {
 	if cfg.TokenManager.JWTSecret == "" {
 		return shared.MissingJWTTokenError("ocis")

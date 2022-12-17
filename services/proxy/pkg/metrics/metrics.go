@@ -29,6 +29,8 @@ func New() *Metrics {
 			Name:      "proxy_total",
 			Help:      "How many proxy requests processed",
 		}, []string{}),
+		// FIXME: nolint
+		// nolint: promlinter
 		Latency: prometheus.NewSummaryVec(prometheus.SummaryOpts{
 			Namespace: Namespace,
 			Subsystem: Subsystem,

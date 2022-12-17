@@ -23,6 +23,7 @@ var (
 	errNotFound = errorcode.New(errorcode.ItemNotFound, "not found")
 )
 
+// LDAP defines the available LDAP configuration.
 type LDAP struct {
 	useServerUUID   bool
 	writeEnabled    bool
@@ -58,6 +59,7 @@ type groupAttributeMap struct {
 	memberSyntax string
 }
 
+// NewLDAPBackend initializes a new LDAP instance.
 func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LDAP, error) {
 	if config.UserDisplayNameAttribute == "" || config.UserIDAttribute == "" ||
 		config.UserEmailAttribute == "" || config.UserNameAttribute == "" {
@@ -393,6 +395,9 @@ func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
 	return res.Entries[0], nil
 }
 
+// GetUser
+// FIXME: nolint
+// nolint
 func (i *LDAP) GetUser(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.User, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetUser")
@@ -419,6 +424,9 @@ func (i *LDAP) GetUser(ctx context.Context, nameOrID string, queryParam url.Valu
 	return u, nil
 }
 
+// GetUsers
+// FIXME: nolint
+// nolint
 func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetUsers")
@@ -502,6 +510,9 @@ func (i *LDAP) getGroupsForUser(dn string) ([]*ldap.Entry, error) {
 	return userGroups, nil
 }
 
+// GetGroup
+// FIXME: nolint
+// nolint
 func (i *LDAP) GetGroup(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.Group, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetGroup")
@@ -630,6 +641,8 @@ func (i *LDAP) removeMemberFromGroupEntry(group *ldap.Entry, memberDN string) (*
 	if !found {
 		i.logger.Debug().Str("backend", "ldap").Str("groupdn", group.DN).Str("member", memberDN).
 			Msg("The target is not a member of the group")
+		// FIXME: nolint
+		// nolint: nilnil
 		return nil, nil
 	}
 
@@ -641,6 +654,9 @@ func (i *LDAP) removeMemberFromGroupEntry(group *ldap.Entry, memberDN string) (*
 	return &mr, nil
 }
 
+// GetGroups
+// FIXME: nolint
+// nolint
 func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetGroups")
@@ -870,7 +886,7 @@ func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs 
 		currentSet[nCurrentMember] = struct{}{}
 	}
 
-	var newMemberDNs []string
+	var newMemberDNS []string
 	for _, memberID := range memberIDs {
 		me, err := i.getLDAPUserByID(memberID)
 		if err != nil {
@@ -882,14 +898,14 @@ func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs 
 			return err
 		}
 		if _, present := currentSet[nDN]; !present {
-			newMemberDNs = append(newMemberDNs, me.DN)
+			newMemberDNS = append(newMemberDNS, me.DN)
 		} else {
 			logger.Debug().Str("memberDN", me.DN).Msg("Member already present in group. Skipping")
 		}
 	}
 
-	if len(newMemberDNs) > 0 {
-		mr.Add(i.groupAttributeMap.member, newMemberDNs)
+	if len(newMemberDNS) > 0 {
+		mr.Add(i.groupAttributeMap.member, newMemberDNS)
 
 		if err := i.conn.Modify(&mr); err != nil {
 			return err

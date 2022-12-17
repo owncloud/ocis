@@ -2,18 +2,20 @@ package nats
 
 import (
 	"context"
-	"time"
-
+	// FIXME: nolint
+	// nolint: nolintlint
 	nserver "github.com/nats-io/nats-server/v2/server"
 )
 
-var NATSListenAndServeLoopTimer = 1 * time.Second
-
+// NATSServer
+// FIXME: nolint
+// nolint: revive
 type NATSServer struct {
 	ctx    context.Context
 	server *nserver.Server
 }
 
+// NewNATSServer initializes a new NATSServer instance.
 func NewNATSServer(ctx context.Context, logger nserver.Logger, opts ...NatsOption) (*NATSServer, error) {
 	natsOpts := &nserver.Options{}
 
@@ -44,6 +46,9 @@ func (n *NATSServer) ListenAndServe() (err error) {
 	return nil
 }
 
+// Shutdown
+// FIXME: nolint
+// nolint: revive
 func (n *NATSServer) Shutdown() {
 	n.server.Shutdown()
 }

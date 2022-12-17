@@ -97,9 +97,12 @@ func Next(d *xml.Decoder) (xml.Token, error) {
 }
 
 // ActiveLock holds active lock xml data
-//  http://www.webdav.org/specs/rfc4918.html#ELEMENT_activelock
+//
+//	http://www.webdav.org/specs/rfc4918.html#ELEMENT_activelock
+//
 // <!ELEMENT activelock (lockscope, locktype, depth, owner?, timeout?,
-//           locktoken?, lockroot)>
+//
+//	locktoken?, lockroot)>
 type ActiveLock struct {
 	XMLName   xml.Name  `xml:"activelock"`
 	Exclusive *struct{} `xml:"lockscope>exclusive,omitempty"`

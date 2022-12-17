@@ -31,6 +31,7 @@ import (
 )
 
 const (
+	// TokenHeader defines the header name that contains the access-token.
 	TokenHeader = "X-Access-Token"
 )
 
@@ -152,6 +153,9 @@ func (g Webdav) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
 }
 
+// DavUserContext
+// FIXME: nolint
+// nolint
 func (g Webdav) DavUserContext() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -181,6 +185,9 @@ func (g Webdav) DavUserContext() func(next http.Handler) http.Handler {
 	}
 }
 
+// DavPublicContext
+// FIXME: nolint
+// nolint
 func (g Webdav) DavPublicContext() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -198,6 +205,10 @@ func (g Webdav) DavPublicContext() func(next http.Handler) http.Handler {
 		})
 	}
 }
+
+// WebDAVContext
+// FIXME: nolint
+// nolint
 func (g Webdav) WebDAVContext() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -339,6 +350,9 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	g.sendThumbnailResponse(rsp, w, r)
 }
 
+// PublicThumbnail
+// FIXME: nolint
+// nolint
 func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 	logger := g.log.SubloggerWithRequestID(r.Context())
 	tr, err := requests.ParseThumbnailRequest(r)
@@ -380,6 +394,9 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 	g.sendThumbnailResponse(rsp, w, r)
 }
 
+// PublicThumbnailHead
+// FIXME: nolint
+// nolint
 func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 	logger := g.log.SubloggerWithRequestID(r.Context())
 	tr, err := requests.ParseThumbnailRequest(r)

@@ -84,8 +84,12 @@ type AuthMiddleware struct {
 }
 
 const (
+	// FIXME: nolint
+	// nolint: revive
 	AccessTokenVerificationNone = "none"
-	AccessTokenVerificationJWT  = "jwt"
+	// FIXME: nolint
+	// nolint: revive
+	AccessTokenVerificationJWT = "jwt"
 	// tdb:
 	// AccessTokenVerificationIntrospect = "introspect"
 )
@@ -101,6 +105,7 @@ type OIDC struct {
 	RewriteWellKnown        bool          `yaml:"rewrite_well_known" env:"PROXY_OIDC_REWRITE_WELLKNOWN" desc:"Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider."`
 }
 
+// JWKS defines the available JWKS configuration.
 type JWKS struct {
 	RefreshInterval   uint64 `yaml:"refresh_interval" env:"PROXY_OIDC_JWKS_REFRESH_INTERVAL" desc:"The interval for refreshing the JWKS (JSON Web Key Set) in minutes in the background via a new HTTP request to the IDP."`
 	RefreshTimeout    uint64 `yaml:"refresh_timeout" env:"PROXY_OIDC_JWKS_REFRESH_TIMEOUT" desc:"The timeout in seconds for an outgoing JWKS request."`
@@ -152,6 +157,7 @@ type RegexSelectorConf struct {
 	SelectorCookieName    string          `yaml:"selector_cookie_name"`
 }
 
+// RegexRuleConf defines the available RegexRule configuration.
 type RegexRuleConf struct {
 	Priority int    `yaml:"priority"`
 	Property string `yaml:"property"`

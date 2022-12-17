@@ -6,15 +6,13 @@ import (
 	"encoding/hex"
 	"net/http"
 	"net/url"
-	"strings"
-
-	storemsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/store/v0"
-	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	storemsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/store/v0"
+	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
 	ocstracing "github.com/owncloud/ocis/v2/services/ocs/pkg/tracing"
@@ -37,7 +35,6 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 		GIDNumber:         u.GidNumber,
 	}
 	o.mustRender(w, r, response.DataRender(d))
-	return
 }
 
 // GetUser returns the user with the given userid
@@ -52,7 +49,7 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case userid == "":
 		o.mustRender(w, r, response.ErrRender(data.MetaBadRequest.StatusCode, "missing user in context"))
-	case o.config.AccountBackend == "cs3":
+	case o.config.AccountBackend == _backendCS3:
 		user, err = o.fetchAccountFromCS3Backend(r.Context(), userid)
 	default:
 		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
@@ -100,7 +97,7 @@ func (o Ocs) GetUser(w http.ResponseWriter, r *http.Request) {
 // AddUser creates a new user account
 func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 	switch o.config.AccountBackend {
-	case "cs3":
+	case _backendCS3:
 		o.cs3WriteNotSupported(w, r)
 		return
 	default:
@@ -111,7 +108,7 @@ func (o Ocs) AddUser(w http.ResponseWriter, r *http.Request) {
 // EditUser creates a new user account
 func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 	switch o.config.AccountBackend {
-	case "cs3":
+	case _backendCS3:
 		o.cs3WriteNotSupported(w, r)
 		return
 	default:
@@ -122,7 +119,7 @@ func (o Ocs) EditUser(w http.ResponseWriter, r *http.Request) {
 // DeleteUser deletes a user
 func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	switch o.config.AccountBackend {
-	case "cs3":
+	case _backendCS3:
 		o.cs3WriteNotSupported(w, r)
 		return
 	default:
@@ -133,7 +130,7 @@ func (o Ocs) DeleteUser(w http.ResponseWriter, r *http.Request) {
 // EnableUser enables a user
 func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 	switch o.config.AccountBackend {
-	case "cs3":
+	case _backendCS3:
 		o.cs3WriteNotSupported(w, r)
 		return
 	default:
@@ -144,7 +141,7 @@ func (o Ocs) EnableUser(w http.ResponseWriter, r *http.Request) {
 // DisableUser disables a user
 func (o Ocs) DisableUser(w http.ResponseWriter, r *http.Request) {
 	switch o.config.AccountBackend {
-	case "cs3":
+	case _backendCS3:
 		o.cs3WriteNotSupported(w, r)
 		return
 	default:
@@ -228,18 +225,13 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 // ListUsers lists the users
 func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 	switch o.config.AccountBackend {
-	case "cs3":
+	case _backendCS3:
 		// TODO
 		o.cs3WriteNotSupported(w, r)
 		return
 	default:
 		o.logger.Fatal().Msgf("Invalid accounts backend type '%s'", o.config.AccountBackend)
 	}
-}
-
-// escapeValue escapes all special characters in the value
-func escapeValue(value string) string {
-	return strings.ReplaceAll(value, "'", "''")
 }
 
 func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*cs3.User, error) {
@@ -254,5 +246,4 @@ func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*cs3.
 func (o Ocs) cs3WriteNotSupported(w http.ResponseWriter, r *http.Request) {
 	o.logger.Warn().Msg("the CS3 backend does not support adding or updating users")
 	o.NotImplementedStub(w, r)
-	return
 }

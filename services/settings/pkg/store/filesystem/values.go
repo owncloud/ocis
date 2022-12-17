@@ -18,6 +18,8 @@ func (s Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, e
 	valuesFolder := s.buildFolderPathForValues(false)
 	valueFiles, err := os.ReadDir(valuesFolder)
 	if err != nil {
+		// FIXME: nolint
+		// nolint: nilerr
 		return []*settingsmsg.Value{}, nil
 	}
 
@@ -71,6 +73,8 @@ func (s Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*set
 			s.Logger.Debug().Msgf("reading contents from file: %v", filepath.Join(valuesFolder, files[i].Name()))
 			if err := s.parseRecordFromFile(&r, filepath.Join(valuesFolder, files[i].Name())); err != nil {
 				s.Logger.Debug().Msgf("match found: %v", filepath.Join(valuesFolder, files[i].Name()))
+				// FIXME: nolint
+				// nolint: nilerr
 				return &settingsmsg.Value{}, nil
 			}
 

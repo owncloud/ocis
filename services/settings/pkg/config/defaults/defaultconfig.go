@@ -9,13 +9,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
 )
 
-func FullDefaultConfig() *config.Config {
-	cfg := DefaultConfig()
-	EnsureDefaults(cfg)
-	Sanitize(cfg)
-	return cfg
-}
-
 // DefaultConfig returns the default config
 func DefaultConfig() *config.Config {
 	return &config.Config{
@@ -58,6 +51,7 @@ func DefaultConfig() *config.Config {
 	}
 }
 
+// EnsureDefaults adds default values to the configuration if they are not set yet
 func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for "envdecode".
 	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
@@ -123,8 +117,8 @@ func EnsureDefaults(cfg *config.Config) {
 	}
 }
 
+// Sanitize sanitizes the configuration
 func Sanitize(cfg *config.Config) {
-	// sanitize config
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 	}

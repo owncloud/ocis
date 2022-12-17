@@ -19,6 +19,9 @@ var (
 	errNotImplemented = errorcode.New(errorcode.NotSupported, "not implemented")
 )
 
+// CS3
+// FIXME: nolint
+// nolint
 type CS3 struct {
 	Config *shared.Reva
 	Logger *log.Logger
@@ -39,6 +42,9 @@ func (i *CS3) UpdateUser(ctx context.Context, nameOrID string, user libregraph.U
 	return nil, errNotImplemented
 }
 
+// GetUser
+// FIXME: nolint
+// nolint
 func (i *CS3) GetUser(ctx context.Context, userID string, queryParam url.Values) (*libregraph.User, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetUser")
@@ -67,6 +73,9 @@ func (i *CS3) GetUser(ctx context.Context, userID string, queryParam url.Values)
 	return CreateUserModelFromCS3(res.User), nil
 }
 
+// GetUsers
+// FIXME: nolint
+// nolint
 func (i *CS3) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetUsers")
@@ -107,6 +116,9 @@ func (i *CS3) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregrap
 	return users, nil
 }
 
+// GetGroups
+// FIXME: nolint
+// nolint: revive
 func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetGroups")
@@ -153,6 +165,9 @@ func (i *CS3) CreateGroup(ctx context.Context, group libregraph.Group) (*libregr
 	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
 }
 
+// GetGroup
+// FIXME: nolint
+// nolint: revive
 func (i *CS3) GetGroup(ctx context.Context, groupID string, queryParam url.Values) (*libregraph.Group, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetGroup")

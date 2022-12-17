@@ -27,6 +27,8 @@ func New() *Metrics {
 			Name:      "getthumbnail_total",
 			Help:      "How many GetThumbnail requests processed",
 		}, []string{}),
+		// FIXME: nolint
+		// nolint: promlinter
 		Latency: prometheus.NewSummaryVec(prometheus.SummaryOpts{
 			Namespace: Namespace,
 			Subsystem: Subsystem,

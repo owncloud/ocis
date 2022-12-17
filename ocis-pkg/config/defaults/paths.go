@@ -6,15 +6,22 @@ import (
 	"path"
 )
 
-const ()
-
 var (
+	// BaseDataPathType
 	// switch between modes
+	// FIXME: nolint
+	// nolint: revive
 	BaseDataPathType = "homedir" // or "path"
+	// BaseDataPathValue
 	// default data path
+	// FIXME: nolint
+	// nolint: revive
 	BaseDataPathValue = "/var/lib/ocis"
 )
 
+// BaseDataPath
+// FIXME: nolint
+// nolint: revive
 func BaseDataPath() string {
 
 	// It is not nice to have hidden / secrete configuration options
@@ -42,14 +49,22 @@ func BaseDataPath() string {
 }
 
 var (
+	// BaseConfigPathType
 	// switch between modes
+	// FIXME: nolint
+	// nolint: revive
 	BaseConfigPathType = "homedir" // or "path"
+	// BaseConfigPathValue
 	// default config path
+	// FIXME: nolint
+	// nolint: revive
 	BaseConfigPathValue = "/etc/ocis"
 )
 
+// BaseConfigPath
+// FIXME: nolint
+// nolint: revive
 func BaseConfigPath() string {
-
 	// It is not nice to have hidden / secrete configuration options
 	// But how can we update the base path for every occurrence with a flagset option?
 	// This is currently not possible and needs a new configuration concept

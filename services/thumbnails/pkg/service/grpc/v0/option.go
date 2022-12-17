@@ -71,12 +71,18 @@ func ThumbnailSource(val imgsource.Source) Option {
 	}
 }
 
+// CS3Source
+// FIXME: nolint
+// nolint: revive
 func CS3Source(val imgsource.Source) Option {
 	return func(o *Options) {
 		o.CS3Source = val
 	}
 }
 
+// CS3Client
+// FIXME: nolint
+// nolint: revive
 func CS3Client(c gateway.GatewayAPIClient) Option {
 	return func(o *Options) {
 		o.CS3Client = c

@@ -39,6 +39,12 @@ linters:
     - stylecheck
     - gocognit
     - nestif # each 10-50 issues in codebase
+    - scopelint
+    - interfacer
+    - rowserrcheck # todo
+    - sqlclosecheck # todo
+    - structcheck # todo
+    - wastedassign # todo
 
 linters-settings:
   gocyclo:

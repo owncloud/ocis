@@ -6,12 +6,15 @@ var defaultRevaConfig = Reva{
 	Address: "127.0.0.1:9142",
 }
 
+// DefaultRevaConfig returns revas default config.
 func DefaultRevaConfig() *Reva {
-	// copy
 	ret := defaultRevaConfig
 	return &ret
 }
 
+// GetRevaOptions
+// FIXME: nolint
+// nolint: revive
 func (r *Reva) GetRevaOptions() []pool.Option {
 	tm, _ := pool.StringToTLSMode(r.TLS.Mode)
 	opts := []pool.Option{
@@ -20,6 +23,9 @@ func (r *Reva) GetRevaOptions() []pool.Option {
 	return opts
 }
 
+// GetGRPCClientConfig
+// FIXME: nolint
+// nolint: revive
 func (r *Reva) GetGRPCClientConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"tls_mode":   r.TLS.Mode,

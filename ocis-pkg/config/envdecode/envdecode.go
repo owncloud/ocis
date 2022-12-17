@@ -19,6 +19,10 @@ import (
 // ErrInvalidTarget indicates that the target value passed to
 // Decode is invalid.  Target must be a non-nil pointer to a struct.
 var ErrInvalidTarget = errors.New("target must be non-nil pointer to struct that has at least one exported field with a valid env tag")
+
+// ErrNoTargetFieldsAreSet
+// FIXME: nolint
+// nolint: revive
 var ErrNoTargetFieldsAreSet = errors.New("none of the target fields were set from environment variables")
 
 // FailureFunc is called when an error is encountered during a MustDecode
@@ -312,6 +316,9 @@ func MustStrictDecode(target interface{}) {
 
 //// Configuration info for Export
 
+// ConfigInfo
+// FIXME: nolint
+// nolint: revive
 type ConfigInfo struct {
 	Field        string
 	EnvVar       string
@@ -322,19 +329,30 @@ type ConfigInfo struct {
 	UsesEnv      bool
 }
 
+// ConfigInfoSlice
+// FIXME: nolint
+// nolint: revive
 type ConfigInfoSlice []*ConfigInfo
 
+// Less
+// FIXME: nolint
 func (c ConfigInfoSlice) Less(i, j int) bool {
 	return c[i].EnvVar < c[j].EnvVar
 }
+
+// Len
+// FIXME: nolint
 func (c ConfigInfoSlice) Len() int {
 	return len(c)
 }
+
+// Swap
+// FIXME: nolint
 func (c ConfigInfoSlice) Swap(i, j int) {
 	c[i], c[j] = c[j], c[i]
 }
 
-// Returns a list of final configuration metadata sorted by envvar name
+// Export returns a list of final configuration metadata sorted by env-var name
 func Export(target interface{}) ([]*ConfigInfo, error) {
 	s := reflect.ValueOf(target)
 	if s.Kind() != reflect.Ptr || s.IsNil() {

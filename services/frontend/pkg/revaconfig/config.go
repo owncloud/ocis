@@ -10,6 +10,8 @@ import (
 )
 
 // FrontendConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
+// FIXME: nolint
+// nolint: maintidx
 func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error) {
 
 	webURL, err := url.Parse(cfg.PublicURL)

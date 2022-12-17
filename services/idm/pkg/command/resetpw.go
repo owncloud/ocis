@@ -92,13 +92,13 @@ func resetPassword(ctx context.Context, logger log.Logger, cfg *config.Config) e
 
 func getPassword() (string, error) {
 	fmt.Print("Enter new password: ")
-	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
+	bytePassword, err := term.ReadPassword(syscall.Stdin)
 	if err != nil {
 		return "", err
 	}
 	fmt.Println("")
 	fmt.Print("Re-enter new password: ")
-	bytePasswordVerify, err := term.ReadPassword(int(syscall.Stdin))
+	bytePasswordVerify, err := term.ReadPassword(syscall.Stdin)
 	if err != nil {
 		return "", err
 	}

@@ -45,6 +45,8 @@ func New(cfg *config.Config) settings.Manager {
 	return &s
 }
 
+// FIXME: nolint
+// nolint: gochecknoinits
 func init() {
 	settings.Registry[managerName] = New
 }

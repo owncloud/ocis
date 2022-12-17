@@ -189,6 +189,8 @@ func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string
 	if reread {
 		c.logger.Debug().Msg("User already exist, re-reading via libregraph")
 		gureq := lgClient.UserApi.GetUser(newctx, newUser.GetOnPremisesSamAccountName())
+		// FIXME: nolint
+		// nolint: bodyclose, ineffassign, staticcheck
 		created, resp, err = gureq.Execute()
 		if err != nil {
 			c.logger.Error().Err(err).Msg("Error trying to re-read user from graphAPI")
@@ -284,7 +286,7 @@ func (c cs3backend) cs3UserFromLibregraph(ctx context.Context, lu *libregraph.Us
 	return cs3user
 }
 
-// This returns an hardcoded internal User, that is privileged to create new User via
+// This returns a hardcoded internal User, that is privileged to create new User via
 // the Graph API. This user is needed for autoprovisioning of users from incoming OIDC
 // claims.
 func getAutoProvisionUserCreator() (*cs3.User, error) {

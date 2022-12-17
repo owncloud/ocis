@@ -28,11 +28,10 @@ func ParseConfig(cfg *config.Config) error {
 		}
 	}
 
-	defaults.Sanitize(cfg)
-
 	return Validate(cfg)
 }
 
+// Validate validates the configuration
 func Validate(cfg *config.Config) error {
 	if cfg.Notifications.MachineAuthAPIKey == "" {
 		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)

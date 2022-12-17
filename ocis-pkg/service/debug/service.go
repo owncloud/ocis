@@ -44,6 +44,8 @@ func NewService(opts ...Option) *http.Server {
 		zpages.Handle(mux, "/debug")
 	}
 
+	// FIXME: nolint
+	// nolint: gosec
 	return &http.Server{
 		Addr: dopts.Address,
 		Handler: alice.New(

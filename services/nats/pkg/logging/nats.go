@@ -6,11 +6,12 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
+// NewLogWrapper initializes a new LogWrapper instance.
 func NewLogWrapper(logger log.Logger) *LogWrapper {
 	return &LogWrapper{logger}
 }
 
-// we need to wrap our logger so we can pass it to the nats server
+// LogWrapper wraps our logger, so we can pass it to the nats-server.
 type LogWrapper struct {
 	logger log.Logger
 }

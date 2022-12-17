@@ -2,18 +2,21 @@ package assets
 
 import (
 	"bytes"
-	"golang.org/x/net/html"
 	"io"
 	"mime"
 	"net/http"
 	"path"
 	"path/filepath"
+
+	"golang.org/x/net/html"
 )
 
 type fileServer struct {
 	root http.FileSystem
 }
 
+// FileServer implements a vue history mode compatible asset server.
+// It falls back to the embedded index.html if path in unknown.
 func FileServer(root http.FileSystem) http.Handler {
 	return &fileServer{root}
 }

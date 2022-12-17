@@ -23,7 +23,9 @@ import (
 
 const (
 	// HeaderPurge defines the header name for the purge header.
-	HeaderPurge = "Purge"
+	HeaderPurge        = "Purge"
+	_orderDesc         = "desc"
+	_driveTypePersonal = "personal"
 )
 
 // Service defines the service handlers.

@@ -25,6 +25,8 @@ func OCDavCommand(cfg *config.Config) *cli.Command {
 	}
 }
 
+// FIXME: nolint
+// nolint: gochecknoinits
 func init() {
 	register.AddCommand(OCDavCommand)
 }

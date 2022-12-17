@@ -206,7 +206,7 @@ func AccessTokenVerifyMethod(method string) Option {
 	}
 }
 
-// JWKS sets the options for fetching the JWKS from the IDP
+// JWKSOptions sets the options for fetching the JWKS from the IDP
 func JWKSOptions(jo config.JWKS) Option {
 	return func(o *Options) {
 		o.JWKS = jo

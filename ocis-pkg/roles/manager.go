@@ -109,7 +109,7 @@ func (m *Manager) FindPermissionByID(ctx context.Context, roleIDs []string, perm
 	return nil
 }
 
-// FindRoleIdsForUser returns all roles that are assigned to the supplied userid
+// FindRoleIDsForUser returns all roles that are assigned to the supplied userid
 func (m *Manager) FindRoleIDsForUser(ctx context.Context, userID string) ([]string, error) {
 	req := &settingssvc.ListRoleAssignmentsRequest{AccountUuid: userID}
 	assignmentResponse, err := m.roleService.ListRoleAssignments(ctx, req)

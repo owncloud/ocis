@@ -35,7 +35,7 @@ func (f *FileSystem) Open(original string) (http.File, error) {
 	return f.fs.Open(original)
 }
 
-// New initializes a new FileSystem. Quits on error
+// New initializes a new FileSystem. Quits on error.
 func New(embedFS embed.FS, assetPath string, logger log.Logger) *FileSystem {
 	f, err := fs.Sub(embedFS, "assets")
 	if err != nil {

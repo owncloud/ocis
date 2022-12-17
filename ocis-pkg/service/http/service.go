@@ -47,6 +47,8 @@ func NewService(opts ...Option) (Service, error) {
 				return Service{}, fmt.Errorf("error creating temporary self-signed certificate: %w", err)
 			}
 		}
+		// FIXME: nolint
+		// nolint: gosec
 		tlsConfig := &tls.Config{
 			Certificates: []tls.Certificate{cert},
 		}

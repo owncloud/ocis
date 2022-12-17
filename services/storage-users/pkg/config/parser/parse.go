@@ -30,11 +30,10 @@ func ParseConfig(cfg *config.Config) error {
 		}
 	}
 
-	defaults.Sanitize(cfg)
-
 	return Validate(cfg)
 }
 
+// Validate validates the configuration
 func Validate(cfg *config.Config) error {
 	if cfg.TokenManager.JWTSecret == "" {
 		return shared.MissingJWTTokenError(cfg.Service.Name)

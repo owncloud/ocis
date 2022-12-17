@@ -30,6 +30,7 @@ type Config struct {
 	Context context.Context `yaml:"-"`
 }
 
+// Spaces defines the available Spaces configuration.
 type Spaces struct {
 	WebDavBase                      string `yaml:"webdav_base" env:"OCIS_URL;GRAPH_SPACES_WEBDAV_BASE" desc:"The public facing URL of WebDAV."`
 	WebDavPath                      string `yaml:"webdav_path" env:"GRAPH_SPACES_WEBDAV_PATH" desc:"The WebDAV subpath for spaces."`
@@ -37,6 +38,7 @@ type Spaces struct {
 	ExtendedSpacePropertiesCacheTTL int    `yaml:"extended_space_properties_cache_ttl" env:"GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL" desc:"Max TTL in seconds for the spaces property cache."`
 }
 
+// LDAP defines the available LDAP configuration.
 type LDAP struct {
 	URI                string `yaml:"uri" env:"LDAP_URI;GRAPH_LDAP_URI" desc:"URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'"`
 	CACert             string `yaml:"cacert" env:"LDAP_CACERT;GRAPH_LDAP_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service."`
@@ -64,6 +66,7 @@ type LDAP struct {
 	GroupIDAttribute   string `yaml:"group_id_attribute" env:"LDAP_GROUP_SCHEMA_ID;GRAPH_LDAP_GROUP_ID_ATTRIBUTE" desc:"LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID."`
 }
 
+// Identity defines the available Identity configuration.
 type Identity struct {
 	Backend string `yaml:"backend" env:"GRAPH_IDENTITY_BACKEND" desc:"The user identity backend to use. Supported backend types are 'ldap' and 'cs3'."`
 	LDAP    LDAP   `yaml:"ldap"`

@@ -29,6 +29,9 @@ type FileSystem struct {
 	logger log.Logger
 }
 
+// Stat
+// FIXME: nolint
+// nolint: revive
 func (s FileSystem) Stat(key string) bool {
 	img := filepath.Join(s.root, filesDir, key)
 	if _, err := os.Stat(img); err != nil {
@@ -37,6 +40,9 @@ func (s FileSystem) Stat(key string) bool {
 	return true
 }
 
+// Get
+// FIXME: nolint
+// nolint: revive
 func (s FileSystem) Get(key string) ([]byte, error) {
 	img := filepath.Join(s.root, filesDir, key)
 	content, err := os.ReadFile(img)
@@ -49,6 +55,9 @@ func (s FileSystem) Get(key string) ([]byte, error) {
 	return content, nil
 }
 
+// Put
+// FIXME: nolint
+// nolint: revive
 func (s FileSystem) Put(key string, img []byte) error {
 	imgPath := filepath.Join(s.root, filesDir, key)
 	dir := filepath.Dir(imgPath)

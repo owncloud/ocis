@@ -27,7 +27,7 @@ const (
 	HeaderTimeout     = "Timeout"     // https://datatracker.ietf.org/doc/html/rfc4918#section-10.7
 )
 
-// Non standard HTTP headers.
+// Non-standard HTTP headers.
 const (
 	HeaderOCFileID             = "OC-FileId"
 	HeaderOCETag               = "OC-ETag"

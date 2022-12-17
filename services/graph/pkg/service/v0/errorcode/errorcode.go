@@ -12,6 +12,7 @@ import (
 // ErrorCode defines code as used in MS Graph - see https://docs.microsoft.com/en-us/graph/errors?context=graph%2Fapi%2F1.0&view=graph-rest-1.0
 type ErrorCode int
 
+// Error combines the ErrorCode with a human-readable message.
 type Error struct {
 	errorCode ErrorCode
 	msg       string
@@ -74,6 +75,7 @@ var errorCodes = [...]string{
 	"preconditionFailed",
 }
 
+// New initializes a new Error.
 func New(e ErrorCode, msg string) Error {
 	return Error{
 		errorCode: e,
@@ -99,6 +101,9 @@ func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int, ms
 	render.JSON(w, r, resp)
 }
 
+// Render
+// FIXME: nolint
+// nolint
 func (e Error) Render(w http.ResponseWriter, r *http.Request) {
 	status := http.StatusInternalServerError
 	if e.errorCode == ItemNotFound {

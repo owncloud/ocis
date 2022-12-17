@@ -25,7 +25,7 @@ type ClientOptions struct {
 	caCert  string
 }
 
-// Option is used to pass client options
+// ClientOption is used to pass client options
 type ClientOption func(opts *ClientOptions)
 
 // WithTLSMode allows to set the TLSMode option for grpc clients
@@ -59,11 +59,15 @@ func Configure(opts ...ClientOption) error {
 		}
 		switch options.tlsMode {
 		case "insecure":
+			// FIXME: nolint
+			// nolint: gosec
 			tlsConfig = &tls.Config{
 				InsecureSkipVerify: true,
 			}
 			cOpts = append(cOpts, mgrpcc.AuthTLS(tlsConfig))
 		case "on":
+			// FIXME: nolint
+			// nolint: gosec
 			tlsConfig = &tls.Config{}
 			// Note: If caCert is empty we use the system's default set of trusted CAs
 			if options.caCert != "" {
@@ -92,6 +96,9 @@ func DefaultClient() client.Client {
 	return defaultClient
 }
 
+// GetClientOptions
+// FIXME: nolint
+// nolint: revive
 func GetClientOptions(t *shared.GRPCClientTLS) []ClientOption {
 	opts := []ClientOption{
 		WithTLSMode(t.Mode),

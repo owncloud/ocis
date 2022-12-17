@@ -60,6 +60,9 @@ type SimpleManager struct {
 	resolutions Resolutions
 }
 
+// Generate
+// FIXME: nolint
+// nolint: revive
 func (s SimpleManager) Generate(r Request, img interface{}) (string, error) {
 	var match image.Rectangle
 	switch m := img.(type) {
@@ -87,11 +90,17 @@ func (s SimpleManager) Generate(r Request, img interface{}) (string, error) {
 	return k, nil
 }
 
+// CheckThumbnail
+// FIXME: nolint
+// nolint: revive
 func (s SimpleManager) CheckThumbnail(r Request) (string, bool) {
 	k := s.storage.BuildKey(mapToStorageRequest(r))
 	return k, s.storage.Stat(k)
 }
 
+// GetThumbnail
+// FIXME: nolint
+// nolint: revive
 func (s SimpleManager) GetThumbnail(key string) ([]byte, error) {
 	return s.storage.Get(key)
 }
@@ -104,6 +113,9 @@ func mapToStorageRequest(r Request) storage.Request {
 	}
 }
 
+// IsMimeTypeSupported
+// FIXME: nolint
+// nolint: revive
 func IsMimeTypeSupported(m string) bool {
 	mimeType, _, err := mime.ParseMediaType(m)
 	if err != nil {

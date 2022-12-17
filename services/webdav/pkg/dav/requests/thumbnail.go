@@ -97,7 +97,7 @@ func parseDimension(d, name string, defaultValue int64) (int64, error) {
 	result, err := strconv.ParseInt(d, 10, 32)
 	if err != nil || result < 1 {
 		// The error message doesn't fit but for OC10 API compatibility reasons we have to set this.
-		return 0, fmt.Errorf("Cannot set %s of 0 or smaller!", name)
+		return 0, fmt.Errorf("Cannot set %s of 0 or smaller", name)
 	}
 	return result, nil
 }

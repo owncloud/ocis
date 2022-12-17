@@ -5,6 +5,7 @@ import (
 	"math/big"
 )
 
+// GenerateRandomPassword generates random password with given length.
 func GenerateRandomPassword(length int) (string, error) {
 	const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-=+!@#$%^&*."
 	ret := make([]byte, length)

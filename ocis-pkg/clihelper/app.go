@@ -5,6 +5,9 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+// DefaultApp
+// FIXME: nolint
+// nolint: revive
 func DefaultApp(app *cli.App) *cli.App {
 	// version info
 	app.Version = version.String

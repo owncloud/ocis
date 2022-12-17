@@ -33,6 +33,7 @@ import (
 	webdav "github.com/owncloud/ocis/v2/services/webdav/pkg/config/defaults"
 )
 
+// DefaultConfig returns a basic default configuration
 func DefaultConfig() *Config {
 	return &Config{
 		OcisURL: "https://localhost:9200",

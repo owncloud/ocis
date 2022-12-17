@@ -13,7 +13,7 @@ import (
 func (s Store) parseRecordFromFile(record proto.Message, filePath string) error {
 	_, err := os.Stat(filePath)
 	if err != nil {
-		return errortypes.BundleNotFound(err.Error())
+		return errortypes.BundleNotFoundError(err.Error())
 	}
 
 	file, err := os.Open(filePath)
@@ -28,7 +28,7 @@ func (s Store) parseRecordFromFile(record proto.Message, filePath string) error 
 	}
 
 	if len(b) == 0 {
-		return errortypes.BundleNotFound(filePath)
+		return errortypes.BundleNotFoundError(filePath)
 	}
 
 	if err := protojson.Unmarshal(b, record); err != nil {

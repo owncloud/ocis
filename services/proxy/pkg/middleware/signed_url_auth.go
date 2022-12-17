@@ -21,7 +21,9 @@ import (
 )
 
 const (
-	_paramOCSignature  = "OC-Signature"
+	_paramOCSignature = "OC-Signature"
+	// FIXME: nolint
+	// nolint: gosec
 	_paramOCCredential = "OC-Credential"
 	_paramOCDate       = "OC-Date"
 	_paramOCExpires    = "OC-Expires"

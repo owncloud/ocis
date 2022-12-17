@@ -24,6 +24,8 @@ type Service struct {
 func NewService(opts ...Option) (Service, error) {
 	var mServer server.Server
 	sopts := newOptions(opts...)
+	// FIXME: nolint
+	// nolint: gosec
 	tlsConfig := &tls.Config{}
 	if sopts.TLSEnabled {
 		var cert tls.Certificate

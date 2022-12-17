@@ -1,15 +1,29 @@
 package oidc
 
 const (
-	Iss               = "iss"
-	Sub               = "sub"
-	Email             = "email"
-	Name              = "name"
+	// Iss
+	// FIXME: nolint
+	// nolint: revive
+	Iss = "iss"
+	// Email
+	// FIXME: nolint
+	// nolint: revive
+	Email = "email"
+	// Name
+	// FIXME: nolint
+	// nolint: revive
+	Name = "name"
+	// PreferredUsername
+	// FIXME: nolint
+	// nolint: revive
 	PreferredUsername = "preferred_username"
-	UIDNumber         = "uidnumber"
-	GIDNumber         = "gidnumber"
-	Groups            = "groups"
-	OwncloudUUID      = "ownclouduuid"
+	// OwncloudUUID
+	// FIXME: nolint
+	// nolint: revive
+	OwncloudUUID = "ownclouduuid"
+	// OcisRoutingPolicy
+	// FIXME: nolint
+	// nolint: revive
 	OcisRoutingPolicy = "ocis.routing.policy"
 )
 

@@ -65,6 +65,8 @@ func (rsp Response) MarshalXML(e *xml.Encoder, start xml.StartElement) (err erro
 	if err = e.EncodeToken(xml.EndElement{Name: start.Name}); err != nil {
 		return
 	}
+	// FIXME: nolint
+	// nolint: nakedret
 	return
 }
 

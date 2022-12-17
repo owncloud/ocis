@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
 
+// Config combines all available configuration parts.
 type Config struct {
 	Commons *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
 	Service Service         `yaml:"-"`
@@ -29,6 +30,8 @@ type Config struct {
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
 }
+
+// Tracing defines the available tracing configuration.
 type Tracing struct {
 	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;SHARING_TRACING_ENABLED" desc:"Activates tracing."`
 	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;SHARING_TRACING_TYPE" desc:"The type of tracing. Defaults to \"\", which is the same as \"jaeger\". Allowed tracing types are \"jaeger\" and \"\" as of now."`
@@ -36,6 +39,7 @@ type Tracing struct {
 	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;SHARING_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset."`
 }
 
+// Log defines the available log configuration.
 type Log struct {
 	Level  string `yaml:"level" env:"OCIS_LOG_LEVEL;SHARING_LOG_LEVEL" desc:"The log level. Valid values are: \"panic\", \"fatal\", \"error\", \"warn\", \"info\", \"debug\", \"trace\"."`
 	Pretty bool   `yaml:"pretty" env:"OCIS_LOG_PRETTY;SHARING_LOG_PRETTY" desc:"Activates pretty log output."`
@@ -43,10 +47,12 @@ type Log struct {
 	File   string `yaml:"file" env:"OCIS_LOG_FILE;SHARING_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set."`
 }
 
+// Service defines the available service configuration.
 type Service struct {
 	Name string `yaml:"-"`
 }
 
+// Debug defines the available debug configuration.
 type Debug struct {
 	Addr   string `yaml:"addr" env:"SHARING_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed."`
 	Token  string `yaml:"token" env:"SHARING_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint."`
@@ -54,6 +60,7 @@ type Debug struct {
 	Zpages bool   `yaml:"zpages" env:"SHARING_DEBUG_ZPAGES" desc:"Enables zpages, which can be used for collecting and viewing in-memory traces."`
 }
 
+// GRPCConfig defines the available grpc configuration.
 type GRPCConfig struct {
 	Addr      string                 `yaml:"addr" env:"SHARING_GRPC_ADDR" desc:"The bind address of the GRPC service."`
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
@@ -61,6 +68,7 @@ type GRPCConfig struct {
 	Protocol  string                 `yaml:"protocol" env:"SHARING_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service."`
 }
 
+// UserSharingDrivers defines the available UserSharingDrivers configuration.
 type UserSharingDrivers struct {
 	JSONCS3     UserSharingJSONCS3Driver     `yaml:"jsoncs3"`
 	JSON        UserSharingJSONDriver        `yaml:"json"`
@@ -70,10 +78,12 @@ type UserSharingDrivers struct {
 	SQL UserSharingSQLDriver `yaml:"sql,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 
+// UserSharingJSONDriver defines the available UserSharingJSONDriver configuration.
 type UserSharingJSONDriver struct {
 	File string `yaml:"file" env:"SHARING_USER_JSON_FILE" desc:"Path to the JSON file where shares will be persisted."`
 }
 
+// UserSharingSQLDriver defines the available UserSharingSQLDriver configuration.
 type UserSharingSQLDriver struct {
 	DBUsername                 string `yaml:"db_username"`
 	DBPassword                 string `yaml:"db_password"`
@@ -86,6 +96,7 @@ type UserSharingSQLDriver struct {
 	UserStorageMountID         string `yaml:"user_storage_mount_id"`
 }
 
+// UserSharingOwnCloudSQLDriver defines the available UserSharingOwnCloudSQLDriver configuration.
 type UserSharingOwnCloudSQLDriver struct {
 	DBUsername         string `yaml:"db_username" env:"SHARING_USER_OWNCLOUDSQL_DB_USERNAME" desc:"Username for the database."`
 	DBPassword         string `yaml:"db_password" env:"SHARING_USER_OWNCLOUDSQL_DB_PASSWORD" desc:"Password for the database."`
@@ -95,6 +106,7 @@ type UserSharingOwnCloudSQLDriver struct {
 	UserStorageMountID string `yaml:"user_storage_mount_id" env:"SHARING_USER_OWNCLOUDSQL_USER_STORAGE_MOUNT_ID" desc:"Mount ID of the ownCloudSQL users storage for mapping ownCloud 10 shares."`
 }
 
+// UserSharingCS3Driver defines the available UserSharingCS3Driver configuration.
 type UserSharingCS3Driver struct {
 	ProviderAddr     string `yaml:"provider_addr" env:"SHARING_USER_CS3_PROVIDER_ADDR" desc:"GRPC address of the STORAGE-SYSTEM service."`
 	SystemUserID     string `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID;SHARING_USER_CS3_SYSTEM_USER_ID" desc:"ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
@@ -111,6 +123,7 @@ type UserSharingJSONCS3Driver struct {
 	CacheTTL         int    `yaml:"cache_ttl" env:"SHARING_USER_JSONCS3_CACHE_TTL" desc:"TTL for the internal caches in seconds."`
 }
 
+// PublicSharingDrivers defines the available PublicSharingDrivers configuration.
 type PublicSharingDrivers struct {
 	JSON    PublicSharingJSONDriver    `yaml:"json"`
 	JSONCS3 PublicSharingJSONCS3Driver `yaml:"jsoncs3"`
@@ -119,10 +132,12 @@ type PublicSharingDrivers struct {
 	SQL PublicSharingSQLDriver `yaml:"sql,omitempty"` // not supported by the oCIS product, therefore not part of docs
 }
 
+// PublicSharingJSONDriver defines the available PublicSharingJSONDriver configuration.
 type PublicSharingJSONDriver struct {
 	File string `yaml:"file" env:"SHARING_PUBLIC_JSON_FILE" desc:"Path to the JSON file where public share meta-data will be stored. This JSON file contains the information about public shares that have been created."`
 }
 
+// PublicSharingSQLDriver defines the available PublicSharingSQLDriver configuration.
 type PublicSharingSQLDriver struct {
 	DBUsername                 string `yaml:"db_username"`
 	DBPassword                 string `yaml:"db_password"`
@@ -135,6 +150,7 @@ type PublicSharingSQLDriver struct {
 	UserStorageMountID         string `yaml:"user_storage_mount_id"`
 }
 
+// PublicSharingCS3Driver defines the available PublicSharingCS3Driver configuration.
 type PublicSharingCS3Driver struct {
 	ProviderAddr     string `yaml:"provider_addr" env:"SHARING_PUBLIC_CS3_PROVIDER_ADDR" desc:"GRPC address of the STORAGE-SYSTEM service."`
 	SystemUserID     string `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID;SHARING_PUBLIC_CS3_SYSTEM_USER_ID" desc:"ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
@@ -150,6 +166,7 @@ type PublicSharingJSONCS3Driver struct {
 	SystemUserAPIKey string `yaml:"system_user_api_key" env:"OCIS_SYSTEM_USER_API_KEY;SHARING_PUBLIC_JSONCS3_SYSTEM_USER_API_KEY" desc:"API key for the STORAGE-SYSTEM system user."`
 }
 
+// Events defines the available Events configuration.
 type Events struct {
 	Addr              string `yaml:"endpoint" env:"SHARING_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture."`
 	ClusterID         string `yaml:"cluster" env:"SHARING_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system."`

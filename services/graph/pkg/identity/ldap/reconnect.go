@@ -23,7 +23,7 @@ type ldapConnection struct {
 	Error error
 }
 
-// Implements the ldap.CLient interface
+// ConnWithReconnect implements the ldap.Client interface
 type ConnWithReconnect struct {
 	conn    chan ldapConnection
 	reset   chan *ldap.Conn
@@ -31,6 +31,7 @@ type ConnWithReconnect struct {
 	logger  *log.Logger
 }
 
+// Config combines all available configuration parts.
 type Config struct {
 	URI          string
 	BindDN       string
@@ -38,6 +39,7 @@ type Config struct {
 	TLSConfig    *tls.Config
 }
 
+// NewLDAPWithReconnect initializes ConnWithReconnect.
 func NewLDAPWithReconnect(logger *log.Logger, config Config) ConnWithReconnect {
 	conn := ConnWithReconnect{
 		conn:    make(chan ldapConnection),
@@ -49,6 +51,9 @@ func NewLDAPWithReconnect(logger *log.Logger, config Config) ConnWithReconnect {
 	return conn
 }
 
+// Search
+// FIXME: nolint
+// nolint
 func (c ConnWithReconnect) Search(sr *ldap.SearchRequest) (*ldap.SearchResult, error) {
 	conn, err := c.GetConnection()
 
@@ -75,6 +80,9 @@ func (c ConnWithReconnect) Search(sr *ldap.SearchRequest) (*ldap.SearchResult, e
 	return nil, ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
+// Add
+// FIXME: nolint
+// nolint
 func (c ConnWithReconnect) Add(a *ldap.AddRequest) error {
 	conn, err := c.GetConnection()
 	if err != nil {
@@ -98,6 +106,9 @@ func (c ConnWithReconnect) Add(a *ldap.AddRequest) error {
 	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
+// Del
+// FIXME: nolint
+// nolint
 func (c ConnWithReconnect) Del(d *ldap.DelRequest) error {
 	conn, err := c.GetConnection()
 	if err != nil {
@@ -122,6 +133,9 @@ func (c ConnWithReconnect) Del(d *ldap.DelRequest) error {
 	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
+// Modify
+// FIXME: nolint
+// nolint
 func (c ConnWithReconnect) Modify(m *ldap.ModifyRequest) error {
 	conn, err := c.GetConnection()
 	if err != nil {
@@ -146,6 +160,9 @@ func (c ConnWithReconnect) Modify(m *ldap.ModifyRequest) error {
 	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
+// PasswordModify
+// FIXME: nolint
+// nolint
 func (c ConnWithReconnect) PasswordModify(m *ldap.PasswordModifyRequest) (*ldap.PasswordModifyResult, error) {
 	conn, err := c.GetConnection()
 	if err != nil {
@@ -171,6 +188,9 @@ func (c ConnWithReconnect) PasswordModify(m *ldap.PasswordModifyRequest) (*ldap.
 	return nil, ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
+// ModifyDN
+// FIXME: nolint
+// nolint
 func (c ConnWithReconnect) ModifyDN(m *ldap.ModifyDNRequest) error {
 	conn, err := c.GetConnection()
 	if err != nil {
@@ -195,6 +215,9 @@ func (c ConnWithReconnect) ModifyDN(m *ldap.ModifyDNRequest) error {
 	return ldap.NewError(ldap.ErrorNetwork, errMaxRetries)
 }
 
+// GetConnection
+// FIXME: nolint
+// nolint: revive
 func (c ConnWithReconnect) GetConnection() (*ldap.Conn, error) {
 	conn := <-c.conn
 	if conn.Conn != nil && !ldap.IsErrorWithCode(conn.Error, ldap.ErrorNetwork) {
@@ -271,36 +294,66 @@ func (c ConnWithReconnect) reconnect(resetConn *ldap.Conn) (*ldap.Conn, error) {
 
 // Remaining methods to fulfill ldap.Client interface
 
+// Start
+// FIXME: nolint
+// nolint: revive
 func (c ConnWithReconnect) Start() {}
 
+// StartTLS
+// FIXME: nolint
+// nolint: revive
 func (c ConnWithReconnect) StartTLS(*tls.Config) error {
 	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
+// Close
+// FIXME: nolint
+// nolint: revive
 func (c ConnWithReconnect) Close() {}
 
+// IsClosing
+// FIXME: nolint
+// nolint: revive
 func (c ConnWithReconnect) IsClosing() bool {
 	return false
 }
 
+// SetTimeout
+// FIXME: nolint
+// nolint: revive
 func (c ConnWithReconnect) SetTimeout(time.Duration) {}
 
+// Bind
+// FIXME: nolint
+// nolint: revive
 func (c ConnWithReconnect) Bind(username, password string) error {
 	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
+// UnauthenticatedBind
+// FIXME: nolint
+// nolint: revive
 func (c ConnWithReconnect) UnauthenticatedBind(username string) error {
 	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
+// SimpleBind
+// FIXME: nolint
+// nolint: revive
 func (c ConnWithReconnect) SimpleBind(*ldap.SimpleBindRequest) (*ldap.SimpleBindResult, error) {
 	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
+// ExternalBind
+// FIXME: nolint
+// nolint: revive
 func (c ConnWithReconnect) ExternalBind() error {
 	return ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
+// ModifyWithResult
+// FIXME: nolint
+// nolint: revive
 func (c ConnWithReconnect) ModifyWithResult(m *ldap.ModifyRequest) (*ldap.ModifyResult, error) {
 	conn, err := c.GetConnection()
 	if err != nil {
@@ -310,10 +363,16 @@ func (c ConnWithReconnect) ModifyWithResult(m *ldap.ModifyRequest) (*ldap.Modify
 	return conn.ModifyWithResult(m)
 }
 
+// Compare
+// FIXME: nolint
+// nolint: revive
 func (c ConnWithReconnect) Compare(dn, attribute, value string) (bool, error) {
 	return false, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }
 
+// SearchWithPaging
+// FIXME: nolint
+// nolint: revive
 func (c ConnWithReconnect) SearchWithPaging(searchRequest *ldap.SearchRequest, pagingSize uint32) (*ldap.SearchResult, error) {
 	return nil, ldap.NewError(ldap.LDAPResultNotSupported, fmt.Errorf("not implemented"))
 }

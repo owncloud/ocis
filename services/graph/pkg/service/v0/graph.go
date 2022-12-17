@@ -104,7 +104,7 @@ func (g Graph) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
 }
 
-// GetClient returns a gateway client to talk to reva
+// GetGatewayClient returns a gateway client to talk to reva
 func (g Graph) GetGatewayClient() GatewayClient {
 	return g.gatewayClient
 }
@@ -128,10 +128,12 @@ func (g Graph) getWebDavBaseURL() (*url.URL, error) {
 	return webDavBaseURL, nil
 }
 
+// ListResponse represents a default graph-api collection response.
 type ListResponse struct {
 	Value interface{} `json:"value,omitempty"`
 }
 
+// FIXME: nolint
 const (
 	ReadmeSpecialFolderName     = "readme"
 	SpaceImageSpecialFolderName = "image"

@@ -8,6 +8,9 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
+// Backend
+// FIXME: nolint
+// nolint
 type Backend interface {
 	// CreateUser creates a given user in the identity backend.
 	CreateUser(ctx context.Context, user libregraph.User) (*libregraph.User, error)
@@ -31,6 +34,9 @@ type Backend interface {
 	RemoveMemberFromGroup(ctx context.Context, groupID string, memberID string) error
 }
 
+// CreateUserModelFromCS3
+// FIXME: nolint
+// nolint: revive
 func CreateUserModelFromCS3(u *cs3.User) *libregraph.User {
 	if u.Id == nil {
 		u.Id = &cs3.UserId{}

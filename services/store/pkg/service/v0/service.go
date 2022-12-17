@@ -65,6 +65,9 @@ func New(opts ...Option) (s *Service, err error) {
 	if err = s.indexRecords(recordsDir); err != nil {
 		return nil, err
 	}
+
+	// FIXME: nolint
+	// nolint: nakedret
 	return
 }
 
@@ -328,5 +331,7 @@ func (s Service) indexRecords(recordsDir string) (err error) {
 		}
 	}
 
+	// FIXME: nolint
+	// nolint: nakedret
 	return
 }

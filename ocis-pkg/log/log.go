@@ -16,9 +16,14 @@ import (
 )
 
 var (
+	// RequestIDString
+	// FIXME: nolint
+	// nolint: revive
 	RequestIDString = "request-id"
 )
 
+// FIXME: nolint
+// nolint: gochecknoinits
 func init() {
 	// this is ugly, but "logger.DefaultLogger" is a global variable and we need to set it _before_ anybody uses it
 	setMicroLogger()

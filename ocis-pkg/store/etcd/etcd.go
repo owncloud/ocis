@@ -16,12 +16,15 @@ const (
 	suffixNS = ".suffix"
 )
 
+// EtcdStore
+// FIXME: nolint
+// nolint: revive
 type EtcdStore struct {
 	options store.Options
 	client  *clientv3.Client
 }
 
-// Create a new go-micro store backed by etcd
+// NewEtcdStore creates a new go-micro store backed by etcd
 func NewEtcdStore(opts ...store.Option) store.Store {
 	es := &EtcdStore{}
 	_ = es.Init(opts...)
@@ -60,7 +63,7 @@ func (es *EtcdStore) setupClient() {
 	es.client = cli
 }
 
-// Initialize the go-micro store implementation.
+// Init initializes the go-micro store implementation.
 // Currently, only the nodes are configurable, the rest of the options
 // will be ignored.
 func (es *EtcdStore) Init(opts ...store.Option) error {
@@ -74,7 +77,7 @@ func (es *EtcdStore) Init(opts ...store.Option) error {
 	return nil
 }
 
-// Get the store options
+// Options returns currently used store.Options
 func (es *EtcdStore) Options() store.Options {
 	return es.options
 }

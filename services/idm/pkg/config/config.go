@@ -25,6 +25,7 @@ type Config struct {
 	Context context.Context `yaml:"-"`
 }
 
+// Settings defines the available Settings configuration.
 type Settings struct {
 	LDAPSAddr    string `yaml:"ldaps_addr" env:"IDM_LDAPS_ADDR" desc:"Listen address for the LDAPS listener (ip-addr:port)."`
 	Cert         string `yaml:"cert" env:"IDM_LDAPS_CERT" desc:"File name of the TLS server certificate for the LDAPS listener."`
@@ -32,6 +33,7 @@ type Settings struct {
 	DatabasePath string `yaml:"database" env:"IDM_DATABASE_PATH" desc:"Full path to the IDM backend database."`
 }
 
+// ServiceUserPasswords defines the available ServiceUserPasswords configuration.
 type ServiceUserPasswords struct {
 	OcisAdmin string `yaml:"admin_password" env:"IDM_ADMIN_PASSWORD" desc:"Password to set for the oCIS \"admin\" user. Either cleartext or an argon2id hash."`
 	Idm       string `yaml:"idm_password" env:"IDM_SVC_PASSWORD" desc:"Password to set for the \"idm\" service user. Either cleartext or an argon2id hash."`

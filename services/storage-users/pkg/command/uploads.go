@@ -18,9 +18,11 @@ import (
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/revaconfig"
 )
 
+// Uploads
+// FIXME: nolint
+// nolint: revive
 func Uploads(cfg *config.Config) *cli.Command {
 	return &cli.Command{
-
 		Name:  "uploads",
 		Usage: "manage unfinished uploads",
 		Subcommands: []*cli.Command{

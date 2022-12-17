@@ -19,10 +19,11 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, ver
 	}
 	ocisRegistry := oregistry.GetRegistry()
 
+	const transportGrpc = "grpc"
 	node.Metadata["registry"] = ocisRegistry.String()
-	node.Metadata["server"] = "grpc"
-	node.Metadata["transport"] = "grpc"
-	node.Metadata["protocol"] = "grpc"
+	node.Metadata["server"] = transportGrpc
+	node.Metadata["transport"] = transportGrpc
+	node.Metadata["protocol"] = transportGrpc
 
 	service := &registry.Service{
 		Name:      serviceID,
@@ -74,10 +75,12 @@ func RegisterHTTPEndpoint(ctx context.Context, serviceID, uuid, addr string, ver
 	}
 	ocisRegistry := oregistry.GetRegistry()
 
+	const protocolHTTP = "http"
+
 	node.Metadata["registry"] = ocisRegistry.String()
-	node.Metadata["server"] = "http"
-	node.Metadata["transport"] = "http"
-	node.Metadata["protocol"] = "http"
+	node.Metadata["server"] = protocolHTTP
+	node.Metadata["transport"] = protocolHTTP
+	node.Metadata["protocol"] = protocolHTTP
 
 	service := &registry.Service{
 		Name:      serviceID,
