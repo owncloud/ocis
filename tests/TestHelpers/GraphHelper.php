@@ -40,7 +40,7 @@ class GraphHelper {
 	 * @return int (1 = true | 0 = false)
 	 */
 	public static function isUUIDv4(string $id): int {
-		$regex = "/^" . self::getUUIDv4Regex() . "/i";
+		$regex = "/^" . self::getUUIDv4Regex() . "$/i";
 		return preg_match($regex, $id);
 	}
 
@@ -50,17 +50,8 @@ class GraphHelper {
 	 * @return int (1 = true | 0 = false)
 	 */
 	public static function isSpaceId(string $spaceId): int {
-		$regex = "/^" . self::getUUIDv4Regex() . '\\$' . self::getUUIDv4Regex() . "/i";
+		$regex = "/^" . self::getUUIDv4Regex() . '\\$' . self::getUUIDv4Regex() . "$/i";
 		return preg_match($regex, $spaceId);
-	}
-
-	/**
-	 * @param string $id
-	 *
-	 * @return string
-	 */
-	public static function isUUIDv44(string $id): string {
-		return "hello";
 	}
 
 	/**
@@ -272,9 +263,9 @@ class GraphHelper {
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
-	 * @param string $user
+	 * @param string $byUser
 	 * @param string $userPassword
-	 * @param string|null $ofUser
+	 * @param string|null $user
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -282,15 +273,15 @@ class GraphHelper {
 	public static function getUserWithDriveInformation(
 		string $baseUrl,
 		string $xRequestId,
-		string $user,
+		string $byUser,
 		string $userPassword,
-		?string $ofUser = null
+		?string $user = null
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'users/' . $ofUser . '?%24select=&%24expand=drive');
+		$url = self::getFullUrl($baseUrl, 'users/' . $user . '?%24select=&%24expand=drive');
 		return HttpRequestHelper::get(
 			$url,
 			$xRequestId,
-			$user,
+			$byUser,
 			$userPassword,
 		);
 	}

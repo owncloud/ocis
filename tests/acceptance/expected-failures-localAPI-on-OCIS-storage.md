@@ -80,4 +80,4 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiCors/cors.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L68)
 
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
-- [apiGraph/getUser.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L21)
+- [apiGraph/getUser.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L23)
