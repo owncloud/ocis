@@ -78,3 +78,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Requests with invalid credentials do not return CORS headers](https://github.com/owncloud/ocis/issues/5194)
 - [apiCors/cors.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L67)
 - [apiCors/cors.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L68)
+
+#### [POST response does not return correct path when creating public link](https://github.com/owncloud/ocis/issues/5139)
+- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:62](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L62)
+- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L63)
+- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:64](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L64)
+- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L90)
+- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:160](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L160)
+- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:161](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L161)
+- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:162](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L162)
