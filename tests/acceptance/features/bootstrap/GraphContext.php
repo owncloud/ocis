@@ -1247,31 +1247,35 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When user :user tries to get information of user :ofUser using Graph API
+	 * @When user :byUser tries to get information of user :user using Graph API
+	 * @When user :byUser gets information of user :user using Graph API
 	 *
+	 * @param string $byUser
 	 * @param string $user
-	 * @param string $ofUser
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
-	public function userTriesToGetInformationOfUser($user, $ofUser): void {
-		$credentials = $this->getAdminOrUserCredentials($user);
+	public function userTriesToGetInformationOfUser(string $byUser, string $user): void {
+		$credentials = $this->getAdminOrUserCredentials($byUser);
 		$response = GraphHelper::getUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$credentials['username'],
 			$credentials['password'],
-			$ofUser
+			$user
 		);
 		$this->featureContext->setResponse($response);
 	}
 
 	/**
-	 * @When user :user tries to get all user using the Graph API
+	 * @When user :user tries to get all users using the Graph API
+	 * @When user :user gets all users using the Graph API
 	 *
 	 * @param string $user
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function userGetsAllUserUsingTheGraphApi(string $user) {
 		$credentials = $this->getAdminOrUserCredentials($user);
@@ -1285,7 +1289,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then the API response should contain all user with following information:
+	 * @Then the API response should contain all users with the following information:
 	 *
 	 * @param TableNode $table
 	 *
@@ -1312,47 +1316,44 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @param string $user
-	 * @param string|null $ofUser
+	 * @param string $byUser
+	 * @param string|null $user
 	 *
 	 * @return ResponseInterface
 	 * @throws JsonException
 	 * @throws GuzzleException
 	 */
 	public function retrieveUserInformationAlongWithDriveUsingGraphApi(
-		string $user,
-		?string $ofUser = null
+		string $byUser,
+		?string $user = null
 	):ResponseInterface {
-		if ($ofUser === null) {
-			$ofUser = $user;
-		}
+		$user = $user ?? $byUser;
 		$credentials = $this->getAdminOrUserCredentials($user);
 		return GraphHelper::getUserWithDriveInformation(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
 			$credentials["password"],
-			$ofUser
+			$user
 		);
 	}
 
 	/**
+	 * @When /^the user "([^"]*)" gets user "([^"]*)" along with (his|her) drive information using Graph API$/
 	 *
-	 * @When /^the user "([^"]*)" tries to get user "([^"]*)" along with (his|her) drive information using Graph API$/
-	 *
+	 * @param string $byUser
 	 * @param string $user
-	 * @param string $ofUser
 	 *
 	 * @return void
 	 */
-	public function userTriesToGetInformationOfUserAlongWithHisDriveData(string $user, $ofUser) {
-		$response = $this->retrieveUserInformationAlongWithDriveUsingGraphApi($user, $ofUser);
+	public function userTriesToGetInformationOfUserAlongWithHisDriveData(string $byUser, string $user) {
+		$response = $this->retrieveUserInformationAlongWithDriveUsingGraphApi($byUser, $user);
 		$this->featureContext->setResponse($response);
 	}
 
 	/**
 	 *
-	 * @When /^the user "([^"]*)" tries to get (his|her) drive information using Graph API$/
+	 * @When /^the user "([^"]*)" gets (his|her) drive information using Graph API$/
 	 *
 	 * @param string $user
 	 *
@@ -1385,13 +1386,12 @@ class GraphContext implements Context {
 			// break the segment with @@@  to find the actual value from the drive infromation from response
 			$separatedKey = explode("@@@", $keyName);
 			// this stores the actual value of each key from drive information response used for assertion
-			$actualKeyValueFromDriveInformation = null;
-			$tempDriveInfo = $actualValueDriveInformation;
+			$actualKeyValueFromDriveInformation = $actualValueDriveInformation;
 
 			foreach ($separatedKey as $key) {
-				$actualKeyValueFromDriveInformation = $tempDriveInfo[$key];
-				$tempDriveInfo = $actualKeyValueFromDriveInformation;
+				$actualKeyValueFromDriveInformation = $actualKeyValueFromDriveInformation[$key];
 			}
+
 			switch ($expectedDriveInformation[$keyName]) {
 				case '%user_id%':
 					Assert::assertEquals(

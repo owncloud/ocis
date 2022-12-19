@@ -93,4 +93,4 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesShares/publicLinkDownload.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/publicLinkDownload.feature#L30)
 
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
-- [apiGraph/getUser.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L21)
+- [apiGraph/getUser.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L23)
