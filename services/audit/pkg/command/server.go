@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/events/server"
+	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
@@ -63,7 +63,7 @@ func Server(cfg *config.Config) *cli.Command {
 					RootCAs:            rootCAPool,
 				}
 			}
-			client, err := server.NewNatsStream(
+			client, err := stream.Nats(
 				natsjs.TLSConfig(tlsConf),
 				natsjs.Address(evtsCfg.Endpoint),
 				natsjs.ClusterID(evtsCfg.Cluster),

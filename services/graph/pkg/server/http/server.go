@@ -7,7 +7,7 @@ import (
 	stdhttp "net/http"
 	"os"
 
-	"github.com/cs3org/reva/v2/pkg/events/server"
+	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-micro/plugins/v4/events/natsjs"
@@ -74,7 +74,7 @@ func Server(opts ...Option) (http.Service, error) {
 				RootCAs:            rootCAPool,
 			}
 		}
-		publisher, err = server.NewNatsStream(
+		publisher, err = stream.Nats(
 			natsjs.TLSConfig(tlsConf),
 			natsjs.Address(options.Config.Events.Endpoint),
 			natsjs.ClusterID(options.Config.Events.Cluster),

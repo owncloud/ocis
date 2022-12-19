@@ -14,7 +14,7 @@ import (
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
-	"github.com/cs3org/reva/v2/pkg/events/server"
+	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/jellydator/ttlcache/v2"
@@ -98,7 +98,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 			RootCAs:            rootCAPool,
 		}
 	}
-	bus, err := server.NewNatsStream(
+	bus, err := stream.Nats(
 		natsjs.TLSConfig(tlsConf),
 		natsjs.Address(cfg.Events.Endpoint),
 		natsjs.ClusterID(cfg.Events.Cluster),
