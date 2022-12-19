@@ -3031,7 +3031,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^public downloads the folder "([^"]*)" of space "([^"]*)" from the last created public link of "([^"]*)" using the resource id$/
+	 * @When /^public downloads the folder "([^"]*)" of space "([^"]*)" from the last created public link of "([^"]*)"$/
 	 *
 	 * @param string $resource
 	 * @param string $space
