@@ -20,7 +20,7 @@ Feature: Public can download folders from project space public link
     And user "Alice" has created a public link share of the space "new-space" with settings:
       | permissions | 1        |
       | name        | someName |
-    When public downloads the folder "NewFolder" of space "new-space" from the last created public link of "Alice"
+    When public downloads the folder "NewFolder" from the last created public link using the public files API
     Then the HTTP status code should be "200"
     And the downloaded tar archive should contain these files:
       | name               | content      |
@@ -36,7 +36,7 @@ Feature: Public can download folders from project space public link
       | shareType   | 3           |
       | permissions | 1           |
       | name        | public link |
-    When public downloads the folder "NewFolder/folder" of space "new-space" from the last created public link of "Alice"
+    When public downloads the folder "folder" from the last created public link using the public files API
     Then the HTTP status code should be "200"
     And the downloaded tar archive should contain these files:
       | name            | content      |
