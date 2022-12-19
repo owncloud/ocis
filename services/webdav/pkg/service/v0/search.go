@@ -14,6 +14,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/tags"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
@@ -188,6 +189,12 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getlastmodified", match.Entity.LastModifiedTime.AsTime().Format(time.RFC3339)))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getcontenttype", match.Entity.MimeType))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:permissions", match.Entity.Permissions))
+
+	t := tags.FromList("")
+	for _, tag := range match.Entity.Tags {
+		t.AddList(tag)
+	}
+	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:tags", t.AsList()))
 
 	// those seem empty - bug?
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getetag", match.Entity.Etag))

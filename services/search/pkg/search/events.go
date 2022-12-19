@@ -21,12 +21,12 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 		events.ContainerCreated{},
 		events.FileTouched{},
 		events.FileVersionRestored{},
-		//events.TagsAdded{},
-		//events.TagsRemoved{},
+		events.TagsAdded{},
+		events.TagsRemoved{},
 	}
 
 	if cfg.Events.AsyncUploads {
-		// evts = append(evts, events.UploadReady{})
+		evts = append(evts, events.UploadReady{})
 	} else {
 		evts = append(evts, events.FileUploaded{})
 	}
@@ -40,7 +40,7 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 		cfg.Events.NumConsumers = 1
 	}
 
-	spaceID := func(ref *provider.Reference) *provider.StorageSpaceId {
+	getSpaceID := func(ref *provider.Reference) *provider.StorageSpaceId {
 		return &provider.StorageSpaceId{
 			OpaqueId: storagespace.FormatResourceID(
 				provider.ResourceId{
@@ -49,6 +49,18 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 				},
 			),
 		}
+	}
+
+	getUser := func(users ...*user.UserId) *user.UserId {
+		for _, u := range users {
+			if u == nil {
+				continue
+			}
+
+			return u
+		}
+
+		return nil
 	}
 
 	indexSpaceDebouncer := NewSpaceDebouncer(time.Duration(cfg.Events.DebounceDuration)*time.Millisecond, func(id *provider.StorageSpaceId, userID *user.UserId) {
@@ -66,28 +78,31 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 
 				switch ev := e.(type) {
 				case events.ItemTrashed:
+					u := getUser(ev.SpaceOwner, ev.Executant)
 					s.TrashItem(ev.ID)
-					indexSpaceDebouncer.Debounce(spaceID(ev.Ref), ev.Executant)
+					indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), u)
 				case events.ItemMoved:
-					s.MoveItem(ev.Ref, ev.Executant)
-					indexSpaceDebouncer.Debounce(spaceID(ev.Ref), ev.Executant)
+					u := getUser(ev.SpaceOwner, ev.Executant)
+					s.MoveItem(ev.Ref, u)
+					indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), getUser(ev.SpaceOwner, ev.Executant))
 				case events.ItemRestored:
-					s.RestoreItem(ev.Ref, ev.Executant)
-					indexSpaceDebouncer.Debounce(spaceID(ev.Ref), ev.Executant)
+					u := getUser(ev.SpaceOwner, ev.Executant)
+					s.RestoreItem(ev.Ref, u)
+					indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), u)
 				case events.ContainerCreated:
-					indexSpaceDebouncer.Debounce(spaceID(ev.Ref), ev.Executant)
+					indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), getUser(ev.SpaceOwner, ev.Executant))
 				case events.FileTouched:
-					indexSpaceDebouncer.Debounce(spaceID(ev.Ref), ev.Executant)
+					indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), getUser(ev.SpaceOwner, ev.Executant))
 				case events.FileVersionRestored:
-					indexSpaceDebouncer.Debounce(spaceID(ev.Ref), ev.Executant)
-				//case events.TagsAdded:
-				//	indexSpaceDebouncer.Debounce(spaceID(ev.Ref), ev.Executant)
-				//case events.TagsRemoved:
-				//indexSpaceDebouncer.Debounce(spaceID(ev.Ref), ev.Executant)
+					indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), getUser(ev.SpaceOwner, ev.Executant))
+				case events.TagsAdded:
+					s.UpsertItem(ev.Ref, getUser(ev.SpaceOwner, ev.Executant))
+				case events.TagsRemoved:
+					s.UpsertItem(ev.Ref, getUser(ev.SpaceOwner, ev.Executant))
 				case events.FileUploaded:
-					indexSpaceDebouncer.Debounce(spaceID(ev.Ref), ev.Executant)
-					//case events.UploadReady:
-					//indexSpaceDebouncer.Debounce(spaceID(ev.FileRef), ev.ExecutingUser.Id)
+					indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), getUser(ev.SpaceOwner, ev.Executant))
+				case events.UploadReady:
+					indexSpaceDebouncer.Debounce(getSpaceID(ev.FileRef), getUser(ev.SpaceOwner, ev.ExecutingUser.Id))
 				}
 
 				if err != nil {

@@ -9,5 +9,5 @@ type Document struct {
 	Size     uint64
 	Mtime    string
 	MimeType string
-	//Tags     []string
+	Tags     []string
 }

@@ -17,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	graphMiddleware "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 	svc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
@@ -129,6 +130,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.WithRoleService(roleService),
 		svc.WithRequireAdminMiddleware(requireAdminMiddleware),
 		svc.WithGatewayClient(gatewayClient),
+		svc.WithSearchService(searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient())),
 	)
 
 	if handle == nil {

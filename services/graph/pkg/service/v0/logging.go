@@ -133,3 +133,18 @@ func (l logging) CreateDrive(w http.ResponseWriter, r *http.Request) {
 func (l logging) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	l.next.GetRootDriveChildren(w, r)
 }
+
+// GetTags implements the Service interface.
+func (l logging) GetTags(w http.ResponseWriter, r *http.Request) {
+	l.next.GetTags(w, r)
+}
+
+// AssignTags implements the Service interface.
+func (l logging) AssignTags(w http.ResponseWriter, r *http.Request) {
+	l.next.AssignTags(w, r)
+}
+
+// UnassignTags implements the Service interface.
+func (l logging) UnassignTags(w http.ResponseWriter, r *http.Request) {
+	l.next.UnassignTags(w, r)
+}

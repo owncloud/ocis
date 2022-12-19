@@ -198,6 +198,12 @@
         },
         "parentId": {
           "$ref": "#/definitions/v0ResourceID"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

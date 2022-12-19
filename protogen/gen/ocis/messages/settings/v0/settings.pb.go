@@ -1193,6 +1193,7 @@ type Value struct {
 	AccountUuid string    `protobuf:"bytes,4,opt,name=account_uuid,json=accountUuid,proto3" json:"account_uuid,omitempty"`
 	Resource    *Resource `protobuf:"bytes,5,opt,name=resource,proto3" json:"resource,omitempty"`
 	// Types that are assignable to Value:
+	//
 	//	*Value_BoolValue
 	//	*Value_IntValue
 	//	*Value_StringValue
@@ -1383,6 +1384,7 @@ type ListOptionValue struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Types that are assignable to Option:
+	//
 	//	*ListOptionValue_StringValue
 	//	*ListOptionValue_IntValue
 	Option isListOptionValue_Option `protobuf_oneof:"option"`

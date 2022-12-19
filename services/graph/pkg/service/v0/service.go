@@ -53,6 +53,10 @@ type Service interface {
 	CreateDrive(w http.ResponseWriter, r *http.Request)
 	UpdateDrive(w http.ResponseWriter, r *http.Request)
 	DeleteDrive(w http.ResponseWriter, r *http.Request)
+
+	GetTags(w http.ResponseWriter, r *http.Request)
+	AssignTags(w http.ResponseWriter, r *http.Request)
+	UnassignTags(w http.ResponseWriter, r *http.Request)
 }
 
 // NewService returns a service implementation for Service.
@@ -69,6 +73,7 @@ func NewService(opts ...Option) Service {
 		spacePropertiesCache: ttlcache.NewCache(),
 		eventsPublisher:      options.EventsPublisher,
 		gatewayClient:        options.GatewayClient,
+		searchService:        options.SearchService,
 	}
 
 	if options.IdentityBackend == nil {
@@ -167,6 +172,11 @@ func NewService(opts ...Option) Service {
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)
 		r.Route("/v1.0", func(r chi.Router) {
+			r.Route("/extensions/org.libregraph", func(r chi.Router) {
+				r.Get("/tags", svc.GetTags)
+				r.Put("/tags", svc.AssignTags)
+				r.Delete("/tags", svc.UnassignTags)
+			})
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/", svc.GetMe)
 				r.Get("/drives", svc.GetDrives)
