@@ -8,10 +8,9 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revaCtx "github.com/cs3org/reva/v2/pkg/ctx"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
-	revaTags "github.com/cs3org/reva/v2/pkg/tags"
+	"github.com/cs3org/reva/v2/pkg/tags"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
@@ -19,10 +18,11 @@ import (
 	"go-micro.dev/v4/metadata"
 )
 
+// GetTags returns all available tags
 func (g Graph) GetTags(w http.ResponseWriter, r *http.Request) {
-	th := r.Header.Get(revactx.TokenHeader)
-	ctx := revactx.ContextSetToken(r.Context(), th)
-	ctx = metadata.Set(ctx, revactx.TokenHeader, th)
+	th := r.Header.Get(revaCtx.TokenHeader)
+	ctx := revaCtx.ContextSetToken(r.Context(), th)
+	ctx = metadata.Set(ctx, revaCtx.TokenHeader, th)
 	sr, err := g.searchService.Search(ctx, &searchsvc.SearchRequest{
 		Query:    "Tags:*",
 		PageSize: -1,
@@ -33,7 +33,7 @@ func (g Graph) GetTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tagList := revaTags.FromList("")
+	tagList := tags.FromList("")
 	for _, match := range sr.Matches {
 		for _, tag := range match.Entity.Tags {
 			tagList.AddList(tag)
@@ -47,6 +47,7 @@ func (g Graph) GetTags(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, tagCollection)
 }
 
+// AssignTags assigns a tag to a resource
 func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 	var (
 		assignment libregraph.TagAssignment
@@ -99,7 +100,7 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 		currentTags = m["tags"]
 	}
 
-	allTags := revaTags.FromList(currentTags)
+	allTags := tags.FromList(currentTags)
 	newTags := strings.Join(assignment.Tags, ",")
 	if !allTags.AddList(newTags) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "no new tags in createtagsrequest or maximum reached")
@@ -136,6 +137,7 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UnassignTags removes a tag from a resource
 func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 	var (
 		unassignment libregraph.TagUnassignment
@@ -188,7 +190,7 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 		currentTags = m["tags"]
 	}
 
-	allTags := revaTags.FromList(currentTags)
+	allTags := tags.FromList(currentTags)
 	toDelete := strings.Join(unassignment.Tags, ",")
 	if !allTags.RemoveList(toDelete) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "no new tags in createtagsrequest or maximum reached")
