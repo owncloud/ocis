@@ -6,9 +6,10 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
-* Bugfix - Enhancement search: [#5221](https://github.com/owncloud/ocis/pull/5221)
-* Enhancement - Add global env variable extractor: [#4916](https://github.com/owncloud/ocis/issues/4916)
+* Enhancement - Add global env variable extractor: [#5164](https://github.com/owncloud/ocis/pull/5164)
 * Enhancement - Async Postprocessing: [#5207](https://github.com/owncloud/ocis/pull/5207)
+* Enhancement - Extended search: [#5221](https://github.com/owncloud/ocis/pull/5221)
+* Enhancement - Resource tags: [#5227](https://github.com/owncloud/ocis/pull/5227)
 
 # Changelog for [2.0.0] (2022-11-30)
 
