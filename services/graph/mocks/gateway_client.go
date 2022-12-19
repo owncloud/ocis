@@ -288,6 +288,36 @@ func (_m *GatewayClient) ListStorageSpaces(ctx context.Context, in *providerv1be
 	return r0, r1
 }
 
+// SetArbitraryMetadata provides a mock function with given fields: ctx, request, opts
+func (_m *GatewayClient) SetArbitraryMetadata(ctx context.Context, request *providerv1beta1.SetArbitraryMetadataRequest, opts ...grpc.CallOption) (*providerv1beta1.SetArbitraryMetadataResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, request)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *providerv1beta1.SetArbitraryMetadataResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *providerv1beta1.SetArbitraryMetadataRequest, ...grpc.CallOption) *providerv1beta1.SetArbitraryMetadataResponse); ok {
+		r0 = rf(ctx, request, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*providerv1beta1.SetArbitraryMetadataResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *providerv1beta1.SetArbitraryMetadataRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, request, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Stat provides a mock function with given fields: ctx, in, opts
 func (_m *GatewayClient) Stat(ctx context.Context, in *providerv1beta1.StatRequest, opts ...grpc.CallOption) (*providerv1beta1.StatResponse, error) {
 	_va := make([]interface{}, len(opts))
