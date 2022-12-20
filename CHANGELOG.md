@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Enhancement - Add global env variable extractor: [#5164](https://github.com/owncloud/ocis/pull/5164)
 * Enhancement - Async Postprocessing: [#5207](https://github.com/owncloud/ocis/pull/5207)
+* Enhancement - Bump reva version: [#5243](https://github.com/owncloud/ocis/pull/5243)
 * Enhancement - Extended search: [#5221](https://github.com/owncloud/ocis/pull/5221)
 * Enhancement - Resource tags: [#5227](https://github.com/owncloud/ocis/pull/5227)
 
