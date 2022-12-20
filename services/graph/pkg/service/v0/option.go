@@ -98,7 +98,7 @@ func WithRoleService(val RoleService) Option {
 	}
 }
 
-// WithRoleService provides a function to set the RoleService option.
+// WithSearchService provides a function to set the SearchService option.
 func WithSearchService(val searchsvc.SearchProviderService) Option {
 	return func(o *Options) {
 		o.SearchService = val
