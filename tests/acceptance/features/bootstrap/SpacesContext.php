@@ -73,6 +73,7 @@ class SpacesContext implements Context {
 	 * @var FilesVersionsContext
 	 */
 	private FilesVersionsContext $filesVersionsContext;
+
 	/**
 	 * @var string
 	 */
@@ -3027,5 +3028,34 @@ class SpacesContext implements Context {
 					break;
 			}
 		}
+	}
+
+	/**
+	 * @When /^public downloads the folder "([^"]*)" from the last created public link using the public files API$/
+	 *
+	 * @param string $resource
+	 *
+	 * @return void
+	 * @throws GuzzleException|JsonException
+	 */
+	public function publicDownloadsTheFolderFromTheLastCreatedPublicLink(string $resource) {
+		$token = $this->featureContext->getLastPublicShareToken();
+		$response = $this->featureContext->listFolderAndReturnResponseXml(
+			$token,
+			$resource,
+			'0',
+			['oc:fileid'],
+			$this->featureContext->getDavPathVersion() === 1 ? "public-files" : "public-files-new"
+		);
+		$resourceId = json_decode(json_encode($response->xpath("//d:response/d:propstat/d:prop/oc:fileid")), true, 512, JSON_THROW_ON_ERROR);
+		$queryString = 'public-token=' . $token . '&id=' . $resourceId[0][0];
+		$this->featureContext->setResponse(
+			HttpRequestHelper::get(
+				$this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
+				'',
+				'',
+				'',
+			)
+		);
 	}
 }
