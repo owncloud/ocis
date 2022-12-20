@@ -1,9 +1,9 @@
 <template>
   <div>
     <oc-select
-        v-model="selectedOption"
         :clearable="false"
         :options="displayOptions"
+        :value="selectedOption"
         @input="onSelectedOption"
        />
   </div>
@@ -38,7 +38,8 @@ export default {
     }
   },
   methods: {
-    async onSelectedOption () {
+    async onSelectedOption (event) {
+      this.selectedOption = event
       const values = []
       if (!isNil(this.selectedOption)) {
         const option = this.setting.singleChoiceValue.options.find(val => val.displayValue === this.selectedOption)
