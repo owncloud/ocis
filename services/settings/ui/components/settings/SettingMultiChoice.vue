@@ -1,8 +1,8 @@
 <template>
   <oc-select
-      v-model="selectedOptions"
       :clearable="false"
       :options="displayOptions"
+      :value="selectedOptions"
       @input="onSelectedOption"
       multiple
   />
@@ -37,7 +37,8 @@ export default {
     }
   },
   methods: {
-    async onSelectedOption () {
+    async onSelectedOption (event) {
+      this.selectedOptions = event
       const values = []
       if (!isNil(this.selectedOptions)) {
         this.selectedOptions.forEach(displayValue => {
