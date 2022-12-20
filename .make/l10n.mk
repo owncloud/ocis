@@ -16,11 +16,11 @@ LOCALE_FILES = $(shell find l10n/locale -name '*.po' 2> /dev/null)
 
 .PHONY: l10n-push
 l10n-push:
-	cd $(OUTPUT_DIR) && tx -d push -s --skip --no-interactive
+	cd $(OUTPUT_DIR) && tx push -s --skip
 
 .PHONY: l10n-pull
 l10n-pull:
-	cd $(OUTPUT_DIR) && tx -d pull -a --skip --minimum-perc=75
+	cd $(OUTPUT_DIR) && tx pull -a --skip --minimum-perc=75
 
 .PHONY: l10n-clean
 l10n-clean:
@@ -46,5 +46,3 @@ $(TEMPLATE_FILE):
 $(OUTPUT_DIR)/translations.json:
 	rm -rf $(OUTPUT_DIR)/translations.json
 	gettext-compile --output $(OUTPUT_DIR)/translations.json $(LOCALE_FILES);
-
-
