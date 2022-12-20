@@ -3031,6 +3031,41 @@ class SpacesContext implements Context {
 		}
 	}
 
+  /**
+	 * @Then /^for user "([^"]*)" the (?:COPY|MOVE) response headers for the (?:space|mountpoint) "([^"]*)" should contain these key and value pairs:$/
+	 *
+	 * @param string $user
+   * @param string $space
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function theCopyResponseHeadersShouldContain(string $user, string $space, TableNode $table): void {
+		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
+		$headers = $this->featureContext->getResponse()->getHeaders();
+    
+    foreach ($table->getHash() as $row) {
+			$findItem = $row['key'];
+      $value = str_replace('UUIDof:', '', $row['value']);
+
+      foreach ($headers as $headerName => $headerValues)
+      {
+        if ($headerName === $findItem) {
+          switch ($findItem) {
+            case "Oc-Fileid":
+              Assert::assertEquals($this->getFileId($user, $space, $value), $headerValues[0], 'wrong fileId in the response header');
+              break;
+            default:
+              Assert::assertEquals($value, $headerValues[0], "wrong $findItem in the response header");
+              break;
+            }
+        }
+      }
+		}
+	}
+
 	/**
 	 * @When /^public downloads the folder "([^"]*)" from the last created public link using the public files API$/
 	 *
