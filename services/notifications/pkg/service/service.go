@@ -68,6 +68,8 @@ func (s eventsNotifier) Run() error {
 				switch e := evt.(type) {
 				case events.SpaceShared:
 					s.handleSpaceShared(e)
+				case events.SpaceUnshared:
+					s.handleSpaceUnshared(e)
 				case events.ShareCreated:
 					s.handleShareCreated(e)
 				}
