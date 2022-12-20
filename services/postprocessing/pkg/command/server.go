@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/cs3org/reva/v2/pkg/events/server"
+	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/go-micro/plugins/v4/events/natsjs"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
@@ -56,7 +56,7 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 			}
 
-			bus, err := server.NewNatsStream(
+			bus, err := stream.Nats(
 				natsjs.TLSConfig(tlsConf),
 				natsjs.Address(evtsCfg.Endpoint),
 				natsjs.ClusterID(evtsCfg.Cluster),
