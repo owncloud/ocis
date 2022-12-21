@@ -1273,8 +1273,13 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $newName
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$spaceId = $space["id"];
+		if ($spaceName === "unknown") {
+			// check sending invalid data
+			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
+		} else {
+			$space = $this->getSpaceByName($user, $spaceName);
+			$spaceId = $space["id"];
+		}
 
 		$bodyData = ["Name" => $newName];
 		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
@@ -1306,8 +1311,13 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $newDescription
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$spaceId = $space["id"];
+		if ($spaceName === "unknown") {
+			// check sending invalid data
+			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
+		} else {
+			$space = $this->getSpaceByName($user, $spaceName);
+			$spaceId = $space["id"];
+		}
 
 		$bodyData = ["description" => $newDescription];
 		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
@@ -1339,8 +1349,13 @@ class SpacesContext implements Context {
 		string $spaceName,
 		int $newQuota
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
-		$spaceId = $space["id"];
+		if ($spaceName === "unknown") {
+			// check sending invalid data
+			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
+		} else {
+			$space = $this->getSpaceByName($user, $spaceName);
+			$spaceId = $space["id"];
+		}
 
 		$bodyData = ["quota" => ["total" => $newQuota]];
 		$body = json_encode($bodyData, JSON_THROW_ON_ERROR);
