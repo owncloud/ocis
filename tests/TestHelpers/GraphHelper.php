@@ -37,21 +37,21 @@ class GraphHelper {
 	/**
 	 * @param string $id
 	 *
-	 * @return int (1 = true | 0 = false)
+	 * @return bool
 	 */
-	public static function isUUIDv4(string $id): int {
+	public static function isUUIDv4(string $id): bool {
 		$regex = "/^" . self::getUUIDv4Regex() . "$/i";
-		return preg_match($regex, $id);
+		return (bool)preg_match($regex, $id);
 	}
 
 	/**
 	 * @param string $spaceId
 	 *
-	 * @return int (1 = true | 0 = false)
+	 * @return bool
 	 */
-	public static function isSpaceId(string $spaceId): int {
+	public static function isSpaceId(string $spaceId): bool {
 		$regex = "/^" . self::getUUIDv4Regex() . '\\$' . self::getUUIDv4Regex() . "$/i";
-		return preg_match($regex, $spaceId);
+		return (bool)preg_match($regex, $spaceId);
 	}
 
 	/**

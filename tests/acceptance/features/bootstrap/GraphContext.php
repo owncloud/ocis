@@ -1226,12 +1226,7 @@ class GraphContext implements Context {
 							. trim($expectedValue[$keyName], '%')
 						);
 					}
-					Assert::assertEquals(
-						1,
-						GraphHelper::isUUIDv4($actualValue['id']),
-						__METHOD__ .
-						' Expected user_id to have UUIDv4 pattern but found: ' . $actualValue['id']
-					);
+					Assert::assertTrue(GraphHelper::isUUIDv4($actualValue['id']), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualValue['id']);
 					break;
 				default:
 					Assert::assertEquals(
@@ -1377,37 +1372,27 @@ class GraphContext implements Context {
 	 * check if single drive information is correct
 	 *
 	 * @param array $expectedDriveInformation
-	 * @param array $actualValueDriveInformation
+	 * @param array $actualDriveInformation
 	 *
 	 * @return void
 	 */
-	public function checkUserDriveInformation(array $expectedDriveInformation, array  $actualValueDriveInformation):void {
+	public function checkUserDriveInformation(array $expectedDriveInformation, array  $actualDriveInformation):void {
 		foreach (array_keys($expectedDriveInformation) as $keyName) {
 			// break the segment with @@@  to find the actual value from the drive infromation from response
 			$separatedKey = explode("@@@", $keyName);
 			// this stores the actual value of each key from drive information response used for assertion
-			$actualKeyValueFromDriveInformation = $actualValueDriveInformation;
+			$actualKeyValue = $actualDriveInformation;
 
 			foreach ($separatedKey as $key) {
-				$actualKeyValueFromDriveInformation = $actualKeyValueFromDriveInformation[$key];
+				$actualKeyValue = $actualKeyValue[$key];
 			}
 
 			switch ($expectedDriveInformation[$keyName]) {
 				case '%user_id%':
-					Assert::assertEquals(
-						1,
-						GraphHelper::isUUIDv4($actualKeyValueFromDriveInformation),
-						__METHOD__ .
-						' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValueFromDriveInformation
-					);
+					Assert::assertTrue(GraphHelper::isUUIDv4($actualKeyValue), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValue);
 					break;
 				case '%space_id%':
-					Assert::assertEquals(
-						1,
-						GraphHelper::isSpaceId($actualKeyValueFromDriveInformation),
-						__METHOD__ .
-						' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValueFromDriveInformation
-					);
+					Assert::assertTrue(GraphHelper::isSpaceId($actualKeyValue), __METHOD__ . ' Expected space_id to have a UUIDv4:UUIDv4 pattern but found: ' . $actualKeyValue);
 					break;
 				default:
 					$expectedDriveInformation[$keyName] = $this->featureContext->substituteInLineCodes(
@@ -1416,14 +1401,15 @@ class GraphContext implements Context {
 						[],
 						[
 							[
+								// the actual space_id is substituted from the actual drive information rather than making an API request and substituting
 								"code" => "%space_id%",
 								"function" =>
 									[$this, "getSpaceIdFromActualDriveinformation"],
-								"parameter" => [$actualValueDriveInformation]
+								"parameter" => [$actualDriveInformation]
 							],
 						]
 					);
-					Assert::assertEquals($expectedDriveInformation[$keyName], $actualKeyValueFromDriveInformation);
+					Assert::assertEquals($expectedDriveInformation[$keyName], $actualKeyValue);
 			}
 		}
 	}
