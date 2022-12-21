@@ -47,6 +47,12 @@ linters-settings:
 severity:
   default-severity: error
 
+skip-dirs:
+  - protogen/gen
+  - docs
+  - deployments
+  - changelog
+
 issues:
   exclude-use-default: true
   exclude-rules:

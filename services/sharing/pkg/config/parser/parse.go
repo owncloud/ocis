@@ -11,6 +11,10 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 )
 
+const (
+	_backendCS3 = "cs3"
+)
+
 // ParseConfig loads configuration from known paths.
 func ParseConfig(cfg *config.Config) error {
 	_, err := ociscfg.BindSourcesToStructs(cfg.Service.Name, cfg)
@@ -38,19 +42,19 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingJWTTokenError(cfg.Service.Name)
 	}
 
-	if cfg.PublicSharingDriver == "cs3" && cfg.PublicSharingDrivers.CS3.SystemUserAPIKey == "" {
+	if cfg.PublicSharingDriver == _backendCS3 && cfg.PublicSharingDrivers.CS3.SystemUserAPIKey == "" {
 		return shared.MissingSystemUserApiKeyError(cfg.Service.Name)
 	}
 
-	if cfg.PublicSharingDriver == "cs3" && cfg.PublicSharingDrivers.CS3.SystemUserID == "" {
+	if cfg.PublicSharingDriver == _backendCS3 && cfg.PublicSharingDrivers.CS3.SystemUserID == "" {
 		return shared.MissingSystemUserID(cfg.Service.Name)
 	}
 
-	if cfg.UserSharingDriver == "cs3" && cfg.UserSharingDrivers.CS3.SystemUserAPIKey == "" {
+	if cfg.UserSharingDriver == _backendCS3 && cfg.UserSharingDrivers.CS3.SystemUserAPIKey == "" {
 		return shared.MissingSystemUserApiKeyError(cfg.Service.Name)
 	}
 
-	if cfg.UserSharingDriver == "cs3" && cfg.UserSharingDrivers.CS3.SystemUserID == "" {
+	if cfg.UserSharingDriver == _backendCS3 && cfg.UserSharingDrivers.CS3.SystemUserID == "" {
 		return shared.MissingSystemUserID(cfg.Service.Name)
 	}
 

@@ -139,7 +139,7 @@ func ensureEncryptionSecretExists(path string) error {
 
 	f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
-		return nil
+		return err
 	}
 	defer f.Close()
 
@@ -175,7 +175,7 @@ func ensureSigningPrivateKeyExists(paths []string) error {
 
 		f, err := os.OpenFile(path, os.O_CREATE|os.O_WRONLY, 0600)
 		if err != nil {
-			return nil
+			return err
 		}
 		defer f.Close()
 

@@ -499,7 +499,7 @@ func sortUsers(req *godata.GoDataRequest, users []*libregraph.User) ([]*libregra
 		return nil, fmt.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
 	}
 
-	if req.Query.OrderBy.OrderByItems[0].Order == "desc" {
+	if req.Query.OrderBy.OrderByItems[0].Order == _sortDescending {
 		sorter = sort.Reverse(sorter)
 	}
 	sort.Sort(sorter)

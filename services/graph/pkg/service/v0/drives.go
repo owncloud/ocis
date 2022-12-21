@@ -33,6 +33,13 @@ import (
 	merrors "go-micro.dev/v4/errors"
 )
 
+const (
+	_spaceTypePersonal = "personal"
+	_spaceTypeProject  = "project"
+
+	_sortDescending = "desc"
+)
+
 var (
 	_invalidSpaceNameCharacters = []string{`/`, `\`, `.`, `:`, `?`, `*`, `"`, `>`, `<`, `|`}
 	_maxSpaceNameLength         = 255
@@ -253,8 +260,8 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		driveType = *drive.DriveType
 	}
 	switch driveType {
-	case "", "project":
-		driveType = "project"
+	case "", _spaceTypeProject:
+		driveType = _spaceTypeProject
 	default:
 		logger.Debug().Str("type", driveType).Msg("could not create drive: drives of this type cannot be created via this api")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "drives of this type cannot be created via this api")
@@ -275,7 +282,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		csr.Opaque = utils.AppendPlainToOpaque(csr.Opaque, "spaceAlias", *drive.DriveAlias)
 	}
 
-	if driveType == "personal" {
+	if driveType == _spaceTypePersonal {
 		csr.Owner = us
 	}
 
@@ -911,7 +918,7 @@ func sortSpaces(req *godata.GoDataRequest, spaces []*libregraph.Drive) ([]*libre
 		return nil, errors.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
 	}
 
-	if req.Query.OrderBy.OrderByItems[0].Order == "desc" {
+	if req.Query.OrderBy.OrderByItems[0].Order == _sortDescending {
 		sorter = sort.Reverse(sorter)
 	}
 	sort.Sort(sorter)
