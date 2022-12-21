@@ -156,8 +156,8 @@ func NewService(opts ...Option) Service {
 				if options.Config.Identity.LDAP.EducationResourcesEnabled {
 					svc.identityEducationBackend = lb
 				} else {
-					noop := &identity.NOOP{}
-					svc.identityEducationBackend = noop
+					errEduBackend := &identity.ErrEducationBackend{}
+					svc.identityEducationBackend = errEduBackend
 				}
 			}
 		default:
