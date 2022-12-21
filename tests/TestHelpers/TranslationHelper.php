@@ -2,8 +2,8 @@
 /**
  * ownCloud
  *
- * @author Phil Davis <phil@jankaritech.com>
- * @copyright Copyright (c) 2020 Phil Davis phil@jankaritech.com
+ * @author Talank Baral <talank@jankaritech.com>
+ * @copyright Copyright (c) 2021 Talank Baral talank@jankaritech.com
  *
  * This code is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License,
@@ -20,14 +20,27 @@
  *
  */
 
-use Composer\Autoload\ClassLoader;
+namespace TestHelpers;
 
-$classLoader = new ClassLoader();
-$classLoader->addPsr4(
-	"",
-	__DIR__ . "/../../../tests/acceptance/features/bootstrap",
-	true
-);
-
-$classLoader->addPsr4("TestHelpers\\", __DIR__ . "/../../../TestHelpers", true);
-$classLoader->register();
+/**
+ * Class TranslationHelper
+ *
+ * Helper functions that are needed to run tests on different languages
+ *
+ * @package TestHelpers
+ */
+class TranslationHelper {
+	/**
+	 * @param string|null $language
+	 *
+	 * @return string|null
+	 */
+	public static function getLanguage(?string $language): ?string {
+		if (!isset($language)) {
+			if (\getenv('OC_LANGUAGE') !== false) {
+				$language = \getenv('OC_LANGUAGE');
+			}
+		}
+		return $language;
+	}
+}

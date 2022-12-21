@@ -153,4 +153,6 @@ default:
         - TrashbinContext:
 
   extensions:
+    rdx\behatvars\BehatVariablesExtension: ~
+
     Cjm\Behat\StepThroughExtension: ~
