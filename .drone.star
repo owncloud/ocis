@@ -716,7 +716,6 @@ def localApiTestPipeline(ctx):
                             "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                                      restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                                      ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"]) +
-                                     restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
                                      localApiTests(suite, storage, params["extraEnvironment"]) +
                                      failEarly(ctx, early_fail),
                             "services": redisForOCStorage(storage),
@@ -736,7 +735,6 @@ def localApiTests(suite, storage, extra_environment = {}):
     environment = {
         "TEST_WITH_GRAPH_API": "true",
         "PATH_TO_OCIS": dirs["base"],
-        "PATH_TO_CORE": "%s/%s" % (dirs["base"], dirs["core"]),
         "TEST_SERVER_URL": "https://ocis-server:9200",
         "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
         "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),

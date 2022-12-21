@@ -84,7 +84,7 @@ class GraphHelper {
 	 */
 	public static function getFullUrl(string $baseUrl, string $path): string {
 		$fullUrl = $baseUrl;
-		if (\substr($fullUrl, -1) !== '/') {
+		if (!str_ends_with($fullUrl, '/')) {
 			$fullUrl .= '/';
 		}
 		$fullUrl .= 'graph/v1.0/' . $path;
