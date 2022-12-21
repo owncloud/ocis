@@ -15,7 +15,7 @@ Feature: Propfind test
     Given user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
     When user "Alice" sends PROPFIND request to space "new-space" using the WebDAV API
     Then the HTTP status code should be "207"
-    And for user "Alice" the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
+    And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
       | key                          | value            |
       | oc:fileid                    | UUIDof:new-space |
       | oc:name                      | new-space        |
