@@ -36,6 +36,7 @@ func Server(cfg *config.Config) *cli.Command {
 			evs := []events.Unmarshaller{
 				events.ShareCreated{},
 				events.SpaceShared{},
+				events.SpaceUnshared{},
 			}
 
 			evtsCfg := cfg.Notifications.Events
