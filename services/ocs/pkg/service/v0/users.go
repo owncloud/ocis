@@ -37,7 +37,6 @@ func (o Ocs) GetSelf(w http.ResponseWriter, r *http.Request) {
 		GIDNumber:         u.GidNumber,
 	}
 	o.mustRender(w, r, response.DataRender(d))
-	return
 }
 
 // GetUser returns the user with the given userid
