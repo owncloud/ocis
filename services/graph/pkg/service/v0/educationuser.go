@@ -259,7 +259,7 @@ func (g Graph) GetEducationUser(w http.ResponseWriter, r *http.Request) {
 			}
 			d.Quota = quota
 			if slices.Contains(sel, "drive") || slices.Contains(exp, "drive") {
-				if *d.DriveType == "personal" {
+				if *d.DriveType == _spaceTypePersonal {
 					user.Drive = d
 				}
 			} else {
@@ -330,7 +330,7 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for _, sp := range lspr.GetStorageSpaces() {
-			if !(sp.SpaceType == "personal" && sp.Owner.Id.OpaqueId == user.GetId()) {
+			if !(sp.SpaceType == _spaceTypePersonal && sp.Owner.Id.OpaqueId == user.GetId()) {
 				continue
 			}
 			// TODO: check if request contains a homespace and if, check if requesting user has the privilege to
