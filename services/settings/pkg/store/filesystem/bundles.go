@@ -23,7 +23,7 @@ func (s Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []strin
 	bundlesFolder := s.buildFolderPathForBundles(false)
 	bundleFiles, err := os.ReadDir(bundlesFolder)
 	if err != nil {
-		return []*settingsmsg.Bundle{}, nil
+		return nil, err
 	}
 
 	records := make([]*settingsmsg.Bundle, 0, len(bundleFiles))
@@ -133,7 +133,7 @@ func (s Store) AddSettingToBundle(bundleID string, setting *settingsmsg.Setting)
 func (s Store) RemoveSettingFromBundle(bundleID string, settingID string) error {
 	bundle, err := s.ReadBundle(bundleID)
 	if err != nil {
-		return nil
+		return err
 	}
 	if ok := removeSetting(bundle, settingID); ok {
 		if _, err := s.WriteBundle(bundle); err != nil {

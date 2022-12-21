@@ -18,7 +18,7 @@ func (s Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, e
 	valuesFolder := s.buildFolderPathForValues(false)
 	valueFiles, err := os.ReadDir(valuesFolder)
 	if err != nil {
-		return []*settingsmsg.Value{}, nil
+		return nil, err
 	}
 
 	records := make([]*settingsmsg.Value, 0, len(valueFiles))
@@ -71,7 +71,7 @@ func (s Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*set
 			s.Logger.Debug().Msgf("reading contents from file: %v", filepath.Join(valuesFolder, files[i].Name()))
 			if err := s.parseRecordFromFile(&r, filepath.Join(valuesFolder, files[i].Name())); err != nil {
 				s.Logger.Debug().Msgf("match found: %v", filepath.Join(valuesFolder, files[i].Name()))
-				return &settingsmsg.Value{}, nil
+				return nil, err
 			}
 
 			// if value saved without accountUUID, then it's a global value

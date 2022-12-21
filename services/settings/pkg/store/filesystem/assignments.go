@@ -15,7 +15,7 @@ func (s Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRoleA
 	assignmentsFolder := s.buildFolderPathForRoleAssignments(false)
 	assignmentFiles, err := os.ReadDir(assignmentsFolder)
 	if err != nil {
-		return records, nil
+		return nil, nil
 	}
 
 	for _, assignmentFile := range assignmentFiles {

@@ -82,13 +82,11 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumb
 	}
 	generator, err := thumbnail.GeneratorForType(tType)
 	if err != nil {
-		g.logger.Debug().Str("thumbnail_type", tType).Msg("unsupported thumbnail type")
-		return nil
+		return merrors.BadRequest(g.serviceID, "unsupported thumbnail type")
 	}
 	encoder, err := thumbnail.EncoderForType(tType)
 	if err != nil {
-		g.logger.Debug().Str("thumbnail_type", tType).Msg("unsupported thumbnail type")
-		return nil
+		return merrors.BadRequest(g.serviceID, "unsupported thumbnail type")
 	}
 
 	var key string
