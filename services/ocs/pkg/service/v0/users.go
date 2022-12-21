@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"net/http"
 	"net/url"
-	"strings"
 
 	storemsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/store/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
@@ -236,11 +235,6 @@ func (o Ocs) ListUsers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// escapeValue escapes all special characters in the value
-func escapeValue(value string) string {
-	return strings.ReplaceAll(value, "'", "''")
-}
-
 func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*cs3.User, error) {
 	backend := o.getCS3Backend()
 	u, _, err := backend.GetUserByClaims(ctx, "username", name, false)
@@ -253,5 +247,4 @@ func (o Ocs) fetchAccountFromCS3Backend(ctx context.Context, name string) (*cs3.
 func (o Ocs) cs3WriteNotSupported(w http.ResponseWriter, r *http.Request) {
 	o.logger.Warn().Msg("the CS3 backend does not support adding or updating users")
 	o.NotImplementedStub(w, r)
-	return
 }
