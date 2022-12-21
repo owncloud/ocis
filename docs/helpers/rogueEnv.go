@@ -15,7 +15,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-const yamlSource = "global_vars.yaml"
+const yamlSource = "extended_vars.yaml"
 
 // ConfigVars is the main yaml source
 type ConfigVars struct {
@@ -70,7 +70,7 @@ func GetRogueEnvs() {
 		log.Fatal(err)
 	}
 	fmt.Println("Gathering variable definitions from source")
-	out, err := exec.Command("bash", "-c", "grep -RHn os.Getenv | grep -v rogueEnv.go |grep \\.go").Output()
+	out, err := exec.Command("sh", "-c", "grep -RHn os.Getenv | grep -v rogueEnv.go |grep \\.go").Output()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -164,7 +164,7 @@ func RenderGlobalVarsTemplate() {
 		log.Fatal(err)
 	}
 
-	targetFile, err := os.Create(filepath.Join(targetFolder, "global_configvars.adoc"))
+	targetFile, err := os.Create(filepath.Join(targetFolder, "extended_configvars.adoc"))
 	if err != nil {
 		log.Fatalf("Failed to create target file: %s", err)
 	}
