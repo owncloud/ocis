@@ -56,6 +56,14 @@
 | LDAP_GROUP_OBJECTCLASS<br/>GRAPH_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | The object class to use for groups in the default group search filter ('groupOfNames'). |
 | LDAP_GROUP_SCHEMA_GROUPNAME<br/>GRAPH_LDAP_GROUP_NAME_ATTRIBUTE | string | cn | LDAP Attribute to use for the name of groups.|
 | LDAP_GROUP_SCHEMA_ID<br/>GRAPH_LDAP_GROUP_ID_ATTRIBUTE | string | owncloudUUID | LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.|
+| LDAP_EDUCATION_RESOURCES_ENABLED<br/>GRAPH_LDAP_EDUCATION_RESOURCES_ENABLED | bool | false | Enable LDAP support for managing education related resources|
+| LDAP_SCHOOL_BASE_DN<br/>GRAPH_LDAP_SCHOOL_BASE_DN | string |  | Search base DN for looking up LDAP schools.|
+| LDAP_SCHOOL_SCOPE<br/>GRAPH_LDAP_SCHOOL_SEARCH_SCOPE | string |  | LDAP search scope to use when looking up schools. Supported scopes are 'base', 'one' and 'sub'.|
+| LDAP_SCHOOL_FILTER<br/>GRAPH_LDAP_SCHOOL_FILTER | string |  | LDAP filter to add to the default filters for school searches.|
+| LDAP_SCHOOL_OBJECTCLASS<br/>GRAPH_LDAP_SCHOOL_OBJECTCLASS | string |  | The object class to use for schools in the default school search filter.|
+| LDAP_SCHOOL_SCHEMA_SCHOOL_NAME<br/>GRAPH_LDAP_SCHOOL_NAME_ATTRIBUTE | string |  | LDAP Attribute to use for the name of a school.|
+| LDAP_SCHOOL_SCHEMA_SCHOOL_NUMBER<br/>GRAPH_LDAP_SCHOOL_NUMBER_ATTRIBUTE | string |  | LDAP Attribute to use for the number of a school.|
+| LDAP_SCHOOL_SCHEMA_ID<br/>GRAPH_LDAP_SCHOOL_ID_ATTRIBUTE | string |  | LDAP Attribute to use as the unique id for schools. This should be a stable globally unique ID like a UUID.|
 | GRAPH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.|
 | GRAPH_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_INSECURE<br/>GRAPH_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|

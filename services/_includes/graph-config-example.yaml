@@ -68,6 +68,15 @@ identity:
     group_objectclass: groupOfNames
     group_name_attribute: cn
     group_id_attribute: owncloudUUID
+    education_resources_enabled: false
+    educationconfig:
+      school_base_dn: ""
+      school_search_scope: ""
+      school_filter: ""
+      school_objectclass: ""
+      school_name_attribute: ""
+      school_number_attribute: ""
+      school_id_attribute: ""
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster

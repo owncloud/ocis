@@ -543,6 +543,86 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
 
+a|`LDAP_EDUCATION_RESOURCES_ENABLED` +
+`GRAPH_LDAP_EDUCATION_RESOURCES_ENABLED` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable LDAP support for managing education related resources
+
+a|`LDAP_SCHOOL_BASE_DN` +
+`GRAPH_LDAP_SCHOOL_BASE_DN` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Search base DN for looking up LDAP schools.
+
+a|`LDAP_SCHOOL_SCOPE` +
+`GRAPH_LDAP_SCHOOL_SEARCH_SCOPE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+LDAP search scope to use when looking up schools. Supported scopes are 'base', 'one' and 'sub'.
+
+a|`LDAP_SCHOOL_FILTER` +
+`GRAPH_LDAP_SCHOOL_FILTER` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+LDAP filter to add to the default filters for school searches.
+
+a|`LDAP_SCHOOL_OBJECTCLASS` +
+`GRAPH_LDAP_SCHOOL_OBJECTCLASS` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The object class to use for schools in the default school search filter.
+
+a|`LDAP_SCHOOL_SCHEMA_SCHOOL_NAME` +
+`GRAPH_LDAP_SCHOOL_NAME_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+LDAP Attribute to use for the name of a school.
+
+a|`LDAP_SCHOOL_SCHEMA_SCHOOL_NUMBER` +
+`GRAPH_LDAP_SCHOOL_NUMBER_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+LDAP Attribute to use for the number of a school.
+
+a|`LDAP_SCHOOL_SCHEMA_ID` +
+`GRAPH_LDAP_SCHOOL_ID_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+LDAP Attribute to use as the unique id for schools. This should be a stable globally unique ID like a UUID.
+
 a|`GRAPH_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
