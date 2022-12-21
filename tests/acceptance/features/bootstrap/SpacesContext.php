@@ -3001,14 +3001,14 @@ class SpacesContext implements Context {
 	/**
 	 * @param string $method # method should be either PROPFIND or REPORT
 	 * @param string $user
-	 * @param string $mountPoint # an entity inside a space, or the space itself
+	 * @param string $spaceNameOrMountPoint # an entity inside a space, or the space name itself
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function theResponseShouldContain(string $method, string $user, string $mountPoint, TableNode $table): void {
+	public function theResponseShouldContain(string $method, string $user, string $spaceNameOrMountPoint, TableNode $table): void {
 		$xmlRes = $this->featureContext->getResponseXml();
 		foreach ($table->getHash() as $row) {
 			$findItem = $row['key'];
@@ -3020,23 +3020,23 @@ class SpacesContext implements Context {
 					$resourceType = $xmlRes->xpath("//d:response/d:propstat/d:prop/d:getcontenttype")[0]->__toString();
 					if ($method === 'PROPFIND') {
 						if (!$resourceType) {
-							Assert::assertEquals($this->getFolderId($user, $mountPoint, $value), $responseValue, 'wrong fileId in the response');
+							Assert::assertEquals($this->getFolderId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong fileId in the response');
 						} else {
-							Assert::assertEquals($this->getFileId($user, $mountPoint, $value), $responseValue, 'wrong fileId in the response');
+							Assert::assertEquals($this->getFileId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong fileId in the response');
 						}
 					} else {
 						if ($resourceType === 'httpd/unix-directory') {
-							Assert::assertEquals($this->getFolderId($user, $mountPoint, $value), $responseValue, 'wrong fileId in the response');
+							Assert::assertEquals($this->getFolderId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong fileId in the response');
 						} else {
-							Assert::assertEquals($this->getFileId($user, $mountPoint, $value), $responseValue, 'wrong fileId in the response');
+							Assert::assertEquals($this->getFileId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong fileId in the response');
 						}
 					}
 					break;
 				case "oc:file-parent":
-					Assert::assertEquals($this->getFolderId($user, $mountPoint, $value), $responseValue, 'wrong file-parentId in the response');
+					Assert::assertEquals($this->getFolderId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong file-parentId in the response');
 					break;
 				case "oc:privatelink":
-					Assert::assertEquals($this->getPrivateLink($user, $mountPoint), $responseValue, 'cannot find private link for space or resource in the response');
+					Assert::assertEquals($this->getPrivateLink($user, $spaceNameOrMountPoint), $responseValue, 'cannot find private link for space or resource in the response');
 					break;
 				default:
 					Assert::assertEquals($value, $responseValue, "wrong $findItem in the response");
