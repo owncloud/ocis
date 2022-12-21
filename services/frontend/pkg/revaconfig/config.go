@@ -47,6 +47,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 		"blacklisted_files": []string{},
 		"undelete":          true,
 		"versioning":        true,
+		"tags":              true,
 		"archivers":         archivers,
 		"app_providers":     appProviders,
 		"favorites":         cfg.EnableFavorites,
