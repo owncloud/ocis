@@ -8,9 +8,9 @@
 
 Output:
 
-- The generated yaml files can be found at: `docs/services/_includes` when running locally respectively in the docs branch after the CI has finished.
-- The generated adoc files can be found at: `docs/services/_includes/adoc` when running locally respectively in the docs branch after the CI has finished.
-- The file name for rouge envvars is named: `global_configvars.adoc`.
+- The generated yaml files can be found at: `docs/services/_includes` when running locally respectively in the `docs branch` after the CI has finished.
+- The generated adoc files can be found at: `docs/services/_includes/adoc` when running locally respectively in the `docs branch` after the CI has finished.
+- The file name for rouge envvars is named: `extended_configvars.adoc`.
 
 Admin doc process:
 
@@ -24,7 +24,7 @@ It can happen that rouge envvars are found but do not need to be published as th
 
 IMPORTANT:
 
-- Once a rouge envvar has been identified, it is added to the `global_vars.yaml` file but never changed or touched by the process. There is one exception with respect to single/double quote usage. While you manually can (and will) define a text like: `"'/var/lib/ocis'"`, quotes are transformed by the process in the .yaml file to: `'''/var/lib/ocis'''`. There is no need to change this back, as the final step transforms this correctly to the adoc table.
+- Once a rouge envvar has been identified, it is added to the `extended_vars.yaml` file but never changed or touched by the process. There is one exception with respect to single/double quote usage. While you manually can (and will) define a text like: `"'/var/lib/ocis'"`, quotes are transformed by the process in the .yaml file to: `'''/var/lib/ocis'''`. There is no need to change this back, as the final step transforms this correctly to the adoc table.
 
 - Because rouge envvars do not have the same structural setup as "normal" envvars like type, description or defaults, these infos need to be provided manually one time - even if found multiple times. Any change on this info will be used on the next CI run and published on the next admin docs build.
 
