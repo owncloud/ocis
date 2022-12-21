@@ -36,7 +36,7 @@ func Server(cfg *config.Config) *cli.Command {
 			evtsCfg := cfg.Postprocessing.Events
 			var tlsConf *tls.Config
 
-			if !evtsCfg.TLSInsecure {
+			if evtsCfg.EnableTLS {
 				var rootCAPool *x509.CertPool
 				if evtsCfg.TLSRootCACertificate != "" {
 					rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
