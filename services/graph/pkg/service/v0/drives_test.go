@@ -56,7 +56,7 @@ var sortTests = []sortTest{
 			Query: &godata.GoDataQuery{
 				OrderBy: &godata.GoDataOrderByQuery{
 					OrderByItems: []*godata.OrderByItem{
-						{Field: &godata.Token{Value: "name"}, Order: "desc"},
+						{Field: &godata.Token{Value: "name"}, Order: _sortDescending},
 					},
 				},
 			},
@@ -94,7 +94,7 @@ var sortTests = []sortTest{
 			Query: &godata.GoDataQuery{
 				OrderBy: &godata.GoDataOrderByQuery{
 					OrderByItems: []*godata.OrderByItem{
-						{Field: &godata.Token{Value: "lastModifiedDateTime"}, Order: "desc"},
+						{Field: &godata.Token{Value: "lastModifiedDateTime"}, Order: _sortDescending},
 					},
 				},
 			},
