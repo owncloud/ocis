@@ -1271,7 +1271,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (?:changes|ties to change) the name of the "([^"]*)" space to "([^"]*)"$/
+	 * @When /^user "([^"]*)" (?:changes|tries to change) the name of the "([^"]*)" space to "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
@@ -1288,7 +1288,7 @@ class SpacesContext implements Context {
 	): void {
 		if ($spaceName === "non-existing") {
 			// check sending invalid data
-			$spaceId = WebDavHelper::generateUUIDv4();
+			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
 		} else {
 			$space = $this->getSpaceByName($user, $spaceName);
 			$spaceId = $space["id"];
@@ -1309,7 +1309,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (?:changes|ties to change) the description of the "([^"]*)" space to "([^"]*)"$/
+	 * @When /^user "([^"]*)" (?:changes|tries to change) the description of the "([^"]*)" space to "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
@@ -1326,7 +1326,7 @@ class SpacesContext implements Context {
 	): void {
 		if ($spaceName === "non-existing") {
 			// check sending invalid data
-			$spaceId = WebDavHelper::generateUUIDv4();
+			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
 		} else {
 			$space = $this->getSpaceByName($user, $spaceName);
 			$spaceId = $space["id"];
@@ -1347,7 +1347,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (?:changes|ties to change) the quota of the "([^"]*)" space to "([^"]*)"$/
+	 * @When /^user "([^"]*)" (?:changes|tries to change) the quota of the "([^"]*)" space to "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
@@ -1364,7 +1364,7 @@ class SpacesContext implements Context {
 	): void {
 		if ($spaceName === "non-existing") {
 			// check sending invalid data
-			$spaceId = WebDavHelper::generateUUIDv4();
+			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
 		} else {
 			$space = $this->getSpaceByName($user, $spaceName);
 			$spaceId = $space["id"];
