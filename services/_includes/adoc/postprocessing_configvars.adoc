@@ -84,7 +84,7 @@ a| [subs=-attributes]
 Cluster ID of the event system.
 
 a|`OCIS_INSECURE` +
-`SEARCH_EVENTS_TLS_INSECURE` +
+`POSTPROCESSING_EVENTS_TLS_INSECURE` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -93,14 +93,24 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Whether to verify the server TLS certificates.
 
-a|`SEARCH_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+a|`POSTPROCESSING_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided SEARCH_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided POSTPROCESSING_EVENTS_TLS_INSECURE will be seen as false.
+
+a|`OCIS_EVENTS_ENABLE_TLS` +
+`POSTPROCESSING_EVENTS_ENABLE_TLS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
 
 a|`POSTPROCESSING_VIRUSSCAN` +
 
