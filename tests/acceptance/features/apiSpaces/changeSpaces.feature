@@ -231,9 +231,9 @@ Feature: Change data of space
 
   
   Scenario: user sends invalid space uuid via the Graph API
-    When user "Admin" ties to change the name of the "non-existing" space to "new name"
+    When user "Admin" tries to change the name of the "non-existing" space to "new name"
     Then the HTTP status code should be "404"
-    When user "Admin" ties to change the quota of the "non-existing" space to "10"
+    When user "Admin" tries to change the quota of the "non-existing" space to "10"
     Then the HTTP status code should be "404"
-    When user "Alice" ties to change the description of the "non-existing" space to "new description"
+    When user "Alice" tries to change the description of the "non-existing" space to "new description"
     Then the HTTP status code should be "404"
