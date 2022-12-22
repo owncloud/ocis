@@ -1258,7 +1258,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" changes the name of the "([^"]*)" space to "([^"]*)"$/
+	 * @When /^user "([^"]*)" (?:changes|ties to change) the name of the "([^"]*)" space to "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
@@ -1273,9 +1273,9 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $newName
 	): void {
-		if ($spaceName === "unknown") {
+		if ($spaceName === "non-existing") {
 			// check sending invalid data
-			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
+			$spaceId = WebDavHelper::generateUUIDv4();
 		} else {
 			$space = $this->getSpaceByName($user, $spaceName);
 			$spaceId = $space["id"];
@@ -1296,7 +1296,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" changes the description of the "([^"]*)" space to "([^"]*)"$/
+	 * @When /^user "([^"]*)" (?:changes|ties to change) the description of the "([^"]*)" space to "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
@@ -1311,9 +1311,9 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $newDescription
 	): void {
-		if ($spaceName === "unknown") {
+		if ($spaceName === "non-existing") {
 			// check sending invalid data
-			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
+			$spaceId = WebDavHelper::generateUUIDv4();
 		} else {
 			$space = $this->getSpaceByName($user, $spaceName);
 			$spaceId = $space["id"];
@@ -1334,7 +1334,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" changes the quota of the "([^"]*)" space to "([^"]*)"$/
+	 * @When /^user "([^"]*)" (?:changes|ties to change) the quota of the "([^"]*)" space to "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
@@ -1349,9 +1349,9 @@ class SpacesContext implements Context {
 		string $spaceName,
 		int $newQuota
 	): void {
-		if ($spaceName === "unknown") {
+		if ($spaceName === "non-existing") {
 			// check sending invalid data
-			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
+			$spaceId = WebDavHelper::generateUUIDv4();
 		} else {
 			$space = $this->getSpaceByName($user, $spaceName);
 			$spaceId = $space["id"];
