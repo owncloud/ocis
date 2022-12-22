@@ -29,6 +29,6 @@ plugins:
 
   - name: doc
     path: ../../.bingo/protoc-gen-doc
-    out: ../../docs/grpc_apis
+    out: ../../docs/apis/grpc_apis
     opt:
       - ../docs/GRPC.tmpl,grpc.md,source_relative
