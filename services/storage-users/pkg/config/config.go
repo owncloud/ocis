@@ -190,7 +190,7 @@ type EOSDriver struct {
 	// SecProtocol specifies the xrootd security protocol to use between the server and EOS.
 	SecProtocol string `yaml:"sec_protocol"`
 	// Keytab specifies the location of the keytab to use to authenticate to EOS.
-	Keytab string `yaml:"keytab"`
+	Keytab string `yaml:"keytab" env:"STORAGE_USERS_EOSFS_KEYTAB"`
 	// SingleUsername is the username to use when SingleUserMode is enabled
 	SingleUsername string `yaml:"single_username"`
 	// Enables logging of the commands executed
