@@ -13,6 +13,7 @@ import (
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/config/defaults"
 	graph "github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	groups "github.com/owncloud/ocis/v2/services/groups/pkg/config/defaults"
+	hub "github.com/owncloud/ocis/v2/services/hub/pkg/config/defaults"
 	idm "github.com/owncloud/ocis/v2/services/idm/pkg/config/defaults"
 	idp "github.com/owncloud/ocis/v2/services/idp/pkg/config/defaults"
 	invitations "github.com/owncloud/ocis/v2/services/invitations/pkg/config/defaults"
@@ -59,6 +60,7 @@ func DefaultConfig() *Config {
 		Gateway:           gateway.DefaultConfig(),
 		Graph:             graph.DefaultConfig(),
 		Groups:            groups.DefaultConfig(),
+		Hub:               hub.DefaultConfig(),
 		IDM:               idm.DefaultConfig(),
 		IDP:               idp.DefaultConfig(),
 		Invitations:       invitations.DefaultConfig(),

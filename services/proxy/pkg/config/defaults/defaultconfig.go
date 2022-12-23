@@ -231,6 +231,10 @@ func DefaultPolicies() []config.Policy {
 					Endpoint: "/api/v0/settings",
 					Service:  "com.owncloud.web.settings",
 				},
+				{
+					Endpoint: "/hub",
+					Service:  "com.owncloud.web.hub",
+				},
 			},
 		},
 	}

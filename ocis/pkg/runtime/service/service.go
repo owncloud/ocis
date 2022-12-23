@@ -27,6 +27,7 @@ import (
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/command"
 	graph "github.com/owncloud/ocis/v2/services/graph/pkg/command"
 	groups "github.com/owncloud/ocis/v2/services/groups/pkg/command"
+	hub "github.com/owncloud/ocis/v2/services/hub/pkg/command"
 	idm "github.com/owncloud/ocis/v2/services/idm/pkg/command"
 	idp "github.com/owncloud/ocis/v2/services/idp/pkg/command"
 	invitations "github.com/owncloud/ocis/v2/services/invitations/pkg/command"
@@ -133,6 +134,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.Postprocessing.Service.Name] = postprocessing.NewSutureService
 	s.ServicesRegistry[opts.Config.EventHistory.Service.Name] = eventhistory.NewSutureService
 	s.ServicesRegistry[opts.Config.Userlog.Service.Name] = userlog.NewSutureService
+	s.ServicesRegistry[opts.Config.Hub.Service.Name] = hub.NewSutureService
 
 	// populate delayed services
 	s.Delayed[opts.Config.Sharing.Service.Name] = sharing.NewSutureService
