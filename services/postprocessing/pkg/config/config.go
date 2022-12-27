@@ -23,8 +23,8 @@ type Config struct {
 // Postprocessing definces the config options for the postprocessing service.
 type Postprocessing struct {
 	Events          Events        `yaml:"events"`
-	Virusscan       bool          `yaml:"virusscan" env:"POSTPROCESSING_VIRUSSCAN" desc:"Needs as prerequisite the antivirus service to be enabled and configured. should the system do a virusscan?"`
-	Delayprocessing time.Duration `yaml:"delayprocessing" env:"POSTPROCESSING_DELAY" desc:"A delay in the given duration during the sytem will sleep while postprocessing. The duration can be set as number followed by a unit identifyer like s, m or h."`
+	Virusscan       bool          `yaml:"virusscan" env:"POSTPROCESSING_VIRUSSCAN" desc:"After uploading a file but before making it available for download, virus scanning the file can be enabled. Needs as prerequisite the antivirus service to be enabled and configured."`
+	Delayprocessing time.Duration `yaml:"delayprocessing" env:"POSTPROCESSING_DELAY" desc:"After uploading a file but before making it available for download, a delay step can be added. Intended for developing purposes only. The duration can be set as number followed by a unit identifier like s, m or h."`
 }
 
 // Events combines the configuration options for the event bus.
