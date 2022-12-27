@@ -59,7 +59,8 @@ variables:
   default_value: '''/var/lib/ocis'' or ''$HOME/.ocis/'''
   description: The base directory location used by several services and for user data.
     Predefined to '/var/lib/ocis' for container images (inside the container) or '$HOME/.ocis/'
-    for binary releases. Can be adapted for services individually.
+    for binary releases. Services can have, if available, an individual setting with
+    an own environment variable.
   do_ignore: false
 - rawname: OCIS_CONFIG_DIR
   path: ocis-pkg/config/defaults/paths.go:56

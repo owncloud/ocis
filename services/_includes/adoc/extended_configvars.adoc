@@ -1,7 +1,7 @@
 // collected through docs/helpers/rougeEnv.go
 
 [caption=]
-.Environment variables with global scope not included in a service
+.Environment variables with extended scope not included in a service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Name
@@ -42,7 +42,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++'/var/lib/ocis' or '$HOME/.ocis/' ++
 a| [subs=-attributes]
-++The base directory location used by several services and for user data. Predefined to '/var/lib/ocis' for container images (inside the container) or '$HOME/.ocis/' for binary releases. Can be adapted for services individually. ++
+++The base directory location used by several services and for user data. Predefined to '/var/lib/ocis' for container images (inside the container) or '$HOME/.ocis/' for binary releases. Services can have, if available, an individual setting with an own environment variable. ++
 
 a| `OCIS_CONFIG_DIR` +
 a| [subs=-attributes]
