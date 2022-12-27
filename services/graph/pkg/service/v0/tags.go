@@ -33,10 +33,10 @@ func (g Graph) GetTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tagList := tags.FromList("")
+	tagList := tags.New("")
 	for _, match := range sr.Matches {
 		for _, tag := range match.Entity.Tags {
-			tagList.AddList(tag)
+			tagList.Add(tag)
 		}
 	}
 
@@ -100,9 +100,8 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 		currentTags = m["tags"]
 	}
 
-	allTags := tags.FromList(currentTags)
-	newTags := strings.Join(assignment.Tags, ",")
-	if !allTags.AddList(newTags) {
+	allTags := tags.New(currentTags)
+	if !allTags.Add(assignment.Tags...) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "no new tags in createtagsrequest or maximum reached")
 		return
 	}
@@ -123,7 +122,7 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 
 	if g.eventsPublisher != nil {
 		ev := events.TagsAdded{
-			Tags: newTags,
+			Tags: strings.Join(assignment.Tags, ","),
 			Ref: &provider.Reference{
 				ResourceId: &rid,
 				Path:       ".",
@@ -190,9 +189,8 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 		currentTags = m["tags"]
 	}
 
-	allTags := tags.FromList(currentTags)
-	toDelete := strings.Join(unassignment.Tags, ",")
-	if !allTags.RemoveList(toDelete) {
+	allTags := tags.New(currentTags)
+	if !allTags.Remove(unassignment.Tags...) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "no new tags in createtagsrequest or maximum reached")
 		return
 	}
@@ -213,7 +211,7 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 
 	if g.eventsPublisher != nil {
 		ev := events.TagsRemoved{
-			Tags: toDelete,
+			Tags: strings.Join(unassignment.Tags, ","),
 			Ref: &provider.Reference{
 				ResourceId: &rid,
 				Path:       ".",

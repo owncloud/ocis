@@ -190,10 +190,7 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getcontenttype", match.Entity.MimeType))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:permissions", match.Entity.Permissions))
 
-	t := tags.FromList("")
-	for _, tag := range match.Entity.Tags {
-		t.AddList(tag)
-	}
+	t := tags.New(match.Entity.Tags...)
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:tags", t.AsList()))
 
 	// those seem empty - bug?

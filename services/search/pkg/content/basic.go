@@ -29,7 +29,7 @@ func (b Basic) Extract(_ context.Context, ri *storageProvider.ResourceInfo) (Doc
 
 	if m := ri.ArbitraryMetadata.GetMetadata(); m != nil {
 		if t, ok := m["tags"]; ok {
-			doc.Tags = tags.FromList(t).AsSlice()
+			doc.Tags = tags.New(t).AsSlice()
 		}
 	}
 
