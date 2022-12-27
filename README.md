@@ -9,6 +9,23 @@
 [![oCIS docker image](https://img.shields.io/docker/v/owncloud/ocis?label=oCIS%20docker%20image&logo=docker&sort=semver)](https://hub.docker.com/r/owncloud/ocis)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+    * [Introduction](#introduction)
+    * [Overview](#overview)
+      * [Clients](#clients)
+      * [Web Office Applications](#web-office-applications)
+      * [Authentication](#authentication)
+      * [Installation](#installation)
+    * [Important Readings](#important-readings)
+    * [Run ownCloud Infinite Scale](#run-owncloud-infinite-scale)
+      * [Use the Official Documentation](#use-the-official-documentation)
+      * [Use the ocis Repo as Source](#use-the-ocis-repo-as-source)
+    * [Documentation](#documentation)
+      * [Admin Documentation](#admin-documentation)
+      * [Development Documentation](#development-documentation)
+    * [Security](#security)
+    * [Contributing](#contributing)
+    * [Copyright](#copyright)
+
 ## Introduction
 
 ownCloud Infinite Scale (oCIS) is the new file sync & share platform that will be the foundation of your data management platform.
@@ -109,5 +126,5 @@ Please always refer to our [Contribution Guidelines](CONTRIBUTING.md).
 ## Copyright
 
 ```console
-Copyright (c) 2020-2022 ownCloud GmbH <https://owncloud.com>
+Copyright (c) 2020-2023 ownCloud GmbH <https://owncloud.com>
 ```
