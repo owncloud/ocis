@@ -72,7 +72,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++127.0.0.1:9233 ++
 a| [subs=-attributes]
-Endpoint of the event system.
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 
 a|`POSTPROCESSING_EVENTS_CLUSTER` +
 
@@ -81,26 +81,26 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ocis-cluster ++
 a| [subs=-attributes]
-Cluster ID of the event system.
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
 
 a|`OCIS_INSECURE` +
-`POSTPROCESSING_EVENTS_TLS_INSECURE` +
+`SEARCH_EVENTS_TLS_INSECURE` +
 
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Whether to verify the server TLS certificates.
+Whether the ocis server should skip the client certificate verification during the TLS handshake.
 
-a|`POSTPROCESSING_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+a|`SEARCH_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided POSTPROCESSING_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided SEARCH_EVENTS_TLS_INSECURE will be seen as false.
 
 a|`OCIS_EVENTS_ENABLE_TLS` +
 `POSTPROCESSING_EVENTS_ENABLE_TLS` +
@@ -110,7 +110,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
 
 a|`POSTPROCESSING_VIRUSSCAN` +
 
@@ -119,7 +119,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-should the system do a virusscan? Needs antivirus service
+After uploading a file but before making it available for download, virus scanning the file can be enabled. Needs as prerequisite the antivirus service to be enabled and configured.
 
 a|`POSTPROCESSING_DELAY` +
 
@@ -128,6 +128,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0s ++
 a| [subs=-attributes]
-the sytem sleeps for this time while postprocessing
+After uploading a file but before making it available for download, a delay step can be added. Intended for developing purposes only. The duration can be set as number followed by a unit identifier like s, m or h.
 |===
 
