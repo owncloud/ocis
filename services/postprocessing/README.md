@@ -1,29 +1,31 @@
-# Postprocessing service
+# Postprocessing Service
 
-The `postprocessing` service handles coordination of asynchronous postprocessing. 
+The `postprocessing` service handles the coordination of asynchronous postprocessing steps. 
 
-## Postprocessing functionality
+## General Prerequisites
 
-The storageprovider service (`storage-users`) can be configured to do asynchronous postprocessing by setting the `STORAGE_USERS_OCIS_ASYNC_UPLOADS` envvar to true.
-If this is the case, the storageprovider will initiate an asynchronous postprocessing after he has reveived all bytes of an upload. The `postprocessing` service will then 
-coordinate various postprocessing steps (like e.g. scan the file for viruses). During postprocessing the file will be in a `processing` state during which only limited actions are available.
+To use the postprocessing service, an event system needs to be configured for all services. By default, `ocis` ships with a preconfigured `nats` service.
 
-## Prerequisites for using `postprocessing` service
+## Postprocessing Functionality
 
-In the storageprovider (`storage-users`) set `STORAGE_USERS_OCIS_ASYNC_UPLOADS` envvar to `true`. Configuring any postprocessing step will require an additional service to be enabled and configured.
-For example to use `virusscan` step one needs to have an enabled and configured `antivirus` service. 
+The storageprovider service (`storage-users`) can be configured to initiate asynchronous postprocessing by setting the `STORAGE_USERS_OCIS_ASYNC_UPLOADS` environment variable to `true`. If this is the case, postprocessing will get initiated *after* uploading a file and all bytes have been recieved.
 
-All of this functionality will need an event system to be configured for all services: `ocis` ships with
-`nats` enabled by default.
+The `postprocessing` service will then coordinate configured postprocessing steps like scanning the file for viruses. During postprocessing, the file will be in a `processing state` where only a limited set of actions are available. Note that this processing state excludes file accessability by users.
 
-## Postprocessing steps
+When all postprocessing steps have completed successfully, the file will be made accessible for users.
 
-As of now ocis allows two different postprocessing steps to be enabled via envvar
+## Additional Prerequisites for the `postprocessing` Service
 
-### Virus scanning
+When postprocessing has been enabled, configuring any postprocessing step will require the requested services to be enabled and pre-configured. For example, to use the `virusscan` step, one needs to have an enabled and configured `antivirus` service. 
 
-Can be set via envvar `POSTPROCESSING_VIRUSSCAN`. This means that each upload is virus scanned during postprocessing. `antivirus` service is needed for this to work.
+## Postprocessing Steps
+
+As of now, `ocis` allows two different postprocessing steps to be enabled via an environment variable.
+
+### Virus Scanning
+
+To enable virus scanning as postprocessing step after uploading a file, the environment variable  `POSTPROCESSING_VIRUSSCAN` needs to be set to ` true`. As a result, each uploaded file gets virus scanned as part of the postprocessing steps. Note that the `antivirus` service is required to be enabled and configured for this to work.
 
 ### Delay
 
-Can be set via envvar `POSTPROCESSING_DELAY`. This step will just sleep for the configured amount of time. Intended for testing postprocessing functionality. NOT RECOMMENDED on productive systems.
+Though this is for development purposes only and NOT RECOMMENDED on productive systems, setting the environment variable `POSTPROCESSING_DELAY` to a duration not equal to zero will add a delay step with the configured amount of time. ocis will continue postprocessing the file after the configured delay.
