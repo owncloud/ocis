@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Return 425 on Thumbnails: [#5300](https://github.com/owncloud/ocis/pull/5300)
 * Bugfix - Fix Postprocessing events: [#5269](https://github.com/owncloud/ocis/pull/5269)
 * Enhancement - Add global env variable extractor: [#5164](https://github.com/owncloud/ocis/pull/5164)
 * Enhancement - Async Postprocessing: [#5207](https://github.com/owncloud/ocis/pull/5207)
