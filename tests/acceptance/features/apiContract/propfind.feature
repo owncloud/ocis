@@ -30,7 +30,7 @@ Feature: Propfind test
     And user "Alice" has shared a space "new-space" to user "Brian" with role "<role>"
     When user "Brian" sends PROPFIND request to space "new-space" using the WebDAV API
     Then the HTTP status code should be "207"
-    And for user "Brian" the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
+    And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
       | key            | value            |
       | oc:fileid      | UUIDof:new-space |
       | oc:name        | new-space        |
