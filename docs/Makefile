@@ -13,6 +13,8 @@ docs-generate: ## run docs-generate for all oCIS services
 .PHONY: docs-init
 docs-init:
 	@mkdir -p hugo/content/
+	@mkdir -p hugo/public/
+	@touch hugo/public/.nojekyll
 	@cd hugo && git init
 	@cd hugo && git config advice.detachedHead false
 	@cd hugo && git remote rm origin || true
