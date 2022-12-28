@@ -24,8 +24,8 @@ As of now, `ocis` allows two different postprocessing steps to be enabled via an
 
 ### Virus Scanning
 
-To enable virus scanning as postprocessing step after uploading a file, the environment variable  `POSTPROCESSING_VIRUSSCAN` needs to be set to ` true`. As a result, each uploaded file gets virus scanned as part of the postprocessing steps. Note that the `antivirus` service is required to be enabled and configured for this to work.
+To enable virus scanning as a postprocessing step after uploading a file, the environment variable  `POSTPROCESSING_VIRUSSCAN` needs to be set to ` true`. As a result, each uploaded file gets virus scanned as part of the postprocessing steps. Note that the `antivirus` service is required to be enabled and configured for this to work.
 
 ### Delay
 
-Though this is for development purposes only and NOT RECOMMENDED on productive systems, setting the environment variable `POSTPROCESSING_DELAY` to a duration not equal to zero will add a delay step with the configured amount of time. ocis will continue postprocessing the file after the configured delay.
+Though this is for development purposes only and NOT RECOMMENDED on production systems, setting the environment variable `POSTPROCESSING_DELAY` to a duration not equal to zero will add a delay step with the configured amount of time. ocis will continue postprocessing the file after the configured delay.
