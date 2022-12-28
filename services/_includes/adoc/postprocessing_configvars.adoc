@@ -84,7 +84,7 @@ a| [subs=-attributes]
 The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
 
 a|`OCIS_INSECURE` +
-`SEARCH_EVENTS_TLS_INSECURE` +
+`POSTPROCESSING_EVENTS_TLS_INSECURE` +
 
 a| [subs=-attributes]
 ++bool ++
@@ -93,14 +93,14 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Whether the ocis server should skip the client certificate verification during the TLS handshake.
 
-a|`SEARCH_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+a|`POSTPROCESSING_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The root CA certificate used to validate the server's TLS certificate. If provided SEARCH_EVENTS_TLS_INSECURE will be seen as false.
+The root CA certificate used to validate the server's TLS certificate. If provided POSTPROCESSING_EVENTS_TLS_INSECURE will be seen as false.
 
 a|`OCIS_EVENTS_ENABLE_TLS` +
 `POSTPROCESSING_EVENTS_ENABLE_TLS` +
