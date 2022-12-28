@@ -3,6 +3,7 @@ package svc
 import (
 	"context"
 	"image"
+	"net/http"
 	"net/url"
 	"path"
 	"strings"
@@ -13,6 +14,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
@@ -281,6 +283,14 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 	}
 	if rsp.Info.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
 		return nil, merrors.BadRequest(g.serviceID, "Unsupported file type")
+	}
+	if utils.ReadPlainFromOpaque(rsp.GetInfo().GetOpaque(), "status") == "processing" {
+		return nil, &merrors.Error{
+			Id:     g.serviceID,
+			Code:   http.StatusTooEarly,
+			Detail: "File Processing",
+			Status: http.StatusText(http.StatusTooEarly),
+		}
 	}
 	if rsp.Info.GetChecksum().GetSum() == "" {
 		g.logger.Error().Msg("resource info is missing checksum")
