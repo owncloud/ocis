@@ -29,12 +29,12 @@ $classLoader->addPsr4("TestHelpers\\", __DIR__ . "/../../../TestHelpers", true);
 
 $classLoader->register();
 
-// while running for the local api tests, the tests code form ownCloud/core is not used
+// while running for the local API tests, the tests code from ownCloud/core is not used
 // so we need the constants to be defined for the tests to use them, but for the case where,
-// the tests are running for core api tests, the constants are already defined in the core bootstrap.php
+// the tests are running for oC/core API tests, the constants are already defined in the bootstrap.php there
 // so we do not declare them again to avoid the "already defined" error
-// Sleep for 10 milliseconds
 
+// Sleep for 10 milliseconds
 if (!\defined('STANDARD_SLEEP_TIME_MILLISEC')) {
 	\define('STANDARD_SLEEP_TIME_MILLISEC', 10);
 }
