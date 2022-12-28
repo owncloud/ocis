@@ -1378,15 +1378,7 @@ class GraphContext implements Context {
 	 */
 	public function checkUserDriveInformation(array $expectedDriveInformation, array  $actualDriveInformation):void {
 		foreach (array_keys($expectedDriveInformation) as $keyName) {
-			// break the segment with @@@  to find the actual value from the drive infromation from response
-			$separatedKey = explode("@@@", $keyName);
-			// this stores the actual value of each key from drive information response used for assertion
-			$actualKeyValue = $actualDriveInformation;
-
-			foreach ($separatedKey as $key) {
-				$actualKeyValue = $actualKeyValue[$key];
-			}
-
+			$actualKeyValue = GraphHelper::separateAndGetValueForKey($keyName, $actualDriveInformation);
 			switch ($expectedDriveInformation[$keyName]) {
 				case '%user_id%':
 					Assert::assertTrue(GraphHelper::isUUIDv4($actualKeyValue), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValue);
@@ -1424,7 +1416,11 @@ class GraphContext implements Context {
 	public function theResponseShouldContainTheFollowingDriveInformation(TableNode $table): void {
 		$expectedDriveInformation = $table->getRowsHash();
 		// array of user drive information (Personal Drive Information Only)
-		$actualDriveInformation = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['drive'];
-		$this->checkUserDriveInformation($expectedDriveInformation, $actualDriveInformation);
+		$actualDriveInformation = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
+		if (\is_array($actualDriveInformation) && \array_key_exists('drive', $actualDriveInformation)) {
+			$this->checkUserDriveInformation($expectedDriveInformation, $actualDriveInformation['drive']);
+		} else {
+			throw new Error('Response is not an array or the array does not consist key "drive"');
+		}
 	}
 }

@@ -55,6 +55,28 @@ class GraphHelper {
 	}
 
 	/**
+	 * Key name can consist of @@@
+	 * This function separate such key and return its actual value from actual drive response which can be used for assertion
+	 *
+	 * @param string $keyName
+	 * @param array $actualDriveInformation
+	 *
+	 * @return string
+	 */
+	public static function separateAndGetValueForKey(string $keyName, array $actualDriveInformation): string {
+		// break the segment with @@@  to find the actual value from the actual drive infromation
+		$separatedKey = explode("@@@", $keyName);
+		// this stores the actual value of each key from drive information response used for assertion
+		$actualKeyValue = $actualDriveInformation;
+
+		foreach ($separatedKey as $key) {
+			$actualKeyValue = $actualKeyValue[$key];
+		}
+
+		return $actualKeyValue;
+	}
+
+	/**
 	 * @param string $baseUrl
 	 * @param string $path
 	 *
