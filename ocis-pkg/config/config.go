@@ -98,7 +98,7 @@ type Config struct {
 	Policies          *policies.Config       `yaml:"policies"`
 	Proxy             *proxy.Config          `yaml:"proxy"`
 	Settings          *settings.Config       `yaml:"settings"`
-	Hub               *hub.Config            `yaml:"settings"`
+	Hub               *hub.Config            `yaml:"hub"`
 	Sharing           *sharing.Config        `yaml:"sharing"`
 	StorageSystem     *storagesystem.Config  `yaml:"storage_system"`
 	StoragePublicLink *storagepublic.Config  `yaml:"storage_public"`

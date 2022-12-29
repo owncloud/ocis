@@ -1,8 +1,10 @@
 package defaults
 
 import (
-	"github.com/owncloud/ocis/v2/services/hub/pkg/config"
 	"strings"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/services/hub/pkg/config"
 )
 
 // FullDefaultConfig used by doc generation
@@ -24,9 +26,16 @@ func DefaultConfig() *config.Config {
 			Namespace: "com.owncloud.web",
 			Root:      "/",
 		},
+		Reva: shared.DefaultRevaConfig(),
+		Events: config.Events{
+			Endpoint:  "127.0.0.1:9233",
+			Cluster:   "ocis-cluster",
+			EnableTLS: false,
+		},
 	}
 }
 
+// EnsureDefaults ensures default values
 func EnsureDefaults(cfg *config.Config) {
 	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
 		cfg.TokenManager = &config.TokenManager{
@@ -35,8 +44,22 @@ func EnsureDefaults(cfg *config.Config) {
 	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
 	}
+
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	}
+
+	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
+		cfg.Reva = &shared.Reva{
+			Address: cfg.Commons.Reva.Address,
+			TLS:     cfg.Commons.Reva.TLS,
+		}
+	} else if cfg.Reva == nil {
+		cfg.Reva = &shared.Reva{}
+	}
 }
 
+// Sanitize saniztizes the config
 func Sanitize(cfg *config.Config) {
 	// sanitize config
 	if cfg.HTTP.Root != "/" {
