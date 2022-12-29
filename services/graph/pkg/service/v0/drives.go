@@ -248,7 +248,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid body schema definition")
 		return
 	}
-	spaceName := strings.TrimSpace(*drive.Name)
+	spaceName := strings.TrimSpace(drive.Name)
 	if err := validateSpaceName(spaceName); err != nil {
 		logger.Debug().Str("name", spaceName).Err(err).Msg("could not create drive: name validation failed")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid spacename: %s", err.Error()))
@@ -392,8 +392,8 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if drive.Name != nil {
-		spacename := strings.TrimSpace(*drive.Name)
+	if drive.Name != "" {
+		spacename := strings.TrimSpace(drive.Name)
 		if err := validateSpaceName(spacename); err != nil {
 			logger.Info().Err(err).Msg("could not update drive: spacename invalid")
 			errorcode.GeneralException.Render(w, r, http.StatusBadRequest, err.Error())
@@ -599,7 +599,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 
 	drive := &libregraph.Drive{
 		Id:   libregraph.PtrString(spaceID),
-		Name: &space.Name,
+		Name: space.Name,
 		//"createdDateTime": "string (timestamp)", // TODO read from StorageSpace ... needs Opaque for now
 		DriveType: &space.SpaceType,
 		Root: &libregraph.DriveItem{

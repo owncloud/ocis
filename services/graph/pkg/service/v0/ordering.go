@@ -24,7 +24,7 @@ type spacesByLastModifiedDateTime struct {
 // Less reports whether the element with index i
 // must sort before the element with index j.
 func (s spacesByName) Less(i, j int) bool {
-	return strings.ToLower(*s.spacesSlice[i].Name) < strings.ToLower(*s.spacesSlice[j].Name)
+	return strings.ToLower(s.spacesSlice[i].Name) < strings.ToLower(s.spacesSlice[j].Name)
 }
 
 // Less reports whether the element with index i
@@ -43,7 +43,7 @@ func (s spacesByLastModifiedDateTime) Less(i, j int) bool {
 		return false
 	}
 	// fallback to name if no dateTime is set on both items
-	return strings.ToLower(*s.spacesSlice[i].Name) < strings.ToLower(*s.spacesSlice[j].Name)
+	return strings.ToLower(s.spacesSlice[i].Name) < strings.ToLower(s.spacesSlice[j].Name)
 }
 
 type userSlice []*libregraph.User

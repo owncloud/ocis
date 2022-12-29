@@ -108,7 +108,7 @@ var _ = Describe("Users changing their own password", func() {
 					Token:  "authtoken",
 				}, nil)
 			}
-			cpw := libregraph.NewPasswordChange()
+			cpw := libregraph.NewPasswordChangeWithDefaults()
 			cpw.SetCurrentPassword(current)
 			cpw.SetNewPassword(newpw)
 			body, _ := json.Marshal(cpw)

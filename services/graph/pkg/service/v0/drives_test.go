@@ -111,7 +111,7 @@ var sortTests = []sortTest{
 }
 
 func drive(ID string, dType string, name string, lastModified *time.Time) *libregraph.Drive {
-	return &libregraph.Drive{Id: libregraph.PtrString(ID), DriveType: libregraph.PtrString(dType), Name: libregraph.PtrString(name), LastModifiedDateTime: lastModified}
+	return &libregraph.Drive{Id: libregraph.PtrString(ID), DriveType: libregraph.PtrString(dType), Name: name, LastModifiedDateTime: lastModified}
 }
 
 // TestSort tests the available orderby queries

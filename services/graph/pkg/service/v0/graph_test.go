@@ -292,7 +292,7 @@ var _ = Describe("Graph", func() {
 				Expect(*value.DriveAlias).To(Equal("mountpoint/new-folder"))
 				Expect(*value.DriveType).To(Equal("mountpoint"))
 				Expect(*value.Id).To(Equal("prID$aID!differentID"))
-				Expect(*value.Name).To(Equal("New Folder"))
+				Expect(value.Name).To(Equal("New Folder"))
 				Expect(*value.Root.WebDavUrl).To(Equal("https://localhost:9200/dav/spaces/prID$aID%21differentID"))
 				Expect(*value.Root.ETag).To(Equal("101112131415"))
 				Expect(*value.Root.Id).To(Equal("prID$aID!differentID"))
@@ -680,7 +680,7 @@ var _ = Describe("Graph", func() {
 				var response libregraph.Drive
 				err := json.Unmarshal(body, &response)
 				Expect(err).ToNot(HaveOccurred())
-				Expect(*response.Name).To(Equal("Test Space"))
+				Expect(response.Name).To(Equal("Test Space"))
 				Expect(*response.DriveType).To(Equal("project"))
 				Expect(*response.DriveAlias).To(Equal("project/testspace"))
 				Expect(*response.Description).To(Equal("This space is for testing"))
@@ -967,7 +967,7 @@ var _ = Describe("Graph", func() {
 		})
 
 		It("sets the description, alias and name", func() {
-			drive := libregraph.NewDrive()
+			drive := libregraph.NewDrive("thename")
 			drive.SetDriveAlias("thealias")
 			drive.SetDescription("thedescription")
 			drive.SetName("thename")
@@ -996,7 +996,7 @@ var _ = Describe("Graph", func() {
 		})
 
 		It("restores", func() {
-			drive := libregraph.NewDrive()
+			drive := libregraph.NewDrive("thename")
 			driveJson, err := json.Marshal(drive)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -1021,7 +1021,7 @@ var _ = Describe("Graph", func() {
 		})
 
 		It("sets the quota", func() {
-			drive := libregraph.NewDrive()
+			drive := libregraph.NewDrive("thename")
 			quota := libregraph.Quota{}
 			quota.SetTotal(1000)
 			drive.SetQuota(quota)
