@@ -33,7 +33,7 @@ func (g Graph) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
-	cpw := libregraph.NewPasswordChange()
+	cpw := libregraph.NewPasswordChangeWithDefaults()
 	err = json.NewDecoder(r.Body).Decode(cpw)
 	if err != nil {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
