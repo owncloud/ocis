@@ -64,7 +64,7 @@ class GraphHelper {
 	 * @return string
 	 */
 	public static function separateAndGetValueForKey(string $keyName, array $actualDriveInformation): string {
-		// break the segment with @@@  to find the actual value from the actual drive infromation
+		// break the segment with @@@  to find the actual value from the actual drive information
 		$separatedKey = explode("@@@", $keyName);
 		// this stores the actual value of each key from drive information response used for assertion
 		$actualKeyValue = $actualDriveInformation;
