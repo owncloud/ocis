@@ -38,7 +38,7 @@ Feature: Share spaces
     Given user "Alice" has shared a space "share space" to user "Brian" with role "viewer"
     And the user "Alice" should have a space called "share space" granted to "Brian" with these key and value pairs:
       | key                                                | value     |
-      | root@@@permissions@@@1@@@grantedTo@@@0@@@user@@@id | %user_id% |
+      | root@@@permissions@@@1@@@grantedToIdentities@@@0@@@user@@@id | %user_id% |
       | root@@@permissions@@@1@@@roles@@@0                 | viewer    |
 
 
