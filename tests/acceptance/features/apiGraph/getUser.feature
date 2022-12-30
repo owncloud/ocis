@@ -35,7 +35,7 @@ Feature: get users
       | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
 
 
-  Scenario: non-admin user tries get all user
+  Scenario: non-admin user tries to get all users
     When user "Brian" tries to get all users using the Graph API
     Then the HTTP status code should be "401"
     And the last response should be an unauthorized response
