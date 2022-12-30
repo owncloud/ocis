@@ -56,7 +56,7 @@ standards combined with freedom of choice between different programming language
 
 The [CS3 APIs](https://github.com/cs3org/cs3apis) connect storages and application providers.
 
-The CS3 APIs follows Google and Uber API design guidelines, specially on error handling and naming convention. You can read more about these
+The CS3 APIs follow Google and Uber API design guidelines, specially on error handling and naming convention. You can read more about these
 guidelines at https://cloud.google.com/apis/design/ and https://github.com/uber/prototool/blob/dev/style/README.md.
 
 The CS3 APIs use [Protocol Buffers version 3 (proto3)](https://github.com/protocolbuffers/protobuf) as their
