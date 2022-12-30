@@ -37,9 +37,9 @@ Feature: Share spaces
   Scenario: A user can see who has been granted access
     Given user "Alice" has shared a space "share space" to user "Brian" with role "viewer"
     And the user "Alice" should have a space called "share space" granted to "Brian" with these key and value pairs:
-      | key                                                | value     |
+      | key                                                          | value     |
       | root@@@permissions@@@1@@@grantedToIdentities@@@0@@@user@@@id | %user_id% |
-      | root@@@permissions@@@1@@@roles@@@0                 | viewer    |
+      | root@@@permissions@@@1@@@roles@@@0                           | viewer    |
 
 
   Scenario: A user can see a file in a received shared space
