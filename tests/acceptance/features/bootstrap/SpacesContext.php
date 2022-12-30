@@ -1018,8 +1018,8 @@ class SpacesContext implements Context {
 
 		$userRole = "";
 		foreach ($permissions as $permission) {
-			foreach ($permission["grantedTo"] as $grantedTo) {
-				if ($grantedTo["user"]["id"] === $userId) {
+			foreach ($permission["grantedToIdentities"] as $grantedToIdentities) {
+				if ($grantedToIdentities["user"]["id"] === $userId) {
 					$userRole = $permission["roles"][0];
 				}
 			}

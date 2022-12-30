@@ -538,29 +538,51 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 
 	var permissions []libregraph.Permission
 	if space.Opaque != nil {
-		var m map[string]*storageprovider.ResourcePermissions
-		entry, ok := space.Opaque.Map["grants"]
+		var permissionsMap map[string]*storageprovider.ResourcePermissions
+		var groupsMap map[string]struct{}
+
+		opaqueGrants, ok := space.Opaque.Map["grants"]
 		if ok {
-			err := json.Unmarshal(entry.Value, &m)
+			err := json.Unmarshal(opaqueGrants.Value, &permissionsMap)
 			if err != nil {
 				logger.Debug().
 					Err(err).
 					Interface("space", space.Root).
-					Bytes("grants", entry.Value).
+					Bytes("grants", opaqueGrants.Value).
 					Msg("unable to parse space: failed to read spaces grants")
 			}
 		}
-		if len(m) != 0 {
+
+		opaqueGroups, ok := space.Opaque.Map["groups"]
+		if ok {
+			err := json.Unmarshal(opaqueGroups.Value, &groupsMap)
+			if err != nil {
+				logger.Debug().
+					Err(err).
+					Interface("space", space.Root).
+					Bytes("groups", opaqueGroups.Value).
+					Msg("unable to parse space: failed to read spaces groups")
+			}
+		}
+
+		if len(permissionsMap) != 0 {
 			managerIdentities := []libregraph.IdentitySet{}
 			editorIdentities := []libregraph.IdentitySet{}
 			viewerIdentities := []libregraph.IdentitySet{}
 
-			for id, perm := range m {
+			for id, perm := range permissionsMap {
 				// This temporary variable is necessary since we need to pass a pointer to the
 				// libregraph.Identity and if we pass the pointer from the loop every identity
 				// will have the same id.
 				tmp := id
-				identity := libregraph.IdentitySet{User: &libregraph.Identity{Id: &tmp}}
+				var identity libregraph.IdentitySet
+
+				if _, ok := groupsMap[id]; !ok {
+					identity = libregraph.IdentitySet{User: &libregraph.Identity{Id: &tmp}}
+				} else {
+					identity = libregraph.IdentitySet{Group: &libregraph.Identity{Id: &tmp}}
+				}
+
 				// we need to map the permissions to the roles
 				switch {
 				// having RemoveGrant qualifies you as a manager
@@ -578,20 +600,20 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 			permissions = make([]libregraph.Permission, 0, 3)
 			if len(managerIdentities) != 0 {
 				permissions = append(permissions, libregraph.Permission{
-					GrantedTo: managerIdentities,
-					Roles:     []string{"manager"},
+					GrantedToIdentities: managerIdentities,
+					Roles:               []string{"manager"},
 				})
 			}
 			if len(editorIdentities) != 0 {
 				permissions = append(permissions, libregraph.Permission{
-					GrantedTo: editorIdentities,
-					Roles:     []string{"editor"},
+					GrantedToIdentities: editorIdentities,
+					Roles:               []string{"editor"},
 				})
 			}
 			if len(viewerIdentities) != 0 {
 				permissions = append(permissions, libregraph.Permission{
-					GrantedTo: viewerIdentities,
-					Roles:     []string{"viewer"},
+					GrantedToIdentities: viewerIdentities,
+					Roles:               []string{"viewer"},
 				})
 			}
 		}
