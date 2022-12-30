@@ -141,10 +141,10 @@ config = {
     # will be re-enabled after the web-pr passed and web is bumped in ocis.
     # https://github.com/owncloud/ocis/pull/5312
     # https://github.com/owncloud/web/pull/8171
-    #"e2eTests": {
-    #    "skip": False,
-    #    "earlyFail": True,
-    #},
+    "e2eTests": {
+        "skip": True,
+        "earlyFail": True,
+    },
     "settingsUITests": {
         "skip": False,
         "earlyFail": True,
