@@ -29,6 +29,11 @@ class GraphContext implements Context {
 	private FeatureContext $featureContext;
 
 	/**
+	 * @var SpacesContext
+	 */
+	private SpacesContext $spacesContext;
+
+	/**
 	 * This will run before EVERY scenario.
 	 * It will set the properties for this object.
 	 *
@@ -1221,12 +1226,7 @@ class GraphContext implements Context {
 							. trim($expectedValue[$keyName], '%')
 						);
 					}
-					Assert::assertEquals(
-						1,
-						GraphHelper::isUUIDv4($actualValue['id']),
-						__METHOD__ .
-						' Expected user_id to have UUIDv4 pattern but found: ' . $actualValue['id']
-					);
+					Assert::assertTrue(GraphHelper::isUUIDv4($actualValue['id']), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualValue['id']);
 					break;
 				default:
 					Assert::assertEquals(
@@ -1238,6 +1238,189 @@ class GraphContext implements Context {
 					);
 					break;
 			}
+		}
+	}
+
+	/**
+	 * @When user :byUser tries to get information of user :user using Graph API
+	 * @When user :byUser gets information of user :user using Graph API
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userTriesToGetInformationOfUser(string $byUser, string $user): void {
+		$credentials = $this->getAdminOrUserCredentials($byUser);
+		$response = GraphHelper::getUser(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password'],
+			$user
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When user :user tries to get all users using the Graph API
+	 * @When user :user gets all users using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsAllUserUsingTheGraphApi(string $user) {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$response = GraphHelper::getUsers(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials['username'],
+			$credentials['password'],
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then the API response should contain all users with the following information:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @throws Exception
+	 * @return void
+	 */
+	public function theApiResponseShouldContainAllUserWithFollowingInformation(TableNode $table): void {
+		$values = $table->getHash();
+		$apiResponse = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'];
+		foreach ($values as $expectedValue) {
+			$found = false;
+			foreach ($apiResponse as $key => $actualResponseValue) {
+				if ($expectedValue["displayName"] === $actualResponseValue["displayName"]) {
+					$found = true;
+					$this->checkUserInformation($expectedValue, $actualResponseValue);
+					unset($apiResponse[$key]);
+					break;
+				}
+			}
+			if (!$found) {
+				throw new Exception('User ' . $expectedValue["displayName"] . ' could not be found in the response.');
+			}
+		}
+	}
+
+	/**
+	 * @param string $byUser
+	 * @param string|null $user
+	 *
+	 * @return ResponseInterface
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function retrieveUserInformationAlongWithDriveUsingGraphApi(
+		string $byUser,
+		?string $user = null
+	):ResponseInterface {
+		$user = $user ?? $byUser;
+		$credentials = $this->getAdminOrUserCredentials($user);
+		return GraphHelper::getUserWithDriveInformation(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials["username"],
+			$credentials["password"],
+			$user
+		);
+	}
+
+	/**
+	 * @When /^the user "([^"]*)" gets user "([^"]*)" along with (his|her) drive information using Graph API$/
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userTriesToGetInformationOfUserAlongWithHisDriveData(string $byUser, string $user) {
+		$response = $this->retrieveUserInformationAlongWithDriveUsingGraphApi($byUser, $user);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 *
+	 * @When /^the user "([^"]*)" gets (his|her) drive information using Graph API$/
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userTriesToGetOwnDriveInformation(string $user) {
+		$response = $this->retrieveUserInformationAlongWithDriveUsingGraphApi($user);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @param array $driveInformation
+	 *
+	 * @return string
+	 */
+	public static function getSpaceIdFromActualDriveinformation(array $driveInformation): string {
+		return $driveInformation['id'];
+	}
+
+	/**
+	 * check if single drive information is correct
+	 *
+	 * @param array $expectedDriveInformation
+	 * @param array $actualDriveInformation
+	 *
+	 * @return void
+	 */
+	public function checkUserDriveInformation(array $expectedDriveInformation, array  $actualDriveInformation):void {
+		foreach (array_keys($expectedDriveInformation) as $keyName) {
+			$actualKeyValue = GraphHelper::separateAndGetValueForKey($keyName, $actualDriveInformation);
+			switch ($expectedDriveInformation[$keyName]) {
+				case '%user_id%':
+					Assert::assertTrue(GraphHelper::isUUIDv4($actualKeyValue), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValue);
+					break;
+				case '%space_id%':
+					Assert::assertTrue(GraphHelper::isSpaceId($actualKeyValue), __METHOD__ . ' Expected space_id to have a UUIDv4:UUIDv4 pattern but found: ' . $actualKeyValue);
+					break;
+				default:
+					$expectedDriveInformation[$keyName] = $this->featureContext->substituteInLineCodes(
+						$expectedDriveInformation[$keyName],
+						$this->featureContext->getCurrentUser(),
+						[],
+						[
+							[
+								// the actual space_id is substituted from the actual drive information rather than making an API request and substituting
+								"code" => "%space_id%",
+								"function" =>
+									[$this, "getSpaceIdFromActualDriveinformation"],
+								"parameter" => [$actualDriveInformation]
+							],
+						]
+					);
+					Assert::assertEquals($expectedDriveInformation[$keyName], $actualKeyValue);
+			}
+		}
+	}
+
+	/**
+	 * @param TableNode $table
+	 *
+	 * @Then the user retrieve API response should contain the following drive information:
+	 *
+	 * @return void
+	 */
+	public function theResponseShouldContainTheFollowingDriveInformation(TableNode $table): void {
+		$expectedDriveInformation = $table->getRowsHash();
+		// array of user drive information (Personal Drive Information Only)
+		$actualDriveInformation = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
+		if (\is_array($actualDriveInformation) && \array_key_exists('drive', $actualDriveInformation)) {
+			$this->checkUserDriveInformation($expectedDriveInformation, $actualDriveInformation['drive']);
+		} else {
+			throw new Error('Response is not an array or the array does not consist key "drive"');
 		}
 	}
 }

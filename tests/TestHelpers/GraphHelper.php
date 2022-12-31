@@ -27,13 +27,53 @@ class GraphHelper {
 	}
 
 	/**
+	 *
+	 * @return string
+	 */
+	public static function getUUIDv4Regex(): string {
+		return '[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}';
+	}
+
+	/**
 	 * @param string $id
 	 *
-	 * @return int (1 = true | 0 = false)
+	 * @return bool
 	 */
-	public static function isUUIDv4(string $id): int {
-		$regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
-		return preg_match($regex, $id);
+	public static function isUUIDv4(string $id): bool {
+		$regex = "/^" . self::getUUIDv4Regex() . "$/i";
+		return (bool)preg_match($regex, $id);
+	}
+
+	/**
+	 * @param string $spaceId
+	 *
+	 * @return bool
+	 */
+	public static function isSpaceId(string $spaceId): bool {
+		$regex = "/^" . self::getUUIDv4Regex() . '\\$' . self::getUUIDv4Regex() . "$/i";
+		return (bool)preg_match($regex, $spaceId);
+	}
+
+	/**
+	 * Key name can consist of @@@
+	 * This function separate such key and return its actual value from actual drive response which can be used for assertion
+	 *
+	 * @param string $keyName
+	 * @param array $actualDriveInformation
+	 *
+	 * @return string
+	 */
+	public static function separateAndGetValueForKey(string $keyName, array $actualDriveInformation): string {
+		// break the segment with @@@  to find the actual value from the actual drive information
+		$separatedKey = explode("@@@", $keyName);
+		// this stores the actual value of each key from drive information response used for assertion
+		$actualKeyValue = $actualDriveInformation;
+
+		foreach ($separatedKey as $key) {
+			$actualKeyValue = $actualKeyValue[$key];
+		}
+
+		return $actualKeyValue;
 	}
 
 	/**
@@ -239,6 +279,32 @@ class GraphHelper {
 			$xRequestId,
 			$adminUser,
 			$adminPassword,
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $byUser
+	 * @param string $userPassword
+	 * @param string|null $user
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getUserWithDriveInformation(
+		string $baseUrl,
+		string $xRequestId,
+		string $byUser,
+		string $userPassword,
+		?string $user = null
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users/' . $user . '?%24select=&%24expand=drive');
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$byUser,
+			$userPassword,
 		);
 	}
 
