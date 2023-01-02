@@ -32,6 +32,7 @@ OCIS_MODULES = \
 	services/notifications \
 	services/ocdav \
 	services/ocs \
+	services/postprocessing \
 	services/proxy \
 	services/search \
 	services/settings \
@@ -143,6 +144,8 @@ clean:
 
 .PHONY: docs-generate
 docs-generate:
+	# empty the folders first to only have files that are generated without remnants
+	find docs/services/_includes/ -type f \( -name "*" ! -name ".git*" ! -name "_*" \) -delete || exit 1
 	@for mod in $(OCIS_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod docs-generate || exit 1; \
     done
