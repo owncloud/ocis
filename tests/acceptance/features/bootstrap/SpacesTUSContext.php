@@ -106,10 +106,11 @@ class SpacesTUSContext implements Context {
 	}
 
 	/**
-	 * @Given user :user has created a new TUS resource for the space :spaceName using the WebDAV API with these headers:
+	 * @Given user :user has created a new TUS resource for the space :spaceName with content :content using the WebDAV API with these headers:
 	 *
 	 * @param string $user
 	 * @param string $spaceName
+   * @param string $content
 	 * @param TableNode $headers
 	 *
 	 * @return void
@@ -120,17 +121,19 @@ class SpacesTUSContext implements Context {
 	public function userHasCreatedANewTusResourceForTheSpaceUsingTheWebdavApiWithTheseHeaders(
 		string $user,
 		string $spaceName,
+    string $content,
 		TableNode $headers
 	): void {
-		$this->userCreatesANewTusResourceForTheSpaceUsingTheWebdavApiWithTheseHeaders($user, $spaceName, $headers);
+		$this->userCreatesANewTusResourceForTheSpaceUsingTheWebdavApiWithTheseHeaders($user, $spaceName, $content, $headers);
 		$this->featureContext->theHTTPStatusCodeShouldBe(201, "Expected response status code should be 201");
 	}
 
 	/**
-	 * @When user :user creates a new TUS resource for the space :spaceName using the WebDAV API with these headers:
+	 * @When user :user creates a new TUS resource for the space :spaceName with content :content using the WebDAV API with these headers:
 	 *
 	 * @param string $user
 	 * @param string $spaceName
+   * @param string $content
 	 * @param TableNode $headers
 	 *
 	 * @return void
@@ -141,10 +144,11 @@ class SpacesTUSContext implements Context {
 	public function userCreatesANewTusResourceForTheSpaceUsingTheWebdavApiWithTheseHeaders(
 		string $user,
 		string $spaceName,
+    string $content,
 		TableNode $headers
 	): void {
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
-		$this->tusContext->createNewTUSResourceWithHeaders($user, $headers, '');
+		$this->tusContext->createNewTUSResourceWithHeaders($user, $headers, $content);
 	}
 
 	/**
