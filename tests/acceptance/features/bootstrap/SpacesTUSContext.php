@@ -110,7 +110,7 @@ class SpacesTUSContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $spaceName
-   * @param string $content
+	 * @param string $content
 	 * @param TableNode $headers
 	 *
 	 * @return void
@@ -121,7 +121,7 @@ class SpacesTUSContext implements Context {
 	public function userHasCreatedANewTusResourceForTheSpaceUsingTheWebdavApiWithTheseHeaders(
 		string $user,
 		string $spaceName,
-    string $content,
+		string $content,
 		TableNode $headers
 	): void {
 		$this->userCreatesANewTusResourceForTheSpaceUsingTheWebdavApiWithTheseHeaders($user, $spaceName, $content, $headers);
@@ -133,7 +133,7 @@ class SpacesTUSContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $spaceName
-   * @param string $content
+	 * @param string $content
 	 * @param TableNode $headers
 	 *
 	 * @return void
@@ -144,7 +144,7 @@ class SpacesTUSContext implements Context {
 	public function userCreatesANewTusResourceForTheSpaceUsingTheWebdavApiWithTheseHeaders(
 		string $user,
 		string $spaceName,
-    string $content,
+		string $content,
 		TableNode $headers
 	): void {
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
