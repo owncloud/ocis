@@ -57,6 +57,7 @@ const filesListHeaderMenu = {
     'Name',
     'Shares',
     'Size',
+    'Tags',
     'Modified',
     'Actions'
   ],
@@ -64,6 +65,7 @@ const filesListHeaderMenu = {
     'Name',
     'Geteilt',
     'Größe',
+    'Schlagwörter',
     'Bearbeitet',
     'Aktionen'
   ],
@@ -71,6 +73,7 @@ const filesListHeaderMenu = {
     'Nombre',
     'Shares',
     'Tamaño',
+    'Tags',
     'Modificado',
     'Acciones'
   ],
@@ -78,6 +81,7 @@ const filesListHeaderMenu = {
     'Nom',
     'Shares',
     'Taille',
+    'Étiquettes',
     'Modifié',
     'Actions'
   ]
