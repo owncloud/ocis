@@ -912,7 +912,6 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                  ocisServer(storage, accounts_hash_difficulty) +
-                 restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
                  [
                      {
                          "name": "oC10ApiTests-%s-storage-%s" % (storage, part_number),
@@ -920,7 +919,6 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                          "environment": {
                              "TEST_WITH_GRAPH_API": "true",
                              "PATH_TO_OCIS": "%s" % dirs["base"],
-                             "PATH_TO_CORE": "%s/%s" % (dirs["base"], dirs["core"]),
                              "TEST_SERVER_URL": "https://ocis-server:9200",
                              "OCIS_REVA_DATA_ROOT": "%s" % (dirs["ocisRevaDataRoot"] if storage == "owncloud" else ""),
                              "OCIS_SKELETON_STRATEGY": "%s" % ("copy" if storage == "owncloud" else "upload"),
@@ -932,9 +930,10 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "RUN_PART": part_number,
                              "EXPECTED_FAILURES_FILE": expectedFailuresFile,
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
+                             "BEHAT_YML": "%s/tests/acceptance/config/behat-core.yml" % (dirs["base"]),
                          },
                          "commands": [
-                             "make -C %s/%s test-acceptance-api" % (dirs["base"], dirs["core"]),
+                             "make -C %s test-acceptance-api" % (dirs["base"]),
                          ],
                      },
                  ] + failEarly(ctx, early_fail),
