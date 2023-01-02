@@ -115,6 +115,16 @@ config = {
                 "OCIS_CORS_ALLOW_ORIGINS": "https://aphno.badal",
             },
         },
+        "apiDelayPostprocessing": {
+            "suites": [
+                "apiAsyncUpload",
+            ],
+            "skip": False,
+            "earlyFail": True,
+            "extraServerEnvironment": {
+                "POSTPROCESSING_DELAY": "30s",
+            },
+        },
     },
     "apiTests": {
         "numberOfParts": 10,

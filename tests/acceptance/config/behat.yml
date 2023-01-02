@@ -152,6 +152,22 @@ default:
         - OCSContext:
         - TrashbinContext:
 
+    apiAsyncUpload:
+      paths:
+        - '%paths.base%/../features/apiAsyncUpload'
+      context: *common_ldap_suite_context
+      contexts:
+        - SpacesContext:
+        - FeatureContext: *common_feature_context_params
+        - OccContext:
+        - WebDavPropertiesContext:
+        - FavoritesContext:
+        - ChecksumContext:
+        - FilesVersionsContext:
+        - OCSContext:
+        - TrashbinContext:
+
+
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
 

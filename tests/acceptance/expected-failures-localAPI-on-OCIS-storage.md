@@ -93,3 +93,13 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
 - [apiGraph/getUser.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L23)
+
+#### [GET a file while it's in processing doesn't return 425 code (async uploads)](https://github.com/owncloud/ocis/issues/5326)
+- [apiAsyncUpload/delayPostprocessing.feature:14](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature#L14)
+- [apiAsyncUpload/delayPostprocessing.feature:15](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature#L15)
+- [apiAsyncUpload/delayPostprocessing.feature:16](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature#L16)
+
+#### [PROPFIND a file while it's in processing doesn't return 425 code (async uploads)](https://github.com/owncloud/ocis/issues/5327)
+- [apiAsyncUpload/delayPostprocessing.feature:24](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature#L24)
+- [apiAsyncUpload/delayPostprocessing.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature#L25)
+- [apiAsyncUpload/delayPostprocessing.feature:26](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature#L26)
