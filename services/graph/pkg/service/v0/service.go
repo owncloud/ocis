@@ -312,6 +312,7 @@ func NewService(opts ...Option) (Graph, error) {
 					})
 				})
 			})
+			r.Get("/applications/{applicationID}", svc.GetApplication)
 		})
 	})
 
