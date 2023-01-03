@@ -447,11 +447,12 @@ if [[ -n "${BEHAT_SUITE}" ]]
 then
 	BEHAT_SUITES+=("${BEHAT_SUITE}")
 else
-	if [[ -n "${RUN_PART}" && "${ACCEPTANCE_TEST_TYPE}" == "core-api" ]]
-	then
-		get_behat_suites "core"
-	else
-		get_behat_suites "${ACCEPTANCE_TEST_TYPE}"
+	if [[ -n "${RUN_PART}" ]]; then
+		if [[ "${ACCEPTANCE_TEST_TYPE}" == "core-api" ]]; then
+			get_behat_suites "core"
+		else
+			get_behat_suites "${ACCEPTANCE_TEST_TYPE}"
+		fi
 	fi
 fi
 
