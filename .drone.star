@@ -253,7 +253,6 @@ def main(ctx):
         codestyle(ctx) + \
         buildWebCache(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
-        cacheCoreReposForTesting(ctx) + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
 
@@ -719,8 +718,7 @@ def localApiTestPipeline(ctx):
                                      localApiTests(suite, storage, params["extraEnvironment"]) +
                                      failEarly(ctx, early_fail),
                             "services": redisForOCStorage(storage),
-                            "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]) +
-                                          getPipelineNames(cacheCoreReposForTesting(ctx)),
+                            "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
                             "trigger": {
                                 "ref": [
                                     "refs/heads/master",
@@ -937,8 +935,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                      },
                  ] + failEarly(ctx, early_fail),
         "services": redisForOCStorage(storage),
-        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]) +
-                      getPipelineNames(cacheCoreReposForTesting(ctx)),
+        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
         "trigger": {
             "ref": [
                 "refs/heads/master",
