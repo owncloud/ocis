@@ -7,14 +7,11 @@ SCRIPT_PATH="`( cd \"${SCRIPT_PATH}\" && pwd )`" # absolutized and normalized
 
 echo 'Script path: '${SCRIPT_PATH}
 
-OC_PATH=${SCRIPT_PATH}/../../
-OCC=${OC_PATH}occ
-
 # Allow optionally passing in the path to the behat program.
 # This gives flexibility for callers that have installed their own behat
 if [ -z "${BEHAT_BIN}" ]
 then
-	BEHAT=${OC_PATH}vendor-bin/behat/vendor/bin/behat
+	BEHAT=${SCRIPT_PATH}/../../vendor-bin/behat/vendor/bin/behat
 else
 	BEHAT=${BEHAT_BIN}
 fi
@@ -50,30 +47,6 @@ then
 		echo "Error: expected failures file ${EXPECTED_FAILURES_FILE} is invalid"
 		exit ${LINT_STATUS}
 	fi
-fi
-
-# Default to testing a local system
-if [ -z "${TESTING_REMOTE_SYSTEM}" ]
-then
-	TESTING_REMOTE_SYSTEM=false
-fi
-
-# Default to not show ownCloud logs
-if [ -z "${SHOW_OC_LOGS}" ]
-then
-	SHOW_OC_LOGS=false
-fi
-
-# Default to re-run failed webUI scenarios
-if [ -z "${RERUN_FAILED_WEBUI_SCENARIOS}" ]
-then
-	RERUN_FAILED_WEBUI_SCENARIOS=true
-fi
-
-# Allow callers to specify NORERUN=true as an environment variable
-if [ "${NORERUN}" = true ]
-then
-	RERUN_FAILED_WEBUI_SCENARIOS=false
 fi
 
 # Default to API tests
@@ -150,12 +123,6 @@ do
 			fi
 			shift 2
 			;;
-		--remote)
-			TESTING_REMOTE_SYSTEM=true
-			;;
-		--show-oc-logs)
-			SHOW_OC_LOGS=true
-			;;
 		--norerun)
 			RERUN_FAILED_WEBUI_SCENARIOS=false
 			;;
@@ -172,173 +139,9 @@ do
 	shift
 done
 
-# Save the current language and set the language to "C"
+# Set the language to "C"
 # We want to have it all in english to be able to parse outputs
-OLD_LANG=${LANG}
 export LANG=C
-
-# @param $1 admin authentication string username:password
-# @param $2 occ url
-# @param $3 command
-# sets $REMOTE_OCC_STDOUT and $REMOTE_OCC_STDERR from returned xml data
-# @return occ return code given in the xml data
-function remote_occ() {
-	if [ "${TEST_OCIS}" == "true" ] || [ "${TEST_REVA}" == "true" ]
-	then
-		return 0
-	fi
-	COMMAND=`echo $3 | xargs`
-	CURL_OCC_RESULT=`curl -k -s -u $1 $2 -d "command=${COMMAND}"`
-	# xargs is (miss)used to trim the output
-	RETURN=`echo ${CURL_OCC_RESULT} | xmllint --xpath "string(ocs/data/code)" - | xargs`
-	# We could not find a proper return of the testing app, so something went wrong
-	if [ -z "${RETURN}" ]
-	then
-		RETURN=1
-		REMOTE_OCC_STDERR=${CURL_OCC_RESULT}
-	else
-		REMOTE_OCC_STDOUT=`echo ${CURL_OCC_RESULT} | xmllint --xpath "string(ocs/data/stdOut)" - | xargs`
-		REMOTE_OCC_STDERR=`echo ${CURL_OCC_RESULT} | xmllint --xpath "string(ocs/data/stdErr)" - | xargs`
-	fi
-	return ${RETURN}
-}
-
-# @param $1 admin authentication string username:password
-# @param $2 occ url (without /bulk appendix)
-# @param $3 commands
-# exists with 1 and sets $REMOTE_OCC_STDERR if any of the occ commands returned a non-zero code
-function remote_bulk_occ() {
-	if [ "${TEST_OCIS}" == "true" ] || [ "${TEST_REVA}" == "true" ]
-	then
-		return 0
-	fi
-	CURL_OCC_RESULT=`curl -k -s -u $1 $2/bulk -d "${3}"`
-	COUNT_RESULTS=`echo ${CURL_OCC_RESULT} | xmllint --xpath "ocs/data/element/code" - | wc -l`
-
-	RETURN=0
-	REMOTE_OCC_STDERR=""
-	for ((n=1;n<=${COUNT_RESULTS};n++))
-	do
-		EXIT_CODE=`echo ${CURL_OCC_RESULT} | xmllint --xpath "string((ocs/data/element/code)[${n}])" -`
-		if [ ${EXIT_CODE} -ne 0 ]
-		then
-			REMOTE_OCC_STDERR+=`echo ${CURL_OCC_RESULT} | xmllint --xpath "string((ocs/data/element/stdErr)[${n}])" - | xargs`
-			REMOTE_OCC_STDERR+="\n"
-			RETURN=1
-		fi
-
-	done
-	return ${RETURN}
-}
-
-# @param $1 admin authentication string username:password
-# @param $2 occ url
-# @param $3 directory to create, relative to the server's root
-# sets $REMOTE_OCC_STDOUT and $REMOTE_OCC_STDERR from returned xml data
-# @return return code given in the xml data
-function remote_dir() {
-	COMMAND=`echo $3 | xargs`
-	CURL_OCC_RESULT=`curl -k -s -u $1 $2 -d "dir=${COMMAND}"`
-	# xargs is (miss)used to trim the output
-	HTTP_STATUS=`echo ${CURL_OCC_RESULT} | xmllint --xpath "string(ocs/meta/statuscode)" - | xargs`
-	# We could not find a proper return of the testing app, so something went wrong
-	if [ -z "${HTTP_STATUS}" ]
-	then
-		RETURN=1
-		REMOTE_OCC_STDERR=${CURL_OCC_RESULT}
-	else
-		if [ "${HTTP_STATUS}" = 200 ]
-		then
-			RETURN=0
-		else
-			RETURN=1
-			REMOTE_OCC_STDERR=${CURL_OCC_RESULT}
-		fi
-	fi
-	return ${RETURN}
-}
-
-# $1 admin auth as needed for curl
-# $2 full URL of the occ command in the testing app
-# $3 system|app
-# $4 app-name if app used
-# $5 setting name
-# $6 type of the variable to set it back correctly (optional)
-# adds a new element to the array PREVIOUS_SETTINGS
-# PREVIOUS_SETTINGS will be an array of strings containing:
-# URL;system|app;app-name;setting-name;value;variable-type
-function save_config_setting() {
-	remote_occ $1 $2 "--no-warnings config:$3:get $4 $5"
-	PREVIOUS_SETTINGS+=("$2;$3;$4;$5;${REMOTE_OCC_STDOUT};$6")
-}
-
-declare -a PREVIOUS_SETTINGS
-
-# get the sub path from an URL
-# $1 the full URL including the protocol
-# echos the path without trailing slash
-function get_path_from_url() {
-	PROTOCOL="$(echo $1 | grep :// | sed -e's,^\(.*://\).*,\1,g')"
-	URL="$(echo ${1/$PROTOCOL/})"
-	PATH="$(echo ${URL} | grep / | cut -d/ -f2-)"
-	echo ${PATH%/}
-}
-
-# check that server is up and working correctly
-# $1 the full URL including the protocol
-# exits if server is not working correctly (by pinging status.php), otherwise returns
-function assert_server_up() {
-	curl -k -sSf -L $1/status.php -o /dev/null
-	if [[ $? -eq 0 ]]
-	then
-		return
-	else
-		echo >&2 "Server on $1 is down or not working correctly."
-		exit 98
-	fi
-}
-
-# check that testing app is installed
-# $1 the full URL including the protocol
-# if testing app is not installed, this returns 500 status code
-# we are not sending request with auth, so if it is installed 401 Not Authorized is returned.
-# anyway, if it's not 500, assume testing app is installed and move on.
-# Otherwise, print to stderr and exit.
-function assert_testing_app_enabled() {
-	CURL_RESULT=`curl -s $1/ocs/v2.php/apps/testing/api/v1/app/testing -o /dev/null -w "%{http_code}"`
-	if [[ ${CURL_RESULT} -eq 500 ]]
-	then
-		echo >&2 "Testing app is not enabled on the server on $1."
-		echo >&2 "Please install and enable it to run the tests."
-		exit 98
-	else
-		return
-	fi
-}
-
-# check if certain apache_module is enabled
-# $1 admin authentication string username:password
-# $2 the full url to the testing app on the server to check
-# $3 Module to check for
-# $4 text description of the server being checked, e.g. "local", "remote"
-# return 0 if given module is enabled, else return with 1
-function check_apache_module_enabled() {
-	if [ "${TEST_OCIS}" == "true" ] || [ "${TEST_REVA}" == "true" ]
-	then
-		return 0
-	fi
-	# test if mod_rewrite is enabled
-	CURL_RESULT=`curl -k -s -u $1 $2apache_modules/$3`
-	STATUS_CODE=`echo ${CURL_RESULT} | xmllint --xpath "string(ocs/meta/statuscode)" -`
-	if [[ ${STATUS_CODE} -ne 200 ]]
-	then
-		echo -n "Could not reliably determine if '$3' module is enabled on the $4 server, because "
-		echo ${CURL_RESULT} | xmllint --xpath "string(ocs/meta/message)" -
-		echo ""
-		return 1
-	fi
-	return 0
-}
 
 # Provide a default admin username and password.
 # But let the caller pass them if they wish
@@ -352,8 +155,6 @@ then
 	ADMIN_PASSWORD="admin"
 fi
 
-ADMIN_AUTH="${ADMIN_USERNAME}:${ADMIN_PASSWORD}"
-
 export ADMIN_USERNAME
 export ADMIN_PASSWORD
 
@@ -362,14 +163,6 @@ then
 	BEHAT_RERUN_TIMES=1
 fi
 
-function env_alt_home_enable {
-	remote_occ ${ADMIN_AUTH} ${OCC_URL} "config:app:set testing enable_alt_user_backend --value yes"
-}
-
-function env_alt_home_clear {
-	remote_occ ${ADMIN_AUTH} ${OCC_URL} "app:disable testing" || { echo "Unable to disable testing app" >&2; exit 1; }
-}
-
 # expected variables
 # --------------------
 # $SUITE_FEATURE_TEXT - human readable which test to run
@@ -377,9 +170,6 @@ function env_alt_home_clear {
 # $BEHAT_FEATURE - feature file, or empty
 # $BEHAT_FILTER_TAGS - list of tags
 # $BEHAT_TAGS_OPTION_FOUND
-# $BROWSER_TEXT
-# $BROWSER_VERSION_TEXT
-# $PLATFORM_TEXT
 # $TEST_LOG_FILE
 # $BEHAT - behat executable
 # $BEHAT_YML
@@ -396,7 +186,7 @@ declare -a UNEXPECTED_PASSED_SCENARIOS
 declare -a UNEXPECTED_BEHAT_EXIT_STATUSES
 
 function run_behat_tests() {
-	echo "Running ${SUITE_FEATURE_TEXT} tests tagged ${BEHAT_FILTER_TAGS} ${BROWSER_TEXT}${BROWSER_VERSION_TEXT}${PLATFORM_TEXT}" | tee ${TEST_LOG_FILE}
+	echo "Running ${SUITE_FEATURE_TEXT} tests tagged ${BEHAT_FILTER_TAGS}" | tee ${TEST_LOG_FILE}
 
 	if [ "${REPLACE_USERNAMES}" == "true" ]
 	then
@@ -404,6 +194,7 @@ function run_behat_tests() {
 		cat ${SCRIPT_PATH}/usernames.json
 	fi
 
+	echo "Using behat config '${BEHAT_YML}'"
 	${BEHAT} --colors --strict ${STEP_THROUGH_OPTION} -c ${BEHAT_YML} -f pretty ${BEHAT_SUITE_OPTION} --tags ${BEHAT_FILTER_TAGS} ${BEHAT_FEATURE} -v 2>&1 | tee -a ${TEST_LOG_FILE}
 
 	BEHAT_EXIT_STATUS=${PIPESTATUS[0]}
@@ -649,76 +440,7 @@ function run_behat_tests() {
 	fi
 }
 
-function teardown() {
-	# Enable any apps that were disabled for the test run
-	for i in "${!APPS_TO_REENABLE[@]}"
-	do
-		read -r -a APP <<< "${APPS_TO_REENABLE[$i]}"
-		remote_occ ${ADMIN_AUTH} ${APP[0]} "--no-warnings app:enable ${APP[1]}"
-	done
-
-	# Disable any apps that were enabled for the test run
-	for i in "${!APPS_TO_REDISABLE[@]}"
-	do
-		read -r -a APP <<< "${APPS_TO_REDISABLE[$i]}"
-		remote_occ ${ADMIN_AUTH} ${APP[0]} "--no-warnings app:disable ${APP[1]}"
-	done
-
-	# Put back settings that were set for the test-run
-	for i in "${!PREVIOUS_SETTINGS[@]}"
-	do
-		PREVIOUS_IFS=${IFS}
-		IFS=';'
-		read -r -a SETTING <<< "${PREVIOUS_SETTINGS[$i]}"
-		IFS=${PREVIOUS_IFS}
-		if [ -z "${SETTING[4]}" ]
-		then
-			remote_occ ${ADMIN_AUTH} ${SETTING[0]} "config:${SETTING[1]}:delete ${SETTING[2]} ${SETTING[3]}"
-		else
-			TYPE_STRING=""
-			if [ -n "${SETTING[5]}" ]
-			then
-				#place the space here not in the command line, so that there is no space if the string is empty
-				TYPE_STRING=" --type ${SETTING[5]}"
-			fi
-			remote_occ ${ADMIN_AUTH} ${SETTING[0]} "config:${SETTING[1]}:set ${SETTING[2]} ${SETTING[3]} --value=${SETTING[4]}${TYPE_STRING}"
-		fi
-	done
-
-	# Put back state of the testing app
-	if [ "${TESTING_ENABLED_BY_SCRIPT}" = true ]
-	then
-		${OCC} app:disable testing
-	fi
-
-	if [ "${OC_TEST_ALT_HOME}" = "1" ]
-	then
-		env_alt_home_clear
-	fi
-
-	if [ "${TEST_WITH_PHPDEVSERVER}" == "true" ]
-	then
-		kill ${PHPPID}
-		kill ${PHPPID_FED}
-	fi
-
-	if [ "${SHOW_OC_LOGS}" = true ]
-	then
-		tail "${OC_PATH}/data/owncloud.log"
-	fi
-
-	# Reset the original language
-	export LANG=${OLD_LANG}
-
-	rm -f "${TEST_LOG_FILE}"
-
-	echo "runsh: Exit code of main run: ${BEHAT_EXIT_STATUS}"
-}
-
 declare -x TEST_SERVER_URL
-declare -x TEST_SERVER_FED_URL
-declare -x TEST_WITH_PHPDEVSERVER
-[[ -z "${TEST_SERVER_URL}" && -z "${TEST_SERVER_FED_URL}" ]] && TEST_WITH_PHPDEVSERVER="true"
 
 if [ -z "${IPV4_URL}" ]
 then
@@ -728,83 +450,6 @@ fi
 if [ -z "${IPV6_URL}" ]
 then
 	IPV6_URL="${TEST_SERVER_URL}"
-fi
-
-if [ "${TEST_WITH_PHPDEVSERVER}" != "true" ]
-then
-	# The endpoint to use to do occ commands via the testing app
-	# set it already here, so it can be used for remote_occ
-	# we know the TEST_SERVER_URL already
-	TESTING_APP_URL="${TEST_SERVER_URL}/ocs/v2.php/apps/testing/api/v1/"
-	OCC_URL="${TESTING_APP_URL}occ"
-	# test that server is up and running, and testing app is enabled.
-	assert_server_up ${TEST_SERVER_URL}
-	if [ "${TEST_OCIS}" != "true" ] && [ "${TEST_REVA}" != "true" ]
-	then
-		assert_testing_app_enabled ${TEST_SERVER_URL}
-	fi
-
-	if [ -n "${TEST_SERVER_FED_URL}" ]
-	then
-		TESTING_APP_FED_URL="${TEST_SERVER_FED_URL}/ocs/v2.php/apps/testing/api/v1/"
-		OCC_FED_URL="${TESTING_APP_FED_URL}occ"
-		# test that fed server is up and running, and testing app is enabled.
-		assert_server_up ${TEST_SERVER_FED_URL}
-		if [ "${TEST_OCIS}" != "true" ] && [ "${TEST_REVA}" != "true" ]
-		then
-			assert_testing_app_enabled ${TEST_SERVER_URL}
-		fi
-	fi
-
-	echo "Not using php inbuilt server for running scenario ..."
-	echo "Updating .htaccess for proper rewrites"
-	#get the sub path of the webserver and set the correct RewriteBase
-	WEBSERVER_PATH=$(get_path_from_url ${TEST_SERVER_URL})
-	HTACCESS_UPDATE_FAILURE_MSG="Could not update .htaccess in local server. Some tests might fail as a result."
-	remote_occ ${ADMIN_AUTH} ${OCC_URL} "config:system:set htaccess.RewriteBase --value /${WEBSERVER_PATH}/"
-	remote_occ ${ADMIN_AUTH} ${OCC_URL} "maintenance:update:htaccess"
-	[[ $? -eq 0 ]] || { echo "${HTACCESS_UPDATE_FAILURE_MSG}"; }
-	# check if mod_rewrite module is enabled
-	check_apache_module_enabled ${ADMIN_AUTH} ${TESTING_APP_URL} "mod_rewrite" "local"
-
-	if [ -n "${TEST_SERVER_FED_URL}" ]
-	then
-		WEBSERVER_PATH=$(get_path_from_url ${TEST_SERVER_FED_URL})
-		remote_occ ${ADMIN_AUTH} ${OCC_FED_URL} "config:system:set htaccess.RewriteBase --value /${WEBSERVER_PATH}/"
-		remote_occ ${ADMIN_AUTH} ${OCC_FED_URL} "maintenance:update:htaccess"
-		[[ $? -eq 0 ]] || { echo "${HTACCESS_UPDATE_FAILURE_MSG/local/federated}"; }
-		# check if mod_rewrite module is enabled
-		check_apache_module_enabled ${ADMIN_AUTH} ${TESTING_APP_FED_URL} "mod_rewrite" "remote"
-	fi
-else
-	echo "Using php inbuilt server for running scenario ..."
-
-	# Avoid port collision on jenkins - use $EXECUTOR_NUMBER
-	declare -x EXECUTOR_NUMBER
-	[[ -z "${EXECUTOR_NUMBER}" ]] && EXECUTOR_NUMBER=0
-
-	PORT=$((8080 + ${EXECUTOR_NUMBER}))
-	echo ${PORT}
-	php -S localhost:${PORT} -t "${OC_PATH}" &
-	PHPPID=$!
-	echo ${PHPPID}
-
-	PORT_FED=$((8180 + ${EXECUTOR_NUMBER}))
-	echo ${PORT_FED}
-	php -S localhost:${PORT_FED} -t ../.. &
-	PHPPID_FED=$!
-	echo ${PHPPID_FED}
-
-	export TEST_SERVER_URL="http://localhost:${PORT}"
-	export TEST_SERVER_FED_URL="http://localhost:${PORT_FED}"
-
-	# The endpoint to use to do occ commands via the testing app
-	TESTING_APP_URL="${TEST_SERVER_URL}/ocs/v2.php/apps/testing/api/v1/"
-	OCC_URL="${TESTING_APP_URL}occ"
-
-	# Give time for the PHP dev server to become available
-	# because we want to use it to get and change settings with the testing app
-	sleep 5
 fi
 
 # If a feature file has been specified but no suite, then deduce the suite
@@ -866,7 +511,6 @@ else
 		if [ ${SUITES_THIS_RUN} -eq 0 ]
 		then
 			echo "there are only ${COUNT_ALL_SUITES} suites, nothing to do in part ${RUN_PART}"
-			teardown
 			exit 0
 		fi
 
@@ -875,31 +519,11 @@ else
 	fi
 fi
 
-# If the suite name begins with "webUI" or the user explicitly specified type "webui"
-# then we will setup for webUI testing and run tests tagged as @webUI,
-# otherwise it is API tests.
-# Currently, running both API and webUI tests in a single run is not supported.
-if [[ "${BEHAT_SUITE}" == webUI* ]] || [ "${ACCEPTANCE_TEST_TYPE}" = "webui" ]
-then
-	TEST_TYPE_TAG="@webUI"
-	TEST_TYPE_TEXT="webUI"
-	RUNNING_API_TESTS=false
-	RUNNING_CLI_TESTS=false
-	RUNNING_WEBUI_TESTS=true
-elif [[ "${BEHAT_SUITE}" == cli* ]] || [ "${ACCEPTANCE_TEST_TYPE}" = "cli" ]
-then
-	TEST_TYPE_TAG="@cli"
-	TEST_TYPE_TEXT="cli"
-	RUNNING_API_TESTS=false
-	RUNNING_CLI_TESTS=true
-	RUNNING_WEBUI_TESTS=false
-else
-	TEST_TYPE_TAG="@api"
-	TEST_TYPE_TEXT="API"
-	RUNNING_API_TESTS=true
-	RUNNING_CLI_TESTS=false
-	RUNNING_WEBUI_TESTS=false
-fi
+TEST_TYPE_TAG="@api"
+TEST_TYPE_TEXT="API"
+RUNNING_API_TESTS=true
+RUNNING_CLI_TESTS=false
+RUNNING_WEBUI_TESTS=false
 
 # Always have one of "@api", "@cli" or "@webUI" filter tags
 if [ -z "${BEHAT_FILTER_TAGS}" ]
@@ -950,25 +574,6 @@ then
 	BROWSER="chrome"
 fi
 
-# Check if we can rely on a local ./occ command or if we are testing
-# a remote instance (e.g. inside docker).
-# If we have a remote instance we cannot enable the testing app and
-# we have to hope it is enabled already, by other ways
-if [ "${TESTING_REMOTE_SYSTEM}" = false ]
-then
-	# Enable testing app
-	PREVIOUS_TESTING_APP_STATUS=$(${OCC} --no-warnings app:list "^testing$")
-	if [[ "${PREVIOUS_TESTING_APP_STATUS}" =~ ^Disabled: ]]
-	then
-		${OCC} app:enable testing || { echo "Unable to enable testing app" >&2; exit 1; }
-		TESTING_ENABLED_BY_SCRIPT=true;
-	else
-		TESTING_ENABLED_BY_SCRIPT=false;
-	fi
-else
-	TESTING_ENABLED_BY_SCRIPT=false;
-fi
-
 # table of settings to be remembered and set
 #system|app;app-name;setting-name;value;variable-type
 declare -a SETTINGS
@@ -984,146 +589,6 @@ SETTINGS+=("app;core;enable_external_storage;yes")
 SETTINGS+=("system;;files_external_allow_create_new_local;true")
 SETTINGS+=("system;;skeletondirectory;;")
 
-# Set various settings
-for URL in ${OCC_URL} ${OCC_FED_URL}
-do
-	declare SETTINGS_CMDS='['
-	for i in "${!SETTINGS[@]}"
-	do
-		PREVIOUS_IFS=${IFS}
-		IFS=';'
-		read -r -a SETTING <<< "${SETTINGS[$i]}"
-		IFS=${PREVIOUS_IFS}
-
-		save_config_setting "${ADMIN_AUTH}" "${URL}" "${SETTING[0]}" "${SETTING[1]}" "${SETTING[2]}" "${SETTING[4]}"
-
-		TYPE_STRING=""
-		if [ -n "${SETTING[4]}" ]
-		then
-			#place the space here not in the command line, so that there is no space if the string is empty
-			TYPE_STRING=" --type ${SETTING[4]}"
-		fi
-
-		SETTINGS_CMDS+="{\"command\": \"config:${SETTING[0]}:set ${SETTING[1]} ${SETTING[2]} --value=${SETTING[3]}${TYPE_STRING}\"},"
-	done
-	SETTINGS_CMDS=${SETTINGS_CMDS%?} # removes the last comma
-	SETTINGS_CMDS+="]"
-	remote_bulk_occ ${ADMIN_AUTH} ${URL} "${SETTINGS_CMDS}"
-	if [ $? -ne 0 ]
-		then
-			echo -e "Could not set some settings on ${URL}. Result:\n${REMOTE_OCC_STDERR}"
-			teardown
-			exit 1
-		fi
-done
-
-#set the skeleton folder
-if [ -n "${SKELETON_DIR}" ]
-then
-	for URL in ${OCC_URL} ${OCC_FED_URL}
-	do
-		remote_occ ${ADMIN_AUTH} ${URL} "config:system:set skeletondirectory --value=${SKELETON_DIR}"
-	done
-fi
-
-#Enable and disable apps as required for default
-if [ -z "${APPS_TO_DISABLE}" ]
-then
-	APPS_TO_DISABLE="firstrunwizard notifications"
-fi
-
-if [ -z "${APPS_TO_ENABLE}" ]
-then
-	APPS_TO_ENABLE=""
-fi
-
-declare -a APPS_TO_REENABLE;
-
-for URL in ${OCC_URL} ${OCC_FED_URL}
-	do
-	for APP_TO_DISABLE in ${APPS_TO_DISABLE}; do
-		remote_occ ${ADMIN_AUTH} ${URL} "--no-warnings app:list ^${APP_TO_DISABLE}$"
-		PREVIOUS_APP_STATUS=${REMOTE_OCC_STDOUT}
-		if [[ "${PREVIOUS_APP_STATUS}" =~ ^Enabled: ]]
-		then
-			APPS_TO_REENABLE+=("${URL} ${APP_TO_DISABLE}");
-			remote_occ ${ADMIN_AUTH} ${URL} "--no-warnings app:disable ${APP_TO_DISABLE}"
-		fi
-	done
-done
-
-declare -a APPS_TO_REDISABLE;
-
-for URL in ${OCC_URL} ${OCC_FED_URL}
-	do
-	for APP_TO_ENABLE in ${APPS_TO_ENABLE}; do
-		remote_occ ${ADMIN_AUTH} ${URL} "--no-warnings app:list ^${APP_TO_ENABLE}$"
-		PREVIOUS_APP_STATUS=${REMOTE_OCC_STDOUT}
-		if [[ "${PREVIOUS_APP_STATUS}" =~ ^Disabled: ]]
-		then
-			APPS_TO_REDISABLE+=("${URL} ${APP_TO_ENABLE}");
-			remote_occ ${ADMIN_AUTH} ${URL} "--no-warnings app:enable ${APP_TO_ENABLE}"
-		fi
-	done
-done
-
-if [ "${OC_TEST_ALT_HOME}" = "1" ]
-then
-	env_alt_home_enable
-fi
-
-# We need to skip some tests in certain browsers.
-if [ "${BROWSER}" == "internet explorer" ] || [ "${BROWSER}" == "MicrosoftEdge" ] || [ "${BROWSER}" == "firefox" ]
-then
-	BROWSER_IN_CAPITALS=${BROWSER//[[:blank:]]/}
-	BROWSER_IN_CAPITALS=${BROWSER_IN_CAPITALS^^}
-	BEHAT_FILTER_TAGS="${BEHAT_FILTER_TAGS}&&~@skipOn${BROWSER_IN_CAPITALS}"
-fi
-
-# Skip tests tagged with the current oC version
-# One, two or three parts of the version can be used
-# e.g.
-# @skipOnOcV10.0.4
-# @skipOnOcV10.0
-# @skipOnOcV10
-
-remote_occ ${ADMIN_AUTH} ${OCC_URL} "config:system:get version"
-OWNCLOUD_VERSION_THREE_DIGIT=`echo ${REMOTE_OCC_STDOUT} | cut -d"." -f1-3`
-BEHAT_FILTER_TAGS='~@skipOnOcV'${OWNCLOUD_VERSION_THREE_DIGIT}'&&'${BEHAT_FILTER_TAGS}
-OWNCLOUD_VERSION_TWO_DIGIT=`echo ${OWNCLOUD_VERSION_THREE_DIGIT} | cut -d"." -f1-2`
-BEHAT_FILTER_TAGS='~@skipOnOcV'${OWNCLOUD_VERSION_TWO_DIGIT}'&&'${BEHAT_FILTER_TAGS}
-OWNCLOUD_VERSION_ONE_DIGIT=`echo ${OWNCLOUD_VERSION_TWO_DIGIT} | cut -d"." -f1`
-BEHAT_FILTER_TAGS='~@skipOnOcV'${OWNCLOUD_VERSION_ONE_DIGIT}'&&'${BEHAT_FILTER_TAGS}
-
-function version { echo "$@" | awk -F. '{ printf("%d%03d%03d\n", $1,$2,$3); }'; }
-
-# Skip tests for OC versions greater than 10.8.0
-if [ $(version $OWNCLOUD_VERSION_THREE_DIGIT) -gt $(version "10.8.0") ]; then
-	BEHAT_FILTER_TAGS='~@skipOnAllVersionsGreaterThanOcV10.8.0&&'${BEHAT_FILTER_TAGS}
-fi
-
-if [ -n "${TEST_SERVER_FED_URL}" ]
-then
-	remote_occ ${ADMIN_AUTH} ${OCC_FED_URL} "config:system:get version"
-	OWNCLOUD_FED_VERSION=`echo ${REMOTE_OCC_STDOUT} | cut -d"." -f1-3`
-	BEHAT_FILTER_TAGS='~@skipOnFedOcV'${OWNCLOUD_FED_VERSION}'&&'${BEHAT_FILTER_TAGS}
-	OWNCLOUD_FED_VERSION=`echo ${OWNCLOUD_FED_VERSION} | cut -d"." -f1-2`
-	BEHAT_FILTER_TAGS='~@skipOnFedOcV'${OWNCLOUD_FED_VERSION}'&&'${BEHAT_FILTER_TAGS}
-	OWNCLOUD_FED_VERSION=`echo ${OWNCLOUD_FED_VERSION} | cut -d"." -f1`
-	BEHAT_FILTER_TAGS='~@skipOnFedOcV'${OWNCLOUD_FED_VERSION}'&&'${BEHAT_FILTER_TAGS}
-fi
-
-# If we are running remote only tests add another skip '@skipWhenTestingRemoteSystems'
-if [ "${TESTING_REMOTE_SYSTEM}" = true ]
-then
-	BEHAT_FILTER_TAGS='~@skipWhenTestingRemoteSystems&&'${BEHAT_FILTER_TAGS}
-fi
-
-if [ "${OC_TEST_ON_OBJECTSTORE}" = "1" ]
-then
-	BEHAT_FILTER_TAGS="${BEHAT_FILTER_TAGS}&&~@skip_on_objectstore"
-fi
-
 # If the caller did not mention specific tags, skip the skipped tests by default
 if [ "${BEHAT_TAGS_OPTION_FOUND}" = false ]
 then
@@ -1134,77 +599,6 @@ then
 		BEHAT_FILTER_TAGS="${BEHAT_FILTER_TAGS}&&~@skip"
 	fi
 fi
-
-if [ -n "${BROWSER_VERSION}" ]
-then
-	BROWSER_VERSION_EXTRA_CAPABILITIES_STRING='"browserVersion":"'${BROWSER_VERSION}'",'
-	BROWSER_VERSION_SELENIUM_STRING='"version": "'${BROWSER_VERSION}'", '
-	BROWSER_VERSION_TEXT='('${BROWSER_VERSION}') '
-else
-	BROWSER_VERSION_EXTRA_CAPABILITIES_STRING=""
-	BROWSER_VERSION_SELENIUM_STRING=""
-	BROWSER_VERSION_TEXT=""
-fi
-
-if [ -n "${PLATFORM}" ]
-then
-	PLATFORM_SELENIUM_STRING='"platform": "'${PLATFORM}'", '
-	PLATFORM_TEXT="on platform '${PLATFORM}' "
-else
-	PLATFORM_SELENIUM_STRING=""
-	PLATFORM_TEXT=""
-fi
-
-if [ "${RUNNING_API_TESTS}" = true ]
-then
-	EXTRA_CAPABILITIES=""
-	BROWSER_TEXT=""
-elif [ "${RUNNING_CLI_TESTS}" = true ]
-then
-	EXTRA_CAPABILITIES=""
-	BROWSER_TEXT=""
-else
-	BROWSER_TEXT="on browser '${BROWSER}' "
-
-	# If we are running in some automated CI, use the provided details
-	if [ -n "${CI_REPO}" ]
-	then
-		CAPABILITIES_NAME_TEXT="${CI_REPO} - ${CI_BRANCH}"
-	else
-		# Otherwise this is a non-CI run, probably a local developer run
-		CAPABILITIES_NAME_TEXT="ownCloud non-CI"
-	fi
-
-	# If SauceLabs credentials have been passed, then use them
-	if [ -n "${SAUCE_USERNAME}" ] && [ -n "${SAUCE_ACCESS_KEY}" ]
-	then
-		SAUCE_CREDENTIALS="${SAUCE_USERNAME}:${SAUCE_ACCESS_KEY}@"
-	else
-		SAUCE_CREDENTIALS=""
-	fi
-
-	if [ "${BROWSER}" == "firefox" ]
-	then
-		# Set the screen resolution so that hopefully draggable elements will be visible
-		# FF gives problems if the destination element is not visible
-		EXTRA_CAPABILITIES='"screenResolution":"1920x1080",'
-
-		# This selenium version works for Firefox after V47
-		# We no longer need to support testing of Firefox V47 or earlier
-		EXTRA_CAPABILITIES='"seleniumVersion":"3.4.0",'${EXTRA_CAPABILITIES}
-	fi
-
-	if [ "${BROWSER}" == "internet explorer" ]
-	then
-		EXTRA_CAPABILITIES='"iedriverVersion": "3.4.0","requiresWindowFocus":true,"screenResolution":"1920x1080",'
-	fi
-
-	EXTRA_CAPABILITIES=${EXTRA_CAPABILITIES}${BROWSER_VERSION_EXTRA_CAPABILITIES_STRING}'"maxDuration":"3600"'
-	export BEHAT_PARAMS='{"extensions" : {"Behat\\MinkExtension" : {"browser_name": "'${BROWSER}'", "base_url" : "'${TEST_SERVER_URL}'", "selenium2":{"capabilities": {"marionette":null, "browser": "'${BROWSER}'", '${BROWSER_VERSION_SELENIUM_STRING}${PLATFORM_SELENIUM_STRING}'"name": "'${CAPABILITIES_NAME_TEXT}'", "extra_capabilities": {'${EXTRA_CAPABILITIES}'}}, "wd_host":"http://'${SAUCE_CREDENTIALS}${SELENIUM_HOST}':'${SELENIUM_PORT}'/wd/hub"}}, "SensioLabs\\Behat\\PageObjectExtension" : {}}}'
-fi
-
-echo ${EXTRA_CAPABILITIES}
-echo ${BEHAT_PARAMS}
 
 export IPV4_URL
 export IPV6_URL
@@ -1261,8 +655,6 @@ done
 TOTAL_SCENARIOS=$((SCENARIOS_THAT_PASSED + SCENARIOS_THAT_FAILED))
 
 echo "runsh: Total ${TOTAL_SCENARIOS} scenarios (${SCENARIOS_THAT_PASSED} passed, ${SCENARIOS_THAT_FAILED} failed)"
-
-teardown
 
 # 3 types of things can have gone wrong:
 #   - some scenario failed (and it was not expected to fail)
