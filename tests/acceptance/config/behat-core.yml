@@ -30,7 +30,6 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
-        - CorsContext:
         - AuthContext:
 
     coreApiAuthOcs:
@@ -47,7 +46,6 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
-        - LoggingContext:
         - OccContext:
         - SearchContext:
         - PublicWebDavContext:
@@ -64,15 +62,6 @@ default:
         - OccContext:
         - AppConfigurationContext:
 
-    coreApiComments:
-      paths:
-        - "%paths.base%/../features/coreApiComments"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - CommentsContext:
-        - WebDavPropertiesContext:
-
     coreApiFavorites:
       paths:
         - "%paths.base%/../features/coreApiFavorites"
@@ -84,113 +73,9 @@ default:
         - AppConfigurationContext:
         - OccContext:
 
-    coreApiFederationToRoot1:
-      paths:
-        - "%paths.base%/../features/coreApiFederationToRoot1"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - FederationContext:
-        - WebDavPropertiesContext:
-        - AppConfigurationContext:
-
-    coreApiFederationToRoot2:
-      paths:
-        - "%paths.base%/../features/coreApiFederationToRoot2"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - FederationContext:
-        - WebDavPropertiesContext:
-        - AppConfigurationContext:
-
-    coreApiFederationToShares1:
-      paths:
-        - "%paths.base%/../features/coreApiFederationToShares1"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - FederationContext:
-        - WebDavPropertiesContext:
-        - AppConfigurationContext:
-        - OccContext:
-
-    coreApiFederationToShares2:
-      paths:
-        - "%paths.base%/../features/coreApiFederationToShares2"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - FederationContext:
-        - WebDavPropertiesContext:
-        - AppConfigurationContext:
-        - OccContext:
-
-    coreApiProvisioning-v1:
-      paths:
-        - "%paths.base%/../features/coreApiProvisioning-v1"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - OccContext:
-        - OccUsersGroupsContext:
-        - AuthContext:
-        - PublicWebDavContext:
-
-    coreApiProvisioning-v2:
-      paths:
-        - "%paths.base%/../features/coreApiProvisioning-v2"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - OccContext:
-        - OccUsersGroupsContext:
-        - AuthContext:
-        - PublicWebDavContext:
-
-    coreApiProvisioningGroups-v1:
-      paths:
-        - "%paths.base%/../features/coreApiProvisioningGroups-v1"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - OccContext:
-        - OccUsersGroupsContext:
-
-    coreApiProvisioningGroups-v2:
-      paths:
-        - "%paths.base%/../features/coreApiProvisioningGroups-v2"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - OccContext:
-        - OccUsersGroupsContext:
-
-    coreApiShareCreateSpecialToRoot1:
-      paths:
-        - "%paths.base%/../features/coreApiShareCreateSpecialToRoot1"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - OccContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
-        - AppConfigurationContext:
-
     coreApiShareCreateSpecialToShares1:
       paths:
         - "%paths.base%/../features/coreApiShareCreateSpecialToShares1"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - OccContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
-        - AppConfigurationContext:
-
-    coreApiShareCreateSpecialToRoot2:
-      paths:
-        - "%paths.base%/../features/coreApiShareCreateSpecialToRoot2"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
@@ -220,19 +105,6 @@ default:
         - OccContext:
         - AppConfigurationContext:
 
-    coreApiShareManagementToRoot:
-      paths:
-        - "%paths.base%/../features/coreApiShareManagementToRoot"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - OccContext:
-        - PublicWebDavContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
-        - AppConfigurationContext:
-        - FilesVersionsContext:
-
     coreApiShareManagementToShares:
       paths:
         - "%paths.base%/../features/coreApiShareManagementToShares"
@@ -246,18 +118,6 @@ default:
         - AppConfigurationContext:
         - FilesVersionsContext:
 
-    coreApiShareManagementBasicToRoot:
-      paths:
-        - "%paths.base%/../features/coreApiShareManagementBasicToRoot"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - OccContext:
-        - PublicWebDavContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
-        - AuthContext:
-
     coreApiShareManagementBasicToShares:
       paths:
         - "%paths.base%/../features/coreApiShareManagementBasicToShares"
@@ -269,28 +129,6 @@ default:
         - TrashbinContext:
         - WebDavPropertiesContext:
         - AuthContext:
-
-    coreApiShareOperationsToRoot1:
-      paths:
-        - "%paths.base%/../features/coreApiShareOperationsToRoot1"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - OccContext:
-        - PublicWebDavContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
-
-    coreApiShareOperationsToRoot2:
-      paths:
-        - "%paths.base%/../features/coreApiShareOperationsToRoot2"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - OccContext:
-        - PublicWebDavContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
 
     coreApiShareOperationsToShares1:
       paths:
@@ -350,17 +188,6 @@ default:
         - WebDavPropertiesContext:
         - AppConfigurationContext:
 
-    coreApiShareReshareToRoot1:
-      paths:
-        - "%paths.base%/../features/coreApiShareReshareToRoot1"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - OccContext:
-        - PublicWebDavContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
-
     coreApiShareReshareToShares1:
       paths:
         - "%paths.base%/../features/coreApiShareReshareToShares1"
@@ -372,33 +199,9 @@ default:
         - TrashbinContext:
         - WebDavPropertiesContext:
 
-    coreApiShareReshareToRoot2:
-      paths:
-        - "%paths.base%/../features/coreApiShareReshareToRoot2"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - OccContext:
-        - PublicWebDavContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
-        - AppConfigurationContext:
-
     coreApiShareReshareToShares2:
       paths:
         - "%paths.base%/../features/coreApiShareReshareToShares2"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - OccContext:
-        - PublicWebDavContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
-        - AppConfigurationContext:
-
-    coreApiShareReshareToRoot3:
-      paths:
-        - "%paths.base%/../features/coreApiShareReshareToRoot3"
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
@@ -420,18 +223,6 @@ default:
         - WebDavPropertiesContext:
         - AppConfigurationContext:
 
-    coreApiShareUpdateToRoot:
-      paths:
-        - "%paths.base%/../features/coreApiShareUpdateToRoot"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - OccContext:
-        - PublicWebDavContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
-        - AppConfigurationContext:
-
     coreApiShareUpdateToShares:
       paths:
         - "%paths.base%/../features/coreApiShareUpdateToShares"
@@ -443,34 +234,6 @@ default:
         - TrashbinContext:
         - WebDavPropertiesContext:
         - AppConfigurationContext:
-
-    coreApiSharingNotificationsToRoot:
-      paths:
-        - "%paths.base%/../features/coreApiSharingNotificationsToRoot"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - NotificationsCoreContext:
-        - AppConfigurationContext:
-
-    coreApiSharingNotificationsToShares:
-      paths:
-        - "%paths.base%/../features/coreApiSharingNotificationsToShares"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - NotificationsCoreContext:
-        - AppConfigurationContext:
-        - OccContext:
-
-    coreApiTags:
-      paths:
-        - "%paths.base%/../features/coreApiTags"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-        - TagsContext:
-        - WebDavPropertiesContext:
 
     coreApiTrashbin:
       paths:
@@ -513,12 +276,10 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
-        - LoggingContext:
         - OccContext:
         - SearchContext:
         - PublicWebDavContext:
         - WebDavPropertiesContext:
-        - TagsContext:
         - TrashbinContext:
 
     coreApiWebdavLocks:
@@ -571,7 +332,6 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
-        - LoggingContext:
         - OccContext:
         - WebDavPropertiesContext:
 
@@ -581,7 +341,6 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
-        - LoggingContext:
         - OccContext:
         - WebDavPropertiesContext:
 
@@ -591,12 +350,10 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
-        - LoggingContext:
         - OccContext:
         - SearchContext:
         - PublicWebDavContext:
         - WebDavPropertiesContext:
-        - TagsContext:
         - TrashbinContext:
 
     coreApiWebdavPreviews:
@@ -614,7 +371,6 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
-        - LoggingContext:
         - OccContext:
         - WebDavPropertiesContext:
         - AppConfigurationContext:
@@ -625,7 +381,6 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
-        - LoggingContext:
         - WebDavPropertiesContext:
         - AppConfigurationContext:
 
@@ -656,7 +411,6 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
-        - LoggingContext:
         - OccContext:
         - PublicWebDavContext:
         - TUSContext:
@@ -669,7 +423,6 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
-        - LoggingContext:
         - OccContext:
         - TrashbinContext:
         - PublicWebDavContext:
@@ -683,7 +436,6 @@ default:
       context: *common_ldap_suite_context
       contexts:
         - FeatureContext: *common_feature_context_params
-        - LoggingContext:
         - OccContext:
         - TrashbinContext:
         - PublicWebDavContext:

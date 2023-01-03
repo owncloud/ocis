@@ -68,6 +68,7 @@ help:
 	@echo -e "${GREEN}Testing with test suite natively installed:${RESET}\n"
 	@echo -e "${PURPLE}\tdocs: https://owncloud.dev/ocis/development/testing/#testing-with-test-suite-natively-installed${RESET}\n"
 	@echo -e "\tmake test-acceptance-api\t\t${BLUE}run API acceptance tests${RESET}"
+	@echo -e "\tmake test-acceptance-core-api\t\t${BLUE}run core API acceptance tests${RESET}"
 	@echo -e "\tmake test-paralleldeployment-api\t${BLUE}run API acceptance tests for parallel deployment${RESET}"
 	@echo -e "\tmake clean-tests\t\t\t${BLUE}delete API tests framework dependencies${RESET}"
 	@echo
@@ -102,10 +103,16 @@ clean-tests:
 BEHAT_BIN=vendor-bin/behat/vendor/bin/behat
 # behat config file for parallel deployment tests
 PARALLEL_BEHAT_YML=tests/parallelDeployAcceptance/config/behat.yml
+# behat config file for core api tests
+CORE_BEHAT_YML=tests/acceptance/config/behat-core.yml
 
 .PHONY: test-acceptance-api
 test-acceptance-api: vendor-bin/behat/vendor
 	BEHAT_BIN=$(BEHAT_BIN) $(PWD)/tests/acceptance/run.sh --type api
+
+.PHONY: test-acceptance-core-api
+test-acceptance-core-api: vendor-bin/behat/vendor
+	BEHAT_BIN=$(BEHAT_BIN) BEHAT_YML=$(CORE_BEHAT_YML) $(PWD)/tests/acceptance/run.sh --type core-api
 
 .PHONY: test-paralleldeployment-api
 test-paralleldeployment-api: vendor-bin/behat/vendor

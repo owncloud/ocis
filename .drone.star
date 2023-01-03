@@ -937,10 +937,9 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "RUN_PART": part_number,
                              "EXPECTED_FAILURES_FILE": expectedFailuresFile,
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
-                             "BEHAT_YML": "%s/tests/acceptance/config/behat-core.yml" % (dirs["base"]),
                          },
                          "commands": [
-                             "make -C %s test-acceptance-api" % (dirs["base"]),
+                             "make -C %s test-acceptance-core-api" % (dirs["base"]),
                          ],
                      },
                  ] + failEarly(ctx, early_fail),
