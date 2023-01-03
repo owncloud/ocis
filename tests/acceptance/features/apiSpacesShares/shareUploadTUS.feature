@@ -221,7 +221,7 @@ Feature: upload resources on share using TUS protocol
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
     And user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
-      | Upload-Length   | 5                                     |
+      | Upload-Length   | 16                                    |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
       | Upload-Metadata | filename L0ZPTERFUi90ZXh0RmlsZS50eHQ= |
       | Tus-Resumable   | 1.0.0                                 |
