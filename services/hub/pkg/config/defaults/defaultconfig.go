@@ -5,6 +5,14 @@ import (
 	"strings"
 )
 
+// FullDefaultConfig used by doc generation
+func FullDefaultConfig() *config.Config {
+	cfg := DefaultConfig()
+	EnsureDefaults(cfg)
+	Sanitize(cfg)
+	return cfg
+}
+
 // DefaultConfig returns the default config
 func DefaultConfig() *config.Config {
 	return &config.Config{

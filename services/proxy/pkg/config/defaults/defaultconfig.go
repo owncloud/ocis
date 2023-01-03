@@ -11,7 +11,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 )
 
-// FullDefaultConfig returns a fully initialized default configuration
+// FullDefaultConfig used by docs generation
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
 	EnsureDefaults(cfg)
@@ -19,7 +19,7 @@ func FullDefaultConfig() *config.Config {
 	return cfg
 }
 
-// DefaultConfig returns a basic default configuration
+// DefaultConfig returns the proxys default config
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
@@ -82,7 +82,7 @@ func DefaultConfig() *config.Config {
 	}
 }
 
-// DefaultPolicies returns the default proxy policies.
+// DefaultPolicies returns the default routing policies
 func DefaultPolicies() []config.Policy {
 	return []config.Policy{
 		{
