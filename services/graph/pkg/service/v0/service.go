@@ -243,6 +243,11 @@ func NewService(opts ...Option) (Graph, error) {
 					r.Get("/", svc.GetUser)
 					r.With(requireAdmin).Delete("/", svc.DeleteUser)
 					r.With(requireAdmin).Patch("/", svc.PatchUser)
+					r.With(requireAdmin).Route("/appRoleAssignments", func(r chi.Router) {
+						r.Get("/", svc.ListAppRoleAssignments)
+						r.Post("/", svc.CreateAppRoleAssignment)
+						r.Delete("/{appRoleAssignmentID}", svc.DeleteAppRoleAssignment)
+					})
 				})
 			})
 			r.Route("/groups", func(r chi.Router) {
