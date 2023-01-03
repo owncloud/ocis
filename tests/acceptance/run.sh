@@ -29,9 +29,6 @@ fi
 # BEHAT_FILTER_TAGS - see "--tags" description
 # BEHAT_SUITE - see "--suite" description
 # BEHAT_YML - see "--config" description
-# BROWSER - see "--browser" description
-# NORERUN - see "--norerun" description
-# RERUN_FAILED_WEBUI_SCENARIOS - opposite of NORERUN
 # RUN_PART and DIVIDE_INTO_NUM_PARTS - see "--part" description
 # SHOW_OC_LOGS - see "--show-oc-logs" description
 # TESTING_REMOTE_SYSTEM - see "--remote" description
@@ -62,15 +59,12 @@ fi
 # -c or --config - specify a behat.yml to use
 # --feature - specify a single feature to run
 # --suite - specify a single suite to run
-# --type - api, cli or webui - if no individual feature or suite is specified, then
+# --type - api or core-api - if no individual feature or suite is specified, then
 #          specify the type of acceptance tests to run. Default api.
 # --tags - specify tags for scenarios to run (or not)
-# --browser - for webUI tests, which browser to use. "chrome", "firefox",
-#             "internet explorer" and "MicrosoftEdge" are possible.
 # --remote - the server under test is remote, so we cannot locally enable the
 #            testing app. We have to assume it is already enabled.
 # --show-oc-logs - tail the ownCloud log after the test run
-# --norerun - do not rerun failed webUI scenarios
 # --loop - loop tests for given number of times. Only use it for debugging purposes
 # --part - run a subset of scenarios, need two numbers.
 #          first number: which part to run
@@ -100,17 +94,13 @@ do
 			shift
 			;;
 		--type)
-			# Lowercase the parameter value, so the user can provide "API", "CLI", "webUI" etc
+			# Lowercase the parameter value, so the user can provide "API", "CORE-API", etc
 			ACCEPTANCE_TEST_TYPE="${2,,}"
 			shift
 			;;
 		--tags)
 			BEHAT_FILTER_TAGS="$2"
 			BEHAT_TAGS_OPTION_FOUND=true
-			shift
-			;;
-		--browser)
-			BROWSER="$2"
 			shift
 			;;
 		--part)
@@ -122,9 +112,6 @@ do
 				exit 1
 			fi
 			shift 2
-			;;
-		--norerun)
-			RERUN_FAILED_WEBUI_SCENARIOS=false
 			;;
 		--step-through)
 			STEP_THROUGH_OPTION="--step-through"
@@ -173,8 +160,6 @@ fi
 # $TEST_LOG_FILE
 # $BEHAT - behat executable
 # $BEHAT_YML
-# $RUNNING_WEBUI_TESTS
-# $RERUN_FAILED_WEBUI_SCENARIOS
 #
 # set arrays
 # ---------------
@@ -356,69 +341,6 @@ function run_behat_tests() {
 		UNEXPECTED_BEHAT_EXIT_STATUSES+=("${SUITE_FEATURE_TEXT} had behat exit status ${BEHAT_EXIT_STATUS}")
 	fi
 
-	# With webUI tests, we try running failed tests again.
-	if [ ${#UNEXPECTED_FAILED_SCENARIOS[@]} -gt 0 ] && [ "${RUNNING_WEBUI_TESTS}" = true ] && [ "${RERUN_FAILED_WEBUI_SCENARIOS}" = true ]
-	then
-		echo "webUI test run failed with exit status: ${BEHAT_EXIT_STATUS}"
-		FAILED_SCENARIO_PATHS_COLORED=`awk '/Failed scenarios:/',0 ${TEST_LOG_FILE} | grep feature`
-		# There will be some ANSI escape codes for color in the FEATURE_COLORED var.
-		# Strip them out so we can pass just the ordinary feature details to Behat.
-		# Thanks to https://en.wikipedia.org/wiki/Tee_(command) and
-		# https://stackoverflow.com/questions/23416278/how-to-strip-ansi-escape-sequences-from-a-variable
-		# for ideas.
-		FAILED_SCENARIO_PATHS=$(echo "${FAILED_SCENARIO_PATHS_COLORED}" | sed "s/\x1b[^m]*m//g")
-
-		# If something else went wrong, and there were no failed scenarios,
-		# then the awk, grep, sed command sequence above ends up with an empty string.
-		# Unset FAILED_SCENARIO_PATHS to avoid later code thinking that there might be
-		# one failed scenario.
-		if [ -z "${FAILED_SCENARIO_PATHS}" ]
-		then
-			unset FAILED_SCENARIO_PATHS
-			FAILED_SCENARIO_PATHS=()
-		fi
-
-		for FAILED_SCENARIO_PATH in ${FAILED_SCENARIO_PATHS}
-			do
-				SUITE_PATH=`dirname ${FAILED_SCENARIO_PATH}`
-				SUITE=`basename ${SUITE_PATH}`
-				SCENARIO=`basename ${FAILED_SCENARIO_PATH}`
-				SUITE_SCENARIO="${SUITE}/${SCENARIO}"
-
-				if [ -n "${EXPECTED_FAILURES_FILE}" ]
-				then
-					grep -x ${SUITE_SCENARIO} ${EXPECTED_FAILURES_FILE} > /dev/null
-					if [ $? -eq 0 ]
-					then
-						echo "Notice: Scenario ${SUITE_SCENARIO} is expected to fail so do not rerun it."
-						continue
-					fi
-				fi
-
-				echo "Rerun failed scenario: ${FAILED_SCENARIO_PATH}"
-				${BEHAT} --colors --strict -c ${BEHAT_YML} -f pretty ${BEHAT_SUITE_OPTION} --tags ${BEHAT_FILTER_TAGS} ${FAILED_SCENARIO_PATH} -v 2>&1 | tee -a ${TEST_LOG_FILE}
-				BEHAT_EXIT_STATUS=${PIPESTATUS[0]}
-				if [ ${BEHAT_EXIT_STATUS} -eq 0 ]
-				then
-					# The scenario was not expected to fail but had failed and is present in the
-					# unexpected_failures list. We've checked the scenario with a re-run and
-					# it passed. So remove it from the unexpected_failures list.
-					for i in "${!UNEXPECTED_FAILED_SCENARIOS[@]}"
-					do
-						if [ "${UNEXPECTED_FAILED_SCENARIOS[i]}" == "$SUITE_SCENARIO" ]
-						then
-							unset "UNEXPECTED_FAILED_SCENARIOS[i]"
-						fi
-					done
-				else
-					echo "webUI test rerun failed with exit status: ${BEHAT_EXIT_STATUS}"
-					# The scenario is not expected to fail but is failing also after the rerun.
-					# Since it is already reported in the unexpected_failures list, there is no
-					# need to touch that again. Continue processing the next scenario to rerun.
-				fi
-			done
-	fi
-
 	if [ "${BEHAT_TAGS_OPTION_FOUND}" != true ]
 	then
 		# The behat run specified to skip scenarios tagged @skip
@@ -484,48 +406,59 @@ ACCEPTANCE_DIR=$(dirname "${BEHAT_CONFIG_DIR}")
 BEHAT_FEATURES_DIR="${ACCEPTANCE_DIR}/features"
 
 declare -a BEHAT_SUITES
+
+function get_behat_suites() {
+	# $1 type of suites to get "api" or "core-api"
+	# defaults to "api"
+	TYPE="$1"
+	if [[ -z "$TYPE" ]]
+	then
+		TYPE="api"
+	fi
+	ALL_SUITES=`find ${BEHAT_FEATURES_DIR}/ -type d -iname ${TYPE}* | sort | rev | cut -d"/" -f1 | rev`
+	COUNT_ALL_SUITES=`echo "${ALL_SUITES}" | wc -l`
+	#divide the suites letting it round down (could be zero)
+	MIN_SUITES_PER_RUN=$((${COUNT_ALL_SUITES} / ${DIVIDE_INTO_NUM_PARTS}))
+	#some jobs might need an extra suite
+	MAX_SUITES_PER_RUN=$((${MIN_SUITES_PER_RUN} + 1))
+	# the remaining number of suites that need to be distributed (could be zero)
+	REMAINING_SUITES=$((${COUNT_ALL_SUITES} - (${DIVIDE_INTO_NUM_PARTS} * ${MIN_SUITES_PER_RUN})))
+
+	if [[ ${RUN_PART} -le ${REMAINING_SUITES} ]]
+	then
+		SUITES_THIS_RUN=${MAX_SUITES_PER_RUN}
+		SUITES_IN_PREVIOUS_RUNS=$((${MAX_SUITES_PER_RUN} * (${RUN_PART} - 1)))
+	else
+		SUITES_THIS_RUN=${MIN_SUITES_PER_RUN}
+		SUITES_IN_PREVIOUS_RUNS=$((((${MAX_SUITES_PER_RUN} * ${REMAINING_SUITES}) + (${MIN_SUITES_PER_RUN} * (${RUN_PART} - ${REMAINING_SUITES} - 1)))))
+	fi
+
+	if [ ${SUITES_THIS_RUN} -eq 0 ]
+	then
+		echo "there are only ${COUNT_ALL_SUITES} suites, nothing to do in part ${RUN_PART}"
+		exit 0
+	fi
+
+	COUNT_FINISH_AND_TODO_SUITES=$((${SUITES_IN_PREVIOUS_RUNS} + ${SUITES_THIS_RUN}))
+	BEHAT_SUITES+=(`echo "${ALL_SUITES}" | head -n ${COUNT_FINISH_AND_TODO_SUITES} | tail -n ${SUITES_THIS_RUN}`)
+}
+
 if [[ -n "${BEHAT_SUITE}" ]]
 then
-	BEHAT_SUITES+=(${BEHAT_SUITE})
+	BEHAT_SUITES+=("${BEHAT_SUITE}")
 else
-	if [[ -n "${RUN_PART}" ]]
+	if [[ -n "${RUN_PART}" && "${ACCEPTANCE_TEST_TYPE}" == "core-api" ]]
 	then
-		ALL_SUITES=`find ${BEHAT_FEATURES_DIR}/ -type d -iname ${ACCEPTANCE_TEST_TYPE}* | sort | rev | cut -d"/" -f1 | rev`
-		COUNT_ALL_SUITES=`echo "${ALL_SUITES}" | wc -l`
-		#divide the suites letting it round down (could be zero)
-		MIN_SUITES_PER_RUN=$((${COUNT_ALL_SUITES} / ${DIVIDE_INTO_NUM_PARTS}))
-		#some jobs might need an extra suite
-		MAX_SUITES_PER_RUN=$((${MIN_SUITES_PER_RUN} + 1))
-		# the remaining number of suites that need to be distributed (could be zero)
-		REMAINING_SUITES=$((${COUNT_ALL_SUITES} - (${DIVIDE_INTO_NUM_PARTS} * ${MIN_SUITES_PER_RUN})))
-
-		if [[ ${RUN_PART} -le ${REMAINING_SUITES} ]]
-		then
-			SUITES_THIS_RUN=${MAX_SUITES_PER_RUN}
-			SUITES_IN_PREVIOUS_RUNS=$((${MAX_SUITES_PER_RUN} * (${RUN_PART} - 1)))
-		else
-			SUITES_THIS_RUN=${MIN_SUITES_PER_RUN}
-			SUITES_IN_PREVIOUS_RUNS=$((((${MAX_SUITES_PER_RUN} * ${REMAINING_SUITES}) + (${MIN_SUITES_PER_RUN} * (${RUN_PART} - ${REMAINING_SUITES} - 1)))))
-		fi
-
-		if [ ${SUITES_THIS_RUN} -eq 0 ]
-		then
-			echo "there are only ${COUNT_ALL_SUITES} suites, nothing to do in part ${RUN_PART}"
-			exit 0
-		fi
-
-		COUNT_FINISH_AND_TODO_SUITES=$((${SUITES_IN_PREVIOUS_RUNS} + ${SUITES_THIS_RUN}))
-		BEHAT_SUITES+=(`echo "${ALL_SUITES}" | head -n ${COUNT_FINISH_AND_TODO_SUITES} | tail -n ${SUITES_THIS_RUN}`)
+		get_behat_suites "core"
+	else
+		get_behat_suites "${ACCEPTANCE_TEST_TYPE}"
 	fi
 fi
 
 TEST_TYPE_TAG="@api"
 TEST_TYPE_TEXT="API"
-RUNNING_API_TESTS=true
-RUNNING_CLI_TESTS=false
-RUNNING_WEBUI_TESTS=false
 
-# Always have one of "@api", "@cli" or "@webUI" filter tags
+# Always have "@api"
 if [ -z "${BEHAT_FILTER_TAGS}" ]
 then
 	BEHAT_FILTER_TAGS="${TEST_TYPE_TAG}"
@@ -558,36 +491,6 @@ if [ -z "${EMAIL_SMTP_PORT}" ]
 then
 	EMAIL_SMTP_PORT="2500"
 fi
-
-if [ -z "${SELENIUM_HOST}" ]
-then
-	SELENIUM_HOST=localhost
-fi
-
-if [ -z "${SELENIUM_PORT}" ]
-then
-	SELENIUM_PORT=4445
-fi
-
-if [ -z "${BROWSER}" ]
-then
-	BROWSER="chrome"
-fi
-
-# table of settings to be remembered and set
-#system|app;app-name;setting-name;value;variable-type
-declare -a SETTINGS
-SETTINGS+=("system;;mail_domain;foobar.com")
-SETTINGS+=("system;;mail_from_address;owncloud")
-SETTINGS+=("system;;mail_smtpmode;smtp")
-SETTINGS+=("system;;mail_smtphost;${EMAIL_HOST}")
-SETTINGS+=("system;;mail_smtpport;${EMAIL_SMTP_PORT}")
-SETTINGS+=("app;core;backgroundjobs_mode;webcron")
-SETTINGS+=("system;;sharing.federation.allowHttpFallback;true;boolean")
-SETTINGS+=("system;;grace_period.demo_key.show_popup;false;boolean")
-SETTINGS+=("app;core;enable_external_storage;yes")
-SETTINGS+=("system;;files_external_allow_create_new_local;true")
-SETTINGS+=("system;;skeletondirectory;;")
 
 # If the caller did not mention specific tags, skip the skipped tests by default
 if [ "${BEHAT_TAGS_OPTION_FOUND}" = false ]
