@@ -228,3 +228,12 @@ Feature: Change data of space
       | 10000      | between "201" and "204" | 10000 | 26   |
       | 0          | between "201" and "204" | 0     | 26   |
       | -1         | between "201" and "204" | 0     | 26   |
+
+  
+  Scenario: user sends invalid space uuid via the Graph API
+    When user "Admin" tries to change the name of the "non-existing" space to "new name"
+    Then the HTTP status code should be "404"
+    When user "Admin" tries to change the quota of the "non-existing" space to "10"
+    Then the HTTP status code should be "404"
+    When user "Alice" tries to change the description of the "non-existing" space to "new description"
+    Then the HTTP status code should be "404"
