@@ -5,7 +5,6 @@
 ALPINE_GIT = "alpine/git:latest"
 CHKO_DOCKER_PUSHRM = "chko/docker-pushrm:1"
 DRONE_CLI = "drone/cli:alpine"
-MARIADB = "mariadb:10.6"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 OC_CI_ALPINE = "owncloudci/alpine:latest"
 OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier:latest"
@@ -19,9 +18,7 @@ OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
 OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:0.2.0"
 OC_LITMUS = "owncloud/litmus:latest"
 OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.8.3"
-OC_SERVER = "owncloud/server:10"
 OC_UBUNTU = "owncloud/ubuntu:20.04"
-OSIXIA_OPEN_LDAP = "osixia/openldap:latest"
 PLUGINS_CODACY = "plugins/codacy:1"
 PLUGINS_DOCKER = "plugins/docker:latest"
 PLUGINS_DOWNSTREAM = "plugins/downstream:latest"
@@ -49,11 +46,6 @@ dirs = {
     "ocisConfig": "tests/config/drone/ocis-config.json",
     "ocis": "/srv/app/tmp/ocis",
     "ocisRevaDataRoot": "/srv/app/tmp/ocis/owncloud/data",
-    # relative path from the base directory dirs["base"]
-    # this is because the PLUGINS_S3_CACHE does not support absolute paths
-    # PLUGINS_S3_CACHE is used to cache the core and testing app
-    "core": "oc10/testrunner",
-    "testing_app": "oc10/testing",
 }
 
 # configuration
@@ -143,24 +135,6 @@ config = {
     "settingsUITests": {
         "skip": False,
         "earlyFail": True,
-    },
-    "parallelApiTests": {
-        "apiSharing": {
-            "suites": [
-                "apiShareManagement",
-            ],
-            "skip": True,
-            "earlyFail": True,
-            "cron": "nightly",
-        },
-        "apiWebdav": {
-            "suites": [
-                "apiWebdavOperations",
-            ],
-            "skip": True,
-            "earlyFail": True,
-            "cron": "nightly",
-        },
     },
     "rocketchat": {
         "channel": "ocis-internal",
@@ -384,9 +358,6 @@ def testPipelines(ctx):
     if "skip" not in config["settingsUITests"] or not config["settingsUITests"]["skip"]:
         pipelines.append(settingsUITests(ctx))
 
-    if "skip" not in config["parallelApiTests"] or not config["parallelApiTests"]["skip"]:
-        pipelines += parallelDeployAcceptancePipeline(ctx)
-
     return pipelines
 
 def testOcisModule(ctx, module):
@@ -475,29 +446,6 @@ def buildOcisBinaryForTesting(ctx):
         },
         "volumes": [pipelineVolumeGo],
     }
-
-def cacheCoreReposForTesting(ctx):
-    return [{
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "cache_core_repos_for_testing",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") +  # skip for those pipelines where core repos are not needed
-                 cloneCoreRepos() +
-                 # this does not support the absolute path to the target directory
-                 # so we need to use a relative path :(
-                 rebuildBuildArtifactCache(ctx, "testrunner", dirs["core"]),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/heads/stable-*",
-                "refs/pull/**",
-            ],
-        },
-    }]
 
 def uploadScanResults(ctx):
     sonar_env = {
@@ -2094,68 +2042,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "depends_on": depends_on,
         }
 
-    if deploy_type == "parallel":
-        user = "33:33"
-        environment = {
-            # Keycloak IDP specific configuration
-            "OCIS_OIDC_ISSUER": "https://keycloak/auth/realms/owncloud",
-            "WEB_OIDC_CLIENT_ID": "ocis-web",
-            "WEB_OIDC_SCOPE": "openid profile email owncloud",
-            # external  ldap is supposed to be read only
-            "GRAPH_IDENTITY_BACKEND": "ldap",
-            "GRAPH_LDAP_SERVER_WRITE_ENABLED": "false",
-            # LDAP bind
-            "LDAP_URI": "ldaps://openldap",
-            "LDAP_INSECURE": "true",
-            "LDAP_BIND_DN": "cn=admin,dc=owncloud,dc=com",
-            "LDAP_BIND_PASSWORD": "admin",
-            # LDAP user settings
-            "PROXY_USER_OIDC_CLAIM": "ocis.user.uuid",  # claim was added in Keycloak
-            "PROXY_USER_CS3_CLAIM": "userid",  # equals STORAGE_LDAP_USER_SCHEMA_UID
-            "LDAP_GROUP_BASE_DN": "ou=TestGroups,dc=owncloud,dc=com",
-            "LDAP_GROUP_SCHEMA_ID": "ownclouduuid",
-            "LDAP_GROUP_FILTER": "(objectclass=owncloud)",
-            "LDAP_USER_BASE_DN": "ou=TestUsers,dc=owncloud,dc=com",
-            "LDAP_USER_SCHEMA_ID": "ownclouduuid",
-            "LDAP_USER_FILTER": "(objectclass=owncloud)",
-            "LDAP_GROUP_SUBSTRING_FILTER_TYPE": "any",
-            "LDAP_USER_SUBSTRING_FILTER_TYPE": "any",
-            # ownCloudSQL storage driver
-            "STORAGE_USERS_DRIVER": "owncloudsql",
-            "STORAGE_USERS_OWNCLOUDSQL_DATADIR": "/mnt/data/files",
-            "STORAGE_USERS_OWNCLOUDSQL_SHARE_FOLDER": "/Shares",
-            "STORAGE_USERS_OWNCLOUDSQL_LAYOUT": "{{.Username}}",
-            "STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME": "owncloud",
-            "STORAGE_USERS_OWNCLOUDSQL_DB_PASSWORD": "owncloud",
-            "STORAGE_USERS_OWNCLOUDSQL_DB_HOST": "oc10-db",
-            "STORAGE_USERS_OWNCLOUDSQL_DB_PORT": 3306,
-            "STORAGE_USERS_OWNCLOUDSQL_DB_NAME": "owncloud",
-            # ownCloudSQL sharing driver
-            "SHARING_USER_DRIVER": "owncloudsql",
-            "SHARING_USER_OWNCLOUDSQL_DB_USERNAME": "owncloud",
-            "SHARING_USER_OWNCLOUDSQL_DB_PASSWORD": "owncloud",
-            "SHARING_USER_OWNCLOUDSQL_DB_HOST": "oc10-db",
-            "SHARING_USER_OWNCLOUDSQL_DB_PORT": 3306,
-            "SHARING_USER_OWNCLOUDSQL_DB_NAME": "owncloud",
-            # General oCIS config
-            # OCIS_RUN_SERVICES specifies to start all fullstack services except idm and idp. These are replaced by external services
-            "OCIS_RUN_SERVICES": "app-registry,app-provider,auth-basic,auth-machine,frontend,gateway,graph,groups,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav",
-            "OCIS_LOG_LEVEL": "info",
-            "OCIS_URL": OCIS_URL,
-            "OCIS_BASE_DATA_PATH": "/mnt/data/ocis",
-            "OCIS_CONFIG_DIR": "/etc/ocis",
-            "PROXY_ENABLE_BASIC_AUTH": "true",
-            "FRONTEND_SEARCH_MIN_LENGTH": "2",
-        }
-        wait_for_ocis = {
-            "name": "wait-for-ocis-server",
-            "image": OC_CI_WAIT_FOR,
-            "commands": [
-                "wait-for -it ocis-server:9200 -t 300",
-            ],
-            "depends_on": depends_on,
-        }
-
     # Pass in "default" accounts_hash_difficulty to not set this environment variable.
     # That will allow OCIS to use whatever its built-in default is.
     # Otherwise pass in a value from 4 to about 11 or 12 (default 4, for making regular tests fast)
@@ -2215,23 +2101,6 @@ def waitForMiddlewareService():
             "wait-for -it middleware:3000 -t 300",
         ],
     }]
-
-def cloneCoreRepos():
-    return [
-        {
-            "name": "clone-core-repos",
-            "image": OC_CI_ALPINE,
-            "commands": [
-                "source .drone.env",
-                "git clone -b master --depth=1 https://github.com/owncloud/testing.git %s" % dirs["testing_app"],
-                "ls -la %s" % dirs["testing_app"],
-                "git clone -b $CORE_BRANCH --single-branch --no-tags https://github.com/owncloud/core.git %s" % dirs["core"],
-                "ls -la %s" % dirs["core"],
-                "cd %s" % dirs["core"],
-                "git checkout $CORE_COMMITID",
-            ],
-        },
-    ]
 
 def redis():
     return [
@@ -2610,14 +2479,10 @@ def pipelineSanityChecks(ctx, pipelines):
     for image in images.keys():
         print(" %sx\t%s" % (images[image], image))
 
-"""Parallel Deployment configs
-"""
-
 # configs
 OCIS_URL = "https://ocis-server:9200"
 OCIS_DOMAIN = "ocis-server:9200"
 OC10_URL = "http://oc10:8080"
-PARALLEL_DEPLOY_CONFIG_PATH = "%s/tests/parallelDeployAcceptance/drone" % dirs["base"]
 
 # step volumes
 stepVolumeOC10Templates = \
@@ -2672,285 +2537,6 @@ pipeOCISConfigVol = \
         "name": "proxy-config",
         "temp": {},
     }
-
-def parallelDeployAcceptancePipeline(ctx):
-    pipelines = []
-
-    default = {
-        "filterTags": "~@skip",
-    }
-
-    for category, params in config["parallelApiTests"].items():
-        if "skip" in params and params["skip"]:
-            return pipelines
-
-        early_fail = params["earlyFail"] if "earlyFail" in params else False
-
-        if type(params["suites"]) == "list":
-            suites = {}
-            for suite in params["suites"]:
-                suites[suite] = suite
-        else:
-            suites = params["suites"]
-
-        for suite, suiteName in suites.items():
-            params = {}
-            for item in default:
-                params[item] = params[item] if item in params else default[item]
-
-            environment = {}
-            environment["BEHAT_FILTER_TAGS"] = params["filterTags"]
-            environment["BEHAT_SUITE"] = suite
-
-            pipeline = {
-                "kind": "pipeline",
-                "type": "docker",
-                "name": "parallel-%s" % (suiteName),
-                "platform": {
-                    "os": "linux",
-                    "arch": "amd64",
-                },
-                "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                         restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                         restoreBuildArtifactCache(ctx, "testrunner", dirs["core"]) +
-                         restoreBuildArtifactCache(ctx, "testing_app", dirs["testing_app"]) +
-                         copyConfigs() +
-                         parallelDeploymentOC10Server() +
-                         owncloudLog() +
-                         fixSharedDataPermissions() +
-                         ocisServer(
-                             "ocis",
-                             4,
-                             [stepVolumeOC10OCISData, stepVolumeOCISConfig],
-                             ["fix-shared-data-permissions"],
-                             "parallel",
-                         ) +
-                         parallelAcceptance(environment) +
-                         failEarly(ctx, early_fail),
-                "services": oc10DbService() +
-                            ldapService() +
-                            redis(),
-                "volumes": [
-                    pipeOC10TemplatesVol,
-                    pipeOC10PreServerVol,
-                    pipeOC10AppsVol,
-                    pipeOC10OCISSharedVol,
-                    pipeOCISConfigVol,
-                ],
-                "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]) +
-                              getPipelineNames(cacheCoreReposForTesting(ctx)),
-                "trigger": {},
-            }
-
-            if (ctx.build.event == "cron"):
-                pipeline["trigger"]["cron"] = params["cron"] if "cron" in params and params["cron"] != "" else "nightly"
-            else:
-                pipeline["trigger"]["ref"] = [
-                    "refs/heads/master",
-                    "refs/heads/stable-*",
-                    "refs/pull/**",
-                ]
-
-            pipelines.append(pipeline)
-
-    return pipelines
-
-def parallelAcceptance(env):
-    environment = {
-        "TEST_SERVER_URL": OCIS_URL,
-        "TEST_OC10_URL": OC10_URL,
-        "TEST_PARALLEL_DEPLOYMENT": "true",
-        "TEST_OCIS": "true",
-        "TEST_WITH_LDAP": "true",
-        "REVA_LDAP_PORT": 636,
-        "REVA_LDAP_BASE_DN": "dc=owncloud,dc=com",
-        "REVA_LDAP_HOSTNAME": "openldap",
-        "REVA_LDAP_BIND_DN": "cn=admin,dc=owncloud,dc=com",
-        "SKELETON_DIR": "/%s/%s/data/apiSkeleton" % (dirs["base"], dirs["testing_app"]),
-        "PATH_TO_CORE": "/%s/%s" % (dirs["base"], dirs["core"]),
-        "OCIS_REVA_DATA_ROOT": "/mnt/data/",
-        "EXPECTED_FAILURES_FILE": "%s/tests/parallelDeployAcceptance/expected-failures-API.md" % dirs["base"],
-        "OCIS_SKELETON_STRATEGY": "copy",
-        "SEND_SCENARIO_LINE_REFERENCES": "true",
-        "UPLOAD_DELETE_WAIT_TIME": "1",
-    }
-    environment.update(env)
-
-    return [{
-        "name": "acceptance-tests",
-        "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-        "environment": environment,
-        "commands": [
-            "make test-paralleldeployment-api",
-        ],
-        "depends_on": ["wait-for-oc10", "wait-for-ocis-server"],
-        "volumes": [
-            stepVolumeOC10Apps,
-            stepVolumeOC10OCISData,
-        ],
-    }]
-
-def parallelDeploymentOC10Server():
-    return [
-        {
-            "name": "oc10",
-            "image": OC_SERVER,
-            "detach": True,
-            "environment": {
-                # can be switched to "web"
-                "OWNCLOUD_DEFAULT_APP": "files",
-                "OWNCLOUD_WEB_REWRITE_LINKS": "false",
-                # script / config variables
-                "IDP_OIDC_ISSUER": "https://keycloak/auth/realms/owncloud",
-                "IDP_OIDC_CLIENT_SECRET": "oc10-oidc-secret",
-                "CLOUD_DOMAIN": OCIS_DOMAIN,
-                # LDAP bind configuration
-                "LDAP_HOST": "openldap",
-                "LDAP_PORT": 389,
-                "STORAGE_LDAP_BIND_DN": "cn=admin,dc=owncloud,dc=com",
-                "STORAGE_LDAP_BIND_PASSWORD": "admin",
-                # LDAP user configuration
-                "LDAP_BASE_DN": "dc=owncloud,dc=com",
-                "LDAP_USER_SCHEMA_DISPLAYNAME": "displayname",
-                "LDAP_LOGINFILTER": "(&(objectclass=owncloud)(|(uid=%uid)(mail=%uid)))",
-                "LDAP_GROUP_SCHEMA_DISPLAYNAME": "cn",
-                "LDAP_USER_SCHEMA_NAME_ATTR": "uid",
-                "LDAP_GROUP_FILTER": "(&(objectclass=groupOfNames)(objectclass=owncloud))",
-                "LDAP_USER_SCHEMA_UID": "ownclouduuid",
-                "LDAP_USERATTRIBUTEFILTERS": "uid",  # ownCloudUUID;cn;uid;mail
-                "LDAP_USER_SCHEMA_MAIL": "mail",
-                "LDAP_USER_FILTER": "(&(objectclass=owncloud))",
-                "LDAP_GROUP_MEMBER_ASSOC_ATTR": "uniqueMember",
-                # database
-                "OWNCLOUD_DB_TYPE": "mysql",
-                "OWNCLOUD_DB_NAME": "owncloud",
-                "OWNCLOUD_DB_USERNAME": "owncloud",
-                "OWNCLOUD_DB_PASSWORD": "owncloud",
-                "OWNCLOUD_DB_HOST": "oc10-db",
-                "OWNCLOUD_ADMIN_USERNAME": "admin",
-                "OWNCLOUD_ADMIN_PASSWORD": "admin",
-                "OWNCLOUD_MYSQL_UTF8MB4": "true",
-                # redis
-                "OWNCLOUD_REDIS_ENABLED": "true",
-                "OWNCLOUD_REDIS_HOST": "redis",
-                # ownCloud config
-                "OWNCLOUD_TRUSTED_PROXIES": OCIS_DOMAIN,
-                "OWNCLOUD_OVERWRITE_PROTOCOL": "https",
-                "OWNCLOUD_OVERWRITE_HOST": OCIS_DOMAIN,
-                "OWNCLOUD_APPS_ENABLE": "openidconnect,oauth2,user_ldap,graphapi",
-                "OWNCLOUD_LOG_LEVEL": 2,
-                "OWNCLOUD_LOG_FILE": "/mnt/data/owncloud.log",
-            },
-            "volumes": [
-                stepVolumeOC10OCISData,
-                stepVolumeOC10Apps,
-                stepVolumeOC10Templates,
-                stepVolumeOC10PreServer,
-            ],
-            "depends_on": ["copy-configs"],
-        },
-        {
-            "name": "wait-for-oc10",
-            "image": OC_CI_WAIT_FOR,
-            "commands": [
-                "wait-for -it oc10:8080 -t 300",
-            ],
-            "depends_on": ["oc10"],
-        },
-    ]
-
-def ldapService():
-    return [{
-        "name": "openldap",
-        "image": OSIXIA_OPEN_LDAP,
-        "environment": {
-            "LDAP_TLS_VERIFY_CLIENT": "never",
-            "LDAP_DOMAIN": "owncloud.com",
-            "LDAP_ORGANISATION": "owncloud",
-            "LDAP_ADMIN_PASSWORD": "admin",
-            "LDAP_RFC2307BIS_SCHEMA": "true",
-            "LDAP_REMOVE_CONFIG_AFTER_SETUP": "false",
-            "LDAP_SEED_INTERNAL_LDIF_PATH": "%s/ldap/ldif" % (PARALLEL_DEPLOY_CONFIG_PATH),
-        },
-        "command": [
-            "--copy-service",
-            "--loglevel",
-            "debug",
-        ],
-    }]
-
-def oc10DbService():
-    return [
-        {
-            "name": "oc10-db",
-            "image": MARIADB,
-            "environment": {
-                "MYSQL_ROOT_PASSWORD": "owncloud",
-                "MYSQL_USER": "owncloud",
-                "MYSQL_PASSWORD": "owncloud",
-                "MYSQL_DATABASE": "owncloud",
-            },
-            "command": [
-                "--max-allowed-packet=128M",
-                "--innodb-log-file-size=64M",
-                "--innodb-read-only-compressed=OFF",
-            ],
-        },
-    ]
-
-def copyConfigs():
-    return [{
-        "name": "copy-configs",
-        "image": OC_SERVER,
-        "commands": [
-            # ocis proxy config
-            "mkdir -p /etc/ocis",
-            "cp %s/ocis/proxy.yaml /etc/ocis/proxy.yaml" % (PARALLEL_DEPLOY_CONFIG_PATH),
-            "chown -R 33:33 /etc/ocis",
-            # oc10 configs
-            "mkdir -p /etc/templates",
-            "mkdir -p /etc/pre_server.d",
-            "cp %s/oc10/oidc.config.php /etc/templates/oidc.config.php" % (PARALLEL_DEPLOY_CONFIG_PATH),
-            "cp %s/oc10/ldap-config.tmpl.json /etc/templates/ldap-config.tmpl.json" % (PARALLEL_DEPLOY_CONFIG_PATH),
-            "cp %s/oc10/10-custom-config.sh /etc/pre_server.d/10-custom-config.sh" % (PARALLEL_DEPLOY_CONFIG_PATH),
-        ],
-        "volumes": [
-            stepVolumeOCISConfig,
-            stepVolumeOC10Templates,
-            stepVolumeOC10PreServer,
-        ],
-    }]
-
-def owncloudLog():
-    return [{
-        "name": "owncloud-log",
-        "image": OC_UBUNTU,
-        "detach": True,
-        "commands": [
-            "tail -f /mnt/data/owncloud.log",
-        ],
-        "volumes": [
-            stepVolumeOC10OCISData,
-        ],
-        "depends_on": ["wait-for-oc10"],
-    }]
-
-def fixSharedDataPermissions():
-    return [{
-        "name": "fix-shared-data-permissions",
-        "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-        "commands": [
-            "chown -R 33:33 /var/www/owncloud",  # www-data  user
-            "chmod -R 777 /var/www/owncloud",
-            "chown -R 33:33 /mnt/data",  # www-data  user
-            "chmod -R 777 /mnt/data",
-        ],
-        "volumes": [
-            stepVolumeOC10Apps,
-            stepVolumeOC10OCISData,
-        ],
-        "depends_on": ["wait-for-oc10"],
-    }]
 
 def litmus(ctx, storage):
     pipelines = []
