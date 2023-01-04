@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -16,8 +17,12 @@ func (g Graph) GetApplication(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Interface("query", r.URL.Query()).Msg("calling get application")
 
-	// TODO make application id and name for this instance configurable
 	applicationID := chi.URLParam(r, "applicationID")
+
+	if applicationID != g.config.Service.ApplicationID {
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, fmt.Sprintf("resource id %s does not match expected application id %v", applicationID, g.config.Service.ApplicationID))
+		return
+	}
 
 	s := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
 
@@ -36,6 +41,7 @@ func (g Graph) GetApplication(w http.ResponseWriter, r *http.Request) {
 	}
 
 	application := libregraph.NewApplication(applicationID)
+	application.SetDisplayName(g.config.Service.ApplicationDisplayName)
 	application.SetAppRoles(roles)
 
 	render.Status(r, http.StatusOK)
