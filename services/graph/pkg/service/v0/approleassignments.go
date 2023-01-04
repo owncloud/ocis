@@ -6,7 +6,12 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
+
+const principalTypeUser = "User"
 
 // ListAppRoleAssignments implements the Service interface.
 func (g Graph) ListAppRoleAssignments(w http.ResponseWriter, r *http.Request) {
@@ -15,16 +20,29 @@ func (g Graph) ListAppRoleAssignments(w http.ResponseWriter, r *http.Request) {
 
 	userID := chi.URLParam(r, "userID")
 
-	ara1 := libregraph.NewAppRoleAssignmentWithDefaults()
-	ara1.SetAppRoleId("appRoleID-1")
-	ara1.SetPrincipalId(userID)
-	ara1.SetResourceId("some-application-id")
-	ara2 := libregraph.NewAppRoleAssignmentWithDefaults()
-	ara2.SetAppRoleId("appRoleID-2")
-	ara2.SetPrincipalId(userID)
-	ara2.SetResourceId("some-application-id")
+	s := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
 
-	values := []*libregraph.AppRoleAssignment{ara1, ara2}
+	lrar, err := s.ListRoleAssignments(r.Context(), &settingssvc.ListRoleAssignmentsRequest{
+		AccountUuid: userID,
+	})
+	if err != nil {
+		logger.Error().Err(err).Msg("could not list role assginments: transport error")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	values := make([]*libregraph.AppRoleAssignment, 0, len(lrar.GetAssignments()))
+	for _, assignment := range lrar.GetAssignments() {
+		appRoleAssignment := libregraph.NewAppRoleAssignmentWithDefaults()
+		appRoleAssignment.SetId(assignment.Id)
+		appRoleAssignment.SetAppRoleId(assignment.RoleId)
+		appRoleAssignment.SetPrincipalType(principalTypeUser)  // currently always assigned to the user
+		appRoleAssignment.SetResourceId("todo-application-id") // TODO read from config
+		// appRoleAssignment.SetResourceDisplayName() // TODO read from config?
+		appRoleAssignment.SetPrincipalId(assignment.AccountUuid)
+		// appRoleAssignment.SetPrincipalDisplayName() // TODO fetch and cache
+		values = append(values, appRoleAssignment)
+	}
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, &ListResponse{Value: values})
