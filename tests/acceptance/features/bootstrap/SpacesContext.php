@@ -768,7 +768,6 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($owner, $spaceName);
 		Assert::assertIsArray($space);
 		Assert::assertNotEmpty($spaceId = $space["id"]);
-		Assert::assertNotEmpty($space["root"]["webDavUrl"]);
 		$url = GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'drives/' . $spaceId);
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
