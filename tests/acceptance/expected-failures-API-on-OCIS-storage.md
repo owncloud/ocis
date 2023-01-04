@@ -74,9 +74,9 @@ Synchronization features like etag propagation, setting mtime and locking files
 - [apiWebdavLocks/exclusiveLocks.feature:181](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/exclusiveLocks.feature#L181)
 - [apiWebdavLocks/exclusiveLocks.feature:186](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/exclusiveLocks.feature#L186)
 - [apiWebdavLocks/exclusiveLocks.feature:187](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/exclusiveLocks.feature#L187)
-- [apiWebdavLocks/requestsWithToken.feature:130](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/requestsWithToken.feature#L130)
-- [apiWebdavLocks/requestsWithToken.feature:131](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/requestsWithToken.feature#L131)
-- [apiWebdavLocks/requestsWithToken.feature:136](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/requestsWithToken.feature#L136)
+- [apiWebdavLocks/requestsWithToken.feature:126](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/requestsWithToken.feature#L126)
+- [apiWebdavLocks/requestsWithToken.feature:127](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/requestsWithToken.feature#L127)
+- [apiWebdavLocks/requestsWithToken.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks/requestsWithToken.feature#L132)
 - [apiWebdavLocks3/independentLocks.feature:65](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks3/independentLocks.feature#L65)
 - [apiWebdavLocks3/independentLocks.feature:66](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks3/independentLocks.feature#L66)
 - [apiWebdavLocks3/independentLocks.feature:67](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocks3/independentLocks.feature#L67)
@@ -118,36 +118,36 @@ Synchronization features like etag propagation, setting mtime and locking files
 - [apiWebdavLocksUnlock/unlock.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlock.feature#L132)
 - [apiWebdavLocksUnlock/unlock.feature:137](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlock.feature#L137)
 - [apiWebdavLocksUnlock/unlock.feature:138](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlock.feature#L138)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:27](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L27)
 - [apiWebdavLocksUnlock/unlockSharingToShares.feature:28](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L28)
 - [apiWebdavLocksUnlock/unlockSharingToShares.feature:29](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L29)
 - [apiWebdavLocksUnlock/unlockSharingToShares.feature:30](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L30)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:31](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L31)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:35](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L35)
 - [apiWebdavLocksUnlock/unlockSharingToShares.feature:36](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L36)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:37](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L37)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:51](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L51)
 - [apiWebdavLocksUnlock/unlockSharingToShares.feature:52](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L52)
 - [apiWebdavLocksUnlock/unlockSharingToShares.feature:53](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L53)
 - [apiWebdavLocksUnlock/unlockSharingToShares.feature:54](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L54)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:55](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L55)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:59](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L59)
 - [apiWebdavLocksUnlock/unlockSharingToShares.feature:60](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L60)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:61](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L61)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:99](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L99)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:100](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L100)
 - [apiWebdavLocksUnlock/unlockSharingToShares.feature:101](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L101)
 - [apiWebdavLocksUnlock/unlockSharingToShares.feature:102](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L102)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:103](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L103)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L104)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:109](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L109)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:110](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L110)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:107](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L107)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:108](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L108)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L123)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:124](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L124)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L125)
 - [apiWebdavLocksUnlock/unlockSharingToShares.feature:126](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L126)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:127](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L127)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:128](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L128)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:129](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L129)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:134](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L134)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:135](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L135)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:131](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L131)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L132)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:147](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L147)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:148](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L148)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:149](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L149)
 - [apiWebdavLocksUnlock/unlockSharingToShares.feature:150](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L150)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:151](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L151)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:152](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L152)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:153](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L153)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:158](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L158)
-- [apiWebdavLocksUnlock/unlockSharingToShares.feature:159](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L159)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:155](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L155)
+- [apiWebdavLocksUnlock/unlockSharingToShares.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiWebdavLocksUnlock/unlockSharingToShares.feature#L156)
 
 ### Share
 
@@ -169,26 +169,26 @@ File and sync features in a shared scenario
 
 #### [accepting matching name shared resources from different users/groups sets no serial identifiers on the resource name for the receiver](https://github.com/owncloud/ocis/issues/4289)
 
-- [apiShareManagementToShares/acceptShares.feature:335](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L335)
-- [apiShareManagementToShares/acceptShares.feature:366](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L366)
+- [apiShareManagementToShares/acceptShares.feature:334](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L334)
+- [apiShareManagementToShares/acceptShares.feature:364](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L364)
 - [apiShareManagementToShares/acceptShares.feature:278](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L278)
-- [apiShareManagementToShares/acceptShares.feature:545](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L545)
-- [apiShareManagementToShares/acceptShares.feature:610](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L610)
-- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:144](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L144)
-- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:145](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L145)
-- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:184](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L184)
-- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:185](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L185)
+- [apiShareManagementToShares/acceptShares.feature:543](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L543)
+- [apiShareManagementToShares/acceptShares.feature:608](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L608)
+- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:141](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L141)
+- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:142](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L142)
+- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:181](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L181)
+- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L182)
 - [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:45](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L45)
 - [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:46](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L46)
 
 #### [sharing the shares folder to users exits with different status code than in oc10 backend](https://github.com/owncloud/ocis/issues/2215)
 
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:750](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L750)
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:751](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L751)
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:785](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L785)
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:786](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L786)
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:769](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L769)
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:770](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L770)
+- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:747](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L747)
+- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:748](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L748)
+- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:766](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L766)
+- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:767](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L767)
+- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:782](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L782)
+- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:783](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L783)
 
 #### [file_target of an auto-renamed file is not correct directly after sharing](https://github.com/owncloud/core/issues/32322)
 
@@ -196,15 +196,15 @@ File and sync features in a shared scenario
 
 #### [File deletion using dav gives unique string in filename in the trashbin](https://github.com/owncloud/product/issues/178)
 
-- [apiShareManagementBasicToShares/deleteShareFromShares.feature:64](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L64)
-- [apiShareManagementBasicToShares/deleteShareFromShares.feature:78](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L78)
+- [apiShareManagementBasicToShares/deleteShareFromShares.feature:63](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L63)
+- [apiShareManagementBasicToShares/deleteShareFromShares.feature:77](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L77)
 
 cannot share a folder with create permission
 
 #### [Resource with share permission create is readable for sharee](https://github.com/owncloud/ocis/issues/4524)
 
-- [apiShareManagementBasicToShares/deleteShareFromShares.feature:132](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L132)
-- [apiShareManagementBasicToShares/deleteShareFromShares.feature:145](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L145)
+- [apiShareManagementBasicToShares/deleteShareFromShares.feature:130](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L130)
+- [apiShareManagementBasicToShares/deleteShareFromShares.feature:143](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L143)
 
 
 #### [OCS error message for attempting to access share via share id as an unauthorized user is not informative](https://github.com/owncloud/ocis/issues/1233)
@@ -214,8 +214,8 @@ cannot share a folder with create permission
 
 #### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis/issues/1231)
 
+- [apiShareOperationsToShares1/gettingShares.feature:221](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/gettingShares.feature#L221)
 - [apiShareOperationsToShares1/gettingShares.feature:222](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/gettingShares.feature#L222)
-- [apiShareOperationsToShares1/gettingShares.feature:223](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares1/gettingShares.feature#L223)
 
 #### [Public link enforce permissions](https://github.com/owncloud/ocis/issues/1269)
 
@@ -441,16 +441,16 @@ cannot share a folder with create permission
 
 #### [Cannot move folder/file from one received share to another](https://github.com/owncloud/ocis/issues/2442)
 
-- [apiShareUpdateToShares/updateShare.feature:236](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L236)
-- [apiShareUpdateToShares/updateShare.feature:195](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L195)
+- [apiShareUpdateToShares/updateShare.feature:235](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L235)
+- [apiShareUpdateToShares/updateShare.feature:194](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L194)
 - [apiShareManagementToShares/mergeShare.feature:141](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/mergeShare.feature#L141)
 
 #### [Sharing folder and sub-folder with same user but different permission,the permission of sub-folder is not obeyed ](https://github.com/owncloud/ocis/issues/2440)
 
-- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:281](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L281)
-- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:316](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L316)
-- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:427](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L427)
-- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:462](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L462)
+- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:278](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L278)
+- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:313](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L313)
+- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:422](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L422)
+- [apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:457](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L457)
 
 #### [Empty OCS response for a share create request using a disabled user](https://github.com/owncloud/ocis/issues/2212)
 
@@ -460,8 +460,8 @@ cannot share a folder with create permission
 
 #### [Edit user share response has a "name" field](https://github.com/owncloud/ocis/issues/1225)
 
+- [apiShareUpdateToShares/updateShare.feature:281](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L281)
 - [apiShareUpdateToShares/updateShare.feature:282](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L282)
-- [apiShareUpdateToShares/updateShare.feature:283](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareUpdateToShares/updateShare.feature#L283)
 
 #### [user can access version metadata of a received share before accepting it](https://github.com/owncloud/ocis/issues/760)
 
@@ -469,13 +469,13 @@ cannot share a folder with create permission
 
 #### [Share lists deleted user as 'user'](https://github.com/owncloud/ocis/issues/903)
 
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:685](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L685)
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:686](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L686)
+- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:682](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L682)
+- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:683](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L683)
 
 #### [deleting a share with wrong authentication returns OCS status 996 / HTTP 500](https://github.com/owncloud/ocis/issues/1229)
 
-- [apiShareManagementBasicToShares/deleteShareFromShares.feature:230](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L230)
-- [apiShareManagementBasicToShares/deleteShareFromShares.feature:231](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L231)
+- [apiShareManagementBasicToShares/deleteShareFromShares.feature:226](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L226)
+- [apiShareManagementBasicToShares/deleteShareFromShares.feature:227](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L227)
 
 ### User Management
 
@@ -613,8 +613,8 @@ And other missing implementation of favorites
 
 #### [Sharing a same file twice to the same group](https://github.com/owncloud/ocis/issues/1710)
 
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:733](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L733)
-- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:734](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L734)
+- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:730](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L730)
+- [apiShareManagementBasicToShares/createShareToSharesFolder.feature:731](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/createShareToSharesFolder.feature#L731)
 
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
 
@@ -673,16 +673,16 @@ And other missing implementation of favorites
 - [apiShareOperationsToShares2/shareAccessByID.feature:92](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L92)
 - [apiShareOperationsToShares2/shareAccessByID.feature:104](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L104)
 - [apiShareOperationsToShares2/shareAccessByID.feature:105](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L105)
-- [apiShareOperationsToShares2/shareAccessByID.feature:143](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L143)
-- [apiShareOperationsToShares2/shareAccessByID.feature:144](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L144)
+- [apiShareOperationsToShares2/shareAccessByID.feature:136](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L136)
 - [apiShareOperationsToShares2/shareAccessByID.feature:137](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L137)
 - [apiShareOperationsToShares2/shareAccessByID.feature:138](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L138)
 - [apiShareOperationsToShares2/shareAccessByID.feature:139](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L139)
 - [apiShareOperationsToShares2/shareAccessByID.feature:140](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L140)
 - [apiShareOperationsToShares2/shareAccessByID.feature:141](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L141)
 - [apiShareOperationsToShares2/shareAccessByID.feature:142](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L142)
+- [apiShareOperationsToShares2/shareAccessByID.feature:143](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L143)
+- [apiShareOperationsToShares2/shareAccessByID.feature:155](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L155)
 - [apiShareOperationsToShares2/shareAccessByID.feature:156](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L156)
-- [apiShareOperationsToShares2/shareAccessByID.feature:157](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L157)
 
 
 #### [Shares to deleted group listed in the response](https://github.com/owncloud/ocis/issues/2441)
@@ -804,17 +804,17 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [apiShareManagementToShares/acceptShares.feature:237](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L237)
 - [apiShareManagementToShares/acceptShares.feature:275](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L275)
 - [apiShareManagementToShares/acceptShares.feature:309](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L309)
-- [apiShareManagementToShares/acceptShares.feature:531](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L531)
+- [apiShareManagementToShares/acceptShares.feature:529](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementToShares/acceptShares.feature#L529)
+- [apiShareOperationsToShares2/shareAccessByID.feature:123](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L123)
 - [apiShareOperationsToShares2/shareAccessByID.feature:124](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L124)
-- [apiShareOperationsToShares2/shareAccessByID.feature:125](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareOperationsToShares2/shareAccessByID.feature#L125)
+- [apiShareManagementBasicToShares/deleteShareFromShares.feature:177](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L177)
+- [apiShareManagementBasicToShares/deleteShareFromShares.feature:178](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L178)
+- [apiShareManagementBasicToShares/deleteShareFromShares.feature:179](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L179)
 - [apiShareManagementBasicToShares/deleteShareFromShares.feature:180](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L180)
-- [apiShareManagementBasicToShares/deleteShareFromShares.feature:181](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L181)
-- [apiShareManagementBasicToShares/deleteShareFromShares.feature:182](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L182)
-- [apiShareManagementBasicToShares/deleteShareFromShares.feature:183](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L183)
-- [apiShareManagementBasicToShares/deleteShareFromShares.feature:200](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L200)
-- [apiShareManagementBasicToShares/deleteShareFromShares.feature:201](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L201)
-- [apiShareManagementBasicToShares/deleteShareFromShares.feature:202](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L202)
-- [apiShareManagementBasicToShares/deleteShareFromShares.feature:203](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L203)
+- [apiShareManagementBasicToShares/deleteShareFromShares.feature:196](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L196)
+- [apiShareManagementBasicToShares/deleteShareFromShares.feature:197](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L197)
+- [apiShareManagementBasicToShares/deleteShareFromShares.feature:198](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L198)
+- [apiShareManagementBasicToShares/deleteShareFromShares.feature:199](https://github.com/owncloud/core/blob/master/tests/acceptance/features/apiShareManagementBasicToShares/deleteShareFromShares.feature#L199)
 
 #### [Content-type is not multipart/byteranges when downloading file with Range Header](https://github.com/owncloud/ocis/issues/2677)
 
