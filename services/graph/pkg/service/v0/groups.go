@@ -404,20 +404,25 @@ func (g Graph) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 }
 
 func sortGroups(req *godata.GoDataRequest, groups []*libregraph.Group) ([]*libregraph.Group, error) {
-	var sorter sort.Interface
 	if req.Query.OrderBy == nil || len(req.Query.OrderBy.OrderByItems) != 1 {
 		return groups, nil
 	}
+	var less func(i, j int) bool
+
 	switch req.Query.OrderBy.OrderByItems[0].Field.Value {
 	case displayNameAttr:
-		sorter = groupsByDisplayName{groups}
+		less = func(i, j int) bool {
+			return strings.ToLower(groups[i].GetDisplayName()) < strings.ToLower(groups[j].GetDisplayName())
+		}
 	default:
 		return nil, fmt.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
 	}
 
 	if req.Query.OrderBy.OrderByItems[0].Order == _sortDescending {
-		sorter = sort.Reverse(sorter)
+		sort.Slice(groups, reverse(less))
+	} else {
+		sort.Slice(groups, less)
 	}
-	sort.Sort(sorter)
+
 	return groups, nil
 }
