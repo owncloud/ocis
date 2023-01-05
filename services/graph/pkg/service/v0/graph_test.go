@@ -67,7 +67,7 @@ var _ = Describe("Graph", func() {
 		gatewayClient = &mocks.GatewayClient{}
 		eventsPublisher = mocks.Publisher{}
 		permissionService = mocks.Permissions{}
-		svc = service.NewService(
+		svc, _ = service.NewService(
 			service.Config(cfg),
 			service.WithGatewayClient(gatewayClient),
 			service.EventsPublisher(&eventsPublisher),
