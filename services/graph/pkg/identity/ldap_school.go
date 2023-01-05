@@ -347,14 +347,14 @@ func (i *LDAP) getSchoolByDN(dn string) (*ldap.Entry, error) {
 	return i.getEntryByDN(dn, attrs, filter)
 }
 
-func (i *LDAP) getSchoolByNumberOrID(numberOrId string) (*ldap.Entry, error) {
-	numberOrId = ldap.EscapeFilter(numberOrId)
+func (i *LDAP) getSchoolByNumberOrID(numberOrID string) (*ldap.Entry, error) {
+	numberOrID = ldap.EscapeFilter(numberOrID)
 	filter := fmt.Sprintf(
 		"(|(%s=%s)(%s=%s))",
 		i.educationConfig.schoolAttributeMap.id,
-		numberOrId,
+		numberOrID,
 		i.educationConfig.schoolAttributeMap.schoolNumber,
-		numberOrId,
+		numberOrID,
 	)
 	return i.getSchoolByFilter(filter)
 }
