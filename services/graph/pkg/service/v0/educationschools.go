@@ -195,17 +195,28 @@ func (g Graph) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	logger.Debug().Str("schoolID", schoolID).Msg("Getting users of school")
+	users, err := g.identityEducationBackend.GetEducationSchoolUsers(r.Context(), schoolID)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not get school users: backend error")
+		renderInternalServerError(w, r, err)
+		return
+	}
+
+	for _, user := range users {
+		logger.Debug().Str("schoolID", schoolID).Str("userID", *user.Id).Msg("calling delete member on backend")
+		if err := g.identityEducationBackend.RemoveUserFromEducationSchool(r.Context(), schoolID, *user.Id); err != nil {
+			logger.Debug().Err(err).Msg("could not delete school member: backend error")
+			renderInternalServerError(w, r, err)
+		}
+	}
+
 	logger.Debug().Str("id", schoolID).Msg("calling delete school on backend")
 	err = g.identityEducationBackend.DeleteEducationSchool(r.Context(), schoolID)
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete school: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		renderInternalServerError(w, r, err)
 		return
 	}
 
@@ -219,6 +230,16 @@ func (g Graph) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
+}
+
+func renderInternalServerError(w http.ResponseWriter, r *http.Request, err error) {
+	var errcode errorcode.Error
+	if errors.As(err, &errcode) {
+		errcode.Render(w, r)
+	} else {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+	}
+	return
 }
 
 // GetEducationSchoolUsers implements the Service interface.
