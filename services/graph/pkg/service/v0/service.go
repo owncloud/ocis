@@ -85,17 +85,23 @@ func NewService(opts ...Option) (Graph, error) {
 	m.Use(options.Middleware...)
 
 	spacePropertiesCache := ttlcache.New[string, interface{}](
-		ttlcache.WithTTL[string, interface{}](options.Config.Spaces.ExtendedSpacePropertiesCacheTTL * time.Second),
+		ttlcache.WithTTL[string, interface{}](
+			time.Duration(options.Config.Spaces.ExtendedSpacePropertiesCacheTTL),
+		),
 	)
 	go spacePropertiesCache.Start()
 
 	usersCache := ttlcache.New[string, libregraph.User](
-		ttlcache.WithTTL[string, libregraph.User](options.Config.Spaces.UsersCacheTTL * time.Second),
+		ttlcache.WithTTL[string, libregraph.User](
+			time.Duration(options.Config.Spaces.UsersCacheTTL),
+		),
 	)
 	go usersCache.Start()
 
 	groupsCache := ttlcache.New[string, libregraph.Group](
-		ttlcache.WithTTL[string, libregraph.Group](options.Config.Spaces.GroupsCacheTTL * time.Second),
+		ttlcache.WithTTL[string, libregraph.Group](
+			time.Duration(options.Config.Spaces.GroupsCacheTTL),
+		),
 	)
 	go groupsCache.Start()
 

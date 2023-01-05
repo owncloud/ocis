@@ -3,7 +3,6 @@ package svc
 import (
 	"context"
 	"errors"
-	libregraph "github.com/owncloud/libre-graph-api-go"
 	"net/http"
 	"net/url"
 	"path"
@@ -14,6 +13,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
 	"github.com/jellydator/ttlcache/v3"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
