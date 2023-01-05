@@ -20,10 +20,12 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
-	settingssvc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
+	settingspkg "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 	"golang.org/x/exp/slices"
 )
 
@@ -58,6 +60,32 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	// expand appRoleAssignments if requested
+	if slices.Contains(exp, "appRoleAssignments") {
+		s := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
+
+		lrar, err := s.ListRoleAssignments(r.Context(), &settingssvc.ListRoleAssignmentsRequest{
+			AccountUuid: me.GetId(),
+		})
+		if err != nil {
+			logger.Debug().Err(err).Str("userid", me.GetId()).Msg("could not get appRoleAssignments for self")
+			var errcode errorcode.Error
+			if errors.As(err, &errcode) {
+				errcode.Render(w, r)
+			} else {
+				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			}
+			return
+		}
+
+		values := make([]libregraph.AppRoleAssignment, 0, len(lrar.GetAssignments()))
+		for _, assignment := range lrar.GetAssignments() {
+			values = append(values, g.assignmentToAppRoleAssignment(assignment))
+		}
+		me.AppRoleAssignments = values
+	}
+
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, me)
 }
@@ -85,6 +113,28 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
 		return
+	}
+
+	// expand appRoleAssignments if requested
+	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
+	if slices.Contains(exp, "appRoleAssignments") {
+		s := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
+
+		for _, u := range users {
+			lrar, err := s.ListRoleAssignments(r.Context(), &settingssvc.ListRoleAssignmentsRequest{
+				AccountUuid: u.GetId(),
+			})
+			if err != nil {
+				logger.Debug().Err(err).Str("userid", u.GetId()).Msg("could not get appRoleAssignments when listing user")
+				continue
+			}
+
+			values := make([]libregraph.AppRoleAssignment, 0, len(lrar.GetAssignments()))
+			for _, assignment := range lrar.GetAssignments() {
+				values = append(values, g.assignmentToAppRoleAssignment(assignment))
+			}
+			u.AppRoleAssignments = values
+		}
 	}
 
 	users, err = sortUsers(odataReq, users)
@@ -165,10 +215,10 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		// to all new users for now, as create Account request does not have any role field
 		if _, err = g.roleService.AssignRoleToUser(r.Context(), &settings.AssignRoleToUserRequest{
 			AccountUuid: *u.Id,
-			RoleId:      settingssvc.BundleUUIDRoleUser,
+			RoleId:      settingspkg.BundleUUIDRoleUser,
 		}); err != nil {
 			// log as error, admin eventually needs to do something
-			logger.Error().Err(err).Str("id", *u.Id).Str("role", settingssvc.BundleUUIDRoleUser).Msg("could not create user: role assignment failed")
+			logger.Error().Err(err).Str("id", *u.Id).Str("role", settingspkg.BundleUUIDRoleUser).Msg("could not create user: role assignment failed")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "role assignment failed")
 			return
 		}
@@ -273,6 +323,30 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 				user.Drives = drives
 			}
 		}
+	}
+	// expand appRoleAssignments if requested
+	if slices.Contains(exp, "appRoleAssignments") {
+		s := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
+
+		lrar, err := s.ListRoleAssignments(r.Context(), &settingssvc.ListRoleAssignmentsRequest{
+			AccountUuid: user.GetId(),
+		})
+		if err != nil {
+			logger.Debug().Err(err).Str("userid", user.GetId()).Msg("could not get appRoleAssignments for user")
+			var errcode errorcode.Error
+			if errors.As(err, &errcode) {
+				errcode.Render(w, r)
+			} else {
+				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			}
+			return
+		}
+
+		values := make([]libregraph.AppRoleAssignment, 0, len(lrar.GetAssignments()))
+		for _, assignment := range lrar.GetAssignments() {
+			values = append(values, g.assignmentToAppRoleAssignment(assignment))
+		}
+		user.AppRoleAssignments = values
 	}
 
 	render.Status(r, http.StatusOK)
