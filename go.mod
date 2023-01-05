@@ -138,7 +138,7 @@ require (
 	github.com/coreos/go-systemd/v22 v22.4.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/crewjam/httperr v0.2.0 // indirect
-	github.com/crewjam/saml v0.4.6 // indirect
+	github.com/crewjam/saml v0.4.9 // indirect
 	github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/deckarep/golang-set v1.8.0 // indirect
