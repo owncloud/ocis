@@ -135,7 +135,7 @@ func (i *LDAP) DeleteEducationSchool(ctx context.Context, id string) error {
 	if !i.writeEnabled {
 		return errReadOnly
 	}
-	e, err := i.getSchoolByID(id)
+	e, err := i.getSchoolByNumberOrID(id)
 	if err != nil {
 		return err
 	}
