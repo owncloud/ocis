@@ -6,154 +6,27 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
-type spacesSlice []*libregraph.Drive
-
-// Len is the number of elements in the collection.
-func (d spacesSlice) Len() int { return len(d) }
-
-// Swap swaps the elements with indexes i and j.
-func (d spacesSlice) Swap(i, j int) { d[i], d[j] = d[j], d[i] }
-
-type spacesByName struct {
-	spacesSlice
-}
-type spacesByLastModifiedDateTime struct {
-	spacesSlice
-}
-
-// Less reports whether the element with index i
-// must sort before the element with index j.
-func (s spacesByName) Less(i, j int) bool {
-	return strings.ToLower(s.spacesSlice[i].Name) < strings.ToLower(s.spacesSlice[j].Name)
-}
-
-// Less reports whether the element with index i
-// must sort before the element with index j.
-func (s spacesByLastModifiedDateTime) Less(i, j int) bool {
+// lessSpacesByLastModifiedDateTime reports whether the element i
+// must sort before the element j.
+func lessSpacesByLastModifiedDateTime(i, j *libregraph.Drive) bool {
 	// compare the items when both dates are set
-	if s.spacesSlice[i].LastModifiedDateTime != nil && s.spacesSlice[j].LastModifiedDateTime != nil {
-		return s.spacesSlice[i].LastModifiedDateTime.Before(*s.spacesSlice[j].LastModifiedDateTime)
+	if i.LastModifiedDateTime != nil && j.LastModifiedDateTime != nil {
+		return i.LastModifiedDateTime.Before(*j.LastModifiedDateTime)
 	}
 	// an item without a timestamp is considered "less than" an item with a timestamp
-	if s.spacesSlice[i].LastModifiedDateTime == nil && s.spacesSlice[j].LastModifiedDateTime != nil {
+	if i.LastModifiedDateTime == nil && j.LastModifiedDateTime != nil {
 		return true
 	}
 	// an item without a timestamp is considered "less than" an item with a timestamp
-	if s.spacesSlice[i].LastModifiedDateTime != nil && s.spacesSlice[j].LastModifiedDateTime == nil {
+	if i.LastModifiedDateTime != nil && j.LastModifiedDateTime == nil {
 		return false
 	}
 	// fallback to name if no dateTime is set on both items
-	return strings.ToLower(s.spacesSlice[i].Name) < strings.ToLower(s.spacesSlice[j].Name)
+	return strings.ToLower(i.Name) < strings.ToLower(j.Name)
 }
 
-type userSlice []*libregraph.User
-
-// Len is the number of elements in the collection.
-func (d userSlice) Len() int { return len(d) }
-
-// Swap swaps the elements with indexes i and j.
-func (d userSlice) Swap(i, j int) { d[i], d[j] = d[j], d[i] }
-
-type usersByDisplayName struct {
-	userSlice
-}
-
-type usersByMail struct {
-	userSlice
-}
-
-type usersByOnPremisesSamAccountName struct {
-	userSlice
-}
-
-// Less reports whether the element with index i
-// must sort before the element with index j.
-func (u usersByDisplayName) Less(i, j int) bool {
-	return strings.ToLower(u.userSlice[i].GetDisplayName()) < strings.ToLower(u.userSlice[j].GetDisplayName())
-}
-
-// Less reports whether the element with index i
-// must sort before the element with index j.
-func (u usersByMail) Less(i, j int) bool {
-	return strings.ToLower(u.userSlice[i].GetMail()) < strings.ToLower(u.userSlice[j].GetMail())
-}
-
-// Less reports whether the element with index i
-// must sort before the element with index j.
-func (u usersByOnPremisesSamAccountName) Less(i, j int) bool {
-	return strings.ToLower(u.userSlice[i].GetOnPremisesSamAccountName()) < strings.ToLower(u.userSlice[j].GetOnPremisesSamAccountName())
-}
-
-type groupSlice []*libregraph.Group
-
-// Len is the number of elements in the collection.
-func (d groupSlice) Len() int { return len(d) }
-
-// Swap swaps the elements with indexes i and j.
-func (d groupSlice) Swap(i, j int) { d[i], d[j] = d[j], d[i] }
-
-type groupsByDisplayName struct {
-	groupSlice
-}
-
-// Less reports whether the element with index i
-// must sort before the element with index j.
-func (g groupsByDisplayName) Less(i, j int) bool {
-	return strings.ToLower(g.groupSlice[i].GetDisplayName()) < strings.ToLower(g.groupSlice[j].GetDisplayName())
-}
-
-type schoolSlice []*libregraph.EducationSchool
-
-// Len is the number of elements in the collection.
-func (d schoolSlice) Len() int { return len(d) }
-
-// Swap swaps the elements with indexes i and j.
-func (d schoolSlice) Swap(i, j int) { d[i], d[j] = d[j], d[i] }
-
-type schoolsByDisplayName struct {
-	schoolSlice
-}
-
-// Less reports whether the element with index i
-// must sort before the element with index j.
-func (g schoolsByDisplayName) Less(i, j int) bool {
-	return strings.ToLower(g.schoolSlice[i].GetDisplayName()) < strings.ToLower(g.schoolSlice[j].GetDisplayName())
-}
-
-type educationUserSlice []*libregraph.EducationUser
-
-// Len is the number of elements in the collection.
-func (d educationUserSlice) Len() int { return len(d) }
-
-// Swap swaps the elements with indexes i and j.
-func (d educationUserSlice) Swap(i, j int) { d[i], d[j] = d[j], d[i] }
-
-type educationUsersByDisplayName struct {
-	educationUserSlice
-}
-
-type educationUsersByMail struct {
-	educationUserSlice
-}
-
-type educationUsersByOnPremisesSamAccountName struct {
-	educationUserSlice
-}
-
-// Less reports whether the element with index i
-// must sort before the element with index j.
-func (u educationUsersByDisplayName) Less(i, j int) bool {
-	return strings.ToLower(u.educationUserSlice[i].GetDisplayName()) < strings.ToLower(u.educationUserSlice[j].GetDisplayName())
-}
-
-// Less reports whether the element with index i
-// must sort before the element with index j.
-func (u educationUsersByMail) Less(i, j int) bool {
-	return strings.ToLower(u.educationUserSlice[i].GetMail()) < strings.ToLower(u.educationUserSlice[j].GetMail())
-}
-
-// Less reports whether the element with index i
-// must sort before the element with index j.
-func (u educationUsersByOnPremisesSamAccountName) Less(i, j int) bool {
-	return strings.ToLower(u.educationUserSlice[i].GetOnPremisesSamAccountName()) < strings.ToLower(u.educationUserSlice[j].GetOnPremisesSamAccountName())
+func reverse(less func(i, j int) bool) func(i, j int) bool {
+	return func(i, j int) bool {
+		return !less(i, j)
+	}
 }

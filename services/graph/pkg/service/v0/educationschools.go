@@ -417,20 +417,25 @@ func (g Graph) DeleteEducationSchoolUser(w http.ResponseWriter, r *http.Request)
 }
 
 func sortEducationSchools(req *godata.GoDataRequest, schools []*libregraph.EducationSchool) ([]*libregraph.EducationSchool, error) {
-	var sorter sort.Interface
 	if req.Query.OrderBy == nil || len(req.Query.OrderBy.OrderByItems) != 1 {
 		return schools, nil
 	}
+	var less func(i, j int) bool
+
 	switch req.Query.OrderBy.OrderByItems[0].Field.Value {
 	case displayNameAttr:
-		sorter = schoolsByDisplayName{schools}
+		less = func(i, j int) bool {
+			return strings.ToLower(schools[i].GetDisplayName()) < strings.ToLower(schools[j].GetDisplayName())
+		}
 	default:
 		return nil, fmt.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
 	}
 
-	if req.Query.OrderBy.OrderByItems[0].Order == "desc" {
-		sorter = sort.Reverse(sorter)
+	if req.Query.OrderBy.OrderByItems[0].Order == _sortDescending {
+		sort.Slice(schools, reverse(less))
+	} else {
+		sort.Slice(schools, less)
 	}
-	sort.Sort(sorter)
+
 	return schools, nil
 }

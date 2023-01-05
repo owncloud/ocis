@@ -458,24 +458,32 @@ func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func sortEducationUsers(req *godata.GoDataRequest, users []*libregraph.EducationUser) ([]*libregraph.EducationUser, error) {
-	var sorter sort.Interface
 	if req.Query.OrderBy == nil || len(req.Query.OrderBy.OrderByItems) != 1 {
 		return users, nil
 	}
+	var less func(i, j int) bool
+
 	switch req.Query.OrderBy.OrderByItems[0].Field.Value {
 	case displayNameAttr:
-		sorter = educationUsersByDisplayName{users}
+		less = func(i, j int) bool {
+			return strings.ToLower(users[i].GetDisplayName()) < strings.ToLower(users[j].GetDisplayName())
+		}
 	case "mail":
-		sorter = educationUsersByMail{users}
+		less = func(i, j int) bool {
+			return strings.ToLower(users[i].GetMail()) < strings.ToLower(users[j].GetMail())
+		}
 	case "onPremisesSamAccountName":
-		sorter = educationUsersByOnPremisesSamAccountName{users}
+		less = func(i, j int) bool {
+			return strings.ToLower(users[i].GetOnPremisesSamAccountName()) < strings.ToLower(users[j].GetOnPremisesSamAccountName())
+		}
 	default:
 		return nil, fmt.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
 	}
 
-	if req.Query.OrderBy.OrderByItems[0].Order == "desc" {
-		sorter = sort.Reverse(sorter)
+	if req.Query.OrderBy.OrderByItems[0].Order == _sortDescending {
+		sort.Slice(users, reverse(less))
+	} else {
+		sort.Slice(users, less)
 	}
-	sort.Sort(sorter)
 	return users, nil
 }

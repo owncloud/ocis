@@ -927,23 +927,29 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 }
 
 func sortSpaces(req *godata.GoDataRequest, spaces []*libregraph.Drive) ([]*libregraph.Drive, error) {
-	var sorter sort.Interface
 	if req.Query.OrderBy == nil || len(req.Query.OrderBy.OrderByItems) != 1 {
 		return spaces, nil
 	}
+	var less func(i, j int) bool
+
 	switch req.Query.OrderBy.OrderByItems[0].Field.Value {
 	case "name":
-		sorter = spacesByName{spaces}
+		less = func(i, j int) bool {
+			return strings.ToLower(spaces[i].GetName()) < strings.ToLower(spaces[j].GetName())
+		}
 	case "lastModifiedDateTime":
-		sorter = spacesByLastModifiedDateTime{spaces}
+		less = func(i, j int) bool {
+			return lessSpacesByLastModifiedDateTime(spaces[i], spaces[j])
+		}
 	default:
 		return nil, errors.Errorf("we do not support <%s> as a order parameter", req.Query.OrderBy.OrderByItems[0].Field.Value)
 	}
 
 	if req.Query.OrderBy.OrderByItems[0].Order == _sortDescending {
-		sorter = sort.Reverse(sorter)
+		sort.Slice(spaces, reverse(less))
+	} else {
+		sort.Slice(spaces, less)
 	}
-	sort.Sort(sorter)
 	return spaces, nil
 }
 
