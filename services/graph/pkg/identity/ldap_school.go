@@ -211,7 +211,7 @@ func (i *LDAP) GetEducationSchoolUsers(ctx context.Context, id string) ([]*libre
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetEducationSchoolUsers")
 
-	schoolEntry, err := i.getSchoolByID(id)
+	schoolEntry, err := i.getSchoolByNumberOrID(id)
 	if err != nil {
 		return nil, err
 	}
@@ -261,7 +261,7 @@ func (i *LDAP) AddUsersToEducationSchool(ctx context.Context, schoolID string, m
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("AddUsersToEducationSchool")
 
-	schoolEntry, err := i.getSchoolByID(schoolID)
+	schoolEntry, err := i.getSchoolByNumberOrID(schoolID)
 	if err != nil {
 		return err
 	}
@@ -306,7 +306,7 @@ func (i *LDAP) RemoveUserFromEducationSchool(ctx context.Context, schoolID strin
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("RemoveUserFromEducationSchool")
 
-	schoolEntry, err := i.getSchoolByID(schoolID)
+	schoolEntry, err := i.getSchoolByNumberOrID(schoolID)
 	if err != nil {
 		return err
 	}
@@ -345,12 +345,6 @@ func (i *LDAP) getSchoolByDN(dn string) (*ldap.Entry, error) {
 		filter = fmt.Sprintf("(&%s(%s))", filter, i.educationConfig.schoolFilter)
 	}
 	return i.getEntryByDN(dn, attrs, filter)
-}
-
-func (i *LDAP) getSchoolByID(id string) (*ldap.Entry, error) {
-	id = ldap.EscapeFilter(id)
-	filter := fmt.Sprintf("(%s=%s)", i.educationConfig.schoolAttributeMap.id, id)
-	return i.getSchoolByFilter(filter)
 }
 
 func (i *LDAP) getSchoolByNumberOrID(numberOrId string) (*ldap.Entry, error) {

@@ -234,7 +234,7 @@ var schoolByIDSearch1 *ldap.SearchRequest = &ldap.SearchRequest{
 	BaseDN:     "",
 	Scope:      2,
 	SizeLimit:  1,
-	Filter:     "(&(objectClass=ocEducationSchool)(owncloudUUID=abcd-defg))",
+	Filter:     "(&(objectClass=ocEducationSchool)(|(owncloudUUID=abcd-defg)(ocEducationSchoolNumber=abcd-defg)))",
 	Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
 	Controls:   []ldap.Control(nil),
 }
