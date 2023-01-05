@@ -1,21 +1,21 @@
 @api @skipOnOcV10
 Feature: Share a file or folder that is inside a space via public link
-      As an user with manager space role
-      I want to be able to share the data inside the space via public link
+  As an user with manager space role
+  I want to be able to share the data inside the space via public link
 
-      folder permissions:
-      | role        | permissions |
-      | internal    | 0           |
-      | viewer      | 1           |
-      | uploader    | 4           |
-      | contributor | 5           |
-      | editor      | 15          |
+  folder permissions:
+  | role        | permissions |
+  | internal    | 0           |
+  | viewer      | 1           |
+  | uploader    | 4           |
+  | contributor | 5           |
+  | editor      | 15          |
 
-      file permissions:
-      | role     | permissions |
-      | internal | 0           |
-      | viewer   | 1           |
-      | editor   | 3           |
+  file permissions:
+  | role     | permissions |
+  | internal | 0           |
+  | viewer   | 1           |
+  | editor   | 3           |
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -44,17 +44,24 @@ Feature: Share a file or folder that is inside a space via public link
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
     And the fields of the last response to user "Alice" should include
-      | path | <path> |
+      | item_type         | <item_type>   |
+      | mimetype          | <mimetype>    |
+      | file_target       | <file_target> |
+      | path              | /<entity>     |
+      | permissions       | <permissions> |
+      | share_type        | public_link   |
+      | displayname_owner | %displayname% |
+      | name              | <name>        |
     Examples:
-      | entity          | path     | permissions | password | name | expireDate               |
-      | folder          | /folder   |0           |          | link |                          |
-      | folder          | /folder   |1           | 123      | link | 2042-03-25T23:59:59+0100 |
-      | folder          | /folder   |4           |          |      |                          |
-      | folder          | /folder   |5           | 200      |      | 2042-03-25T23:59:59+0100 |
-      | folder          | /folder   |15          |          | link |                          |
-      | folder/file.txt | /file.txt |0           | 123      | link | 2042-03-25T23:59:59+0100 |
-      | folder/file.txt | /file.txt |1           | 123      | link | 2042-03-25T23:59:59+0100 |
-      | folder/file.txt | /file.txt |3           | 123      | link | 2042-03-25T23:59:59+0100 |
+      | entity          | file_target | permissions | password | name | expireDate               | item_type | mimetype             |
+      | folder          | /folder     | 0           |          | link |                          | folder    | httpd/unix-directory |
+      | folder          | /folder     | 1           | 123      | link | 2042-03-25T23:59:59+0100 | folder    | httpd/unix-directory |
+      | folder          | /folder     | 4           |          |      |                          | folder    | httpd/unix-directory |
+      | folder          | /folder     | 5           | 200      |      | 2042-03-25T23:59:59+0100 | folder    | httpd/unix-directory |
+      | folder          | /folder     | 15          |          | link |                          | folder    | httpd/unix-directory |
+      | folder/file.txt | /file.txt   | 0           | 123      | link | 2042-03-25T23:59:59+0100 | file      | text/plain           |
+      | folder/file.txt | /file.txt   | 1           | 123      | link | 2042-03-25T23:59:59+0100 | file      | text/plain           |
+      | folder/file.txt | /file.txt   | 3           | 123      | link | 2042-03-25T23:59:59+0100 | file      | text/plain           |
 
 
   Scenario Outline: An user participant of the project space with space manager role can share an entity inside project space via public link
@@ -69,12 +76,18 @@ Feature: Share a file or folder that is inside a space via public link
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    And the fields of the last response to user "Alice" should include
-      | path | <path> |
+    And the fields of the last response to user "Brian" should include
+      | item_type         | <item_type>   |
+      | mimetype          | <mimetype>    |
+      | file_target       | <file_target> |
+      | path              | /<entity>     |
+      | share_type        | public_link   |
+      | displayname_owner | %displayname% |
+      | name              | public link   |
     Examples:
-      | entity          | path      |
-      | folder          | /folder   |
-      | folder/file.txt | /file.txt |
+      | entity          | file_target | item_type | mimetype             |
+      | folder          | /folder     | folder    | httpd/unix-directory |
+      | folder/file.txt | /file.txt   | file      | text/plain           |
 
 
   Scenario Outline: An user participant of the project space without space manager role cannot share an entity inside project space via public link
@@ -130,7 +143,18 @@ Feature: Share a file or folder that is inside a space via public link
       | path        | folder/file.txt |
       | shareType   | 3               |
       | permissions | 1               |
-    Then for user "Brian" the space "share sub-item" should contain the last created public link of the file "folder/file.txt"
+    Then the fields of the last response to user "Alice" should include
+      | item_type              | file            |
+      | mimetype               | text/plain      |
+      | file_target            | /file.txt       |
+      | path                   | folder/file.txt |
+      | permissions            | 1               |
+      | share_type             | public_link     |
+      | displayname_file_owner | %displayname%   |
+      | displayname_owner      | %displayname%   |
+      | uid_file_owner         | %username%      |
+      | uid_owner              | %username%      |
+    And for user "Brian" the space "share sub-item" should contain the last created public link of the file "folder/file.txt"
     Examples:
       | spaceRole |
       | editor    |
