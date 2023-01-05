@@ -96,3 +96,4 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Project Space has owner](https://github.com/owncloud/ocis/issues/4419)
 - [apiSpaces/listSpaces.feature:136](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/listSpaces.feature#L136)
+- [apiSpaces/listSpaces.feature:156](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/listSpaces.feature#L156)

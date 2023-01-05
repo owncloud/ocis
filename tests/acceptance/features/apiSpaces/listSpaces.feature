@@ -133,7 +133,7 @@ Feature: List and create spaces
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
 
   
-  Scenario: The owner of the project space should be who created space or manager if the creater leaved project space
+  Scenario: A project space owner should always be one of the space managers
     Given the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created a space "Project Venus" with the default quota using the GraphApi
@@ -145,6 +145,26 @@ Feature: List and create spaces
       | name              | Project Venus                    |
       | owner@@@user@@@id | %user_id%                        |
     When user "Alice" unshares a space "Project Venus" to user "Alice"
+    And user "Brian" lists all available spaces via the GraphApi with query "$filter=driveType eq 'project'"
+    Then the json responded should contain a space "Project Venus" owned by "Brian" with these key and value pairs:
+      | key               | value                            |
+      | driveType         | project                          |
+      | name              | Project Venus                    |
+      | owner@@@user@@@id | %user_id%                        |
+
+
+  Scenario: The project space owner changes when old owner's role is reduced
+    Given the administrator has given "Alice" the role "Space Admin" using the settings api
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has created a space "Project Venus" with the default quota using the GraphApi
+    And user "Alice" has shared a space "Project Venus" to user "Brian" with role "manager"
+    When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'project'"
+    Then the json responded should contain a space "Project Venus" owned by "Alice" with these key and value pairs:
+      | key               | value                            |
+      | driveType         | project                          |
+      | name              | Project Venus                    |
+      | owner@@@user@@@id | %user_id%                        |
+    When user "Brian" updates the space "Project Venus" for user "Alice" changing the role to "editor"
     And user "Brian" lists all available spaces via the GraphApi with query "$filter=driveType eq 'project'"
     Then the json responded should contain a space "Project Venus" owned by "Brian" with these key and value pairs:
       | key               | value                            |
