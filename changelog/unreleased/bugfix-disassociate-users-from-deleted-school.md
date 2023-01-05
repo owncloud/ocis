@@ -1,4 +1,4 @@
-Bugfix: Disassociate users from deleted school.
+Bugfix: Disassociate users from deleted school
 
 When a school is deleted, users should be disassociated from it.
 
