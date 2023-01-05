@@ -3,6 +3,7 @@ package defaults
 import (
 	"path"
 	"strings"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -32,9 +33,11 @@ func DefaultConfig() *config.Config {
 		},
 		Reva: shared.DefaultRevaConfig(),
 		Spaces: config.Spaces{
-			WebDavBase:   "https://localhost:9200",
-			WebDavPath:   "/dav/spaces/",
-			DefaultQuota: "1000000000",
+			WebDavBase:     "https://localhost:9200",
+			WebDavPath:     "/dav/spaces/",
+			DefaultQuota:   "1000000000",
+			GroupsCacheTTL: 30 * time.Minute,
+			UsersCacheTTL:  30 * time.Minute,
 		},
 		Identity: config.Identity{
 			Backend: "ldap",

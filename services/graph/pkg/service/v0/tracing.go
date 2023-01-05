@@ -5,7 +5,7 @@ import (
 )
 
 // NewTracing returns a service that instruments traces.
-func NewTracing(next Service) Service {
+func NewTracing(next Service) tracing {
 	return tracing{
 		next: next,
 	}

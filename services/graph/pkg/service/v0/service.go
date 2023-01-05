@@ -3,14 +3,16 @@ package svc
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/jellydator/ttlcache/v2"
-
+	"github.com/jellydator/ttlcache/v3"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
@@ -76,17 +78,34 @@ type Service interface {
 }
 
 // NewService returns a service implementation for Service.
-func NewService(opts ...Option) Service {
+func NewService(opts ...Option) (Graph, error) {
 	options := newOptions(opts...)
 
 	m := chi.NewMux()
 	m.Use(options.Middleware...)
 
+	spacePropertiesCache := ttlcache.New[string, interface{}](
+		ttlcache.WithTTL[string, interface{}](options.Config.Spaces.ExtendedSpacePropertiesCacheTTL * time.Second),
+	)
+	go spacePropertiesCache.Start()
+
+	usersCache := ttlcache.New[string, libregraph.User](
+		ttlcache.WithTTL[string, libregraph.User](options.Config.Spaces.UsersCacheTTL * time.Second),
+	)
+	go usersCache.Start()
+
+	groupsCache := ttlcache.New[string, libregraph.Group](
+		ttlcache.WithTTL[string, libregraph.Group](options.Config.Spaces.GroupsCacheTTL * time.Second),
+	)
+	go groupsCache.Start()
+
 	svc := Graph{
 		config:                   options.Config,
 		mux:                      m,
 		logger:                   &options.Logger,
-		spacePropertiesCache:     ttlcache.NewCache(),
+		spacePropertiesCache:     spacePropertiesCache,
+		usersCache:               usersCache,
+		groupsCache:              groupsCache,
 		eventsPublisher:          options.EventsPublisher,
 		gatewayClient:            options.GatewayClient,
 		searchService:            options.SearchService,
@@ -129,11 +148,11 @@ func NewService(opts ...Option) Service {
 				pemData, err := os.ReadFile(options.Config.Identity.LDAP.CACert)
 				if err != nil {
 					options.Logger.Error().Err(err).Msgf("Error initializing LDAP Backend")
-					return nil
+					return svc, err
 				}
 				if !certs.AppendCertsFromPEM(pemData) {
 					options.Logger.Error().Msgf("Error initializing LDAP Backend. Adding CA cert failed")
-					return nil
+					return svc, err
 				}
 				tlsConf.RootCAs = certs
 			}
@@ -149,7 +168,7 @@ func NewService(opts ...Option) Service {
 			lb, err := identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger)
 			if err != nil {
 				options.Logger.Error().Msgf("Error initializing LDAP Backend: '%s'", err)
-				return nil
+				return svc, err
 			}
 			svc.identityBackend = lb
 			if options.IdentityEducationBackend == nil {
@@ -161,8 +180,9 @@ func NewService(opts ...Option) Service {
 				}
 			}
 		default:
-			options.Logger.Error().Msgf("Unknown Identity Backend: '%s'", options.Config.Identity.Backend)
-			return nil
+			err := fmt.Errorf("Unknown Identity Backend: '%s'", options.Config.Identity.Backend)
+			options.Logger.Err(err)
+			return svc, err
 		}
 	} else {
 		svc.identityBackend = options.IdentityBackend
@@ -284,7 +304,7 @@ func NewService(opts ...Option) Service {
 		})
 	})
 
-	return svc
+	return svc, nil
 }
 
 // parseHeaderPurge parses the 'Purge' header.
