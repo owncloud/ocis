@@ -68,6 +68,6 @@ Configuration options are described [here](https://github.com/owncloud/ocis-char
 ### Run oCIS
 
 1. clone the charts: `git clone https://github.com/owncloud/ocis-charts.git /var/tmp/ocis-charts`
-2. cd into the charts root: `cd /var/tmp/ocis-charts/ocis`
+2. cd into the charts root: `cd /var/tmp/ocis-charts/charts/ocis`
 3. install the package: `helm install ocis .` (you need to set configuration values in almost all cases)
 4. verify the application is running in the cluster: `kubectl get pods`
