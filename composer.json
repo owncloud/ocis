@@ -9,9 +9,8 @@
       "bamarni/composer-bin-plugin": true
     }
   },
-  "require": {
-  },
   "require-dev": {
+    "ext-simplexml": "*",
     "bamarni/composer-bin-plugin": "^1.4"
   },
   "extra": {

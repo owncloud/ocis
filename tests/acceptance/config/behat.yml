@@ -73,7 +73,7 @@ default:
         - WebDavPropertiesContext:
         - TUSContext:
         - SpacesTUSContext:
-    
+
     apiContract:
       paths:
         - '%paths.base%/../features/apiContract'
@@ -152,4 +152,6 @@ default:
         - TrashbinContext:
 
   extensions:
+    rdx\behatvars\BehatVariablesExtension: ~
+
     Cjm\Behat\StepThroughExtension: ~

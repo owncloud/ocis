@@ -20,18 +20,14 @@
  *
  */
 
-$pathToCore = \getenv('PATH_TO_CORE');
-if ($pathToCore === false) {
-	$pathToCore = "../core";
-}
+use Composer\Autoload\ClassLoader;
 
-require_once $pathToCore . '/tests/acceptance/features/bootstrap/bootstrap.php';
-
-$classLoader = new \Composer\Autoload\ClassLoader();
+$classLoader = new ClassLoader();
 $classLoader->addPsr4(
 	"",
-	$pathToCore . "/tests/acceptance/features/bootstrap",
+	__DIR__ . "/../../../tests/acceptance/features/bootstrap",
 	true
 );
 
+$classLoader->addPsr4("TestHelpers\\", __DIR__ . "/../../../TestHelpers", true);
 $classLoader->register();
