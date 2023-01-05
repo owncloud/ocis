@@ -754,6 +754,35 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" sends PATCH request to the space "([^"]*)" of user "([^"]*)" with data "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $owner
+	 * @param string $data
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userSendsPatchRequestToTheSpaceOfUserWithData(string $user, string $spaceName, string $owner, string $data): void {
+		$space = $this->getSpaceByName($owner, $spaceName);
+		Assert::assertIsArray($space);
+		Assert::assertNotEmpty($spaceId = $space["id"]);
+		$url = GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'drives/' . $spaceId);
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$url,
+				"",
+				"PATCH",
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
+				null,
+				$data
+			)
+		);
+	}
+
+	/**
 	 * @Then /^the (?:propfind|search) result of the space should (not|)\s?contain these (?:files|entries):$/
 	 *
 	 * @param string    $shouldOrNot   (not|)
