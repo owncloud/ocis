@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 )
@@ -15,7 +16,12 @@ func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRole
 	s.Init()
 	ctx := context.TODO()
 	assIDs, err := s.mdc.ReadDir(ctx, accountPath(accountUUID))
-	if err != nil {
+	switch err.(type) {
+	case nil:
+		// continue
+	case errtypes.NotFound:
+		return make([]*settingsmsg.UserRoleAssignment, 0), nil
+	default:
 		return nil, err
 	}
 
@@ -42,10 +48,17 @@ func (s *Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.Us
 	s.Init()
 	ctx := context.TODO()
 	// as per https://github.com/owncloud/product/issues/103 "Each user can have exactly one role"
-	_ = s.mdc.Delete(ctx, accountPath(accountUUID))
-	// TODO: How to differentiate between 'not found' and other errors?
+	err := s.mdc.Delete(ctx, accountPath(accountUUID))
+	switch err.(type) {
+	case nil:
+		// continue
+	case errtypes.NotFound:
+		// continue
+	default:
+		return nil, err
+	}
 
-	err := s.mdc.MakeDirIfNotExist(ctx, accountPath(accountUUID))
+	err = s.mdc.MakeDirIfNotExist(ctx, accountPath(accountUUID))
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +94,9 @@ func (s *Store) RemoveRoleAssignment(assignmentID string) error {
 
 		for _, assID := range assIDs {
 			if assID == assignmentID {
-				return s.mdc.Delete(ctx, assignmentPath(accID, assID))
+				// as per https://github.com/owncloud/product/issues/103 "Each user can have exactly one role"
+				// we also have to delete the cached dir listing
+				return s.mdc.Delete(ctx, accountPath(accID))
 			}
 		}
 	}

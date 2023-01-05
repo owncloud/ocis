@@ -29,7 +29,7 @@ func (g Graph) ListAppRoleAssignments(w http.ResponseWriter, r *http.Request) {
 		AccountUuid: userID,
 	})
 	if err != nil {
-		logger.Error().Err(err).Msg("could not list role assginments: transport error")
+		// TODO check the error type and return proper error code
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -48,15 +48,14 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Interface("query", r.URL.Query()).Msg("calling create appRoleAssignment")
 
-	userID := chi.URLParam(r, "userID")
-
 	appRoleAssignment := libregraph.NewAppRoleAssignmentWithDefaults()
 	err := json.NewDecoder(r.Body).Decode(appRoleAssignment)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %v", err.Error()))
 		return
 	}
+
+	userID := chi.URLParam(r, "userID")
 
 	if appRoleAssignment.GetPrincipalId() != userID {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("user id %s does not match principal id %v", userID, appRoleAssignment.GetPrincipalId()))
@@ -74,7 +73,6 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 		RoleId:      appRoleAssignment.AppRoleId,
 	})
 	if err != nil {
-		logger.Error().Err(err).Msg("could not assign role to user")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -87,6 +85,40 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 func (g Graph) DeleteAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Interface("body", r.Body).Msg("calling delete appRoleAssignment")
+
+	s := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
+
+	userID := chi.URLParam(r, "userID")
+
+	// check assignment belongs to the user
+	lrar, err := s.ListRoleAssignments(r.Context(), &settingssvc.ListRoleAssignmentsRequest{
+		AccountUuid: userID,
+	})
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	appRoleAssignmentID := chi.URLParam(r, "appRoleAssignmentID")
+
+	assignmentFound := false
+	for _, roleAssignment := range lrar.GetAssignments() {
+		if roleAssignment.Id == appRoleAssignmentID {
+			assignmentFound = true
+		}
+	}
+	if !assignmentFound {
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, fmt.Sprintf("appRoleAssignment %v not found for user %v", appRoleAssignmentID, userID))
+		return
+	}
+
+	_, err = s.RemoveRoleFromUser(r.Context(), &settingssvc.RemoveRoleFromUserRequest{
+		Id: appRoleAssignmentID,
+	})
+	if err != nil {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	render.NoContent(w, r)
 }
