@@ -115,12 +115,79 @@ func TestDeleteEducationSchool(t *testing.T) {
 }
 
 func TestGetEducationSchool(t *testing.T) {
+	tests := []struct {
+		name                 string
+		numberOrId           string
+		filter               string
+		expectedItemNotFound bool
+	}{
+		{
+			name:                 "Test search school using schoolId",
+			numberOrId:           "abcd-defg",
+			filter:               "(&(objectClass=ocEducationSchool)(|(owncloudUUID=abcd-defg)(ocEducationSchoolNumber=abcd-defg)))",
+			expectedItemNotFound: false,
+		},
+		{
+			name:                 "Test search school using unknown schoolId",
+			numberOrId:           "xxxx-xxxx",
+			filter:               "(&(objectClass=ocEducationSchool)(|(owncloudUUID=xxxx-xxxx)(ocEducationSchoolNumber=xxxx-xxxx)))",
+			expectedItemNotFound: true,
+		},
+		{
+			name:                 "Test search school using schoolNumber",
+			numberOrId:           "0123",
+			filter:               "(&(objectClass=ocEducationSchool)(|(owncloudUUID=0123)(ocEducationSchoolNumber=0123)))",
+			expectedItemNotFound: false,
+		},
+		{
+			name:                 "Test search school using unknown schoolNumber",
+			numberOrId:           "3210",
+			filter:               "(&(objectClass=ocEducationSchool)(|(owncloudUUID=3210)(ocEducationSchoolNumber=3210)))",
+			expectedItemNotFound: true,
+		},
+	}
+
+	for _, tt := range tests {
+		lm := &mocks.Client{}
+		sr := &ldap.SearchRequest{
+			BaseDN:     "",
+			Scope:      2,
+			SizeLimit:  1,
+			Filter:     tt.filter,
+			Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+			Controls:   []ldap.Control(nil),
+		}
+		if tt.expectedItemNotFound {
+			lm.On("Search", sr).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
+		} else {
+			lm.On("Search", sr).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry}}, nil)
+		}
+
+		b, err := getMockedBackend(lm, eduConfig, &logger)
+		assert.Nil(t, err)
+
+		school, err := b.GetEducationSchool(context.Background(), tt.numberOrId, nil)
+		lm.AssertNumberOfCalls(t, "Search", 1)
+
+		if tt.expectedItemNotFound {
+			assert.NotNil(t, err)
+			assert.Equal(t, "itemNotFound", err.Error())
+		} else {
+			assert.Nil(t, err)
+			assert.Equal(t, "Test School", school.GetDisplayName())
+			assert.Equal(t, "abcd-defg", school.GetId())
+			assert.Equal(t, "0123", school.GetSchoolNumber())
+		}
+	}
+}
+
+func TestGetEducationSchoolOld(t *testing.T) {
 	lm := &mocks.Client{}
 	sr1 := &ldap.SearchRequest{
 		BaseDN:     "",
 		Scope:      2,
 		SizeLimit:  1,
-		Filter:     "(&(objectClass=ocEducationSchool)(owncloudUUID=abcd-defg))",
+		Filter:     "(&(objectClass=ocEducationSchool)(|(owncloudUUID=abcd-defg)(ocEducationSchoolNumber=abcd-defg)))",
 		Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
 		Controls:   []ldap.Control(nil),
 	}
@@ -128,14 +195,33 @@ func TestGetEducationSchool(t *testing.T) {
 		BaseDN:     "",
 		Scope:      2,
 		SizeLimit:  1,
-		Filter:     "(&(objectClass=ocEducationSchool)(owncloudUUID=xxxx-xxxx))",
+		Filter:     "(&(objectClass=ocEducationSchool)(|(owncloudUUID=xxxx-xxxx)(ocEducationSchoolNumber=xxxx-xxxx)))",
+		Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+		Controls:   []ldap.Control(nil),
+	}
+	sr3 := &ldap.SearchRequest{
+		BaseDN:     "",
+		Scope:      2,
+		SizeLimit:  1,
+		Filter:     "(&(objectClass=ocEducationSchool)(|(owncloudUUID=0123)(ocEducationSchoolNumber=0123)))",
+		Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+		Controls:   []ldap.Control(nil),
+	}
+	sr4 := &ldap.SearchRequest{
+		BaseDN:     "",
+		Scope:      2,
+		SizeLimit:  1,
+		Filter:     "(&(objectClass=ocEducationSchool)(|(owncloudUUID=3210)(ocEducationSchoolNumber=3210)))",
 		Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
 		Controls:   []ldap.Control(nil),
 	}
 	lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry}}, nil)
 	lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
+	lm.On("Search", sr3).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry}}, nil)
+	lm.On("Search", sr4).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
 	b, err := getMockedBackend(lm, eduConfig, &logger)
 	assert.Nil(t, err)
+
 	school, err := b.GetEducationSchool(context.Background(), "abcd-defg", nil)
 	lm.AssertNumberOfCalls(t, "Search", 1)
 	assert.Nil(t, err)
@@ -147,6 +233,19 @@ func TestGetEducationSchool(t *testing.T) {
 	lm.AssertNumberOfCalls(t, "Search", 2)
 	assert.NotNil(t, err)
 	assert.Equal(t, "itemNotFound", err.Error())
+
+	school, err = b.GetEducationSchool(context.Background(), "0123", nil)
+	lm.AssertNumberOfCalls(t, "Search", 3)
+	assert.Nil(t, err)
+	assert.Equal(t, "Test School", school.GetDisplayName())
+	assert.Equal(t, "abcd-defg", school.GetId())
+	assert.Equal(t, "0123", school.GetSchoolNumber())
+
+	school, err = b.GetEducationSchool(context.Background(), "3210", nil)
+	lm.AssertNumberOfCalls(t, "Search", 4)
+	assert.NotNil(t, err)
+	assert.Equal(t, "itemNotFound", err.Error())
+
 }
 
 func TestGetEducationSchools(t *testing.T) {

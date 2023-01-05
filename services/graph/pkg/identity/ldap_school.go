@@ -150,10 +150,10 @@ func (i *LDAP) DeleteEducationSchool(ctx context.Context, id string) error {
 }
 
 // GetEducationSchool implements the EducationBackend interface for the LDAP backend.
-func (i *LDAP) GetEducationSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error) {
+func (i *LDAP) GetEducationSchool(ctx context.Context, numberOrID string, queryParam url.Values) (*libregraph.EducationSchool, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetEducationSchool")
-	e, err := i.getSchoolByID(nameOrID)
+	e, err := i.getSchoolByNumberOrID(numberOrID)
 	if err != nil {
 		return nil, err
 	}
@@ -350,6 +350,18 @@ func (i *LDAP) getSchoolByDN(dn string) (*ldap.Entry, error) {
 func (i *LDAP) getSchoolByID(id string) (*ldap.Entry, error) {
 	id = ldap.EscapeFilter(id)
 	filter := fmt.Sprintf("(%s=%s)", i.educationConfig.schoolAttributeMap.id, id)
+	return i.getSchoolByFilter(filter)
+}
+
+func (i *LDAP) getSchoolByNumberOrID(numberOrId string) (*ldap.Entry, error) {
+	numberOrId = ldap.EscapeFilter(numberOrId)
+	filter := fmt.Sprintf(
+		"(|(%s=%s)(%s=%s))",
+		i.educationConfig.schoolAttributeMap.id,
+		numberOrId,
+		i.educationConfig.schoolAttributeMap.schoolNumber,
+		numberOrId,
+	)
 	return i.getSchoolByFilter(filter)
 }
 
