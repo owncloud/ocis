@@ -137,14 +137,14 @@ Feature: List and create spaces
     Given the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created a space "Project Venus" with the default quota using the GraphApi
-    And user "Alice" has shared a space "Project Venus" to user "Brian" with role "manager"
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'project'"
     Then the json responded should contain a space "Project Venus" owned by "Alice" with these key and value pairs:
       | key               | value                            |
       | driveType         | project                          |
       | name              | Project Venus                    |
       | owner@@@user@@@id | %user_id%                        |
-    When user "Alice" unshares a space "Project Venus" to user "Alice"
+    When user "Alice" shares a space "Project Venus" to user "Brian" with role "manager"
+    And user "Alice" unshares a space "Project Venus" to user "Alice"
     And user "Brian" lists all available spaces via the GraphApi with query "$filter=driveType eq 'project'"
     Then the json responded should contain a space "Project Venus" owned by "Brian" with these key and value pairs:
       | key               | value                            |
@@ -157,14 +157,14 @@ Feature: List and create spaces
     Given the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created a space "Project Venus" with the default quota using the GraphApi
-    And user "Alice" has shared a space "Project Venus" to user "Brian" with role "manager"
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'project'"
     Then the json responded should contain a space "Project Venus" owned by "Alice" with these key and value pairs:
       | key               | value                            |
       | driveType         | project                          |
       | name              | Project Venus                    |
       | owner@@@user@@@id | %user_id%                        |
-    When user "Brian" updates the space "Project Venus" for user "Alice" changing the role to "editor"
+    When user "Alice" shares a space "Project Venus" to user "Brian" with role "manager"
+    And user "Brian" updates the space "Project Venus" for user "Alice" changing the role to "editor"
     And user "Brian" lists all available spaces via the GraphApi with query "$filter=driveType eq 'project'"
     Then the json responded should contain a space "Project Venus" owned by "Brian" with these key and value pairs:
       | key               | value                            |
