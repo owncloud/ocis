@@ -9,6 +9,7 @@
     },
     "require": {
       "behat/behat": "^3.9",
+      "behat/gherkin": "^4.9",
       "behat/mink": "1.7.1",
       "friends-of-behat/mink-extension": "^2.5",
       "ciaranmcnulty/behat-stepthroughextension" : "dev-master",
