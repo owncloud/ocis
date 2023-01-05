@@ -239,7 +239,6 @@ func renderInternalServerError(w http.ResponseWriter, r *http.Request, err error
 	} else {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 	}
-	return
 }
 
 // GetEducationSchoolUsers implements the Service interface.
