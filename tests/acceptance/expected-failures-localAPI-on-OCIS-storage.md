@@ -93,3 +93,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
 - [apiGraph/getUser.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L23)
+
+#### [Project Space has owner](https://github.com/owncloud/ocis/issues/4419)
+- [apiSpaces/listSpaces.feature:136](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/listSpaces.feature#L136)
