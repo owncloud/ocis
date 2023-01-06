@@ -74,7 +74,7 @@ var _ = Describe("EducationUsers", func() {
 			service.WithGatewayClient(gatewayClient),
 			service.EventsPublisher(&eventsPublisher),
 			service.WithIdentityEducationBackend(identityEducationBackend),
-			//service.WithRoleService(roleService),
+			service.WithRoleService(roleService),
 		)
 	})
 
