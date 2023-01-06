@@ -11,6 +11,7 @@ import (
 
 	"github.com/CiscoM31/godata"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 
 	"github.com/go-chi/chi/v5"
@@ -206,6 +207,10 @@ func (g Graph) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
 	for _, user := range users {
 		logger.Debug().Str("schoolID", schoolID).Str("userID", *user.Id).Msg("calling delete member on backend")
 		if err := g.identityEducationBackend.RemoveUserFromEducationSchool(r.Context(), schoolID, *user.Id); err != nil {
+			if errors.Is(err, identity.ErrNotFound) {
+				logger.Debug().Str("schoolID", schoolID).Str("userID", *user.Id).Msg("user not found")
+				continue
+			}
 			logger.Debug().Err(err).Msg("could not delete school member: backend error")
 			renderInternalServerError(w, r, err)
 		}
