@@ -144,6 +144,10 @@ class HttpRequestHelper {
 			$debugRequests = false;
 		}
 
+		if ($debugRequests) {
+			self::debugRequest($request, $user, $password);
+		}
+
 		// The exceptions that might happen here include:
 		// ConnectException - in that case there is no response. Don't catch the exception.
 		// RequestException - if there is something in the response then pass it back.
@@ -158,10 +162,6 @@ class HttpRequestHelper {
 			if ($response === null) {
 				throw $ex;
 			}
-		}
-
-		if ($debugRequests) {
-			self::debugRequest($request, $user, $password);
 		}
 
 		return $response;
