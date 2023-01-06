@@ -134,7 +134,7 @@ Feature: upload resources on share using TUS protocol
     Given user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    And user "Alice" has created a new TUS resource for the space "Personal" using the WebDAV API with these headers:
+    And user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 5                                     |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
       | Upload-Metadata | filename L0ZPTERFUi90ZXh0RmlsZS50eHQ= |
@@ -149,7 +149,7 @@ Feature: upload resources on share using TUS protocol
     Given user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    And user "Alice" has created a new TUS resource for the space "Personal" using the WebDAV API with these headers:
+    And user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 5                                     |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
       | Upload-Metadata | filename L0ZPTERFUi90ZXh0RmlsZS50eHQ= |
@@ -160,7 +160,7 @@ Feature: upload resources on share using TUS protocol
 
 
   Scenario: Sharer shares a file with correct checksum should return the checksum in the propfind for sharee
-    Given user "Alice" has created a new TUS resource for the space "Personal" using the WebDAV API with these headers:
+    Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 5                         |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
@@ -174,7 +174,7 @@ Feature: upload resources on share using TUS protocol
 
 
   Scenario: Sharer shares a file with correct checksum should return the checksum in the download header for sharee
-    Given user "Alice" has created a new TUS resource for the space "Personal" using the WebDAV API with these headers:
+    Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 5                         |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
@@ -190,7 +190,7 @@ Feature: upload resources on share using TUS protocol
     Given user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    When user "Brian" creates a new TUS resource for the space "Shares" using the WebDAV API with these headers:
+    When user "Brian" creates a new TUS resource for the space "Shares" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 16                                    |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
       | Upload-Metadata | filename L0ZPTERFUi90ZXh0RmlsZS50eHQ= |
@@ -205,13 +205,13 @@ Feature: upload resources on share using TUS protocol
     Given user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    When user "Brian" creates a new TUS resource for the space "Shares" using the WebDAV API with these headers:
+    When user "Brian" creates a new TUS resource for the space "Shares" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 16                                    |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
       | Upload-Metadata | filename L0ZPTERFUi90ZXh0RmlsZS50eHQ= |
       | Tus-Resumable   | 1.0.0                                 |
     And user "Brian" uploads file with checksum "MD5 827ccb0eea8a706c4c34a16891f84e8c" to the last created TUS Location with offset "0" and content "uploaded content" via TUS inside of the space "Shares" using the WebDAV API
-    Then the HTTP status code should be "406"
+    Then the HTTP status code should be "460"
     And for user "Alice" folder "FOLDER" of the space "Personal" should not contain these entries:
       | textFile.txt |
 
@@ -220,13 +220,13 @@ Feature: upload resources on share using TUS protocol
     Given user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    And user "Alice" has created a new TUS resource for the space "Personal" using the WebDAV API with these headers:
-      | Upload-Length   | 5                                     |
-            #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
+    And user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
+      | Upload-Length   | 16                                    |
+      #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
       | Upload-Metadata | filename L0ZPTERFUi90ZXh0RmlsZS50eHQ= |
       | Tus-Resumable   | 1.0.0                                 |
     When user "Alice" uploads file with checksum "SHA1 8cb2237d0679ca88db6464eac60da96345513954" to the last created TUS Location with offset "0" and content "uploaded content" via TUS inside of the space "Personal" using the WebDAV API
-    Then the HTTP status code should be "406"
+    Then the HTTP status code should be "460"
     And for user "Alice" folder "FOLDER" of the space "Personal" should not contain these entries:
       | textFile.txt |
     And for user "Brian" folder "FOLDER" of the space "Shares" should not contain these entries:
@@ -234,7 +234,7 @@ Feature: upload resources on share using TUS protocol
 
 
   Scenario: Sharer uploads a chunked file with correct checksum and share it with sharee should work
-    Given user "Alice" has created a new TUS resource for the space "Personal" using the WebDAV API with these headers:
+    Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 10                        |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
@@ -250,7 +250,7 @@ Feature: upload resources on share using TUS protocol
     Given user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
     And user "Brian" has accepted share "/FOLDER" offered by user "Alice"
-    And user "Brian" has created a new TUS resource for the space "Shares" using the WebDAV API with these headers:
+    And user "Brian" has created a new TUS resource for the space "Shares" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 10                                    |
       #    L0ZPTERFUi90ZXh0RmlsZS50eHQ= is the base64 encode of /FOLDER/textFile.txt
       | Upload-Metadata | filename L0ZPTERFUi90ZXh0RmlsZS50eHQ= |
@@ -264,7 +264,7 @@ Feature: upload resources on share using TUS protocol
 
 
   Scenario: Sharer uploads a file with checksum and as a sharee overwrites the shared file with new data and correct checksum
-    Given user "Alice" has created a new TUS resource for the space "Personal" using the WebDAV API with these headers:
+    Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 16                        |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
@@ -282,7 +282,7 @@ Feature: upload resources on share using TUS protocol
 
 
   Scenario: Sharer uploads a file with checksum and as a sharee overwrites the shared file with new data and invalid checksum
-    Given user "Alice" has created a new TUS resource for the space "Personal" using the WebDAV API with these headers:
+    Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 16                        |
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
@@ -295,5 +295,5 @@ Feature: upload resources on share using TUS protocol
       #    dGV4dEZpbGUudHh0 is the base64 encode of textFile.txt
       | Upload-Metadata | filename dGV4dEZpbGUudHh0 |
       | Tus-Resumable   | 1.0.0                     |
-    Then the HTTP status code should be "406"
+    Then the HTTP status code should be "460"
     And for user "Alice" the content of the file "/textFile.txt" of the space "Personal" should be "original content"
