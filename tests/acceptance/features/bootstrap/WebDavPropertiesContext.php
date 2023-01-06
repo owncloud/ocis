@@ -645,6 +645,27 @@ class WebDavPropertiesContext implements Context {
 	}
 
 	/**
+	 * @Then as user :user the value of the item :xpath of path :path in the response should be :value
+	 *
+	 * @param string $user
+	 * @param string $xpath
+	 * @param string $path
+	 * @param string $expectedValue
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function valueOfItemOfPathShouldBe(string $user, string $xpath, string $path, string $expectedValue):void {
+		$path = $this->featureContext->substituteInLineCodes($path, $user);
+		$fullXpath = "//d:response/d:href[.='$path']/following-sibling::d:propstat$xpath";
+		$this->assertValueOfItemInResponseAboutUserIs(
+			$fullXpath,
+			null,
+			$expectedValue
+		);
+	}
+
+	/**
 	 * @Then the value of the item :xpath in the response about user :user should be :value
 	 *
 	 * @param string $xpath
