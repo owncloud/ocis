@@ -257,7 +257,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ocis ++
 a| [subs=-attributes]
-The storage driver which should be used by the service
+The storage driver which should be used by the service. Defaults to 'ocis', Supported values are: 'ocis', 's3ng' and 'owncloudsql'. The 'ocis' driver stores all data (file and meta data) in an POSIX compliant volume. The 's3ng' driver stores all metadata in an POSIX compliant volume and uploads blobs to the s3 bucket.
 
 a|`STORAGE_USERS_OCIS_ROOT` +
 
