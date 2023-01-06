@@ -8,7 +8,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
@@ -23,9 +22,7 @@ func (g Graph) ListAppRoleAssignments(w http.ResponseWriter, r *http.Request) {
 
 	userID := chi.URLParam(r, "userID")
 
-	s := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
-
-	lrar, err := s.ListRoleAssignments(r.Context(), &settingssvc.ListRoleAssignmentsRequest{
+	lrar, err := g.roleService.ListRoleAssignments(r.Context(), &settingssvc.ListRoleAssignmentsRequest{
 		AccountUuid: userID,
 	})
 	if err != nil {
@@ -66,9 +63,7 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
-
-	artur, err := s.AssignRoleToUser(r.Context(), &settingssvc.AssignRoleToUserRequest{
+	artur, err := g.roleService.AssignRoleToUser(r.Context(), &settingssvc.AssignRoleToUserRequest{
 		AccountUuid: userID,
 		RoleId:      appRoleAssignment.AppRoleId,
 	})
@@ -86,12 +81,10 @@ func (g Graph) DeleteAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Interface("body", r.Body).Msg("calling delete appRoleAssignment")
 
-	s := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
-
 	userID := chi.URLParam(r, "userID")
 
 	// check assignment belongs to the user
-	lrar, err := s.ListRoleAssignments(r.Context(), &settingssvc.ListRoleAssignmentsRequest{
+	lrar, err := g.roleService.ListRoleAssignments(r.Context(), &settingssvc.ListRoleAssignmentsRequest{
 		AccountUuid: userID,
 	})
 	if err != nil {
@@ -112,7 +105,7 @@ func (g Graph) DeleteAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = s.RemoveRoleFromUser(r.Context(), &settingssvc.RemoveRoleFromUserRequest{
+	_, err = g.roleService.RemoveRoleFromUser(r.Context(), &settingssvc.RemoveRoleFromUserRequest{
 		Id: appRoleAssignmentID,
 	})
 	if err != nil {

@@ -20,12 +20,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
-	settingspkg "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
+	settingssvc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 	"golang.org/x/exp/slices"
 )
 
@@ -63,9 +61,7 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 
 	// expand appRoleAssignments if requested
 	if slices.Contains(exp, "appRoleAssignments") {
-		s := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
-
-		lrar, err := s.ListRoleAssignments(r.Context(), &settingssvc.ListRoleAssignmentsRequest{
+		lrar, err := g.roleService.ListRoleAssignments(r.Context(), &settings.ListRoleAssignmentsRequest{
 			AccountUuid: me.GetId(),
 		})
 		if err != nil {
@@ -118,10 +114,8 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	// expand appRoleAssignments if requested
 	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
 	if slices.Contains(exp, "appRoleAssignments") {
-		s := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
-
 		for _, u := range users {
-			lrar, err := s.ListRoleAssignments(r.Context(), &settingssvc.ListRoleAssignmentsRequest{
+			lrar, err := g.roleService.ListRoleAssignments(r.Context(), &settings.ListRoleAssignmentsRequest{
 				AccountUuid: u.GetId(),
 			})
 			if err != nil {
@@ -215,10 +209,10 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		// to all new users for now, as create Account request does not have any role field
 		if _, err = g.roleService.AssignRoleToUser(r.Context(), &settings.AssignRoleToUserRequest{
 			AccountUuid: *u.Id,
-			RoleId:      settingspkg.BundleUUIDRoleUser,
+			RoleId:      settingssvc.BundleUUIDRoleUser,
 		}); err != nil {
 			// log as error, admin eventually needs to do something
-			logger.Error().Err(err).Str("id", *u.Id).Str("role", settingspkg.BundleUUIDRoleUser).Msg("could not create user: role assignment failed")
+			logger.Error().Err(err).Str("id", *u.Id).Str("role", settingssvc.BundleUUIDRoleUser).Msg("could not create user: role assignment failed")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "role assignment failed")
 			return
 		}
@@ -326,9 +320,8 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 	// expand appRoleAssignments if requested
 	if slices.Contains(exp, "appRoleAssignments") {
-		s := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
 
-		lrar, err := s.ListRoleAssignments(r.Context(), &settingssvc.ListRoleAssignmentsRequest{
+		lrar, err := g.roleService.ListRoleAssignments(r.Context(), &settings.ListRoleAssignmentsRequest{
 			AccountUuid: user.GetId(),
 		})
 		if err != nil {

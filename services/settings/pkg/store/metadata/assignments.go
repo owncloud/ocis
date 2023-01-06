@@ -19,7 +19,7 @@ func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRole
 	switch err.(type) {
 	case nil:
 		// continue
-	case errtypes.NotFound:
+	case errtypes.NotFound: // FIXME this won't trigger on the disk based implementation
 		return make([]*settingsmsg.UserRoleAssignment, 0), nil
 	default:
 		return nil, err

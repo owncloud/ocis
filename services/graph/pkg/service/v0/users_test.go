@@ -17,11 +17,13 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
+	"go-micro.dev/v4/client"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
-	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
+	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
@@ -67,6 +69,7 @@ var _ = Describe("Users", func() {
 		cfg.TokenManager.JWTSecret = "loremipsum"
 		cfg.Commons = &shared.Commons{}
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
+		cfg.Service.ApplicationID = "some-application-ID"
 
 		_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
 		svc, _ = service.NewService(
@@ -94,8 +97,13 @@ var _ = Describe("Users", func() {
 			Expect(rr.Code).To(Equal(http.StatusOK))
 		})
 
-		It("expands the user", func() {
-			user := &libregraph.User{}
+		It("expands the memberOf", func() {
+			user := &libregraph.User{
+				Id: libregraph.PtrString("user1"),
+				MemberOf: []libregraph.Group{
+					{DisplayName: libregraph.PtrString("somegroup")},
+				},
+			}
 			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me?$expand=memberOf", nil)
@@ -103,6 +111,48 @@ var _ = Describe("Users", func() {
 			svc.GetMe(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			responseUser := &libregraph.User{}
+			err = json.Unmarshal(data, &responseUser)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(responseUser.GetId()).To(Equal("user1"))
+			Expect(responseUser.GetMemberOf()).To(HaveLen(1))
+			Expect(responseUser.GetMemberOf()[0].GetDisplayName()).To(Equal("somegroup"))
+
+		})
+
+		It("expands the appRoleAssignments", func() {
+			assignments := []*settingsmsg.UserRoleAssignment{
+				{
+					Id:          "some-appRoleAssignment-ID",
+					AccountUuid: "user",
+					RoleId:      "some-appRole-ID",
+				},
+			}
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me?$expand=appRoleAssignments", nil)
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+			svc.GetMe(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			responseUser := &libregraph.User{}
+			err = json.Unmarshal(data, &responseUser)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(responseUser.GetId()).To(Equal("user"))
+			Expect(responseUser.GetAppRoleAssignments()).To(HaveLen(1))
+			Expect(responseUser.GetAppRoleAssignments()[0].GetId()).To(Equal("some-appRoleAssignment-ID"))
+			Expect(responseUser.GetAppRoleAssignments()[0].GetAppRoleId()).To(Equal("some-appRole-ID"))
+			Expect(responseUser.GetAppRoleAssignments()[0].GetPrincipalId()).To(Equal("user"))
+			Expect(responseUser.GetAppRoleAssignments()[0].GetResourceId()).To(Equal("some-application-ID"))
 		})
 	})
 
@@ -216,6 +266,62 @@ var _ = Describe("Users", func() {
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
+
+		It("expands the appRoleAssignments", func() {
+
+			user := &libregraph.User{}
+			user.SetId("user1")
+			user.SetMail("z@example.com")
+			user.SetDisplayName("9")
+			user.SetOnPremisesSamAccountName("9")
+			user2 := &libregraph.User{}
+			user2.SetId("user2")
+			user2.SetMail("a@example.com")
+			user2.SetDisplayName("1")
+			user2.SetOnPremisesSamAccountName("1")
+			users := []*libregraph.User{user, user2}
+			identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(users, nil)
+
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(func(ctx context.Context, in *settings.ListRoleAssignmentsRequest, opts ...client.CallOption) *settings.ListRoleAssignmentsResponse {
+				return &settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{
+					{
+						Id:          "some-appRoleAssignment-ID",
+						AccountUuid: in.GetAccountUuid(),
+						RoleId:      "some-appRole-ID",
+					},
+				}}
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$expand=appRoleAssignments", nil)
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+			svc.GetUsers(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			res := userList{}
+			err = json.Unmarshal(data, &res)
+			Expect(err).ToNot(HaveOccurred())
+
+			responseUsers := res.Value
+			Expect(len(responseUsers)).To(Equal(2))
+			Expect(responseUsers[0].GetId()).To(Equal("user1"))
+			Expect(responseUsers[0].GetAppRoleAssignments()).To(HaveLen(1))
+			Expect(responseUsers[0].GetAppRoleAssignments()[0].GetId()).To(Equal("some-appRoleAssignment-ID"))
+			Expect(responseUsers[0].GetAppRoleAssignments()[0].GetAppRoleId()).To(Equal("some-appRole-ID"))
+			Expect(responseUsers[0].GetAppRoleAssignments()[0].GetPrincipalId()).To(Equal("user1"))
+			Expect(responseUsers[0].GetAppRoleAssignments()[0].GetResourceId()).To(Equal("some-application-ID"))
+
+			Expect(responseUsers[1].GetId()).To(Equal("user2"))
+			Expect(responseUsers[1].GetAppRoleAssignments()).To(HaveLen(1))
+			Expect(responseUsers[1].GetAppRoleAssignments()[0].GetId()).To(Equal("some-appRoleAssignment-ID"))
+			Expect(responseUsers[1].GetAppRoleAssignments()[0].GetAppRoleId()).To(Equal("some-appRole-ID"))
+			Expect(responseUsers[1].GetAppRoleAssignments()[0].GetPrincipalId()).To(Equal("user2"))
+			Expect(responseUsers[1].GetAppRoleAssignments()[0].GetResourceId()).To(Equal("some-application-ID"))
+
+		})
 	})
 
 	Describe("GetUser", func() {
@@ -322,6 +428,44 @@ var _ = Describe("Users", func() {
 			Expect(responseUser.GetId()).To(Equal("user1"))
 			Expect(len(responseUser.GetDrives())).To(Equal(1))
 		})
+
+		It("expands the appRoleAssignments", func() {
+			user := &libregraph.User{}
+			user.SetId("user1")
+
+			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
+
+			assignments := []*settingsmsg.UserRoleAssignment{
+				{
+					Id:          "some-appRoleAssignment-ID",
+					AccountUuid: "user1",
+					RoleId:      "some-appRole-ID",
+				},
+			}
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{Assignments: assignments}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users/user1?$expand=appRoleAssignments", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", user.GetId())
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.GetUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			responseUser := &libregraph.User{}
+			err = json.Unmarshal(data, &responseUser)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(responseUser.GetId()).To(Equal("user1"))
+			Expect(responseUser.GetAppRoleAssignments()).To(HaveLen(1))
+			Expect(responseUser.GetAppRoleAssignments()[0].GetId()).To(Equal("some-appRoleAssignment-ID"))
+			Expect(responseUser.GetAppRoleAssignments()[0].GetAppRoleId()).To(Equal("some-appRole-ID"))
+			Expect(responseUser.GetAppRoleAssignments()[0].GetPrincipalId()).To(Equal("user1"))
+			Expect(responseUser.GetAppRoleAssignments()[0].GetResourceId()).To(Equal("some-application-ID"))
+		})
 	})
 
 	Describe("PostUser", func() {
@@ -381,7 +525,7 @@ var _ = Describe("Users", func() {
 		})
 
 		It("creates a user", func() {
-			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything).Return(&settingssvc.AssignRoleToUserResponse{}, nil)
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{}, nil)
 			identityBackend.On("CreateUser", mock.Anything, mock.Anything).Return(func(ctx context.Context, user libregraph.User) *libregraph.User {
 				user.SetId("/users/user")
 				return &user
