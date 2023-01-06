@@ -40,6 +40,10 @@ type Service interface {
 	PatchUser(http.ResponseWriter, *http.Request)
 	ChangeOwnPassword(http.ResponseWriter, *http.Request)
 
+	ListAppRoleAssignments(http.ResponseWriter, *http.Request)
+	CreateAppRoleAssignment(http.ResponseWriter, *http.Request)
+	DeleteAppRoleAssignment(http.ResponseWriter, *http.Request)
+
 	GetGroups(http.ResponseWriter, *http.Request)
 	GetGroup(http.ResponseWriter, *http.Request)
 	PostGroup(http.ResponseWriter, *http.Request)

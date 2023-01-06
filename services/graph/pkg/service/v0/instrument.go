@@ -59,6 +59,21 @@ func (i instrument) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
 	i.next.ChangeOwnPassword(w, r)
 }
 
+// ListAppRoleAssignments implements the Service interface.
+func (i instrument) ListAppRoleAssignments(w http.ResponseWriter, r *http.Request) {
+	i.next.ListAppRoleAssignments(w, r)
+}
+
+// CreateAppRoleAssignment implements the Service interface.
+func (i instrument) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
+	i.next.CreateAppRoleAssignment(w, r)
+}
+
+// DeleteAppRoleAssignment implements the Service interface.
+func (i instrument) DeleteAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
+	i.next.DeleteAppRoleAssignment(w, r)
+}
+
 // GetGroups implements the Service interface.
 func (i instrument) GetGroups(w http.ResponseWriter, r *http.Request) {
 	i.next.GetGroups(w, r)

@@ -55,6 +55,21 @@ func (t tracing) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
 	t.next.ChangeOwnPassword(w, r)
 }
 
+// ListAppRoleAssignments implements the Service interface.
+func (t tracing) ListAppRoleAssignments(w http.ResponseWriter, r *http.Request) {
+	t.next.ListAppRoleAssignments(w, r)
+}
+
+// CreateAppRoleAssignment implements the Service interface.
+func (t tracing) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
+	t.next.CreateAppRoleAssignment(w, r)
+}
+
+// DeleteAppRoleAssignment implements the Service interface.
+func (t tracing) DeleteAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
+	t.next.DeleteAppRoleAssignment(w, r)
+}
+
 // GetGroups implements the Service interface.
 func (t tracing) GetGroups(w http.ResponseWriter, r *http.Request) {
 	t.next.GetGroups(w, r)
