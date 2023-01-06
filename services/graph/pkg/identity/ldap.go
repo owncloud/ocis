@@ -18,11 +18,6 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-var (
-	errReadOnly = errorcode.New(errorcode.NotAllowed, "server is configured read-only")
-	errNotFound = errorcode.New(errorcode.ItemNotFound, "not found")
-)
-
 type LDAP struct {
 	useServerUUID   bool
 	writeEnabled    bool
@@ -126,7 +121,7 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("CreateUser")
 	if !i.writeEnabled {
-		return nil, errReadOnly
+		return nil, ErrReadOnly
 	}
 
 	ar, err := i.userToAddRequest(user)
@@ -165,7 +160,7 @@ func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("DeleteUser")
 	if !i.writeEnabled {
-		return errReadOnly
+		return ErrReadOnly
 	}
 	e, err := i.getLDAPUserByNameOrID(nameOrID)
 	if err != nil {
@@ -200,7 +195,7 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("UpdateUser")
 	if !i.writeEnabled {
-		return nil, errReadOnly
+		return nil, ErrReadOnly
 	}
 	e, err := i.getLDAPUserByNameOrID(nameOrID)
 	if err != nil {
@@ -315,13 +310,12 @@ func (i *LDAP) getEntryByDN(dn string, attrs []string, filter string) (*ldap.Ent
 		Interface("attributes", searchRequest.Attributes).
 		Msg("getEntryByDN")
 	res, err := i.conn.Search(searchRequest)
-
 	if err != nil {
 		i.logger.Error().Err(err).Str("backend", "ldap").Str("dn", dn).Msg("Search user by DN failed")
 		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
 	}
 	if len(res.Entries) == 0 {
-		return nil, errNotFound
+		return nil, ErrNotFound
 	}
 
 	return res.Entries[0], nil
@@ -349,13 +343,12 @@ func (i *LDAP) searchLDAPEntryByFilter(basedn string, attrs []string, filter str
 		Interface("attributes", searchRequest.Attributes).
 		Msg("getEntryByFilter")
 	res, err := i.conn.Search(searchRequest)
-
 	if err != nil {
 		i.logger.Error().Err(err).Str("backend", "ldap").Str("dn", basedn).Str("filter", filter).Msg("Search user by filter failed")
 		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
 	}
 	if len(res.Entries) == 0 {
-		return nil, errNotFound
+		return nil, ErrNotFound
 	}
 
 	return res.Entries[0], nil
@@ -393,7 +386,7 @@ func (i *LDAP) GetUser(ctx context.Context, nameOrID string, queryParam url.Valu
 	}
 	u := i.createUserModelFromLDAP(e)
 	if u == nil {
-		return nil, errNotFound
+		return nil, ErrNotFound
 	}
 	sel := strings.Split(queryParam.Get("$select"), ",")
 	exp := strings.Split(queryParam.Get("$expand"), ",")
@@ -579,7 +572,6 @@ func (i *LDAP) getLDAPGroupsByFilter(filter string, requestMembers, single bool)
 		Interface("attributes", searchRequest.Attributes).
 		Msg("getLDAPGroupsByFilter")
 	res, err := i.conn.Search(searchRequest)
-
 	if err != nil {
 		var errmsg string
 		if lerr, ok := err.(*ldap.Error); ok {
