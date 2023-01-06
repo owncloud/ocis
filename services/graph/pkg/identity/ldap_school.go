@@ -92,7 +92,7 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("CreateEducationSchool")
 	if !i.writeEnabled {
-		return nil, errReadOnly
+		return nil, ErrReadOnly
 	}
 
 	dn := fmt.Sprintf("%s=%s,%s",
@@ -133,7 +133,7 @@ func (i *LDAP) DeleteEducationSchool(ctx context.Context, id string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("DeleteEducationSchool")
 	if !i.writeEnabled {
-		return errReadOnly
+		return ErrReadOnly
 	}
 	e, err := i.getSchoolByNumberOrID(id)
 	if err != nil {
@@ -217,7 +217,7 @@ func (i *LDAP) GetEducationSchoolUsers(ctx context.Context, id string) ([]*libre
 	}
 
 	if schoolEntry == nil {
-		return nil, errNotFound
+		return nil, ErrNotFound
 	}
 	id = ldap.EscapeFilter(id)
 	idFilter := fmt.Sprintf("(%s=%s)", i.educationConfig.memberOfSchoolAttribute, id)
@@ -267,7 +267,7 @@ func (i *LDAP) AddUsersToEducationSchool(ctx context.Context, schoolID string, m
 	}
 
 	if schoolEntry == nil {
-		return errNotFound
+		return ErrNotFound
 	}
 
 	userEntries := make([]*ldap.Entry, 0, len(memberIDs))
@@ -312,7 +312,7 @@ func (i *LDAP) RemoveUserFromEducationSchool(ctx context.Context, schoolID strin
 	}
 
 	if schoolEntry == nil {
-		return errNotFound
+		return ErrNotFound
 	}
 	user, err := i.getEducationUserByNameOrID(memberID)
 	if err != nil {
@@ -385,7 +385,6 @@ func (i *LDAP) getSchoolByFilter(filter string) (*ldap.Entry, error) {
 		Interface("attributes", searchRequest.Attributes).
 		Msg("getSchoolByFilter")
 	res, err := i.conn.Search(searchRequest)
-
 	if err != nil {
 		var errmsg string
 		if lerr, ok := err.(*ldap.Error); ok {
@@ -398,7 +397,7 @@ func (i *LDAP) getSchoolByFilter(filter string) (*ldap.Entry, error) {
 		return nil, errorcode.New(errorcode.ItemNotFound, errmsg)
 	}
 	if len(res.Entries) == 0 {
-		return nil, errNotFound
+		return nil, ErrNotFound
 	}
 
 	return res.Entries[0], nil

@@ -6,6 +6,15 @@ import (
 
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+)
+
+// Errors used by the interfaces
+var (
+	// ErrReadOnly signals that the backend is set to read only.
+	ErrReadOnly = errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+	// ErrNotFound signals that the requested resource was not found.
+	ErrNotFound = errorcode.New(errorcode.ItemNotFound, "not found")
 )
 
 // Backend defines the Interface for an IdentityBackend implementation

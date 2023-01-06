@@ -29,7 +29,7 @@ func (i *LDAP) CreateEducationUser(ctx context.Context, user libregraph.Educatio
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("CreateEducationUser")
 	if !i.writeEnabled {
-		return nil, errReadOnly
+		return nil, ErrReadOnly
 	}
 
 	ar, err := i.educationUserToAddRequest(user)
@@ -61,7 +61,7 @@ func (i *LDAP) DeleteEducationUser(ctx context.Context, nameOrID string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("DeleteEducationUser")
 	if !i.writeEnabled {
-		return errReadOnly
+		return ErrReadOnly
 	}
 	// TODO, implement a proper lookup for education Users here
 	e, err := i.getEducationUserByNameOrID(nameOrID)
@@ -91,7 +91,7 @@ func (i *LDAP) GetEducationUser(ctx context.Context, nameOrID string, queryParam
 	}
 	u := i.createEducationUserModelFromLDAP(e)
 	if u == nil {
-		return nil, errNotFound
+		return nil, ErrNotFound
 	}
 	return u, nil
 }
@@ -165,6 +165,7 @@ func (i *LDAP) educationUserToUser(eduUser libregraph.EducationUser) *libregraph
 	user.Mail = eduUser.Mail
 	return user
 }
+
 func (i *LDAP) userToEducationUser(user libregraph.User, e *ldap.Entry) *libregraph.EducationUser {
 	eduUser := libregraph.NewEducationUser()
 	eduUser.Id = user.Id
