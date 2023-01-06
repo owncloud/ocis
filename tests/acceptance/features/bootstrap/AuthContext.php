@@ -1155,4 +1155,34 @@ class AuthContext implements Context {
 			$this->tokenAuthHasBeenSetTo = '';
 		}
 	}
+
+	/**
+	 * @When user :user requests :endpoint with :method without retrying
+	 *
+	 * @param string $user
+	 * @param string $endpoint
+	 * @param string $method
+	 *
+	 * @return void
+	 */
+	public function userRequestsURLWithoutRetry(
+		string $user,
+		string $endpoint,
+		string $method
+	):void {
+		$username = $this->featureContext->getActualUsername($user);
+		$endpoint = $this->featureContext->substituteInLineCodes(
+			$endpoint,
+			$username
+		);
+		$fullUrl = $this->featureContext->getBaseUrl() . $endpoint;
+		$response = HttpRequestHelper::sendRequestOnce(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			$method,
+			$username,
+			$this->featureContext->getPasswordForUser($user)
+		);
+		$this->featureContext->setResponse($response);
+	}
 }

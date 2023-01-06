@@ -103,7 +103,7 @@ class HttpRequestHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function sendRequest(
+	public static function sendRequestOnce(
 		?string $url,
 		?string $xRequestId,
 		?string $method = 'GET',
@@ -144,14 +144,66 @@ class HttpRequestHelper {
 			$debugRequests = false;
 		}
 
+		if ($debugRequests) {
+			self::debugRequest($request, $user, $password);
+		}
+
+		// The exceptions that might happen here include:
+		// ConnectException - in that case there is no response. Don't catch the exception.
+		// RequestException - if there is something in the response then pass it back.
+		//                    otherwise re-throw the exception.
+		// GuzzleException - something else unexpected happened. Don't catch the exception.
+		try {
+			$response = $client->send($request);
+		} catch (RequestException $ex) {
+			$response = $ex->getResponse();
+
+			//if the response was null for some reason do not return it but re-throw
+			if ($response === null) {
+				throw $ex;
+			}
+		}
+
+		return $response;
+	}
+
+	/**
+	 *
+	 * @param string|null $url
+	 * @param string|null $xRequestId
+	 * @param string|null $method
+	 * @param string|null $user
+	 * @param string|null $password
+	 * @param array|null $headers ['X-MyHeader' => 'value']
+	 * @param mixed $body
+	 * @param array|null $config
+	 * @param CookieJar|null $cookies
+	 * @param bool $stream Set to true to stream a response rather
+	 *                     than download it all up-front.
+	 * @param int|null $timeout
+	 * @param Client|null $client
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function sendRequest(
+		?string $url,
+		?string $xRequestId,
+		?string $method = 'GET',
+		?string $user = null,
+		?string $password = null,
+		?array $headers = null,
+		$body = null,
+		?array $config = null,
+		?CookieJar $cookies = null,
+		bool $stream = false,
+		?int $timeout = 0,
+		?Client $client =  null
+	):ResponseInterface {
 		if ((\getenv('DEBUG_ACCEPTANCE_RESPONSES') !== false) || (\getenv('DEBUG_ACCEPTANCE_API_CALLS') !== false)) {
 			$debugResponses = true;
 		} else {
 			$debugResponses = false;
-		}
-
-		if ($debugRequests) {
-			self::debugRequest($request, $user, $password);
 		}
 
 		$sendRetryLimit = self::numRetriesOnHttpTooEarly();
@@ -159,21 +211,23 @@ class HttpRequestHelper {
 		$sendExceptionHappened = false;
 
 		do {
-			// The exceptions that might happen here include:
-			// ConnectException - in that case there is no response. Don't catch the exception.
-			// RequestException - if there is something in the response then pass it back.
-			//                    otherwise re-throw the exception.
-			// GuzzleException - something else unexpected happened. Don't catch the exception.
-			try {
-				$response = $client->send($request);
-			} catch (RequestException $ex) {
-				$sendExceptionHappened = true;
-				$response = $ex->getResponse();
+			$response = self::sendRequestOnce(
+				$url,
+				$xRequestId,
+				$method,
+				$user,
+				$password,
+				$headers,
+				$body,
+				$config,
+				$cookies,
+				$stream,
+				$timeout,
+				$client
+			);
 
-				//if the response was null for some reason do not return it but re-throw
-				if ($response === null) {
-					throw $ex;
-				}
+			if ($response->getStatusCode() >= 400 && $response->getStatusCode() !== self::HTTP_TOO_EARLY) {
+				$sendExceptionHappened = true;
 			}
 
 			if ($debugResponses) {
