@@ -256,7 +256,7 @@ Last but not least, it is never a good idea to use the `latest` docker tag. Pin 
     # see also https://docs.docker.com/engine/reference/commandline/images/#list-image-digests
 ```
 
-## Final solution
+## Wrapping up
 
 If you have completed this guide, your docker-compose.yml should look like the following example:
 
