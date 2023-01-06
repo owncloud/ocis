@@ -226,7 +226,7 @@ class HttpRequestHelper {
 				$client
 			);
 
-			if ($response->getStatusCode() >= 400) {
+			if ($response->getStatusCode() >= 400 && $response->getStatusCode() !== self::HTTP_TOO_EARLY) {
 				$sendExceptionHappened = true;
 			}
 

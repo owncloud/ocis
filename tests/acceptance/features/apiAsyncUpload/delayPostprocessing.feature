@@ -28,7 +28,7 @@ Feature: delay post-processing of uploaded files
       | /dav/spaces/%spaceid%/file.txt            |
 
 
-  Scenario Outline: user sends PROPFIND request to the folder while its some files are still being processed
+  Scenario Outline: user sends PROPFIND request to the folder while files in the folder are still being processed
     Given user "Alice" has created folder "my_data"
     And user "Alice" has uploaded file with content "uploaded content" to "/my_data/file.txt"
     When user "Alice" requests "<dav_path>" with "PROPFIND" without retrying
