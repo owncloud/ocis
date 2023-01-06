@@ -7,7 +7,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
@@ -24,9 +23,7 @@ func (g Graph) GetApplication(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
-
-	lbr, err := s.ListRoles(r.Context(), &settingssvc.ListBundlesRequest{})
+	lbr, err := g.roleService.ListRoles(r.Context(), &settingssvc.ListBundlesRequest{})
 	if err != nil {
 		logger.Error().Err(err).Msg("could not list roles: transport error")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -45,5 +42,5 @@ func (g Graph) GetApplication(w http.ResponseWriter, r *http.Request) {
 	application.SetAppRoles(roles)
 
 	render.Status(r, http.StatusOK)
-	render.JSON(w, r, &ListResponse{Value: application})
+	render.JSON(w, r, application)
 }

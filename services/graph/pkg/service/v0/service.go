@@ -32,6 +32,9 @@ const (
 // Service defines the service handlers.
 type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
+
+	GetApplication(http.ResponseWriter, *http.Request)
+
 	GetMe(http.ResponseWriter, *http.Request)
 	GetUsers(http.ResponseWriter, *http.Request)
 	GetUser(http.ResponseWriter, *http.Request)

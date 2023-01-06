@@ -1,0 +1,110 @@
+package svc_test
+
+import (
+	"context"
+	"encoding/json"
+	"io"
+	"net/http"
+	"net/http/httptest"
+
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/go-chi/chi/v5"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
+	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/stretchr/testify/mock"
+
+	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
+	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/services/graph/mocks"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
+	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
+	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+)
+
+var _ = Describe("Applications", func() {
+	var (
+		svc             service.Service
+		ctx             context.Context
+		cfg             *config.Config
+		gatewayClient   *mocks.GatewayClient
+		eventsPublisher mocks.Publisher
+		roleService     *mocks.RoleService
+		identityBackend *identitymocks.Backend
+
+		rr *httptest.ResponseRecorder
+
+		currentUser = &userv1beta1.User{
+			Id: &userv1beta1.UserId{
+				OpaqueId: "user",
+			},
+		}
+	)
+
+	BeforeEach(func() {
+		eventsPublisher.On("Publish", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+		identityBackend = &identitymocks.Backend{}
+		roleService = &mocks.RoleService{}
+		gatewayClient = &mocks.GatewayClient{}
+
+		rr = httptest.NewRecorder()
+		ctx = context.Background()
+
+		cfg = defaults.FullDefaultConfig()
+		cfg.Identity.LDAP.CACert = "" // skip the startup checks, we don't use LDAP at all in this tests
+		cfg.TokenManager.JWTSecret = "loremipsum"
+		cfg.Commons = &shared.Commons{}
+		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
+		cfg.Service.ApplicationID = "some-application-ID"
+
+		_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
+		svc = service.NewService(
+			service.Config(cfg),
+			service.WithGatewayClient(gatewayClient),
+			service.EventsPublisher(&eventsPublisher),
+			service.WithIdentityBackend(identityBackend),
+			service.WithRoleService(roleService),
+		)
+	})
+
+	Describe("GetApplication", func() {
+		It("gets the application with appRoles", func() {
+			roleService.On("ListRoles", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListBundlesResponse{
+				Bundles: []*settingsmsg.Bundle{
+					{
+						Id:          "some-appRole-ID",
+						Type:        settingsmsg.Bundle_TYPE_ROLE,
+						DisplayName: "A human readable name for a role",
+					},
+				},
+			}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/applications/some-application-ID", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("applicationID", cfg.Service.ApplicationID)
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.GetApplication(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			application := libregraph.Application{}
+			err = json.Unmarshal(data, &application)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(application.Id).To(Equal(cfg.Service.ApplicationID))
+			Expect(len(application.GetAppRoles())).To(Equal(1))
+			Expect(application.GetAppRoles()[0].GetId()).To(Equal("some-appRole-ID"))
+			Expect(application.GetAppRoles()[0].GetDisplayName()).To(Equal("A human readable name for a role"))
+
+		})
+
+	})
+
+})

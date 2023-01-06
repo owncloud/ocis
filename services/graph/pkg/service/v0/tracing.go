@@ -20,6 +20,11 @@ func (t tracing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.next.ServeHTTP(w, r)
 }
 
+// GetApplication implements the Service interface.
+func (t tracing) GetApplication(w http.ResponseWriter, r *http.Request) {
+	t.next.GetMe(w, r)
+}
+
 // GetMe implements the Service interface.
 func (t tracing) GetMe(w http.ResponseWriter, r *http.Request) {
 	t.next.GetMe(w, r)

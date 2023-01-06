@@ -24,6 +24,11 @@ func (i instrument) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	i.next.ServeHTTP(w, r)
 }
 
+// GetApplication implements the Service interface.
+func (i instrument) GetApplication(w http.ResponseWriter, r *http.Request) {
+	i.next.GetMe(w, r)
+}
+
 // GetMe implements the Service interface.
 func (i instrument) GetMe(w http.ResponseWriter, r *http.Request) {
 	i.next.GetMe(w, r)
