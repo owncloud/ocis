@@ -11,6 +11,7 @@ import (
 
 	"github.com/CiscoM31/godata"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 
 	"github.com/go-chi/chi/v5"
@@ -195,17 +196,32 @@ func (g Graph) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	logger.Debug().Str("schoolID", schoolID).Msg("Getting users of school")
+	users, err := g.identityEducationBackend.GetEducationSchoolUsers(r.Context(), schoolID)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not get school users: backend error")
+		renderInternalServerError(w, r, err)
+		return
+	}
+
+	for _, user := range users {
+		logger.Debug().Str("schoolID", schoolID).Str("userID", *user.Id).Msg("calling delete member on backend")
+		if err := g.identityEducationBackend.RemoveUserFromEducationSchool(r.Context(), schoolID, *user.Id); err != nil {
+			if errors.Is(err, identity.ErrNotFound) {
+				logger.Debug().Str("schoolID", schoolID).Str("userID", *user.Id).Msg("user not found")
+				continue
+			}
+			logger.Debug().Err(err).Msg("could not delete school member: backend error")
+			renderInternalServerError(w, r, err)
+		}
+	}
+
 	logger.Debug().Str("id", schoolID).Msg("calling delete school on backend")
 	err = g.identityEducationBackend.DeleteEducationSchool(r.Context(), schoolID)
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete school: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		renderInternalServerError(w, r, err)
 		return
 	}
 
@@ -219,6 +235,15 @@ func (g Graph) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
+}
+
+func renderInternalServerError(w http.ResponseWriter, r *http.Request, err error) {
+	var errcode errorcode.Error
+	if errors.As(err, &errcode) {
+		errcode.Render(w, r)
+	} else {
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+	}
 }
 
 // GetEducationSchoolUsers implements the Service interface.
