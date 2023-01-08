@@ -2,6 +2,7 @@ package service
 
 import (
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
@@ -11,7 +12,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		Str("itemid", e.ItemID.OpaqueId).
 		Logger()
 
-	ownerCtx, sharerDisplayName, err := s.impersonate(e.Sharer)
+	ownerCtx, owner, err := utils.Impersonate(e.Sharer, s.gwClient, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not impersonate sharer")
 		return
@@ -39,6 +40,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		return
 	}
 
+	sharerDisplayName := owner.GetDisplayName()
 	msg, subj, err := s.render("shares/shareCreated.email.body.tmpl", "shares/shareCreated.email.subject.tmpl", map[string]string{
 		"ShareGrantee": shareGrantee,
 		"ShareSharer":  sharerDisplayName,
@@ -62,13 +64,13 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		Str("itemid", e.ItemID.GetOpaqueId()).
 		Logger()
 
-	ownerCtx, sharerDisplayName, err := s.impersonate(e.ShareOwner)
+	ctx, owner, err := utils.Impersonate(e.ShareOwner, s.gwClient, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not impersonate sharer")
 		return
 	}
 
-	resourceInfo, err := s.getResourceInfo(ownerCtx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
+	resourceInfo, err := s.getResourceInfo(ctx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
 	if err != nil {
 		logger.Error().
 			Err(err).
@@ -76,7 +78,7 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		return
 	}
 
-	shareGrantee, err := s.getGranteeName(ownerCtx, e.GranteeUserID, e.GranteeGroupID)
+	shareGrantee, err := s.getGranteeName(ctx, e.GranteeUserID, e.GranteeGroupID)
 	if err != nil {
 		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("Could not get grantee name")
 		return
@@ -92,7 +94,7 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("Could not render E-Mail body template for shares")
 	}
 
-	if err := s.send(ownerCtx, e.GranteeUserID, e.GranteeGroupID, msg, subj, sharerDisplayName); err != nil {
+	if err := s.send(ctx, e.GranteeUserID, e.GranteeGroupID, msg, subj, owner.GetDisplayName()); err != nil {
 		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("failed to send a message")
 	}
 

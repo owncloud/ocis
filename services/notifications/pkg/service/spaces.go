@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 )
 
 func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
@@ -11,7 +12,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		Str("itemid", e.ID.OpaqueId).
 		Logger()
 
-	ownerCtx, sharerDisplayName, err := s.impersonate(e.Executant)
+	ownerCtx, owner, err := utils.Impersonate(e.Executant, s.gwClient, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().
 			Err(err).
@@ -52,6 +53,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		return
 	}
 
+	sharerDisplayName := owner.GetDisplayName()
 	msg, subj, err := s.render("spaces/sharedSpace.email.body.tmpl", "spaces/sharedSpace.email.subject.tmpl", map[string]string{
 		"SpaceGrantee": spaceGrantee,
 		"SpaceSharer":  sharerDisplayName,
@@ -74,7 +76,7 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 		Str("itemid", e.ID.OpaqueId).
 		Logger()
 
-	ownerCtx, sharerDisplayName, err := s.impersonate(e.Executant)
+	ownerCtx, owner, err := utils.Impersonate(e.Executant, s.gwClient, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not handle space unshared event")
 		return
@@ -113,6 +115,7 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 		return
 	}
 
+	sharerDisplayName := owner.GetDisplayName()
 	msg, subj, err := s.render("spaces/unsharedSpace.email.body.tmpl", "spaces/unsharedSpace.email.subject.tmpl", map[string]string{
 		"SpaceGrantee": spaceGrantee,
 		"SpaceSharer":  sharerDisplayName,
@@ -128,4 +131,38 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 	if err := s.send(ownerCtx, e.GranteeUserID, e.GranteeGroupID, msg, subj, sharerDisplayName); err != nil {
 		logger.Error().Err(err).Msg("failed to send a message")
 	}
+}
+
+func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExpired) {
+	logger := s.logger.With().
+		Str("event", "SpaceMembershipExpired").
+		Str("itemid", e.SpaceID).
+		Logger()
+
+	ctx, owner, err := utils.Impersonate(e.SpaceOwner, s.gwClient, s.machineAuthAPIKey)
+	if err != nil {
+		logger.Error().Err(err).Msg("Could not impersonate sharer")
+		return
+	}
+
+	shareGrantee, err := s.getGranteeName(ctx, e.GranteeUserID, e.GranteeGroupID)
+	if err != nil {
+		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("Could not get grantee name")
+		return
+	}
+
+	msg, subj, err := s.render("spaces/membershipExpired.email.body.tmpl", "spaces/membershipExpired.email.subject.tmpl", map[string]string{
+		"SpaceGrantee": shareGrantee,
+		"SpaceName":    e.SpaceName,
+		"ExpiredAt":    e.ExpiredAt.Format("2006-01-02 15:04:05"),
+	})
+
+	if err != nil {
+		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("Could not render E-Mail body template for shares")
+	}
+
+	if err := s.send(ctx, e.GranteeUserID, e.GranteeGroupID, msg, subj, owner.GetDisplayName()); err != nil {
+		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("failed to send a message")
+	}
+
 }

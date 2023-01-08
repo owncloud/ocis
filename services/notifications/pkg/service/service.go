@@ -16,12 +16,10 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
@@ -73,8 +71,12 @@ func (s eventsNotifier) Run() error {
 					s.handleSpaceShared(e)
 				case events.SpaceUnshared:
 					s.handleSpaceUnshared(e)
+				case events.SpaceMembershipExpired:
+					s.handleSpaceMembershipExpired(e)
 				case events.ShareCreated:
 					s.handleShareCreated(e)
+				case events.ShareExpired:
+					s.handleShareExpired(e)
 				}
 			}()
 		case <-s.signals:
@@ -140,34 +142,6 @@ func (s eventsNotifier) getGranteeName(ctx context.Context, u *user.UserId, g *g
 		return "", errors.New("Need at least one non-nil grantee")
 	}
 
-}
-
-func (s eventsNotifier) impersonate(userID *user.UserId) (context.Context, string, error) {
-	getUserResponse, err := s.gwClient.GetUser(context.Background(), &user.GetUserRequest{
-		UserId: userID,
-	})
-	if err != nil {
-		return nil, "", err
-	}
-	if getUserResponse.Status.Code != rpc.Code_CODE_OK {
-		return nil, "", fmt.Errorf("error getting user: %s", getUserResponse.Status.Message)
-	}
-
-	// Get auth context
-	ownerCtx := revactx.ContextSetUser(context.Background(), getUserResponse.User)
-	authRes, err := s.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
-		Type:         "machine",
-		ClientId:     "userid:" + userID.OpaqueId,
-		ClientSecret: s.machineAuthAPIKey,
-	})
-	if err != nil {
-		return nil, "", err
-	}
-	if authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, "", fmt.Errorf("error impersonating user: %s", authRes.Status.Message)
-	}
-
-	return metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, authRes.Token), authRes.GetUser().GetDisplayName(), nil
 }
 
 func (s eventsNotifier) getResourceInfo(ctx context.Context, resourceID *providerv1beta1.ResourceId, fieldmask *fieldmaskpb.FieldMask) (*provider.ResourceInfo, error) {
