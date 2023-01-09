@@ -24,9 +24,14 @@ func (l logging) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	l.next.ServeHTTP(w, r)
 }
 
+// ListApplications implements the Service interface.
+func (l logging) ListApplications(w http.ResponseWriter, r *http.Request) {
+	l.next.ListApplications(w, r)
+}
+
 // GetApplication implements the Service interface.
 func (l logging) GetApplication(w http.ResponseWriter, r *http.Request) {
-	l.next.GetMe(w, r)
+	l.next.GetApplication(w, r)
 }
 
 // GetMe implements the Service interface.

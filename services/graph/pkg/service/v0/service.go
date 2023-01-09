@@ -33,6 +33,7 @@ const (
 type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
 
+	ListApplications(w http.ResponseWriter, r *http.Request)
 	GetApplication(http.ResponseWriter, *http.Request)
 
 	GetMe(http.ResponseWriter, *http.Request)
@@ -243,6 +244,10 @@ func NewService(opts ...Option) (Graph, error) {
 				r.Put("/tags", svc.AssignTags)
 				r.Delete("/tags", svc.UnassignTags)
 			})
+			r.Route("/applications", func(r chi.Router) {
+				r.Get("/", svc.ListApplications)
+				r.Get("/{applicationID}", svc.GetApplication)
+			})
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/", svc.GetMe)
 				r.Get("/drives", svc.GetDrives)
@@ -325,7 +330,6 @@ func NewService(opts ...Option) (Graph, error) {
 					})
 				})
 			})
-			r.Get("/applications/{applicationID}", svc.GetApplication)
 		})
 	})
 

@@ -20,9 +20,14 @@ func (t tracing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	t.next.ServeHTTP(w, r)
 }
 
+// ListApplications implements the Service interface.
+func (t tracing) ListApplications(w http.ResponseWriter, r *http.Request) {
+	t.next.ListApplications(w, r)
+}
+
 // GetApplication implements the Service interface.
 func (t tracing) GetApplication(w http.ResponseWriter, r *http.Request) {
-	t.next.GetMe(w, r)
+	t.next.GetApplication(w, r)
 }
 
 // GetMe implements the Service interface.

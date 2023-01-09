@@ -11,6 +11,37 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
 
+// ListApplications implements the Service interface.
+func (g Graph) ListApplications(w http.ResponseWriter, r *http.Request) {
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+	logger.Info().Interface("query", r.URL.Query()).Msg("calling get application")
+
+	lbr, err := g.roleService.ListRoles(r.Context(), &settingssvc.ListBundlesRequest{})
+	if err != nil {
+		logger.Error().Err(err).Msg("could not list roles: transport error")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	roles := make([]libregraph.AppRole, 0, len(lbr.Bundles))
+	for _, bundle := range lbr.GetBundles() {
+		role := libregraph.NewAppRole(bundle.GetId())
+		role.SetDisplayName(bundle.GetDisplayName())
+		roles = append(roles, *role)
+	}
+
+	application := libregraph.NewApplication(g.config.Service.ApplicationID)
+	application.SetDisplayName(g.config.Service.ApplicationDisplayName)
+	application.SetAppRoles(roles)
+
+	applications := []*libregraph.Application{
+		application,
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, &ListResponse{Value: applications})
+}
+
 // GetApplication implements the Service interface.
 func (g Graph) GetApplication(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
