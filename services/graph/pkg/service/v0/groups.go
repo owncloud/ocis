@@ -19,7 +19,6 @@ import (
 	"github.com/go-chi/render"
 )
 
-const memberRefsLimit = 20
 const memberTypeUsers = "users"
 
 // GetGroups implements the Service interface.
@@ -124,13 +123,13 @@ func (g Graph) PatchGroup(w http.ResponseWriter, r *http.Request) {
 
 	if memberRefs, ok := changes.GetMembersodataBindOk(); ok {
 		// The spec defines a limit of 20 members maxium per Request
-		if len(memberRefs) > memberRefsLimit {
+		if len(memberRefs) > g.config.API.UserPatchLimit {
 			logger.Debug().
 				Int("number", len(memberRefs)).
-				Int("limit", memberRefsLimit).
+				Int("limit", g.config.API.UserPatchLimit).
 				Msg("could not create group, exceeded members limit")
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
-				fmt.Sprintf("Request is limited to %d members", memberRefsLimit))
+				fmt.Sprintf("Request is limited to %d members", g.config.API.UserPatchLimit))
 			return
 		}
 		memberIDs := make([]string, 0, len(memberRefs))
