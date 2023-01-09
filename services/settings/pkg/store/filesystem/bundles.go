@@ -2,6 +2,7 @@
 package store
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,7 +10,7 @@ import (
 
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/store/errortypes"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 )
 
 var m = &sync.RWMutex{}
@@ -111,7 +112,7 @@ func (s Store) WriteBundle(record *settingsmsg.Bundle) (*settingsmsg.Bundle, err
 func (s Store) AddSettingToBundle(bundleID string, setting *settingsmsg.Setting) (*settingsmsg.Setting, error) {
 	bundle, err := s.ReadBundle(bundleID)
 	if err != nil {
-		if _, notFound := err.(errortypes.BundleNotFound); !notFound {
+		if !errors.Is(err, settings.ErrNotFound) {
 			return nil, err
 		}
 		bundle = new(settingsmsg.Bundle)

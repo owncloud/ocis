@@ -1,10 +1,11 @@
 package store
 
 import (
+	"fmt"
 	"io"
 	"os"
 
-	"github.com/owncloud/ocis/v2/services/settings/pkg/store/errortypes"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
@@ -13,7 +14,7 @@ import (
 func (s Store) parseRecordFromFile(record proto.Message, filePath string) error {
 	_, err := os.Stat(filePath)
 	if err != nil {
-		return errortypes.BundleNotFound(err.Error())
+		return fmt.Errorf("%q: %w", filePath, settings.ErrNotFound)
 	}
 
 	file, err := os.Open(filePath)
@@ -28,7 +29,7 @@ func (s Store) parseRecordFromFile(record proto.Message, filePath string) error 
 	}
 
 	if len(b) == 0 {
-		return errortypes.BundleNotFound(filePath)
+		return fmt.Errorf("%q: %w", filePath, settings.ErrNotFound)
 	}
 
 	if err := protojson.Unmarshal(b, record); err != nil {

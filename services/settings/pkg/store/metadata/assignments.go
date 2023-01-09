@@ -9,6 +9,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 )
 
 // ListRoleAssignments loads and returns all role assignments matching the given assignment identifier.
@@ -19,7 +20,7 @@ func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRole
 	switch err.(type) {
 	case nil:
 		// continue
-	case errtypes.NotFound: // FIXME this won't trigger on the disk based implementation
+	case errtypes.NotFound:
 		return make([]*settingsmsg.UserRoleAssignment, 0), nil
 	default:
 		return nil, err
@@ -28,7 +29,12 @@ func (s *Store) ListRoleAssignments(accountUUID string) ([]*settingsmsg.UserRole
 	ass := make([]*settingsmsg.UserRoleAssignment, 0, len(assIDs))
 	for _, assID := range assIDs {
 		b, err := s.mdc.SimpleDownload(ctx, assignmentPath(accountUUID, assID))
-		if err != nil {
+		switch err.(type) {
+		case nil:
+			// continue
+		case errtypes.NotFound:
+			continue
+		default:
 			return nil, err
 		}
 
@@ -53,7 +59,7 @@ func (s *Store) WriteRoleAssignment(accountUUID, roleID string) (*settingsmsg.Us
 	case nil:
 		// continue
 	case errtypes.NotFound:
-		// continue
+		// already gone, continue
 	default:
 		return nil, err
 	}
@@ -80,7 +86,12 @@ func (s *Store) RemoveRoleAssignment(assignmentID string) error {
 	s.Init()
 	ctx := context.TODO()
 	accounts, err := s.mdc.ReadDir(ctx, accountsFolderLocation)
-	if err != nil {
+	switch err.(type) {
+	case nil:
+		// continue
+	case errtypes.NotFound:
+		return fmt.Errorf("assignmentID '%s' %w", assignmentID, settings.ErrNotFound)
+	default:
 		return err
 	}
 
@@ -100,7 +111,7 @@ func (s *Store) RemoveRoleAssignment(assignmentID string) error {
 			}
 		}
 	}
-	return fmt.Errorf("assignmentID '%s' not found", assignmentID)
+	return fmt.Errorf("assignmentID '%s' %w", assignmentID, settings.ErrNotFound)
 }
 
 func accountPath(accountUUID string) string {

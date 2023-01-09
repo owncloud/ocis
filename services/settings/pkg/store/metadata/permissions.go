@@ -55,7 +55,7 @@ func (s *Store) ReadPermissionByName(name string, roleIDs []string) (*settingsms
 			}
 		}
 	}
-	return nil, settings.ErrPermissionNotFound
+	return nil, settings.ErrNotFound
 }
 
 // extractPermissionsByResource collects all permissions from the provided role that match the requested resource
