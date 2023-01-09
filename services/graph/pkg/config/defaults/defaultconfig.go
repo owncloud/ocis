@@ -30,6 +30,9 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "graph",
 		},
+		API: config.API{
+			UserPatchLimit: 20,
+		},
 		Reva: shared.DefaultRevaConfig(),
 		Spaces: config.Spaces{
 			WebDavBase:   "https://localhost:9200",

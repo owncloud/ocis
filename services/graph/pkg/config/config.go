@@ -19,6 +19,8 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
+	API API `yaml:"api"`
+
 	Reva          *shared.Reva          `yaml:"reva"`
 	TokenManager  *TokenManager         `yaml:"token_manager"`
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
@@ -83,6 +85,11 @@ type LDAPEducationConfig struct {
 type Identity struct {
 	Backend string `yaml:"backend" env:"GRAPH_IDENTITY_BACKEND" desc:"The user identity backend to use. Supported backend types are 'ldap' and 'cs3'."`
 	LDAP    LDAP   `yaml:"ldap"`
+}
+
+// API represents API configuration parameters.
+type API struct {
+	UserPatchLimit int `yaml:"user_patch_limit" env:"GRAPH_USER_PATCH_LIMIT" desc:"The amount of users allowed to be changed in PATCH requests."`
 }
 
 // Events combines the configuration options for the event bus.
