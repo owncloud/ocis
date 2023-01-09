@@ -2,8 +2,8 @@
 title: Groups
 weight: 40
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/services/graph
-geekdocFilePath: users.md
+geekdocEditPath: edit/master/docs/apis/http/graph
+geekdocFilePath: groups.md
 ---
 
 {{< toc >}}
