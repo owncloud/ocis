@@ -58,11 +58,20 @@ type Service interface {
 	PostEducationSchoolUser(http.ResponseWriter, *http.Request)
 	DeleteEducationSchoolUser(http.ResponseWriter, *http.Request)
 
+	GetEducationClasses(http.ResponseWriter, *http.Request)
+	GetEducationClass(http.ResponseWriter, *http.Request)
+	PostEducationClass(http.ResponseWriter, *http.Request)
+	PatchEducationClass(http.ResponseWriter, *http.Request)
+	DeleteEducationClass(w http.ResponseWriter, r *http.Request)
+	GetEducationClassMembers(w http.ResponseWriter, r *http.Request)
+	PostEducationClassMember(w http.ResponseWriter, r *http.Request)
+
 	GetEducationUsers(http.ResponseWriter, *http.Request)
 	GetEducationUser(http.ResponseWriter, *http.Request)
 	PostEducationUser(http.ResponseWriter, *http.Request)
 	DeleteEducationUser(http.ResponseWriter, *http.Request)
 	PatchEducationUser(http.ResponseWriter, *http.Request)
+	DeleteEducationClassMember(w http.ResponseWriter, r *http.Request)
 
 	GetDrives(w http.ResponseWriter, r *http.Request)
 	GetSingleDrive(w http.ResponseWriter, r *http.Request)
@@ -293,16 +302,16 @@ func NewService(opts ...Option) (Graph, error) {
 					})
 				})
 				r.Route("/classes", func(r chi.Router) {
-					r.Get("/", svc.GetGroups)
-					r.Post("/", svc.PostGroup)
-					r.Route("/{groupID}", func(r chi.Router) {
-						r.Get("/", svc.GetGroup)
-						r.Delete("/", svc.DeleteGroup)
-						r.Patch("/", svc.PatchGroup)
+					r.Get("/", svc.GetEducationClasses)
+					r.Post("/", svc.PostEducationClass)
+					r.Route("/{classID}", func(r chi.Router) {
+						r.Get("/", svc.GetEducationClass)
+						r.Delete("/", svc.DeleteEducationClass)
+						r.Patch("/", svc.PatchEducationClass)
 						r.Route("/members", func(r chi.Router) {
-							r.Get("/", svc.GetGroupMembers)
-							r.Post("/$ref", svc.PostGroupMember)
-							r.Delete("/{memberID}/$ref", svc.DeleteGroupMember)
+							r.Get("/", svc.GetEducationClassMembers)
+							r.Post("/$ref", svc.PostEducationClassMember)
+							r.Delete("/{memberID}/$ref", svc.DeleteEducationClassMember)
 						})
 					})
 				})

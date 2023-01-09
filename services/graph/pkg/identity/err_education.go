@@ -50,6 +50,31 @@ func (i *ErrEducationBackend) RemoveUserFromEducationSchool(ctx context.Context,
 	return errNotImplemented
 }
 
+// GetEducationClasses implements the EducationBackend interface
+func (i *ErrEducationBackend) GetEducationClasses(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationClass, error) {
+	return nil, errNotImplemented
+}
+
+// GetEducationClass implements the EducationBackend interface
+func (i *ErrEducationBackend) GetEducationClass(ctx context.Context, namedOrID string, queryParam url.Values) (*libregraph.EducationClass, error) {
+	return nil, errNotImplemented
+}
+
+// CreateEducationClass implements the EducationBackend interface
+func (i *ErrEducationBackend) CreateEducationClass(ctx context.Context, class libregraph.EducationClass) (*libregraph.EducationClass, error) {
+	return nil, errNotImplemented
+}
+
+// DeleteEducationClass implements the EducationBackend interface
+func (i *ErrEducationBackend) DeleteEducationClass(ctx context.Context, nameOrID string) error {
+	return errNotImplemented
+}
+
+// GetEducationClassMembers implements the EducationBackend interface
+func (i *ErrEducationBackend) GetEducationClassMembers(ctx context.Context, nameOrID string) ([]*libregraph.EducationUser, error) {
+	return nil, errNotImplemented
+}
+
 // CreateEducationUser creates a given education user in the identity backend.
 func (i *ErrEducationBackend) CreateEducationUser(ctx context.Context, user libregraph.EducationUser) (*libregraph.EducationUser, error) {
 	return nil, errNotImplemented

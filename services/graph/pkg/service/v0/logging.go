@@ -139,6 +139,46 @@ func (l logging) DeleteEducationSchoolUser(w http.ResponseWriter, r *http.Reques
 	l.next.DeleteEducationSchoolUser(w, r)
 }
 
+// GetEducationClasses implements the Service interface.
+func (l logging) GetEducationClasses(w http.ResponseWriter, r *http.Request) {
+	l.next.GetEducationClasses(w, r)
+}
+
+// GetEducationClass implements the Service interface.
+func (l logging) GetEducationClass(w http.ResponseWriter, r *http.Request) {
+	l.next.GetEducationClass(w, r)
+}
+
+// PostEducationClass implements the Service interface.
+func (l logging) PostEducationClass(w http.ResponseWriter, r *http.Request) {
+	l.next.PostEducationClass(w, r)
+}
+
+// PatchEducationClass implements the Service interface.
+func (l logging) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
+	l.next.PatchEducationClass(w, r)
+}
+
+// DeleteEducationClass implements the Service interface.
+func (l logging) DeleteEducationClass(w http.ResponseWriter, r *http.Request) {
+	l.next.DeleteEducationClass(w, r)
+}
+
+// GetEducationClassMembers implements the Service interface.
+func (l logging) GetEducationClassMembers(w http.ResponseWriter, r *http.Request) {
+	l.next.GetEducationClassMembers(w, r)
+}
+
+// PostEducationClassMember implements the Service interface.
+func (l logging) PostEducationClassMember(w http.ResponseWriter, r *http.Request) {
+	l.next.PostEducationClassMember(w, r)
+}
+
+// DeleteEducationClassMember implements the Service interface.
+func (l logging) DeleteEducationClassMember(w http.ResponseWriter, r *http.Request) {
+	l.next.DeleteEducationClassMember(w, r)
+}
+
 // GetEducationUsers implements the Service interface.
 func (l logging) GetEducationUsers(w http.ResponseWriter, r *http.Request) {
 	l.next.GetEducationUsers(w, r)
