@@ -31,9 +31,8 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "graph",
 			// TODO ApplicationID should be randomized on install with init
-			ApplicationID: "14bc9a84-a974-41a6-a948-b19d0a9d7f11",
-			// TODO ApplicationDisplayName should be used in ocis web as well
-			ApplicationDisplayName: "oCIS Web",
+			ApplicationID:          "14bc9a84-a974-41a6-a948-b19d0a9d7f11",
+			ApplicationDisplayName: "ownCloud Infinite Scale",
 		},
 		API: config.API{
 			GroupMembersPatchLimit: 20,
