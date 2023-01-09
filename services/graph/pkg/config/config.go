@@ -89,7 +89,7 @@ type Identity struct {
 
 // API represents API configuration parameters.
 type API struct {
-	UserPatchLimit int `yaml:"user_patch_limit" env:"GRAPH_USER_PATCH_LIMIT" desc:"The amount of users allowed to be changed in PATCH requests."`
+	GroupMembersPatchLimit int `yaml:"group_members_patch_limit" env:"GRAPH_GROUP_MEMBERS_PATCH_LIMIT" desc:"The amount of group members allowed to be added with a single patch request."`
 }
 
 // Events combines the configuration options for the event bus.

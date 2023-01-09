@@ -31,7 +31,7 @@ func DefaultConfig() *config.Config {
 			Name: "graph",
 		},
 		API: config.API{
-			UserPatchLimit: 20,
+			GroupMembersPatchLimit: 20,
 		},
 		Reva: shared.DefaultRevaConfig(),
 		Spaces: config.Spaces{
