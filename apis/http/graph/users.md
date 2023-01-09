@@ -2,7 +2,7 @@
 title: Users
 weight: 30
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/services/graph
+geekdocEditPath: edit/master/docs/apis/http/graph
 geekdocFilePath: users.md
 ---
 
