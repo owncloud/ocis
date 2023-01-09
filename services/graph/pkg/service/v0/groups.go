@@ -123,13 +123,13 @@ func (g Graph) PatchGroup(w http.ResponseWriter, r *http.Request) {
 
 	if memberRefs, ok := changes.GetMembersodataBindOk(); ok {
 		// The spec defines a limit of 20 members maxium per Request
-		if len(memberRefs) > g.config.API.UserPatchLimit {
+		if len(memberRefs) > g.config.API.GroupMembersPatchLimit {
 			logger.Debug().
 				Int("number", len(memberRefs)).
-				Int("limit", g.config.API.UserPatchLimit).
+				Int("limit", g.config.API.GroupMembersPatchLimit).
 				Msg("could not create group, exceeded members limit")
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
-				fmt.Sprintf("Request is limited to %d members", g.config.API.UserPatchLimit))
+				fmt.Sprintf("Request is limited to %d members", g.config.API.GroupMembersPatchLimit))
 			return
 		}
 		memberIDs := make([]string, 0, len(memberRefs))
