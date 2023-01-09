@@ -21,11 +21,13 @@ Feature: upload resources using TUS protocol
 
   Scenario: upload a file bigger than the set quota to a project space
     Given user "Alice" has created a space "Project Jupiter" of type "project" with quota "10"
-    When user "Alice" creates a new TUS resource for the space "Project Jupiter" using the WebDAV API with these headers:
-      | Upload-Length   | 100                       |
+    When user "Alice" creates a new TUS resource for the space "Project Jupiter" with content "file content is 24 bytes" using the WebDAV API with these headers:
+      | Upload-Length   | 24                              |
       # dXBsb2FkLnR4dA== is the base64 encoded value of filename upload.txt
-      | Upload-Metadata | filename dXBsb2FkLnR4dA== |
-      | Tus-Resumable   | 1.0.0                     |
+      | Upload-Metadata | filename dXBsb2FkLnR4dA==       |
+      | Content-Type    | application/offset+octet-stream |
+      | Tus-Resumable   | 1.0.0                           |
+      | Tus-Extension   | creation-with-upload            |
     Then the HTTP status code should be "507"
     And for user "Alice" the space "Project Jupiter" should not contain these entries:
       | upload.txt |
