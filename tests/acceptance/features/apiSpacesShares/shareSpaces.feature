@@ -228,4 +228,4 @@ Feature: Share spaces
     When the administrator deletes group "group2" using the Graph API
     Then the HTTP status code should be "204"
     And the user "Brian" should not have a space called "share space"
-    But the user "Bob" should not have a space called "share space"
+    And the user "Bob" should not have a space called "share space"
