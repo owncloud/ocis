@@ -45,6 +45,8 @@ spaces:
   webdav_path: /dav/spaces/
   default_quota: "1000000000"
   extended_space_properties_cache_ttl: 0
+  users_cache_ttl: 1800000000000
+  groups_cache_ttl: 1800000000000
 identity:
   backend: ldap
   ldap:

@@ -326,6 +326,24 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Max TTL in seconds for the spaces property cache.
 
+a|`GRAPH_SPACES_USERS_CACHE_TTL` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1800000000000 ++
+a| [subs=-attributes]
+Max TTL in seconds for the spaces users cache.
+
+a|`GRAPH_SPACES_GROUPS_CACHE_TTL` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++1800000000000 ++
+a| [subs=-attributes]
+Max TTL in seconds for the spaces groups cache.
+
 a|`GRAPH_IDENTITY_BACKEND` +
 
 a| [subs=-attributes]
