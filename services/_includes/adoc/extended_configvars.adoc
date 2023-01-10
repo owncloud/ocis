@@ -1,4 +1,4 @@
-// collected through docs/helpers/rougeEnv.go
+// collected through docs/helpers/extendedEnv.go
 
 [caption=]
 .Environment variables with extended scope not included in a service
