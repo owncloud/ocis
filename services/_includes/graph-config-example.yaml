@@ -28,6 +28,8 @@ http:
     cert: ""
     key: ""
   apitoken: ""
+api:
+  group_members_patch_limit: 20
 reva:
   address: 127.0.0.1:9142
   tls:

@@ -225,6 +225,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 An optional API bearer token
 
+a|`GRAPH_GROUP_MEMBERS_PATCH_LIMIT` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++20 ++
+a| [subs=-attributes]
+The amount of group members allowed to be added with a single patch request.
+
 a|`REVA_GATEWAY` +
 
 a| [subs=-attributes]
