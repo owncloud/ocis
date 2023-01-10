@@ -22,6 +22,7 @@ type groupAttributeMap struct {
 	memberSyntax string
 }
 
+// GetGroup implements the Backend Interface for the LDAP Backend
 func (i *LDAP) GetGroup(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.Group, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetGroup")
@@ -53,6 +54,7 @@ func (i *LDAP) GetGroup(ctx context.Context, nameOrID string, queryParam url.Val
 	return g, nil
 }
 
+// GetGroups implements the Backend Interface for the LDAP Backend
 func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetGroups")
@@ -166,37 +168,12 @@ func (i *LDAP) CreateGroup(ctx context.Context, group libregraph.Group) (*libreg
 	if !i.writeEnabled {
 		return nil, errorcode.New(errorcode.NotAllowed, "server is configured read-only")
 	}
-	ar := ldap.AddRequest{
-		DN: fmt.Sprintf("cn=%s,%s", oldap.EscapeDNAttributeValue(*group.DisplayName), i.groupBaseDN),
-		Attributes: []ldap.Attribute{
-			{
-				Type: i.groupAttributeMap.name,
-				Vals: []string{*group.DisplayName},
-			},
-			// This is a crutch to allow groups without members for LDAP Server's which
-			// that apply strict Schema checking. The RFCs define "member/uniqueMember"
-			// as required attribute for groupOfNames/groupOfUniqueNames. So we
-			// add an empty string (which is a valid DN) as the initial member.
-			// It will be replace once real members are added.
-			// We might wanna use the newer, but not so broadly used "groupOfMembers"
-			// objectclass (RFC2307bis-02) where "member" is optional.
-			{
-				Type: i.groupAttributeMap.member,
-				Vals: []string{""},
-			},
-		},
+	ar, err := i.groupToAddRequest(group)
+	if err != nil {
+		return nil, err
 	}
 
-	// TODO make group objectclass configurable to support e.g. posixGroup, groupOfUniqueNames, groupOfMembers?}
-	objectClasses := []string{"groupOfNames", "top"}
-
-	if !i.useServerUUID {
-		ar.Attribute("owncloudUUID", []string{uuid.Must(uuid.NewV4()).String()})
-		objectClasses = append(objectClasses, "owncloud")
-	}
-	ar.Attribute("objectClass", objectClasses)
-
-	if err := i.conn.Add(&ar); err != nil {
+	if err := i.conn.Add(ar); err != nil {
 		return nil, err
 	}
 
@@ -260,7 +237,7 @@ func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs 
 		currentSet[nCurrentMember] = struct{}{}
 	}
 
-	var newMemberDNs []string
+	var newMemberDN []string
 	for _, memberID := range memberIDs {
 		me, err := i.getLDAPUserByID(memberID)
 		if err != nil {
@@ -272,14 +249,14 @@ func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs 
 			return err
 		}
 		if _, present := currentSet[nDN]; !present {
-			newMemberDNs = append(newMemberDNs, me.DN)
+			newMemberDN = append(newMemberDN, me.DN)
 		} else {
 			logger.Debug().Str("memberDN", me.DN).Msg("Member already present in group. Skipping")
 		}
 	}
 
-	if len(newMemberDNs) > 0 {
-		mr.Add(i.groupAttributeMap.member, newMemberDNs)
+	if len(newMemberDN) > 0 {
+		mr.Add(i.groupAttributeMap.member, newMemberDN)
 
 		if err := i.conn.Modify(&mr); err != nil {
 			return err
@@ -304,10 +281,48 @@ func (i *LDAP) RemoveMemberFromGroup(ctx context.Context, groupID string, member
 	}
 	logger.Debug().Str("backend", "ldap").Str("groupdn", ge.DN).Str("member", me.DN).Msg("remove member")
 
-	if mr, err := i.removeMemberFromGroupEntry(ge, me.DN); err == nil && mr != nil {
+	if mr, err := i.removeMemberFromGroupEntry(ge, me.DN); err == nil {
 		return i.conn.Modify(mr)
 	}
 	return nil
+}
+
+func (i *LDAP) groupToAddRequest(group libregraph.Group) (*ldap.AddRequest, error) {
+	ar := ldap.NewAddRequest(i.getGroupLDAPDN(group), nil)
+
+	attrMap, err := i.groupToLDAPAttrValues(group)
+	if err != nil {
+		return nil, err
+	}
+	for attrType, values := range attrMap {
+		ar.Attribute(attrType, values)
+	}
+	return ar, nil
+}
+
+func (i *LDAP) getGroupLDAPDN(group libregraph.Group) string {
+	return fmt.Sprintf("cn=%s,%s", oldap.EscapeDNAttributeValue(group.GetDisplayName()), i.groupBaseDN)
+}
+
+func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]string, error) {
+	attrs := map[string][]string{
+		i.groupAttributeMap.name: {group.GetDisplayName()},
+		"objectClass":            {"groupOfNames", "top"},
+		// This is a crutch to allow groups without members for LDAP servers
+		// that apply strict Schema checking. The RFCs define "member/uniqueMember"
+		// as required attribute for groupOfNames/groupOfUniqueNames. So we
+		// add an empty string (which is a valid DN) as the initial member.
+		// It will be replaced once real members are added.
+		// We might wanna use the newer, but not so broadly used "groupOfMembers"
+		// objectclass (RFC2307bis-02) where "member" is optional.
+		i.groupAttributeMap.member: {""},
+	}
+
+	if !i.useServerUUID {
+		attrs["owncloudUUID"] = []string{uuid.Must(uuid.NewV4()).String()}
+		attrs["objectClass"] = append(attrs["objectClass"], "owncloud")
+	}
+	return attrs, nil
 }
 
 func (i *LDAP) expandLDAPGroupMembers(ctx context.Context, e *ldap.Entry) ([]*ldap.Entry, error) {
@@ -428,7 +443,7 @@ func (i *LDAP) removeMemberFromGroupEntry(group *ldap.Entry, memberDN string) (*
 	if !found {
 		i.logger.Debug().Str("backend", "ldap").Str("groupdn", group.DN).Str("member", memberDN).
 			Msg("The target is not a member of the group")
-		return nil, nil
+		return nil, ErrNotFound
 	}
 
 	mr := ldap.ModifyRequest{DN: group.DN}
