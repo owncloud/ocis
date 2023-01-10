@@ -30,6 +30,11 @@ func (i *ErrEducationBackend) GetEducationSchools(ctx context.Context, queryPara
 	return nil, errNotImplemented
 }
 
+// UpdateEducationSchool implements the EducationBackend interface for the ErrEducationBackend backend.
+func (i *ErrEducationBackend) UpdateEducationSchool(ctx context.Context, numberOrID string, school libregraph.EducationSchool) (*libregraph.EducationSchool, error) {
+	return nil, errNotImplemented
+}
+
 // GetEducationSchoolUsers implements the EducationBackend interface for the ErrEducationBackend backend.
 func (i *ErrEducationBackend) GetEducationSchoolUsers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
 	return nil, errNotImplemented

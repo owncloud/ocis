@@ -46,6 +46,11 @@ var schoolEntry1 = ldap.NewEntry("ou=Test School1",
 		"owncloudUUID":            {"hijk-defg"},
 	})
 
+var filterSchoolSearchByIdExisting = "(&(objectClass=ocEducationSchool)(|(owncloudUUID=abcd-defg)(ocEducationSchoolNumber=abcd-defg)))"
+var filterSchoolSearchByIdNonexistant = "(&(objectClass=ocEducationSchool)(|(owncloudUUID=xxxx-xxxx)(ocEducationSchoolNumber=xxxx-xxxx)))"
+var filterSchoolSearchByNumberExisting = "(&(objectClass=ocEducationSchool)(|(owncloudUUID=0123)(ocEducationSchoolNumber=0123)))"
+var filterSchoolSearchByNumberNonexistant = "(&(objectClass=ocEducationSchool)(|(owncloudUUID=3210)(ocEducationSchoolNumber=3210)))"
+
 func TestCreateEducationSchool(t *testing.T) {
 	lm := &mocks.Client{}
 	lm.On("Add", mock.Anything).
@@ -75,6 +80,64 @@ func TestCreateEducationSchool(t *testing.T) {
 	assert.Equal(t, res_school.GetSchoolNumber(), school.GetSchoolNumber())
 }
 
+func TestUpdateEducationSchoolOperation(t *testing.T) {
+	tests := []struct {
+		name              string
+		displayName       string
+		schoolNumber      string
+		expectedOperation SchoolUpdateOperation
+	}{
+		{
+			name:              "Test using school with both number and name",
+			displayName:       "A name",
+			schoolNumber:      "1234",
+			expectedOperation: TooManyValues,
+		},
+		{
+			name:              "Test with unchanged number",
+			schoolNumber:      "1234",
+			expectedOperation: SchoolUnchanged,
+		},
+		{
+			name:              "Test with unchanged name",
+			displayName:       "A name",
+			expectedOperation: SchoolUnchanged,
+		},
+		{
+			name:              "Test new name",
+			displayName:       "Something new",
+			expectedOperation: DisplayNameUpdated,
+		},
+		{
+			name:              "Test new number",
+			schoolNumber:      "9876",
+			expectedOperation: SchoolNumberUpdated,
+		},
+	}
+
+	for _, tt := range tests {
+		lm := &mocks.Client{}
+		b, err := getMockedBackend(lm, eduConfig, &logger)
+		assert.Nil(t, err)
+
+		displayName := "A name"
+		schoolNumber := "1234"
+
+		currentSchool := libregraph.EducationSchool{
+			DisplayName:  &displayName,
+			SchoolNumber: &schoolNumber,
+		}
+
+		schoolUpdate := libregraph.EducationSchool{
+			DisplayName:  &tt.displayName,
+			SchoolNumber: &tt.schoolNumber,
+		}
+
+		operation := b.UpdateEducationSchoolOperation(schoolUpdate, currentSchool)
+		assert.Equal(t, tt.expectedOperation, operation)
+	}
+}
+
 func TestDeleteEducationSchool(t *testing.T) {
 	tests := []struct {
 		name                 string
@@ -85,25 +148,25 @@ func TestDeleteEducationSchool(t *testing.T) {
 		{
 			name:                 "Test delete school using schoolId",
 			numberOrId:           "abcd-defg",
-			filter:               "(&(objectClass=ocEducationSchool)(|(owncloudUUID=abcd-defg)(ocEducationSchoolNumber=abcd-defg)))",
+			filter:               filterSchoolSearchByIdExisting,
 			expectedItemNotFound: false,
 		},
 		{
 			name:                 "Test delete school using unknown schoolId",
 			numberOrId:           "xxxx-xxxx",
-			filter:               "(&(objectClass=ocEducationSchool)(|(owncloudUUID=xxxx-xxxx)(ocEducationSchoolNumber=xxxx-xxxx)))",
+			filter:               filterSchoolSearchByIdNonexistant,
 			expectedItemNotFound: true,
 		},
 		{
 			name:                 "Test delete school using schoolNumber",
 			numberOrId:           "0123",
-			filter:               "(&(objectClass=ocEducationSchool)(|(owncloudUUID=0123)(ocEducationSchoolNumber=0123)))",
+			filter:               filterSchoolSearchByNumberExisting,
 			expectedItemNotFound: false,
 		},
 		{
 			name:                 "Test delete school using unknown schoolNumber",
 			numberOrId:           "3210",
-			filter:               "(&(objectClass=ocEducationSchool)(|(owncloudUUID=3210)(ocEducationSchoolNumber=3210)))",
+			filter:               filterSchoolSearchByNumberNonexistant,
 			expectedItemNotFound: true,
 		},
 	}
@@ -154,25 +217,25 @@ func TestGetEducationSchool(t *testing.T) {
 		{
 			name:                 "Test search school using schoolId",
 			numberOrId:           "abcd-defg",
-			filter:               "(&(objectClass=ocEducationSchool)(|(owncloudUUID=abcd-defg)(ocEducationSchoolNumber=abcd-defg)))",
+			filter:               filterSchoolSearchByIdExisting,
 			expectedItemNotFound: false,
 		},
 		{
 			name:                 "Test search school using unknown schoolId",
 			numberOrId:           "xxxx-xxxx",
-			filter:               "(&(objectClass=ocEducationSchool)(|(owncloudUUID=xxxx-xxxx)(ocEducationSchoolNumber=xxxx-xxxx)))",
+			filter:               filterSchoolSearchByIdNonexistant,
 			expectedItemNotFound: true,
 		},
 		{
 			name:                 "Test search school using schoolNumber",
 			numberOrId:           "0123",
-			filter:               "(&(objectClass=ocEducationSchool)(|(owncloudUUID=0123)(ocEducationSchoolNumber=0123)))",
+			filter:               filterSchoolSearchByNumberExisting,
 			expectedItemNotFound: false,
 		},
 		{
 			name:                 "Test search school using unknown schoolNumber",
 			numberOrId:           "3210",
-			filter:               "(&(objectClass=ocEducationSchool)(|(owncloudUUID=3210)(ocEducationSchoolNumber=3210)))",
+			filter:               filterSchoolSearchByNumberNonexistant,
 			expectedItemNotFound: true,
 		},
 	}
@@ -234,7 +297,7 @@ var schoolByIDSearch1 *ldap.SearchRequest = &ldap.SearchRequest{
 	BaseDN:     "",
 	Scope:      2,
 	SizeLimit:  1,
-	Filter:     "(&(objectClass=ocEducationSchool)(|(owncloudUUID=abcd-defg)(ocEducationSchoolNumber=abcd-defg)))",
+	Filter:     filterSchoolSearchByIdExisting,
 	Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
 	Controls:   []ldap.Control(nil),
 }

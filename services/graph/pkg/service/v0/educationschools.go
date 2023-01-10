@@ -112,21 +112,28 @@ func (g Graph) PatchEducationSchool(w http.ResponseWriter, r *http.Request) {
 	schoolID := chi.URLParam(r, "schoolID")
 	schoolID, err := url.PathUnescape(schoolID)
 	if err != nil {
-		logger.Debug().Str("id", schoolID).Msg("could not change school: unescaping school id failed")
+		logger.Debug().Str("id", schoolID).Msg("could not update school: unescaping school id failed")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping school id failed")
 		return
 	}
 
 	if schoolID == "" {
-		logger.Debug().Msg("could not change school: missing school id")
+		logger.Debug().Msg("could not update school: missing school id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing school id")
 		return
 	}
-	changes := libregraph.NewEducationSchool()
-	err = json.NewDecoder(r.Body).Decode(changes)
+
+	school := libregraph.NewEducationSchool()
+	err = json.NewDecoder(r.Body).Decode(school)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not change school: invalid request body")
+		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update school: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+
+	if school, err = g.identityEducationBackend.UpdateEducationSchool(r.Context(), schoolID, *school); err != nil {
+		logger.Debug().Err(err).Interface("school", school).Msg("could not update school: backend error")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
 
@@ -138,8 +145,8 @@ func (g Graph) PatchEducationSchool(w http.ResponseWriter, r *http.Request) {
 	g.publishEvent(e)
 	*/
 
-	render.Status(r, http.StatusNoContent)
-	render.NoContent(w, r)
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, school)
 }
 
 // GetEducationSchool implements the Service interface.
