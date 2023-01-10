@@ -7,7 +7,7 @@ import (
 )
 
 // NewInstrument returns a service that instruments metrics.
-func NewInstrument(next Service, metrics *metrics.Metrics) Service {
+func NewInstrument(next Service, metrics *metrics.Metrics) instrument {
 	return instrument{
 		next:    next,
 		metrics: metrics,

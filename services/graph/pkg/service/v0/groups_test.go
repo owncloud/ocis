@@ -70,7 +70,7 @@ var _ = Describe("Groups", func() {
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 
 		_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
-		svc = service.NewService(
+		svc, _ = service.NewService(
 			service.Config(cfg),
 			service.WithGatewayClient(gatewayClient),
 			service.EventsPublisher(&eventsPublisher),

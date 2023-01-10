@@ -70,7 +70,7 @@ var _ = Describe("Users changing their own password", func() {
 		Expect(err).To(BeNil())
 
 		eventsPublisher = mocks.Publisher{}
-		svc = service.NewService(
+		svc, _ = service.NewService(
 			service.Config(cfg),
 			service.WithGatewayClient(gatewayClient),
 			service.WithIdentityBackend(identityBackend),

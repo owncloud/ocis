@@ -3,6 +3,7 @@ package defaults
 import (
 	"path"
 	"strings"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -38,6 +39,10 @@ func DefaultConfig() *config.Config {
 			WebDavBase:   "https://localhost:9200",
 			WebDavPath:   "/dav/spaces/",
 			DefaultQuota: "1000000000",
+			// 30 minutes
+			GroupsCacheTTL: 1800,
+			// 30 minutes
+			UsersCacheTTL: 1800,
 		},
 		Identity: config.Identity{
 			Backend: "ldap",
@@ -136,4 +141,10 @@ func Sanitize(cfg *config.Config) {
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 	}
+
+	// convert ttl to millisecond
+	// the config is in seconds, therefore we need multiply it.
+	cfg.Spaces.ExtendedSpacePropertiesCacheTTL = cfg.Spaces.ExtendedSpacePropertiesCacheTTL * int(time.Second)
+	cfg.Spaces.GroupsCacheTTL = cfg.Spaces.GroupsCacheTTL * int(time.Second)
+	cfg.Spaces.UsersCacheTTL = cfg.Spaces.UsersCacheTTL * int(time.Second)
 }

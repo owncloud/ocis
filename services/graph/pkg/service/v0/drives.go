@@ -23,6 +23,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+	"github.com/jellydator/ttlcache/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
@@ -575,25 +576,44 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 				// libregraph.Identity and if we pass the pointer from the loop every identity
 				// will have the same id.
 				tmp := id
-				var identity libregraph.IdentitySet
+				var identitySet libregraph.IdentitySet
+				if _, ok := groupsMap[id]; ok {
+					var group libregraph.Group
+					if item := g.groupsCache.Get(id); item == nil {
+						if requestedGroup, err := g.identityBackend.GetGroup(ctx, id, url.Values{}); err == nil {
+							group = *requestedGroup
+							g.groupsCache.Set(id, group, ttlcache.DefaultTTL)
+						}
+					} else {
+						group = item.Value()
+					}
 
-				if _, ok := groupsMap[id]; !ok {
-					identity = libregraph.IdentitySet{User: &libregraph.Identity{Id: &tmp}}
+					identitySet = libregraph.IdentitySet{Group: &libregraph.Identity{Id: &tmp, DisplayName: group.GetDisplayName()}}
 				} else {
-					identity = libregraph.IdentitySet{Group: &libregraph.Identity{Id: &tmp}}
+					var user libregraph.User
+					if item := g.usersCache.Get(id); item == nil {
+						if requestedUser, err := g.identityBackend.GetUser(ctx, id, url.Values{}); err == nil {
+							user = *requestedUser
+							g.usersCache.Set(id, user, ttlcache.DefaultTTL)
+						}
+					} else {
+						user = item.Value()
+					}
+
+					identitySet = libregraph.IdentitySet{User: &libregraph.Identity{Id: &tmp, DisplayName: user.GetDisplayName()}}
 				}
 
 				// we need to map the permissions to the roles
 				switch {
 				// having RemoveGrant qualifies you as a manager
 				case perm.RemoveGrant:
-					managerIdentities = append(managerIdentities, identity)
+					managerIdentities = append(managerIdentities, identitySet)
 				// InitiateFileUpload means you are an editor
 				case perm.InitiateFileUpload:
-					editorIdentities = append(editorIdentities, identity)
+					editorIdentities = append(editorIdentities, identitySet)
 				// Stat permission at least makes you a viewer
 				case perm.Stat:
-					viewerIdentities = append(viewerIdentities, identity)
+					viewerIdentities = append(viewerIdentities, identitySet)
 				}
 			}
 

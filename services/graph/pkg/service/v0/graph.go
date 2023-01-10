@@ -12,7 +12,8 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
-	"github.com/jellydator/ttlcache/v2"
+	"github.com/jellydator/ttlcache/v3"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -100,7 +101,9 @@ type Graph struct {
 	gatewayClient            GatewayClient
 	roleService              RoleService
 	permissionsService       Permissions
-	spacePropertiesCache     *ttlcache.Cache
+	spacePropertiesCache     *ttlcache.Cache[string, interface{}]
+	usersCache               *ttlcache.Cache[string, libregraph.User]
+	groupsCache              *ttlcache.Cache[string, libregraph.Group]
 	eventsPublisher          events.Publisher
 	searchService            searchsvc.SearchProviderService
 }
