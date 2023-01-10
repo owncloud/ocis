@@ -189,6 +189,7 @@ Feature: Share spaces
       | editor  |
       | viewer  |
 
+
   Scenario Outline: The user has no access to the space if access for the group has been removed
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using GraphApi
