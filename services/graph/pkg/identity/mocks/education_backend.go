@@ -234,6 +234,29 @@ func (_m *EducationBackend) RemoveUserFromEducationSchool(ctx context.Context, s
 	return r0
 }
 
+// UpdateEducationSchool provides a mock function with given fields: ctx, numberOrID, school
+func (_m *EducationBackend) UpdateEducationSchool(ctx context.Context, numberOrID string, school libregraph.EducationSchool) (*libregraph.EducationSchool, error) {
+	ret := _m.Called(ctx, numberOrID, school)
+
+	var r0 *libregraph.EducationSchool
+	if rf, ok := ret.Get(0).(func(context.Context, string, libregraph.EducationSchool) *libregraph.EducationSchool); ok {
+		r0 = rf(ctx, numberOrID, school)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*libregraph.EducationSchool)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, libregraph.EducationSchool) error); ok {
+		r1 = rf(ctx, numberOrID, school)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // UpdateEducationUser provides a mock function with given fields: ctx, nameOrID, user
 func (_m *EducationBackend) UpdateEducationUser(ctx context.Context, nameOrID string, user libregraph.EducationUser) (*libregraph.EducationUser, error) {
 	ret := _m.Called(ctx, nameOrID, user)

@@ -34,6 +34,15 @@ type schoolAttributeMap struct {
 	id           string
 }
 
+type SchoolUpdateOperation uint8
+
+const (
+	TooManyValues SchoolUpdateOperation = iota
+	SchoolUnchanged
+	DisplayNameUpdated
+	SchoolNumberUpdated
+)
+
 func defaultEducationConfig() educationConfig {
 	return educationConfig{
 		schoolObjectClass:       "ocEducationSchool",
@@ -95,6 +104,8 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 		return nil, ErrReadOnly
 	}
 
+	// FIXME: Verify that the school number is not already in use
+
 	dn := fmt.Sprintf("%s=%s,%s",
 		i.educationConfig.schoolAttributeMap.displayName,
 		oldap.EscapeDNAttributeValue(school.GetDisplayName()),
@@ -122,6 +133,130 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 
 	// Read	back school from LDAP to get the generated UUID
 	e, err := i.getSchoolByDN(ar.DN)
+	if err != nil {
+		return nil, err
+	}
+	return i.createSchoolModelFromLDAP(e), nil
+}
+
+// UpdateEducationSchoolOperation contains the logic for which update operation to apply to a school
+func (i *LDAP) UpdateEducationSchoolOperation(
+	schoolUpdate libregraph.EducationSchool,
+	currentSchool libregraph.EducationSchool,
+) SchoolUpdateOperation {
+	providedDisplayName := schoolUpdate.GetDisplayName()
+	schoolNumber := schoolUpdate.GetSchoolNumber()
+
+	if providedDisplayName != "" && schoolNumber != "" {
+		return TooManyValues
+	}
+
+	if providedDisplayName != "" && providedDisplayName != currentSchool.GetDisplayName() {
+		return DisplayNameUpdated
+	}
+
+	if schoolNumber != "" && schoolNumber != currentSchool.GetSchoolNumber() {
+		return SchoolNumberUpdated
+	}
+
+	return SchoolUnchanged
+}
+
+// updateDisplayName updates the school OU in the identity backend
+func (i *LDAP) updateDisplayName(ctx context.Context, dn string, providedDisplayName string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	newDisplayName := fmt.Sprintf(
+		"%s=%s",
+		i.educationConfig.schoolAttributeMap.displayName,
+		providedDisplayName,
+	)
+
+	mrdn := ldap.NewModifyDNRequest(dn, newDisplayName, true, "")
+	i.logger.Debug().Str("backend", "ldap").
+		Str("dn", mrdn.DN).
+		Str("newrdn", mrdn.NewRDN).
+		Msg("updateDisplayName")
+
+	if err := i.conn.ModifyDN(mrdn); err != nil {
+		var lerr *ldap.Error
+		logger.Debug().Err(err).Msg("error updating school name")
+		if errors.As(err, &lerr) {
+			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
+				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
+			}
+		}
+		return err
+	}
+
+	return nil
+}
+
+// updateSchoolNumber checks if a school number is already taken, and if not updates the school number
+func (i *LDAP) updateSchoolNumber(ctx context.Context, dn string, schoolNumber string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	_, err := i.getSchoolByNumberOrID(schoolNumber)
+	if err == nil {
+		errmsg := fmt.Sprintf("school number '%s' already exists", schoolNumber)
+		err = fmt.Errorf(errmsg)
+		return err
+	}
+
+	mr := ldap.NewModifyRequest(dn, nil)
+	mr.Replace(i.educationConfig.schoolAttributeMap.schoolNumber, []string{schoolNumber})
+
+	if err := i.conn.Modify(mr); err != nil {
+		var lerr *ldap.Error
+		logger.Debug().Err(err).Msg("error updating school number")
+		if errors.As(err, &lerr) {
+			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
+				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
+			}
+		}
+		return err
+	}
+
+	return nil
+}
+
+// UpdateEducationSchool updates the supplied school in the identity backend
+func (i *LDAP) UpdateEducationSchool(ctx context.Context, numberOrID string, school libregraph.EducationSchool) (*libregraph.EducationSchool, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("UpdateEducationSchool")
+	if !i.writeEnabled {
+		return nil, errReadOnly
+	}
+
+	providedDisplayName := school.GetDisplayName()
+	schoolNumber := school.GetSchoolNumber()
+
+	if providedDisplayName != "" && schoolNumber != "" {
+		return nil, fmt.Errorf("school name and school number cannot be updated in the same request")
+	}
+
+	e, err := i.getSchoolByNumberOrID(numberOrID)
+	if err != nil {
+		return nil, err
+	}
+
+	currentSchool := i.createSchoolModelFromLDAP(e)
+	switch i.UpdateEducationSchoolOperation(school, *currentSchool) {
+	case TooManyValues:
+		return nil, fmt.Errorf("school name and school number cannot be updated in the same request")
+	case SchoolUnchanged:
+		logger.Debug().Str("backend", "ldap").Msg("UpdateEducationSchool: Nothing changed")
+		return i.createSchoolModelFromLDAP(e), nil
+	case DisplayNameUpdated:
+		if err := i.updateDisplayName(ctx, e.DN, providedDisplayName); err != nil {
+			return nil, err
+		}
+	case SchoolNumberUpdated:
+		if err := i.updateSchoolNumber(ctx, e.DN, schoolNumber); err != nil {
+			return nil, err
+		}
+	}
+
+	// Read	back school from LDAP
+	e, err = i.getSchoolByNumberOrID(i.getID(e))
 	if err != nil {
 		return nil, err
 	}
@@ -408,9 +543,9 @@ func (i *LDAP) createSchoolModelFromLDAP(e *ldap.Entry) *libregraph.EducationSch
 		return nil
 	}
 
-	displayName := e.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.displayName)
-	id := e.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.id)
-	schoolNumber := e.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.schoolNumber)
+	displayName := i.getDisplayName(e)
+	id := i.getID(e)
+	schoolNumber := i.getSchoolNumber(e)
 
 	if id != "" && displayName != "" && schoolNumber != "" {
 		school := libregraph.NewEducationSchool()
@@ -421,4 +556,19 @@ func (i *LDAP) createSchoolModelFromLDAP(e *ldap.Entry) *libregraph.EducationSch
 	}
 	i.logger.Warn().Str("dn", e.DN).Str("id", id).Str("displayName", displayName).Str("schoolNumber", schoolNumber).Msg("Invalid School. Missing required attribute")
 	return nil
+}
+
+func (i *LDAP) getSchoolNumber(e *ldap.Entry) string {
+	schoolNumber := e.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.schoolNumber)
+	return schoolNumber
+}
+
+func (i *LDAP) getID(e *ldap.Entry) string {
+	id := e.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.id)
+	return id
+}
+
+func (i *LDAP) getDisplayName(e *ldap.Entry) string {
+	displayName := e.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.displayName)
+	return displayName
 }

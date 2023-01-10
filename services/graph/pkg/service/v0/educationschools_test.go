@@ -315,6 +315,8 @@ var _ = Describe("Schools", func() {
 			newSchoolJson, err := json.Marshal(newSchool)
 			Expect(err).ToNot(HaveOccurred())
 
+			identityEducationBackend.On("UpdateEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(newSchool, nil)
+
 			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/education/schools/schoolid", bytes.NewBuffer(newSchoolJson))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("schoolID", "school-id")
@@ -322,7 +324,7 @@ var _ = Describe("Schools", func() {
 
 			svc.PatchEducationSchool(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusNoContent))
+			Expect(rr.Code).To(Equal(http.StatusOK))
 		})
 	})
 

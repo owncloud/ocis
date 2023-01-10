@@ -51,6 +51,8 @@ type EducationBackend interface {
 	GetEducationSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error)
 	// GetEducationSchools lists all schools
 	GetEducationSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error)
+	// UpdateEducationSchool updates attributes of a school
+	UpdateEducationSchool(ctx context.Context, numberOrID string, school libregraph.EducationSchool) (*libregraph.EducationSchool, error)
 	// GetEducationSchoolUsers lists all members of a school
 	GetEducationSchoolUsers(ctx context.Context, id string) ([]*libregraph.EducationUser, error)
 	// AddUsersToEducationSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
