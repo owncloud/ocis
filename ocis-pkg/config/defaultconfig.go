@@ -31,6 +31,7 @@ import (
 	users "github.com/owncloud/ocis/v2/services/users/pkg/config/defaults"
 	web "github.com/owncloud/ocis/v2/services/web/pkg/config/defaults"
 	webdav "github.com/owncloud/ocis/v2/services/webdav/pkg/config/defaults"
+	webfinger "github.com/owncloud/ocis/v2/services/webfinger/pkg/config/defaults"
 )
 
 func DefaultConfig() *Config {
@@ -71,5 +72,6 @@ func DefaultConfig() *Config {
 		Users:             users.DefaultConfig(),
 		Web:               web.DefaultConfig(),
 		WebDAV:            webdav.DefaultConfig(),
+		Webfinger:         webfinger.DefaultConfig(),
 	}
 }
