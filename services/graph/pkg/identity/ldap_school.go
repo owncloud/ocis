@@ -34,13 +34,13 @@ type schoolAttributeMap struct {
 	id           string
 }
 
-type SchoolUpdateOperation uint8
+type schoolUpdateOperation uint8
 
 const (
-	TooManyValues SchoolUpdateOperation = iota
-	SchoolUnchanged
-	DisplayNameUpdated
-	SchoolNumberUpdated
+	tooManyValues schoolUpdateOperation = iota
+	schoolUnchanged
+	displayNameUpdated
+	schoolNumberUpdated
 )
 
 func defaultEducationConfig() educationConfig {
@@ -104,7 +104,7 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 		return nil, ErrReadOnly
 	}
 
-	// FIXME: Verify that the school number is not already in use
+	// Here we should verify that the school number is not already used
 
 	dn := fmt.Sprintf("%s=%s,%s",
 		i.educationConfig.schoolAttributeMap.displayName,
@@ -143,23 +143,23 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 func (i *LDAP) UpdateEducationSchoolOperation(
 	schoolUpdate libregraph.EducationSchool,
 	currentSchool libregraph.EducationSchool,
-) SchoolUpdateOperation {
+) schoolUpdateOperation {
 	providedDisplayName := schoolUpdate.GetDisplayName()
 	schoolNumber := schoolUpdate.GetSchoolNumber()
 
 	if providedDisplayName != "" && schoolNumber != "" {
-		return TooManyValues
+		return tooManyValues
 	}
 
 	if providedDisplayName != "" && providedDisplayName != currentSchool.GetDisplayName() {
-		return DisplayNameUpdated
+		return displayNameUpdated
 	}
 
 	if schoolNumber != "" && schoolNumber != currentSchool.GetSchoolNumber() {
-		return SchoolNumberUpdated
+		return schoolNumberUpdated
 	}
 
-	return SchoolUnchanged
+	return schoolUnchanged
 }
 
 // updateDisplayName updates the school OU in the identity backend
@@ -223,7 +223,7 @@ func (i *LDAP) UpdateEducationSchool(ctx context.Context, numberOrID string, sch
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("UpdateEducationSchool")
 	if !i.writeEnabled {
-		return nil, errReadOnly
+		return nil, ErrReadOnly
 	}
 
 	providedDisplayName := school.GetDisplayName()
@@ -240,16 +240,16 @@ func (i *LDAP) UpdateEducationSchool(ctx context.Context, numberOrID string, sch
 
 	currentSchool := i.createSchoolModelFromLDAP(e)
 	switch i.UpdateEducationSchoolOperation(school, *currentSchool) {
-	case TooManyValues:
+	case tooManyValues:
 		return nil, fmt.Errorf("school name and school number cannot be updated in the same request")
-	case SchoolUnchanged:
+	case schoolUnchanged:
 		logger.Debug().Str("backend", "ldap").Msg("UpdateEducationSchool: Nothing changed")
 		return i.createSchoolModelFromLDAP(e), nil
-	case DisplayNameUpdated:
+	case displayNameUpdated:
 		if err := i.updateDisplayName(ctx, e.DN, providedDisplayName); err != nil {
 			return nil, err
 		}
-	case SchoolNumberUpdated:
+	case schoolNumberUpdated:
 		if err := i.updateSchoolNumber(ctx, e.DN, schoolNumber); err != nil {
 			return nil, err
 		}
