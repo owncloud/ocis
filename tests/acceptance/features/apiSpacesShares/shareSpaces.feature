@@ -60,7 +60,7 @@ Feature: Share spaces
       | name      | share space |
     When user "Alice" unshares a space "share space" to user "Brian"
     Then the HTTP status code should be "200"
-    Then the user "Brian" should not have a space called "share space"
+    And the user "Brian" should not have a space called "share space"
 
 
   Scenario Outline: Owner of a space cannot see the space after removing his access to the space
@@ -188,3 +188,44 @@ Feature: Share spaces
       | manager |
       | editor  |
       | viewer  |
+
+
+  Scenario Outline: The user has no access to the space if access for the group has been removed
+    Given group "group2" has been created
+    And the administrator has added a user "Brian" to the group "group2" using GraphApi
+    And user "Alice" has shared a space "share space" to group "group2" with role "<role>"
+    When user "Alice" unshares a space "share space" to group "group2"
+    Then the HTTP status code should be "200"
+    And the user "Brian" should not have a space called "share space"
+    Examples:
+      | role    |
+      | manager |
+      | editor  |
+      | viewer  |
+
+
+  Scenario: The user has no access to the space if he has been removed from the group
+    Given group "group2" has been created
+    And the administrator has added a user "Brian" to the group "group2" using GraphApi
+    And the administrator has added a user "Bob" to the group "group2" using GraphApi
+    And user "Alice" has shared a space "share space" to group "group2" with role "editor"
+    When the administrator removes the following users from the following groups using the Graph API
+      | username | groupname |
+      | Brian    | group2    |
+    Then the HTTP status code of responses on all endpoints should be "204"
+    And the user "Brian" should not have a space called "share space"
+    But the user "Bob" should have a space called "share space" with these key and value pairs:
+      | key       | value       |
+      | driveType | project     |
+      | name      | share space |
+
+
+  Scenario: Users don't have access to the space if the group has been deleted
+    Given group "group2" has been created
+    And the administrator has added a user "Brian" to the group "group2" using GraphApi
+    And the administrator has added a user "Bob" to the group "group2" using GraphApi
+    And user "Alice" has shared a space "share space" to group "group2" with role "editor"
+    When the administrator deletes group "group2" using the Graph API
+    Then the HTTP status code should be "204"
+    And the user "Brian" should not have a space called "share space"
+    And the user "Bob" should not have a space called "share space"

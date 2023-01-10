@@ -1116,7 +1116,7 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userDeletesGroupUsingTheGraphApi(string $group, ?string $user): void {
+	public function userDeletesGroupUsingTheGraphApi(string $group, ?string $user = null): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$response = $this->userDeletesGroupWithGroupId($groupId, $user);
 		$this->featureContext->setResponse($response);

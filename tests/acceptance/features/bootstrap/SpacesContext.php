@@ -2060,11 +2060,11 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has shared a space "([^"]*)" to user "([^"]*)" with role "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has shared a space "([^"]*)" to (?:user|group) "([^"]*)" with role "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
-	 * @param  string $userRecipient
+	 * @param  string $recipient
 	 * @param  string $role
 	 *
 	 * @return void
@@ -2073,10 +2073,10 @@ class SpacesContext implements Context {
 	public function userHasSharedSpace(
 		string $user,
 		string $spaceName,
-		string $userRecipient,
+		string $recipient,
 		string $role
 	): void {
-		$this->sendShareSpaceRequest($user, $spaceName, $userRecipient, $role);
+		$this->sendShareSpaceRequest($user, $spaceName, $recipient, $role);
 		$expectedHTTPStatus = "200";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$expectedHTTPStatus,
@@ -2087,11 +2087,11 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" unshares a space "([^"]*)" to user "([^"]*)"$/
+	 * @When /^user "([^"]*)" unshares a space "([^"]*)" to (?:user|group) "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
-	 * @param  string $userRecipient
+	 * @param  string $recipient
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -2099,10 +2099,10 @@ class SpacesContext implements Context {
 	public function sendUnshareSpaceRequest(
 		string $user,
 		string $spaceName,
-		string $userRecipient
+		string $recipient
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
-		$fullUrl = $this->baseUrl . $this->ocsApiUrl . "/" . $space['id'] . "?shareWith=" . $userRecipient;
+		$fullUrl = $this->baseUrl . $this->ocsApiUrl . "/" . $space['id'] . "?shareWith=" . $recipient;
 
 		$this->featureContext->setResponse(
 			HttpRequestHelper::delete(
