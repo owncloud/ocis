@@ -81,37 +81,39 @@ func TestCreateEducationSchool(t *testing.T) {
 }
 
 func TestUpdateEducationSchoolOperation(t *testing.T) {
+	testSchoolName := "A name"
+	testSchoolNumber := "1234"
 	tests := []struct {
 		name              string
 		displayName       string
 		schoolNumber      string
-		expectedOperation SchoolUpdateOperation
+		expectedOperation schoolUpdateOperation
 	}{
 		{
 			name:              "Test using school with both number and name",
-			displayName:       "A name",
-			schoolNumber:      "1234",
-			expectedOperation: TooManyValues,
+			displayName:       testSchoolName,
+			schoolNumber:      testSchoolNumber,
+			expectedOperation: tooManyValues,
 		},
 		{
 			name:              "Test with unchanged number",
-			schoolNumber:      "1234",
-			expectedOperation: SchoolUnchanged,
+			schoolNumber:      testSchoolNumber,
+			expectedOperation: schoolUnchanged,
 		},
 		{
 			name:              "Test with unchanged name",
-			displayName:       "A name",
-			expectedOperation: SchoolUnchanged,
+			displayName:       testSchoolName,
+			expectedOperation: schoolUnchanged,
 		},
 		{
 			name:              "Test new name",
 			displayName:       "Something new",
-			expectedOperation: DisplayNameUpdated,
+			expectedOperation: displayNameUpdated,
 		},
 		{
 			name:              "Test new number",
 			schoolNumber:      "9876",
-			expectedOperation: SchoolNumberUpdated,
+			expectedOperation: schoolNumberUpdated,
 		},
 	}
 
