@@ -26,6 +26,9 @@ type educationConfig struct {
 
 	userObjectClass  string
 	userAttributeMap educationUserAttributeMap
+
+	classObjectClass  string
+	classAttributeMap educationClassAttributeMap
 }
 
 type schoolAttributeMap struct {
@@ -52,6 +55,9 @@ func defaultEducationConfig() educationConfig {
 
 		userObjectClass:  "ocEducationUser",
 		userAttributeMap: newEducationUserAttributeMap(),
+
+		classObjectClass:  "ocEducationClass",
+		classAttributeMap: newEducationClassAttributeMap(),
 	}
 }
 

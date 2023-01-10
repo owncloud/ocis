@@ -180,7 +180,7 @@ func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 	for _, group := range groupEntries {
 		logger.Debug().Str("group", group.DN).Str("user", e.DN).Msg("Cleaning up group membership")
 
-		if mr, err := i.removeMemberFromGroupEntry(group, e.DN); err == nil && mr != nil {
+		if mr, err := i.removeMemberFromGroupEntry(group, e.DN); err == nil {
 			if err = i.conn.Modify(mr); err != nil {
 				// Errors when deleting the memberships are only logged as warnings but not returned
 				// to the user as we already successfully deleted the users itself
