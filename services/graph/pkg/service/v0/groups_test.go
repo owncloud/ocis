@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 
@@ -284,8 +285,10 @@ var _ = Describe("Groups", func() {
 			It("fails when the number of users is exceeded - spec says 20 max", func() {
 				updatedGroup := libregraph.NewGroup()
 				updatedGroup.SetDisplayName("group1 updated")
-				updatedGroup.SetMembersodataBind([]string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18",
-					"19", "20", "21"})
+				updatedGroup.SetMembersodataBind([]string{
+					"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18",
+					"19", "20", "21",
+				})
 				updatedGroupJson, err := json.Marshal(updatedGroup)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -295,6 +298,41 @@ var _ = Describe("Groups", func() {
 				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 				svc.PatchGroup(rr, r)
 
+				resp, err := ioutil.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(string(resp)).To(ContainSubstring("Request is limited to 20"))
+				Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			})
+
+			It("succeeds when the number of users is over 20 but the limit is raised to 21", func() {
+				updatedGroup := libregraph.NewGroup()
+				updatedGroup.SetDisplayName("group1 updated")
+				updatedGroup.SetMembersodataBind([]string{
+					"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18",
+					"19", "20", "21",
+				})
+				updatedGroupJson, err := json.Marshal(updatedGroup)
+				Expect(err).ToNot(HaveOccurred())
+
+				cfg.API.GroupMembersPatchLimit = 21
+				svc = service.NewService(
+					service.Config(cfg),
+					service.WithGatewayClient(gatewayClient),
+					service.EventsPublisher(&eventsPublisher),
+					service.WithIdentityBackend(identityBackend),
+				)
+
+				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", bytes.NewBuffer(updatedGroupJson))
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("groupID", *newGroup.Id)
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				svc.PatchGroup(rr, r)
+
+				resp, err := ioutil.ReadAll(rr.Body)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(string(resp)).To(ContainSubstring("Error parsing member@odata.bind values"))
 				Expect(rr.Code).To(Equal(http.StatusBadRequest))
 			})
 
