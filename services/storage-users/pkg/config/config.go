@@ -165,6 +165,17 @@ type S3Driver struct {
 	Endpoint  string `yaml:"endpoint"`
 	Bucket    string `yaml:"bucket"`
 }
+
+type SpacesDbConfig struct {
+	Enabled    bool   `mapstructure:"enabled" yaml:"enabled" env:"STORAGE_USERS_EOSFS_SPACES_ENABLED" desc:"Enables the spaces config for eosfs driver."`
+	DbUsername string `mapstructure:"db_username" yaml:"db_username" env:"STORAGE_USERS_EOSFS_SPACES_DBUSERNAME" desc:"eosfs storage space database username."`
+	DbPassword string `mapstructure:"db_password" yaml:"db_password" env:"STORAGE_USERS_EOSFS_SPACES_DBPASSWORD" desc:"eosfs storage space database password."`
+	DbHost     string `mapstructure:"db_host" yaml:"db_host" env:"STORAGE_USERS_EOSFS_SPACES_DBHOST" desc:"eosfs storage space database host."`
+	DbName     string `mapstructure:"db_name" yaml:"db_name" env:"STORAGE_USERS_EOSFS_SPACES_DBNAME" desc:"eosfs storage space database name."`
+	DbTable    string `mapstructure:"db_table" yaml:"db_table" env:"STORAGE_USERS_EOSFS_SPACES_DBTABLENAME" desc:"eosfs storage space database talbe name."`
+	DbPort     int    `mapstructure:"db_port" yaml:"db_port" env:"STORAGE_USERS_EOSFS_SPACES_DBPORT" desc:"eosfs storage space database port."`
+}
+
 type EOSDriver struct {
 	// Root is the absolute path to the location of the data
 	Root string `yaml:"root"`
@@ -206,10 +217,11 @@ type EOSDriver struct {
 	// gateway service to use for uid lookups
 	GatewaySVC string `yaml:"gateway_svc"`
 	//ShareFolder defines the name of the folder jailing all shares
-	ShareFolder string `yaml:"share_folder"`
-	GRPCURI     string
-	GRPCAuthKey string `yaml:"grpc_authkey" env:"STORAGE_USERS_EOSFS_GRPC_AUTHKEY" desc:"The token used to authenticate the grpc requests."`
-	UserLayout  string
+	ShareFolder  string `yaml:"share_folder"`
+	GRPCURI      string
+	GRPCAuthKey  string `yaml:"grpc_authkey" env:"STORAGE_USERS_EOSFS_GRPC_AUTHKEY" desc:"The token used to authenticate the grpc requests."`
+	UserLayout   string
+	SpacesConfig SpacesDbConfig `yaml:"spaces_config"`
 }
 
 type LocalDriver struct {

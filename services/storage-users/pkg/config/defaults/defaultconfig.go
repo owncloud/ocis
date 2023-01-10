@@ -91,6 +91,15 @@ func DefaultConfig() *config.Config {
 				MasterURL:     "root://localhost:1094",
 				XrdcopyBinary: "/usr/bin/xrdcopy",
 				Root:          "/ocis",
+				SpacesConfig: config.SpacesDbConfig{
+					Enabled:    true,
+					DbUsername: "root",
+					DbPassword: "",
+					DbHost:     "localhost",
+					DbName:     "eosspaces",
+					DbTable:    "projectspaces",
+					DbPort:     3306,
+				},
 			},
 		},
 		Events: config.Events{

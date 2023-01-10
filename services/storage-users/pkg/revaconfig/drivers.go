@@ -46,6 +46,7 @@ func EOSHome(cfg *config.Config) map[string]interface{} {
 		"force_single_user_mode": cfg.Drivers.EOS.ForceSingleUserMode,
 		"use_keytab":             cfg.Drivers.EOS.UseKeytab,
 		"gatewaysvc":             cfg.Drivers.EOS.GatewaySVC,
+		"spaces_config":          cfg.Drivers.EOS.SpacesConfig,
 	}
 }
 
@@ -71,6 +72,7 @@ func EOSGRPC(cfg *config.Config) map[string]interface{} {
 		"use_keytab":             cfg.Drivers.EOS.UseKeytab,
 		"enable_home":            false,
 		"gatewaysvc":             cfg.Drivers.EOS.GatewaySVC,
+		"spaces_config":          cfg.Drivers.EOS.SpacesConfig,
 	}
 }
 
