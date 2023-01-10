@@ -69,7 +69,7 @@ var _ = Describe("Users", func() {
 		cfg.TokenManager.JWTSecret = "loremipsum"
 		cfg.Commons = &shared.Commons{}
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
-		cfg.Service.ApplicationID = "some-application-ID"
+		cfg.Application.ID = "some-application-ID"
 
 		_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
 		svc, _ = service.NewService(

@@ -2,8 +2,10 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
+	defaults2 "github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
@@ -40,6 +42,14 @@ func Validate(cfg *config.Config) error {
 
 	if cfg.Identity.Backend == "ldap" && cfg.Identity.LDAP.BindPassword == "" {
 		return shared.MissingLDAPBindPassword(cfg.Service.Name)
+	}
+
+	if cfg.Application.ID == "" {
+		return fmt.Errorf("The application ID has not been configured for %s. "+
+			"Make sure your %s config contains the proper values "+
+			"(e.g. by running ocis init or setting it manually in "+
+			"the config/corresponding environment variable).",
+			"graph", defaults2.BaseConfigPath())
 	}
 
 	return nil

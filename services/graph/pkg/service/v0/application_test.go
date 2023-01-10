@@ -56,7 +56,7 @@ var _ = Describe("Applications", func() {
 		cfg.TokenManager.JWTSecret = "loremipsum"
 		cfg.Commons = &shared.Commons{}
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
-		cfg.Service.ApplicationID = "some-application-ID"
+		cfg.Application.ID = "some-application-ID"
 
 		_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
 		svc = service.NewService(
@@ -92,7 +92,7 @@ var _ = Describe("Applications", func() {
 			err = json.Unmarshal(data, &responseList)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(responseList.Value)).To(Equal(1))
-			Expect(responseList.Value[0].Id).To(Equal(cfg.Service.ApplicationID))
+			Expect(responseList.Value[0].Id).To(Equal(cfg.Application.ID))
 			Expect(len(responseList.Value[0].GetAppRoles())).To(Equal(1))
 			Expect(responseList.Value[0].GetAppRoles()[0].GetId()).To(Equal("some-appRole-ID"))
 			Expect(responseList.Value[0].GetAppRoles()[0].GetDisplayName()).To(Equal("A human readable name for a role"))
@@ -113,7 +113,7 @@ var _ = Describe("Applications", func() {
 
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/applications/some-application-ID", nil)
 			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("applicationID", cfg.Service.ApplicationID)
+			rctx.URLParams.Add("applicationID", cfg.Application.ID)
 			r = r.WithContext(context.WithValue(ctx, chi.RouteCtxKey, rctx))
 			svc.GetApplication(rr, r)
 
@@ -125,7 +125,7 @@ var _ = Describe("Applications", func() {
 			application := libregraph.Application{}
 			err = json.Unmarshal(data, &application)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(application.Id).To(Equal(cfg.Service.ApplicationID))
+			Expect(application.Id).To(Equal(cfg.Application.ID))
 			Expect(len(application.GetAppRoles())).To(Equal(1))
 			Expect(application.GetAppRoles()[0].GetId()).To(Equal("some-appRole-ID"))
 			Expect(application.GetAppRoles()[0].GetDisplayName()).To(Equal("A human readable name for a role"))

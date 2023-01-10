@@ -30,8 +30,8 @@ func (g Graph) ListApplications(w http.ResponseWriter, r *http.Request) {
 		roles = append(roles, *role)
 	}
 
-	application := libregraph.NewApplication(g.config.Service.ApplicationID)
-	application.SetDisplayName(g.config.Service.ApplicationDisplayName)
+	application := libregraph.NewApplication(g.config.Application.ID)
+	application.SetDisplayName(g.config.Application.DisplayName)
 	application.SetAppRoles(roles)
 
 	applications := []*libregraph.Application{
@@ -49,8 +49,8 @@ func (g Graph) GetApplication(w http.ResponseWriter, r *http.Request) {
 
 	applicationID := chi.URLParam(r, "applicationID")
 
-	if applicationID != g.config.Service.ApplicationID {
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, fmt.Sprintf("resource id %s does not match expected application id %v", applicationID, g.config.Service.ApplicationID))
+	if applicationID != g.config.Application.ID {
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, fmt.Sprintf("resource id %s does not match expected application id %v", applicationID, g.config.Application.ID))
 		return
 	}
 
@@ -69,7 +69,7 @@ func (g Graph) GetApplication(w http.ResponseWriter, r *http.Request) {
 	}
 
 	application := libregraph.NewApplication(applicationID)
-	application.SetDisplayName(g.config.Service.ApplicationDisplayName)
+	application.SetDisplayName(g.config.Application.DisplayName)
 	application.SetAppRoles(roles)
 
 	render.Status(r, http.StatusOK)

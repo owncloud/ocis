@@ -50,11 +50,15 @@ type LdapBasedService struct {
 type Events struct {
 	TLSInsecure bool `yaml:"tls_insecure"`
 }
+type GraphApplication struct {
+	ID string `yaml:"id"`
+}
 
 type GraphService struct {
-	Events   Events
-	Spaces   InsecureService
-	Identity LdapBasedService
+	Application GraphApplication
+	Events      Events
+	Spaces      InsecureService
+	Identity    LdapBasedService
 }
 
 type ServiceUserPasswordsSettings struct {
@@ -219,6 +223,7 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 
 	systemUserID := uuid.Must(uuid.NewV4()).String()
 	adminUserID := uuid.Must(uuid.NewV4()).String()
+	graphApplicationID := uuid.Must(uuid.NewV4()).String()
 	storageUsersMountID := uuid.Must(uuid.NewV4()).String()
 
 	idmServicePassword, err := generators.GenerateRandomPassword(passwordLength)
@@ -306,6 +311,9 @@ func CreateConfig(insecure, forceOverwrite bool, configPath, adminPassword strin
 			},
 		},
 		Graph: GraphService{
+			Application: GraphApplication{
+				ID: graphApplicationID,
+			},
 			Identity: LdapBasedService{
 				Ldap: LdapSettings{
 					BindPassword: idmServicePassword,

@@ -66,7 +66,7 @@ var _ = Describe("AppRoleAssignments", func() {
 		cfg.TokenManager.JWTSecret = "loremipsum"
 		cfg.Commons = &shared.Commons{}
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
-		cfg.Service.ApplicationID = "some-application-ID"
+		cfg.Application.ID = "some-application-ID"
 
 		_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
 		svc = service.NewService(
@@ -110,7 +110,7 @@ var _ = Describe("AppRoleAssignments", func() {
 			Expect(responseList.Value[0].GetId()).ToNot(BeEmpty())
 			Expect(responseList.Value[0].GetAppRoleId()).To(Equal("some-appRole-ID"))
 			Expect(responseList.Value[0].GetPrincipalId()).To(Equal(user.GetId()))
-			Expect(responseList.Value[0].GetResourceId()).To(Equal(cfg.Service.ApplicationID))
+			Expect(responseList.Value[0].GetResourceId()).To(Equal(cfg.Application.ID))
 
 		})
 
@@ -131,7 +131,7 @@ var _ = Describe("AppRoleAssignments", func() {
 			ara := libregraph.NewAppRoleAssignmentWithDefaults()
 			ara.SetAppRoleId("some-appRole-ID")
 			ara.SetPrincipalId(user.GetId())
-			ara.SetResourceId(cfg.Service.ApplicationID)
+			ara.SetResourceId(cfg.Application.ID)
 
 			araJson, err := json.Marshal(ara)
 			Expect(err).ToNot(HaveOccurred())
@@ -153,7 +153,7 @@ var _ = Describe("AppRoleAssignments", func() {
 			Expect(assignment.GetId()).ToNot(BeEmpty())
 			Expect(assignment.GetAppRoleId()).To(Equal("some-appRole-ID"))
 			Expect(assignment.GetPrincipalId()).To(Equal("user1"))
-			Expect(assignment.GetResourceId()).To(Equal(cfg.Service.ApplicationID))
+			Expect(assignment.GetResourceId()).To(Equal(cfg.Application.ID))
 		})
 
 	})
@@ -178,7 +178,7 @@ var _ = Describe("AppRoleAssignments", func() {
 			ara := libregraph.NewAppRoleAssignmentWithDefaults()
 			ara.SetAppRoleId("some-appRole-ID")
 			ara.SetPrincipalId(user.GetId())
-			ara.SetResourceId(cfg.Service.ApplicationID)
+			ara.SetResourceId(cfg.Application.ID)
 
 			araJson, err := json.Marshal(ara)
 			Expect(err).ToNot(HaveOccurred())

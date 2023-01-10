@@ -25,9 +25,10 @@ type Config struct {
 	TokenManager  *TokenManager         `yaml:"token_manager"`
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 
-	Spaces   Spaces   `yaml:"spaces"`
-	Identity Identity `yaml:"identity"`
-	Events   Events   `yaml:"events"`
+	Application Application `yaml:"application"`
+	Spaces      Spaces      `yaml:"spaces"`
+	Identity    Identity    `yaml:"identity"`
+	Events      Events      `yaml:"events"`
 
 	Context context.Context `yaml:"-"`
 }

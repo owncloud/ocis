@@ -58,8 +58,8 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("user id %s does not match principal id %v", userID, appRoleAssignment.GetPrincipalId()))
 		return
 	}
-	if appRoleAssignment.GetResourceId() != g.config.Service.ApplicationID {
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("resource id %s does not match expected application id %v", userID, g.config.Service.ApplicationID))
+	if appRoleAssignment.GetResourceId() != g.config.Application.ID {
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("resource id %s does not match expected application id %v", userID, g.config.Application.ID))
 		return
 	}
 
@@ -121,8 +121,8 @@ func (g Graph) assignmentToAppRoleAssignment(assignment *settingsmsg.UserRoleAss
 	appRoleAssignment.SetId(assignment.Id)
 	appRoleAssignment.SetAppRoleId(assignment.RoleId)
 	appRoleAssignment.SetPrincipalType(principalTypeUser) // currently always assigned to the user
-	appRoleAssignment.SetResourceId(g.config.Service.ApplicationID)
-	appRoleAssignment.SetResourceDisplayName(g.config.Service.ApplicationDisplayName)
+	appRoleAssignment.SetResourceId(g.config.Application.ID)
+	appRoleAssignment.SetResourceDisplayName(g.config.Application.DisplayName)
 	appRoleAssignment.SetPrincipalId(assignment.AccountUuid)
 	// appRoleAssignment.SetPrincipalDisplayName() // TODO fetch and cache
 	return *appRoleAssignment
