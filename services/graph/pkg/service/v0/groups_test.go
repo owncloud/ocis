@@ -316,7 +316,7 @@ var _ = Describe("Groups", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				cfg.API.GroupMembersPatchLimit = 21
-				svc = service.NewService(
+				svc, _ = service.NewService(
 					service.Config(cfg),
 					service.WithGatewayClient(gatewayClient),
 					service.EventsPublisher(&eventsPublisher),
