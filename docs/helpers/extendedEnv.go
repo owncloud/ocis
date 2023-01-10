@@ -146,7 +146,7 @@ func RenderGlobalVarsTemplate() {
 	}
 	fullYamlPath := filepath.Join(curdir, yamlSource)
 
-	content, err := ioutil.ReadFile("../../docs/templates/ADOC_global.tmpl")
+	content, err := ioutil.ReadFile("../../docs/templates/ADOC_extended.tmpl")
 	if err != nil {
 		log.Fatal(err)
 	}
