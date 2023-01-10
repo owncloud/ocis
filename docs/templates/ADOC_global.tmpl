@@ -1,6 +1,9 @@
+// collected through docs/helpers/adoc-generator.go.tmpl
+
+[.landscape]
 [caption=]
 .Environment variables with global scope available in multiple services
-[width="100%",cols="~,~,~,~,~",options="header"]
+[width="100%",cols="30%,25%,~,~,~",options="header"]
 |===
 | Name
 | Services
@@ -12,9 +15,9 @@
 
 a| `{{ .Name }}`
 
-a| [subs=-attributes]
+a| [subs=attributes+]
 {{- range .Services}}
-xref:{s-path}/{{ . }}.adoc[{{ . }}] +
+* xref:{s-path}/{{ . }}.adoc[{{ . }}] +
 {{- end }}
 
 a| [subs=-attributes]
@@ -24,7 +27,7 @@ a| [subs=-attributes]
 ++{{ .DefaultValue }} ++
 
 a| [subs=-attributes]
-++{{ .Description }} ++
+{{ .Description }}
 
 {{- end }}
 |===

@@ -9,10 +9,12 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+	"sort"
 
     {{- range $key, $value := .}}
     pkg{{$key}} "{{$value}}"
-    {{- end}})
+    {{- end}}
+)
 
 // ConfigField is the representation of one configuration field
 type ConfigField struct {
@@ -83,6 +85,9 @@ func main() {
 		for _, e := range f.EnvVars {
 		    if env, ok := all[e]; ok {
 			env.Services = append(env.Services, service)
+			sort.Slice(env.Services, func(i, j int) bool {
+			    return env.Services[i] < env.Services[j]
+			})
 			all[e] = env
 		    } else {
 			all[e] = EnvVar{
@@ -129,6 +134,11 @@ func main() {
 		})	    
 	    }
 	}
+
+	// sort
+	sort.Slice(tmplValues, func(i, j int) bool {
+		return tmplValues[i]["Name"].(string) < tmplValues[j]["Name"].(string)
+	})
 
 	glc, err := os.ReadFile("../../docs/templates/ADOC_global.tmpl")
 	if err != nil {
