@@ -1,0 +1,1411 @@
+// collected through docs/helpers/adoc-generator.go.tmpl
+
+[.landscape]
+[caption=]
+.Environment variables with global scope available in multiple services
+[width="100%",cols="30%,25%,~,~,~",options="header"]
+|===
+| Name
+| Services
+| Type
+| Default Value
+| Description
+
+
+
+a| `ACCOUNTS_DEMO_USERS_AND_GROUPS`
+
+a| [subs=attributes+]
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/settings.adoc[settings] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+The default role assignments the demo users should be setup.
+
+a| `LDAP_BIND_DN`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++uid=idp,ou=sysusers,o=libregraph-idm ++
+
+a| [subs=-attributes]
+LDAP DN to use for simple bind authentication with the target LDAP server.
+
+a| `LDAP_BIND_PASSWORD`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Password to use for authenticating the 'bind_dn'.
+
+a| `LDAP_CACERT`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++~/.ocis/idm/ldap.crt ++
+
+a| [subs=-attributes]
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service.
+
+a| `LDAP_GROUP_BASE_DN`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ou=groups,o=libregraph-idm ++
+
+a| [subs=-attributes]
+Search base DN for looking up LDAP groups.
+
+a| `LDAP_GROUP_FILTER`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+LDAP filter to add to the default filters for group searches.
+
+a| `LDAP_GROUP_OBJECTCLASS`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++groupOfNames ++
+
+a| [subs=-attributes]
+The object class to use for groups in the default group search filter ('groupOfNames'). 
+
+a| `LDAP_GROUP_SCHEMA_DISPLAYNAME`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++cn ++
+
+a| [subs=-attributes]
+LDAP Attribute to use for the displayname of groups (often the same as groupname attribute).
+
+a| `LDAP_GROUP_SCHEMA_GROUPNAME`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++cn ++
+
+a| [subs=-attributes]
+LDAP Attribute to use for the name of groups.
+
+a| `LDAP_GROUP_SCHEMA_ID`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++owncloudUUID ++
+
+a| [subs=-attributes]
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
+
+a| `LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
+
+a| `LDAP_GROUP_SCHEMA_MAIL`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++mail ++
+
+a| [subs=-attributes]
+LDAP Attribute to use for the email address of groups (can be empty).
+
+a| `LDAP_GROUP_SCHEMA_MEMBER`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++member ++
+
+a| [subs=-attributes]
+LDAP Attribute that is used for group members.
+
+a| `LDAP_GROUP_SCOPE`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++sub ++
+
+a| [subs=-attributes]
+LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
+
+a| `LDAP_INSECURE`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.
+
+a| `LDAP_URI`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ldaps://localhost:9235 ++
+
+a| [subs=-attributes]
+Url of the LDAP service to use as IDP.
+
+a| `LDAP_USER_BASE_DN`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ou=users,o=libregraph-idm ++
+
+a| [subs=-attributes]
+Search base DN for looking up LDAP users.
+
+a| `LDAP_USER_FILTER`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.
+
+a| `LDAP_USER_OBJECTCLASS`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++inetOrgPerson ++
+
+a| [subs=-attributes]
+LDAP User ObjectClass like 'inetOrgPerson'.
+
+a| `LDAP_USER_SCHEMA_DISPLAYNAME`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++displayname ++
+
+a| [subs=-attributes]
+LDAP Attribute to use for the displayname of users.
+
+a| `LDAP_USER_SCHEMA_ID`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++uid ++
+
+a| [subs=-attributes]
+LDAP User uuid attribute like 'uid'.
+
+a| `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user id's.
+
+a| `LDAP_USER_SCHEMA_MAIL`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++mail ++
+
+a| [subs=-attributes]
+LDAP User email attribute like 'mail'.
+
+a| `LDAP_USER_SCHEMA_USERNAME`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++displayName ++
+
+a| [subs=-attributes]
+LDAP User name attribute like 'displayName'.
+
+a| `LDAP_USER_SCOPE`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++sub ++
+
+a| [subs=-attributes]
+LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
+
+a| `OCIS_ADMIN_USER_ID`
+
+a| [subs=attributes+]
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/settings.adoc[settings] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+ID of the user that should receive admin privileges.
+
+a| `OCIS_CACHE_STORE_ADDRESS`
+
+a| [subs=attributes+]
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++[]string ++
+
+a| [subs=-attributes]
+++[] ++
+
+a| [subs=-attributes]
+Node addresses to use for the cache store.
+
+a| `OCIS_CACHE_STORE_SIZE`
+
+a| [subs=attributes+]
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+
+a| [subs=-attributes]
+++int ++
+
+a| [subs=-attributes]
+++0 ++
+
+a| [subs=-attributes]
+Maximum number of items per table in the ocmem cache store. Other cache stores will ignore the option and can grow indefinitely.
+
+a| `OCIS_CACHE_STORE_TYPE`
+
+a| [subs=attributes+]
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++memory ++
+
+a| [subs=-attributes]
+Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
+
+a| `OCIS_CORS_ALLOW_CREDENTIALS`
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++true ++
+
+a| [subs=-attributes]
+Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
+
+a| `OCIS_CORS_ALLOW_HEADERS`
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++[]string ++
+
+a| [subs=-attributes]
+++[Authorization Origin Content-Type Accept X-Requested-With] ++
+
+a| [subs=-attributes]
+A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
+
+a| `OCIS_CORS_ALLOW_METHODS`
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++[]string ++
+
+a| [subs=-attributes]
+++[GET POST PUT PATCH DELETE OPTIONS] ++
+
+a| [subs=-attributes]
+A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
+
+a| `OCIS_CORS_ALLOW_ORIGINS`
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++[]string ++
+
+a| [subs=-attributes]
+++[*] ++
+
+a| [subs=-attributes]
+A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
+
+a| `OCIS_EVENTS_ENABLE_TLS`
+
+a| [subs=attributes+]
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+
+a| `OCIS_GRPC_CLIENT_TLS_CACERT`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/store.adoc[store] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
+
+a| `OCIS_GRPC_CLIENT_TLS_MODE`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/store.adoc[store] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+TLS mode for grpc connection to the go-micro based grpc services. Possible values are 'off', 'insecure' and 'on'. 'off': disables transport security for the clients. 'insecure' allows to use transport security, but disables certificate verification (to be used with the autogenerated self-signed certificates). 'on' enables transport security, including server ceritificate verification.
+
+a| `OCIS_GRPC_TLS_CERTIFICATE`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/store.adoc[store] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Path/File name of the TLS server certificate (in PEM format) for the grpc services.
+
+a| `OCIS_GRPC_TLS_ENABLED`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/store.adoc[store] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Activates TLS for the grpc based services using the server certifcate and key configured via OCIS_GRPC_TLS_CERTIFICATE and OCIS_GRPC_TLS_KEY. If OCIS_GRPC_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with OCIS_GRPC_CLIENT_TLS_MODE=insecure.
+
+a| `OCIS_GRPC_TLS_KEY`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/store.adoc[store] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the grpc services.
+
+a| `OCIS_HTTP_TLS_CERTIFICATE`
+
+a| [subs=attributes+]
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Path/File name of the TLS server certificate (in PEM format) for the http services.
+
+a| `OCIS_HTTP_TLS_ENABLED`
+
+a| [subs=attributes+]
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.
+
+a| `OCIS_HTTP_TLS_KEY`
+
+a| [subs=attributes+]
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.
+
+a| `OCIS_INSECURE`
+
+a| [subs=attributes+]
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Whether to verify the server TLS certificates.
+
+a| `OCIS_JWT_SECRET`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/users.adoc[users] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The secret to mint and validate jwt tokens.
+
+a| `OCIS_LOG_COLOR`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/store.adoc[store] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Activates colorized log output.
+
+a| `OCIS_LOG_FILE`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/store.adoc[store] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The path to the log file. Activates logging to this file if set.
+
+a| `OCIS_LOG_LEVEL`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/store.adoc[store] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The log level. Valid values are: "panic", "fatal", "error", "warn", "info", "debug", "trace".
+
+a| `OCIS_LOG_PRETTY`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/audit.adoc[audit] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/postprocessing.adoc[postprocessing] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/store.adoc[store] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Activates pretty log output.
+
+a| `OCIS_MACHINE_AUTH_API_KEY`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Machine auth API key used to validate internal requests necessary to access resources from other services.
+
+a| `OCIS_OIDC_ISSUER`
+
+a| [subs=attributes+]
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++https://localhost:9200 ++
+
+a| [subs=-attributes]
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+
+a| `OCIS_SYSTEM_USER_API_KEY`
+
+a| [subs=attributes+]
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+API key for the STORAGE-SYSTEM system user.
+
+a| `OCIS_SYSTEM_USER_ID`
+
+a| [subs=attributes+]
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
+
+a| `OCIS_SYSTEM_USER_IDP`
+
+a| [subs=attributes+]
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/sharing.adoc[sharing] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++internal ++
+
+a| [subs=-attributes]
+IDP of the oCIS STORAGE-SYSTEM system user.
+
+a| `OCIS_TRACING_COLLECTOR`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/store.adoc[store] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+
+a| `OCIS_TRACING_ENABLED`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/store.adoc[store] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Activates tracing.
+
+a| `OCIS_TRACING_ENDPOINT`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/store.adoc[store] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The endpoint of the tracing agent.
+
+a| `OCIS_TRACING_TYPE`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/store.adoc[store] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+
+a| `OCIS_URL`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++https://127.0.0.1:9200 ++
+
+a| [subs=-attributes]
+URL, where oCIS is reachable for users.
+
+a| `REVA_GATEWAY`
+
+a| [subs=attributes+]
+* xref:{s-path}/app-provider.adoc[app-provider] +
+* xref:{s-path}/app-registry.adoc[app-registry] +
+* xref:{s-path}/auth-basic.adoc[auth-basic] +
+* xref:{s-path}/auth-bearer.adoc[auth-bearer] +
+* xref:{s-path}/auth-machine.adoc[auth-machine] +
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/sharing.adoc[sharing] +
+* xref:{s-path}/storage-publiclink.adoc[storage-publiclink] +
+* xref:{s-path}/storage-shares.adoc[storage-shares] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/users.adoc[users] +
+* xref:{s-path}/webdav.adoc[webdav] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++127.0.0.1:9142 ++
+
+a| [subs=-attributes]
+The CS3 gateway endpoint.
+
+a| `STORAGE_TRANSFER_SECRET`
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+Transfer secret for signing file up- and download requests.
+
+a| `STORAGE_USERS_OCIS_ASYNC_UPLOADS`
+
+a| [subs=attributes+]
+* xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Enable asynchronous file uploads.
+|===
