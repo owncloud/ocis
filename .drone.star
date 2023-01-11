@@ -805,7 +805,7 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                      },
                      {
                          "name": "wopiserver",
-                         "image": "cs3org/wopiserver:v9.3.2",
+                         "image": "cs3org/wopiserver:v9.3.0",
                          "detach": True,
                          "commands": [
                              "cp %s/tests/config/drone/wopiserver.conf /etc/wopi/wopiserver.conf" % (dirs["base"]),
