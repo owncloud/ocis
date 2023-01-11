@@ -994,8 +994,8 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 	attrs["sn"] = []string{sn}
 
 	// When we get a givenName, we set the attribute.
-	if user.GivenName != nil && *user.GivenName != "" {
-		attrs["givenname"] = []string{*user.GivenName}
+	if givenName := user.GetGivenName(); givenName != "" {
+		attrs["givenname"] = []string{givenName}
 	}
 
 	if !i.usePwModifyExOp && user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
