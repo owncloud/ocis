@@ -122,7 +122,8 @@ func Server(opts ...Option) (http.Service, error) {
 		// no gatewayclient needed
 	}
 
-	handle := svc.NewService(
+	var handle svc.Service
+	handle, err = svc.NewService(
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
 		svc.Middleware(middlewares...),
@@ -133,7 +134,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.WithSearchService(searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient())),
 	)
 
-	if handle == nil {
+	if err != nil {
 		return http.Service{}, errors.New("could not initialize graph service")
 	}
 

@@ -14,6 +14,8 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump libre-graph-api-go: [#5309](https://github.com/owncloud/ocis/pull/5309)
 * Enhancement - Bump reva version: [#5243](https://github.com/owncloud/ocis/pull/5243)
 * Enhancement - Drive group permissions: [#5312](https://github.com/owncloud/ocis/pull/5312)
+* Enhancement - Make the group members addition limit configurable: [#5357](https://github.com/owncloud/ocis/pull/5357)
+* Enhancement - Graph Drives IdentitySet displayName: [#5347](https://github.com/owncloud/ocis/pull/5347)
 * Enhancement - Extended search: [#5221](https://github.com/owncloud/ocis/pull/5221)
 * Enhancement - Resource tags: [#5227](https://github.com/owncloud/ocis/pull/5227)
 

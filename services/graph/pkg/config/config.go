@@ -19,6 +19,8 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
+	API API `yaml:"api"`
+
 	Reva          *shared.Reva          `yaml:"reva"`
 	TokenManager  *TokenManager         `yaml:"token_manager"`
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
@@ -35,6 +37,8 @@ type Spaces struct {
 	WebDavPath                      string `yaml:"webdav_path" env:"GRAPH_SPACES_WEBDAV_PATH" desc:"The WebDAV subpath for spaces."`
 	DefaultQuota                    string `yaml:"default_quota" env:"GRAPH_SPACES_DEFAULT_QUOTA" desc:"The default quota in bytes."`
 	ExtendedSpacePropertiesCacheTTL int    `yaml:"extended_space_properties_cache_ttl" env:"GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL" desc:"Max TTL in seconds for the spaces property cache."`
+	UsersCacheTTL                   int    `yaml:"users_cache_ttl" env:"GRAPH_SPACES_USERS_CACHE_TTL" desc:"Max TTL in seconds for the spaces users cache."`
+	GroupsCacheTTL                  int    `yaml:"groups_cache_ttl" env:"GRAPH_SPACES_GROUPS_CACHE_TTL" desc:"Max TTL in seconds for the spaces groups cache."`
 }
 
 type LDAP struct {
@@ -83,6 +87,11 @@ type LDAPEducationConfig struct {
 type Identity struct {
 	Backend string `yaml:"backend" env:"GRAPH_IDENTITY_BACKEND" desc:"The user identity backend to use. Supported backend types are 'ldap' and 'cs3'."`
 	LDAP    LDAP   `yaml:"ldap"`
+}
+
+// API represents API configuration parameters.
+type API struct {
+	GroupMembersPatchLimit int `yaml:"group_members_patch_limit" env:"GRAPH_GROUP_MEMBERS_PATCH_LIMIT" desc:"The amount of group members allowed to be added with a single patch request."`
 }
 
 // Events combines the configuration options for the event bus.

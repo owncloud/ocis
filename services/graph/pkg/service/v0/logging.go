@@ -7,7 +7,7 @@ import (
 )
 
 // NewLogging returns a service that logs messages.
-func NewLogging(next Service, logger log.Logger) Service {
+func NewLogging(next Service, logger log.Logger) logging {
 	return logging{
 		next:   next,
 		logger: logger,
