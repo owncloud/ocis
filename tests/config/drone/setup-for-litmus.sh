@@ -5,7 +5,7 @@ SHARE_ENDPOINT="ocs/v2.php/apps/files_sharing/api/v1/shares"
 # envs
 ENV="SPACE_ID="
 # get space id
-SPACE_ID=$(curl -ks -uadmin:admin "${TEST_SERVER_URL}/graph/v1.0/me/drives" | grep -Po '(?<="webDavUrl":").*?(?="})' | cut -d"/" -f6 | sed "s/\\$/\\\\$/g")
+SPACE_ID=$(curl -ks -uadmin:admin "${TEST_SERVER_URL}/graph/v1.0/me/drives" | jq -r '.value[] | select(.driveType == "personal") | .root.webDavUrl' | cut -d"/" -f6 | sed "s/\\$/\\\\$/g")
 ENV+=${SPACE_ID}
 
 # create a folder
