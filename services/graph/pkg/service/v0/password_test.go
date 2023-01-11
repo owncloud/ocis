@@ -25,13 +25,6 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-type changePwTest struct {
-	desc      string
-	currentpw string
-	newpw     string
-	expected  int
-}
-
 var _ = Describe("Users changing their own password", func() {
 	var (
 		svc             service.Service
