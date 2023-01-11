@@ -7,9 +7,11 @@ import (
 	"testing"
 
 	"github.com/go-ldap/ldap/v3"
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
+	"github.com/stretchr/testify/assert"
 	"github.com/test-go/testify/mock"
 )
 
@@ -44,12 +46,14 @@ var userEntry = ldap.NewEntry("uid=user",
 		"mail":        {"user@example"},
 		"entryuuid":   {"abcd-defg"},
 	})
+
 var invalidUserEntry = ldap.NewEntry("uid=user",
 	map[string][]string{
 		"uid":         {"invalid"},
 		"displayname": {"DisplayName"},
 		"mail":        {"user@example"},
 	})
+
 var groupEntry = ldap.NewEntry("cn=group",
 	map[string][]string{
 		"cn":        {"group"},
@@ -59,6 +63,7 @@ var groupEntry = ldap.NewEntry("cn=group",
 			"uid=invalid,ou=people,dc=test",
 		},
 	})
+
 var invalidGroupEntry = ldap.NewEntry("cn=invalid",
 	map[string][]string{
 		"cn": {"invalid"},
@@ -67,7 +72,6 @@ var invalidGroupEntry = ldap.NewEntry("cn=invalid",
 var logger = log.NewLogger(log.Level("debug"))
 
 func TestNewLDAPBackend(t *testing.T) {
-
 	l := &mocks.Client{}
 
 	tc := lconfig
@@ -97,7 +101,41 @@ func TestNewLDAPBackend(t *testing.T) {
 	if _, err := NewLDAPBackend(l, lconfig, &logger); err != nil {
 		t.Errorf("Should fail with invalid group search scope")
 	}
+}
 
+func TestCreateUser(t *testing.T) {
+	l := &mocks.Client{}
+	l.On("Search", mock.Anything).
+		Return(
+			&ldap.SearchResult{
+				Entries: []*ldap.Entry{userEntry},
+			},
+			nil)
+	l.On("Add", mock.Anything).Return(nil)
+	logger := log.NewLogger(log.Level("debug"))
+
+	displayName := "DisplayName"
+	mail := "user@example"
+	userName := "user"
+	surname := "surname"
+	givenName := "givenName"
+
+	user := libregraph.NewUser()
+	user.SetDisplayName(displayName)
+	user.SetMail(mail)
+	user.SetOnPremisesSamAccountName(userName)
+	user.SetSurname(surname)
+	user.SetGivenName(givenName)
+
+	c := lconfig
+	c.UseServerUUID = true
+	b, _ := NewLDAPBackend(l, c, &logger)
+
+	newUser, err := b.CreateUser(context.Background(), *user)
+	assert.Nil(t, err)
+	assert.Equal(t, displayName, newUser.GetDisplayName())
+	assert.Equal(t, mail, newUser.GetMail())
+	assert.Equal(t, userName, newUser.GetOnPremisesSamAccountName())
 }
 
 func TestCreateUserModelFromLDAP(t *testing.T) {
