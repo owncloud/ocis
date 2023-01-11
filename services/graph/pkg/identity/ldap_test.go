@@ -255,7 +255,7 @@ func TestGetUser(t *testing.T) {
 			nil)
 
 	b, _ = getMockedBackend(lm, lconfig, &logger)
-	u, err = b.GetUser(context.Background(), "invalid", nil)
+	_, err = b.GetUser(context.Background(), "invalid", nil)
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}

@@ -370,7 +370,7 @@ func TestGetEducationSchoolUsers(t *testing.T) {
 	lm := &mocks.Client{}
 	lm.On("Search", schoolByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry, schoolEntry1}}, nil)
 	lm.On("Search", usersBySchoolIDSearch).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntryWithSchool}}, nil)
-	b, err := getMockedBackend(lm, eduConfig, &logger)
+	b, _ := getMockedBackend(lm, eduConfig, &logger)
 	users, err := b.GetEducationSchoolUsers(context.Background(), "abcd-defg")
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(users))
