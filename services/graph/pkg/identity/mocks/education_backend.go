@@ -31,6 +31,29 @@ func (_m *EducationBackend) AddUsersToEducationSchool(ctx context.Context, schoo
 	return r0
 }
 
+// CreateEducationClass provides a mock function with given fields: ctx, class
+func (_m *EducationBackend) CreateEducationClass(ctx context.Context, class libregraph.EducationClass) (*libregraph.EducationClass, error) {
+	ret := _m.Called(ctx, class)
+
+	var r0 *libregraph.EducationClass
+	if rf, ok := ret.Get(0).(func(context.Context, libregraph.EducationClass) *libregraph.EducationClass); ok {
+		r0 = rf(ctx, class)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*libregraph.EducationClass)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, libregraph.EducationClass) error); ok {
+		r1 = rf(ctx, class)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // CreateEducationSchool provides a mock function with given fields: ctx, group
 func (_m *EducationBackend) CreateEducationSchool(ctx context.Context, group libregraph.EducationSchool) (*libregraph.EducationSchool, error) {
 	ret := _m.Called(ctx, group)
@@ -77,6 +100,20 @@ func (_m *EducationBackend) CreateEducationUser(ctx context.Context, user libreg
 	return r0, r1
 }
 
+// DeleteEducationClass provides a mock function with given fields: ctx, nameOrID
+func (_m *EducationBackend) DeleteEducationClass(ctx context.Context, nameOrID string) error {
+	ret := _m.Called(ctx, nameOrID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
+		r0 = rf(ctx, nameOrID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // DeleteEducationSchool provides a mock function with given fields: ctx, id
 func (_m *EducationBackend) DeleteEducationSchool(ctx context.Context, id string) error {
 	ret := _m.Called(ctx, id)
@@ -103,6 +140,75 @@ func (_m *EducationBackend) DeleteEducationUser(ctx context.Context, nameOrID st
 	}
 
 	return r0
+}
+
+// GetEducationClass provides a mock function with given fields: ctx, namedOrID, queryParam
+func (_m *EducationBackend) GetEducationClass(ctx context.Context, namedOrID string, queryParam url.Values) (*libregraph.EducationClass, error) {
+	ret := _m.Called(ctx, namedOrID, queryParam)
+
+	var r0 *libregraph.EducationClass
+	if rf, ok := ret.Get(0).(func(context.Context, string, url.Values) *libregraph.EducationClass); ok {
+		r0 = rf(ctx, namedOrID, queryParam)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*libregraph.EducationClass)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string, url.Values) error); ok {
+		r1 = rf(ctx, namedOrID, queryParam)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetEducationClassMembers provides a mock function with given fields: ctx, nameOrID
+func (_m *EducationBackend) GetEducationClassMembers(ctx context.Context, nameOrID string) ([]*libregraph.EducationUser, error) {
+	ret := _m.Called(ctx, nameOrID)
+
+	var r0 []*libregraph.EducationUser
+	if rf, ok := ret.Get(0).(func(context.Context, string) []*libregraph.EducationUser); ok {
+		r0 = rf(ctx, nameOrID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*libregraph.EducationUser)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, nameOrID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetEducationClasses provides a mock function with given fields: ctx, queryParam
+func (_m *EducationBackend) GetEducationClasses(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationClass, error) {
+	ret := _m.Called(ctx, queryParam)
+
+	var r0 []*libregraph.EducationClass
+	if rf, ok := ret.Get(0).(func(context.Context, url.Values) []*libregraph.EducationClass); ok {
+		r0 = rf(ctx, queryParam)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*libregraph.EducationClass)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, url.Values) error); ok {
+		r1 = rf(ctx, queryParam)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 // GetEducationSchool provides a mock function with given fields: ctx, nameOrID, queryParam

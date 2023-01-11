@@ -60,6 +60,17 @@ type EducationBackend interface {
 	// RemoveUserFromEducationSchool removes a single member (by ID) from a school
 	RemoveUserFromEducationSchool(ctx context.Context, schoolID string, memberID string) error
 
+	// GetEducationClasses lists all classes
+	GetEducationClasses(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationClass, error)
+	// GetEducationClasses reads a given class by id
+	GetEducationClass(ctx context.Context, namedOrID string, queryParam url.Values) (*libregraph.EducationClass, error)
+	// CreateEducationClass creates the supplied education class in the identity backend.
+	CreateEducationClass(ctx context.Context, class libregraph.EducationClass) (*libregraph.EducationClass, error)
+	// DeleteEducationClass deletes the supplied education class in the identity backend.
+	DeleteEducationClass(ctx context.Context, nameOrID string) error
+	// GetEducationClassMembers returns the EducationUser members for an EducationClass
+	GetEducationClassMembers(ctx context.Context, nameOrID string) ([]*libregraph.EducationUser, error)
+
 	// CreateEducationUser creates a given education user in the identity backend.
 	CreateEducationUser(ctx context.Context, user libregraph.EducationUser) (*libregraph.EducationUser, error)
 	// DeleteEducationUser deletes a given educationuser, identified by username or id, from the backend
