@@ -993,6 +993,11 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 	}
 	attrs["sn"] = []string{sn}
 
+	// When we get a givenName, we set the attribute.
+	if givenName := user.GetGivenName(); givenName != "" {
+		attrs["givenname"] = []string{givenName}
+	}
+
 	if !i.usePwModifyExOp && user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
 		// Depending on the LDAP server implementation this might cause the
 		// password to be stored in cleartext in the LDAP database. Using the
