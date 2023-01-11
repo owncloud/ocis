@@ -72,51 +72,65 @@ func (s svc) Webfinger(ctx context.Context, resource, rel string) (webfinger.JSO
 	// TODO query ldap server here and fetch all instances the user has access to
 	// what is the domain for the instance?
 
+	href := ctx.Value("href").(string)
+
 	// TODO use another relation? more graph specific? nah
 	return webfinger.JSONResourceDescriptor{
 		Subject: resource,
 		Links: []webfinger.Link{
 			{
 				Rel:  OwnCloudInstanceRel,
-				Href: "https://instance.server...",
+				Href: href,
 				Titles: map[string]string{
-					"en": "Readable Instance name",
-				},
-			},
-			{
-				Rel:  OwnCloudInstanceRel,
-				Href: "https://otherinstance.server...",
-				Titles: map[string]string{
-					"en": "Other readable Instance name",
-				},
-			},
-			// and we can return the OpenID Connect
-			{
-				Rel:  OpenIDConnectRel,
-				Href: "https://idp.server...",
-				Titles: map[string]string{
-					"en": "Readable Openid Connect IDP name",
-				},
-			},
-			{
-				Rel:  OpenIDConnectRel,
-				Href: "https://otheridp.server...",
-				Titles: map[string]string{
-					"en": "Other readable Openid Connect IDP name",
-				},
-			},
-			// FIXME but now the clients have no way of knowing whic idp belongs to which instance
-			// we could mix like this:
-			{
-				Rel:  OwnCloudInstanceRel,
-				Href: "https://otherinstance.server...",
-				Titles: map[string]string{
-					"en": "Other readable Instance name",
+					"en": "ownCloud Infinite Scale",
 				},
 				Properties: map[string]string{
-					OpenIDConnectRel: "https://otheridp.server...",
+					OpenIDConnectRel: href,
 				},
 			},
+			/*
+				{
+					Rel:  OwnCloudInstanceRel,
+					Href: "https://instance.server...",
+					Titles: map[string]string{
+						"en": "Readable Instance name",
+					},
+				},
+				{
+					Rel:  OwnCloudInstanceRel,
+					Href: "https://otherinstance.server...",
+					Titles: map[string]string{
+						"en": "Other readable Instance name",
+					},
+				},
+				// and we can return the OpenID Connect
+				{
+					Rel:  OpenIDConnectRel,
+					Href: "https://idp.server...",
+					Titles: map[string]string{
+						"en": "Readable Openid Connect IDP name",
+					},
+				},
+				{
+					Rel:  OpenIDConnectRel,
+					Href: "https://otheridp.server...",
+					Titles: map[string]string{
+						"en": "Other readable Openid Connect IDP name",
+					},
+				},
+				// FIXME but now the clients have no way of knowing which idp belongs to which instance
+				// we could mix like this:
+				{
+					Rel:  OwnCloudInstanceRel,
+					Href: "https://otherinstance.server...",
+					Titles: map[string]string{
+						"en": "Other readable Instance name",
+					},
+					Properties: map[string]string{
+						OpenIDConnectRel: "https://otheridp.server...",
+					},
+				},
+			*/
 		},
 	}, nil
 }

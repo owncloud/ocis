@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
@@ -66,6 +67,9 @@ func Server(opts ...Option) (ohttp.Service, error) {
 		r.Get("/.well-known/webfinger", func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 
+			// for now, put the url in the context so it can be used to fake a list
+			ctx = context.WithValue(ctx, "href", getHref(r))
+
 			// from https://www.rfc-editor.org/rfc/rfc7033#section-4.2
 			//
 			// If the "resource" parameter is a value for which the server has no
@@ -95,4 +99,16 @@ func Server(opts ...Option) (ohttp.Service, error) {
 
 	svc.Init()
 	return svc, nil
+}
+
+func getHref(r *http.Request) string {
+	proto := r.Header.Get("x-forwarded-proto")
+	host := r.Header.Get("x-forwarded-host")
+	port := r.Header.Get("x-forwarded-port")
+
+	if (proto == "http" && port != "80") || (proto == "https" && port != "443") {
+		host = host + ":" + port
+	}
+
+	return proto + "://" + host
 }
