@@ -6,14 +6,13 @@ import (
 
 	pkgcrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
-	svc "github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"go-micro.dev/v4"
 )
 
 // Server initializes the http service and server.
-func Server(opts ...Option) (svc.Service, error) {
+func Server(opts ...Option) (http.Service, error) {
 	options := newOptions(opts...)
 	l := options.Logger
 	httpCfg := options.Config.HTTP
@@ -33,19 +32,19 @@ func Server(opts ...Option) (svc.Service, error) {
 	}
 	chain := options.Middlewares.Then(options.Handler)
 
-	service, err := svc.NewService(
-		svc.Name(options.Config.Service.Name),
-		svc.Version(version.GetString()),
+	service, err := http.NewService(
+		http.Name(options.Config.Service.Name),
+		http.Version(version.GetString()),
 		http.TLSConfig(shared.HTTPServiceTLS{
 			Enabled: options.Config.HTTP.TLS,
 			Cert:    options.Config.HTTP.TLSCert,
 			Key:     options.Config.HTTP.TLSKey,
 		}),
-		svc.Logger(options.Logger),
-		svc.Address(options.Config.HTTP.Addr),
-		svc.Namespace(options.Config.HTTP.Namespace),
-		svc.Context(options.Context),
-		svc.Flags(options.Flags...),
+		http.Logger(options.Logger),
+		http.Address(options.Config.HTTP.Addr),
+		http.Namespace(options.Config.HTTP.Namespace),
+		http.Context(options.Context),
+		http.Flags(options.Flags...),
 	)
 	if err != nil {
 		options.Logger.Error().
@@ -55,7 +54,7 @@ func Server(opts ...Option) (svc.Service, error) {
 	}
 
 	if err := micro.RegisterHandler(service.Server(), chain); err != nil {
-		return svc.Service{}, err
+		return http.Service{}, err
 	}
 
 	return service, nil

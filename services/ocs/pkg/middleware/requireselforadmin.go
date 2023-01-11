@@ -11,7 +11,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
 	settings "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
-	settingsService "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 )
 
 // RequireSelfOrAdmin middleware is used to require the requesting user to be an admin or the requested user himself
@@ -48,7 +47,7 @@ func RequireSelfOrAdmin(opts ...Option) func(next http.Handler) http.Handler {
 					return
 				}
 				if len(roleIDs) == 0 {
-					roleIDs = append(roleIDs, settingsService.BundleUUIDRoleUser, settingsService.SelfManagementPermissionID)
+					roleIDs = append(roleIDs, settings.BundleUUIDRoleUser, settings.SelfManagementPermissionID)
 					// if roles are empty, assume we haven't seen the user before and assign a default user role. At least until
 					// proper roles are provided. See https://github.com/owncloud/ocis/v2/issues/1825 for more context.
 					//return user, nil
