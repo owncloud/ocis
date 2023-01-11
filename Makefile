@@ -150,9 +150,12 @@ clean:
 
 .PHONY: docs-generate
 docs-generate:
+	# empty the folders first to only have files that are generated without remnants
+	find docs/services/_includes/ -type f \( -name "*" ! -name ".git*" ! -name "_*" \) -delete || exit 1
 	@for mod in $(OCIS_MODULES); do \
         $(MAKE) --no-print-directory -C $$mod docs-generate || exit 1; \
     done
+	$(MAKE) --no-print-directory -C docs docs-generate || exit 1
 
 .PHONY: ci-go-generate
 ci-go-generate:
