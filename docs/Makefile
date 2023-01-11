@@ -8,12 +8,13 @@ help:
 
 .PHONY: docs-generate
 docs-generate: ## run docs-generate for all oCIS services
-	@pushd helpers && go run configenvextractor.go; popd
-	@$(MAKE) --no-print-directory -C ../ docs-generate
+	@pushd helpers && go run .; popd
 
 .PHONY: docs-init
 docs-init:
 	@mkdir -p hugo/content/
+	@mkdir -p hugo/public/
+	@touch hugo/public/.nojekyll
 	@cd hugo && git init
 	@cd hugo && git config advice.detachedHead false
 	@cd hugo && git remote rm origin || true
