@@ -3,8 +3,8 @@
     <oc-select
         :clearable="false"
         :options="displayOptions"
-        :value="selectedOption"
-        @input="onSelectedOption"
+        :model-value="selectedOption"
+        @update:modelValue="onSelectedOption"
        />
   </div>
 </template>
