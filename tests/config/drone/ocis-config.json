@@ -25,7 +25,8 @@
     "markdown-editor",
     "media-viewer",
     "pdf-viewer",
-    "search"
+    "search",
+    "admin-settings"
   ],
   "external_apps": [
     {
