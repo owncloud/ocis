@@ -50,8 +50,6 @@ Other free text and markdown formatting can be used elsewhere in the document if
 
 ### [Implement expiration date for shares](https://github.com/owncloud/ocis/issues/1250)
 - [webUISharingInternalGroups/shareWithGroups.feature:222](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L222)
-- [webUISharingInternalGroups/shareWithGroups.feature:274](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L274)
-- [webUISharingInternalGroups/shareWithGroups.feature:275](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingInternalGroups/shareWithGroups.feature#L275)
 - [webUISharingExpirationDate/shareWithExpirationDate.feature:21](https://github.com/owncloud/web/blob/master/tests/acceptance/features/webUISharingExpirationDate/shareWithExpirationDate.feature#L21)
 
 ### [Notifications endpoint](https://github.com/owncloud/ocis/issues/14)
