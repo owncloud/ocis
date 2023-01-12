@@ -45,7 +45,7 @@ web:
     - text-editor
     - pdf-viewer
     - external
-    - user-management
+    - admin-settings
     applications: []
     external_apps:
     - id: settings
