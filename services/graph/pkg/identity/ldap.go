@@ -18,6 +18,11 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+const (
+	givenNameAttribute = "givenname"
+	surNameAttribute   = "sn"
+)
+
 type LDAP struct {
 	useServerUUID   bool
 	writeEnabled    bool
@@ -46,6 +51,8 @@ type userAttributeMap struct {
 	id          string
 	mail        string
 	userName    string
+	givenName   string
+	surname     string
 }
 
 type groupAttributeMap struct {
@@ -67,6 +74,8 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		id:          config.UserIDAttribute,
 		mail:        config.UserEmailAttribute,
 		userName:    config.UserNameAttribute,
+		givenName:   givenNameAttribute,
+		surname:     surNameAttribute,
 	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
@@ -266,6 +275,8 @@ func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
 		i.userAttributeMap.id,
 		i.userAttributeMap.mail,
 		i.userAttributeMap.userName,
+		i.userAttributeMap.surname,
+		i.userAttributeMap.givenName,
 	}
 
 	filter := fmt.Sprintf("(objectClass=%s)", i.userObjectClass)
@@ -373,6 +384,8 @@ func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
 		i.userAttributeMap.id,
 		i.userAttributeMap.mail,
 		i.userAttributeMap.userName,
+		i.userAttributeMap.surname,
+		i.userAttributeMap.givenName,
 	}
 	return i.searchLDAPEntryByFilter(i.userBaseDN, attrs, filter)
 }
@@ -430,6 +443,8 @@ func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregra
 			i.userAttributeMap.id,
 			i.userAttributeMap.mail,
 			i.userAttributeMap.userName,
+			i.userAttributeMap.surname,
+			i.userAttributeMap.givenName,
 		},
 		nil,
 	)
@@ -932,6 +947,8 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 
 	opsan := e.GetEqualFoldAttributeValue(i.userAttributeMap.userName)
 	id := e.GetEqualFoldAttributeValue(i.userAttributeMap.id)
+	givenName := e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName)
+	surname := e.GetEqualFoldAttributeValue(i.userAttributeMap.surname)
 
 	if id != "" && opsan != "" {
 		return &libregraph.User{
@@ -939,6 +956,8 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 			Mail:                     pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.mail)),
 			OnPremisesSamAccountName: &opsan,
 			Id:                       &id,
+			GivenName:                &givenName,
+			Surname:                  &surname,
 		}
 	}
 	i.logger.Warn().Str("dn", e.DN).Msg("Invalid User. Missing username or id attribute")
@@ -991,11 +1010,11 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 	} else {
 		sn = *user.OnPremisesSamAccountName
 	}
-	attrs["sn"] = []string{sn}
+	attrs[i.userAttributeMap.surname] = []string{sn}
 
 	// When we get a givenName, we set the attribute.
 	if givenName := user.GetGivenName(); givenName != "" {
-		attrs["givenname"] = []string{givenName}
+		attrs[i.userAttributeMap.givenName] = []string{givenName}
 	}
 
 	if !i.usePwModifyExOp && user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
