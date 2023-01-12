@@ -14,7 +14,7 @@ import (
 // ListApplications implements the Service interface.
 func (g Graph) ListApplications(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Interface("query", r.URL.Query()).Msg("calling get application")
+	logger.Info().Interface("query", r.URL.Query()).Msg("calling list applications")
 
 	lbr, err := g.roleService.ListRoles(r.Context(), &settingssvc.ListBundlesRequest{})
 	if err != nil {
@@ -50,7 +50,7 @@ func (g Graph) GetApplication(w http.ResponseWriter, r *http.Request) {
 	applicationID := chi.URLParam(r, "applicationID")
 
 	if applicationID != g.config.Application.ID {
-		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, fmt.Sprintf("resource id %s does not match expected application id %v", applicationID, g.config.Application.ID))
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, fmt.Sprintf("requested id %s does not match expected application id %v", applicationID, g.config.Application.ID))
 		return
 	}
 
