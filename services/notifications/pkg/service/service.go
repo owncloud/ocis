@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -10,19 +11,18 @@ import (
 	"syscall"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	groupv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
-	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
+	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
+// Service should be named `Runner`
 type Service interface {
 	Run() error
 }
@@ -70,8 +70,12 @@ func (s eventsNotifier) Run() error {
 					s.handleSpaceShared(e)
 				case events.SpaceUnshared:
 					s.handleSpaceUnshared(e)
+				case events.SpaceMembershipExpired:
+					s.handleSpaceMembershipExpired(e)
 				case events.ShareCreated:
 					s.handleShareCreated(e)
+				case events.ShareExpired:
+					s.handleShareExpired(e)
 				}
 			}()
 		case <-s.signals:
@@ -82,138 +86,80 @@ func (s eventsNotifier) Run() error {
 	}
 }
 
-func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
-	logger := s.logger.With().
-		Str("event", "ShareCreated").
-		Str("itemid", e.ItemID.OpaqueId).
-		Logger()
-
-	impersonateRes, err := s.impersonate(e.Sharer)
+func (s eventsNotifier) render(bodyTemplate string, subjTemplate string, values map[string]string) (string, string, error) {
+	msg, err := email.RenderEmailTemplate(bodyTemplate, values, s.emailTemplatePath)
 	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("Could not impersonate sharer")
-		return
+		return "", "", err
 	}
-	ownerCtx := metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, impersonateRes.Token)
 
-	resourceInfo, err := s.getResourceInfo(ownerCtx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
+	sub, err := email.RenderEmailTemplate(subjTemplate, values, s.emailTemplatePath)
 	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("could not stat resource")
-		return
+		return "", "", err
 	}
 
-	shareLink, err := urlJoinPath(s.ocisURL, "files/shares/with-me")
-	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("could not create link to the share")
-		return
-	}
-
-	shareGrantee := ""
-	switch {
-	// Note: We're using the 'ownerCtx' (authenticated as the share owner) here for requesting
-	// the Grantees of the shares. Ideally the notfication service would use some kind of service
-	// user for this.
-	case e.GranteeUserID != nil:
-		granteeUserResponse, err := s.gwClient.GetUser(ownerCtx, &userv1beta1.GetUserRequest{
-			UserId: e.GranteeUserID,
-		})
-		if err != nil || granteeUserResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
-			s.logger.Error().
-				Err(err).
-				Str("event", "ShareCreated").
-				Msg("Could not get user response from gatway client")
-			return
-		}
-		shareGrantee = granteeUserResponse.GetUser().DisplayName
-	case e.GranteeGroupID != nil:
-		granteeGroupResponse, err := s.gwClient.GetGroup(ownerCtx, &groupv1beta1.GetGroupRequest{
-			GroupId: e.GranteeGroupID,
-		})
-		if err != nil || granteeGroupResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
-			s.logger.Error().
-				Err(err).
-				Str("event", "ShareCreated").
-				Msg("Could not get group response from gatway client")
-			return
-		}
-		shareGrantee = granteeGroupResponse.GetGroup().DisplayName
-	default:
-		s.logger.Error().
-			Str("event", "ShareCreated").
-			Msg("Event 'ShareCreated' has no grantee")
-		return
-	}
-
-	sharerDisplayName := impersonateRes.GetUser().DisplayName
-	msg, err := email.RenderEmailTemplate("shares/shareCreated.email.body.tmpl", map[string]string{
-		"ShareGrantee": shareGrantee,
-		"ShareSharer":  sharerDisplayName,
-		"ShareFolder":  resourceInfo.Name,
-		"ShareLink":    shareLink,
-	}, s.emailTemplatePath)
-
-	if err != nil {
-		s.logger.Error().
-			Err(err).
-			Str("event", "ShareCreated").
-			Msg("Could not render E-Mail body template for shares")
-	}
-
-	emailSubject, err := email.RenderEmailTemplate("shares/shareCreated.email.subject.tmpl", map[string]string{
-		"ShareSharer": sharerDisplayName,
-		"ShareFolder": resourceInfo.Name,
-	}, s.emailTemplatePath)
-
-	if err != nil {
-		s.logger.Error().
-			Err(err).
-			Str("event", "SpaceCreated").
-			Msg("Could not render E-Mail subject template for shares")
-	}
-
-	if e.GranteeUserID != nil {
-		err = s.channel.SendMessage(ownerCtx, []string{e.GranteeUserID.OpaqueId}, msg, emailSubject, sharerDisplayName)
-	} else if e.GranteeGroupID != nil {
-		err = s.channel.SendMessageToGroup(ownerCtx, e.GranteeGroupID, msg, emailSubject, sharerDisplayName)
-	}
-	if err != nil {
-		s.logger.Error().
-			Err(err).
-			Str("event", "ShareCreated").
-			Msg("failed to send a message")
-	}
+	return msg, sub, nil
 }
 
-func (s eventsNotifier) impersonate(userID *userv1beta1.UserId) (*gateway.AuthenticateResponse, error) {
-	getUserResponse, err := s.gwClient.GetUser(context.Background(), &userv1beta1.GetUserRequest{
-		UserId: userID,
-	})
-	if err != nil {
-		return nil, err
-	}
-	if getUserResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
-		return nil, fmt.Errorf("error getting user: %s", getUserResponse.Status.Message)
+func (s eventsNotifier) send(ctx context.Context, u *user.UserId, g *group.GroupId, msg, subj, sender string) error {
+	if u != nil {
+		return s.channel.SendMessage(ctx, []string{u.GetOpaqueId()}, msg, subj, sender)
+
 	}
 
-	// Get auth context
-	ownerCtx := revactx.ContextSetUser(context.Background(), getUserResponse.User)
-	authRes, err := s.gwClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
-		Type:         "machine",
-		ClientId:     "userid:" + userID.OpaqueId,
-		ClientSecret: s.machineAuthAPIKey,
+	if g != nil {
+		return s.channel.SendMessageToGroup(ctx, g, msg, subj, sender)
+	}
+
+	return nil
+}
+
+func (s eventsNotifier) getGranteeName(ctx context.Context, u *user.UserId, g *group.GroupId) (string, error) {
+	switch {
+	case u != nil:
+		r, err := s.gwClient.GetUser(ctx, &user.GetUserRequest{UserId: u})
+		if err != nil {
+			return "", err
+		}
+
+		if r.Status.Code != rpc.Code_CODE_OK {
+			return "", fmt.Errorf("unexpected status code from gateway client: %d", r.GetStatus().GetCode())
+		}
+
+		return r.GetUser().GetDisplayName(), nil
+	case g != nil:
+		r, err := s.gwClient.GetGroup(ctx, &group.GetGroupRequest{GroupId: g})
+		if err != nil {
+			return "", err
+		}
+
+		if r.GetStatus().GetCode() != rpc.Code_CODE_OK {
+			return "", fmt.Errorf("unexpected status code from gateway client: %d", r.GetStatus().GetCode())
+		}
+
+		return r.GetGroup().GetDisplayName(), nil
+	default:
+		return "", errors.New("Need at least one non-nil grantee")
+	}
+
+}
+
+func (s eventsNotifier) getResourceInfo(ctx context.Context, resourceID *provider.ResourceId, fieldmask *fieldmaskpb.FieldMask) (*provider.ResourceInfo, error) {
+	// TODO: maybe cache this stat to reduce storage iops
+	md, err := s.gwClient.Stat(ctx, &provider.StatRequest{
+		Ref: &provider.Reference{
+			ResourceId: resourceID,
+		},
+		FieldMask: fieldmask,
 	})
+
 	if err != nil {
 		return nil, err
 	}
-	if authRes.GetStatus().GetCode() != rpcv1beta1.Code_CODE_OK {
-		return nil, fmt.Errorf("error impersonating user: %s", authRes.Status.Message)
+
+	if md.Status.Code != rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("could not resource info: %s", md.Status.Message)
 	}
-	return authRes, nil
+	return md.GetInfo(), nil
 }
 
 // TODO: this function is a backport for go1.19 url.JoinPath, upon go bump, replace this
@@ -224,23 +170,4 @@ func urlJoinPath(base string, elements ...string) (string, error) {
 	}
 	u.Path = path.Join(append([]string{u.Path}, elements...)...)
 	return u.String(), nil
-}
-
-func (s eventsNotifier) getResourceInfo(ctx context.Context, resourceID *providerv1beta1.ResourceId, fieldmask *fieldmaskpb.FieldMask) (*providerv1beta1.ResourceInfo, error) {
-	// TODO: maybe cache this stat to reduce storage iops
-	md, err := s.gwClient.Stat(ctx, &providerv1beta1.StatRequest{
-		Ref: &providerv1beta1.Reference{
-			ResourceId: resourceID,
-		},
-		FieldMask: fieldmask,
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	if md.Status.Code != rpcv1beta1.Code_CODE_OK {
-		return nil, fmt.Errorf("could not resource info: %s", md.Status.Message)
-	}
-	return md.GetInfo(), nil
 }

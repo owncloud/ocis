@@ -35,8 +35,10 @@ func Server(cfg *config.Config) *cli.Command {
 			// evs defines a list of events to subscribe to
 			evs := []events.Unmarshaller{
 				events.ShareCreated{},
+				events.ShareExpired{},
 				events.SpaceShared{},
 				events.SpaceUnshared{},
+				events.SpaceMembershipExpired{},
 			}
 
 			evtsCfg := cfg.Notifications.Events

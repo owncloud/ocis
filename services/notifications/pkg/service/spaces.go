@@ -1,16 +1,9 @@
 package service
 
 import (
-	"context"
-
-	groupv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
-	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
-	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
-	"google.golang.org/grpc/metadata"
+	"github.com/cs3org/reva/v2/pkg/utils"
 )
 
 func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
@@ -19,14 +12,13 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		Str("itemid", e.ID.OpaqueId).
 		Logger()
 
-	impersonateRes, err := s.impersonate(e.Executant)
+	ownerCtx, owner, err := utils.Impersonate(e.Executant, s.gwClient, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().
 			Err(err).
 			Msg("could not handle space shared event")
 		return
 	}
-	ownerCtx := metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, impersonateRes.Token)
 
 	resourceID, err := storagespace.ParseID(e.ID.OpaqueId)
 	if err != nil {
@@ -52,73 +44,29 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		return
 	}
 
-	spaceGrantee := ""
-	switch {
 	// Note: We're using the 'ownerCtx' (authenticated as the share owner) here for requesting
 	// the Grantees of the shares. Ideally the notfication service would use some kind of service
 	// user for this.
-	case e.GranteeUserID != nil:
-		granteeUserResponse, err := s.gwClient.GetUser(ownerCtx, &userv1beta1.GetUserRequest{
-			UserId: e.GranteeUserID,
-		})
-		if err != nil || granteeUserResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
-			logger.Error().
-				Err(err).
-				Msg("Could not get user response from gatway client")
-			return
-		}
-		spaceGrantee = granteeUserResponse.GetUser().GetDisplayName()
-	case e.GranteeGroupID != nil:
-		granteeGroupResponse, err := s.gwClient.GetGroup(ownerCtx, &groupv1beta1.GetGroupRequest{
-			GroupId: e.GranteeGroupID,
-		})
-		if err != nil || granteeGroupResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
-			logger.Error().
-				Err(err).
-				Msg("Could not get group response from gatway client")
-			return
-		}
-		spaceGrantee = granteeGroupResponse.GetGroup().GetDisplayName()
-	default:
-		logger.Error().
-			Msg("Event 'SpaceShared' has no grantee")
+	spaceGrantee, err := s.getGranteeName(ownerCtx, e.GranteeUserID, e.GranteeGroupID)
+	if err != nil {
+		logger.Error().Err(err).Msg("Could not get grantee name")
 		return
 	}
 
-	sharerDisplayName := impersonateRes.GetUser().GetDisplayName()
-	msg, err := email.RenderEmailTemplate("spaces/sharedSpace.email.body.tmpl", map[string]string{
+	sharerDisplayName := owner.GetDisplayName()
+	msg, subj, err := s.render("spaces/sharedSpace.email.body.tmpl", "spaces/sharedSpace.email.subject.tmpl", map[string]string{
 		"SpaceGrantee": spaceGrantee,
 		"SpaceSharer":  sharerDisplayName,
-		"SpaceName":    resourceInfo.GetSpace().Name,
+		"SpaceName":    resourceInfo.GetSpace().GetName(),
 		"ShareLink":    shareLink,
-	}, s.emailTemplatePath)
-
+	})
 	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("Could not render E-Mail body template for spaces")
+		logger.Error().Err(err).Msg("Could not render E-Mail template for spaces")
+		return
 	}
 
-	emailSubject, err := email.RenderEmailTemplate("spaces/sharedSpace.email.subject.tmpl", map[string]string{
-		"SpaceSharer": sharerDisplayName,
-		"SpaceName":   resourceInfo.GetSpace().Name,
-	}, s.emailTemplatePath)
-
-	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("Could not render E-Mail subject template for spaces")
-	}
-
-	if e.GranteeUserID != nil {
-		err = s.channel.SendMessage(ownerCtx, []string{e.GranteeUserID.OpaqueId}, msg, emailSubject, sharerDisplayName)
-	} else if e.GranteeGroupID != nil {
-		err = s.channel.SendMessageToGroup(ownerCtx, e.GranteeGroupID, msg, emailSubject, sharerDisplayName)
-	}
-	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("failed to send a message")
+	if err := s.send(ownerCtx, e.GranteeUserID, e.GranteeGroupID, msg, subj, sharerDisplayName); err != nil {
+		logger.Error().Err(err).Msg("failed to send a message")
 	}
 }
 
@@ -128,14 +76,11 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 		Str("itemid", e.ID.OpaqueId).
 		Logger()
 
-	impersonateRes, err := s.impersonate(e.Executant)
+	ownerCtx, owner, err := utils.Impersonate(e.Executant, s.gwClient, s.machineAuthAPIKey)
 	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("could not handle space unshared event")
+		logger.Error().Err(err).Msg("could not handle space unshared event")
 		return
 	}
-	ownerCtx := metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, impersonateRes.Token)
 
 	resourceID, err := storagespace.ParseID(e.ID.OpaqueId)
 	if err != nil {
@@ -161,72 +106,63 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 		return
 	}
 
-	spaceGrantee := ""
-	switch {
 	// Note: We're using the 'ownerCtx' (authenticated as the share owner) here for requesting
 	// the Grantees of the shares. Ideally the notfication service would use some kind of service
 	// user for this.
-	case e.GranteeUserID != nil:
-		granteeUserResponse, err := s.gwClient.GetUser(ownerCtx, &userv1beta1.GetUserRequest{
-			UserId: e.GranteeUserID,
-		})
-		if err != nil || granteeUserResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
-			logger.Error().
-				Err(err).
-				Msg("Could not get user response from gatway client")
-			return
-		}
-		spaceGrantee = granteeUserResponse.GetUser().GetDisplayName()
-	case e.GranteeGroupID != nil:
-		granteeGroupResponse, err := s.gwClient.GetGroup(ownerCtx, &groupv1beta1.GetGroupRequest{
-			GroupId: e.GranteeGroupID,
-		})
-		if err != nil || granteeGroupResponse.Status.Code != rpcv1beta1.Code_CODE_OK {
-			logger.Error().
-				Err(err).
-				Msg("Could not get group response from gatway client")
-			return
-		}
-		spaceGrantee = granteeGroupResponse.GetGroup().GetDisplayName()
-	default:
-		logger.Error().
-			Msg("Event 'SpaceShared' has no grantee")
+	spaceGrantee, err := s.getGranteeName(ownerCtx, e.GranteeUserID, e.GranteeGroupID)
+	if err != nil {
+		logger.Error().Err(err).Msg("Could not get grantee name")
 		return
 	}
 
-	sharerDisplayName := impersonateRes.GetUser().GetDisplayName()
-	msg, err := email.RenderEmailTemplate("spaces/unsharedSpace.email.body.tmpl", map[string]string{
+	sharerDisplayName := owner.GetDisplayName()
+	msg, subj, err := s.render("spaces/unsharedSpace.email.body.tmpl", "spaces/unsharedSpace.email.subject.tmpl", map[string]string{
 		"SpaceGrantee": spaceGrantee,
 		"SpaceSharer":  sharerDisplayName,
 		"SpaceName":    resourceInfo.GetSpace().Name,
 		"ShareLink":    shareLink,
-	}, s.emailTemplatePath)
+	})
 
 	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("Could not render E-Mail body template for spaces")
+		logger.Error().Err(err).Msg("Could not render E-Mail template for spaces")
+		return
 	}
 
-	emailSubject, err := email.RenderEmailTemplate("spaces/unsharedSpace.email.subject.tmpl", map[string]string{
-		"SpaceSharer": sharerDisplayName,
-		"SpaceName":   resourceInfo.GetSpace().Name,
-	}, s.emailTemplatePath)
+	if err := s.send(ownerCtx, e.GranteeUserID, e.GranteeGroupID, msg, subj, sharerDisplayName); err != nil {
+		logger.Error().Err(err).Msg("failed to send a message")
+	}
+}
+
+func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExpired) {
+	logger := s.logger.With().
+		Str("event", "SpaceMembershipExpired").
+		Str("itemid", e.SpaceID.GetOpaqueId()).
+		Logger()
+
+	ctx, owner, err := utils.Impersonate(e.SpaceOwner, s.gwClient, s.machineAuthAPIKey)
+	if err != nil {
+		logger.Error().Err(err).Msg("Could not impersonate sharer")
+		return
+	}
+
+	shareGrantee, err := s.getGranteeName(ctx, e.GranteeUserID, e.GranteeGroupID)
+	if err != nil {
+		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("Could not get grantee name")
+		return
+	}
+
+	msg, subj, err := s.render("spaces/membershipExpired.email.body.tmpl", "spaces/membershipExpired.email.subject.tmpl", map[string]string{
+		"SpaceGrantee": shareGrantee,
+		"SpaceName":    e.SpaceName,
+		"ExpiredAt":    e.ExpiredAt.Format("2006-01-02 15:04:05"),
+	})
 
 	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("Could not render E-Mail subject template for spaces")
+		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("Could not render E-Mail body template for shares")
 	}
 
-	if e.GranteeUserID != nil {
-		err = s.channel.SendMessage(ownerCtx, []string{e.GranteeUserID.OpaqueId}, msg, emailSubject, sharerDisplayName)
-	} else if e.GranteeGroupID != nil {
-		err = s.channel.SendMessageToGroup(ownerCtx, e.GranteeGroupID, msg, emailSubject, sharerDisplayName)
+	if err := s.send(ctx, e.GranteeUserID, e.GranteeGroupID, msg, subj, owner.GetDisplayName()); err != nil {
+		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("failed to send a message")
 	}
-	if err != nil {
-		logger.Error().
-			Err(err).
-			Msg("failed to send a message")
-	}
+
 }
