@@ -1,0 +1,159 @@
+---
+version: "3.7"
+
+services:
+  traefik:
+    image: traefik:v2.9.1
+    networks:
+      ocis-net:
+        aliases:
+          - ${OCIS_DOMAIN:-ocis.owncloud.test}
+    command:
+      - "--log.level=${TRAEFIK_LOG_LEVEL:-ERROR}"
+      # letsencrypt configuration
+      - "--certificatesResolvers.http.acme.email=${TRAEFIK_ACME_MAIL:-example@example.org}"
+      - "--certificatesResolvers.http.acme.storage=/certs/acme.json"
+      - "--certificatesResolvers.http.acme.httpChallenge.entryPoint=http"
+      # enable dashboard
+      - "--api.dashboard=true"
+      # define entrypoints
+      - "--entryPoints.http.address=:80"
+      - "--entryPoints.http.http.redirections.entryPoint.to=https"
+      - "--entryPoints.http.http.redirections.entryPoint.scheme=https"
+      - "--entryPoints.https.address=:443"
+      # docker provider (get configuration from container labels)
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.docker.exposedByDefault=false"
+      # access log
+      - "--accessLog=true"
+      - "--accessLog.format=json"
+      - "--accessLog.fields.headers.names.X-Request-Id=keep"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock:ro"
+      - "certs:/certs"
+    labels:
+      - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH_USERS:-admin:$$apr1$$4vqie50r$$YQAmQdtmz5n9rEALhxJ4l.}" # defaults to admin:admin
+      - "traefik.http.routers.traefik.entrypoints=https"
+      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_DOMAIN:-traefik.owncloud.test}`)"
+      - "traefik.http.routers.traefik.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik.tls.certresolver=http"
+      - "traefik.http.routers.traefik.service=api@internal"
+    logging:
+      driver: "${DOCKER_LOG_DRIVER:-local}"
+    restart: always
+
+  ocis:
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
+    networks:
+      ocis-net:
+    depends_on:
+      - ldap-server
+    entrypoint:
+      - /bin/sh
+    # run ocis init to initialize a configuration file with random secrets
+    # it will fail on subsequent runs, because the config file already exists
+    # therefore we ignore the error and then start the ocis server
+    command: ["-c", "ocis init || true; ocis graph server"]
+    environment:
+      # users/gropups from ldap
+      GRAPH_EVENTS_ENDPOINT: ""
+      GRAPH_HTTP_ADDR:  "0.0.0.0:9200"
+      GRAPH_HTTP_API_TOKEN: "a-secret-token"
+      GRAPH_IDENTITY_BACKEND: "ldap"
+      GRAPH_JWT_SECRET: "unused"
+      GRAPH_LDAP_CACERT: ""
+      GRAPH_LDAP_EDUCATION_RESOURCES_ENABLED: "true"
+      GRAPH_LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
+      GRAPH_LDAP_GROUP_FILTER: ""
+      GRAPH_LDAP_GROUP_ID_ATTRIBUTE: "owncloudUUID"
+      GRAPH_LDAP_GROUP_NAME_ATTRIBUTE: "cn"
+      GRAPH_LDAP_GROUP_OBJECTCLASS: "groupOfNames"
+      GRAPH_LDAP_GROUP_SEARCH_SCOPE: "sub"
+      GRAPH_LDAP_SCHOOL_BASE_DN: "ou=schools,dc=owncloud,dc=com"
+      GRAPH_LDAP_SERVER_USE_PASSWORD_MODIFY_EXOP: "false"
+      GRAPH_LDAP_SERVER_WRITE_ENABLED: "true"
+      GRAPH_LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
+      GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE: "displayName"
+      GRAPH_LDAP_USER_EMAIL_ATTRIBUTE: "mail"
+      GRAPH_LDAP_USER_FILTER: ""
+      GRAPH_LDAP_USER_NAME_ATTRIBUTE: "uid"
+      GRAPH_LDAP_USER_OBJECTCLASS: "inetOrgPerson"
+      GRAPH_LDAP_USER_SCOPE: "sub"
+      GRAPH_LDAP_USER_UID_ATTRIBUTE: "owncloudUUID"
+      LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
+      LDAP_INSECURE: "true"
+      LDAP_URI: "ldaps://ldap-server:1636"
+      LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+      OCIS_INSECURE: "${INSECURE:-false}"
+      OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
+      OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+    volumes:
+      - ocis-config:/etc/ocis
+      - ocis-data:/var/lib/ocis
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ocis.entrypoints=https"
+      - "traefik.http.routers.ocis.rule=Host(`${OCIS_DOMAIN:-ocis.owncloud.test}`)"
+      - "traefik.http.routers.ocis.tls.certresolver=http"
+      - "traefik.http.routers.ocis.service=ocis"
+      - "traefik.http.services.ocis.loadbalancer.server.port=9200"
+    logging:
+      driver: ${DOCKER_LOG_DRIVER:-local}
+    restart: always
+
+  ldap-server:
+    image: bitnami/openldap:2.6
+    networks:
+      ocis-net:
+    environment:
+      BITNAMI_DEBUG: true
+      LDAP_TLS_VERIFY_CLIENT: "never"
+      LDAP_ENABLE_TLS: "yes"
+      LDAP_TLS_CA_FILE: /opt/bitnami/openldap/certs/openldap.crt
+      LDAP_TLS_CERT_FILE: /opt/bitnami/openldap/certs/openldap.crt
+      LDAP_TLS_KEY_FILE: /opt/bitnami/openldap/certs/openldap.key
+      LDAP_ROOT: "dc=owncloud,dc=com"
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
+    ports:
+      - "127.0.0.1:1389:1389"
+      - "127.0.0.1:1636:1636"
+    volumes:
+      - ./config/ldap/ldifs:/ldifs
+      - ./config/ldap/schemas:/schemas
+      - ./config/ldap/docker-entrypoint-override.sh:/opt/bitnami/scripts/openldap/docker-entrypoint-override.sh
+      - ldap-certs:/opt/bitnami/openldap/certs
+    logging:
+      driver: ${DOCKER_LOG_DRIVER:-local}
+    entrypoint: ["/bin/sh", "/opt/bitnami/scripts/openldap/docker-entrypoint-override.sh", "/opt/bitnami/scripts/openldap/run.sh" ]
+    restart: always
+
+  ldap-manager:
+    image: osixia/phpldapadmin:latest
+    networks:
+      ocis-net:
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: ldap-server
+      PHPLDAPADMIN_HTTPS: "false"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ldap-manager.entrypoints=https"
+      - "traefik.http.routers.ldap-manager.rule=Host(`${LDAP_MANAGER_DOMAIN:-ldap.owncloud.test}`)"
+      - "traefik.http.routers.ldap-manager.tls.certresolver=http"
+      - "traefik.http.routers.ldap-manager.service=ldap-manager"
+      - "traefik.http.services.ldap-manager.loadbalancer.server.port=80"
+    logging:
+      driver: ${DOCKER_LOG_DRIVER:-local}
+    restart: always
+
+volumes:
+  certs:
+  ldap-certs:
+  ocis-config:
+  ocis-data:
+
+networks:
+  ocis-net:

@@ -1,0 +1,35 @@
+# This LDIF files describes the ownCloud schema to be used for
+# storing education related objects as exposed by the graph/education/ REST API
+dn: cn=owncloud-education,cn=schema,cn=config
+cn: owncloud-education
+objectClass: olcSchemaConfig
+olcObjectIdentifier: ownCloudEduOid 1.3.6.1.4.1.39430.42
+olcAttributeTypes: ( ownCloudEduOid:1.1 NAME 'ocEducationSchoolNumber'
+  DESC 'numerical School identifier, might have leading zeros'
+  EQUALITY numericStringMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.36 SINGLE-VALUE )
+olcAttributeTypes: ( ownCloudEduOid:1.2 NAME 'ocMemberOfSchool'
+  DESC 'the UUID of the School(s) a user or group is assigned to'
+  EQUALITY uuidMatch
+  SYNTAX 1.3.6.1.1.16.1 )
+olcAttributeTypes: ( ownCloudEduOid:1.3 NAME 'ocEducationClassType'
+  DESC 'type of the educationClass, e.g. be "class" or "course"'
+  EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+olcAttributeTypes: ( ownCloudEduOid:1.4 NAME 'ocEducationExternalId'
+  DESC 'An externally issued ID for education related objects'
+  EQUALITY caseExactMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+olcObjectClasses: ( ownCloudEduOid:2.1 NAME 'ocEducationSchool'
+  DESC 'auxliary class for Schools'
+  AUXILIARY
+  MAY ( ownCloudUUID $ ocEducationSchoolNumber) )
+olcObjectClasses: ( ownCloudEduOid:2.2 NAME 'ocEducationUser'
+  DESC 'auxliary class for education users'
+  SUP ownCloudUser
+  AUXILIARY
+  MAY ( userClass $ ocMemberOfSchool ) )
+olcObjectClasses: ( ownCloudEduOid:2.3 NAME 'ocEducationClass'
+  DESC 'auxliary class for education classes'
+  AUXILIARY
+  MAY ( ownCloudUUID $ ocEducationClassType $ ocEducationExternalId $ ocMemberOfSchool ) )
