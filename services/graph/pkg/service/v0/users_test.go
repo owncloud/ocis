@@ -158,7 +158,7 @@ var _ = Describe("Users", func() {
 
 	Describe("GetUsers", func() {
 		It("handles invalid requests", func() {
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/users?$invalid=true", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$invalid=true", nil)
 			svc.GetUsers(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -171,7 +171,7 @@ var _ = Describe("Users", func() {
 
 			identityBackend.On("GetUsers", mock.Anything, mock.Anything, mock.Anything).Return(users, nil)
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/users", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users", nil)
 			svc.GetUsers(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
@@ -216,52 +216,52 @@ var _ = Describe("Users", func() {
 				return res.Value
 			}
 
-			unsorted := getUsers("/graph/v1.0/me/users")
+			unsorted := getUsers("/graph/v1.0/users")
 			Expect(len(unsorted)).To(Equal(2))
 			Expect(unsorted[0].GetId()).To(Equal("user1"))
 			Expect(unsorted[1].GetId()).To(Equal("user2"))
 
-			byMail := getUsers("/graph/v1.0/me/users?$orderby=mail")
+			byMail := getUsers("/graph/v1.0/users?$orderby=mail")
 			Expect(len(byMail)).To(Equal(2))
 			Expect(byMail[0].GetId()).To(Equal("user2"))
 			Expect(byMail[1].GetId()).To(Equal("user1"))
-			byMail = getUsers("/graph/v1.0/me/users?$orderby=mail%20asc")
+			byMail = getUsers("/graph/v1.0/users?$orderby=mail%20asc")
 			Expect(len(byMail)).To(Equal(2))
 			Expect(byMail[0].GetId()).To(Equal("user2"))
 			Expect(byMail[1].GetId()).To(Equal("user1"))
-			byMail = getUsers("/graph/v1.0/me/users?$orderby=mail%20desc")
+			byMail = getUsers("/graph/v1.0/users?$orderby=mail%20desc")
 			Expect(len(byMail)).To(Equal(2))
 			Expect(byMail[0].GetId()).To(Equal("user1"))
 			Expect(byMail[1].GetId()).To(Equal("user2"))
 
-			byDisplayName := getUsers("/graph/v1.0/me/users?$orderby=displayName")
+			byDisplayName := getUsers("/graph/v1.0/users?$orderby=displayName")
 			Expect(len(byDisplayName)).To(Equal(2))
 			Expect(byDisplayName[0].GetId()).To(Equal("user2"))
 			Expect(byDisplayName[1].GetId()).To(Equal("user1"))
-			byDisplayName = getUsers("/graph/v1.0/me/users?$orderby=displayName%20asc")
+			byDisplayName = getUsers("/graph/v1.0/users?$orderby=displayName%20asc")
 			Expect(len(byDisplayName)).To(Equal(2))
 			Expect(byDisplayName[0].GetId()).To(Equal("user2"))
 			Expect(byDisplayName[1].GetId()).To(Equal("user1"))
-			byDisplayName = getUsers("/graph/v1.0/me/users?$orderby=displayName%20desc")
+			byDisplayName = getUsers("/graph/v1.0/users?$orderby=displayName%20desc")
 			Expect(len(byDisplayName)).To(Equal(2))
 			Expect(byDisplayName[0].GetId()).To(Equal("user1"))
 			Expect(byDisplayName[1].GetId()).To(Equal("user2"))
 
-			byOnPremisesSamAccountName := getUsers("/graph/v1.0/me/users?$orderby=onPremisesSamAccountName")
+			byOnPremisesSamAccountName := getUsers("/graph/v1.0/users?$orderby=onPremisesSamAccountName")
 			Expect(len(byOnPremisesSamAccountName)).To(Equal(2))
 			Expect(byOnPremisesSamAccountName[0].GetId()).To(Equal("user2"))
 			Expect(byOnPremisesSamAccountName[1].GetId()).To(Equal("user1"))
-			byOnPremisesSamAccountName = getUsers("/graph/v1.0/me/users?$orderby=onPremisesSamAccountName%20asc")
+			byOnPremisesSamAccountName = getUsers("/graph/v1.0/users?$orderby=onPremisesSamAccountName%20asc")
 			Expect(len(byOnPremisesSamAccountName)).To(Equal(2))
 			Expect(byOnPremisesSamAccountName[0].GetId()).To(Equal("user2"))
 			Expect(byOnPremisesSamAccountName[1].GetId()).To(Equal("user1"))
-			byOnPremisesSamAccountName = getUsers("/graph/v1.0/me/users?$orderby=onPremisesSamAccountName%20desc")
+			byOnPremisesSamAccountName = getUsers("/graph/v1.0/users?$orderby=onPremisesSamAccountName%20desc")
 			Expect(len(byOnPremisesSamAccountName)).To(Equal(2))
 			Expect(byOnPremisesSamAccountName[0].GetId()).To(Equal("user1"))
 			Expect(byOnPremisesSamAccountName[1].GetId()).To(Equal("user2"))
 
 			// Handles invalid sort field
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/users?$orderby=invalid", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$orderby=invalid", nil)
 			svc.GetUsers(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -326,7 +326,7 @@ var _ = Describe("Users", func() {
 
 	Describe("GetUser", func() {
 		It("handles missing userids", func() {
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/users", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users", nil)
 			svc.GetUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -337,7 +337,7 @@ var _ = Describe("Users", func() {
 			user.SetId("user1")
 
 			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/users", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", *user.Id)
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -378,7 +378,7 @@ var _ = Describe("Users", func() {
 				},
 			}, nil)
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/users?$expand=drive", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$expand=drive", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", *user.Id)
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -413,7 +413,7 @@ var _ = Describe("Users", func() {
 				},
 			}, nil)
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/users?$expand=drives", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$expand=drives", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", *user.Id)
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -476,7 +476,7 @@ var _ = Describe("Users", func() {
 				userJson, err := json.Marshal(user)
 				Expect(err).ToNot(HaveOccurred())
 
-				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users", bytes.NewBuffer(userJson))
+				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users", bytes.NewBuffer(userJson))
 				svc.PostUser(rr, r)
 
 				Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -491,7 +491,7 @@ var _ = Describe("Users", func() {
 		})
 
 		It("handles invalid bodies", func() {
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users?$invalid=true", nil)
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users?$invalid=true", nil)
 			svc.PostUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -533,7 +533,7 @@ var _ = Describe("Users", func() {
 			userJson, err := json.Marshal(user)
 			Expect(err).ToNot(HaveOccurred())
 
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users", bytes.NewBuffer(userJson))
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users", bytes.NewBuffer(userJson))
 			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
 			svc.PostUser(rr, r)
 
@@ -543,7 +543,7 @@ var _ = Describe("Users", func() {
 
 	Describe("DeleteUser", func() {
 		It("handles missing userids", func() {
-			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/users/{userid}", nil)
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/users/{userid}", nil)
 			svc.DeleteUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -554,7 +554,7 @@ var _ = Describe("Users", func() {
 			lu.SetId(currentUser.Id.OpaqueId)
 			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(&lu, nil)
 
-			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/users/{userid}", nil)
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/users/{userid}", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", currentUser.Id.OpaqueId)
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -590,7 +590,7 @@ var _ = Describe("Users", func() {
 				},
 			}, nil)
 
-			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/users/{userid}", nil)
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/users/{userid}", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", lu.GetId())
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -617,14 +617,14 @@ var _ = Describe("Users", func() {
 		})
 
 		It("handles missing userids", func() {
-			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/users/{userid}", nil)
+			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/users/{userid}", nil)
 			svc.PatchUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
 		It("handles invalid bodies", func() {
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users?$invalid=true", nil)
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users?$invalid=true", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", user.GetId())
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -638,7 +638,7 @@ var _ = Describe("Users", func() {
 			data, err := json.Marshal(user)
 			Expect(err).ToNot(HaveOccurred())
 
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users?$invalid=true", bytes.NewBuffer(data))
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users?$invalid=true", bytes.NewBuffer(data))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", user.GetId())
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -654,7 +654,7 @@ var _ = Describe("Users", func() {
 			data, err := json.Marshal(user)
 			Expect(err).ToNot(HaveOccurred())
 
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users?$invalid=true", bytes.NewBuffer(data))
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users?$invalid=true", bytes.NewBuffer(data))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", user.GetId())
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
