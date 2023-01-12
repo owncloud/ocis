@@ -1026,6 +1026,20 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 	return attrs, nil
 }
 
+func (i *LDAP) getUserAttrTypes() []string {
+	return []string{
+		i.userAttributeMap.displayName,
+		i.userAttributeMap.userName,
+		i.userAttributeMap.mail,
+		i.userAttributeMap.surname,
+		i.userAttributeMap.givenName,
+		"objectClass",
+		"cn",
+		"owncloudUUID",
+		"userPassword",
+	}
+}
+
 func (i *LDAP) getUserLDAPDN(user libregraph.User) string {
 	return fmt.Sprintf("uid=%s,%s", oldap.EscapeDNAttributeValue(*user.OnPremisesSamAccountName), i.userBaseDN)
 }
@@ -1037,8 +1051,11 @@ func (i *LDAP) userToAddRequest(user libregraph.User) (*ldap.AddRequest, error) 
 	if err != nil {
 		return nil, err
 	}
-	for attrType, values := range attrMap {
-		ar.Attribute(attrType, values)
+
+	for _, attrType := range i.getUserAttrTypes() {
+		if values, ok := attrMap[attrType]; ok {
+			ar.Attribute(attrType, values)
+		}
 	}
 	return ar, nil
 }

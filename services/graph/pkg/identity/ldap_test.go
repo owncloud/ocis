@@ -3,6 +3,7 @@ package identity
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/url"
 	"testing"
 
@@ -106,6 +107,21 @@ func TestNewLDAPBackend(t *testing.T) {
 }
 
 func TestCreateUser(t *testing.T) {
+	displayName := "DisplayName"
+	mail := "user@example"
+	userName := "user"
+	surname := "surname"
+	givenName := "givenName"
+
+	ar := ldap.NewAddRequest(fmt.Sprintf("uid=user,%s", lconfig.UserBaseDN), nil)
+	ar.Attribute(lconfig.UserDisplayNameAttribute, []string{displayName})
+	ar.Attribute(lconfig.UserNameAttribute, []string{userName})
+	ar.Attribute(lconfig.UserEmailAttribute, []string{mail})
+	ar.Attribute("sn", []string{surname})
+	ar.Attribute("givenname", []string{givenName})
+	ar.Attribute("objectClass", []string{"inetOrgPerson", "organizationalPerson", "person", "top"})
+	ar.Attribute("cn", []string{userName})
+
 	l := &mocks.Client{}
 	l.On("Search", mock.Anything).
 		Return(
@@ -113,14 +129,8 @@ func TestCreateUser(t *testing.T) {
 				Entries: []*ldap.Entry{userEntry},
 			},
 			nil)
-	l.On("Add", mock.Anything).Return(nil)
+	l.On("Add", ar).Return(nil)
 	logger := log.NewLogger(log.Level("debug"))
-
-	displayName := "DisplayName"
-	mail := "user@example"
-	userName := "user"
-	surname := "surname"
-	givenName := "givenName"
 
 	user := libregraph.NewUser()
 	user.SetDisplayName(displayName)
