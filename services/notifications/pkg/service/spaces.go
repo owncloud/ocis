@@ -57,7 +57,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 	msg, subj, err := s.render("spaces/sharedSpace.email.body.tmpl", "spaces/sharedSpace.email.subject.tmpl", map[string]string{
 		"SpaceGrantee": spaceGrantee,
 		"SpaceSharer":  sharerDisplayName,
-		"SpaceName":    resourceInfo.GetSpace().Name,
+		"SpaceName":    resourceInfo.GetSpace().GetName(),
 		"ShareLink":    shareLink,
 	})
 	if err != nil {
@@ -136,7 +136,7 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExpired) {
 	logger := s.logger.With().
 		Str("event", "SpaceMembershipExpired").
-		Str("itemid", e.SpaceID).
+		Str("itemid", e.SpaceID.GetOpaqueId()).
 		Logger()
 
 	ctx, owner, err := utils.Impersonate(e.SpaceOwner, s.gwClient, s.machineAuthAPIKey)

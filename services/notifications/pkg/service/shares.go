@@ -86,7 +86,7 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 
 	msg, subj, err := s.render("shares/shareExpired.email.body.tmpl", "shares/shareExpired.email.subject.tmpl", map[string]string{
 		"ShareGrantee": shareGrantee,
-		"ShareFolder":  resourceInfo.Name,
+		"ShareFolder":  resourceInfo.GetName(),
 		"ExpiredAt":    e.ExpiredAt.Format("2006-01-02 15:04:05"),
 	})
 

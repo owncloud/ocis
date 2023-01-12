@@ -15,7 +15,6 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	providerv1beta1 "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
@@ -144,7 +143,7 @@ func (s eventsNotifier) getGranteeName(ctx context.Context, u *user.UserId, g *g
 
 }
 
-func (s eventsNotifier) getResourceInfo(ctx context.Context, resourceID *providerv1beta1.ResourceId, fieldmask *fieldmaskpb.FieldMask) (*provider.ResourceInfo, error) {
+func (s eventsNotifier) getResourceInfo(ctx context.Context, resourceID *provider.ResourceId, fieldmask *fieldmaskpb.FieldMask) (*provider.ResourceInfo, error) {
 	// TODO: maybe cache this stat to reduce storage iops
 	md, err := s.gwClient.Stat(ctx, &provider.StatRequest{
 		Ref: &provider.Reference{
