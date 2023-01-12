@@ -69,6 +69,12 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"service_user_idp":    cfg.UserSharingDrivers.JSONCS3.SystemUserIDP,
 							"machine_auth_apikey": cfg.UserSharingDrivers.JSONCS3.SystemUserAPIKey,
 							"ttl":                 cfg.UserSharingDrivers.JSONCS3.CacheTTL,
+							"events": map[string]interface{}{
+								"natsaddress":          cfg.Events.Addr,
+								"natsclusterid":        cfg.Events.ClusterID,
+								"tlsinsecure":          cfg.Events.TLSInsecure,
+								"tlsrootcacertificate": cfg.Events.TLSRootCaCertPath,
+							},
 						},
 					},
 				},
