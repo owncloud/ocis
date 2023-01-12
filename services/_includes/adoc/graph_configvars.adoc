@@ -289,6 +289,24 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
 
+a|`GRAPH_APPLICATION_ID` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The ocis application id shown in the graph. All app roles are tied to this.
+
+a|`GRAPH_APPLICATION_DISPLAYNAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ownCloud Infinite Scale ++
+a| [subs=-attributes]
+The oCIS application name
+
 a|`OCIS_URL` +
 `GRAPH_SPACES_WEBDAV_BASE` +
 

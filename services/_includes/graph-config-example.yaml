@@ -40,6 +40,9 @@ token_manager:
 grpc_client_tls:
   mode: ""
   cacert: ""
+application:
+  id: ""
+  displayname: ownCloud Infinite Scale
 spaces:
   webdav_base: https://localhost:9200
   webdav_path: /dav/spaces/
