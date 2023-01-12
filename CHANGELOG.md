@@ -17,6 +17,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Drive group permissions: [#5312](https://github.com/owncloud/ocis/pull/5312)
 * Enhancement - Make the group members addition limit configurable: [#5357](https://github.com/owncloud/ocis/pull/5357)
 * Enhancement - Graph Drives IdentitySet displayName: [#5347](https://github.com/owncloud/ocis/pull/5347)
+* Enhancement - Display surname and givenName attributes: [#5388](https://github.com/owncloud/ocis/pull/5388)
 * Enhancement - Extended search: [#5221](https://github.com/owncloud/ocis/pull/5221)
 * Enhancement - Resource tags: [#5227](https://github.com/owncloud/ocis/pull/5227)
 
