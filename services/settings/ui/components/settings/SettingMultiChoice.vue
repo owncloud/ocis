@@ -2,8 +2,8 @@
   <oc-select
       :clearable="false"
       :options="displayOptions"
-      :value="selectedOptions"
-      @input="onSelectedOption"
+      :model-value="selectedOption"
+      @update:modelValue="onSelectedOption"
       multiple
   />
 </template>
