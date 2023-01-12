@@ -45,6 +45,8 @@ var userEntry = ldap.NewEntry("uid=user",
 		"displayname": {"DisplayName"},
 		"mail":        {"user@example"},
 		"entryuuid":   {"abcd-defg"},
+		"sn":          {"surname"},
+		"givenname":   {"givenName"},
 	})
 
 var invalidUserEntry = ldap.NewEntry("uid=user",
@@ -136,6 +138,8 @@ func TestCreateUser(t *testing.T) {
 	assert.Equal(t, displayName, newUser.GetDisplayName())
 	assert.Equal(t, mail, newUser.GetMail())
 	assert.Equal(t, userName, newUser.GetOnPremisesSamAccountName())
+	assert.Equal(t, givenName, newUser.GetGivenName())
+	assert.Equal(t, surname, newUser.GetSurname())
 }
 
 func TestCreateUserModelFromLDAP(t *testing.T) {
@@ -359,14 +363,14 @@ func TestGetGroup(t *testing.T) {
 		BaseDN:     "uid=user,ou=people,dc=test",
 		SizeLimit:  1,
 		Filter:     "(objectClass=inetOrgPerson)",
-		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
+		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname"},
 		Controls:   []ldap.Control(nil),
 	}
 	sr3 := &ldap.SearchRequest{
 		BaseDN:     "uid=invalid,ou=people,dc=test",
 		SizeLimit:  1,
 		Filter:     "(objectClass=inetOrgPerson)",
-		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
+		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname"},
 		Controls:   []ldap.Control(nil),
 	}
 
@@ -454,14 +458,14 @@ func TestGetGroups(t *testing.T) {
 		BaseDN:     "uid=user,ou=people,dc=test",
 		SizeLimit:  1,
 		Filter:     "(objectClass=inetOrgPerson)",
-		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
+		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname"},
 		Controls:   []ldap.Control(nil),
 	}
 	sr3 := &ldap.SearchRequest{
 		BaseDN:     "uid=invalid,ou=people,dc=test",
 		SizeLimit:  1,
 		Filter:     "(objectClass=inetOrgPerson)",
-		Attributes: []string{"displayname", "entryUUID", "mail", "uid"},
+		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname"},
 		Controls:   []ldap.Control(nil),
 	}
 
