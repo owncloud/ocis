@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config/defaults"
 )
 
@@ -53,9 +54,12 @@ func NewMDC(s *Store) error {
 	return s.initMetadataClient(mdc)
 }
 
-// SimpleDownload returns nil if not found
+// SimpleDownload returns errtypes.NotFound if not found
 func (m *MockedMetadataClient) SimpleDownload(_ context.Context, id string) ([]byte, error) {
-	return m.data[id], nil
+	if data, ok := m.data[id]; ok {
+		return data, nil
+	}
+	return nil, errtypes.NotFound("not found")
 }
 
 // SimpleUpload can't error

@@ -7,8 +7,10 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 )
 
 // ListBundles returns all bundles in the dataPath folder that match the given type.
@@ -18,7 +20,12 @@ func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []stri
 
 	if len(bundleIDs) == 0 {
 		bIDs, err := s.mdc.ReadDir(ctx, bundleFolderLocation)
-		if err != nil {
+		switch err.(type) {
+		case nil:
+			// continue
+		case errtypes.NotFound:
+			return make([]*settingsmsg.Bundle, 0), nil
+		default:
 			return nil, err
 		}
 
@@ -27,7 +34,12 @@ func (s *Store) ListBundles(bundleType settingsmsg.Bundle_Type, bundleIDs []stri
 	var bundles []*settingsmsg.Bundle
 	for _, id := range bundleIDs {
 		b, err := s.mdc.SimpleDownload(ctx, bundlePath(id))
-		if err != nil {
+		switch err.(type) {
+		case nil:
+			// continue
+		case errtypes.NotFound:
+			continue
+		default:
 			return nil, err
 		}
 
@@ -50,7 +62,12 @@ func (s *Store) ReadBundle(bundleID string) (*settingsmsg.Bundle, error) {
 	s.Init()
 	ctx := context.TODO()
 	b, err := s.mdc.SimpleDownload(ctx, bundlePath(bundleID))
-	if err != nil {
+	switch err.(type) {
+	case nil:
+		// continue
+	case errtypes.NotFound:
+		return nil, fmt.Errorf("bundleID '%s' %w", bundleID, settings.ErrNotFound)
+	default:
 		return nil, err
 	}
 
@@ -64,7 +81,12 @@ func (s *Store) ReadSetting(settingID string) (*settingsmsg.Setting, error) {
 	ctx := context.TODO()
 
 	ids, err := s.mdc.ReadDir(ctx, bundleFolderLocation)
-	if err != nil {
+	switch err.(type) {
+	case nil:
+		// continue
+	case errtypes.NotFound:
+		return nil, fmt.Errorf("settingID '%s' %w", settingID, settings.ErrNotFound)
+	default:
 		return nil, err
 	}
 
@@ -72,6 +94,9 @@ func (s *Store) ReadSetting(settingID string) (*settingsmsg.Setting, error) {
 	for _, id := range ids {
 		b, err := s.ReadBundle(id)
 		if err != nil {
+			if errors.Is(err, settings.ErrNotFound) {
+				continue
+			}
 			return nil, err
 		}
 
@@ -82,7 +107,7 @@ func (s *Store) ReadSetting(settingID string) (*settingsmsg.Setting, error) {
 		}
 
 	}
-	return nil, fmt.Errorf("setting '%s' not found", settingID)
+	return nil, fmt.Errorf("settingID '%s' %w", settingID, settings.ErrNotFound)
 }
 
 // WriteBundle sends the givens record to the metadataclient. returns `record` for legacy reasons
@@ -102,7 +127,9 @@ func (s *Store) AddSettingToBundle(bundleID string, setting *settingsmsg.Setting
 	s.Init()
 	b, err := s.ReadBundle(bundleID)
 	if err != nil {
-		// TODO: How to differentiate 'not found'?
+		if !errors.Is(err, settings.ErrNotFound) {
+			return nil, err
+		}
 		b = new(settingsmsg.Bundle)
 		b.Id = bundleID
 		b.Type = settingsmsg.Bundle_TYPE_DEFAULT

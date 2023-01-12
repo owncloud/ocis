@@ -58,6 +58,30 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+
+	// expand appRoleAssignments if requested
+	if slices.Contains(exp, "appRoleAssignments") {
+		lrar, err := g.roleService.ListRoleAssignments(r.Context(), &settings.ListRoleAssignmentsRequest{
+			AccountUuid: me.GetId(),
+		})
+		if err != nil {
+			logger.Debug().Err(err).Str("userid", me.GetId()).Msg("could not get appRoleAssignments for self")
+			var errcode errorcode.Error
+			if errors.As(err, &errcode) {
+				errcode.Render(w, r)
+			} else {
+				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			}
+			return
+		}
+
+		values := make([]libregraph.AppRoleAssignment, 0, len(lrar.GetAssignments()))
+		for _, assignment := range lrar.GetAssignments() {
+			values = append(values, g.assignmentToAppRoleAssignment(assignment))
+		}
+		me.AppRoleAssignments = values
+	}
+
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, me)
 }
@@ -85,6 +109,26 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
 		return
+	}
+
+	// expand appRoleAssignments if requested
+	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
+	if slices.Contains(exp, "appRoleAssignments") {
+		for _, u := range users {
+			lrar, err := g.roleService.ListRoleAssignments(r.Context(), &settings.ListRoleAssignmentsRequest{
+				AccountUuid: u.GetId(),
+			})
+			if err != nil {
+				logger.Debug().Err(err).Str("userid", u.GetId()).Msg("could not get appRoleAssignments when listing user")
+				continue
+			}
+
+			values := make([]libregraph.AppRoleAssignment, 0, len(lrar.GetAssignments()))
+			for _, assignment := range lrar.GetAssignments() {
+				values = append(values, g.assignmentToAppRoleAssignment(assignment))
+			}
+			u.AppRoleAssignments = values
+		}
 	}
 
 	users, err = sortUsers(odataReq, users)
@@ -273,6 +317,29 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 				user.Drives = drives
 			}
 		}
+	}
+	// expand appRoleAssignments if requested
+	if slices.Contains(exp, "appRoleAssignments") {
+
+		lrar, err := g.roleService.ListRoleAssignments(r.Context(), &settings.ListRoleAssignmentsRequest{
+			AccountUuid: user.GetId(),
+		})
+		if err != nil {
+			logger.Debug().Err(err).Str("userid", user.GetId()).Msg("could not get appRoleAssignments for user")
+			var errcode errorcode.Error
+			if errors.As(err, &errcode) {
+				errcode.Render(w, r)
+			} else {
+				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			}
+			return
+		}
+
+		values := make([]libregraph.AppRoleAssignment, 0, len(lrar.GetAssignments()))
+		for _, assignment := range lrar.GetAssignments() {
+			values = append(values, g.assignmentToAppRoleAssignment(assignment))
+		}
+		user.AppRoleAssignments = values
 	}
 
 	render.Status(r, http.StatusOK)

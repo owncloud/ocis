@@ -7,8 +7,10 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/gofrs/uuid"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 )
 
 // ListValues reads all values that match the given bundleId and accountUUID.
@@ -20,7 +22,12 @@ func (s *Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, 
 	ctx := context.TODO()
 
 	vIDs, err := s.mdc.ReadDir(ctx, valuesFolderLocation)
-	if err != nil {
+	switch err.(type) {
+	case nil:
+		// continue
+	case errtypes.NotFound:
+		return make([]*settingsmsg.Value, 0), nil
+	default:
 		return nil, err
 	}
 
@@ -28,7 +35,12 @@ func (s *Store) ListValues(bundleID, accountUUID string) ([]*settingsmsg.Value, 
 	var values []*settingsmsg.Value
 	for _, vid := range vIDs {
 		b, err := s.mdc.SimpleDownload(ctx, valuePath(vid))
-		if err != nil {
+		switch err.(type) {
+		case nil:
+			// continue
+		case errtypes.NotFound:
+			continue
+		default:
 			return nil, err
 		}
 
@@ -61,7 +73,12 @@ func (s *Store) ReadValue(valueID string) (*settingsmsg.Value, error) {
 	ctx := context.TODO()
 
 	b, err := s.mdc.SimpleDownload(ctx, valuePath(valueID))
-	if err != nil {
+	switch err.(type) {
+	case nil:
+		// continue
+	case errtypes.NotFound:
+		return nil, fmt.Errorf("valueID '%s' %w", valueID, settings.ErrNotFound)
+	default:
 		return nil, err
 	}
 	val := &settingsmsg.Value{}

@@ -32,6 +32,10 @@ const (
 // Service defines the service handlers.
 type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
+
+	ListApplications(w http.ResponseWriter, r *http.Request)
+	GetApplication(http.ResponseWriter, *http.Request)
+
 	GetMe(http.ResponseWriter, *http.Request)
 	GetUsers(http.ResponseWriter, *http.Request)
 	GetUser(http.ResponseWriter, *http.Request)
@@ -39,6 +43,10 @@ type Service interface {
 	DeleteUser(http.ResponseWriter, *http.Request)
 	PatchUser(http.ResponseWriter, *http.Request)
 	ChangeOwnPassword(http.ResponseWriter, *http.Request)
+
+	ListAppRoleAssignments(http.ResponseWriter, *http.Request)
+	CreateAppRoleAssignment(http.ResponseWriter, *http.Request)
+	DeleteAppRoleAssignment(http.ResponseWriter, *http.Request)
 
 	GetGroups(http.ResponseWriter, *http.Request)
 	GetGroup(http.ResponseWriter, *http.Request)
@@ -127,86 +135,20 @@ func NewService(opts ...Option) (Graph, error) {
 		identityEducationBackend: options.IdentityEducationBackend,
 	}
 
-	if options.IdentityBackend == nil {
-		switch options.Config.Identity.Backend {
-		case "cs3":
-			svc.identityBackend = &identity.CS3{
-				Config: options.Config.Reva,
-				Logger: &options.Logger,
-			}
-		case "ldap":
-			var err error
-
-			var tlsConf *tls.Config
-			if options.Config.Identity.LDAP.Insecure {
-				// When insecure is set to true then we don't need a certificate.
-				options.Config.Identity.LDAP.CACert = ""
-				tlsConf = &tls.Config{
-					MinVersion: tls.VersionTLS12,
-					//nolint:gosec // We need the ability to run with "insecure" (dev/testing)
-					InsecureSkipVerify: options.Config.Identity.LDAP.Insecure,
-				}
-			}
-
-			if options.Config.Identity.LDAP.CACert != "" {
-				if err := ocisldap.WaitForCA(options.Logger,
-					options.Config.Identity.LDAP.Insecure,
-					options.Config.Identity.LDAP.CACert); err != nil {
-					options.Logger.Fatal().Err(err).Msg("The configured LDAP CA cert does not exist")
-				}
-				if tlsConf == nil {
-					tlsConf = &tls.Config{
-						MinVersion: tls.VersionTLS12,
-					}
-				}
-				certs := x509.NewCertPool()
-				pemData, err := os.ReadFile(options.Config.Identity.LDAP.CACert)
-				if err != nil {
-					options.Logger.Error().Err(err).Msgf("Error initializing LDAP Backend")
-					return svc, err
-				}
-				if !certs.AppendCertsFromPEM(pemData) {
-					options.Logger.Error().Msgf("Error initializing LDAP Backend. Adding CA cert failed")
-					return svc, err
-				}
-				tlsConf.RootCAs = certs
-			}
-
-			conn := ldap.NewLDAPWithReconnect(&options.Logger,
-				ldap.Config{
-					URI:          options.Config.Identity.LDAP.URI,
-					BindDN:       options.Config.Identity.LDAP.BindDN,
-					BindPassword: options.Config.Identity.LDAP.BindPassword,
-					TLSConfig:    tlsConf,
-				},
-			)
-			lb, err := identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger)
-			if err != nil {
-				options.Logger.Error().Msgf("Error initializing LDAP Backend: '%s'", err)
-				return svc, err
-			}
-			svc.identityBackend = lb
-			if options.IdentityEducationBackend == nil {
-				if options.Config.Identity.LDAP.EducationResourcesEnabled {
-					svc.identityEducationBackend = lb
-				} else {
-					errEduBackend := &identity.ErrEducationBackend{}
-					svc.identityEducationBackend = errEduBackend
-				}
-			}
-		default:
-			err := fmt.Errorf("Unknown Identity Backend: '%s'", options.Config.Identity.Backend)
-			options.Logger.Err(err)
-			return svc, err
-		}
-	} else {
-		svc.identityBackend = options.IdentityBackend
+	if err := setIdentityBackends(options, &svc); err != nil {
+		return svc, err
 	}
 
 	if options.PermissionService == nil {
 		svc.permissionsService = settingssvc.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient())
 	} else {
 		svc.permissionsService = options.PermissionService
+	}
+
+	if options.RoleService == nil {
+		svc.roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
+	} else {
+		svc.roleService = options.RoleService
 	}
 
 	roleManager := options.RoleManager
@@ -239,6 +181,10 @@ func NewService(opts ...Option) (Graph, error) {
 				r.Put("/tags", svc.AssignTags)
 				r.Delete("/tags", svc.UnassignTags)
 			})
+			r.Route("/applications", func(r chi.Router) {
+				r.Get("/", svc.ListApplications)
+				r.Get("/{applicationID}", svc.GetApplication)
+			})
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/", svc.GetMe)
 				r.Get("/drives", svc.GetDrives)
@@ -252,6 +198,11 @@ func NewService(opts ...Option) (Graph, error) {
 					r.Get("/", svc.GetUser)
 					r.With(requireAdmin).Delete("/", svc.DeleteUser)
 					r.With(requireAdmin).Patch("/", svc.PatchUser)
+					r.With(requireAdmin).Route("/appRoleAssignments", func(r chi.Router) {
+						r.Get("/", svc.ListAppRoleAssignments)
+						r.Post("/", svc.CreateAppRoleAssignment)
+						r.Delete("/{appRoleAssignmentID}", svc.DeleteAppRoleAssignment)
+					})
 				})
 			})
 			r.Route("/groups", func(r chi.Router) {
@@ -320,6 +271,88 @@ func NewService(opts ...Option) (Graph, error) {
 	})
 
 	return svc, nil
+}
+
+func setIdentityBackends(options Options, svc *Graph) error {
+	if options.IdentityBackend == nil {
+		switch options.Config.Identity.Backend {
+		case "cs3":
+			svc.identityBackend = &identity.CS3{
+				Config: options.Config.Reva,
+				Logger: &options.Logger,
+			}
+		case "ldap":
+			var err error
+
+			var tlsConf *tls.Config
+			if options.Config.Identity.LDAP.Insecure {
+
+				// When insecure is set to true then we don't need a certificate.
+				options.Config.Identity.LDAP.CACert = ""
+				tlsConf = &tls.Config{
+					MinVersion: tls.VersionTLS12,
+
+					//nolint:gosec // We need the ability to run with "insecure" (dev/testing)
+					InsecureSkipVerify: options.Config.Identity.LDAP.Insecure,
+				}
+			}
+
+			if options.Config.Identity.LDAP.CACert != "" {
+				if err := ocisldap.WaitForCA(options.Logger,
+					options.Config.Identity.LDAP.Insecure,
+					options.Config.Identity.LDAP.CACert); err != nil {
+					options.Logger.Fatal().Err(err).Msg("The configured LDAP CA cert does not exist")
+				}
+				if tlsConf == nil {
+					tlsConf = &tls.Config{
+						MinVersion: tls.VersionTLS12,
+					}
+				}
+				certs := x509.NewCertPool()
+				pemData, err := os.ReadFile(options.Config.Identity.LDAP.CACert)
+				if err != nil {
+					options.Logger.Error().Err(err).Msg("Error initializing LDAP Backend")
+					return err
+				}
+				if !certs.AppendCertsFromPEM(pemData) {
+					options.Logger.Error().Msg("Error initializing LDAP Backend. Adding CA cert failed")
+					return err
+				}
+				tlsConf.RootCAs = certs
+			}
+
+			conn := ldap.NewLDAPWithReconnect(&options.Logger,
+				ldap.Config{
+					URI:          options.Config.Identity.LDAP.URI,
+					BindDN:       options.Config.Identity.LDAP.BindDN,
+					BindPassword: options.Config.Identity.LDAP.BindPassword,
+					TLSConfig:    tlsConf,
+				},
+			)
+			lb, err := identity.NewLDAPBackend(conn, options.Config.Identity.LDAP, &options.Logger)
+			if err != nil {
+				options.Logger.Error().Err(err).Msg("Error initializing LDAP Backend")
+				return err
+			}
+			svc.identityBackend = lb
+			if options.IdentityEducationBackend == nil {
+				if options.Config.Identity.LDAP.EducationResourcesEnabled {
+					svc.identityEducationBackend = lb
+				} else {
+					errEduBackend := &identity.ErrEducationBackend{}
+					svc.identityEducationBackend = errEduBackend
+				}
+			}
+		default:
+			err := fmt.Errorf("unknown identity backend: '%s'", options.Config.Identity.Backend)
+			options.Logger.Err(err)
+			return err
+		}
+	} else {
+		svc.identityBackend = options.IdentityBackend
+	}
+
+	return nil
 }
 
 // parseHeaderPurge parses the 'Purge' header.

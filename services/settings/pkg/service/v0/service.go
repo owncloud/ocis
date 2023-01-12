@@ -79,7 +79,7 @@ func (g Service) CheckPermission(ctx context.Context, req *permissions.CheckPerm
 
 	permission, err := g.manager.ReadPermissionByName(req.Permission, roleIDs)
 	if err != nil {
-		if !errors.Is(err, settings.ErrPermissionNotFound) {
+		if !errors.Is(err, settings.ErrNotFound) {
 			return &permissions.CheckPermissionResponse{
 				Status: status.NewInternal(ctx, err.Error()),
 			}, nil

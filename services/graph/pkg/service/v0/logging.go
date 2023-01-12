@@ -24,6 +24,16 @@ func (l logging) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	l.next.ServeHTTP(w, r)
 }
 
+// ListApplications implements the Service interface.
+func (l logging) ListApplications(w http.ResponseWriter, r *http.Request) {
+	l.next.ListApplications(w, r)
+}
+
+// GetApplication implements the Service interface.
+func (l logging) GetApplication(w http.ResponseWriter, r *http.Request) {
+	l.next.GetApplication(w, r)
+}
+
 // GetMe implements the Service interface.
 func (l logging) GetMe(w http.ResponseWriter, r *http.Request) {
 	l.next.GetMe(w, r)
@@ -57,6 +67,21 @@ func (l logging) PatchUser(w http.ResponseWriter, r *http.Request) {
 // ChangeOwnPassword implements the Service interface.
 func (l logging) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
 	l.next.ChangeOwnPassword(w, r)
+}
+
+// ListAppRoleAssignments implements the Service interface.
+func (l logging) ListAppRoleAssignments(w http.ResponseWriter, r *http.Request) {
+	l.next.ListAppRoleAssignments(w, r)
+}
+
+// CreateAppRoleAssignment implements the Service interface.
+func (l logging) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
+	l.next.CreateAppRoleAssignment(w, r)
+}
+
+// DeleteAppRoleAssignment implements the Service interface.
+func (l logging) DeleteAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
+	l.next.DeleteAppRoleAssignment(w, r)
 }
 
 // GetGroups implements the Service interface.

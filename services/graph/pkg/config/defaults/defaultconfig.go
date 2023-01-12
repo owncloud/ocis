@@ -31,6 +31,9 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "graph",
 		},
+		Application: config.Application{
+			DisplayName: "ownCloud Infinite Scale",
+		},
 		API: config.API{
 			GroupMembersPatchLimit: 20,
 		},

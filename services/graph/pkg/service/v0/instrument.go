@@ -24,6 +24,16 @@ func (i instrument) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	i.next.ServeHTTP(w, r)
 }
 
+// ListApplications implements the Service interface.
+func (i instrument) ListApplications(w http.ResponseWriter, r *http.Request) {
+	i.next.ListApplications(w, r)
+}
+
+// GetApplication implements the Service interface.
+func (i instrument) GetApplication(w http.ResponseWriter, r *http.Request) {
+	i.next.GetApplication(w, r)
+}
+
 // GetMe implements the Service interface.
 func (i instrument) GetMe(w http.ResponseWriter, r *http.Request) {
 	i.next.GetMe(w, r)
@@ -57,6 +67,21 @@ func (i instrument) PatchUser(w http.ResponseWriter, r *http.Request) {
 // ChangeOwnPassword implements the Service interface.
 func (i instrument) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
 	i.next.ChangeOwnPassword(w, r)
+}
+
+// ListAppRoleAssignments implements the Service interface.
+func (i instrument) ListAppRoleAssignments(w http.ResponseWriter, r *http.Request) {
+	i.next.ListAppRoleAssignments(w, r)
+}
+
+// CreateAppRoleAssignment implements the Service interface.
+func (i instrument) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
+	i.next.CreateAppRoleAssignment(w, r)
+}
+
+// DeleteAppRoleAssignment implements the Service interface.
+func (i instrument) DeleteAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
+	i.next.DeleteAppRoleAssignment(w, r)
 }
 
 // GetGroups implements the Service interface.

@@ -12,7 +12,12 @@ var (
 	Registry = map[string]RegisterFunc{}
 
 	// ErrPermissionNotFound defines a new error for when a permission was not found
+	//
+	// Deprecated use the more generic ErrNotFound
 	ErrPermissionNotFound = errors.New("permission not found")
+
+	// ErrNotFound is the error to use when a resource was not found.
+	ErrNotFound = errors.New("not found")
 )
 
 // RegisterFunc stores store constructors
