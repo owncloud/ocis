@@ -247,6 +247,9 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 											"version": "1.0.0",
 										},
 									},
+									"expire_date": map[string]interface{}{
+										"enabled": true,
+									},
 								},
 								"user_enumeration": map[string]interface{}{
 									"enabled":            true,
