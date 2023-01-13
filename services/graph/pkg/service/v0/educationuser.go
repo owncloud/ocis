@@ -112,7 +112,7 @@ func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if accountName, ok := u.GetOnPremisesSamAccountNameOk(); ok {
-		if !isValidUsername(*accountName) {
+		if !g.isValidUsername(*accountName) {
 			logger.Debug().Str("username", *accountName).Msg("could not create education user: username must be at least the local part of an email")
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("username %s must be at least the local part of an email", *u.OnPremisesSamAccountName))
 			return

@@ -92,7 +92,8 @@ type Identity struct {
 
 // API represents API configuration parameters.
 type API struct {
-	GroupMembersPatchLimit int `yaml:"group_members_patch_limit" env:"GRAPH_GROUP_MEMBERS_PATCH_LIMIT" desc:"The amount of group members allowed to be added with a single patch request."`
+	GroupMembersPatchLimit int    `yaml:"group_members_patch_limit" env:"GRAPH_GROUP_MEMBERS_PATCH_LIMIT" desc:"The amount of group members allowed to be added with a single patch request."`
+	UsernameMatch          string `yaml:"graph_username_match" env:"GRAPH_USERNAME_MATCH" desc:"Option to allow legacy usernames. Supported options are 'default' and 'none'."`
 }
 
 // Events combines the configuration options for the event bus.
