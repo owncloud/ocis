@@ -80,7 +80,7 @@ var _ = Describe("Groups", func() {
 
 	Describe("GetGroups", func() {
 		It("handles invalid ODATA parameters", func() {
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups?§foo=bar", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups?§foo=bar", nil)
 			svc.GetGroups(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -89,7 +89,7 @@ var _ = Describe("Groups", func() {
 		It("handles invalid sorting queries", func() {
 			identityBackend.On("GetGroups", ctx, mock.Anything).Return([]*libregraph.Group{newGroup}, nil)
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups?$orderby=invalid", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups?$orderby=invalid", nil)
 			svc.GetGroups(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -105,7 +105,7 @@ var _ = Describe("Groups", func() {
 		It("handles unknown backend errors", func() {
 			identityBackend.On("GetGroups", ctx, mock.Anything).Return(nil, errors.New("failed"))
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups", nil)
 			svc.GetGroups(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
 			data, err := io.ReadAll(rr.Body)
@@ -120,7 +120,7 @@ var _ = Describe("Groups", func() {
 		It("handles backend errors", func() {
 			identityBackend.On("GetGroups", ctx, mock.Anything).Return(nil, errorcode.New(errorcode.AccessDenied, "access denied"))
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups", nil)
 			svc.GetGroups(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusInternalServerError))
@@ -136,7 +136,7 @@ var _ = Describe("Groups", func() {
 		It("renders an empty list of groups", func() {
 			identityBackend.On("GetGroups", ctx, mock.Anything).Return([]*libregraph.Group{}, nil)
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups", nil)
 			svc.GetGroups(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
@@ -152,7 +152,7 @@ var _ = Describe("Groups", func() {
 		It("renders a list of groups", func() {
 			identityBackend.On("GetGroups", ctx, mock.Anything).Return([]*libregraph.Group{newGroup}, nil)
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups", nil)
 			svc.GetGroups(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
@@ -170,12 +170,12 @@ var _ = Describe("Groups", func() {
 
 	Describe("GetGroup", func() {
 		It("handles missing or empty group id", func() {
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups", nil)
 			svc.GetGroup(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 
-			r = httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups", nil)
+			r = httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", "")
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
@@ -190,7 +190,7 @@ var _ = Describe("Groups", func() {
 			})
 
 			It("gets the group", func() {
-				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups/"+*newGroup.Id, nil)
+				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups/"+*newGroup.Id, nil)
 				rctx := chi.NewRouteContext()
 				rctx.URLParams.Add("groupID", *newGroup.Id)
 				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, nil), chi.RouteCtxKey, rctx))
@@ -204,7 +204,7 @@ var _ = Describe("Groups", func() {
 
 	Describe("PostGroup", func() {
 		It("handles invalid body", func() {
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/", bytes.NewBufferString("{invalid"))
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/groups/", bytes.NewBufferString("{invalid"))
 
 			svc.PostGroup(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -217,7 +217,7 @@ var _ = Describe("Groups", func() {
 			newGroupJson, err := json.Marshal(newGroup)
 			Expect(err).ToNot(HaveOccurred())
 
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/", bytes.NewBuffer(newGroupJson))
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/groups/", bytes.NewBuffer(newGroupJson))
 
 			svc.PostGroup(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -231,7 +231,7 @@ var _ = Describe("Groups", func() {
 			newGroupJson, err := json.Marshal(newGroup)
 			Expect(err).ToNot(HaveOccurred())
 
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/", bytes.NewBuffer(newGroupJson))
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/groups/", bytes.NewBuffer(newGroupJson))
 
 			svc.PostGroup(rr, r)
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -245,7 +245,7 @@ var _ = Describe("Groups", func() {
 
 			identityBackend.On("CreateGroup", mock.Anything, mock.Anything).Return(newGroup, nil)
 
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/", bytes.NewBuffer(newGroupJson))
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/groups/", bytes.NewBuffer(newGroupJson))
 
 			svc.PostGroup(rr, r)
 
@@ -254,7 +254,7 @@ var _ = Describe("Groups", func() {
 	})
 	Describe("PatchGroup", func() {
 		It("handles invalid body", func() {
-			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups/", bytes.NewBufferString("{invalid"))
+			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/groups/", bytes.NewBufferString("{invalid"))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -263,12 +263,12 @@ var _ = Describe("Groups", func() {
 		})
 
 		It("handles missing or empty group id", func() {
-			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", nil)
+			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/groups", nil)
 			svc.PatchGroup(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 
-			r = httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", nil)
+			r = httptest.NewRequest(http.MethodPatch, "/graph/v1.0/groups", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", "")
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -292,7 +292,7 @@ var _ = Describe("Groups", func() {
 				updatedGroupJson, err := json.Marshal(updatedGroup)
 				Expect(err).ToNot(HaveOccurred())
 
-				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", bytes.NewBuffer(updatedGroupJson))
+				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/groups", bytes.NewBuffer(updatedGroupJson))
 				rctx := chi.NewRouteContext()
 				rctx.URLParams.Add("groupID", *newGroup.Id)
 				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -323,7 +323,7 @@ var _ = Describe("Groups", func() {
 					service.WithIdentityBackend(identityBackend),
 				)
 
-				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", bytes.NewBuffer(updatedGroupJson))
+				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/groups", bytes.NewBuffer(updatedGroupJson))
 				rctx := chi.NewRouteContext()
 				rctx.URLParams.Add("groupID", *newGroup.Id)
 				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -343,7 +343,7 @@ var _ = Describe("Groups", func() {
 				updatedGroupJson, err := json.Marshal(updatedGroup)
 				Expect(err).ToNot(HaveOccurred())
 
-				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", bytes.NewBuffer(updatedGroupJson))
+				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/groups", bytes.NewBuffer(updatedGroupJson))
 				rctx := chi.NewRouteContext()
 				rctx.URLParams.Add("groupID", *newGroup.Id)
 				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -359,7 +359,7 @@ var _ = Describe("Groups", func() {
 				updatedGroupJson, err := json.Marshal(updatedGroup)
 				Expect(err).ToNot(HaveOccurred())
 
-				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", bytes.NewBuffer(updatedGroupJson))
+				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/groups", bytes.NewBuffer(updatedGroupJson))
 				rctx := chi.NewRouteContext()
 				rctx.URLParams.Add("groupID", *newGroup.Id)
 				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -377,7 +377,7 @@ var _ = Describe("Groups", func() {
 				updatedGroupJson, err := json.Marshal(updatedGroup)
 				Expect(err).ToNot(HaveOccurred())
 
-				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", bytes.NewBuffer(updatedGroupJson))
+				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/groups", bytes.NewBuffer(updatedGroupJson))
 				rctx := chi.NewRouteContext()
 				rctx.URLParams.Add("groupID", *newGroup.Id)
 				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -398,7 +398,7 @@ var _ = Describe("Groups", func() {
 
 		It("deletes the group", func() {
 			identityBackend.On("DeleteGroup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
-			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/me/groups", nil)
+			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/groups", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -416,7 +416,7 @@ var _ = Describe("Groups", func() {
 			user.SetId("user")
 			identityBackend.On("GetGroupMembers", mock.Anything, mock.Anything, mock.Anything).Return([]*libregraph.User{user}, nil)
 
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/groups/{groupID}/members", nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/groups/{groupID}/members", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -437,7 +437,7 @@ var _ = Describe("Groups", func() {
 
 	Describe("PostGroupMembers", func() {
 		It("fails on invalid body", func() {
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/{groupID}/members", bytes.NewBufferString("{invalid"))
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/groups/{groupID}/members", bytes.NewBufferString("{invalid"))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -450,7 +450,7 @@ var _ = Describe("Groups", func() {
 			data, err := json.Marshal(member)
 			Expect(err).ToNot(HaveOccurred())
 
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/{groupID}/members", bytes.NewBuffer(data))
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/groups/{groupID}/members", bytes.NewBuffer(data))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -464,7 +464,7 @@ var _ = Describe("Groups", func() {
 			data, err := json.Marshal(member)
 			Expect(err).ToNot(HaveOccurred())
 
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/{groupID}/members", bytes.NewBuffer(data))
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/groups/{groupID}/members", bytes.NewBuffer(data))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -479,7 +479,7 @@ var _ = Describe("Groups", func() {
 			Expect(err).ToNot(HaveOccurred())
 			identityBackend.On("AddMembersToGroup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/groups/{groupID}/members", bytes.NewBuffer(data))
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/groups/{groupID}/members", bytes.NewBuffer(data))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -492,7 +492,7 @@ var _ = Describe("Groups", func() {
 
 	Describe("DeleteGroupMembers", func() {
 		It("handles missing or empty member id", func() {
-			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/groups/{groupID}/members/{memberID}/$ref", nil)
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/groups/{groupID}/members/{memberID}/$ref", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -500,7 +500,7 @@ var _ = Describe("Groups", func() {
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 		It("handles missing or empty member id", func() {
-			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/groups/{groupID}/members/{memberID}/$ref", nil)
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/groups/{groupID}/members/{memberID}/$ref", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("memberID", "/users/user")
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
@@ -511,7 +511,7 @@ var _ = Describe("Groups", func() {
 		It("deletes members", func() {
 			identityBackend.On("RemoveMemberFromGroup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
-			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/me/groups/{groupID}/members/{memberID}/$ref", nil)
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/groups/{groupID}/members/{memberID}/$ref", nil)
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("groupID", *newGroup.Id)
 			rctx.URLParams.Add("memberID", "/users/user1")
