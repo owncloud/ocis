@@ -96,9 +96,9 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 				case events.FileVersionRestored:
 					indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), getUser(ev.SpaceOwner, ev.Executant))
 				case events.TagsAdded:
-					s.UpsertItem(ev.Ref, getUser(ev.SpaceOwner, ev.Executant))
+					s.UpsertItem(ev.Ref, ev.Executant)
 				case events.TagsRemoved:
-					s.UpsertItem(ev.Ref, getUser(ev.SpaceOwner, ev.Executant))
+					s.UpsertItem(ev.Ref, ev.Executant)
 				case events.FileUploaded:
 					indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), getUser(ev.SpaceOwner, ev.Executant))
 				case events.UploadReady:
