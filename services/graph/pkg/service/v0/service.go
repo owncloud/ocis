@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -11,16 +12,20 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/gofrs/uuid"
 	"github.com/jellydator/ttlcache/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/store"
+	storemsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/store/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
 	graphm "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
+	"go-micro.dev/v4/client"
 )
 
 const (
@@ -173,6 +178,14 @@ func NewService(opts ...Option) (Graph, error) {
 		requireAdmin = options.RequireAdminMiddleware
 	}
 
+	if svc.store == nil {
+		svc.store = storesvc.NewStoreService("com.owncloud.api.store", grpc.DefaultClient())
+	}
+	var err error
+	if svc.config.Application.ID, err = initApplicationID(svc.config.Context, svc.store); err != nil {
+		return svc, err
+	}
+
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Use(middleware.StripSlashes)
 		r.Route("/v1.0", func(r chi.Router) {
@@ -271,6 +284,36 @@ func NewService(opts ...Option) (Graph, error) {
 	})
 
 	return svc, nil
+}
+
+func initApplicationID(ctx context.Context, store storesvc.StoreService) (string, error) {
+	var applicationID string
+	res, err := store.Read(ctx, &storesvc.ReadRequest{
+		Options: &storemsg.ReadOptions{
+			Database: "graph",
+			Table:    "application",
+		},
+		Key: "id",
+	}, client.WithRetries(5))
+	if err != nil || len(res.Records) < 1 {
+		applicationID = uuid.Must(uuid.NewV4()).String()
+		_, err := store.Write(ctx, &storesvc.WriteRequest{
+			Options: &storemsg.WriteOptions{
+				Database: "graph",
+				Table:    "application",
+			},
+			Record: &storemsg.Record{
+				Key:   "id",
+				Value: []byte(applicationID),
+			},
+		})
+		if err != nil {
+			return "", err
+		}
+	} else {
+		applicationID = string(res.Records[0].Value)
+	}
+	return applicationID, nil
 }
 
 func setIdentityBackends(options Options, svc *Graph) error {

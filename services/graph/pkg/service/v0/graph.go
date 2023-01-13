@@ -17,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"go-micro.dev/v4/client"
@@ -104,6 +105,7 @@ type Graph struct {
 	spacePropertiesCache     *ttlcache.Cache[string, interface{}]
 	usersCache               *ttlcache.Cache[string, libregraph.User]
 	groupsCache              *ttlcache.Cache[string, libregraph.Group]
+	store                    storesvc.StoreService
 	eventsPublisher          events.Publisher
 	searchService            searchsvc.SearchProviderService
 }
