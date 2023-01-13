@@ -90,7 +90,7 @@ func DefaultConfig() *config.Config {
 				SecProtocol:   "sss",
 				MasterURL:     "root://localhost:1094",
 				XrdcopyBinary: "/usr/bin/xrdcopy",
-				Root:          "/ocis",
+				Root:          "/o/c/is",
 				SpacesConfig: config.SpacesDbConfig{
 					Enabled:    true,
 					DbUsername: "root",
