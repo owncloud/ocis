@@ -120,7 +120,7 @@ func TestGetEducationUser(t *testing.T) {
 	assert.Equal(t, "Test User", user.GetDisplayName())
 	assert.Equal(t, "abcd-defg", user.GetId())
 
-	user, err = b.GetEducationUser(context.Background(), "xxxx-xxxx", nil)
+	_, err = b.GetEducationUser(context.Background(), "xxxx-xxxx", nil)
 	lm.AssertNumberOfCalls(t, "Search", 2)
 	assert.NotNil(t, err)
 	assert.Equal(t, "itemNotFound", err.Error())

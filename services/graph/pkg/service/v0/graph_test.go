@@ -12,7 +12,6 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userprovider "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
-	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
@@ -46,8 +45,8 @@ var _ = Describe("Graph", func() {
 		cfg               *config.Config
 		rr                *httptest.ResponseRecorder
 
-		currentUser = &userv1beta1.User{
-			Id: &userv1beta1.UserId{
+		currentUser = &userprovider.User{
+			Id: &userprovider.UserId{
 				OpaqueId: "user",
 			},
 		}

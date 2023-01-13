@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -58,7 +57,7 @@ func GetRogueEnvs() {
 	re := regexp.MustCompile(`os.Getenv\(([^\)]+)\)`)
 	vars := &ConfigVars{}
 	fmt.Printf("Reading existing variable definitions from %s\n", fullYamlPath)
-	yfile, err := ioutil.ReadFile(fullYamlPath)
+	yfile, err := os.ReadFile(fullYamlPath)
 	if err == nil {
 		err := yaml.Unmarshal(yfile, &vars)
 		if err != nil {
@@ -129,7 +128,7 @@ func GetRogueEnvs() {
 		log.Fatal(err)
 	}
 	fmt.Printf("Writing new variable definitions to %s\n", fullYamlPath)
-	err = ioutil.WriteFile(fullYamlPath, output, 0666)
+	err = os.WriteFile(fullYamlPath, output, 0666)
 	if err != nil {
 		log.Fatalf("could not write %s", fullYamlPath)
 	}
@@ -146,7 +145,7 @@ func RenderGlobalVarsTemplate() {
 	}
 	fullYamlPath := filepath.Join(curdir, yamlSource)
 
-	content, err := ioutil.ReadFile("../../docs/templates/ADOC_extended.tmpl")
+	content, err := os.ReadFile("../../docs/templates/ADOC_extended.tmpl")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -155,7 +154,7 @@ func RenderGlobalVarsTemplate() {
 
 	vars := &ConfigVars{}
 	fmt.Printf("Reading existing variable definitions from %s\n", fullYamlPath)
-	yfile, err := ioutil.ReadFile(fullYamlPath)
+	yfile, err := os.ReadFile(fullYamlPath)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -189,7 +189,7 @@ func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string
 	if reread {
 		c.logger.Debug().Msg("User already exist, re-reading via libregraph")
 		gureq := lgClient.UserApi.GetUser(newctx, newUser.GetOnPremisesSamAccountName())
-		created, resp, err = gureq.Execute()
+		created, _, err = gureq.Execute()
 		if err != nil {
 			c.logger.Error().Err(err).Msg("Error trying to re-read user from graphAPI")
 			return nil, err

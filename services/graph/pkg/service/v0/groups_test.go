@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 
@@ -298,7 +297,7 @@ var _ = Describe("Groups", func() {
 				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 				svc.PatchGroup(rr, r)
 
-				resp, err := ioutil.ReadAll(rr.Body)
+				resp, err := io.ReadAll(rr.Body)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(string(resp)).To(ContainSubstring("Request is limited to 20"))
@@ -329,7 +328,7 @@ var _ = Describe("Groups", func() {
 				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 				svc.PatchGroup(rr, r)
 
-				resp, err := ioutil.ReadAll(rr.Body)
+				resp, err := io.ReadAll(rr.Body)
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(string(resp)).To(ContainSubstring("Error parsing member@odata.bind values"))

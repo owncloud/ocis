@@ -11,7 +11,6 @@ import (
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
@@ -145,7 +144,7 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 	}
 	ctx = grpcmetadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
-	u, _ := ctxpkg.ContextGetUser(ctx)
+	u, _ := revactx.ContextGetUser(ctx)
 	key := cacheKey(in.Query, in.PageSize, in.Ref, u)
 	res, ok := s.FromCache(key)
 	if !ok {

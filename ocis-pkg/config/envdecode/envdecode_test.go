@@ -80,7 +80,7 @@ type testConfigOverride struct {
 }
 
 type testNoExportedFields struct {
-	// folowing unexported fields are used for tests
+	// following unexported fields are used for tests
 	aString  string  `env:"TEST_STRING"`  //nolint:structcheck,unused
 	anInt64  int64   `env:"TEST_INT64"`   //nolint:structcheck,unused
 	aUint16  uint16  `env:"TEST_UINT16"`  //nolint:structcheck,unused
