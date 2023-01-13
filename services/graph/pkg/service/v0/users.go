@@ -159,7 +159,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if accountName, ok := u.GetOnPremisesSamAccountNameOk(); ok {
-		if !isValidUsername(*accountName) {
+		if !g.isValidUsername(*accountName) {
 			logger.Debug().Str("username", *accountName).Msg("could not create user: username must be at least the local part of an email")
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("username %s must be at least the local part of an email", *u.OnPremisesSamAccountName))
 			return
@@ -530,16 +530,28 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow integration with our glauth LDAP service
-// so we are adding a few restrictions from https://stackoverflow.com/questions/6949667/what-are-the-real-rules-for-linux-usernames-on-centos-6-and-rhel-6
-// names should not start with numbers
-var usernameRegex = regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*(@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)*$")
+const (
+	usernameMatchDefault = "default"
+	usernameMatchNone    = "none"
+)
 
-func isValidUsername(e string) bool {
+var usernameRegexes = map[string]*regexp.Regexp{
+	// We want to allow email addresses as usernames so they show up when using them in ACLs on storages that allow integration with our glauth LDAP service
+	// so we are adding a few restrictions from https://stackoverflow.com/questions/6949667/what-are-the-real-rules-for-linux-usernames-on-centos-6-and-rhel-6
+	// names should not start with numbers
+	usernameMatchDefault: regexp.MustCompile("^[a-zA-Z_][a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]*(@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)*$"),
+
+	// In some cases users will be provisioned from an existing system, which may or may not have strange usernames. Because of this we want to "trust" the
+	// upstream system and allow weird usernames, so relying on the used identity provider to complain if a username is violating its restrictions.
+	usernameMatchNone: regexp.MustCompile(".*"),
+}
+
+func (g Graph) isValidUsername(e string) bool {
 	if len(e) < 1 && len(e) > 254 {
 		return false
 	}
-	return usernameRegex.MatchString(e)
+
+	return usernameRegexes[g.config.API.UsernameMatch].MatchString(e)
 }
 
 // regex from https://www.w3.org/TR/2016/REC-html51-20161101/sec-forms.html#valid-e-mail-address

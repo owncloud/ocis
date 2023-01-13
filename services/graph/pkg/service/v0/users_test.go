@@ -539,6 +539,63 @@ var _ = Describe("Users", func() {
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
 		})
+
+		Describe("Handling usernames with spaces", func() {
+			var (
+				newSvc = func(usernameMatch string) service.Service {
+					localCfg := defaults.FullDefaultConfig()
+					localCfg.Identity.LDAP.CACert = "" // skip the startup checks, we don't use LDAP at all in this tests
+					localCfg.TokenManager.JWTSecret = "loremipsum"
+					localCfg.Commons = &shared.Commons{}
+					localCfg.GRPCClientTLS = &shared.GRPCClientTLS{}
+
+					localCfg.API.UsernameMatch = usernameMatch
+
+					_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
+					localSvc, _ := service.NewService(
+						service.Config(localCfg),
+						service.WithGatewayClient(gatewayClient),
+						service.EventsPublisher(&eventsPublisher),
+						service.WithIdentityBackend(identityBackend),
+						service.WithRoleService(roleService),
+					)
+
+					return localSvc
+				}
+			)
+
+			BeforeEach(func() {
+				user.SetOnPremisesSamAccountName("username with spaces")
+			})
+
+			It("rejects a username with spaces if match regex is default", func() {
+				userJson, err := json.Marshal(user)
+				Expect(err).ToNot(HaveOccurred())
+
+				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users", bytes.NewBuffer(userJson))
+				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+
+				newSvc("default").PostUser(rr, r)
+				Expect(rr.Code).To(Equal(http.StatusBadRequest))
+			})
+
+			It("creates a user with spaces in username if regex is none", func() {
+				roleService.On("AssignRoleToUser", mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{}, nil)
+				identityBackend.On("CreateUser", mock.Anything, mock.Anything).Return(func(ctx context.Context, user libregraph.User) *libregraph.User {
+					user.SetId("/users/user")
+					return &user
+				}, nil)
+				userJson, err := json.Marshal(user)
+				Expect(err).ToNot(HaveOccurred())
+
+				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/me/users", bytes.NewBuffer(userJson))
+				r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+				newSvc("none").PostUser(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusOK))
+			})
+		})
+
 	})
 
 	Describe("DeleteUser", func() {
