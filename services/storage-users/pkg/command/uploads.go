@@ -45,7 +45,7 @@ func ListUploads(cfg *config.Config) *cli.Command {
 				os.Exit(1)
 			}
 			drivers := revaconfig.UserDrivers(cfg)
-			fs, err := f(drivers[cfg.Driver].(map[string]interface{}))
+			fs, err := f(drivers[cfg.Driver].(map[string]interface{}), nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failed to initialize filesystem driver '%s'\n", cfg.Driver)
 				return err
@@ -86,7 +86,7 @@ func PurgeExpiredUploads(cfg *config.Config) *cli.Command {
 				os.Exit(1)
 			}
 			drivers := revaconfig.UserDrivers(cfg)
-			fs, err := f(drivers[cfg.Driver].(map[string]interface{}))
+			fs, err := f(drivers[cfg.Driver].(map[string]interface{}), nil)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Failed to initialize filesystem driver '%s'\n", cfg.Driver)
 				return err
