@@ -36,11 +36,15 @@ Feature: Tag
     And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
       | key     | value   |
       | oc:tags | fileTag |
-    And the following tags should exist for user "Alice":
+    When user "Alice" lists all available tags via the GraphApi
+    Then the HTTP status code should be "200"
+    And the user should have following tags:
       | tag level#1                    |
       | tag with symbols @^$#^%$@%!_+) |
       | fileTag                        |
-    And the following tags should exist for user "Brian":
+    When user "Alice" lists all available tags via the GraphApi
+    Then the HTTP status code should be "200"
+    And the user should have following tags:
       | tag level#1                    |
       | tag with symbols @^$#^%$@%!_+) |
       | fileTag                        |
@@ -67,8 +71,9 @@ Feature: Tag
     And the "PROPFIND" response to user "Alice" should contain a mountpoint "Alice Hansen" with these key and value pairs:
       | key     | value                                 |
       | oc:tags | fileTag,tag with symbol @^$#^%$@%!_+) |
-    And the value of the item "//d:response/d:propstat/d:prop/oc:tags" in the response should be "fileTag,tag with symbol @^$#^%$@%!_+)"
-    And the following tags should exist for user "Alice":
+    When user "Alice" lists all available tags via the GraphApi
+    Then the HTTP status code should be "200"
+    And the user should have following tags:
       | my tag                        |
       | important                     |
       | fileTag                       |

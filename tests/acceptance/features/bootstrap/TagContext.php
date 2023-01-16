@@ -118,15 +118,14 @@ class TagContext implements Context {
 	}
 
 	/**
-	 * @Then the following tag(s) should exist for user :user:
+	 * @When user :user lists all available tag(s) via the GraphApi
 	 *
 	 * @param string $user
-	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theFollowingTagsShouldExistForUser(string $user, TableNode $table):void {
+	public function theUserGetsAllAvailableTags(string $user):void {
 		$this->featureContext->setResponse(
 			GraphHelper::getTag(
 				$this->featureContext->getBaseUrl(),
@@ -134,8 +133,17 @@ class TagContext implements Context {
 				$this->featureContext->getPasswordForUser($user)
 			)
 		);
-		$this->featureContext->theHttpStatusCodeShouldBe(200);
-	
+	}
+
+	/**
+	 * @Then the user should have following tag(s):
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theFollowingTagsShouldExistForUser(TableNode $table):void {
 		$rows = $table->getRows();
 		foreach ($rows as $row) {
 			$responseArray = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'];
