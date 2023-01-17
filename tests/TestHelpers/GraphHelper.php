@@ -939,4 +939,96 @@ class GraphHelper {
 			\json_encode($payload)
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $user
+	 * @param string $password
+	 * @param string $xRequestId
+	 * @param array $body
+	 * @param array $headers
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getTags(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $xRequestId = '',
+		array  $body = [],
+		array  $headers = []
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'extensions/org.libregraph/tags');
+
+		return HttpRequestHelper::get($url, $xRequestId, $user, $password, $headers, $body);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $resourceId
+	 * @param array $tagName
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function createTags(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $resourceId,
+		array $tagName
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'extensions/org.libregraph/tags');
+		$payload['resourceId'] = $resourceId;
+		$payload['tags'] = $tagName;
+
+		return HttpRequestHelper::sendRequest(
+			$url,
+			$xRequestId,
+			"PUT",
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			\json_encode($payload)
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $resourceId
+	 * @param array $tagName
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function deleteTags(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $resourceId,
+		array $tagName
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'extensions/org.libregraph/tags');
+		$payload['resourceId'] = $resourceId;
+		$payload['tags'] = $tagName;
+
+		return HttpRequestHelper::sendRequest(
+			$url,
+			$xRequestId,
+			"DELETE",
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			\json_encode($payload)
+		);
+	}
 }

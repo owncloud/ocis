@@ -1666,7 +1666,7 @@ class SpacesContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string $fullUrl
-	 * @param string $headers
+	 * @param array $headers
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -1980,8 +1980,9 @@ class SpacesContext implements Context {
 		string $userRecipient,
 		string $role
 	): void {
-		$this->sendRequestForShareOfEntityInsideOfSpace($user, $entity, $spaceName, $userRecipient, $role);
-		$this->featureContext->theHTTPStatusCodeShouldBe(
+		$response = $this->sendRequestForShareOfEntityInsideOfSpace($user, $entity, $spaceName, $userRecipient, $role);
+		Assert::assertEquals(
+			$response->getStatusCode(),
 			200,
 			"Expected response status code should be 200"
 		);
@@ -3004,23 +3005,25 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" sends PROPFIND request to space "([^"]*)" using the WebDAV API$/
+	 * @When /^user "([^"]*)" sends PROPFIND request from the space "([^"]*)" to the resource "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
+	 * @param ?string $resource
 	 *
 	 * @throws GuzzleException
 	 *
 	 * @return void
 	 */
-	public function userSendsPropfindRequestToSpace(string $user, string $spaceName): void {
+	public function userSendsPropfindRequestToSpace(string $user, string $spaceName, ?string $resource = ""): void {
 		$this->setSpaceIDByName($user, $spaceName);
-		$properties = ['oc:permissions','oc:fileid','oc:share-types','oc:privatelink','d:resourcetype','oc:size','oc:name','d:getcontenttype'];
+		$properties = ['oc:permissions','oc:fileid','oc:share-types','oc:privatelink','d:resourcetype','oc:size','oc:name','d:getcontenttype', 'oc:tags'];
 		$this->featureContext->setResponse(
 			WebDavHelper::propfind(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
-				"",
+				$resource,
 				$properties,
 				"",
 				"0",

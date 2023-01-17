@@ -746,12 +746,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiFavorites/favorites.feature:148](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiFavorites/favorites.feature#L148)
 - [coreApiFavorites/favorites.feature:225](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiFavorites/favorites.feature#L225)
 
-#### [could not create system tag](https://github.com/owncloud/ocis/issues/3092)
-
-- [coreApiWebdavOperations/search.feature:274](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L274)
-- [coreApiWebdavOperations/search.feature:291](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L291)
-- [coreApiWebdavOperations/search.feature:317](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/search.feature#L317)
-
 #### [Cannot disable the dav propfind depth infinity for resources](https://github.com/owncloud/ocis/issues/3720)
 
 - [coreApiWebdavOperations/listFiles.feature:364](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/listFiles.feature#L364)

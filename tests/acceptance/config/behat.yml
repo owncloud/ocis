@@ -46,6 +46,7 @@ default:
         - OCSContext:
         - PublicWebDavContext:
         - SearchContext:
+        - TagContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
         - TUSContext:
