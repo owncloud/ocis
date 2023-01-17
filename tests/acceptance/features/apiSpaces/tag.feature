@@ -38,13 +38,13 @@ Feature: Tag
       | oc:tags | fileTag |
     When user "Alice" lists all available tags via the GraphApi
     Then the HTTP status code should be "200"
-    And the user should have following tags:
+    And the response should contain following tags:
       | tag level#1                    |
       | tag with symbols @^$#^%$@%!_+) |
       | fileTag                        |
     When user "Alice" lists all available tags via the GraphApi
     Then the HTTP status code should be "200"
-    And the user should have following tags:
+    And the response should contain following tags:
       | tag level#1                    |
       | tag with symbols @^$#^%$@%!_+) |
       | fileTag                        |
@@ -73,7 +73,7 @@ Feature: Tag
       | oc:tags | fileTag,tag with symbol @^$#^%$@%!_+) |
     When user "Alice" lists all available tags via the GraphApi
     Then the HTTP status code should be "200"
-    And the user should have following tags:
+    And the response should contain following tags:
       | my tag                        |
       | important                     |
       | fileTag                       |

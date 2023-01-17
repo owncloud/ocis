@@ -896,7 +896,7 @@ class GraphHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function getTag(
+	public static function getTags(
 		string $baseUrl,
 		string $user,
 		string $password,
@@ -920,7 +920,7 @@ class GraphHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function createTag(
+	public static function createTags(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,
@@ -954,7 +954,7 @@ class GraphHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function deleteTag(
+	public static function deleteTags(
 		string $baseUrl,
 		string $xRequestId,
 		string $user,

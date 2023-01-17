@@ -89,7 +89,7 @@ class TagContext implements Context {
 			$resourceId = $this->spacesContext->getFileId($user, $space, $resource);
 		}
 
-		$response = GraphHelper::createTag(
+		$response = GraphHelper::createTags(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$user,
@@ -101,7 +101,7 @@ class TagContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" has created the following tags a (folder|file)\s?"([^"]*)" of the space "([^"]*)":$/
+	 * @Given /^user "([^"]*)" has created the following tags a (folder|file)\s?"([^"]*)" of the space "([^"]*)":$/
 	 *
 	 * @param string $user
 	 * @param string $fileOrFolder   (file|folder)
@@ -127,7 +127,7 @@ class TagContext implements Context {
 	 */
 	public function theUserGetsAllAvailableTags(string $user):void {
 		$this->featureContext->setResponse(
-			GraphHelper::getTag(
+			GraphHelper::getTags(
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user)
@@ -136,7 +136,7 @@ class TagContext implements Context {
 	}
 
 	/**
-	 * @Then the user should have following tag(s):
+	 * @Then the response should contain following tag(s):
 	 *
 	 * @param TableNode $table
 	 *
