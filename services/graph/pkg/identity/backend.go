@@ -70,6 +70,8 @@ type EducationBackend interface {
 	DeleteEducationClass(ctx context.Context, nameOrID string) error
 	// GetEducationClassMembers returns the EducationUser members for an EducationClass
 	GetEducationClassMembers(ctx context.Context, nameOrID string) ([]*libregraph.EducationUser, error)
+	// UpdateEducationClass updates properties of the supplied class in the identity backend.
+	UpdateEducationClass(ctx context.Context, id string, class libregraph.EducationClass) (*libregraph.EducationClass, error)
 
 	// CreateEducationUser creates a given education user in the identity backend.
 	CreateEducationUser(ctx context.Context, user libregraph.EducationUser) (*libregraph.EducationUser, error)

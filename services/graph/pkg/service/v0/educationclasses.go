@@ -120,6 +120,16 @@ func (g Graph) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	class, err := g.identityEducationBackend.UpdateEducationClass(r.Context(), classID, *changes)
+	if err != nil {
+		logger.Error().
+			Err(err).
+			Str("classID", classID).
+			Msg("could not update class")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	if memberRefs, ok := changes.GetMembersodataBindOk(); ok {
 		// The spec defines a limit of 20 members maxium per Request
 		if len(memberRefs) > g.config.API.GroupMembersPatchLimit {
@@ -166,8 +176,8 @@ func (g Graph) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	render.Status(r, http.StatusNoContent) // TODO StatusNoContent when prefer=minimal is used, otherwise OK and the resource in the body
-	render.NoContent(w, r)
+	render.Status(r, http.StatusOK) // TODO StatusNoContent when prefer=minimal is used, otherwise OK and the resource in the body
+	render.JSON(w, r, class)
 }
 
 // GetEducationClass implements the Service interface.
