@@ -75,6 +75,10 @@ func (i *ErrEducationBackend) GetEducationClassMembers(ctx context.Context, name
 	return nil, errNotImplemented
 }
 
+func (i *ErrEducationBackend) UpdateEducationClass(ctx context.Context, id string, class libregraph.EducationClass) (*libregraph.EducationClass, error) {
+	return nil, errNotImplemented
+}
+
 // CreateEducationUser creates a given education user in the identity backend.
 func (i *ErrEducationBackend) CreateEducationUser(ctx context.Context, user libregraph.EducationUser) (*libregraph.EducationUser, error) {
 	return nil, errNotImplemented

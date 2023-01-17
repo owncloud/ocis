@@ -139,6 +139,78 @@ func (i *LDAP) DeleteEducationClass(ctx context.Context, id string) error {
 	return nil
 }
 
+// UpdateEducationClass implements the EducationBackend interface for the LDAP backend.
+// Only the displayName and externalID are supported to change at this point.
+func (i *LDAP) UpdateEducationClass(ctx context.Context, id string, class libregraph.EducationClass) (*libregraph.EducationClass, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("UpdateEducationClass")
+	if !i.writeEnabled {
+		return nil, ErrReadOnly
+	}
+
+	g, err := i.getLDAPGroupByID(id, false)
+	if err != nil {
+		return nil, err
+	}
+
+	var updateNeeded bool
+
+	if class.GetId() != "" {
+		if g.GetEqualFoldAttributeValue(i.groupAttributeMap.id) != class.GetId() {
+			return nil, errorcode.New(errorcode.NotAllowed, "changing the GroupID is not allowed")
+		}
+	}
+
+	if class.GetOnPremisesSamAccountName() != "" {
+		return nil, errorcode.New(errorcode.NotSupported, "changing the SAM account name is currently not supported")
+	}
+
+	if class.GetOnPremisesDomainName() != "" {
+		return nil, errorcode.New(errorcode.NotSupported, "changing the SAM account name is currently not supported")
+	}
+
+	if class.GetDescription() != "" {
+		return nil, errorcode.New(errorcode.NotSupported, "changing the description is currently not supported")
+	}
+
+	if len(class.GetMembers()) != 0 {
+		return nil, errorcode.New(errorcode.NotSupported, "changing the members is currently not supported")
+	}
+
+	if class.GetClassification() != "" {
+		return nil, errorcode.New(errorcode.NotSupported, "changing the classification is currently not supported")
+	}
+
+	mr := ldap.ModifyRequest{DN: g.DN}
+
+	if eID := class.GetExternalId(); eID != "" {
+		if g.GetEqualFoldAttributeValue(i.educationConfig.classAttributeMap.externalID) != eID {
+			mr.Replace(i.educationConfig.classAttributeMap.externalID, []string{eID})
+			updateNeeded = true
+		}
+	}
+
+	if dName := class.GetDisplayName(); dName != "" {
+		if g.GetEqualFoldAttributeValue(i.groupAttributeMap.name) != dName {
+			mr.Replace(i.groupAttributeMap.name, []string{dName})
+			updateNeeded = true
+		}
+	}
+
+	if updateNeeded {
+		if err := i.conn.Modify(&mr); err != nil {
+			return nil, err
+		}
+	}
+
+	g, err = i.getEducationClassByDN(g.DN)
+	if err != nil {
+		return nil, err
+	}
+
+	return i.createEducationClassModelFromLDAP(g), nil
+}
+
 // GetEducationClassMembers implements the EducationBackend interface for the LDAP backend.
 func (i *LDAP) GetEducationClassMembers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
