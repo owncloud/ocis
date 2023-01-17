@@ -56,7 +56,9 @@
                 "IDP_LDAP_BIND_PASSWORD": "some-ldap-idp-password",
                 // storage users mount ID
                 "GATEWAY_STORAGE_USERS_MOUNT_ID": "storage-users-1",
-                "STORAGE_USERS_MOUNT_ID": "storage-users-1"
+                "STORAGE_USERS_MOUNT_ID": "storage-users-1",
+                // graph application ID
+                "GRAPH_APPLICATION_ID": "application-1"
             }
         }
     ]
