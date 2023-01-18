@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Disassociate users from deleted school: [#5343](https://github.com/owncloud/ocis/pull/5343)
 * Bugfix - Fix Postprocessing events: [#5269](https://github.com/owncloud/ocis/pull/5269)
 * Bugfix - Fix Search tag indexing: [#5405](https://github.com/owncloud/ocis/pull/5405)
+* Bugfix - Populate expanded properties: [#5421](https://github.com/owncloud/ocis/pull/5421)
 * Enhancement - Add global env variable extractor: [#5164](https://github.com/owncloud/ocis/pull/5164)
 * Enhancement - Async Postprocessing: [#5207](https://github.com/owncloud/ocis/pull/5207)
 * Enhancement - Bump libre-graph-api-go: [#5309](https://github.com/owncloud/ocis/pull/5309)
