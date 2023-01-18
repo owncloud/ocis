@@ -49,18 +49,18 @@ Feature: public share sharers groups setting
     And parameter "public_share_sharers_groups_allowlist_enabled" of app "files_sharing" has been set to "yes"
     And parameter "public_share_sharers_groups_allowlist" of app "files_sharing" has been set to '["grp1"]'
     When user "Alice" updates the last public link share using the sharing API with
-      | expireDate | +3 days |
+      | expireDate | 2040-01-01T23:59:59+0100 |
     Then the HTTP status code should be "200"
     And the OCS status code should be "100"
     And the fields of the last response to user "Alice" should include
-      | expiration | +3 days |
+      | expiration | 2040-01-01 22:59:59 |
 
 
   Scenario: existing links can still be deleted by sharers even if they are not present in public share sharers groups
     Given user "Alice" has created a public link share with settings
       | path        | /fileToShare.txt |
       | permissions | read             |
-      | name        | shared-link       |
+      | name        | shared-link      |
     And parameter "public_share_sharers_groups_allowlist_enabled" of app "files_sharing" has been set to "yes"
     And parameter "public_share_sharers_groups_allowlist" of app "files_sharing" has been set to '["grp1"]'
     When user "Alice" deletes public link share named "shared-link" in file "fileToShare.txt" using the sharing API

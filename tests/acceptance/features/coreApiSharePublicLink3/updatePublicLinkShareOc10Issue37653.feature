@@ -12,7 +12,7 @@ Feature: update a public link share
     And user "Alice" has created a public link share with settings
       | path | FOLDER |
     When user "Alice" updates the last public link share using the sharing API with
-      | expireDate | +3 days |
+      | expireDate | 2040-01-01T23:59:59+0100 |
     Then the OCS status code should be "<ocs_status_code>"
     And the OCS status message should be ""
     #And the OCS status message should be "Ok"
