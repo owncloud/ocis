@@ -234,6 +234,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The amount of group members allowed to be added with a single patch request.
 
+a|`GRAPH_USERNAME_MATCH` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++default ++
+a| [subs=-attributes]
+Option to allow legacy usernames. Supported options are 'default' and 'none'.
+
 a|`REVA_GATEWAY` +
 
 a| [subs=-attributes]

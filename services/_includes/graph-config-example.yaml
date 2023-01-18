@@ -30,6 +30,7 @@ http:
   apitoken: ""
 api:
   group_members_patch_limit: 20
+  graph_username_match: default
 reva:
   address: 127.0.0.1:9142
   tls:
