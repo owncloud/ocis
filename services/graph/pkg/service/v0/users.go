@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -57,13 +58,15 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
+		if me.MemberOf == nil {
+			me.MemberOf = []libregraph.Group{}
+		}
 	}
 
 	// expand appRoleAssignments if requested
 	if slices.Contains(exp, "appRoleAssignments") {
-		lrar, err := g.roleService.ListRoleAssignments(r.Context(), &settings.ListRoleAssignmentsRequest{
-			AccountUuid: me.GetId(),
-		})
+		var err error
+		me.AppRoleAssignments, err = g.fetchAppRoleAssignments(r.Context(), me.GetId())
 		if err != nil {
 			logger.Debug().Err(err).Str("userid", me.GetId()).Msg("could not get appRoleAssignments for self")
 			var errcode errorcode.Error
@@ -74,16 +77,25 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-
-		values := make([]libregraph.AppRoleAssignment, 0, len(lrar.GetAssignments()))
-		for _, assignment := range lrar.GetAssignments() {
-			values = append(values, g.assignmentToAppRoleAssignment(assignment))
-		}
-		me.AppRoleAssignments = values
 	}
 
 	render.Status(r, http.StatusOK)
 	render.JSON(w, r, me)
+}
+
+func (g Graph) fetchAppRoleAssignments(ctx context.Context, accountuuid string) ([]libregraph.AppRoleAssignment, error) {
+	lrar, err := g.roleService.ListRoleAssignments(ctx, &settings.ListRoleAssignmentsRequest{
+		AccountUuid: accountuuid,
+	})
+	if err != nil {
+		return []libregraph.AppRoleAssignment{}, err
+	}
+
+	values := make([]libregraph.AppRoleAssignment, 0, len(lrar.Assignments))
+	for _, assignment := range lrar.GetAssignments() {
+		values = append(values, g.assignmentToAppRoleAssignment(assignment))
+	}
+	return values, nil
 }
 
 // GetUsers implements the Service interface.
@@ -113,21 +125,21 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 
 	// expand appRoleAssignments if requested
 	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
-	if slices.Contains(exp, "appRoleAssignments") {
-		for _, u := range users {
-			lrar, err := g.roleService.ListRoleAssignments(r.Context(), &settings.ListRoleAssignmentsRequest{
-				AccountUuid: u.GetId(),
-			})
+	expandAppRoleAssignments := slices.Contains(exp, "appRoleAssignments")
+	expandMemberOf := slices.Contains(exp, "memberOf")
+	for _, u := range users {
+		if expandAppRoleAssignments {
+			u.AppRoleAssignments, err = g.fetchAppRoleAssignments(r.Context(), u.GetId())
 			if err != nil {
+				// TODO I think we should not continue here, see http://docs.oasis-open.org/odata/odata/v4.01/odata-v4.01-part1-protocol.html#sec_SystemQueryOptionexpand
+				// > The $expand system query option indicates the related entities and stream values that MUST be represented inline. The service MUST return the specified content, and MAY choose to return additional information.
 				logger.Debug().Err(err).Str("userid", u.GetId()).Msg("could not get appRoleAssignments when listing user")
-				continue
 			}
-
-			values := make([]libregraph.AppRoleAssignment, 0, len(lrar.GetAssignments()))
-			for _, assignment := range lrar.GetAssignments() {
-				values = append(values, g.assignmentToAppRoleAssignment(assignment))
+		}
+		if expandMemberOf {
+			if u.MemberOf == nil {
+				u.MemberOf = []libregraph.Group{}
 			}
-			u.AppRoleAssignments = values
 		}
 	}
 
@@ -307,7 +319,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				logger.Debug().Err(err).Interface("id", sp.Id).Msg("error calling get quota on drive")
 			}
-			d.Quota = quota
+			d.Quota = &quota
 			if slices.Contains(sel, "drive") || slices.Contains(exp, "drive") {
 				if *d.DriveType == "personal" {
 					user.Drive = d
@@ -320,10 +332,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 	// expand appRoleAssignments if requested
 	if slices.Contains(exp, "appRoleAssignments") {
-
-		lrar, err := g.roleService.ListRoleAssignments(r.Context(), &settings.ListRoleAssignmentsRequest{
-			AccountUuid: user.GetId(),
-		})
+		user.AppRoleAssignments, err = g.fetchAppRoleAssignments(r.Context(), user.GetId())
 		if err != nil {
 			logger.Debug().Err(err).Str("userid", user.GetId()).Msg("could not get appRoleAssignments for user")
 			var errcode errorcode.Error
@@ -334,12 +343,6 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			}
 			return
 		}
-
-		values := make([]libregraph.AppRoleAssignment, 0, len(lrar.GetAssignments()))
-		for _, assignment := range lrar.GetAssignments() {
-			values = append(values, g.assignmentToAppRoleAssignment(assignment))
-		}
-		user.AppRoleAssignments = values
 	}
 
 	render.Status(r, http.StatusOK)

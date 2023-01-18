@@ -257,7 +257,7 @@ func (g Graph) GetEducationUser(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				logger.Debug().Err(err).Interface("id", sp.Id).Msg("error calling get quota on drive")
 			}
-			d.Quota = quota
+			d.Quota = &quota
 			if slices.Contains(sel, "drive") || slices.Contains(exp, "drive") {
 				if *d.DriveType == _spaceTypePersonal {
 					user.Drive = d

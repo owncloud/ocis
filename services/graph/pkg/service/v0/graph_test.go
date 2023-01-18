@@ -143,6 +143,7 @@ var _ = Describe("Graph", func() {
 						"driveType":"aspacetype",
 						"id":"pro-1$sameID",
 						"name":"aspacename",
+						"quota": {},
 						"root":{
 							"id":"pro-1$sameID",
 							"webDavUrl":"https://localhost:9200/dav/spaces/pro-1$sameID"
@@ -213,6 +214,7 @@ var _ = Describe("Graph", func() {
 						"driveType":"aspacetype",
 						"id":"pro-1$asameID",
 						"name":"aspacename",
+						"quota": {},
 						"root":{
 							"eTag":"101112131415",
 							"id":"pro-1$asameID",
@@ -225,6 +227,7 @@ var _ = Describe("Graph", func() {
 						"driveType":"bspacetype",
 						"id":"pro-1$bsameID",
 						"name":"bspacename",
+						"quota": {},
 						"root":{
 							"eTag":"123456789",
 							"id":"pro-1$bsameID",

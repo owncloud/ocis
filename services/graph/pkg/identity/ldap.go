@@ -387,10 +387,7 @@ func (i *LDAP) GetUser(ctx context.Context, nameOrID string, queryParam url.Valu
 		if err != nil {
 			return nil, err
 		}
-		if len(userGroups) > 0 {
-			groups := i.groupsFromLDAPEntries(userGroups)
-			u.MemberOf = groups
-		}
+		u.MemberOf = i.groupsFromLDAPEntries(userGroups)
 	}
 	return u, nil
 }
@@ -454,14 +451,7 @@ func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregra
 			if err != nil {
 				return nil, err
 			}
-			if len(userGroups) > 0 {
-				expand := ldap.EscapeFilter(queryParam.Get("expand"))
-				if expand == "" {
-					expand = "false"
-				}
-				groups := i.groupsFromLDAPEntries(userGroups)
-				u.MemberOf = groups
-			}
+			u.MemberOf = i.groupsFromLDAPEntries(userGroups)
 		}
 		users = append(users, u)
 	}
