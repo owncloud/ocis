@@ -36,6 +36,13 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					"expose_data_server": cfg.ExposeDataServer,
 					"data_server_url":    cfg.DataServerURL,
 					"upload_expiration":  cfg.UploadExpiration,
+					"events": map[string]interface{}{
+						"nats_address":     cfg.Events.Addr,
+						"nats_clusterid":   cfg.Events.ClusterID,
+						"nats_enable_tls":  cfg.Events.EnableTLS,
+						"tls_insecure":     cfg.Events.TLSInsecure,
+						"tls_root_ca_cert": cfg.Events.TLSRootCaCertPath,
+					},
 				},
 			},
 			"interceptors": map[string]interface{}{
