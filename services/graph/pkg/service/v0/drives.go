@@ -478,8 +478,10 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 		// can't access disabled space
 		if utils.ReadPlainFromOpaque(storageSpace.Opaque, "trashed") != "trashed" {
 			res.Special = g.getExtendedSpaceProperties(ctx, baseURL, storageSpace)
-			res.Quota, err = g.getDriveQuota(ctx, storageSpace)
+			quota, err := g.getDriveQuota(ctx, storageSpace)
+			res.Quota = &quota
 			if err != nil {
+				//logger.Debug().Err(err).Interface("id", sp.Id).Msg("error calling get quota on drive")
 				return nil, err
 			}
 		}
@@ -718,6 +720,8 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		lastModified := cs3TimestampToTime(space.Mtime)
 		drive.LastModifiedDateTime = &lastModified
 	}
+
+	drive.Quota = &libregraph.Quota{}
 	if space.Quota != nil {
 		var t int64
 		if space.Quota.QuotaMaxBytes > math.MaxInt64 {
@@ -725,15 +729,13 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		} else {
 			t = int64(space.Quota.QuotaMaxBytes)
 		}
-		drive.Quota = &libregraph.Quota{
-			Total: &t,
-		}
+		drive.Quota.Total = &t
 	}
 
 	return drive, nil
 }
 
-func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (*libregraph.Quota, error) {
+func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (libregraph.Quota, error) {
 	logger := g.logger.SubloggerWithRequestID(ctx)
 	client := g.GetGatewayClient()
 
@@ -747,13 +749,13 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	switch {
 	case err != nil:
 		logger.Error().Err(err).Interface("ref", req.Ref).Msg("could not call GetQuota: transport error")
-		return nil, nil
+		return libregraph.Quota{}, nil
 	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_UNIMPLEMENTED:
 		logger.Debug().Msg("get quota is not implemented on the storage driver")
-		return nil, nil
+		return libregraph.Quota{}, nil
 	case res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
 		logger.Debug().Str("grpc", res.GetStatus().GetMessage()).Msg("error sending get quota grpc request")
-		return nil, errors.New(res.GetStatus().GetMessage())
+		return libregraph.Quota{}, errors.New(res.GetStatus().GetMessage())
 	}
 
 	var remaining int64
@@ -783,7 +785,7 @@ func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.Storage
 	state := calculateQuotaState(t, used)
 	qta.State = &state
 
-	return &qta, nil
+	return qta, nil
 }
 
 func calculateQuotaState(total int64, used int64) (state string) {

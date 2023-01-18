@@ -41,14 +41,13 @@ func (i *LDAP) GetGroup(ctx context.Context, nameOrID string, queryParam url.Val
 		if err != nil {
 			return nil, err
 		}
+		g.Members = make([]libregraph.User, 0, len(members))
 		if len(members) > 0 {
-			m := make([]libregraph.User, 0, len(members))
 			for _, ue := range members {
 				if u := i.createUserModelFromLDAP(ue); u != nil {
-					m = append(m, *u)
+					g.Members = append(g.Members, *u)
 				}
 			}
-			g.Members = m
 		}
 	}
 	return g, nil
@@ -120,14 +119,13 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 			if err != nil {
 				return nil, err
 			}
+			g.Members = make([]libregraph.User, 0, len(members))
 			if len(members) > 0 {
-				m := make([]libregraph.User, 0, len(members))
 				for _, ue := range members {
 					if u := i.createUserModelFromLDAP(ue); u != nil {
-						m = append(m, *u)
+						g.Members = append(g.Members, *u)
 					}
 				}
-				g.Members = m
 			}
 		}
 		groups = append(groups, g)
