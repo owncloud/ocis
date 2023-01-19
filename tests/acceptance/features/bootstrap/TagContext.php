@@ -126,6 +126,7 @@ class TagContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserGetsAllAvailableTags(string $user):void {
+		// after creating or deleting tags, in some cases tags do not appear or disappear immediately, so we use waiting
 		sleep(1);
 		$this->featureContext->setResponse(
 			GraphHelper::getTags(
