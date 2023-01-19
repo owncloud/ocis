@@ -610,3 +610,28 @@ Feature: update a public link share
       | dav-path | ocs_api_version | ocs_status_code |
       | spaces   | 1               | 100             |
       | spaces   | 2               | 200             |
+
+
+  Scenario Outline: Updating the role of a public link to internal
+    Given using OCS API version "<ocs_api_version>"
+    And using <dav-path> DAV path
+    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile.txt"
+    And user "Alice" has created a public link share with settings
+      | path        | /textfile.txt |
+      | permissions | read          |
+    When user "Alice" updates the last public link share using the sharing API with
+      | permissions | 0 |
+    Then the OCS status code should be "<ocs_status_code>"
+    And the HTTP status code should be "200"
+    Examples:
+      | dav-path | ocs_api_version | ocs_status_code |
+      | old      | 1               | 100             |
+      | old      | 2               | 200             |
+      | new      | 1               | 100             |
+      | new      | 2               | 200             |
+
+    @personalSpace
+    Examples:
+      | dav-path | ocs_api_version | ocs_status_code |
+      | spaces   | 1               | 100             |
+      | spaces   | 2               | 200             |
