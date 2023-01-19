@@ -35,15 +35,19 @@ _ocdav: double-check the webdav property parsing when custom namespaces are used
 
 #### [file versions do not report the version author](https://github.com/owncloud/ocis/issues/2914)
 
-- [coreApiVersions/fileVersionAuthor.feature:14](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L14)
-- [coreApiVersions/fileVersionAuthor.feature:37](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L37)
-- [coreApiVersions/fileVersionAuthor.feature:58](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L58)
-- [coreApiVersions/fileVersionAuthor.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L78)
-- [coreApiVersions/fileVersionAuthor.feature:104](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L104)
-- [coreApiVersions/fileVersionAuthor.feature:129](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L129)
-- [coreApiVersions/fileVersionAuthor.feature:154](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L154)
-- [coreApiVersions/fileVersionAuthor.feature:180](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L180)
+- [coreApiVersions/fileVersionAuthor.feature:13](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L13)
+- [coreApiVersions/fileVersionAuthor.feature:44](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L44)
+- [coreApiVersions/fileVersionAuthor.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L71)
+- [coreApiVersions/fileVersionAuthor.feature:97](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L97)
+- [coreApiVersions/fileVersionAuthor.feature:130](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L130)
+- [coreApiVersions/fileVersionAuthor.feature:157](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L157)
+- [coreApiVersions/fileVersionAuthor.feature:188](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L188)
 - [coreApiVersions/fileVersionAuthor.feature:223](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L223)
+- [coreApiVersions/fileVersionAuthor.feature:275](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L275)
+- [coreApiVersions/fileVersionAuthor.feature:324](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L324)
+- [coreApiVersions/fileVersionAuthor.feature:345](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L345)
+- [coreApiVersions/fileVersionAuthor.feature:365](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L365)
+- [coreApiVersions/fileVersionAuthor.feature:390](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionAuthor.feature#L390)
 
 ### Sync
 
