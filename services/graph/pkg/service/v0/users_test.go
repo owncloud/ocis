@@ -372,6 +372,7 @@ var _ = Describe("Users", func() {
 					},
 					{
 						Id:        &provider.StorageSpaceId{OpaqueId: "personal"},
+						Owner:     &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "user1"}},
 						Root:      &provider.ResourceId{SpaceId: "personal", OpaqueId: "personal"},
 						SpaceType: "personal",
 					},
@@ -391,7 +392,7 @@ var _ = Describe("Users", func() {
 			err = json.Unmarshal(data, &responseUser)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(responseUser.GetId()).To(Equal("user1"))
-			Expect(*responseUser.GetDrive().Id).To(Equal("personal"))
+			Expect(responseUser.GetDrive().Id).To(Equal("personal"))
 		})
 
 		It("includes the drives if requested", func() {

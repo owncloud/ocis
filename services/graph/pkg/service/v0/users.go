@@ -273,7 +273,20 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	}
 	sel := strings.Split(r.URL.Query().Get("$select"), ",")
 	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
-	if slices.Contains(sel, "drive") || slices.Contains(sel, "drives") || slices.Contains(exp, "drive") || slices.Contains(exp, "drives") {
+	listDrives := slices.Contains(sel, "drives") || slices.Contains(exp, "drives")
+	listDrive := slices.Contains(sel, "drive") || slices.Contains(exp, "drive")
+
+	// do we need to list all or only the personal drive
+	filters := []*storageprovider.ListStorageSpacesRequest_Filter{}
+	if listDrives || listDrive {
+		filters = append(filters, listStorageSpacesUserFilter(user.GetId()))
+		if !listDrives {
+			// TODO filter by owner when decomposedfs supports the OWNER filter
+			filters = append(filters, listStorageSpacesTypeFilter("personal"))
+		}
+	}
+
+	if len(filters) > 0 {
 		wdu, err := g.getWebDavBaseURL()
 		if err != nil {
 			// log error, wrong configuration
@@ -285,14 +298,13 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			render.Status(r, http.StatusInternalServerError)
 			return
 		}
-		logger.Debug().Str("id", user.GetId()).Msg("calling list storage spaces with user id filter")
-		f := listStorageSpacesUserFilter(user.GetId())
+		logger.Debug().Str("id", user.GetId()).Msg("calling list storage spaces with filter")
 		// use the unrestricted flag to get all possible spaces
 		// users with the canListAllSpaces permission should see all spaces
 		opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
 		lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
 			Opaque:  opaque,
-			Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
+			Filters: filters,
 		})
 		if err != nil {
 			// transport error, needs to be fixed by admin
@@ -302,13 +314,18 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		if lspr.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
-			logger.Debug().Str("grpc", lspr.GetStatus().GetMessage()).Msg("could not get drive for user")
+			logger.Debug().Str("grpc", lspr.GetStatus().GetMessage()).Msg("could not list drives for user")
 			// in case of NOT_OK, we can just return the user object with empty drives
 			render.Status(r, status.HTTPStatusFromCode(http.StatusOK))
 			render.JSON(w, r, user)
 			return
 		}
-		drives := []libregraph.Drive{}
+		if listDrives {
+			user.Drives = make([]libregraph.Drive, 0, len(lspr.GetStorageSpaces()))
+		}
+		if listDrive {
+			user.Drive = &libregraph.Drive{}
+		}
 		for _, sp := range lspr.GetStorageSpaces() {
 			d, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, sp)
 			if err != nil {
@@ -320,16 +337,18 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 				logger.Debug().Err(err).Interface("id", sp.Id).Msg("error calling get quota on drive")
 			}
 			d.Quota = &quota
-			if slices.Contains(sel, "drive") || slices.Contains(exp, "drive") {
-				if *d.DriveType == "personal" {
+			if d.GetDriveType() == "personal" && sp.GetOwner().GetId().GetOpaqueId() == user.GetId() {
+				if listDrive {
 					user.Drive = d
 				}
 			} else {
-				drives = append(drives, *d)
-				user.Drives = drives
+				if listDrives {
+					user.Drives = append(user.Drives, *d)
+				}
 			}
 		}
 	}
+
 	// expand appRoleAssignments if requested
 	if slices.Contains(exp, "appRoleAssignments") {
 		user.AppRoleAssignments, err = g.fetchAppRoleAssignments(r.Context(), user.GetId())
