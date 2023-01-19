@@ -25,6 +25,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/middleware"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/middleware/authorization"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/proxy"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/server/debug"
@@ -207,6 +208,19 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		Store:              storeClient,
 	})
 
+	var authorizers []authorization.Authorizer
+
+	if cfg.AuthorizationMiddleware.OPA.Enabled {
+		if authorizerOPA, err := authorization.NewOPAAuthorizer(logger, cfg.AuthorizationMiddleware.OPA); err != nil {
+			logger.
+				Error().
+				Err(err).
+				Msg("Failed to setup OPA Authorizer")
+		} else {
+			authorizers = append(authorizers, authorizerOPA)
+		}
+	}
+
 	return alice.New(
 		// first make sure we log all requests and redirect to https if necessary
 		pkgmiddleware.TraceContext,
@@ -219,12 +233,10 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			cfg.OIDC.RewriteWellKnown,
 			oidcHTTPClient,
 		),
-
 		router.Middleware(cfg.PolicySelector, cfg.Policies, logger),
-
 		middleware.Authentication(
 			authenticators,
-			middleware.CredentialsByUserAgent(cfg.AuthMiddleware.CredentialsByUserAgent),
+			middleware.CredentialsByUserAgent(cfg.AuthenticationMiddleware.CredentialsByUserAgent),
 			middleware.Logger(logger),
 			middleware.OIDCIss(cfg.OIDC.Issuer),
 			middleware.EnableBasicAuth(cfg.EnableBasicAuth),
@@ -237,13 +249,12 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			middleware.UserCS3Claim(cfg.UserCS3Claim),
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
 		),
-
 		middleware.SelectorCookie(
 			middleware.Logger(logger),
 			middleware.UserProvider(userProvider),
 			middleware.PolicySelectorConfig(*cfg.PolicySelector),
 		),
-
+		authorization.Authorization(logger, authorizers),
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(logger),

@@ -3,6 +3,7 @@ package defaults
 import (
 	"path"
 	"strings"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -60,6 +61,15 @@ func DefaultConfig() *config.Config {
 		AutoprovisionAccounts: false,
 		EnableBasicAuth:       false,
 		InsecureBackends:      false,
+		AuthorizationMiddleware: config.AuthorizationMiddleware{
+			OPA: config.AuthorizationMiddlewareOPA{
+				Enabled: true,
+				Policies: []string{
+					"services/proxy/pkg/config/policies/ocis.authz.rego",
+				},
+				Timeout: 5,
+			},
+		},
 	}
 }
 
@@ -275,4 +285,8 @@ func Sanitize(cfg *config.Config) {
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 	}
+
+	// convert timeout to millisecond
+	// the config is in seconds, therefore we need multiply it.
+	cfg.AuthorizationMiddleware.OPA.Timeout = cfg.AuthorizationMiddleware.OPA.Timeout * int(time.Second)
 }
