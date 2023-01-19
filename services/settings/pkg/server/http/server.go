@@ -89,7 +89,7 @@ func Server(opts ...Option) (ohttp.Service, error) {
 		settingssvc.RegisterPermissionServiceWeb(r, handle)
 	})
 
-	chi.Walk(mux, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+	_ = chi.Walk(mux, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		options.Logger.Debug().Str("method", method).Str("route", route).Int("middlewares", len(middlewares)).Msg("serving endpoint")
 		return nil
 	})

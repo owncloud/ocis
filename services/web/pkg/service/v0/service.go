@@ -45,7 +45,7 @@ func NewService(opts ...Option) Service {
 		r.Mount("/", svc.Static(options.Config.HTTP.CacheTTL))
 	})
 
-	chi.Walk(m, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+	_ = chi.Walk(m, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		options.Logger.Debug().Str("method", method).Str("route", route).Int("middlewares", len(middlewares)).Msg("serving endpoint")
 		return nil
 	})
