@@ -218,7 +218,7 @@ func (i *LDAP) UpdateEducationClass(ctx context.Context, id string, class libreg
 
 func (i *LDAP) updateClassExternalID(ctx context.Context, dn, externalID string) (string, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
-	newDN := fmt.Sprintf("ocEducationExternalID=%s", externalID)
+	newDN := fmt.Sprintf("ocEducationExternalId=%s", externalID)
 
 	mrdn := ldap.NewModifyDNRequest(dn, newDN, true, "")
 	i.logger.Debug().Str("Backend", "ldap").

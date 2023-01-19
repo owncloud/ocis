@@ -284,13 +284,16 @@ var _ = Describe("EducationClass", func() {
 		Context("with an existing group", func() {
 			BeforeEach(func() {
 				identityEducationBackend.On("GetEducationClass", mock.Anything, mock.Anything, mock.Anything).Return(newClass, nil)
+				identityEducationBackend.On("UpdateEducationClass", mock.Anything, mock.Anything, mock.Anything).Return(newClass, nil)
 			})
 
 			It("fails when the number of users is exceeded - spec says 20 max", func() {
 				updatedClass := libregraph.NewEducationClassWithDefaults()
 				updatedClass.SetDisplayName("class updated")
-				updatedClass.SetMembersodataBind([]string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18",
-					"19", "20", "21"})
+				updatedClass.SetMembersodataBind([]string{
+					"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18",
+					"19", "20", "21",
+				})
 				updatedClassJson, err := json.Marshal(updatedClass)
 				Expect(err).ToNot(HaveOccurred())
 
@@ -323,6 +326,7 @@ var _ = Describe("EducationClass", func() {
 					service.WithGatewayClient(gatewayClient),
 					service.EventsPublisher(&eventsPublisher),
 					service.WithIdentityBackend(identityBackend),
+					service.WithIdentityEducationBackend(identityEducationBackend),
 				)
 
 				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/education/classes", bytes.NewBuffer(updatedClassJson))
@@ -385,7 +389,7 @@ var _ = Describe("EducationClass", func() {
 				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 				svc.PatchEducationClass(rr, r)
 
-				Expect(rr.Code).To(Equal(http.StatusNoContent))
+				Expect(rr.Code).To(Equal(http.StatusOK))
 				identityBackend.AssertNumberOfCalls(GinkgoT(), "AddMembersToGroup", 1)
 			})
 		})
@@ -408,7 +412,7 @@ var _ = Describe("EducationClass", func() {
 
 			Expect(rr.Code).To(Equal(http.StatusNoContent))
 			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "DeleteEducationClass", 1)
-			//eventsPublisher.AssertNumberOfCalls(GinkgoT(), "Publish", 1)
+			// eventsPublisher.AssertNumberOfCalls(GinkgoT(), "Publish", 1)
 		})
 	})
 

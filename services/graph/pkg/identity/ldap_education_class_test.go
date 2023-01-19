@@ -20,6 +20,7 @@ var classEntry = ldap.NewEntry("ocEducationExternalId=Math0123",
 		"ocEducationClassType":  {"course"},
 		"entryUUID":             {"abcd-defg"},
 	})
+
 var classEntryWithMember = ldap.NewEntry("ocEducationExternalId=Math0123",
 	map[string][]string{
 		"cn":                    {"Math"},
@@ -298,5 +299,293 @@ func TestGetEducationClassMembers(t *testing.T) {
 			assert.Nil(t, err)
 			assert.Equal(t, len(users), 1)
 		}
+	}
+}
+
+func TestLDAP_UpdateEducationClass(t *testing.T) {
+	externalIDs := []string{"Math3210"}
+	changeString := "xxxx-xxxx"
+	type args struct {
+		id    string
+		class libregraph.EducationClass
+	}
+	type modifyData struct {
+		arg *ldap.ModifyRequest
+		ret error
+	}
+	type modifyDNData struct {
+		arg *ldap.ModifyDNRequest
+		ret error
+	}
+	type searchData struct {
+		res *ldap.SearchResult
+		err error
+	}
+	tests := []struct {
+		name         string
+		args         args
+		modifyDNData modifyDNData
+		modifyData   modifyData
+		searchData   searchData
+		assertion    func(assert.TestingT, error, ...interface{}) bool
+	}{
+		{
+			name: "Change name",
+			args: args{
+				id: "abcd-defg",
+				class: libregraph.EducationClass{
+					DisplayName: "Math-2",
+				},
+			},
+			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Nil(tt, err) },
+			modifyData: modifyData{
+				arg: &ldap.ModifyRequest{
+					DN: "ocEducationExternalId=Math0123",
+					Changes: []ldap.Change{
+						{
+							Operation: ldap.ReplaceAttribute,
+							Modification: ldap.PartialAttribute{
+								Type: "cn",
+								Vals: []string{"Math-2"},
+							},
+						},
+					},
+				},
+			},
+			modifyDNData: modifyDNData{
+				arg: &ldap.ModifyDNRequest{},
+				ret: nil,
+			},
+			searchData: searchData{
+				res: &ldap.SearchResult{
+					Entries: []*ldap.Entry{classEntry},
+				},
+				err: nil,
+			},
+		},
+		{
+			name: "Change external ID",
+			args: args{
+				id: "abcd-defg",
+				class: libregraph.EducationClass{
+					ExternalId: &externalIDs[0],
+				},
+			},
+			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Nil(tt, err) },
+			modifyData: modifyData{
+				arg: &ldap.ModifyRequest{},
+			},
+			modifyDNData: modifyDNData{
+				arg: &ldap.ModifyDNRequest{
+					DN:           "ocEducationExternalId=Math0123",
+					NewRDN:       "ocEducationExternalId=Math3210",
+					DeleteOldRDN: true,
+					NewSuperior:  "",
+				},
+				ret: nil,
+			},
+			searchData: searchData{
+				res: &ldap.SearchResult{
+					Entries: []*ldap.Entry{classEntry},
+				},
+				err: nil,
+			},
+		},
+		{
+			name: "Change both name and external ID",
+			args: args{
+				id: "abcd-defg",
+				class: libregraph.EducationClass{
+					DisplayName: "Math-2",
+					ExternalId:  &externalIDs[0],
+				},
+			},
+			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Nil(tt, err) },
+			modifyData: modifyData{
+				arg: &ldap.ModifyRequest{
+					DN: "ocEducationExternalId=Math3210,ou=groups,dc=test",
+					Changes: []ldap.Change{
+						{
+							Operation: ldap.ReplaceAttribute,
+							Modification: ldap.PartialAttribute{
+								Type: "cn",
+								Vals: []string{"Math-2"},
+							},
+						},
+					},
+				},
+			},
+			modifyDNData: modifyDNData{
+				arg: &ldap.ModifyDNRequest{
+					DN:           "ocEducationExternalId=Math0123",
+					NewRDN:       "ocEducationExternalId=Math3210",
+					DeleteOldRDN: true,
+					NewSuperior:  "",
+				},
+				ret: nil,
+			},
+			searchData: searchData{
+				res: &ldap.SearchResult{
+					Entries: []*ldap.Entry{classEntry},
+				},
+				err: nil,
+			},
+		},
+		{
+			name: "Check error: attempt at changing ID",
+			args: args{
+				id: "abcd-defg",
+				class: libregraph.EducationClass{
+					Id: &changeString,
+				},
+			},
+			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Error(tt, err) },
+			modifyData: modifyData{
+				arg: &ldap.ModifyRequest{},
+			},
+			modifyDNData: modifyDNData{
+				arg: &ldap.ModifyDNRequest{},
+				ret: nil,
+			},
+			searchData: searchData{
+				res: &ldap.SearchResult{
+					Entries: []*ldap.Entry{classEntry},
+				},
+				err: nil,
+			},
+		},
+		{
+			name: "Check error: attempt at changing SAM account name",
+			args: args{
+				id: "abcd-defg",
+				class: libregraph.EducationClass{
+					OnPremisesSamAccountName: &changeString,
+				},
+			},
+			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Error(tt, err) },
+			modifyData: modifyData{
+				arg: &ldap.ModifyRequest{},
+			},
+			modifyDNData: modifyDNData{
+				arg: &ldap.ModifyDNRequest{},
+				ret: nil,
+			},
+			searchData: searchData{
+				res: &ldap.SearchResult{
+					Entries: []*ldap.Entry{classEntry},
+				},
+				err: nil,
+			},
+		},
+		{
+			name: "Check error: attempt at changing Domain Name",
+			args: args{
+				id: "abcd-defg",
+				class: libregraph.EducationClass{
+					OnPremisesDomainName: &changeString,
+				},
+			},
+			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Error(tt, err) },
+			modifyData: modifyData{
+				arg: &ldap.ModifyRequest{},
+			},
+			modifyDNData: modifyDNData{
+				arg: &ldap.ModifyDNRequest{},
+				ret: nil,
+			},
+			searchData: searchData{
+				res: &ldap.SearchResult{
+					Entries: []*ldap.Entry{classEntry},
+				},
+				err: nil,
+			},
+		},
+		{
+			name: "Check error: attempt at changing description",
+			args: args{
+				id: "abcd-defg",
+				class: libregraph.EducationClass{
+					Description: &changeString,
+				},
+			},
+			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Error(tt, err) },
+			modifyData: modifyData{
+				arg: &ldap.ModifyRequest{},
+			},
+			modifyDNData: modifyDNData{
+				arg: &ldap.ModifyDNRequest{},
+				ret: nil,
+			},
+			searchData: searchData{
+				res: &ldap.SearchResult{
+					Entries: []*ldap.Entry{classEntry},
+				},
+				err: nil,
+			},
+		},
+		{
+			name: "Check error: attempt at changing classification",
+			args: args{
+				id: "abcd-defg",
+				class: libregraph.EducationClass{
+					Classification: changeString,
+				},
+			},
+			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Error(tt, err) },
+			modifyData: modifyData{
+				arg: &ldap.ModifyRequest{},
+			},
+			modifyDNData: modifyDNData{
+				arg: &ldap.ModifyDNRequest{},
+				ret: nil,
+			},
+			searchData: searchData{
+				res: &ldap.SearchResult{
+					Entries: []*ldap.Entry{classEntry},
+				},
+				err: nil,
+			},
+		},
+		{
+			name: "Check error: attempt at changing members",
+			args: args{
+				id: "abcd-defg",
+				class: libregraph.EducationClass{
+					Members: []libregraph.User{*libregraph.NewUser()},
+				},
+			},
+			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Error(tt, err) },
+			modifyData: modifyData{
+				arg: &ldap.ModifyRequest{},
+			},
+			modifyDNData: modifyDNData{
+				arg: &ldap.ModifyDNRequest{},
+				ret: nil,
+			},
+			searchData: searchData{
+				res: &ldap.SearchResult{
+					Entries: []*ldap.Entry{classEntry},
+				},
+				err: nil,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lm := &mocks.Client{}
+			b, err := getMockedBackend(lm, eduConfig, &logger)
+			if err != nil {
+				panic(err)
+			}
+
+			lm.On("Modify", tt.modifyData.arg).Return(tt.modifyData.ret)
+			lm.On("ModifyDN", tt.modifyDNData.arg).Return(tt.modifyDNData.ret)
+			lm.On("Search", mock.Anything).Return(tt.searchData.res, tt.searchData.err)
+
+			ctx := context.Background()
+
+			_, err = b.UpdateEducationClass(ctx, tt.args.id, tt.args.class)
+			tt.assertion(t, err)
+		})
 	}
 }
