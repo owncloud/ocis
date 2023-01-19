@@ -23,8 +23,3 @@ type logging struct {
 func (l logging) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	l.next.ServeHTTP(w, r)
 }
-
-// GetConfig implements the Service interface.
-func (l logging) GetConfig(w http.ResponseWriter, r *http.Request) {
-	l.next.GetConfig(w, r)
-}
