@@ -207,10 +207,8 @@ func createGroupModelFromCS3(g *cs3group.Group) *libregraph.Group {
 		g.Id = &cs3group.GroupId{}
 	}
 	return &libregraph.Group{
-		Id:                       &g.Id.OpaqueId,
-		OnPremisesDomainName:     &g.Id.Idp,
-		OnPremisesSamAccountName: &g.GroupName,
-		DisplayName:              &g.DisplayName,
+		Id:          &g.Id.OpaqueId,
+		DisplayName: &g.GroupName,
 		// TODO when to fetch and expand memberof, usernames or ids?
 	}
 }
