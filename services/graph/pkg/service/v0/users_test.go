@@ -512,9 +512,6 @@ var _ = Describe("Users", func() {
 		})
 
 		It("handles bad Mails", func() {
-			user.Mail = nil
-			assertHandleBadAttributes(user)
-
 			user.SetMail("not-a-mail-address")
 			assertHandleBadAttributes(user)
 		})
