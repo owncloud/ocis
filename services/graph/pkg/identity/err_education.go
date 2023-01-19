@@ -75,6 +75,7 @@ func (i *ErrEducationBackend) GetEducationClassMembers(ctx context.Context, name
 	return nil, errNotImplemented
 }
 
+// UpdateEducationClass implments the EducationBackend interface
 func (i *ErrEducationBackend) UpdateEducationClass(ctx context.Context, id string, class libregraph.EducationClass) (*libregraph.EducationClass, error) {
 	return nil, errNotImplemented
 }
