@@ -24,7 +24,7 @@ Feature: create user
       | withoutPassSameEmail         | without pass     | alice@example.org   |                              | 200  | should     |
       | name                         | pass with space  | example@example.org | my pass                      | 200  | should     |
       | nameWithCharacters(*:!;_+-&) | user             | new@example.org     | 123                          | 400  | should not |
-      | withoutEmail                 | without email    |                     | 123                          | 400  | should not |
+      | withoutEmail                 | without email    |                     | 123                          | 200  | should     |
       | Alice                        | same userName    | new@example.org     | 123                          | 400  | should     |
       | name with space              | name with space  | example@example.org | 123                          | 400  | should not |
 

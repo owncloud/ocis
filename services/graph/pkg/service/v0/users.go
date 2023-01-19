@@ -188,10 +188,6 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("%v is not a valid email address", *u.Mail))
 			return
 		}
-	} else {
-		logger.Debug().Interface("user", u).Msg("could not create user: missing required Attribute: 'mail'")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'mail'")
-		return
 	}
 
 	// Disallow user-supplied IDs. It's supposed to be readonly. We're either
