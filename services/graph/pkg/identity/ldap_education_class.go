@@ -2,6 +2,7 @@ package identity
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 
@@ -181,14 +182,18 @@ func (i *LDAP) UpdateEducationClass(ctx context.Context, id string, class libreg
 		return nil, errorcode.New(errorcode.NotSupported, "changing the classification is currently not supported")
 	}
 
-	mr := ldap.ModifyRequest{DN: g.DN}
+	dn := g.DN
 
 	if eID := class.GetExternalId(); eID != "" {
 		if g.GetEqualFoldAttributeValue(i.educationConfig.classAttributeMap.externalID) != eID {
-			mr.Replace(i.educationConfig.classAttributeMap.externalID, []string{eID})
-			updateNeeded = true
+			dn, err = i.updateClassExternalID(ctx, dn, eID)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
+
+	mr := ldap.ModifyRequest{DN: dn}
 
 	if dName := class.GetDisplayName(); dName != "" {
 		if g.GetEqualFoldAttributeValue(i.groupAttributeMap.name) != dName {
@@ -203,12 +208,36 @@ func (i *LDAP) UpdateEducationClass(ctx context.Context, id string, class libreg
 		}
 	}
 
-	g, err = i.getEducationClassByDN(g.DN)
+	g, err = i.getEducationClassByDN(dn)
 	if err != nil {
 		return nil, err
 	}
 
 	return i.createEducationClassModelFromLDAP(g), nil
+}
+
+func (i *LDAP) updateClassExternalID(ctx context.Context, dn, externalID string) (string, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	newDN := fmt.Sprintf("ocEducationExternalID=%s", externalID)
+
+	mrdn := ldap.NewModifyDNRequest(dn, newDN, true, "")
+	i.logger.Debug().Str("Backend", "ldap").
+		Str("dn", mrdn.DN).
+		Str("newrdn", mrdn.NewRDN).
+		Msg("updating class external ID")
+
+	if err := i.conn.ModifyDN(mrdn); err != nil {
+		var lerr *ldap.Error
+		logger.Debug().Err(err).Msg("error updating class external ID")
+		if errors.As(err, &lerr) {
+			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
+				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
+			}
+		}
+		return "", err
+	}
+
+	return fmt.Sprintf("%s,%s", newDN, i.groupBaseDN), nil
 }
 
 // GetEducationClassMembers implements the EducationBackend interface for the LDAP backend.
