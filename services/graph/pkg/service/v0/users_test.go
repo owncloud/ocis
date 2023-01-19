@@ -392,7 +392,7 @@ var _ = Describe("Users", func() {
 			err = json.Unmarshal(data, &responseUser)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(responseUser.GetId()).To(Equal("user1"))
-			Expect(responseUser.GetDrive().Id).To(Equal("personal"))
+			Expect(*responseUser.GetDrive().Id).To(Equal("personal"))
 		})
 
 		It("includes the drives if requested", func() {
