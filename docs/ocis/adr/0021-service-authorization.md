@@ -54,14 +54,14 @@ Chosen option: ?
 ### Service Accounts
 
 Implement service accounts to mimic the MS graph servicePrincipals for an application. The appRoles can be used to limit the interactions to other services, e.g. `Files.Read.All` to allow the servicePrincipal reading all files in all drives of a tenant. 
-An application is represented by a dedicated servicePrincipal per tenant, which is created when granting an application access to a tenant (currently instace) by an admin. These servicepPrancipals then get an appRoleAssignment for the appRoles defined by the application.
+An application is represented by a dedicated servicePrincipal per tenant, which is created when granting an application access to a tenant (currently instace) by an admin. These servicePrincipals then get an appRoleAssignment for the appRoles defined by the application.
 An application could be the search service (or only a content extraction service), a workflow service, a publication service or any other service.
 
 TODO which services need a service account?
 TODO do we store them in the same user backend? CS3 has USER_TYPE_SERVICE and USER_TYPE_APPLICATION, where application is sth like collabora and service is afaict sth like service accounts. No, but we have to implement a new reva auth-service manager.
 
 * Good, because we could replace machine auth with specific service accounts and no longer have to distribude a shared secret everywhere
-* Bad, because we don't know if a there are placles in the code that try to look up a user with USER_TYPE_SERVICE at the cs3 users service ... they might not exist there ... or do we have to implement a userregistry, similar to the authregistry?
+* Bad, because we don't know if a there are places in the code that try to look up a user with USER_TYPE_SERVICE at the cs3 users service ... they might not exist there ... or do we have to implement a userregistry, similar to the authregistry?
 * Bad, because we have to provision and manage service accounts on init
 * Bad, because we have to write codemanage service accounts in the admin ui
 
@@ -72,7 +72,7 @@ We could implement a new auth manager that can authenticate space owners, a CS3 
 
 * Good, because it reuses the space owner user type
 * Bad, because the space owner always has write permisson
-* Bad, because we don't know if a there are placles in the code that try to look up a user with USER_TYPE_SPACE_OWNER at the cs3 users service ... they might not exist there ... or do we have to implement a userregistry, similar to the authregistry?
+* Bad, because we don't know if a there are places in the code that try to look up a user with USER_TYPE_SPACE_OWNER at the cs3 users service ... they might not exist there ... or do we have to implement a userregistry, similar to the authregistry?
 
 ## Links
 
