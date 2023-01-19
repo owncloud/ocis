@@ -311,8 +311,6 @@ cannot share a folder with create permission
 - [coreApiShareOperationsToShares1/changingFilesShare.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/changingFilesShare.feature#L131)
 - [coreApiShareOperationsToShares1/changingFilesShare.feature:132](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/changingFilesShare.feature#L132)
 - [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:538](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L538)
-- [coreApiVersions/fileVersionsSharingToShares.feature:220](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionsSharingToShares.feature#L220)
-- [coreApiVersions/fileVersionsSharingToShares.feature:221](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionsSharingToShares.feature#L221)
 - [coreApiWebdavMove2/moveShareOnOcis.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L30)
 - [coreApiWebdavMove2/moveShareOnOcis.feature:32](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L32)
 - [coreApiWebdavMove2/moveShareOnOcis.feature:98](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L98)
@@ -469,7 +467,7 @@ cannot share a folder with create permission
 
 #### [user can access version metadata of a received share before accepting it](https://github.com/owncloud/ocis/issues/760)
 
-- [coreApiVersions/fileVersionsSharingToShares.feature:283](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersionsSharingToShares.feature#L283)
+- [coreApiVersions/fileVersions.feature:487](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiVersions/fileVersions.feature#L487)
 
 #### [Share lists deleted user as 'user'](https://github.com/owncloud/ocis/issues/903)
 
