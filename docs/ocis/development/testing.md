@@ -89,8 +89,8 @@ make -C tests/acceptance/docker clean
 
 ## Testing with test suite natively installed
 
-we have 2 sets of tests:
-- `test-acceptance-core-api` set was transferred from [core](https://github.com/owncloud/core) repository 
+We have two sets of tests:
+- `test-acceptance-from-core-api` set was transferred from [core](https://github.com/owncloud/core) repository 
 The suite name of all tests transferred from the core starts with "core"
 
 - `test-acceptance-api` set was created for ocis. Mainly for testing spaces features
@@ -103,20 +103,24 @@ Create an up-to-date ocis binary by [building oCIS]({{< ref "build" >}})
 To start ocis:
 
 ```bash
-IDM_ADMIN_PASSWORD=admin ocis/bin/ocis init --insecure true
-OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true ocis/bin/ocis server
+IDM_ADMIN_PASSWORD=admin \
+ocis/bin/ocis init --insecure true
+
+OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true \
+ocis/bin/ocis server
 ```
 
 `PROXY_ENABLE_BASIC_AUTH` will allow the acceptance tests to make requests against the provisioning api (and other endpoints) using basic auth.
 
-### Run the test-acceptance-core-api tests
+### Run the test-acceptance-from-core-api tests
 
 ```bash
-make test-acceptance-core-api \
+make test-acceptance-from-core-api \
 TEST_SERVER_URL=https://localhost:9200 \
 TEST_WITH_GRAPH_API=true \
 TEST_OCIS=true \
 ```
+Note: This command only works for suites that start with core
 
 ### Run the test-acceptance-api tests
 
@@ -140,7 +144,7 @@ To run tests with a different storage driver set `STORAGE_DRIVER` to the correct
 
 ### use existing tests for BDD
 
-As a lot of scenarios from `test-acceptance-core-api` are written for oC10, we can use those tests for Behaviour driven development in ocis.
+As a lot of scenarios from `test-acceptance-from-core-api` are written for oC10, we can use those tests for Behaviour driven development in ocis.
 Every scenario that does not work in oCIS with "ocis" storage, is listed in `tests/acceptance/expected-failures-API-on-OCIS-storage.md` with a link to the related issue.
 
 Those scenarios are run in the ordinary acceptance test pipeline in CI. The scenarios that fail are checked against the
@@ -155,7 +159,7 @@ If you want to work on a specific issue
     E.g.:
 
     ```bash
-    make test-acceptance-core-api \
+    make test-acceptance-from-core-api \
     TEST_SERVER_URL=https://localhost:9200 \
     TEST_OCIS=true \
     TEST_WITH_GRAPH_API=true \
@@ -165,7 +169,7 @@ If you want to work on a specific issue
 
 2. the tests will fail, try to understand how and why they are failing
 3. fix the code
-4. go back to 2. and repeat till the tests are passing.
+4. go back to 1. and repeat till the tests are passing.
 5. remove those tests from the expected failures file
 6. make a PR that has the fixed code, and the relevant lines removed from the expected failures file.
 
