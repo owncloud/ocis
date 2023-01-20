@@ -26,7 +26,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Flag to enable or disable the creation of the demo users.
+The default role assignments the demo users should be setup.
 
 a| `LDAP_BIND_DN`
 
@@ -1071,7 +1071,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary to access resources from other services.
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1130,7 +1130,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
+ID of the oCIS storage-system system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
 
 a| `OCIS_SYSTEM_USER_IDP`
 
@@ -1334,7 +1334,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The public facing URL of the oCIS Web UI, used e.g. when sending notification eMails
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
 a| `REVA_GATEWAY`
 
@@ -1370,7 +1370,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-CS3 gateway used to look up user metadata
+The CS3 gateway endpoint.
 
 a| `STORAGE_TRANSFER_SECRET`
 
