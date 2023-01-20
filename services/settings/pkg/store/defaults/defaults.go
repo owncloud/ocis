@@ -58,7 +58,7 @@ const (
 	// DeleteAllSpacesPermissionName is the hardcoded setting name for the delete all space permission
 	DeleteAllSpacesPermissionName string = "delete-all-spaces"
 
-	// ManageSpacePropertiesPermissionID is the hardcoded setting UUID for the manage space properites permission
+	// ManageSpacePropertiesPermissionID is the hardcoded setting UUID for the manage space properties permission
 	ManageSpacePropertiesPermissionID string = "b44b4054-31a2-42b8-bb71-968b15cfbd4f"
 	// ManageSpacePropertiesPermissionName is the hardcoded setting name for the manage space properties permission
 	ManageSpacePropertiesPermissionName string = "Drive.ReadWrite"
