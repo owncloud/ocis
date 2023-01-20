@@ -885,7 +885,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                          },
                          "commands": [
-                             "make -C %s test-acceptance-core-api" % (dirs["base"]),
+                             "make -C %s test-acceptance-from-core-api" % (dirs["base"]),
                          ],
                      },
                  ] + failEarly(ctx, early_fail),
