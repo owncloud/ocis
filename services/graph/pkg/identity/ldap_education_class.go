@@ -162,14 +162,6 @@ func (i *LDAP) UpdateEducationClass(ctx context.Context, id string, class libreg
 		}
 	}
 
-	if class.GetOnPremisesSamAccountName() != "" {
-		return nil, errorcode.New(errorcode.NotSupported, "changing the SAM account name is currently not supported")
-	}
-
-	if class.GetOnPremisesDomainName() != "" {
-		return nil, errorcode.New(errorcode.NotSupported, "changing the SAM account name is currently not supported")
-	}
-
 	if class.GetDescription() != "" {
 		return nil, errorcode.New(errorcode.NotSupported, "changing the description is currently not supported")
 	}
