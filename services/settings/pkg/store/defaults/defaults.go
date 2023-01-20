@@ -58,6 +58,16 @@ const (
 	// DeleteAllSpacesPermissionName is the hardcoded setting name for the delete all space permission
 	DeleteAllSpacesPermissionName string = "delete-all-spaces"
 
+	// ManageSpacePropertiesPermissionID is the hardcoded setting UUID for the manage space properites permission
+	ManageSpacePropertiesPermissionID string = "b44b4054-31a2-42b8-bb71-968b15cfbd4f"
+	// ManageSpacePropertiesPermissionName is the hardcoded setting name for the manage space properties permission
+	ManageSpacePropertiesPermissionName string = "Drive.ReadWrite"
+
+	// SpaceAbilityPermissionID is the hardcoded setting UUID for the space ability permission
+	SpaceAbilityPermissionID string = "cf3faa8c-50d9-4f84-9650-ff9faf21aa9d"
+	// SpaceAbilityPermissionName is the hardcoded setting name for the space ability permission
+	SpaceAbilityPermissionName string = "Drive.ReadWriteEnable"
+
 	settingUUIDProfileLanguage = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f"
 
 	// AccountManagementPermissionID is the hardcoded setting UUID for the account management permission
@@ -265,6 +275,36 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 			Type: settingsmsg.Resource_TYPE_SYSTEM,
 		},
 		Settings: []*settingsmsg.Setting{
+			{
+				Id:          ManageSpacePropertiesPermissionID,
+				Name:        ManageSpacePropertiesPermissionName,
+				DisplayName: "Manage space properties",
+				Description: "This permission allows to manage space properties such as name and description.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SYSTEM,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+			{
+				Id:          SpaceAbilityPermissionID,
+				Name:        SpaceAbilityPermissionName,
+				DisplayName: "Space ability",
+				Description: "This permission allows to enable and disable spaces.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SYSTEM,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
 			{
 				Id:          SetSpaceQuotaPermissionID,
 				Name:        SetSpaceQuotaPermissionName,
