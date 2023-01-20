@@ -589,7 +589,7 @@ class GraphHelper {
 		$payload['onPremisesSamAccountName'] = $userName;
 		$payload['passwordProfile'] = ['password' => $password];
 		$payload['displayName'] = $displayName ?? $userName;
-		if (!isset($email)) {
+		if (!empty($email)) {
 			$payload['mail'] = $email ?? $userName . '@example.com';
 		}
 		return \json_encode($payload);
