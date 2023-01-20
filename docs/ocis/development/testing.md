@@ -89,15 +89,12 @@ make -C tests/acceptance/docker clean
 
 ## Testing with test suite natively installed
 
-We are using the ownCloud 10 acceptance test suite against oCIS.
+We have two sets of tests:
+- `test-acceptance-from-core-api` set was transferred from [core](https://github.com/owncloud/core) repository 
+The suite name of all tests transferred from the core starts with "core"
 
-### Getting the tests
+- `test-acceptance-api` set was created for ocis. Mainly for testing spaces features
 
-All you need to do to get the acceptance tests is check out the core repo:
-
-```bash
-git clone https://github.com/owncloud/core.git
-```
 
 ### Run ocis
 
@@ -106,47 +103,49 @@ Create an up-to-date ocis binary by [building oCIS]({{< ref "build" >}})
 To start ocis:
 
 ```bash
-IDM_ADMIN_PASSWORD=admin ocis/bin/ocis init --insecure true
-OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true ocis/bin/ocis server
+IDM_ADMIN_PASSWORD=admin \
+ocis/bin/ocis init --insecure true
+
+OCIS_INSECURE=true PROXY_ENABLE_BASIC_AUTH=true \
+ocis/bin/ocis server
 ```
 
 `PROXY_ENABLE_BASIC_AUTH` will allow the acceptance tests to make requests against the provisioning api (and other endpoints) using basic auth.
 
-### Run the acceptance tests
-
-First we will need to clone the testing app in owncloud which contains the skeleton files required for running the tests.
-In the ownCloud 10 core clone the testing app with the following command:
+### Run the test-acceptance-from-core-api tests
 
 ```bash
-git clone https://github.com/owncloud/testing apps/testing
+make test-acceptance-from-core-api \
+TEST_SERVER_URL=https://localhost:9200 \
+TEST_WITH_GRAPH_API=true \
+TEST_OCIS=true \
 ```
+Note: This command only works for suites that start with core
 
-Then run the api acceptance tests with the following command from the root of the ownCloud 10 core repository:
+### Run the test-acceptance-api tests
 
 ```bash
 make test-acceptance-api \
 TEST_SERVER_URL=https://localhost:9200 \
 TEST_WITH_GRAPH_API=true \
-PATH_TO_OCIS=/var/www/ocis \
-PATH_TO_CORE=. \
 TEST_OCIS=true \
-STORAGE_DRIVER=OCIS \
-SKELETON_DIR=apps/testing/data/apiSkeleton \
-BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS'
 ```
 
-Make sure to adjust the settings `TEST_SERVER_URL` and `PATH_TO_OCIS` according to your environment.
+Make sure to adjust the settings `TEST_SERVER_URL` according to your environment.
 
-This will run all tests that are relevant to oCIS.
-
-To run a single feature add `BEHAT_FEATURE=<feature file>`
+To run a single feature add `BEHAT_FEATURE=<feature file>` 
+example: `BEHAT_SUITE=tests/acceptance/features/apiGraph/createUser.feature`
+To run a single test add `BEHAT_FEATURE=<file.feature:(line number)>`
+example: `BEHAT_SUITE=tests/acceptance/features/apiGraph/createUser.feature:12`
+To run a single suite add `BEHAT_SUITE=<test suite>`
+example: `BEHAT_SUITE=apiGraph`
 
 To run tests with a different storage driver set `STORAGE_DRIVER` to the correct value. It can be set to `OCIS` or `OWNCLOUD` and uses `OWNCLOUD` as the default value.
 
 ### use existing tests for BDD
 
-As a lot of scenarios are written for oC10, we can use those tests for Behaviour driven development in ocis.
-Every scenario that does not work in oCIS with "ocis" storage, is listed in `tests/acceptance/expected-failures-on-OCIS-storage.md` with a link to the related issue.
+As a lot of scenarios from `test-acceptance-from-core-api` are written for oC10, we can use those tests for Behaviour driven development in ocis.
+Every scenario that does not work in oCIS with "ocis" storage, is listed in `tests/acceptance/expected-failures-API-on-OCIS-storage.md` with a link to the related issue.
 
 Those scenarios are run in the ordinary acceptance test pipeline in CI. The scenarios that fail are checked against the
 expected failures. If there are any differences then the CI pipeline fails.
@@ -155,30 +154,24 @@ The tests are not currently run in CI with the OWNCLOUD or EOS storage drivers, 
 
 If you want to work on a specific issue
 
-1. adjust the core commit id to the latest commit in core so that CI will run the latest test code and scenarios from core.
-    For that change `CORE_COMMITID` in `.drone.env`:
-
-        # The test runner source for API tests
-        CORE_COMMITID=38c91e5cf5fc4ffdc0536ba1d147a2a618ef83b5
-        CORE_BRANCH=master
-
-2. locally run each of the tests marked with that issue in the expected failures file.
+1. locally run each of the tests marked with that issue in the expected failures file.
 
     E.g.:
 
     ```bash
-    make test-acceptance-api \
+    make test-acceptance-from-core-api \
     TEST_SERVER_URL=https://localhost:9200 \
     TEST_OCIS=true \
+    TEST_WITH_GRAPH_API=true \
     STORAGE_DRIVER=OCIS \
-    BEHAT_FEATURE='tests/acceptance/features/apiComments/comments.feature:123'
+    BEHAT_FEATURE='tests/acceptance/features/coreApiVersions/fileVersions.feature:147'
     ```
 
-3. the tests will fail, try to understand how and why they are failing
-4. fix the code
-5. go back to 2. and repeat till the tests are passing.
-6. remove those tests from the expected failures file
-7. make a PR that has the fixed code, and the relevant lines removed from the expected failures file.
+2. the tests will fail, try to understand how and why they are failing
+3. fix the code
+4. go back to 1. and repeat till the tests are passing.
+5. remove those tests from the expected failures file
+6. make a PR that has the fixed code, and the relevant lines removed from the expected failures file.
 
 ## Running tests for parallel deployment
 
