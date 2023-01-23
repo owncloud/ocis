@@ -55,7 +55,7 @@
     "@cucumber/cucumber": "^7.3.2",
     "@cucumber/pretty-formatter": "^1.0.0",
     "@erquhart/rollup-plugin-node-builtins": "^2.1.5",
-    "@rollup/plugin-commonjs": "^17.1.0",
+    "@rollup/plugin-commonjs": "^24.0.1",
     "@rollup/plugin-json": "^4.0.1",
     "@rollup/plugin-replace": "^4.0.0",
     "archiver": "^5.3.0",
