@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/logging"
@@ -31,10 +30,6 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 			err := tracing.Configure(cfg)
-			if err != nil {
-				return err
-			}
-			err = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
 			if err != nil {
 				return err
 			}

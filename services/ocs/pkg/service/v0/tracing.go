@@ -21,8 +21,3 @@ type tracing struct {
 func (t tracing) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	middleware.TraceContext(t.next).ServeHTTP(w, r)
 }
-
-// GetConfig implements the Service interface.
-func (t tracing) GetConfig(w http.ResponseWriter, r *http.Request) {
-	t.next.GetConfig(w, r)
-}

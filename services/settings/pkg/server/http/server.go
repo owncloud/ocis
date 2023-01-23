@@ -2,13 +2,14 @@ package http
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
+	ohttp "github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/assets"
@@ -17,24 +18,24 @@ import (
 )
 
 // Server initializes the http service and server.
-func Server(opts ...Option) (http.Service, error) {
+func Server(opts ...Option) (ohttp.Service, error) {
 	options := newOptions(opts...)
 
-	service, err := http.NewService(
-		http.TLSConfig(options.Config.HTTP.TLS),
-		http.Logger(options.Logger),
-		http.Name(options.Name),
-		http.Version(version.GetString()),
-		http.Address(options.Config.HTTP.Addr),
-		http.Namespace(options.Config.HTTP.Namespace),
-		http.Context(options.Context),
-		http.Flags(options.Flags...),
+	service, err := ohttp.NewService(
+		ohttp.TLSConfig(options.Config.HTTP.TLS),
+		ohttp.Logger(options.Logger),
+		ohttp.Name(options.Name),
+		ohttp.Version(version.GetString()),
+		ohttp.Address(options.Config.HTTP.Addr),
+		ohttp.Namespace(options.Config.HTTP.Namespace),
+		ohttp.Context(options.Context),
+		ohttp.Flags(options.Flags...),
 	)
 	if err != nil {
 		options.Logger.Error().
 			Err(err).
 			Msg("Error initializing http service")
-		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
+		return ohttp.Service{}, fmt.Errorf("could not initialize http service: %w", err)
 	}
 
 	handle := svc.NewService(options.Config, options.Logger)
@@ -86,6 +87,11 @@ func Server(opts ...Option) (http.Service, error) {
 		settingssvc.RegisterValueServiceWeb(r, handle)
 		settingssvc.RegisterRoleServiceWeb(r, handle)
 		settingssvc.RegisterPermissionServiceWeb(r, handle)
+	})
+
+	_ = chi.Walk(mux, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
+		options.Logger.Debug().Str("method", method).Str("route", route).Int("middlewares", len(middlewares)).Msg("serving endpoint")
+		return nil
 	})
 
 	micro.RegisterHandler(service.Server(), mux)

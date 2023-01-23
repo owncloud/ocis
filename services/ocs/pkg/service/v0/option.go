@@ -4,8 +4,6 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
-	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/config"
 )
 
@@ -14,11 +12,9 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger      log.Logger
-	Config      *config.Config
-	Middleware  []func(http.Handler) http.Handler
-	RoleService settingssvc.RoleService
-	RoleManager *roles.Manager
+	Logger     log.Logger
+	Config     *config.Config
+	Middleware []func(http.Handler) http.Handler
 }
 
 // newOptions initializes the available default options.
@@ -50,19 +46,5 @@ func Config(val *config.Config) Option {
 func Middleware(val ...func(http.Handler) http.Handler) Option {
 	return func(o *Options) {
 		o.Middleware = val
-	}
-}
-
-// RoleService provides a function to set the RoleService option.
-func RoleService(val settingssvc.RoleService) Option {
-	return func(o *Options) {
-		o.RoleService = val
-	}
-}
-
-// RoleManager provides a function to set the RoleManager option.
-func RoleManager(val *roles.Manager) Option {
-	return func(o *Options) {
-		o.RoleManager = val
 	}
 }

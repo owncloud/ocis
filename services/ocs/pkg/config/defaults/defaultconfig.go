@@ -3,7 +3,6 @@ package defaults
 import (
 	"strings"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/config"
 )
 
@@ -35,11 +34,6 @@ func DefaultConfig() *config.Config {
 		},
 		Service: config.Service{
 			Name: "ocs",
-		},
-		AccountBackend: "cs3",
-		Reva:           shared.DefaultRevaConfig(),
-		IdentityManagement: config.IdentityManagement{
-			Address: "https://localhost:9200",
 		},
 	}
 }
@@ -78,15 +72,6 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.CacheStore = &config.CacheStore{}
 	}
 
-	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
-		cfg.Reva = &shared.Reva{
-			Address: cfg.Commons.Reva.Address,
-			TLS:     cfg.Commons.Reva.TLS,
-		}
-	} else if cfg.Reva == nil {
-		cfg.Reva = &shared.Reva{}
-	}
-
 	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
 		cfg.TokenManager = &config.TokenManager{
 			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
@@ -95,17 +80,6 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 
-	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
-		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
-	}
-
-	if cfg.GRPCClientTLS == nil {
-		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
-		if cfg.Commons != nil && cfg.Commons.GRPCClientTLS != nil {
-			cfg.GRPCClientTLS.Mode = cfg.Commons.GRPCClientTLS.Mode
-			cfg.GRPCClientTLS.CACert = cfg.Commons.GRPCClientTLS.CACert
-		}
-	}
 	if cfg.Commons != nil {
 		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
 	}
