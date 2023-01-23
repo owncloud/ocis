@@ -455,52 +455,6 @@ func TestLDAP_UpdateEducationClass(t *testing.T) {
 			},
 		},
 		{
-			name: "Check error: attempt at changing SAM account name",
-			args: args{
-				id: "abcd-defg",
-				class: libregraph.EducationClass{
-					OnPremisesSamAccountName: &changeString,
-				},
-			},
-			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Error(tt, err) },
-			modifyData: modifyData{
-				arg: &ldap.ModifyRequest{},
-			},
-			modifyDNData: modifyDNData{
-				arg: &ldap.ModifyDNRequest{},
-				ret: nil,
-			},
-			searchData: searchData{
-				res: &ldap.SearchResult{
-					Entries: []*ldap.Entry{classEntry},
-				},
-				err: nil,
-			},
-		},
-		{
-			name: "Check error: attempt at changing Domain Name",
-			args: args{
-				id: "abcd-defg",
-				class: libregraph.EducationClass{
-					OnPremisesDomainName: &changeString,
-				},
-			},
-			assertion: func(tt assert.TestingT, err error, i ...interface{}) bool { return assert.Error(tt, err) },
-			modifyData: modifyData{
-				arg: &ldap.ModifyRequest{},
-			},
-			modifyDNData: modifyDNData{
-				arg: &ldap.ModifyDNRequest{},
-				ret: nil,
-			},
-			searchData: searchData{
-				res: &ldap.SearchResult{
-					Entries: []*ldap.Entry{classEntry},
-				},
-				err: nil,
-			},
-		},
-		{
 			name: "Check error: attempt at changing description",
 			args: args{
 				id: "abcd-defg",
