@@ -348,11 +348,11 @@ func (i *LDAP) GetEducationSchools(ctx context.Context, queryParam url.Values) (
 }
 
 // GetEducationSchoolUsers implements the EducationBackend interface for the LDAP backend.
-func (i *LDAP) GetEducationSchoolUsers(ctx context.Context, id string) ([]*libregraph.EducationUser, error) {
+func (i *LDAP) GetEducationSchoolUsers(ctx context.Context, schoolNumberOrID string) ([]*libregraph.EducationUser, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetEducationSchoolUsers")
 
-	schoolEntry, err := i.getSchoolByNumberOrID(id)
+	schoolEntry, err := i.getSchoolByNumberOrID(schoolNumberOrID)
 	if err != nil {
 		return nil, err
 	}
@@ -360,8 +360,9 @@ func (i *LDAP) GetEducationSchoolUsers(ctx context.Context, id string) ([]*libre
 	if schoolEntry == nil {
 		return nil, ErrNotFound
 	}
-	id = ldap.EscapeFilter(id)
-	idFilter := fmt.Sprintf("(%s=%s)", i.educationConfig.memberOfSchoolAttribute, id)
+	schoolID := schoolEntry.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.id)
+	schoolID = ldap.EscapeFilter(schoolID)
+	idFilter := fmt.Sprintf("(%s=%s)", i.educationConfig.memberOfSchoolAttribute, schoolID)
 	userFilter := fmt.Sprintf("(&%s(objectClass=%s)%s)", i.userFilter, i.educationConfig.userObjectClass, idFilter)
 
 	searchRequest := ldap.NewSearchRequest(
@@ -398,11 +399,11 @@ func (i *LDAP) GetEducationSchoolUsers(ctx context.Context, id string) ([]*libre
 }
 
 // AddUsersToEducationSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
-func (i *LDAP) AddUsersToEducationSchool(ctx context.Context, schoolID string, memberIDs []string) error {
+func (i *LDAP) AddUsersToEducationSchool(ctx context.Context, schoolNumberOrID string, memberIDs []string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("AddUsersToEducationSchool")
 
-	schoolEntry, err := i.getSchoolByNumberOrID(schoolID)
+	schoolEntry, err := i.getSchoolByNumberOrID(schoolNumberOrID)
 	if err != nil {
 		return err
 	}
@@ -410,6 +411,8 @@ func (i *LDAP) AddUsersToEducationSchool(ctx context.Context, schoolID string, m
 	if schoolEntry == nil {
 		return ErrNotFound
 	}
+
+	schoolID := schoolEntry.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.id)
 
 	userEntries := make([]*ldap.Entry, 0, len(memberIDs))
 	for _, memberID := range memberIDs {
@@ -443,11 +446,11 @@ func (i *LDAP) AddUsersToEducationSchool(ctx context.Context, schoolID string, m
 }
 
 // RemoveUserFromEducationSchool removes a single member (by ID) from a school
-func (i *LDAP) RemoveUserFromEducationSchool(ctx context.Context, schoolID string, memberID string) error {
+func (i *LDAP) RemoveUserFromEducationSchool(ctx context.Context, schoolNumberOrID string, memberID string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("RemoveUserFromEducationSchool")
 
-	schoolEntry, err := i.getSchoolByNumberOrID(schoolID)
+	schoolEntry, err := i.getSchoolByNumberOrID(schoolNumberOrID)
 	if err != nil {
 		return err
 	}
@@ -455,6 +458,8 @@ func (i *LDAP) RemoveUserFromEducationSchool(ctx context.Context, schoolID strin
 	if schoolEntry == nil {
 		return ErrNotFound
 	}
+
+	schoolID := schoolEntry.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.id)
 	user, err := i.getEducationUserByNameOrID(memberID)
 	if err != nil {
 		i.logger.Warn().Str("userid", memberID).Msg("User does not exist")

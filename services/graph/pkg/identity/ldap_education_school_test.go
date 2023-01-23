@@ -303,6 +303,14 @@ var schoolByIDSearch1 *ldap.SearchRequest = &ldap.SearchRequest{
 	Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
 	Controls:   []ldap.Control(nil),
 }
+var schoolByNumberSearch *ldap.SearchRequest = &ldap.SearchRequest{
+	BaseDN:     "",
+	Scope:      2,
+	SizeLimit:  1,
+	Filter:     filterSchoolSearchByNumberExisting,
+	Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+	Controls:   []ldap.Control(nil),
+}
 var userByIDSearch1 *ldap.SearchRequest = &ldap.SearchRequest{
 	BaseDN:     "ou=people,dc=test",
 	Scope:      2,
@@ -320,12 +328,39 @@ var userByIDSearch2 *ldap.SearchRequest = &ldap.SearchRequest{
 	Controls:   []ldap.Control(nil),
 }
 
+var userToSchoolModRequest *ldap.ModifyRequest = &ldap.ModifyRequest{
+	DN: "uid=user,ou=people,dc=test",
+	Changes: []ldap.Change{
+		{
+			Operation: ldap.AddAttribute,
+			Modification: ldap.PartialAttribute{
+				Type: "ocMemberOfSchool",
+				Vals: []string{"abcd-defg"},
+			},
+		},
+	},
+}
+
+var userFromSchoolModRequest *ldap.ModifyRequest = &ldap.ModifyRequest{
+	DN: "uid=user,ou=people,dc=test",
+	Changes: []ldap.Change{
+		{
+			Operation: ldap.DeleteAttribute,
+			Modification: ldap.PartialAttribute{
+				Type: "ocMemberOfSchool",
+				Vals: []string{"abcd-defg"},
+			},
+		},
+	},
+}
+
 func TestAddUsersToEducationSchool(t *testing.T) {
 	lm := &mocks.Client{}
-	lm.On("Search", schoolByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry, schoolEntry1}}, nil)
+	lm.On("Search", schoolByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry}}, nil)
+	lm.On("Search", schoolByNumberSearch).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry}}, nil)
 	lm.On("Search", userByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntry}}, nil)
 	lm.On("Search", userByIDSearch2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
-	lm.On("Modify", mock.Anything).Return(nil)
+	lm.On("Modify", userToSchoolModRequest).Return(nil)
 	b, err := getMockedBackend(lm, eduConfig, &logger)
 	assert.Nil(t, err)
 	err = b.AddUsersToEducationSchool(context.Background(), "abcd-defg", []string{"does-not-exist"})
@@ -337,14 +372,19 @@ func TestAddUsersToEducationSchool(t *testing.T) {
 	err = b.AddUsersToEducationSchool(context.Background(), "abcd-defg", []string{"abcd-defg"})
 	lm.AssertNumberOfCalls(t, "Search", 7)
 	assert.Nil(t, err)
+	// try to add by school number (instead or id)
+	err = b.AddUsersToEducationSchool(context.Background(), "0123", []string{"abcd-defg"})
+	lm.AssertNumberOfCalls(t, "Search", 9)
+	assert.Nil(t, err)
 }
 
 func TestRemoveMemberFromEducationSchool(t *testing.T) {
 	lm := &mocks.Client{}
-	lm.On("Search", schoolByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry, schoolEntry1}}, nil)
+	lm.On("Search", schoolByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry}}, nil)
+	lm.On("Search", schoolByNumberSearch).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry}}, nil)
 	lm.On("Search", userByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntryWithSchool}}, nil)
 	lm.On("Search", userByIDSearch2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
-	lm.On("Modify", mock.Anything).Return(nil)
+	lm.On("Modify", userFromSchoolModRequest).Return(nil)
 	b, err := getMockedBackend(lm, eduConfig, &logger)
 	assert.Nil(t, err)
 	err = b.RemoveUserFromEducationSchool(context.Background(), "abcd-defg", "does-not-exist")
@@ -354,6 +394,10 @@ func TestRemoveMemberFromEducationSchool(t *testing.T) {
 	err = b.RemoveUserFromEducationSchool(context.Background(), "abcd-defg", "abcd-defg")
 	lm.AssertNumberOfCalls(t, "Search", 4)
 	lm.AssertNumberOfCalls(t, "Modify", 1)
+	// try to remove by school number (instead or id)
+	err = b.RemoveUserFromEducationSchool(context.Background(), "0123", "abcd-defg")
+	lm.AssertNumberOfCalls(t, "Search", 6)
+	lm.AssertNumberOfCalls(t, "Modify", 2)
 	assert.Nil(t, err)
 }
 
@@ -368,10 +412,14 @@ var usersBySchoolIDSearch *ldap.SearchRequest = &ldap.SearchRequest{
 
 func TestGetEducationSchoolUsers(t *testing.T) {
 	lm := &mocks.Client{}
-	lm.On("Search", schoolByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry, schoolEntry1}}, nil)
+	lm.On("Search", schoolByIDSearch1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry}}, nil)
+	lm.On("Search", schoolByNumberSearch).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry}}, nil)
 	lm.On("Search", usersBySchoolIDSearch).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntryWithSchool}}, nil)
 	b, _ := getMockedBackend(lm, eduConfig, &logger)
 	users, err := b.GetEducationSchoolUsers(context.Background(), "abcd-defg")
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(users))
+	users, err = b.GetEducationSchoolUsers(context.Background(), "0123")
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(users))
 }
