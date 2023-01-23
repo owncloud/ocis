@@ -164,7 +164,7 @@ testSuite: build-dev-image clean-docker-container
 	@if [ -n "${START_CEPH}" ]; then \
 		COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 		COMPOSE_FILE=src/ceph.yml \
-		docker-compose run start_ceph; \
+		docker compose run start_ceph; \
 	fi; \
 	COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 	COMPOSE_FILE=$(COMPOSE_FILE) \
@@ -175,13 +175,13 @@ testSuite: build-dev-image clean-docker-container
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
 	DIVIDE_INTO_NUM_PARTS=$(DIVIDE_INTO_NUM_PARTS) \
 	RUN_PART=$(RUN_PART) \
-	docker-compose up -d --build --force-recreate
+	docker compose up -d --build --force-recreate
 
 .PHONY: show-test-logs
 show-test-logs: ## show logs of test
 	@COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 	COMPOSE_FILE=$(COMPOSE_FILE) \
-	docker-compose logs --no-log-prefix -f acceptance-tests | less
+	docker compose logs --no-log-prefix -f acceptance-tests | less
 
 .PHONY: build-dev-image
 build-dev-image:
@@ -204,7 +204,7 @@ clean-docker-container: ## clean docker containers created during acceptance tes
 	RUN_PART="" \
 	STORAGE_DRIVER="" \
 	TEST_SOURCE="" \
-	docker-compose down --remove-orphans
+	docker compose down --remove-orphans
 
 .PHONY: clean-docker-volumes
 clean-docker-volumes: ## clean docker volumes created during acceptance tests
@@ -216,7 +216,7 @@ clean-docker-volumes: ## clean docker volumes created during acceptance tests
 	RUN_PART="" \
 	STORAGE_DRIVER="" \
 	TEST_SOURCE="" \
-	docker-compose down --remove-orphans -v
+	docker compose down --remove-orphans -v
 
 .PHONY: clean-files
 clean-files:

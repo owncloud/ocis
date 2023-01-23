@@ -5,26 +5,6 @@
 
 git config --global advice.detachedHead false
 
-## GET DEPENDENCIES
-
-if cd $TESTING_DIR > /dev/null 2>&1
-then
-    git pull
-else
-    git clone -b master --depth=1 https://github.com/owncloud/testing.git $TESTING_DIR
-fi
-
-if cd $PATH_TO_CORE > /dev/null 2>&1
-then
-    git checkout $CORE_BRANCH
-    git pull
-    git checkout $CORE_COMMITID
-else
-    git clone -b $CORE_BRANCH --single-branch --no-tags https://github.com/owncloud/core.git $PATH_TO_CORE
-    cd $PATH_TO_CORE
-    git checkout $CORE_COMMITID
-fi
-
 ## CONFIGURE TEST
 
 if [ "$TEST_SOURCE" = "oc10" ]
@@ -95,7 +75,9 @@ fi
 
 if [ "$TEST_SOURCE" = "oc10" ]
 then
-    make -C /srv/app/testrunner test-acceptance-api
+   cd $OCIS_ROOT
+       sleep 10
+       make test-acceptance-from-core-api
 elif [ "$TEST_SOURCE" = "ocis" ]
 then
     cd $OCIS_ROOT
