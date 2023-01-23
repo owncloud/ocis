@@ -26,7 +26,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-The default role assignments the demo users should be setup.
+Flag to enable or disable the creation of the demo users.
 
 a| `LDAP_BIND_DN`
 
@@ -131,7 +131,7 @@ a| [subs=-attributes]
 ++groupOfNames ++
 
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter like 'groupOfNames'. 
+The object class to use for groups in the default group search filter ('groupOfNames'). 
 
 a| `LDAP_GROUP_SCHEMA_DISPLAYNAME`
 
@@ -181,7 +181,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique ID for groups. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
 
 a| `LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -197,7 +197,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs.
 
 a| `LDAP_GROUP_SCHEMA_MAIL`
 
@@ -336,7 +336,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-The object class to use for users in the default user search filter like 'inetOrgPerson'.
+The object class to use for users in the default user search filter ('inetOrgPerson').
 
 a| `LDAP_USER_SCHEMA_DISPLAYNAME`
 
@@ -370,7 +370,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
+LDAP Attribute to use as the unique id for users. This should be a stable globally unique ID like a UUID.
 
 a| `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -386,7 +386,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.
+Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.
 
 a| `LDAP_USER_SCHEMA_MAIL`
 
@@ -466,13 +466,13 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
-++string ++
+++[]string ++
 
 a| [subs=-attributes]
-++ ++
+++[] ++
 
 a| [subs=-attributes]
-A comma-separated list of addresses to connect to. Only valid if the above setting is set to "etcd"
+Node addresses to use for the cache store.
 
 a| `OCIS_CACHE_STORE_SIZE`
 
@@ -501,10 +501,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ ++
+++memory ++
 
 a| [subs=-attributes]
-The type of the cache store. Valid options are "noop", "ocmem", "etcd" and "memory"
+Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -611,8 +611,6 @@ a| [subs=attributes+]
 * xref:{s-path}/idp.adoc[idp] +
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
-* xref:{s-path}/ocs.adoc[ocs] +
-* xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/search.adoc[search] +
@@ -653,8 +651,6 @@ a| [subs=attributes+]
 * xref:{s-path}/idp.adoc[idp] +
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
-* xref:{s-path}/ocs.adoc[ocs] +
-* xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/search.adoc[search] +
@@ -853,7 +849,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments.
+Allow insecure connections to the OIDC issuer.
 
 a| `OCIS_JWT_SECRET`
 
@@ -885,7 +881,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The secret to mint and validate JWT tokens.
+The secret to mint and validate jwt tokens.
 
 a| `OCIS_LOG_COLOR`
 
@@ -1067,7 +1063,6 @@ a| [subs=attributes+]
 * xref:{s-path}/idp.adoc[idp] +
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
-* xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/search.adoc[search] +
 
@@ -1078,7 +1073,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary to access resources from other services.
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1087,7 +1082,6 @@ a| [subs=attributes+]
 * xref:{s-path}/auth-bearer.adoc[auth-bearer] +
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/idp.adoc[idp] +
-* xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
@@ -1326,7 +1320,6 @@ a| [subs=attributes+]
 * xref:{s-path}/idp.adoc[idp] +
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
-* xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
@@ -1358,7 +1351,6 @@ a| [subs=attributes+]
 * xref:{s-path}/idp.adoc[idp] +
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
-* xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/sharing.adoc[sharing] +
@@ -1392,7 +1384,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Transfer secret for signing file up- and download requests.
+The storage transfer secret.
 
 a| `STORAGE_USERS_OCIS_ASYNC_UPLOADS`
 
