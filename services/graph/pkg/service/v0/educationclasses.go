@@ -176,8 +176,8 @@ func (g Graph) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	render.Status(r, http.StatusOK) // TODO StatusNoContent when prefer=minimal is used, otherwise OK and the resource in the body
-	render.JSON(w, r, class)
+	render.Status(r, http.StatusNoContent) // TODO StatusNoContent when prefer=minimal is used, otherwise OK and the resource in the body
+	render.NoContent(w, r)
 }
 
 // GetEducationClass implements the Service interface.
