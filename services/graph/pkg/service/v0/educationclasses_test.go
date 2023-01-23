@@ -389,7 +389,7 @@ var _ = Describe("EducationClass", func() {
 				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
 				svc.PatchEducationClass(rr, r)
 
-				Expect(rr.Code).To(Equal(http.StatusOK))
+				Expect(rr.Code).To(Equal(http.StatusNoContent))
 				identityBackend.AssertNumberOfCalls(GinkgoT(), "AddMembersToGroup", 1)
 			})
 		})
