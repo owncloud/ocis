@@ -120,7 +120,7 @@ func (g Graph) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	class, err := g.identityEducationBackend.UpdateEducationClass(r.Context(), classID, *changes)
+	_, err = g.identityEducationBackend.UpdateEducationClass(r.Context(), classID, *changes)
 	if err != nil {
 		logger.Error().
 			Err(err).
