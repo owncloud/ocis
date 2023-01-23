@@ -101,7 +101,7 @@ class TagContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has created the following tags a (folder|file)\s?"([^"]*)" of the space "([^"]*)":$/
+	 * @Given /^user "([^"]*)" has created the following tags for (folder|file)\s?"([^"]*)" of the space "([^"]*)":$/
 	 *
 	 * @param string $user
 	 * @param string $fileOrFolder   (file|folder)
@@ -126,6 +126,8 @@ class TagContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserGetsAllAvailableTags(string $user):void {
+		// after creating or deleting tags, in some cases tags do not appear or disappear immediately, so we use waiting
+		sleep(1);
 		$this->featureContext->setResponse(
 			GraphHelper::getTags(
 				$this->featureContext->getBaseUrl(),
@@ -136,18 +138,58 @@ class TagContext implements Context {
 	}
 
 	/**
-	 * @Then the response should contain following tag(s):
+	 * @Then /^the response should (not|)\s?contain following tag(s):$/
 	 *
+	 * @param string    $shouldOrNot   (not|)
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theFollowingTagsShouldExistForUser(TableNode $table):void {
+	public function theFollowingTagsShouldExistForUser(string $shouldOrNot, TableNode $table):void {
 		$rows = $table->getRows();
 		foreach ($rows as $row) {
 			$responseArray = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'];
-			Assert::assertTrue(\in_array($row[0], $responseArray), "the response does not contain the tag $row[0]");
+			if ($shouldOrNot === "not") {
+				Assert::assertFalse(\in_array($row[0], $responseArray), "the response should not contain the tag $row[0]");
+			} else {
+				Assert::assertTrue(\in_array($row[0], $responseArray), "the response does not contain the tag $row[0]");
+			}
 		}
+	}
+
+	/**
+	 * @When /^user "([^"]*)" removes the following tags for (folder|file)\s?"([^"]*)" of space "([^"]*)":$/
+	 *
+	 * @param string $user
+	 * @param string $fileOrFolder   (file|folder)
+	 * @param string $resource
+	 * @param string $space
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userRemovesTagsFromResourceOfTheSpace(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):void {
+		$tagNameArray = [];
+		foreach ($table->getRows() as $value) {
+			array_push($tagNameArray, $value[0]);
+		}
+
+		if ($fileOrFolder === 'folder') {
+			$resourceId = $this->spacesContext->getFolderId($user, $space, $resource);
+		} else {
+			$resourceId = $this->spacesContext->getFileId($user, $space, $resource);
+		}
+
+		$response = GraphHelper::deleteTags(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$resourceId,
+			$tagNameArray
+		);
+		$this->featureContext->setResponse($response);
 	}
 }
