@@ -10,6 +10,8 @@ import (
 	"strings"
 
 	"github.com/CiscoM31/godata"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/events"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 
@@ -120,6 +122,15 @@ func (g Graph) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var features []events.GroupFeature
+	if displayName, ok := changes.GetDisplayNameOk(); ok {
+		features = append(features, events.GroupFeature{Name: "displayname", Value: *displayName})
+	}
+
+	if externalID, ok := changes.GetExternalIdOk(); ok {
+		features = append(features, events.GroupFeature{Name: "externalid", Value: *externalID})
+	}
+
 	_, err = g.identityEducationBackend.UpdateEducationClass(r.Context(), classID, *changes)
 	if err != nil {
 		logger.Error().
@@ -176,6 +187,20 @@ func (g Graph) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+
+	if len(features) > 0 {
+		e := events.GroupFeatureChanged{
+			GroupID:  classID,
+			Features: features,
+		}
+
+		if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
+			e.Executant = currentUser.GetId()
+		}
+		g.publishEvent(e)
+
+	}
+
 	render.Status(r, http.StatusNoContent) // TODO StatusNoContent when prefer=minimal is used, otherwise OK and the resource in the body
 	render.NoContent(w, r)
 }
