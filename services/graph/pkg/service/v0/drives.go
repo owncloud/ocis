@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/CiscoM31/godata"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -543,6 +544,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	var permissions []libregraph.Permission
 	if space.Opaque != nil {
 		var permissionsMap map[string]*storageprovider.ResourcePermissions
+		var permissionsExpirations map[string]*types.Timestamp
 		var groupsMap map[string]struct{}
 
 		opaqueGrants, ok := space.Opaque.Map["grants"]
@@ -554,6 +556,18 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 					Interface("space", space.Root).
 					Bytes("grants", opaqueGrants.Value).
 					Msg("unable to parse space: failed to read spaces grants")
+			}
+		}
+
+		opaqueGrantsExpirations, ok := space.Opaque.Map["grants_expirations"]
+		if ok {
+			err := json.Unmarshal(opaqueGrantsExpirations.Value, &permissionsExpirations)
+			if err != nil {
+				logger.Debug().
+					Err(err).
+					Interface("space", space.Root).
+					Bytes("grants_expirations", opaqueGrantsExpirations.Value).
+					Msg("unable to parse space: failed to read spaces grants expirations")
 			}
 		}
 
@@ -570,10 +584,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 		}
 
 		if len(permissionsMap) != 0 {
-			managerIdentities := []libregraph.IdentitySet{}
-			editorIdentities := []libregraph.IdentitySet{}
-			viewerIdentities := []libregraph.IdentitySet{}
-
+			permissions = make([]libregraph.Permission, 0, len(permissionsMap))
 			for id, perm := range permissionsMap {
 				// This temporary variable is necessary since we need to pass a pointer to the
 				// libregraph.Identity and if we pass the pointer from the loop every identity
@@ -606,38 +617,27 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 					identitySet = libregraph.IdentitySet{User: &libregraph.Identity{Id: &tmp, DisplayName: user.GetDisplayName()}}
 				}
 
+				p := libregraph.Permission{
+					GrantedToIdentities: []libregraph.IdentitySet{identitySet},
+				}
+
+				if exp := permissionsExpirations[id]; exp != nil {
+					p.ExpirationDateTime = libregraph.PtrTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
+				}
+
 				// we need to map the permissions to the roles
 				switch {
 				// having RemoveGrant qualifies you as a manager
 				case perm.RemoveGrant:
-					managerIdentities = append(managerIdentities, identitySet)
+					p.SetRoles([]string{"manager"})
 				// InitiateFileUpload means you are an editor
 				case perm.InitiateFileUpload:
-					editorIdentities = append(editorIdentities, identitySet)
+					p.SetRoles([]string{"editor"})
 				// Stat permission at least makes you a viewer
 				case perm.Stat:
-					viewerIdentities = append(viewerIdentities, identitySet)
+					p.SetRoles([]string{"viewer"})
 				}
-			}
-
-			permissions = make([]libregraph.Permission, 0, 3)
-			if len(managerIdentities) != 0 {
-				permissions = append(permissions, libregraph.Permission{
-					GrantedToIdentities: managerIdentities,
-					Roles:               []string{"manager"},
-				})
-			}
-			if len(editorIdentities) != 0 {
-				permissions = append(permissions, libregraph.Permission{
-					GrantedToIdentities: editorIdentities,
-					Roles:               []string{"editor"},
-				})
-			}
-			if len(viewerIdentities) != 0 {
-				permissions = append(permissions, libregraph.Permission{
-					GrantedToIdentities: viewerIdentities,
-					Roles:               []string{"viewer"},
-				})
+				permissions = append(permissions, p)
 			}
 		}
 	}
