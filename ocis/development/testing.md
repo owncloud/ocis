@@ -134,10 +134,15 @@ TEST_OCIS=true \
 Make sure to adjust the settings `TEST_SERVER_URL` according to your environment.
 
 To run a single feature add `BEHAT_FEATURE=<feature file>` 
+
 example: `BEHAT_SUITE=tests/acceptance/features/apiGraph/createUser.feature`
+
 To run a single test add `BEHAT_FEATURE=<file.feature:(line number)>`
+
 example: `BEHAT_SUITE=tests/acceptance/features/apiGraph/createUser.feature:12`
+
 To run a single suite add `BEHAT_SUITE=<test suite>`
+
 example: `BEHAT_SUITE=apiGraph`
 
 To run tests with a different storage driver set `STORAGE_DRIVER` to the correct value. It can be set to `OCIS` or `OWNCLOUD` and uses `OWNCLOUD` as the default value.
