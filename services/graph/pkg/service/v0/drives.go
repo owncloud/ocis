@@ -541,106 +541,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	}
 	spaceID := storagespace.FormatResourceID(spaceRid)
 
-	var permissions []libregraph.Permission
-	if space.Opaque != nil {
-		var permissionsMap map[string]*storageprovider.ResourcePermissions
-		var permissionsExpirations map[string]*types.Timestamp
-		var groupsMap map[string]struct{}
-
-		opaqueGrants, ok := space.Opaque.Map["grants"]
-		if ok {
-			err := json.Unmarshal(opaqueGrants.Value, &permissionsMap)
-			if err != nil {
-				logger.Debug().
-					Err(err).
-					Interface("space", space.Root).
-					Bytes("grants", opaqueGrants.Value).
-					Msg("unable to parse space: failed to read spaces grants")
-			}
-		}
-
-		opaqueGrantsExpirations, ok := space.Opaque.Map["grants_expirations"]
-		if ok {
-			err := json.Unmarshal(opaqueGrantsExpirations.Value, &permissionsExpirations)
-			if err != nil {
-				logger.Debug().
-					Err(err).
-					Interface("space", space.Root).
-					Bytes("grants_expirations", opaqueGrantsExpirations.Value).
-					Msg("unable to parse space: failed to read spaces grants expirations")
-			}
-		}
-
-		opaqueGroups, ok := space.Opaque.Map["groups"]
-		if ok {
-			err := json.Unmarshal(opaqueGroups.Value, &groupsMap)
-			if err != nil {
-				logger.Debug().
-					Err(err).
-					Interface("space", space.Root).
-					Bytes("groups", opaqueGroups.Value).
-					Msg("unable to parse space: failed to read spaces groups")
-			}
-		}
-
-		if len(permissionsMap) != 0 {
-			permissions = make([]libregraph.Permission, 0, len(permissionsMap))
-			for id, perm := range permissionsMap {
-				// This temporary variable is necessary since we need to pass a pointer to the
-				// libregraph.Identity and if we pass the pointer from the loop every identity
-				// will have the same id.
-				tmp := id
-				var identitySet libregraph.IdentitySet
-				if _, ok := groupsMap[id]; ok {
-					var group libregraph.Group
-					if item := g.groupsCache.Get(id); item == nil {
-						if requestedGroup, err := g.identityBackend.GetGroup(ctx, id, url.Values{}); err == nil {
-							group = *requestedGroup
-							g.groupsCache.Set(id, group, ttlcache.DefaultTTL)
-						}
-					} else {
-						group = item.Value()
-					}
-
-					identitySet = libregraph.IdentitySet{Group: &libregraph.Identity{Id: &tmp, DisplayName: group.GetDisplayName()}}
-				} else {
-					var user libregraph.User
-					if item := g.usersCache.Get(id); item == nil {
-						if requestedUser, err := g.identityBackend.GetUser(ctx, id, &godata.GoDataRequest{}); err == nil {
-							user = *requestedUser
-							g.usersCache.Set(id, user, ttlcache.DefaultTTL)
-						}
-					} else {
-						user = item.Value()
-					}
-
-					identitySet = libregraph.IdentitySet{User: &libregraph.Identity{Id: &tmp, DisplayName: user.GetDisplayName()}}
-				}
-
-				p := libregraph.Permission{
-					GrantedToIdentities: []libregraph.IdentitySet{identitySet},
-				}
-
-				if exp := permissionsExpirations[id]; exp != nil {
-					p.ExpirationDateTime = libregraph.PtrTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
-				}
-
-				// we need to map the permissions to the roles
-				switch {
-				// having RemoveGrant qualifies you as a manager
-				case perm.RemoveGrant:
-					p.SetRoles([]string{"manager"})
-				// InitiateFileUpload means you are an editor
-				case perm.InitiateFileUpload:
-					p.SetRoles([]string{"editor"})
-				// Stat permission at least makes you a viewer
-				case perm.Stat:
-					p.SetRoles([]string{"viewer"})
-				}
-				permissions = append(permissions, p)
-			}
-		}
-	}
+	permissions := g.cs3PermissionsToLibreGraph(ctx, space)
 
 	drive := &libregraph.Drive{
 		Id:   libregraph.PtrString(spaceID),
@@ -734,6 +635,112 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 	}
 
 	return drive, nil
+}
+
+func (g Graph) cs3PermissionsToLibreGraph(ctx context.Context, space *storageprovider.StorageSpace) []libregraph.Permission {
+	if space.Opaque == nil {
+		return nil
+	}
+	logger := g.logger.SubloggerWithRequestID(ctx)
+
+	var permissionsMap map[string]*storageprovider.ResourcePermissions
+	opaqueGrants, ok := space.Opaque.Map["grants"]
+	if ok {
+		err := json.Unmarshal(opaqueGrants.Value, &permissionsMap)
+		if err != nil {
+			logger.Debug().
+				Err(err).
+				Interface("space", space.Root).
+				Bytes("grants", opaqueGrants.Value).
+				Msg("unable to parse space: failed to read spaces grants")
+		}
+	}
+	if len(permissionsMap) == 0 {
+		return nil
+	}
+
+	var permissionsExpirations map[string]*types.Timestamp
+	opaqueGrantsExpirations, ok := space.Opaque.Map["grants_expirations"]
+	if ok {
+		err := json.Unmarshal(opaqueGrantsExpirations.Value, &permissionsExpirations)
+		if err != nil {
+			logger.Debug().
+				Err(err).
+				Interface("space", space.Root).
+				Bytes("grants_expirations", opaqueGrantsExpirations.Value).
+				Msg("unable to parse space: failed to read spaces grants expirations")
+		}
+	}
+
+	var groupsMap map[string]struct{}
+	opaqueGroups, ok := space.Opaque.Map["groups"]
+	if ok {
+		err := json.Unmarshal(opaqueGroups.Value, &groupsMap)
+		if err != nil {
+			logger.Debug().
+				Err(err).
+				Interface("space", space.Root).
+				Bytes("groups", opaqueGroups.Value).
+				Msg("unable to parse space: failed to read spaces groups")
+		}
+	}
+
+	permissions := make([]libregraph.Permission, 0, len(permissionsMap))
+	for id, perm := range permissionsMap {
+		// This temporary variable is necessary since we need to pass a pointer to the
+		// libregraph.Identity and if we pass the pointer from the loop every identity
+		// will have the same id.
+		tmp := id
+		var identitySet libregraph.IdentitySet
+		if _, ok := groupsMap[id]; ok {
+			var group libregraph.Group
+			if item := g.groupsCache.Get(id); item == nil {
+				if requestedGroup, err := g.identityBackend.GetGroup(ctx, id, url.Values{}); err == nil {
+					group = *requestedGroup
+					g.groupsCache.Set(id, group, ttlcache.DefaultTTL)
+				}
+			} else {
+				group = item.Value()
+			}
+
+			identitySet = libregraph.IdentitySet{Group: &libregraph.Identity{Id: &tmp, DisplayName: group.GetDisplayName()}}
+		} else {
+			var user libregraph.User
+			if item := g.usersCache.Get(id); item == nil {
+				if requestedUser, err := g.identityBackend.GetUser(ctx, id, &godata.GoDataRequest{}); err == nil {
+					user = *requestedUser
+					g.usersCache.Set(id, user, ttlcache.DefaultTTL)
+				}
+			} else {
+				user = item.Value()
+			}
+
+			identitySet = libregraph.IdentitySet{User: &libregraph.Identity{Id: &tmp, DisplayName: user.GetDisplayName()}}
+		}
+
+		p := libregraph.Permission{
+			GrantedToIdentities: []libregraph.IdentitySet{identitySet},
+		}
+
+		if exp := permissionsExpirations[id]; exp != nil {
+			p.ExpirationDateTime = libregraph.PtrTime(time.Unix(int64(exp.GetSeconds()), int64(exp.GetNanos())))
+		}
+
+		// we need to map the permissions to the roles
+		switch {
+		// having RemoveGrant qualifies you as a manager
+		case perm.RemoveGrant:
+			p.SetRoles([]string{"manager"})
+		// InitiateFileUpload means you are an editor
+		case perm.InitiateFileUpload:
+			p.SetRoles([]string{"editor"})
+		// Stat permission at least makes you a viewer
+		case perm.Stat:
+			p.SetRoles([]string{"viewer"})
+		}
+		permissions = append(permissions, p)
+	}
+	return permissions
 }
 
 func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (libregraph.Quota, error) {
