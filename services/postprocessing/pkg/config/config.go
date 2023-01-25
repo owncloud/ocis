@@ -23,7 +23,7 @@ type Config struct {
 // Postprocessing definces the config options for the postprocessing service.
 type Postprocessing struct {
 	Events          Events        `yaml:"events"`
-	Steps           []string      `yaml:"steps" env:"POSTPROCESSING_STEPS" desc:"A comma seperated list of postprocessing steps. Known to the system are virusscan and delay. Custom steps are allowed. See README.md for instructions."`
+	Steps           []string      `yaml:"steps" env:"POSTPROCESSING_STEPS" desc:"A comma separated list of postprocessing steps, processed in order of their appearance. Currently supported values by the system are: 'virusscan' and 'delay'. Custom steps are allowed. See the documentation for instructions."`
 	Virusscan       bool          `yaml:"virusscan" env:"POSTPROCESSING_VIRUSSCAN" desc:"After uploading a file but before making it available for download, virus scanning the file can be enabled. Needs as prerequisite the antivirus service to be enabled and configured."`
 	Delayprocessing time.Duration `yaml:"delayprocessing" env:"POSTPROCESSING_DELAY" desc:"After uploading a file but before making it available for download, a delay step can be added. Intended for developing purposes only. The duration can be set as number followed by a unit identifier like s, m or h."`
 }

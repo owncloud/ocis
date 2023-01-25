@@ -1,5 +1,5 @@
 Enhancement: Better config for postprocessing service
 
-We want postprocessing service to be individually configurable. We achieve this by allowing to define a list of postprocessing steps with the `POSTPROCESSING_STEPS` envvar
+The postporcessing service is now individually configurable. This is achieved by allowing a list of postprocessing steps that are processed in order of their appearance in the `POSTPROCESSING_STEPS` envvar.
 
 https://github.com/owncloud/ocis/pull/5457
