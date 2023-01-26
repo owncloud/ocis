@@ -66,7 +66,7 @@ const (
 	// SpaceAbilityPermissionID is the hardcoded setting UUID for the space ability permission
 	SpaceAbilityPermissionID string = "cf3faa8c-50d9-4f84-9650-ff9faf21aa9d"
 	// SpaceAbilityPermissionName is the hardcoded setting name for the space ability permission
-	SpaceAbilityPermissionName string = "Drive.ReadWriteEnable"
+	SpaceAbilityPermissionName string = "Drive.ReadWriteEnabled"
 
 	settingUUIDProfileLanguage = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f"
 
