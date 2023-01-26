@@ -24,6 +24,7 @@ import (
 	appRegistry "github.com/owncloud/ocis/v2/services/app-registry/pkg/command"
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/command"
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/command"
+	authz "github.com/owncloud/ocis/v2/services/authz/pkg/command"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/command"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/command"
 	graph "github.com/owncloud/ocis/v2/services/graph/pkg/command"
@@ -127,6 +128,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.Notifications.Service.Name] = notifications.NewSutureService
 	s.ServicesRegistry[opts.Config.Search.Service.Name] = search.NewSutureService
 	s.ServicesRegistry[opts.Config.Postprocessing.Service.Name] = postprocessing.NewSutureService
+	s.ServicesRegistry[opts.Config.Authz.Service.Name] = authz.NewSutureService
 
 	// populate delayed services
 	s.Delayed[opts.Config.Sharing.Service.Name] = sharing.NewSutureService

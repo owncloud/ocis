@@ -210,8 +210,8 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 
 	var authorizers []authorization.Authorizer
 
-	if cfg.AuthorizationMiddleware.OPA.Enabled {
-		if authorizerOPA, err := authorization.NewOPAAuthorizer(logger, cfg.AuthorizationMiddleware.OPA); err != nil {
+	if cfg.AuthorizationMiddleware.Authz.Enabled {
+		if authorizerOPA, err := authorization.NewAuthz(); err != nil {
 			logger.
 				Error().
 				Err(err).

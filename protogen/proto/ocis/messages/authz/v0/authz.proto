@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package ocis.messages.authz.v0;
+
+option go_package = "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/authz/v0";
+
+message User {
+	string username = 1;
+	string mail = 2;
+	string display_name = 3;
+	repeated string groups = 4;
+}
+
+message ResourceID {
+		string storage_id = 1;
+		string opaque_id = 2;
+		string space_id = 3;
+}
+
+enum Stage {
+	STAGE_PP = 0;
+	STAGE_HTTP = 1;
+}

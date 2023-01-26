@@ -9,6 +9,7 @@ import (
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/config"
 	authbearer "github.com/owncloud/ocis/v2/services/auth-bearer/pkg/config"
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/config"
+	authz "github.com/owncloud/ocis/v2/services/authz/pkg/config"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/config"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/config"
 	graph "github.com/owncloud/ocis/v2/services/graph/pkg/config"
@@ -33,14 +34,6 @@ import (
 	users "github.com/owncloud/ocis/v2/services/users/pkg/config"
 	web "github.com/owncloud/ocis/v2/services/web/pkg/config"
 	webdav "github.com/owncloud/ocis/v2/services/webdav/pkg/config"
-)
-
-const (
-	// SUPERVISED sets the runtime mode as supervised threads.
-	SUPERVISED = iota
-
-	// UNSUPERVISED sets the runtime mode as a single thread.
-	UNSUPERVISED
 )
 
 type Mode int
@@ -96,6 +89,7 @@ type Config struct {
 	Postprocessing    *postprocessing.Config `yaml:"postprocessing"`
 	Proxy             *proxy.Config          `yaml:"proxy"`
 	Settings          *settings.Config       `yaml:"settings"`
+	Authz             *authz.Config          `yaml:"authz"`
 	Sharing           *sharing.Config        `yaml:"sharing"`
 	StorageSystem     *storagesystem.Config  `yaml:"storage_system"`
 	StoragePublicLink *storagepublic.Config  `yaml:"storage_public"`

@@ -86,14 +86,12 @@ type AuthenticationMiddleware struct {
 
 // AuthorizationMiddleware configures the proxy http authorization middleware.
 type AuthorizationMiddleware struct {
-	OPA AuthorizationMiddlewareOPA `yaml:"opa"`
+	Authz AuthorizationMiddlewareAuthz `yaml:"authz"`
 }
 
-// AuthorizationMiddlewareOPA configures the opa policy middleware.
-type AuthorizationMiddlewareOPA struct {
-	Enabled  bool     `yaml:"enabled"`
-	Policies []string `yaml:"policies"`
-	Timeout  int      `yaml:"timeout"`
+// AuthorizationMiddlewareAuthz configures the opa policy middleware.
+type AuthorizationMiddlewareAuthz struct {
+	Enabled bool `yaml:"enabled"`
 }
 
 const (

@@ -56,7 +56,6 @@ func (pp *Postprocessing) NextStep(ev events.PostprocessingStepFinished) interfa
 		return pp.next(ev.FinishedStep)
 	default:
 		return pp.finished(ev.Outcome)
-
 	}
 }
 

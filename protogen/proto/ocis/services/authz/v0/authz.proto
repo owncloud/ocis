@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package ocis.services.authz.v0;
+
+option go_package = "github.com/owncloud/ocis/protogen/gen/ocis/service/authz/v0";
+
+import "ocis/messages/authz/v0/authz.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/field_mask.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "ownCloud Infinite Scale authz";
+    version: "1.0.0";
+    contact: {
+      name: "ownCloud GmbH";
+      url: "https://github.com/owncloud/ocis";
+      email: "support@owncloud.com";
+    };
+    license: {
+      name: "Apache-2.0";
+      url: "https://github.com/owncloud/ocis/blob/master/LICENSE";
+    };
+  };
+  schemes: HTTP;
+  schemes: HTTPS;
+  consumes: "application/json";
+  produces: "application/json";
+  external_docs: {
+    description: "Developer Manual";
+    url: "https://owncloud.dev/services/authz/";
+  };
+};
+
+service AuthzProvider {
+	rpc Allowed(AllowedRequest) returns (AllowedResponse) {
+    option (google.api.http) = {
+        post: "/api/v0/authz/allowed",
+        body: "*"
+    };
+  };
+}
+
+message AllowedRequest {
+  string name = 1;
+  uint64 size = 2 [(google.api.field_behavior) = OPTIONAL];
+  string method = 3 [(google.api.field_behavior) = OPTIONAL];
+  string url = 4 [(google.api.field_behavior) = OPTIONAL];
+  ocis.messages.authz.v0.User user = 5 [(google.api.field_behavior) = OPTIONAL];
+  ocis.messages.authz.v0.Stage stage = 6;
+  ocis.messages.authz.v0.ResourceID resource_id = 7 [(google.api.field_behavior) = OPTIONAL];
+}
+
+message AllowedResponse {
+  bool allowed = 1;
+}
