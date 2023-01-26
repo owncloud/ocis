@@ -1,9 +1,6 @@
 package service
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
@@ -88,39 +85,5 @@ func getSteps(c config.Postprocessing) []events.Postprocessingstep {
 		steps = append(steps, events.Postprocessingstep(s))
 	}
 
-	if c.Virusscan {
-		if !contains(steps, events.PPStepAntivirus) {
-			steps = append(steps, events.PPStepAntivirus)
-			fmt.Printf("ATTENTION: POSTPROCESSING_VIRUSSCAN is deprecated. Use `POSTPROCESSING_STEPS=%v` in the future\n", join(steps))
-		}
-	}
-
-	if c.Delayprocessing != 0 {
-		if !contains(steps, events.PPStepDelay) {
-			if len(steps) > 0 {
-				fmt.Printf("Added delay step to the list of postprocessing steps. NOTE: Use envvar `POSTPROCESSING_STEPS=%v` to suppress this message and choose the order of postprocessing steps.\n", join(append(steps, events.PPStepDelay)))
-			}
-
-			steps = append(steps, events.PPStepDelay)
-		}
-	}
-
 	return steps
-}
-
-func contains(all []events.Postprocessingstep, candidate events.Postprocessingstep) bool {
-	for _, s := range all {
-		if s == candidate {
-			return true
-		}
-	}
-	return false
-}
-
-func join(all []events.Postprocessingstep) string {
-	var slice []string
-	for _, s := range all {
-		slice = append(slice, string(s))
-	}
-	return strings.Join(slice, ",")
 }
