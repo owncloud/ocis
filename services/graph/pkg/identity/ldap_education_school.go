@@ -10,6 +10,7 @@ import (
 	"github.com/gofrs/uuid"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	oldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
@@ -352,42 +353,16 @@ func (i *LDAP) GetEducationSchoolUsers(ctx context.Context, schoolNumberOrID str
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetEducationSchoolUsers")
 
-	schoolEntry, err := i.getSchoolByNumberOrID(schoolNumberOrID)
+	entries, err := i.getEducationSchoolEntries(
+		schoolNumberOrID, i.userFilter, i.educationConfig.userObjectClass, i.userBaseDN, i.userScope, i.getUserAttrTypes(), logger,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	if schoolEntry == nil {
-		return nil, ErrNotFound
-	}
-	schoolID := schoolEntry.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.id)
-	schoolID = ldap.EscapeFilter(schoolID)
-	idFilter := fmt.Sprintf("(%s=%s)", i.educationConfig.memberOfSchoolAttribute, schoolID)
-	userFilter := fmt.Sprintf("(&%s(objectClass=%s)%s)", i.userFilter, i.educationConfig.userObjectClass, idFilter)
+	users := make([]*libregraph.EducationUser, 0, len(entries))
 
-	searchRequest := ldap.NewSearchRequest(
-		i.userBaseDN,
-		i.userScope,
-		ldap.NeverDerefAliases, 0, 0, false,
-		userFilter,
-		i.getEducationUserAttrTypes(),
-		nil,
-	)
-	logger.Debug().Str("backend", "ldap").
-		Str("base", searchRequest.BaseDN).
-		Str("filter", searchRequest.Filter).
-		Int("scope", searchRequest.Scope).
-		Int("sizelimit", searchRequest.SizeLimit).
-		Interface("attributes", searchRequest.Attributes).
-		Msg("GetEducationUsers")
-	res, err := i.conn.Search(searchRequest)
-	if err != nil {
-		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
-	}
-
-	users := make([]*libregraph.EducationUser, 0, len(res.Entries))
-
-	for _, e := range res.Entries {
+	for _, e := range entries {
 		u := i.createEducationUserModelFromLDAP(e)
 		// Skip invalid LDAP users
 		if u == nil {
@@ -463,6 +438,154 @@ func (i *LDAP) RemoveUserFromEducationSchool(ctx context.Context, schoolNumberOr
 	user, err := i.getEducationUserByNameOrID(memberID)
 	if err != nil {
 		i.logger.Warn().Str("userid", memberID).Msg("User does not exist")
+		return err
+	}
+	currentSchools := user.GetEqualFoldAttributeValues(i.educationConfig.memberOfSchoolAttribute)
+	for _, currentSchool := range currentSchools {
+		if currentSchool == schoolID {
+			mr := ldap.ModifyRequest{DN: user.DN}
+			mr.Delete(i.educationConfig.memberOfSchoolAttribute, []string{schoolID})
+			if err := i.conn.Modify(&mr); err != nil {
+				return err
+			}
+			break
+		}
+	}
+	return nil
+}
+
+// GetEducationSchoolClasses implements the EducationBackend interface for the LDAP backend.
+func (i *LDAP) GetEducationSchoolClasses(ctx context.Context, schoolNumberOrID string) ([]*libregraph.EducationClass, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("GetEducationSchoolClasses")
+
+	entries, err := i.getEducationSchoolEntries(
+		schoolNumberOrID, i.groupFilter, i.educationConfig.classObjectClass, i.groupBaseDN, i.groupScope, i.getEducationClassAttrTypes(false), logger, // TODO: Add attributes
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	users := make([]*libregraph.EducationClass, 0, len(entries))
+
+	for _, e := range entries {
+		u := i.createEducationClassModelFromLDAP(e)
+		// Skip invalid LDAP classes
+		if u == nil {
+			continue
+		}
+		users = append(users, u)
+	}
+	return users, nil
+}
+
+func (i *LDAP) getEducationSchoolEntries(
+	schoolNumberOrID, filter, objectClass, baseDN string,
+	scope int,
+	attributes []string,
+	logger log.Logger,
+) ([]*ldap.Entry, error) {
+	schoolEntry, err := i.getSchoolByNumberOrID(schoolNumberOrID)
+	if err != nil {
+		return nil, err
+	}
+
+	if schoolEntry == nil {
+		return nil, ErrNotFound
+	}
+
+	schoolID := schoolEntry.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.id)
+	schoolID = ldap.EscapeFilter(schoolID)
+	idFilter := fmt.Sprintf("(%s=%s)", i.educationConfig.memberOfSchoolAttribute, schoolID)
+	searchFilter := fmt.Sprintf("(&%s(objectClass=%s)%s)", filter, objectClass, idFilter)
+
+	searchRequest := ldap.NewSearchRequest(
+		baseDN,
+		scope,
+		ldap.NeverDerefAliases, 0, 0, false,
+		searchFilter,
+		attributes,
+		nil,
+	)
+	logger.Debug().Str("backend", "ldap").
+		Str("base", searchRequest.BaseDN).
+		Str("filter", searchRequest.Filter).
+		Int("scope", searchRequest.Scope).
+		Int("sizelimit", searchRequest.SizeLimit).
+		Interface("attributes", searchRequest.Attributes).
+		Msg("GetEducationClasses")
+	res, err := i.conn.Search(searchRequest)
+	if err != nil {
+		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
+	}
+	return res.Entries, nil
+}
+
+// AddClassesToEducationSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
+func (i *LDAP) AddClassesToEducationSchool(ctx context.Context, schoolNumberOrID string, memberIDs []string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("AddClassesToEducationSchool")
+
+	schoolEntry, err := i.getSchoolByNumberOrID(schoolNumberOrID)
+	if err != nil {
+		return err
+	}
+
+	if schoolEntry == nil {
+		return ErrNotFound
+	}
+
+	schoolID := schoolEntry.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.id)
+
+	classEntries := make([]*ldap.Entry, 0, len(memberIDs))
+	for _, memberID := range memberIDs {
+		class, err := i.getEducationClassByID(memberID, false)
+		if err != nil {
+			i.logger.Warn().Str("userid", memberID).Msg("Class does not exist")
+			return err
+		}
+		classEntries = append(classEntries, class)
+	}
+
+	for _, classEntry := range classEntries {
+		currentSchools := classEntry.GetEqualFoldAttributeValues(i.educationConfig.memberOfSchoolAttribute)
+		found := false
+		for _, currentSchool := range currentSchools {
+			if currentSchool == schoolID {
+				found = true
+				break
+			}
+		}
+		if !found {
+			mr := ldap.ModifyRequest{DN: classEntry.DN}
+			mr.Add(i.educationConfig.memberOfSchoolAttribute, []string{schoolID})
+			if err := i.conn.Modify(&mr); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// RemoveClassFromEducationSchool removes a single member (by ID) from a school
+func (i *LDAP) RemoveClassFromEducationSchool(ctx context.Context, schoolNumberOrID string, memberID string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("RemoveClassFromEducationSchool")
+
+	schoolEntry, err := i.getSchoolByNumberOrID(schoolNumberOrID)
+	if err != nil {
+		return err
+	}
+
+	if schoolEntry == nil {
+		return ErrNotFound
+	}
+
+	schoolID := schoolEntry.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.id)
+	user, err := i.getEducationClassByID(memberID, false)
+	if err != nil {
+		i.logger.Warn().Str("userid", memberID).Msg("Class does not exist")
 		return err
 	}
 	currentSchools := user.GetEqualFoldAttributeValues(i.educationConfig.memberOfSchoolAttribute)
