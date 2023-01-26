@@ -341,16 +341,14 @@ func (i *LDAP) getEducationClassLDAPDN(class libregraph.EducationClass) string {
 	return fmt.Sprintf("ocEducationExternalId=%s,%s", oldap.EscapeDNAttributeValue(class.GetExternalId()), i.groupBaseDN)
 }
 
-// getEducationClassByID looks up a class by id (and be ID or externalID)
-func (i *LDAP) getEducationClassByID(id string, requestMembers bool) (*ldap.Entry, error) {
-	id = ldap.EscapeFilter(id)
-	filter := fmt.Sprintf("(|(%s=%s)(%s=%s))",
-		i.groupAttributeMap.id, id,
-		i.educationConfig.classAttributeMap.externalID, id)
-	return i.getEducationClassByFilter(filter, requestMembers)
-}
-
-func (i *LDAP) getEducationClassByFilter(filter string, requestMembers bool) (*ldap.Entry, error) {
-	filter = fmt.Sprintf("(&%s(objectClass=%s)%s)", i.groupFilter, i.educationConfig.classObjectClass, filter)
-	return i.searchLDAPEntryByFilter(i.groupBaseDN, i.getEducationClassAttrTypes(requestMembers), filter)
+func (i *LDAP) getEducationClassByID(nameOrID string, requestMembers bool) (*ldap.Entry, error) {
+	return i.getEducationObjectByNameOrID(
+		nameOrID,
+		i.groupAttributeMap.name,
+		i.groupAttributeMap.id,
+		i.groupFilter,
+		i.educationConfig.classObjectClass,
+		i.groupBaseDN,
+		i.getEducationClassAttrTypes(requestMembers),
+	)
 }
