@@ -4,3 +4,4 @@ We now return an empty array when an expanded relation has no entries. This make
 
 https://github.com/owncloud/ocis/pull/5421
 https://github.com/owncloud/ocis/issues/5419
+https://github.com/owncloud/ocis/pull/5426

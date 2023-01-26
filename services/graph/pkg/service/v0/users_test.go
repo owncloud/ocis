@@ -372,6 +372,7 @@ var _ = Describe("Users", func() {
 					},
 					{
 						Id:        &provider.StorageSpaceId{OpaqueId: "personal"},
+						Owner:     &userv1beta1.User{Id: &userv1beta1.UserId{OpaqueId: "user1"}},
 						Root:      &provider.ResourceId{SpaceId: "personal", OpaqueId: "personal"},
 						SpaceType: "personal",
 					},
