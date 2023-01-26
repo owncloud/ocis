@@ -47,13 +47,13 @@ func (pp *Postprocessing) Init(ev events.BytesReceived) interface{} {
 	return pp.nextStep(pp.steps[0])
 }
 
-// Virusscan is the virusscanning step of the postprocessing
-func (pp *Postprocessing) Virusscan(ev events.VirusscanFinished) interface{} {
-	pp.m[events.PPStepAntivirus] = ev
+// NextStep returns the next postprocessing step
+func (pp *Postprocessing) NextStep(ev events.PostprocessingStepFinished) interface{} {
+	pp.m[ev.FinishedStep] = ev
 
 	switch ev.Outcome {
 	case events.PPOutcomeContinue:
-		return pp.next(events.PPStepAntivirus)
+		return pp.next(ev.FinishedStep)
 	default:
 		return pp.finished(ev.Outcome)
 

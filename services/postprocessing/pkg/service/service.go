@@ -50,13 +50,13 @@ func (pps *PostprocessingService) Run() error {
 			pp := postprocessing.New(ev.UploadID, ev.URL, ev.ExecutingUser, ev.Filename, ev.Filesize, ev.ResourceID, pps.steps, pps.c.Delayprocessing)
 			current[ev.UploadID] = pp
 			next = pp.Init(ev)
-		case events.VirusscanFinished:
+		case events.PostprocessingStepFinished:
 			pp := current[ev.UploadID]
 			if pp == nil {
 				// no current upload - this was an on demand scan
 				continue
 			}
-			next = pp.Virusscan(ev)
+			next = pp.NextStep(ev)
 		case events.StartPostprocessingStep:
 			if ev.StepToStart != events.PPStepDelay {
 				continue
