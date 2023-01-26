@@ -27,11 +27,5 @@
     "pdf-viewer",
     "search",
     "admin-settings"
-  ],
-  "external_apps": [
-    {
-      "id": "settings",
-      "path": "https://ocis-server:9200/settings.js"
-    }
   ]
 }

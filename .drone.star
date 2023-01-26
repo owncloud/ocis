@@ -142,10 +142,6 @@ config = {
         "skip": False,
         "earlyFail": True,
     },
-    "settingsUITests": {
-        "skip": False,
-        "earlyFail": True,
-    },
     "rocketchat": {
         "channel": "ocis-internal",
         "from_secret": "private_rocketchat",
@@ -363,9 +359,6 @@ def testPipelines(ctx):
 
     if "skip" not in config["e2eTests"] or not config["e2eTests"]["skip"]:
         pipelines += e2eTests(ctx)
-
-    if "skip" not in config["settingsUITests"] or not config["settingsUITests"]["skip"]:
-        pipelines.append(settingsUITests(ctx))
 
     return pipelines
 
@@ -1150,74 +1143,6 @@ def publishTracingResult(ctx, suite):
             ],
         },
     }]
-
-def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
-    early_fail = config["settingsUITests"]["earlyFail"] if "earlyFail" in config["settingsUITests"] else False
-
-    return {
-        "kind": "pipeline",
-        "type": "docker",
-        "name": "settingsUITests",
-        "platform": {
-            "os": "linux",
-            "arch": "amd64",
-        },
-        "steps": skipIfUnchanged(ctx, "acceptance-tests") +
-                 restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                 ocisServer(storage, accounts_hash_difficulty) +
-                 waitForSeleniumService() +
-                 waitForMiddlewareService() +
-                 restoreWebCache() +
-                 restoreWebPnpmCache() +
-                 [
-                     {
-                         "name": "WebUIAcceptanceTests",
-                         "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-                         "environment": {
-                             "SERVER_HOST": "https://ocis-server:9200",
-                             "BACKEND_HOST": "https://ocis-server:9200",
-                             "RUN_ON_OCIS": "true",
-                             "OCIS_REVA_DATA_ROOT": "%s" % dirs["ocisRevaDataRoot"],
-                             "WEB_UI_CONFIG": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
-                             "TEST_TAGS": "not @skipOnOCIS and not @skip",
-                             "LOCAL_UPLOAD_DIR": "/uploads",
-                             "NODE_TLS_REJECT_UNAUTHORIZED": 0,
-                             "WEB_PATH": dirs["web"],
-                             "FEATURE_PATH": "%s/services/settings/ui/tests/acceptance/features" % dirs["base"],
-                             "MIDDLEWARE_HOST": "http://middleware:3000",
-                         },
-                         "commands": [
-                             # TODO: settings/package.json has all the acceptance test dependencies
-                             # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
-                             "cd %s/services/settings" % dirs["base"],
-                             "pnpm config set store-dir ./.pnpm-store",
-                             "retry -t 3 'pnpm install'",
-                             "make test-acceptance-webui",
-                         ],
-                         "volumes": [{
-                             "name": "uploads",
-                             "path": "/uploads",
-                         }],
-                     },
-                 ] + failEarly(ctx, early_fail),
-        "services": [
-            {
-                "name": "redis",
-                "image": REDIS,
-            },
-        ] + selenium() + middlewareService(),
-        "volumes": [{
-            "name": "uploads",
-            "temp": {},
-        }],
-        "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)] + buildWebCache(ctx)),
-        "trigger": {
-            "ref": [
-                "refs/heads/master",
-                "refs/pull/**",
-            ],
-        },
-    }
 
 def failEarly(ctx, early_fail):
     """failEarly sends posts a comment about the failed pipeline to the github pr and then kills all pipelines of the current build
