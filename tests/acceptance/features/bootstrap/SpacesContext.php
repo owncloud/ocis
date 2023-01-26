@@ -590,6 +590,11 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * The method is used on the administration setting tab, which only the Admin user and the Space admin user have access to
+	 *
+	 * @When /^user "([^"]*)" lists all spaces via the GraphApi$/
+	 * @When /^user "([^"]*)" lists all spaces via the GraphApi with query "([^"]*)"$/
+	 * @When /^user "([^"]*)" tries to list all spaces via the GraphApi$/
 	 *
 	 * @param string $user
 	 * @param string $query
@@ -600,13 +605,15 @@ class SpacesContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserListsAllAvailableSpacesUsingTheGraphApi(string $user, string $query = ''): void {
-		$response = GraphHelper::getAllSpaces(
-			$this->featureContext->getBaseUrl(),
-			$user,
-			$this->featureContext->getPasswordForUser($user),
-			"?" . $query
+		$this->featureContext->setResponse(
+			GraphHelper::getAllSpaces(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				"?" . $query
+			)
 		);
-		$this->rememberTheAvailableSpaces($response);
+		$this->rememberTheAvailableSpaces();
 	}
 
 	/**
@@ -1289,10 +1296,12 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" (?:changes|tries to change) the name of the "([^"]*)" space to "([^"]*)"$/
+	 * @When /^user "([^"]*)" (?:changes|tries to change) the name of the "([^"]*)" space to "([^"]*)" owned by user "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $newName
+	 * @param string $owner
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -1301,13 +1310,14 @@ class SpacesContext implements Context {
 	public function updateSpaceName(
 		string $user,
 		string $spaceName,
-		string $newName
+		string $newName,
+		string $owner = ''
 	): void {
 		if ($spaceName === "non-existing") {
 			// check sending invalid data
 			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
 		} else {
-			$space = $this->getSpaceByName($user, $spaceName);
+			$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
 			$spaceId = $space["id"];
 		}
 
@@ -1327,10 +1337,12 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" (?:changes|tries to change) the description of the "([^"]*)" space to "([^"]*)"$/
+	 * @When /^user "([^"]*)" (?:changes|tries to change) the description of the "([^"]*)" space to "([^"]*)" owned by user "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $newDescription
+	 * @param string $owner
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -1339,13 +1351,14 @@ class SpacesContext implements Context {
 	public function updateSpaceDescription(
 		string $user,
 		string $spaceName,
-		string $newDescription
+		string $newDescription,
+		string $owner = ''
 	): void {
 		if ($spaceName === "non-existing") {
 			// check sending invalid data
 			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
 		} else {
-			$space = $this->getSpaceByName($user, $spaceName);
+			$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
 			$spaceId = $space["id"];
 		}
 
@@ -1364,11 +1377,36 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Given /^user "([^"]*)" has changed the description of the "([^"]*)" space to "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $newDescription
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userHasChangedDescription(
+		string $user,
+		string $spaceName,
+		string $newDescription
+	): void {
+		$this->updateSpaceDescription($user, $spaceName, $newDescription);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" (?:changes|tries to change) the quota of the "([^"]*)" space to "([^"]*)"$/
+	 * @When /^user "([^"]*)" (?:changes|tries to change) the quota of the "([^"]*)" space to "([^"]*)" owned by user "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param int $newQuota
+	 * @param string $owner
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -1377,13 +1415,14 @@ class SpacesContext implements Context {
 	public function updateSpaceQuota(
 		string $user,
 		string $spaceName,
-		int $newQuota
+		int $newQuota,
+		string $owner = ''
 	): void {
 		if ($spaceName === "non-existing") {
 			// check sending invalid data
 			$spaceId = "39c49dd3-1f24-4687-97d1-42df43f71713";
 		} else {
-			$space = $this->getSpaceByName($user, $spaceName);
+			$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
 			$spaceId = $space["id"];
 		}
 
@@ -2143,18 +2182,21 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" disables a space "([^"]*)"$/
+	 * @When /^user "([^"]*)" (?:disables|tries to disable) a space "([^"]*)" owned by user "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
+	 * @param  string $owner
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function sendDisableSpaceRequest(
 		string $user,
-		string $spaceName
+		string $spaceName,
+		string $owner = ''
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
+		$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
 		$this->featureContext->setResponse(
 			GraphHelper::disableSpace(
 				$this->featureContext->getBaseUrl(),
@@ -2211,18 +2253,21 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" deletes a space "([^"]*)"$/
+	 * @When /^user "([^"]*)" (?:deletes|tries to delete) a space "([^"]*)" owned by user "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
+	 * @param  string $owner
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function sendDeleteSpaceRequest(
 		string $user,
-		string $spaceName
+		string $spaceName,
+		$owner = ''
 	): void {
-		$space = $this->getSpaceByName($user, $spaceName);
+		$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
 
 		$this->featureContext->setResponse(
 			GraphHelper::deleteSpace(
@@ -2236,10 +2281,11 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" restores a disabled space "([^"]*)"$/
+	 * @When /^user "([^"]*)" (?:restores|tries to restore) a disabled space "([^"]*)" owned by user "([^"]*)"$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
-	 * @param  string $userWithManagerRights
+	 * @param  string $owner
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -2247,13 +2293,9 @@ class SpacesContext implements Context {
 	public function sendRestoreSpaceRequest(
 		string $user,
 		string $spaceName,
-		string $userWithManagerRights = ''
+		string $owner = ''
 	): void {
-		if (!empty($userWithManagerRights)) {
-			$space = $this->getSpaceByNameManager($userWithManagerRights, $spaceName);
-		} else {
-			$space = $this->getSpaceByName($user, $spaceName);
-		}
+		$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
 		$this->featureContext->setResponse(
 			GraphHelper::restoreSpace(
 				$this->featureContext->getBaseUrl(),
@@ -2262,22 +2304,6 @@ class SpacesContext implements Context {
 				$space["id"]
 			)
 		);
-	}
-
-	/**
-	 * @When /^user "([^"]*)" restores a disabled space "([^"]*)" without manager rights$/
-	 *
-	 * @param  string $user
-	 * @param  string $spaceName
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function sendRestoreSpaceWithoutRightsRequest(
-		string $user,
-		string $spaceName
-	): void {
-		$this->sendRestoreSpaceRequest($user, $spaceName, $this->featureContext->getAdminUsername());
 	}
 
 	/**

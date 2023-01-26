@@ -222,8 +222,7 @@ Feature: Tag
     Given user "Alice" has created the following tags for folder "folderMain" of the space "use-tag":
       | folderTag |
       | marketing |
-    When user "Alice" disables a space "use-tag"
-    Then the HTTP status code should be "204"
+    And user "Alice" has disabled a space "use-tag"
     When user "Alice" lists all available tags via the GraphApi
     Then the HTTP status code should be "200"
     And the response should contain following tags:

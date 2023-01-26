@@ -57,7 +57,7 @@ Feature: Restoring space
   Scenario Outline: User without space manager role cannot restore space
     Given user "Alice" has shared a space "restore a space" to user "Brian" with role "<role>"
     And user "Alice" has disabled a space "restore a space"
-    When user "Brian" restores a disabled space "restore a space" without manager rights
+    When user "Brian" restores a disabled space "restore a space" owned by user "Alice"
     Then the HTTP status code should be "404"
     Examples:
       | role   |
