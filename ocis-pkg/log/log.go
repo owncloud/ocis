@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"regexp"
+	"runtime"
 	"strings"
 	"time"
 
@@ -17,6 +19,10 @@ import (
 
 var (
 	RequestIDString = "request-id"
+
+	// Match all paths outside of ocis. Will break if path does not include '/ocis/',
+	// but this is intended for debugging purposes.
+	pathRegex = regexp.MustCompile(`.*/ocis/`)
 )
 
 func init() {
@@ -62,6 +68,19 @@ func LoggerFromConfig(name string, cfg *shared.Log) Logger {
 // NopLogger initializes a no-operation logger.
 func NopLogger() Logger {
 	return Logger{zerolog.Nop()}
+}
+
+type LineInfoHook struct{}
+
+// Run is a hook to add line info to log messages.
+// I found the zerolog example for this here:
+// https://github.com/rs/zerolog/issues/22#issuecomment-1127295489
+func (h LineInfoHook) Run(e *zerolog.Event, l zerolog.Level, msg string) {
+	_, file, line, ok := runtime.Caller(3)
+	if ok {
+		file := pathRegex.ReplaceAllString(file, "")
+		e.Str("line", fmt.Sprintf("%s:%d", file, line))
+	}
 }
 
 // NewLogger initializes a new logger instance.
@@ -118,6 +137,11 @@ func NewLogger(opts ...Option) Logger {
 		Str("service", options.Name).
 		Timestamp().
 		Logger().Level(logLevel)
+
+	if logLevel == zerolog.DebugLevel {
+		var lineInfoHook LineInfoHook
+		logger = logger.Hook(lineInfoHook)
+	}
 
 	return Logger{
 		logger,
