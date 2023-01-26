@@ -13,5 +13,6 @@ postprocessing:
     tls_insecure: false
     tls_root_ca_certificate: ""
     enable_tls: false
+  steps: []
   virusscan: false
   delayprocessing: 0s

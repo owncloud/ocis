@@ -1,6 +1,6 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
@@ -12,6 +12,11 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacment
+
+| POSTPROCESSING_VIRUSSCAN is not longer necessary and is replaced by POSTPROCESSING_STEPS which also holds information about the order of steps
+| master
+| master
+| POSTPROCESSING_STEPS
 |===
 
 endif::[]
@@ -112,8 +117,17 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
 
-a|`POSTPROCESSING_VIRUSSCAN` +
+a|`POSTPROCESSING_STEPS` +
 
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+A comma separated list of postprocessing steps, processed in order of their appearance. Currently supported values by the system are: 'virusscan' and 'delay'. Custom steps are allowed. See the documentation for instructions.
+
+a|`POSTPROCESSING_VIRUSSCAN` +
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -128,6 +142,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0s ++
 a| [subs=-attributes]
-After uploading a file but before making it available for download, a delay step can be added. Intended for developing purposes only. The duration can be set as number followed by a unit identifier like s, m or h.
+After uploading a file but before making it available for download, a delay step can be added. Intended for developing purposes only. The duration can be set as number followed by a unit identifier like s, m or h. If a duration is set but the keyword 'delay' is not explicitely added to 'POSTPROCESSING_STEPS', the delay step will be processed as last step. In such a case, a log entry will be written on service startup to remind the admin about that situation.
 |===
 
