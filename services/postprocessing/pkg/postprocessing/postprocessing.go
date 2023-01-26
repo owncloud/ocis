@@ -6,7 +6,6 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
 )
 
 // Postprocessing handles postprocessing of a file
@@ -18,22 +17,22 @@ type Postprocessing struct {
 	filename   string
 	filesize   uint64
 	resourceID *provider.ResourceId
-	c          config.Postprocessing
 	steps      []events.Postprocessingstep
+	delay      time.Duration
 }
 
 // New returns a new postprocessing instance
-func New(uploadID string, uploadURL string, user *user.User, filename string, filesize uint64, resourceID *provider.ResourceId, c config.Postprocessing) *Postprocessing {
+func New(uploadID string, uploadURL string, user *user.User, filename string, filesize uint64, resourceID *provider.ResourceId, steps []events.Postprocessingstep, delay time.Duration) *Postprocessing {
 	return &Postprocessing{
 		id:         uploadID,
 		url:        uploadURL,
 		u:          user,
 		m:          make(map[events.Postprocessingstep]interface{}),
-		c:          c,
 		filename:   filename,
 		filesize:   filesize,
 		resourceID: resourceID,
-		steps:      getSteps(c),
+		steps:      steps,
+		delay:      delay,
 	}
 }
 
@@ -48,13 +47,13 @@ func (pp *Postprocessing) Init(ev events.BytesReceived) interface{} {
 	return pp.nextStep(pp.steps[0])
 }
 
-// Virusscan is the virusscanning step of the postprocessing
-func (pp *Postprocessing) Virusscan(ev events.VirusscanFinished) interface{} {
-	pp.m[events.PPStepAntivirus] = ev
+// NextStep returns the next postprocessing step
+func (pp *Postprocessing) NextStep(ev events.PostprocessingStepFinished) interface{} {
+	pp.m[ev.FinishedStep] = ev
 
 	switch ev.Outcome {
 	case events.PPOutcomeContinue:
-		return pp.next(events.PPStepAntivirus)
+		return pp.next(ev.FinishedStep)
 	default:
 		return pp.finished(ev.Outcome)
 
@@ -64,7 +63,7 @@ func (pp *Postprocessing) Virusscan(ev events.VirusscanFinished) interface{} {
 // Delay will sleep the configured time then continue
 func (pp *Postprocessing) Delay(ev events.StartPostprocessingStep) interface{} {
 	pp.m[events.PPStepDelay] = ev
-	time.Sleep(pp.c.Delayprocessing)
+	time.Sleep(pp.delay)
 	return pp.next(events.PPStepDelay)
 }
 
@@ -98,21 +97,4 @@ func (pp *Postprocessing) finished(outcome events.PostprocessingOutcome) events.
 		Filename:      pp.filename,
 		Outcome:       outcome,
 	}
-}
-
-func getSteps(c config.Postprocessing) []events.Postprocessingstep {
-	// NOTE: first version only contains very basic configuration options
-	// But we aim for a system where postprocessing steps and their order can be configured per space
-	// ideally by the spaceadmin itself
-	// We need to iterate over configuring PP service when we see fit
-	var steps []events.Postprocessingstep
-	if c.Delayprocessing != 0 {
-		steps = append(steps, events.PPStepDelay)
-	}
-
-	if c.Virusscan {
-		steps = append(steps, events.PPStepAntivirus)
-	}
-
-	return steps
 }

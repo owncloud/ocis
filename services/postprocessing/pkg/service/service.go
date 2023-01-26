@@ -12,6 +12,7 @@ type PostprocessingService struct {
 	log    log.Logger
 	events <-chan interface{}
 	pub    events.Publisher
+	steps  []events.Postprocessingstep
 	c      config.Postprocessing
 }
 
@@ -31,6 +32,7 @@ func NewPostprocessingService(stream events.Stream, logger log.Logger, c config.
 		log:    logger,
 		events: evs,
 		pub:    stream,
+		steps:  getSteps(c),
 		c:      c,
 	}, nil
 }
@@ -42,16 +44,16 @@ func (pps *PostprocessingService) Run() error {
 		var next interface{}
 		switch ev := e.(type) {
 		case events.BytesReceived:
-			pp := postprocessing.New(ev.UploadID, ev.URL, ev.ExecutingUser, ev.Filename, ev.Filesize, ev.ResourceID, pps.c)
+			pp := postprocessing.New(ev.UploadID, ev.URL, ev.ExecutingUser, ev.Filename, ev.Filesize, ev.ResourceID, pps.steps, pps.c.Delayprocessing)
 			current[ev.UploadID] = pp
 			next = pp.Init(ev)
-		case events.VirusscanFinished:
+		case events.PostprocessingStepFinished:
 			pp := current[ev.UploadID]
 			if pp == nil {
 				// no current upload - this was an on demand scan
 				continue
 			}
-			next = pp.Virusscan(ev)
+			next = pp.NextStep(ev)
 		case events.StartPostprocessingStep:
 			if ev.StepToStart != events.PPStepDelay {
 				continue
@@ -72,4 +74,16 @@ func (pps *PostprocessingService) Run() error {
 
 	}
 	return nil
+}
+
+func getSteps(c config.Postprocessing) []events.Postprocessingstep {
+	// NOTE: improved version only allows configuring order of postprocessing steps
+	// But we aim for a system where postprocessing steps can be configured per space, ideally by the spaceadmin itself
+	// We need to iterate over configuring PP service when we see fit
+	var steps []events.Postprocessingstep
+	for _, s := range c.Steps {
+		steps = append(steps, events.Postprocessingstep(s))
+	}
+
+	return steps
 }
