@@ -193,11 +193,6 @@ func DefaultPolicies() []config.Policy {
 					Endpoint: "/api/v0/settings",
 					Service:  "com.owncloud.web.settings",
 				},
-				{
-					Endpoint:    "/settings.js",
-					Service:     "com.owncloud.web.settings",
-					Unprotected: true,
-				},
 			},
 		},
 	}
