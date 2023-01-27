@@ -52,18 +52,26 @@ type templateData struct {
 
 func main() {
 	fmt.Println("Generating adoc documentation for environment variables:")
-	content, err := os.ReadFile("../../docs/templates/ADOC.tmpl")
+	adoc, err := os.ReadFile("../../docs/templates/ADOC.tmpl")
+	if err != nil {
+	    log.Fatal(err)
+	}
+	dpr, err := os.ReadFile("../../docs/templates/ADOC_deprecation.tmpl")
 	if err != nil {
 	    log.Fatal(err)
 	}
 	replacer := strings.NewReplacer(
 			"github.com/owncloud/ocis/v2/services/", "",
 			"/pkg/config/defaults", "",
-		)
-	var fields []ConfigField
-	var deprecations []DeprecationField
-	var targetFile *os.File
-	tpl := template.Must(template.New("").Parse(string(content)))
+	)
+	var (
+	    fields 	 []ConfigField
+	    deprecations []DeprecationField
+	    adocFile  	 *os.File
+	    dprFile 	 *os.File
+	)
+	adoctpl := template.Must(template.New("").Parse(string(adoc)))
+	dprtpl := template.Must(template.New("").Parse(string(dpr)))
 
 	m := map[string]interface{}{
 	{{- range $key, $value := .}}
@@ -103,19 +111,29 @@ func main() {
 
 	    if len(fields) > 0 || len(deprecations) > 0 {
 		fmt.Printf("... %s\n", pkg)
-		targetFile, err = os.Create(filepath.Join(targetFolder, service + "_configvars.adoc"))
-		if err != nil {
-			log.Fatalf("Failed to create target file: %s", err)
-		}
-		defer targetFile.Close()
-
 		td := templateData{
 			ExtensionName: service,
 			Fields:        fields,
 			Deprecations: deprecations,
 			HasDeprecations: hasDeprecations ,
 		}
-		if err := tpl.Execute(targetFile, td); err != nil {
+		adocFile, err = os.Create(filepath.Join(targetFolder, service + "_configvars.adoc"))
+		if err != nil {
+			log.Fatalf("Failed to create target file: %s", err)
+		}
+		defer adocFile.Close()
+
+		if err := adoctpl.Execute(adocFile, td); err != nil {
+			log.Fatalf("Failed to execute template: %s", err)
+		}
+
+		dprFile, err = os.Create(filepath.Join(targetFolder, service + "_deprecation.adoc"))
+		if err != nil {
+			log.Fatalf("Failed to create target file: %s", err)
+		}
+		defer dprFile.Close()
+
+		if err := dprtpl.Execute(dprFile, td); err != nil {
 			log.Fatalf("Failed to execute template: %s", err)
 		}
 	    }
