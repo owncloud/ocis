@@ -423,6 +423,176 @@ func (g Graph) DeleteEducationSchoolUser(w http.ResponseWriter, r *http.Request)
 	render.NoContent(w, r)
 }
 
+// GetEducationSchoolUsers implements the Service interface.
+func (g Graph) GetEducationSchoolClasses(w http.ResponseWriter, r *http.Request) {
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+	logger.Info().Msg("calling get school classes")
+	schoolID := chi.URLParam(r, "schoolID")
+	schoolID, err := url.PathUnescape(schoolID)
+	if err != nil {
+		logger.Debug().Str("id", schoolID).Msg("could not get school users: unescaping school id failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping school id failed")
+		return
+	}
+
+	if schoolID == "" {
+		logger.Debug().Msg("could not get school users: missing school id")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing school id")
+		return
+	}
+
+	logger.Debug().Str("id", schoolID).Msg("calling get school classes on backend")
+	classes, err := g.identityEducationBackend.GetEducationSchoolClasses(r.Context(), schoolID)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not get school classes: backend error")
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, classes)
+}
+
+// PostEducationSchoolUser implements the Service interface.
+func (g Graph) PostEducationSchoolClass(w http.ResponseWriter, r *http.Request) {
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+	logger.Info().Msg("Calling post school class")
+
+	schoolID := chi.URLParam(r, "schoolID")
+	schoolID, err := url.PathUnescape(schoolID)
+	if err != nil {
+		logger.Debug().
+			Err(err).
+			Str("id", schoolID).
+			Msg("could not add class to school: unescaping school id failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping school id failed")
+		return
+	}
+
+	if schoolID == "" {
+		logger.Debug().Msg("could not add school class: missing school id")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing school id")
+		return
+	}
+	memberRef := libregraph.NewMemberReference()
+	err = json.NewDecoder(r.Body).Decode(memberRef)
+	if err != nil {
+		logger.Debug().
+			Err(err).
+			Interface("body", r.Body).
+			Msg("could not add school class: invalid request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+	memberRefURL, ok := memberRef.GetOdataIdOk()
+	if !ok {
+		logger.Debug().Msg("could not add school class: @odata.id reference is missing")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "@odata.id reference is missing")
+		return
+	}
+	memberType, id, err := g.parseMemberRef(*memberRefURL)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not add school class: error parsing @odata.id url")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Error parsing @odata.id url")
+		return
+	}
+	// The MS Graph spec allows "directoryObject", "user", "school" and "organizational Contact"
+	// we restrict this to users for now. Might add Schools as members later
+	if memberType != "classes" {
+		logger.Debug().Str("type", memberType).Msg("could not add school class: Only classes are allowed as school members")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Only classes are allowed as school members")
+		return
+	}
+
+	logger.Debug().Str("memberType", memberType).Str("id", id).Msg("calling add class on backend")
+	err = g.identityEducationBackend.AddClassesToEducationSchool(r.Context(), schoolID, []string{id})
+
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not add school class: backend error")
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	/* TODO requires reva changes
+	e := events.SchoolMemberAdded{SchoolID: schoolID, UserID: id}
+	if currentUser, ok := ctxpkg.ContextGetUser(r.Context()); ok {
+		e.Executant = currentUser.GetId()
+	}
+	g.publishEvent(e)
+	*/
+
+	render.Status(r, http.StatusNoContent)
+	render.NoContent(w, r)
+}
+
+// DeleteEducationSchoolUser implements the Service interface.
+func (g Graph) DeleteEducationSchoolClass(w http.ResponseWriter, r *http.Request) {
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+	logger.Info().Msg("calling delete school class")
+
+	schoolID := chi.URLParam(r, "schoolID")
+	schoolID, err := url.PathUnescape(schoolID)
+	if err != nil {
+		logger.Debug().Err(err).Str("id", schoolID).Msg("could not delete school class: unescaping school id failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping school id failed")
+		return
+	}
+
+	if schoolID == "" {
+		logger.Debug().Msg("could not delete school class: missing school id")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing school id")
+		return
+	}
+
+	classID := chi.URLParam(r, "classID")
+	classID, err = url.PathUnescape(classID)
+	if err != nil {
+		logger.Debug().Err(err).Str("id", classID).Msg("could not delete school class: unescaping class id failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping class id failed")
+		return
+	}
+
+	if classID == "" {
+		logger.Debug().Msg("could not delete school class: missing class id")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing class id")
+		return
+	}
+	logger.Debug().Str("schoolID", schoolID).Str("userID", classID).Msg("calling delete class on backend")
+	err = g.identityEducationBackend.RemoveClassFromEducationSchool(r.Context(), schoolID, classID)
+
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not delete school class: backend error")
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	/* TODO requires reva changes
+	e := events.SchoolMemberRemoved{SchoolID: schoolID, UserID: userID}
+	if currentUser, ok := ctxpkg.ContextGetUser(r.Context()); ok {
+		e.Executant = currentUser.GetId()
+	}
+	g.publishEvent(e)
+	*/
+
+	render.Status(r, http.StatusNoContent)
+	render.NoContent(w, r)
+}
+
 func sortEducationSchools(req *godata.GoDataRequest, schools []*libregraph.EducationSchool) ([]*libregraph.EducationSchool, error) {
 	if req.Query.OrderBy == nil || len(req.Query.OrderBy.OrderByItems) != 1 {
 		return schools, nil

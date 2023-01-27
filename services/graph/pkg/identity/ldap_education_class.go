@@ -344,8 +344,8 @@ func (i *LDAP) getEducationClassLDAPDN(class libregraph.EducationClass) string {
 func (i *LDAP) getEducationClassByID(nameOrID string, requestMembers bool) (*ldap.Entry, error) {
 	return i.getEducationObjectByNameOrID(
 		nameOrID,
-		i.groupAttributeMap.name,
-		i.groupAttributeMap.id,
+		i.userAttributeMap.id,
+		i.educationConfig.classAttributeMap.externalID,
 		i.groupFilter,
 		i.educationConfig.classObjectClass,
 		i.groupBaseDN,
