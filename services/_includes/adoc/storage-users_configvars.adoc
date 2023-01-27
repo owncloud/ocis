@@ -6,6 +6,7 @@ ifeval::[{show-deprecation} == true]
 
 [[deprecation-note]]
 [caption=]
+.Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
 |===
 | Deprecation Info
