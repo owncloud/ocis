@@ -40,6 +40,21 @@ func (i *ErrEducationBackend) GetEducationSchoolUsers(ctx context.Context, id st
 	return nil, errNotImplemented
 }
 
+// GetEducationSchoolClasses implements the EducationBackend interface for the ErrEducationBackend backend.
+func (i *ErrEducationBackend) GetEducationSchoolClasses(ctx context.Context, schoolNumberOrID string) ([]*libregraph.EducationClass, error) {
+	return nil, errNotImplemented
+}
+
+// AddClassesToEducationSchool implements the EducationBackend interface for the ErrEducationBackend backend.
+func (i *ErrEducationBackend) AddClassesToEducationSchool(ctx context.Context, schoolNumberOrID string, memberIDs []string) error {
+	return errNotImplemented
+}
+
+// RemoveClassFromEducationSchool implements the EducationBackend interface for the ErrEducationBackend backend.
+func (i *ErrEducationBackend) RemoveClassFromEducationSchool(ctx context.Context, schoolNumberOrID string, memberID string) error {
+	return errNotImplemented
+}
+
 // AddUsersToEducationSchool adds new members (reference by a slice of IDs) to supplied school in the identity backend.
 func (i *ErrEducationBackend) AddUsersToEducationSchool(ctx context.Context, schoolID string, memberID []string) error {
 	return errNotImplemented

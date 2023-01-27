@@ -241,6 +241,11 @@ func NewService(opts ...Option) (Graph, error) {
 							r.Post("/$ref", svc.PostEducationSchoolUser)
 							r.Delete("/{userID}/$ref", svc.DeleteEducationSchoolUser)
 						})
+						r.Route("/classes", func(r chi.Router) {
+							r.Get("/", svc.GetEducationSchoolClasses)
+							r.Post("/$ref", svc.PostEducationSchoolClass)
+							r.Delete("/{classID}/$ref", svc.DeleteEducationSchoolClass)
+						})
 					})
 				})
 				r.Route("/users", func(r chi.Router) {

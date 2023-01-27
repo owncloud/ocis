@@ -354,7 +354,7 @@ func (i *LDAP) GetEducationSchoolUsers(ctx context.Context, schoolNumberOrID str
 	logger.Debug().Str("backend", "ldap").Msg("GetEducationSchoolUsers")
 
 	entries, err := i.getEducationSchoolEntries(
-		schoolNumberOrID, i.userFilter, i.educationConfig.userObjectClass, i.userBaseDN, i.userScope, i.getUserAttrTypes(), logger,
+		schoolNumberOrID, i.userFilter, i.educationConfig.userObjectClass, i.userBaseDN, i.userScope, i.getEducationUserAttrTypes(), logger,
 	)
 	if err != nil {
 		return nil, err
