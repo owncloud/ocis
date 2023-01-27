@@ -48,9 +48,6 @@ web:
     - admin-settings
     applications: []
     external_apps:
-    - id: settings
-      path: /settings.js
-      config: {}
     - id: preview
       path: web-app-preview
       config:
