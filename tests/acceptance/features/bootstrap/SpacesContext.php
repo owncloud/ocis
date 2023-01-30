@@ -3166,4 +3166,27 @@ class SpacesContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @Then the relative quota amount should be :quota_amount
+	 *
+	 * @param string $quotaAmount
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theRelativeQuotaAmountShouldBe(string $quotaAmount): void {
+		$data = $this->ocsContext->getOCSResponseData($this->featureContext->getResponse());
+		if (isset($data->quota, $data->quota->relative)) {
+			Assert::assertEquals(
+				$data->quota->relative,
+				$quotaAmount,
+				"Expected relative quota amount to be $quotaAmount but found to be $data->quota->relative"
+			);
+		} else {
+			throw new Exception(
+				"No relative quota amount found in responseXml"
+			);
+		}
+	}
 }
