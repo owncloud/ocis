@@ -66,12 +66,12 @@ Feature: Space management
       | quota@@@total | 10    |
 
 
-  Scenario: The space admin user changes the quota of the personal space
-    When user "Brian" changes the quota of the "Alice Hansen" space to "20" owned by user "Alice"
-    Then the HTTP status code should be "200"
+  Scenario: The space admin user tries to change the quota of the personal space
+    When user "Brian" tries to change the quota of the "Alice Hansen" space to "20" owned by user "Alice"
+    Then the HTTP status code should be "401"
     And the user "Alice" should have a space called "Alice Hansen" with these key and value pairs:
       | key           | value |
-      | quota@@@total | 20    |
+      | quota@@@total | 10    |
 
 
   Scenario: The user without space admin permissions tries to change the quota of the personal space
