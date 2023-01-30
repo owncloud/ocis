@@ -37,7 +37,7 @@ allow := false if {
     hasMimetype(dataB, "image/png")
 }
 
-# disallow markdown files with content `voldemort` for all users except admin
+# disallow files with content `voldemort` for all users except admin
 allow := false if {
     not is_admin
 

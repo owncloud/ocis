@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"time"
 
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/gabriel-vasile/mimetype"
@@ -28,7 +27,7 @@ func NewOPA(conf *config.Config) (OPA, error) {
 }
 
 func (o OPA) Allowed(ctx context.Context, env Environment) (bool, error) {
-	ctx, cancel := context.WithTimeout(ctx, time.Duration(o.config.OPA.Timeout))
+	ctx, cancel := context.WithTimeout(ctx, o.config.OPA.Timeout)
 	defer cancel()
 
 	q, err := rego.New(

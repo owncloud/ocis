@@ -33,7 +33,7 @@ func DefaultConfig() *config.Config {
 			Policies: []string{
 				"services/authz/pkg/config/policies/ocis.authz.rego",
 			},
-			Timeout: 5,
+			Timeout: 5 * time.Second,
 		},
 	}
 }
@@ -65,8 +65,4 @@ func Sanitize(cfg *config.Config) {
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 	}
-
-	// convert timeout to millisecond
-	// the config is in seconds, therefore we need multiply it.
-	cfg.OPA.Timeout = cfg.OPA.Timeout * int(time.Second)
 }

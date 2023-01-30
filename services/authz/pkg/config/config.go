@@ -2,6 +2,8 @@ package config
 
 import (
 	"context"
+	"time"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
 
@@ -44,9 +46,9 @@ type TokenManager struct {
 
 // OPA configures the opa policy middleware.
 type OPA struct {
-	Enabled  bool     `yaml:"enabled"`
-	Policies []string `yaml:"policies"`
-	Timeout  int      `yaml:"timeout"`
+	Enabled  bool          `yaml:"enabled"`
+	Policies []string      `yaml:"policies"`
+	Timeout  time.Duration `yaml:"timeout"`
 }
 
 // Events combines the configuration options for the event bus.
