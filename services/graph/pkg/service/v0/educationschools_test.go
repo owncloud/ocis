@@ -483,4 +483,109 @@ var _ = Describe("Schools", func() {
 			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "RemoveUserFromEducationSchool", 1)
 		})
 	})
+
+	Describe("GetEducationSchoolClasses", func() {
+		It("gets the list of classes", func() {
+			class := libregraph.NewEducationClassWithDefaults()
+			class.SetId("class")
+			identityEducationBackend.On("GetEducationSchoolClasses", mock.Anything, *newSchool.Id).Return([]*libregraph.EducationClass{class}, nil)
+
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/schools/{schoolID}/classes", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("schoolID", *newSchool.Id)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.GetEducationSchoolClasses(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusOK))
+
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			var members []*libregraph.User
+			err = json.Unmarshal(data, &members)
+			Expect(err).ToNot(HaveOccurred())
+
+			Expect(len(members)).To(Equal(1))
+			Expect(members[0].GetId()).To(Equal("class"))
+		})
+	})
+
+	Describe("PostEducationSchoolClasses", func() {
+		It("fails on invalid body", func() {
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/{schoolID}/classes", bytes.NewBufferString("{invalid"))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("schoolID", *newSchool.Id)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.PostEducationSchoolClass(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("fails on missing member refs", func() {
+			member := libregraph.NewMemberReference()
+			data, err := json.Marshal(member)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/{schoolID}/classes", bytes.NewBuffer(data))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("schoolID", *newSchool.Id)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.PostEducationSchoolClass(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("fails on invalid class refs", func() {
+			class := libregraph.NewMemberReference()
+			class.SetOdataId("/invalidtype/class")
+			data, err := json.Marshal(class)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/{schoolID}/classesa", bytes.NewBuffer(data))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("schoolID", *newSchool.Id)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.PostEducationSchoolUser(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("adds a new class", func() {
+			member := libregraph.NewMemberReference()
+			member.SetOdataId("/classes/class")
+			data, err := json.Marshal(member)
+			Expect(err).ToNot(HaveOccurred())
+			identityEducationBackend.On("AddClassesToEducationSchool", mock.Anything, *newSchool.Id, []string{"class"}).Return(nil)
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/schools/{schoolID}/members", bytes.NewBuffer(data))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("schoolID", *newSchool.Id)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.PostEducationSchoolClass(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusNoContent))
+
+			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "AddClassesToEducationSchool", 1)
+		})
+	})
+
+	Describe("DeleteEducationSchoolClass", func() {
+		It("handles missing or empty member id", func() {
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/education/schools/{schoolID}/classes/{classID}/$ref", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("schoolID", *newSchool.Id)
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.DeleteEducationSchoolClass(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("deletes members", func() {
+			identityEducationBackend.On("RemoveClassFromEducationSchool", mock.Anything, *newSchool.Id, "/classes/class1").Return(nil)
+
+			r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/education/schools/{schoolID}/classes/{classID}/$ref", nil)
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("schoolID", *newSchool.Id)
+			rctx.URLParams.Add("classID", "/classes/class1")
+			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.DeleteEducationSchoolClass(rr, r)
+			Expect(rr.Code).To(Equal(http.StatusNoContent))
+
+			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "RemoveClassFromEducationSchool", 1)
+		})
+	})
 })

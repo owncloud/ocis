@@ -535,7 +535,7 @@ func (g Graph) PostEducationSchoolClass(w http.ResponseWriter, r *http.Request) 
 	render.NoContent(w, r)
 }
 
-// DeleteEducationSchoolUser implements the Service interface.
+// DeleteEducationSchoolClass implements the Service interface.
 func (g Graph) DeleteEducationSchoolClass(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling delete school class")
@@ -567,7 +567,7 @@ func (g Graph) DeleteEducationSchoolClass(w http.ResponseWriter, r *http.Request
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing class id")
 		return
 	}
-	logger.Debug().Str("schoolID", schoolID).Str("userID", classID).Msg("calling delete class on backend")
+	logger.Debug().Str("schoolID", schoolID).Str("classID", classID).Msg("calling delete class on backend")
 	err = g.identityEducationBackend.RemoveClassFromEducationSchool(r.Context(), schoolID, classID)
 
 	if err != nil {
