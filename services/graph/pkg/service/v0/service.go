@@ -65,6 +65,9 @@ type Service interface {
 	GetEducationSchoolUsers(http.ResponseWriter, *http.Request)
 	PostEducationSchoolUser(http.ResponseWriter, *http.Request)
 	DeleteEducationSchoolUser(http.ResponseWriter, *http.Request)
+	GetEducationSchoolClasses(http.ResponseWriter, *http.Request)
+	PostEducationSchoolClass(http.ResponseWriter, *http.Request)
+	DeleteEducationSchoolClass(http.ResponseWriter, *http.Request)
 
 	GetEducationClasses(http.ResponseWriter, *http.Request)
 	GetEducationClass(http.ResponseWriter, *http.Request)
