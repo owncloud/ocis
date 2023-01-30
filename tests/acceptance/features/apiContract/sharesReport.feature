@@ -1,6 +1,6 @@
 @api
-Feature: Test REPORT response for personal shares
-  Check that the REPORT response contains all relevant details for personal shares
+Feature: REPORT request to Shares space
+  Check that the REPORT response contains all relevant details for Shares
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
