@@ -33,7 +33,7 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "${DOCKER_SOCKET_PATH:-/var/run/docker.sock}:/var/run/docker.sock:ro"
       - "certs:/certs"
     labels:
       - "traefik.enable=${TRAEFIK_DASHBOARD:-false}"
@@ -44,7 +44,7 @@ services:
       - "traefik.http.routers.traefik.tls.certresolver=http"
       - "traefik.http.routers.traefik.service=api@internal"
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
   ocis:
@@ -81,7 +81,7 @@ services:
       - "traefik.http.routers.ocis.service=ocis"
       - "traefik.http.services.ocis.loadbalancer.server.port=9200"
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
   postgres:
@@ -95,7 +95,7 @@ services:
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: keycloak
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
   keycloak:
@@ -129,7 +129,7 @@ services:
     depends_on:
       - postgres
     logging:
-      driver: "local"
+      driver: ${LOG_DRIVER:-local}
     restart: always
 
 volumes:
