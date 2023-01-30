@@ -41,7 +41,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=reva,ou=sysusers,o=libregraph-idm ++
+++uid=idp,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -131,7 +131,7 @@ a| [subs=-attributes]
 ++groupOfNames ++
 
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter ('groupOfNames').
+The object class to use for groups in the default group search filter ('groupOfNames'). 
 
 a| `LDAP_GROUP_SCHEMA_DISPLAYNAME`
 
@@ -178,7 +178,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ownclouduuid ++
+++owncloudUUID ++
 
 a| [subs=-attributes]
 LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
@@ -282,7 +282,7 @@ a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
 
 a| [subs=-attributes]
-URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
+Url of the LDAP service to use as IDP.
 
 a| `LDAP_USER_BASE_DN`
 
@@ -336,7 +336,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-The object class to use for users in the default user search filter ('inetOrgPerson').
+LDAP User ObjectClass like 'inetOrgPerson'.
 
 a| `LDAP_USER_SCHEMA_DISPLAYNAME`
 
@@ -367,10 +367,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ownclouduuid ++
+++uid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
+LDAP User uuid attribute like 'uid'.
 
 a| `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -404,7 +404,7 @@ a| [subs=-attributes]
 ++mail ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for the email address of users.
+LDAP User email attribute like 'mail'.
 
 a| `LDAP_USER_SCHEMA_USERNAME`
 
@@ -419,10 +419,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid ++
+++displayName ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for username of users.
+LDAP User name attribute like 'displayName'.
 
 a| `LDAP_USER_SCOPE`
 
@@ -1092,7 +1092,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
+The OIDC issuer URL to use.
 
 a| `OCIS_SYSTEM_USER_API_KEY`
 
@@ -1385,5 +1385,5 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Transfer secret for signing file up- and download requests.
+The storage transfer secret.
 |===
