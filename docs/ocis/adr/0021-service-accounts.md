@@ -60,11 +60,10 @@ Chosen option: [Service Accounts](#service-accounts)
 ### Service Accounts
 
 Make the reva auth manager and registry aware of CS3 users of type [`USER_TYPE_SERVICE`](https://cs3org.github.io/cs3apis/#cs3.identity.user.v1beta1.UserType). Then we can provision service accounts at oCIS initialization and use the permissions service to check permissions.
-When assigning permissions we use the permission constraints to define the scope of permissions. When checking permissions we do not check for global permissions but for the concrete permission, e.g. the index service account has the read permission constrained to tenant and the permissions check is the triple (index service account, `Resource.Read`, resourceid). Normal users like the demo users Einstein and Marie would have the permission `Resource.ReadWrite` with the constraint ALL (which limits them to all files they own and that have been shared with them).
+When assigning permissions we use the permission constraints to define the scope of permissions, see [Permission Checks](#permission-checks) for more details.
 
-The permission names and constraints are different from the MS Graph API. Giving permission like [`Files.ReadWrite.All`](https://learn.microsoft.com/en-us/graph/permissions-reference#user-permissions) a different meaning, depending on the type of user (for normal users it means all files they have access to, for service accounts it means all files in the organization) is a source of confusion which only gets worse when there are two different UUIDs for this. 
+To authenticate service accounts the static reva auth registry needs to be configured with a new auth provider for type `service`. The actual provider can use a plain JSON file or JSONCS3 that is provisioned once with `ocis init`. TODO Furthermore, the user provider needs to be able to return users for service accounts.
 
-To authenticate service accounts the static reva auth registry needs to be configured with a new auth provider for type `service`. The actual provider can use a plain JSON file or JSONCS3 that is provisioned once with `ocis init`.
 
 * Good, because we could replace machine auth with specific service accounts and no longer have to distribute a shared secret everywhere
 * Bad, because we don't know if a there are places in the code that try to look up a user with USER_TYPE_SERVICE at the cs3 users service ... they might not exist there ... or do we have to implement a userregistry, similar to the authregistry?
@@ -85,3 +84,12 @@ We could implement a new auth manager that can authenticate space owners, a CS3 
 
 * [MS Graph servicePrincipal](https://learn.microsoft.com/en-us/graph/api/resources/serviceprincipal?view=graph-rest-1.0)
 * [reva auth managers](https://reva.link/docs/config/packages/auth/manager/) - lacks docs for `auth_machine`, to be found [in the code](https://github.com/cs3org/reva/blob/edge/pkg/auth/manager/machine/machine.go)
+
+## Permission checks
+When checking permissions we do not check for global permissions but for the concrete permission. Global permissions describe permissions that are used when assigning permissions, e.g. the index service account has the read permission constrained to tenant. The concrete permission check always contains a resource and a specific permission like `Resource.Read` or `Space.Delete`. That we currently check if a user has the `delete-all-spaces` permission is wrong. It should instead check if the user has the permission `Space.Delete` on a specific space. The permissions service can implement the check by taking the permission constraint into account.
+
+Another example would be a `Resource.Read` check for a specific resource. Normal users like the demo users Einstein and Marie would have the permission `Resource.ReadWrite` with the constraint ALL (which limits them to all files they own and that have been shared with them). The permissions service can return true. Service accounts like the indexer would have  `Resource.Read` with the constraint TENANT and thus be granted read access to all resources.
+
+In the storage drive implementation we can check the ACLs first (which would allow service accounts that are known to the underlying storage system, e.g. EOS to access the resource) and then make a call to the permissions service. At least for the Read Resource permission. Other permission checks can be introduced as needed.
+
+The permission names and constraints are different from the MS Graph API. Giving permission like [`Files.ReadWrite.All`](https://learn.microsoft.com/en-us/graph/permissions-reference#user-permissions) a different meaning, depending on the type of user (for normal users it means all files they have access to, for service accounts it means all files in the organization) is a source of confusion which only gets worse when there are two different UUIDs for this. 
