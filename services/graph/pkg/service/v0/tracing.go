@@ -160,6 +160,21 @@ func (t tracing) DeleteEducationSchoolUser(w http.ResponseWriter, r *http.Reques
 	t.next.DeleteEducationSchoolUser(w, r)
 }
 
+// GetEducationSchoolClasses implements the Service interface.
+func (t tracing) GetEducationSchoolClasses(w http.ResponseWriter, r *http.Request) {
+	t.next.GetEducationSchoolClasses(w, r)
+}
+
+// PostEducationSchoolClass implements the Service interface.
+func (t tracing) PostEducationSchoolClass(w http.ResponseWriter, r *http.Request) {
+	t.next.PostEducationSchoolClass(w, r)
+}
+
+// DeleteEducationSchoolClass implements the Service interface.
+func (t tracing) DeleteEducationSchoolClass(w http.ResponseWriter, r *http.Request) {
+	t.next.DeleteEducationSchoolClass(w, r)
+}
+
 // GetEducationClasses implements the Service interface.
 func (t tracing) GetEducationClasses(w http.ResponseWriter, r *http.Request) {
 	t.next.GetEducationClasses(w, r)

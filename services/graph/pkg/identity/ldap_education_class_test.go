@@ -21,6 +21,15 @@ var classEntry = ldap.NewEntry("ocEducationExternalId=Math0123",
 		"entryUUID":             {"abcd-defg"},
 	})
 
+var classEntryWithSchool = ldap.NewEntry("ocEducationExternalId=Math0123",
+	map[string][]string{
+		"cn":                    {"Math"},
+		"ocEducationExternalId": {"Math0123"},
+		"ocEducationClassType":  {"course"},
+		"entryUUID":             {"abcd-defg"},
+		"ocMemberOfSchool":      {"abcd-defg"},
+	})
+
 var classEntryWithMember = ldap.NewEntry("ocEducationExternalId=Math0123",
 	map[string][]string{
 		"cn":                    {"Math"},
