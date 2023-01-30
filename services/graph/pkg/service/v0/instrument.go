@@ -164,6 +164,21 @@ func (i instrument) DeleteEducationSchoolUser(w http.ResponseWriter, r *http.Req
 	i.next.DeleteEducationSchoolUser(w, r)
 }
 
+// GetEducationSchoolClasses implements the Service interface.
+func (i instrument) GetEducationSchoolClasses(w http.ResponseWriter, r *http.Request) {
+	i.next.GetEducationSchoolClasses(w, r)
+}
+
+// PostEducationSchoolClass implements the Service interface.
+func (i instrument) PostEducationSchoolClass(w http.ResponseWriter, r *http.Request) {
+	i.next.PostEducationSchoolClass(w, r)
+}
+
+// DeleteEducationSchoolClass implements the Service interface.
+func (i instrument) DeleteEducationSchoolClass(w http.ResponseWriter, r *http.Request) {
+	i.next.DeleteEducationSchoolClass(w, r)
+}
+
 // GetEducationClasses implements the Service interface.
 func (i instrument) GetEducationClasses(w http.ResponseWriter, r *http.Request) {
 	i.next.GetEducationClasses(w, r)
