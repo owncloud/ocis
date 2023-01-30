@@ -423,7 +423,7 @@ func (g Graph) DeleteEducationSchoolUser(w http.ResponseWriter, r *http.Request)
 	render.NoContent(w, r)
 }
 
-// GetEducationSchoolUsers implements the Service interface.
+// GetEducationSchoolClasses implements the Service interface.
 func (g Graph) GetEducationSchoolClasses(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling get school classes")
@@ -458,7 +458,7 @@ func (g Graph) GetEducationSchoolClasses(w http.ResponseWriter, r *http.Request)
 	render.JSON(w, r, classes)
 }
 
-// PostEducationSchoolUser implements the Service interface.
+// PostEducationSchoolClass implements the Service interface.
 func (g Graph) PostEducationSchoolClass(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("Calling post school class")
