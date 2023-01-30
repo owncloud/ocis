@@ -60,7 +60,7 @@ services:
     environment:
       # Keycloak IDP specific configuration
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
-      OCIS_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/auth/realms/${KEYCLOAK_REALM:-oCIS}
+      OCIS_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/realms/${KEYCLOAK_REALM:-oCIS}
       PROXY_OIDC_REWRITE_WELLKNOWN: "true"
       WEB_OIDC_CLIENT_ID: ${OCIS_OIDC_CLIENT_ID:-web}
       # general config
@@ -99,26 +99,24 @@ services:
     restart: always
 
   keycloak:
-    # Keycloak WildFly distribution, Quarkus is not ready yet for automatic setup https://github.com/keycloak/keycloak/issues/10216
-    image: quay.io/keycloak/keycloak:legacy
+    image: quay.io/keycloak/keycloak:20.0
     networks:
       ocis-net:
-    entrypoint: ["/bin/sh", "/opt/jboss/tools/docker-entrypoint-override.sh"]
+    command: ["start", "--proxy edge", "--import-realm"]
+    entrypoint: ["/bin/sh", "/opt/keycloak/bin/docker-entrypoint-override.sh"]
     volumes:
-      - ./config/keycloak/docker-entrypoint-override.sh:/opt/jboss/tools/docker-entrypoint-override.sh
-      - ./config/keycloak/ocis-realm.dist.json:/opt/jboss/keycloak/ocis-realm.dist.json
+      - "./config/keycloak/docker-entrypoint-override.sh:/opt/keycloak/bin/docker-entrypoint-override.sh"
+      - "./config/keycloak/ocis-realm.dist.json:/opt/keycloak/data/import-dist/ocis-realm.json"
     environment:
       OCIS_DOMAIN: ${OCIS_DOMAIN:-ocis.owncloud.test}
-      DB_VENDOR: POSTGRES
-      DB_ADDR: postgres
-      DB_DATABASE: keycloak
-      DB_USER: keycloak
-      DB_SCHEMA: public
-      DB_PASSWORD: keycloak
-      KEYCLOAK_USER: ${KEYCLOAK_ADMIN_USER:-admin}
-      KEYCLOAK_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
-      PROXY_ADDRESS_FORWARDING: "true"
-      KEYCLOAK_IMPORT: /opt/jboss/keycloak/ocis-realm.json
+      KC_HOSTNAME: ${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}
+      KC_DB: postgres
+      KC_DB_URL: "jdbc:postgresql://postgres:5432/keycloak"
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+      KC_FEATURES: impersonation
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.keycloak.entrypoints=https"
