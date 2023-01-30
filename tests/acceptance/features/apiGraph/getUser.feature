@@ -75,3 +75,15 @@ Feature: get users
       | root@@@id         | %space_id%                       |
       | root@@@webDavUrl  | %base_url%/dav/spaces/%space_id% |
       | webUrl            | %base_url%/f/%space_id%          |
+
+
+  Scenario: admin user gets the group information of a user
+    Given group "tea-lover" has been created
+    And group "coffee-lover" has been created
+    And user "Brian" has been added to group "tea-lover"
+    And user "Brian" has been added to group "coffee-lover"
+    When the user "Alice" gets user "Brian" along with his group information using Graph API
+    Then the HTTP status code should be "200"
+    And the user retrieve API response should contain the following information:
+      | displayName  | id        | mail              | onPremisesSamAccountName | memberOf                |
+      | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    | tea-lover, coffee-lover |

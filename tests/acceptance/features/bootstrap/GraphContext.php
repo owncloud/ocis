@@ -1334,6 +1334,29 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @param string $byUser
+	 * @param string|null $user
+	 *
+	 * @return ResponseInterface
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function retrieveUserInformationAlongWithGroupUsingGraphApi(
+		string $byUser,
+		?string $user = null
+	):ResponseInterface {
+		$user = $user ?? $byUser;
+		$credentials = $this->getAdminOrUserCredentials($user);
+		return GraphHelper::getUserWithGroupInformation(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials["username"],
+			$credentials["password"],
+			$user
+		);
+	}
+
+	/**
 	 * @When /^the user "([^"]*)" gets user "([^"]*)" along with (his|her) drive information using Graph API$/
 	 *
 	 * @param string $byUser
@@ -1343,6 +1366,19 @@ class GraphContext implements Context {
 	 */
 	public function userTriesToGetInformationOfUserAlongWithHisDriveData(string $byUser, string $user) {
 		$response = $this->retrieveUserInformationAlongWithDriveUsingGraphApi($byUser, $user);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When /^the user "([^"]*)" gets user "([^"]*)" along with (his|her) group information using Graph API$/
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userTriesToGetInformationOfUserAlongWithHisGroup(string $byUser, string $user) {
+		$response = $this->retrieveUserInformationAlongWithGroupUsingGraphApi($byUser, $user);
 		$this->featureContext->setResponse($response);
 	}
 
