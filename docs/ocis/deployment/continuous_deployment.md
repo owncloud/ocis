@@ -12,6 +12,7 @@ geekdocFilePath: continuous_deployment.md
 We are continuously deploying the following deployment examples. Every example is deployed in two flavors:
 
 - Latest: reflects the current master branch state of oCIS and will be updated with every commit to master
+- Daily: reflects the master branch state of oCIS as of the time of deployment
 - Released: reflects the newest release state (currently latest release of version 1) and will be updated with every release
 
 The configuration for the continuous deployment can be found in the [oCIS repository](https://github.com/owncloud/ocis/tree/master/deployments/continuous-deployment-config).
@@ -27,6 +28,11 @@ Credentials:
 - oCIS: [ocis.ocis-traefik.latest.owncloud.works](https://ocis.ocis-traefik.latest.owncloud.works)
 - Mail: [mail.ocis-traefik.latest.owncloud.works](https://mail.ocis-traefik.latest.owncloud.works)
 
+## Daily
+
+- oCIS: [ocis.ocis-traefik.daily.owncloud.works](https://ocis.ocis-traefik.daily.owncloud.works)
+- Mail: [mail.ocis-traefik.daily.owncloud.works](https://mail.ocis-traefik.daily.owncloud.works)
+
 ## Released
 
 - oCIS: [ocis.ocis-traefik.released.owncloud.works](https://ocis.ocis-traefik.released.owncloud.works)
@@ -41,10 +47,17 @@ Credentials:
 ## Latest
 
 - oCIS: [ocis.ocis-wopi.latest.owncloud.works](https://ocis.ocis-wopi.latest.owncloud.works)
+- Mail: [mail.ocis-wopi.latest.owncloud.works](https://mail.ocis-wopi.latest.owncloud.works)
+
+## Daily
+
+- oCIS: [ocis.ocis-wopi.daily.owncloud.works](https://ocis.ocis-wopi.daily.owncloud.works)
+- Mail: [mail.ocis-wopi.daily.owncloud.works](https://mail.ocis-wopi.daily.owncloud.works)
 
 ## Released
 
 - oCIS: [ocis.ocis-wopi.released.owncloud.works](https://ocis.ocis-wopi.released.owncloud.works)
+- Mail: [mail.ocis-wopi.released.owncloud.works](https://mail.ocis-wopi.released.owncloud.works)
 
 # oCIS with latest ownCloud Web
 
@@ -55,6 +68,10 @@ Credentials:
 ## Latest
 
 - oCIS: [ocis.ocis-web.latest.owncloud.works](https://ocis.ocis-web.latest.owncloud.works)
+
+## Daily
+
+- oCIS: [ocis.ocis-web.daily.owncloud.works](https://ocis.ocis-web.daily.owncloud.works)
 
 # oCIS with Keycloak
 
