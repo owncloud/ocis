@@ -140,7 +140,7 @@ func TestGetEducationClass(t *testing.T) {
 			Scope:      2,
 			SizeLimit:  1,
 			Filter:     tt.filter,
-			Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId"},
+			Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId", "ocMemberOfSchool"},
 			Controls:   []ldap.Control(nil),
 		}
 		if tt.expectedItemNotFound {
@@ -207,7 +207,7 @@ func TestDeleteEducationClass(t *testing.T) {
 			Scope:      2,
 			SizeLimit:  1,
 			Filter:     tt.filter,
-			Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId"},
+			Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId", "ocMemberOfSchool"},
 			Controls:   []ldap.Control(nil),
 		}
 		if tt.expectedItemNotFound {
@@ -285,7 +285,7 @@ func TestGetEducationClassMembers(t *testing.T) {
 			Scope:      2,
 			SizeLimit:  1,
 			Filter:     tt.filter,
-			Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId", "member"},
+			Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId", "ocMemberOfSchool", "member"},
 			Controls:   []ldap.Control(nil),
 		}
 		if tt.expectedItemNotFound {
