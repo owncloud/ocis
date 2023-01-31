@@ -17,7 +17,7 @@ variables:
   do_ignore: true
 - rawname: MICRO_LOG_LEVEL
   path: ocis-pkg/log/log.go:34
-  foundincode: true
+  foundincode: false
   name: MICRO_LOG_LEVEL
   type: string
   default_value: Error
@@ -26,12 +26,28 @@ variables:
   do_ignore: false
 - rawname: MICRO_LOG_LEVEL
   path: ocis-pkg/log/log.go:30
-  foundincode: true
+  foundincode: false
   name: MICRO_LOG_LEVEL
   type: ""
   default_value: ""
   description: ""
   do_ignore: true
+- rawname: MICRO_LOG_LEVEL
+  path: ocis-pkg/log/log.go:35
+  foundincode: true
+  name: MICRO_LOG_LEVEL
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: MICRO_LOG_LEVEL
+  path: ocis-pkg/log/log.go:31
+  foundincode: true
+  name: MICRO_LOG_LEVEL
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: registryEnv
   path: ocis-pkg/registry/registry.go:44
   foundincode: true
