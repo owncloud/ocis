@@ -2,6 +2,7 @@ package revaconfig
 
 import "github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 
+// DataProviderDrivers are the storage drivers for the data provider
 func DataProviderDrivers(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"eos": map[string]interface{}{
@@ -98,7 +99,7 @@ func DataProviderDrivers(cfg *config.Config) map[string]interface{} {
 			"permissionssvc_tls_mode":     cfg.Commons.GRPCClientTLS.Mode,
 			"max_acquire_lock_cycles":     cfg.Drivers.OCIS.MaxAcquireLockCycles,
 			"lock_cycle_duration_factor":  cfg.Drivers.OCIS.LockCycleDurationFactor,
-			// "asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
+			"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
 			"statcache": map[string]interface{}{
 				"cache_store":    cfg.Cache.Store,
 				"cache_nodes":    cfg.Cache.Nodes,
