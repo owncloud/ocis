@@ -87,3 +87,13 @@ Feature: get users
     And the user retrieve API response should contain the following information:
       | displayName  | id        | mail              | onPremisesSamAccountName | memberOf                |
       | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    | tea-lover, coffee-lover |
+
+
+  Scenario: non-admin user tries to get the group information of a user
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And group "coffee-lover" has been created
+    And user "Brian" has been added to group "coffee-lover"
+    When the user "Carol" gets user "Brian" along with his group information using Graph API
+    Then the HTTP status code should be "401"
+    And the last response should be an unauthorized response
+    
