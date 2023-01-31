@@ -132,8 +132,10 @@ func NewLogger(opts ...Option) Logger {
 		Timestamp().
 		Logger().Level(logLevel)
 
-	var lineInfoHook LineInfoHook
-	logger = logger.Hook(lineInfoHook)
+	if logLevel <= zerolog.InfoLevel {
+		var lineInfoHook LineInfoHook
+		logger = logger.Hook(lineInfoHook)
+	}
 
 	return Logger{
 		logger,
