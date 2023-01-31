@@ -72,7 +72,7 @@ func StorageUsersConfigFromStruct(cfg *config.Config) map[string]interface{} {
 				"dataprovider": map[string]interface{}{
 					"prefix":                 cfg.HTTP.Prefix,
 					"driver":                 cfg.Driver,
-					"drivers":                UserDrivers(cfg),
+					"drivers":                DataProviderDrivers(cfg),
 					"nats_address":           cfg.Events.Addr,
 					"nats_clusterID":         cfg.Events.ClusterID,
 					"nats_tls_insecure":      cfg.Events.TLSInsecure,
