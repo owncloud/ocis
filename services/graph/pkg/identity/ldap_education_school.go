@@ -460,23 +460,23 @@ func (i *LDAP) GetEducationSchoolClasses(ctx context.Context, schoolNumberOrID s
 	logger.Debug().Str("backend", "ldap").Msg("GetEducationSchoolClasses")
 
 	entries, err := i.getEducationSchoolEntries(
-		schoolNumberOrID, i.groupFilter, i.educationConfig.classObjectClass, i.groupBaseDN, i.groupScope, i.getEducationClassAttrTypes(false), logger, // TODO: Add attributes
+		schoolNumberOrID, i.groupFilter, i.educationConfig.classObjectClass, i.groupBaseDN, i.groupScope, i.getEducationClassAttrTypes(false), logger,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	users := make([]*libregraph.EducationClass, 0, len(entries))
+	classes := make([]*libregraph.EducationClass, 0, len(entries))
 
 	for _, e := range entries {
-		u := i.createEducationClassModelFromLDAP(e)
+		class := i.createEducationClassModelFromLDAP(e)
 		// Skip invalid LDAP classes
-		if u == nil {
+		if class == nil {
 			continue
 		}
-		users = append(users, u)
+		classes = append(classes, class)
 	}
-	return users, nil
+	return classes, nil
 }
 
 func (i *LDAP) getEducationSchoolEntries(
@@ -583,15 +583,15 @@ func (i *LDAP) RemoveClassFromEducationSchool(ctx context.Context, schoolNumberO
 	}
 
 	schoolID := schoolEntry.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.id)
-	user, err := i.getEducationClassByID(memberID, false)
+	class, err := i.getEducationClassByID(memberID, false)
 	if err != nil {
 		i.logger.Warn().Str("userid", memberID).Msg("Class does not exist")
 		return err
 	}
-	currentSchools := user.GetEqualFoldAttributeValues(i.educationConfig.memberOfSchoolAttribute)
+	currentSchools := class.GetEqualFoldAttributeValues(i.educationConfig.memberOfSchoolAttribute)
 	for _, currentSchool := range currentSchools {
 		if currentSchool == schoolID {
-			mr := ldap.ModifyRequest{DN: user.DN}
+			mr := ldap.ModifyRequest{DN: class.DN}
 			mr.Delete(i.educationConfig.memberOfSchoolAttribute, []string{schoolID})
 			if err := i.conn.Modify(&mr); err != nil {
 				return err
