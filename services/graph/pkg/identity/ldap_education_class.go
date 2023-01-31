@@ -298,6 +298,7 @@ func (i *LDAP) getEducationClassAttrTypes(requestMembers bool) []string {
 		i.groupAttributeMap.id,
 		i.educationConfig.classAttributeMap.classification,
 		i.educationConfig.classAttributeMap.externalID,
+		i.educationConfig.memberOfSchoolAttribute,
 	}
 	if requestMembers {
 		attrs = append(attrs, i.groupAttributeMap.member)
