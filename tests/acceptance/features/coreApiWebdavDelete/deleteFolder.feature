@@ -62,50 +62,6 @@ Feature: delete folder
       | dav_version |
       | spaces      |
 
-  @files_sharing-app-required @notToImplementOnOCIS
-  Scenario Outline: delete a folder when there is a default folder for received shares
-    Given using <dav_version> DAV path
-    And the administrator has set the default folder for received shares to "<share_folder>"
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Brian" has created folder "/Received"
-    And user "Brian" has created folder "/Top"
-    And user "Brian" has created folder "/Top/ReceivedShares"
-    And user "Alice" has shared folder "/PARENT" with user "Brian"
-    When user "Brian" deletes folder "<share_folder>" using the WebDAV API
-    Then the HTTP status code should be "403"
-    And as "Brian" folder "<share_folder>/PARENT" should exist
-    And user "Brian" should be able to delete folder "/Received"
-    And user "Brian" should be able to delete folder "/Top/ReceivedShares"
-    And user "Brian" should be able to delete folder "/Top"
-    Examples:
-      | dav_version | share_folder    |
-      | old         | ReceivedShares  |
-      | old         | /ReceivedShares |
-      | new         | ReceivedShares  |
-      | new         | /ReceivedShares |
-
-  @files_sharing-app-required @notToImplementOnOCIS
-  Scenario Outline: delete a folder when there is a default folder for received shares that is a multi-level path
-    Given using <dav_version> DAV path
-    And the administrator has set the default folder for received shares to "/My/Received/Shares"
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Brian" has created folder "/M"
-    And user "Brian" has created folder "/Received"
-    And user "Brian" has created folder "/Received/Shares"
-    And user "Alice" has shared folder "/PARENT" with user "Brian"
-    When user "Brian" deletes folder "/My/Received/Shares" using the WebDAV API
-    Then the HTTP status code should be "403"
-    And user "Brian" should not be able to delete folder "/My/Received"
-    And user "Brian" should not be able to delete folder "/My"
-    And as "Brian" folder "/My/Received/Shares/PARENT" should exist
-    But user "Brian" should be able to delete folder "/M"
-    And user "Brian" should be able to delete folder "/Received/Shares"
-    And user "Brian" should be able to delete folder "/Received"
-    Examples:
-      | dav_version |
-      | old         |
-      | new         |
-
 
   Scenario Outline: deleting folder with dot in the name
     Given using <dav_version> DAV path

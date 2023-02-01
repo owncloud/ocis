@@ -848,7 +848,7 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
     early_fail = config["apiTests"]["earlyFail"] if "earlyFail" in config["apiTests"] else False
-    filterTags = "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage&&~@caldav&&~@carddav" % ("OC" if storage == "owncloud" else "OCIS")
+    filterTags = "~@skipOnGraph&&~@skipOnOcis&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage&&~@caldav&&~@carddav" % ("OC" if storage == "owncloud" else "OCIS")
     expectedFailuresFile = "%s/tests/acceptance/expected-failures-API-on-%s-storage.md" % (dirs["base"], storage.upper())
 
     return {

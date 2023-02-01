@@ -12,7 +12,7 @@ then
     if [ "$STORAGE_DRIVER" = "ocis" ]
     then
         export OCIS_REVA_DATA_ROOT=''
-        export BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage'
+        export BEHAT_FILTER_TAGS='~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage'
         export OCIS_SKELETON_STRATEGY='upload'
         export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-OCIS-storage.md'
     elif [ "$STORAGE_DRIVER" = "s3ng" ]

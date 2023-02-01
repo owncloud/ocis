@@ -89,15 +89,6 @@ Feature: previews of files downloaded through the webdav API
     Then the HTTP status code should be "200"
     And the downloaded image should be "32" pixels wide and "32" pixels high
 
-  @notToImplementOnOCIS
-  Scenario: download previews of shared files (to root)
-    Given user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
-    And user "Alice" has shared file "/parent.txt" with user "Brian"
-    When user "Brian" downloads the preview of "/parent.txt" with width "32" and height "32" using the WebDAV API
-    Then the HTTP status code should be "200"
-    And the downloaded image should be "32" pixels wide and "32" pixels high
-
 
   Scenario: download previews of other users files
     Given user "Brian" has been created with default attributes and without skeleton files
@@ -184,16 +175,6 @@ Feature: previews of files downloaded through the webdav API
     Then the HTTP status code should be "204"
     And as user "Alice" the preview of "/parent.txt" with width "32" and height "32" should have been changed
 
-  @notToImplementOnOCIS
-  Scenario: when owner updates a shared file, previews for sharee are also updated
-    Given user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
-    And user "Alice" has shared file "/parent.txt" with user "Brian"
-    And user "Brian" has downloaded the preview of "/parent.txt" with width "32" and height "32"
-    When user "Alice" uploads file with content "this is a file to upload" to "/parent.txt" using the WebDAV API
-    Then the HTTP status code should be "204"
-    And as user "Brian" the preview of "/parent.txt" with width "32" and height "32" should have been changed
-
   @issue-ocis-2538
   Scenario: when owner updates a shared file, previews for sharee are also updated (to shared folder)
     Given the administrator has set the default folder for received shares to "Shares"
@@ -263,16 +244,3 @@ Feature: previews of files downloaded through the webdav API
     And as user "Alice" the preview of "/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
     And as user "Brian" the preview of "Shares/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
     And as user "Carol" the preview of "Shares/FOLDER/lorem.txt" with width "32" and height "32" should have been changed
-
-  @notToImplementOnOCIS
-  Scenario: JPEG preview quality can be determined by config
-    Given user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "/testavatar_low.jpg"
-    And the administrator has updated system config key "previewJPEGImageDisplayQuality" with value "1"
-    And user "Alice" downloads the preview of "/testavatar_low.jpg" with width "32" and height "32" using the WebDAV API
-    Then the HTTP status code should be "200"
-    And the requested JPEG image should have a quality value of "1"
-    Then user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "/testavatar_high.jpg"
-    And the administrator has updated system config key "previewJPEGImageDisplayQuality" with value "100"
-    And user "Alice" downloads the preview of "/testavatar_high.jpg" with width "32" and height "32" using the WebDAV API
-    Then the HTTP status code should be "200"
-    And the requested JPEG image should have a quality value of "100"

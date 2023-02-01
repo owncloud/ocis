@@ -167,22 +167,6 @@ Feature: Restore deleted files/folders
     And as "Alice" the folder with original path "/local_storage/tmp/textfile0.txt" should not exist in the trashbin
     And the content of file "/local_storage/tmp/textfile0.txt" for user "Alice" should be "AA"
 
-  @local_storage @files_external-app-required @skipOnEncryptionType:user-keys @encryption-issue-42 @skip_on_objectstore @notToImplementOnOCIS @newChunking @issue-ocis-1321
-  Scenario: Deleting an updated file into external storage moves it to the trashbin and can be restored with new chunking
-    Given using new DAV path
-    And the administrator has invoked occ command "files:scan --all"
-    And user "Alice" has created folder "/local_storage/tmp"
-    And user "Alice" has moved file "/textfile0.txt" to "/local_storage/tmp/textfile0.txt"
-    And user "Alice" has uploaded the following chunks to "/local_storage/tmp/textfile0.txt" with new chunking
-      | number | content |
-      | 1      | AA      |
-    And user "Alice" has deleted file "/local_storage/tmp/textfile0.txt"
-    And as "Alice" the folder with original path "/local_storage/tmp/textfile0.txt" should exist in the trashbin
-    When user "Alice" restores the folder with original path "/local_storage/tmp/textfile0.txt" using the trashbin API
-    Then the HTTP status code should be "201"
-    And as "Alice" the folder with original path "/local_storage/tmp/textfile0.txt" should not exist in the trashbin
-    And the content of file "/local_storage/tmp/textfile0.txt" for user "Alice" should be "AA"
-
   @smokeTest
   Scenario Outline: A deleted file cannot be restored by a different user
     Given using <dav-path> DAV path
