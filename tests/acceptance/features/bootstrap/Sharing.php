@@ -1030,14 +1030,7 @@ trait Sharing {
 			$this->shareFields
 		);
 		$bodyRows = $body->getRowsHash();
-		if (\array_key_exists('expireDate', $bodyRows)) {
-			$dateModification = $bodyRows['expireDate'];
-			if (!empty($bodyRows['expireDate'])) {
-				$bodyRows['expireDate'] = \date('Y-m-d', \strtotime($dateModification));
-			} else {
-				$bodyRows['expireDate'] = '';
-			}
-		}
+		
 		if (\array_key_exists('password', $bodyRows)) {
 			$bodyRows['password'] = $this->getActualPassword($bodyRows['password']);
 		}
@@ -1283,7 +1276,7 @@ trait Sharing {
 		}
 		Assert::assertIsObject($data, __METHOD__ . " data not found in response XML");
 
-		$dateFieldsArrayToConvert = ['expiration', 'original_date', 'new_date'];
+		$dateFieldsArrayToConvert = ['original_date', 'new_date'];
 		//do not try to convert empty date
 		if ((string) \in_array($field, \array_merge($dateFieldsArrayToConvert)) && !empty($contentExpected)) {
 			$timestamp = \strtotime($contentExpected, $this->getServerShareTimeFromLastResponse());
@@ -1305,6 +1298,10 @@ trait Sharing {
 				if (isset($element->$field)) {
 					$fieldIsSet = true;
 					$value = (string) $element->$field;
+					// convert expiration to Y-m-d format. bug #5424
+					if ($field === "expiration") {
+						$value = (preg_split("/[\sT]+/", $value))[0];
+					}
 					if ($this->doesFieldValueMatchExpectedContent(
 						$field,
 						$value,
@@ -2384,6 +2381,21 @@ trait Sharing {
 			$url,
 			null
 		);
+	}
+
+	/**
+	 * @When the information about the last share for user :user should include
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userGetsTheLastShareSharedWithHimUsingTheSharingApi(string $user, $table):void {
+		$user = $this->getActualUsername($user);
+		$shareId = $this->getLastPublicLinkShareId();
+		$this->getShareData($user, $shareId);
+		$this->checkFields($user, $table);
 	}
 
 	/**

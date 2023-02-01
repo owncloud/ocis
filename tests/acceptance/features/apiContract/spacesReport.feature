@@ -19,7 +19,10 @@ Feature: Report test
 
 
   Scenario: check the response of the found folder
-    Given user "Alice" shares the following entity "folderMain" inside of space "find data" with user "Brian" with role "viewer"
+    Given user "Alice" has created a share inside of space "find data" with settings:
+      | path      | folderMain |
+      | shareWith | Brian      |
+      | role      | viewer     |
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "SubFolder1" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -35,7 +38,10 @@ Feature: Report test
 
 
   Scenario: check the response of the found file
-    Given user "Alice" shares the following entity "folderMain" inside of space "find data" with user "Brian" with role "editor"
+    Given user "Alice" has created a share inside of space "find data" with settings:
+      | path      | folderMain |
+      | shareWith | Brian      |
+      | role      | editor     |
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "insideTheFolder.txt" using the WebDAV API
     Then the HTTP status code should be "207"

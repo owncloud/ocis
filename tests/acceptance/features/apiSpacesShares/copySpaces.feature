@@ -731,7 +731,10 @@ Feature: copy file
     And user "Alice" has created a space "Project" with the default quota using the GraphApi
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/newfolder/personal.txt"
-    And user "Alice" shares the following entity "newfolder" inside of space "Project" with user "Brian" with role "editor"
+    And user "Alice" creates a share inside of space "Project" with settings:
+      | path      | newfolder |
+      | shareWith | Brian     |
+      | role      | editor    |
     And user "Brian" has accepted share "/newfolder" offered by user "Alice"
     And user "Brian" has uploaded file with content "new content" to "/personal.txt"
     When user "Brian" copies file "/personal.txt" from space "Personal" to "/newfolder/personal (1).txt" inside space "Shares" using the WebDAV API
@@ -751,13 +754,16 @@ Feature: copy file
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "old content version 1" to "/newfolder/personal.txt"
     And user "Alice" has uploaded a file inside space "Project" with content "old content version 2" to "/newfolder/personal.txt"
-    And user "Alice" shares the following entity "newfolder" inside of space "Project" with user "Brian" with role "editor"
+    And user "Alice" creates a share inside of space "Project" with settings:
+      | path      | newfolder |
+      | shareWith | Brian     |
+      | role      | editor    |
     And user "Brian" has accepted share "/newfolder" offered by user "Alice"
     And user "Brian" has uploaded file with content "new content" to "/personal.txt"
     When user "Brian" overwrites file "/personal.txt" from space "Personal" to "/newfolder/personal.txt" inside space "Shares" while copying using the WebDAV API
     Then the HTTP status code should be "204"
     And for user "Alice" the space "Project" should contain these entries:
-      | newfolder/personal.txt     |
+      | newfolder/personal.txt |
     And for user "Alice" the content of the file "/newfolder/personal.txt" of the space "Project" should be "new content"
     When user "Alice" downloads version of the file "/newfolder/personal.txt" with the index "1" of the space "Project" using the WebDAV API
     Then the HTTP status code should be "200"

@@ -102,7 +102,10 @@ Feature: Tag
     Given user "Alice" has created the following tags for folder "folderMain" of the space "use-tag":
       | folderTag |
       | marketing |
-    And user "Alice" has shared the following entity "folderMain" inside of space "use-tag" with user "Brian" with role "viewer"
+    And user "Alice" has created a share inside of space "use-tag" with settings:
+      | path      | folderMain |
+      | shareWith | Brian      |
+      | role      | viewer     |
     When user "Brian" lists all available tags via the GraphApi
     Then the HTTP status code should be "200"
     And the response should not contain following tags:
@@ -117,7 +120,10 @@ Feature: Tag
 
 
   Scenario Outline: The recipient of the shared resource tries to create a tag
-    Given user "Alice" has shared the following entity "folderMain" inside of space "use-tag" with user "Brian" with role "<role>"
+    Given user "Alice" has created a share inside of space "use-tag" with settings:
+      | path      | folderMain |
+      | shareWith | Brian      |
+      | role      | <role>     |
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" creates the following tags for <resource> "<resourceName>" of space "Shares":
       | tag in a shared resource |
@@ -139,7 +145,10 @@ Feature: Tag
 
 
   Scenario Outline: The recipient of the shared resource tries to remove a tag
-    Given user "Alice" has shared the following entity "folderMain" inside of space "use-tag" with user "Brian" with role "<role>"
+    Given user "Alice" has created a share inside of space "use-tag" with settings:
+      | path      | folderMain |
+      | shareWith | Brian      |
+      | role      | <role>     |
     And user "Alice" has created the following tags for <resource> "<resourceName>" of the space "use-tag":
       | tag in a shared resource |
       | second tag               |

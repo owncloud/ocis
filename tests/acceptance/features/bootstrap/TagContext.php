@@ -84,7 +84,7 @@ class TagContext implements Context {
 		}
 
 		if ($fileOrFolder === 'folder') {
-			$resourceId = $this->spacesContext->getFolderId($user, $space, $resource);
+			$resourceId = $this->spacesContext->getResourceId($user, $space, $resource);
 		} else {
 			$resourceId = $this->spacesContext->getFileId($user, $space, $resource);
 		}
@@ -177,7 +177,7 @@ class TagContext implements Context {
 		}
 
 		if ($fileOrFolder === 'folder') {
-			$resourceId = $this->spacesContext->getFolderId($user, $space, $resource);
+			$resourceId = $this->spacesContext->getResourceId($user, $space, $resource);
 		} else {
 			$resourceId = $this->spacesContext->getFileId($user, $space, $resource);
 		}
