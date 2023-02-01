@@ -2122,7 +2122,7 @@ def skipIfUnchanged(ctx, type):
     }]
 
 def example_deploys(ctx):
-    latest_configs = [
+    on_merge_deploy = [
         "ocis_ldap/latest.yml",
         "ocis_keycloak/latest.yml",
         "ocis_traefik/latest.yml",
@@ -2131,23 +2131,25 @@ def example_deploys(ctx):
         "ocis_s3/latest.yml",
         "oc10_ocis_parallel/latest.yml",
     ]
-    released_configs = [
+    nightly_deploy = [
         "ocis_ldap/released.yml",
         "ocis_keycloak/released.yml",
         "ocis_traefik/released.yml",
         "ocis_wopi/released.yml",
+        "ocis_traefik/daily.yml",
+        "ocis_wopi/daily.yml",
     ]
 
     # if on master branch:
-    configs = latest_configs
+    configs = on_merge_deploy
     rebuild = "false"
 
     if ctx.build.event == "tag":
-        configs = released_configs
+        configs = nightly_deploy
         rebuild = "false"
 
     if ctx.build.event == "cron":
-        configs = latest_configs + released_configs
+        configs = on_merge_deploy + nightly_deploy
         rebuild = "true"
 
     deploys = []

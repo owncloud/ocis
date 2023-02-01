@@ -19,7 +19,6 @@
   vars:
     ssh_authorized_keys:
       - https://github.com/butonic.keys
-      - https://github.com/C0rby.keys
       - https://github.com/fschade.keys
       - https://github.com/kulmann.keys
       - https://github.com/micbar.keys
