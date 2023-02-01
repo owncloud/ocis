@@ -139,6 +139,10 @@ func EnsureDefaults(cfg *config.Config) {
 			cfg.GRPC.TLS.Key = cfg.Commons.GRPCServiceTLS.Key
 		}
 	}
+
+	if cfg.Commons == nil {
+		cfg.Commons = &shared.Commons{}
+	}
 }
 
 func Sanitize(cfg *config.Config) {

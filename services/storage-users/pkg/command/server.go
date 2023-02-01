@@ -7,6 +7,7 @@ import (
 	"path"
 
 	"github.com/cs3org/reva/v2/cmd/revad/runtime"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
@@ -15,6 +16,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config/parser"
+	"github.com/owncloud/ocis/v2/services/storage-users/pkg/event"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/revaconfig"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/server/debug"
@@ -86,6 +88,27 @@ func Server(cfg *config.Config) *cli.Command {
 				logger,
 			); err != nil {
 				logger.Fatal().Err(err).Msg("failed to register the grpc endpoint")
+			}
+
+			{
+				stream, err := event.NewStream(cfg.Events)
+				if err != nil {
+					logger.Fatal().Err(err).Msg("can't connect to nats")
+				}
+
+				gw, err := pool.GetGatewayServiceClient(cfg.Reva.Address)
+				if err != nil {
+					return err
+				}
+
+				eventSVC, err := event.NewService(gw, stream, logger, cfg.Commons.MachineAuthAPIKey)
+				if err != nil {
+					logger.Fatal().Err(err).Msg("can't create event service")
+				}
+
+				gr.Add(eventSVC.Run, func(_ error) {
+					cancel()
+				})
 			}
 
 			return gr.Run()
