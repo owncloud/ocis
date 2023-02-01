@@ -311,6 +311,32 @@ class GraphHelper {
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
+	 * @param string $byUser
+	 * @param string $userPassword
+	 * @param string|null $user
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getUserWithGroupInformation(
+		string $baseUrl,
+		string $xRequestId,
+		string $byUser,
+		string $userPassword,
+		?string $user = null
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users/' . $user . '?%24expand=memberOf');
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$byUser,
+			$userPassword,
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
 	 * @param string $adminUser
 	 * @param string $adminPassword
 	 * @param string $groupName
