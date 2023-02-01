@@ -147,22 +147,6 @@ Feature: favorite
       | dav_version |
       | spaces      |
 
-  @files_sharing-app-required @notToImplementOnOCIS
-  Scenario Outline: moving a favorite file out of a share keeps favorite state
-    Given using <dav_version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has created folder "/shared"
-    And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"
-    And user "Alice" has shared folder "/shared" with user "Brian"
-    And user "Brian" has favorited element "/shared/shared_file.txt"
-    When user "Brian" moves file "/shared/shared_file.txt" to "/taken_out.txt" using the WebDAV API
-    Then user "Brian" should have favorited the following elements
-      | /taken_out.txt |
-    Examples:
-      | dav_version |
-      | old         |
-      | new         |
-
   @issue-33840 @skipOnOcV10
   Scenario Outline: Get favorited elements and limit count of entries
     Given using <dav_version> DAV path
@@ -221,35 +205,6 @@ Feature: favorite
       | dav_version |
       | spaces      |
 
-  @files_sharing-app-required @notToImplementOnOCIS
-  Scenario Outline: sharer file favorite state should not change the favorite state of sharee
-    Given using <dav_version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has moved file "/textfile0.txt" to "/favoriteFile.txt"
-    And user "Alice" has shared file "/favoriteFile.txt" with user "Brian"
-    When user "Alice" favorites element "/favoriteFile.txt" using the WebDAV API
-    Then the HTTP status code should be "207"
-    And as user "Alice" file "/favoriteFile.txt" should be favorited
-    And as user "Brian" file "/favoriteFile.txt" should not be favorited
-    Examples:
-      | dav_version |
-      | old         |
-      | new         |
-
-  @files_sharing-app-required @notToImplementOnOCIS
-  Scenario Outline: sharee file favorite state should not change the favorite state of sharer
-    Given using <dav_version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has moved file "/textfile0.txt" to "/favoriteFile.txt"
-    And user "Alice" has shared file "/favoriteFile.txt" with user "Brian"
-    When user "Brian" favorites element "/favoriteFile.txt" using the WebDAV API
-    Then the HTTP status code should be "207"
-    And as user "Alice" file "/favoriteFile.txt" should not be favorited
-    Examples:
-      | dav_version |
-      | old         |
-      | new         |
-
 
   Scenario Outline: favoriting a folder does not change the favorite state of elements inside the folder
     Given using <dav_version> DAV path
@@ -268,40 +223,3 @@ Feature: favorite
     Examples:
       | dav_version |
       | spaces      |
-
-  @files_sharing-app-required @notToImplementOnOCIS
-  Scenario Outline: favorite a file inside of a received share
-    Given using <dav_version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has shared folder "/PARENT" with user "Brian"
-    When user "Brian" favorites element "/PARENT/parent.txt" using the WebDAV API
-    Then as user "Brian" file "/PARENT/parent.txt" should be favorited
-    Examples:
-      | dav_version |
-      | old         |
-      | new         |
-
-  @files_sharing-app-required @notToImplementOnOCIS
-  Scenario Outline: favorite a folder inside of a received share
-    Given using <dav_version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has created folder "/PARENT/sub-folder"
-    And user "Alice" has shared folder "/PARENT" with user "Brian"
-    When user "Brian" favorites element "/PARENT/sub-folder" using the WebDAV API
-    Then as user "Brian" folder "/PARENT/sub-folder" should be favorited
-    Examples:
-      | dav_version |
-      | old         |
-      | new         |
-
-  @files_sharing-app-required @notToImplementOnOCIS
-  Scenario Outline: favorite a received share itself
-    Given using <dav_version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has shared folder "/PARENT" with user "Brian"
-    When user "Brian" favorites element "/PARENT" using the WebDAV API
-    Then as user "Brian" folder "/PARENT" should be favorited
-    Examples:
-      | dav_version |
-      | old         |
-      | new         |

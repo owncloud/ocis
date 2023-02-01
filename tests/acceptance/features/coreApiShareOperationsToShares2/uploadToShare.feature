@@ -188,7 +188,7 @@ Feature: sharing
       | old      |
       | new      |
 
-  
+
   Scenario Outline: Uploading to a group shared folder with read/write permission when the sharer has unsufficient quota does not work
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -251,24 +251,6 @@ Feature: sharing
       | dav-path |
       | old      |
       | new      |
-
-  @notToImplementOnOCIS @newChunking @issue-ocis-1321
-  Scenario: Uploading a file in to a shared folder without edit permissions
-    Given using new DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has created folder "/READ_ONLY"
-    And user "Alice" has created a share with settings
-      | path        | /READ_ONLY |
-      | shareType   | user       |
-      | permissions | read       |
-      | shareWith   | Brian      |
-    And user "Brian" has accepted share "/READ_ONLY" offered by user "Alice"
-    When user "Brian" uploads the following chunks to "/Shares/READ_ONLY/myfile.txt" with new chunking and using the WebDAV API
-      | number | content |
-      | 1      | hallo   |
-      | 2      | welt    |
-    Then the HTTP status code should be "403"
-    And as "Alice" file "/FOLDER/myfile.txt" should not exist
 
 
   Scenario Outline: Sharer can download file uploaded with different permission by sharee to a shared folder

@@ -851,7 +851,7 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
 
 def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", accounts_hash_difficulty = 4):
     early_fail = config["apiTests"]["earlyFail"] if "earlyFail" in config["apiTests"] else False
-    filterTags = "~@skipOnGraph&&~@skipOnOcis&&~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage&&~@caldav&&~@carddav" % ("OC" if storage == "owncloud" else "OCIS")
+    filterTags = "~@skipOnGraph&&~@skipOnOcis&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-%s-Storage&&~@caldav&&~@carddav" % ("OC" if storage == "owncloud" else "OCIS")
     expectedFailuresFile = "%s/tests/acceptance/expected-failures-API-on-%s-storage.md" % (dirs["base"], storage.upper())
 
     return {
@@ -946,7 +946,7 @@ def uiTests(ctx):
     return pipelines
 
 def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, storage = "ocis", uniqueName = "", accounts_hash_difficulty = 4):
-    standardFilterTags = "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS and not @federated-server-needed"
+    standardFilterTags = "not @skipOnOCIS and not @skip and not @federated-server-needed"
     if filterTags == "":
         finalFilterTags = standardFilterTags
         expectedFailuresFileFilterTags = ""

@@ -32,13 +32,13 @@ then
     if [ "$STORAGE_DRIVER" = "owncloud" ]
     then
         export OCIS_REVA_DATA_ROOT='/srv/app/tmp/ocis/owncloud/data/'
-        export BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OC-Storage'
+        export BEHAT_FILTER_TAGS='~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OC-Storage'
         export OCIS_SKELETON_STRATEGY='copy'
         export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-OWNCLOUD-storage.md'
     elif [ "$STORAGE_DRIVER" = "ocis" ]
     then
         export OCIS_REVA_DATA_ROOT=''
-        export BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage'
+        export BEHAT_FILTER_TAGS='~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage'
         export OCIS_SKELETON_STRATEGY='upload'
         export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-OCIS-storage.md'
     else

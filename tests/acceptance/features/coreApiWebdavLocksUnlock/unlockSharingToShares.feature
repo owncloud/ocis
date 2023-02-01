@@ -59,30 +59,6 @@ Feature: UNLOCK locked items (sharing)
       | spaces   | shared     |
       | spaces   | exclusive  |
 
-  @notToImplementOnOCIS
-  Scenario Outline: as share receiver unlocking a shared folder locked by the file owner is not possible. To unlock use the owners locktoken
-    Given using <dav-path> DAV path
-    And user "Alice" has created folder "PARENT/CHILD"
-    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/CHILD/child.txt"
-    And user "Alice" has locked folder "PARENT" setting the following properties
-      | lockscope | <lock-scope> |
-    And user "Alice" has shared folder "PARENT" with user "Brian"
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
-    When user "Brian" unlocks folder "Shares/PARENT" with the last created lock of folder "PARENT" of user "Alice" using the WebDAV API
-    Then the HTTP status code should be "403"
-    And 3 locks should be reported for folder "PARENT" of user "Alice" by the WebDAV API
-    And 2 locks should be reported for folder "PARENT/CHILD" of user "Alice" by the WebDAV API
-    And 1 locks should be reported for file "PARENT/parent.txt" of user "Alice" by the WebDAV API
-    And 3 locks should be reported for folder "Shares/PARENT" of user "Brian" by the WebDAV API
-    And 2 locks should be reported for folder "Shares/PARENT/CHILD" of user "Brian" by the WebDAV API
-    And 1 locks should be reported for file "Shares/PARENT/parent.txt" of user "Brian" by the WebDAV API
-    Examples:
-      | dav-path | lock-scope |
-      | old      | shared     |
-      | old      | exclusive  |
-      | new      | shared     |
-      | new      | exclusive  |
-
 
   Scenario Outline: as share receiver unlock a shared file
     Given using <dav-path> DAV path
@@ -154,27 +130,3 @@ Feature: UNLOCK locked items (sharing)
       | dav-path | lock-scope |
       | spaces   | shared     |
       | spaces   | exclusive  |
-
-  @notToImplementOnOCIS
-  Scenario Outline: as owner unlocking a shared folder locked by the share receiver is not possible. To unlock use the receivers locktoken
-    Given using <dav-path> DAV path
-    And user "Alice" has created folder "PARENT/CHILD"
-    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/CHILD/child.txt"
-    And user "Alice" has shared folder "PARENT" with user "Brian"
-    And user "Brian" has accepted share "/PARENT" offered by user "Alice"
-    And user "Brian" has locked folder "Shares/PARENT" setting the following properties
-      | lockscope | <lock-scope> |
-    When user "Alice" unlocks folder "PARENT" with the last created lock of folder "Shares/PARENT" of user "Brian" using the WebDAV API
-    Then the HTTP status code should be "403"
-    And 3 locks should be reported for folder "PARENT" of user "Alice" by the WebDAV API
-    And 2 locks should be reported for folder "PARENT/CHILD" of user "Alice" by the WebDAV API
-    And 1 locks should be reported for file "PARENT/parent.txt" of user "Alice" by the WebDAV API
-    And 3 locks should be reported for folder "Shares/PARENT" of user "Brian" by the WebDAV API
-    And 2 locks should be reported for folder "Shares/PARENT/CHILD" of user "Brian" by the WebDAV API
-    And 1 locks should be reported for file "Shares/PARENT/parent.txt" of user "Brian" by the WebDAV API
-    Examples:
-      | dav-path | lock-scope |
-      | old      | shared     |
-      | old      | exclusive  |
-      | new      | shared     |
-      | new      | exclusive  |
