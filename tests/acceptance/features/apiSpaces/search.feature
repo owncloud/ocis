@@ -42,7 +42,10 @@ Feature: Search
 
 
   Scenario: Brian can find data from the Shares
-    Given user "Alice" shares the following entity "folderMain" inside of space "find data" with user "Brian" with role "viewer"
+    Given user "Alice" has created a share inside of space "find data" with settings:
+      | path      | folderMain |
+      | shareWith | Brian      |
+      | role      | viewer     |
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "folder" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -64,7 +67,10 @@ Feature: Search
 
 
   Scenario: User cannot find pending folder
-    Given user "Alice" shares the following entity "folderMain" inside of space "find data" with user "Brian" with role "viewer"
+    Given user "Alice" has created a share inside of space "find data" with settings:
+      | path      | folderMain |
+      | shareWith | Brian      |
+      | role      | viewer     |
     When user "Brian" searches for "folder" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "0" entries
@@ -75,7 +81,10 @@ Feature: Search
 
 
   Scenario: User cannot find declined folder
-    Given user "Alice" shares the following entity "folderMain" inside of space "find data" with user "Brian" with role "viewer"
+    Given user "Alice" has created a share inside of space "find data" with settings:
+      | path      | folderMain |
+      | shareWith | Brian      |
+      | role      | viewer     |
     And user "Brian" has declined share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "folder" using the WebDAV API
     Then the HTTP status code should be "207"

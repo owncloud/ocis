@@ -12,7 +12,7 @@ Feature: update a public link share
     And user "Alice" has created a public link share with settings
       | path | FOLDER |
     When user "Alice" updates the last public link share using the sharing API with
-      | expireDate | +3 days |
+      | expireDate | 2040-01-01T23:59:59+0100 |
     Then the OCS status code should be "<ocs_status_code>"
     And the OCS status message should be "OK"
     And the HTTP status code should be "200"
@@ -52,7 +52,7 @@ Feature: update a public link share
     And user "Alice" has created a public link share with settings
       | path | FOLDER |
     And user "Alice" has updated the last public link share with
-      | expireDate | +3 days |
+      | expireDate | 2033-01-31T23:59:59+0100 |
     When user "Alice" gets the info of the last public link share using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
@@ -65,7 +65,7 @@ Feature: update a public link share
       | file_target       | /FOLDER              |
       | permissions       | read                 |
       | stime             | A_NUMBER             |
-      | expiration        | +3 days              |
+      | expiration        | 2033-01-31           |
       | token             | A_TOKEN              |
       | storage           | A_STRING             |
       | mail_send         | 0                    |
@@ -86,13 +86,13 @@ Feature: update a public link share
       | path     | randomfile.txt |
       | password | %public%       |
     When user "Alice" updates the last public link share using the sharing API with
-      | expireDate | +3 days |
+      | expireDate | 2040-01-01T23:59:59+0100 |
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And the public should be able to download the last publicly shared file using the old public WebDAV API with password "%public%" and the content should be "Random data"
     And the public should be able to download the last publicly shared file using the new public WebDAV API with password "%public%" and the content should be "Random data"
 
-   @issue-ocis-2079
+    @issue-ocis-2079
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
@@ -106,14 +106,47 @@ Feature: update a public link share
       | path     | randomfile.txt |
       | password | %public%       |
     When user "Alice" updates the last public link share using the sharing API with
-    #removing password is basically making password empty
+      #removing password is basically making password empty
       | password | %remove% |
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And the public should be able to download the last publicly shared file using the old public WebDAV API without a password and the content should be "Random data"
     And the public should be able to download the last publicly shared file using the new public WebDAV API without a password and the content should be "Random data"
 
-  @issue-ocis-2079
+    @issue-ocis-2079
+    Examples:
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |
+
+  @issue-ocis-reva-336
+  Scenario Outline: Creating a new public link share, updating its expiration date and getting its info (ocis Bug demonstration)
+    Given using OCS API version "<ocs_api_version>"
+    And user "Alice" has created folder "FOLDER"
+    And user "Alice" has created a public link share with settings
+      | path | FOLDER |
+    And user "Alice" has updated the last public link share with
+      | expireDate | 2040-01-01T23:59:59+0100 |
+    When user "Alice" gets the info of the last public link share using the sharing API
+    Then the OCS status code should be "<ocs_status_code>"
+    And the HTTP status code should be "200"
+    And the fields of the last response to user "Alice" should include
+      | id                | A_STRING             |
+      | item_type         | folder               |
+      | item_source       | A_STRING             |
+      | share_type        | public_link          |
+      | file_source       | A_STRING             |
+      | file_target       | /FOLDER              |
+      | permissions       | read                 |
+      | stime             | A_NUMBER             |
+      | expiration        | 2040-01-01           |
+      | token             | A_TOKEN              |
+      | storage           | A_STRING             |
+      | mail_send         | 0                    |
+      | uid_owner         | %username%           |
+      | displayname_owner | %displayname%        |
+      | url               | AN_URL               |
+      | mimetype          | httpd/unix-directory |
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
@@ -337,7 +370,7 @@ Feature: update a public link share
     And uploading a file should work using the old public WebDAV API
     And uploading a file should work using the new public WebDAV API
 
-  @issue-ocis-2079
+    @issue-ocis-2079
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
@@ -359,7 +392,7 @@ Feature: update a public link share
     And the HTTP status code of responses on all endpoints should be "403"
     And as "Alice" file "PARENT/CHILD/child.txt" should exist
 
-   @issue-ocis-2079 @issue-ocis-reva-292
+    @issue-ocis-2079 @issue-ocis-reva-292
     Examples:
       | ocs_api_version |
       | 1               |

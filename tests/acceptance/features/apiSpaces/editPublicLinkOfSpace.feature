@@ -31,7 +31,6 @@ Feature: A manager of the space can edit public link
       | permissions | <permissions> |
       | password    | <password>    |
       | name        | <linkName>    |
-      | expireDate  | <expireDate>  |
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
@@ -44,13 +43,12 @@ Feature: A manager of the space can edit public link
       | share_type        | public_link           |
       | displayname_owner | %displayname%         |
       | name              | <linkName>            |
-      | expiration        | <expireDate>          |
     And the public should be able to download file "/test.txt" from inside the last public link shared folder using the new public WebDAV API with password "<password>"
     And the downloaded content should be "some content"
     Examples:
-      | permissions | expectedPermissions       | password | linkName | expireDate               |
-      | 5           | read,create               | newPass  |          |                          |
-      | 15          | read,update,create,delete |          | newName  | 2042-03-25T23:59:59+0100 |
+      | permissions | expectedPermissions       | password | linkName |
+      | 5           | read,create               | newPass  |          |
+      | 15          | read,update,create,delete |          | newName  |
 
 
   Scenario Outline: All members can see a created public link

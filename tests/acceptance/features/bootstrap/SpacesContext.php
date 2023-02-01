@@ -336,7 +336,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * The method returns folderId
+	 * The method returns "fileid" from the PROPFIND response
 	 *
 	 * @param string $user
 	 * @param string $spaceName
@@ -345,7 +345,7 @@ class SpacesContext implements Context {
 	 * @return string
 	 * @throws GuzzleException
 	 */
-	public function getFolderId(string $user, string $spaceName, string $folderName): string {
+	public function getResourceId(string $user, string $spaceName, string $folderName): string {
 		$space = $this->getSpaceByName($user, $spaceName);
 		// For a level 1 folder, the parent is space so $folderName = ''
 		if ($folderName === $space["name"]) {
@@ -1907,24 +1907,32 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * Request to send share of resource inside of space
+	 * @When /^user "([^"]*)" creates a share inside of space "([^"]*)" with settings:$/
 	 *
 	 * @param  string $user
-	 * @param  string $entity
 	 * @param  string $spaceName
-	 * @param  string $userRecipient
-	 * @param  string $role
+	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function sendRequestForShareOfEntityInsideOfSpace(string $user, string $entity, string $spaceName, string $userRecipient, string $role):void {
-		$space = $this->getSpaceByName($user, $spaceName);
+	public function createShareResource(
+		string $user,
+		string $spaceName,
+		TableNode $table
+	): void {
+		$rows = $table->getRowsHash();
+		$rows["path"] = \array_key_exists("path", $rows) ? $rows["path"] : null;
+		$rows["shareType"] = \array_key_exists("shareType", $rows) ? $rows["shareType"] : 0;
+		$rows["role"] = \array_key_exists("role", $rows) ? $rows["role"] : 'viewer';
+		$rows["expireDate"] = \array_key_exists("expireDate", $rows) ? $rows["expireDate"] : null;
+
 		$body = [
-			"space_ref" => $space['id'] . "/" . $entity,
-			"shareType" => 0,
-			"shareWith" => $userRecipient,
-			"role" => $role
+			"space_ref" => $this->getResourceId($user, $spaceName, $rows["path"]),
+			"shareWith" => $rows["shareWith"],
+			"shareType" => $rows["shareType"],
+			"expireDate" => $rows["expireDate"],
+			"role" => $rows["role"]
 		];
 
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
@@ -1940,51 +1948,61 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" shares the following entity "([^"]*)" inside of space "([^"]*)" with user "([^"]*)" with role "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has created a share inside of space "([^"]*)" with settings:$/
 	 *
 	 * @param  string $user
-	 * @param  string $entity
 	 * @param  string $spaceName
-	 * @param  string $userRecipient
-	 * @param  string $role
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function sharesTheFollowingEntityInsideOfSpace(
-		string $user,
-		string $entity,
-		string $spaceName,
-		string $userRecipient,
-		string $role
-	): void {
-		$this->sendRequestForShareOfEntityInsideOfSpace($user, $entity, $spaceName, $userRecipient, $role);
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has shared the following entity "([^"]*)" inside of space "([^"]*)" with user "([^"]*)" with role "([^"]*)"$/
-	 *
-	 * @param  string $user
-	 * @param  string $entity
-	 * @param  string $spaceName
-	 * @param  string $userRecipient
-	 * @param  string $role
+	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
 	public function hasSharedTheFollowingEntityInsideOfSpace(
 		string $user,
-		string $entity,
 		string $spaceName,
-		string $userRecipient,
-		string $role
+		TableNode $table
 	): void {
-		$response = $this->sendRequestForShareOfEntityInsideOfSpace($user, $entity, $spaceName, $userRecipient, $role);
+		$this->createShareResource($user, $spaceName, $table);
 		Assert::assertEquals(
-			$response->getStatusCode(),
+			$this->featureContext->getResponse()->getStatusCode(),
 			200,
 			"Expected response status code should be 200"
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" changes the last share with settings:$/
+	 *
+	 * @param  string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function changeShareResource(
+		string $user,
+		TableNode $table
+	): void {
+		$shareId = $this->featureContext->getLastPublicLinkShareId();
+		$rows = $table->getRowsHash();
+		$rows["role"] = \array_key_exists("role", $rows) ? $rows["role"] : 'viewer';
+		$rows["expireDate"] = \array_key_exists("expireDate", $rows) ? $rows["expireDate"] : null;
+
+		$body = [
+			"expireDate" => $rows["expireDate"],
+		];
+
+		$fullUrl = $this->baseUrl . $this->ocsApiUrl . '/' . $shareId;
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				$fullUrl,
+				"",
+				"PUT",
+				$this->featureContext->getActualUsername($user),
+				$this->featureContext->getPasswordForUser($user),
+				null,
+				$body
+			)
 		);
 	}
 
@@ -3088,20 +3106,20 @@ class SpacesContext implements Context {
 					$resourceType = $xmlRes->xpath("//d:response/d:propstat/d:prop/d:getcontenttype")[0]->__toString();
 					if ($method === 'PROPFIND') {
 						if (!$resourceType) {
-							Assert::assertEquals($this->getFolderId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong fileId in the response');
+							Assert::assertEquals($this->getResourceId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong fileId in the response');
 						} else {
 							Assert::assertEquals($this->getFileId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong fileId in the response');
 						}
 					} else {
 						if ($resourceType === 'httpd/unix-directory') {
-							Assert::assertEquals($this->getFolderId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong fileId in the response');
+							Assert::assertEquals($this->getResourceId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong fileId in the response');
 						} else {
 							Assert::assertEquals($this->getFileId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong fileId in the response');
 						}
 					}
 					break;
 				case "oc:file-parent":
-					Assert::assertEquals($this->getFolderId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong file-parentId in the response');
+					Assert::assertEquals($this->getResourceId($user, $spaceNameOrMountPoint, $value), $responseValue, 'wrong file-parentId in the response');
 					break;
 				case "oc:privatelink":
 					Assert::assertEquals($this->getPrivateLink($user, $spaceNameOrMountPoint), $responseValue, 'cannot find private link for space or resource in the response');
