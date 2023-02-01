@@ -5,7 +5,7 @@ Feature: update a public link share
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and without skeleton files
 
-  @issue-37653 @skipOnOcV10
+
   Scenario Outline: API responds with a full set of parameters when owner changes the expireDate of a public share
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
@@ -77,50 +77,6 @@ Feature: update a public link share
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
       | 2               | 200             |
-
-  @notToImplementOnOCIS @issue-39820
-  Scenario Outline: API responds with a full set of parameters when owner renames the folder with a public link (bug demonstration)
-    Given using OCS API version "<ocs_api_version>"
-    And using <dav-path> DAV path
-    And user "Alice" has created folder "FOLDER"
-    And user "Alice" has created a public link share with settings
-      | path | FOLDER |
-    And user "Alice" has moved folder "/FOLDER" to "/RENAMED_FOLDER"
-    When user "Alice" gets the info of the last public link share using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
-    And the HTTP status code should be "200"
-    And the fields of the last response to user "Alice" should include
-      | id                         | A_STRING             |
-      | share_type                 | public_link          |
-      | uid_owner                  | %username%           |
-      | displayname_owner          | %displayname%        |
-      | permissions                | read                 |
-      | stime                      | A_NUMBER             |
-      | parent                     |                      |
-      | expiration                 |                      |
-      | token                      | A_STRING             |
-      | uid_file_owner             | %username%           |
-      | displayname_file_owner     | %displayname%        |
-      | additional_info_owner      |                      |
-      | additional_info_file_owner |                      |
-      | item_type                  | folder               |
-      | item_source                | A_STRING             |
-      | path                       | /RENAMED_FOLDER      |
-      | mimetype                   | httpd/unix-directory |
-      | storage_id                 | A_STRING             |
-      | storage                    | A_STRING             |
-      | file_source                | A_STRING             |
-      # uncomment the following line and remove the next one after the issue has been fixed
-      # | file_target                | /RENAMED_FOLDER  |
-      | file_target                | /FOLDER              |
-      | mail_send                  | 0                    |
-      | name                       |                      |
-    Examples:
-      | dav-path | ocs_api_version | ocs_status_code |
-      | old      | 1               | 100             |
-      | old      | 2               | 200             |
-      | new      | 1               | 100             |
-      | new      | 2               | 200             |
 
 
   Scenario Outline: Creating a new public link share with password and adding an expiration date using public API
@@ -521,49 +477,6 @@ Feature: update a public link share
       | spaces   | 1               | 100             |
       | spaces   | 2               | 200             |
 
-  @notToImplementOnOCIS @issue-39820
-  Scenario Outline: API responds with a full set of parameters when owner renames the file with a public link (bug demonstration)
-    Given using OCS API version "<ocs_api_version>"
-    And using <dav-path> DAV path
-    And user "Alice" has uploaded file with content "some content" to "/lorem.txt"
-    And user "Alice" has created a public link share with settings
-      | path | lorem.txt |
-    And user "Alice" has moved file "/lorem.txt" to "/new-lorem.txt"
-    When user "Alice" gets the info of the last public link share using the sharing API
-    Then the OCS status code should be "<ocs_status_code>"
-    And the HTTP status code should be "200"
-    And the fields of the last response to user "Alice" should include
-      | id                         | A_STRING       |
-      | share_type                 | public_link    |
-      | uid_owner                  | %username%     |
-      | displayname_owner          | %displayname%  |
-      | permissions                | read           |
-      | stime                      | A_NUMBER       |
-      | parent                     |                |
-      | expiration                 |                |
-      | token                      | A_STRING       |
-      | uid_file_owner             | %username%     |
-      | displayname_file_owner     | %displayname%  |
-      | additional_info_owner      |                |
-      | additional_info_file_owner |                |
-      | item_type                  | file           |
-      | item_source                | A_STRING       |
-      | path                       | /new-lorem.txt |
-      | mimetype                   | text/plain     |
-      | storage_id                 | A_STRING       |
-      | storage                    | A_STRING       |
-      | file_source                | A_STRING       |
-      # uncomment the following line and remove the next one after the issue has been fixed
-      # | file_target                | /new-lorem.txt  |
-      | file_target                | /lorem.txt     |
-      | mail_send                  | 0              |
-      | name                       |                |
-    Examples:
-      | dav-path | ocs_api_version | ocs_status_code |
-      | old      | 1               | 100             |
-      | old      | 2               | 200             |
-      | new      | 1               | 100             |
-      | new      | 2               | 200             |
 
   @skipOnOcV10
   Scenario Outline: API responds with a full set of parameters when owner renames the file with a public link in ocis
