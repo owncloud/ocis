@@ -137,7 +137,7 @@ Feature: multilinksharing
       | old      |
       | new      |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -204,7 +204,7 @@ Feature: multilinksharing
       | old      |
       | new      |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -239,7 +239,7 @@ Feature: multilinksharing
       | old      |
       | new      |
 
-  @personalSpace @skipOnOcV10
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
