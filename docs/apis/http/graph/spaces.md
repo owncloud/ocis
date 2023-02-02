@@ -177,7 +177,7 @@ Returns a list of all available spaces, even ones where the acting user is not a
 The ownCloud spaces concept draws a strict line between users which can work with the content of a space and others who have the permission to manage the space. A user which is able to manage quota and space metadata does not necessarily need to be able to access the content of a space.
 
 **Space Admin**\
-There is a global user role "Space Admin" which grants users some global permissions to manage space quota and some space metadata. This Role enables the user also to disable, restore and delete spaces.
+There is a global user role "Space Admin" which grants users some global permissions to manage space quota and some space metadata. This Role enables the user also to disable, restore and delete spaces. He cannot manage space members.
 
 **Space Manager**\
 The "Space Manager" is a user which is a regular member of a space because he has been invited. In addition to being part of a space the user can also manage the memberships of the space.
@@ -288,7 +288,7 @@ Returns a list of all spaces ordered by the specified key. Possible order keys a
 | name	                 | The space name                               |
 | lastModifiedDateTime	 | The last modified date and time of the space |
 
-Both sort orders are supported, `asc`(ascending) and `desc`(descending).
+Both sort orders are supported, `asc` (ascending) and `desc` (descending).
 
 #### Ordering examples
 
@@ -395,7 +395,7 @@ curl -L -k -X PATCH 'https://localhost:9200/graph/v1.0/drives/storage-users-1$53
 
 ### Change the space name, subtitle and alias `PATCH /drives/{drive-id}`
 
-You can change multiple space properties in one request as long as you submit a valid body json. Please be aware that some properties need different permissions.
+You can change multiple space properties in one request as long as you submit a valid JSON body. Please be aware that some properties need different permissions.
 
 {{< tabs "change-space-props" >}}
 {{< tab "Request" >}}
@@ -404,7 +404,7 @@ curl -L -k -X PATCH 'https://localhost:9200/graph/v1.0/drives/storage-users-1$53
 -H 'Content-Type: application/json' \
 --data-raw '{
     "name": "Mars",
-    "description": "mission to mars",
+    "description": "Mission to mars",
     "driveAlias": "project/mission-to-mars"
 }'
 ```
@@ -413,7 +413,7 @@ curl -L -k -X PATCH 'https://localhost:9200/graph/v1.0/drives/storage-users-1$53
 {{< tab "Response - 200 OK" >}}
 ````json {hl_lines=[2,3,7]}
 {
-    "description": "mission to mars",
+    "description": "Mission to mars",
     "driveAlias": "project/mission-to-mars",
     "driveType": "project",
     "id": "storage-users-1$535aa42d-a3c7-4329-9eba-5ef48fcaa3ff",
