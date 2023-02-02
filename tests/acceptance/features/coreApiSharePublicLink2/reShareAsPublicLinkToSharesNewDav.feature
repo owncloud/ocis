@@ -6,10 +6,9 @@ Feature: reshare as public link
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
-      | username  |
-      | Alice     |
-      | Brian     |
-    And the administrator has set the default folder for received shares to "Shares"
+      | username |
+      | Alice    |
+      | Brian    |
     And auto-accept shares has been disabled
 
 
