@@ -71,7 +71,7 @@ type UserSharingDrivers struct {
 }
 
 type UserSharingJSONDriver struct {
-	File string `yaml:"file" env:"SHARING_USER_JSON_FILE" desc:"Path to the JSON file where shares will be persisted."`
+	File string `yaml:"file" env:"SHARING_USER_JSON_FILE" desc:"Path to the JSON file where shares will be persisted. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage."`
 }
 
 type UserSharingSQLDriver struct {
@@ -120,7 +120,7 @@ type PublicSharingDrivers struct {
 }
 
 type PublicSharingJSONDriver struct {
-	File string `yaml:"file" env:"SHARING_PUBLIC_JSON_FILE" desc:"Path to the JSON file where public share meta-data will be stored. This JSON file contains the information about public shares that have been created."`
+	File string `yaml:"file" env:"SHARING_PUBLIC_JSON_FILE" desc:"Path to the JSON file where public share meta-data will be stored. This JSON file contains the information about public shares that have been created. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage."`
 }
 
 type PublicSharingSQLDriver struct {
