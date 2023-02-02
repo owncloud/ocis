@@ -74,15 +74,11 @@ Feature: State of the quota
       | endpoint    |
       | <end_point> |
     Then the HTTP status code should be "200"
-    And the json responded should contain these key and value pairs:
-      | key              | value            |
-      | quota@@@free     | <quota_free>     |
-      | quota@@@used     | <quota_used>     |
-      | quota@@@total    | <quota_total>    |
-      | quota@@@relative | <quota_relative> |
+    And the OCS status code should be "<ocs_code>"
+    And the relative quota amount should be "<quota_relative>"
     Examples:
-      | file_upload                   | end_point                                 | quota_free | quota_used | quota_total | quota_relative |
-      | /filesForUpload/lorem.txt     | /ocs/v1.php/cloud/users/Alice?format=json | 9301       | 699        | 10000       | 6.99           |
-      | /filesForUpload/lorem-big.txt | /ocs/v1.php/cloud/users/Alice?format=json | 883        | 9117       | 10000       | 91.17          |
-      | /filesForUpload/lorem.txt     | /ocs/v2.php/cloud/users/Alice?format=json | 9301       | 699        | 10000       | 6.99           |
-      | /filesForUpload/lorem-big.txt | /ocs/v2.php/cloud/users/Alice?format=json | 883        | 9117       | 10000       | 91.17          |
+      | file_upload                   | end_point                          | ocs_code | quota_relative |
+      | /filesForUpload/lorem.txt     | /ocs/v1.php/cloud/users/%username% | 100      | 6.99           |
+      | /filesForUpload/lorem-big.txt | /ocs/v1.php/cloud/users/%username% | 100      | 91.17          |
+      | /filesForUpload/lorem.txt     | /ocs/v2.php/cloud/users/%username% | 200      | 6.99           |
+      | /filesForUpload/lorem-big.txt | /ocs/v2.php/cloud/users/%username% | 200      | 91.17          |

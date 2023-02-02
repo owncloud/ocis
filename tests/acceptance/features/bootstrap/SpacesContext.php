@@ -3136,31 +3136,25 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^the json responded should contain these key and value pairs:$/
+	 * @Then the relative quota amount should be :quota_amount
 	 *
-	 * Loops through data items in response to find given key and value pairs
-	 * It does not support field value replacing
-	 *
-	 * @param TableNode $table
+	 * @param string $quotaAmount
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theJsonRespondedShouldContainTheseKeyAndValuePairs(TableNode $table):void {
-		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
-		$response = json_decode((string)$this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
-		$data = $response["ocs"]["data"];
-		foreach ($table->getHash() as $row) {
-			$key = $row['key'];
-			$expectedValue = $row['value'];
-			$segments = explode('@@@', $key);
-			$actualValue  = $data;
-			foreach ($segments as $segment) {
-				$arrayKeyExists = \array_key_exists($segment, $actualValue);
-				Assert::assertTrue($arrayKeyExists, "The key $segment does not exist on the response");
-				$actualValue = $actualValue[$segment];
-			}
-			Assert::assertEquals($expectedValue, $actualValue, "Expected $expectedValue but received $actualValue");
+	public function theRelativeQuotaAmountShouldBe(string $quotaAmount): void {
+		$data = $this->ocsContext->getOCSResponseData($this->featureContext->getResponse());
+		if (isset($data->quota, $data->quota->relative)) {
+			Assert::assertEquals(
+				$data->quota->relative,
+				$quotaAmount,
+				"Expected relative quota amount to be $quotaAmount but found to be $data->quota->relative"
+			);
+		} else {
+			throw new Exception(
+				"No relative quota amount found in responseXml"
+			);
 		}
 	}
 }
