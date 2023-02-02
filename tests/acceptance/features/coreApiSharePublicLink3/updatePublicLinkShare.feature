@@ -14,7 +14,7 @@ Feature: update a public link share
     When user "Alice" updates the last public link share using the sharing API with
       | expireDate | 2040-01-01T23:59:59+0100 |
     Then the OCS status code should be "<ocs_status_code>"
-    And the OCS status message should be "Ok"
+    And the OCS status message should be "OK"
     And the HTTP status code should be "200"
     And the fields of the last response to user "Alice" should include
       | id                         | A_STRING             |
@@ -28,8 +28,8 @@ Feature: update a public link share
       | token                      | A_STRING             |
       | uid_file_owner             | %username%           |
       | displayname_file_owner     | %displayname%        |
-      | additional_info_owner      |                      |
-      | additional_info_file_owner |                      |
+      | additional_info_owner      | %emailaddress%       |
+      | additional_info_file_owner | %emailaddress%       |
       | item_type                  | folder               |
       | item_source                | A_STRING             |
       | path                       | /FOLDER              |
@@ -413,25 +413,17 @@ Feature: update a public link share
       | permissions | read    |
     And user "Alice" has updated the last public link share with
       | permissions | read,update,create,delete |
-    When the public deletes file "CHILD/child.txt" from the last public link share using the <public-webdav-api-version> public WebDAV API
-    And the public deletes file "parent.txt" from the last public link share using the <public-webdav-api-version> public WebDAV API
+    When the public deletes file "CHILD/child.txt" from the last public link share using the new public WebDAV API
+    And the public deletes file "parent.txt" from the last public link share using the new public WebDAV API
     Then the HTTP status code of responses on all endpoints should be "204"
     And as "Alice" file "PARENT/CHILD/child.txt" should not exist
     And as "Alice" file "PARENT/parent.txt" should not exist
-
-    @notToImplementOnOCIS @issue-ocis-2079
     Examples:
-      | ocs_api_version | public-webdav-api-version |
-      | 1               | old                       |
-      | 2               | old                       |
+      | ocs_api_version |
+      | 1               |
+      | 2               |
 
 
-    Examples:
-      | ocs_api_version | public-webdav-api-version |
-      | 1               | new                       |
-      | 2               | new                       |
-
-  @skipOnOcV10
   Scenario Outline: API responds with a full set of parameters when owner renames the folder with a public link in ocis
     Given using OCS API version "<ocs_api_version>"
     And using <dav-path> DAV path
@@ -478,7 +470,6 @@ Feature: update a public link share
       | spaces   | 2               | 200             |
 
 
-  @skipOnOcV10
   Scenario Outline: API responds with a full set of parameters when owner renames the file with a public link in ocis
     Given using OCS API version "<ocs_api_version>"
     And using <dav-path> DAV path

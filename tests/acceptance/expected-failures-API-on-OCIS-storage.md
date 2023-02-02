@@ -260,18 +260,16 @@ cannot share a folder with create permission
 - [coreApiSharePublicLink2/copyFromPublicLink.feature:174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink2/copyFromPublicLink.feature#L174)
 - [coreApiSharePublicLink2/copyFromPublicLink.feature:189](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink2/copyFromPublicLink.feature#L189)
 - [coreApiSharePublicLink2/copyFromPublicLink.feature:190](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink2/copyFromPublicLink.feature#L190)
-- [coreApiSharePublicLink3/updatePublicLinkShare.feature:45](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink3/updatePublicLinkShare.feature#L45)
-- [coreApiSharePublicLink3/updatePublicLinkShare.feature:46](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink3/updatePublicLinkShare.feature#L46)
 
 #### [Upload-only shares must not overwrite but create a separate file](https://github.com/owncloud/ocis/issues/1267)
 
-- [coreApiSharePublicLink3/uploadToPublicLinkShare.feature:24](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink3/uploadToPublicLinkShare.feature#L24)
-- [coreApiSharePublicLink3/uploadToPublicLinkShare.feature:273](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink3/uploadToPublicLinkShare.feature#L273)
+- [coreApiSharePublicLink3/uploadToPublicLinkShare.feature:10](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink3/uploadToPublicLinkShare.feature#L10)
+- [coreApiSharePublicLink3/uploadToPublicLinkShare.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink3/uploadToPublicLinkShare.feature#L131)
 
 #### [Set quota over settings](https://github.com/owncloud/ocis/issues/1290)
 
-- [coreApiSharePublicLink3/uploadToPublicLinkShare.feature:160](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink3/uploadToPublicLinkShare.feature#L160)
-- [coreApiSharePublicLink3/uploadToPublicLinkShare.feature:179](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink3/uploadToPublicLinkShare.feature#L179)
+- [coreApiSharePublicLink3/uploadToPublicLinkShare.feature:84](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink3/uploadToPublicLinkShare.feature#L84)
+- [coreApiSharePublicLink3/uploadToPublicLinkShare.feature:93](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink3/uploadToPublicLinkShare.feature#L93)
 
 
 #### [deleting a file inside a received shared folder is moved to the trash-bin of the sharer not the receiver](https://github.com/owncloud/ocis/issues/1124)
@@ -706,11 +704,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiWebdavUpload1/uploadFileToBlacklistedName.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToBlacklistedName.feature#L71)
 - [coreApiWebdavUpload1/uploadFileToBlacklistedName.feature:70](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToBlacklistedName.feature#L70)
 - [coreApiWebdavUpload1/uploadFileToBlacklistedName.feature:76](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToBlacklistedName.feature#L76)
-
-#### [Allow public link sharing only for certain groups feature not implemented](https://github.com/owncloud/ocis/issues/4623)
-
-- [coreApiSharePublicLink3/allowGroupToCreatePublicLinks.feature:35](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink3/allowGroupToCreatePublicLinks.feature#L35)
-- [coreApiSharePublicLink3/allowGroupToCreatePublicLinks.feature:92](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink3/allowGroupToCreatePublicLinks.feature#L92)
 
 #### [Preview of text file with UTF content does not render correctly](https://github.com/owncloud/ocis/issues/2570)
 
