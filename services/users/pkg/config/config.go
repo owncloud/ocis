@@ -71,7 +71,7 @@ type JSONDriver struct {
 }
 type LDAPDriver struct {
 	URI                     string          `yaml:"uri" env:"LDAP_URI;USERS_LDAP_URI" desc:"URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'"`
-	CACert                  string          `yaml:"ca_cert" env:"LDAP_CACERT;USERS_LDAP_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service."`
+	CACert                  string          `yaml:"ca_cert" env:"LDAP_CACERT;USERS_LDAP_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/idm."`
 	Insecure                bool            `yaml:"insecure" env:"LDAP_INSECURE;USERS_LDAP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments."`
 	BindDN                  string          `yaml:"bind_dn" env:"LDAP_BIND_DN;USERS_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server."`
 	BindPassword            string          `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;USERS_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'."`

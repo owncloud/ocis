@@ -83,7 +83,7 @@ type StorageRegistry struct {
 	Driver              string   `yaml:"driver"` //TODO: configure via env?
 	Rules               []string `yaml:"rules"`  //TODO: configure via env?
 	JSON                string   `yaml:"json"`   //TODO: configure via env?
-	StorageUsersMountID string   `yaml:"storage_users_mount_id" env:"GATEWAY_STORAGE_USERS_MOUNT_ID" desc:"Mount ID of this storage. This ID needs to be unique."`
+	StorageUsersMountID string   `yaml:"storage_users_mount_id" env:"GATEWAY_STORAGE_USERS_MOUNT_ID" desc:"Mount ID of this storage. Admins can set the ID for the storage in this config option manually which is then used to reference the storage. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
 }
 
 // Cache holds cache config
