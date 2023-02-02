@@ -148,11 +148,7 @@ func NewService(opts ...Option) (Graph, error) {
 		svc.permissionsService = options.PermissionService
 	}
 
-	if options.RoleService == nil {
-		svc.roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
-	} else {
-		svc.roleService = options.RoleService
-	}
+	svc.roleService = options.RoleService
 
 	roleManager := options.RoleManager
 	if roleManager == nil {
@@ -201,11 +197,13 @@ func NewService(opts ...Option) (Graph, error) {
 					r.Get("/", svc.GetUser)
 					r.With(requireAdmin).Delete("/", svc.DeleteUser)
 					r.With(requireAdmin).Patch("/", svc.PatchUser)
-					r.With(requireAdmin).Route("/appRoleAssignments", func(r chi.Router) {
-						r.Get("/", svc.ListAppRoleAssignments)
-						r.Post("/", svc.CreateAppRoleAssignment)
-						r.Delete("/{appRoleAssignmentID}", svc.DeleteAppRoleAssignment)
-					})
+					if svc.roleService != nil {
+						r.With(requireAdmin).Route("/appRoleAssignments", func(r chi.Router) {
+							r.Get("/", svc.ListAppRoleAssignments)
+							r.Post("/", svc.CreateAppRoleAssignment)
+							r.Delete("/{appRoleAssignmentID}", svc.DeleteAppRoleAssignment)
+						})
+					}
 				})
 			})
 			r.Route("/groups", func(r chi.Router) {
