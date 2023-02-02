@@ -89,8 +89,13 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if grp != nil && grp.Id != nil {
-		currentUser := revactx.ContextMustGetUser(r.Context())
-		g.publishEvent(events.GroupCreated{Executant: currentUser.Id, GroupID: *grp.Id})
+		e := events.GroupCreated{
+			GroupID: grp.GetId(),
+		}
+		if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
+			e.Executant = currentUser.GetId()
+		}
+		g.publishEvent(e)
 	}
 	render.Status(r, http.StatusOK) // FIXME 201 should return 201 created
 	render.JSON(w, r, grp)
@@ -239,8 +244,13 @@ func (g Graph) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser := revactx.ContextMustGetUser(r.Context())
-	g.publishEvent(events.GroupDeleted{Executant: currentUser.Id, GroupID: groupID})
+	e := events.GroupDeleted{
+		GroupID: groupID,
+	}
+	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
+		e.Executant = currentUser.GetId()
+	}
+	g.publishEvent(e)
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
 }
@@ -345,8 +355,14 @@ func (g Graph) PostGroupMember(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	currentUser := revactx.ContextMustGetUser(r.Context())
-	g.publishEvent(events.GroupMemberAdded{Executant: currentUser.Id, GroupID: groupID, UserID: id})
+	e := events.GroupMemberAdded{
+		GroupID: groupID,
+		UserID:  id,
+	}
+	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
+		e.Executant = currentUser.GetId()
+	}
+	g.publishEvent(e)
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
 }
@@ -396,8 +412,14 @@ func (g Graph) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	currentUser := revactx.ContextMustGetUser(r.Context())
-	g.publishEvent(events.GroupMemberRemoved{Executant: currentUser.Id, GroupID: groupID, UserID: memberID})
+	e := events.GroupMemberRemoved{
+		GroupID: groupID,
+		UserID:  memberID,
+	}
+	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
+		e.Executant = currentUser.GetId()
+	}
+	g.publishEvent(e)
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
 }
