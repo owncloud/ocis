@@ -58,5 +58,5 @@ type GRPCConfig struct {
 }
 
 type StorageProvider struct {
-	MountID string `yaml:"mount_id" env:"STORAGE_PUBLICLINK_STORAGE_PROVIDER_MOUNT_ID" desc:"Mount ID of this storage."`
+	MountID string `yaml:"mount_id" env:"STORAGE_PUBLICLINK_STORAGE_PROVIDER_MOUNT_ID" desc:"Mount ID of this storage. Admins can set the ID for the storage in this config option manually which is then used to reference the storage. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
 }
