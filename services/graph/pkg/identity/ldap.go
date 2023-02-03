@@ -216,7 +216,10 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	// want to allow changing the user name?). For now just disallow it.
 	if user.OnPremisesSamAccountName != nil && *user.OnPremisesSamAccountName != "" {
 		if e.GetEqualFoldAttributeValue(i.userAttributeMap.userName) != *user.OnPremisesSamAccountName {
-			return nil, errorcode.New(errorcode.NotSupported, "changing the user name is currently not supported")
+			e, err = i.changeUserName(ctx, e.DN, user.GetOnPremisesSamAccountName())
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -468,6 +471,42 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 		users = append(users, u)
 	}
 	return users, nil
+}
+
+func (i *LDAP) changeUserName(ctx context.Context, dn, originalUserName, newUserName string) (*ldap.Entry, error) {
+	groups, err := i.getGroupsForUser(dn)
+	if err != nil {
+		return nil, err
+	}
+
+	newDN := fmt.Sprintf("%s=%s", i.userAttributeMap.userName, newUserName)
+	for _, g := range groups {
+		err = i.renameMemberInGroup(ctx, g, dn, newDN)
+		// This could leave the groups in an inconsistent state, might be a good idea to
+		// add a defer that changes everything back on error. Ideally, this entire function
+		// should be atomic, but LDAP doesn't support that.
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	mrdn := ldap.NewModifyDNRequest(dn, newDN, true, "")
+
+	if err := i.conn.ModifyDN(mrdn); err != nil {
+		var lerr *ldap.Error
+		if errors.As(err, &lerr) {
+			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
+				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
+			}
+		}
+		return nil, err
+	}
+
+	return i.getUserByDN(newDN)
+}
+
+// TODO: Fill this in.
+func (i *LDAP) renameMemberInGroup(ctx context.Context, group *ldap.Entry, oldMember, newMember) error {
 }
 
 func (i *LDAP) updateUserPassowrd(ctx context.Context, dn, password string) error {
