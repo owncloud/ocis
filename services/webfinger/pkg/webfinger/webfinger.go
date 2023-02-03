@@ -14,7 +14,16 @@ type Link struct {
 	//
 	// The "href" member is OPTIONAL in the link relation object.
 	Href string `json:"href,omitempty"`
-
+	// The "properties" object within the link relation object comprises
+	// zero or more name/value pairs whose names are URIs (referred to as
+	// "property identifiers") and whose values are strings or null.
+	//
+	// Properties are used to convey additional information about the link
+	// relation.  As an example, consider this use of "properties":
+	//
+	//  "properties" : { "http://webfinger.example/mail/port" : "993" }
+	//
+	// The "properties" member is OPTIONAL in the link relation object.
 	Properties map[string]string `json:"properties,omitempty"`
 	// Titles comprises zero or more name/value pairs whose
 	// names are a language tag or the string "und"

@@ -16,13 +16,15 @@ func FullDefaultConfig() *config.Config {
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
-			Addr:   "127.0.0.1:19119", // FIXME
+			Addr: "127.0.0.1:19119", // FIXME
+			//Addr:      "127.0.0.1:0", // :0 to pick any free local port
 			Token:  "",
 			Pprof:  false,
 			Zpages: false,
 		},
 		HTTP: config.HTTP{
-			Addr:      "127.0.0.1:19115", // FIXME
+			Addr: "127.0.0.1:19115", // FIXME
+			//Addr:      "127.0.0.1:0", // :0 to pick any free local port
 			Root:      "/",
 			Namespace: "com.owncloud.web",
 			CORS: config.CORS{
