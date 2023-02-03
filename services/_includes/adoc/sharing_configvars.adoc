@@ -344,7 +344,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/storage/shares.json ++
 a| [subs=-attributes]
-Path to the JSON file where shares will be persisted.
+Path to the JSON file where shares will be persisted. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
 a|`SHARING_USER_CS3_PROVIDER_ADDR` +
 
@@ -455,7 +455,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/storage/publicshares.json ++
 a| [subs=-attributes]
-Path to the JSON file where public share meta-data will be stored. This JSON file contains the information about public shares that have been created.
+Path to the JSON file where public share meta-data will be stored. This JSON file contains the information about public shares that have been created. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
 a|`SHARING_PUBLIC_JSONCS3_PROVIDER_ADDR` +
 

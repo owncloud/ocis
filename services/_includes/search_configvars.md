@@ -26,14 +26,14 @@
 | SEARCH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | SEARCH_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | STORAGE_USERS_OCIS_ASYNC_UPLOADS<br/>SEARCH_EVENTS_ASYNC_UPLOADS | bool | false | Enable asynchronous file uploads.|
-| SEARCH_EVENTS_NUM_CONSUMERS | int | 0 | number of event consumers per service instance|
+| SEARCH_EVENTS_NUM_CONSUMERS | int | 0 | The amount of concurrent event consumers to start. Event consumers are used for searching files. Multiple consumers increase parallelisation, but will also increase CPU and memory demands. The default value is 0.|
 | SEARCH_EVENTS_REINDEX_DEBOUNCE_DURATION | int | 1000 | The duration in milliseconds the reindex debouncer waits before triggering a reindex of a space that was modified.|
 | OCIS_INSECURE<br/>SEARCH_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | SEARCH_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided SEARCH_EVENTS_TLS_INSECURE will be seen as false.|
-| OCIS_EVENTS_ENABLE_TLS<br/>SEARCH_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
-| SEARCH_ENGINE_TYPE | string | bleve | Defines which search engine to use.|
-| SEARCH_ENGINE_BLEVE_DATA_PATH | string | ~/.ocis/search | Path for the search persistence directory.|
-| SEARCH_EXTRACTOR_TYPE | string | basic | Defines the content extraction engine.|
+| OCIS_EVENTS_ENABLE_TLS<br/>SEARCH_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|
+| SEARCH_ENGINE_TYPE | string | bleve | Defines which search engine to use. Defaults to 'bleve'. Supported values are: 'bleve'.|
+| SEARCH_ENGINE_BLEVE_DATA_PATH | string | ~/.ocis/search | The directory where the filesystem will store search data. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/search.|
+| SEARCH_EXTRACTOR_TYPE | string | basic | Defines the content extraction engine. Defaults to 'basic'. Supported values are: 'basic' and 'tika'.|
 | OCIS_INSECURE<br/>SEARCH_EXTRACTOR_CS3SOURCE_INSECURE | bool | false | Ignore untrusted SSL certificates when connecting to the CS3 source.|
 | SEARCH_EXTRACTOR_TIKA_TIKA_URL | string | http://127.0.0.1:9998 | URL of the tika server.|
 | OCIS_MACHINE_AUTH_API_KEY<br/>SEARCH_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|

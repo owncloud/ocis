@@ -258,7 +258,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-number of event consumers per service instance
+The amount of concurrent event consumers to start. Event consumers are used for searching files. Multiple consumers increase parallelisation, but will also increase CPU and memory demands. The default value is 0.
 
 a|`SEARCH_EVENTS_REINDEX_DEBOUNCE_DURATION` +
 
@@ -296,7 +296,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
 
 a|`SEARCH_ENGINE_TYPE` +
 
@@ -305,7 +305,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++bleve ++
 a| [subs=-attributes]
-Defines which search engine to use.
+Defines which search engine to use. Defaults to 'bleve'. Supported values are: 'bleve'.
 
 a|`SEARCH_ENGINE_BLEVE_DATA_PATH` +
 
@@ -314,7 +314,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/search ++
 a| [subs=-attributes]
-Path for the search persistence directory.
+The directory where the filesystem will store search data. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/search.
 
 a|`SEARCH_EXTRACTOR_TYPE` +
 
@@ -323,7 +323,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++basic ++
 a| [subs=-attributes]
-Defines the content extraction engine.
+Defines the content extraction engine. Defaults to 'basic'. Supported values are: 'basic' and 'tika'.
 
 a|`OCIS_INSECURE` +
 `SEARCH_EXTRACTOR_CS3SOURCE_INSECURE` +

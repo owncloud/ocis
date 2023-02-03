@@ -285,7 +285,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/storage/metadata ++
 a| [subs=-attributes]
-Path for the directory where the STORAGE-SYSTEM service stores it's persistent data.
+Path for the directory where the STORAGE-SYSTEM service stores it's persistent data. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.
 
 a|`STORAGE_SYSTEM_OCIS_MAX_ACQUIRE_LOCK_CYCLES` +
 

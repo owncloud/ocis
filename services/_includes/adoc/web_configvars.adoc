@@ -297,6 +297,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++openid profile email ++
 a| [subs=-attributes]
-OIDC scopes to request during authentication.
+OIDC scopes to request during authentication to authorize access to user details. Defaults to 'openid profile email'. Values are separated by blank. More example values but not limited to are 'address' or 'phone' etc.
 |===
 
