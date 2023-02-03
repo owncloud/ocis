@@ -21,11 +21,11 @@ type logging struct {
 }
 
 // Webfinger implements the Service interface.
-func (l logging) Webfinger(ctx context.Context, resource, rel string) (webfinger.JSONResourceDescriptor, error) {
+func (l logging) Webfinger(ctx context.Context, resource string, rels []string) (webfinger.JSONResourceDescriptor, error) {
 	l.logger.Debug().
 		Str("resource", resource).
-		Str("rel", rel).
+		Strs("rel", rels).
 		Msg("Webfinger")
 
-	return l.next.Webfinger(ctx, resource, rel)
+	return l.next.Webfinger(ctx, resource, rels)
 }

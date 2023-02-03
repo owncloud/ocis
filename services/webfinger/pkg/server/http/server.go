@@ -77,9 +77,14 @@ func Server(opts ...Option) (ohttp.Service, error) {
 			// request as per Section 10.4.5 of RFC 2616.
 			// TODO the MUST might be a problem, is a guest instance ok enough?
 			resource := r.URL.Query().Get("resource")
-			rel := r.URL.Query().Get("rel")
+			rels := make([]string, 0)
+			for k, v := range r.URL.Query() {
+				if k == "rel" {
+					rels = append(rels, v...)
+				}
+			}
 
-			jrd, err := service.Webfinger(ctx, resource, rel)
+			jrd, err := service.Webfinger(ctx, resource, rels)
 			if err != nil {
 				render.Status(r, http.StatusInternalServerError)
 				render.PlainText(w, r, err.Error())

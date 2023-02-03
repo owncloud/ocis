@@ -15,7 +15,7 @@ const (
 
 // Service defines the extension handlers.
 type Service interface {
-	Webfinger(ctx context.Context, resource, rel string) (webfinger.JSONResourceDescriptor, error)
+	Webfinger(ctx context.Context, resource string, rels []string) (webfinger.JSONResourceDescriptor, error)
 }
 
 // New returns a new instance of Service
@@ -67,10 +67,12 @@ type svc struct {
 //	    }
 //	  ]
 //	}
-func (s svc) Webfinger(ctx context.Context, resource, rel string) (webfinger.JSONResourceDescriptor, error) {
+func (s svc) Webfinger(ctx context.Context, resource string, rel []string) (webfinger.JSONResourceDescriptor, error) {
 
 	// TODO query ldap server here and fetch all instances the user has access to
 	// what is the domain for the instance?
+
+	// or fetch from claims
 
 	href := ctx.Value("href").(string)
 
@@ -78,13 +80,17 @@ func (s svc) Webfinger(ctx context.Context, resource, rel string) (webfinger.JSO
 		Subject: resource,
 		Links: []webfinger.Link{
 			{
+				Rel:  OpenIDConnectRel,
+				Href: href,
+				Titles: map[string]string{
+					"en": "ownCloud Infinite Scale OpenID Connect Identity Provider",
+				},
+			},
+			{
 				Rel:  OwnCloudInstanceRel,
 				Href: href,
 				Titles: map[string]string{
 					"en": "ownCloud Infinite Scale",
-				},
-				Properties: map[string]string{
-					OpenIDConnectRel: href,
 				},
 			},
 		},

@@ -18,5 +18,8 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
+	Rules string `yaml:"webdav_namespace" env:"WEBFINGER_" desc:"Jail requests to /dav/webdav into this CS3 namespace. Supports template layouting with CS3 User properties."`
+	// TODO wie proxy?
+
 	Context context.Context `yaml:"-"`
 }
