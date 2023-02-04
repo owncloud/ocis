@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"net/url"
 
 	webfingertracing "github.com/owncloud/ocis/v2/services/webfinger/pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/webfinger"
@@ -21,12 +22,12 @@ type tracing struct {
 }
 
 // Webfinger implements the Service interface.
-func (t tracing) Webfinger(ctx context.Context, resource string, rels []string) (webfinger.JSONResourceDescriptor, error) {
+func (t tracing) Webfinger(ctx context.Context, queryTarget *url.URL, rels []string) (webfinger.JSONResourceDescriptor, error) {
 	ctx, span := webfingertracing.TraceProvider.Tracer("webfinger").Start(ctx, "Webfinger", trace.WithAttributes(
-		attribute.KeyValue{Key: "resource", Value: attribute.StringValue(resource)},
+		attribute.KeyValue{Key: "query_target", Value: attribute.StringValue(queryTarget.String())},
 		attribute.KeyValue{Key: "rels", Value: attribute.StringSliceValue(rels)},
 	))
 	defer span.End()
 
-	return t.next.Webfinger(ctx, resource, rels)
+	return t.next.Webfinger(ctx, queryTarget, rels)
 }

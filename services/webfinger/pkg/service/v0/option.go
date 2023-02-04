@@ -10,8 +10,10 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger log.Logger
-	Config *config.Config
+	Logger             log.Logger
+	Config             *config.Config
+	InstanceIdSelector InstanceSelector
+	InstanceLookup     InstanceLookup
 }
 
 // newOptions initializes the available default options.
@@ -36,5 +38,17 @@ func Logger(val log.Logger) Option {
 func Config(val *config.Config) Option {
 	return func(o *Options) {
 		o.Config = val
+	}
+}
+
+func WithInstanceSelector(val InstanceSelector) Option {
+	return func(o *Options) {
+		o.InstanceIdSelector = val
+	}
+}
+
+func WithInstanceLookup(val InstanceLookup) Option {
+	return func(o *Options) {
+		o.InstanceLookup = val
 	}
 }

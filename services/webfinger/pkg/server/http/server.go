@@ -2,7 +2,9 @@ package http
 
 import (
 	"context"
+	"errors"
 	"net/http"
+	"net/url"
 
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
@@ -11,6 +13,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	ohttp "github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	serviceErrors "github.com/owncloud/ocis/v2/services/webfinger/pkg/service/v0"
 	"go-micro.dev/v4"
 )
 
@@ -70,13 +73,20 @@ func Server(opts ...Option) (ohttp.Service, error) {
 			// for now, put the url in the context so it can be used to fake a list
 			ctx = context.WithValue(ctx, "href", getHref(r))
 
-			// from https://www.rfc-editor.org/rfc/rfc7033#section-4.2
-			//
-			// If the "resource" parameter is a value for which the server has no
-			// information, the server MUST indicate that it was unable to match the
-			// request as per Section 10.4.5 of RFC 2616.
-			// TODO the MUST might be a problem, is a guest instance ok enough?
+			// A WebFinger URI MUST contain a query component (see Section 3.4 of
+			// RFC 3986).  The query component MUST contain a "resource" parameter
+			// and MAY contain one or more "rel" parameters.
 			resource := r.URL.Query().Get("resource")
+			queryTarget, err := url.Parse(resource)
+			if resource == "" || err != nil {
+				// If the "resource" parameter is absent or malformed, the WebFinger
+				// resource MUST indicate that the request is bad as per Section 10.4.1
+				// of RFC 2616.
+				render.Status(r, http.StatusBadRequest)
+				render.PlainText(w, r, "absent or malformed 'resource' parameter")
+				return
+			}
+
 			rels := make([]string, 0)
 			for k, v := range r.URL.Query() {
 				if k == "rel" {
@@ -84,7 +94,17 @@ func Server(opts ...Option) (ohttp.Service, error) {
 				}
 			}
 
-			jrd, err := service.Webfinger(ctx, resource, rels)
+			jrd, err := service.Webfinger(ctx, queryTarget, rels)
+			if errors.Is(err, serviceErrors.ErrNotFound) {
+				// from https://www.rfc-editor.org/rfc/rfc7033#section-4.2
+				//
+				// If the "resource" parameter is a value for which the server has no
+				// information, the server MUST indicate that it was unable to match the
+				// request as per Section 10.4.5 of RFC 2616.
+				render.Status(r, http.StatusNotFound)
+				render.PlainText(w, r, err.Error())
+				return
+			}
 			if err != nil {
 				render.Status(r, http.StatusInternalServerError)
 				render.PlainText(w, r, err.Error())

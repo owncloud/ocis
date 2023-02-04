@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"net/url"
 
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/webfinger"
@@ -22,7 +23,7 @@ type instrument struct {
 }
 
 // Webfinger implements the Service interface.
-func (i instrument) Webfinger(ctx context.Context, resource string, rels []string) (webfinger.JSONResourceDescriptor, error) {
+func (i instrument) Webfinger(ctx context.Context, queryTarget *url.URL, rels []string) (webfinger.JSONResourceDescriptor, error) {
 	timer := prometheus.NewTimer(prometheus.ObserverFunc(func(v float64) {
 		us := v * 1000000
 
@@ -34,5 +35,5 @@ func (i instrument) Webfinger(ctx context.Context, resource string, rels []strin
 
 	i.metrics.Counter.WithLabelValues().Inc()
 
-	return i.next.Webfinger(ctx, resource, rels)
+	return i.next.Webfinger(ctx, queryTarget, rels)
 }

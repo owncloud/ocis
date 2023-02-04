@@ -50,7 +50,15 @@ func Server(cfg *config.Config) *cli.Command {
 			metrics.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
 			{
-				svc, err := service.New(service.Logger(logger), service.Config(cfg))
+				svc, err := service.New(
+					service.Logger(logger),
+					service.Config(cfg),
+					service.WithInstanceSelector(getInstanceSelector(cfg.InstanceSelector)),
+					service.WithInstanceLookup(getInstanceLookup(cfg.InstanceLookup)),
+					// TODO pass in InstanceSelector
+					// TODO pass in InsanceLookup
+
+				)
 				if err != nil {
 					logger.Error().Err(err).Msg("handler init")
 					return err
@@ -108,5 +116,19 @@ func Server(cfg *config.Config) *cli.Command {
 
 			return gr.Run()
 		},
+	}
+}
+
+func getInstanceSelector(selector string) service.InstanceSelector {
+	switch selector {
+	default:
+		return service.DefaultInstanceSelector{}
+	}
+}
+
+func getInstanceLookup(lookup string) service.InstanceLookup {
+	switch lookup {
+	default:
+		return service.DefaultInstanceLookup{}
 	}
 }
