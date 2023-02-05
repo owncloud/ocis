@@ -44,7 +44,9 @@ Feature: Share spaces
 
   Scenario: A user can see that the group has been granted access
     Given group "sales" has been created
-    And user "Alice" has shared a space "share space" to group "sales" with role "viewer"
+    When user "Alice" shares a space "share space" to group "sales" with role "viewer"
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "200"
     And the user "Alice" should have a space called "share space" granted to group "sales" with these key and value pairs:
       | key                                                           | value      |
       | root@@@permissions@@@1@@@grantedToIdentities@@@0@@@group@@@id | %group_id% |

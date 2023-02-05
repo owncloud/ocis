@@ -441,14 +441,14 @@ class SpacesContext implements Context {
 			$groupName
 		);
 		if ($response) {
-			$data = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+			$data = $this->featureContext->getJsonDecodedResponse($response);
 			if (isset($data["id"])) {
 				return $data["id"];
 			} else {
 				throw new Exception(__METHOD__ . " accounts-list is empty");
 			}
 		}
-		throw new Exception(__METHOD__ . " user with name $groupName not found");
+		throw new Exception(__METHOD__ . " Group with name $groupName not found");
 	}
 
 	/**
