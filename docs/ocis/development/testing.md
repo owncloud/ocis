@@ -41,14 +41,14 @@ The names of the full test suite make targets have the same naming as in the CI 
 
 For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis` runs the same tests as the `localApiTests-apiAccountsHashDifficulty-ocis` CI pipeline, which runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with oCIS storage.
 
-For example `make -C tests/acceptance/docker Core-API-Tests-owncloud-storage-3`runs the same tests as the `Core-API-Tests-owncloud-storage-3` CI pipeline, which runs the third (out of ten) ownCloud test suite against an oCIS with owncloud storage.
+For example `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) ownCloud test suite against an oCIS with ocis storage.
 
 ### Run single feature test
 
 The single feature tests can also be run against the different storage backends. Therefore, multiple make targets with the schema test-<test source>-feature-<storage backend> exist. To select a single feature you have to add an additional `BEHAT_FEATURE=...` parameter when invoking the make command:
 
 ```
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage  TEST_SERVER_URL=<OCIS-HOST> BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature'
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature'
 ```
 
 This must be pointing to a valid feature definition.
@@ -187,7 +187,7 @@ Instruction on setup is available [here](https://owncloud.dev/ocis/deployment/oc
 Edit the `.env` file and uncomment this line:
 
 ```bash
-COMPOSE_FILE=ocis-base.yml:testing/docker-compose-additions.yml
+COMPOSE_FILE=docker-compose.yml:testing/docker-compose-additions.yml
 ```
 
 Start the docker stack with the following command:

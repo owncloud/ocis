@@ -1,7 +1,7 @@
 services:
   acceptance-tests:
     image: owncloudci/php:7.4
-    command: /bin/bash /tests/run-tests.sh
+    command: /bin/bash /test/run-tests.sh
     environment:
       OCIS_ROOT: /drone/src
       TEST_OCIS: "true"
@@ -18,7 +18,7 @@ services:
     env_file:
       - ../../../../.drone.env
     volumes:
-      - ./run-tests.sh:/tests/run-tests.sh
+      - ./run-tests.sh:/test/run-tests.sh
       - oCISownCloud10testsuite:/drone/src
       - ../../../../:/drone/src
       - ../../../../vendor-bin/behat/composer.json:/tmp/vendor-bin/behat/composer.json
