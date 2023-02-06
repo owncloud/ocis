@@ -24,7 +24,7 @@ Use the following skeleton as a docker-compose.yml:
 ```bash
 mkdir simple-ocis && \
 cd simple-ocis && \
-touch docker-compose.yml
+touch ocis-base.yml
 ```
 
 Copy the following file content into `docker-compose.yml` and save it.
@@ -72,7 +72,7 @@ Check your local folder. We just generated a default ocis configuration file wit
 
 ```bash
 ls # list the current folder
-docker-compose.yml                    ocis.yaml # ocis.yaml has been generated
+ocis-base.yml                    ocis.yaml # ocis.yaml has been generated
 ```
 
 Run `cat ocis.yaml`

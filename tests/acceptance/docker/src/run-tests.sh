@@ -76,8 +76,8 @@ fi
 if [ "$TEST_SOURCE" = "oc10" ]
 then
    cd $OCIS_ROOT
-       sleep 10
-       make test-acceptance-from-core-api
+   sleep 10
+   make test-acceptance-from-core-api
 elif [ "$TEST_SOURCE" = "ocis" ]
 then
     cd $OCIS_ROOT

@@ -90,7 +90,7 @@ make -C tests/acceptance/docker clean
 ## Testing with test suite natively installed
 
 We have two sets of tests:
-- `test-acceptance-from-core-api` set was transferred from [core](https://github.com/owncloud/core) repository 
+- `test-acceptance-from-core-api` set was transferred from [core](https://github.com/owncloud/core) repository
 The suite name of all tests transferred from the core starts with "core"
 
 - `test-acceptance-api` set was created for ocis. Mainly for testing spaces features
@@ -133,7 +133,7 @@ TEST_OCIS=true \
 
 Make sure to adjust the settings `TEST_SERVER_URL` according to your environment.
 
-To run a single feature add `BEHAT_FEATURE=<feature file>` 
+To run a single feature add `BEHAT_FEATURE=<feature file>`
 
 example: `BEHAT_SUITE=tests/acceptance/features/apiGraph/createUser.feature`
 
@@ -187,7 +187,7 @@ Instruction on setup is available [here](https://owncloud.dev/ocis/deployment/oc
 Edit the `.env` file and uncomment this line:
 
 ```bash
-COMPOSE_FILE=docker-compose.yml:testing/docker-compose-additions.yml
+COMPOSE_FILE=ocis-base.yml:testing/docker-compose-additions.yml
 ```
 
 Start the docker stack with the following command:
