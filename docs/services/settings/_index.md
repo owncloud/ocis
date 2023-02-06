@@ -21,13 +21,13 @@ graph TD
     sdk --- sdks{ocis-settings<br>available?}
     sdks ---|"yes"| os
     sdks ---|"no"| defaults[Use set of<br>default values]
-    oa[oCIS extensions<br>e.g. ocis-accounts] ---|"saveSettingsBundle(bundle)"| os
+    oa[oCIS services<br>e.g. ocis-accounts] ---|"saveSettingsBundle(bundle)"| os
 {{< /mermaid >}}
 
 The diagram shows how the settings service integrates into oCIS:
 
 **Settings management:**
-- oCIS extensions can register *settings bundles* with the ocis-settings service.
+- oCIS services can register *settings bundles* with the ocis-settings service.
 
 **Settings usage:**
 - Extensions can query ocis-settings for *settings values* of a user.

@@ -47,7 +47,7 @@ PROXY_TRANSPORT_TLS_CERT=./certs/your-host.crt \
 
 If you generated these certificates on your own, you might need to set `OCIS_INSECURE` to `true`.
 
-For more configuration options check the configuration section in [oCIS]({{< ref "../config" >}}) and the oCIS extensions.
+For more configuration options check the configuration section in [oCIS]({{< ref "../config" >}}) and the oCIS services.
 
 ## Start the oCIS fullstack server with Docker Compose
 
