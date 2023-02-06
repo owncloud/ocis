@@ -24,7 +24,7 @@ make -C tests/acceptance/docker help
 Basically we have two sources for feature tests and test suites:
 
 - [oCIS feature test and test suites](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
-- [ownCloud feature tests and test suites](https://github.com/owncloud/core/tree/master/tests/acceptance/features)
+- [ownCloud feature tests and test suites, they have prefix coreApi](https://github.com/owncloud/core/tree/master/ocis/acceptance/features)
 
 At the moment both can be applied to oCIS since the api of oCIS is designed to be compatible with ownCloud.
 
