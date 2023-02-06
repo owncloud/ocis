@@ -10,7 +10,7 @@ geekdocFilePath: releasing.md
 
 ## Requirements
 
-You need a working installation of [the Go programming language](https://golang.org/), [the Node runtime](https://nodejs.org/) and [the pnpm package manager](https://pnpm.io) installed to build the assets for a working release.
+You need a working installation of [the Go programming language](https://golang.org/).
 
 ## Releasing
 

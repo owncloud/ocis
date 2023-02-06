@@ -27,17 +27,11 @@ type Config struct {
 
 	AdminUserID string `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID;SETTINGS_ADMIN_USER_ID" desc:"ID of the user that should receive admin privileges."`
 
-	Asset        Asset         `yaml:"asset"`
 	TokenManager *TokenManager `yaml:"token_manager"`
 
 	SetupDefaultAssignments bool `yaml:"set_default_assignments" env:"SETTINGS_SETUP_DEFAULT_ASSIGNMENTS;ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"The default role assignments the demo users should be setup."`
 
 	Context context.Context `yaml:"-"`
-}
-
-// Asset defines the available asset configuration.
-type Asset struct {
-	Path string `yaml:"path" env:"SETTINGS_ASSET_PATH" desc:"Serve settings Web UI assets from a path on the filesystem instead of the builtin assets. Can be used for development and customization."`
 }
 
 // Metadata configures the metadata store to use

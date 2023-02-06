@@ -53,8 +53,6 @@ policies:
         backend: http://localhost:9120
       - endpoint: /api/v0/settings
         backend: http://localhost:9190
-      - endpoint: /settings.js
-        backend: http://localhost:9190
   - name: oc10
     routes:
       - endpoint: "/"

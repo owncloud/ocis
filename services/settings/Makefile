@@ -3,11 +3,6 @@ NAME := settings
 
 include ../../.make/recursion.mk
 
-.PHONY: test-acceptance-webui
-test-acceptance-webui:
-	./ui/tests/run-acceptance-test.sh $(FEATURE_PATH)
-
-
 ############ tooling ############
 ifneq (, $(shell command -v go 2> /dev/null)) # suppress `command not found warnings` for non go targets in CI
 include ../../.bingo/Variables.mk
@@ -23,9 +18,6 @@ include ../../.make/release.mk
 ############ docs generate ############
 include ../../.make/docs.mk
 
-############ l10n ############
-include ../../.make/l10n.mk
-
 .PHONY: docs-generate
 docs-generate: config-docs-generate \
 			   grpc-docs-generate
@@ -37,17 +29,7 @@ include ../../.make/generate.mk
 ci-go-generate: protobuf # CI runs ci-node-generate automatically before this target
 
 .PHONY: ci-node-generate
-ci-node-generate: pnpm-build
-
-.PHONY: pnpm-build
-pnpm-build: node_modules
-	pnpm lint
-	pnpm test
-	pnpm build
-
-.PHONY: node_modules
-node_modules:
-	pnpm install
+ci-node-generate:
 
 ############ protobuf ############
 include ../../.make/protobuf.mk
@@ -57,10 +39,7 @@ protobuf: buf-generate
 
 ############ licenses ############
 .PHONY: ci-node-check-licenses
-ci-node-check-licenses: node_modules
-	pnpm licenses:check
+ci-node-check-licenses:
 
 .PHONY: ci-node-save-licenses
-ci-node-save-licenses: node_modules
-	pnpm licenses:csv
-	pnpm licenses:save
+ci-node-save-licenses:

@@ -8,8 +8,7 @@ geekdocFilePath: values.md
 ---
 
 A **Settings Value** is the value an authenticated user has chosen for a specific setting, defined in a
-*settings bundle*. For choosing settings values as a user the sole entry point is the ocis-web extension
-provided by this service.
+*settings bundle*.
 
 ## Identifying settings values
 
@@ -68,8 +67,7 @@ a JWT, providing it in the HTTP header as `x-access-token`. That UUID is then us
 ```
 
 ## gRPC endpoints
-The obvious way of modifying settings is the ocis-web extension, as described earlier. However, services can
-use the respective gRPC endpoints of the `ValueService` to query and modify *settings values* as well.
+Services can use gRPC endpoints of the `ValueService` to query and modify *settings values*.
 The gRPC endpoints require the same identifier attributes as described above, so for making a request to
 the `ValueService` you will have to make sure that the accountUuid of the authenticated user is available in
 your service at the time of the request.

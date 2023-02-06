@@ -12,7 +12,6 @@ import (
 	ohttp "github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/assets"
 	svc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 	"go-micro.dev/v4"
 )
@@ -71,15 +70,6 @@ func Server(opts ...Option) (ohttp.Service, error) {
 
 	mux.Use(middleware.Logger(
 		options.Logger,
-	))
-
-	mux.Use(middleware.Static(
-		options.Config.HTTP.Root,
-		assets.New(
-			assets.Logger(options.Logger),
-			assets.Config(options.Config),
-		),
-		options.Config.HTTP.CacheTTL,
 	))
 
 	mux.Route(options.Config.HTTP.Root, func(r chi.Router) {

@@ -32,7 +32,6 @@ func DefaultConfig() *config.Config {
 			Addr:      "127.0.0.1:9190",
 			Namespace: "com.owncloud.web",
 			Root:      "/",
-			CacheTTL:  604800, // 7 days
 			CORS: config.CORS{
 				AllowedOrigins:   []string{"*"},
 				AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -44,11 +43,8 @@ func DefaultConfig() *config.Config {
 			Addr:      "127.0.0.1:9191",
 			Namespace: "com.owncloud.api",
 		},
-		StoreType: "metadata", // use metadata or filesystem
-		DataPath:  path.Join(defaults.BaseDataPath(), "settings"),
-		Asset: config.Asset{
-			Path: "",
-		},
+		StoreType:               "metadata", // use metadata or filesystem
+		DataPath:                path.Join(defaults.BaseDataPath(), "settings"),
 		SetupDefaultAssignments: false,
 		Metadata: config.Metadata{
 			GatewayAddress: "127.0.0.1:9215", // system storage

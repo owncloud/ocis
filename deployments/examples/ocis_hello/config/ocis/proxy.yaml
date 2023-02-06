@@ -53,8 +53,6 @@ policies:
         backend: http://localhost:9120
       - endpoint: /api/v0/settings
         backend: http://localhost:9190
-      - endpoint: /settings.js
-        backend: http://localhost:9190
       # oCIS Hello specific routes
       - endpoint: "/api/v0/greet"
         backend: http://ocis-hello:9105
