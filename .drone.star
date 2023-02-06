@@ -946,7 +946,7 @@ def uiTests(ctx):
     return pipelines
 
 def uiTestPipeline(ctx, filterTags, early_fail, runPart = 1, numberOfParts = 1, storage = "ocis", uniqueName = "", accounts_hash_difficulty = 4):
-    standardFilterTags = "not @skipOnOCIS and not @skip and not @federated-server-needed"
+    standardFilterTags = "not @skipOnOCIS and not @skip and not @notToImplementOnOCIS and not @federated-server-needed"
     if filterTags == "":
         finalFilterTags = standardFilterTags
         expectedFailuresFileFilterTags = ""
