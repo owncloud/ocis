@@ -50,11 +50,11 @@ var _ = Describe("Notifications", func() {
 
 	DescribeTable("Sending notifications",
 		func(tc testChannel, ev interface{}) {
-			ch := make(chan interface{})
+			ch := make(chan events.Event)
 			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gwc, "", "", "")
 			go evts.Run()
 
-			ch <- ev
+			ch <- events.Event{Event: ev}
 			select {
 			case <-tc.done:
 				// finished

@@ -517,7 +517,7 @@ var testCases = []struct {
 func TestAuditLogging(t *testing.T) {
 	log := log.NewLogger()
 
-	inch := make(chan interface{})
+	inch := make(chan events.Event)
 	defer close(inch)
 
 	outch := make(chan []byte)
@@ -533,7 +533,7 @@ func TestAuditLogging(t *testing.T) {
 	for i := range testCases {
 		tc := testCases[i]
 		t.Run(tc.Alias, func(t *testing.T) {
-			inch <- tc.SystemEvent
+			inch <- events.Event{Event: tc.SystemEvent}
 			tc.CheckAuditEvent(t, <-outch)
 		})
 	}

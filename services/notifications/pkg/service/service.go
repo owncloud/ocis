@@ -29,7 +29,7 @@ type Service interface {
 
 // NewEventsNotifier provides a new eventsNotifier
 func NewEventsNotifier(
-	events <-chan interface{},
+	events <-chan events.Event,
 	channel channels.Channel,
 	logger log.Logger,
 	gwClient gateway.GatewayAPIClient,
@@ -49,7 +49,7 @@ func NewEventsNotifier(
 type eventsNotifier struct {
 	logger            log.Logger
 	channel           channels.Channel
-	events            <-chan interface{}
+	events            <-chan events.Event
 	signals           chan os.Signal
 	gwClient          gateway.GatewayAPIClient
 	machineAuthAPIKey string
@@ -65,7 +65,7 @@ func (s eventsNotifier) Run() error {
 		select {
 		case evt := <-s.events:
 			go func() {
-				switch e := evt.(type) {
+				switch e := evt.Event.(type) {
 				case events.SpaceShared:
 					s.handleSpaceShared(e)
 				case events.SpaceUnshared:
