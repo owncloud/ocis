@@ -8,7 +8,7 @@ The `eventhistory` services consumes all events from the configured event sytem.
 
 ## Storing
 
-The `eventhistory` stores each consumed event in the configured store. Possible stores are ? and ? but not ?.
+The `eventhistory` stores each consumed event in the configured store. Possible stores are `inmemory` and ? but not ?.
 
 ## Retrieving
 

@@ -34,7 +34,8 @@ type GRPCConfig struct {
 
 // Store configures the store to use
 type Store struct {
-	RecordExpiry time.Duration `yaml:"record_expiry" env:"RECORD_EXPIRY" desc:"time to life for events in the store"`
+	Type         string        `yaml:"type" env:"EVENTHISTORY_STORE_TYPE" desc:"The type of the store. Supported is inmemory"`
+	RecordExpiry time.Duration `yaml:"record_expiry" env:"EVENTHISTORY_RECORD_EXPIRY" desc:"time to life for events in the store"`
 }
 
 // Events combines the configuration options for the event bus.

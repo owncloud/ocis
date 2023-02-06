@@ -42,6 +42,9 @@ func (eh *EventHistoryService) StoreEvents() {
 			Key:    event.ID,
 			Value:  event.Event.([]byte),
 			Expiry: eh.cfg.Store.RecordExpiry,
+			Metadata: map[string]interface{}{
+				"type": event.Type,
+			},
 		}); err != nil {
 			// we can't store. That's it for us.
 			return
@@ -63,6 +66,7 @@ func (eh *EventHistoryService) GetEvents(ctx context.Context, req *ehsvc.GetEven
 		resp.Events = append(resp.Events, &ehmsg.Event{
 			Id:    id,
 			Event: evs[0].Value,
+			Type:  evs[0].Metadata["type"].(string),
 		})
 	}
 

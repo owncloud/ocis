@@ -54,8 +54,13 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			// TODO: configure store
-			st := store.DefaultStore
+			var st store.Store
+			switch cfg.Store.Type {
+			case "inmemory":
+				st = store.NewMemoryStore()
+			default:
+				return fmt.Errorf("unknown store '%s' configured", cfg.Store.Type)
+			}
 
 			service := grpc.NewService(
 				grpc.Logger(logger),
@@ -69,11 +74,11 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Store(st),
 			)
 
-			gr.Add(service.Run, func(_ error) {
+			gr.Add(service.Run, func(err error) {
 				logger.Error().
 					Err(err).
 					Str("server", "grpc").
-					Msg("Shutting down server")
+					Msg("Shutting Down server")
 
 				cancel()
 			})

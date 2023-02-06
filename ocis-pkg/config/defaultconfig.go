@@ -7,6 +7,7 @@ import (
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/config/defaults"
 	authbearer "github.com/owncloud/ocis/v2/services/auth-bearer/pkg/config/defaults"
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/config/defaults"
+	eventhistory "github.com/owncloud/ocis/v2/services/eventhistory/pkg/config/defaults"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/config/defaults"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/config/defaults"
 	graph "github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
@@ -47,6 +48,7 @@ func DefaultConfig() *Config {
 		AuthBasic:         authbasic.DefaultConfig(),
 		AuthBearer:        authbearer.DefaultConfig(),
 		AuthMachine:       authmachine.DefaultConfig(),
+		EventHistory:      eventhistory.DefaultConfig(),
 		Frontend:          frontend.DefaultConfig(),
 		Gateway:           gateway.DefaultConfig(),
 		Graph:             graph.DefaultConfig(),
