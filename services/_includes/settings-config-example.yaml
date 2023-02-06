@@ -23,7 +23,6 @@ http:
     cert: ""
     key: ""
   root: /
-  cache_ttl: 604800
   cors:
     allow_origins:
     - '*'
@@ -59,8 +58,6 @@ metadata_config:
   system_user_idp: internal
   system_user_api_key: ""
 admin_user_id: ""
-asset:
-  path: ""
 token_manager:
   jwt_secret: ""
 set_default_assignments: false

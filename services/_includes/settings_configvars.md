@@ -19,7 +19,6 @@
 | OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|
 | OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
 | SETTINGS_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
-| SETTINGS_CACHE_TTL | int | 604800 | Browser cache control max-age value in seconds for settings Web UI assets.|
 | OCIS_CORS_ALLOW_ORIGINS<br/>SETTINGS_CORS_ALLOW_ORIGINS | []string | [*] | A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin|
 | OCIS_CORS_ALLOW_METHODS<br/>SETTINGS_CORS_ALLOW_METHODS | []string | [GET POST PUT PATCH DELETE OPTIONS] | A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method|
 | OCIS_CORS_ALLOW_HEADERS<br/>SETTINGS_CORS_ALLOW_HEADERS | []string | [Authorization Origin Content-Type Accept X-Requested-With] | A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.|
@@ -38,6 +37,5 @@
 | OCIS_SYSTEM_USER_IDP<br/>SETTINGS_SYSTEM_USER_IDP | string | internal | IDP of the oCIS STORAGE-SYSTEM system user.|
 | OCIS_SYSTEM_USER_API_KEY | string |  | API key for the STORAGE-SYSTEM system user.|
 | OCIS_ADMIN_USER_ID<br/>SETTINGS_ADMIN_USER_ID | string |  | ID of the user that should receive admin privileges.|
-| SETTINGS_ASSET_PATH | string |  | Serve settings Web UI assets from a path on the filesystem instead of the builtin assets. Can be used for development and customization.|
 | OCIS_JWT_SECRET<br/>SETTINGS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | SETTINGS_SETUP_DEFAULT_ASSIGNMENTS<br/>ACCOUNTS_DEMO_USERS_AND_GROUPS | bool | false | The default role assignments the demo users should be setup.|

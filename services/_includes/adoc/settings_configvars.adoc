@@ -187,15 +187,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Subdirectory that serves as the root for this HTTP service.
 
-a|`SETTINGS_CACHE_TTL` +
-
-a| [subs=-attributes]
-++int ++
-a| [subs=-attributes]
-++604800 ++
-a| [subs=-attributes]
-Browser cache control max-age value in seconds for settings Web UI assets.
-
 a|`OCIS_CORS_ALLOW_ORIGINS` +
 `SETTINGS_CORS_ALLOW_ORIGINS` +
 
@@ -364,15 +355,6 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 ID of the user that should receive admin privileges.
-
-a|`SETTINGS_ASSET_PATH` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-Serve settings Web UI assets from a path on the filesystem instead of the builtin assets. Can be used for development and customization.
 
 a|`OCIS_JWT_SECRET` +
 `SETTINGS_JWT_SECRET` +

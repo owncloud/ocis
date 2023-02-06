@@ -102,9 +102,6 @@ policies:
     service: com.owncloud.graph.graph
   - endpoint: /api/v0/settings
     service: com.owncloud.web.settings
-  - endpoint: /settings.js
-    service: com.owncloud.web.settings
-    unprotected: true
 oidc:
   issuer: https://localhost:9200
   insecure: false
