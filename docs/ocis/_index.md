@@ -39,7 +39,7 @@ The oCIS runtime allows us to dynamically manage services running in a single pr
 
 ### oCIS Services
 
-Every oCIS extension uses [ocis-pkg](https://github.com/owncloud/ocis/tree/master/ocis-pkg), which implements the [go-micro](https://go-micro.dev/) interfaces for [servers](https://github.com/asim/go-micro/blob/v3.5.0/server/server.go#L17-L37) to register and [clients](https://github.com/asim/go-micro/blob/v3.5.0/client/client.go#L11-L23) to lookup nodes with a service [registry](https://github.com/asim/go-micro/blob/v3.5.0/registry/registry.go).
+Every oCIS service uses [ocis-pkg](https://github.com/owncloud/ocis/tree/master/ocis-pkg), which implements the [go-micro](https://go-micro.dev/) interfaces for [servers](https://github.com/asim/go-micro/blob/v3.5.0/server/server.go#L17-L37) to register and [clients](https://github.com/asim/go-micro/blob/v3.5.0/client/client.go#L11-L23) to lookup nodes with a service [registry](https://github.com/asim/go-micro/blob/v3.5.0/registry/registry.go).
 We are following the [12 Factor](https://12factor.net/) methodology with oCIS. The uniformity of services also allows us to use the same command, logging and configuration mechanism. Configurations are forwarded from the
 oCIS runtime to the individual extensions.
 
