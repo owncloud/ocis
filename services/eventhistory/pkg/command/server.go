@@ -3,11 +3,13 @@ package command
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config/parser"
@@ -15,7 +17,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/server/grpc"
 	"github.com/urfave/cli/v2"
-	"go-micro.dev/v4/store"
 )
 
 // Server is the entrypoint for the server command.
@@ -54,8 +55,13 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			// TODO: configure store
-			st := store.DefaultStore
+			st := store.Create(
+				store.Type(cfg.Store.Type),
+				store.Addresses(strings.Split(cfg.Store.Addresses, ",")...),
+				store.Database(cfg.Store.Database),
+				store.Table(cfg.Store.Table),
+				store.TTL(cfg.Store.RecordExpiry),
+			)
 
 			service := grpc.NewService(
 				grpc.Logger(logger),
@@ -69,11 +75,11 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Store(st),
 			)
 
-			gr.Add(service.Run, func(_ error) {
+			gr.Add(service.Run, func(err error) {
 				logger.Error().
 					Err(err).
 					Str("server", "grpc").
-					Msg("Shutting down server")
+					Msg("Shutting Down server")
 
 				cancel()
 			})

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config"
@@ -16,10 +17,11 @@ type EventHistoryService struct {
 	ch    <-chan events.Event
 	store store.Store
 	cfg   *config.Config
+	log   log.Logger
 }
 
 // NewEventHistoryService returns an EventHistory service
-func NewEventHistoryService(cfg *config.Config, consumer events.Consumer, store store.Store) (*EventHistoryService, error) {
+func NewEventHistoryService(cfg *config.Config, consumer events.Consumer, store store.Store, log log.Logger) (*EventHistoryService, error) {
 	if consumer == nil || store == nil {
 		return nil, fmt.Errorf("Need non nil consumer (%v) and store (%v) to work properly", consumer, store)
 	}
@@ -29,7 +31,7 @@ func NewEventHistoryService(cfg *config.Config, consumer events.Consumer, store 
 		return nil, err
 	}
 
-	eh := &EventHistoryService{ch: ch, store: store, cfg: cfg}
+	eh := &EventHistoryService{ch: ch, store: store, cfg: cfg, log: log}
 	go eh.StoreEvents()
 
 	return eh, nil
@@ -42,8 +44,12 @@ func (eh *EventHistoryService) StoreEvents() {
 			Key:    event.ID,
 			Value:  event.Event.([]byte),
 			Expiry: eh.cfg.Store.RecordExpiry,
+			Metadata: map[string]interface{}{
+				"type": event.Type,
+			},
 		}); err != nil {
 			// we can't store. That's it for us.
+			eh.log.Error().Err(err).Str("eventid", event.ID).Msg("could not store event")
 			return
 		}
 	}
@@ -54,15 +60,16 @@ func (eh *EventHistoryService) GetEvents(ctx context.Context, req *ehsvc.GetEven
 	for _, id := range req.Ids {
 		evs, err := eh.store.Read(id)
 		if err != nil {
-			// TODO: Handle!
-			// return?
-			// gather errors and add to response?
+			if err != store.ErrNotFound {
+				eh.log.Error().Err(err).Str("eventid", id).Msg("could not read event")
+			}
 			continue
 		}
 
 		resp.Events = append(resp.Events, &ehmsg.Event{
 			Id:    id,
 			Event: evs[0].Value,
+			Type:  evs[0].Metadata["type"].(string),
 		})
 	}
 

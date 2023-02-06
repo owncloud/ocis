@@ -1,15 +1,29 @@
-# Eventhistory service
+# Eventhistory Service
 
-The `eventhistory` consumes all events from the configured event systems, stores them and allows to retrieve them via an eventid
+The `eventhistory` consumes all events from the configured event system like NATS, stores them and allows other services to retrieve them via an eventid.
+
+## Prerequisites
+
+Running the eventhistory service without an event sytem like NATS is not possible.
 
 ## Consuming
 
-The `eventhistory` services consumes all events from the configured event sytem. Running it without an event sytem is not possible.
+The `eventhistory` services consumes all events from the configured event sytem.
 
 ## Storing
 
-The `eventhistory` stores each consumed event in the configured store. Possible stores are ? and ? but not ?.
+The `eventhistory` service stores each consumed event via the configured store in `EVENTHISTORY_STORE_TYPE`. Possible stores are:
+  -   `mem`: Basic in-memory store and the default.
+  -   `ocmem`: Advanced in-memory store allowing max size.
+  -   `redis`: Stores data in a configured redis cluster.
+  -   `etcd`: Stores data in a configured etcd cluster.
+  -   `nats-js`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
+  -   `noop`: Stores nothing. Useful for testing. Not recommended in productive enviroments.
+
+1.  Note that in-memory stores are by nature not reboot persistent.
+2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicapable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store applies.
+3.  Events stay in the store for 2 weeks by default. Use `EVENTHISTORY_RECORD_EXPIRY` to adjust this value.
 
 ## Retrieving
 
-Other services can call the `eventhistory` service via a grpc call to retrieve events. The request must contain the eventid that should be retrieved
+Other services can call the `eventhistory` service via a grpc call to retrieve events. The request must contain the eventid that should be retrieved.
