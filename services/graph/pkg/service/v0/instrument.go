@@ -293,3 +293,18 @@ func (i instrument) AssignTags(w http.ResponseWriter, r *http.Request) {
 func (i instrument) UnassignTags(w http.ResponseWriter, r *http.Request) {
 	i.next.UnassignTags(w, r)
 }
+
+// GetEducationClassTeachers implements the Service interface.
+func (i instrument) GetEducationClassTeachers(w http.ResponseWriter, r *http.Request) {
+	i.next.UnassignTags(w, r)
+}
+
+// PostEducationClassTeacher implements the Service interface.
+func (i instrument) PostEducationClassTeacher(w http.ResponseWriter, r *http.Request) {
+	i.next.UnassignTags(w, r)
+}
+
+// DeleteEducationClassTeacher implements the Service interface.
+func (i instrument) DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Request) {
+	i.next.UnassignTags(w, r)
+}

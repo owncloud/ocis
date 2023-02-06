@@ -118,3 +118,18 @@ func (i *ErrEducationBackend) GetEducationUser(ctx context.Context, nameOrID str
 func (i *ErrEducationBackend) GetEducationUsers(ctx context.Context) ([]*libregraph.EducationUser, error) {
 	return nil, errNotImplemented
 }
+
+// GetEducationClassTeachers implements the EducationBackend interface for the ErrEducationBackend backend.
+func (i *ErrEducationBackend) GetEducationClassTeachers(ctx context.Context, classID string) ([]*libregraph.EducationUser, error) {
+	return nil, errNotImplemented
+}
+
+// AddTeacherToEducationclass implements the EducationBackend interface for the ErrEducationBackend backend.
+func (i *ErrEducationBackend) AddTeacherToEducationClass(ctx context.Context, classID string, teacherID string) error {
+	return errNotImplemented
+}
+
+// RemoveTeacherFromEducationClass implements the EducationBackend interface for the ErrEducationBackend backend.
+func (i *ErrEducationBackend) RemoveTeacherFromEducationClass(ctx context.Context, classID string, teacherID string) error {
+	return errNotImplemented
+}

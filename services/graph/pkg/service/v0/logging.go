@@ -293,3 +293,18 @@ func (l logging) AssignTags(w http.ResponseWriter, r *http.Request) {
 func (l logging) UnassignTags(w http.ResponseWriter, r *http.Request) {
 	l.next.UnassignTags(w, r)
 }
+
+// GetEducationClassTeachers implements the Service interface.
+func (l logging) GetEducationClassTeachers(w http.ResponseWriter, r *http.Request) {
+	l.next.UnassignTags(w, r)
+}
+
+// PostEducationClassTeacher implements the Service interface.
+func (l logging) PostEducationClassTeacher(w http.ResponseWriter, r *http.Request) {
+	l.next.UnassignTags(w, r)
+}
+
+// DeleteEducationClassTeacher implements the Service interface.
+func (l logging) DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Request) {
+	l.next.UnassignTags(w, r)
+}

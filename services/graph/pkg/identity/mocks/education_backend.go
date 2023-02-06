@@ -29,6 +29,20 @@ func (_m *EducationBackend) AddClassesToEducationSchool(ctx context.Context, sch
 	return r0
 }
 
+// AddTeacherToEducationClass provides a mock function with given fields: ctx, classID, teacherID
+func (_m *EducationBackend) AddTeacherToEducationClass(ctx context.Context, classID string, teacherID string) error {
+	ret := _m.Called(ctx, classID, teacherID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
+		r0 = rf(ctx, classID, teacherID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
 // AddUsersToEducationSchool provides a mock function with given fields: ctx, schoolID, memberID
 func (_m *EducationBackend) AddUsersToEducationSchool(ctx context.Context, schoolID string, memberID []string) error {
 	ret := _m.Called(ctx, schoolID, memberID)
@@ -193,6 +207,29 @@ func (_m *EducationBackend) GetEducationClassMembers(ctx context.Context, nameOr
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
 		r1 = rf(ctx, nameOrID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// GetEducationClassTeachers provides a mock function with given fields: ctx, classID
+func (_m *EducationBackend) GetEducationClassTeachers(ctx context.Context, classID string) ([]*libregraph.EducationUser, error) {
+	ret := _m.Called(ctx, classID)
+
+	var r0 []*libregraph.EducationUser
+	if rf, ok := ret.Get(0).(func(context.Context, string) []*libregraph.EducationUser); ok {
+		r0 = rf(ctx, classID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*libregraph.EducationUser)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, classID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -368,6 +405,20 @@ func (_m *EducationBackend) RemoveClassFromEducationSchool(ctx context.Context, 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
 		r0 = rf(ctx, schoolNumberOrID, memberID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// RemoveTeacherFromEducationClass provides a mock function with given fields: ctx, classID, teacherID
+func (_m *EducationBackend) RemoveTeacherFromEducationClass(ctx context.Context, classID string, teacherID string) error {
+	ret := _m.Called(ctx, classID, teacherID)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) error); ok {
+		r0 = rf(ctx, classID, teacherID)
 	} else {
 		r0 = ret.Error(0)
 	}
