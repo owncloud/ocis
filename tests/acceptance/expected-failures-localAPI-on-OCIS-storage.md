@@ -103,5 +103,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Sharing to a group with an expiration date does not work #5442](https://github.com/owncloud/ocis/issues/5442)
 - [apiSpacesShares/shareSubItemOfSpace.feature:99](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L99)
 
+#### [Space admin should not not be able to change the user quota](https://github.com/owncloud/ocis/issues/5475)
+- [apiSpaces/spaceManagement.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/spaceManagement.feature#L69)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
