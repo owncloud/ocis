@@ -8,7 +8,7 @@ geekdocFilePath: port-ranges.go
 geekdocCollapseSection: true
 ---
 
-oCIS extensions often need a port to expose their services to other services or the outside world.
+oCIS services often need a port to expose their services to other services or the outside world.
 As users may have many different extensions running on the same machine, we should track port usage in the oCIS ecosystem. In the best case we ensure that each extension uses a non colliding port range, to make life of users easier.
 
 This page tracks the knowingly used port ranges.

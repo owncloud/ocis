@@ -9,7 +9,7 @@ geekdocFilePath: bundles.md
 
 A **Settings Bundle** is a collection of settings, uniquely identified by the key of the
 extension registering the bundle and the key of the bundle itself. Its purpose is to let
-oCIS extensions define settings and make them available to users. They are dynamically
+oCIS services define settings and make them available to users. They are dynamically
 rendered into forms, available in the frontend.
 
 As of now we support five different types of settings:

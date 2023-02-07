@@ -25,7 +25,7 @@ We assume that you already have oCIS deployed on one or multiple servers by usin
 
 Telegraf will collect host metrics (CPU, RAM, network, processes, ...) and docker metrics (per container CPU, RAM, network, ...). Telegraf is also configured to scrape metrics from Prometheus metric endpoints which oCIS exposes, this is done by the Prometheus input plugin . The metrics from oCIS and all other metrics gathered will be exposed with the Prometheus output plugin and can therefore be scraped by our monitoring & tracing server.
 
-Jaeger agent is being configured as target for traces in oCIS. It then will receive traces from all oCIS extensions, add some process tags to them and forward them to our Jaeger collector on our monitoring & tracing server.
+Jaeger agent is being configured as target for traces in oCIS. It then will receive traces from all oCIS services, add some process tags to them and forward them to our Jaeger collector on our monitoring & tracing server.
 
 For more information and how to deploy it, see [monitoring & tracing client](https://github.com/owncloud-devops/monitoring-tracing-client).
 

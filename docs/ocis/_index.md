@@ -35,18 +35,18 @@ When Marie enters that URL she will be presented with a login form on the `https
 
 ### oCIS microservice runtime
 
-The oCIS runtime allows us to dynamically manage services running in a single process. We use [suture](https://github.com/thejerf/suture) to create a supervisor tree that starts each service in a dedicated goroutine. By default oCIS will start all built-in oCIS extensions in a single process. Individual services can be moved to other nodes to scale-out and meet specific performance requirements. A [go-micro](https://github.com/asim/go-micro/blob/master/registry/registry.go) based registry allows services in multiple nodes to form a distributed microservice architecture.
+The oCIS runtime allows us to dynamically manage services running in a single process. We use [suture](https://github.com/thejerf/suture) to create a supervisor tree that starts each service in a dedicated goroutine. By default oCIS will start all built-in oCIS services in a single process. Individual services can be moved to other nodes to scale-out and meet specific performance requirements. A [go-micro](https://github.com/asim/go-micro/blob/master/registry/registry.go) based registry allows services in multiple nodes to form a distributed microservice architecture.
 
-### oCIS extensions
+### oCIS Services
 
-Every oCIS extension uses [ocis-pkg](https://github.com/owncloud/ocis/tree/master/ocis-pkg), which implements the [go-micro](https://go-micro.dev/) interfaces for [servers](https://github.com/asim/go-micro/blob/v3.5.0/server/server.go#L17-L37) to register and [clients](https://github.com/asim/go-micro/blob/v3.5.0/client/client.go#L11-L23) to lookup nodes with a service [registry](https://github.com/asim/go-micro/blob/v3.5.0/registry/registry.go).
+Every oCIS service uses [ocis-pkg](https://github.com/owncloud/ocis/tree/master/ocis-pkg), which implements the [go-micro](https://go-micro.dev/) interfaces for [servers](https://github.com/asim/go-micro/blob/v3.5.0/server/server.go#L17-L37) to register and [clients](https://github.com/asim/go-micro/blob/v3.5.0/client/client.go#L11-L23) to lookup nodes with a service [registry](https://github.com/asim/go-micro/blob/v3.5.0/registry/registry.go).
 We are following the [12 Factor](https://12factor.net/) methodology with oCIS. The uniformity of services also allows us to use the same command, logging and configuration mechanism. Configurations are forwarded from the
 oCIS runtime to the individual extensions.
 
 
 ### go-micro
 
-While the [go-micro](https://go-micro.dev/) framework provides abstractions as well as implementations for the different components in a microservice architecture, it uses a more developer focused runtime philosophy: It is used to download services from a repo, compile them on the fly and start them as individual processes. For oCIS we decided to use a more admin friendly runtime: You can download a single binary and start the contained oCIS extensions with a single `bin/ocis server`. This also makes packaging easier.
+While the [go-micro](https://go-micro.dev/) framework provides abstractions as well as implementations for the different components in a microservice architecture, it uses a more developer focused runtime philosophy: It is used to download services from a repo, compile them on the fly and start them as individual processes. For oCIS we decided to use a more admin friendly runtime: You can download a single binary and start the contained oCIS services with a single `bin/ocis server`. This also makes packaging easier.
 
 We use [ocis-pkg](https://github.com/owncloud/ocis/tree/master/ocis-pkg) to configure the default implementations for the go-micro [grpc server](https://github.com/asim/go-micro/tree/v3.5.0/plugins/server/grpc), [client](https://github.com/asim/go-micro/tree/v3.5.0/plugins/client/grpc) and [mdns registry](https://github.com/asim/go-micro/blob/v3.5.0/registry/mdns_registry.go), swapping them out as needed, e.g. to use the [kubernetes registry plugin](https://github.com/asim/go-micro/tree/v3.5.0/plugins/registry/kubernetes).
 
