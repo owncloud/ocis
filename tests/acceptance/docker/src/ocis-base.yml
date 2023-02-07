@@ -26,9 +26,8 @@ services:
       STORAGE_USERS_S3NG_BUCKET: test
     volumes:
       - ../../../config:/drone/src/tests/config
-      - oCISownCloud10testsuite:/srv
     entrypoint: /bin/sh
-    command: ["-c", "ocis init || true; ocis server"]
-
-volumes:
-  oCISownCloud10testsuite:
+    # run ocis init to initialize a configuration file with random secrets
+    # it will fail on subsequent runs, because the config file already exists
+    # therefore we ignore the error and then start the ocis server
+    command: ["-c", "/usr/bin/ocis init || true; /usr/bin/ocis server"]

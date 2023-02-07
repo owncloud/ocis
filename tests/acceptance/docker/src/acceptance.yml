@@ -19,11 +19,5 @@ services:
       - ../../../../.drone.env
     volumes:
       - ./run-tests.sh:/test/run-tests.sh
-      - oCISownCloud10testsuite:/drone/src
       - ../../../../:/drone/src
       - ../../../../vendor-bin/behat/composer.json:/tmp/vendor-bin/behat/composer.json
-      - oCISownCloud10testsuite-vendor:/drone/src/vendor
-
-volumes:
-  oCISownCloud10testsuite:
-  oCISownCloud10testsuite-vendor:

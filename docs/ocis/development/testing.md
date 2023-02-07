@@ -24,12 +24,11 @@ make -C tests/acceptance/docker help
 Basically we have two sources for feature tests and test suites:
 
 - [oCIS feature test and test suites](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
-- [ownCloud feature tests and test suites, they have prefix coreApi](https://github.com/owncloud/core/tree/master/ocis/acceptance/features)
+- [tests and test suites transferred from ownCloud, they have prefix coreApi](https://github.com/owncloud/core/tree/master/ocis/acceptance/features)
 
 At the moment both can be applied to oCIS since the api of oCIS is designed to be compatible with ownCloud.
 
-Since we have to offer a migration path to existing users of ownCloud, you can use your existing ownCloud as the storage backend for oCIS. As another storage backend we offer oCIS native storage, also called "oCIS". This stores files directly on disk. Which storage backend is used is also reflected in the tests, there are always different tests for oCIS storage and ownCloud storage.
-
+As a storage backend we offer oCIS native storage, also called "oCIS". This stores files directly on disk.
 You can invoke two types of test suite runs:
 
 - run a full test suite, which consists of multiple feature tests
@@ -41,7 +40,7 @@ The names of the full test suite make targets have the same naming as in the CI 
 
 For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis` runs the same tests as the `localApiTests-apiAccountsHashDifficulty-ocis` CI pipeline, which runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with oCIS storage.
 
-For example `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) ownCloud test suite against an oCIS with ocis storage.
+For example `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suite transferred from ownCloud against an oCIS with ocis storage.
 
 ### Run single feature test
 

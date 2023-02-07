@@ -21,6 +21,11 @@ then
         export BEHAT_FILTER_TAGS='~@notToImplementOnOCIS&&~@toImplementOnOCIS&&~comments-app-required&&~@federation-app-required&&~@notifications-app-required&&~systemtags-app-required&&~@local_storage&&~@skipOnOcis-OCIS-Storage'
         export OCIS_SKELETON_STRATEGY='upload'
         export EXPECTED_FAILURES_FILE='/drone/src/tests/acceptance/expected-failures-API-on-OCIS-storage.md'
+    elif [ "$STORAGE_DRIVER" = "s3ng" ]
+    then
+        export BEHAT_FILTER_TAGS='~@skip&&~@skipOnOcis-S3NG-Storage'
+        export OCIS_REVA_DATA_ROOT=''
+        export OCIS_SKELETON_STRATEGY='upload'
     else
         echo "non existing STORAGE selected"
         exit 1
