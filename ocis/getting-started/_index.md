@@ -114,7 +114,7 @@ To start oCIS server:
 ocis server
 {{< / highlight >}}
 
-The list command prints all running oCIS extensions.
+The list command prints all running oCIS services.
 {{< highlight txt >}}
 ocis list
 {{< / highlight >}}
