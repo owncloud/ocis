@@ -1459,4 +1459,53 @@ class GraphContext implements Context {
 			throw new Error('Response is not an array or the array does not consist key "drive"');
 		}
 	}
+
+	/**
+	 * @When user :user gets all applications using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsAllApplicationsUsingTheGraphApi(string $user) {
+		$response = GraphHelper::getApplications(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @param TableNode $table
+	 *
+	 * @Then the user retrieve API response should contain the following applications information:
+	 *
+	 * @return void
+	 */
+	public function theResponseShouldContainTheFollowingApplicationsInformation(TableNode $table): void {
+		$responseArray = ($this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse()))['value'][0];
+		$original = $responseArray;
+
+		foreach ($table->getHash() as $row) {
+			$segments = explode("@@@", $row["key"]);
+	  
+			foreach ($segments as $segment) {
+				$arrayKeyExists = \array_key_exists($segment, $responseArray);
+				$key = $row["key"];
+				Assert::assertTrue($arrayKeyExists, "The key $key does not exist on the response");
+				if ($arrayKeyExists) {
+					$responseArray = $responseArray[$segment];
+				}
+			}
+			if ($segment === 'id') {
+				Assert::assertTrue(GraphHelper::isUUIDv4($responseArray), __METHOD__ . ' Expected id to have UUIDv4 pattern but found: ' . $row["value"]);
+			} else {
+				Assert::assertEquals($responseArray, $row["value"]);
+			}
+			$responseArray = $original;
+		}
+	}
 }
