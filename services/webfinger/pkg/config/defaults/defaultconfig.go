@@ -3,6 +3,7 @@ package defaults
 import (
 	"strings"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/config"
 )
 
@@ -31,8 +32,39 @@ func DefaultConfig() *config.Config {
 				AllowedOrigins: []string{"*"},
 			},
 		},
+		Reva: shared.DefaultRevaConfig(),
 		Service: config.Service{
 			Name: "webfinger",
+		},
+		LookupChain: "openid-discovery,owncloud-status,owncloud-account,owncloud-instance",
+		Instances: []config.Instance{
+			{
+				Claim: "mail",
+				Regex: "einstein@example.com",
+				Href:  "{{OCIS_URL}}",
+				Titles: map[string]string{
+					"en": "oCIS Instance for Einstein",
+					"de": "oCIS Instanz für Einstein",
+				},
+			},
+			{
+				Claim: "mail",
+				Regex: ".*@example.com",
+				Href:  "{{OCIS_URL}}",
+				Titles: map[string]string{
+					"en": "oCIS Instance for example.org",
+					"de": "oCIS Instanz für example.org",
+				},
+			},
+			{
+				Claim: "id",
+				Regex: ".*",
+				Href:  "{{OCIS_URL}}",
+				Titles: map[string]string{
+					"en": "oCIS Instance",
+					"de": "oCIS Instanz",
+				},
+			},
 		},
 	}
 }

@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
@@ -11,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/metrics"
+	"github.com/owncloud/ocis/v2/services/webfinger/pkg/relations"
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/server/debug"
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/server/http"
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/service/v0"
@@ -53,11 +55,7 @@ func Server(cfg *config.Config) *cli.Command {
 				svc, err := service.New(
 					service.Logger(logger),
 					service.Config(cfg),
-					service.WithInstanceSelector(getInstanceSelector(cfg.InstanceSelector)),
-					service.WithInstanceLookup(getInstanceLookup(cfg.InstanceLookup)),
-					// TODO pass in InstanceSelector
-					// TODO pass in InsanceLookup
-
+					service.WithLookupChain(getLookupChain(cfg)),
 				)
 				if err != nil {
 					logger.Error().Err(err).Msg("handler init")
@@ -119,16 +117,26 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-func getInstanceSelector(selector string) service.InstanceSelector {
-	switch selector {
-	default:
-		return service.DefaultInstanceSelector{}
+func getLookupChain(cfg *config.Config) service.Webfinger {
+	lookups := strings.Split(cfg.LookupChain, ",")
+	if len(lookups) == 0 {
+		return nil
 	}
-}
-
-func getInstanceLookup(lookup string) service.InstanceLookup {
-	switch lookup {
-	default:
-		return service.DefaultInstanceLookup{}
+	var webfinger service.Webfinger
+	for i := len(lookups) - 1; i >= 0; i-- {
+		switch lookups[i] {
+		case "openid-discovery":
+			webfinger = relations.OpenIDDiscovery(cfg.IDP, webfinger)
+		case "owncloud-status":
+		case "owncloud-account":
+			//url, _ := url.Parse(cfg.OcisURL)
+			// TODO error / ignore
+			//webfinger = relations.OwnCloudAccount(*url, webfinger)
+		case "owncloud-instance":
+			webfinger = relations.OwnCloudInstance(cfg.Instances, webfinger)
+		default:
+			// TODO error / ignore
+		}
 	}
+	return webfinger
 }

@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"net/url"
 
@@ -14,6 +13,7 @@ import (
 	ohttp "github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	serviceErrors "github.com/owncloud/ocis/v2/services/webfinger/pkg/service/v0"
+	"github.com/pkg/errors"
 	"go-micro.dev/v4"
 )
 
@@ -58,6 +58,16 @@ func Server(opts ...Option) (ohttp.Service, error) {
 	mux.Use(middleware.Version(
 		options.Name,
 		version.String,
+	))
+
+	// FIXME urgh we would have to do the auth ourself ...
+	// use auth bearer service ...
+
+	// TODO use plain oidc claims: we don't want to have to call reva, which makes a call to ldap and also fetches groups ...
+	//
+
+	mux.Use(middleware.OidcAuth(
+		middleware.WithLogger(options.Logger),
 	))
 
 	// this logs http request related data

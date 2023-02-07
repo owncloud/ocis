@@ -33,6 +33,8 @@ He will get a response like
 }
 ```
 
+As a special form of lookup clients can use the relation `acct:me@{host}` to look up the oCIS specific user id, username, email and displayname.
+
 In this case there are two ocis instances and the client has to ask the user which instance he wants to use.
 
 ## TODO
@@ -45,6 +47,11 @@ Currently, clients need to make subsequent calls to:
 - /ocs/v1.php/cloud/capabilities to fetch instance capabilites
 - /ocs/v1.php/cloud/users/einstein to fetch the quota which could come from graph and actually is now tied to the spaces, not tu users
 - /graph/v1.0/me?%24expand=memberOf to fetch the user id and the groups the user is a member of
+
+We need a way to pass oidc claims from the proxy, which does the authentication to the webfinger service, preferably by minting them into the internal reva token.
+- Currently, we use machine auth so we can autoprovision an account if it does not exist. We should use revas oidc auth and, when autoprovisioning is enabled, retry the authentication after provisioning the account. This would allow us to use a `roles` claim to decide which roles to use and eg. a `school` claim to determine a specific instance. We may use https://github.com/PerimeterX/marshmallow to parse the RegisteredClaims and get the custom claims as a separate map.
+
+For now, webfinger can only match users based on a regex and produce a list of instances based on that.
 
 Here are some Ideas which need to be discussed with all client teams in the future:
 
@@ -182,3 +189,20 @@ We could also embed subject metadata, however since apps like ocis web also need
 }
 ```
 
+# status php
+
+```
+{
+    "subject": "https://drive.ocis.test",
+    "properties": {
+        "http://webfinger.owncloud/prop/maintenance": "false",
+        "http://webfinger.owncloud/prop/version": "10.11.0.6"
+    }
+    "links": [
+        {
+            "rel": "http://openid.net/specs/connect/1.0/issuer"
+            "href": "https://idp.ocis.test",
+        },
+    ]
+}
+```
