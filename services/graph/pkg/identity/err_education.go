@@ -2,7 +2,6 @@ package identity
 
 import (
 	"context"
-	"net/url"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
 )
@@ -21,12 +20,12 @@ func (i *ErrEducationBackend) DeleteEducationSchool(ctx context.Context, id stri
 }
 
 // GetEducationSchool implements the EducationBackend interface for the ErrEducationBackend backend.
-func (i *ErrEducationBackend) GetEducationSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error) {
+func (i *ErrEducationBackend) GetEducationSchool(ctx context.Context, nameOrID string) (*libregraph.EducationSchool, error) {
 	return nil, errNotImplemented
 }
 
 // GetEducationSchools implements the EducationBackend interface for the ErrEducationBackend backend.
-func (i *ErrEducationBackend) GetEducationSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error) {
+func (i *ErrEducationBackend) GetEducationSchools(ctx context.Context) ([]*libregraph.EducationSchool, error) {
 	return nil, errNotImplemented
 }
 
@@ -66,12 +65,12 @@ func (i *ErrEducationBackend) RemoveUserFromEducationSchool(ctx context.Context,
 }
 
 // GetEducationClasses implements the EducationBackend interface
-func (i *ErrEducationBackend) GetEducationClasses(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationClass, error) {
+func (i *ErrEducationBackend) GetEducationClasses(ctx context.Context) ([]*libregraph.EducationClass, error) {
 	return nil, errNotImplemented
 }
 
 // GetEducationClass implements the EducationBackend interface
-func (i *ErrEducationBackend) GetEducationClass(ctx context.Context, namedOrID string, queryParam url.Values) (*libregraph.EducationClass, error) {
+func (i *ErrEducationBackend) GetEducationClass(ctx context.Context, namedOrID string) (*libregraph.EducationClass, error) {
 	return nil, errNotImplemented
 }
 
@@ -111,11 +110,11 @@ func (i *ErrEducationBackend) UpdateEducationUser(ctx context.Context, nameOrID 
 }
 
 // GetEducationUser implements the EducationBackend interface for the ErrEducationBackend backend.
-func (i *ErrEducationBackend) GetEducationUser(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationUser, error) {
+func (i *ErrEducationBackend) GetEducationUser(ctx context.Context, nameOrID string) (*libregraph.EducationUser, error) {
 	return nil, errNotImplemented
 }
 
 // GetEducationUsers implements the EducationBackend interface for the ErrEducationBackend backend.
-func (i *ErrEducationBackend) GetEducationUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationUser, error) {
+func (i *ErrEducationBackend) GetEducationUsers(ctx context.Context) ([]*libregraph.EducationUser, error) {
 	return nil, errNotImplemented
 }

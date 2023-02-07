@@ -48,9 +48,9 @@ type EducationBackend interface {
 	// DeleteSchool deletes a given school, identified by id
 	DeleteEducationSchool(ctx context.Context, id string) error
 	// GetEducationSchool reads a given school by id
-	GetEducationSchool(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationSchool, error)
+	GetEducationSchool(ctx context.Context, nameOrID string) (*libregraph.EducationSchool, error)
 	// GetEducationSchools lists all schools
-	GetEducationSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error)
+	GetEducationSchools(ctx context.Context) ([]*libregraph.EducationSchool, error)
 	// UpdateEducationSchool updates attributes of a school
 	UpdateEducationSchool(ctx context.Context, numberOrID string, school libregraph.EducationSchool) (*libregraph.EducationSchool, error)
 	// GetEducationSchoolUsers lists all members of a school
@@ -68,9 +68,9 @@ type EducationBackend interface {
 	RemoveClassFromEducationSchool(ctx context.Context, schoolNumberOrID string, memberID string) error
 
 	// GetEducationClasses lists all classes
-	GetEducationClasses(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationClass, error)
+	GetEducationClasses(ctx context.Context) ([]*libregraph.EducationClass, error)
 	// GetEducationClasses reads a given class by id
-	GetEducationClass(ctx context.Context, namedOrID string, queryParam url.Values) (*libregraph.EducationClass, error)
+	GetEducationClass(ctx context.Context, namedOrID string) (*libregraph.EducationClass, error)
 	// CreateEducationClass creates the supplied education class in the identity backend.
 	CreateEducationClass(ctx context.Context, class libregraph.EducationClass) (*libregraph.EducationClass, error)
 	// DeleteEducationClass deletes the supplied education class in the identity backend.
@@ -86,8 +86,10 @@ type EducationBackend interface {
 	DeleteEducationUser(ctx context.Context, nameOrID string) error
 	// UpdateEducationUser applies changes to given education user, identified by username or id
 	UpdateEducationUser(ctx context.Context, nameOrID string, user libregraph.EducationUser) (*libregraph.EducationUser, error)
-	GetEducationUser(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationUser, error)
-	GetEducationUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationUser, error)
+	// GetEducationUser reads an education user by id or name
+	GetEducationUser(ctx context.Context, nameOrID string) (*libregraph.EducationUser, error)
+	// GetEducationUsers lists all education users
+	GetEducationUsers(ctx context.Context) ([]*libregraph.EducationUser, error)
 }
 
 func CreateUserModelFromCS3(u *cs3.User) *libregraph.User {

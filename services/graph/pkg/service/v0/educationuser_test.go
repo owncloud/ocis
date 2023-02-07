@@ -216,84 +216,8 @@ var _ = Describe("EducationUsers", func() {
 			err = json.Unmarshal(data, &responseUser)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(responseUser.GetId()).To(Equal("user1"))
-			Expect(len(responseUser.GetDrives())).To(Equal(0))
 		})
 
-		It("includes the personal space if requested", func() {
-			user := &libregraph.EducationUser{}
-			user.SetId("user1")
-
-			identityEducationBackend.On("GetEducationUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
-			gatewayClient.On("GetQuota", mock.Anything, mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
-				Status:     status.NewOK(ctx),
-				TotalBytes: 10,
-			}, nil)
-			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
-				Status: status.NewOK(ctx),
-				StorageSpaces: []*provider.StorageSpace{
-					{
-						Id:        &provider.StorageSpaceId{OpaqueId: "drive1"},
-						Root:      &provider.ResourceId{SpaceId: "space", OpaqueId: "space"},
-						SpaceType: "project",
-					},
-					{
-						Id:        &provider.StorageSpaceId{OpaqueId: "personal"},
-						Root:      &provider.ResourceId{SpaceId: "personal", OpaqueId: "personal"},
-						SpaceType: "personal",
-					},
-				},
-			}, nil)
-
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/users?$expand=drive", nil)
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("userID", *user.Id)
-			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.GetEducationUser(rr, r)
-
-			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err := io.ReadAll(rr.Body)
-			Expect(err).ToNot(HaveOccurred())
-			responseUser := &libregraph.EducationUser{}
-			err = json.Unmarshal(data, &responseUser)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(responseUser.GetId()).To(Equal("user1"))
-			Expect(*responseUser.GetDrive().Id).To(Equal("personal"))
-		})
-
-		It("includes the drives if requested", func() {
-			user := &libregraph.EducationUser{}
-			user.SetId("user1")
-
-			identityEducationBackend.On("GetEducationUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
-			gatewayClient.On("GetQuota", mock.Anything, mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
-				Status:     status.NewOK(ctx),
-				TotalBytes: 10,
-			}, nil)
-			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
-				Status: status.NewOK(ctx),
-				StorageSpaces: []*provider.StorageSpace{
-					{
-						Id:   &provider.StorageSpaceId{OpaqueId: "drive1"},
-						Root: &provider.ResourceId{SpaceId: "space", OpaqueId: "space"},
-					},
-				},
-			}, nil)
-
-			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/education/users?$expand=drives", nil)
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("userID", *user.Id)
-			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.GetEducationUser(rr, r)
-
-			Expect(rr.Code).To(Equal(http.StatusOK))
-			data, err := io.ReadAll(rr.Body)
-			Expect(err).ToNot(HaveOccurred())
-			responseUser := &libregraph.EducationUser{}
-			err = json.Unmarshal(data, &responseUser)
-			Expect(err).ToNot(HaveOccurred())
-			Expect(responseUser.GetId()).To(Equal("user1"))
-			Expect(len(responseUser.GetDrives())).To(Equal(1))
-		})
 	})
 
 	Describe("PostEducationUser", func() {

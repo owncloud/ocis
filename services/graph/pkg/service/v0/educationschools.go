@@ -30,7 +30,7 @@ func (g Graph) GetEducationSchools(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	schools, err := g.identityEducationBackend.GetEducationSchools(r.Context(), r.URL.Query())
+	schools, err := g.identityEducationBackend.GetEducationSchools(r.Context())
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get schools: backend error")
 		var errcode errorcode.Error
@@ -170,7 +170,7 @@ func (g Graph) GetEducationSchool(w http.ResponseWriter, r *http.Request) {
 		Str("id", schoolID).
 		Interface("query", r.URL.Query()).
 		Msg("calling get school on backend")
-	school, err := g.identityEducationBackend.GetEducationSchool(r.Context(), schoolID, r.URL.Query())
+	school, err := g.identityEducationBackend.GetEducationSchool(r.Context(), schoolID)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get school: backend error")
 		var errcode errorcode.Error

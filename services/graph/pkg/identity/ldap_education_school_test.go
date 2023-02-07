@@ -264,7 +264,7 @@ func TestGetEducationSchool(t *testing.T) {
 		b, err := getMockedBackend(lm, eduConfig, &logger)
 		assert.Nil(t, err)
 
-		school, err := b.GetEducationSchool(context.Background(), tt.numberOrId, nil)
+		school, err := b.GetEducationSchool(context.Background(), tt.numberOrId)
 		lm.AssertNumberOfCalls(t, "Search", 1)
 
 		if tt.expectedItemNotFound {
@@ -293,7 +293,7 @@ func TestGetEducationSchools(t *testing.T) {
 	//	lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{}}, nil)
 	b, err := getMockedBackend(lm, eduConfig, &logger)
 	assert.Nil(t, err)
-	_, err = b.GetEducationSchools(context.Background(), nil)
+	_, err = b.GetEducationSchools(context.Background())
 	lm.AssertNumberOfCalls(t, "Search", 1)
 	assert.Nil(t, err)
 }

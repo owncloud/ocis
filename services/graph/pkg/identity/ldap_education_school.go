@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
 
 	"github.com/go-ldap/ldap/v3"
 	"github.com/gofrs/uuid"
@@ -292,7 +291,7 @@ func (i *LDAP) DeleteEducationSchool(ctx context.Context, id string) error {
 }
 
 // GetEducationSchool implements the EducationBackend interface for the LDAP backend.
-func (i *LDAP) GetEducationSchool(ctx context.Context, numberOrID string, queryParam url.Values) (*libregraph.EducationSchool, error) {
+func (i *LDAP) GetEducationSchool(ctx context.Context, numberOrID string) (*libregraph.EducationSchool, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetEducationSchool")
 	e, err := i.getSchoolByNumberOrID(numberOrID)
@@ -304,7 +303,7 @@ func (i *LDAP) GetEducationSchool(ctx context.Context, numberOrID string, queryP
 }
 
 // GetEducationSchools implements the EducationBackend interface for the LDAP backend.
-func (i *LDAP) GetEducationSchools(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationSchool, error) {
+func (i *LDAP) GetEducationSchools(ctx context.Context) ([]*libregraph.EducationSchool, error) {
 	var filter string
 	filter = fmt.Sprintf("(objectClass=%s)", i.educationConfig.schoolObjectClass)
 

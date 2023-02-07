@@ -32,7 +32,7 @@ func (g Graph) GetEducationClasses(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	classes, err := g.identityEducationBackend.GetEducationClasses(r.Context(), r.URL.Query())
+	classes, err := g.identityEducationBackend.GetEducationClasses(r.Context())
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get classes: backend error")
 		var errcode errorcode.Error
@@ -226,7 +226,7 @@ func (g Graph) GetEducationClass(w http.ResponseWriter, r *http.Request) {
 		Str("id", classID).
 		Interface("query", r.URL.Query()).
 		Msg("calling get class on backend")
-	class, err := g.identityEducationBackend.GetEducationClass(r.Context(), classID, r.URL.Query())
+	class, err := g.identityEducationBackend.GetEducationClass(r.Context(), classID)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get class: backend error")
 		var errcode errorcode.Error
