@@ -190,12 +190,7 @@ Feature: sharing
       | mimetype          | httpd/unix-directory |
     And as "Alice" folder "/Alice-folder/folder2" should not exist
     And as "Carol" folder "/Carol-folder/folder2" should exist
-    @skipOnOcis
-    Examples:
-      | path                 |
-      | /Shares/Carol-folder |
-
-    @skipOnOcV10 @issue-2442
+    @issue-2442
     Examples:
       | path          |
       | /Carol-folder |
