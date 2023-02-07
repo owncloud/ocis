@@ -47,4 +47,4 @@
 | GATEWAY_STORAGE_USERS_ENDPOINT | string | localhost:9157 | The STORAGE USERS API endpoint.|
 | GATEWAY_STORAGE_SHARES_ENDPOINT | string | localhost:9154 | The STORAGE SHARES API endpoint.|
 | GATEWAY_APP_REGISTRY_ENDPOINT | string | localhost:9242 | The APP REGISTRY API endpoint.|
-| GATEWAY_STORAGE_USERS_MOUNT_ID | string |  | Mount ID of this storage. This ID needs to be unique.|
+| GATEWAY_STORAGE_USERS_MOUNT_ID | string |  | Mount ID of this storage. Admins can set the ID for the storage in this config option manually which is then used to reference the storage. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|

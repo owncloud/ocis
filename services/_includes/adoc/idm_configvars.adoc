@@ -158,7 +158,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/idm/ldap.crt ++
 a| [subs=-attributes]
-File name of the TLS server certificate for the LDAPS listener.
+File name of the TLS server certificate for the LDAPS listener. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
 
 a|`IDM_LDAPS_KEY` +
 
@@ -167,7 +167,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/idm/ldap.key ++
 a| [subs=-attributes]
-File name for the TLS certificate key for the server certificate.
+File name for the TLS certificate key for the server certificate. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
 
 a|`IDM_DATABASE_PATH` +
 
@@ -176,7 +176,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/idm/ocis.boltdb ++
 a| [subs=-attributes]
-Full path to the IDM backend database.
+Full path to the IDM backend database. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
 
 a|`IDM_CREATE_DEMO_USERS` +
 `ACCOUNTS_DEMO_USERS_AND_GROUPS` +

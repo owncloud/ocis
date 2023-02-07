@@ -258,7 +258,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ocis ++
 a| [subs=-attributes]
-The storage driver which should be used by the service
+The storage driver which should be used by the service. Defaults to 'ocis', Supported values are: 'ocis', 's3ng' and 'owncloudsql'. The 'ocis' driver stores all data (blob and meta data) in an POSIX compliant volume. The 's3ng' driver stores metadata in a POSIX compliant volume and uploads blobs to the s3 bucket.
 
 a|`STORAGE_USERS_OCIS_ROOT` +
 
@@ -267,7 +267,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/storage/users ++
 a| [subs=-attributes]
-The directory where the filesystem storage will store user files. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.
+The directory where the filesystem storage will store blobs and metadata. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.
 
 a|`STORAGE_USERS_OCIS_USER_LAYOUT` +
 
@@ -285,7 +285,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++127.0.0.1:9191 ++
 a| [subs=-attributes]
-Endpoint of the permissions service.
+Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.
 
 a|`STORAGE_USERS_OCIS_PERSONAL_SPACE_ALIAS_TEMPLATE` +
 
@@ -339,7 +339,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/storage/users ++
 a| [subs=-attributes]
-The directory where the filesystem storage will store user files. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.
+The directory where the filesystem storage will store metadata for blobs. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.
 
 a|`STORAGE_USERS_S3NG_USER_LAYOUT` +
 
@@ -358,7 +358,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++127.0.0.1:9191 ++
 a| [subs=-attributes]
-Endpoint of the permissions service.
+Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.
 
 a|`STORAGE_USERS_S3NG_REGION` +
 
@@ -484,7 +484,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/storage/uploadinfo ++
 a| [subs=-attributes]
-Path to a directory, where uploads will be stored temporarily.
+The directory where the filesystem will store uploads temporarily. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/uploadinfo.
 
 a|`STORAGE_USERS_OWNCLOUDSQL_DB_USERNAME` +
 
@@ -661,6 +661,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++86400 ++
 a| [subs=-attributes]
-Duration after which uploads will expire.
+Duration in seconds after which uploads will expire.
 |===
 
