@@ -941,6 +941,24 @@ class OCSContext implements Context {
 	}
 
 	/**
+	 * Parses the xml answer to return data items from ocs response
+	 *
+	 * @param ResponseInterface $response
+	 *
+	 * @return SimpleXMLElement
+	 * @throws Exception
+	 */
+	public function getOCSResponseData(ResponseInterface $response): SimpleXMLElement {
+		$responseXml = $this->featureContext->getResponseXml($response, __METHOD__);
+		if (isset($responseXml->data)) {
+			return $responseXml->data;
+		}
+		throw new Exception(
+			"No OCS data items found in responseXml"
+		);
+	}
+
+	/**
 	 * Parses the xml answer to get ocs response message which doesn't match with
 	 * http one in v1 of the api.
 	 *
