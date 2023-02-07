@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/CiscoM31/godata"
 	"github.com/go-ldap/ldap/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -172,23 +173,24 @@ func TestGetUser(t *testing.T) {
 			nil, ldap.NewError(ldap.LDAPResultSizeLimitExceeded, errors.New("mock")))
 	b, _ := getMockedBackend(lm, lconfig, &logger)
 
-	queryParamExpand := url.Values{
-		"$expand": []string{"memberOf"},
+	odataReqDefault, err := godata.ParseRequest(context.Background(), "",
+		url.Values{})
+	if err != nil {
+		t.Errorf("Expected success got '%s'", err.Error())
 	}
-	queryParamSelect := url.Values{
-		"$select": []string{"memberOf"},
+
+	odataReqExpand, err := godata.ParseRequest(context.Background(), "",
+		url.Values{"$expand": []string{"memberOf"}})
+	if err != nil {
+		t.Errorf("Expected success got '%s'", err.Error())
 	}
-	_, err := b.GetUser(context.Background(), "fred", nil)
+
+	_, err = b.GetUser(context.Background(), "fred", odataReqDefault)
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
 
-	_, err = b.GetUser(context.Background(), "fred", queryParamExpand)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
-
-	_, err = b.GetUser(context.Background(), "fred", queryParamSelect)
+	_, err = b.GetUser(context.Background(), "fred", odataReqExpand)
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
@@ -199,17 +201,12 @@ func TestGetUser(t *testing.T) {
 		Return(
 			&ldap.SearchResult{}, nil)
 	b, _ = getMockedBackend(lm, lconfig, &logger)
-	_, err = b.GetUser(context.Background(), "fred", nil)
+	_, err = b.GetUser(context.Background(), "fred", odataReqDefault)
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
 
-	_, err = b.GetUser(context.Background(), "fred", queryParamExpand)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
-	}
-
-	_, err = b.GetUser(context.Background(), "fred", queryParamSelect)
+	_, err = b.GetUser(context.Background(), "fred", odataReqExpand)
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
@@ -224,21 +221,14 @@ func TestGetUser(t *testing.T) {
 			nil)
 
 	b, _ = getMockedBackend(lm, lconfig, &logger)
-	u, err := b.GetUser(context.Background(), "user", nil)
+	u, err := b.GetUser(context.Background(), "user", odataReqDefault)
 	if err != nil {
 		t.Errorf("Expected GetUser to succeed. Got %s", err.Error())
 	} else if *u.Id != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id) {
 		t.Errorf("Expected GetUser to return a valid user")
 	}
 
-	u, err = b.GetUser(context.Background(), "user", queryParamExpand)
-	if err != nil {
-		t.Errorf("Expected GetUser to succeed. Got %s", err.Error())
-	} else if *u.Id != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id) {
-		t.Errorf("Expected GetUser to return a valid user")
-	}
-
-	u, err = b.GetUser(context.Background(), "user", queryParamSelect)
+	u, err = b.GetUser(context.Background(), "user", odataReqExpand)
 	if err != nil {
 		t.Errorf("Expected GetUser to succeed. Got %s", err.Error())
 	} else if *u.Id != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id) {
@@ -266,8 +256,14 @@ func TestGetUsers(t *testing.T) {
 	lm := &mocks.Client{}
 	lm.On("Search", mock.Anything).Return(nil, ldap.NewError(ldap.LDAPResultOperationsError, errors.New("mock")))
 
+	odataReqDefault, err := godata.ParseRequest(context.Background(), "",
+		url.Values{})
+	if err != nil {
+		t.Errorf("Expected success got '%s'", err.Error())
+	}
+
 	b, _ := getMockedBackend(lm, lconfig, &logger)
-	_, err := b.GetUsers(context.Background(), url.Values{})
+	_, err = b.GetUsers(context.Background(), odataReqDefault)
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
@@ -275,7 +271,7 @@ func TestGetUsers(t *testing.T) {
 	lm = &mocks.Client{}
 	lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)
 	b, _ = getMockedBackend(lm, lconfig, &logger)
-	g, err := b.GetUsers(context.Background(), url.Values{})
+	g, err := b.GetUsers(context.Background(), odataReqDefault)
 	if err != nil {
 		t.Errorf("Expected success, got '%s'", err.Error())
 	} else if g == nil || len(g) != 0 {

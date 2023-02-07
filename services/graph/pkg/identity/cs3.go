@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/url"
 
+	"github.com/CiscoM31/godata"
 	cs3group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -39,7 +40,8 @@ func (i *CS3) UpdateUser(ctx context.Context, nameOrID string, user libregraph.U
 	return nil, errNotImplemented
 }
 
-func (i *CS3) GetUser(ctx context.Context, userID string, queryParam url.Values) (*libregraph.User, error) {
+// GetUser implements the Backend Interface.
+func (i *CS3) GetUser(ctx context.Context, userID string, _ *godata.GoDataRequest) (*libregraph.User, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetUser")
 	client, err := pool.GetGatewayServiceClient(i.Config.Address, i.Config.GetRevaOptions()...)
@@ -67,7 +69,8 @@ func (i *CS3) GetUser(ctx context.Context, userID string, queryParam url.Values)
 	return CreateUserModelFromCS3(res.User), nil
 }
 
-func (i *CS3) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error) {
+// GetUsers implements the Backend Interface.
+func (i *CS3) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.User, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetUsers")
 	client, err := pool.GetGatewayServiceClient(i.Config.Address, i.Config.GetRevaOptions()...)
@@ -76,9 +79,9 @@ func (i *CS3) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregrap
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	}
 
-	search := queryParam.Get("search")
-	if search == "" {
-		search = queryParam.Get("$search")
+	search, err := GetSearchValues(oreq.Query)
+	if err != nil {
+		return nil, err
 	}
 
 	res, err := client.FindUsers(ctx, &cs3user.FindUsersRequest{
@@ -107,6 +110,7 @@ func (i *CS3) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregrap
 	return users, nil
 }
 
+// GetGroups implements the Backend Interface.
 func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetGroups")
@@ -153,6 +157,7 @@ func (i *CS3) CreateGroup(ctx context.Context, group libregraph.Group) (*libregr
 	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
 }
 
+// GetGroup implements the Backend Interface.
 func (i *CS3) GetGroup(ctx context.Context, groupID string, queryParam url.Values) (*libregraph.Group, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetGroup")

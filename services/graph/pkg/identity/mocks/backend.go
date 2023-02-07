@@ -5,6 +5,8 @@ package mocks
 import (
 	context "context"
 
+	godata "github.com/CiscoM31/godata"
+
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	mock "github.com/stretchr/testify/mock"
@@ -174,13 +176,13 @@ func (_m *Backend) GetGroups(ctx context.Context, queryParam url.Values) ([]*lib
 	return r0, r1
 }
 
-// GetUser provides a mock function with given fields: ctx, nameOrID, queryParam
-func (_m *Backend) GetUser(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.User, error) {
-	ret := _m.Called(ctx, nameOrID, queryParam)
+// GetUser provides a mock function with given fields: ctx, nameOrID, oreq
+func (_m *Backend) GetUser(ctx context.Context, nameOrID string, oreq *godata.GoDataRequest) (*libregraph.User, error) {
+	ret := _m.Called(ctx, nameOrID, oreq)
 
 	var r0 *libregraph.User
-	if rf, ok := ret.Get(0).(func(context.Context, string, url.Values) *libregraph.User); ok {
-		r0 = rf(ctx, nameOrID, queryParam)
+	if rf, ok := ret.Get(0).(func(context.Context, string, *godata.GoDataRequest) *libregraph.User); ok {
+		r0 = rf(ctx, nameOrID, oreq)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*libregraph.User)
@@ -188,8 +190,8 @@ func (_m *Backend) GetUser(ctx context.Context, nameOrID string, queryParam url.
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string, url.Values) error); ok {
-		r1 = rf(ctx, nameOrID, queryParam)
+	if rf, ok := ret.Get(1).(func(context.Context, string, *godata.GoDataRequest) error); ok {
+		r1 = rf(ctx, nameOrID, oreq)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -197,13 +199,13 @@ func (_m *Backend) GetUser(ctx context.Context, nameOrID string, queryParam url.
 	return r0, r1
 }
 
-// GetUsers provides a mock function with given fields: ctx, queryParam
-func (_m *Backend) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error) {
-	ret := _m.Called(ctx, queryParam)
+// GetUsers provides a mock function with given fields: ctx, oreq
+func (_m *Backend) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.User, error) {
+	ret := _m.Called(ctx, oreq)
 
 	var r0 []*libregraph.User
-	if rf, ok := ret.Get(0).(func(context.Context, url.Values) []*libregraph.User); ok {
-		r0 = rf(ctx, queryParam)
+	if rf, ok := ret.Get(0).(func(context.Context, *godata.GoDataRequest) []*libregraph.User); ok {
+		r0 = rf(ctx, oreq)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*libregraph.User)
@@ -211,8 +213,8 @@ func (_m *Backend) GetUsers(ctx context.Context, queryParam url.Values) ([]*libr
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, url.Values) error); ok {
-		r1 = rf(ctx, queryParam)
+	if rf, ok := ret.Get(1).(func(context.Context, *godata.GoDataRequest) error); ok {
+		r1 = rf(ctx, oreq)
 	} else {
 		r1 = ret.Error(1)
 	}

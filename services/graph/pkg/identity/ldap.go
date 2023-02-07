@@ -4,9 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
-	"strings"
 
+	"github.com/CiscoM31/godata"
 	"github.com/go-ldap/ldap/v3"
 	"github.com/gofrs/uuid"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -369,20 +368,27 @@ func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
 	return i.searchLDAPEntryByFilter(i.userBaseDN, attrs, filter)
 }
 
-func (i *LDAP) GetUser(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.User, error) {
+// GetUser implements the Backend Interface.
+func (i *LDAP) GetUser(ctx context.Context, nameOrID string, oreq *godata.GoDataRequest) (*libregraph.User, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetUser")
+
 	e, err := i.getLDAPUserByNameOrID(nameOrID)
 	if err != nil {
 		return nil, err
 	}
+
 	u := i.createUserModelFromLDAP(e)
 	if u == nil {
 		return nil, ErrNotFound
 	}
-	sel := strings.Split(queryParam.Get("$select"), ",")
-	exp := strings.Split(queryParam.Get("$expand"), ",")
-	if slices.Contains(sel, "memberOf") || slices.Contains(exp, "memberOf") {
+
+	exp, err := GetExpandValues(oreq.Query)
+	if err != nil {
+		return nil, err
+	}
+
+	if slices.Contains(exp, "memberOf") {
 		userGroups, err := i.getGroupsForUser(e.DN)
 		if err != nil {
 			return nil, err
@@ -392,14 +398,21 @@ func (i *LDAP) GetUser(ctx context.Context, nameOrID string, queryParam url.Valu
 	return u, nil
 }
 
-func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error) {
+// GetUsers implements the Backend Interface.
+func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.User, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetUsers")
 
-	search := queryParam.Get("search")
-	if search == "" {
-		search = queryParam.Get("$search")
+	search, err := GetSearchValues(oreq.Query)
+	if err != nil {
+		return nil, err
 	}
+
+	exp, err := GetExpandValues(oreq.Query)
+	if err != nil {
+		return nil, err
+	}
+
 	var userFilter string
 	if search != "" {
 		search = ldap.EscapeFilter(search)
@@ -439,14 +452,12 @@ func (i *LDAP) GetUsers(ctx context.Context, queryParam url.Values) ([]*libregra
 	users := make([]*libregraph.User, 0, len(res.Entries))
 
 	for _, e := range res.Entries {
-		sel := strings.Split(queryParam.Get("$select"), ",")
-		exp := strings.Split(queryParam.Get("$expand"), ",")
 		u := i.createUserModelFromLDAP(e)
 		// Skip invalid LDAP users
 		if u == nil {
 			continue
 		}
-		if slices.Contains(sel, "memberOf") || slices.Contains(exp, "memberOf") {
+		if slices.Contains(exp, "memberOf") {
 			userGroups, err := i.getGroupsForUser(e.DN)
 			if err != nil {
 				return nil, err
