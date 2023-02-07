@@ -44,6 +44,7 @@ OCIS_MODULES = \
 	services/storage-users \
 	services/store \
 	services/thumbnails \
+	services/userlog \
 	services/users \
 	services/web \
 	services/webdav\

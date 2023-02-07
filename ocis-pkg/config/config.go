@@ -31,6 +31,7 @@ import (
 	storageusers "github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 	store "github.com/owncloud/ocis/v2/services/store/pkg/config"
 	thumbnails "github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
+	userlog "github.com/owncloud/ocis/v2/services/userlog/pkg/config"
 	users "github.com/owncloud/ocis/v2/services/users/pkg/config"
 	web "github.com/owncloud/ocis/v2/services/web/pkg/config"
 	webdav "github.com/owncloud/ocis/v2/services/webdav/pkg/config"
@@ -105,6 +106,7 @@ type Config struct {
 	StorageUsers      *storageusers.Config   `yaml:"storage_users"`
 	Store             *store.Config          `yaml:"store"`
 	Thumbnails        *thumbnails.Config     `yaml:"thumbnails"`
+	Userlog           *userlog.Config        `yaml:"userlog"`
 	Users             *users.Config          `yaml:"users"`
 	Web               *web.Config            `yaml:"web"`
 	WebDAV            *webdav.Config         `yaml:"webdav"`

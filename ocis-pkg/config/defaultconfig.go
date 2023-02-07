@@ -29,6 +29,7 @@ import (
 	storageusers "github.com/owncloud/ocis/v2/services/storage-users/pkg/config/defaults"
 	store "github.com/owncloud/ocis/v2/services/store/pkg/config/defaults"
 	thumbnails "github.com/owncloud/ocis/v2/services/thumbnails/pkg/config/defaults"
+	userlog "github.com/owncloud/ocis/v2/services/userlog/pkg/config/defaults"
 	users "github.com/owncloud/ocis/v2/services/users/pkg/config/defaults"
 	web "github.com/owncloud/ocis/v2/services/web/pkg/config/defaults"
 	webdav "github.com/owncloud/ocis/v2/services/webdav/pkg/config/defaults"
@@ -70,6 +71,7 @@ func DefaultConfig() *Config {
 		StorageUsers:      storageusers.DefaultConfig(),
 		Store:             store.DefaultConfig(),
 		Thumbnails:        thumbnails.DefaultConfig(),
+		Userlog:           userlog.DefaultConfig(),
 		Users:             users.DefaultConfig(),
 		Web:               web.DefaultConfig(),
 		WebDAV:            webdav.DefaultConfig(),

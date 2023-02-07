@@ -46,6 +46,7 @@ import (
 	storageusers "github.com/owncloud/ocis/v2/services/storage-users/pkg/command"
 	store "github.com/owncloud/ocis/v2/services/store/pkg/command"
 	thumbnails "github.com/owncloud/ocis/v2/services/thumbnails/pkg/command"
+	userlog "github.com/owncloud/ocis/v2/services/userlog/pkg/command"
 	users "github.com/owncloud/ocis/v2/services/users/pkg/command"
 	web "github.com/owncloud/ocis/v2/services/web/pkg/command"
 	webdav "github.com/owncloud/ocis/v2/services/webdav/pkg/command"
@@ -129,6 +130,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.Search.Service.Name] = search.NewSutureService
 	s.ServicesRegistry[opts.Config.Postprocessing.Service.Name] = postprocessing.NewSutureService
 	s.ServicesRegistry[opts.Config.EventHistory.Service.Name] = eventhistory.NewSutureService
+	s.ServicesRegistry[opts.Config.Userlog.Service.Name] = userlog.NewSutureService
 
 	// populate delayed services
 	s.Delayed[opts.Config.Sharing.Service.Name] = sharing.NewSutureService
