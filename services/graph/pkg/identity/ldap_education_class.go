@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
 
 	"github.com/go-ldap/ldap/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -25,26 +24,11 @@ func newEducationClassAttributeMap() educationClassAttributeMap {
 }
 
 // GetEducationClasses implements the EducationBackend interface for the LDAP backend.
-func (i *LDAP) GetEducationClasses(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationClass, error) {
+func (i *LDAP) GetEducationClasses(ctx context.Context) ([]*libregraph.EducationClass, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetEducationClasses")
 
-	search := queryParam.Get("search")
-	if search == "" {
-		search = queryParam.Get("$search")
-	}
-
-	var classFilter string
-	if search != "" {
-		search = ldap.EscapeFilter(search)
-		classFilter = fmt.Sprintf(
-			"(|(%s=%s)(%s=%s*)(%s=%s*))",
-			i.educationConfig.classAttributeMap.externalID, search,
-			i.groupAttributeMap.name, search,
-			i.groupAttributeMap.id, search,
-		)
-	}
-	classFilter = fmt.Sprintf("(&%s(objectClass=%s)%s)", i.groupFilter, i.educationConfig.classObjectClass, classFilter)
+	classFilter := fmt.Sprintf("(&%s(objectClass=%s))", i.groupFilter, i.educationConfig.classObjectClass)
 
 	classAttrs := i.getEducationClassAttrTypes(false)
 
@@ -105,7 +89,7 @@ func (i *LDAP) CreateEducationClass(ctx context.Context, class libregraph.Educat
 }
 
 // GetEducationClass implements the EducationBackend interface for the LDAP backend.
-func (i *LDAP) GetEducationClass(ctx context.Context, id string, queryParam url.Values) (*libregraph.EducationClass, error) {
+func (i *LDAP) GetEducationClass(ctx context.Context, id string) (*libregraph.EducationClass, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetEducationClass")
 	e, err := i.getEducationClassByID(id, false)

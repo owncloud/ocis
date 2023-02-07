@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
 	"strings"
 
 	"github.com/go-ldap/ldap/v3"
@@ -82,7 +81,7 @@ func (i *LDAP) UpdateEducationUser(ctx context.Context, nameOrID string, user li
 }
 
 // GetEducationUser implements the EducationBackend interface for the LDAP backend.
-func (i *LDAP) GetEducationUser(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.EducationUser, error) {
+func (i *LDAP) GetEducationUser(ctx context.Context, nameOrID string) (*libregraph.EducationUser, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetEducationUser")
 	e, err := i.getEducationUserByNameOrID(nameOrID)
@@ -97,29 +96,16 @@ func (i *LDAP) GetEducationUser(ctx context.Context, nameOrID string, queryParam
 }
 
 // GetEducationUsers implements the EducationBackend interface for the LDAP backend.
-func (i *LDAP) GetEducationUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.EducationUser, error) {
+func (i *LDAP) GetEducationUsers(ctx context.Context) ([]*libregraph.EducationUser, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetEducationUsers")
 
-	search := queryParam.Get("search")
-	if search == "" {
-		search = queryParam.Get("$search")
-	}
 	var userFilter string
-	if search != "" {
-		search = ldap.EscapeFilter(search)
-		userFilter = fmt.Sprintf(
-			"(|(%s=%s*)(%s=%s*)(%s=%s*))",
-			i.userAttributeMap.userName, search,
-			i.userAttributeMap.mail, search,
-			i.userAttributeMap.displayName, search,
-		)
-	}
 
-	if userFilter == "" && i.userFilter == "" {
+	if i.userFilter == "" {
 		userFilter = fmt.Sprintf("(objectClass=%s)", i.educationConfig.userObjectClass)
 	} else {
-		userFilter = fmt.Sprintf("(&%s(objectClass=%s)%s)", i.userFilter, i.educationConfig.userObjectClass, userFilter)
+		userFilter = fmt.Sprintf("(&%s(objectClass=%s))", i.userFilter, i.educationConfig.userObjectClass)
 	}
 
 	searchRequest := ldap.NewSearchRequest(

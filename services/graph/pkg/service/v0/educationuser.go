@@ -10,11 +10,9 @@ import (
 	"strings"
 
 	"github.com/CiscoM31/godata"
-	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
@@ -22,7 +20,6 @@ import (
 	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	settingssvc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
-	"golang.org/x/exp/slices"
 )
 
 // GetEducationUsers implements the Service interface.
@@ -38,7 +35,7 @@ func (g Graph) GetEducationUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Debug().Interface("query", r.URL.Query()).Msg("calling get education users on backend")
-	users, err := g.identityEducationBackend.GetEducationUsers(r.Context(), r.URL.Query())
+	users, err := g.identityEducationBackend.GetEducationUsers(r.Context())
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get education users from backend")
 		var errcode errorcode.Error
@@ -197,7 +194,7 @@ func (g Graph) GetEducationUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Debug().Str("id", userID).Msg("calling get education user from backend")
-	user, err := g.identityEducationBackend.GetEducationUser(r.Context(), userID, r.URL.Query())
+	user, err := g.identityEducationBackend.GetEducationUser(r.Context(), userID)
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get education user: error fetching education user from backend")
@@ -208,65 +205,6 @@ func (g Graph) GetEducationUser(w http.ResponseWriter, r *http.Request) {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
 		return
-	}
-	sel := strings.Split(r.URL.Query().Get("$select"), ",")
-	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
-	if slices.Contains(sel, "drive") || slices.Contains(sel, "drives") || slices.Contains(exp, "drive") || slices.Contains(exp, "drives") {
-		wdu, err := g.getWebDavBaseURL()
-		if err != nil {
-			// log error, wrong configuration
-			logger.Error().
-				Err(err).
-				Str("webdav_base", g.config.Spaces.WebDavBase).
-				Str("webdav_path", g.config.Spaces.WebDavPath).
-				Msg("error parsing webdav URL")
-			render.Status(r, http.StatusInternalServerError)
-			return
-		}
-		logger.Debug().Str("id", user.GetId()).Msg("calling list storage spaces with education user id filter")
-		f := listStorageSpacesUserFilter(user.GetId())
-		// use the unrestricted flag to get all possible spaces
-		// users with the canListAllSpaces permission should see all spaces
-		opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
-		lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
-			Opaque:  opaque,
-			Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
-		})
-		if err != nil {
-			// transport error, needs to be fixed by admin
-			logger.Error().Err(err).Interface("query", r.URL.Query()).Msg("error getting storages: transport error")
-			render.Status(r, http.StatusInternalServerError)
-			render.JSON(w, r, user)
-			return
-		}
-		if lspr.GetStatus().GetCode() != cs3rpc.Code_CODE_OK {
-			logger.Debug().Str("grpc", lspr.GetStatus().GetMessage()).Msg("could not get drive for education user")
-			// in case of NOT_OK, we can just return the user object with empty drives
-			render.Status(r, status.HTTPStatusFromCode(http.StatusOK))
-			render.JSON(w, r, user)
-			return
-		}
-		drives := []libregraph.Drive{}
-		for _, sp := range lspr.GetStorageSpaces() {
-			d, err := g.cs3StorageSpaceToDrive(r.Context(), wdu, sp)
-			if err != nil {
-				logger.Debug().Err(err).Interface("id", sp.Id).Msg("error converting space to drive")
-				continue
-			}
-			quota, err := g.getDriveQuota(r.Context(), sp)
-			if err != nil {
-				logger.Debug().Err(err).Interface("id", sp.Id).Msg("error calling get quota on drive")
-			}
-			d.Quota = &quota
-			if slices.Contains(sel, "drive") || slices.Contains(exp, "drive") {
-				if *d.DriveType == _spaceTypePersonal {
-					user.Drive = d
-				}
-			} else {
-				drives = append(drives, *d)
-				user.Drives = drives
-			}
-		}
 	}
 
 	render.Status(r, http.StatusOK)
@@ -291,7 +229,7 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	logger.Debug().Str("id", userID).Msg("calling get education user on user backend")
-	user, err := g.identityEducationBackend.GetEducationUser(r.Context(), userID, r.URL.Query())
+	user, err := g.identityEducationBackend.GetEducationUser(r.Context(), userID)
 	if err != nil {
 		logger.Debug().Err(err).Str("userID", userID).Msg("failed to get education user from backend")
 		var errcode errorcode.Error

@@ -3,7 +3,6 @@ package identity
 import (
 	"context"
 	"errors"
-	"net/url"
 	"testing"
 
 	"github.com/go-ldap/ldap/v3"
@@ -72,7 +71,7 @@ func TestGetEducationClasses(t *testing.T) {
 	lm := &mocks.Client{}
 	lm.On("Search", mock.Anything).Return(nil, ldap.NewError(ldap.LDAPResultOperationsError, errors.New("mock")))
 	b, _ := getMockedBackend(lm, lconfig, &logger)
-	_, err := b.GetEducationClasses(context.Background(), url.Values{})
+	_, err := b.GetEducationClasses(context.Background())
 	if err == nil || err.Error() != "itemNotFound" {
 		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
 	}
@@ -80,7 +79,7 @@ func TestGetEducationClasses(t *testing.T) {
 	lm = &mocks.Client{}
 	lm.On("Search", mock.Anything).Return(&ldap.SearchResult{}, nil)
 	b, _ = getMockedBackend(lm, lconfig, &logger)
-	g, err := b.GetEducationClasses(context.Background(), url.Values{})
+	g, err := b.GetEducationClasses(context.Background())
 	if err != nil {
 		t.Errorf("Expected success, got '%s'", err.Error())
 	} else if g == nil || len(g) != 0 {
@@ -92,7 +91,7 @@ func TestGetEducationClasses(t *testing.T) {
 		Entries: []*ldap.Entry{classEntry},
 	}, nil)
 	b, _ = getMockedBackend(lm, lconfig, &logger)
-	g, err = b.GetEducationClasses(context.Background(), url.Values{})
+	g, err = b.GetEducationClasses(context.Background())
 	if err != nil {
 		t.Errorf("Expected GetEducationClasses to succeed. Got %s", err.Error())
 	} else if *g[0].Id != classEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id) {
@@ -152,7 +151,7 @@ func TestGetEducationClass(t *testing.T) {
 		b, err := getMockedBackend(lm, eduConfig, &logger)
 		assert.Nil(t, err)
 
-		class, err := b.GetEducationClass(context.Background(), tt.id, nil)
+		class, err := b.GetEducationClass(context.Background(), tt.id)
 		lm.AssertNumberOfCalls(t, "Search", 1)
 
 		if tt.expectedItemNotFound {
