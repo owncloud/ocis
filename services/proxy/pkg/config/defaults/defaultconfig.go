@@ -202,6 +202,10 @@ func DefaultPolicies() []config.Policy {
 					Endpoint: "/api/v0/settings",
 					Service:  "com.owncloud.web.settings",
 				},
+				{
+					Endpoint: "/api/v0/activities",
+					Service:  "com.owncloud.userlog.userlog",
+				},
 			},
 		},
 	}
