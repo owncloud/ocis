@@ -1,3 +1,5 @@
+run:
+  modules-download-mode: readonly
 linters:
   enable-all: true
   disable:
