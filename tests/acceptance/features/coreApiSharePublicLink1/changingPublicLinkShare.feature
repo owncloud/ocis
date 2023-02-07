@@ -14,16 +14,16 @@ Feature: changing a public link share
     Given user "Alice" has created a public link share with settings
       | path        | /PARENT       |
       | permissions | <permissions> |
-    When the public deletes file "parent.txt" from the last public link share using the <public-webdav-api-version> public WebDAV API
+    When the public deletes file "parent.txt" from the last public link share using the new public WebDAV API
     Then the HTTP status code should be "<http-status-code>"
     And as "Alice" file "PARENT/parent.txt" <should-or-not> exist
 
     Examples:
-      | permissions               | http-status-code | should-or-not | public-webdav-api-version |
-      | read                      | 403              | should        | new                       |
-      | read,create               | 403              | should        | new                       |
-      | create                    | 403              | should        | new                       |
-      | read,update,create,delete | 204              | should not    | new                       |
+      | permissions               | http-status-code | should-or-not |
+      | read                      | 403              | should        |
+      | read,create               | 403              | should        |
+      | create                    | 403              | should        |
+      | read,update,create,delete | 204              | should not    |
 
 
   Scenario: Public link share permissions work correctly for renaming and share permissions read,update,create,delete using the public WebDAV API

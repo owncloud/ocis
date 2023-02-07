@@ -301,7 +301,6 @@ Feature: create a public link share
       | name                   |                      |
     And the public should be able to download file "/randomfile.txt" from inside the last public link shared folder using the new public WebDAV API without password and the content should be "Random data"
     And the public upload to the last publicly shared folder using the new public WebDAV API should fail with HTTP status code "403"
-
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
@@ -347,8 +346,8 @@ Feature: create a public link share
     And user "Alice" has created a public link share with settings
       | path        | PARENT |
       | permissions | read   |
-    And user "Alice" has deleted folder "PARENT"
-    When the public download of file "/parent.txt" from inside the last public link shared folder using the new public WebDAV API should fail with HTTP status code "404"
+    When user "Alice" deletes folder "/PARENT" using the WebDAV API
+    Then the public download of file "/parent.txt" from inside the last public link shared folder using the new public WebDAV API should fail with HTTP status code "404"
 
   @issue-ocis-reva-292 @issue-ocis-reva-199
   Scenario: try to download from a public share that has upload only permissions using the public webdav api
