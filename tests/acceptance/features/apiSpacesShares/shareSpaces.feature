@@ -17,7 +17,7 @@ Feature: Share spaces
     And using spaces DAV path
 
 
-  Scenario Outline:: A Space Admin can share a space to another user
+  Scenario Outline: A Space Admin can share a space to another user
     When user "Alice" shares a space "share space" to user "Brian" with role "<role>"
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
@@ -40,6 +40,17 @@ Feature: Share spaces
       | key                                                | value     |
       | root@@@permissions@@@1@@@grantedTo@@@0@@@user@@@id | %user_id% |
       | root@@@permissions@@@1@@@roles@@@0                 | viewer    |
+
+
+  Scenario: A user can see that the group has been granted access
+    Given group "sales" has been created
+    When user "Alice" shares a space "share space" to group "sales" with role "viewer"
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "200"
+    And the user "Alice" should have a space called "share space" granted to group "sales" with these key and value pairs:
+      | key                                                           | value      |
+      | root@@@permissions@@@1@@@grantedToIdentities@@@0@@@group@@@id | %group_id% |
+      | root@@@permissions@@@1@@@roles@@@0                            | viewer     |
 
 
   Scenario: A user can see a file in a received shared space
