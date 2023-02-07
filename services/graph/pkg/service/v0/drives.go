@@ -322,6 +322,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, newDrive)
 }
 
+// UpdateDrive updates the properties of a storage drive (space).
 func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling update drive")
@@ -594,7 +595,7 @@ func (g Graph) cs3StorageSpaceToDrive(ctx context.Context, baseURL *url.URL, spa
 				} else {
 					var user libregraph.User
 					if item := g.usersCache.Get(id); item == nil {
-						if requestedUser, err := g.identityBackend.GetUser(ctx, id, url.Values{}); err == nil {
+						if requestedUser, err := g.identityBackend.GetUser(ctx, id, &godata.GoDataRequest{}); err == nil {
 							user = *requestedUser
 							g.usersCache.Set(id, user, ttlcache.DefaultTTL)
 						}
@@ -881,6 +882,7 @@ func listStorageSpacesTypeFilter(spaceType string) *storageprovider.ListStorageS
 	}
 }
 
+// DeleteDrive deletes a storage drive (space).
 func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling delete drive")

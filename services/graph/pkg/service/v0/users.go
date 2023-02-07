@@ -32,6 +32,14 @@ import (
 func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling get user in /me")
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+
+	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
+	if err != nil {
+		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
 
 	u, ok := revactx.ContextGetUser(r.Context())
 	if !ok {
@@ -39,7 +47,14 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "user not in context")
 		return
 	}
-	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
+
+	exp, err := identity.GetExpandValues(odataReq.Query)
+	if err != nil {
+		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: $expand error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	var me *libregraph.User
 	// We can just return the user from context unless we need to expand the group memberships
 	if !slices.Contains(exp, "memberOf") {
@@ -47,7 +62,7 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 	} else {
 		var err error
 		logger.Debug().Msg("calling get user on backend")
-		me, err = g.identityBackend.GetUser(r.Context(), u.GetId().GetOpaqueId(), r.URL.Query())
+		me, err = g.identityBackend.GetUser(r.Context(), u.GetId().GetOpaqueId(), odataReq)
 		if err != nil {
 			logger.Debug().Err(err).Interface("user", u).Msg("could not get user from backend")
 			var errcode errorcode.Error
@@ -111,7 +126,7 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Debug().Interface("query", r.URL.Query()).Msg("calling get users on backend")
-	users, err := g.identityBackend.GetUsers(r.Context(), r.URL.Query())
+	users, err := g.identityBackend.GetUsers(r.Context(), odataReq)
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users from backend")
 		var errcode errorcode.Error
@@ -123,8 +138,12 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// expand appRoleAssignments if requested
-	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
+	exp, err := identity.GetExpandValues(odataReq.Query)
+	if err != nil {
+		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: $expand error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
 	expandAppRoleAssignments := slices.Contains(exp, "appRoleAssignments")
 	expandMemberOf := slices.Contains(exp, "memberOf")
 	for _, u := range users {
@@ -240,6 +259,9 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling get user")
+
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+
 	userID := chi.URLParam(r, "userID")
 	userID, err := url.PathUnescape(userID)
 	if err != nil {
@@ -254,8 +276,22 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
+	if err != nil {
+		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	exp, err := identity.GetExpandValues(odataReq.Query)
+	if err != nil {
+		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: $expand error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	logger.Debug().Str("id", userID).Msg("calling get user from backend")
-	user, err := g.identityBackend.GetUser(r.Context(), userID, r.URL.Query())
+	user, err := g.identityBackend.GetUser(r.Context(), userID, odataReq)
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get user: error fetching user from backend")
@@ -267,10 +303,9 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	sel := strings.Split(r.URL.Query().Get("$select"), ",")
-	exp := strings.Split(r.URL.Query().Get("$expand"), ",")
-	listDrives := slices.Contains(sel, "drives") || slices.Contains(exp, "drives")
-	listDrive := slices.Contains(sel, "drive") || slices.Contains(exp, "drive")
+
+	listDrives := slices.Contains(exp, "drives")
+	listDrive := slices.Contains(exp, "drive")
 
 	// do we need to list all or only the personal drive
 	filters := []*storageprovider.ListStorageSpacesRequest_Filter{}
@@ -368,6 +403,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling delete user")
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 	userID := chi.URLParam(r, "userID")
 	userID, err := url.PathUnescape(userID)
 	if err != nil {
@@ -381,8 +417,16 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
 		return
 	}
+
+	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
+	if err != nil {
+		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	logger.Debug().Str("id", userID).Msg("calling get user on user backend")
-	user, err := g.identityBackend.GetUser(r.Context(), userID, r.URL.Query())
+	user, err := g.identityBackend.GetUser(r.Context(), userID, odataReq)
 	if err != nil {
 		logger.Debug().Err(err).Str("userID", userID).Msg("failed to get user from backend")
 		var errcode errorcode.Error

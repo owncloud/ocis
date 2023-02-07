@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/url"
 
+	"github.com/CiscoM31/godata"
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
@@ -25,8 +26,8 @@ type Backend interface {
 	DeleteUser(ctx context.Context, nameOrID string) error
 	// UpdateUser applies changes to given user, identified by username or id
 	UpdateUser(ctx context.Context, nameOrID string, user libregraph.User) (*libregraph.User, error)
-	GetUser(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.User, error)
-	GetUsers(ctx context.Context, queryParam url.Values) ([]*libregraph.User, error)
+	GetUser(ctx context.Context, nameOrID string, oreq *godata.GoDataRequest) (*libregraph.User, error)
+	GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.User, error)
 
 	// CreateGroup creates the supplied group in the identity backend.
 	CreateGroup(ctx context.Context, group libregraph.Group) (*libregraph.Group, error)
