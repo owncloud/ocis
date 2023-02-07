@@ -2,12 +2,13 @@ package assets
 
 import (
 	"bytes"
-	"golang.org/x/net/html"
 	"io"
 	"mime"
 	"net/http"
 	"path"
 	"path/filepath"
+
+	"golang.org/x/net/html"
 )
 
 type fileServer struct {

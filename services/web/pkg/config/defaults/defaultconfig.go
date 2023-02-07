@@ -1,8 +1,10 @@
 package defaults
 
 import (
+	"path/filepath"
 	"strings"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
 )
 
@@ -31,7 +33,7 @@ func DefaultConfig() *config.Config {
 			Name: "web",
 		},
 		Asset: config.Asset{
-			Path: "",
+			Path: filepath.Join(defaults.BaseDataPath(), "web/assets"),
 		},
 		Web: config.Web{
 			Path:        "",

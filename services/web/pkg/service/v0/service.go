@@ -2,16 +2,21 @@ package svc
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/owncloud/ocis/v2/ocis-pkg/assetsfs"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/web"
 	"github.com/owncloud/ocis/v2/services/web/pkg/assets"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
 )
@@ -25,6 +30,7 @@ var (
 type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
 	Config(http.ResponseWriter, *http.Request)
+	UploadLogo(http.ResponseWriter, *http.Request)
 }
 
 // NewService returns a service implementation for Service.
@@ -38,10 +44,12 @@ func NewService(opts ...Option) Service {
 		logger: options.Logger,
 		config: options.Config,
 		mux:    m,
+		fs:     assetsfs.New(web.Assets, options.Config.Asset.Path, options.Logger),
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Get("/config.json", svc.Config)
+		r.Post("/branding/logo", svc.UploadLogo)
 		r.Mount("/", svc.Static(options.Config.HTTP.CacheTTL))
 	})
 
@@ -58,6 +66,7 @@ type Web struct {
 	logger log.Logger
 	config *config.Config
 	mux    *chi.Mux
+	fs     *assetsfs.FileSystem
 }
 
 // ServeHTTP implements the Service interface.
@@ -131,12 +140,7 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 
 	static := http.StripPrefix(
 		rootWithSlash,
-		assets.FileServer(
-			assets.New(
-				assets.Logger(p.logger),
-				assets.Config(p.config),
-			),
-		),
+		assets.FileServer(p.fs),
 	)
 
 	lastModified := time.Now().UTC().Format(http.TimeFormat)
@@ -160,4 +164,32 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 
 		static.ServeHTTP(w, r)
 	}
+}
+
+// UploadLogo implements the endpoint to upload a custom logo for the oCIS instance.
+func (p Web) UploadLogo(w http.ResponseWriter, r *http.Request) {
+	file, fileHeader, err := r.FormFile("logo")
+	if err != nil {
+		if errors.Is(err, http.ErrMissingFile) {
+			w.WriteHeader(http.StatusBadRequest)
+		}
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer file.Close()
+
+	dst, err := p.fs.Create(filepath.Join("branding", filepath.Join("/", fileHeader.Filename)))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer dst.Close()
+
+	_, err = io.Copy(dst, file)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
