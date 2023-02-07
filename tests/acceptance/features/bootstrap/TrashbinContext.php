@@ -308,11 +308,7 @@ class TrashbinContext implements Context {
 	 * @throws Exception
 	 */
 	public function userGetsFilesInTheTrashbinWithDepthUsingTheWebdavApi(string $user, string $depth):void {
-		$techPreviewHadToBeEnabled = $this->occContext->enableDAVTechPreview();
 		$this->listTopOfTrashbinFolder($user, $depth);
-		if ($techPreviewHadToBeEnabled) {
-			$this->occContext->disableDAVTechPreview();
-		}
 	}
 
 	/**
@@ -678,8 +674,6 @@ class TrashbinContext implements Context {
 		$path = \trim($path, '/');
 		$sections = \explode('/', $path, 2);
 
-		$techPreviewHadToBeEnabled = $this->occContext->enableDAVTechPreview();
-
 		$firstEntry = $this->findFirstTrashedEntry($user, \trim($sections[0], '/'));
 
 		Assert::assertNotNull(
@@ -690,10 +684,6 @@ class TrashbinContext implements Context {
 		if (\count($sections) !== 1) {
 			// TODO: handle deeper structures
 			$listing = $this->listTrashbinFolderCollection($user, \basename(\rtrim($firstEntry['href'], '/')));
-		}
-
-		if ($techPreviewHadToBeEnabled) {
-			$this->occContext->disableDAVTechPreview();
 		}
 
 		// query was on the main element ?
@@ -729,14 +719,10 @@ class TrashbinContext implements Context {
 	 * @throws Exception
 	 */
 	private function isInTrash(?string $user, ?string $originalPath):bool {
-		$techPreviewHadToBeEnabled = $this->occContext->enableDAVTechPreview();
 		$res = $this->featureContext->getResponse();
 		$listing = $this->listTrashbinFolder($user);
 
 		$this->featureContext->setResponse($res);
-		if ($techPreviewHadToBeEnabled) {
-			$this->occContext->disableDAVTechPreview();
-		}
 
 		// we don't care if the test step writes a leading "/" or not
 		$originalPath = \ltrim($originalPath, '/');

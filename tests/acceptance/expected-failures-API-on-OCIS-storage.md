@@ -222,11 +222,6 @@ cannot share a folder with create permission
 - [coreApiShareOperationsToShares1/gettingShares.feature:222](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L222)
 
 #### [Public link enforce permissions](https://github.com/owncloud/ocis/issues/1269)
-
-- [coreApiSharePublicLink1/accessToPublicLinkShare.feature:10](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/accessToPublicLinkShare.feature#L10)
-- [coreApiSharePublicLink1/accessToPublicLinkShare.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/accessToPublicLinkShare.feature#L21)
-- [coreApiSharePublicLink1/accessToPublicLinkShare.feature:31](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/accessToPublicLinkShare.feature#L31)
-- [coreApiSharePublicLink1/accessToPublicLinkShare.feature:47](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/accessToPublicLinkShare.feature#L47)
 - [coreApiSharePublicLink1/createPublicLinkShare.feature:528](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/createPublicLinkShare.feature#L528)
 - [coreApiSharePublicLink1/createPublicLinkShare.feature:549](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/createPublicLinkShare.feature#L549)
 

@@ -8,8 +8,7 @@ Feature: accessing a public link share
 
 
   Scenario: Access to the preview of password protected public link without providing the password is not allowed
-    Given the administrator has enabled DAV tech_preview
-    And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
+    Given user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
     And user "Alice" has created a public link share with settings
       | path        | /testavatar.jpg |
       | permissions | change          |
@@ -19,8 +18,7 @@ Feature: accessing a public link share
 
 
   Scenario: Access to the preview of public shared file without password
-    Given the administrator has enabled DAV tech_preview
-    And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
+    Given user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
     And user "Alice" has created a public link share with settings
       | path        | /testavatar.jpg |
       | permissions | change          |
@@ -29,8 +27,7 @@ Feature: accessing a public link share
 
 
   Scenario: Access to the preview of password protected public shared file inside a folder without providing the password is not allowed
-    Given the administrator has enabled DAV tech_preview
-    And user "Alice" has created folder "FOLDER"
+    Given user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "FOLDER/testavatar.jpg"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "FOLDER/textfile0.txt"
     And user "Alice" has created a public link share with settings
@@ -45,8 +42,7 @@ Feature: accessing a public link share
 
 
   Scenario: Access to the preview of public shared file inside a folder without password
-    Given the administrator has enabled DAV tech_preview
-    And user "Alice" has created folder "FOLDER"
+    Given user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "FOLDER/testavatar.jpg"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "FOLDER/textfile0.txt"
     And user "Alice" has created a public link share with settings
