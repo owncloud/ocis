@@ -425,6 +425,33 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * The method returns groupId
+	 *
+	 * @param string $groupName
+	 *
+	 * @return string
+	 * @throws Exception|GuzzleException
+	 */
+	public function getGroupIdByGroupName(string $groupName): string {
+		$response = GraphHelper::getGroup(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+			$groupName
+		);
+		if ($response) {
+			$data = $this->featureContext->getJsonDecodedResponse($response);
+			if (isset($data["id"])) {
+				return $data["id"];
+			} else {
+				throw new Exception(__METHOD__ . " accounts-list is empty");
+			}
+		}
+		throw new Exception(__METHOD__ . " Group with name $groupName not found");
+	}
+
+	/**
 	 * using method from core to set share data
 	 *
 	 * @return void
@@ -934,6 +961,7 @@ class SpacesContext implements Context {
 	 * @param string $spaceName
 	 * @param string|null $userName
 	 * @param string|null $fileName
+	 * @param string|null $groupName
 	 * @param TableNode $table
 	 *
 	 * @return void
@@ -943,6 +971,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		?string $userName = null,
 		?string $fileName = null,
+		?string $groupName = null,
 		TableNode $table
 	): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
@@ -979,6 +1008,12 @@ class SpacesContext implements Context {
 						[$this, "getETag"],
 						"parameter" => [$userName, $spaceName, $fileName]
 					],
+					[
+						"code" => "%group_id%",
+						"function" =>
+						[$this, "getGroupIdByGroupName"],
+						"parameter" => [$groupName]
+					]
 				]
 			);
 			$segments = explode("@@@", $row["key"]);
@@ -1024,7 +1059,32 @@ class SpacesContext implements Context {
 			200,
 			"Expected response status code should be 200"
 		);
-		$this->jsonRespondedShouldContain($spaceName, $grantedUser, $fileName, $table);
+		$this->jsonRespondedShouldContain($spaceName, $grantedUser, $fileName, null, $table);
+	}
+
+	/**
+	 * @Then /^the user "([^"]*)" should have a space called "([^"]*)" granted to group "([^"]*)" with these key and value pairs:$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $grantedGroup
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userHasSpaceGrantedToGroup(
+		string $user,
+		string $spaceName,
+		string $grantedGroup,
+		TableNode $table
+	): void {
+		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+		$this->jsonRespondedShouldContain($spaceName, null, null, $grantedGroup, $table);
 	}
 
 	/**
