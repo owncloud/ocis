@@ -59,67 +59,6 @@ class OccContext implements Context {
 	private $lastDeletedJobId;
 
 	/**
-	 * The code to manage dav.enable.tech_preview was used in 10.4/10.3
-	 * The use of the steps to enable/disable it has been removed from the
-	 * feature files. But the infrastructure has been left here, as a similar
-	 * thing might likely happen in the future.
-	 *
-	 * @var boolean
-	 */
-	private $doTechPreview = false;
-
-	/**
-	 * @var boolean techPreviewEnabled
-	 */
-	private $techPreviewEnabled = false;
-
-	/**
-	 * @var string initialTechPreviewStatus
-	 */
-	private $initialTechPreviewStatus;
-
-	/**
-	 * @return boolean
-	 */
-	public function isTechPreviewEnabled():bool {
-		return $this->techPreviewEnabled;
-	}
-
-	/**
-	 * @return boolean
-	 * @throws Exception
-	 */
-	public function enableDAVTechPreview():bool {
-		if ($this->doTechPreview) {
-			if (!$this->isTechPreviewEnabled()) {
-				$this->addSystemConfigKeyUsingTheOccCommand(
-					"dav.enable.tech_preview",
-					"true",
-					"boolean"
-				);
-				$this->techPreviewEnabled = true;
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * @return boolean true if delete-system-config-key was done
-	 * @throws Exception
-	 */
-	public function disableDAVTechPreview():bool {
-		if ($this->doTechPreview) {
-			$this->deleteSystemConfigKeyUsingTheOccCommand(
-				"dav.enable.tech_preview"
-			);
-			$this->techPreviewEnabled = false;
-			return true;
-		}
-		return false;
-	}
-
-	/**
 	 * @param string $cmd
 	 *
 	 * @return void
@@ -602,28 +541,6 @@ class OccContext implements Context {
 	 */
 	public function listLocalStorageShowPassword():void {
 		$this->invokingTheCommand('files_external:list --show-password --output=json');
-	}
-
-	/**
-	 * @When the administrator enables DAV tech_preview
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorEnablesDAVTechPreview():void {
-		$this->enableDAVTechPreview();
-	}
-
-	/**
-	 * @Given the administrator has enabled DAV tech_preview
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasEnabledDAVTechPreview():void {
-		if ($this->enableDAVTechPreview()) {
-			$this->theCommandShouldHaveBeenSuccessful();
-		}
 	}
 
 	/**
@@ -3558,30 +3475,6 @@ class OccContext implements Context {
 
 	/**
 	 * This will run after EVERY scenario.
-	 * It will set the properties for this object.
-	 *
-	 * @AfterScenario
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function resetDAVTechPreview():void {
-		if ($this->doTechPreview) {
-			if ($this->initialTechPreviewStatus === "") {
-				SetupHelper::deleteSystemConfig(
-					'dav.enable.tech_preview',
-					$this->featureContext->getStepLineRef()
-				);
-			} elseif ($this->initialTechPreviewStatus === 'true' && !$this->techPreviewEnabled) {
-				$this->enableDAVTechPreview();
-			} elseif ($this->initialTechPreviewStatus === 'false' && $this->techPreviewEnabled) {
-				$this->disableDAVTechPreview();
-			}
-		}
-	}
-
-	/**
-	 * This will run after EVERY scenario.
 	 * Some local_storage tests import storage from an export file. In that case
 	 * we have not explicitly created the storage, and so we do not explicitly
 	 * know to delete it. So delete the local storage that is known to be used
@@ -3625,19 +3518,6 @@ class OccContext implements Context {
 			'version',
 			$this->featureContext->getStepLineRef()
 		);
-		// dav.enable.tech_preview was used in some ownCloud versions before 10.4.0
-		// only set it on those versions of ownCloud
-		if (\version_compare($ocVersion, '10.4.0') === -1) {
-			$this->doTechPreview = true;
-			$techPreviewEnabled = \trim(
-				SetupHelper::getSystemConfigValue(
-					'dav.enable.tech_preview',
-					$this->featureContext->getStepLineRef()
-				)
-			);
-			$this->initialTechPreviewStatus = $techPreviewEnabled;
-			$this->techPreviewEnabled = $techPreviewEnabled === 'true';
-		}
 	}
 
 	/**

@@ -3831,8 +3831,7 @@ trait Sharing {
 	 */
 	public function getPublicPreviewOfFile(string $fileName, string $token):void {
 		$url = $this->getBaseUrl() .
-			"/index.php/apps/files_sharing/ajax/publicpreview.php" .
-			"?file=$fileName&t=$token";
+			"/remote.php/dav/public-files/$token/$fileName?preview=1";
 		$resp = HttpRequestHelper::get(
 			$url,
 			$this->getStepLineRef()
