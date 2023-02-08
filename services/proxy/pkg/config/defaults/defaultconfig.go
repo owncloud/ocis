@@ -1,6 +1,7 @@
 package defaults
 
 import (
+	"net/http"
 	"path"
 	"strings"
 
@@ -197,6 +198,11 @@ func DefaultPolicies() []config.Policy {
 				{
 					Endpoint: "/api/v0/settings",
 					Service:  "com.owncloud.web.settings",
+				},
+				{
+					Method:   http.MethodPost,
+					Endpoint: "/branding/logo",
+					Service:  "com.owncloud.web.web",
 				},
 			},
 		},
