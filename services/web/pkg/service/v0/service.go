@@ -2,13 +2,10 @@ package svc
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"os"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -163,51 +160,4 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 
 		static.ServeHTTP(w, r)
 	}
-}
-
-// UploadLogo implements the endpoint to upload a custom logo for the oCIS instance.
-func (p Web) UploadLogo(w http.ResponseWriter, r *http.Request) {
-	file, fileHeader, err := r.FormFile("logo")
-	if err != nil {
-		if errors.Is(err, http.ErrMissingFile) {
-			w.WriteHeader(http.StatusBadRequest)
-		}
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	defer file.Close()
-
-	fp := filepath.Join("branding", filepath.Join("/", fileHeader.Filename))
-	dst, err := p.fs.Create(fp)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	defer dst.Close()
-
-	_, err = io.Copy(dst, file)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	f, err := p.fs.Open("themes/owncloud/theme.json")
-	if err == nil {
-		defer f.Close()
-	}
-	var m map[string]interface{}
-	_ = json.NewDecoder(f).Decode(&m)
-	logos := m["default"].(map[string]interface{})["logo"].(map[string]interface{})
-	logos["login"] = fp
-	logos["topbar"] = fp
-
-	dst, err = p.fs.Create("themes/owncloud/theme.json")
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	_ = json.NewEncoder(dst).Encode(m)
-
-	w.WriteHeader(http.StatusOK)
 }
