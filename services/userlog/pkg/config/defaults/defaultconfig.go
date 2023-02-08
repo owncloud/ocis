@@ -27,8 +27,9 @@ func DefaultConfig() *config.Config {
 			EnableTLS: false,
 		},
 		Store: config.Store{
-			Type: "inmemory",
+			Type: "mem",
 		},
+		RevaGateway: shared.DefaultRevaConfig().Address,
 		HTTP: config.HTTP{
 			Addr:      "127.0.0.1:0",
 			Root:      "/",
@@ -55,6 +56,10 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Log == nil {
 		cfg.Log = &config.Log{}
+	}
+
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
 
 	if cfg.GRPCClientTLS == nil {

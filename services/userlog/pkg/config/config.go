@@ -2,7 +2,6 @@ package config
 
 import (
 	"context"
-	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -19,16 +18,21 @@ type Config struct {
 	HTTP          HTTP                  `yaml:"http"`
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 
-	Events Events `yaml:"events"`
-	Store  Store  `yaml:"store"`
+	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;USERLOG_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
+	RevaGateway       string `yaml:"reva_gateway" env:"REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata"`
+	Events            Events `yaml:"events"`
+	Store             Store  `yaml:"store"`
 
 	Context context.Context `yaml:"-"`
 }
 
 // Store configures the store to use
 type Store struct {
-	Type         string        `yaml:"type" env:"USERLOG_STORE_TYPE" desc:"The type of the store. Supported is inmemory"`
-	RecordExpiry time.Duration `yaml:"record_expiry" env:"USERLOG_RECORD_EXPIRY" desc:"time to life for events in the store"`
+	Type      string `yaml:"type" env:"USERLOG_STORE_TYPE" desc:"The type of the userlog store. Supported values are: 'mem', 'ocmem', 'etcd', 'redis', 'nats-js', 'noop'. See the text description for details."`
+	Addresses string `yaml:"addresses" env:"USERLOG_STORE_ADDRESSES" desc:"A comma separated list of addresses to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how addresses are used is dependent on the library of the configured store."`
+	Database  string `yaml:"database" env:"USERLOG_STORE_DATABASE" desc:"(optional) The database name the configured store should use. This has no effect when 'in-memory' stores are configured."`
+	Table     string `yaml:"table" env:"USERLOG_STORE_TABLE" desc:"(optional) The database table the store should use. This has no effect when 'in-memory' stores are configured."`
+	Size      int    `yaml:"size" env:"USERLOG_STORE_SIZE" desc:"The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512."`
 }
 
 // Events combines the configuration options for the event bus.

@@ -102,6 +102,11 @@ func DefaultPolicies() []config.Policy {
 					Service:  "com.owncloud.web.frontend",
 				},
 				{
+					// reroute oc10 notifications endpoint to userlog service
+					Endpoint: "/ocs/v2.php/apps/notifications/api/v1/notifications",
+					Service:  "com.owncloud.userlog.userlog",
+				},
+				{
 					Type:     config.RegexRoute,
 					Endpoint: "/ocs/v[12].php/cloud/user/signing-key", // only `user/signing-key` is left in ocis-ocs
 					Service:  "com.owncloud.web.ocs",
@@ -201,10 +206,6 @@ func DefaultPolicies() []config.Policy {
 				{
 					Endpoint: "/api/v0/settings",
 					Service:  "com.owncloud.web.settings",
-				},
-				{
-					Endpoint: "/api/v0/activities",
-					Service:  "com.owncloud.userlog.userlog",
 				},
 			},
 		},

@@ -3,6 +3,11 @@ package http
 import (
 	"fmt"
 
+	stdhttp "net/http"
+
+	"github.com/go-chi/chi/v5"
+	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	svc "github.com/owncloud/ocis/v2/services/userlog/pkg/service"
@@ -34,27 +39,34 @@ func Server(opts ...Option) (http.Service, error) {
 		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
 	}
 
-	//middlewares := []func(stdhttp.Handler) stdhttp.Handler{
-	//middleware.TraceContext,
-	//chimiddleware.RequestID,
-	//middleware.Version(
-	//"userlog",
-	//version.GetString(),
-	//),
-	//middleware.Logger(
-	//options.Logger,
-	//),
-	//}
-
-	handle, err := svc.NewUserlogService(options.Config, options.Consumer, options.Store, options.RegisteredEvents)
-	if err != nil {
-		return http.Service{}, err
+	middlewares := []func(stdhttp.Handler) stdhttp.Handler{
+		middleware.TraceContext,
+		chimiddleware.RequestID,
+		middleware.Version(
+			"userlog",
+			version.GetString(),
+		),
+		middleware.Logger(
+			options.Logger,
+		),
+		middleware.ExtractAccountUUID(),
 	}
 
-	{
-		//handle = svc.NewInstrument(handle, options.Metrics)
-		//handle = svc.NewLogging(handle, options.Logger)
-		//handle = svc.NewTracing(handle)
+	mux := chi.NewMux()
+	mux.Use(middlewares...)
+
+	handle, err := svc.NewUserlogService(
+		svc.Logger(options.Logger),
+		svc.Consumer(options.Consumer),
+		svc.Mux(mux),
+		svc.Store(options.Store),
+		svc.Config(options.Config),
+		svc.HistoryClient(options.HistoryClient),
+		svc.GatewayClient(options.GatewayClient),
+		svc.RegisteredEvents(options.RegisteredEvents),
+	)
+	if err != nil {
+		return http.Service{}, err
 	}
 
 	if err := micro.RegisterHandler(service.Server(), handle); err != nil {
