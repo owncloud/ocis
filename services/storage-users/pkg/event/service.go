@@ -45,7 +45,7 @@ func (s Service) Run() error {
 	for e := range ch {
 		var errs []error
 
-		switch ev := e.(type) {
+		switch ev := e.Event.(type) {
 		case PurgeTrashBin:
 			executionTime := ev.ExecutionTime
 			if executionTime.IsZero() {

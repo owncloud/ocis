@@ -46,7 +46,7 @@ func Server(opts ...Option) (http.Service, error) {
 	//),
 	//}
 
-	handle, err := svc.NewUserlogService(options.Config, options.Consumer, options.Store, options.RegisteredEvents)
+	handle, err := svc.NewUserlogService(options.Config, options.Consumer, options.Store, options.GatewayClient, options.RegisteredEvents, options.Logger)
 	if err != nil {
 		return http.Service{}, err
 	}

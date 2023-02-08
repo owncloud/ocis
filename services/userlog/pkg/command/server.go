@@ -6,6 +6,7 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
@@ -22,6 +23,14 @@ import (
 // all events we care about
 var _registeredEvents = []events.Unmarshaller{
 	events.UploadReady{},
+	events.ContainerCreated{},
+	events.FileTouched{},
+	events.FileDownloaded{},
+	events.FileVersionRestored{},
+	events.ItemMoved{},
+	events.ItemTrashed{},
+	events.ItemPurged{},
+	events.ItemRestored{},
 }
 
 // Server is the entrypoint for the server command.
@@ -48,7 +57,9 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 				return context.WithCancel(cfg.Context)
 			}()
+
 			mtrcs := metrics.New()
+			mtrcs.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
 			defer cancel()
 
@@ -65,7 +76,18 @@ func Server(cfg *config.Config) *cli.Command {
 				return fmt.Errorf("unknown store '%s' configured", cfg.Store.Type)
 			}
 
-			mtrcs.BuildInfo.WithLabelValues(version.GetString()).Set(1)
+			tm, err := pool.StringToTLSMode(cfg.GRPCClientTLS.Mode)
+			if err != nil {
+				return err
+			}
+			gwclient, err := pool.GetGatewayServiceClient(
+				cfg.RevaGateway,
+				pool.WithTLSCACert(cfg.GRPCClientTLS.CACert),
+				pool.WithTLSMode(tm),
+			)
+			if err != nil {
+				return fmt.Errorf("could not get reva client: %s", err)
+			}
 
 			{
 				server, err := http.Server(
@@ -75,6 +97,7 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Metrics(mtrcs),
 					http.Store(st),
 					http.Consumer(consumer),
+					http.Gateway(gwclient),
 					http.RegisteredEvents(_registeredEvents),
 				)
 
