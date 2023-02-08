@@ -728,10 +728,6 @@ class PublicWebDavContext implements Context {
 	):void {
 		if (OcisHelper::isTestingOnOcisOrReva() && $publicWebDAVAPIVersion === "old") {
 			return;
-		} elseif ($publicWebDAVAPIVersion === "new") {
-			$techPreviewHadToBeEnabled = $this->occContext->enableDAVTechPreview();
-		} else {
-			$techPreviewHadToBeEnabled = false;
 		}
 
 		$this->downloadPublicFileWithRange(
@@ -744,10 +740,6 @@ class PublicWebDavContext implements Context {
 			$expectedContent,
 			"Checking the content of the last public shared file after downloading with the $publicWebDAVAPIVersion public WebDAV API"
 		);
-
-		if ($techPreviewHadToBeEnabled) {
-			$this->occContext->disableDAVTechPreview();
-		}
 
 		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
 	}
@@ -885,10 +877,6 @@ class PublicWebDavContext implements Context {
 	):void {
 		if (OcisHelper::isTestingOnOcisOrReva() && $publicWebDAVAPIVersion === "old") {
 			return;
-		} elseif ($publicWebDAVAPIVersion === "new") {
-			$techPreviewHadToBeEnabled = $this->occContext->enableDAVTechPreview();
-		} else {
-			$techPreviewHadToBeEnabled = false;
 		}
 
 		$this->publicDownloadsTheFileInsideThePublicSharedFolderWithPassword(
@@ -899,9 +887,6 @@ class PublicWebDavContext implements Context {
 
 		$this->featureContext->downloadedContentShouldBePlusEndOfLine($content);
 
-		if ($techPreviewHadToBeEnabled) {
-			$this->occContext->disableDAVTechPreview();
-		}
 		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
 	}
 
@@ -924,10 +909,6 @@ class PublicWebDavContext implements Context {
 	):void {
 		if (OcisHelper::isTestingOnOcisOrReva() && $publicWebDAVAPIVersion === "old") {
 			return;
-		} elseif ($publicWebDAVAPIVersion === "new") {
-			$techPreviewHadToBeEnabled = $this->occContext->enableDAVTechPreview();
-		} else {
-			$techPreviewHadToBeEnabled = false;
 		}
 
 		$this->publicDownloadsTheFileInsideThePublicSharedFolderWithPassword(
@@ -938,9 +919,6 @@ class PublicWebDavContext implements Context {
 
 		$this->featureContext->downloadedContentShouldBe($content);
 
-		if ($techPreviewHadToBeEnabled) {
-			$this->occContext->disableDAVTechPreview();
-		}
 		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
 	}
 
@@ -1007,10 +985,6 @@ class PublicWebDavContext implements Context {
 	):void {
 		if (OcisHelper::isTestingOnOcisOrReva() && $publicWebDAVAPIVersion === "old") {
 			return;
-		} elseif ($publicWebDAVAPIVersion === "new") {
-			$techPreviewHadToBeEnabled = $this->occContext->enableDAVTechPreview();
-		} else {
-			$techPreviewHadToBeEnabled = false;
 		}
 
 		$this->publicDownloadsTheFileInsideThePublicSharedFolderWithPasswordAndRange(
@@ -1043,10 +1017,6 @@ class PublicWebDavContext implements Context {
 	):void {
 		if (OcisHelper::isTestingOnOcisOrReva() && $publicWebDAVAPIVersion === "old") {
 			return;
-		} elseif ($publicWebDAVAPIVersion === "new") {
-			$techPreviewHadToBeEnabled = $this->occContext->enableDAVTechPreview();
-		} else {
-			$techPreviewHadToBeEnabled = false;
 		}
 
 		$this->publicDownloadsTheFileInsideThePublicSharedFolderWithPasswordAndRange(
@@ -1064,10 +1034,6 @@ class PublicWebDavContext implements Context {
 			"response body: \n$responseContent\n"
 		);
 		$this->featureContext->theHTTPStatusCodeShouldBe($expectedHttpCode);
-
-		if ($techPreviewHadToBeEnabled) {
-			$this->occContext->disableDAVTechPreview();
-		}
 	}
 
 	/**
@@ -1135,12 +1101,8 @@ class PublicWebDavContext implements Context {
 		$filename = "";
 		if (OcisHelper::isTestingOnOcisOrReva() && $publicWebDAVAPIVersion === "old") {
 			return;
-		} elseif ($publicWebDAVAPIVersion === "new") {
-			$filename = (string)$this->featureContext->getLastPublicShareData()->data[0]->file_target;
-			$techPreviewHadToBeEnabled = $this->occContext->enableDAVTechPreview();
-		} else {
-			$techPreviewHadToBeEnabled = false;
 		}
+		$filename = (string)$this->featureContext->getLastPublicShareData()->data[0]->file_target;
 
 		$this->publicUploadContent(
 			$filename,
@@ -1152,10 +1114,6 @@ class PublicWebDavContext implements Context {
 		);
 
 		$this->featureContext->theHTTPStatusCodeShouldBe($expectedHttpCode);
-
-		if ($techPreviewHadToBeEnabled) {
-			$this->occContext->disableDAVTechPreview();
-		}
 	}
 
 	/**
@@ -1174,10 +1132,6 @@ class PublicWebDavContext implements Context {
 	):void {
 		if (OcisHelper::isTestingOnOcisOrReva() && $publicWebDAVAPIVersion === "old") {
 			return;
-		} elseif ($publicWebDAVAPIVersion === "new") {
-			$techPreviewHadToBeEnabled = $this->occContext->enableDAVTechPreview();
-		} else {
-			$techPreviewHadToBeEnabled = false;
 		}
 
 		$this->publicUploadContent(
@@ -1188,10 +1142,6 @@ class PublicWebDavContext implements Context {
 			[],
 			$publicWebDAVAPIVersion
 		);
-
-		if ($techPreviewHadToBeEnabled) {
-			$this->occContext->disableDAVTechPreview();
-		}
 
 		$response = $this->featureContext->getResponse();
 		if ($expectedHttpCode === null) {
@@ -1277,10 +1227,6 @@ class PublicWebDavContext implements Context {
 
 		if (OcisHelper::isTestingOnOcisOrReva() && $publicWebDAVAPIVersion === "old") {
 			return;
-		} elseif ($publicWebDAVAPIVersion === "new") {
-			$techPreviewHadToBeEnabled = $this->occContext->enableDAVTechPreview();
-		} else {
-			$techPreviewHadToBeEnabled = false;
 		}
 
 		$this->publicUploadContent(
@@ -1302,10 +1248,6 @@ class PublicWebDavContext implements Context {
 			$publicWebDAVAPIVersion
 		);
 		$this->featureContext->checkDownloadedContentMatches($content);
-
-		if ($techPreviewHadToBeEnabled) {
-			$this->occContext->disableDAVTechPreview();
-		}
 	}
 
 	/**
@@ -1326,10 +1268,8 @@ class PublicWebDavContext implements Context {
 		if (OcisHelper::isTestingOnOcisOrReva() && $publicWebDAVAPIVersion === "old") {
 			return;
 		} elseif ($publicWebDAVAPIVersion === "new") {
-			$techPreviewHadToBeEnabled = $this->occContext->enableDAVTechPreview();
 			$path = $this->featureContext->getLastPublicSharePath();
 		} else {
-			$techPreviewHadToBeEnabled = false;
 			$path = "";
 		}
 
@@ -1366,10 +1306,6 @@ class PublicWebDavContext implements Context {
 				"upload should have failed with HTTP status $expectedCode but passed with code " .
 				$response->getStatusCode()
 			);
-		}
-
-		if ($techPreviewHadToBeEnabled) {
-			$this->occContext->disableDAVTechPreview();
 		}
 	}
 
