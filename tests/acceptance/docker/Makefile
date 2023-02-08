@@ -43,7 +43,7 @@ help:
 	@echo -e "oCIS feature tests and test suites can be found here:"
 	@echo -e "\thttps://github.com/owncloud/ocis/tree/master/tests/acceptance/features"
 	@echo
-	@echo -e "ownCloud feature tests and test suites that are applicable for oCIS can be found here and they start with prefix coreApi-:"
+	@echo -e "test suites that test ownCloud 10 API core compatibility are found here and they start with prefix coreApi-:"
 	@echo -e "\thttps://github.com/owncloud/ocis/tree/master/tests/acceptance/features"
 	@echo
 	@echo -e "The oCIS to be tested will be build from your current working state."
@@ -80,13 +80,13 @@ help:
 	@echo -e "\texample: ${RED}tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature${RESET}"
 	@echo
 	@echo -e "${GREEN}Run an ownCloud feature test against oCIS with oCIS storage:${RESET}\n"
-	@echo -e "\tmake test-oc10-feature-ocis-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
+	@echo -e "\tmake test-core-feature-ocis-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
 	@echo
 	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
 	@echo -e "\texample: ${RED}tests/acceptance/features/coreApiAuth/webDavAuth.feature${RESET}"
 	@echo
 	@echo -e "${GREEN}Run an ownCloud feature test against oCIS with s3ng storage:${RESET}\n"
-	@echo -e "\tmake test-oc10-feature-s3ng-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
+	@echo -e "\tmake test-core-feature-s3ng-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
 	@echo
 	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
 	@echo -e "\texample: ${RED}tests/acceptance/features/coreApiAuth/webDavAuth.feature${RESET}"
@@ -119,15 +119,15 @@ test-ocis-feature-s3ng-storage: ## test a ocis feature with s3ng storage, usage:
 	START_CEPH=1 \
 	$(MAKE) --no-print-directory testSuite
 
-.PHONY: test-oc10-feature-ocis-storage
-test-oc10-feature-ocis-storage: ## test a oC10 feature with oCIS storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
+.PHONY: test-core-feature-ocis-storage
+test-core-feature-ocis-storage: ## test a core feature with oCIS storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
 	@TEST_SOURCE=oc10 \
 	STORAGE_DRIVER=ocis \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
 	$(MAKE) --no-print-directory testSuite
 
-.PHONY: test-oc10-feature-s3ng-storage
-test-oc10-feature-s3ng-storage: ## test a oC10 feature with s3ng storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
+.PHONY: test-core-feature-s3ng-storage
+test-core-feature-s3ng-storage: ## test a core feature with s3ng storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
 	@TEST_SOURCE=oc10 \
 	STORAGE_DRIVER=s3ng \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \

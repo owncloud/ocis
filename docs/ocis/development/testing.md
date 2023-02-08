@@ -24,7 +24,7 @@ make -C tests/acceptance/docker help
 Basically we have two sources for feature tests and test suites:
 
 - [oCIS feature test and test suites](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
-- [tests and test suites transferred from ownCloud, they have prefix coreApi](https://github.com/owncloud/core/tree/master/ocis/acceptance/features)
+- [tests and test suites transferred from ownCloud, they have prefix coreApi](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
 
 At the moment both can be applied to oCIS since the api of oCIS is designed to be compatible with ownCloud.
 
@@ -39,13 +39,13 @@ You can invoke two types of test suite runs:
 
 The names of the full test suite make targets have the same naming as in the CI pipeline. The available local ocis specific test suites are `apiAccountsHashDifficulty`, `apiArchiver`, `apiContract`, `apiGraph`, `apiSpaces`, `apiSpacesShares`, `apiCors`, `apiAsyncUpload`. They can be run with `oCIS` storage and `S3` storage.
 
+> Note: In order to see the tests log attach `show-test-logs` in the command
+
 For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis` runs the same tests as the `localApiTests-apiAccountsHashDifficulty-ocis` CI pipeline, which runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with oCIS storage.
 
 For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-s3ng` runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with s3 storage.
 
-> Note: To run the tests from `apiAsyncUpload` suite you need to provide extra environment variable `POSTPROCESSING_DELAY` 
-
-For example `make -C tests/acceptance/docker localApiTests-apiAsyncUpload-s3ng` runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with oCIS storage.
+> Note: To run the tests from `apiAsyncUpload` suite you need to provide extra environment variable `POSTPROCESSING_DELAY`
 
 For example `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suite transferred from ownCloud against an oCIS with ocis storage.
 
@@ -56,7 +56,7 @@ For example `make -C tests/acceptance/docker Core-API-Tests-ocis-s3ng-3` runs th
 The single feature tests can also be run against the different storage backends. Therefore, multiple make targets with the schema test-<test source>-feature-<storage backend> exist. To select a single feature you have to add an additional `BEHAT_FEATURE=...` parameter when invoking the make command:
 
 ```
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature'
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21'
 ```
 
 This must be pointing to a valid feature definition.
@@ -64,7 +64,7 @@ This must be pointing to a valid feature definition.
 To run a single scenario in a feature, then mention the line number of the scenario:
 
 ```
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:20'
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21'
 ```
 
 Similarly, with S3 storage,
@@ -75,21 +75,21 @@ make -C tests/acceptance/docker test-ocis-feature-s3ng-storage BEHAT_FEATURE='te
 
 - run a single scenario
 ```
-make -C tests/acceptance/docker test-ocis-feature-s3ng-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:20'
+make -C tests/acceptance/docker test-ocis-feature-s3ng-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21'
 ```
 
 In the same way for the tests transferred from oc10 can be run as
 - run a whole feature
 ```
-make -C tests/acceptance/docker test-oc10-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
+make -C tests/acceptance/docker test-core-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
 ```
 
 - run a single scenario
 ```
-make -C tests/acceptance/docker test-oc10-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature:13'
+make -C tests/acceptance/docker test-core-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature:13'
 ```
 
-> Note: the tests transferred fron oc10 starts with coreApi
+> Note: the tests transferred from oc10 start with coreApi
 
 ### oCIS image to be tested (or: skip build and take existing image)
 
