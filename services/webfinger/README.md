@@ -6,7 +6,7 @@ It is based on https://github.com/owncloud/lookup-webfinger-sciebo but also retu
 
 A client can discover various endpoints by making a `GET` request to `https://drive.ocis.test/.well-known/webfinger?resource=acct%3Aeinstein%40cloud.ocis.test`.
 
-He will get a response like
+It will get a response like
 ```
 {
     "subject": "acct:einstein@drive.ocis.test",
@@ -45,7 +45,7 @@ Currently, clients need to make subsequent calls to:
 - /.well-known/openid-configuration, auth2 token and oidc userinfo endpoints to authenticate the user
 - /ocs/v1.php/cloud/user to get the username, eg. einstein ... again? it contains the oc10 user id (marie, not the uuid)
 - /ocs/v1.php/cloud/capabilities to fetch instance capabilites
-- /ocs/v1.php/cloud/users/einstein to fetch the quota which could come from graph and actually is now tied to the spaces, not tu users
+- /ocs/v1.php/cloud/users/einstein to fetch the quota which could come from graph and actually is now tied to the spaces, not to users
 - /graph/v1.0/me?%24expand=memberOf to fetch the user id and the groups the user is a member of
 
 We need a way to pass oidc claims from the proxy, which does the authentication to the webfinger service, preferably by minting them into the internal reva token.
@@ -156,7 +156,7 @@ In theory the graph endpoint would allow discovering drives on any domain. But t
 
 ### Subject properties
 
-We could also embed subject metadata, however since apps like ocis web also need the groups a user is member of a dadicated call to the libregraph api is probably better. In any case, we could return properties for the subject:
+We could also embed subject metadata, however since apps like ocis web also need the groups a user is member of a dedicated call to the libregraph api is probably better. In any case, we could return properties for the subject:
 ```
 {
     "subject": "acct:einstein@drive.ocis.test",
