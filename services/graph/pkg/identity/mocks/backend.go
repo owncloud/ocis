@@ -130,13 +130,13 @@ func (_m *Backend) GetGroup(ctx context.Context, nameOrID string, queryParam url
 	return r0, r1
 }
 
-// GetGroupMembers provides a mock function with given fields: ctx, id
-func (_m *Backend) GetGroupMembers(ctx context.Context, id string) ([]*libregraph.User, error) {
-	ret := _m.Called(ctx, id)
+// GetGroupMembers provides a mock function with given fields: ctx, id, oreq
+func (_m *Backend) GetGroupMembers(ctx context.Context, id string, oreq *godata.GoDataRequest) ([]*libregraph.User, error) {
+	ret := _m.Called(ctx, id, oreq)
 
 	var r0 []*libregraph.User
-	if rf, ok := ret.Get(0).(func(context.Context, string) []*libregraph.User); ok {
-		r0 = rf(ctx, id)
+	if rf, ok := ret.Get(0).(func(context.Context, string, *godata.GoDataRequest) []*libregraph.User); ok {
+		r0 = rf(ctx, id, oreq)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*libregraph.User)
@@ -144,8 +144,8 @@ func (_m *Backend) GetGroupMembers(ctx context.Context, id string) ([]*libregrap
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(ctx, id)
+	if rf, ok := ret.Get(1).(func(context.Context, string, *godata.GoDataRequest) error); ok {
+		r1 = rf(ctx, id, oreq)
 	} else {
 		r1 = ret.Error(1)
 	}

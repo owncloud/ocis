@@ -193,7 +193,7 @@ func (i *CS3) DeleteGroup(ctx context.Context, id string) error {
 }
 
 // GetGroupMembers implements the Backend Interface. It's currently not supported for the CS3 backend
-func (i *CS3) GetGroupMembers(ctx context.Context, groupID string) ([]*libregraph.User, error) {
+func (i *CS3) GetGroupMembers(ctx context.Context, groupID string, _ *godata.GoDataRequest) ([]*libregraph.User, error) {
 	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
 }
 

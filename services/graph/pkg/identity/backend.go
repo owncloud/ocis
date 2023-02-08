@@ -35,7 +35,8 @@ type Backend interface {
 	DeleteGroup(ctx context.Context, id string) error
 	GetGroup(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.Group, error)
 	GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error)
-	GetGroupMembers(ctx context.Context, id string) ([]*libregraph.User, error)
+	// GetGroupMembers list all members of a group
+	GetGroupMembers(ctx context.Context, id string, oreq *godata.GoDataRequest) ([]*libregraph.User, error)
 	// AddMembersToGroup adds new members (reference by a slice of IDs) to supplied group in the identity backend.
 	AddMembersToGroup(ctx context.Context, groupID string, memberID []string) error
 	// RemoveMemberFromGroup removes a single member (by ID) from a group

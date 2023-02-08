@@ -201,13 +201,25 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Debug().Interface("query", r.URL.Query()).Msg("calling get users on backend")
-	users, err := g.identityBackend.GetUsers(r.Context(), odataReq)
+
+	var users []*libregraph.User
+
+	if odataReq.Query.Filter != nil {
+		users, err = g.applyUserFilter(r.Context(), odataReq, nil)
+	} else {
+		users, err = g.identityBackend.GetUsers(r.Context(), odataReq)
+	}
+
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users from backend")
 		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
+		var godataerr *godata.GoDataError
+		switch {
+		case errors.As(err, &errcode):
 			errcode.Render(w, r)
-		} else {
+		case errors.As(err, &godataerr):
+			errorcode.GeneralException.Render(w, r, godataerr.ResponseCode, err.Error())
+		default:
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
 		return
