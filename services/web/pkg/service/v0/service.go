@@ -41,10 +41,9 @@ func NewService(opts ...Option) Service {
 	m.Use(options.Middleware...)
 
 	svc := Web{
-		logger: options.Logger,
-		config: options.Config,
-		mux:    m,
-		fs:     assetsfs.New(web.Assets, options.Config.Asset.Path, options.Logger),
+		logger: options.Logger, config: options.Config,
+		mux: m,
+		fs:  assetsfs.New(web.Assets, options.Config.Asset.Path, options.Logger),
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
@@ -178,7 +177,8 @@ func (p Web) UploadLogo(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
-	dst, err := p.fs.Create(filepath.Join("branding", filepath.Join("/", fileHeader.Filename)))
+	fp := filepath.Join("branding", filepath.Join("/", fileHeader.Filename))
+	dst, err := p.fs.Create(fp)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -190,6 +190,24 @@ func (p Web) UploadLogo(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	f, err := p.fs.Open("themes/owncloud/theme.json")
+	if err == nil {
+		defer f.Close()
+	}
+	var m map[string]interface{}
+	_ = json.NewDecoder(f).Decode(&m)
+	logos := m["default"].(map[string]interface{})["logo"].(map[string]interface{})
+	logos["login"] = fp
+	logos["topbar"] = fp
+
+	dst, err = p.fs.Create("themes/owncloud/theme.json")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	_ = json.NewEncoder(dst).Encode(m)
 
 	w.WriteHeader(http.StatusOK)
 }
