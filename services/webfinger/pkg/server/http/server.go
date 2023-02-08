@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"net/http"
 	"net/url"
 
@@ -80,9 +79,6 @@ func Server(opts ...Option) (ohttp.Service, error) {
 		r.Get("/.well-known/webfinger", func(w http.ResponseWriter, r *http.Request) {
 			ctx := r.Context()
 
-			// for now, put the url in the context so it can be used to fake a list
-			ctx = context.WithValue(ctx, "href", getHref(r))
-
 			// A WebFinger URI MUST contain a query component (see Section 3.4 of
 			// RFC 3986).  The query component MUST contain a "resource" parameter
 			// and MAY contain one or more "rel" parameters.
@@ -134,16 +130,4 @@ func Server(opts ...Option) (ohttp.Service, error) {
 
 	svc.Init()
 	return svc, nil
-}
-
-func getHref(r *http.Request) string {
-	proto := r.Header.Get("x-forwarded-proto")
-	host := r.Header.Get("x-forwarded-host")
-	port := r.Header.Get("x-forwarded-port")
-
-	if (proto == "http" && port != "80") || (proto == "https" && port != "443") {
-		host = host + ":" + port
-	}
-
-	return proto + "://" + host
 }

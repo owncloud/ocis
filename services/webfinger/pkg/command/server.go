@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
@@ -52,10 +51,16 @@ func Server(cfg *config.Config) *cli.Command {
 			metrics.BuildInfo.WithLabelValues(version.GetString()).Set(1)
 
 			{
+				relationProviders, err := getRelationProviders(cfg)
+				if err != nil {
+					logger.Error().Err(err).Msg("relation providier init")
+					return err
+				}
+
 				svc, err := service.New(
 					service.Logger(logger),
 					service.Config(cfg),
-					service.WithLookupChain(getLookupChain(cfg)),
+					service.WithRelationProviders(relationProviders),
 				)
 				if err != nil {
 					logger.Error().Err(err).Msg("handler init")
@@ -117,26 +122,21 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-func getLookupChain(cfg *config.Config) service.Webfinger {
-	lookups := strings.Split(cfg.LookupChain, ",")
-	if len(lookups) == 0 {
-		return nil
-	}
-	var webfinger service.Webfinger
-	for i := len(lookups) - 1; i >= 0; i-- {
-		switch lookups[i] {
-		case "openid-discovery":
-			webfinger = relations.OpenIDDiscovery(cfg.IDP, webfinger)
-		case "owncloud-status":
-		case "owncloud-account":
-			//url, _ := url.Parse(cfg.OcisURL)
-			// TODO error / ignore
-			//webfinger = relations.OwnCloudAccount(*url, webfinger)
-		case "owncloud-instance":
-			webfinger = relations.OwnCloudInstance(cfg.Instances, webfinger)
+func getRelationProviders(cfg *config.Config) (map[string]service.RelationProvider, error) {
+	rels := map[string]service.RelationProvider{}
+	for _, relationURI := range cfg.Relations {
+		switch relationURI {
+		case relations.OpenIDConnectRel:
+			rels[relationURI] = relations.OpenIDDiscovery(cfg.IDP)
+		case relations.OwnCloudInstanceRel:
+			var err error
+			rels[relationURI], err = relations.OwnCloudInstance(cfg.Instances, cfg.OcisURL)
+			if err != nil {
+				return nil, err
+			}
 		default:
-			// TODO error / ignore
+			return nil, fmt.Errorf("unknown relation '%s'", relationURI)
 		}
 	}
-	return webfinger
+	return rels, nil
 }

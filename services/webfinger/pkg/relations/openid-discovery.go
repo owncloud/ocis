@@ -13,20 +13,15 @@ const (
 
 type openIDDiscovery struct {
 	Href string
-	next service.Webfinger
 }
 
-func OpenIDDiscovery(href string, next service.Webfinger) service.Webfinger {
-	if next == nil {
-		next = Noop{}
-	}
+func OpenIDDiscovery(href string) service.RelationProvider {
 	return &openIDDiscovery{
 		Href: href,
-		next: next,
 	}
 }
 
-func (l *openIDDiscovery) Lookup(ctx context.Context, jrd *webfinger.JSONResourceDescriptor) {
+func (l *openIDDiscovery) Add(ctx context.Context, jrd *webfinger.JSONResourceDescriptor) {
 	if jrd == nil {
 		jrd = &webfinger.JSONResourceDescriptor{}
 	}
@@ -36,8 +31,4 @@ func (l *openIDDiscovery) Lookup(ctx context.Context, jrd *webfinger.JSONResourc
 		Href: l.Href,
 		// Titles: , // TODO use , separated env var with : separated language -> title pairs
 	})
-	l.next.Lookup(ctx, jrd)
-}
-func (l *openIDDiscovery) Next(next service.Webfinger) {
-	l.next = next
 }

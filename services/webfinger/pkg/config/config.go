@@ -16,19 +16,12 @@ type Config struct {
 	Log     *Log     `yaml:"log"`
 	Debug   Debug    `yaml:"debug"`
 
-	HTTP HTTP         `yaml:"http"`
-	Reva *shared.Reva `yaml:"reva"`
+	HTTP HTTP `yaml:"http"`
 
-	Instances        []Instance `yaml:"instances"`
-	InstanceSelector string     `yaml:"instance_selector" env:"WEBFINGER_INSTANCE_SELECTOR" desc:"How to select which instance to use for an account. Can be 'default', 'regex' or 'claims'?"`
-	InstanceLookup   string     `yaml:"instance_lookup" env:"WEBFINGER_INSTANCE_LOOKUP" desc:"How to look up to instance href and topic. Can be 'default', 'template', 'static' or 'ldap'?"`
-	InstanceMatches  string     `yaml:"instance_matches" env:"WEBFINGER_INSTANCE_MATCHES" desc:"TODO"`
-	LookupChain      string     `yaml:"lookup_chain" env:"WEBFINGER_LOOKUP_CHAIN" desc:"A chain of lookup steps for webfinger."`
-	IDP              string     `yaml:"idp" env:"OCIS_URL;WEBFINGER_OIDC_ISSUER" desc:"The identity provider href for the openid-discovery relation."`
-	OcisURL          string     `yaml:"idp" env:"OCIS_URL;WEBFINGER_OCIS_URL" desc:"The oCIS instance URL for the owncloud-account relation. The host part will be used for the 'acct' URI."`
-
-	Rules string `yaml:"webdav_namespace" env:"WEBFINGER_" desc:"Jail requests to /dav/webdav into this CS3 namespace. Supports template layouting with CS3 User properties."`
-	// TODO wie proxy?
+	Instances []Instance `yaml:"instances"`
+	Relations []string   `yaml:"relations" env:"WEBFINGER_RELATIONS" desc:"A comma-separated list of relation URIs or registered relation types to add to webfinger responses."`
+	IDP       string     `yaml:"idp" env:"OCIS_URL;WEBFINGER_OIDC_ISSUER" desc:"The identity provider href for the openid-discovery relation."`
+	OcisURL   string     `yaml:"idp" env:"OCIS_URL;WEBFINGER_OCIS_URL" desc:"The oCIS instance URL for the owncloud instance relations."`
 
 	Context context.Context `yaml:"-"`
 }
@@ -39,4 +32,5 @@ type Instance struct {
 	Regex  string            `yaml:"rule"`
 	Href   string            `yaml:"href"`
 	Titles map[string]string `yaml:"title"`
+	Break  bool              `yaml:"break"`
 }

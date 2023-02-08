@@ -10,9 +10,9 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger      log.Logger
-	Config      *config.Config
-	LookupChain Webfinger
+	Logger            log.Logger
+	Config            *config.Config
+	RelationProviders map[string]RelationProvider
 }
 
 // newOptions initializes the available default options.
@@ -40,8 +40,8 @@ func Config(val *config.Config) Option {
 	}
 }
 
-func WithLookupChain(val Webfinger) Option {
+func WithRelationProviders(val map[string]RelationProvider) Option {
 	return func(o *Options) {
-		o.LookupChain = val
+		o.RelationProviders = val
 	}
 }

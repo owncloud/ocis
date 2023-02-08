@@ -53,43 +53,8 @@ type Service interface {
 	Webfinger(ctx context.Context, queryTarget *url.URL, rels []string) (webfinger.JSONResourceDescriptor, error)
 }
 
-type Webfinger interface {
-	Lookup(ctx context.Context, jrd *webfinger.JSONResourceDescriptor)
-	Next(next Webfinger)
-}
-
-type InstanceSelector interface {
-	GetInstanceIds(ctx context.Context, account string) []string
-}
-
-type InstanceLookup interface {
-	GetInstance(ctx context.Context, id string) Instance
-	// get multiple instances at once?
-}
-
-type Instance struct {
-	Href   string
-	Titles map[string]string
-}
-
-type DefaultInstanceSelector struct{}
-
-func (s DefaultInstanceSelector) GetInstanceIds(ctx context.Context, account string) []string {
-	return []string{"default"}
-}
-
-type DefaultInstanceLookup struct{}
-
-func (l DefaultInstanceLookup) GetInstance(ctx context.Context, id string) Instance {
-	if id == "default" {
-		return Instance{
-			Href: ctx.Value("href").(string),
-			Titles: map[string]string{
-				"en": "ownCloud Infinite Scale",
-			},
-		}
-	}
-	return Instance{}
+type RelationProvider interface {
+	Add(ctx context.Context, jrd *webfinger.JSONResourceDescriptor)
 }
 
 // New returns a new instance of Service
@@ -100,16 +65,16 @@ func New(opts ...Option) (Service, error) {
 	// The InstanceIdLookup may have to happen earlier?
 
 	return svc{
-		log:         options.Logger,
-		config:      options.Config,
-		lookupChain: options.LookupChain,
+		log:               options.Logger,
+		config:            options.Config,
+		relationProviders: options.RelationProviders,
 	}, nil
 }
 
 type svc struct {
-	config      *config.Config
-	log         log.Logger
-	lookupChain Webfinger
+	config            *config.Config
+	log               log.Logger
+	relationProviders map[string]RelationProvider
 }
 
 // TODO implement different implementations:
@@ -127,45 +92,19 @@ func (s svc) Webfinger(ctx context.Context, queryTarget *url.URL, rel []string) 
 		Subject: queryTarget.String(),
 	}
 
-	// TODO acct chain vs https: chain?
-	switch queryTarget.Scheme {
-	case "acct":
-		s.lookupChain.Lookup(ctx, &jrd)
-	case "http", "https":
-		s.lookupChain.Lookup(ctx, &jrd)
-	default:
-		return jrd, ErrNotFound
+	if len(rel) == 0 {
+		// add all configured relation providers
+		for _, relation := range s.relationProviders {
+			relation.Add(ctx, &jrd)
+		}
+	} else {
+		// only add requested relations
+		for _, r := range rel {
+			if relation, ok := s.relationProviders[r]; ok {
+				relation.Add(ctx, &jrd)
+			}
+		}
 	}
 
 	return jrd, nil
-	/*
-	   instanceIds := s.instanceIdSelector.GetInstanceIds(ctx, strings.TrimPrefix(queryTarget.String(), "acct:"))
-
-	   href := ctx.Value("href").(string)
-
-	   links := make([]webfinger.Link, 0, len(instanceIds))
-	   // TODO, make listing oidc configuration optional
-
-	   	links = append(links, webfinger.Link{
-	   		Rel:  OpenIDConnectRel,
-	   		Href: href,
-	   		Titles: map[string]string{
-	   			"en": "ownCloud Infinite Scale OpenID Connect Identity Provider",
-	   		},
-	   	})
-
-	   	for _, instanceId := range instanceIds {
-	   		instance := s.instanceLookup.GetInstance(ctx, instanceId)
-	   		links = append(links, webfinger.Link{
-	   			Rel:    OwnCloudInstanceRel,
-	   			Href:   instance.Href,
-	   			Titles: instance.Titles,
-	   		})
-	   	}
-
-	   	return webfinger.JSONResourceDescriptor{
-	   		Subject: queryTarget.String(),
-	   		Links:   links,
-	   	}, nil
-	*/
 }

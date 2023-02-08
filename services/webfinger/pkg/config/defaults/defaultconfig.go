@@ -3,8 +3,8 @@ package defaults
 import (
 	"strings"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/webfinger/pkg/config"
+	"github.com/owncloud/ocis/v2/services/webfinger/pkg/relations"
 )
 
 func FullDefaultConfig() *config.Config {
@@ -17,49 +17,71 @@ func FullDefaultConfig() *config.Config {
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
-			Addr: "127.0.0.1:19119", // FIXME
-			//Addr:      "127.0.0.1:0", // :0 to pick any free local port
+			//Addr: "127.0.0.1:19119", // FIXME
+			Addr:   "127.0.0.1:0", // :0 to pick any free local port
 			Token:  "",
 			Pprof:  false,
 			Zpages: false,
 		},
 		HTTP: config.HTTP{
-			Addr: "127.0.0.1:19115", // FIXME
-			//Addr:      "127.0.0.1:0", // :0 to pick any free local port
+			//Addr: "127.0.0.1:19115", // FIXME
+			Addr:      "127.0.0.1:0", // :0 to pick any free local port
 			Root:      "/",
 			Namespace: "com.owncloud.web",
 			CORS: config.CORS{
 				AllowedOrigins: []string{"*"},
 			},
 		},
-		Reva: shared.DefaultRevaConfig(),
 		Service: config.Service{
 			Name: "webfinger",
 		},
-		LookupChain: "openid-discovery,owncloud-status,owncloud-account,owncloud-instance",
+
+		Relations: []string{relations.OpenIDConnectRel, relations.OwnCloudInstanceRel},
 		Instances: []config.Instance{
 			{
-				Claim: "mail",
-				Regex: "einstein@example.com",
-				Href:  "{{OCIS_URL}}",
+				Claim: "email",
+				Regex: "einstein@example\\.org", // only einstein
+				Href:  "{{.OCIS_URL}}",
 				Titles: map[string]string{
 					"en": "oCIS Instance for Einstein",
 					"de": "oCIS Instanz für Einstein",
 				},
+				Break: true,
 			},
 			{
-				Claim: "mail",
-				Regex: ".*@example.com",
-				Href:  "{{OCIS_URL}}",
+				Claim: "email",
+				Regex: "marie@example\\.org", // only marie
+				Href:  "https://{{.preferred_username}}.cloud.ocis.test",
+				Titles: map[string]string{
+					"en": "oCIS Instance for Marie",
+					"de": "oCIS Instanz für Marie",
+				},
+				// also continue with next instance
+			},
+			{
+				Claim: "email",
+				Regex: ".+@example\\.org", // example.org, including marie but not for einstein
+				Href:  "{{.OCIS_URL}}",    // zb https://{{schoolid}}.cloud.ocis.de bei dem der schoolid claim dann genommen wird. templates?
 				Titles: map[string]string{
 					"en": "oCIS Instance for example.org",
 					"de": "oCIS Instanz für example.org",
 				},
+				Break: true,
 			},
 			{
-				Claim: "id",
-				Regex: ".*",
-				Href:  "{{OCIS_URL}}",
+				Claim: "email",
+				Regex: ".+@example\\.com", // example.com
+				Href:  "{{.OCIS_URL}}",
+				Titles: map[string]string{
+					"en": "oCIS Instance for example.com",
+					"de": "oCIS Instanz für example.com",
+				},
+				Break: true,
+			},
+			{
+				Claim: "email",
+				Regex: ".+",
+				Href:  "{{.OCIS_URL}}",
 				Titles: map[string]string{
 					"en": "oCIS Instance",
 					"de": "oCIS Instanz",
