@@ -20,8 +20,8 @@ type Config struct {
 
 	Instances []Instance `yaml:"instances"`
 	Relations []string   `yaml:"relations" env:"WEBFINGER_RELATIONS" desc:"A comma-separated list of relation URIs or registered relation types to add to webfinger responses."`
-	IDP       string     `yaml:"idp" env:"OCIS_URL;WEBFINGER_OIDC_ISSUER" desc:"The identity provider href for the openid-discovery relation."`
-	OcisURL   string     `yaml:"idp" env:"OCIS_URL;WEBFINGER_OCIS_URL" desc:"The oCIS instance URL for the owncloud instance relations."`
+	IDP       string     `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;WEBFINGER_OIDC_ISSUER" desc:"The identity provider href for the openid-discovery relation."`
+	OcisURL   string     `yaml:"ocis_url" env:"OCIS_URL;WEBFINGER_OCIS_URL" desc:"URL, where oCIS is reachable for users."`
 
 	Context context.Context `yaml:"-"`
 }
