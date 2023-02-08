@@ -28,7 +28,8 @@ Basically we have two sources for feature tests and test suites:
 
 At the moment both can be applied to oCIS since the api of oCIS is designed to be compatible with ownCloud.
 
-As a storage backend we offer oCIS native storage, also called "oCIS". This stores files directly on disk.
+As a storage backend we offer oCIS native storage, also called "oCIS". This stores files directly on disk. Along with that we also provide `S3` storage driver.
+
 You can invoke two types of test suite runs:
 
 - run a full test suite, which consists of multiple feature tests
@@ -36,11 +37,19 @@ You can invoke two types of test suite runs:
 
 ### Run full test suite
 
-The names of the full test suite make targets have the same naming as in the CI pipeline.
+The names of the full test suite make targets have the same naming as in the CI pipeline. The available local ocis specific test suites are `apiAccountsHashDifficulty`, `apiArchiver`, `apiContract`, `apiGraph`, `apiSpaces`, `apiSpacesShares`, `apiCors`, `apiAsyncUpload`. They can be run with `oCIS` storage and `S3` storage.
 
 For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis` runs the same tests as the `localApiTests-apiAccountsHashDifficulty-ocis` CI pipeline, which runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with oCIS storage.
 
+For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-s3ng` runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with s3 storage.
+
+> Note: To run the tests from `apiAsyncUpload` suite you need to provide extra environment variable `POSTPROCESSING_DELAY` 
+
+For example `make -C tests/acceptance/docker localApiTests-apiAsyncUpload-s3ng` runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with oCIS storage.
+
 For example `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suite transferred from ownCloud against an oCIS with ocis storage.
+
+For example `make -C tests/acceptance/docker Core-API-Tests-ocis-s3ng-3` runs the third (out of ten) test suite transferred from ownCloud against an oCIS with s3 storage.
 
 ### Run single feature test
 
@@ -57,6 +66,30 @@ To run a single scenario in a feature, then mention the line number of the scena
 ```
 make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:20'
 ```
+
+Similarly, with S3 storage,
+- run a whole feature
+```
+make -C tests/acceptance/docker test-ocis-feature-s3ng-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature'
+```
+
+- run a single scenario
+```
+make -C tests/acceptance/docker test-ocis-feature-s3ng-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:20'
+```
+
+In the same way for the tests transferred from oc10 can be run as
+- run a whole feature
+```
+make -C tests/acceptance/docker test-oc10-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
+```
+
+- run a single scenario
+```
+make -C tests/acceptance/docker test-oc10-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature:13'
+```
+
+> Note: the tests transferred fron oc10 starts with coreApi
 
 ### oCIS image to be tested (or: skip build and take existing image)
 
