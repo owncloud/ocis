@@ -5,12 +5,19 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"path"
 	"path/filepath"
 )
 
 var (
-	errInvalidThemeConfig = errors.New("invalid themes config")
-	_themesConfigPath     = filepath.FromSlash("themes/owncloud/theme.json")
+	errInvalidThemeConfig       = errors.New("invalid themes config")
+	_themesConfigPath           = filepath.FromSlash("themes/owncloud/theme.json")
+	_allowedExtensionMediatypes = map[string]string{
+		".jpg":  "image/jpeg",
+		".jpeg": "image/jpeg",
+		".png":  "image/png",
+		".gif":  "image/gif",
+	}
 )
 
 // UploadLogo implements the endpoint to upload a custom logo for the oCIS instance.
@@ -24,6 +31,12 @@ func (p Web) UploadLogo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
+
+	mediatype := fileHeader.Header.Get("Content-Type")
+	if !allowedFiletype(fileHeader.Filename, mediatype) {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
 	fp := filepath.Join("branding", filepath.Join("/", fileHeader.Filename))
 	err = p.storeAsset(fp, file)
@@ -57,6 +70,9 @@ func (p Web) updateLogoThemeConfig(logoPath string) error {
 	if err == nil {
 		defer f.Close()
 	}
+
+	// This decoding of the themes.json file is not optimal. If we need to decode it for other
+	// usecases as well we should consider decoding to a struct.
 	var m map[string]interface{}
 	_ = json.NewDecoder(f).Decode(&m)
 
@@ -97,4 +113,12 @@ func (p Web) updateLogoThemeConfig(logoPath string) error {
 	}
 
 	return json.NewEncoder(dst).Encode(m)
+}
+
+func allowedFiletype(filename, mediatype string) bool {
+	ext := path.Ext(filename)
+
+	// Check if we allow that extension and if the mediatype matches the extension
+	mt, ok := _allowedExtensionMediatypes[ext]
+	return ok && mt == mediatype
 }
