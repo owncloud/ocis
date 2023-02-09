@@ -37,9 +37,10 @@ Feature: Share spaces
   Scenario: A user can see who has been granted access
     Given user "Alice" has shared a space "share space" to user "Brian" with role "viewer"
     And the user "Alice" should have a space called "share space" granted to "Brian" with these key and value pairs:
-      | key                                                          | value     |
-      | root@@@permissions@@@1@@@grantedToIdentities@@@0@@@user@@@id | %user_id% |
-      | root@@@permissions@@@1@@@roles@@@0                           | viewer    |
+      | key                                                                   | value        |
+      | root@@@permissions@@@1@@@grantedToIdentities@@@0@@@user@@@displayName | Brian Murphy |
+      | root@@@permissions@@@1@@@grantedToIdentities@@@0@@@user@@@id          | %user_id%    |
+      | root@@@permissions@@@1@@@roles@@@0                                    | viewer       |
 
 
   Scenario: A user can see that the group has been granted access
@@ -48,10 +49,11 @@ Feature: Share spaces
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the user "Alice" should have a space called "share space" granted to group "sales" with these key and value pairs:
-      | key                                                           | value      |
-      | root@@@permissions@@@1@@@grantedToIdentities@@@0@@@group@@@id | %group_id% |
-      | root@@@permissions@@@1@@@roles@@@0                            | viewer     |
-
+      | key                                                                    | value      |
+      | root@@@permissions@@@0@@@grantedToIdentities@@@0@@@group@@@displayName | sales      |
+      | root@@@permissions@@@0@@@grantedToIdentities@@@0@@@group@@@id          | %group_id% |
+      | root@@@permissions@@@0@@@roles@@@0                                     | viewer     |
+      
 
   Scenario: A user can see a file in a received shared space
     Given user "Alice" has uploaded a file inside space "share space" with content "Test" to "test.txt"
