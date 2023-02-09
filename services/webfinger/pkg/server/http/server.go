@@ -59,14 +59,9 @@ func Server(opts ...Option) (ohttp.Service, error) {
 		version.String,
 	))
 
-	// FIXME urgh we would have to do the auth ourself ...
-	// use auth bearer service ...
-
-	// TODO use plain oidc claims: we don't want to have to call reva, which makes a call to ldap and also fetches groups ...
-	//
-
 	mux.Use(middleware.OidcAuth(
 		middleware.WithLogger(options.Logger),
+		middleware.WithOidcIssuer(options.Config.IDP),
 	))
 
 	// this logs http request related data

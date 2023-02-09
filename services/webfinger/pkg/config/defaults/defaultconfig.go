@@ -17,14 +17,12 @@ func FullDefaultConfig() *config.Config {
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
-			//Addr: "127.0.0.1:19119", // FIXME
 			Addr:   "127.0.0.1:0", // :0 to pick any free local port
 			Token:  "",
 			Pprof:  false,
 			Zpages: false,
 		},
 		HTTP: config.HTTP{
-			//Addr: "127.0.0.1:19115", // FIXME
 			Addr:      "127.0.0.1:0", // :0 to pick any free local port
 			Root:      "/",
 			Namespace: "com.owncloud.web",
@@ -39,52 +37,11 @@ func DefaultConfig() *config.Config {
 		Relations: []string{relations.OpenIDConnectRel, relations.OwnCloudInstanceRel},
 		Instances: []config.Instance{
 			{
-				Claim: "email",
-				Regex: "einstein@example\\.org", // only einstein
-				Href:  "{{.OCIS_URL}}",
-				Titles: map[string]string{
-					"en": "oCIS Instance for Einstein",
-					"de": "oCIS Instanz für Einstein",
-				},
-				Break: true,
-			},
-			{
-				Claim: "email",
-				Regex: "marie@example\\.org", // only marie
-				Href:  "https://{{.preferred_username}}.cloud.ocis.test",
-				Titles: map[string]string{
-					"en": "oCIS Instance for Marie",
-					"de": "oCIS Instanz für Marie",
-				},
-				// also continue with next instance
-			},
-			{
-				Claim: "email",
-				Regex: ".+@example\\.org", // example.org, including marie but not for einstein
-				Href:  "{{.OCIS_URL}}",    // zb https://{{schoolid}}.cloud.ocis.de bei dem der schoolid claim dann genommen wird. templates?
-				Titles: map[string]string{
-					"en": "oCIS Instance for example.org",
-					"de": "oCIS Instanz für example.org",
-				},
-				Break: true,
-			},
-			{
-				Claim: "email",
-				Regex: ".+@example\\.com", // example.com
-				Href:  "{{.OCIS_URL}}",
-				Titles: map[string]string{
-					"en": "oCIS Instance for example.com",
-					"de": "oCIS Instanz für example.com",
-				},
-				Break: true,
-			},
-			{
-				Claim: "email",
+				Claim: "sub",
 				Regex: ".+",
 				Href:  "{{.OCIS_URL}}",
 				Titles: map[string]string{
 					"en": "oCIS Instance",
-					"de": "oCIS Instanz",
 				},
 			},
 		},
@@ -125,5 +82,4 @@ func Sanitize(cfg *config.Config) {
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 	}
-
 }

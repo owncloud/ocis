@@ -29,8 +29,8 @@ type Config struct {
 // Instance to use with a matching rule and titles
 type Instance struct {
 	Claim  string            `yaml:"claim"`
-	Regex  string            `yaml:"rule"`
+	Regex  string            `yaml:"regex"`
 	Href   string            `yaml:"href"`
-	Titles map[string]string `yaml:"title"`
+	Titles map[string]string `yaml:"titles"`
 	Break  bool              `yaml:"break"`
 }

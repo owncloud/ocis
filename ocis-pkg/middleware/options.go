@@ -12,8 +12,17 @@ type Option func(o *Options)
 type Options struct {
 	// Logger to use for logging, must be set
 	Logger log.Logger
+	// The OpenID Connect Issuer URL
+	OidcIssuer string
 	// GatewayAPIClient is a reva gateway client
 	GatewayAPIClient gatewayv1beta1.GatewayAPIClient
+}
+
+// WithLogger provides a function to set the openid connect issuer option.
+func WithOidcIssuer(val string) Option {
+	return func(o *Options) {
+		o.OidcIssuer = val
+	}
 }
 
 // WithLogger provides a function to set the logger option.
