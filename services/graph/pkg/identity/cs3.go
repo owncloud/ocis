@@ -9,6 +9,7 @@ import (
 	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/go-ldap/ldap/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -205,6 +206,11 @@ func (i *CS3) AddMembersToGroup(ctx context.Context, groupID string, memberID []
 // RemoveMemberFromGroup implements the Backend Interface. It's currently not supported for the CS3 backend
 func (i *CS3) RemoveMemberFromGroup(ctx context.Context, groupID string, memberID string) error {
 	return errorcode.New(errorcode.NotSupported, "not implemented")
+}
+
+// RemoveEntryByDNAndAttributeFromEntry implements the Backend Interface. It's currently not supported for the CS3 backend
+func (i *CS3) RemoveEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string, attribute string) (*ldap.ModifyRequest, error) {
+	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
 }
 
 func createGroupModelFromCS3(g *cs3group.Group) *libregraph.Group {

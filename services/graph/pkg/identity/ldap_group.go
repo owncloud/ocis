@@ -279,7 +279,7 @@ func (i *LDAP) RemoveMemberFromGroup(ctx context.Context, groupID string, member
 	}
 	logger.Debug().Str("backend", "ldap").Str("groupdn", ge.DN).Str("member", me.DN).Msg("remove member")
 
-	if mr, err := i.removeMemberFromGroupEntry(ge, me.DN); err == nil {
+	if mr, err := i.RemoveEntryByDNAndAttributeFromEntry(ge, me.DN, i.groupAttributeMap.member); err == nil {
 		return i.conn.Modify(mr)
 	}
 	return nil
@@ -411,45 +411,6 @@ func (i *LDAP) getLDAPGroupsByFilter(filter string, requestMembers, single bool)
 		return nil, errorcode.New(errorcode.ItemNotFound, errmsg)
 	}
 	return res.Entries, nil
-}
-
-// removeMemberFromGroupEntry creates an LDAP Modify request (not sending it)
-// that would update the supplied entry to remove the specified member from the
-// group
-func (i *LDAP) removeMemberFromGroupEntry(group *ldap.Entry, memberDN string) (*ldap.ModifyRequest, error) {
-	nOldMemberDN, err := ldapdn.ParseNormalize(memberDN)
-	if err != nil {
-		return nil, err
-	}
-	members := group.GetEqualFoldAttributeValues(i.groupAttributeMap.member)
-	found := false
-	for _, member := range members {
-		if member == "" {
-			continue
-		}
-		if nMember, err := ldapdn.ParseNormalize(member); err != nil {
-			// We couldn't parse the member value as a DN. Let's keep it
-			// as it is but log a warning
-			i.logger.Warn().Str("memberDN", member).Err(err).Msg("Couldn't parse DN")
-			continue
-		} else {
-			if nMember == nOldMemberDN {
-				found = true
-			}
-		}
-	}
-	if !found {
-		i.logger.Debug().Str("backend", "ldap").Str("groupdn", group.DN).Str("member", memberDN).
-			Msg("The target is not a member of the group")
-		return nil, ErrNotFound
-	}
-
-	mr := ldap.ModifyRequest{DN: group.DN}
-	if len(members) == 1 {
-		mr.Add(i.groupAttributeMap.member, []string{""})
-	}
-	mr.Delete(i.groupAttributeMap.member, []string{memberDN})
-	return &mr, nil
 }
 
 func (i *LDAP) getGroupByDN(dn string) (*ldap.Entry, error) {

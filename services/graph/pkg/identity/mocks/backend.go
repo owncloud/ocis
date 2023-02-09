@@ -7,6 +7,8 @@ import (
 
 	godata "github.com/CiscoM31/godata"
 
+	ldap "github.com/go-ldap/ldap/v3"
+
 	libregraph "github.com/owncloud/libre-graph-api-go"
 
 	mock "github.com/stretchr/testify/mock"
@@ -215,6 +217,29 @@ func (_m *Backend) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *godata.GoDataRequest) error); ok {
 		r1 = rf(ctx, oreq)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// RemoveEntryByDNAndAttributeFromEntry provides a mock function with given fields: entry, dn, attribute
+func (_m *Backend) RemoveEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string, attribute string) (*ldap.ModifyRequest, error) {
+	ret := _m.Called(entry, dn, attribute)
+
+	var r0 *ldap.ModifyRequest
+	if rf, ok := ret.Get(0).(func(*ldap.Entry, string, string) *ldap.ModifyRequest); ok {
+		r0 = rf(entry, dn, attribute)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*ldap.ModifyRequest)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*ldap.Entry, string, string) error); ok {
+		r1 = rf(entry, dn, attribute)
 	} else {
 		r1 = ret.Error(1)
 	}

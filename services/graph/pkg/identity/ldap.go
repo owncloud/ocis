@@ -8,6 +8,7 @@ import (
 	"github.com/CiscoM31/godata"
 	"github.com/go-ldap/ldap/v3"
 	"github.com/gofrs/uuid"
+	"github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	oldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -179,7 +180,7 @@ func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 	for _, group := range groupEntries {
 		logger.Debug().Str("group", group.DN).Str("user", e.DN).Msg("Cleaning up group membership")
 
-		if mr, err := i.removeMemberFromGroupEntry(group, e.DN); err == nil {
+		if mr, err := i.RemoveEntryByDNAndAttributeFromEntry(group, e.DN, i.groupAttributeMap.member); err == nil {
 			if err = i.conn.Modify(mr); err != nil {
 				// Errors when deleting the memberships are only logged as warnings but not returned
 				// to the user as we already successfully deleted the users itself
@@ -607,4 +608,41 @@ func stringToScope(scope string) (int, error) {
 		return 0, fmt.Errorf("invalid Scope '%s'", scope)
 	}
 	return s, nil
+}
+
+// RemoveEntryByDNAndAttributeFromEntry creates a request to remove a single member entry by attribute and DN from an ldap entry
+func (i *LDAP) RemoveEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string, attribute string) (*ldap.ModifyRequest, error) {
+	nOldDN, err := ldapdn.ParseNormalize(dn)
+	if err != nil {
+		return nil, err
+	}
+	entries := entry.GetEqualFoldAttributeValues(attribute)
+	found := false
+	for _, entry := range entries {
+		if entry == "" {
+			continue
+		}
+		if nEntry, err := ldapdn.ParseNormalize(entry); err != nil {
+			// We couldn't parse the entry value as a DN. Let's keep it
+			// as it is but log a warning
+			i.logger.Warn().Str("entryDN", entry).Err(err).Msg("Couldn't parse DN")
+			continue
+		} else {
+			if nEntry == nOldDN {
+				found = true
+			}
+		}
+	}
+	if !found {
+		i.logger.Debug().Str("backend", "ldap").Str("entry", entry.DN).Str("target", dn).
+			Msg("The target is not an entry in the attribute list")
+		return nil, ErrNotFound
+	}
+
+	mr := ldap.ModifyRequest{DN: entry.DN}
+	if len(entries) == 1 {
+		mr.Add(attribute, []string{""})
+	}
+	mr.Delete(attribute, []string{dn})
+	return &mr, nil
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/CiscoM31/godata"
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/go-ldap/ldap/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
@@ -40,6 +41,8 @@ type Backend interface {
 	AddMembersToGroup(ctx context.Context, groupID string, memberID []string) error
 	// RemoveMemberFromGroup removes a single member (by ID) from a group
 	RemoveMemberFromGroup(ctx context.Context, groupID string, memberID string) error
+	// RemoveEntryByDNAndAttributeFromEntry creates a request to remove a single member entry by attribute and DN from an ldap entry
+	RemoveEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string, attribute string) (*ldap.ModifyRequest, error)
 }
 
 // EducationBackend defines the Interface for an EducationBackend implementation

@@ -467,48 +467,9 @@ func (i *LDAP) RemoveTeacherFromEducationClass(ctx context.Context, classID stri
 		return err
 	}
 
-	if mr, err := i.removeTeacherFromClassEntry(class, teacher.DN); err == nil {
+	if mr, err := i.RemoveEntryByDNAndAttributeFromEntry(class, teacher.DN, i.educationConfig.classAttributeMap.teachers); err == nil {
 		return i.conn.Modify(mr)
 	}
 
 	return nil
-}
-
-// removeTeacherFromClassEntry creates an LDAP Modify request (not sending it)
-// that would update the supplied entry to remove the specified teacher from the
-// class
-func (i *LDAP) removeTeacherFromClassEntry(class *ldap.Entry, teacherDN string) (*ldap.ModifyRequest, error) {
-	nOldTeacherDN, err := ldapdn.ParseNormalize(teacherDN)
-	if err != nil {
-		return nil, err
-	}
-	teachers := class.GetEqualFoldAttributeValues(i.educationConfig.classAttributeMap.teachers)
-	found := false
-	for _, teacher := range teachers {
-		if teacher == "" {
-			continue
-		}
-		if nTeacher, err := ldapdn.ParseNormalize(teacher); err != nil {
-			// We couldn't parse the teacher value as a DN. Let's keep it
-			// as it is but log a warning
-			i.logger.Warn().Str("teacherDN", teacher).Err(err).Msg("Couldn't parse DN")
-			continue
-		} else {
-			if nTeacher == nOldTeacherDN {
-				found = true
-			}
-		}
-	}
-	if !found {
-		i.logger.Debug().Str("backend", "ldap").Str("groupdn", class.DN).Str("teacher", teacherDN).
-			Msg("The target is not a teacher of the class")
-		return nil, ErrNotFound
-	}
-
-	mr := ldap.ModifyRequest{DN: class.DN}
-	if len(teachers) == 1 {
-		mr.Add(i.educationConfig.classAttributeMap.teachers, []string{""})
-	}
-	mr.Delete(i.educationConfig.classAttributeMap.teachers, []string{teacherDN})
-	return &mr, nil
 }
