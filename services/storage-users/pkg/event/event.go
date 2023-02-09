@@ -1,10 +1,10 @@
 package event
 
 import (
-	"os"
-
 	"crypto/tls"
 	"crypto/x509"
+	"os"
+
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/go-micro/plugins/v4/events/natsjs"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
@@ -32,7 +32,8 @@ func NewStream(cfg config.Events) (events.Stream, error) {
 		}
 
 		tlsConf = &tls.Config{
-			RootCAs: rootCAPool,
+			MinVersion: tls.VersionTLS12,
+			RootCAs:    rootCAPool,
 		}
 	}
 

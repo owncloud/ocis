@@ -24,6 +24,7 @@ var (
 	}
 )
 
+// TrashBin wraps trash-bin related sub-commands.
 func TrashBin(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "trash-bin",

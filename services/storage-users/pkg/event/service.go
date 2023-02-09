@@ -31,6 +31,7 @@ func NewService(gw gateway.GatewayAPIClient, s events.Stream, l log.Logger, clie
 	return svc, nil
 }
 
+// Run to fulfil Runner interface
 func (s Service) Run() error {
 	ch, err := events.Consume(s.stream, consumerGroup, PurgeTrashBin{})
 	if err != nil {

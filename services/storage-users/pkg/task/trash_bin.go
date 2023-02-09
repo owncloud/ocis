@@ -17,11 +17,11 @@ import (
 )
 
 // PurgeTrashBin can be used to purge space trash-bin's,
-// the provided executantId must have space access and delete permissions.
+// the provided executantID must have space access and delete permissions.
 // removeBefore specifies how long an item must be in the trash-bin to be deleted,
-// items that stay there for a shorter time are ignored.
-func PurgeTrashBin(gw apiGateway.GatewayAPIClient, clientSecret, executantId string, removeBefore time.Time) error {
-	executantToken, err := getToken(gw, clientSecret, executantId)
+// items that stay there for a shorter time are ignored and kept in place.
+func PurgeTrashBin(gw apiGateway.GatewayAPIClient, clientSecret, executantID string, removeBefore time.Time) error {
+	executantToken, err := getToken(gw, clientSecret, executantID)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,7 @@ func PurgeTrashBin(gw apiGateway.GatewayAPIClient, clientSecret, executantId str
 			}
 
 			for id, permissions := range permissionsMap {
-				if permissions.Delete != true {
+				if !permissions.Delete {
 					continue
 				}
 
@@ -73,7 +73,7 @@ func PurgeTrashBin(gw apiGateway.GatewayAPIClient, clientSecret, executantId str
 		}
 
 		if impersonationUserID == "" {
-			err = fmt.Errorf("cant impersonate space user for space: %s", storageSpace.GetId())
+			err = fmt.Errorf("can't impersonate space user for space: %s", storageSpace.GetId().GetOpaqueId())
 		}
 
 		if err != nil {
@@ -87,6 +87,9 @@ func PurgeTrashBin(gw apiGateway.GatewayAPIClient, clientSecret, executantId str
 
 		impersonatedCtx := metadata.AppendToOutgoingContext(context.Background(), ctxpkg.TokenHeader, impersonationToken)
 		listRecycleResponse, err := gw.ListRecycle(impersonatedCtx, &apiProvider.ListRecycleRequest{Ref: storageSpaceReference})
+		if err != nil {
+			return err
+		}
 
 		for _, recycleItem := range listRecycleResponse.GetRecycleItems() {
 			doDelete := utils.TSToUnixNano(recycleItem.DeletionTime) < utils.TSToUnixNano(utils.TimeToTS(removeBefore))
