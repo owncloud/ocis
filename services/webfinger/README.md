@@ -7,13 +7,13 @@ It is based on https://github.com/owncloud/lookup-webfinger-sciebo but also retu
 ## OpenID Connect Discovery
 
 Clients can make an unauthenticated `GET https://drive.ocis.test/.well-known/webfinger?resource=https%3A%2F%2Fcloud.ocis.test` request to discover the OpenID Connect Issuer in the `http://openid.net/specs/connect/1.0/issuer` relation:
-```
+```json
 {
     "subject": "acct:einstein@drive.ocis.test",
     "links": [
         {
-            "rel": "http://openid.net/specs/connect/1.0/issuer"
-            "href": "https://sso.example.org/cas/oidc/",
+            "rel": "http://openid.net/specs/connect/1.0/issuer",
+            "href": "https://sso.example.org/cas/oidc/"
         }
     ]
 }
@@ -27,7 +27,6 @@ When using OpenID connect to authenticate requests clients can look up the owncl
 *   Authentication is necessary to prevent leaking information about existing users
 *   Basic auth is not supported
 
-
 The default configuration will simply return the `OCIS_URL` and direct clients to that domain:
 
 ```json
@@ -35,29 +34,21 @@ The default configuration will simply return the `OCIS_URL` and direct clients t
     "subject": "acct:einstein@drive.ocis.test",
     "links": [
         {
-            "rel": "http://openid.net/specs/connect/1.0/issuer"
-            "href": "https://sso.example.org/cas/oidc/",
+            "rel": "http://openid.net/specs/connect/1.0/issuer",
+            "href": "https://sso.example.org/cas/oidc/"
         },
         {
             "rel": "http://webfinger.owncloud/rel/server-instance",
-            "href": "https://abc.drive.example.org"
-    	    "titles": {
-    	      "en": "Readable Instance Name"
-    	    }
-        },
-        {
-            "rel": "http://webfinger.owncloud/rel/server-instance",
-            "href": "https://xyz.drive.example.org"
-    	    "titles": {
-    	      "en": "Readable Other Instance Name"
-    	    }
+            "href": "https://abc.drive.example.org",
+            "titles": {
+                "en": "oCIS Instance"
+            }
         }
     ]
 }
 ```
 
 ## Configure different instances based on OpenidConnect UserInfo claims
-
 
 A more complex example for configuring different instances could look like this
 ```yaml
@@ -107,8 +98,8 @@ Now, an authenticated webfinger request for `acct:me@example.org` (when logged i
     "subject": "acct:marie@example.org",
     "links": [
         {
-            "rel": "http://openid.net/specs/connect/1.0/issuer"
-            "href": "https://sso.example.org/cas/oidc/",
+            "rel": "http://openid.net/specs/connect/1.0/issuer",
+            "href": "https://sso.example.org/cas/oidc/"
         },
         {
             "rel": "http://webfinger.owncloud/rel/server-instance",
