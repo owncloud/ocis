@@ -1479,33 +1479,45 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @param TableNode $table
-	 *
 	 * @Then the user retrieve API response should contain the following applications information:
+	 *
+	 * @param TableNode $table
 	 *
 	 * @return void
 	 */
 	public function theResponseShouldContainTheFollowingApplicationsInformation(TableNode $table): void {
-		$responseArray = ($this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse()))['value'][0];
-		$original = $responseArray;
-
+		Assert::assertIsArray($responseArray = ($this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse()))['value'][0]);
 		foreach ($table->getHash() as $row) {
-			$segments = explode("@@@", $row["key"]);
-	  
-			foreach ($segments as $segment) {
-				$arrayKeyExists = \array_key_exists($segment, $responseArray);
-				$key = $row["key"];
-				Assert::assertTrue($arrayKeyExists, "The key $key does not exist on the response");
-				if ($arrayKeyExists) {
-					$responseArray = $responseArray[$segment];
+			$key = $row["key"];
+			if ($key === 'id') {
+				Assert::assertTrue(
+					GraphHelper::isUUIDv4($responseArray[$key]),
+					__METHOD__ . ' Expected id to have UUIDv4 pattern but found: ' . $row["value"]
+				);
+			} else {
+				Assert::assertEquals($responseArray[$key], $row["value"]);
+			}
+		}
+	}
+
+	/**
+	 * @Then the user retrieve API response should contain the following app roles:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theResponseShouldContainTheFollowingAppRolesInformation(TableNode $table): void {
+		Assert::assertIsArray($responseArray = ($this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse()))['value'][0]);
+		foreach ($table->getRows() as $row) {
+			$foundRoleInResponse = false;
+			foreach ($responseArray['appRoles'] as $role) {
+				if ($role['displayName'] === $row[0]) {
+					$foundRoleInResponse = true;
+					break;
 				}
 			}
-			if ($segment === 'id') {
-				Assert::assertTrue(GraphHelper::isUUIDv4($responseArray), __METHOD__ . ' Expected id to have UUIDv4 pattern but found: ' . $row["value"]);
-			} else {
-				Assert::assertEquals($responseArray, $row["value"]);
-			}
-			$responseArray = $original;
+			Assert::assertTrue($foundRoleInResponse, "the response does not contain the role $row[0]");
 		}
 	}
 }
