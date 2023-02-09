@@ -646,3 +646,26 @@ func (i *LDAP) RemoveEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string
 	mr.Delete(attribute, []string{dn})
 	return &mr, nil
 }
+
+// ExpandLDAPAttributeEntries reads an attribute from an ldap entry and expands to users
+func (i *LDAP) ExpandLDAPAttributeEntries(ctx context.Context, e *ldap.Entry, attribute string) ([]*ldap.Entry, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("ExpandLDAPAttributeEntries")
+	result := []*ldap.Entry{}
+
+	for _, entryDN := range e.GetEqualFoldAttributeValues(attribute) {
+		if entryDN == "" {
+			continue
+		}
+		logger.Debug().Str("entryDN", entryDN).Msg("lookup")
+		ue, err := i.getUserByDN(entryDN)
+		if err != nil {
+			// Ignore errors when reading a specific entry fails, just log them and continue
+			logger.Debug().Err(err).Str("entry", entryDN).Msg("error reading attribute member entry")
+			continue
+		}
+		result = append(result, ue)
+	}
+
+	return result, nil
+}

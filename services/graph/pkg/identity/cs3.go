@@ -213,6 +213,11 @@ func (i *CS3) RemoveEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string,
 	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
 }
 
+// ExpandLDAPAttributeEntries implements the Backend Interface. It's currently not supported for the CS3 backend
+func (i *CS3) ExpandLDAPAttributeEntries(ctx context.Context, e *ldap.Entry, attribute string) ([]*ldap.Entry, error) {
+	return nil, errorcode.New(errorcode.NotSupported, "not implemented")
+}
+
 func createGroupModelFromCS3(g *cs3group.Group) *libregraph.Group {
 	if g.Id == nil {
 		g.Id = &cs3group.GroupId{}

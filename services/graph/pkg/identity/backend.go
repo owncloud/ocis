@@ -43,6 +43,8 @@ type Backend interface {
 	RemoveMemberFromGroup(ctx context.Context, groupID string, memberID string) error
 	// RemoveEntryByDNAndAttributeFromEntry creates a request to remove a single member entry by attribute and DN from an ldap entry
 	RemoveEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string, attribute string) (*ldap.ModifyRequest, error)
+	// ExpandLDAPAttributeEntries reads an attribute from an ldap entry and expands to users
+	ExpandLDAPAttributeEntries(ctx context.Context, e *ldap.Entry, attribute string) ([]*ldap.Entry, error)
 }
 
 // EducationBackend defines the Interface for an EducationBackend implementation

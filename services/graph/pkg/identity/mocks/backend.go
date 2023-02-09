@@ -109,6 +109,29 @@ func (_m *Backend) DeleteUser(ctx context.Context, nameOrID string) error {
 	return r0
 }
 
+// ExpandLDAPAttributeEntries provides a mock function with given fields: ctx, e, attribute
+func (_m *Backend) ExpandLDAPAttributeEntries(ctx context.Context, e *ldap.Entry, attribute string) ([]*ldap.Entry, error) {
+	ret := _m.Called(ctx, e, attribute)
+
+	var r0 []*ldap.Entry
+	if rf, ok := ret.Get(0).(func(context.Context, *ldap.Entry, string) []*ldap.Entry); ok {
+		r0 = rf(ctx, e, attribute)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*ldap.Entry)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *ldap.Entry, string) error); ok {
+		r1 = rf(ctx, e, attribute)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // GetGroup provides a mock function with given fields: ctx, nameOrID, queryParam
 func (_m *Backend) GetGroup(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.Group, error) {
 	ret := _m.Called(ctx, nameOrID, queryParam)

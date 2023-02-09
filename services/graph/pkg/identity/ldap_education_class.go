@@ -228,7 +228,7 @@ func (i *LDAP) GetEducationClassMembers(ctx context.Context, id string) ([]*libr
 		return nil, err
 	}
 
-	memberEntries, err := i.expandLDAPGroupMembers(ctx, e)
+	memberEntries, err := i.ExpandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
 	result := make([]*libregraph.EducationUser, 0, len(memberEntries))
 	if err != nil {
 		return nil, err
@@ -351,7 +351,7 @@ func (i *LDAP) GetEducationClassTeachers(ctx context.Context, classID string) ([
 		return nil, err
 	}
 
-	teacherEntries, err := i.expandLDAPClassTeachers(ctx, class)
+	teacherEntries, err := i.ExpandLDAPAttributeEntries(ctx, class, i.educationConfig.classAttributeMap.teachers)
 	result := make([]*libregraph.EducationUser, 0, len(teacherEntries))
 	if err != nil {
 		return nil, err
@@ -364,28 +364,6 @@ func (i *LDAP) GetEducationClassTeachers(ctx context.Context, classID string) ([
 
 	return result, nil
 
-}
-
-func (i *LDAP) expandLDAPClassTeachers(ctx context.Context, e *ldap.Entry) ([]*ldap.Entry, error) {
-	logger := i.logger.SubloggerWithRequestID(ctx)
-	logger.Debug().Str("backend", "ldap").Msg("expandLDAPClassTeachers")
-	result := []*ldap.Entry{}
-
-	for _, teacherDN := range e.GetEqualFoldAttributeValues(i.educationConfig.classAttributeMap.teachers) {
-		if teacherDN == "" {
-			continue
-		}
-		logger.Debug().Str("teacherDN", teacherDN).Msg("lookup")
-		ue, err := i.getUserByDN(teacherDN)
-		if err != nil {
-			// Ignore errors when reading a specific teacher fails, just log them and continue
-			logger.Debug().Err(err).Str("teacher", teacherDN).Msg("error reading class teacher")
-			continue
-		}
-		result = append(result, ue)
-	}
-
-	return result, nil
 }
 
 // AddTeacherToEducationclass adds a teacher (by ID) to class in the identity backend.

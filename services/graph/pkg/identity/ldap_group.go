@@ -37,7 +37,7 @@ func (i *LDAP) GetGroup(ctx context.Context, nameOrID string, queryParam url.Val
 		return nil, errorcode.New(errorcode.ItemNotFound, "not found")
 	}
 	if slices.Contains(sel, "members") || slices.Contains(exp, "members") {
-		members, err := i.expandLDAPGroupMembers(ctx, e)
+		members, err := i.ExpandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
 		if err != nil {
 			return nil, err
 		}
@@ -115,7 +115,7 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 			continue
 		}
 		if expandMembers {
-			members, err := i.expandLDAPGroupMembers(ctx, e)
+			members, err := i.ExpandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
 			if err != nil {
 				return nil, err
 			}
@@ -142,7 +142,7 @@ func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string) ([]*libregra
 		return nil, err
 	}
 
-	memberEntries, err := i.expandLDAPGroupMembers(ctx, e)
+	memberEntries, err := i.ExpandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
 	result := make([]*libregraph.User, 0, len(memberEntries))
 	if err != nil {
 		return nil, err
@@ -321,28 +321,6 @@ func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]strin
 		attrs["objectClass"] = append(attrs["objectClass"], "owncloud")
 	}
 	return attrs, nil
-}
-
-func (i *LDAP) expandLDAPGroupMembers(ctx context.Context, e *ldap.Entry) ([]*ldap.Entry, error) {
-	logger := i.logger.SubloggerWithRequestID(ctx)
-	logger.Debug().Str("backend", "ldap").Msg("expandLDAPGroupMembers")
-	result := []*ldap.Entry{}
-
-	for _, memberDN := range e.GetEqualFoldAttributeValues(i.groupAttributeMap.member) {
-		if memberDN == "" {
-			continue
-		}
-		logger.Debug().Str("memberDN", memberDN).Msg("lookup")
-		ue, err := i.getUserByDN(memberDN)
-		if err != nil {
-			// Ignore errors when reading a specific member fails, just log them and continue
-			logger.Debug().Err(err).Str("member", memberDN).Msg("error reading group member")
-			continue
-		}
-		result = append(result, ue)
-	}
-
-	return result, nil
 }
 
 func (i *LDAP) getLDAPGroupByID(id string, requestMembers bool) (*ldap.Entry, error) {
