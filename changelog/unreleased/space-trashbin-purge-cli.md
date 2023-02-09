@@ -3,7 +3,7 @@ Enhancement: Cli to purge expired trash-bin items
 Introduction of a new cli command to purge old trash-bin items.
 The command is part of the `storage-users` service and can be used as follows:
 
-`storage-users trash-bin purge-expired`.
+`ocis storage-users trash-bin purge-expired`.
 
 The `purge-expired` command configuration is done in the `ocis`configuration or as usual by using environment variables.
 
