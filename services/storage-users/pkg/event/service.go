@@ -1,9 +1,13 @@
 package event
 
 import (
-	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"time"
+
+	apiGateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	apiUser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/task"
 )
 
@@ -13,19 +17,19 @@ const (
 
 // Service wraps all common logic that is needed to react to incoming events.
 type Service struct {
-	gateway      gateway.GatewayAPIClient
-	stream       events.Stream
-	logger       log.Logger
-	clientSecret string
+	gatewayClient apiGateway.GatewayAPIClient
+	eventStream   events.Stream
+	logger        log.Logger
+	config        config.Config
 }
 
 // NewService prepares and returns a Service implementation.
-func NewService(gw gateway.GatewayAPIClient, s events.Stream, l log.Logger, clientSecret string) (Service, error) {
+func NewService(gatewayClient apiGateway.GatewayAPIClient, eventStream events.Stream, logger log.Logger, conf config.Config) (Service, error) {
 	svc := Service{
-		gateway:      gw,
-		stream:       s,
-		logger:       l,
-		clientSecret: clientSecret,
+		gatewayClient: gatewayClient,
+		eventStream:   eventStream,
+		logger:        logger,
+		config:        conf,
 	}
 
 	return svc, nil
@@ -33,20 +37,46 @@ func NewService(gw gateway.GatewayAPIClient, s events.Stream, l log.Logger, clie
 
 // Run to fulfil Runner interface
 func (s Service) Run() error {
-	ch, err := events.Consume(s.stream, consumerGroup, PurgeTrashBin{})
+	ch, err := events.Consume(s.eventStream, consumerGroup, PurgeTrashBin{})
 	if err != nil {
 		return err
 	}
 
 	for e := range ch {
-		var err error
+		var errs []error
 
 		switch ev := e.(type) {
 		case PurgeTrashBin:
-			err = task.PurgeTrashBin(s.gateway, s.clientSecret, ev.ExecutantID, ev.RemoveBefore)
+			executionTime := ev.ExecutionTime
+			if executionTime.IsZero() {
+				executionTime = time.Now()
+			}
+
+			executantID := ev.ExecutantID
+			if executantID == nil {
+				executantID = &apiUser.UserId{OpaqueId: s.config.Tasks.PurgeTrashBin.UserID}
+			}
+
+			tasks := map[task.SpaceType]time.Time{
+				task.Project:  executionTime.Add(-s.config.Tasks.PurgeTrashBin.ProjectDeleteBefore),
+				task.Personal: executionTime.Add(-s.config.Tasks.PurgeTrashBin.PersonalDeleteBefore),
+			}
+
+			for spaceType, deleteBefore := range tasks {
+				// skip task execution if the deleteBefore time is the same as the now time,
+				// this indicates that the configuration for this task iteration is set to 0 which is used as disable indicator.
+				if deleteBefore.Equal(executionTime) {
+					continue
+				}
+
+				if err = task.PurgeTrashBin(executantID, deleteBefore, spaceType, s.gatewayClient, s.config.Commons.MachineAuthAPIKey); err != nil {
+					errs = append(errs, err)
+				}
+			}
+
 		}
 
-		if err != nil {
+		for _, err := range errs {
 			s.logger.Error().Err(err).Interface("event", e)
 		}
 	}

@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"path/filepath"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -87,6 +88,12 @@ func DefaultConfig() *config.Config {
 			Store:    "memory",
 			Database: "users",
 		},
+		Tasks: config.Tasks{
+			PurgeTrashBin: config.PurgeTrashBin{
+				ProjectDeleteBefore:  30 * 24 * time.Hour,
+				PersonalDeleteBefore: 30 * 24 * time.Hour,
+			},
+		},
 	}
 }
 
@@ -140,8 +147,8 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	}
 
-	if cfg.Commons == nil {
-		cfg.Commons = &shared.Commons{}
+	if cfg.Tasks.PurgeTrashBin.UserID == "" && cfg.Commons != nil {
+		cfg.Tasks.PurgeTrashBin.UserID = cfg.Commons.AdminUserID
 	}
 }
 

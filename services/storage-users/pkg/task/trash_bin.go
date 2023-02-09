@@ -1,35 +1,38 @@
 package task
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
 
 	apiGateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	apiUser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	apiRpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	apiProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	"google.golang.org/grpc/metadata"
 )
 
 // PurgeTrashBin can be used to purge space trash-bin's,
-// the provided executantID must have space access and delete permissions.
+// the provided executantID must have space access.
 // removeBefore specifies how long an item must be in the trash-bin to be deleted,
 // items that stay there for a shorter time are ignored and kept in place.
-func PurgeTrashBin(gw apiGateway.GatewayAPIClient, clientSecret, executantID string, removeBefore time.Time) error {
-	executantToken, err := getToken(gw, clientSecret, executantID)
+func PurgeTrashBin(executantID *apiUser.UserId, deleteBefore time.Time, spaceType SpaceType, gwc apiGateway.GatewayAPIClient, machineAuthAPIKey string) error {
+	executantCtx, _, err := utils.Impersonate(executantID, gwc, machineAuthAPIKey)
 	if err != nil {
 		return err
 	}
 
-	executantCtx := metadata.AppendToOutgoingContext(context.Background(), ctxpkg.TokenHeader, executantToken)
-	listStorageSpacesResponse, err := gw.ListStorageSpaces(executantCtx, &apiProvider.ListStorageSpacesRequest{
-		// ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE cant handle `AND` (`project` && `personal`) chains,
-		// therefore we need to request all space types and filter them out later (`virtual`).
+	listStorageSpacesResponse, err := gwc.ListStorageSpaces(executantCtx, &apiProvider.ListStorageSpacesRequest{
+		Filters: []*apiProvider.ListStorageSpacesRequest_Filter{
+			{
+				Type: apiProvider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
+				Term: &apiProvider.ListStorageSpacesRequest_Filter_SpaceType{
+					SpaceType: string(spaceType),
+				},
+			},
+		},
 	})
 	if err != nil {
 		return err
@@ -38,16 +41,16 @@ func PurgeTrashBin(gw apiGateway.GatewayAPIClient, clientSecret, executantID str
 	for _, storageSpace := range listStorageSpacesResponse.StorageSpaces {
 		var (
 			err                   error
-			impersonationUserID   string
+			impersonationID       *apiUser.UserId
 			storageSpaceReference = &apiProvider.Reference{
 				ResourceId: storageSpace.GetRoot(),
 			}
 		)
 
 		switch storageSpace.GetSpaceType() {
-		case "personal":
-			impersonationUserID = storageSpace.GetOwner().GetId().GetOpaqueId()
-		case "project":
+		case string(Personal):
+			impersonationID = storageSpace.GetOwner().GetId()
+		case string(Project):
 			opaqueGrants, ok := storageSpace.GetOpaque().GetMap()["grants"]
 			if !ok {
 				err = errors.New("no grants")
@@ -65,14 +68,16 @@ func PurgeTrashBin(gw apiGateway.GatewayAPIClient, clientSecret, executantID str
 					continue
 				}
 
-				impersonationUserID = id
+				impersonationID = &apiUser.UserId{
+					OpaqueId: id,
+				}
 				break
 			}
 		default:
 			continue
 		}
 
-		if impersonationUserID == "" {
+		if impersonationID == nil {
 			err = fmt.Errorf("can't impersonate space user for space: %s", storageSpace.GetId().GetOpaqueId())
 		}
 
@@ -80,24 +85,23 @@ func PurgeTrashBin(gw apiGateway.GatewayAPIClient, clientSecret, executantID str
 			return err
 		}
 
-		impersonationToken, err := getToken(gw, clientSecret, impersonationUserID)
+		impersonatedCtx, _, err := utils.Impersonate(impersonationID, gwc, machineAuthAPIKey)
 		if err != nil {
 			return err
 		}
 
-		impersonatedCtx := metadata.AppendToOutgoingContext(context.Background(), ctxpkg.TokenHeader, impersonationToken)
-		listRecycleResponse, err := gw.ListRecycle(impersonatedCtx, &apiProvider.ListRecycleRequest{Ref: storageSpaceReference})
+		listRecycleResponse, err := gwc.ListRecycle(impersonatedCtx, &apiProvider.ListRecycleRequest{Ref: storageSpaceReference})
 		if err != nil {
 			return err
 		}
 
 		for _, recycleItem := range listRecycleResponse.GetRecycleItems() {
-			doDelete := utils.TSToUnixNano(recycleItem.DeletionTime) < utils.TSToUnixNano(utils.TimeToTS(removeBefore))
+			doDelete := utils.TSToUnixNano(recycleItem.DeletionTime) < utils.TSToUnixNano(utils.TimeToTS(deleteBefore))
 			if !doDelete {
 				continue
 			}
 
-			purgeRecycleResponse, err := gw.PurgeRecycle(impersonatedCtx, &apiProvider.PurgeRecycleRequest{
+			purgeRecycleResponse, err := gwc.PurgeRecycle(impersonatedCtx, &apiProvider.PurgeRecycleRequest{
 				Ref: storageSpaceReference,
 				Key: recycleItem.Key,
 			})

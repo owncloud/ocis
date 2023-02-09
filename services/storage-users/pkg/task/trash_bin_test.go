@@ -31,11 +31,12 @@ func MustMarshal(v any) []byte {
 
 var _ = Describe("trash", func() {
 	var (
-		gw                        *cs3mocks.GatewayAPIClient
+		gwc                       *cs3mocks.GatewayAPIClient
 		ctx                       context.Context
 		now                       time.Time
 		genericError              error
 		user                      *apiUser.User
+		getUserResponse           *apiUser.GetUserResponse
 		authenticateResponse      *apiGateway.AuthenticateResponse
 		listStorageSpacesResponse *apiProvider.ListStorageSpacesResponse
 		personalSpace             *apiProvider.StorageSpace
@@ -44,10 +45,13 @@ var _ = Describe("trash", func() {
 	)
 
 	BeforeEach(func() {
-		gw = &cs3mocks.GatewayAPIClient{}
+		gwc = &cs3mocks.GatewayAPIClient{}
 		ctx = context.Background()
 		now = time.Now()
 		genericError = errors.New("any")
+		getUserResponse = &apiUser.GetUserResponse{
+			Status: status.NewOK(ctx),
+		}
 		authenticateResponse = &apiGateway.AuthenticateResponse{
 			Status: status.NewOK(ctx),
 			Token:  "",
@@ -96,68 +100,73 @@ var _ = Describe("trash", func() {
 
 	Describe("PurgeTrashBin", func() {
 		It("throws an error if the user cannot authenticate", func() {
-			gw.On("Authenticate", mock.Anything, mock.Anything).Return(nil, genericError)
+			gwc.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gwc.On("Authenticate", mock.Anything, mock.Anything).Return(nil, genericError)
 
-			err := task.PurgeTrashBin(gw, "", "", now)
+			err := task.PurgeTrashBin(user.Id, now, task.Project, gwc, "")
 			Expect(err).To(HaveOccurred())
 		})
 		It("throws an error if space listing fails", func() {
-			gw.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
-			gw.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(nil, genericError)
+			gwc.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gwc.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
+			gwc.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(nil, genericError)
 
-			err := task.PurgeTrashBin(gw, "", "", now)
+			err := task.PurgeTrashBin(user.Id, now, task.Project, gwc, "")
 			Expect(err).To(HaveOccurred())
 		})
 		It("throws an error if a personal space user can't be impersonated", func() {
 			listStorageSpacesResponse.StorageSpaces = []*apiProvider.StorageSpace{personalSpace}
-			gw.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
-			gw.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listStorageSpacesResponse, nil)
+			gwc.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gwc.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
+			gwc.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listStorageSpacesResponse, nil)
 
-			err := task.PurgeTrashBin(gw, "", "", now)
+			err := task.PurgeTrashBin(user.Id, now, task.Project, gwc, "")
 			Expect(err).To(MatchError(errors.New("can't impersonate space user for space: personal")))
 		})
 		It("throws an error if a project space user can't be impersonated", func() {
 			listStorageSpacesResponse.StorageSpaces = []*apiProvider.StorageSpace{projectSpace}
-			gw.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
-			gw.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listStorageSpacesResponse, nil)
+			gwc.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gwc.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
+			gwc.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listStorageSpacesResponse, nil)
 
-			err := task.PurgeTrashBin(gw, "", "", now)
+			err := task.PurgeTrashBin(user.Id, now, task.Project, gwc, "")
 			Expect(err).To(MatchError(errors.New("can't impersonate space user for space: project")))
 		})
 		It("throws an error if a project space has no user with delete permissions", func() {
 			listStorageSpacesResponse.StorageSpaces = []*apiProvider.StorageSpace{projectSpace}
 			projectSpace.Opaque.Map = map[string]*apiTypes.OpaqueEntry{
-				"grants": &apiTypes.OpaqueEntry{
+				"grants": {
 					Value: MustMarshal(map[string]*apiProvider.ResourcePermissions{
-						"admin": &apiProvider.ResourcePermissions{
+						"admin": {
 							Delete: false,
 						},
 					}),
 				},
 			}
-			gw.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
-			gw.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listStorageSpacesResponse, nil)
+			gwc.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gwc.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
+			gwc.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listStorageSpacesResponse, nil)
 
-			err := task.PurgeTrashBin(gw, "", "", now)
+			err := task.PurgeTrashBin(user.Id, now, task.Project, gwc, "")
 			Expect(err).To(MatchError(errors.New("can't impersonate space user for space: project")))
 		})
 		It("only deletes items older than the specified period", func() {
 			var (
 				recycleItems = map[string][]*apiProvider.RecycleItem{
-					"personal": []*apiProvider.RecycleItem{
-						&apiProvider.RecycleItem{Key: "now", DeletionTime: utils.TimeToTS(now)},
-						&apiProvider.RecycleItem{Key: "after", DeletionTime: utils.TimeToTS(now.Add(1 * time.Second))},
-						&apiProvider.RecycleItem{Key: "before", DeletionTime: utils.TimeToTS(now.Add(-1 * time.Second))},
+					"personal": {
+						{Key: "now", DeletionTime: utils.TimeToTS(now)},
+						{Key: "after", DeletionTime: utils.TimeToTS(now.Add(1 * time.Second))},
+						{Key: "before", DeletionTime: utils.TimeToTS(now.Add(-1 * time.Second))},
 					},
-					"project": []*apiProvider.RecycleItem{
-						&apiProvider.RecycleItem{Key: "now", DeletionTime: utils.TimeToTS(now)},
-						&apiProvider.RecycleItem{Key: "after", DeletionTime: utils.TimeToTS(now.Add(1 * time.Minute))},
-						&apiProvider.RecycleItem{Key: "before", DeletionTime: utils.TimeToTS(now.Add(-1 * time.Minute))},
+					"project": {
+						{Key: "now", DeletionTime: utils.TimeToTS(now)},
+						{Key: "after", DeletionTime: utils.TimeToTS(now.Add(1 * time.Minute))},
+						{Key: "before", DeletionTime: utils.TimeToTS(now.Add(-1 * time.Minute))},
 					},
-					"virtual": []*apiProvider.RecycleItem{
-						&apiProvider.RecycleItem{Key: "now", DeletionTime: utils.TimeToTS(now)},
-						&apiProvider.RecycleItem{Key: "after", DeletionTime: utils.TimeToTS(now.Add(1 * time.Hour))},
-						&apiProvider.RecycleItem{Key: "before", DeletionTime: utils.TimeToTS(now.Add(-1 * time.Hour))},
+					"virtual": {
+						{Key: "now", DeletionTime: utils.TimeToTS(now)},
+						{Key: "after", DeletionTime: utils.TimeToTS(now.Add(1 * time.Hour))},
+						{Key: "before", DeletionTime: utils.TimeToTS(now.Add(-1 * time.Hour))},
 					},
 				}
 			)
@@ -169,25 +178,26 @@ var _ = Describe("trash", func() {
 				virtualSpace,
 			}
 			projectSpace.Opaque.Map = map[string]*apiTypes.OpaqueEntry{
-				"grants": &apiTypes.OpaqueEntry{
+				"grants": {
 					Value: MustMarshal(map[string]*apiProvider.ResourcePermissions{
-						"admin": &apiProvider.ResourcePermissions{
+						"admin": {
 							Delete: true,
 						},
 					}),
 				},
 			}
 
-			gw.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
-			gw.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listStorageSpacesResponse, nil)
-			gw.On("ListRecycle", mock.Anything, mock.Anything).Return(
+			gwc.On("GetUser", mock.Anything, mock.Anything).Return(getUserResponse, nil)
+			gwc.On("Authenticate", mock.Anything, mock.Anything).Return(authenticateResponse, nil)
+			gwc.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(listStorageSpacesResponse, nil)
+			gwc.On("ListRecycle", mock.Anything, mock.Anything).Return(
 				func(_ context.Context, req *apiProvider.ListRecycleRequest, _ ...grpc.CallOption) *apiProvider.ListRecycleResponse {
 					return &apiProvider.ListRecycleResponse{
 						RecycleItems: recycleItems[req.Ref.ResourceId.OpaqueId],
 					}
 				}, nil,
 			)
-			gw.On("PurgeRecycle", mock.Anything, mock.Anything).Return(
+			gwc.On("PurgeRecycle", mock.Anything, mock.Anything).Return(
 				func(_ context.Context, req *apiProvider.PurgeRecycleRequest, _ ...grpc.CallOption) *apiProvider.PurgeRecycleResponse {
 					var items []*apiProvider.RecycleItem
 					for _, item := range recycleItems[req.Ref.ResourceId.OpaqueId] {
@@ -208,7 +218,7 @@ var _ = Describe("trash", func() {
 				}, nil,
 			)
 
-			err := task.PurgeTrashBin(gw, "", "", now)
+			err := task.PurgeTrashBin(user.Id, now, task.Project, gwc, "")
 			Expect(err).To(BeNil())
 			Expect(recycleItems["personal"]).To(HaveLen(2))
 			Expect(recycleItems["project"]).To(HaveLen(2))

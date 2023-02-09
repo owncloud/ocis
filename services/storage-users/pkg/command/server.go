@@ -101,7 +101,7 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				eventSVC, err := event.NewService(gw, stream, logger, cfg.Commons.MachineAuthAPIKey)
+				eventSVC, err := event.NewService(gw, stream, logger, *cfg)
 				if err != nil {
 					logger.Fatal().Err(err).Msg("can't create event service")
 				}
