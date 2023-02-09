@@ -284,6 +284,8 @@ github.com/bwesterb/go-ristretto v1.2.1/go.mod h1:fUIoIZaG73pV5biE2Blr2xEzDoMj7N
 github.com/c-bata/go-prompt v0.2.5/go.mod h1:vFnjEGDIIA/Lib7giyE4E9c50Lvl8j0S+7FVlAwDAVw=
 github.com/c0rby/go-cs3apis v0.0.0-20230110100311-5b424f1baa35 h1:bbpRY/l4z5MTH+TRGZdkIqDM9JXQQewJdO1o+80zcok=
 github.com/c0rby/go-cs3apis v0.0.0-20230110100311-5b424f1baa35/go.mod h1:UXha4TguuB52H14EMoSsCqDj7k8a/t7g4gVP+bgY5LY=
+github.com/c0rby/reva/v2 v2.0.0-20230125143632-a7e24c8dd66b h1:PKbmBHmUzd5d9GdpBlJY2p0a3dqg7YboEYg0Kolt3xs=
+github.com/c0rby/reva/v2 v2.0.0-20230125143632-a7e24c8dd66b/go.mod h1:u73Df9JAZsDj43GIjQIb3DO1PLJuPutZXkRqQH0oGXA=
 github.com/cenkalti/backoff v2.2.1+incompatible h1:tNowT99t7UNflLxfYYSlKYsBpXdEet03Pg2g16Swow4=
 github.com/cenkalti/backoff v2.2.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
 github.com/cenkalti/backoff/v4 v4.1.0/go.mod h1:scbssz8iZGpm3xbr14ovlUdkxfGXNInqkPWOWmG2CLw=
@@ -343,8 +345,8 @@ github.com/crewjam/httperr v0.2.0/go.mod h1:Jlz+Sg/XqBQhyMjdDiC+GNNRzZTD7x39Gu3p
 github.com/crewjam/saml v0.4.6/go.mod h1:ZBOXnNPFzB3CgOkRm7Nd6IVdkG+l/wF+0ZXLqD96t1A=
 github.com/crewjam/saml v0.4.9 h1:X2jDv4dv3IvfT9t+RhADavzNFAcq3fVxzTCIH3G605U=
 github.com/crewjam/saml v0.4.9/go.mod h1:9Zh6dWPtB3MSzTRt8fIFH60Z351QQ+s7hCU3J/tTlA4=
-github.com/cs3org/reva/v2 v2.12.1-0.20230203122123-cd2b2a5feca9 h1:iokM4RfMgO0HhIERr1MWjRJkIwTt4XhL3fOSc3emlhY=
-github.com/cs3org/reva/v2 v2.12.1-0.20230203122123-cd2b2a5feca9/go.mod h1:u73Df9JAZsDj43GIjQIb3DO1PLJuPutZXkRqQH0oGXA=
+github.com/cs3org/reva/v2 v2.12.1-0.20230208154945-81b9c3e9d310 h1:UIsxP51vo9Z7OJTclC6yYetgtAPZaoLJ8d41c6WkT+o=
+github.com/cs3org/reva/v2 v2.12.1-0.20230208154945-81b9c3e9d310/go.mod h1:u73Df9JAZsDj43GIjQIb3DO1PLJuPutZXkRqQH0oGXA=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
