@@ -12,7 +12,7 @@ The `user-id flag` takes the system admin user as the default. It should be note
 The command only considers spaces to which the user has access and delete permission.
 
 Likewise, only spaces of the type `project` and `personal` are taken into account.
-Spaces of type virtual`, for example, are ignored.
+Spaces of type `virtual`, for example, are ignored.
 
 https://github.com/owncloud/ocis/pull/5500
 https://github.com/owncloud/ocis/issues/5499
