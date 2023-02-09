@@ -248,5 +248,5 @@ Feature: Share spaces
     Then the HTTP status code should be "201"
     Examples:
       | firstRecipient | secondRecipient |
-      | group "sales" | user "Brian"    |
-      | user "Brian"   | group "sales"  |
+      | group "sales"  | user "Brian"    |
+      | user "Brian"   | group "sales"   |
