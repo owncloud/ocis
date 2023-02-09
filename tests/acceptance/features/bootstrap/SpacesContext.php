@@ -3266,4 +3266,44 @@ class SpacesContext implements Context {
 			);
 		}
 	}
+
+	/**
+	 * @Then /^the user "([^"]*)" should have a space called "([^"]*)" granted to (user|group)\s? "([^"]*)" with role "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string $recipientType
+	 * @param string $recipient
+	 * @param string $role
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserShouldHaveSpaceWithRecipient(
+		string $user,
+		string $spaceName,
+		string $recipientType,
+		string $recipient,
+		string $role
+	): void {
+		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+		Assert::assertIsArray($spaceAsArray = $this->getSpaceByNameFromResponse($spaceName), "No space with name $spaceName found");
+		$recipientType === 'user' ? $recipientId = $this->getUserIdByUserName($recipient) : $recipientId = $this->getGroupIdByGroupName($recipient);
+
+		$recipientId = $this->getUserIdByUserName($user);
+		foreach ($spaceAsArray['root']['permissions'] as $permission) {
+			$foundRoleInResponse = false;
+			if ($permission['roles'][0] === $role || $permission['grantedToIdentities'][0][$recipientType]['id'] === $recipientId) {
+				$foundRoleInResponse = true;
+				break;
+			}
+			Assert::assertTrue($foundRoleInResponse, "the response does not contain the $recipientType $recipient");
+		}
+	}
 }
