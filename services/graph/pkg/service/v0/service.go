@@ -186,6 +186,7 @@ func NewService(opts ...Option) (Graph, error) {
 			})
 			r.Route("/me", func(r chi.Router) {
 				r.Get("/", svc.GetMe)
+				r.Get("/drive", svc.GetUserDrive)
 				r.Get("/drives", svc.GetDrives)
 				r.Get("/drive/root/children", svc.GetRootDriveChildren)
 				r.Post("/changePassword", svc.ChangeOwnPassword)
@@ -195,6 +196,7 @@ func NewService(opts ...Option) (Graph, error) {
 				r.With(requireAdmin).Post("/", svc.PostUser)
 				r.Route("/{userID}", func(r chi.Router) {
 					r.Get("/", svc.GetUser)
+					r.Get("/drive", svc.GetUserDrive)
 					r.With(requireAdmin).Delete("/", svc.DeleteUser)
 					r.With(requireAdmin).Patch("/", svc.PatchUser)
 					if svc.roleService != nil {

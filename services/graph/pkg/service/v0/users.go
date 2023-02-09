@@ -113,6 +113,81 @@ func (g Graph) fetchAppRoleAssignments(ctx context.Context, accountuuid string) 
 	return values, nil
 }
 
+// GetUserDrive implements the Service interface.
+func (g Graph) GetUserDrive(w http.ResponseWriter, r *http.Request) {
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+	logger.Info().Interface("query", r.URL.Query()).Msg("calling get user drive")
+
+	userID, err := url.PathUnescape(chi.URLParam(r, "userID"))
+	if err != nil {
+		logger.Debug().Err(err).Str("userID", chi.URLParam(r, "userID")).Msg("could not get drive: unescaping drive id failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
+		return
+	}
+
+	if userID == "" {
+		u, ok := revactx.ContextGetUser(r.Context())
+		if !ok {
+			logger.Debug().Msg("could not get user: user not in context")
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "user not in context")
+			return
+		}
+		userID = u.GetId().GetOpaqueId()
+	}
+
+	logger.Debug().Str("userID", userID).Msg("calling list storage spaces with user and personal filter")
+	ctx := r.Context()
+
+	filters := []*storageprovider.ListStorageSpacesRequest_Filter{listStorageSpacesTypeFilter("personal"), listStorageSpacesUserFilter(userID)}
+	res, err := g.ListStorageSpacesWithFilters(ctx, filters, false)
+	switch {
+	case err != nil:
+		logger.Error().Err(err).Msg("could not get drive: transport error")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	case res.Status.Code != cs3rpc.Code_CODE_OK:
+		if res.Status.Code == cs3rpc.Code_CODE_NOT_FOUND {
+			// the client is doing a lookup for a specific space, therefore we need to return
+			// not found to the caller
+			logger.Debug().Str("userID", userID).Msg("could not get personal drive for user: not found")
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "drive not found")
+			return
+		}
+		logger.Debug().
+			Str("userID", userID).
+			Str("grpcmessage", res.GetStatus().GetMessage()).
+			Msg("could not get personal drive for user: grpc error")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, res.Status.Message)
+		return
+	}
+
+	webDavBaseURL, err := g.getWebDavBaseURL()
+	if err != nil {
+		logger.Error().Err(err).Str("url", webDavBaseURL.String()).Msg("could not get personal drive: error parsing webdav base url")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	spaces, err := g.formatDrives(ctx, webDavBaseURL, res.StorageSpaces)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not get personal drive: error parsing grpc response")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		return
+	}
+	switch num := len(spaces); {
+	case num == 0:
+		logger.Debug().Str("userID", userID).Msg("could not get personal drive: no drive returned from storage")
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "no drive returned from storage")
+		return
+	case num == 1:
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, spaces[0])
+	default:
+		logger.Debug().Int("number", num).Msg("could not get personal drive: expected to find a single drive but fetched more")
+		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "could not get personal drive: expected to find a single drive but fetched more")
+		return
+	}
+}
+
 // GetUsers implements the Service interface.
 func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
