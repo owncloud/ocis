@@ -7,6 +7,10 @@ import (
 	"net/http"
 	"path"
 	"path/filepath"
+
+	permissionsapi "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 )
 
 var (
@@ -22,6 +26,24 @@ var (
 
 // UploadLogo implements the endpoint to upload a custom logo for the oCIS instance.
 func (p Web) UploadLogo(w http.ResponseWriter, r *http.Request) {
+	user := revactx.ContextMustGetUser(r.Context())
+	rsp, err := p.gatewayClient.CheckPermission(r.Context(), &permissionsapi.CheckPermissionRequest{
+		Permission: "change-logo",
+		SubjectRef: &permissionsapi.SubjectReference{
+			Spec: &permissionsapi.SubjectReference_UserId{
+				UserId: user.Id,
+			},
+		},
+	})
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if rsp.Status.Code != rpc.Code_CODE_OK {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
 	file, fileHeader, err := r.FormFile("logo")
 	if err != nil {
 		if errors.Is(err, http.ErrMissingFile) {

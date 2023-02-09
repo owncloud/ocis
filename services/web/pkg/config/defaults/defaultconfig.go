@@ -35,6 +35,7 @@ func DefaultConfig() *config.Config {
 		Asset: config.Asset{
 			Path: filepath.Join(defaults.BaseDataPath(), "web/assets"),
 		},
+		GatewayAddress: "127.0.0.1:9142",
 		Web: config.Web{
 			Path:        "",
 			ThemeServer: "https://localhost:9200",
@@ -95,6 +96,13 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
+	}
 	if cfg.Commons != nil {
 		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
 	}

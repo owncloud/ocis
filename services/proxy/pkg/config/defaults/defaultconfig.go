@@ -1,7 +1,6 @@
 package defaults
 
 import (
-	"net/http"
 	"path"
 	"strings"
 
@@ -83,6 +82,10 @@ func DefaultPolicies() []config.Policy {
 					Endpoint:    "/.well-known/openid-configuration",
 					Service:     "com.owncloud.web.idp",
 					Unprotected: true,
+				},
+				{
+					Endpoint: "/branding/logo",
+					Service:  "com.owncloud.web.web",
 				},
 				{
 					Endpoint:    "/konnect/",
@@ -198,11 +201,6 @@ func DefaultPolicies() []config.Policy {
 				{
 					Endpoint: "/api/v0/settings",
 					Service:  "com.owncloud.web.settings",
-				},
-				{
-					Method:   http.MethodPost,
-					Endpoint: "/branding/logo",
-					Service:  "com.owncloud.web.web",
 				},
 			},
 		},
