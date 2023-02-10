@@ -2,6 +2,7 @@ package relations
 
 import (
 	"context"
+	"net/url"
 	"regexp"
 	"strings"
 	"text/template"
@@ -23,8 +24,9 @@ type compiledInstance struct {
 }
 
 type ownCloudInstance struct {
-	instances []compiledInstance
-	ocisURL   string
+	instances    []compiledInstance
+	ocisURL      string
+	instanceHost string
 }
 
 func OwnCloudInstance(instances []config.Instance, ocisURL string) (service.RelationProvider, error) {
@@ -43,9 +45,14 @@ func OwnCloudInstance(instances []config.Instance, ocisURL string) (service.Rela
 		compiledInstances = append(compiledInstances, compiled)
 	}
 
+	u, err := url.Parse(ocisURL)
+	if err != nil {
+		return nil, err
+	}
 	return &ownCloudInstance{
-		instances: compiledInstances,
-		ocisURL:   ocisURL,
+		instances:    compiledInstances,
+		ocisURL:      ocisURL,
+		instanceHost: u.Host + u.Path,
 	}, nil
 }
 
@@ -54,6 +61,11 @@ func (l *ownCloudInstance) Add(ctx context.Context, jrd *webfinger.JSONResourceD
 		jrd = &webfinger.JSONResourceDescriptor{}
 	}
 	if claims := oidc.FromContext(ctx); claims != nil {
+		if value, ok := claims[oidc.PreferredUsername].(string); ok {
+			jrd.Subject = "acct:" + value + "@" + l.instanceHost
+		} else if value, ok := claims[oidc.Email].(string); ok {
+			jrd.Subject = "mailto:" + value
+		}
 		// allow referencing OCIS_URL in the template
 		claims["OCIS_URL"] = l.ocisURL
 		for _, instance := range l.instances {
