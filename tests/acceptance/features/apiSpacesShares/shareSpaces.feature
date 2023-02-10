@@ -240,3 +240,19 @@ Feature: Share spaces
     Then the HTTP status code should be "204"
     And the user "Brian" should not have a space called "share space"
     And the user "Bob" should not have a space called "share space"
+
+
+  Scenario Outline: User increases permissions for one member of the group or for the entire group
+    Given group "sales" has been created
+    And the administrator has added a user "Brian" to the group "sales" using GraphApi
+    And user "Alice" has shared a space "share space" to <firstRecipient> with role "viewer"
+    When user "Brian" uploads a file inside space "share space" with content "Test" to "test.txt" using the WebDAV API
+    Then the HTTP status code should be "403"
+    When user "Alice" shares a space "share space" to <secondRecipient> with role "editor"
+    Then the HTTP status code should be "200"
+    When user "Brian" uploads a file inside space "share space" with content "Test" to "test.txt" using the WebDAV API
+    Then the HTTP status code should be "201"
+    Examples:
+      | firstRecipient | secondRecipient |
+      | group "sales"  | user "Brian"    |
+      | user "Brian"   | group "sales"   |
