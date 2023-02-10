@@ -23,4 +23,4 @@
 | IDM_SVC_PASSWORD | string |  | Password to set for the "idm" service user. Either cleartext or an argon2id hash.|
 | IDM_REVASVC_PASSWORD | string |  | Password to set for the "reva" service user. Either cleartext or an argon2id hash.|
 | IDM_IDPSVC_PASSWORD | string |  | Password to set for the "idp" service user. Either cleartext or an argon2id hash.|
-| OCIS_ADMIN_USER_ID<br/>IDM_ADMIN_USER_ID | string |  | ID of the user that should receive admin privileges.|
+| OCIS_ADMIN_USER_ID<br/>IDM_ADMIN_USER_ID | string |  | ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.|
