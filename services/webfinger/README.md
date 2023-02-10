@@ -48,7 +48,7 @@ The default configuration will simply return the `OCIS_URL` and direct clients t
 }
 ```
 
-## Configure different instances based on OpenidConnect UserInfo claims
+## Configure Different Instances Based on OpenidConnect UserInfo Claims
 
 A more complex example for configuring different instances could look like this:
 ```yaml
