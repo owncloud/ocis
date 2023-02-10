@@ -75,5 +75,5 @@ type Commons struct {
 	TransferSecret    string          `mask:"password" yaml:"transfer_secret,omitempty" env:"REVA_TRANSFER_SECRET"`
 	SystemUserID      string          `yaml:"system_user_id" env:"OCIS_SYSTEM_USER_ID" desc:"ID of the oCIS storage-system system user. Admins need to set the ID for the storage-system system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
 	SystemUserAPIKey  string          `mask:"password" yaml:"system_user_api_key" env:"SYSTEM_USER_API_KEY"`
-	AdminUserID       string          `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID" desc:"ID of a user, that should receive admin privileges."`
+	AdminUserID       string          `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID" desc:"ID of a user, that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand."`
 }
