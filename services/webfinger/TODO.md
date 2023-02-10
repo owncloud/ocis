@@ -1,4 +1,3 @@
-
 # TODO
 Currently, clients need to make subsequent calls to:
 *   /status.php to check if the instance is in maintenance mode or if the version is supported
@@ -11,7 +10,7 @@ Currently, clients need to make subsequent calls to:
 *   /graph/v1.0/me?%24expand=memberOf to fetch the user id and the groups the user is a member of
 
 We need a way to pass oidc claims from the proxy, which does the authentication to the webfinger service, preferably by minting them into the internal reva token.
-- Currently, we use machine auth so we can autoprovision an account if it does not exist. We should use revas oidc auth and, when autoprovisioning is enabled, retry the authentication after provisioning the account. This would allow us to use a `roles` claim to decide which roles to use and eg. a `school` claim to determine a specific instance. We may use https://github.com/PerimeterX/marshmallow to parse the RegisteredClaims and get the custom claims as a separate map.
+*   Currently, we use machine auth so we can autoprovision an account if it does not exist. We should use revas oidc auth and, when autoprovisioning is enabled, retry the authentication after provisioning the account. This would allow us to use a `roles` claim to decide which roles to use and eg. a `school` claim to determine a specific instance. We may use https://github.com/PerimeterX/marshmallow to parse the RegisteredClaims and get the custom claims as a separate map.
 
 For now, webfinger can only match users based on a regex and produce a list of instances based on that.
 
@@ -105,7 +104,7 @@ In theory the graph endpoint would allow discovering drives on any domain. But t
 ## Subject Properties
 
 We could also embed subject metadata, however since apps like ocis web also need the groups a user is member of a dedicated call to the libregraph api is probably better. In any case, we could return properties for the subject:
-```
+```json
 {
     "subject": "acct:einstein@drive.ocis.test",
     "properties": {
@@ -113,22 +112,22 @@ We could also embed subject metadata, however since apps like ocis web also need
         "http://libregraph.org/prop/user/onPremisesSamAccountName": "einstein",
         "http://libregraph.org/prop/user/mail": "einstein@example.org",
         "http://libregraph.org/prop/user/displayName": "Albert Einstein",
-    }
+    },
     "links": [
         {
-            "rel": "http://openid.net/specs/connect/1.0/issuer"
-            "href": "https://idp.ocis.test",
+            "rel": "http://openid.net/specs/connect/1.0/issuer",
+            "href": "https://idp.ocis.test"
         },
         {
             "rel": "http://webfinger.owncloud/rel/server-instance",
-            "href": "https://abc.drive.ocis.test"
+            "href": "https://abc.drive.ocis.test",
     	    "titles": {
     	      "en": "Readable Instance Name"
     	    }
         },
         {
             "rel": "http://webfinger.owncloud/rel/server-instance",
-            "href": "https://xyz.drive.ocis.test"
+            "href": "https://xyz.drive.ocis.test",
     	    "titles": {
     	      "en": "Readable Other Instance Name"
     	    }

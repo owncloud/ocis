@@ -69,8 +69,9 @@ func OidcAuth(opts ...Option) func(http.Handler) http.Handler {
 					oauth2.StaticTokenSource(oauth2Token),
 				)
 				if err != nil {
-					// what if unauthorized
-					break
+					w.Header().Add("WWW-Authenticate", `Bearer`)
+					w.WriteHeader(http.StatusUnauthorized)
+					return
 				}
 				claims := map[string]interface{}{}
 				err = userInfo.Claims(&claims)

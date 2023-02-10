@@ -15,6 +15,7 @@ type openIDDiscovery struct {
 	Href string
 }
 
+// OpenIDDiscovery adds the Openid Connect issuer relation
 func OpenIDDiscovery(href string) service.RelationProvider {
 	return &openIDDiscovery{
 		Href: href,
@@ -25,10 +26,8 @@ func (l *openIDDiscovery) Add(ctx context.Context, jrd *webfinger.JSONResourceDe
 	if jrd == nil {
 		jrd = &webfinger.JSONResourceDescriptor{}
 	}
-	// TODO check if this relation was requested
 	jrd.Links = append(jrd.Links, webfinger.Link{
 		Rel:  OpenIDConnectRel,
 		Href: l.Href,
-		// Titles: , // TODO use , separated env var with : separated language -> title pairs
 	})
 }
