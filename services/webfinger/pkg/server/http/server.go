@@ -12,6 +12,7 @@ import (
 	ohttp "github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	serviceErrors "github.com/owncloud/ocis/v2/services/webfinger/pkg/service/v0"
+	svc "github.com/owncloud/ocis/v2/services/webfinger/pkg/service/v0"
 	"github.com/pkg/errors"
 	"go-micro.dev/v4"
 )
@@ -70,52 +71,7 @@ func Server(opts ...Option) (ohttp.Service, error) {
 	))
 
 	mux.Route(options.Config.HTTP.Root, func(r chi.Router) {
-
-		r.Get("/.well-known/webfinger", func(w http.ResponseWriter, r *http.Request) {
-			ctx := r.Context()
-
-			// A WebFinger URI MUST contain a query component (see Section 3.4 of
-			// RFC 3986).  The query component MUST contain a "resource" parameter
-			// and MAY contain one or more "rel" parameters.
-			resource := r.URL.Query().Get("resource")
-			queryTarget, err := url.Parse(resource)
-			if resource == "" || err != nil {
-				// If the "resource" parameter is absent or malformed, the WebFinger
-				// resource MUST indicate that the request is bad as per Section 10.4.1
-				// of RFC 2616.
-				render.Status(r, http.StatusBadRequest)
-				render.PlainText(w, r, "absent or malformed 'resource' parameter")
-				return
-			}
-
-			rels := make([]string, 0)
-			for k, v := range r.URL.Query() {
-				if k == "rel" {
-					rels = append(rels, v...)
-				}
-			}
-
-			jrd, err := service.Webfinger(ctx, queryTarget, rels)
-			if errors.Is(err, serviceErrors.ErrNotFound) {
-				// from https://www.rfc-editor.org/rfc/rfc7033#section-4.2
-				//
-				// If the "resource" parameter is a value for which the server has no
-				// information, the server MUST indicate that it was unable to match the
-				// request as per Section 10.4.5 of RFC 2616.
-				render.Status(r, http.StatusNotFound)
-				render.PlainText(w, r, err.Error())
-				return
-			}
-			if err != nil {
-				render.Status(r, http.StatusInternalServerError)
-				render.PlainText(w, r, err.Error())
-				return
-			}
-
-			w.Header().Set("Content-type", "application/jrd+json")
-			render.Status(r, http.StatusOK)
-			render.JSON(w, r, jrd)
-		})
+		r.Get("/.well-known/webfinger", WebfingerHandler(service))
 	})
 
 	err = micro.RegisterHandler(svc.Server(), mux)
@@ -125,4 +81,52 @@ func Server(opts ...Option) (ohttp.Service, error) {
 
 	svc.Init()
 	return svc, nil
+}
+
+func WebfingerHandler(service svc.Service) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		// A WebFinger URI MUST contain a query component (see Section 3.4 of
+		// RFC 3986).  The query component MUST contain a "resource" parameter
+		// and MAY contain one or more "rel" parameters.
+		resource := r.URL.Query().Get("resource")
+		queryTarget, err := url.Parse(resource)
+		if resource == "" || err != nil {
+			// If the "resource" parameter is absent or malformed, the WebFinger
+			// resource MUST indicate that the request is bad as per Section 10.4.1
+			// of RFC 2616.
+			render.Status(r, http.StatusBadRequest)
+			render.PlainText(w, r, "absent or malformed 'resource' parameter")
+			return
+		}
+
+		rels := make([]string, 0)
+		for k, v := range r.URL.Query() {
+			if k == "rel" {
+				rels = append(rels, v...)
+			}
+		}
+
+		jrd, err := service.Webfinger(ctx, queryTarget, rels)
+		if errors.Is(err, serviceErrors.ErrNotFound) {
+			// from https://www.rfc-editor.org/rfc/rfc7033#section-4.2
+			//
+			// If the "resource" parameter is a value for which the server has no
+			// information, the server MUST indicate that it was unable to match the
+			// request as per Section 10.4.5 of RFC 2616.
+			render.Status(r, http.StatusNotFound)
+			render.PlainText(w, r, err.Error())
+			return
+		}
+		if err != nil {
+			render.Status(r, http.StatusInternalServerError)
+			render.PlainText(w, r, err.Error())
+			return
+		}
+
+		w.Header().Set("Content-type", "application/jrd+json")
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, jrd)
+	}
 }
