@@ -90,3 +90,8 @@ mount_id: ""
 expose_data_server: false
 readonly: false
 upload_expiration: 86400
+tasks:
+  purge_trash_bin:
+    user_id: ""
+    personal_delete_before: 720h0m0s
+    project_delete_before: 720h0m0s

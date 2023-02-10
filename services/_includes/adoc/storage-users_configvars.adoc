@@ -698,5 +698,33 @@ a| [subs=-attributes]
 ++86400 ++
 a| [subs=-attributes]
 Duration in seconds after which uploads will expire.
+
+a|`OCIS_ADMIN_USER_ID` +
+`STORAGE_USERS_PURGE_TRASH_BIN_USER_ID` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+ID of the user who collects all necessary information for deletion.
+
+a|`STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++720h0m0s ++
+a| [subs=-attributes]
+Specifies the period of time in which items that have been in the personal trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion
+
+a|`STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++720h0m0s ++
+a| [subs=-attributes]
+Specifies the period of time in which items that have been in the project trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion
 |===
 
