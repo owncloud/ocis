@@ -132,3 +132,17 @@ Feature: Share a file or folder that is inside a space
     Then the HTTP status code should be "200"
     And the information about the last share for user "Brian" should include
       | expiration | 2044-01-01 |
+
+
+  Scenario: A user deletes the expiration date
+    Given user "Alice" has created a share inside of space "share sub-item" with settings:
+      | path       | folder                   |
+      | shareWith  | Brian                    |
+      | role       | viewer                   |
+      | expireDate | 2042-01-01T23:59:59+0100 |
+    And user "Brian" has accepted share "/folder" offered by user "Alice"
+    When user "Alice" changes the last share with settings:
+      | expireDate |  |
+    Then the HTTP status code should be "200"
+    And the information about the last share for user "Brian" should include
+      | expiration |  |
