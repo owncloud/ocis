@@ -124,7 +124,7 @@ func (i *ErrEducationBackend) GetEducationClassTeachers(ctx context.Context, cla
 	return nil, errNotImplemented
 }
 
-// AddTeacherToEducationclass implements the EducationBackend interface for the ErrEducationBackend backend.
+// AddTeacherToEducationClass implements the EducationBackend interface for the ErrEducationBackend backend.
 func (i *ErrEducationBackend) AddTeacherToEducationClass(ctx context.Context, classID string, teacherID string) error {
 	return errNotImplemented
 }

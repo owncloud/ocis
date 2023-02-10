@@ -366,7 +366,7 @@ func (i *LDAP) GetEducationClassTeachers(ctx context.Context, classID string) ([
 
 }
 
-// AddTeacherToEducationclass adds a teacher (by ID) to class in the identity backend.
+// AddTeacherToEducationClass adds a teacher (by ID) to class in the identity backend.
 func (i *LDAP) AddTeacherToEducationClass(ctx context.Context, classID string, teacherID string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	class, err := i.getEducationClassByID(classID, false)
