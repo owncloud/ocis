@@ -69,14 +69,12 @@ fi
 
 if [ "$TEST_SOURCE" = "oc10" ]
 then
-   cd $OCIS_ROOT
    sleep 10
-   make test-acceptance-from-core-api
+   make -C $OCIS_ROOT test-acceptance-from-core-api
 elif [ "$TEST_SOURCE" = "ocis" ]
 then
-    cd $OCIS_ROOT
     sleep 10
-    make test-acceptance-api
+    make -C $OCIS_ROOT test-acceptance-api
 else
     echo "non existing TEST_SOURCE selected"
     exit 1
