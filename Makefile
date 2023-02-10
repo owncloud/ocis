@@ -209,7 +209,7 @@ golangci-lint-fix:
 
 .PHONY: bingo-update
 bingo-update: $(BINGO)
-	$(BINGO) get -l -u
+	$(BINGO) get -l
 
 .PHONY: check-licenses
 check-licenses: ci-go-check-licenses ci-node-check-licenses
