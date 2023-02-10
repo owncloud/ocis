@@ -45,10 +45,10 @@ func PurgeTrashBin(executantID *apiUser.UserId, deleteBefore time.Time, spaceTyp
 			}
 		)
 
-		switch storageSpace.GetSpaceType() {
-		case string(Personal):
+		switch SpaceType(storageSpace.GetSpaceType()) {
+		case Personal:
 			impersonationID = storageSpace.GetOwner().GetId()
-		case string(Project):
+		case Project:
 			var permissionsMap map[string]*apiProvider.ResourcePermissions
 			err := utils.ReadJSONFromOpaque(storageSpace.GetOpaque(), "grants", &permissionsMap)
 			if err != nil {
