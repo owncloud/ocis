@@ -226,6 +226,7 @@ def main(ctx):
         cancelPreviousBuilds() + \
         codestyle(ctx) + \
         buildWebCache(ctx) + \
+        [getGoDepsForTesting(ctx)] + \
         [buildOcisBinaryForTesting(ctx)] + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
@@ -307,7 +308,7 @@ def testOcisModules(ctx):
     scan_result_upload = uploadScanResults(ctx)
     scan_result_upload["depends_on"] = getPipelineNames(pipelines)
 
-    return [getGoDepsForTesting(ctx)] + pipelines + [scan_result_upload]
+    return pipelines + [scan_result_upload]
 
 def cancelPreviousBuilds():
     return [{
@@ -473,6 +474,7 @@ def buildOcisBinaryForTesting(ctx):
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  makeNodeGenerate("") +
+                 restoreBuildArtifactCache(ctx, "go-deps-for-testing", "/go") +
                  makeGoGenerate("") +
                  build() +
                  rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin"),
@@ -483,6 +485,7 @@ def buildOcisBinaryForTesting(ctx):
                 "refs/pull/**",
             ],
         },
+        "depends_on": getPipelineNames([getGoDepsForTesting(ctx)]),
         "volumes": [pipelineVolumeGo],
     }
 
