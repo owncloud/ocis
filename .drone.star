@@ -366,9 +366,11 @@ def testOcisModule(ctx, module):
             "name": "golangci-lint",
             "image": OC_CI_GOLANG,
             "commands": [
+                "du -hs /go",
                 "mkdir -p cache/checkstyle",
                 "retry -t 5 -m 10 -x 240 'make -C %s ci-golangci-lint'" % (module),
                 "mv %s/checkstyle.xml cache/checkstyle/$(basename %s)_checkstyle.xml" % (module, module),
+                "du -hs /go",
             ],
             "volumes": [stepVolumeGo],
         },
