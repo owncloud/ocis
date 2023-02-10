@@ -3282,11 +3282,13 @@ class SpacesContext implements Context {
 		$recipientId = $this->getUserIdByUserName($user);
 		foreach ($spaceAsArray['root']['permissions'] as $permission) {
 			$foundRoleInResponse = false;
-			if ($permission['roles'][0] === $role || $permission['grantedToIdentities'][0][$recipientType]['id'] === $recipientId) {
-				$foundRoleInResponse = true;
-				break;
+			if (\array_key_exists($recipientType, $permission['grantedToIdentities'][0])) {
+				if ($permission['roles'][0] === $role || $permission['grantedToIdentities'][0][$recipientType]['id'] === $recipientId) {
+					$foundRoleInResponse = true;
+					break;
+				}
+				Assert::assertTrue($foundRoleInResponse, "the response does not contain the $recipientType $recipient");
 			}
-			Assert::assertTrue($foundRoleInResponse, "the response does not contain the $recipientType $recipient");
 		}
 	}
 }
