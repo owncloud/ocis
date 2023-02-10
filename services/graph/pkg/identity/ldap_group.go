@@ -37,7 +37,7 @@ func (i *LDAP) GetGroup(ctx context.Context, nameOrID string, queryParam url.Val
 		return nil, errorcode.New(errorcode.ItemNotFound, "not found")
 	}
 	if slices.Contains(sel, "members") || slices.Contains(exp, "members") {
-		members, err := i.ExpandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
+		members, err := i.expandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
 		if err != nil {
 			return nil, err
 		}
@@ -115,7 +115,7 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 			continue
 		}
 		if expandMembers {
-			members, err := i.ExpandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
+			members, err := i.expandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
 			if err != nil {
 				return nil, err
 			}
@@ -142,7 +142,7 @@ func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string) ([]*libregra
 		return nil, err
 	}
 
-	memberEntries, err := i.ExpandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
+	memberEntries, err := i.expandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
 	result := make([]*libregraph.User, 0, len(memberEntries))
 	if err != nil {
 		return nil, err
@@ -279,7 +279,7 @@ func (i *LDAP) RemoveMemberFromGroup(ctx context.Context, groupID string, member
 	}
 	logger.Debug().Str("backend", "ldap").Str("groupdn", ge.DN).Str("member", me.DN).Msg("remove member")
 
-	if mr, err := i.RemoveEntryByDNAndAttributeFromEntry(ge, me.DN, i.groupAttributeMap.member); err == nil {
+	if mr, err := i.removeEntryByDNAndAttributeFromEntry(ge, me.DN, i.groupAttributeMap.member); err == nil {
 		return i.conn.Modify(mr)
 	}
 	return nil

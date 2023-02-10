@@ -228,7 +228,7 @@ func (i *LDAP) GetEducationClassMembers(ctx context.Context, id string) ([]*libr
 		return nil, err
 	}
 
-	memberEntries, err := i.ExpandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
+	memberEntries, err := i.expandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
 	result := make([]*libregraph.EducationUser, 0, len(memberEntries))
 	if err != nil {
 		return nil, err
@@ -351,7 +351,7 @@ func (i *LDAP) GetEducationClassTeachers(ctx context.Context, classID string) ([
 		return nil, err
 	}
 
-	teacherEntries, err := i.ExpandLDAPAttributeEntries(ctx, class, i.educationConfig.classAttributeMap.teachers)
+	teacherEntries, err := i.expandLDAPAttributeEntries(ctx, class, i.educationConfig.classAttributeMap.teachers)
 	result := make([]*libregraph.EducationUser, 0, len(teacherEntries))
 	if err != nil {
 		return nil, err
@@ -445,7 +445,7 @@ func (i *LDAP) RemoveTeacherFromEducationClass(ctx context.Context, classID stri
 		return err
 	}
 
-	if mr, err := i.RemoveEntryByDNAndAttributeFromEntry(class, teacher.DN, i.educationConfig.classAttributeMap.teachers); err == nil {
+	if mr, err := i.removeEntryByDNAndAttributeFromEntry(class, teacher.DN, i.educationConfig.classAttributeMap.teachers); err == nil {
 		return i.conn.Modify(mr)
 	}
 

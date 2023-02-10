@@ -180,7 +180,7 @@ func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 	for _, group := range groupEntries {
 		logger.Debug().Str("group", group.DN).Str("user", e.DN).Msg("Cleaning up group membership")
 
-		if mr, err := i.RemoveEntryByDNAndAttributeFromEntry(group, e.DN, i.groupAttributeMap.member); err == nil {
+		if mr, err := i.removeEntryByDNAndAttributeFromEntry(group, e.DN, i.groupAttributeMap.member); err == nil {
 			if err = i.conn.Modify(mr); err != nil {
 				// Errors when deleting the memberships are only logged as warnings but not returned
 				// to the user as we already successfully deleted the users itself
@@ -610,8 +610,8 @@ func stringToScope(scope string) (int, error) {
 	return s, nil
 }
 
-// RemoveEntryByDNAndAttributeFromEntry creates a request to remove a single member entry by attribute and DN from an ldap entry
-func (i *LDAP) RemoveEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string, attribute string) (*ldap.ModifyRequest, error) {
+// removeEntryByDNAndAttributeFromEntry creates a request to remove a single member entry by attribute and DN from an ldap entry
+func (i *LDAP) removeEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string, attribute string) (*ldap.ModifyRequest, error) {
 	nOldDN, err := ldapdn.ParseNormalize(dn)
 	if err != nil {
 		return nil, err
@@ -647,8 +647,8 @@ func (i *LDAP) RemoveEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string
 	return &mr, nil
 }
 
-// ExpandLDAPAttributeEntries reads an attribute from an ldap entry and expands to users
-func (i *LDAP) ExpandLDAPAttributeEntries(ctx context.Context, e *ldap.Entry, attribute string) ([]*ldap.Entry, error) {
+// expandLDAPAttributeEntries reads an attribute from an ldap entry and expands to users
+func (i *LDAP) expandLDAPAttributeEntries(ctx context.Context, e *ldap.Entry, attribute string) ([]*ldap.Entry, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("ExpandLDAPAttributeEntries")
 	result := []*ldap.Entry{}

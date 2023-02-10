@@ -463,7 +463,6 @@ func (g Graph) GetEducationClassTeachers(w http.ResponseWriter, r *http.Request)
 
 	logger.Debug().Str("id", classID).Msg("calling get class teachers on backend")
 	teachers, err := g.identityEducationBackend.GetEducationClassTeachers(r.Context(), classID)
-	// teachers, err := g.identityEducationBackend.GetEducationClassMembers(r.Context(), classID)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get class teachers: backend error")
 		var errcode errorcode.Error
