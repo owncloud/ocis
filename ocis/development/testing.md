@@ -24,11 +24,11 @@ make -C tests/acceptance/docker help
 Basically we have two sources for feature tests and test suites:
 
 - [oCIS feature test and test suites](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
-- [ownCloud feature tests and test suites](https://github.com/owncloud/core/tree/master/tests/acceptance/features)
+- [tests and test suites transferred from ownCloud, they have prefix coreApi](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
 
 At the moment both can be applied to oCIS since the api of oCIS is designed to be compatible with ownCloud.
 
-Since we have to offer a migration path to existing users of ownCloud, you can use your existing ownCloud as the storage backend for oCIS. As another storage backend we offer oCIS native storage, also called "oCIS". This stores files directly on disk. Which storage backend is used is also reflected in the tests, there are always different tests for oCIS storage and ownCloud storage.
+As a storage backend, we offer oCIS native storage, also called "ocis". This stores files directly on disk. Along with that we also provide `S3` storage driver.
 
 You can invoke two types of test suite runs:
 
@@ -37,18 +37,26 @@ You can invoke two types of test suite runs:
 
 ### Run full test suite
 
-The names of the full test suite make targets have the same naming as in the CI pipeline.
+The names of the full test suite make targets have the same naming as in the CI pipeline. The available local ocis specific test suites are `apiAccountsHashDifficulty`, `apiArchiver`, `apiContract`, `apiGraph`, `apiSpaces`, `apiSpacesShares`, `apiCors`, `apiAsyncUpload`. They can be run with `ocis` storage and `S3` storage.
 
-For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis` runs the same tests as the `localApiTests-apiAccountsHashDifficulty-ocis` CI pipeline, which runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with oCIS storage.
+> Note: In order to see the tests log attach `show-test-logs` in the command
 
-For example `make -C tests/acceptance/docker Core-API-Tests-owncloud-storage-3`runs the same tests as the `Core-API-Tests-owncloud-storage-3` CI pipeline, which runs the third (out of ten) ownCloud test suite against an oCIS with owncloud storage.
+For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis` runs the same tests as the `localApiTests-apiAccountsHashDifficulty-ocis` CI pipeline, which runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with ocis storage.
+
+For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-s3ng` runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with s3 storage.
+
+> Note: To run the tests from `apiAsyncUpload` suite you need to provide extra environment variable `POSTPROCESSING_DELAY`
+
+For example `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suite transferred from ownCloud against an oCIS with ocis storage.
+
+For example `make -C tests/acceptance/docker Core-API-Tests-s3ng-storage-3` runs the third (out of ten) test suite transferred from ownCloud against an oCIS with s3 storage.
 
 ### Run single feature test
 
 The single feature tests can also be run against the different storage backends. Therefore, multiple make targets with the schema test-<test source>-feature-<storage backend> exist. To select a single feature you have to add an additional `BEHAT_FEATURE=...` parameter when invoking the make command:
 
 ```
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature'
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21'
 ```
 
 This must be pointing to a valid feature definition.
@@ -56,8 +64,32 @@ This must be pointing to a valid feature definition.
 To run a single scenario in a feature, then mention the line number of the scenario:
 
 ```
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:20'
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21'
 ```
+
+Similarly, with S3 storage,
+- run a whole feature
+```
+make -C tests/acceptance/docker test-ocis-feature-s3ng-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature'
+```
+
+- run a single scenario
+```
+make -C tests/acceptance/docker test-ocis-feature-s3ng-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21'
+```
+
+In the same way for the tests transferred from oc10 can be run as
+- run a whole feature
+```
+make -C tests/acceptance/docker test-core-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
+```
+
+- run a single scenario
+```
+make -C tests/acceptance/docker test-core-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature:13'
+```
+
+> Note: the tests transferred from oc10 start with coreApi
 
 ### oCIS image to be tested (or: skip build and take existing image)
 
@@ -90,7 +122,7 @@ make -C tests/acceptance/docker clean
 ## Testing with test suite natively installed
 
 We have two sets of tests:
-- `test-acceptance-from-core-api` set was transferred from [core](https://github.com/owncloud/core) repository 
+- `test-acceptance-from-core-api` set was transferred from [core](https://github.com/owncloud/core) repository
 The suite name of all tests transferred from the core starts with "core"
 
 - `test-acceptance-api` set was created for ocis. Mainly for testing spaces features
@@ -133,7 +165,7 @@ TEST_OCIS=true \
 
 Make sure to adjust the settings `TEST_SERVER_URL` according to your environment.
 
-To run a single feature add `BEHAT_FEATURE=<feature file>` 
+To run a single feature add `BEHAT_FEATURE=<feature file>`
 
 example: `BEHAT_SUITE=tests/acceptance/features/apiGraph/createUser.feature`
 

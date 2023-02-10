@@ -466,13 +466,13 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
-++[]string ++
+++string ++
 
 a| [subs=-attributes]
-++[] ++
+++ ++
 
 a| [subs=-attributes]
-Node addresses to use for the cache store.
+A comma-separated list of addresses to connect to. Only valid if the above setting is set to "etcd"
 
 a| `OCIS_CACHE_STORE_SIZE`
 
@@ -501,10 +501,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++memory ++
+++ ++
 
 a| [subs=-attributes]
-Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
+The type of the cache store. Valid options are "noop", "ocmem", "etcd" and "memory"
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -535,7 +535,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With] ++
+++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -552,7 +552,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET POST PUT PATCH DELETE OPTIONS] ++
+++[OPTIONS HEAD GET PUT POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
@@ -849,7 +849,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether to verify the server TLS certificates.
+Allow insecure connections to the frontend.
 
 a| `OCIS_JWT_SECRET`
 
@@ -1073,7 +1073,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+The machine auth API key used to validate internal requests necessary to access resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1334,7 +1334,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+The public facing URL of the oCIS frontend.
 
 a| `REVA_GATEWAY`
 
@@ -1384,7 +1384,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 
 a| `STORAGE_USERS_OCIS_ASYNC_UPLOADS`
 
