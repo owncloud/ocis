@@ -25,18 +25,18 @@ We could use ldap, the graph service or a reva based authentication to look up m
 
 The /.well-known/webfinger enpdoint allows us to not only get rid of some of these calls, e.g. by embedding status.php info:
 
-```
+```json
 {
     "subject": "https://drive.ocis.test",
     "properties": {
         "http://webfinger.owncloud/prop/maintenance": "false",
         "http://webfinger.owncloud/prop/version": "10.11.0.6"
-    }
+    },
     "links": [
         {
-            "rel": "http://openid.net/specs/connect/1.0/issuer"
-            "href": "https://idp.ocis.test",
-        },
+            "rel": "http://openid.net/specs/connect/1.0/issuer",
+            "href": "https://idp.ocis.test"
+        }
     ]
 }
 ```
@@ -44,32 +44,32 @@ The /.well-known/webfinger enpdoint allows us to not only get rid of some of the
 ## Introduce Dedicated ocis web Endpoint
 
 It also allows us to move some services out of a sharded deployment. We could e.g. introduce a relation for a common ocis web endpoint to not exponse the different instances in the browser bar:
-```
+```json
 {
     "subject": "acct:einstein@drive.ocis.test",
     "links": [
         {
-            "rel": "http://openid.net/specs/connect/1.0/issuer"
-            "href": "https://idp.ocis.test",
+            "rel": "http://openid.net/specs/connect/1.0/issuer",
+            "href": "https://idp.ocis.test"
         },
         {
-            "rel": "http://webfinger.owncloud/rel/web"
-            "href": "https://drive.ocis.test",
+            "rel": "http://webfinger.owncloud/rel/web",
+            "href": "https://drive.ocis.test"
         },
         {
             "rel": "http://webfinger.owncloud/rel/server-instance",
-            "href": "https://abc.drive.ocis.test"
+            "href": "https://abc.drive.ocis.test",
     	    "titles": {
     	      "en": "Readable Instance Name"
     	    }
         },
         {
             "rel": "http://webfinger.owncloud/rel/server-instance",
-            "href": "https://xyz.drive.ocis.test"
+            "href": "https://xyz.drive.ocis.test",
     	    "titles": {
     	      "en": "Readable Other Instance Name"
     	    }
-        },
+        }
     ]
 }
 ```
@@ -77,25 +77,25 @@ It also allows us to move some services out of a sharded deployment. We could e.
 ## Dedicated ocis web Endpoint
 
 We could also omit the `http://webfinger.owncloud/rel/server-instance` relation and go straight for a graph service with e.g. `rel=http://libregraph.org/rel/graph`:
-```
+```json
 {
     "subject": "acct:einstein@drive.ocis.test",
     "links": [
         {
-            "rel": "http://openid.net/specs/connect/1.0/issuer"
-            "href": "https://idp.ocis.test",
+            "rel": "http://openid.net/specs/connect/1.0/issuer",
+            "href": "https://idp.ocis.test"
         },
         {
-            "rel": "http://webfinger.owncloud/rel/web"
-            "href": "https://drive.ocis.test",
+            "rel": "http://webfinger.owncloud/rel/web",
+            "href": "https://drive.ocis.test"
         },
         {
             "rel": "http://libregraph.org/rel/graph",
-            "href": "https://abc.drive.ocis.test/graph/v1.0"
+            "href": "https://abc.drive.ocis.test/graph/v1.0",
     	    "titles": {
     	      "en": "Readable Instance Name"
     	    }
-        },
+        }
     ]
 }
 ```
