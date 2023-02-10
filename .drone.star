@@ -379,7 +379,7 @@ def getGoDepsForTesting(ctx):
                 "refs/pull/**",
             ],
         },
-        "volumes": [stepVolumeGo],
+        "volumes": [pipelineVolumeGo],
     }
 
 def bingoGet():
