@@ -27,6 +27,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Better config for postprocessing service: [#5457](https://github.com/owncloud/ocis/pull/5457)
 * Enhancement - Add expiration to user and group shares: [#5389](https://github.com/owncloud/ocis/pull/5389)
 * Enhancement - Space Management permissions: [#5441](https://github.com/owncloud/ocis/pull/5441)
+* Enhancement - Cli to purge expired trash-bin items: [#5500](https://github.com/owncloud/ocis/pull/5500)
 
 # Changelog for [2.0.0] (2022-11-30)
 
