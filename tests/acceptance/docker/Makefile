@@ -29,7 +29,7 @@ OCIS_IMAGE_TAG ?= dev
 # static
 DIVIDE_INTO_NUM_PARTS := 10
 PARTS = 1 2 3 4 5 6 7 8 9 10
-LOCAL_API_SUITES = apiAccountsHashDifficulty apiArchiver apiContract apiGraph apiSpaces apiSpacesShares apiAsyncUpload apiCors
+LOCAL_API_SUITES = $(shell ls ../features | grep ^api*)
 
 COMPOSE_PROJECT_NAME := ocis-acceptance-tests
 
