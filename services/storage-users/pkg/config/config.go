@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -32,6 +33,7 @@ type Config struct {
 	ExposeDataServer bool    `yaml:"expose_data_server" env:"STORAGE_USERS_EXPOSE_DATA_SERVER" desc:"Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users."`
 	ReadOnly         bool    `yaml:"readonly" env:"STORAGE_USERS_READ_ONLY" desc:"Set this storage to be read-only."`
 	UploadExpiration int64   `yaml:"upload_expiration" env:"STORAGE_USERS_UPLOAD_EXPIRATION" desc:"Duration in seconds after which uploads will expire."`
+	Tasks            Tasks   `yaml:"tasks"`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
@@ -217,4 +219,16 @@ type LocalDriver struct {
 	//ShareFolder defines the name of the folder jailing all shares
 	ShareFolder string `yaml:"share_folder"`
 	UserLayout  string `yaml:"user_layout"`
+}
+
+// Tasks wraps task configurations
+type Tasks struct {
+	PurgeTrashBin PurgeTrashBin `yaml:"purge_trash_bin"`
+}
+
+// PurgeTrashBin contains all necessary configurations to clean up the respective trash cans
+type PurgeTrashBin struct {
+	UserID               string        `yaml:"user_id" env:"OCIS_ADMIN_USER_ID;STORAGE_USERS_PURGE_TRASH_BIN_USER_ID" desc:"ID of the user who collects all necessary information for deletion."`
+	PersonalDeleteBefore time.Duration `yaml:"personal_delete_before" env:"STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE" desc:"Specifies the period of time in which items that have been in the personal trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion"`
+	ProjectDeleteBefore  time.Duration `yaml:"project_delete_before" env:"STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE" desc:"Specifies the period of time in which items that have been in the project trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion"`
 }
