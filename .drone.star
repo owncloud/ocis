@@ -388,7 +388,9 @@ def bingoGet():
             "name": "bingo-get",
             "image": OC_CI_GOLANG,
             "commands": [
+                "du -hs /go",
                 "make bingo-update",
+                "du -hs /go"
                 ],
             "volumes": [stepVolumeGo],
         },
