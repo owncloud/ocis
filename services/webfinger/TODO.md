@@ -17,11 +17,11 @@ For now, webfinger can only match users based on a regex and produce a list of i
 
 Here are some Ideas which need to be discussed with all client teams in the future:
 
-## Implement a backend lookup
+## Implement a Backend Lookup
 
 We could use ldap, the graph service or a reva based authentication to look up more properties that can be used to determine which instances to list. The initial implementation works on oidc claims and does not work with basic auth.
 
-## Replace status.php with properties
+## Replace status.php with Properties
 
 The /.well-known/webfinger enpdoint allows us to not only get rid of some of these calls, e.g. by embedding status.php info:
 
@@ -41,7 +41,7 @@ The /.well-known/webfinger enpdoint allows us to not only get rid of some of the
 }
 ```
 
-## Introduce Dedicated ocis web endpoint
+## Introduce Dedicated ocis web Endpoint
 
 It also allows us to move some services out of a sharded deployment. We could e.g. introduce a relation for a common ocis web endpoint to not exponse the different instances in the browser bar:
 ```
@@ -74,7 +74,7 @@ It also allows us to move some services out of a sharded deployment. We could e.
 }
 ```
 
-## Dedicated ocis web endpoint
+## Dedicated ocis web Endpoint
 
 We could also omit the `http://webfinger.owncloud/rel/server-instance` relation and go straight for a graph service with e.g. `rel=http://libregraph.org/rel/graph`:
 ```
@@ -102,7 +102,7 @@ We could also omit the `http://webfinger.owncloud/rel/server-instance` relation 
 
 In theory the graph endpoint would allow discovering drives on any domain. But there is a lot more work to be done here.
 
-## Subject properties
+## Subject Properties
 
 We could also embed subject metadata, however since apps like ocis web also need the groups a user is member of a dedicated call to the libregraph api is probably better. In any case, we could return properties for the subject:
 ```
