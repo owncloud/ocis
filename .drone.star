@@ -390,8 +390,8 @@ def bingoGet():
             "commands": [
                 "du -hs /go",
                 "make bingo-update",
-                "du -hs /go"
-                ],
+                "du -hs /go",
+            ],
             "volumes": [stepVolumeGo],
         },
     ]
@@ -2386,7 +2386,7 @@ def genericCache(name, action, mounts, cache_path):
             "path": cache_path,
             "fallback_path": cache_path,
         },
-        "volumes": [stepVolumeGo]
+        "volumes": [stepVolumeGo],
     }
     return step
 
