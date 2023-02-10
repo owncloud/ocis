@@ -307,7 +307,7 @@ def testOcisModules(ctx):
     scan_result_upload = uploadScanResults(ctx)
     scan_result_upload["depends_on"] = getPipelineNames(pipelines)
 
-    return pipelines + [scan_result_upload]
+    return [getGoDepsForTesting(ctx)] + pipelines + [scan_result_upload]
 
 def cancelPreviousBuilds():
     return [{
@@ -360,8 +360,42 @@ def testPipelines(ctx):
 
     return pipelines
 
+def getGoDepsForTesting(ctx):
+    return {
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "get-go-deps-for-testing",
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": skipIfUnchanged(ctx, "unit-tests") +
+                 bingoGet() +
+                 rebuildBuildArtifactCache(ctx, "go-deps-for-testing", "/go"),
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/heads/stable-*",
+                "refs/pull/**",
+            ],
+        },
+        "volumes": [stepVolumeGo],
+    }
+
+def bingoGet():
+    return [
+        {
+            "name": "bingo-get",
+            "image": OC_CI_GOLANG,
+            "commands": [
+                "make bingo-update",
+                ],
+            "volumes": [stepVolumeGo],
+        },
+    ]
+
 def testOcisModule(ctx, module):
-    steps = skipIfUnchanged(ctx, "unit-tests") + makeGoGenerate(module) + [
+    steps = skipIfUnchanged(ctx, "unit-tests") + restoreBuildArtifactCache(ctx, "go-deps-for-testing", "/go") + makeGoGenerate(module) + [
         {
             "name": "golangci-lint",
             "image": OC_CI_GOLANG,
@@ -422,6 +456,7 @@ def testOcisModule(ctx, module):
                 "refs/pull/**",
             ],
         },
+        "depends_on": getPipelineNames([getGoDepsForTesting(ctx)]),
         "volumes": [pipelineVolumeGo],
     }
 
