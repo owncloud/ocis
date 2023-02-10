@@ -42,9 +42,9 @@ func PurgeExpiredResources(cfg *config.Config) *cli.Command {
 			}
 
 			// go-micro nats implementation uses async publishing,
-			// therefor we need to manually wait.
+			// therefore we need to manually wait.
 			//
-			// fixMe: upstream pr
+			// FIXME: upstream pr
 			//
 			// https://github.com/go-micro/plugins/blob/3e77393890683be4bacfb613bc5751867d584692/v4/events/natsjs/nats.go#L115
 			time.Sleep(5 * time.Second)

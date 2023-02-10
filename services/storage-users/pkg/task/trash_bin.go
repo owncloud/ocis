@@ -1,8 +1,6 @@
 package task
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"time"
 
@@ -51,14 +49,8 @@ func PurgeTrashBin(executantID *apiUser.UserId, deleteBefore time.Time, spaceTyp
 		case string(Personal):
 			impersonationID = storageSpace.GetOwner().GetId()
 		case string(Project):
-			opaqueGrants, ok := storageSpace.GetOpaque().GetMap()["grants"]
-			if !ok {
-				err = errors.New("no grants")
-				break
-			}
-
 			var permissionsMap map[string]*apiProvider.ResourcePermissions
-			err = json.Unmarshal(opaqueGrants.Value, &permissionsMap)
+			err := utils.ReadJSONFromOpaque(storageSpace.GetOpaque(), "grants", &permissionsMap)
 			if err != nil {
 				break
 			}
@@ -77,12 +69,12 @@ func PurgeTrashBin(executantID *apiUser.UserId, deleteBefore time.Time, spaceTyp
 			continue
 		}
 
-		if impersonationID == nil {
-			err = fmt.Errorf("can't impersonate space user for space: %s", storageSpace.GetId().GetOpaqueId())
-		}
-
 		if err != nil {
 			return err
+		}
+
+		if impersonationID == nil {
+			return fmt.Errorf("can't impersonate space user for space: %s", storageSpace.GetId().GetOpaqueId())
 		}
 
 		impersonatedCtx, _, err := utils.Impersonate(impersonationID, gwc, machineAuthAPIKey)

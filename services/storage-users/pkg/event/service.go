@@ -64,7 +64,7 @@ func (s Service) Run() error {
 
 			for spaceType, deleteBefore := range tasks {
 				// skip task execution if the deleteBefore time is the same as the now time,
-				// this indicates that the configuration for this task iteration is set to 0 which is used as disable indicator.
+				// which indicates that the duration configuration for this space type is set to 0 which is the equivalent to disabled.
 				if deleteBefore.Equal(executionTime) {
 					continue
 				}

@@ -179,6 +179,7 @@ var _ = Describe("trash", func() {
 			}
 			projectSpace.Opaque.Map = map[string]*apiTypes.OpaqueEntry{
 				"grants": {
+					Decoder: "json",
 					Value: MustMarshal(map[string]*apiProvider.ResourcePermissions{
 						"admin": {
 							Delete: true,
