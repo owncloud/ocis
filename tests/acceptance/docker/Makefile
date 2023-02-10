@@ -29,6 +29,7 @@ OCIS_IMAGE_TAG ?= dev
 # static
 DIVIDE_INTO_NUM_PARTS := 10
 PARTS = 1 2 3 4 5 6 7 8 9 10
+LOCAL_API_SUITES = $(shell ls ../features | grep ^api*)
 
 COMPOSE_PROJECT_NAME := ocis-acceptance-tests
 
@@ -42,8 +43,8 @@ help:
 	@echo -e "oCIS feature tests and test suites can be found here:"
 	@echo -e "\thttps://github.com/owncloud/ocis/tree/master/tests/acceptance/features"
 	@echo
-	@echo -e "ownCloud feature tests and test suites can be found here:"
-	@echo -e "\thttps://github.com/owncloud/core/tree/master/tests/acceptance/features"
+	@echo -e "test suites that test ownCloud 10 API core compatibility are found here and they start with prefix coreApi-:"
+	@echo -e "\thttps://github.com/owncloud/ocis/tree/master/tests/acceptance/features"
 	@echo
 	@echo -e "The oCIS to be tested will be build from your current working state."
 	@echo -e "You also can select the oCIS Docker image for all tests by setting"
@@ -52,13 +53,10 @@ help:
 	@echo -e "https://hub.docker.com/r/owncloud/ocis."
 	@echo
 	@echo -e "${GREEN}Run full oCIS test suites against oCIS with oCIS storage:${RESET}\n"
-	@echo -e "\tmake localApiTests-apiAccountsHashDifficulty-ocis\t\t${BLUE}run apiAccountsHashDifficulty test suite${RESET}"
+	@echo -e "\tmake localApiTests-apiAccountsHashDifficulty-ocis\t\t${BLUE}run apiAccountsHashDifficulty test suite,  where available test suite are apiAccountsHashDifficulty apiArchiver apiContract apiGraph apiSpaces apiSpacesShares apiAsyncUpload apiCors${RESET}"
 	@echo
 	@echo -e "${GREEN}Run full oCIS test suites against oCIS with s3ng storage:${RESET}\n"
-	@echo -e "\tmake localApiTests-apiAccountsHashDifficulty-s3ng\t\t${BLUE}run apiAccountsHashDifficulty test suite${RESET}"
-	@echo
-	@echo -e "${GREEN}Run full oCIS test suites against oCIS with ownCloud storage:${RESET}\n"
-	@echo -e "\tmake localApiTests-apiAccountsHashDifficulty-owncloud\t\t${BLUE}run apiAccountsHashDifficulty test suite${RESET}"
+	@echo -e "\tmake localApiTests-apiAccountsHashDifficulty-s3ng\t\t${BLUE}run apiAccountsHashDifficulty test suite, where available test suite are apiAccountsHashDifficulty apiArchiver apiContract apiGraph apiSpaces apiSpacesShares apiAsyncUpload apiCors${RESET}"
 	@echo
 	@echo -e "${GREEN}Run full ownCloud test suites against oCIS with oCIS storage:${RESET}\n"
 	@echo -e "\tmake Core-API-Tests-ocis-storage-${RED}X${RESET}\t\t${BLUE}run test suite number X, where ${RED}X = 1 .. 10${RESET}"
@@ -82,19 +80,19 @@ help:
 	@echo -e "\texample: ${RED}tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature${RESET}"
 	@echo
 	@echo -e "${GREEN}Run an ownCloud feature test against oCIS with oCIS storage:${RESET}\n"
-	@echo -e "\tmake test-oc10-feature-ocis-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
+	@echo -e "\tmake test-core-feature-ocis-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
 	@echo
 	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
-	@echo -e "\texample: ${RED}tests/acceptance/features/apiAuth/cors.feature${RESET}"
+	@echo -e "\texample: ${RED}tests/acceptance/features/coreApiAuth/webDavAuth.feature${RESET}"
 	@echo
 	@echo -e "${GREEN}Run an ownCloud feature test against oCIS with s3ng storage:${RESET}\n"
-	@echo -e "\tmake test-oc10-feature-s3ng-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
+	@echo -e "\tmake test-core-feature-s3ng-storage ${YELLOW}BEHAT_FEATURE='...'${RESET}\t${BLUE}run single feature test${RESET}"
 	@echo
 	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
-	@echo -e "\texample: ${RED}tests/acceptance/features/apiAuth/cors.feature${RESET}"
+	@echo -e "\texample: ${RED}tests/acceptance/features/coreApiAuth/webDavAuth.feature${RESET}"
 	@echo
 	@echo -e "\twhere ${YELLOW}BEHAT_FEATURE='...'${RESET} contains a relative path to the feature definition."
-	@echo -e "\texample: ${RED}tests/acceptance/features/apiAuth/cors.feature${RESET}"
+	@echo -e "\texample: ${RED}tests/acceptance/features/coreApiAuth/webDavAuth.feature${RESET}"
 	@echo
 	@echo
 	@echo -e "${GREEN}Show output of tests:${RESET}\n"
@@ -121,41 +119,54 @@ test-ocis-feature-s3ng-storage: ## test a ocis feature with s3ng storage, usage:
 	START_CEPH=1 \
 	$(MAKE) --no-print-directory testSuite
 
-.PHONY: test-oc10-feature-ocis-storage
-test-oc10-feature-ocis-storage: ## test a oC10 feature with oCIS storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/apiAuth/cors.feature'
+.PHONY: test-core-feature-ocis-storage
+test-core-feature-ocis-storage: ## test a core feature with oCIS storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
 	@TEST_SOURCE=oc10 \
 	STORAGE_DRIVER=ocis \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
 	$(MAKE) --no-print-directory testSuite
 
-.PHONY: test-oc10-feature-s3ng-storage
-test-oc10-feature-s3ng-storage: ## test a oC10 feature with s3ng storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/apiAuth/cors.feature'
+.PHONY: test-core-feature-s3ng-storage
+test-core-feature-s3ng-storage: ## test a core feature with s3ng storage, usage: make ... BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
 	@TEST_SOURCE=oc10 \
 	STORAGE_DRIVER=s3ng \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
 	START_CEPH=1 \
 	$(MAKE) --no-print-directory testSuite
 
-.PHONY: localApiTests-apiAccountsHashDifficulty-owncloud
-localApiTests-apiAccountsHashDifficulty-owncloud: ## run apiAccountsHashDifficulty test suite with owncloud storage
-	@TEST_SOURCE=ocis \
-	STORAGE_DRIVER=owncloud \
-	BEHAT_SUITE=apiAccountsHashDifficulty \
-	$(MAKE) --no-print-directory testSuite
-
-.PHONY: localApiTests-apiAccountsHashDifficulty-ocis
-localApiTests-apiAccountsHashDifficulty-ocis: ## run apiAccountsHashDifficulty test suite with ocis storage
+localSuiteOcis = $(addprefix localApiTests-, $(addsuffix -ocis,${LOCAL_API_SUITES}))
+.PHONY: $(localSuiteOcis)
+$(localSuiteOcis): ## run local api test suite with ocis storage
+	@$(eval BEHAT_SUITE=$(shell echo "$@" | cut -d'-' -f2))
 	@TEST_SOURCE=ocis \
 	STORAGE_DRIVER=ocis \
-	BEHAT_SUITE=apiAccountsHashDifficulty \
+	BEHAT_SUITE=$(BEHAT_SUITE) \
 	$(MAKE) --no-print-directory testSuite
 
-targets = $(addprefix Core-API-Tests-ocis-storage-,$(PARTS))
-.PHONY: $(targets)
-$(targets):
+localSuites3ng = $(addprefix localApiTests-, $(addsuffix -s3ng,${LOCAL_API_SUITES}))
+.PHONY: $(localSuites3ng)
+$(localSuites3ng): ## run local api test suite with s3 storage
+	@$(eval BEHAT_SUITE=$(shell echo "$@" | cut -d'-' -f2))
+	@TEST_SOURCE=ocis \
+	STORAGE_DRIVER=s3ng \
+	BEHAT_SUITE=$(BEHAT_SUITE) \
+	$(MAKE) --no-print-directory testSuite
+
+targetsOCIS = $(addprefix Core-API-Tests-ocis-storage-,$(PARTS))
+.PHONY: $(targetsOCIS)
+$(targetsOCIS):
 	@$(eval RUN_PART=$(shell echo "$@" | tr -dc '0-9'))
 	@TEST_SOURCE=oc10 \
 	STORAGE_DRIVER=ocis \
+	RUN_PART=$(RUN_PART) \
+	$(MAKE) --no-print-directory testSuite
+
+targetsS3ng = $(addprefix Core-API-Tests-s3ng-storage-,$(PARTS))
+.PHONY: $(targetsS3ng)
+$(targets):
+	@$(eval RUN_PART=$(shell echo "$@" | tr -dc '0-9'))
+	@TEST_SOURCE=oc10 \
+	STORAGE_DRIVER=s3ng \
 	RUN_PART=$(RUN_PART) \
 	$(MAKE) --no-print-directory testSuite
 
@@ -220,7 +231,7 @@ clean-docker-volumes: ## clean docker volumes created during acceptance tests
 
 .PHONY: clean-files
 clean-files:
-	@$(MAKE) --no-print-directory -C ../. clean-tests
+	@$(MAKE) --no-print-directory -C ../../../. clean-tests
 
 .PHONY: clean
 clean: clean-docker-container clean-docker-volumes clean-dev-docker-image clean-files ## clean all
