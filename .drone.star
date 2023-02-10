@@ -367,7 +367,7 @@ def testOcisModule(ctx, module):
             "image": OC_CI_GOLANG,
             "commands": [
                 "mkdir -p cache/checkstyle",
-                "retry -t 3 'make -C %s ci-golangci-lint'" % (module),
+                "retry -t 3 -m 10 -x 240 'make -C %s ci-golangci-lint'" % (module),
                 "mv %s/checkstyle.xml cache/checkstyle/$(basename %s)_checkstyle.xml" % (module, module),
             ],
             "volumes": [stepVolumeGo],
@@ -1190,7 +1190,7 @@ def settingsUITests(ctx, storage = "ocis", accounts_hash_difficulty = 4):
                              # they shouldn't be needed since we could also use them from web:/tests/acceptance/package.json
                              "cd %s/services/settings" % dirs["base"],
                              "pnpm config set store-dir ./.pnpm-store",
-                             "retry -t 3 'pnpm install'",
+                             "retry -t 3 -m 10 -x 240 'pnpm install'",
                              "make test-acceptance-webui",
                          ],
                          "volumes": [{
@@ -1922,7 +1922,7 @@ def makeNodeGenerate(module):
             },
             "commands": [
                 "pnpm config set store-dir ./.pnpm-store",
-                "retry -t 3 '%s ci-node-generate'" % (make),
+                "retry -t 3 -m 10 -x 240 '%s ci-node-generate'" % (make),
             ],
             "volumes": [stepVolumeGo],
         },
@@ -1938,7 +1938,7 @@ def makeGoGenerate(module):
             "name": "generate go",
             "image": OC_CI_GOLANG,
             "commands": [
-                "retry -t 3 '%s ci-go-generate'" % (make),
+                "retry -t 3 -m 10 -x 240 '%s ci-go-generate'" % (make),
             ],
             "volumes": [stepVolumeGo],
         },
@@ -2143,7 +2143,7 @@ def build():
             "name": "build",
             "image": OC_CI_GOLANG,
             "commands": [
-                "retry -t 3 'make -C ocis build'",
+                "retry -t 3 -m 10 -x 240 'make -C ocis build'",
             ],
             "volumes": [stepVolumeGo],
         },
@@ -2710,7 +2710,7 @@ def generateWebPnpmCache(ctx):
             "commands": [
                 "cd %s" % dirs["web"],
                 "pnpm config set store-dir ./.pnpm-store",
-                "retry -t 3 'pnpm install'",
+                "retry -t 3 -m 10 -x 240 'pnpm install'",
             ],
         },
         {
@@ -2801,6 +2801,6 @@ def restoreWebPnpmCache():
             "rm -rf .pnpm-store",
             "tar -xvf %s" % dirs["webPnpmZip"],
             "pnpm config set store-dir ./.pnpm-store",
-            "retry -t 3 'pnpm install'",
+            "retry -t 3 -m 10 -x 240 'pnpm install'",
         ],
     }]
