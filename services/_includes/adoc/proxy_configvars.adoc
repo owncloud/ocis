@@ -360,7 +360,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++preferred_username ++
 a| [subs=-attributes]
-The name of an OpenID Connect claim that should be used for resolving users with the account backend. Currently defaults to 'email'.
+The name of an OpenID Connect claim that is used for resolving users with the account backend. The value of the claim must hold a per user unique, stable and non re-assignable identifier. The availability of claims depends on your Identity Provider. There are common claims available for most Identity providers like 'email' or 'preferred_user' but you can also add your own claim.
 
 a|`PROXY_USER_CS3_CLAIM` +
 
