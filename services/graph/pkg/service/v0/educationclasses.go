@@ -443,6 +443,167 @@ func (g Graph) DeleteEducationClassMember(w http.ResponseWriter, r *http.Request
 	render.NoContent(w, r)
 }
 
+// GetEducationClassTeachers implements the Service interface.
+func (g Graph) GetEducationClassTeachers(w http.ResponseWriter, r *http.Request) {
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+	logger.Info().Msg("calling get class teachers")
+	classID := chi.URLParam(r, "classID")
+	classID, err := url.PathUnescape(classID)
+	if err != nil {
+		logger.Debug().Str("id", classID).Msg("could not get class teachers: unescaping class id failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping class id failed")
+		return
+	}
+
+	if classID == "" {
+		logger.Debug().Msg("could not get class teachers: missing class id")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing class id")
+		return
+	}
+
+	logger.Debug().Str("id", classID).Msg("calling get class teachers on backend")
+	teachers, err := g.identityEducationBackend.GetEducationClassTeachers(r.Context(), classID)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not get class teachers: backend error")
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, teachers)
+}
+
+// PostEducationClassTeacher implements the Service interface.
+func (g Graph) PostEducationClassTeacher(w http.ResponseWriter, r *http.Request) {
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+	logger.Info().Msg("Calling post class teacher")
+
+	classID := chi.URLParam(r, "classID")
+	classID, err := url.PathUnescape(classID)
+	if err != nil {
+		logger.Debug().
+			Err(err).
+			Str("id", classID).
+			Msg("could not add teacher to class: unescaping class id failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping class id failed")
+		return
+	}
+
+	if classID == "" {
+		logger.Debug().Msg("could not add class teacher: missing class id")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing class id")
+		return
+	}
+	memberRef := libregraph.NewMemberReference()
+	err = json.NewDecoder(r.Body).Decode(memberRef)
+	if err != nil {
+		logger.Debug().
+			Err(err).
+			Interface("body", r.Body).
+			Msg("could not add class teacher: invalid request body")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+	memberRefURL, ok := memberRef.GetOdataIdOk()
+	if !ok {
+		logger.Debug().Msg("could not add class teacher: @odata.id reference is missing")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "@odata.id reference is missing")
+		return
+	}
+	memberType, id, err := g.parseMemberRef(*memberRefURL)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not add class teacher: error parsing @odata.id url")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Error parsing @odata.id url")
+		return
+	}
+	// The MS Graph spec allows "directoryObject", "user", "class" and "organizational Contact"
+	// we restrict this to users for now. Might add EducationClass as members later
+	if memberType != memberTypeUsers {
+		logger.Debug().Str("type", memberType).Msg("could not add class member: Only users are allowed as class teachers")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Only users are allowed as class teachers")
+		return
+	}
+
+	logger.Debug().Str("memberType", memberType).Str("id", id).Msg("calling add teacher on backend")
+	err = g.identityEducationBackend.AddTeacherToEducationClass(r.Context(), classID, id)
+
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not add class teacher: backend error")
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+
+	/* TODO requires reva changes
+	currentUser := revactx.ContextMustGetUser(r.Context())
+	g.publishEvent(events.EducationClassTeacherAdded{Executant: currentUser.Id, EducationClassID: classID, UserID: id})
+	*/
+	render.Status(r, http.StatusNoContent)
+	render.NoContent(w, r)
+}
+
+// DeleteEducationClassTeacher implements the Service interface.
+func (g Graph) DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Request) {
+	logger := g.logger.SubloggerWithRequestID(r.Context())
+	logger.Info().Msg("calling delete class teacher")
+
+	classID := chi.URLParam(r, "classID")
+	classID, err := url.PathUnescape(classID)
+	if err != nil {
+		logger.Debug().Err(err).Str("id", classID).Msg("could not delete class teacher: unescaping class id failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping class id failed")
+		return
+	}
+
+	if classID == "" {
+		logger.Debug().Msg("could not delete class teacher: missing class id")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing class id")
+		return
+	}
+
+	teacherID := chi.URLParam(r, "teacherID")
+	teacherID, err = url.PathUnescape(teacherID)
+	if err != nil {
+		logger.Debug().Err(err).Str("id", teacherID).Msg("could not delete class teacher: unescaping teacher id failed")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping teacher id failed")
+		return
+	}
+
+	if teacherID == "" {
+		logger.Debug().Msg("could not delete class teacher: missing teacher id")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing teacher id")
+		return
+	}
+	logger.Debug().Str("classID", classID).Str("teacherID", teacherID).Msg("calling delete teacher on backend")
+	err = g.identityEducationBackend.RemoveTeacherFromEducationClass(r.Context(), classID, teacherID)
+
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not delete class teacher: backend error")
+		var errcode errorcode.Error
+		if errors.As(err, &errcode) {
+			errcode.Render(w, r)
+		} else {
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		}
+		return
+	}
+	/* TODO requires reva changes
+	currentUser := revactx.ContextMustGetUser(r.Context())
+	g.publishEvent(events.EducationClassTeacherRemoved{Executant: currentUser.Id, EducationClassID: classID, UserID: teacherID})
+	*/
+	render.Status(r, http.StatusNoContent)
+	render.NoContent(w, r)
+}
+
 func sortClasses(req *godata.GoDataRequest, classes []*libregraph.EducationClass) ([]*libregraph.EducationClass, error) {
 	if req.Query.OrderBy == nil || len(req.Query.OrderBy.OrderByItems) != 1 {
 		return classes, nil

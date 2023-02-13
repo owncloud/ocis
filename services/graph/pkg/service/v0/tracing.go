@@ -289,3 +289,18 @@ func (t tracing) AssignTags(w http.ResponseWriter, r *http.Request) {
 func (t tracing) UnassignTags(w http.ResponseWriter, r *http.Request) {
 	t.next.UnassignTags(w, r)
 }
+
+// GetEducationClassTeachers implements the Service interface.
+func (t tracing) GetEducationClassTeachers(w http.ResponseWriter, r *http.Request) {
+	t.next.UnassignTags(w, r)
+}
+
+// PostEducationClassTeacher implements the Service interface.
+func (t tracing) PostEducationClassTeacher(w http.ResponseWriter, r *http.Request) {
+	t.next.UnassignTags(w, r)
+}
+
+// DeleteEducationClassTeacher implements the Service interface.
+func (t tracing) DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Request) {
+	t.next.UnassignTags(w, r)
+}

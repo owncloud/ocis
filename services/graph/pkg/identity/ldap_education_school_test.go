@@ -461,7 +461,7 @@ var classesBySchoolIDSearch *ldap.SearchRequest = &ldap.SearchRequest{
 	Scope:      2,
 	SizeLimit:  0,
 	Filter:     "(&(objectClass=ocEducationClass)(ocMemberOfSchool=abcd-defg))",
-	Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId", "ocMemberOfSchool"},
+	Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId", "ocMemberOfSchool", "ocEducationTeacherMember"},
 	Controls:   []ldap.Control(nil),
 }
 
@@ -484,7 +484,7 @@ var classesByUUIDSearchNotFound *ldap.SearchRequest = &ldap.SearchRequest{
 	Scope:      2,
 	SizeLimit:  1,
 	Filter:     "(&(objectClass=ocEducationClass)(|(entryUUID=does-not-exist)(ocEducationExternalId=does-not-exist)))",
-	Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId", "ocMemberOfSchool"},
+	Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId", "ocMemberOfSchool", "ocEducationTeacherMember"},
 	Controls:   []ldap.Control(nil),
 }
 
@@ -493,7 +493,7 @@ var classesByUUIDSearchFound *ldap.SearchRequest = &ldap.SearchRequest{
 	Scope:      2,
 	SizeLimit:  1,
 	Filter:     "(&(objectClass=ocEducationClass)(|(entryUUID=abcd-defg)(ocEducationExternalId=abcd-defg)))",
-	Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId", "ocMemberOfSchool"},
+	Attributes: []string{"cn", "entryUUID", "ocEducationClassType", "ocEducationExternalId", "ocMemberOfSchool", "ocEducationTeacherMember"},
 	Controls:   []ldap.Control(nil),
 }
 

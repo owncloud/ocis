@@ -37,7 +37,7 @@ func (i *LDAP) GetGroup(ctx context.Context, nameOrID string, queryParam url.Val
 		return nil, errorcode.New(errorcode.ItemNotFound, "not found")
 	}
 	if slices.Contains(sel, "members") || slices.Contains(exp, "members") {
-		members, err := i.expandLDAPGroupMembers(ctx, e)
+		members, err := i.expandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
 		if err != nil {
 			return nil, err
 		}
@@ -115,7 +115,7 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 			continue
 		}
 		if expandMembers {
-			members, err := i.expandLDAPGroupMembers(ctx, e)
+			members, err := i.expandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
 			if err != nil {
 				return nil, err
 			}
@@ -142,7 +142,7 @@ func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string) ([]*libregra
 		return nil, err
 	}
 
-	memberEntries, err := i.expandLDAPGroupMembers(ctx, e)
+	memberEntries, err := i.expandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
 	result := make([]*libregraph.User, 0, len(memberEntries))
 	if err != nil {
 		return nil, err
@@ -279,7 +279,7 @@ func (i *LDAP) RemoveMemberFromGroup(ctx context.Context, groupID string, member
 	}
 	logger.Debug().Str("backend", "ldap").Str("groupdn", ge.DN).Str("member", me.DN).Msg("remove member")
 
-	if mr, err := i.removeMemberFromGroupEntry(ge, me.DN); err == nil {
+	if mr, err := i.removeEntryByDNAndAttributeFromEntry(ge, me.DN, i.groupAttributeMap.member); err == nil {
 		return i.conn.Modify(mr)
 	}
 	return nil
@@ -321,28 +321,6 @@ func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]strin
 		attrs["objectClass"] = append(attrs["objectClass"], "owncloud")
 	}
 	return attrs, nil
-}
-
-func (i *LDAP) expandLDAPGroupMembers(ctx context.Context, e *ldap.Entry) ([]*ldap.Entry, error) {
-	logger := i.logger.SubloggerWithRequestID(ctx)
-	logger.Debug().Str("backend", "ldap").Msg("expandLDAPGroupMembers")
-	result := []*ldap.Entry{}
-
-	for _, memberDN := range e.GetEqualFoldAttributeValues(i.groupAttributeMap.member) {
-		if memberDN == "" {
-			continue
-		}
-		logger.Debug().Str("memberDN", memberDN).Msg("lookup")
-		ue, err := i.getUserByDN(memberDN)
-		if err != nil {
-			// Ignore errors when reading a specific member fails, just log them and continue
-			logger.Debug().Err(err).Str("member", memberDN).Msg("error reading group member")
-			continue
-		}
-		result = append(result, ue)
-	}
-
-	return result, nil
 }
 
 func (i *LDAP) getLDAPGroupByID(id string, requestMembers bool) (*ldap.Entry, error) {
@@ -411,45 +389,6 @@ func (i *LDAP) getLDAPGroupsByFilter(filter string, requestMembers, single bool)
 		return nil, errorcode.New(errorcode.ItemNotFound, errmsg)
 	}
 	return res.Entries, nil
-}
-
-// removeMemberFromGroupEntry creates an LDAP Modify request (not sending it)
-// that would update the supplied entry to remove the specified member from the
-// group
-func (i *LDAP) removeMemberFromGroupEntry(group *ldap.Entry, memberDN string) (*ldap.ModifyRequest, error) {
-	nOldMemberDN, err := ldapdn.ParseNormalize(memberDN)
-	if err != nil {
-		return nil, err
-	}
-	members := group.GetEqualFoldAttributeValues(i.groupAttributeMap.member)
-	found := false
-	for _, member := range members {
-		if member == "" {
-			continue
-		}
-		if nMember, err := ldapdn.ParseNormalize(member); err != nil {
-			// We couldn't parse the member value as a DN. Let's keep it
-			// as it is but log a warning
-			i.logger.Warn().Str("memberDN", member).Err(err).Msg("Couldn't parse DN")
-			continue
-		} else {
-			if nMember == nOldMemberDN {
-				found = true
-			}
-		}
-	}
-	if !found {
-		i.logger.Debug().Str("backend", "ldap").Str("groupdn", group.DN).Str("member", memberDN).
-			Msg("The target is not a member of the group")
-		return nil, ErrNotFound
-	}
-
-	mr := ldap.ModifyRequest{DN: group.DN}
-	if len(members) == 1 {
-		mr.Add(i.groupAttributeMap.member, []string{""})
-	}
-	mr.Delete(i.groupAttributeMap.member, []string{memberDN})
-	return &mr, nil
 }
 
 func (i *LDAP) getGroupByDN(dn string) (*ldap.Entry, error) {

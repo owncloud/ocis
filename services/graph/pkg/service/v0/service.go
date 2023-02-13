@@ -84,6 +84,10 @@ type Service interface {
 	PatchEducationUser(http.ResponseWriter, *http.Request)
 	DeleteEducationClassMember(w http.ResponseWriter, r *http.Request)
 
+	GetEducationClassTeachers(w http.ResponseWriter, r *http.Request)
+	PostEducationClassTeacher(w http.ResponseWriter, r *http.Request)
+	DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Request)
+
 	GetDrives(w http.ResponseWriter, r *http.Request)
 	GetSingleDrive(w http.ResponseWriter, r *http.Request)
 	GetAllDrives(w http.ResponseWriter, r *http.Request)
@@ -271,6 +275,11 @@ func NewService(opts ...Option) (Graph, error) {
 							r.Get("/", svc.GetEducationClassMembers)
 							r.Post("/$ref", svc.PostEducationClassMember)
 							r.Delete("/{memberID}/$ref", svc.DeleteEducationClassMember)
+						})
+						r.Route("/teachers", func(r chi.Router) {
+							r.Get("/", svc.GetEducationClassTeachers)
+							r.Post("/$ref", svc.PostEducationClassTeacher)
+							r.Delete("/{teacherID}/$ref", svc.DeleteEducationClassTeacher)
 						})
 					})
 				})

@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/go-ldap/ldap/v3"
+	"github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	oldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
@@ -14,12 +15,14 @@ import (
 type educationClassAttributeMap struct {
 	externalID     string
 	classification string
+	teachers       string
 }
 
 func newEducationClassAttributeMap() educationClassAttributeMap {
 	return educationClassAttributeMap{
 		externalID:     "ocEducationExternalId",
 		classification: "ocEducationClassType",
+		teachers:       "ocEducationTeacherMember",
 	}
 }
 
@@ -225,7 +228,7 @@ func (i *LDAP) GetEducationClassMembers(ctx context.Context, id string) ([]*libr
 		return nil, err
 	}
 
-	memberEntries, err := i.expandLDAPGroupMembers(ctx, e)
+	memberEntries, err := i.expandLDAPAttributeEntries(ctx, e, i.groupAttributeMap.member)
 	result := make([]*libregraph.EducationUser, 0, len(memberEntries))
 	if err != nil {
 		return nil, err
@@ -283,6 +286,7 @@ func (i *LDAP) getEducationClassAttrTypes(requestMembers bool) []string {
 		i.educationConfig.classAttributeMap.classification,
 		i.educationConfig.classAttributeMap.externalID,
 		i.educationConfig.memberOfSchoolAttribute,
+		i.educationConfig.classAttributeMap.teachers,
 	}
 	if requestMembers {
 		attrs = append(attrs, i.groupAttributeMap.member)
@@ -336,4 +340,114 @@ func (i *LDAP) getEducationClassByID(nameOrID string, requestMembers bool) (*lda
 		i.groupBaseDN,
 		i.getEducationClassAttrTypes(requestMembers),
 	)
+}
+
+// GetEducationClassTeachers returns the EducationUser teachers for an EducationClass
+func (i *LDAP) GetEducationClassTeachers(ctx context.Context, classID string) ([]*libregraph.EducationUser, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	class, err := i.getEducationClassByID(classID, false)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not get class: backend error")
+		return nil, err
+	}
+
+	teacherEntries, err := i.expandLDAPAttributeEntries(ctx, class, i.educationConfig.classAttributeMap.teachers)
+	result := make([]*libregraph.EducationUser, 0, len(teacherEntries))
+	if err != nil {
+		return nil, err
+	}
+	for _, teacher := range teacherEntries {
+		if u := i.createEducationUserModelFromLDAP(teacher); u != nil {
+			result = append(result, u)
+		}
+	}
+
+	return result, nil
+
+}
+
+// AddTeacherToEducationClass adds a teacher (by ID) to class in the identity backend.
+func (i *LDAP) AddTeacherToEducationClass(ctx context.Context, classID string, teacherID string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	class, err := i.getEducationClassByID(classID, false)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not get class: backend error")
+		return err
+	}
+
+	logger.Debug().Str("classDn", class.DN).Msg("got a class")
+	teacher, err := i.getEducationUserByNameOrID(teacherID)
+
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not get education user: error fetching education user from backend")
+		return err
+	}
+
+	logger.Debug().Str("userDn", teacher.DN).Msg("got a user")
+
+	mr := ldap.ModifyRequest{DN: class.DN}
+	// Handle empty teacher list
+	current := class.GetEqualFoldAttributeValues(i.educationConfig.classAttributeMap.teachers)
+	if len(current) == 1 && current[0] == "" {
+		mr.Delete(i.educationConfig.classAttributeMap.teachers, []string{""})
+	}
+
+	// Create a Set of current teachers
+	currentSet := make(map[string]struct{}, len(current))
+	for _, currentTeacher := range current {
+		if currentTeacher == "" {
+			continue
+		}
+		nCurrentTeacher, err := ldapdn.ParseNormalize(currentTeacher)
+		if err != nil {
+			// Couldn't parse teacher value as a DN, skipping
+			logger.Warn().Str("teacherDN", currentTeacher).Err(err).Msg("Couldn't parse DN")
+			continue
+		}
+		currentSet[nCurrentTeacher] = struct{}{}
+	}
+
+	var newTeacherDN []string
+	nDN, err := ldapdn.ParseNormalize(teacher.DN)
+	if err != nil {
+		logger.Error().Str("new teacher", teacher.DN).Err(err).Msg("Couldn't parse DN")
+		return err
+	}
+	if _, present := currentSet[nDN]; !present {
+		newTeacherDN = append(newTeacherDN, teacher.DN)
+	} else {
+		logger.Debug().Str("teacherDN", teacher.DN).Msg("Member already present in group. Skipping")
+	}
+
+	if len(newTeacherDN) > 0 {
+		mr.Add(i.educationConfig.classAttributeMap.teachers, newTeacherDN)
+
+		if err := i.conn.Modify(&mr); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// RemoveTeacherFromEducationClass removes teacher (by ID) from a class
+func (i *LDAP) RemoveTeacherFromEducationClass(ctx context.Context, classID string, teacherID string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	class, err := i.getEducationClassByID(classID, false)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not get class: backend error")
+		return err
+	}
+
+	teacher, err := i.getEducationUserByNameOrID(teacherID)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not get education user: error fetching education user from backend")
+		return err
+	}
+
+	if mr, err := i.removeEntryByDNAndAttributeFromEntry(class, teacher.DN, i.educationConfig.classAttributeMap.teachers); err == nil {
+		return i.conn.Modify(mr)
+	}
+
+	return nil
 }

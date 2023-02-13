@@ -91,6 +91,13 @@ type EducationBackend interface {
 	GetEducationUser(ctx context.Context, nameOrID string) (*libregraph.EducationUser, error)
 	// GetEducationUsers lists all education users
 	GetEducationUsers(ctx context.Context) ([]*libregraph.EducationUser, error)
+
+	// GetEducationClassTeachers returns the EducationUser teachers for an EducationClass
+	GetEducationClassTeachers(ctx context.Context, classID string) ([]*libregraph.EducationUser, error)
+	// AddTeacherToEducationclass adds a teacher (by ID) to class in the identity backend.
+	AddTeacherToEducationClass(ctx context.Context, classID string, teacherID string) error
+	// RemoveTeacherFromEducationClass removes teacher (by ID) from a class
+	RemoveTeacherFromEducationClass(ctx context.Context, classID string, teacherID string) error
 }
 
 func CreateUserModelFromCS3(u *cs3.User) *libregraph.User {
