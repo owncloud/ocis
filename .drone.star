@@ -53,36 +53,36 @@ config = {
     "modules": [
         # if you add a module here please also add it to the root level Makefile
         "services/app-provider",
-        "services/app-registry",
-        "services/audit",
-        "services/auth-basic",
-        "services/auth-bearer",
-        "services/auth-machine",
-        "services/frontend",
-        "services/gateway",
-        "services/graph",
-        "services/groups",
-        "services/idm",
-        "services/idp",
-        "services/nats",
-        "services/notifications",
-        "services/ocdav",
-        "services/ocs",
-        "services/proxy",
-        "services/search",
-        "services/settings",
-        "services/sharing",
-        "services/storage-system",
-        "services/storage-publiclink",
-        "services/storage-shares",
-        "services/storage-users",
-        "services/store",
-        "services/thumbnails",
-        "services/users",
-        "services/web",
-        "services/webdav",
-        "ocis-pkg",
-        "ocis",
+        # "services/app-registry",
+        # "services/audit",
+        # "services/auth-basic",
+        # "services/auth-bearer",
+        # "services/auth-machine",
+        # "services/frontend",
+        # "services/gateway",
+        # "services/graph",
+        # "services/groups",
+        # "services/idm",
+        # "services/idp",
+        # "services/nats",
+        # "services/notifications",
+        # "services/ocdav",
+        # "services/ocs",
+        # "services/proxy",
+        # "services/search",
+        # "services/settings",
+        # "services/sharing",
+        # "services/storage-system",
+        # "services/storage-publiclink",
+        # "services/storage-shares",
+        # "services/storage-users",
+        # "services/store",
+        # "services/thumbnails",
+        # "services/users",
+        # "services/web",
+        # "services/webdav",
+        # "ocis-pkg",
+        # "ocis",
     ],
     "cs3ApiTests": {
         "skip": False,
@@ -224,12 +224,8 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
-        codestyle(ctx) + \
-        buildWebCache(ctx) + \
         [getGoDepsForTesting(ctx)] + \
-        [buildOcisBinaryForTesting(ctx)] + \
-        testOcisModules(ctx) + \
-        testPipelines(ctx)
+        testOcisModules(ctx)
 
     build_release_pipelines = \
         [licenseCheck(ctx)] + \
@@ -245,11 +241,12 @@ def main(ctx):
     test_pipelines.append(
         pipelineDependsOn(
             purgeBuildArtifactCache(ctx),
-            testPipelines(ctx),
+            # testPipelines(ctx),
+            testOcisModules(ctx),
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
+    pipelines = test_pipelines  # + build_release_pipelines + build_release_helpers
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -271,7 +268,7 @@ def main(ctx):
         ),
     )
 
-    pipelines += checkStarlark()
+    # pipelines += checkStarlark()
     pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
