@@ -10,8 +10,13 @@ import (
 	"strings"
 	"time"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/go-chi/chi/v5"
+	"github.com/owncloud/ocis/v2/ocis-pkg/account"
+	"github.com/owncloud/ocis/v2/ocis-pkg/assetsfs"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/services/web"
 	"github.com/owncloud/ocis/v2/services/web/pkg/assets"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
 )
@@ -25,6 +30,8 @@ var (
 type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
 	Config(http.ResponseWriter, *http.Request)
+	UploadLogo(http.ResponseWriter, *http.Request)
+	ResetLogo(http.ResponseWriter, *http.Request)
 }
 
 // NewService returns a service implementation for Service.
@@ -35,13 +42,23 @@ func NewService(opts ...Option) Service {
 	m.Use(options.Middleware...)
 
 	svc := Web{
-		logger: options.Logger,
-		config: options.Config,
-		mux:    m,
+		logger:        options.Logger,
+		config:        options.Config,
+		mux:           m,
+		fs:            assetsfs.New(web.Assets, options.Config.Asset.Path, options.Logger),
+		gatewayClient: options.GatewayClient,
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 		r.Get("/config.json", svc.Config)
+		r.Route("/branding/logo", func(r chi.Router) {
+			r.Use(middleware.ExtractAccountUUID(
+				account.Logger(options.Logger),
+				account.JWTSecret(options.Config.TokenManager.JWTSecret),
+			))
+			r.Post("/", svc.UploadLogo)
+			r.Delete("/", svc.ResetLogo)
+		})
 		r.Mount("/", svc.Static(options.Config.HTTP.CacheTTL))
 	})
 
@@ -55,9 +72,11 @@ func NewService(opts ...Option) Service {
 
 // Web defines implements the business logic for Service.
 type Web struct {
-	logger log.Logger
-	config *config.Config
-	mux    *chi.Mux
+	logger        log.Logger
+	config        *config.Config
+	mux           *chi.Mux
+	fs            *assetsfs.FileSystem
+	gatewayClient gateway.GatewayAPIClient
 }
 
 // ServeHTTP implements the Service interface.
@@ -131,12 +150,7 @@ func (p Web) Static(ttl int) http.HandlerFunc {
 
 	static := http.StripPrefix(
 		rootWithSlash,
-		assets.FileServer(
-			assets.New(
-				assets.Logger(p.logger),
-				assets.Config(p.config),
-			),
-		),
+		assets.FileServer(p.fs),
 	)
 
 	lastModified := time.Now().UTC().Format(http.TimeFormat)

@@ -3,6 +3,7 @@ package svc
 import (
 	"net/http"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
 )
@@ -12,9 +13,10 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger     log.Logger
-	Config     *config.Config
-	Middleware []func(http.Handler) http.Handler
+	Logger        log.Logger
+	Config        *config.Config
+	Middleware    []func(http.Handler) http.Handler
+	GatewayClient gateway.GatewayAPIClient
 }
 
 // newOptions initializes the available default options.
@@ -46,5 +48,12 @@ func Config(val *config.Config) Option {
 func Middleware(val ...func(http.Handler) http.Handler) Option {
 	return func(o *Options) {
 		o.Middleware = val
+	}
+}
+
+// GatewayClient provides a function to set the GatewayClient option.
+func GatewayClient(client gateway.GatewayAPIClient) Option {
+	return func(o *Options) {
+		o.GatewayClient = client
 	}
 }

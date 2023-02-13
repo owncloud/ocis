@@ -22,7 +22,10 @@ type Config struct {
 	File  string `yaml:"file" env:"WEB_UI_CONFIG" desc:"Read the ownCloud Web configuration from this file."` // TODO: rename this to a more self explaining string
 	Web   Web    `yaml:"web"`
 
-	Context context.Context `yaml:"-"`
+	TokenManager *TokenManager `yaml:"token_manager"`
+
+	GatewayAddress string          `yaml:"gateway_addr" env:"WEB_GATEWAY_GRPC_ADDR" desc:"The bind address of the GRPC service."`
+	Context        context.Context `yaml:"-"`
 }
 
 // Asset defines the available asset configuration.
@@ -60,13 +63,14 @@ type Application struct {
 }
 
 // ExternalApp defines an external web app.
-// {
-//	"name": "hello",
-//	"path": "http://localhost:9105/hello.js",
-//	  "config": {
-//	    "url": "http://localhost:9105"
-//	  }
-//  }
+//
+//	{
+//		"name": "hello",
+//		"path": "http://localhost:9105/hello.js",
+//		  "config": {
+//		    "url": "http://localhost:9105"
+//		  }
+//	 }
 type ExternalApp struct {
 	ID   string `json:"id,omitempty" yaml:"id"`
 	Path string `json:"path,omitempty" yaml:"path"`
@@ -85,4 +89,9 @@ type Web struct {
 	ThemeServer string    `yaml:"theme_server" env:"OCIS_URL;WEB_UI_THEME_SERVER" desc:"URL to load themes from. Will be prepended to the theme path."` // used to build Theme in WebConfig
 	ThemePath   string    `yaml:"theme_path" env:"WEB_UI_THEME_PATH" desc:"URL path to load themes from. The theme server will be prepended."`          // used to build Theme in WebConfig
 	Config      WebConfig `yaml:"config"`
+}
+
+// TokenManager is the config for using the reva token manager
+type TokenManager struct {
+	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET;WEB_JWT_SECRET" desc:"The secret to mint and validate jwt tokens."`
 }

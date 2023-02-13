@@ -1,12 +1,11 @@
 package assetsfs
 
 import (
-	"embed"
 	"fmt"
 	"io/fs"
 	"net/http"
 	"os"
-	"path"
+	"path/filepath"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
@@ -21,22 +20,35 @@ type FileSystem struct {
 // Open checks if assetPath is set and tries to load from there. Falls back to fs if that is not possible
 func (f *FileSystem) Open(original string) (http.File, error) {
 	if f.assetPath != "" {
-		file, err := read(f.assetPath, original)
+		file, err := os.Open(filepath.Join(f.assetPath, original))
 		if err == nil {
 			return file, nil
 		}
-		f.log.Warn().
-			Str("path", f.assetPath).
-			Str("filename", original).
-			Str("error", err.Error()).
-			Msg("error reading from assetPath")
 	}
-
 	return f.fs.Open(original)
 }
 
+func (f *FileSystem) OpenEmbedded(name string) (http.File, error) {
+	return f.fs.Open(name)
+}
+
+// Create creates a new file in the assetPath
+func (f *FileSystem) Create(name string) (*os.File, error) {
+	fullPath := f.jailPath(name)
+	if err := os.MkdirAll(filepath.Dir(fullPath), 0770); err != nil {
+		return nil, err
+	}
+	return os.Create(fullPath)
+}
+
+// jailPath returns the fullPath `<assetPath>/<name>`. It makes sure that the path is
+// always under `<assetPath>` to prevent directory traversal.
+func (f *FileSystem) jailPath(name string) string {
+	return filepath.Join(f.assetPath, filepath.Join("/", name))
+}
+
 // New initializes a new FileSystem. Quits on error
-func New(embedFS embed.FS, assetPath string, logger log.Logger) *FileSystem {
+func New(embedFS fs.FS, assetPath string, logger log.Logger) *FileSystem {
 	f, err := fs.Sub(embedFS, "assets")
 	if err != nil {
 		fmt.Println("Cannot load subtree fs:", err.Error())
@@ -48,18 +60,4 @@ func New(embedFS embed.FS, assetPath string, logger log.Logger) *FileSystem {
 		assetPath: assetPath,
 		log:       logger,
 	}
-}
-
-// tries to read file from disk or errors
-func read(assetPath string, fileName string) (http.File, error) {
-	if stat, err := os.Stat(assetPath); err != nil || !stat.IsDir() {
-		return nil, fmt.Errorf("can't load asset path: %s", err)
-	}
-
-	p := path.Join(assetPath, fileName)
-	if _, err := os.Stat(p); err != nil {
-		return nil, err
-	}
-
-	return os.Open(p)
 }

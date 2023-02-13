@@ -1,8 +1,10 @@
 package defaults
 
 import (
+	"path/filepath"
 	"strings"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/web/pkg/config"
 )
 
@@ -31,8 +33,9 @@ func DefaultConfig() *config.Config {
 			Name: "web",
 		},
 		Asset: config.Asset{
-			Path: "",
+			Path: filepath.Join(defaults.BaseDataPath(), "web/assets"),
 		},
+		GatewayAddress: "127.0.0.1:9142",
 		Web: config.Web{
 			Path:        "",
 			ThemeServer: "https://localhost:9200",
@@ -93,6 +96,13 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
+	}
 	if cfg.Commons != nil {
 		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
 	}

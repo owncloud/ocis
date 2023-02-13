@@ -82,6 +82,11 @@ const (
 	SelfManagementPermissionID string = "e03070e9-4362-4cc6-a872-1c7cb2eb2b8e"
 	// SelfManagementPermissionName is the hardcoded setting name for the self management permission
 	SelfManagementPermissionName string = "self-management"
+
+	// ChangeLogoPermissionID is the hardcoded setting UUID for the change-logo permission
+	ChangeLogoPermissionID string = "ed83fc10-1f54-4a9e-b5a7-fb517f5f3e01"
+	// ChangeLogoPermissionName is the hardcoded setting name for the change-logo permission
+	ChangeLogoPermissionName string = "change-logo"
 )
 
 // GenerateBundlesDefaultRoles bootstraps the default roles.
@@ -256,6 +261,21 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				Value: &settingsmsg.Setting_PermissionValue{
 					PermissionValue: &settingsmsg.Permission{
 						Operation:  settingsmsg.Permission_OPERATION_DELETE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+			{
+				Id:          ChangeLogoPermissionID,
+				Name:        ChangeLogoPermissionName,
+				DisplayName: "Change logo",
+				Description: "This permission permits to change the system logo.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SYSTEM,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
 						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 					},
 				},

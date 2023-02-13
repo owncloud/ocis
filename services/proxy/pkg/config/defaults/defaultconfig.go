@@ -84,6 +84,10 @@ func DefaultPolicies() []config.Policy {
 					Unprotected: true,
 				},
 				{
+					Endpoint: "/branding/logo",
+					Service:  "com.owncloud.web.web",
+				},
+				{
 					Endpoint:    "/konnect/",
 					Service:     "com.owncloud.web.idp",
 					Unprotected: true,

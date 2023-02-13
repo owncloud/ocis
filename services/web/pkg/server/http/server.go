@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
@@ -33,9 +34,15 @@ func Server(opts ...Option) (http.Service, error) {
 		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
 	}
 
+	client, err := pool.GetGatewayServiceClient(options.Config.GatewayAddress)
+	if err != nil {
+		return http.Service{}, err
+	}
+
 	handle := svc.NewService(
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
+		svc.GatewayClient(client),
 		svc.Middleware(
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,
