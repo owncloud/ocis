@@ -24,7 +24,7 @@ type Config struct {
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 
-	GatewayAddress string          `yaml:"gateway_addr" env:"WEB_GATEWAY_GRPC_ADDR" desc:"GRPC address of the Reva gateway service."`
+	GatewayAddress string          `yaml:"gateway_addr" env:"WEB_GATEWAY_GRPC_ADDR" desc:"The bind address of the GRPC service."`
 	Context        context.Context `yaml:"-"`
 }
 
