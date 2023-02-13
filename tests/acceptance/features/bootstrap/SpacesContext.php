@@ -1945,14 +1945,12 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" shares a space "([^"]*)" to user "([^"]*)" with role "([^"]*)"$/
-	 * @When /^user "([^"]*)" shares a space "([^"]*)" to group "([^"]*)" with role "([^"]*)"$/
-	 * @When /^user "([^"]*)" updates the space "([^"]*)" for user "([^"]*)" changing the role to "([^"]*)"$/
+	 * @When /^user "([^"]*)" shares a space "([^"]*)" with settings:$/
+	 * @When /^user "([^"]*)" updates the space "([^"]*)" with settings:$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
-	 * @param  string $recipient
-	 * @param  string $role
+	 * @param  TableNode $table
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -1960,19 +1958,23 @@ class SpacesContext implements Context {
 	public function sendShareSpaceRequest(
 		string $user,
 		string $spaceName,
-		string $recipient,
-		string $role
+		TableNode $table
 	): void {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$availableRoleToAssignToShareSpace = ['manager', 'editor', 'viewer'];
-		if (!\in_array(\strtolower($role), $availableRoleToAssignToShareSpace)) {
-			throw new Error("The Selected " . $role . " Cannot be Found");
+		$rows = $table->getRowsHash();
+		if (!\in_array(\strtolower($rows['role']), $availableRoleToAssignToShareSpace)) {
+			throw new Error("The Selected " . $rows['role'] . " Cannot be Found");
 		}
+		$rows["shareType"] = \array_key_exists("shareType", $rows) ? $rows["shareType"] : 7;
+		$rows["expireDate"] = \array_key_exists("expireDate", $rows) ? $rows["expireDate"] : null;
+
 		$body = [
-			"space_ref" => $space['id'],
-			"shareType" => 7,
-			"shareWith" => $recipient,
-			"role" => $role // role overrides the permissions parameter
+			"space_ref" => $space["id"],
+			"shareType" => $rows["shareType"],
+			"shareWith" => $rows["shareWith"],
+			"role" => $rows["role"],
+		  "expireDate" => $rows["expireDate"]
 		];
 
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
@@ -2159,12 +2161,11 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has shared a space "([^"]*)" to (?:user|group) "([^"]*)" with role "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has shared a space "([^"]*)" with settings:$/
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
-	 * @param  string $recipient
-	 * @param  string $role
+	 * @param  TableNode $tableNode
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -2172,10 +2173,9 @@ class SpacesContext implements Context {
 	public function userHasSharedSpace(
 		string $user,
 		string $spaceName,
-		string $recipient,
-		string $role
+		TableNode $tableNode
 	): void {
-		$this->sendShareSpaceRequest($user, $spaceName, $recipient, $role);
+		$this->sendShareSpaceRequest($user, $spaceName, $tableNode);
 		$expectedHTTPStatus = "200";
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$expectedHTTPStatus,
@@ -3252,12 +3252,14 @@ class SpacesContext implements Context {
 
 	/**
 	 * @Then /^the user "([^"]*)" should have a space called "([^"]*)" granted to (user|group)\s? "([^"]*)" with role "([^"]*)"$/
+	 * @Then /^the user "([^"]*)" should have a space called "([^"]*)" granted to (user|group)\s? "([^"]*)" with role "([^"]*)" and expiration date "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
 	 * @param string $recipientType
 	 * @param string $recipient
 	 * @param string $role
+	 * @param string $expirationDate
 	 *
 	 * @return void
 	 *
@@ -3269,7 +3271,8 @@ class SpacesContext implements Context {
 		string $spaceName,
 		string $recipientType,
 		string $recipient,
-		string $role
+		string $role,
+		string $expirationDate = null
 	): void {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
@@ -3282,6 +3285,10 @@ class SpacesContext implements Context {
 		foreach ($spaceAsArray['root']['permissions'] as $permission) {
 			if (isset($permission['grantedToIdentities'][0][$recipientType]) && $permission['roles'][0] === $role && $permission['grantedToIdentities'][0][$recipientType]['id'] === $recipientId) {
 				$foundRoleInResponse = true;
+				if ($expirationDate !== null) {
+					Assert::assertArrayHasKey('expirationDateTime', $permission, 'expirationDateTime key not found in response');
+					Assert::assertEquals($expirationDate, (preg_split("/[\sT]+/", $permission['expirationDateTime']))[0], "$expirationDate is different in the response");
+				}
 				break;
 			}
 		}
