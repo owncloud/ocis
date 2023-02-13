@@ -21,7 +21,7 @@ type Config struct {
 	Instances []Instance `yaml:"instances"`
 	Relations []string   `yaml:"relations" env:"WEBFINGER_RELATIONS" desc:"A comma-separated list of relation URIs or registered relation types to add to webfinger responses."`
 	IDP       string     `yaml:"idp" env:"OCIS_URL;OCIS_OIDC_ISSUER;WEBFINGER_OIDC_ISSUER" desc:"The identity provider href for the openid-discovery relation."`
-	OcisURL   string     `yaml:"ocis_url" env:"OCIS_URL;WEBFINGER_OWNCLOUD_SERVER_INSTANCE_URL" desc:"The URL for the owncloud server instance relation."`
+	OcisURL   string     `yaml:"ocis_url" env:"OCIS_URL;WEBFINGER_OWNCLOUD_SERVER_INSTANCE_URL" desc:"The URL for the legacy ownCloud server instance relation (not to be confused with the product ownCloud Server). It defaults to the OCIS_URL but can be overridden to support some reverse proxy corner cases. To shard the deployment, multiple instances can be configured in the configuration file."`
 
 	Context context.Context `yaml:"-"`
 }
