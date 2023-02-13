@@ -26,7 +26,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-The default role assignments the demo users should be setup.
+Flag to enable or disable the creation of the demo users.
 
 a| `LDAP_BIND_DN`
 
@@ -131,7 +131,7 @@ a| [subs=-attributes]
 ++groupOfNames ++
 
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter ('groupOfNames'). 
+The object class to use for groups in the default group search filter ('groupOfNames').
 
 a| `LDAP_GROUP_SCHEMA_DISPLAYNAME`
 
@@ -181,7 +181,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
 
 a| `LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -197,7 +197,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs.
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
 
 a| `LDAP_GROUP_SCHEMA_MAIL`
 
@@ -246,7 +246,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
 
 a| `LDAP_INSECURE`
 
@@ -370,7 +370,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
 
 a| `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -386,7 +386,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.
+Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user id's.
 
 a| `LDAP_USER_SCHEMA_MAIL`
 
@@ -440,7 +440,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
 
 a| `OCIS_ADMIN_USER_ID`
 
@@ -467,13 +467,13 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
-++string ++
+++[]string ++
 
 a| [subs=-attributes]
-++ ++
+++[] ++
 
 a| [subs=-attributes]
-A comma-separated list of addresses to connect to. Only valid if the above setting is set to "etcd"
+Node addresses to use for the cache store.
 
 a| `OCIS_CACHE_STORE_SIZE`
 
@@ -502,10 +502,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ ++
+++memory ++
 
 a| [subs=-attributes]
-The type of the cache store. Valid options are "noop", "ocmem", "etcd" and "memory"
+Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -514,12 +514,13 @@ a| [subs=attributes+]
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++bool ++
 
 a| [subs=-attributes]
-++true ++
+++false ++
 
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
@@ -531,12 +532,13 @@ a| [subs=attributes+]
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With] ++
+++[] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -548,12 +550,13 @@ a| [subs=attributes+]
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET POST PUT PATCH DELETE OPTIONS] ++
+++[] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
@@ -565,6 +568,7 @@ a| [subs=attributes+]
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++[]string ++
@@ -775,6 +779,7 @@ a| [subs=attributes+]
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++string ++
@@ -794,6 +799,7 @@ a| [subs=attributes+]
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++bool ++
@@ -813,6 +819,7 @@ a| [subs=attributes+]
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++string ++
@@ -917,6 +924,7 @@ a| [subs=attributes+]
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++bool ++
@@ -960,6 +968,7 @@ a| [subs=attributes+]
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++string ++
@@ -1003,6 +1012,7 @@ a| [subs=attributes+]
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++string ++
@@ -1046,6 +1056,7 @@ a| [subs=attributes+]
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++bool ++
@@ -1074,7 +1085,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary to access resources from other services.
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1086,6 +1097,7 @@ a| [subs=attributes+]
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++string ++
@@ -1094,7 +1106,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
 
 a| `OCIS_SYSTEM_USER_API_KEY`
 
@@ -1181,6 +1193,7 @@ a| [subs=attributes+]
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++string ++
@@ -1220,6 +1233,7 @@ a| [subs=attributes+]
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++bool ++
@@ -1259,6 +1273,7 @@ a| [subs=attributes+]
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++string ++
@@ -1298,6 +1313,7 @@ a| [subs=attributes+]
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++string ++
@@ -1327,6 +1343,8 @@ a| [subs=attributes+]
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
+* xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
 ++string ++
@@ -1335,7 +1353,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
 
 a| `REVA_GATEWAY`
 

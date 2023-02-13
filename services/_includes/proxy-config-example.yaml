@@ -36,7 +36,10 @@ policies:
   - endpoint: /
     service: com.owncloud.web.web
     unprotected: true
-  - endpoint: /.well-known/
+  - endpoint: /.well-known/webfinger
+    service: com.owncloud.web.webfinger
+    unprotected: true
+  - endpoint: /.well-known/openid-configuration
     service: com.owncloud.web.idp
     unprotected: true
   - endpoint: /konnect/
