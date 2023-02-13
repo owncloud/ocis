@@ -33,3 +33,8 @@ func (i instrument) Config(w http.ResponseWriter, r *http.Request) {
 func (i instrument) UploadLogo(w http.ResponseWriter, r *http.Request) {
 	i.next.UploadLogo(w, r)
 }
+
+// ResetLogo implements the Service interface.
+func (i instrument) ResetLogo(w http.ResponseWriter, r *http.Request) {
+	i.next.ResetLogo(w, r)
+}

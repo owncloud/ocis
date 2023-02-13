@@ -28,6 +28,10 @@ func (f *FileSystem) Open(original string) (http.File, error) {
 	return f.fs.Open(original)
 }
 
+func (f *FileSystem) OpenEmbedded(name string) (http.File, error) {
+	return f.fs.Open(name)
+}
+
 // Create creates a new file in the assetPath
 func (f *FileSystem) Create(name string) (*os.File, error) {
 	fullPath := f.jailPath(name)

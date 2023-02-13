@@ -29,3 +29,8 @@ func (t tracing) Config(w http.ResponseWriter, r *http.Request) {
 func (t tracing) UploadLogo(w http.ResponseWriter, r *http.Request) {
 	t.next.UploadLogo(w, r)
 }
+
+// ResetLogo implements the Service interface.
+func (t tracing) ResetLogo(w http.ResponseWriter, r *http.Request) {
+	t.next.ResetLogo(w, r)
+}

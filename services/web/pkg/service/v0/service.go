@@ -31,6 +31,7 @@ type Service interface {
 	ServeHTTP(http.ResponseWriter, *http.Request)
 	Config(http.ResponseWriter, *http.Request)
 	UploadLogo(http.ResponseWriter, *http.Request)
+	ResetLogo(http.ResponseWriter, *http.Request)
 }
 
 // NewService returns a service implementation for Service.
@@ -56,6 +57,7 @@ func NewService(opts ...Option) Service {
 				account.JWTSecret(options.Config.TokenManager.JWTSecret),
 			))
 			r.Post("/", svc.UploadLogo)
+			r.Delete("/", svc.ResetLogo)
 		})
 		r.Mount("/", svc.Static(options.Config.HTTP.CacheTTL))
 	})

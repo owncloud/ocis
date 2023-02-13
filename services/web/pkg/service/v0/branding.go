@@ -76,6 +76,46 @@ func (p Web) UploadLogo(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+// ResetLogo implements the endpoint to reset the instance logo.
+// The config will be changed back to use the embedded logo asset.
+func (p Web) ResetLogo(w http.ResponseWriter, r *http.Request) {
+	user := revactx.ContextMustGetUser(r.Context())
+	rsp, err := p.gatewayClient.CheckPermission(r.Context(), &permissionsapi.CheckPermissionRequest{
+		Permission: "change-logo",
+		SubjectRef: &permissionsapi.SubjectReference{
+			Spec: &permissionsapi.SubjectReference_UserId{
+				UserId: user.Id,
+			},
+		},
+	})
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if rsp.Status.Code != rpc.Code_CODE_OK {
+		w.WriteHeader(http.StatusForbidden)
+		return
+	}
+
+	f, err := p.fs.OpenEmbedded(_themesConfigPath)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	defer f.Close()
+
+	originalPath, err := p.getLogoPath(f)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err := p.updateLogoThemeConfig(originalPath); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
 func (p Web) storeAsset(name string, asset io.Reader) error {
 	dst, err := p.fs.Create(name)
 	if err != nil {
@@ -85,6 +125,35 @@ func (p Web) storeAsset(name string, asset io.Reader) error {
 
 	_, err = io.Copy(dst, asset)
 	return err
+}
+
+func (p Web) getLogoPath(r io.Reader) (string, error) {
+	// This decoding of the themes.json file is not optimal. If we need to decode it for other
+	// usecases as well we should consider decoding to a struct.
+	var m map[string]interface{}
+	_ = json.NewDecoder(r).Decode(&m)
+
+	webCfg, ok := m["web"].(map[string]interface{})
+	if !ok {
+		return "", errInvalidThemeConfig
+	}
+
+	defaultCfg, ok := webCfg["default"].(map[string]interface{})
+	if !ok {
+		return "", errInvalidThemeConfig
+	}
+
+	logoCfg, ok := defaultCfg["logo"].(map[string]interface{})
+	if !ok {
+		return "", errInvalidThemeConfig
+	}
+
+	logoPath, ok := logoCfg["login"].(string)
+	if !ok {
+		return "", errInvalidThemeConfig
+	}
+
+	return logoPath, nil
 }
 
 func (p Web) updateLogoThemeConfig(logoPath string) error {
