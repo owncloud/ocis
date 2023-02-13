@@ -1978,7 +1978,9 @@ def makeGoGenerate(module):
             "image": OC_CI_GOLANG,
             "commands": [
                 "ls -lh /",
+                "ls -lh",
                 "du -hs /go",
+                "du -hs ./go",
                 "retry -t 3 -m 10 -x 240 '%s ci-go-generate'" % (make),
             ],
             "volumes": [stepVolumeGo],
