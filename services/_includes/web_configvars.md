@@ -20,7 +20,7 @@
 | OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
 | WEB_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
 | WEB_CACHE_TTL | int | 604800 | Cache policy in seconds for ownCloud Web assets.|
-| WEB_ASSET_PATH | string |  | Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets.|
+| WEB_ASSET_PATH | string | ~/.ocis/web/assets | Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets.|
 | WEB_UI_CONFIG | string |  | Read the ownCloud Web configuration from this file.|
 | WEB_UI_PATH | string |  | Read the ownCloud Web configuration from this file path.|
 | OCIS_URL<br/>WEB_UI_THEME_SERVER | string | https://localhost:9200 | URL to load themes from. Will be prepended to the theme path.|
@@ -31,3 +31,5 @@
 | WEB_OIDC_CLIENT_ID | string | web | OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP.|
 | WEB_OIDC_RESPONSE_TYPE | string | code | OIDC response type to use for authentication.|
 | WEB_OIDC_SCOPE | string | openid profile email | OIDC scopes to request during authentication to authorize access to user details. Defaults to 'openid profile email'. Values are separated by blank. More example values but not limited to are 'address' or 'phone' etc.|
+| OCIS_JWT_SECRET<br/>WEB_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
+| WEB_GATEWAY_GRPC_ADDR | string | 127.0.0.1:9142 | The bind address of the GRPC service.|

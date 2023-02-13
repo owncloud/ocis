@@ -25,7 +25,7 @@ http:
   root: /
   cache_ttl: 604800
 asset:
-  path: ""
+  path: ~/.ocis/web/assets
 file: ""
 web:
   path: ""
@@ -64,3 +64,6 @@ web:
       - image/tiff
       - image/bmp
       - image/x-ms-bmp
+token_manager:
+  jwt_secret: ""
+gateway_addr: 127.0.0.1:9142

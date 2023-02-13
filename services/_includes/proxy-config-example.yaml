@@ -42,6 +42,8 @@ policies:
   - endpoint: /.well-known/openid-configuration
     service: com.owncloud.web.idp
     unprotected: true
+  - endpoint: /branding/logo
+    service: com.owncloud.web.web
   - endpoint: /konnect/
     service: com.owncloud.web.idp
     unprotected: true
