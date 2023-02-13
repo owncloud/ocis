@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Change - Remove the settings ui: [#5463](https://github.com/owncloud/ocis/pull/5463)
 * Enhancement - Add global env variable extractor: [#5164](https://github.com/owncloud/ocis/pull/5164)
 * Enhancement - Async Postprocessing: [#5207](https://github.com/owncloud/ocis/pull/5207)
+* Enhancement - Add endpoints to upload a custom logo: [#5559](https://github.com/owncloud/ocis/pull/5559)
 * Enhancement - Bump libre-graph-api-go: [#5309](https://github.com/owncloud/ocis/pull/5309)
 * Enhancement - Bump reva version: [#5243](https://github.com/owncloud/ocis/pull/5243)
 * Enhancement - Collect global envvars: [#5367](https://github.com/owncloud/ocis/pull/5367)
