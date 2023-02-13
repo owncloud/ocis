@@ -46,6 +46,7 @@ OCIS_MODULES = \
 	services/users \
 	services/web \
 	services/webdav\
+	services/webfinger\
 	ocis \
 	ocis-pkg
 

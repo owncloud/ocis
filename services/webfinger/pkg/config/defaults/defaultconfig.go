@@ -34,6 +34,7 @@ func DefaultConfig() *config.Config {
 			Name: "webfinger",
 		},
 
+		OcisURL:   "https://localhost:9200",
 		Relations: []string{relations.OpenIDConnectRel, relations.OwnCloudInstanceRel},
 		Instances: []config.Instance{
 			{
