@@ -504,43 +504,6 @@ class GraphHelper {
 	 * @param string $xRequestId
 	 * @param string $adminUser
 	 * @param string $adminPassword
-	 * @param string $groupId
-	 * @param array $users expects users array with user ids
-	 *                     [ [ 'id' => 'some_id' ], ]
-	 *
-	 * @return ResponseInterface
-	 * @throws GuzzleException
-	 */
-	public static function addUsersToGroup(
-		string $baseUrl,
-		string $xRequestId,
-		string $adminUser,
-		string $adminPassword,
-		string $groupId,
-		array $users
-	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId . '/users');
-		$payload = [
-			"members@odata.bind" => []
-		];
-		foreach ($users as $user) {
-			$payload[0][] = self::getFullUrl($baseUrl, 'users/' . $user["id"]);
-		}
-		return HttpRequestHelper::post(
-			$url,
-			$xRequestId,
-			$adminUser,
-			$adminPassword,
-			self::getRequestHeaders(),
-			\json_encode($payload)
-		);
-	}
-
-	/**
-	 * @param string $baseUrl
-	 * @param string $xRequestId
-	 * @param string $adminUser
-	 * @param string $adminPassword
 	 * @param string $userId
 	 * @param string $groupId
 	 *
@@ -1029,6 +992,31 @@ class GraphHelper {
 			$password,
 			self::getRequestHeaders(),
 			\json_encode($payload)
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getApplications(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'applications');
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
 		);
 	}
 }
