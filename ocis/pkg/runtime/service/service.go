@@ -48,6 +48,7 @@ import (
 	users "github.com/owncloud/ocis/v2/services/users/pkg/command"
 	web "github.com/owncloud/ocis/v2/services/web/pkg/command"
 	webdav "github.com/owncloud/ocis/v2/services/webdav/pkg/command"
+	webfinger "github.com/owncloud/ocis/v2/services/webfinger/pkg/command"
 	"github.com/thejerf/suture/v4"
 )
 
@@ -112,6 +113,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.Thumbnails.Service.Name] = thumbnails.NewSutureService
 	s.ServicesRegistry[opts.Config.Web.Service.Name] = web.NewSutureService
 	s.ServicesRegistry[opts.Config.WebDAV.Service.Name] = webdav.NewSutureService
+	s.ServicesRegistry[opts.Config.Webfinger.Service.Name] = webfinger.NewSutureService
 	s.ServicesRegistry[opts.Config.Frontend.Service.Name] = frontend.NewSutureService
 	s.ServicesRegistry[opts.Config.OCDav.Service.Name] = ocdav.NewSutureService
 	s.ServicesRegistry[opts.Config.Gateway.Service.Name] = gateway.NewSutureService

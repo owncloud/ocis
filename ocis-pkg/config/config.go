@@ -33,6 +33,7 @@ import (
 	users "github.com/owncloud/ocis/v2/services/users/pkg/config"
 	web "github.com/owncloud/ocis/v2/services/web/pkg/config"
 	webdav "github.com/owncloud/ocis/v2/services/webdav/pkg/config"
+	webfinger "github.com/owncloud/ocis/v2/services/webfinger/pkg/config"
 )
 
 const (
@@ -106,5 +107,6 @@ type Config struct {
 	Users             *users.Config          `yaml:"users"`
 	Web               *web.Config            `yaml:"web"`
 	WebDAV            *webdav.Config         `yaml:"webdav"`
+	Webfinger         *webfinger.Config      `yaml:"webfinger"`
 	Search            *search.Config         `yaml:"search"`
 }

@@ -74,7 +74,12 @@ func DefaultPolicies() []config.Policy {
 					Unprotected: true,
 				},
 				{
-					Endpoint:    "/.well-known/",
+					Endpoint:    "/.well-known/webfinger",
+					Service:     "com.owncloud.web.webfinger",
+					Unprotected: true,
+				},
+				{
+					Endpoint:    "/.well-known/openid-configuration",
 					Service:     "com.owncloud.web.idp",
 					Unprotected: true,
 				},
