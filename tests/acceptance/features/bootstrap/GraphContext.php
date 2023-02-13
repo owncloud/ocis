@@ -1665,4 +1665,65 @@ class GraphContext implements Context {
 		}
 		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
 	}
+
+	/**
+	 * @When user :user gets all applications using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsAllApplicationsUsingTheGraphApi(string $user) {
+		$response = GraphHelper::getApplications(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then the user retrieve API response should contain the following applications information:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theResponseShouldContainTheFollowingApplicationsInformation(TableNode $table): void {
+		Assert::assertIsArray($responseArray = ($this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse()))['value'][0]);
+		foreach ($table->getHash() as $row) {
+			$key = $row["key"];
+			if ($key === 'id') {
+				Assert::assertTrue(
+					GraphHelper::isUUIDv4($responseArray[$key]),
+					__METHOD__ . ' Expected id to have UUIDv4 pattern but found: ' . $row["value"]
+				);
+			} else {
+				Assert::assertEquals($responseArray[$key], $row["value"]);
+			}
+		}
+	}
+
+	/**
+	 * @Then the user retrieve API response should contain the following app roles:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theResponseShouldContainTheFollowingAppRolesInformation(TableNode $table): void {
+		Assert::assertIsArray($responseArray = ($this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse()))['value'][0]);
+		foreach ($table->getRows() as $row) {
+			$foundRoleInResponse = false;
+			foreach ($responseArray['appRoles'] as $role) {
+				if ($role['displayName'] === $row[0]) {
+					$foundRoleInResponse = true;
+					break;
+				}
+			}
+			Assert::assertTrue($foundRoleInResponse, "the response does not contain the role $row[0]");
+		}
+	}
 }
