@@ -2846,7 +2846,9 @@ trait Sharing {
 			"uid_file_owner",
 			"share_with",
 			"displayname_file_owner",
-			"displayname_owner"
+			"displayname_owner",
+			"additional_info_owner",
+			"additional_info_file_owner"
 		];
 		foreach ($bodyRows as $field => $value) {
 			if (\in_array($field, $userRelatedFieldNames)) {
