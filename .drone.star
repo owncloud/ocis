@@ -389,22 +389,25 @@ def bingoGet():
                 "du -hs /go",
                 "make bingo-update",
                 "du -hs /go",
+                "du -hs /go/*",
             ],
             "volumes": [stepVolumeGo],
         },
     ]
 
 def testOcisModule(ctx, module):
-    steps = skipIfUnchanged(ctx, "unit-tests") + restoreBuildArtifactCache(ctx, "go-deps-for-testing", "/go") + makeGoGenerate(module) + [
+    steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoCache(ctx, "go-deps-for-testing", "/go") + makeGoGenerate(module) + [
         {
             "name": "golangci-lint",
             "image": OC_CI_GOLANG,
             "commands": [
                 "du -hs /go",
+                "du -hs /go/*",
                 "mkdir -p cache/checkstyle",
                 "retry -t 5 -m 10 -x 240 'make -C %s ci-golangci-lint'" % (module),
                 "mv %s/checkstyle.xml cache/checkstyle/$(basename %s)_checkstyle.xml" % (module, module),
                 "du -hs /go",
+                "du -hs /go/*",
             ],
             "volumes": [stepVolumeGo],
         },
@@ -1977,10 +1980,7 @@ def makeGoGenerate(module):
             "name": "generate go",
             "image": OC_CI_GOLANG,
             "commands": [
-                "ls -lh /",
-                "ls -lh",
                 "du -hs /go",
-                "du -hs ./go",
                 "retry -t 3 -m 10 -x 240 '%s ci-go-generate'" % (make),
             ],
             "volumes": [stepVolumeGo],
@@ -2455,6 +2455,20 @@ def rebuildBuildArtifactCache(ctx, name, path):
 
 def purgeBuildArtifactCache(ctx):
     return genericBuildArtifactCache(ctx, "", "purge", [])
+
+def restoreGoCache(ctx, name, path):
+    return restoreBuildArtifactCache(ctx, name, path) + [
+        {
+            "name": "move-go-cache",
+            "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+            "commands": [
+                "rsync -a --remove-source-files %s/go/ /go" % dirs["base"],
+                "ls -al -r %s/go" % dirs["base"],
+                "rm -rf %s/go" % dirs["base"],
+            ],
+            "volumes": [stepVolumeGo],
+        },
+    ]
 
 def pipelineSanityChecks(ctx, pipelines):
     """pipelineSanityChecks helps the CI developers to find errors before running it
