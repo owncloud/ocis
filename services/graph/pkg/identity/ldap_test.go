@@ -278,3 +278,360 @@ func TestGetUsers(t *testing.T) {
 		t.Errorf("Expected zero length user slice")
 	}
 }
+
+func TestLDAP_UpdateUser(t *testing.T) {
+	type userProps struct {
+		id                       string
+		mail                     string
+		displayName              string
+		onPremisesSamAccountName string
+	}
+	type args struct {
+		nameOrID  string
+		userProps userProps
+	}
+	type mockInputs struct {
+		funcName string
+		args     []interface{}
+		returns  []interface{}
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      *userProps
+		assertion assert.ErrorAssertionFunc
+		ldapMocks []mockInputs
+	}{
+		{
+			name: "Test changing ID",
+			args: args{
+				nameOrID: "testUser",
+				userProps: userProps{
+					id: "testUser",
+				},
+			},
+			want: nil,
+			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+				return assert.NotNil(t, err, args...)
+			},
+			ldapMocks: []mockInputs{
+				{
+					funcName: "Search",
+					args: []interface{}{
+						ldap.NewSearchRequest(
+							"ou=people,dc=test",
+							ldap.ScopeWholeSubtree,
+							ldap.NeverDerefAliases, 1, 0, false,
+							"(&(objectClass=inetOrgPerson)(|(uid=testUser)(entryUUID=testUser)))",
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname"},
+							nil,
+						),
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "ua=testUser",
+								},
+							},
+						},
+						nil,
+					},
+				},
+			},
+		},
+		{
+			name: "Test changing mail",
+			args: args{
+				nameOrID: "testUser",
+				userProps: userProps{
+					mail: "testuser@example.org",
+				},
+			},
+			want: &userProps{
+				id:                       "testUser",
+				mail:                     "testuser@example.org",
+				displayName:              "testUser",
+				onPremisesSamAccountName: "testUser",
+			},
+			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+				return assert.Nil(t, err, args...)
+			},
+			ldapMocks: []mockInputs{
+				{
+					funcName: "Search",
+					args: []interface{}{
+						ldap.NewSearchRequest(
+							"ou=people,dc=test",
+							ldap.ScopeWholeSubtree,
+							ldap.NeverDerefAliases, 1, 0, false,
+							"(&(objectClass=inetOrgPerson)(|(uid=testUser)(entryUUID=testUser)))",
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname"},
+							nil,
+						),
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "ua=foo",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "displayname",
+											Values: []string{"oldmail@example.org"},
+										},
+									},
+								},
+								{
+									DN: "ua=foo",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "entryUUID",
+											Values: []string{"testUser"},
+										},
+									},
+								},
+								{
+									DN: "ua=foo",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "mail",
+											Values: []string{"oldmail@example.org"},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+				{
+					funcName: "Search",
+					args: []interface{}{
+						&ldap.SearchRequest{
+							BaseDN:       "ua=foo",
+							Scope:        0,
+							DerefAliases: 0,
+							SizeLimit:    1,
+							TimeLimit:    0,
+							TypesOnly:    false,
+							Filter:       "(objectClass=inetOrgPerson)",
+							Attributes:   []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname"},
+							Controls:     []ldap.Control(nil),
+						},
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "ua=foo",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   lconfig.UserIDAttribute,
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   lconfig.UserEmailAttribute,
+											Values: []string{"testuser@example.org"},
+										},
+										{
+											Name:   lconfig.UserDisplayNameAttribute,
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   lconfig.UserNameAttribute,
+											Values: []string{"testUser"},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+				{
+					funcName: "Modify",
+					args: []interface{}{
+						&ldap.ModifyRequest{
+							DN: "ua=foo",
+							Changes: []ldap.Change{
+								{
+									Operation: 0x2,
+									Modification: ldap.PartialAttribute{
+										Type: "mail",
+										Vals: []string{"testuser@example.org"},
+									},
+								},
+							},
+							Controls: []ldap.Control(nil),
+						},
+					},
+					returns: []interface{}{nil},
+				},
+			},
+		},
+		{
+			name: "Test changing displayName",
+			args: args{
+				nameOrID: "testUser",
+				userProps: userProps{
+					displayName: "newName",
+				},
+			},
+			want: &userProps{
+				id:                       "testUser",
+				mail:                     "testuser@example.org",
+				displayName:              "newName",
+				onPremisesSamAccountName: "testUser",
+			},
+			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+				return assert.Nil(t, err, args...)
+			},
+			ldapMocks: []mockInputs{
+				{
+					funcName: "Search",
+					args: []interface{}{
+						ldap.NewSearchRequest(
+							"ou=people,dc=test",
+							ldap.ScopeWholeSubtree,
+							ldap.NeverDerefAliases, 1, 0, false,
+							"(&(objectClass=inetOrgPerson)(|(uid=testUser)(entryUUID=testUser)))",
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname"},
+							nil,
+						),
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "ua=foo",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "displayname",
+											Values: []string{"testUser"},
+										},
+									},
+								},
+								{
+									DN: "ua=foo",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "entryUUID",
+											Values: []string{"testUser"},
+										},
+									},
+								},
+								{
+									DN: "ua=foo",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "mail",
+											Values: []string{"testuser@example.org"},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+				{
+					funcName: "Search",
+					args: []interface{}{
+						&ldap.SearchRequest{
+							BaseDN:       "ua=foo",
+							Scope:        0,
+							DerefAliases: 0,
+							SizeLimit:    1,
+							TimeLimit:    0,
+							TypesOnly:    false,
+							Filter:       "(objectClass=inetOrgPerson)",
+							Attributes:   []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname"},
+							Controls:     []ldap.Control(nil),
+						},
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "ua=foo",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   lconfig.UserIDAttribute,
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   lconfig.UserEmailAttribute,
+											Values: []string{"testuser@example.org"},
+										},
+										{
+											Name:   lconfig.UserDisplayNameAttribute,
+											Values: []string{"newName"},
+										},
+										{
+											Name:   lconfig.UserNameAttribute,
+											Values: []string{"testUser"},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+				{
+					funcName: "Modify",
+					args: []interface{}{
+						&ldap.ModifyRequest{
+							DN: "ua=foo",
+							Changes: []ldap.Change{
+								{
+									Operation: 0x2,
+									Modification: ldap.PartialAttribute{
+										Type: lconfig.UserDisplayNameAttribute,
+										Vals: []string{"newName"},
+									},
+								},
+							},
+							Controls: []ldap.Control(nil),
+						},
+					},
+					returns: []interface{}{nil},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lm := &mocks.Client{}
+			for _, mock := range tt.ldapMocks {
+				lm.On(mock.funcName, mock.args...).Return(mock.returns...)
+			}
+			i, _ := getMockedBackend(lm, lconfig, &logger)
+
+			user := libregraph.User{
+				Id:                       &tt.args.userProps.id,
+				Mail:                     &tt.args.userProps.mail,
+				DisplayName:              &tt.args.userProps.displayName,
+				OnPremisesSamAccountName: &tt.args.userProps.onPremisesSamAccountName,
+			}
+
+			emptyString := ""
+			var want *libregraph.User = nil
+			if tt.want != nil {
+				want = &libregraph.User{
+					Id:                       &tt.want.id,
+					Mail:                     &tt.want.mail,
+					DisplayName:              &tt.want.displayName,
+					OnPremisesSamAccountName: &tt.want.onPremisesSamAccountName,
+					Surname:                  &emptyString,
+					GivenName:                &emptyString,
+				}
+			}
+
+			got, err := i.UpdateUser(context.Background(), tt.args.nameOrID, user)
+			tt.assertion(t, err)
+			assert.Equal(t, want, got)
+		})
+	}
+}

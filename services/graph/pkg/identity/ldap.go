@@ -215,8 +215,8 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	// As we currently using uid as the naming Attribute for the user entries. (Do we even
 	// want to allow changing the user name?). For now just disallow it.
 	if user.OnPremisesSamAccountName != nil && *user.OnPremisesSamAccountName != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.userName) != *user.OnPremisesSamAccountName {
-			e, err = i.changeUserName(ctx, e.DN, user.GetOnPremisesSamAccountName())
+		if eu := e.GetEqualFoldAttributeValue(i.userAttributeMap.userName); eu != *user.OnPremisesSamAccountName {
+			e, err = i.changeUserName(ctx, e.DN, eu, user.GetOnPremisesSamAccountName())
 			if err != nil {
 				return nil, err
 			}
@@ -474,26 +474,20 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 }
 
 func (i *LDAP) changeUserName(ctx context.Context, dn, originalUserName, newUserName string) (*ldap.Entry, error) {
+	logger := i.logger.SubloggerWithRequestID(ctx)
 	groups, err := i.getGroupsForUser(dn)
 	if err != nil {
 		return nil, err
 	}
 
 	newDN := fmt.Sprintf("%s=%s", i.userAttributeMap.userName, newUserName)
-	for _, g := range groups {
-		err = i.renameMemberInGroup(ctx, g, dn, newDN)
-		// This could leave the groups in an inconsistent state, might be a good idea to
-		// add a defer that changes everything back on error. Ideally, this entire function
-		// should be atomic, but LDAP doesn't support that.
-		if err != nil {
-			return nil, err
-		}
-	}
 
+	logger.Debug().Str("originalDN", dn).Str("newDN", newDN).Msg("Modifying DN")
 	mrdn := ldap.NewModifyDNRequest(dn, newDN, true, "")
 
 	if err := i.conn.ModifyDN(mrdn); err != nil {
 		var lerr *ldap.Error
+		logger.Debug().Str("originalDN", dn).Str("newDN", newDN).Err(err).Msg("Failed to modify DN")
 		if errors.As(err, &lerr) {
 			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
 				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
@@ -502,11 +496,43 @@ func (i *LDAP) changeUserName(ctx context.Context, dn, originalUserName, newUser
 		return nil, err
 	}
 
-	return i.getUserByDN(newDN)
+	u, err := i.getUserByDN(fmt.Sprintf("%s,%s", newDN, i.userBaseDN))
+	if err != nil {
+		return nil, err
+	}
+
+	for _, g := range groups {
+		err = i.renameMemberInGroup(ctx, g, dn, u.DN)
+		// This could leave the groups in an inconsistent state, might be a good idea to
+		// add a defer that changes everything back on error. Ideally, this entire function
+		// should be atomic, but LDAP doesn't support that.
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return u, nil
 }
 
-// TODO: Fill this in.
-func (i *LDAP) renameMemberInGroup(ctx context.Context, group *ldap.Entry, oldMember, newMember) error {
+func (i *LDAP) renameMemberInGroup(ctx context.Context, group *ldap.Entry, oldMember, newMember string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("oldMember", oldMember).Str("newMember", newMember).Msg("replacing group member")
+	members := group.GetEqualFoldAttributeValues(i.groupAttributeMap.member)
+	match := -1
+	for i, m := range members {
+		if m == oldMember {
+			match = i
+		}
+	}
+	if match != -1 {
+		members[match] = newMember
+		mr := ldap.NewModifyRequest(group.DN, nil)
+		mr.Replace(i.groupAttributeMap.member, members)
+		if err := i.conn.Modify(mr); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (i *LDAP) updateUserPassowrd(ctx context.Context, dn, password string) error {
