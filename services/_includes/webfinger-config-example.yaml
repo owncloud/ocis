@@ -40,4 +40,4 @@ relations:
 - http://openid.net/specs/connect/1.0/issuer
 - http://webfinger.owncloud/rel/server-instance
 idp: ""
-ocis_url: ""
+ocis_url: https://localhost:9200
