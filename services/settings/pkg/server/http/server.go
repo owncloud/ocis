@@ -1,18 +1,24 @@
 package http
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/render"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	ohttp "github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/permissions"
 	svc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 	"go-micro.dev/v4"
 )
 
@@ -77,6 +83,38 @@ func Server(opts ...Option) (ohttp.Service, error) {
 		settingssvc.RegisterValueServiceWeb(r, handle)
 		settingssvc.RegisterRoleServiceWeb(r, handle)
 		settingssvc.RegisterPermissionServiceWeb(r, handle)
+		r.MethodFunc("POST", "/api/v0/settings/permissions-list", func(w http.ResponseWriter, r *http.Request) {
+
+			req := &permissions.ListPermissionsRequest{}
+			if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+				http.Error(w, err.Error(), http.StatusPreconditionFailed)
+				return
+			}
+
+			us, ok := revactx.ContextGetUser(r.Context())
+			if !ok {
+				http.Error(w, "invalid user", http.StatusUnauthorized)
+				return
+			}
+
+			if us.GetId().GetOpaqueId() != req.UserID {
+				http.Error(w, fmt.Sprintf("user %s not found", req.UserID), http.StatusNotFound)
+				return
+			}
+
+			resp, err := handle.ListPermissions(r.Context(), req)
+			if err != nil {
+				if errors.Is(err, settings.ErrNotFound) {
+					http.Error(w, err.Error(), http.StatusNotFound)
+				} else {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+				}
+				return
+			}
+
+			render.Status(r, http.StatusOK)
+			render.JSON(w, r, resp)
+		})
 	})
 
 	_ = chi.Walk(mux, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
+	cs3permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -14,6 +14,7 @@ import (
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/permissions"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	filestore "github.com/owncloud/ocis/v2/services/settings/pkg/store/filesystem"
@@ -54,20 +55,20 @@ func NewService(cfg *config.Config, logger log.Logger) Service {
 
 // CheckPermission implements the CS3 API Permssions service.
 // It's used to check if a subject (user or group) has a permission.
-func (g Service) CheckPermission(ctx context.Context, req *permissions.CheckPermissionRequest) (*permissions.CheckPermissionResponse, error) {
+func (g Service) CheckPermission(ctx context.Context, req *cs3permissions.CheckPermissionRequest) (*cs3permissions.CheckPermissionResponse, error) {
 	spec := req.SubjectRef.Spec
 
 	var accountID string
 	switch ref := spec.(type) {
-	case *permissions.SubjectReference_UserId:
+	case *cs3permissions.SubjectReference_UserId:
 		accountID = ref.UserId.OpaqueId
-	case *permissions.SubjectReference_GroupId:
+	case *cs3permissions.SubjectReference_GroupId:
 		accountID = ref.GroupId.OpaqueId
 	}
 
 	assignments, err := g.manager.ListRoleAssignments(accountID)
 	if err != nil {
-		return &permissions.CheckPermissionResponse{
+		return &cs3permissions.CheckPermissionResponse{
 			Status: status.NewInternal(ctx, err.Error()),
 		}, nil
 	}
@@ -80,22 +81,61 @@ func (g Service) CheckPermission(ctx context.Context, req *permissions.CheckPerm
 	permission, err := g.manager.ReadPermissionByName(req.Permission, roleIDs)
 	if err != nil {
 		if !errors.Is(err, settings.ErrNotFound) {
-			return &permissions.CheckPermissionResponse{
+			return &cs3permissions.CheckPermissionResponse{
 				Status: status.NewInternal(ctx, err.Error()),
 			}, nil
 		}
 	}
 
 	if permission == nil {
-		return &permissions.CheckPermissionResponse{
+		return &cs3permissions.CheckPermissionResponse{
 			Status: &rpcv1beta1.Status{
 				Code: rpcv1beta1.Code_CODE_PERMISSION_DENIED,
 			},
 		}, nil
 	}
 
-	return &permissions.CheckPermissionResponse{
+	return &cs3permissions.CheckPermissionResponse{
 		Status: status.NewOK(ctx),
+	}, nil
+}
+
+func (g Service) ListPermissions(ctx context.Context, req *permissions.ListPermissionsRequest) (*permissions.ListPermissionsResponse, error) {
+	assignments, err := g.manager.ListRoleAssignments(req.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	// deduplicate role ids
+	roleIDs := map[string]struct{}{}
+	for _, a := range assignments {
+		roleIDs[a.RoleId] = struct{}{}
+	}
+
+	permissionNames := map[string]struct{}{}
+	for roleID, _ := range roleIDs {
+		bundle, err := g.manager.ReadBundle(roleID)
+		if err != nil {
+			if !errors.Is(err, settings.ErrNotFound) {
+				return nil, err
+			}
+			continue
+		}
+
+		if bundle != nil {
+			for _, setting := range bundle.GetSettings() {
+				permissionNames[setting.Name] = struct{}{}
+			}
+		}
+	}
+
+	deduplicatedPermissions := make([]string, 0, len(permissionNames))
+	for p := range permissionNames {
+		deduplicatedPermissions = append(deduplicatedPermissions, p)
+	}
+
+	return &permissions.ListPermissionsResponse{
+		Permissions: deduplicatedPermissions,
 	}, nil
 }
 
