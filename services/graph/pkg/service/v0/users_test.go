@@ -340,16 +340,28 @@ var _ = Describe("Users", func() {
 		Entry("with unsupported lambda token ", "memberOf/all(n:n/id eq 1)", http.StatusNotImplemented),
 		Entry("with unsupported filter operation ", "memberOf/any(n:n/id ne 1)", http.StatusNotImplemented),
 		Entry("with unsupported filter operand type", "memberOf/any(n:n/id eq 1)", http.StatusNotImplemented),
-		Entry("with unsupported lambda filter property", "memberOf/any(n:n/name eq 'name')", http.StatusNotImplemented),
+		Entry("with unsupported memberOf lambda filter property", "memberOf/any(n:n/name eq 'name')", http.StatusNotImplemented),
+		Entry("with unsupported appRoleAssignments lambda filter property", "appRoleAssignments/any(n:n/id eq 'id')", http.StatusNotImplemented),
 	)
 
-	DescribeTable("With a valid memberOf filter",
+	DescribeTable("With a valid filter",
 		func(filter string, status int) {
 			user := &libregraph.User{}
 			user.SetId("25cb7bc0-3168-4a0c-adbe-396f478ad494")
 			users := []*libregraph.User{user}
 			identityBackend.On("GetGroupMembers", mock.Anything, "25cb7bc0-3168-4a0c-adbe-396f478ad494", mock.Anything).Return(users, nil)
 			identityBackend.On("GetGroupMembers", mock.Anything, "2713f1d5-6822-42bd-ad56-9f6c55a3a8fa", mock.Anything).Return([]*libregraph.User{}, nil)
+			identityBackend.On("GetUsers", mock.Anything, mock.Anything).Return([]*libregraph.User{user}, nil)
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).
+				Return(func(ctx context.Context, in *settings.ListRoleAssignmentsRequest, opts ...client.CallOption) *settings.ListRoleAssignmentsResponse {
+					return &settings.ListRoleAssignmentsResponse{Assignments: []*settingsmsg.UserRoleAssignment{
+						{
+							Id:          "some-appRoleAssignment-ID",
+							AccountUuid: user.GetId(),
+							RoleId:      "some-appRole-ID",
+						},
+					}}
+				}, nil)
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape(filter), nil)
 			svc.GetUsers(rr, r)
 
@@ -357,6 +369,7 @@ var _ = Describe("Users", func() {
 		},
 		Entry("with memberOf lambda filter with UUID", "memberOf/any(n:n/id eq 25cb7bc0-3168-4a0c-adbe-396f478ad494)", http.StatusOK),
 		Entry("with memberOf lambda filter with UUID string", "memberOf/any(n:n/id eq '25cb7bc0-3168-4a0c-adbe-396f478ad494')", http.StatusOK),
+		Entry("with appRoleAssignments lambda filter with appRoleId", "appRoleAssignments/any(n:n/appRoleId eq 'some-appRole-ID')", http.StatusOK),
 		Entry("with two memberOf lambda filters",
 			"memberOf/any(n:n/id eq 25cb7bc0-3168-4a0c-adbe-396f478ad494) and memberOf/any(n:n/id eq 2713f1d5-6822-42bd-ad56-9f6c55a3a8fa)",
 			http.StatusOK),
