@@ -259,6 +259,7 @@ func (g Graph) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 func (g Graph) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling get group members")
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 	groupID := chi.URLParam(r, "groupID")
 	groupID, err := url.PathUnescape(groupID)
 	if err != nil {
@@ -273,8 +274,15 @@ func (g Graph) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
+	if err != nil {
+		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	logger.Debug().Str("id", groupID).Msg("calling get group members on backend")
-	members, err := g.identityBackend.GetGroupMembers(r.Context(), groupID)
+	members, err := g.identityBackend.GetGroupMembers(r.Context(), groupID, odataReq)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get group members: backend error")
 		var errcode errorcode.Error

@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/CiscoM31/godata"
 	"github.com/go-ldap/ldap/v3"
 	"github.com/gofrs/uuid"
 	ldapdn "github.com/libregraph/idm/pkg/ldapdn"
@@ -134,9 +135,15 @@ func (i *LDAP) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregr
 }
 
 // GetGroupMembers implements the Backend Interface for the LDAP Backend
-func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string) ([]*libregraph.User, error) {
+func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string, req *godata.GoDataRequest) ([]*libregraph.User, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("GetGroupMembers")
+
+	exp, err := GetExpandValues(req.Query)
+	if err != nil {
+		return nil, err
+	}
+
 	e, err := i.getLDAPGroupByNameOrID(groupID, true)
 	if err != nil {
 		return nil, err
@@ -149,6 +156,13 @@ func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string) ([]*libregra
 	}
 	for _, member := range memberEntries {
 		if u := i.createUserModelFromLDAP(member); u != nil {
+			if slices.Contains(exp, "memberOf") {
+				userGroups, err := i.getGroupsForUser(member.DN)
+				if err != nil {
+					return nil, err
+				}
+				u.MemberOf = i.groupsFromLDAPEntries(userGroups)
+			}
 			result = append(result, u)
 		}
 	}

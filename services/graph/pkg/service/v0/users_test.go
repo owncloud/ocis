@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -324,6 +325,43 @@ var _ = Describe("Users", func() {
 		})
 	})
 
+	DescribeTable("GetUsers handles unsupported or invalid filters",
+		func(filter string, status int) {
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape(filter), nil)
+			svc.GetUsers(rr, r)
+
+			Expect(rr.Code).To(Equal(status))
+		},
+		Entry("with invalid filter", "invalid", http.StatusBadRequest),
+		Entry("with unsupported filter for user property", "mail eq 'unsupported'", http.StatusNotImplemented),
+		Entry("with unsupported filter operation", "mail add 10", http.StatusNotImplemented),
+		Entry("with unsupported logical operation", "memberOf/any(n:n/id eq 1) or memberOf/any(n:n/id eq 2)", http.StatusNotImplemented),
+		Entry("with unsupported lambda query ", `drives/any(n:n/id eq '1')`, http.StatusNotImplemented),
+		Entry("with unsupported lambda token ", "memberOf/all(n:n/id eq 1)", http.StatusNotImplemented),
+		Entry("with unsupported filter operation ", "memberOf/any(n:n/id ne 1)", http.StatusNotImplemented),
+		Entry("with unsupported filter operand type", "memberOf/any(n:n/id eq 1)", http.StatusNotImplemented),
+		Entry("with unsupported lambda filter property", "memberOf/any(n:n/name eq 'name')", http.StatusNotImplemented),
+	)
+
+	DescribeTable("With a valid memberOf filter",
+		func(filter string, status int) {
+			user := &libregraph.User{}
+			user.SetId("25cb7bc0-3168-4a0c-adbe-396f478ad494")
+			users := []*libregraph.User{user}
+			identityBackend.On("GetGroupMembers", mock.Anything, "25cb7bc0-3168-4a0c-adbe-396f478ad494", mock.Anything).Return(users, nil)
+			identityBackend.On("GetGroupMembers", mock.Anything, "2713f1d5-6822-42bd-ad56-9f6c55a3a8fa", mock.Anything).Return([]*libregraph.User{}, nil)
+			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users?$filter="+url.QueryEscape(filter), nil)
+			svc.GetUsers(rr, r)
+
+			Expect(rr.Code).To(Equal(status))
+		},
+		Entry("with memberOf lambda filter with UUID", "memberOf/any(n:n/id eq 25cb7bc0-3168-4a0c-adbe-396f478ad494)", http.StatusOK),
+		Entry("with memberOf lambda filter with UUID string", "memberOf/any(n:n/id eq '25cb7bc0-3168-4a0c-adbe-396f478ad494')", http.StatusOK),
+		Entry("with two memberOf lambda filters",
+			"memberOf/any(n:n/id eq 25cb7bc0-3168-4a0c-adbe-396f478ad494) and memberOf/any(n:n/id eq 2713f1d5-6822-42bd-ad56-9f6c55a3a8fa)",
+			http.StatusOK),
+	)
+
 	Describe("GetUser", func() {
 		It("handles missing userids", func() {
 			r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/users", nil)
@@ -345,6 +383,7 @@ var _ = Describe("Users", func() {
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
 			data, err := io.ReadAll(rr.Body)
+
 			Expect(err).ToNot(HaveOccurred())
 			responseUser := &libregraph.User{}
 			err = json.Unmarshal(data, &responseUser)
