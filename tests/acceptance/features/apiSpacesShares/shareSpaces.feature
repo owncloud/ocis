@@ -194,7 +194,7 @@ Feature: Share spaces
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian  |
       | role      | <role> |
-    Given user "Alice" has shared a space "share space" with settings:
+    And user "Alice" has shared a space "share space" with settings:
       | shareWith | Bob    |
       | role      | viewer |
     When user "Brian" updates the space "share space" with settings:

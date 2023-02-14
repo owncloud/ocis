@@ -53,7 +53,9 @@ Feature: copy file
     And user "Brian" has shared a space "Project2" with settings:
       | shareWith | Alice     |
       | role      | <to_role> |
-    And user "Brian" has shared a space "Project1" to user "Alice" with role "<from_role>"
+    And user "Brian" has shared a space "Project1" with settings:
+      | shareWith | Alice       |
+      | role      | <from_role> |
     When user "Alice" copies file "/project1.txt" from space "Project1" to "/project1.txt" inside space "Project2" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Project2" should contain these entries:
