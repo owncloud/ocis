@@ -81,16 +81,22 @@ func (g Graph) applyFilterLambda(ctx context.Context, req *godata.GoDataRequest,
 	if len(nodes) != 2 {
 		return users, invalidFilterError()
 	}
-	// We only support memberOf/any queries for now
-	if nodes[0].Token.Type != godata.ExpressionTokenLiteral || nodes[0].Token.Value != "memberOf" {
-		logger.Debug().Str("Token", nodes[0].Token.Value).Msg("unsupported relation for lambda filter")
-		return users, unsupportedFilterError()
-	}
+	// We only support the "any" operator for lambda queries for now
 	if nodes[1].Token.Type != godata.ExpressionTokenLambda || nodes[1].Token.Value != "any" {
 		logger.Debug().Str("Token", nodes[1].Token.Value).Msg("unsupported lambda filter")
 		return users, unsupportedFilterError()
 	}
-	return g.applyLambdaMemberOfAny(ctx, req, nodes[1].Children)
+	if nodes[0].Token.Type != godata.ExpressionTokenLiteral {
+		return users, unsupportedFilterError()
+	}
+	switch nodes[0].Token.Value {
+	case "memberOf":
+		return g.applyLambdaMemberOfAny(ctx, req, nodes[1].Children)
+	case "appRoleAssignments":
+		return g.applyLambdaAppRoleAssignmentAny(ctx, req, nodes[1].Children)
+	}
+	logger.Debug().Str("Token", nodes[0].Token.Value).Msg("unsupported relation for lambda filter")
+	return users, unsupportedFilterError()
 }
 
 func (g Graph) applyLambdaMemberOfAny(ctx context.Context, req *godata.GoDataRequest, nodes []*godata.ParseNode) (users []*libregraph.User, err error) {
@@ -141,7 +147,85 @@ func (g Graph) applyMemberOfEq(ctx context.Context, req *godata.GoDataRequest, n
 	default:
 		return users, unsupportedFilterError()
 	}
+}
 
+func (g Graph) applyLambdaAppRoleAssignmentAny(ctx context.Context, req *godata.GoDataRequest, nodes []*godata.ParseNode) (users []*libregraph.User, err error) {
+	if len(nodes) != 2 {
+		return users, invalidFilterError()
+	}
+
+	// First element is the "name" of the lambda function's parameter
+	if nodes[0].Token.Type != godata.ExpressionTokenLiteral {
+		return users, invalidFilterError()
+	}
+
+	// We only support the 'eq' expression for now
+	if nodes[1].Token.Type != godata.ExpressionTokenLogical || nodes[1].Token.Value != "eq" {
+		return users, unsupportedFilterError()
+	}
+	return g.applyAppRoleAssignmentEq(ctx, req, nodes[1].Children)
+}
+
+func (g Graph) applyAppRoleAssignmentEq(ctx context.Context, req *godata.GoDataRequest, nodes []*godata.ParseNode) (users []*libregraph.User, err error) {
+	logger := g.logger.SubloggerWithRequestID(ctx)
+	if len(nodes) != 2 {
+		return users, invalidFilterError()
+	}
+
+	if nodes[0].Token.Type != godata.ExpressionTokenNav {
+		return users, invalidFilterError()
+	}
+
+	if len(nodes[0].Children) != 2 {
+		return users, invalidFilterError()
+	}
+
+	if nodes[0].Children[1].Token.Value == "appRoleId" {
+		var filterValue string
+		switch nodes[1].Token.Type {
+		case godata.ExpressionTokenGuid:
+			filterValue = nodes[1].Token.Value
+		case godata.ExpressionTokenString:
+			// unquote
+			filterValue = strings.Trim(nodes[1].Token.Value, "'")
+		default:
+			return users, unsupportedFilterError()
+		}
+
+		logger.Debug().Str("property", nodes[0].Children[1].Token.Value).Str("value", filterValue).Msg("Filtering appRoleAssignments by appRoleId")
+		if users, err = g.identityBackend.GetUsers(ctx, req); err != nil {
+			return users, err
+		}
+
+		return g.filterUsersByAppRoleId(ctx, filterValue, users)
+	}
+	return users, unsupportedFilterError()
+}
+
+func (g Graph) filterUsersByAppRoleId(ctx context.Context, appRoleId string, users []*libregraph.User) ([]*libregraph.User, error) {
+	// We're using a map for the results here, in order to avoid returning
+	// a user twice. The settings API, still has an issue that causes it to
+	// duplicate some assignments on restart:
+	// https://github.com/owncloud/ocis/issues/3432
+	resultUsersMap := make(map[string]*libregraph.User, len(users))
+	for _, user := range users {
+		assignments, err := g.fetchAppRoleAssignments(ctx, user.GetId())
+		if err != nil {
+			return users, err
+		}
+		for _, assignment := range assignments {
+			if assignment.GetAppRoleId() == appRoleId {
+				if _, ok := resultUsersMap[user.GetId()]; !ok {
+					resultUsersMap[user.GetId()] = user
+				}
+			}
+		}
+	}
+	resultUsers := make([]*libregraph.User, 0, len(resultUsersMap))
+	for _, user := range resultUsersMap {
+		resultUsers = append(resultUsers, user)
+	}
+	return resultUsers, nil
 }
 
 func userSliceToMap(users []*libregraph.User) map[string]*libregraph.User {
