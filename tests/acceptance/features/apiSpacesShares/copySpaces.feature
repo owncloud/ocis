@@ -479,7 +479,7 @@ Feature: copy file
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has shared a space "Project" with settings:
       | shareWith | Alice  |
-      | role      | <role> |
+      | role      | viewer |
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created folder "/testshare/folder1"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/folder1/testshare.txt"

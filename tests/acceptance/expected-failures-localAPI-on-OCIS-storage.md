@@ -39,8 +39,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 ### [Copy or move on an existing resource doesn't create a new version but deletes instead](https://github.com/owncloud/ocis/issues/4797)
 - [apiSpacesShares/moveSpaces.feature:322](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/moveSpaces.feature#L322)
-- [apiSpacesShares/copySpaces.feature:710](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L710)
-- [apiSpacesShares/copySpaces.feature:751](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L751)
+- [apiSpacesShares/copySpaces.feature:752](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L752)
+- [apiSpacesShares/copySpaces.feature:793](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L793)
 
 ### [Creating group with empty name returns status code 200](https://github.com/owncloud/ocis/issues/5050)
 - [apiGraph/createGroup.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroup.feature#L40)
