@@ -98,7 +98,7 @@ Credentials:
 
 Credentials:
 
-- oC10 / oCIS: see [default demo users]({{< ref "../getting-started#login-to-owncloud-web" >}})
+- oC10 / oCIS: see [default demo users]({{< ref "../getting-started/demo-users/" >}})
 - Keycloak:
   - username: admin
   - password: admin
@@ -116,7 +116,7 @@ Credentials:
 
 Credentials:
 
-- oCIS: see [default demo users]({{< ref "../getting-started#login-to-owncloud-web" >}})
+- oCIS: see [default demo users]({{< ref "../getting-started/demo-users/" >}})
 
 ## Latest
 
@@ -126,7 +126,7 @@ Credentials:
 
 Credentials:
 
-- oCIS: see [default demo users]({{< ref "../getting-started#login-to-owncloud-web" >}})
+- oCIS: see [default demo users]({{< ref "../getting-started/demo-users/" >}})
 - MinIO:
   - access key: ocis
   - secret access key: ocis-secret-key
@@ -140,7 +140,7 @@ Credentials:
 
 Credentials:
 
-- oCIS: see [default demo users]({{< ref "../getting-started#login-to-owncloud-web" >}})
+- oCIS: see [default demo users]({{< ref "../getting-started/demo-users/" >}})
 - LDAP admin:
   - username: cn=admin,dc=owncloud,dc=com
   - password: admin
