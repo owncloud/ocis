@@ -69,10 +69,16 @@ class SpacesContext implements Context {
 	 * @var ChecksumContext
 	 */
 	private ChecksumContext $checksumContext;
+	
 	/**
 	 * @var FilesVersionsContext
 	 */
 	private FilesVersionsContext $filesVersionsContext;
+
+	/**
+	 * @var GraphContext
+	 */
+	private GraphContext $graphContext;
 
 	/**
 	 * @var string
@@ -398,60 +404,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * The method returns userId
-	 *
-	 * @param string $userName
-	 *
-	 * @return string
-	 * @throws Exception|GuzzleException
-	 */
-	public function getUserIdByUserName(string $userName): string {
-		$response = GraphHelper::getUser(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$userName
-		);
-		if ($response) {
-			$data = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
-			if (isset($data["id"])) {
-				return $data["id"];
-			} else {
-				throw new Exception(__METHOD__ . " accounts-list is empty");
-			}
-		}
-		throw new Exception(__METHOD__ . " user with name $userName not found");
-	}
-
-	/**
-	 * The method returns groupId
-	 *
-	 * @param string $groupName
-	 *
-	 * @return string
-	 * @throws Exception|GuzzleException
-	 */
-	public function getGroupIdByGroupName(string $groupName): string {
-		$response = GraphHelper::getGroup(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$this->featureContext->getAdminUsername(),
-			$this->featureContext->getAdminPassword(),
-			$groupName
-		);
-		if ($response) {
-			$data = $this->featureContext->getJsonDecodedResponse($response);
-			if (isset($data["id"])) {
-				return $data["id"];
-			} else {
-				throw new Exception(__METHOD__ . " accounts-list is empty");
-			}
-		}
-		throw new Exception(__METHOD__ . " Group with name $groupName not found");
-	}
-
-	/**
 	 * using method from core to set share data
 	 *
 	 * @return void
@@ -485,6 +437,7 @@ class SpacesContext implements Context {
 		$this->favoritesContext = $environment->getContext('FavoritesContext');
 		$this->checksumContext = $environment->getContext('ChecksumContext');
 		$this->filesVersionsContext = $environment->getContext('FilesVersionsContext');
+		$this->graphContext = $environment->getContext('GraphContext');
 		// Run the BeforeScenario function in OCSContext to set it up correctly
 		$this->ocsContext->before($scope);
 		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
@@ -991,12 +944,6 @@ class SpacesContext implements Context {
 						"parameter" => [$spaceName]
 					],
 					[
-						"code" => "%user_id%",
-						"function" =>
-						[$this, "getUserIdByUserName"],
-						"parameter" => [$userName]
-					],
-					[
 						"code" => "%file_id%",
 						"function" =>
 						[$this, "getFileId"],
@@ -1007,14 +954,9 @@ class SpacesContext implements Context {
 						"function" =>
 						[$this, "getETag"],
 						"parameter" => [$userName, $spaceName, $fileName]
-					],
-					[
-						"code" => "%group_id%",
-						"function" =>
-						[$this, "getGroupIdByGroupName"],
-						"parameter" => [$groupName]
 					]
-				]
+				],
+				$groupName
 			);
 			$segments = explode("@@@", $row["key"]);
 			// traverse down in the array
@@ -1111,7 +1053,7 @@ class SpacesContext implements Context {
 		);
 		Assert::assertIsArray($spaceAsArray = $this->getSpaceByNameFromResponse($spaceName), "No space with name $spaceName found");
 		$permissions = $spaceAsArray["root"]["permissions"];
-		$userId = $this->getUserIdByUserName($grantedUser);
+		$userId = $this->featureContext->getUserIdByUserName($grantedUser);
 
 		$userRole = "";
 		foreach ($permissions as $permission) {
@@ -3277,7 +3219,7 @@ class SpacesContext implements Context {
 			"Expected response status code should be 200"
 		);
 		Assert::assertIsArray($spaceAsArray = $this->getSpaceByNameFromResponse($spaceName), "No space with name $spaceName found");
-		$recipientType === 'user' ? $recipientId = $this->getUserIdByUserName($recipient) : $recipientId = $this->getGroupIdByGroupName($recipient);
+		$recipientType === 'user' ? $recipientId = $this->featureContext->getUserIdByUserName($recipient) : $recipientId = $this->featureContext->getGroupIdByGroupName($recipient);
 		$foundRoleInResponse = false;
 		foreach ($spaceAsArray['root']['permissions'] as $permission) {
 			if (isset($permission['grantedToIdentities'][0][$recipientType]) && $permission['roles'][0] === $role && $permission['grantedToIdentities'][0][$recipientType]['id'] === $recipientId) {
