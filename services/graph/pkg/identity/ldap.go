@@ -211,9 +211,6 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 			return nil, errorcode.New(errorcode.NotAllowed, "changing the UserId is not allowed")
 		}
 	}
-	// TODO: In order to allow updating the user name we'd need to issue a ModRDN operation
-	// As we currently using uid as the naming Attribute for the user entries. (Do we even
-	// want to allow changing the user name?). For now just disallow it.
 	if user.OnPremisesSamAccountName != nil && *user.OnPremisesSamAccountName != "" {
 		if eu := e.GetEqualFoldAttributeValue(i.userAttributeMap.userName); eu != *user.OnPremisesSamAccountName {
 			e, err = i.changeUserName(ctx, e.DN, eu, user.GetOnPremisesSamAccountName())
@@ -517,20 +514,19 @@ func (i *LDAP) changeUserName(ctx context.Context, dn, originalUserName, newUser
 func (i *LDAP) renameMemberInGroup(ctx context.Context, group *ldap.Entry, oldMember, newMember string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("oldMember", oldMember).Str("newMember", newMember).Msg("replacing group member")
-	members := group.GetEqualFoldAttributeValues(i.groupAttributeMap.member)
-	match := -1
-	for i, m := range members {
-		if m == oldMember {
-			match = i
+	mr := ldap.NewModifyRequest(group.DN, nil)
+	mr.Delete(i.groupAttributeMap.member, []string{oldMember})
+	mr.Add(i.groupAttributeMap.member, []string{newMember})
+	if err := i.conn.Modify(mr); err != nil {
+		var lerr *ldap.Error
+		if errors.As(err, &lerr) {
+			if lerr.ResultCode == ldap.LDAPResultNoSuchObject {
+				groupID := group.GetEqualFoldAttributeValue(i.groupAttributeMap.id)
+				logger.Warn().Str("group", groupID).Msg("Group no longer exists")
+				return nil
+			}
 		}
-	}
-	if match != -1 {
-		members[match] = newMember
-		mr := ldap.NewModifyRequest(group.DN, nil)
-		mr.Replace(i.groupAttributeMap.member, members)
-		if err := i.conn.Modify(mr); err != nil {
-			return err
-		}
+		return err
 	}
 	return nil
 }

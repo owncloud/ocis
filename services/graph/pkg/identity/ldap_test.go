@@ -663,7 +663,7 @@ func TestUpdateUser(t *testing.T) {
 							Scope:  2, DerefAliases: 0, SizeLimit: 0, TimeLimit: 0,
 							TypesOnly:  false,
 							Filter:     "(&(objectClass=groupOfNames)(member=uid=oldName))",
-							Attributes: []string{"cn", "entryUUID", "member"},
+							Attributes: []string{"cn", "entryUUID"},
 							Controls:   []ldap.Control(nil),
 						},
 					},
@@ -680,10 +680,6 @@ func TestUpdateUser(t *testing.T) {
 										{
 											Name:   lconfig.GroupIDAttribute,
 											Values: []string{"group1-id"},
-										},
-										{
-											Name:   "member",
-											Values: []string{"uid=oldName"},
 										},
 									},
 								},
@@ -758,7 +754,14 @@ func TestUpdateUser(t *testing.T) {
 							DN: "cn=group1",
 							Changes: []ldap.Change{
 								{
-									Operation: 0x2,
+									Operation: 0x1,
+									Modification: ldap.PartialAttribute{
+										Type: "member",
+										Vals: []string{"uid=oldName"},
+									},
+								},
+								{
+									Operation: 0x0,
 									Modification: ldap.PartialAttribute{
 										Type: "member",
 										Vals: []string{"uid=newName,ou=people,dc=test"},
