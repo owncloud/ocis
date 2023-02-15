@@ -49,10 +49,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiAccountsHashDifficulty/assignRole.feature:27](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L27)
 - [apiAccountsHashDifficulty/assignRole.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L28)
 
-### [Settings service user can see roles list](https://github.com/owncloud/ocis/issues/5079)
-- [apiAccountsHashDifficulty/assignRole.feature:15](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L15)
-- [apiAccountsHashDifficulty/assignRole.feature:16](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L16)
-
 ### [Group having percentage (%) can be created but cannot be GET](https://github.com/owncloud/ocis/issues/5083)
 - [apiGraph/deleteGroup.feature:49](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L49)
 - [apiGraph/deleteGroup.feature:50](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L50)

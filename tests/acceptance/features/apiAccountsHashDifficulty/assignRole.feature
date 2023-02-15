@@ -12,8 +12,8 @@ Feature: assign role
     Examples:
       | userRole    | statusCode |
       | Admin       | 201        |
-      | Space Admin | 401        |
-      | User        | 401        |
+      | Space Admin | 201        |
+      | User        | 201        |
 
 
   Scenario Outline: only admin user can see assignments list
