@@ -100,10 +100,21 @@ func (g Service) CheckPermission(ctx context.Context, req *cs3permissions.CheckP
 	}, nil
 }
 
-func (g Service) ListPermissions(ctx context.Context, req *permissions.ListPermissionsRequest) (*permissions.ListPermissionsResponse, error) {
+func (g Service) ListPermissions(ctx context.Context, req *permissions.ListPermissionsRequest, res *permissions.ListPermissionsResponse) error {
+
+	ownAccountUUID, ok := metadata.Get(ctx, middleware.AccountID)
+	if !ok {
+		g.logger.Debug().Str("id", g.id).Msg("user not in context")
+		return merrors.InternalServerError(g.id, "user not in context")
+	}
+
+	if ownAccountUUID != req.UserID {
+		return merrors.NotFound(g.id, "user not found: %s", ownAccountUUID)
+	}
+
 	assignments, err := g.manager.ListRoleAssignments(req.UserID)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// deduplicate role ids
@@ -117,7 +128,7 @@ func (g Service) ListPermissions(ctx context.Context, req *permissions.ListPermi
 		bundle, err := g.manager.ReadBundle(roleID)
 		if err != nil {
 			if !errors.Is(err, settings.ErrNotFound) {
-				return nil, err
+				return err
 			}
 			continue
 		}
@@ -134,9 +145,9 @@ func (g Service) ListPermissions(ctx context.Context, req *permissions.ListPermi
 		deduplicatedPermissions = append(deduplicatedPermissions, p)
 	}
 
-	return &permissions.ListPermissionsResponse{
-		Permissions: deduplicatedPermissions,
-	}, nil
+	res.Permissions = deduplicatedPermissions
+
+	return nil
 }
 
 // RegisterDefaultRoles composes default roles and saves them. Skipped if the roles already exist.
