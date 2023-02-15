@@ -472,7 +472,7 @@ func (g Service) ListPermissions(ctx context.Context, req *settingssvc.ListPermi
 	}
 
 	if ownAccountUUID != req.AccountUuid {
-		return merrors.NotFound(g.id, "user not found: %s", ownAccountUUID)
+		return merrors.NotFound(g.id, "user not found: %s", req.AccountUuid)
 	}
 
 	assignments, err := g.manager.ListRoleAssignments(req.AccountUuid)
