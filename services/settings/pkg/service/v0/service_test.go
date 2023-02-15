@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
@@ -11,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/stretchr/testify/assert"
 	"github.com/test-go/testify/mock"
+	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 )
 
@@ -225,4 +227,10 @@ func TestListPermissionsOfOtherUser(t *testing.T) {
 	res := v0.ListPermissionsResponse{}
 	err := svc.ListPermissions(ctxWithUUID, &req, &res)
 	assert.Error(t, err)
+
+	// assert the requested account uuid was not found
+	merr, ok := merrors.As(err)
+	assert.True(t, ok)
+	assert.Equal(t, int32(http.StatusNotFound), merr.Code)
+	assert.Contains(t, err.Error(), req.AccountUuid)
 }
