@@ -71,6 +71,7 @@ type Publisher interface {
 
 // Permissions is the interface used to access the permissions service
 type Permissions interface {
+	ListPermissions(ctx context.Context, req *settingssvc.ListPermissionsRequest, opts ...client.CallOption) (*settingssvc.ListPermissionsResponse, error)
 	GetPermissionByID(ctx context.Context, request *settingssvc.GetPermissionByIDRequest, opts ...client.CallOption) (*settingssvc.GetPermissionByIDResponse, error)
 	ListPermissionsByResource(ctx context.Context, in *settingssvc.ListPermissionsByResourceRequest, opts ...client.CallOption) (*settingssvc.ListPermissionsByResourceResponse, error)
 }

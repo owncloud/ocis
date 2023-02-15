@@ -47,6 +47,36 @@ func (_m *Permissions) GetPermissionByID(ctx context.Context, request *v0.GetPer
 	return r0, r1
 }
 
+// ListPermissions provides a mock function with given fields: ctx, req, opts
+func (_m *Permissions) ListPermissions(ctx context.Context, req *v0.ListPermissionsRequest, opts ...client.CallOption) (*v0.ListPermissionsResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, req)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *v0.ListPermissionsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *v0.ListPermissionsRequest, ...client.CallOption) *v0.ListPermissionsResponse); ok {
+		r0 = rf(ctx, req, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*v0.ListPermissionsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *v0.ListPermissionsRequest, ...client.CallOption) error); ok {
+		r1 = rf(ctx, req, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // ListPermissionsByResource provides a mock function with given fields: ctx, in, opts
 func (_m *Permissions) ListPermissionsByResource(ctx context.Context, in *v0.ListPermissionsByResourceRequest, opts ...client.CallOption) (*v0.ListPermissionsByResourceResponse, error) {
 	_va := make([]interface{}, len(opts))
