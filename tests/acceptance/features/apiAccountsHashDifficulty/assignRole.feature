@@ -4,7 +4,7 @@ Feature: assign role
   I cannot change my own role.
   Users without an admin role cannot get the list of roles, assignments list and assign roles to users
 
-  Scenario Outline: only admin user can see all existing roles
+  Scenario Outline: all user can see all existing roles using setting api
     Given user "Alice" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "<userRole>" using the settings api
     When user "Alice" tries to get all existing roles
@@ -62,3 +62,16 @@ Feature: assign role
       | Space Admin | Space Admin | 400        | User         |
       | User        | Admin       | 400        | User         |
       | User        | Space Admin | 400        | User         |
+
+  Scenario Outline: assign role to the user using graph api
+    Given user "Alice" has been created with default attributes and without skeleton files
+    And the administrator has given "Alice" the role "<userRole>" using the Graph API
+    When user "Alice" retrieves assigned role using the Graph API
+    Then the HTTP status code should be "200"
+    And the Graph API response should have the role "<userRole>"
+    Examples:
+      | userRole    |
+      | Admin       |
+      | Space Admin |
+      | User        |
+      | Guest       |
