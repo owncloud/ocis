@@ -129,32 +129,3 @@ Feature: get file info using POST
       | /remote.php/dav/spaces/%spaceid%/PARENT            |
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
-
-  @notToImplementOnOCIS @issue-ocis-reva-37
-  Scenario: send POST requests to webDav endpoints using token authentication should not work
-    Given token auth has been enforced
-    And a new browser session for "Alice" has been started
-    And the user has generated a new app password named "my-client"
-    When the user requests these endpoints with "POST" using the generated app password about user "Alice"
-      | endpoint                                           |
-      | /remote.php/webdav/textfile0.txt                   |
-      | /remote.php/dav/files/%username%/textfile0.txt     |
-      | /remote.php/webdav/PARENT                          |
-      | /remote.php/dav/files/%username%/PARENT            |
-      | /remote.php/dav/files/%username%/PARENT/parent.txt |
-    Then the HTTP status code of responses on all endpoints should be "401"
-
-  @notToImplementOnOCIS @issue-ocis-reva-37
-  Scenario: send POST requests to webDav endpoints using app password token as password
-    Given token auth has been enforced
-    And a new browser session for "Alice" has been started
-    And the user has generated a new app password named "my-client"
-    When the user "Alice" requests these endpoints with "POST" with body "doesnotmatter" using basic auth and generated app password about user "Alice"
-      | endpoint                                           |
-      # this method is not available so gives 501
-      | /remote.php/webdav/textfile0.txt                   |
-      | /remote.php/dav/files/%username%/textfile1.txt     |
-      | /remote.php/dav/files/%username%/PARENT/parent.txt |
-      | /remote.php/webdav/PARENT                          |
-      | /remote.php/dav/files/%username%/FOLDER            |
-    Then the HTTP status code of responses on all endpoints should be "501"
