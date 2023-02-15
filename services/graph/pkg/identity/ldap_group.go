@@ -423,7 +423,7 @@ func (i *LDAP) getGroupsForUser(dn string) ([]*ldap.Entry, error) {
 		"(%s=%s)",
 		i.groupAttributeMap.member, dn,
 	)
-	userGroups, err := i.getLDAPGroupsByFilter(groupFilter, true, false)
+	userGroups, err := i.getLDAPGroupsByFilter(groupFilter, false, false)
 	if err != nil {
 		return nil, err
 	}
