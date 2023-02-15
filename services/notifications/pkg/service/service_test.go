@@ -49,8 +49,8 @@ var _ = Describe("Notifications", func() {
 	})
 
 	DescribeTable("Sending notifications",
-		func(tc testChannel, ev interface{}) {
-			ch := make(chan interface{})
+		func(tc testChannel, ev events.Event) {
+			ch := make(chan events.Event)
 			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gwc, "", "", "")
 			go evts.Run()
 

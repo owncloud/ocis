@@ -20,17 +20,19 @@ import (
 
 var testCases = []struct {
 	Alias           string
-	SystemEvent     interface{}
+	SystemEvent     events.Event
 	CheckAuditEvent func(*testing.T, []byte)
 }{
 	{
 		Alias: "ShareCreated - user",
-		SystemEvent: events.ShareCreated{
-			Sharer:         userID("sharing-userid"),
-			GranteeUserID:  userID("beshared-userid"),
-			GranteeGroupID: nil,
-			ItemID:         resourceID("provider-1", "storage-1", "itemid-1"),
-			CTime:          timestamp(0),
+		SystemEvent: events.Event{
+			Event: events.ShareCreated{
+				Sharer:         userID("sharing-userid"),
+				GranteeUserID:  userID("beshared-userid"),
+				GranteeGroupID: nil,
+				ItemID:         resourceID("provider-1", "storage-1", "itemid-1"),
+				CTime:          timestamp(0),
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventShareCreated{}
@@ -52,12 +54,14 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "ShareCreated - group",
-		SystemEvent: events.ShareCreated{
-			Sharer:         userID("sharing-userid"),
-			GranteeUserID:  nil,
-			GranteeGroupID: groupID("beshared-groupid"),
-			ItemID:         resourceID("provider-1", "storage-1", "itemid-1"),
-			CTime:          timestamp(10e8),
+		SystemEvent: events.Event{
+			Event: events.ShareCreated{
+				Sharer:         userID("sharing-userid"),
+				GranteeUserID:  nil,
+				GranteeGroupID: groupID("beshared-groupid"),
+				ItemID:         resourceID("provider-1", "storage-1", "itemid-1"),
+				CTime:          timestamp(10e8),
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventShareCreated{}
@@ -80,15 +84,17 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "ShareUpdated",
-		SystemEvent: events.ShareUpdated{
-			ShareID:        shareID("shareid"),
-			Sharer:         userID("sharing-userid"),
-			GranteeUserID:  nil,
-			GranteeGroupID: groupID("beshared-groupid"),
-			ItemID:         resourceID("provider-1", "storage-1", "itemid-1"),
-			Permissions:    sharePermissions("stat", "get_quota"),
-			MTime:          timestamp(10e8),
-			Updated:        "permissions",
+		SystemEvent: events.Event{
+			Event: events.ShareUpdated{
+				ShareID:        shareID("shareid"),
+				Sharer:         userID("sharing-userid"),
+				GranteeUserID:  nil,
+				GranteeGroupID: groupID("beshared-groupid"),
+				ItemID:         resourceID("provider-1", "storage-1", "itemid-1"),
+				Permissions:    sharePermissions("stat", "get_quota"),
+				MTime:          timestamp(10e8),
+				Updated:        "permissions",
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventShareUpdated{}
@@ -110,17 +116,19 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "LinkUpdated - permissions",
-		SystemEvent: events.LinkUpdated{
-			ShareID:           linkID("shareid"),
-			Sharer:            userID("sharing-userid"),
-			ItemID:            resourceID("provider-1", "storage-1", "itemid-1"),
-			Permissions:       linkPermissions("stat"),
-			CTime:             timestamp(10e8),
-			DisplayName:       "link",
-			Expiration:        timestamp(10e8 + 10e5),
-			PasswordProtected: true,
-			Token:             "token-123",
-			FieldUpdated:      "permissions",
+		SystemEvent: events.Event{
+			Event: events.LinkUpdated{
+				ShareID:           linkID("shareid"),
+				Sharer:            userID("sharing-userid"),
+				ItemID:            resourceID("provider-1", "storage-1", "itemid-1"),
+				Permissions:       linkPermissions("stat"),
+				CTime:             timestamp(10e8),
+				DisplayName:       "link",
+				Expiration:        timestamp(10e8 + 10e5),
+				PasswordProtected: true,
+				Token:             "token-123",
+				FieldUpdated:      "permissions",
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventShareUpdated{}
@@ -142,9 +150,11 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "ShareRemoved",
-		SystemEvent: events.ShareRemoved{
-			ShareID:  shareID("shareid"),
-			ShareKey: nil,
+		SystemEvent: events.Event{
+			Event: events.ShareRemoved{
+				ShareID:  shareID("shareid"),
+				ShareKey: nil,
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventShareRemoved{}
@@ -161,10 +171,12 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "LinkRemoved - id",
-		SystemEvent: events.LinkRemoved{
-			Executant:  userID("sharing-userid"),
-			ShareID:    linkID("shareid"),
-			ShareToken: "",
+		SystemEvent: events.Event{
+			Event: events.LinkRemoved{
+				Executant:  userID("sharing-userid"),
+				ShareID:    linkID("shareid"),
+				ShareToken: "",
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventShareRemoved{}
@@ -181,10 +193,12 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "LinkRemoved - token",
-		SystemEvent: events.LinkRemoved{
-			Executant:  userID("sharing-userid"),
-			ShareID:    nil,
-			ShareToken: "token-123",
+		SystemEvent: events.Event{
+			Event: events.LinkRemoved{
+				Executant:  userID("sharing-userid"),
+				ShareID:    nil,
+				ShareToken: "token-123",
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventShareRemoved{}
@@ -201,15 +215,17 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "Share accepted",
-		SystemEvent: events.ReceivedShareUpdated{
-			ShareID:        shareID("shareid"),
-			ItemID:         resourceID("provider-1", "storageid-1", "itemid-1"),
-			Permissions:    sharePermissions("get_quota"),
-			GranteeUserID:  userID("beshared-userid"),
-			GranteeGroupID: nil,
-			Sharer:         userID("sharing-userid"),
-			MTime:          timestamp(10e8),
-			State:          "SHARE_STATE_ACCEPTED",
+		SystemEvent: events.Event{
+			Event: events.ReceivedShareUpdated{
+				ShareID:        shareID("shareid"),
+				ItemID:         resourceID("provider-1", "storageid-1", "itemid-1"),
+				Permissions:    sharePermissions("get_quota"),
+				GranteeUserID:  userID("beshared-userid"),
+				GranteeGroupID: nil,
+				Sharer:         userID("sharing-userid"),
+				MTime:          timestamp(10e8),
+				State:          "SHARE_STATE_ACCEPTED",
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventReceivedShareUpdated{}
@@ -226,15 +242,17 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "Share declined",
-		SystemEvent: events.ReceivedShareUpdated{
-			ShareID:        shareID("shareid"),
-			ItemID:         resourceID("provider-1", "storageid-1", "itemid-1"),
-			Permissions:    sharePermissions("get_quota"),
-			GranteeUserID:  userID("beshared-userid"),
-			GranteeGroupID: nil,
-			Sharer:         userID("sharing-userid"),
-			MTime:          timestamp(10e8),
-			State:          "SHARE_STATE_DECLINED",
+		SystemEvent: events.Event{
+			Event: events.ReceivedShareUpdated{
+				ShareID:        shareID("shareid"),
+				ItemID:         resourceID("provider-1", "storageid-1", "itemid-1"),
+				Permissions:    sharePermissions("get_quota"),
+				GranteeUserID:  userID("beshared-userid"),
+				GranteeGroupID: nil,
+				Sharer:         userID("sharing-userid"),
+				MTime:          timestamp(10e8),
+				State:          "SHARE_STATE_DECLINED",
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventReceivedShareUpdated{}
@@ -251,16 +269,18 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "Link accessed - success",
-		SystemEvent: events.LinkAccessed{
-			ShareID:           linkID("shareid"),
-			Sharer:            userID("sharing-userid"),
-			ItemID:            resourceID("provider-1", "storage-1", "itemid-1"),
-			Permissions:       linkPermissions("stat"),
-			DisplayName:       "link",
-			Expiration:        timestamp(10e8 + 10e5),
-			PasswordProtected: true,
-			CTime:             timestamp(10e8),
-			Token:             "token-123",
+		SystemEvent: events.Event{
+			Event: events.LinkAccessed{
+				ShareID:           linkID("shareid"),
+				Sharer:            userID("sharing-userid"),
+				ItemID:            resourceID("provider-1", "storage-1", "itemid-1"),
+				Permissions:       linkPermissions("stat"),
+				DisplayName:       "link",
+				Expiration:        timestamp(10e8 + 10e5),
+				PasswordProtected: true,
+				CTime:             timestamp(10e8),
+				Token:             "token-123",
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventLinkAccessed{}
@@ -277,11 +297,13 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "Link accessed - failure",
-		SystemEvent: events.LinkAccessFailed{
-			ShareID: linkID("shareid"),
-			Token:   "token-123",
-			Status:  8,
-			Message: "access denied",
+		SystemEvent: events.Event{
+			Event: events.LinkAccessFailed{
+				ShareID: linkID("shareid"),
+				Token:   "token-123",
+				Status:  8,
+				Message: "access denied",
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventLinkAccessed{}
@@ -298,10 +320,12 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "File created",
-		SystemEvent: events.FileUploaded{
-			Executant: userID("uid-123"),
-			Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
-			Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
+		SystemEvent: events.Event{
+			Event: events.FileUploaded{
+				Executant: userID("uid-123"),
+				Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
+				Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventFileCreated{}
@@ -314,10 +338,12 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "File read",
-		SystemEvent: events.FileDownloaded{
-			Executant: userID("uid-123"),
-			Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
-			Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
+		SystemEvent: events.Event{
+			Event: events.FileDownloaded{
+				Executant: userID("uid-123"),
+				Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
+				Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventFileRead{}
@@ -330,10 +356,12 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "File trashed",
-		SystemEvent: events.ItemTrashed{
-			Executant: userID("uid-123"),
-			Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
-			Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
+		SystemEvent: events.Event{
+			Event: events.ItemTrashed{
+				Executant: userID("uid-123"),
+				Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
+				Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventFileDeleted{}
@@ -346,11 +374,13 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "File renamed",
-		SystemEvent: events.ItemMoved{
-			Executant:    userID("uid-123"),
-			Ref:          reference("pro-1", "sto-123", "iid-123", "./item"),
-			OldReference: reference("pro-1", "sto-123", "iid-123", "./anotheritem"),
-			Owner:        userID("uid-123"), // NOTE: owner not yet implemented in reva
+		SystemEvent: events.Event{
+			Event: events.ItemMoved{
+				Executant:    userID("uid-123"),
+				Ref:          reference("pro-1", "sto-123", "iid-123", "./item"),
+				OldReference: reference("pro-1", "sto-123", "iid-123", "./anotheritem"),
+				Owner:        userID("uid-123"), // NOTE: owner not yet implemented in reva
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventFileRenamed{}
@@ -366,10 +396,12 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "File purged",
-		SystemEvent: events.ItemPurged{
-			Executant: userID("uid-123"),
-			Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
-			Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
+		SystemEvent: events.Event{
+			Event: events.ItemPurged{
+				Executant: userID("uid-123"),
+				Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
+				Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventFilePurged{}
@@ -382,12 +414,14 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "File restored",
-		SystemEvent: events.ItemRestored{
-			Executant:    userID("uid-123"),
-			Ref:          reference("pro-1", "sto-123", "iid-123", "./item"),
-			Owner:        userID("uid-123"), // NOTE: owner not yet implemented in reva
-			OldReference: reference("pro-1", "sto-123", "sto-123!iid-123/item", "./oldpath"),
-			Key:          "",
+		SystemEvent: events.Event{
+			Event: events.ItemRestored{
+				Executant:    userID("uid-123"),
+				Ref:          reference("pro-1", "sto-123", "iid-123", "./item"),
+				Owner:        userID("uid-123"), // NOTE: owner not yet implemented in reva
+				OldReference: reference("pro-1", "sto-123", "sto-123!iid-123/item", "./oldpath"),
+				Key:          "",
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventFileRestored{}
@@ -403,11 +437,13 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "File version restored",
-		SystemEvent: events.FileVersionRestored{
-			Executant: userID("uid-123"),
-			Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
-			Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
-			Key:       "v1",
+		SystemEvent: events.Event{
+			Event: events.FileVersionRestored{
+				Executant: userID("uid-123"),
+				Ref:       reference("pro-1", "sto-123", "iid-123", "./item"),
+				Owner:     userID("uid-123"), // NOTE: owner not yet implemented in reva
+				Key:       "v1",
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventFileVersionRestored{}
@@ -423,15 +459,17 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "Space created",
-		SystemEvent: events.SpaceCreated{
-			Executant: userID("uid-123"),
-			ID:        &provider.StorageSpaceId{OpaqueId: "space-123"},
-			Owner:     userID("uid-123"),
-			Root:      resourceID("pro-1", "sto-123", "iid-123"),
-			Name:      "test-space",
-			Type:      "project",
-			Quota:     nil, // Quota not interesting atm
-			MTime:     timestamp(10e9),
+		SystemEvent: events.Event{
+			Event: events.SpaceCreated{
+				Executant: userID("uid-123"),
+				ID:        &provider.StorageSpaceId{OpaqueId: "space-123"},
+				Owner:     userID("uid-123"),
+				Root:      resourceID("pro-1", "sto-123", "iid-123"),
+				Name:      "test-space",
+				Type:      "project",
+				Quota:     nil, // Quota not interesting atm
+				MTime:     timestamp(10e9),
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventSpaceCreated{}
@@ -449,11 +487,13 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "Space renamed",
-		SystemEvent: events.SpaceRenamed{
-			Executant: userID("uid-123"),
-			ID:        &provider.StorageSpaceId{OpaqueId: "space-123"},
-			Owner:     userID("uid-123"),
-			Name:      "new-name",
+		SystemEvent: events.Event{
+			Event: events.SpaceRenamed{
+				Executant: userID("uid-123"),
+				ID:        &provider.StorageSpaceId{OpaqueId: "space-123"},
+				Owner:     userID("uid-123"),
+				Name:      "new-name",
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventSpaceRenamed{}
@@ -468,9 +508,11 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "Space disabled",
-		SystemEvent: events.SpaceDisabled{
-			Executant: userID("uid-123"),
-			ID:        &provider.StorageSpaceId{OpaqueId: "space-123"},
+		SystemEvent: events.Event{
+			Event: events.SpaceDisabled{
+				Executant: userID("uid-123"),
+				ID:        &provider.StorageSpaceId{OpaqueId: "space-123"},
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventSpaceDisabled{}
@@ -483,9 +525,11 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "Space enabled",
-		SystemEvent: events.SpaceEnabled{
-			Executant: userID("uid-123"),
-			ID:        &provider.StorageSpaceId{OpaqueId: "space-123"},
+		SystemEvent: events.Event{
+			Event: events.SpaceEnabled{
+				Executant: userID("uid-123"),
+				ID:        &provider.StorageSpaceId{OpaqueId: "space-123"},
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventSpaceEnabled{}
@@ -498,9 +542,11 @@ var testCases = []struct {
 		},
 	}, {
 		Alias: "Space deleted",
-		SystemEvent: events.SpaceDeleted{
-			Executant: userID("uid-123"),
-			ID:        &provider.StorageSpaceId{OpaqueId: "space-123"},
+		SystemEvent: events.Event{
+			Event: events.SpaceDeleted{
+				Executant: userID("uid-123"),
+				ID:        &provider.StorageSpaceId{OpaqueId: "space-123"},
+			},
 		},
 		CheckAuditEvent: func(t *testing.T, b []byte) {
 			ev := types.AuditEventSpaceDeleted{}
@@ -517,7 +563,7 @@ var testCases = []struct {
 func TestAuditLogging(t *testing.T) {
 	log := log.NewLogger()
 
-	inch := make(chan interface{})
+	inch := make(chan events.Event)
 	defer close(inch)
 
 	outch := make(chan []byte)

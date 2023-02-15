@@ -70,13 +70,13 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 	})
 
 	for i := 0; i < cfg.Events.NumConsumers; i++ {
-		go func(s Searcher, ch <-chan interface{}) {
+		go func(s Searcher, ch <-chan events.Event) {
 			for e := range ch {
 				logger.Debug().Interface("event", e).Msg("updating index")
 
 				var err error
 
-				switch ev := e.(type) {
+				switch ev := e.Event.(type) {
 				case events.ItemTrashed:
 					u := getUser(ev.SpaceOwner, ev.Executant)
 					s.TrashItem(ev.ID)
