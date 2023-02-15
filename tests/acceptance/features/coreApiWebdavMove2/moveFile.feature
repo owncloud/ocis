@@ -105,92 +105,6 @@ Feature: move (rename) file
       | dav_version |
       | spaces      |
 
-  @files_sharing-app-required @skipOnOcis
-  Scenario Outline: Moving a file into a shared folder as the sharee and as the sharer
-    Given using <dav_version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Brian" has created folder "/testshare"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | change    |
-      | shareWith   | Alice     |
-    And user "<mover>" has uploaded file with content "test data" to "/testfile.txt"
-    When user "<mover>" moves file "/testfile.txt" to "/testshare/testfile.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And the content of file "/testshare/testfile.txt" for user "Alice" should be "test data"
-    And the content of file "/testshare/testfile.txt" for user "Brian" should be "test data"
-    And as "<mover>" file "/testfile.txt" should not exist
-    Examples:
-      | dav_version | mover |
-      | old         | Alice |
-      | new         | Alice |
-      | old         | Brian |
-      | new         | Brian |
-
-  @files_sharing-app-required @skipOnOcis
-  Scenario Outline: Moving a file out of a shared folder as the sharee and as the sharer
-    Given using <dav_version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Brian" has created folder "/testshare"
-    And user "Brian" has uploaded file with content "test data" to "/testshare/testfile.txt"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | change    |
-      | shareWith   | Alice     |
-    When user "<mover>" moves file "/testshare/testfile.txt" to "/testfile.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And the content of file "/testfile.txt" for user "<mover>" should be "test data"
-    And as "Alice" file "/testshare/testfile.txt" should not exist
-    And as "Brian" file "/testshare/testfile.txt" should not exist
-    Examples:
-      | dav_version | mover |
-      | old         | Alice |
-      | new         | Alice |
-      | old         | Brian |
-      | new         | Brian |
-
-  @files_sharing-app-required @skipOnOcis
-  Scenario Outline: Moving a file to a shared folder with no permissions
-    Given using <dav_version> DAV path
-    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Brian" has created folder "/testshare"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | read      |
-      | shareWith   | Alice     |
-    When user "Alice" moves file "/textfile0.txt" to "/testshare/textfile0.txt" using the WebDAV API
-    Then the HTTP status code should be "403"
-    And user "Alice" should not be able to download file "/testshare/textfile0.txt"
-    Examples:
-      | dav_version |
-      | old         |
-      | new         |
-
-  @files_sharing-app-required @skipOnOcis
-  Scenario Outline: Moving a file to overwrite a file in a shared folder with no permissions
-    Given using <dav_version> DAV path
-    And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Brian" has created folder "/testshare"
-    And user "Brian" has uploaded file with content "Welcome to ownCloud" to "fileToCopy.txt"
-    And user "Brian" has created a share with settings
-      | path        | testshare |
-      | shareType   | user      |
-      | permissions | read      |
-      | shareWith   | Alice     |
-    And user "Brian" has copied file "/fileToCopy.txt" to "/testshare/overwritethis.txt"
-    When user "Alice" moves file "/textfile0.txt" to "/testshare/overwritethis.txt" using the WebDAV API
-    Then the HTTP status code should be "403"
-    And the content of file "/testshare/overwritethis.txt" for user "Alice" should be "Welcome to ownCloud"
-    Examples:
-      | dav_version |
-      | old         |
-      | new         |
-
 
   Scenario Outline: move file into a not-existing folder
     Given using <dav_version> DAV path
@@ -243,31 +157,6 @@ Feature: move (rename) file
     Examples:
       | dav_version |
       | spaces      |
-
-  @files_sharing-app-required @skipOnOcis
-  Scenario Outline: Checking file id after a move between received shares
-    Given using <dav_version> DAV path
-    And user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has created folder "/folderA"
-    And user "Alice" has created folder "/folderB"
-    And user "Alice" has shared folder "/folderA" with user "Brian"
-    And user "Alice" has shared folder "/folderB" with user "Brian"
-    And user "Brian" has created folder "/folderA/ONE"
-    And user "Brian" has stored id of folder "/folderA/ONE"
-    And user "Brian" has created folder "/folderA/ONE/TWO"
-    When user "Brian" moves folder "/folderA/ONE" to "/folderB/ONE" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And as "Brian" folder "/folderA" should exist
-    And as "Brian" folder "/folderA/ONE" should not exist
-		# yes, a weird bug used to make this one fail
-    And as "Brian" folder "/folderA/ONE/TWO" should not exist
-    And as "Brian" folder "/folderB/ONE" should exist
-    And as "Brian" folder "/folderB/ONE/TWO" should exist
-    And user "Brian" folder "/folderB/ONE" should have the previously stored id
-    Examples:
-      | dav_version |
-      | old         |
-      | new         |
 
   @issue-ocis-reva-211
   Scenario Outline: Renaming a file to a path with extension .part should not be possible

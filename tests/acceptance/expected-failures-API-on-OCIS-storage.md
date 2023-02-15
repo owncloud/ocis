@@ -26,12 +26,12 @@ _ocdav: double-check the webdav property parsing when custom namespaces are used
 
 #### [Cannot set custom webDav properties](https://github.com/owncloud/product/issues/264)
 
-- [coreApiWebdavProperties2/getFileProperties.feature:348](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties2/getFileProperties.feature#L348)
-- [coreApiWebdavProperties2/getFileProperties.feature:353](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties2/getFileProperties.feature#L353)
-- [coreApiWebdavProperties2/getFileProperties.feature:358](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties2/getFileProperties.feature#L358)
-- [coreApiWebdavProperties2/getFileProperties.feature:388](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties2/getFileProperties.feature#L388)
-- [coreApiWebdavProperties2/getFileProperties.feature:393](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties2/getFileProperties.feature#L393)
-- [coreApiWebdavProperties2/getFileProperties.feature:398](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties2/getFileProperties.feature#L398)
+- [coreApiWebdavProperties2/getFileProperties.feature:341](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties2/getFileProperties.feature#L341)
+- [coreApiWebdavProperties2/getFileProperties.feature:346](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties2/getFileProperties.feature#L346)
+- [coreApiWebdavProperties2/getFileProperties.feature:351](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties2/getFileProperties.feature#L351)
+- [coreApiWebdavProperties2/getFileProperties.feature:381](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties2/getFileProperties.feature#L381)
+- [coreApiWebdavProperties2/getFileProperties.feature:386](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties2/getFileProperties.feature#L386)
+- [coreApiWebdavProperties2/getFileProperties.feature:391](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties2/getFileProperties.feature#L391)
 
 #### [file versions do not report the version author](https://github.com/owncloud/ocis/issues/2914)
 
@@ -179,24 +179,24 @@ File and sync features in a shared scenario
 - [coreApiShareManagementToShares/acceptShares.feature:495](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/acceptShares.feature#L495)
 - [coreApiShareManagementToShares/acceptShares.feature:560](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/acceptShares.feature#L560)
 - [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:141](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L141)
-- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:142](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L142)
+- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:129](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L129)
 - [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:181](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L181)
-- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:182](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L182)
+- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:164](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L164)
 - [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:45](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L45)
-- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:46](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L46)
+- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:38](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L38)
 
 #### [sharing the shares folder to users exits with different status code than in oc10 backend](https://github.com/owncloud/ocis/issues/2215)
 
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:747](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L747)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:748](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L748)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:766](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L766)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:767](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L767)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:782](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L782)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:783](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L783)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:742](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L742)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:743](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L743)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:761](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L761)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:762](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L762)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:777](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L777)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:778](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L778)
 
 #### [file_target of an auto-renamed file is not correct directly after sharing](https://github.com/owncloud/core/issues/32322)
 
-- [coreApiShareManagementToShares/mergeShare.feature:121](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/mergeShare.feature#L121)
+- [coreApiShareManagementToShares/mergeShare.feature:116](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/mergeShare.feature#L116)
 
 #### [File deletion using dav gives unique string in filename in the trashbin](https://github.com/owncloud/product/issues/178)
 
@@ -213,13 +213,13 @@ cannot share a folder with create permission
 
 #### [OCS error message for attempting to access share via share id as an unauthorized user is not informative](https://github.com/owncloud/ocis/issues/1233)
 
-- [coreApiShareOperationsToShares1/gettingShares.feature:184](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L184)
-- [coreApiShareOperationsToShares1/gettingShares.feature:185](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L185)
+- [coreApiShareOperationsToShares1/gettingShares.feature:151](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L151)
+- [coreApiShareOperationsToShares1/gettingShares.feature:152](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L152)
 
 #### [Listing shares via ocs API does not show path for parent folders](https://github.com/owncloud/ocis/issues/1231)
 
-- [coreApiShareOperationsToShares1/gettingShares.feature:221](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L221)
-- [coreApiShareOperationsToShares1/gettingShares.feature:222](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L222)
+- [coreApiShareOperationsToShares1/gettingShares.feature:188](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L188)
+- [coreApiShareOperationsToShares1/gettingShares.feature:189](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/gettingShares.feature#L189)
 
 #### [Public link enforce permissions](https://github.com/owncloud/ocis/issues/1269)
 - [coreApiSharePublicLink1/createPublicLinkShare.feature:353](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/createPublicLinkShare.feature#L353)
@@ -296,7 +296,7 @@ cannot share a folder with create permission
 - [coreApiShareOperationsToShares1/changingFilesShare.feature:70](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/changingFilesShare.feature#L70)
 - [coreApiShareOperationsToShares1/changingFilesShare.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/changingFilesShare.feature#L91)
 - [coreApiShareOperationsToShares1/changingFilesShare.feature:92](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareOperationsToShares1/changingFilesShare.feature#L92)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:538](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L538)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:533](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L533)
 - [coreApiWebdavMove2/moveShareOnOcis.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L30)
 - [coreApiWebdavMove2/moveShareOnOcis.feature:32](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L32)
 - [coreApiWebdavMove2/moveShareOnOcis.feature:98](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveShareOnOcis.feature#L98)
@@ -398,8 +398,8 @@ cannot share a folder with create permission
 
 - [coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature:175](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature#L175)
 - [coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature:176](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature#L176)
-- [coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature:201](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature#L201)
-- [coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature:202](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature#L202)
+- [coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature:73](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature#L73)
+- [coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature:74](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature#L74)
 - [coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature:229](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature#L229)
 - [coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature:230](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature#L230)
 - [coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature:258](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares1/createShareExpirationDate.feature#L258)
@@ -431,14 +431,14 @@ cannot share a folder with create permission
 
 - [coreApiShareUpdateToShares/updateShare.feature:201](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L201)
 - [coreApiShareUpdateToShares/updateShare.feature:160](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L160)
-- [coreApiShareManagementToShares/mergeShare.feature:141](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/mergeShare.feature#L141)
+- [coreApiShareManagementToShares/mergeShare.feature:136](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementToShares/mergeShare.feature#L136)
 
 #### [Sharing folder and sub-folder with same user but different permission,the permission of sub-folder is not obeyed ](https://github.com/owncloud/ocis/issues/2440)
 
-- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:278](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L278)
-- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:313](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L313)
-- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:422](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L422)
-- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:457](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L457)
+- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:261](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L261)
+- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:296](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L296)
+- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:405](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L405)
+- [coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature:440](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareCreateSpecialToShares2/createShareReceivedInMultipleWays.feature#L440)
 
 #### [Empty OCS response for a share create request using a disabled user](https://github.com/owncloud/ocis/issues/2212)
 
@@ -448,8 +448,8 @@ cannot share a folder with create permission
 
 #### [Edit user share response has a "name" field](https://github.com/owncloud/ocis/issues/1225)
 
-- [coreApiShareUpdateToShares/updateShare.feature:247](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L247)
-- [coreApiShareUpdateToShares/updateShare.feature:248](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L248)
+- [coreApiShareUpdateToShares/updateShare.feature:242](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L242)
+- [coreApiShareUpdateToShares/updateShare.feature:243](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareUpdateToShares/updateShare.feature#L243)
 
 #### [user can access version metadata of a received share before accepting it](https://github.com/owncloud/ocis/issues/760)
 
@@ -457,8 +457,8 @@ cannot share a folder with create permission
 
 #### [Share lists deleted user as 'user'](https://github.com/owncloud/ocis/issues/903)
 
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:682](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L682)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:683](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L683)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:677](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L677)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:678](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L678)
 
 #### [deleting a share with wrong authentication returns OCS status 996 / HTTP 500](https://github.com/owncloud/ocis/issues/1229)
 
@@ -602,8 +602,8 @@ And other missing implementation of favorites
 
 #### [Sharing a same file twice to the same group](https://github.com/owncloud/ocis/issues/1710)
 
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:730](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L730)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:731](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L731)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:725](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L725)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:726](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L726)
 
 #### [PATCH request for TUS upload with wrong checksum gives incorrect response](https://github.com/owncloud/ocis/issues/1755)
 
@@ -677,7 +677,7 @@ And other missing implementation of favorites
 #### [Shares to deleted group listed in the response](https://github.com/owncloud/ocis/issues/2441)
 
 - [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:534](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L534)
-- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:535](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L535)
+- [coreApiShareManagementBasicToShares/createShareToSharesFolder.feature:529](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareManagementBasicToShares/createShareToSharesFolder.feature#L529)
 
 #### [copying the file inside Shares folder returns 404](https://github.com/owncloud/ocis/issues/3874)
 
@@ -863,7 +863,7 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 #### [HTTP status code differ while deleting file of another user's trash bin](https://github.com/owncloud/ocis/issues/3544)
 
-- [coreApiTrashbin/trashbinDelete.feature:109](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L109)
+- [coreApiTrashbin/trashbinDelete.feature:104](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L104)
 
 #### [Problem accessing trashbin with personal space id](https://github.com/owncloud/ocis/issues/3639)
 
@@ -871,13 +871,13 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiTrashbin/trashbinDelete.feature:36](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L36)
 - [coreApiTrashbin/trashbinDelete.feature:58](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L58)
 - [coreApiTrashbin/trashbinDelete.feature:85](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L85)
-- [coreApiTrashbin/trashbinDelete.feature:132](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L132)
-- [coreApiTrashbin/trashbinDelete.feature:155](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L155)
-- [coreApiTrashbin/trashbinDelete.feature:180](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L180)
-- [coreApiTrashbin/trashbinDelete.feature:205](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L205)
-- [coreApiTrashbin/trashbinDelete.feature:242](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L242)
-- [coreApiTrashbin/trashbinDelete.feature:279](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L279)
-- [coreApiTrashbin/trashbinDelete.feature:328](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L328)
+- [coreApiTrashbin/trashbinDelete.feature:128](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L128)
+- [coreApiTrashbin/trashbinDelete.feature:151](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L151)
+- [coreApiTrashbin/trashbinDelete.feature:176](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L176)
+- [coreApiTrashbin/trashbinDelete.feature:201](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L201)
+- [coreApiTrashbin/trashbinDelete.feature:238](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L238)
+- [coreApiTrashbin/trashbinDelete.feature:275](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L275)
+- [coreApiTrashbin/trashbinDelete.feature:324](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L324)
 - [coreApiTrashbin/trashbinFilesFolders.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L25)
 - [coreApiTrashbin/trashbinFilesFolders.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L41)
 - [coreApiTrashbin/trashbinFilesFolders.feature:60](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L60)
@@ -885,19 +885,19 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiTrashbin/trashbinFilesFolders.feature:100](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L100)
 - [coreApiTrashbin/trashbinFilesFolders.feature:136](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L136)
 - [coreApiTrashbin/trashbinFilesFolders.feature:159](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L159)
-- [coreApiTrashbin/trashbinFilesFolders.feature:339](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L339)
-- [coreApiTrashbin/trashbinFilesFolders.feature:340](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L340)
-- [coreApiTrashbin/trashbinFilesFolders.feature:341](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L341)
-- [coreApiTrashbin/trashbinFilesFolders.feature:346](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L346)
-- [coreApiTrashbin/trashbinFilesFolders.feature:347](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L347)
-- [coreApiTrashbin/trashbinFilesFolders.feature:348](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L348)
-- [coreApiTrashbin/trashbinFilesFolders.feature:349](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L349)
-- [coreApiTrashbin/trashbinFilesFolders.feature:350](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L350)
-- [coreApiTrashbin/trashbinFilesFolders.feature:351](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L351)
-- [coreApiTrashbin/trashbinFilesFolders.feature:368](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L368)
-- [coreApiTrashbin/trashbinFilesFolders.feature:388](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L388)
-- [coreApiTrashbin/trashbinFilesFolders.feature:442](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L442)
-- [coreApiTrashbin/trashbinFilesFolders.feature:479](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L479)
+- [coreApiTrashbin/trashbinFilesFolders.feature:323](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L323)
+- [coreApiTrashbin/trashbinFilesFolders.feature:324](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L324)
+- [coreApiTrashbin/trashbinFilesFolders.feature:325](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L325)
+- [coreApiTrashbin/trashbinFilesFolders.feature:330](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L330)
+- [coreApiTrashbin/trashbinFilesFolders.feature:331](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L331)
+- [coreApiTrashbin/trashbinFilesFolders.feature:332](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L332)
+- [coreApiTrashbin/trashbinFilesFolders.feature:333](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L333)
+- [coreApiTrashbin/trashbinFilesFolders.feature:334](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L334)
+- [coreApiTrashbin/trashbinFilesFolders.feature:335](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L335)
+- [coreApiTrashbin/trashbinFilesFolders.feature:352](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L352)
+- [coreApiTrashbin/trashbinFilesFolders.feature:372](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L372)
+- [coreApiTrashbin/trashbinFilesFolders.feature:426](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L426)
+- [coreApiTrashbin/trashbinFilesFolders.feature:463](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L463)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
