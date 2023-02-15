@@ -92,7 +92,7 @@ Credentials:
 
 - oCIS: [ocis.ocis-keycloak.released.owncloud.works](https://ocis.ocis-keycloak.released.owncloud.works)
 - Keycloak: [keycloak.ocis-keycloak.released.owncloud.works](https://keycloak.ocis-keycloak.released.owncloud.works)
-- - Keycloak account management: [keycloak.ocis-keycloak.released.owncloud.works/realms/oCIS/account/#/](https://keycloak.ocis-keycloak.released.owncloud.works/realms/oCIS/account/#/)
+- Keycloak account management: [keycloak.ocis-keycloak.released.owncloud.works/realms/oCIS/account/#/](https://keycloak.ocis-keycloak.released.owncloud.works/realms/oCIS/account/#/)
 
 # Parallel deployment of oC10 and oCIS
 
