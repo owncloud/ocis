@@ -26,15 +26,3 @@ Feature: auth
     Examples:
       | dav_path              |
       | /dav/spaces/%spaceid% |
-
-  @smokeTest @notToImplementOnOCIS @issue-ocis-reva-28
-  Scenario: using WebDAV with token auth
-    Given a new client token for "Alice" has been generated
-    When user "Alice" requests "/remote.php/webdav" with "PROPFIND" using basic token auth
-    Then the HTTP status code should be "207"
-
-  @smokeTest  @notToImplementOnOCIS
-  Scenario: using WebDAV with browser session
-    Given a new browser session for "Alice" has been started
-    When the user requests "/remote.php/webdav" with "PROPFIND" using the browser session
-    Then the HTTP status code should be "207"

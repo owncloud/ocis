@@ -280,18 +280,6 @@ Feature: get file properties
       | dav_version |
       | spaces      |
 
-  @notToImplementOnOCIS
-  Scenario Outline: Doing a PROPFIND with a web login should work with CSRF token on the new backend
-    Given using <dav_version> DAV path
-    And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/somefile.txt"
-    And user "Alice" has logged in to a web-style session
-    When the client sends a "PROPFIND" to "/remote.php/dav/files/%username%/somefile.txt" of user "Alice" with requesttoken
-    Then the HTTP status code should be "207"
-    Examples:
-      | dav_version |
-      | old         |
-      | new         |
-
   @smokeTest @issue-ocis-reva-216
   Scenario Outline: Retrieving private link
     Given using <dav_version> DAV path
