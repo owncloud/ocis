@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
@@ -11,6 +12,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/stretchr/testify/assert"
 	"github.com/test-go/testify/mock"
+	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 )
 
@@ -168,4 +170,67 @@ func TestRemoveOwnRoleAssignment(t *testing.T) {
 	}
 	err = svc.RemoveRoleFromUser(ctxWithUUID, &req, nil)
 	assert.Nil(t, err)
+}
+
+func TestListPermissionsOfCurrentUser(t *testing.T) {
+	manager := &mocks.Manager{}
+	a := []*settingsmsg.UserRoleAssignment{
+		{
+			Id:          "00000000-0000-0000-0000-000000000001",
+			AccountUuid: "61445573-4dbe-4d56-88dc-88ab47aceba7",
+			RoleId:      "aceb15b8-7486-479f-ae32-c91118e07a39",
+		},
+	}
+	manager.On("ListRoleAssignments", mock.Anything).Return(a, nil)
+	b := &settingsmsg.Bundle{
+		Id: "aceb15b8-7486-479f-ae32-c91118e07a39",
+		Settings: []*settingsmsg.Setting{
+			{
+				Name: "some-permission",
+			},
+			{
+				Name: "other-permission",
+			},
+			{
+				Name: "duplicate-permission",
+			},
+			{
+				Name: "duplicate-permission",
+			},
+		},
+	}
+	manager.On("ReadBundle", mock.Anything).Return(b, nil)
+	svc := Service{
+		manager: manager,
+	}
+
+	// Listing permissions for yourself
+	req := v0.ListPermissionsRequest{
+		AccountUuid: "61445573-4dbe-4d56-88dc-88ab47aceba7",
+	}
+	res := v0.ListPermissionsResponse{}
+	err := svc.ListPermissions(ctxWithUUID, &req, &res)
+	assert.NoError(t, err)
+	assert.Len(t, res.Permissions, 3)
+}
+
+func TestListPermissionsOfOtherUser(t *testing.T) {
+	manager := &mocks.Manager{}
+	svc := Service{
+		manager: manager,
+	}
+
+	// Listing permissions for another user produces a not found error
+	req := v0.ListPermissionsRequest{
+		AccountUuid: "66666666-4444-4444-8888-88ab47aceba7",
+	}
+	res := v0.ListPermissionsResponse{}
+	err := svc.ListPermissions(ctxWithUUID, &req, &res)
+	assert.Error(t, err)
+
+	// assert the requested account uuid was not found
+	merr, ok := merrors.As(err)
+	assert.True(t, ok)
+	assert.Equal(t, int32(http.StatusNotFound), merr.Code)
+	assert.Contains(t, err.Error(), req.AccountUuid)
 }

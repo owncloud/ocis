@@ -121,6 +121,12 @@ service RoleService {
 }
 
 service PermissionService {
+  rpc ListPermissions(ListPermissionsRequest) returns (ListPermissionsResponse) {
+    option (google.api.http) = {
+      post: "/api/v0/settings/permissions-list",
+      body: "*"
+    };
+  }
   rpc ListPermissionsByResource(ListPermissionsByResourceRequest) returns (ListPermissionsByResourceResponse) {
     option (google.api.http) = {
       post: "/api/v0/settings/permissions-list-by-resource",
@@ -239,6 +245,14 @@ message RemoveRoleFromUserRequest {
 // --
 // requests and responses for permissions
 // ---
+
+message ListPermissionsRequest {
+  string account_uuid = 1;
+}
+
+message ListPermissionsResponse {
+  repeated string permissions = 1;
+}
 
 message ListPermissionsByResourceRequest {
   ocis.messages.settings.v0.Resource resource = 1;
