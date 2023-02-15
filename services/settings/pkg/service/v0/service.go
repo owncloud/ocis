@@ -14,7 +14,6 @@ import (
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/permissions"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/settings"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	filestore "github.com/owncloud/ocis/v2/services/settings/pkg/store/filesystem"
@@ -98,56 +97,6 @@ func (g Service) CheckPermission(ctx context.Context, req *cs3permissions.CheckP
 	return &cs3permissions.CheckPermissionResponse{
 		Status: status.NewOK(ctx),
 	}, nil
-}
-
-func (g Service) ListPermissions(ctx context.Context, req *permissions.ListPermissionsRequest, res *permissions.ListPermissionsResponse) error {
-
-	ownAccountUUID, ok := metadata.Get(ctx, middleware.AccountID)
-	if !ok {
-		g.logger.Debug().Str("id", g.id).Msg("user not in context")
-		return merrors.InternalServerError(g.id, "user not in context")
-	}
-
-	if ownAccountUUID != req.UserID {
-		return merrors.NotFound(g.id, "user not found: %s", ownAccountUUID)
-	}
-
-	assignments, err := g.manager.ListRoleAssignments(req.UserID)
-	if err != nil {
-		return err
-	}
-
-	// deduplicate role ids
-	roleIDs := map[string]struct{}{}
-	for _, a := range assignments {
-		roleIDs[a.RoleId] = struct{}{}
-	}
-
-	permissionNames := map[string]struct{}{}
-	for roleID, _ := range roleIDs {
-		bundle, err := g.manager.ReadBundle(roleID)
-		if err != nil {
-			if !errors.Is(err, settings.ErrNotFound) {
-				return err
-			}
-			continue
-		}
-
-		if bundle != nil {
-			for _, setting := range bundle.GetSettings() {
-				permissionNames[setting.Name] = struct{}{}
-			}
-		}
-	}
-
-	deduplicatedPermissions := make([]string, 0, len(permissionNames))
-	for p := range permissionNames {
-		deduplicatedPermissions = append(deduplicatedPermissions, p)
-	}
-
-	res.Permissions = deduplicatedPermissions
-
-	return nil
 }
 
 // RegisterDefaultRoles composes default roles and saves them. Skipped if the roles already exist.
@@ -511,6 +460,55 @@ func (g Service) RemoveRoleFromUser(ctx context.Context, req *settingssvc.Remove
 	if err := g.manager.RemoveRoleAssignment(req.Id); err != nil {
 		return merrors.BadRequest(g.id, err.Error())
 	}
+	return nil
+}
+
+// ListPermissions implements the PermissionServiceHandler interface
+func (g Service) ListPermissions(ctx context.Context, req *settingssvc.ListPermissionsRequest, res *settingssvc.ListPermissionsResponse) error {
+	ownAccountUUID, ok := metadata.Get(ctx, middleware.AccountID)
+	if !ok {
+		g.logger.Debug().Str("id", g.id).Msg("user not in context")
+		return merrors.InternalServerError(g.id, "user not in context")
+	}
+
+	if ownAccountUUID != req.AccountUuid {
+		return merrors.NotFound(g.id, "user not found: %s", ownAccountUUID)
+	}
+
+	assignments, err := g.manager.ListRoleAssignments(req.AccountUuid)
+	if err != nil {
+		return err
+	}
+
+	// deduplicate role ids
+	roleIDs := map[string]struct{}{}
+	for _, a := range assignments {
+		roleIDs[a.RoleId] = struct{}{}
+	}
+
+	// deduplicate permission names
+	permissionNames := map[string]struct{}{}
+	for roleID := range roleIDs {
+		bundle, err := g.manager.ReadBundle(roleID)
+		if err != nil {
+			if !errors.Is(err, settings.ErrNotFound) {
+				return err
+			}
+			continue
+		}
+
+		if bundle != nil {
+			for _, setting := range bundle.GetSettings() {
+				permissionNames[setting.Name] = struct{}{}
+			}
+		}
+	}
+
+	res.Permissions = make([]string, 0, len(permissionNames))
+	for p := range permissionNames {
+		res.Permissions = append(res.Permissions, p)
+	}
+
 	return nil
 }
 

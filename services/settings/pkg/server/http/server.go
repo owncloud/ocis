@@ -12,7 +12,6 @@ import (
 	ohttp "github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/permissions"
 	svc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 	"go-micro.dev/v4"
 )
@@ -78,7 +77,6 @@ func Server(opts ...Option) (ohttp.Service, error) {
 		settingssvc.RegisterValueServiceWeb(r, handle)
 		settingssvc.RegisterRoleServiceWeb(r, handle)
 		settingssvc.RegisterPermissionServiceWeb(r, handle)
-		permissions.RegisterListPermissionsHandler(r, handle)
 	})
 
 	_ = chi.Walk(mux, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {

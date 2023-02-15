@@ -427,6 +427,32 @@ func (h *webPermissionServiceHandler) ServeHTTP(w http.ResponseWriter, r *http.R
 	h.r.ServeHTTP(w, r)
 }
 
+func (h *webPermissionServiceHandler) ListPermissions(w http.ResponseWriter, r *http.Request) {
+	req := &ListPermissionsRequest{}
+	resp := &ListPermissionsResponse{}
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusPreconditionFailed)
+		return
+	}
+
+	if err := h.h.ListPermissions(
+		r.Context(),
+		req,
+		resp,
+	); err != nil {
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusNotFound {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+		}
+		return
+	}
+
+	render.Status(r, http.StatusCreated)
+	render.JSON(w, r, resp)
+}
+
 func (h *webPermissionServiceHandler) ListPermissionsByResource(w http.ResponseWriter, r *http.Request) {
 	req := &ListPermissionsByResourceRequest{}
 	resp := &ListPermissionsByResourceResponse{}
@@ -485,6 +511,7 @@ func RegisterPermissionServiceWeb(r chi.Router, i PermissionServiceHandler, midd
 		h: i,
 	}
 
+	r.MethodFunc("POST", "/api/v0/settings/permissions-list", handler.ListPermissions)
 	r.MethodFunc("POST", "/api/v0/settings/permissions-list-by-resource", handler.ListPermissionsByResource)
 	r.MethodFunc("POST", "/api/v0/settings/permissions-get-by-id", handler.GetPermissionByID)
 }
@@ -1244,6 +1271,78 @@ func (m *RemoveRoleFromUserRequest) UnmarshalJSON(b []byte) error {
 }
 
 var _ json.Unmarshaler = (*RemoveRoleFromUserRequest)(nil)
+
+// ListPermissionsRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of ListPermissionsRequest. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var ListPermissionsRequestJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *ListPermissionsRequest) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := ListPermissionsRequestJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*ListPermissionsRequest)(nil)
+
+// ListPermissionsRequestJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of ListPermissionsRequest. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var ListPermissionsRequestJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *ListPermissionsRequest) UnmarshalJSON(b []byte) error {
+	return ListPermissionsRequestJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*ListPermissionsRequest)(nil)
+
+// ListPermissionsResponseJSONMarshaler describes the default jsonpb.Marshaler used by all
+// instances of ListPermissionsResponse. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var ListPermissionsResponseJSONMarshaler = new(jsonpb.Marshaler)
+
+// MarshalJSON satisfies the encoding/json Marshaler interface. This method
+// uses the more correct jsonpb package to correctly marshal the message.
+func (m *ListPermissionsResponse) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return json.Marshal(nil)
+	}
+
+	buf := &bytes.Buffer{}
+
+	if err := ListPermissionsResponseJSONMarshaler.Marshal(buf, m); err != nil {
+		return nil, err
+	}
+
+	return buf.Bytes(), nil
+}
+
+var _ json.Marshaler = (*ListPermissionsResponse)(nil)
+
+// ListPermissionsResponseJSONUnmarshaler describes the default jsonpb.Unmarshaler used by all
+// instances of ListPermissionsResponse. This struct is safe to replace or modify but
+// should not be done so concurrently.
+var ListPermissionsResponseJSONUnmarshaler = new(jsonpb.Unmarshaler)
+
+// UnmarshalJSON satisfies the encoding/json Unmarshaler interface. This method
+// uses the more correct jsonpb package to correctly unmarshal the message.
+func (m *ListPermissionsResponse) UnmarshalJSON(b []byte) error {
+	return ListPermissionsResponseJSONUnmarshaler.Unmarshal(bytes.NewReader(b), m)
+}
+
+var _ json.Unmarshaler = (*ListPermissionsResponse)(nil)
 
 // ListPermissionsByResourceRequestJSONMarshaler describes the default jsonpb.Marshaler used by all
 // instances of ListPermissionsByResourceRequest. This struct is safe to replace or modify but

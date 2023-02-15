@@ -328,6 +328,38 @@
         ]
       }
     },
+    "/api/v0/settings/permissions-list": {
+      "post": {
+        "operationId": "PermissionService_ListPermissions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v0ListPermissionsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v0ListPermissionsRequest"
+            }
+          }
+        ],
+        "tags": [
+          "PermissionService"
+        ]
+      }
+    },
     "/api/v0/settings/permissions-list-by-resource": {
       "post": {
         "operationId": "PermissionService_ListPermissionsByResource",
@@ -853,6 +885,25 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/v0Permission"
+          }
+        }
+      }
+    },
+    "v0ListPermissionsRequest": {
+      "type": "object",
+      "properties": {
+        "accountUuid": {
+          "type": "string"
+        }
+      }
+    },
+    "v0ListPermissionsResponse": {
+      "type": "object",
+      "properties": {
+        "permissions": {
+          "type": "array",
+          "items": {
+            "type": "string"
           }
         }
       }
