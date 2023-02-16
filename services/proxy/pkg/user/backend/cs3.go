@@ -3,7 +3,6 @@ package backend
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -23,7 +22,6 @@ import (
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	settingsService "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
-	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 	"go-micro.dev/v4/selector"
 )
@@ -80,27 +78,26 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 	if user.Id.Type != cs3.UserType_USER_TYPE_LIGHTWEIGHT {
 		roleIDs, err = loadRolesIDs(ctx, user.Id.OpaqueId, c.settingsRoleService)
 		if err != nil {
-			var merr *merrors.Error
-			if errors.As(err, &merr) && merr.Code == http.StatusNotFound {
-				// This user doesn't have a role assignment yet. Assign a
-				// default user role. At least until proper roles are provided. See
-				// https://github.com/owncloud/ocis/v2/issues/1825 for more context.
-				if user.Id.Type == cs3.UserType_USER_TYPE_PRIMARY {
-					c.logger.Info().Str("userid", user.Id.OpaqueId).Msg("user has no role assigned, assigning default user role")
-					ctx = metadata.Set(ctx, middleware.AccountID, user.Id.OpaqueId)
-					_, err := c.settingsRoleService.AssignRoleToUser(ctx, &settingssvc.AssignRoleToUserRequest{
-						AccountUuid: user.Id.OpaqueId,
-						RoleId:      settingsService.BundleUUIDRoleUser,
-					})
-					if err != nil {
-						c.logger.Error().Err(err).Msg("Could not add default role")
-						return nil, "", err
-					}
-					roleIDs = append(roleIDs, settingsService.BundleUUIDRoleUser)
+			c.logger.Error().Err(err).Msgf("Could not load roles")
+			return nil, "", err
+		}
+
+		if len(roleIDs) == 0 {
+			// This user doesn't have a role assignment yet. Assign a
+			// default user role. At least until proper roles are provided. See
+			// https://github.com/owncloud/ocis/v2/issues/1825 for more context.
+			if user.Id.Type == cs3.UserType_USER_TYPE_PRIMARY {
+				c.logger.Info().Str("userid", user.Id.OpaqueId).Msg("user has no role assigned, assigning default user role")
+				ctx = metadata.Set(ctx, middleware.AccountID, user.Id.OpaqueId)
+				_, err := c.settingsRoleService.AssignRoleToUser(ctx, &settingssvc.AssignRoleToUserRequest{
+					AccountUuid: user.Id.OpaqueId,
+					RoleId:      settingsService.BundleUUIDRoleUser,
+				})
+				if err != nil {
+					c.logger.Error().Err(err).Msg("Could not add default role")
+					return nil, "", err
 				}
-			} else {
-				c.logger.Error().Err(err).Msgf("Could not load roles")
-				return nil, "", err
+				roleIDs = append(roleIDs, settingsService.BundleUUIDRoleUser)
 			}
 		}
 	}
