@@ -213,7 +213,7 @@ type EOSDriver struct {
 	// ForceSingleUserMode will force connections to EOS to use SingleUsername
 	ForceSingleUserMode bool `yaml:"force_single_user_mode"`
 	// UseKeyTabAuth changes will authenticate requests by using an EOS keytab.
-	UseKeytab bool `yaml:"user_keytab"`
+	UseKeytab bool `yaml:"use_keytab"`
 	// gateway service to use for uid lookups
 	GatewaySVC string `yaml:"gateway_svc"`
 	//ShareFolder defines the name of the folder jailing all shares
