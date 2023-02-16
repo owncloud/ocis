@@ -35,7 +35,7 @@ ci-node-generate:
 include ../../.make/protobuf.mk
 
 .PHONY: protobuf
-protobuf: buf-generate $(BINGO)
+protobuf: buf-generate $(PROTOC_GO_INJECT_TAG)
 	cd ../../protogen/gen/ && $(PROTOC_GO_INJECT_TAG) -input="ocis/messages/settings/v0/*.pb.go"
 
 ############ licenses ############
