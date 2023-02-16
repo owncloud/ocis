@@ -53,6 +53,7 @@ default:
         - WebDavPropertiesContext:
         - TUSContext:
         - SpacesTUSContext:
+        - GraphContext:
 
     apiSpacesShares:
       paths:
@@ -75,6 +76,7 @@ default:
         - TUSContext:
         - SpacesTUSContext:
         - ArchiverContext:
+        - GraphContext:
 
     apiContract:
       paths:
@@ -96,6 +98,7 @@ default:
         - WebDavPropertiesContext:
         - TUSContext:
         - SpacesTUSContext:
+        - GraphContext:
 
     apiArchiver:
       paths:
@@ -115,6 +118,7 @@ default:
         - FavoritesContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
+        - GraphContext:
 
     apiGraph:
       paths:
@@ -152,6 +156,7 @@ default:
         - FilesVersionsContext:
         - OCSContext:
         - TrashbinContext:
+        - GraphContext:
 
     apiAsyncUpload:
       paths:
@@ -167,6 +172,7 @@ default:
         - FilesVersionsContext:
         - OCSContext:
         - TrashbinContext:
+        - GraphContext:
 
 
   extensions:

@@ -39,6 +39,7 @@ use TestHelpers\HttpRequestHelper;
 use TestHelpers\UploadHelper;
 use TestHelpers\OcisHelper;
 use Laminas\Ldap\Ldap;
+use TestHelpers\GraphHelper;
 use TestHelpers\WebDavHelper;
 
 require_once 'bootstrap.php';
@@ -3104,6 +3105,8 @@ class FeatureContext extends BehatVariablesContext {
 	 *                               "parameter" => []
 	 *                             ],
 	 *                           ]
+	 * @param string|null $group
+	 * @param string|null $userName
 	 *
 	 * @return string
 	 */
@@ -3111,7 +3114,9 @@ class FeatureContext extends BehatVariablesContext {
 		?string $value,
 		?string $user = null,
 		?array  $functions = [],
-		?array  $additionalSubstitutions = []
+		?array  $additionalSubstitutions = [],
+		?string $group = null,
+		?string $userName = null
 	): ?string {
 		$substitutions = [
 			[
@@ -3249,6 +3254,18 @@ class FeatureContext extends BehatVariablesContext {
 					"getLastPublicShareToken"
 				],
 				"parameter" => []
+			],
+			[
+			"code" => "%user_id%",
+			"function" =>
+			[$this, "getUserIdByUserName"],
+			"parameter" => [$userName]
+			],
+			[
+			"code" => "%group_id%",
+			"function" =>
+			[$this, "getGroupIdByGroupName"],
+			"parameter" => [$group]
 			]
 		];
 		if ($user !== null) {
@@ -3293,6 +3310,18 @@ class FeatureContext extends BehatVariablesContext {
 						"getPersonalSpaceIdForUser",
 					],
 					"parameter" => [$user, true]
+				],
+				[
+				"code" => "%user_id%",
+				"function" =>
+				[$this, "getUserIdByUserName"],
+				"parameter" => [$userName]
+				],
+				[
+				"code" => "%group_id%",
+				"function" =>
+				[$this, "getGroupIdByGroupName"],
+				"parameter" => [$group]
 				]
 			);
 		}
@@ -4484,5 +4513,59 @@ class FeatureContext extends BehatVariablesContext {
 			$this->getAdminPassword(),
 			$this->getBaseUrl()
 		);
+	}
+
+	/**
+	 * The method returns userId
+	 *
+	 * @param string $userName
+	 *
+	 * @return string
+	 * @throws Exception|GuzzleException
+	 */
+	public function getUserIdByUserName(string $userName): string {
+		$response = GraphHelper::getUser(
+			$this->getBaseUrl(),
+			$this->getStepLineRef(),
+			$this->getAdminUsername(),
+			$this->getAdminPassword(),
+			$userName
+		);
+		if ($response) {
+			$data = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+			if (isset($data["id"])) {
+				return $data["id"];
+			} else {
+				throw new Exception(__METHOD__ . " accounts-list is empty");
+			}
+		}
+		throw new Exception(__METHOD__ . " user with name $userName not found");
+	}
+
+	/**
+	 * The method returns groupId
+	 *
+	 * @param string $groupName
+	 *
+	 * @return string
+	 * @throws Exception|GuzzleException
+	 */
+	public function getGroupIdByGroupName(string $groupName): string {
+		$response = GraphHelper::getGroup(
+			$this->getBaseUrl(),
+			$this->getStepLineRef(),
+			$this->getAdminUsername(),
+			$this->getAdminPassword(),
+			$groupName
+		);
+		if ($response) {
+			$data = $this->getJsonDecodedResponse($response);
+			if (isset($data["id"])) {
+				return $data["id"];
+			} else {
+				throw new Exception(__METHOD__ . " accounts-list is empty");
+			}
+		}
+		throw new Exception(__METHOD__ . " Group with name $groupName not found");
 	}
 }
