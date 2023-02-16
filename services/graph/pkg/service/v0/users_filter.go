@@ -8,6 +8,10 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 )
 
+const (
+	appRoleID = "appRoleId"
+)
+
 func invalidFilterError() error {
 	return godata.BadRequestError("invalid filter")
 }
@@ -53,22 +57,51 @@ func (g Graph) applyFilterLogical(ctx context.Context, req *godata.GoDataRequest
 
 func (g Graph) applyFilterLogicalAnd(ctx context.Context, req *godata.GoDataRequest, operand1 *godata.ParseNode, operand2 *godata.ParseNode) (users []*libregraph.User, err error) {
 	logger := g.logger.SubloggerWithRequestID(ctx)
-	results := make([][]*libregraph.User, 0, 2)
+	var res1, res2 []*libregraph.User
 
-	for _, node := range []*godata.ParseNode{operand1, operand2} {
-		res, err := g.applyUserFilter(ctx, req, node)
-		if err != nil {
-			return users, err
+	// The appRoleAssignmentFilter requires a full list of user, get try to avoid a full user listing and
+	// process the other part of the filter first, if that is an appRoleAssignmentFilter as well, we have
+	// to bite the bullet and get a full user listing anyway
+	if matched, property, value := g.isAppRoleAssignmentFilter(ctx, operand1); matched {
+		logger.Debug().Str("property", property).Str("value", value).Msg("delay processing of approleAssignments filter")
+		if property != appRoleID {
+			return users, unsupportedFilterError()
 		}
-		logger.Debug().Interface("subfilter", res).Msg("result part")
-		results = append(results, res)
+		res2, err = g.applyUserFilter(ctx, req, operand2)
+		if err != nil {
+			return []*libregraph.User{}, err
+		}
+		logger.Debug().Str("property", property).Str("value", value).Msg("applying approleAssignments filter on result set")
+		return g.filterUsersByAppRoleID(ctx, value, res2)
 	}
 
-	// 'results' contains two slices of libregraph.Users now turn one of them
+	// 1st part is no appRoleAssignmentFilter, run the filter query
+	res1, err = g.applyUserFilter(ctx, req, operand1)
+	if err != nil {
+		return []*libregraph.User{}, err
+	}
+
+	// Now check 2nd part for appRoleAssignmentFilter and apply that using the result return from the first
+	// filter
+	if matched, property, value := g.isAppRoleAssignmentFilter(ctx, operand2); matched {
+		if property != appRoleID {
+			return users, unsupportedFilterError()
+		}
+		logger.Debug().Str("property", property).Str("value", value).Msg("applying approleAssignments filter on result set")
+		return g.filterUsersByAppRoleID(ctx, value, res1)
+	}
+
+	// 2nd part is no appRoleAssignmentFilter either
+	res2, err = g.applyUserFilter(ctx, req, operand2)
+	if err != nil {
+		return []*libregraph.User{}, err
+	}
+
+	// We now have two slice with results of the subfilters. Now turn one of them
 	// into a map for efficiently getting the intersection of both slices
-	userSet := userSliceToMap(results[0])
+	userSet := userSliceToMap(res1)
 	var filteredUsers []*libregraph.User
-	for _, user := range results[1] {
+	for _, user := range res2 {
 		if _, found := userSet[user.GetId()]; found {
 			filteredUsers = append(filteredUsers, user)
 		}
@@ -132,16 +165,11 @@ func (g Graph) applyMemberOfEq(ctx context.Context, req *godata.GoDataRequest, n
 
 	switch nodes[0].Children[1].Token.Value {
 	case "id":
-		var filterValue string
-		switch nodes[1].Token.Type {
-		case godata.ExpressionTokenGuid:
-			filterValue = nodes[1].Token.Value
-		case godata.ExpressionTokenString:
-			// unquote
-			filterValue = strings.Trim(nodes[1].Token.Value, "'")
-		default:
+		filterValue, err := g.getUUIDTokenValue(ctx, nodes[1])
+		if err != nil {
 			return users, unsupportedFilterError()
 		}
+
 		logger.Debug().Str("property", nodes[0].Children[1].Token.Value).Str("value", filterValue).Msg("Filtering memberOf by group id")
 		return g.identityBackend.GetGroupMembers(ctx, filterValue, req)
 	default:
@@ -180,15 +208,9 @@ func (g Graph) applyAppRoleAssignmentEq(ctx context.Context, req *godata.GoDataR
 		return users, invalidFilterError()
 	}
 
-	if nodes[0].Children[1].Token.Value == "appRoleId" {
-		var filterValue string
-		switch nodes[1].Token.Type {
-		case godata.ExpressionTokenGuid:
-			filterValue = nodes[1].Token.Value
-		case godata.ExpressionTokenString:
-			// unquote
-			filterValue = strings.Trim(nodes[1].Token.Value, "'")
-		default:
+	if nodes[0].Children[1].Token.Value == appRoleID {
+		filterValue, err := g.getUUIDTokenValue(ctx, nodes[1])
+		if err != nil {
 			return users, unsupportedFilterError()
 		}
 
@@ -197,12 +219,12 @@ func (g Graph) applyAppRoleAssignmentEq(ctx context.Context, req *godata.GoDataR
 			return users, err
 		}
 
-		return g.filterUsersByAppRoleId(ctx, filterValue, users)
+		return g.filterUsersByAppRoleID(ctx, filterValue, users)
 	}
 	return users, unsupportedFilterError()
 }
 
-func (g Graph) filterUsersByAppRoleId(ctx context.Context, appRoleId string, users []*libregraph.User) ([]*libregraph.User, error) {
+func (g Graph) filterUsersByAppRoleID(ctx context.Context, id string, users []*libregraph.User) ([]*libregraph.User, error) {
 	// We're using a map for the results here, in order to avoid returning
 	// a user twice. The settings API, still has an issue that causes it to
 	// duplicate some assignments on restart:
@@ -214,7 +236,7 @@ func (g Graph) filterUsersByAppRoleId(ctx context.Context, appRoleId string, use
 			return users, err
 		}
 		for _, assignment := range assignments {
-			if assignment.GetAppRoleId() == appRoleId {
+			if assignment.GetAppRoleId() == id {
 				if _, ok := resultUsersMap[user.GetId()]; !ok {
 					resultUsersMap[user.GetId()] = user
 				}
@@ -226,6 +248,67 @@ func (g Graph) filterUsersByAppRoleId(ctx context.Context, appRoleId string, use
 		resultUsers = append(resultUsers, user)
 	}
 	return resultUsers, nil
+}
+
+func (g Graph) getUUIDTokenValue(ctx context.Context, node *godata.ParseNode) (string, error) {
+	var value string
+	switch node.Token.Type {
+	case godata.ExpressionTokenGuid:
+		value = node.Token.Value
+	case godata.ExpressionTokenString:
+		// unquote
+		value = strings.Trim(node.Token.Value, "'")
+	default:
+		return "", unsupportedFilterError()
+	}
+	return value, nil
+}
+
+func (g Graph) isAppRoleAssignmentFilter(ctx context.Context, node *godata.ParseNode) (match bool, property string, filter string) {
+	if node.Token.Type != godata.ExpressionTokenLambdaNav {
+		return false, "", ""
+	}
+
+	if len(node.Children) != 2 {
+		return false, "", ""
+	}
+
+	if node.Children[0].Token.Type != godata.ExpressionTokenLiteral || node.Children[0].Token.Value != "appRoleAssignments" {
+		return false, "", ""
+	}
+
+	if node.Children[1].Token.Type != godata.ExpressionTokenLambda || node.Children[1].Token.Value != "any" {
+		return false, "", ""
+	}
+
+	if len(node.Children[1].Children) != 2 {
+		return false, "", ""
+	}
+	lambdaParam := node.Children[1].Children
+	// We only support the 'eq' expression for now
+	if lambdaParam[1].Token.Type != godata.ExpressionTokenLogical || lambdaParam[1].Token.Value != "eq" {
+		return false, "", ""
+	}
+
+	if len(lambdaParam[1].Children) != 2 {
+		return false, "", ""
+	}
+	expression := lambdaParam[1].Children
+	if expression[0].Token.Type != godata.ExpressionTokenNav || expression[0].Token.Value != "/" {
+		return false, "", ""
+	}
+
+	if len(expression[0].Children) != 2 {
+		return false, "", ""
+	}
+	if expression[0].Children[1].Token.Value != appRoleID {
+		return false, "", ""
+	}
+	filterValue, err := g.getUUIDTokenValue(ctx, expression[1])
+	if err != nil {
+		return false, "", ""
+	}
+	return true, appRoleID, filterValue
 }
 
 func userSliceToMap(users []*libregraph.User) map[string]*libregraph.User {
