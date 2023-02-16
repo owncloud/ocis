@@ -101,6 +101,12 @@ $(PROTOC_GEN_OPENAPIV2): $(BINGO_DIR)/protoc-gen-openapiv2.mod
 	@echo "(re)installing $(GOBIN)/protoc-gen-openapiv2-v2.13.0"
 	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=protoc-gen-openapiv2.mod -o=$(GOBIN)/protoc-gen-openapiv2-v2.13.0 "github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2"
 
+PROTOC_GO_INJECT_TAG := $(GOBIN)/protoc-go-inject-tag-v1.4.0
+$(PROTOC_GO_INJECT_TAG): $(BINGO_DIR)/protoc-go-inject-tag.mod
+	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.
+	@echo "(re)installing $(GOBIN)/protoc-go-inject-tag-v1.4.0"
+	@cd $(BINGO_DIR) && GOWORK=off $(GO) build -mod=mod -modfile=protoc-go-inject-tag.mod -o=$(GOBIN)/protoc-go-inject-tag-v1.4.0 "github.com/favadi/protoc-go-inject-tag"
+
 REFLEX := $(GOBIN)/reflex-v0.3.1
 $(REFLEX): $(BINGO_DIR)/reflex.mod
 	@# Install binary/ries using Go 1.14+ build command. This is using bwplotka/bingo-controlled, separate go module with pinned dependencies.

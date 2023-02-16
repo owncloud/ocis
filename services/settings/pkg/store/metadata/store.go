@@ -112,7 +112,7 @@ func (s *Store) initMetadataClient(mdc MetadataClient) error {
 		}
 	}
 
-	for _, p := range defaults.GenerateBundlesDefaultRoles() {
+	for _, p := range s.cfg.Bundles {
 		b, err := json.Marshal(p)
 		if err != nil {
 			return err

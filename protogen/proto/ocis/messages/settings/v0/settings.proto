@@ -59,65 +59,65 @@ message Bundle {
     TYPE_UNKNOWN = 0;
     TYPE_DEFAULT = 1;
     TYPE_ROLE = 2;
-  }
-  string id = 1;
-  string name = 2;
-  Type type = 3;
-  string extension = 4;
-  string display_name = 5;
-  repeated Setting settings = 6;
-  Resource resource = 7;
+  };
+  string id = 1; // @gotags: yaml:"id"
+  string name = 2; // @gotags: yaml:"name"
+  Type type = 3; // @gotags: yaml:"type"
+  string extension = 4; // @gotags: yaml:"extension"
+  string display_name = 5; // @gotags: yaml:"display_name"
+  repeated Setting settings = 6; // @gotags: yaml:"settings"
+  Resource resource = 7; // @gotags: yaml:"resource"
 }
 
 message Setting {
-  string id = 1;
-  string name = 2;
-  string display_name = 3;
-  string description = 4;
+  string id = 1; // @gotags: yaml:"id"
+  string name = 2; // @gotags: yaml:"name"
+  string display_name = 3; // @gotags: yaml:"display_name"
+  string description = 4; // @gotags: yaml:"description"
   oneof value {
-    Int int_value = 5;
-    String string_value = 6;
-    Bool bool_value = 7;
-    SingleChoiceList single_choice_value = 8;
-    MultiChoiceList multi_choice_value = 9;
-    Permission permission_value = 10;
+    Int int_value = 5; // @gotags: yaml:"int_value"
+    String string_value = 6; // @gotags: yaml:"string_value"
+    Bool bool_value = 7; // @gotags: yaml:"bool_value"
+    SingleChoiceList single_choice_value = 8; // @gotags: yaml:"single_choice_value"
+    MultiChoiceList multi_choice_value = 9; // @gotags: yaml:"multi_choice_value"
+    Permission permission_value = 10; // @gotags: yaml:"permission_value"
   }
-  Resource resource = 11;
+  Resource resource = 11; // @gotags: yaml:"resource"
 }
 
 message Int {
-  int64 default = 1;
-  int64 min = 2;
-  int64 max = 3;
-  int64 step = 4;
-  string placeholder = 5;
+  int64 default = 1; // @gotags: yaml:"default"
+  int64 min = 2; // @gotags: yaml:"min"
+  int64 max = 3; // @gotags: yaml:"max"
+  int64 step = 4; // @gotags: yaml:"step"
+  string placeholder = 5; // @gotags: yaml:"placeholder"
 }
 
 message String {
-  string default = 1;
-  bool required = 2;
-  int32 min_length = 3;
-  int32 max_length = 4;
-  string placeholder = 5;
+  string default = 1; // @gotags: yaml:"default"
+  bool required = 2; // @gotags: yaml:"required"
+  int32 min_length = 3; // @gotags: yaml:"min_length"
+  int32 max_length = 4; // @gotags: yaml:"max_length"
+  string placeholder = 5; // @gotags: yaml:"placeholder"
 }
 
 message Bool {
-  bool default = 1;
-  string label = 2;
+  bool default = 1; // @gotags: yaml:"default"
+  string label = 2; // @gotags: yaml:"label"
 }
 
 message SingleChoiceList {
-  repeated ListOption options = 1;
+  repeated ListOption options = 1; // @gotags: yaml:"options"
 }
 
 message MultiChoiceList {
-  repeated ListOption options = 1;
+  repeated ListOption options = 1; // @gotags: yaml:"options"
 }
 
 message ListOption {
-  ListOptionValue value = 1;
-  bool default = 2;
-  string display_value = 3;
+  ListOptionValue value = 1; // @gotags: yaml:"value"
+  bool default = 2; // @gotags: yaml:"default"
+  string display_value = 3; // @gotags: yaml:"display_value"
 }
 
 message Permission {
@@ -130,14 +130,14 @@ message Permission {
     OPERATION_WRITE = 5;// WRITE is a combination of CREATE and UPDATE
     OPERATION_READWRITE = 6;// READWRITE is a combination of READ and WRITE
   }
-  Operation operation = 1;
+  Operation operation = 1; // @gotags: yaml:"operation"
   enum Constraint {
     CONSTRAINT_UNKNOWN = 0;
     CONSTRAINT_OWN = 1;
     CONSTRAINT_SHARED = 2;
     CONSTRAINT_ALL = 3;
   }
-  Constraint constraint = 2;
+  Constraint constraint = 2; // @gotags: yaml:"constraint"
 }
 
 // ---
@@ -146,27 +146,27 @@ message Permission {
 
 message Value {
   // id is the id of the Value. It is generated on saving it.
-  string id = 1;
-  string bundle_id = 2;
+  string id = 1; // @gotags: yaml:"id"
+  string bundle_id = 2; // @gotags: yaml:"bundle_id"
   // setting_id is the id of the setting from within its bundle.
-  string setting_id = 3;
-  string account_uuid = 4;
-  Resource resource = 5;
+  string setting_id = 3; // @gotags: yaml:"setting_id"
+  string account_uuid = 4; // @gotags: yaml:"account_uuid"
+  Resource resource = 5; // @gotags: yaml:"resource"
   oneof value {
-    bool bool_value = 6;
-    int64 int_value = 7;
-    string string_value = 8;
-    ListValue list_value = 9;
+    bool bool_value = 6; // @gotags: yaml:"bool_value"
+    int64 int_value = 7; // @gotags: yaml:"int_value"
+    string string_value = 8; // @gotags: yaml:"string_value"
+    ListValue list_value = 9; // @gotags: yaml:"list_value"
   }
 }
 
 message ListValue {
-  repeated ListOptionValue values = 1;
+  repeated ListOptionValue values = 1; // @gotags: yaml:"values"
 }
 
 message ListOptionValue {
   oneof option {
-    string string_value = 1;
-    int64 int_value = 2;
+    string string_value = 1; // @gotags: yaml:"string_value"
+    int64 int_value = 2; // @gotags: yaml:"int_value"
   }
 }
