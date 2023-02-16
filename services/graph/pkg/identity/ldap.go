@@ -493,7 +493,17 @@ func (i *LDAP) changeUserName(ctx context.Context, dn, originalUserName, newUser
 		return nil, err
 	}
 
-	u, err := i.getUserByDN(fmt.Sprintf("%s,%s", newDN, i.userBaseDN))
+	parsed, err := ldap.ParseDN(dn)
+	if err != nil {
+		return nil, err
+	}
+
+	newFullDN, err := replaceDN(parsed, newDN)
+	if err != nil {
+		return nil, err
+	}
+
+	u, err := i.getUserByDN(newFullDN)
 	if err != nil {
 		return nil, err
 	}
@@ -729,4 +739,20 @@ func (i *LDAP) expandLDAPAttributeEntries(ctx context.Context, e *ldap.Entry, at
 	}
 
 	return result, nil
+}
+
+func replaceDN(fullDN *ldap.DN, newDN string) (string, error) {
+	if len(fullDN.RDNs) == 0 {
+		return "", fmt.Errorf("Can't operate on an empty dn")
+	}
+
+	if len(fullDN.RDNs) == 1 {
+		return newDN, nil
+	}
+
+	for _, part := range fullDN.RDNs[1:] {
+		newDN += "," + part.String()
+	}
+
+	return newDN, nil
 }
