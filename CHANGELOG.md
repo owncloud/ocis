@@ -18,6 +18,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump libre-graph-api-go: [#5309](https://github.com/owncloud/ocis/pull/5309)
 * Enhancement - Bump reva version: [#5243](https://github.com/owncloud/ocis/pull/5243)
 * Enhancement - Collect global envvars: [#5367](https://github.com/owncloud/ocis/pull/5367)
+* Enhancement - Make the settings bundles part of the service config: [#5589](https://github.com/owncloud/ocis/pull/5589)
 * Enhancement - Drive group permissions: [#5312](https://github.com/owncloud/ocis/pull/5312)
 * Enhancement - Make the group members addition limit configurable: [#5357](https://github.com/owncloud/ocis/pull/5357)
 * Enhancement - Allow username to be changed: [#5509](https://github.com/owncloud/ocis/pull/5509)
