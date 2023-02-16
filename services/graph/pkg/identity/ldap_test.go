@@ -634,19 +634,23 @@ func TestUpdateUser(t *testing.T) {
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
-									DN: "uid=oldName",
+									DN: "uid=oldName,ou=people,dc=test,dc=net",
 									Attributes: []*ldap.EntryAttribute{
 										{
-											Name:   "displayname",
+											Name:   lconfig.UserDisplayNameAttribute,
 											Values: []string{"testUser"},
 										},
 										{
-											Name:   "entryUUID",
+											Name:   lconfig.UserIDAttribute,
 											Values: []string{"testUser"},
 										},
 										{
-											Name:   "mail",
+											Name:   lconfig.UserEmailAttribute,
 											Values: []string{"testuser@example.org"},
+										},
+										{
+											Name:   lconfig.UserNameAttribute,
+											Values: []string{"oldName"},
 										},
 									},
 								},
@@ -662,7 +666,7 @@ func TestUpdateUser(t *testing.T) {
 							BaseDN: "ou=groups,dc=test",
 							Scope:  2, DerefAliases: 0, SizeLimit: 0, TimeLimit: 0,
 							TypesOnly:  false,
-							Filter:     "(&(objectClass=groupOfNames)(member=uid=oldName))",
+							Filter:     "(&(objectClass=groupOfNames)(member=uid=oldName,ou=people,dc=test,dc=net))",
 							Attributes: []string{"cn", "entryUUID"},
 							Controls:   []ldap.Control(nil),
 						},
@@ -692,7 +696,7 @@ func TestUpdateUser(t *testing.T) {
 					funcName: "ModifyDN",
 					args: []interface{}{
 						&ldap.ModifyDNRequest{
-							DN:           "uid=oldName",
+							DN:           "uid=oldName,ou=people,dc=test,dc=net",
 							NewRDN:       "uid=newName",
 							DeleteOldRDN: true,
 							NewSuperior:  "",
@@ -707,7 +711,7 @@ func TestUpdateUser(t *testing.T) {
 					funcName: "Search",
 					args: []interface{}{
 						&ldap.SearchRequest{
-							BaseDN:       "uid=newName,ou=people,dc=test",
+							BaseDN:       "uid=newName,ou=people,dc=test,dc=net",
 							Scope:        0,
 							DerefAliases: 0,
 							SizeLimit:    1,
@@ -722,7 +726,7 @@ func TestUpdateUser(t *testing.T) {
 						&ldap.SearchResult{
 							Entries: []*ldap.Entry{
 								{
-									DN: "uid=newName,ou=people,dc=test",
+									DN: "uid=newName,ou=people,dc=test,dc=net",
 									Attributes: []*ldap.EntryAttribute{
 										{
 											Name:   lconfig.UserIDAttribute,
@@ -757,14 +761,14 @@ func TestUpdateUser(t *testing.T) {
 									Operation: 0x1,
 									Modification: ldap.PartialAttribute{
 										Type: "member",
-										Vals: []string{"uid=oldName"},
+										Vals: []string{"uid=oldName,ou=people,dc=test,dc=net"},
 									},
 								},
 								{
 									Operation: 0x0,
 									Modification: ldap.PartialAttribute{
 										Type: "member",
-										Vals: []string{"uid=newName,ou=people,dc=test"},
+										Vals: []string{"uid=newName,ou=people,dc=test,dc=net"},
 									},
 								},
 							},
