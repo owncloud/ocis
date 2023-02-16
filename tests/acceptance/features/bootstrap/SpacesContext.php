@@ -956,7 +956,8 @@ class SpacesContext implements Context {
 						"parameter" => [$userName, $spaceName, $fileName]
 					]
 				],
-				$groupName
+				$groupName,
+				$userName
 			);
 			$segments = explode("@@@", $row["key"]);
 			// traverse down in the array

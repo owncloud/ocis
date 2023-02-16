@@ -3106,6 +3106,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *                             ],
 	 *                           ]
 	 * @param string|null $group
+	 * @param string|null $userName
 	 *
 	 * @return string
 	 */
@@ -3114,7 +3115,8 @@ class FeatureContext extends BehatVariablesContext {
 		?string $user = null,
 		?array  $functions = [],
 		?array  $additionalSubstitutions = [],
-		?string $group = null
+		?string $group = null,
+		?string $userName = null
 	): ?string {
 		$substitutions = [
 			[
@@ -3257,7 +3259,7 @@ class FeatureContext extends BehatVariablesContext {
 			"code" => "%user_id%",
 			"function" =>
 			[$this, "getUserIdByUserName"],
-			"parameter" => [$user]
+			"parameter" => [$userName]
 			],
 			[
 			"code" => "%group_id%",
@@ -3313,7 +3315,7 @@ class FeatureContext extends BehatVariablesContext {
 				"code" => "%user_id%",
 				"function" =>
 				[$this, "getUserIdByUserName"],
-				"parameter" => [$user]
+				"parameter" => [$userName]
 				],
 				[
 				"code" => "%group_id%",
