@@ -342,6 +342,14 @@ var _ = Describe("Users", func() {
 		Entry("with unsupported filter operand type", "memberOf/any(n:n/id eq 1)", http.StatusNotImplemented),
 		Entry("with unsupported memberOf lambda filter property", "memberOf/any(n:n/name eq 'name')", http.StatusNotImplemented),
 		Entry("with unsupported appRoleAssignments lambda filter property", "appRoleAssignments/any(n:n/id eq 'id')", http.StatusNotImplemented),
+		Entry("with unsupported appRoleAssignments lambda filter property",
+			"appRoleAssignments/any(n:n/id eq 'id') and appRoleAssignments/any(n:n/id eq 'id')", http.StatusNotImplemented),
+		Entry("with unsupported appRoleAssignments lambda filter operation",
+			"appRoleAssignments/all(n:n/appRoleId eq 'id') and appRoleAssignments/any(n:n/appRoleId eq 'id')", http.StatusNotImplemented),
+		Entry("with unsupported appRoleAssignments lambda filter operation",
+			"appRoleAssignments/any(n:n/appRoleId ne 'id') and appRoleAssignments/any(n:n/appRoleId eq 'id')", http.StatusNotImplemented),
+		Entry("with unsupported appRoleAssignments lambda filter operation",
+			"appRoleAssignments/any(n:n/appRoleId eq 1) and appRoleAssignments/any(n:n/appRoleId eq 'id')", http.StatusNotImplemented),
 	)
 
 	DescribeTable("With a valid filter",
@@ -372,6 +380,9 @@ var _ = Describe("Users", func() {
 		Entry("with appRoleAssignments lambda filter with appRoleId", "appRoleAssignments/any(n:n/appRoleId eq 'some-appRole-ID')", http.StatusOK),
 		Entry("with two memberOf lambda filters",
 			"memberOf/any(n:n/id eq 25cb7bc0-3168-4a0c-adbe-396f478ad494) and memberOf/any(n:n/id eq 2713f1d5-6822-42bd-ad56-9f6c55a3a8fa)",
+			http.StatusOK),
+		Entry("with supported appRoleAssignments lambda filter property",
+			"appRoleAssignments/any(n:n/appRoleId eq 'some-appRoleAssignment-ID') and memberOf/any(n:n/id eq 2713f1d5-6822-42bd-ad56-9f6c55a3a8fa)",
 			http.StatusOK),
 	)
 
