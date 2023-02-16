@@ -149,7 +149,7 @@ message Value {
   string id = 1; // @gotags: yaml:"id"
   string bundle_id = 2; // @gotags: yaml:"bundle_id"
   // setting_id is the id of the setting from within its bundle.
-  string setting_id = 3; // @gotags: yaml:"settings_id"
+  string setting_id = 3; // @gotags: yaml:"setting_id"
   string account_uuid = 4; // @gotags: yaml:"account_uuid"
   Resource resource = 5; // @gotags: yaml:"resource"
   oneof value {
