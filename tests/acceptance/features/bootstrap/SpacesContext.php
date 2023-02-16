@@ -1974,7 +1974,7 @@ class SpacesContext implements Context {
 			"shareType" => $rows["shareType"],
 			"shareWith" => $rows["shareWith"],
 			"role" => $rows["role"],
-		  "expireDate" => $rows["expireDate"]
+			"expireDate" => $rows["expireDate"]
 		];
 
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl;

@@ -285,26 +285,38 @@ Feature: Share spaces
     And the user "Bob" should not have a space called "share space"
 
 
-  Scenario Outline: User increases permissions for one member of the group or for the entire group
+  Scenario: User increases permissions for one member of the group or for the entire group
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
     And user "Alice" has shared a space "share space" with settings:
-      | shareWith | <firstRecipient> |
-      | shareType | <firstShareType> |
-      | role      | viewer           |
+      | shareWith | sales  |
+      | shareType | 8      |
+      | role      | viewer |
     When user "Brian" uploads a file inside space "share space" with content "Test" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     When user "Alice" has shared a space "share space" with settings:
-      | shareWith | <secondRecipient> |
-      | shareType | <secondShareType> |
-      | role      | editor            |
+      | shareWith | Brian  |
+      | role      | editor |
     Then the HTTP status code should be "200"
     When user "Brian" uploads a file inside space "share space" with content "Test" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "201"
-    Examples:
-      | firstRecipient | firstShareType | secondRecipient | secondShareType |
-      | sales          | 8              | Brian           | 7               |
-      | Brian          | 7              | sales           | 8               |
+
+
+  Scenario: User increases permissions for the group, so the user's permissions are increased
+    Given group "sales" has been created
+    And the administrator has added a user "Brian" to the group "sales" using GraphApi
+    And user "Alice" has shared a space "share space" with settings:
+      | shareWith | Brian  |
+      | role      | viewer |
+    When user "Brian" uploads a file inside space "share space" with content "Test" to "test.txt" using the WebDAV API
+    Then the HTTP status code should be "403"
+    When user "Alice" has shared a space "share space" with settings:
+      | shareWith | sales  |
+      | shareType | 8      |
+      | role      | editor |
+    Then the HTTP status code should be "200"
+    When user "Brian" uploads a file inside space "share space" with content "Test" to "test.txt" using the WebDAV API
+    Then the HTTP status code should be "201"
 
 
   Scenario Outline: A Space Admin can share a space to the user with an expiration date
