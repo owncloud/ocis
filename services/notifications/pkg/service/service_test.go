@@ -68,11 +68,13 @@ var _ = Describe("Notifications", func() {
 			expectedSubject:     "Dr. S. Harer shared 'secrets of the board' with you",
 			expectedSender:      sharer.GetDisplayName(),
 			done:                make(chan struct{}),
-		}, events.ShareCreated{
-			Sharer:        sharer.GetId(),
-			GranteeUserID: sharee.GetId(),
-			CTime:         utils.TimeToTS(time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC)),
-			ItemID:        resourceid,
+		}, events.Event{
+			Event: events.ShareCreated{
+				Sharer:        sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				CTime:         utils.TimeToTS(time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC)),
+				ItemID:        resourceid,
+			},
 		}),
 
 		Entry("Share Expired", testChannel{
@@ -80,11 +82,13 @@ var _ = Describe("Notifications", func() {
 			expectedSubject:     "Share to 'secrets of the board' expired at 2023-04-17 16:42:00",
 			expectedSender:      sharer.GetDisplayName(),
 			done:                make(chan struct{}),
-		}, events.ShareExpired{
-			ShareOwner:    sharer.GetId(),
-			GranteeUserID: sharee.GetId(),
-			ExpiredAt:     time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
-			ItemID:        resourceid,
+		}, events.Event{
+			Event: events.ShareExpired{
+				ShareOwner:    sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				ExpiredAt:     time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
+				ItemID:        resourceid,
+			},
 		}),
 
 		Entry("Added to Space", testChannel{
@@ -92,11 +96,13 @@ var _ = Describe("Notifications", func() {
 			expectedSubject:     "Dr. S. Harer invited you to join secret space",
 			expectedSender:      sharer.GetDisplayName(),
 			done:                make(chan struct{}),
-		}, events.SpaceShared{
-			Executant:     sharer.GetId(),
-			Creator:       sharer.GetId(),
-			GranteeUserID: sharee.GetId(),
-			ID:            &provider.StorageSpaceId{OpaqueId: "spaceid"},
+		}, events.Event{
+			Event: events.SpaceShared{
+				Executant:     sharer.GetId(),
+				Creator:       sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				ID:            &provider.StorageSpaceId{OpaqueId: "spaceid"},
+			},
 		}),
 
 		Entry("Removed from Space", testChannel{
@@ -104,10 +110,12 @@ var _ = Describe("Notifications", func() {
 			expectedSubject:     "Dr. S. Harer removed you from secret space",
 			expectedSender:      sharer.GetDisplayName(),
 			done:                make(chan struct{}),
-		}, events.SpaceUnshared{
-			Executant:     sharer.GetId(),
-			GranteeUserID: sharee.GetId(),
-			ID:            &provider.StorageSpaceId{OpaqueId: "spaceid"},
+		}, events.Event{
+			Event: events.SpaceUnshared{
+				Executant:     sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				ID:            &provider.StorageSpaceId{OpaqueId: "spaceid"},
+			},
 		}),
 
 		Entry("Space Expired", testChannel{
@@ -115,12 +123,14 @@ var _ = Describe("Notifications", func() {
 			expectedSubject:     "Membership of 'secret space' expired at 2023-04-17 16:42:00",
 			expectedSender:      sharer.GetDisplayName(),
 			done:                make(chan struct{}),
-		}, events.SpaceMembershipExpired{
-			SpaceOwner:    sharer.GetId(),
-			GranteeUserID: sharee.GetId(),
-			SpaceID:       &provider.StorageSpaceId{OpaqueId: "spaceid"},
-			SpaceName:     "secret space",
-			ExpiredAt:     time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
+		}, events.Event{
+			Event: events.SpaceMembershipExpired{
+				SpaceOwner:    sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				SpaceID:       &provider.StorageSpaceId{OpaqueId: "spaceid"},
+				SpaceName:     "secret space",
+				ExpiredAt:     time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC),
+			},
 		}),
 	)
 })
