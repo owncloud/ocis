@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/CiscoM31/godata"
 	"github.com/go-ldap/ldap/v3"
@@ -46,12 +48,13 @@ type LDAP struct {
 }
 
 type userAttributeMap struct {
-	displayName string
-	id          string
-	mail        string
-	userName    string
-	givenName   string
-	surname     string
+	displayName    string
+	id             string
+	mail           string
+	userName       string
+	givenName      string
+	surname        string
+	accountEnabled string
 }
 
 type ldapAttributeValues map[string][]string
@@ -62,12 +65,13 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		return nil, errors.New("invalid user attribute mappings")
 	}
 	uam := userAttributeMap{
-		displayName: config.UserDisplayNameAttribute,
-		id:          config.UserIDAttribute,
-		mail:        config.UserEmailAttribute,
-		userName:    config.UserNameAttribute,
-		givenName:   givenNameAttribute,
-		surname:     surNameAttribute,
+		displayName:    config.UserDisplayNameAttribute,
+		id:             config.UserIDAttribute,
+		mail:           config.UserEmailAttribute,
+		userName:       config.UserNameAttribute,
+		accountEnabled: config.UserEnabledAttribute,
+		givenName:      givenNameAttribute,
+		surname:        surNameAttribute,
 	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
@@ -245,7 +249,17 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 			updateNeeded = true
 		}
 	}
-	// TODO implement account disabled/enabled
+
+	if user.AccountEnabled != nil {
+		boolString := strings.ToUpper(strconv.FormatBool(*user.AccountEnabled))
+		ldapValue := e.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled)
+		updateNeeded = true
+		if ldapValue != "" {
+			mr.Replace(i.userAttributeMap.accountEnabled, []string{boolString})
+		} else {
+			mr.Add(i.userAttributeMap.accountEnabled, []string{boolString})
+		}
+	}
 
 	if updateNeeded {
 		if err := i.conn.Modify(&mr); err != nil {
@@ -269,6 +283,7 @@ func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
 		i.userAttributeMap.userName,
 		i.userAttributeMap.surname,
 		i.userAttributeMap.givenName,
+		i.userAttributeMap.accountEnabled,
 	}
 
 	filter := fmt.Sprintf("(objectClass=%s)", i.userObjectClass)
@@ -365,6 +380,7 @@ func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
 		i.userAttributeMap.userName,
 		i.userAttributeMap.surname,
 		i.userAttributeMap.givenName,
+		i.userAttributeMap.accountEnabled,
 	}
 	return i.searchLDAPEntryByFilter(i.userBaseDN, attrs, filter)
 }
@@ -581,6 +597,7 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 			Id:                       &id,
 			GivenName:                &givenName,
 			Surname:                  &surname,
+			AccountEnabled:           booleanOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled)),
 		}
 	}
 	i.logger.Warn().Str("dn", e.DN).Msg("Invalid User. Missing username or id attribute")
@@ -592,13 +609,18 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 		i.userAttributeMap.displayName: {user.GetDisplayName()},
 		i.userAttributeMap.userName:    {user.GetOnPremisesSamAccountName()},
 		i.userAttributeMap.mail:        {user.GetMail()},
-		"objectClass":                  {"inetOrgPerson", "organizationalPerson", "person", "top"},
+		"objectClass":                  {"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"},
 		"cn":                           {user.GetOnPremisesSamAccountName()},
 	}
 
 	if !i.useServerUUID {
 		attrs["owncloudUUID"] = []string{uuid.Must(uuid.NewV4()).String()}
-		attrs["objectClass"] = append(attrs["objectClass"], "owncloud")
+	}
+
+	if user.AccountEnabled != nil {
+		attrs[i.userAttributeMap.accountEnabled] = []string{
+			strings.ToUpper(strconv.FormatBool(*user.AccountEnabled)),
+		}
 	}
 
 	// inetOrgPerson requires "sn" to be set. Set it to the Username if
@@ -636,6 +658,7 @@ func (i *LDAP) getUserAttrTypes() []string {
 		"cn",
 		"owncloudUUID",
 		"userPassword",
+		i.userAttributeMap.accountEnabled,
 	}
 }
 
@@ -664,6 +687,16 @@ func pointerOrNil(val string) *string {
 		return nil
 	}
 	return &val
+}
+
+func booleanOrNil(val string) *bool {
+	boolValue, err := strconv.ParseBool(val)
+
+	if err != nil {
+		return nil
+	}
+
+	return &boolValue
 }
 
 func stringToScope(scope string) (int, error) {

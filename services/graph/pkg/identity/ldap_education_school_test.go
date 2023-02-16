@@ -21,6 +21,7 @@ var eduConfig = config.LDAP{
 	UserIDAttribute:          "entryUUID",
 	UserEmailAttribute:       "mail",
 	UserNameAttribute:        "uid",
+	UserEnabledAttribute:     "userEnabledAttribute",
 
 	GroupBaseDN:        "ou=groups,dc=test",
 	GroupObjectClass:   "groupOfNames",
