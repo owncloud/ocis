@@ -52,3 +52,20 @@ Feature: create user
       | role        |
       | Space Admin |
       | User        |
+
+  Scenario Outline: only user with admin role can create user
+    Given user "Alice" has been created with default attributes and without skeleton files
+    And the administrator has given "Alice" the role "<userRole>" using the Graph API
+    When the user "Alice" creates a new user using GraphAPI with the following settings:
+      | userName    | <userName>    |
+      | displayName | <displayName> |
+      | email       | <email>       |
+      | password    | <password>    |
+    Then the HTTP status code should be "<code>"
+    And user "<userName>" <shouldOrNot> exist
+    Examples:
+      | userRole    | userName          | displayName     | email               | password                     | code | shouldOrNot |
+      | Admin       | SameDisplayName   | Alice Hansen    | new@example.org     | containsCharacters(*:!;_+-&) | 200  | should      |
+      | Space Admin | withPassSameEmail | with pass       | alice@example.org   | $-ad#                        | 401  | should not  |
+      | User        | name              | pass with space | example@example.org | my pass                      | 401  | should not  |
+      | Guest       | hari kumar        | hary            | hari@example.com    | 123                          | 401  | should not  |

@@ -58,10 +58,19 @@ Feature: assign role
       | Admin       | User        | 201        | User         |
       | Admin       | Space Admin | 201        | Space Admin  |
       | Admin       | Admin       | 201        | Admin        |
+      | Admin       | Guest       | 201        | Guest        |
       | Space Admin | Admin       | 400        | User         |
+      | Space Admin | User        | 400        | User         |
+      | Space Admin | Guest       | 400        | User         |
       | Space Admin | Space Admin | 400        | User         |
       | User        | Admin       | 400        | User         |
       | User        | Space Admin | 400        | User         |
+      | User        | User        | 400        | User         |
+      | User        | Guest       | 400        | User         |
+      | Guest       | Space Admin | 400        | User         |
+      | Guest       | User        | 400        | User         |
+      | Guest       | Admin       | 400        | User         |
+      | Guest       | Guest       | 400        | User         |
 
   Scenario Outline: assign role to the user using graph api
     Given user "Alice" has been created with default attributes and without skeleton files

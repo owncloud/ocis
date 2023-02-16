@@ -35,10 +35,16 @@ Feature: get users
       | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
 
 
-  Scenario: non-admin user tries to get all users
+  Scenario Outline: non-admin user tries to get all users
+    Given the administrator has given "Brian" the role "<userRole>" using the Graph API
     When user "Brian" tries to get all users using the Graph API
     Then the HTTP status code should be "401"
     And the last response should be an unauthorized response
+    Examples:
+      | userRole    |
+      | Space Admin |
+      | User        |
+      | Guest       |
 
 
   Scenario: admin user gets the drive information of a user
@@ -96,4 +102,3 @@ Feature: get users
     When the user "Carol" gets user "Brian" along with his group information using Graph API
     Then the HTTP status code should be "401"
     And the last response should be an unauthorized response
-    

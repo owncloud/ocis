@@ -30,11 +30,17 @@ Feature: create group
     And group "mygroup" should exist
 
 
-  Scenario: normal user tries to create a group
+  Scenario Outline: normal user tries to create a group
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has given "Brian" the role "<userRole>" using the Graph API
     When user "Brian" tries to create a group "mygroup" using the Graph API
     And the HTTP status code should be "401"
     And group "mygroup" should not exist
+    Examples:
+      | userRole    |
+      | Space Admin |
+      | User        |
+      | Guest       |
 
 
   Scenario: admin user tries to create a group that is the empty string

@@ -21,15 +21,20 @@ Feature: get groups and their members
       | h2o-lover    |
 
 
-  Scenario: normal user cannot get the groups list
+  Scenario Outline: normal user cannot get the groups list
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has given "Brian" the role "<userRole>" using the Graph API
     And group "tea-lover" has been created
     And group "coffee-lover" has been created
     And group "h2o-lover" has been created
     When user "Brian" gets all the groups using the Graph API
     Then the HTTP status code should be "401"
     And the last response should be an unauthorized response
-
+    Examples:
+      | userRole    |
+      | Space Admin |
+      | User        |
+      | Guest       |
 
   Scenario: admin user gets users of a group
     Given these users have been created with default attributes and without skeleton files:
@@ -46,9 +51,15 @@ Feature: get groups and their members
       | Carol |
 
 
-  Scenario: normal user tries to get users of a group
+  Scenario Outline: normal user tries to get users of a group
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has given "Brian" the role "<userRole>" using the Graph API
     And group "tea-lover" has been created
     When user "Brian" gets all the members of group "tea-lover" using the Graph API
     Then the HTTP status code should be "401"
     And the last response should be an unauthorized response
+    Examples:
+      | userRole    |
+      | Space Admin |
+      | User        |
+      | Guest       |
