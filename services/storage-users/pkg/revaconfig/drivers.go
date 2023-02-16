@@ -17,6 +17,7 @@ func EOS(cfg *config.Config) map[string]interface{} {
 		"sec_protocol":           cfg.Drivers.EOS.SecProtocol,
 		"keytab":                 cfg.Drivers.EOS.Keytab,
 		"single_username":        cfg.Drivers.EOS.SingleUsername,
+		"user_layout":            cfg.Drivers.EOS.UserLayout,
 		"enable_logging":         cfg.Drivers.EOS.EnableLogging,
 		"show_hidden_sys_files":  cfg.Drivers.EOS.ShowHiddenSysFiles,
 		"force_single_user_mode": cfg.Drivers.EOS.ForceSingleUserMode,
