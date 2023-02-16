@@ -1529,14 +1529,15 @@ class GraphContext implements Context {
 		};
 	}
 
-	/**
-	 * @When /^user "([^"]*)" retrieves assigned role using the Graph API$/
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
+    /**
+     * @When /^user "([^"]*)" tries to get assigned role using the Graph API$/
+     *
+     * @param string $user
+     *
+     * @return void
+     * @throws GuzzleException
+     * @throws Exception
+     */
 	public function userRetrievesAssignedRoleUsingTheGraphApi(string $user): void {
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
 		$userId = $userId ?? $user;

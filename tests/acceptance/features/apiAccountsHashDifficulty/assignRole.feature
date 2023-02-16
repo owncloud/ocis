@@ -66,7 +66,7 @@ Feature: assign role
   Scenario Outline: assign role to the user using graph api
     Given user "Alice" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "<userRole>" using the Graph API
-    When user "Alice" retrieves assigned role using the Graph API
+    When user "Alice" tries to get assigned role using the Graph API
     Then the HTTP status code should be "200"
     And the Graph API response should have the role "<userRole>"
     Examples:
@@ -76,7 +76,7 @@ Feature: assign role
       | User        |
       | Guest       |
 
-  Scenario Outline: assign role to the user with setting api and list role with graph api
+  Scenario Outline: assign role to the user with graph api and list role with setting api
     Given user "Alice" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "<userRole>" using the Graph API
     When user "Alice" tries to get list of assignment
