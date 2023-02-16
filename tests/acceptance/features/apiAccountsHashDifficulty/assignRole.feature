@@ -68,7 +68,7 @@ Feature: assign role
     And the administrator has given "Alice" the role "<userRole>" using the Graph API
     When user "Alice" tries to get assigned role using the Graph API
     Then the HTTP status code should be "200"
-    And the Graph API response should have the role "<userRole>"
+    And the user "Alice" should have role "<userRole>" in the Graph API response
     Examples:
       | userRole    |
       | Admin       |
@@ -82,6 +82,20 @@ Feature: assign role
     When user "Alice" tries to get list of assignment
     Then the HTTP status code should be "201"
     And the setting API response should have the role "<userRole>"
+    Examples:
+      | userRole    |
+      | Admin       |
+      | Space Admin |
+      | User        |
+      | Guest       |
+
+
+  Scenario Outline: assign role to the user with setting api and list role with graph api
+    Given user "Alice" has been created with default attributes and without skeleton files
+    And the administrator has given "Alice" the role "<userRole>" using the settings api
+    When user "Alice" tries to get assigned role using the Graph API
+    Then the HTTP status code should be "200"
+    And the user "Alice" should have role "<userRole>" in the Graph API response
     Examples:
       | userRole    |
       | Admin       |

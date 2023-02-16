@@ -1224,30 +1224,30 @@ class GraphContext implements Context {
 		foreach (array_keys($expectedValue) as $keyName) {
 			switch ($keyName) {
 				case "memberOf":
-					$memberOfFromApiReponse = [];
-					$memberOf = preg_split('/\s*,\s*/', trim($expectedValue['memberOf']));
-					foreach ($actualValue['memberOf'] as $member) {
-						$memberOfFromApiReponse[] = $member['displayName'];
+				$memberOfFromApiReponse = [];
+				$memberOf = preg_split('/\s*,\s*/', trim($expectedValue['memberOf']));
+				foreach ($actualValue['memberOf'] as $member) {
+					$memberOfFromApiReponse[] = $member['displayName'];
 					}
-					Assert::assertEqualsCanonicalizing($memberOf, $memberOfFromApiReponse);
+                Assert::assertEqualsCanonicalizing($memberOf, $memberOfFromApiReponse);
 					break;
 				case "id":
-					if ($expectedValue[$keyName] !== '%uuid_v4%') {
-						throw new Error(
-							'Only UUIDv4 patterned user id can be checked' . ' but got '
-							. trim($expectedValue[$keyName], '%')
-						);
-					}
-					Assert::assertTrue(GraphHelper::isUUIDv4($actualValue['id']), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualValue['id']);
+                if ($expectedValue[$keyName] !== '%uuid_v4%') {
+                    throw new Error(
+                    'Only UUIDv4 patterned user id can be checked' . ' but got '
+                    . trim($expectedValue[$keyName], '%')
+                    );
+                }
+                Assert::assertTrue(GraphHelper::isUUIDv4($actualValue['id']), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualValue['id']);
 					break;
 				default:
-					Assert::assertEquals(
-						$expectedValue[$keyName],
-						$actualValue[$keyName],
-						__METHOD__ .
-						' Expected ' . $keyName . 'to have value' . $expectedValue[$keyName]
-						. ' but got ' . $actualValue[$keyName]
-					);
+                Assert::assertEquals(
+				$expectedValue[$keyName],
+				$actualValue[$keyName],
+				__METHOD__ .
+				' Expected ' . $keyName . 'to have value' . $expectedValue[$keyName]
+				. ' but got ' . $actualValue[$keyName]
+                );
 					break;
 			}
 		}
@@ -1429,27 +1429,27 @@ class GraphContext implements Context {
 			$actualKeyValue = GraphHelper::separateAndGetValueForKey($keyName, $actualDriveInformation);
 			switch ($expectedDriveInformation[$keyName]) {
 				case '%user_id%':
-					Assert::assertTrue(GraphHelper::isUUIDv4($actualKeyValue), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValue);
+                Assert::assertTrue(GraphHelper::isUUIDv4($actualKeyValue), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValue);
 					break;
 				case '%space_id%':
-					Assert::assertTrue(GraphHelper::isSpaceId($actualKeyValue), __METHOD__ . ' Expected space_id to have a UUIDv4:UUIDv4 pattern but found: ' . $actualKeyValue);
+                Assert::assertTrue(GraphHelper::isSpaceId($actualKeyValue), __METHOD__ . ' Expected space_id to have a UUIDv4:UUIDv4 pattern but found: ' . $actualKeyValue);
 					break;
 				default:
-					$expectedDriveInformation[$keyName] = $this->featureContext->substituteInLineCodes(
-						$expectedDriveInformation[$keyName],
-						$this->featureContext->getCurrentUser(),
-						[],
-						[
-							[
-								// the actual space_id is substituted from the actual drive information rather than making an API request and substituting
-								"code" => "%space_id%",
-								"function" =>
-									[$this, "getSpaceIdFromActualDriveinformation"],
-								"parameter" => [$actualDriveInformation]
-							],
-						]
-					);
-					Assert::assertEquals($expectedDriveInformation[$keyName], $actualKeyValue);
+                $expectedDriveInformation[$keyName] = $this->featureContext->substituteInLineCodes(
+				$expectedDriveInformation[$keyName],
+				$this->featureContext->getCurrentUser(),
+				[],
+				[
+                [
+				// the actual space_id is substituted from the actual drive information rather than making an API request and substituting
+				"code" => "%space_id%",
+				"function" =>
+                [$this, "getSpaceIdFromActualDriveinformation"],
+				"parameter" => [$actualDriveInformation]
+                ],
+				]
+                );
+                Assert::assertEquals($expectedDriveInformation[$keyName], $actualKeyValue);
 			}
 		}
 	}
@@ -1480,7 +1480,7 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userGetsAllApplicationsUsingTheGraphApi(string $user) {
+	public function userGetsAllApplicationsUsingTheGraphApi(string $user): void {
 		$response = GraphHelper::getApplications(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -1488,6 +1488,11 @@ class GraphContext implements Context {
 			$this->featureContext->getPasswordForUser($user),
 		);
 		$this->featureContext->setResponse($response);
+		$applicationEntity = ($this->featureContext->getJsonDecodedResponse($response))['value'][0];
+		foreach ($applicationEntity["appRoles"] as $value) {
+			$this->appRole[$value['displayName']] = $value['id'];
+		}
+		$this->applicationId = $applicationEntity["id"];
 	}
 
 	/**
@@ -1507,12 +1512,6 @@ class GraphContext implements Context {
 		$userId = $userId ?? $user;
 		$this->userGetsAllApplicationsUsingTheGraphApi($user);
 
-		$applicationEntity = ($this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse()))['value'][0];
-		foreach ($applicationEntity["appRoles"] as $value) {
-			$this->appRole[$value['displayName']] = $value['id'];
-		}
-		$this->applicationId = $applicationEntity["id"];
-
 		$response = $this->featureContext->getJsonDecodedResponse(
 			GraphHelper::assignRole(
 				$this->featureContext->getBaseUrl(),
@@ -1529,15 +1528,15 @@ class GraphContext implements Context {
 		};
 	}
 
-    /**
-     * @When /^user "([^"]*)" tries to get assigned role using the Graph API$/
-     *
-     * @param string $user
-     *
-     * @return void
-     * @throws GuzzleException
-     * @throws Exception
-     */
+	/**
+	 * @When /^user "([^"]*)" tries to get assigned role using the Graph API$/
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
 	public function userRetrievesAssignedRoleUsingTheGraphApi(string $user): void {
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
 		$userId = $userId ?? $user;
@@ -1553,15 +1552,21 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then /^the Graph API response should have the role "([^"]*)"$/
+	 * @Then /^the user "([^"]*)" should have role "([^"]*)" in the Graph API response$/
 	 *
+	 * @param string $user
 	 * @param string $role
 	 *
 	 * @return void
 	 * @throws Exception
+	 * @throws GuzzleException
 	 */
-	public function theGraphApiResponseShouldHaveTheRole(string $role): void {
+	public function theGraphApiResponseShouldHaveTheRole(string $user, string $role): void {
 		$response = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'][0];
+		if (empty($this->appRole)) {
+			$this->userGetsAllApplicationsUsingTheGraphApi($user);
+		}
+		$res = $this->appRole[$role];
 		if ($this->appRole[$role] !== $response['appRoleId']) {
 			throw new Error('App role should be' . $role . ' but found ' . $response['appRoleId']);
 		}
