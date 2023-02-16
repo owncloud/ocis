@@ -7,6 +7,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
+	rdefaults "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 )
 
 func FullDefaultConfig() *config.Config {
@@ -51,6 +52,7 @@ func DefaultConfig() *config.Config {
 			StorageAddress: "127.0.0.1:9215",
 			SystemUserIDP:  "internal",
 		},
+		Bundles: rdefaults.GenerateBundlesDefaultRoles(),
 	}
 }
 
