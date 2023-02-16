@@ -19,7 +19,7 @@ type Log func([]byte)
 type Marshaller func(interface{}) ([]byte, error)
 
 // AuditLoggerFromConfig will start a new AuditLogger generated from the config
-func AuditLoggerFromConfig(ctx context.Context, cfg config.Auditlog, ch <-chan interface{}, log log.Logger) {
+func AuditLoggerFromConfig(ctx context.Context, cfg config.Auditlog, ch <-chan events.Event, log log.Logger) {
 	var logs []Log
 
 	if cfg.LogToConsole {
@@ -37,14 +37,14 @@ func AuditLoggerFromConfig(ctx context.Context, cfg config.Auditlog, ch <-chan i
 // StartAuditLogger will block. run in separate go routine
 //
 //nolint:gocyclo
-func StartAuditLogger(ctx context.Context, ch <-chan interface{}, log log.Logger, marshaller Marshaller, logto ...Log) {
+func StartAuditLogger(ctx context.Context, ch <-chan events.Event, log log.Logger, marshaller Marshaller, logto ...Log) {
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case i := <-ch:
 			var auditEvent interface{}
-			switch ev := i.(type) {
+			switch ev := i.Event.(type) {
 			case events.ShareCreated:
 				auditEvent = types.ShareCreated(ev)
 			case events.LinkCreated:

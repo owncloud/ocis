@@ -10,7 +10,7 @@ import (
 // PostprocessingService is an instance of the service handling postprocessing of files
 type PostprocessingService struct {
 	log    log.Logger
-	events <-chan interface{}
+	events <-chan events.Event
 	pub    events.Publisher
 	steps  []events.Postprocessingstep
 	c      config.Postprocessing
@@ -42,7 +42,7 @@ func (pps *PostprocessingService) Run() error {
 	current := make(map[string]*postprocessing.Postprocessing)
 	for e := range pps.events {
 		var next interface{}
-		switch ev := e.(type) {
+		switch ev := e.Event.(type) {
 		case events.BytesReceived:
 			pp := postprocessing.New(ev.UploadID, ev.URL, ev.ExecutingUser, ev.Filename, ev.Filesize, ev.ResourceID, pps.steps, pps.c.Delayprocessing)
 			current[ev.UploadID] = pp
