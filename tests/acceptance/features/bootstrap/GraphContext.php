@@ -29,11 +29,6 @@ class GraphContext implements Context {
 	private FeatureContext $featureContext;
 
 	/**
-	 * @var SpacesContext
-	 */
-	private SpacesContext $spacesContext;
-
-	/**
 	 * This will run before EVERY scenario.
 	 * It will set the properties for this object.
 	 *
@@ -1379,14 +1374,15 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then the API response should contain all users with the following information:
+	 * @Then /^the API response should (not|)\s?contain following (user|users) with the information:$/
 	 *
+	 * @param string    $shouldOrNot   (not|)
 	 * @param TableNode $table
 	 *
 	 * @throws Exception
 	 * @return void
 	 */
-	public function theApiResponseShouldContainAllUserWithFollowingInformation(TableNode $table): void {
+	public function theApiResponseShouldContainAllUserWithFollowingInformation(string $shouldOrNot, TableNode $table): void {
 		$values = $table->getHash();
 		$apiResponse = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'];
 		foreach ($values as $expectedValue) {
@@ -1399,8 +1395,10 @@ class GraphContext implements Context {
 					break;
 				}
 			}
-			if (!$found) {
-				throw new Exception('User ' . $expectedValue["displayName"] . ' could not be found in the response.');
+			if ($shouldOrNot === 'not') {
+				Assert::assertFalse($found, $expectedValue["displayName"] . ' has been found in the response, but should not be.');
+			} else {
+				Assert::assertTrue($found, $expectedValue["displayName"] . ' could not be found in the response.');
 			}
 		}
 	}
@@ -1725,5 +1723,50 @@ class GraphContext implements Context {
 			}
 			Assert::assertTrue($foundRoleInResponse, "the response does not contain the role $row[0]");
 		}
+	}
+
+	/**
+	 * @When the user :user gets all users of the group :group using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $group
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsAllUsersOfTheGroupUsingTheGraphApi(string $user, string $group) {
+		$groupId = $this->featureContext->getGroupIdByGroupName($group);
+		$response = GraphHelper::getUsersWithFilterMemberOf(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$groupId
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the user :user gets all users of two groups :groups using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $groups
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsAllUsersOfTwoGroupsUsingTheGraphApi(string $user, string $groups) {
+		$groupsIdArray = [];
+		foreach (explode(',', $groups) as $group) {
+			array_push($groupsIdArray, $this->featureContext->getGroupIdByGroupName($group));
+		}
+		$response = GraphHelper::getUsersOfTwoGroups(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$groupsIdArray
+		);
+		$this->featureContext->setResponse($response);
 	}
 }

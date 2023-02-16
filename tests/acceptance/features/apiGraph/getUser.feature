@@ -29,7 +29,7 @@ Feature: get users
   Scenario: admin user gets all users
     When user "Alice" gets all users using the Graph API
     Then the HTTP status code should be "200"
-    And the API response should contain all users with the following information:
+    And the API response should contain following users with the information:
       | displayName  | id        | mail              | onPremisesSamAccountName |
       | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    |
       | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
@@ -96,4 +96,30 @@ Feature: get users
     When the user "Carol" gets user "Brian" along with his group information using Graph API
     Then the HTTP status code should be "401"
     And the last response should be an unauthorized response
-    
+
+
+  Scenario: admin user gets all users of certain groups
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And group "tea-lover" has been created
+    And group "coffee-lover" has been created
+    And user "Alice" has been added to group "tea-lover"
+    And user "Brian" has been added to group "tea-lover"
+    And user "Brian" has been added to group "coffee-lover"
+    When the user "Alice" gets all users of the group "tea-lover" using the Graph API
+    Then the HTTP status code should be "200"
+    And the API response should contain following users with the information:
+      | displayName  | id        | mail              | onPremisesSamAccountName |
+      | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    |
+      | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
+    But the API response should not contain following user with the information:
+      | displayName | id        | mail              | onPremisesSamAccountName |
+      | Carol King  | %uuid_v4% | carol@example.org | Carol                    |
+    When the user "Alice" gets all users of two groups "tea-lover,coffee-lover" using the Graph API
+    Then the HTTP status code should be "200"
+    And the API response should contain following user with the information:
+      | displayName  | id        | mail              | onPremisesSamAccountName |
+      | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
+    But the API response should not contain following users with the information:
+      | displayName  | id        | mail              | onPremisesSamAccountName |
+      | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    |
+      | Carol King   | %uuid_v4% | carol@example.org | Carol                    |

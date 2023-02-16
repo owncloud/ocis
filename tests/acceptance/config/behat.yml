@@ -1,11 +1,11 @@
 default:
   autoload:
-    '': '%paths.base%/../features/bootstrap'
+    "": "%paths.base%/../features/bootstrap"
 
   suites:
     apiAccountsHashDifficulty:
       paths:
-        - '%paths.base%/../features/apiAccountsHashDifficulty'
+        - "%paths.base%/../features/apiAccountsHashDifficulty"
       context: &common_ldap_suite_context
         parameters:
           ldapAdminPassword: admin
@@ -33,7 +33,7 @@ default:
 
     apiSpaces:
       paths:
-        - '%paths.base%/../features/apiSpaces'
+        - "%paths.base%/../features/apiSpaces"
       context: *common_ldap_suite_context
       contexts:
         - RoleAssignmentContext:
@@ -51,10 +51,11 @@ default:
         - WebDavPropertiesContext:
         - TUSContext:
         - SpacesTUSContext:
+        - GraphContext:
 
     apiSpacesShares:
       paths:
-        - '%paths.base%/../features/apiSpacesShares'
+        - "%paths.base%/../features/apiSpacesShares"
       context: *common_ldap_suite_context
       contexts:
         - RoleAssignmentContext:
@@ -72,10 +73,11 @@ default:
         - TUSContext:
         - SpacesTUSContext:
         - ArchiverContext:
+        - GraphContext:
 
     apiContract:
       paths:
-        - '%paths.base%/../features/apiContract'
+        - "%paths.base%/../features/apiContract"
       context: *common_ldap_suite_context
       contexts:
         - RoleAssignmentContext:
@@ -92,10 +94,11 @@ default:
         - WebDavPropertiesContext:
         - TUSContext:
         - SpacesTUSContext:
+        - GraphContext:
 
     apiArchiver:
       paths:
-        - '%paths.base%/../features/apiArchiver'
+        - "%paths.base%/../features/apiArchiver"
       context: *common_ldap_suite_context
       contexts:
         - RoleAssignmentContext:
@@ -110,10 +113,11 @@ default:
         - FavoritesContext:
         - TrashbinContext:
         - WebDavPropertiesContext:
+        - GraphContext:
 
     apiGraph:
       paths:
-        - '%paths.base%/../features/apiGraph'
+        - "%paths.base%/../features/apiGraph"
       context: *common_ldap_suite_context
       contexts:
         - RoleAssignmentContext:
@@ -134,7 +138,7 @@ default:
 
     apiCors:
       paths:
-        - '%paths.base%/../features/apiCors'
+        - "%paths.base%/../features/apiCors"
       context: *common_ldap_suite_context
       contexts:
         - SpacesContext:
@@ -145,6 +149,7 @@ default:
         - FilesVersionsContext:
         - OCSContext:
         - TrashbinContext:
+        - GraphContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
