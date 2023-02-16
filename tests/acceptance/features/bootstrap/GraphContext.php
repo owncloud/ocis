@@ -33,17 +33,17 @@ class GraphContext implements Context {
 	 */
 	private SpacesContext $spacesContext;
 
-    /**
-     * list of appRole
-     *
-     * @var array
-     */
-    private $appRole = [];
+	/**
+	 * list of appRole
+	 *
+	 * @var array
+	 */
+	private $appRole = [];
 
-    /**
-     * @var string
-     */
-    private $applicationId = '';
+	/**
+	 * @var string
+	 */
+	private $applicationId = '';
 
 	/**
 	 * This will run before EVERY scenario.
@@ -1490,81 +1490,83 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse($response);
 	}
 
-    /**
-     * @When /^the administrator has given "([^"]*)" the role "([^"]*)" using the Graph API$/
-     *
-     * @param string $user
-     * @param string $role
-     *
-     * @return void
-     *
-     * @throws GuzzleException
-     * @throws Exception
-     */
-    public function theAdministratorHasGivenTheRoleUsingTheGraphApi(string $user, string $role): void {
-        $admin = $this->featureContext->getAdminUserName();
-        $userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
-        $userId = $userId ?? $user;
-        $this->userGetsAllApplicationsUsingTheGraphApi($user);
+	/**
+	 * @When /^the administrator has given "([^"]*)" the role "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $role
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theAdministratorHasGivenTheRoleUsingTheGraphApi(string $user, string $role): void {
+		$admin = $this->featureContext->getAdminUserName();
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
+		$userId = $userId ?? $user;
+		$this->userGetsAllApplicationsUsingTheGraphApi($user);
 
-        $applicationEntity = ($this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse()))['value'][0];
-        foreach ($applicationEntity["appRoles"] as $value ){
-            $this->appRole[$value['displayName']] = $value['id'];
-        }
-        $this->applicationId = $applicationEntity["id"];
+		$applicationEntity = ($this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse()))['value'][0];
+		foreach ($applicationEntity["appRoles"] as $value) {
+			$this->appRole[$value['displayName']] = $value['id'];
+		}
+		$this->applicationId = $applicationEntity["id"];
 
-        $response=$this->featureContext->getJsonDecodedResponse(GraphHelper::assignRole(
-            $this->featureContext->getBaseUrl(),
-            $this->featureContext->getStepLineRef(),
-            $admin,
-            $this->featureContext->getPasswordForUser($admin),
-            $this->appRole[$role],
-            $this->applicationId,
-            $userId
-        ));
-        if (!\array_key_exists('appRoleId', $response) && $response['appRoleId'] !== $this->appRole[$role]) {
-            throw new Error('Could not assign role'. $role);
-        };
-    }
+		$response = $this->featureContext->getJsonDecodedResponse(
+			GraphHelper::assignRole(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$admin,
+				$this->featureContext->getPasswordForUser($admin),
+				$this->appRole[$role],
+				$this->applicationId,
+				$userId
+			)
+		);
+		if (!\array_key_exists('appRoleId', $response) && $response['appRoleId'] !== $this->appRole[$role]) {
+			throw new Error('Could not assign role' . $role);
+		};
+	}
 
-    /**
-     * @When /^user "([^"]*)" retrieves assigned role using the Graph API$/
-     *
-     * @param string $user
-     * @return void
-     *
-     * @throws GuzzleException
-     */
-    public function userRetrievesAssignedRoleUsingTheGraphApi(string $user): void {
-        $userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
-        $userId = $userId ?? $user;
-        $this->featureContext->setResponse(GraphHelper::getAssignedRole(
-            $this->featureContext->getBaseUrl(),
-            $this->featureContext->getStepLineRef(),
-            $user,
-            $this->featureContext->getPasswordForUser($user),
-            $userId
-        ));
-    }
+	/**
+	 * @When /^user "([^"]*)" retrieves assigned role using the Graph API$/
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userRetrievesAssignedRoleUsingTheGraphApi(string $user): void {
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
+		$userId = $userId ?? $user;
+		$this->featureContext->setResponse(
+			GraphHelper::getAssignedRole(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$user,
+				$this->featureContext->getPasswordForUser($user),
+				$userId
+			)
+		);
+	}
 
-    /**
-     * @Then /^the Graph API response should have the role "([^"]*)"$/
-     *
-     * @param string $role
-     * @return void
-     *
-     * @throws Exception
-     */
-    public function theGraphApiResponseShouldHaveTheRole(string $role): void
-    {
-        $response=$this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'][0];
-        if ($this->appRole[$role] !==$response['appRoleId']){
-            throw new Error('App role should be'. $role.' but found '.$response['appRoleId']);
-        }
+	/**
+	 * @Then /^the Graph API response should have the role "([^"]*)"$/
+	 *
+	 * @param string $role
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theGraphApiResponseShouldHaveTheRole(string $role): void {
+		$response = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'][0];
+		if ($this->appRole[$role] !== $response['appRoleId']) {
+			throw new Error('App role should be' . $role . ' but found ' . $response['appRoleId']);
+		}
+	}
 
-    }
-
-    /**
+	/**
 	 * @Then the user retrieve API response should contain the following applications information:
 	 *
 	 * @param TableNode $table
