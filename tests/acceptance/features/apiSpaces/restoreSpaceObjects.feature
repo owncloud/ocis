@@ -22,7 +22,9 @@ Feature: Restore files, folder
 
 
   Scenario Outline: The user with different role can see deleted objects in trash bin of the space via the webDav API
-    Given user "Alice" has shared a space "restore objects" to user "Brian" with role "<role>"
+    Given user "Alice" has shared a space "restore objects" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     And user "Alice" has removed the file "newFolder/file.txt" from space "restore objects"
     And user "Alice" has removed the folder "newFolder" from space "restore objects"
     When user "<user>" lists all deleted files in the trash bin of the space "restore objects"
@@ -37,7 +39,9 @@ Feature: Restore files, folder
 
 
   Scenario Outline: The user can restore a folder with some objects from the trash via the webDav API
-    Given user "Alice" has shared a space "restore objects" to user "Brian" with role "<role>"
+    Given user "Alice" has shared a space "restore objects" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     And user "Alice" has removed the folder "newFolder" from space "restore objects"
     When user "<user>" restores the folder "newFolder" from the trash of the space "restore objects" to "/newFolder"
     Then the HTTP status code should be "<code>"
@@ -53,7 +57,9 @@ Feature: Restore files, folder
 
 
   Scenario Outline: The user can restore a file from the trash via the webDav API
-    Given user "Alice" has shared a space "restore objects" to user "Brian" with role "<role>"
+    Given user "Alice" has shared a space "restore objects" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     And user "Alice" has removed the file "newFolder/file.txt" from space "restore objects"
     When user "<user>" restores the file "file.txt" from the trash of the space "restore objects" to "newFolder/file.txt"
     Then the HTTP status code should be "<code>"

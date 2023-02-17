@@ -53,7 +53,9 @@ Feature: A manager of the space can edit public link
 
   Scenario Outline: All members can see a created public link
     Given using OCS API version "2"
-    When user "Alice" shares a space "edit space" to user "Brian" with role "<role>"
+    When user "Alice" shares a space "edit space" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And for user "Alice" the space "edit space" should contain the last created public link
@@ -67,7 +69,9 @@ Feature: A manager of the space can edit public link
 
   Scenario Outline: Members of the space try to edit a public link
     Given using OCS API version "2"
-    And user "Alice" has shared a space "edit space" to user "Brian" with role "<role>"
+    And user "Alice" has shared a space "edit space" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     When user "Brian" updates the last public link share using the sharing API with
       | permissions | 15 |
     Then the HTTP status code should be "<code>"

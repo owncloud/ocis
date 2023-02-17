@@ -17,7 +17,9 @@ Feature: copy file
     And user "Alice" has created a space "Project" with the default quota using the GraphApi
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/insideSpace.txt"
-    And user "Alice" has shared a space "Project" to user "Brian" with role "<role>"
+    And user "Alice" has shared a space "Project" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     When user "Brian" copies file "/insideSpace.txt" to "/newfolder/insideSpace.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Brian" the space "Project" should contain these entries:
@@ -34,7 +36,9 @@ Feature: copy file
     And user "Alice" has created a space "Project" with the default quota using the GraphApi
     And user "Alice" has created a folder "/newfolder" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
-    And user "Alice" has shared a space "Project" to user "Brian" with role "viewer"
+    And user "Alice" has shared a space "Project" with settings:
+      | shareWith | Brian  |
+      | role      | viewer |
     When user "Brian" copies file "/insideSpace.txt" to "/newfolder/insideSpace.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Brian" the space "Project" should not contain these entries:
@@ -46,8 +50,12 @@ Feature: copy file
     And user "Brian" has created a space "Project1" with the default quota using the GraphApi
     And user "Brian" has created a space "Project2" with the default quota using the GraphApi
     And user "Brian" has uploaded a file inside space "Project1" with content "Project1 content" to "/project1.txt"
-    And user "Brian" has shared a space "Project2" to user "Alice" with role "<to_role>"
-    And user "Brian" has shared a space "Project1" to user "Alice" with role "<from_role>"
+    And user "Brian" has shared a space "Project2" with settings:
+      | shareWith | Alice     |
+      | role      | <to_role> |
+    And user "Brian" has shared a space "Project1" with settings:
+      | shareWith | Alice       |
+      | role      | <from_role> |
     When user "Alice" copies file "/project1.txt" from space "Project1" to "/project1.txt" inside space "Project2" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Project2" should contain these entries:
@@ -66,8 +74,12 @@ Feature: copy file
     And user "Brian" has created a space "Project1" with the default quota using the GraphApi
     And user "Brian" has created a space "Project2" with the default quota using the GraphApi
     And user "Brian" has uploaded a file inside space "Project1" with content "Project1 content" to "/project1.txt"
-    And user "Brian" has shared a space "Project2" to user "Alice" with role "viewer"
-    And user "Brian" has shared a space "Project1" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project2" with settings:
+      | shareWith | Alice  |
+      | role      | viewer |
+    And user "Brian" has shared a space "Project1" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     When user "Alice" copies file "/project1.txt" from space "Project1" to "/project1.txt" inside space "Project2" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" the space "Project2" should not contain these entries:
@@ -82,7 +94,9 @@ Feature: copy file
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "/project.txt"
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     When user "Alice" copies file "/project.txt" from space "Project" to "/project.txt" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
@@ -100,7 +114,9 @@ Feature: copy file
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "/project.txt"
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "31"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" copies file "/project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares" using the WebDAV API
@@ -120,7 +136,9 @@ Feature: copy file
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "/project.txt"
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "17"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" copies file "/project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares" using the WebDAV API
@@ -137,7 +155,9 @@ Feature: copy file
   Scenario Outline: User copies a file from space personal to space project with different role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     And user "Alice" has uploaded file with content "personal space content" to "/personal.txt"
     When user "Alice" copies file "/personal.txt" from space "Personal" to "/personal.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -153,7 +173,9 @@ Feature: copy file
   Scenario: User copies a file from space personal to space project with role viewer
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
-    And user "Brian" has shared a space "Project" to user "Alice" with role "viewer"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | viewer |
     And user "Alice" has uploaded file with content "personal space content" to "/personal.txt"
     When user "Alice" copies file "/personal.txt" from space "Personal" to "/personal.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
@@ -204,7 +226,9 @@ Feature: copy file
   Scenario Outline: User copies a file from space Shares with different role to space project with different role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
@@ -225,7 +249,9 @@ Feature: copy file
   Scenario Outline: User copies a file from space Shares with different role to space project with role viewer
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
-    And user "Brian" has shared a space "Project" to user "Alice" with role "viewer"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | viewer |
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
@@ -288,7 +314,9 @@ Feature: copy file
     And user "Alice" has created a folder "/folder1" in space "Project"
     And user "Alice" has created a folder "/folder2" in space "Project"
     And user "Alice" has uploaded a file inside space "Project" with content "some content" to "/folder2/demo.txt"
-    And user "Alice" has shared a space "Project" to user "Brian" with role "<role>"
+    And user "Alice" has shared a space "Project" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     When user "Brian" copies folder "/folder2" to "/folder1/folder2" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
     And for user "Brian" the space "Project" <shouldOrNot> contain these entries:
@@ -306,8 +334,12 @@ Feature: copy file
     And user "Brian" has created a space "Project2" with the default quota using the GraphApi
     And user "Brian" has created a folder "/folder1" in space "Project1"
     And user "Brian" has uploaded a file inside space "Project1" with content "some content" to "/folder1/demo.txt"
-    And user "Brian" has shared a space "Project2" to user "Alice" with role "<to_role>"
-    And user "Brian" has shared a space "Project1" to user "Alice" with role "<from_role>"
+    And user "Brian" has shared a space "Project2" with settings:
+      | shareWith | Alice     |
+      | role      | <to_role> |
+    And user "Brian" has shared a space "Project1" with settings:
+      | shareWith | Alice       |
+      | role      | <from_role> |
     When user "Alice" copies folder "/folder1" from space "Project1" to "/folder1" inside space "Project2" using the WebDAV API
     Then the HTTP status code should be "<status-code>"
     And for user "Alice" the space "Project2" <shouldOrNot> contain these entries:
@@ -328,7 +360,9 @@ Feature: copy file
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created a folder "/folder1" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "/folder1/demo.txt"
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     When user "Alice" copies file "/folder1" from space "Project" to "/folder1" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Personal" should contain these entries:
@@ -346,7 +380,9 @@ Feature: copy file
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created a folder "/folder1" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "/folder1/demo.txt"
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" copies folder "/folder1" from space "Project" to "/testshare/folder1" inside space "Shares" using the WebDAV API
@@ -366,7 +402,9 @@ Feature: copy file
   Scenario Outline: User copies a folder from space personal to space project with different role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     And user "Alice" has created folder "/folder1"
     And user "Alice" has uploaded file with content "some content" to "folder1/demo.txt"
     When user "Alice" copies folder "/folder1" from space "Personal" to "/folder1" inside space "Project" using the WebDAV API
@@ -416,7 +454,9 @@ Feature: copy file
   Scenario Outline: User copies a folder from space Shares with different role to space project with different role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created folder "/testshare/folder1"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/folder1/testshare.txt"
@@ -437,7 +477,9 @@ Feature: copy file
   Scenario Outline: User copies a folder from space Shares with different role to space project with role viewer
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
-    And user "Brian" has shared a space "Project" to user "Alice" with role "viewer"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | viewer |
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created folder "/testshare/folder1"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/folder1/testshare.txt"

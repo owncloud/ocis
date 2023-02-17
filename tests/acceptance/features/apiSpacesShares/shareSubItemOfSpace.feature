@@ -43,7 +43,9 @@ Feature: Share a file or folder that is inside a space
 
 
   Scenario Outline: A user participant of the project space with manager role can share an entity to another user
-    Given user "Alice" has shared a space "share sub-item" to user "Brian" with role "manager"
+    Given user "Alice" has shared a space "share sub-item" with settings:
+      | shareWith | Brian   |
+      | role      | manager |
     When user "Brian" creates a share inside of space "share sub-item" with settings:
       | path       | <entity>     |
       | shareWith  | Bob          |
@@ -65,7 +67,9 @@ Feature: Share a file or folder that is inside a space
 
 
   Scenario Outline: A user participant of the project space without space manager role cannot share an entity to another user
-    Given user "Alice" has shared a space "share sub-item" to user "Brian" with role "<spaceRole>"
+    Given user "Alice" has shared a space "share sub-item" with settings:
+      | shareWith | Brian       |
+      | role      | <spaceRole> |
     When user "Brian" creates a share inside of space "share sub-item" with settings:
       | path      | <entity> |
       | shareWith | Bob      |
@@ -82,7 +86,9 @@ Feature: Share a file or folder that is inside a space
 
 
   Scenario Outline: A user participant of the project space can see the created resources share
-    Given user "Alice" has shared a space "share sub-item" to user "Brian" with role "<spaceRole>"
+    Given user "Alice" has shared a space "share sub-item" with settings:
+      | shareWith | Brian       |
+      | role      | <spaceRole> |
     When user "Alice" creates a share inside of space "share sub-item" with settings:
       | path      | file.txt |
       | shareWith | Bob      |
