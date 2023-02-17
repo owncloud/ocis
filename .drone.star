@@ -372,7 +372,7 @@ def getGoDepsForTesting(ctx):
         },
         "steps": skipIfUnchanged(ctx, "unit-tests") +
                  bingoGet() +
-                 rebuildBuildArtifactCache(ctx, "go-deps-for-testing", "/go"),
+                 rebuildBuildArtifactCache(ctx, "go-deps-for-testing", "/go/bin"),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -2457,8 +2457,10 @@ def restoreGoCache(ctx, name, path):
             "name": "move-go-cache",
             "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
             "commands": [
+                "du -sh ./go/*",
                 "rsync -a --remove-source-files %s/go/ /go" % dirs["base"],
                 "rm -rf %s/go" % dirs["base"],
+                "du -sh /go/*",
             ],
             "volumes": [stepVolumeGo],
         },
