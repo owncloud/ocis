@@ -14,8 +14,12 @@ Feature: Change data of space
       | Bob      |
     And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "Project Jupiter" of type "project" with quota "20"
-    And user "Alice" has shared a space "Project Jupiter" to user "Brian" with role "editor"
-    And user "Alice" has shared a space "Project Jupiter" to user "Bob" with role "viewer"
+    And user "Alice" has shared a space "Project Jupiter" with settings:
+      | shareWith | Brian    |
+      | role      | editor |
+    And user "Alice" has shared a space "Project Jupiter" with settings:
+      | shareWith | Bob    |
+      | role      | viewer |
     And using spaces DAV path
 
 

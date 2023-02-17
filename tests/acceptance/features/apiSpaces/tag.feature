@@ -18,7 +18,9 @@ Feature: Tag
 
 
   Scenario: Alice creates tags for resources in the project space
-    Given user "Alice" has shared a space "use-tag" to user "Brian" with role "viewer"
+    Given user "Alice" has shared a space "use-tag" with settings:
+      | shareWith | Brian  |
+      | role      | viewer |
     When user "Alice" creates the following tags for folder "folderMain" of space "use-tag":
       | tag level#1                    |
       | tag with symbols @^$#^%$@%!_+) |
@@ -81,7 +83,9 @@ Feature: Tag
 
 
   Scenario Outline: Member of the space tries to create tag
-    Given user "Alice" has shared a space "use-tag" to user "Brian" with role "<role>"
+    Given user "Alice" has shared a space "use-tag" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     When user "Brian" creates the following tags for folder "folderMain/insideTheFolder.txt" of space "use-tag":
       | tag level#1                    |
       | tag with symbols @^$#^%$@%!_+) |
