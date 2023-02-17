@@ -433,13 +433,6 @@ default:
         - WebDavPropertiesContext:
         - AppConfigurationContext:
 
-    coreApiTranslation:
-      paths:
-        - "%paths.base%/../features/coreApiTranslation"
-      context: *common_ldap_suite_context
-      contexts:
-        - FeatureContext: *common_feature_context_params
-
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
 
