@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	cs3permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -499,7 +500,7 @@ func (g Service) ListPermissions(ctx context.Context, req *settingssvc.ListPermi
 
 		if bundle != nil {
 			for _, setting := range bundle.GetSettings() {
-				permissionNames[setting.Name] = struct{}{}
+				permissionNames[formatPermissionName(setting)] = struct{}{}
 			}
 		}
 	}
@@ -666,4 +667,9 @@ func (g Service) isCurrentUser(ctx context.Context, accountID string) bool {
 
 func (g Service) canManageRoles(ctx context.Context) bool {
 	return g.hasStaticPermission(ctx, RoleManagementPermissionID)
+}
+
+func formatPermissionName(setting *settingsmsg.Setting) string {
+	constraint := strings.TrimPrefix(setting.GetPermissionValue().GetConstraint().String(), "CONSTRAINT_")
+	return setting.Name + "." + strings.ToLower(constraint)
 }
