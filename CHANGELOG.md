@@ -27,6 +27,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Extended search: [#5221](https://github.com/owncloud/ocis/pull/5221)
 * Enhancement - Resource tags: [#5227](https://github.com/owncloud/ocis/pull/5227)
 * Enhancement - Expiration Notifications: [#5330](https://github.com/owncloud/ocis/pull/5330)
+* Enhancement - Add endpoint to list permissions: [#5594](https://github.com/owncloud/ocis/pull/5594)
 * Enhancement - Better config for postprocessing service: [#5457](https://github.com/owncloud/ocis/pull/5457)
 * Enhancement - Add expiration to user and group shares: [#5389](https://github.com/owncloud/ocis/pull/5389)
 * Enhancement - Space Management permissions: [#5441](https://github.com/owncloud/ocis/pull/5441)
