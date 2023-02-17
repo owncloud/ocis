@@ -70,6 +70,7 @@ identity:
     user_displayname_attribute: displayName
     user_name_attribute: uid
     user_id_attribute: owncloudUUID
+    user_enabled_attribute: ownCloudUserEnabled
     group_base_dn: ou=groups,o=libregraph-idm
     group_search_scope: sub
     group_filter: ""

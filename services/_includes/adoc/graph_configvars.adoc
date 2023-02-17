@@ -538,6 +538,16 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
 
+a|`LDAP_USER_ENABLED_ATTRIBUTE` +
+`GRAPH_USER_ENABLED_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ownCloudUserEnabled ++
+a| [subs=-attributes]
+LDAP Attribute to use as a flag telling if the user is enabled or disabled.
+
 a|`LDAP_GROUP_BASE_DN` +
 `GRAPH_LDAP_GROUP_BASE_DN` +
 
