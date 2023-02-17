@@ -451,6 +451,7 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 			i.userAttributeMap.userName,
 			i.userAttributeMap.surname,
 			i.userAttributeMap.givenName,
+			i.userAttributeMap.accountEnabled,
 		},
 		nil,
 	)
