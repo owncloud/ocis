@@ -458,15 +458,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Allow to create, modify and delete LDAP users via GRAPH API. This is only works when the default Schema is used.
 
-a|`GRAPH_LDAP_REFINT_ENABLED` +
-
-a| [subs=-attributes]
-++bool ++
-a| [subs=-attributes]
-++false ++
-a| [subs=-attributes]
-Signals that the server has the refint plugin enabled, which makes some actions not needed.
-
 a|`LDAP_USER_BASE_DN` +
 `GRAPH_LDAP_USER_BASE_DN` +
 
