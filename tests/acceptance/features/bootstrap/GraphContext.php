@@ -599,6 +599,26 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 *
+	 * @param string $user
+	 * @param string|null $group
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function listAllGroupsAlongWithAllMemberInformation(string $user, ?string $group = null): ResponseInterface {
+		$credentials = $this->getAdminOrUserCredentials($user);
+
+		return GraphHelper::getAllGroupsAlongWithMembers(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials["username"],
+			$credentials["password"],
+			($group) ? $this->featureContext->getAttributeOfCreatedGroup($group, 'id') : null
+		);
+	}
+
+	/**
 	 * returns list of users of a group
 	 *
 	 * @param ResponseInterface $response
@@ -994,6 +1014,59 @@ class GraphContext implements Context {
 	 */
 	public function userGetsAllTheMembersOfGroupUsingTheGraphApi($user, $group): void {
 		$this->featureContext->setResponse($this->listGroupMembers($group, $user));
+	}
+
+	/**
+	 * @When user :user retrieves all groups along with their members using Graph API
+	 * @When user :user gets all the members information of group :group using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $group
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userRetrievesMembersOfAllGroupsUsingTheGraphAPI(string $user, string $group = ''): void {
+		$this->featureContext->setResponse($this->listAllGroupsAlongWithAllMemberInformation($user, $group));
+	}
+
+	/**
+	 * @Then the group :group should have the following member information
+	 *
+	 * @param string $group
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theGroupShouldHaveTheFollowingMemberInformation(string $group, TableNode $table): void {
+		$response = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
+		$rows = $table->getHash();
+        $nextMemberInformation = 0;
+		if (!isset($response['value'])) {
+			foreach ($rows as $row) {
+				$this->checkUserInformation($row, $response['members'][$nextMemberInformation]);
+				$nextMemberInformation++;
+			}
+		} else {
+			$response = $response['value'];
+			$groupFoundInResponse = false;
+			foreach ($response as $value) {
+				if ($value['displayName'] === $group) {
+					$groupFoundInResponse = true;
+					foreach ($rows as $row) {
+						$this->checkUserInformation($row, $value['members'][$nextMemberInformation]);
+						$nextMemberInformation++;
+					}
+					break;
+				}
+			}
+			if (!$groupFoundInResponse) {
+				throw new Error(
+					'Group ' . $group . " could not be found in the response."
+				);
+			}
+		}
 	}
 
 	/**
