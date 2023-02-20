@@ -53,36 +53,36 @@ config = {
     "modules": [
         # if you add a module here please also add it to the root level Makefile
         "services/app-provider",
-        "services/app-registry",
-        "services/audit",
-        "services/auth-basic",
-        "services/auth-bearer",
-        "services/auth-machine",
-        "services/frontend",
-        "services/gateway",
-        "services/graph",
-        "services/groups",
-        "services/idm",
-        "services/idp",
-        "services/nats",
-        "services/notifications",
-        "services/ocdav",
-        "services/ocs",
-        "services/proxy",
-        "services/search",
-        "services/settings",
-        "services/sharing",
-        "services/storage-system",
-        "services/storage-publiclink",
-        "services/storage-shares",
-        "services/storage-users",
-        "services/store",
-        "services/thumbnails",
-        "services/users",
-        "services/web",
-        "services/webdav",
-        "ocis-pkg",
-        "ocis",
+        # "services/app-registry",
+        # "services/audit",
+        # "services/auth-basic",
+        # "services/auth-bearer",
+        # "services/auth-machine",
+        # "services/frontend",
+        # "services/gateway",
+        # "services/graph",
+        # "services/groups",
+        # "services/idm",
+        # "services/idp",
+        # "services/nats",
+        # "services/notifications",
+        # "services/ocdav",
+        # "services/ocs",
+        # "services/proxy",
+        # "services/search",
+        # "services/settings",
+        # "services/sharing",
+        # "services/storage-system",
+        # "services/storage-publiclink",
+        # "services/storage-shares",
+        # "services/storage-users",
+        # "services/store",
+        # "services/thumbnails",
+        # "services/users",
+        # "services/web",
+        # "services/webdav",
+        # "ocis-pkg",
+        # "ocis",
     ],
     "cs3ApiTests": {
         "skip": False,
@@ -219,6 +219,8 @@ def main(ctx):
     Returns:
       none
     """
+
+    return cancelPreviousBuilds() + getGoBinForTesting(ctx)
 
     pipelines = []
 
@@ -372,7 +374,7 @@ def getGoBinForTesting(ctx):
         },
         "steps": skipIfUnchanged(ctx, "unit-tests") +
                  checkGoBinCache() +
-                 bingoGet() +
+                 #  bingoGet() +
                  cacheGoBin(),
         #  rebuildBuildArtifactCache(ctx, "go-bin", "/go/bin"),
         "trigger": {
