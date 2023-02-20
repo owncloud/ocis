@@ -1040,13 +1040,8 @@ class GraphContext implements Context {
 	public function theGroupShouldHaveTheFollowingMemberInformation(string $group, TableNode $table): void {
 		$response = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
 		$rows = $table->getHash();
-        $nextMemberInformation = 0;
-		if (!isset($response['value'])) {
-			foreach ($rows as $row) {
-				$this->checkUserInformation($row, $response['members'][$nextMemberInformation]);
-				$nextMemberInformation++;
-			}
-		} else {
+		$nextMemberInformation = 0;
+		if (isset($response['value'])) {
 			$response = $response['value'];
 			$groupFoundInResponse = false;
 			foreach ($response as $value) {
@@ -1063,6 +1058,11 @@ class GraphContext implements Context {
 				throw new Error(
 					'Group ' . $group . " could not be found in the response."
 				);
+			}
+		} else {
+			foreach ($rows as $row) {
+				$this->checkUserInformation($row, $response['members'][$nextMemberInformation]);
+				$nextMemberInformation++;
 			}
 		}
 	}
