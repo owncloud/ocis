@@ -1193,4 +1193,67 @@ class GraphHelper {
 			self::getRequestHeaders()
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $appRoleId
+	 * @param string $applicationId
+	 * @param string $userId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function assignRole(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $appRoleId,
+		string $applicationId,
+		string $userId
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users/' . $userId . '/appRoleAssignments');
+		$payload['principalId'] = $userId;
+		$payload['appRoleId'] = $appRoleId;
+		$payload['resourceId'] = $applicationId;
+		return HttpRequestHelper::sendRequest(
+			$url,
+			$xRequestId,
+			"POST",
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			\json_encode($payload)
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $userId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getAssignedRole(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $userId
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users/' . $userId . '/appRoleAssignments');
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
 }

@@ -29,6 +29,13 @@ class GraphContext implements Context {
 	private FeatureContext $featureContext;
 
 	/**
+	 * application Entity
+	 *
+	 * @var array
+	 */
+	private $appEntity = [];
+
+	/**
 	 * This will run before EVERY scenario.
 	 * It will set the properties for this object.
 	 *
@@ -1836,5 +1843,93 @@ class GraphContext implements Context {
 			$this->featureContext->getGroupIdByGroupName($group)
 		);
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given /^the administrator has assigned the role "([^"]*)" to user "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $role
+	 * @param string $user
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theAdministratorHasGivenTheRoleUsingTheGraphApi(string $role, string $user): void {
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $user;
+
+		if (empty($this->appEntity)) {
+			$applicationEntity = (
+				$this->featureContext->getJsonDecodedResponse(
+					GraphHelper::getApplications(
+						$this->featureContext->getBaseUrl(),
+						$this->featureContext->getStepLineRef(),
+						$this->featureContext->getAdminUsername(),
+						$this->featureContext->getAdminPassword(),
+					)
+				)
+			)['value'][0];
+			$this->appEntity["id"] = $applicationEntity["id"];
+			foreach ($applicationEntity["appRoles"] as $value) {
+				$this->appEntity["appRoles"][$value['displayName']] = $value['id'];
+			}
+		}
+
+		$response = GraphHelper::assignRole(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+			$this->appEntity["appRoles"][$role],
+			$this->appEntity["id"],
+			$userId
+		);
+		Assert::assertEquals(
+			201,
+			$response->getStatusCode(),
+			__METHOD__
+			. "\nExpected status code '200' but got '" . $response->getStatusCode() . "'"
+		);
+	}
+
+	/**
+	 * @When /^the administrator retrieves the assigned role of user "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userRetrievesAssignedRoleUsingTheGraphApi(string $user): void {
+		$admin = $this->featureContext->getAdminUserName();
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $user;
+		$this->featureContext->setResponse(
+			GraphHelper::getAssignedRole(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$admin,
+				$this->featureContext->getPasswordForUser($admin),
+				$userId
+			)
+		);
+	}
+
+	/**
+	 * @Then /^the Graph API response should have the role "([^"]*)"$/
+	 *
+	 * @param string $role
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theGraphApiResponseShouldHaveTheRole(string $role): void {
+		$response = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'][0];
+		Assert::assertEquals(
+			$this->appEntity["appRoles"][$role],
+			$response['appRoleId'],
+			__METHOD__
+			. "\nExpected rolId for role '$role'' to be '" . $this->appEntity["appRoles"][$role] . "' but got '" . $response['appRoleId'] . "'"
+		);
 	}
 }
