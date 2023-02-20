@@ -48,6 +48,9 @@ dirs = {
     "ocisRevaDataRoot": "/srv/app/tmp/ocis/owncloud/data",
 }
 
+# command to get the hash of a directory
+SHA256_HASH_COMMAND = "find %s/.bingo -type f -exec sha256sum {} \\\\; | sort -k 2 | sha256sum | cut -d ' ' -f 1"
+
 # configuration
 config = {
     "modules": [
@@ -220,7 +223,7 @@ def main(ctx):
       none
     """
 
-    return cancelPreviousBuilds() + getGoBinForTesting(ctx)
+    return cancelPreviousBuilds() + getGoBinForTesting(ctx) + testOcisModules(ctx)
 
     pipelines = []
 
@@ -374,9 +377,7 @@ def getGoBinForTesting(ctx):
         },
         "steps": skipIfUnchanged(ctx, "unit-tests") +
                  checkGoBinCache() +
-                 #  bingoGet() +
                  cacheGoBin(),
-        #  rebuildBuildArtifactCache(ctx, "go-bin", "/go/bin"),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -386,18 +387,6 @@ def getGoBinForTesting(ctx):
         },
         "volumes": [pipelineVolumeGo],
     }]
-
-def bingoGet():
-    return [
-        {
-            "name": "bingo-get",
-            "image": OC_CI_GOLANG,
-            "commands": [
-                "make bingo-update",
-            ],
-            "volumes": [stepVolumeGo],
-        },
-    ]
 
 def checkGoBinCache():
     return [{
@@ -412,25 +401,71 @@ def checkGoBinCache():
             },
         },
         "commands": [
-            "bash -x %s/tests/config/drone/check_go_bin_cache.sh" % dirs["base"],
+            "bash -x %s/tests/config/drone/check_go_bin_cache.sh %s" % (dirs["base"], dirs["base"]),
         ],
     }]
 
 def cacheGoBin():
-    return [{
-        "name": "cache-go-bin",
-        "image": MINIO_MC,
-        "environment": MINIO_MC_ENV,
-        "commands": [
-            # cache using the minio/mc client to the public bucket (long term bucket)
-            "echo $BINGO_HASH",
-            # "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-            # "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/go-bin/%s.tar.gz" % "hash",
-        ],
-    }]
+    return [
+        {
+            "name": "bingo-get",
+            "image": OC_CI_GOLANG,
+            "commands": [
+                "make bingo-update",
+            ],
+            "volumes": [stepVolumeGo],
+        },
+        {
+            "name": "archive-go-bin",
+            "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
+            "commands": [
+                # zip the pnpm deps before caching
+                "BINGO_HASH=$(cat %s/.bingo_hash)" % dirs["base"],
+                "echo $BINGO_HASH",
+                "tar -czvf $BINGO_HASH.tar.gz /go/bin",
+            ],
+            "volumes": [stepVolumeGo],
+        },
+        {
+            "name": "cache-go-bin",
+            "image": MINIO_MC,
+            "environment": MINIO_MC_ENV,
+            "commands": [
+                # cache using the minio/mc client to the public bucket (long term bucket)
+                "BINGO_HASH=$(cat %s/.bingo_hash)" % dirs["base"],
+                "echo $BINGO_HASH",
+                "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
+                "mc cp -r -a %s/$BINGO_HASH.tar.gz s3/$CACHE_BUCKET/ocis/go-bin" % dirs["base"],
+            ],
+        },
+    ]
+
+def restoreGoBinCache():
+    return [
+        {
+            "name": "restore-go-bin-cache",
+            "image": MINIO_MC,
+            "environment": MINIO_MC_ENV,
+            "commands": [
+                "mkdir -p /go",
+                "BINGO_HASH=$(" + SHA256_HASH_COMMAND % dirs["base"] + ")",
+                "echo $BINGO_HASH",
+                "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
+                "mc cp -r -a s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH.tar.gz %s" % dirs["base"],
+                "ls -al",
+            ],
+        },
+        # {
+        #     "name": "unzip-web-cache",
+        #     "image": OC_UBUNTU,
+        #     "commands": [
+        #         "tar -xvf %s -C ." % dirs["webZip"],
+        #     ],
+        # },
+    ]
 
 def testOcisModule(ctx, module):
-    steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoCache(ctx, "go-deps-for-testing", "/go") + makeGoGenerate(module) + [
+    steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoBinCache() + makeGoGenerate(module) + [
         {
             "name": "golangci-lint",
             "image": OC_CI_GOLANG,
