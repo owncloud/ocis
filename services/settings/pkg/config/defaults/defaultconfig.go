@@ -52,7 +52,7 @@ func DefaultConfig() *config.Config {
 			StorageAddress: "127.0.0.1:9215",
 			SystemUserIDP:  "internal",
 		},
-		Bundles: rdefaults.GenerateBundlesDefaultRoles(),
+		Bundles: nil,
 	}
 }
 
@@ -122,6 +122,10 @@ func EnsureDefaults(cfg *config.Config) {
 }
 
 func Sanitize(cfg *config.Config) {
+	if cfg.Bundles == nil {
+		cfg.Bundles = rdefaults.GenerateBundlesDefaultRoles()
+	}
+
 	// sanitize config
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
