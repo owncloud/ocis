@@ -76,7 +76,7 @@ services:
       IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
       IDP_LDAP_UUID_ATTRIBUTE: "ownclouduuid"
       IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
-      GRAPH_LDAP_SERVER_WRITE_ENABLED: "true" # assuming the external ldap is readonly
+      GRAPH_LDAP_SERVER_WRITE_ENABLED: "true" # assuming the external ldap is writable
       GRAPH_LDAP_REFINT_ENABLED: "true" # osixia has refint enabled.
       # OCIS_RUN_SERVICES specifies to start all services except glauth, idm and accounts. These are replaced by external services
       OCIS_RUN_SERVICES: app-registry,app-provider,audit,auth-basic,auth-machine,frontend,gateway,graph,groups,idp,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav
