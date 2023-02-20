@@ -54,7 +54,7 @@ Feature: get groups and their members
     And the last response should be an unauthorized response
 
 
-    Scenario: admin user gets all groups along with their members information
+    Scenario: admin user gets all groups along with its member's information
       Given user "Brian" has been created with default attributes and without skeleton files
       And user "Carol" has been created with default attributes and without skeleton files
       And group "tea-lover" has been created
