@@ -27,6 +27,7 @@ const (
 type LDAP struct {
 	useServerUUID   bool
 	writeEnabled    bool
+	refintEnabled   bool
 	usePwModifyExOp bool
 
 	userBaseDN       string
@@ -116,6 +117,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		logger:            logger,
 		conn:              lc,
 		writeEnabled:      config.WriteEnabled,
+		refintEnabled:     config.RefintEnabled,
 	}, nil
 }
 
@@ -489,10 +491,6 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 
 func (i *LDAP) changeUserName(ctx context.Context, dn, originalUserName, newUserName string) (*ldap.Entry, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
-	groups, err := i.getGroupsForUser(dn)
-	if err != nil {
-		return nil, err
-	}
 
 	newDN := fmt.Sprintf("%s=%s", i.userAttributeMap.userName, newUserName)
 
@@ -525,13 +523,20 @@ func (i *LDAP) changeUserName(ctx context.Context, dn, originalUserName, newUser
 		return nil, err
 	}
 
-	for _, g := range groups {
-		err = i.renameMemberInGroup(ctx, g, dn, u.DN)
-		// This could leave the groups in an inconsistent state, might be a good idea to
-		// add a defer that changes everything back on error. Ideally, this entire function
-		// should be atomic, but LDAP doesn't support that.
+	if !i.refintEnabled {
+		groups, err := i.getGroupsForUser(dn)
 		if err != nil {
 			return nil, err
+		}
+		for _, g := range groups {
+			logger.Debug().Str("originalDN", dn).Str("newDN", u.DN).Str("group", g.DN).Msg("Changing member in group")
+			err = i.renameMemberInGroup(ctx, g, dn, u.DN)
+			// This could leave the groups in an inconsistent state, might be a good idea to
+			// add a defer that changes everything back on error. Ideally, this entire function
+			// should be atomic, but LDAP doesn't support that.
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -550,6 +555,13 @@ func (i *LDAP) renameMemberInGroup(ctx context.Context, group *ldap.Entry, oldMe
 			if lerr.ResultCode == ldap.LDAPResultNoSuchObject {
 				groupID := group.GetEqualFoldAttributeValue(i.groupAttributeMap.id)
 				logger.Warn().Str("group", groupID).Msg("Group no longer exists")
+				return nil
+			} else if lerr.ResultCode == ldap.LDAPResultNoSuchAttribute {
+				logger.Warn().
+					Str("oldMember", oldMember).
+					Str("newMember", newMember).
+					Str("groupDN", group.DN).
+					Msg("member attribute not found, this probably means that the server has refint enabled, please configure the OCIS to respect that.")
 				return nil
 			}
 		}
@@ -692,7 +704,6 @@ func pointerOrNil(val string) *string {
 
 func booleanOrNil(val string) *bool {
 	boolValue, err := strconv.ParseBool(val)
-
 	if err != nil {
 		return nil
 	}

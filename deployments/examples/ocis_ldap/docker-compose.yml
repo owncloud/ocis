@@ -57,17 +57,17 @@ services:
     # run ocis init to initialize a configuration file with random secrets
     # it will fail on subsequent runs, because the config file already exists
     # therefore we ignore the error and then start the ocis server
-    command: ["-c", "ocis init || true; ocis server"]
+    command: [ "-c", "ocis init || true; ocis server" ]
     environment:
       # users/gropups from ldap
       LDAP_URI: ldaps://ldap-server
       LDAP_INSECURE: "true"
       LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
       LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
-      LDAP_GROUP_BASE_DN: "dc=owncloud,dc=com"
+      LDAP_GROUP_BASE_DN: "ou=groups,dc=owncloud,dc=com"
       LDAP_GROUP_FILTER: "(objectclass=owncloud)"
       LDAP_GROUP_OBJECTCLASS: "groupOfNames"
-      LDAP_USER_BASE_DN: "dc=owncloud,dc=com"
+      LDAP_USER_BASE_DN: "ou=users,dc=owncloud,dc=com"
       LDAP_USER_FILTER: "(objectclass=owncloud)"
       LDAP_USER_OBJECTCLASS: "inetOrgPerson"
       LDAP_LOGIN_ATTRIBUTES: "uid"
@@ -76,18 +76,20 @@ services:
       IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
       IDP_LDAP_UUID_ATTRIBUTE: "ownclouduuid"
       IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
-      GRAPH_LDAP_SERVER_WRITE_ENABLED: "false" # assuming the external ldap is readonly
+      GRAPH_LDAP_SERVER_WRITE_ENABLED: "true" # assuming the external ldap is readonly
+      GRAPH_LDAP_REFINT_ENABLED: "true" # osixia has refint enabled.
       # OCIS_RUN_SERVICES specifies to start all services except glauth, idm and accounts. These are replaced by external services
       OCIS_RUN_SERVICES: app-registry,app-provider,audit,auth-basic,auth-machine,frontend,gateway,graph,groups,idp,nats,notifications,ocdav,ocs,proxy,search,settings,sharing,storage-system,storage-publiclink,storage-shares,storage-users,store,thumbnails,users,web,webdav
       # General oCIS config
       OCIS_URL: https://${OCIS_DOMAIN:-ocis.owncloud.test}
       OCIS_LOG_LEVEL: ${OCIS_LOG_LEVEL:-info}
       OCIS_LOG_COLOR: "${OCIS_LOG_COLOR:-false}"
+      GRAPH_LOG_LEVEL: "debug"
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-false}"
       # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
-      PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
+      PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-true}"
       # admin user password
     volumes:
       - ocis-config:/etc/ocis
@@ -146,6 +148,7 @@ volumes:
   certs:
   ocis-config:
   ocis-data:
+
 
 networks:
   ocis-net:
