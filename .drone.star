@@ -412,7 +412,7 @@ def checkGoBinCache():
             },
         },
         "commands": [
-            "bash -x check_go_bin_cache.sh",
+            "bash -x %s/tests/config/drone/check_go_bin_cache.sh" % dirs["base"],
         ],
     }]
 
