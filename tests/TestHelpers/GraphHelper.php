@@ -603,8 +603,9 @@ class GraphHelper {
 		string $adminPassword,
 		?string $groupId = null
 	): ResponseInterface {
-		$queryParam = ($groupId) ? '/' . $groupId . '?$expand=members' : '?$expand=members';
-		$url = self::getFullUrl($baseUrl, 'groups' . $queryParam);
+		// we can expand to get list of members for a single group with groupId and also expand to get all groups with all its members
+		$endPath = ($groupId) ? '/' . $groupId . '?$expand=members' : '?$expand=members';
+		$url = self::getFullUrl($baseUrl, 'groups' . $endPath);
 		return HttpRequestHelper::get(
 			$url,
 			$xRequestId,
