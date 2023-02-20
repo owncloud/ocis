@@ -48,6 +48,7 @@
 | GRAPH_LDAP_SERVER_UUID | bool | false | If set to true, rely on the LDAP Server to generate a unique ID for users and groups, like when using 'entryUUID' as the user ID attribute.|
 | GRAPH_LDAP_SERVER_USE_PASSWORD_MODIFY_EXOP | bool | true | User the Password Modify Extended Operation for updating user passwords.|
 | GRAPH_LDAP_SERVER_WRITE_ENABLED | bool | true | Allow to create, modify and delete LDAP users via GRAPH API. This is only works when the default Schema is used.|
+| GRAPH_LDAP_REFINT_ENABLED | bool | false | Signals that the server has the refint plugin enabled, which makes some actions not needed.|
 | LDAP_USER_BASE_DN<br/>GRAPH_LDAP_USER_BASE_DN | string | ou=users,o=libregraph-idm | Search base DN for looking up LDAP users.|
 | LDAP_USER_SCOPE<br/>GRAPH_LDAP_USER_SCOPE | string | sub | LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.|
 | LDAP_USER_FILTER<br/>GRAPH_LDAP_USER_FILTER | string |  | LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.|
