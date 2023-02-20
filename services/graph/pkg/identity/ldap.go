@@ -178,19 +178,21 @@ func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 		return err
 	}
 
-	// Find all the groups that this user was a member of and remove it from there
-	groupEntries, err := i.getLDAPGroupsByFilter(fmt.Sprintf("(%s=%s)", i.groupAttributeMap.member, e.DN), true, false)
-	if err != nil {
-		return err
-	}
-	for _, group := range groupEntries {
-		logger.Debug().Str("group", group.DN).Str("user", e.DN).Msg("Cleaning up group membership")
+	if !i.refintEnabled {
+		// Find all the groups that this user was a member of and remove it from there
+		groupEntries, err := i.getLDAPGroupsByFilter(fmt.Sprintf("(%s=%s)", i.groupAttributeMap.member, e.DN), true, false)
+		if err != nil {
+			return err
+		}
+		for _, group := range groupEntries {
+			logger.Debug().Str("group", group.DN).Str("user", e.DN).Msg("Cleaning up group membership")
 
-		if mr, err := i.removeEntryByDNAndAttributeFromEntry(group, e.DN, i.groupAttributeMap.member); err == nil {
-			if err = i.conn.Modify(mr); err != nil {
-				// Errors when deleting the memberships are only logged as warnings but not returned
-				// to the user as we already successfully deleted the users itself
-				logger.Warn().Str("group", group.DN).Str("user", e.DN).Err(err).Msg("failed to remove member")
+			if mr, err := i.removeEntryByDNAndAttributeFromEntry(group, e.DN, i.groupAttributeMap.member); err == nil {
+				if err = i.conn.Modify(mr); err != nil {
+					// Errors when deleting the memberships are only logged as warnings but not returned
+					// to the user as we already successfully deleted the users itself
+					logger.Warn().Str("group", group.DN).Str("user", e.DN).Err(err).Msg("failed to remove member")
+				}
 			}
 		}
 	}
@@ -553,8 +555,7 @@ func (i *LDAP) renameMemberInGroup(ctx context.Context, group *ldap.Entry, oldMe
 		var lerr *ldap.Error
 		if errors.As(err, &lerr) {
 			if lerr.ResultCode == ldap.LDAPResultNoSuchObject {
-				groupID := group.GetEqualFoldAttributeValue(i.groupAttributeMap.id)
-				logger.Warn().Str("group", groupID).Msg("Group no longer exists")
+				logger.Warn().Str("group", group.DN).Msg("Group no longer exists")
 				return nil
 			} else if lerr.ResultCode == ldap.LDAPResultNoSuchAttribute {
 				logger.Warn().
