@@ -597,6 +597,33 @@ class GraphHelper {
 	}
 
 	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
+	 * @param string|null $groupId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getAllGroupsAlongWithMembers(
+		string $baseUrl,
+		string $xRequestId,
+		string $adminUser,
+		string $adminPassword,
+		?string $groupId = null
+	): ResponseInterface {
+		$queryParam = ($groupId) ? '/' . $groupId . '?$expand=members' : '?$expand=members';
+		$url = self::getFullUrl($baseUrl, 'groups' . $queryParam);
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$adminUser,
+			$adminPassword
+		);
+	}
+
+	/**
 	 * returns json encoded payload for user creating request
 	 *
 	 * @param string|null $userName
