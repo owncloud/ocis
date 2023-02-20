@@ -6,6 +6,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
 	rdefaults "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 )
@@ -52,7 +53,7 @@ func DefaultConfig() *config.Config {
 			StorageAddress: "127.0.0.1:9215",
 			SystemUserIDP:  "internal",
 		},
-		Bundles: rdefaults.GenerateBundlesDefaultRoles(),
+		Bundles: []*v0.Bundle{},
 	}
 }
 
@@ -122,6 +123,10 @@ func EnsureDefaults(cfg *config.Config) {
 }
 
 func Sanitize(cfg *config.Config) {
+	if len(cfg.Bundles) == 0 {
+		cfg.Bundles = rdefaults.GenerateBundlesDefaultRoles()
+	}
+
 	// sanitize config
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")

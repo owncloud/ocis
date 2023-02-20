@@ -1190,7 +1190,7 @@ type Value struct {
 	Id       string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" yaml:"id"`                             // @gotags: yaml:"id"
 	BundleId string `protobuf:"bytes,2,opt,name=bundle_id,json=bundleId,proto3" json:"bundle_id,omitempty" yaml:"bundle_id"` // @gotags: yaml:"bundle_id"
 	// setting_id is the id of the setting from within its bundle.
-	SettingId   string    `protobuf:"bytes,3,opt,name=setting_id,json=settingId,proto3" json:"setting_id,omitempty" yaml:"settings_id"`       // @gotags: yaml:"settings_id"
+	SettingId   string    `protobuf:"bytes,3,opt,name=setting_id,json=settingId,proto3" json:"setting_id,omitempty" yaml:"setting_id"`       // @gotags: yaml:"setting_id"
 	AccountUuid string    `protobuf:"bytes,4,opt,name=account_uuid,json=accountUuid,proto3" json:"account_uuid,omitempty" yaml:"account_uuid"` // @gotags: yaml:"account_uuid"
 	Resource    *Resource `protobuf:"bytes,5,opt,name=resource,proto3" json:"resource,omitempty" yaml:"resource"`                          // @gotags: yaml:"resource"
 	// Types that are assignable to Value:

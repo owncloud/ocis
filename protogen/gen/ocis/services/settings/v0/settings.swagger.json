@@ -598,7 +598,8 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/v0ListOptionValue"
-          }
+          },
+          "title": "@gotags: yaml:\"values\""
         }
       }
     },
@@ -607,33 +608,40 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "id is the id of the Value. It is generated on saving it."
+          "description": "id is the id of the Value. It is generated on saving it.\n\n@gotags: yaml:\"id\""
         },
         "bundleId": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"bundle_id\""
         },
         "settingId": {
           "type": "string",
-          "description": "setting_id is the id of the setting from within its bundle."
+          "description": "setting_id is the id of the setting from within its bundle.\n\n@gotags: yaml:\"setting_id\""
         },
         "accountUuid": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"account_uuid\""
         },
         "resource": {
-          "$ref": "#/definitions/v0Resource"
+          "$ref": "#/definitions/v0Resource",
+          "title": "@gotags: yaml:\"resource\""
         },
         "boolValue": {
-          "type": "boolean"
+          "type": "boolean",
+          "title": "@gotags: yaml:\"bool_value\""
         },
         "intValue": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "title": "@gotags: yaml:\"int_value\""
         },
         "stringValue": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"string_value\""
         },
         "listValue": {
-          "$ref": "#/definitions/settingsv0ListValue"
+          "$ref": "#/definitions/settingsv0ListValue",
+          "title": "@gotags: yaml:\"list_value\""
         }
       }
     },
@@ -680,10 +688,12 @@
       "type": "object",
       "properties": {
         "default": {
-          "type": "boolean"
+          "type": "boolean",
+          "title": "@gotags: yaml:\"default\""
         },
         "label": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"label\""
         }
       }
     },
@@ -691,28 +701,35 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"id\""
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"name\""
         },
         "type": {
-          "$ref": "#/definitions/v0BundleType"
+          "$ref": "#/definitions/v0BundleType",
+          "title": "@gotags: yaml:\"type\""
         },
         "extension": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"extension\""
         },
         "displayName": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"display_name\""
         },
         "settings": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/v0Setting"
-          }
+          },
+          "title": "@gotags: yaml:\"settings\""
         },
         "resource": {
-          "$ref": "#/definitions/v0Resource"
+          "$ref": "#/definitions/v0Resource",
+          "title": "@gotags: yaml:\"resource\""
         }
       }
     },
@@ -803,22 +820,27 @@
       "properties": {
         "default": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "title": "@gotags: yaml:\"default\""
         },
         "min": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "title": "@gotags: yaml:\"min\""
         },
         "max": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "title": "@gotags: yaml:\"max\""
         },
         "step": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "title": "@gotags: yaml:\"step\""
         },
         "placeholder": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"placeholder\""
         }
       }
     },
@@ -848,13 +870,16 @@
       "type": "object",
       "properties": {
         "value": {
-          "$ref": "#/definitions/v0ListOptionValue"
+          "$ref": "#/definitions/v0ListOptionValue",
+          "title": "@gotags: yaml:\"value\""
         },
         "default": {
-          "type": "boolean"
+          "type": "boolean",
+          "title": "@gotags: yaml:\"default\""
         },
         "displayValue": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"display_value\""
         }
       }
     },
@@ -862,11 +887,13 @@
       "type": "object",
       "properties": {
         "stringValue": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"string_value\""
         },
         "intValue": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "title": "@gotags: yaml:\"int_value\""
         }
       }
     },
@@ -956,7 +983,8 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/v0ListOption"
-          }
+          },
+          "title": "@gotags: yaml:\"options\""
         }
       }
     },
@@ -964,10 +992,12 @@
       "type": "object",
       "properties": {
         "operation": {
-          "$ref": "#/definitions/v0PermissionOperation"
+          "$ref": "#/definitions/v0PermissionOperation",
+          "title": "@gotags: yaml:\"operation\""
         },
         "constraint": {
-          "$ref": "#/definitions/PermissionConstraint"
+          "$ref": "#/definitions/PermissionConstraint",
+          "title": "@gotags: yaml:\"constraint\""
         }
       }
     },
@@ -1066,37 +1096,48 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"id\""
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"name\""
         },
         "displayName": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"display_name\""
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"description\""
         },
         "intValue": {
-          "$ref": "#/definitions/v0Int"
+          "$ref": "#/definitions/v0Int",
+          "title": "@gotags: yaml:\"int_value\""
         },
         "stringValue": {
-          "$ref": "#/definitions/v0String"
+          "$ref": "#/definitions/v0String",
+          "title": "@gotags: yaml:\"string_value\""
         },
         "boolValue": {
-          "$ref": "#/definitions/v0Bool"
+          "$ref": "#/definitions/v0Bool",
+          "title": "@gotags: yaml:\"bool_value\""
         },
         "singleChoiceValue": {
-          "$ref": "#/definitions/v0SingleChoiceList"
+          "$ref": "#/definitions/v0SingleChoiceList",
+          "title": "@gotags: yaml:\"single_choice_value\""
         },
         "multiChoiceValue": {
-          "$ref": "#/definitions/v0MultiChoiceList"
+          "$ref": "#/definitions/v0MultiChoiceList",
+          "title": "@gotags: yaml:\"multi_choice_value\""
         },
         "permissionValue": {
-          "$ref": "#/definitions/v0Permission"
+          "$ref": "#/definitions/v0Permission",
+          "title": "@gotags: yaml:\"permission_value\""
         },
         "resource": {
-          "$ref": "#/definitions/v0Resource"
+          "$ref": "#/definitions/v0Resource",
+          "title": "@gotags: yaml:\"resource\""
         }
       }
     },
@@ -1107,7 +1148,8 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/v0ListOption"
-          }
+          },
+          "title": "@gotags: yaml:\"options\""
         }
       }
     },
@@ -1115,21 +1157,26 @@
       "type": "object",
       "properties": {
         "default": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"default\""
         },
         "required": {
-          "type": "boolean"
+          "type": "boolean",
+          "title": "@gotags: yaml:\"required\""
         },
         "minLength": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "@gotags: yaml:\"min_length\""
         },
         "maxLength": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "title": "@gotags: yaml:\"max_length\""
         },
         "placeholder": {
-          "type": "string"
+          "type": "string",
+          "title": "@gotags: yaml:\"placeholder\""
         }
       }
     },
