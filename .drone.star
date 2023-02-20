@@ -417,17 +417,6 @@ def cacheGoBin():
             "volumes": [stepVolumeGo],
         },
         {
-            "name": "archive-go-bin",
-            "image": OC_CI_NODEJS % DEFAULT_NODEJS_VERSION,
-            "commands": [
-                # zip the pnpm deps before caching
-                "BINGO_HASH=$(cat %s/.bingo_hash)" % dirs["base"],
-                "echo $BINGO_HASH",
-                "tar -czvf $BINGO_HASH.tar.gz /go/bin",
-            ],
-            "volumes": [stepVolumeGo],
-        },
-        {
             "name": "cache-go-bin",
             "image": MINIO_MC,
             "environment": MINIO_MC_ENV,
@@ -436,8 +425,10 @@ def cacheGoBin():
                 "BINGO_HASH=$(cat %s/.bingo_hash)" % dirs["base"],
                 "echo $BINGO_HASH",
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc cp -r -a %s/$BINGO_HASH.tar.gz s3/$CACHE_BUCKET/ocis/go-bin" % dirs["base"],
+                "mc rm -r --force s3/$CACHE_BUCKET/ocis/go-bin",
+                "mc cp -r /go/bin s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH",
             ],
+            "volumes": [stepVolumeGo],
         },
     ]
 
@@ -452,9 +443,13 @@ def restoreGoBinCache():
                 "BINGO_HASH=$(" + SHA256_HASH_COMMAND % dirs["base"] + ")",
                 "echo $BINGO_HASH",
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc cp -r -a s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH.tar.gz %s" % dirs["base"],
+                "mc ls -r s3/$CACHE_BUCKET/ocis/go-bin",
+                "mc cp -r -a s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH/bin /go",
                 "ls -al",
+                "ls -al /go",
+                "ls -al /go/bin",
             ],
+            "volumes": [stepVolumeGo],
         },
         # {
         #     "name": "unzip-web-cache",

@@ -16,7 +16,7 @@ BINGO_HASH=$(cat $(ls -ad "$BINGO_DIR"/*) | sha256sum | cut -d ' ' -f 1)
 
 echo "[INOF] BINGO_HASH: $BINGO_HASH"
 
-URL="$CACHE_ENDPOINT/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH.tar.gz"
+URL="$CACHE_ENDPOINT/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH"
 
 echo "[INFO] Checking for the go bin cache at '$URL'."
 
