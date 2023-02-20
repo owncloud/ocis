@@ -127,8 +127,7 @@ class RoleAssignmentContext implements Context {
 	public function theAdministratorHasGivenUserTheRole(string $user, string $role): void {
 		$admin = $this->featureContext->getAdminUserName();
 		$roleId = $this->userGetRoleIdByRoleName($admin, $role);
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
-		$userId = $userId ?? $user;
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $user;
 		$this->setRoleToUser($admin, $userId, $roleId);
 	}
 
@@ -239,7 +238,7 @@ class RoleAssignmentContext implements Context {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" should have the role "([^"]*)"$/
+	 * @Then /^user "([^"]*)" should have the role "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $role
@@ -255,5 +254,19 @@ class RoleAssignmentContext implements Context {
 		$rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
 		$assignmentRoleId = \json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR)["assignments"][0]["roleId"];
 		Assert::assertEquals($this->userGetRoleIdByRoleName($this->featureContext->getAdminUserName(), $role), $assignmentRoleId, "user $user has no role $role");
+	}
+
+	/**
+	 * @Then /^the setting API response should have the role "([^"]*)"$/
+	 *
+	 * @param string $role
+	 *
+	 * @return void
+	 *
+	 * @throws Exception
+	 */
+	public function theSettingApiResponseShouldHaveTheRole(string $role): void {
+		$assignmentRoleId = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())["assignments"][0]["roleId"];
+		Assert::assertEquals($this->userGetRoleIdByRoleName($this->featureContext->getAdminUserName(), $role), $assignmentRoleId, "user has no role $role");
 	}
 }
