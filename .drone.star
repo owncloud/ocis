@@ -879,6 +879,7 @@ def coreApiTests(ctx, part_number = 1, number_of_parts = 1, storage = "ocis", ac
                              "DIVIDE_INTO_NUM_PARTS": number_of_parts,
                              "RUN_PART": part_number,
                              "EXPECTED_FAILURES_FILE": expectedFailuresFile,
+                             "PLAIN_OUTPUT": "true",
                              "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
                          },
                          "commands": [
