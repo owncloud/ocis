@@ -226,7 +226,7 @@ def main(ctx):
         cancelPreviousBuilds() + \
         codestyle(ctx) + \
         buildWebCache(ctx) + \
-        [getGoDepsForTesting(ctx)] + \
+        getGoBinForTesting(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
@@ -361,18 +361,20 @@ def testPipelines(ctx):
 
     return pipelines
 
-def getGoDepsForTesting(ctx):
-    return {
+def getGoBinForTesting(ctx):
+    return [{
         "kind": "pipeline",
         "type": "docker",
-        "name": "get-go-deps-for-testing",
+        "name": "get-go-bin",
         "platform": {
             "os": "linux",
             "arch": "amd64",
         },
         "steps": skipIfUnchanged(ctx, "unit-tests") +
+                 checkGoBinCache() +
                  bingoGet() +
-                 rebuildBuildArtifactCache(ctx, "go-deps-for-testing", "/go/bin"),
+                 cacheGoBin(),
+        #  rebuildBuildArtifactCache(ctx, "go-bin", "/go/bin"),
         "trigger": {
             "ref": [
                 "refs/heads/master",
@@ -381,7 +383,7 @@ def getGoDepsForTesting(ctx):
             ],
         },
         "volumes": [pipelineVolumeGo],
-    }
+    }]
 
 def bingoGet():
     return [
@@ -394,6 +396,36 @@ def bingoGet():
             "volumes": [stepVolumeGo],
         },
     ]
+
+def checkGoBinCache():
+    return [{
+        "name": "check-go-bin-cache",
+        "image": OC_UBUNTU,
+        "environment": {
+            "CACHE_ENDPOINT": {
+                "from_secret": "cache_public_s3_server",
+            },
+            "CACHE_BUCKET": {
+                "from_secret": "cache_public_s3_bucket",
+            },
+        },
+        "commands": [
+            "bash -x check_go_bin_cache.sh",
+        ],
+    }]
+
+def cacheGoBin():
+    return [{
+        "name": "cache-go-bin",
+        "image": MINIO_MC,
+        "environment": MINIO_MC_ENV,
+        "commands": [
+            # cache using the minio/mc client to the public bucket (long term bucket)
+            "echo $BINGO_HASH",
+            # "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
+            # "mc cp -r -a %s s3/$CACHE_BUCKET/ocis/go-bin/%s.tar.gz" % "hash",
+        ],
+    }]
 
 def testOcisModule(ctx, module):
     steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoCache(ctx, "go-deps-for-testing", "/go") + makeGoGenerate(module) + [
@@ -455,7 +487,7 @@ def testOcisModule(ctx, module):
                 "refs/pull/**",
             ],
         },
-        "depends_on": getPipelineNames([getGoDepsForTesting(ctx)]),
+        "depends_on": getPipelineNames(getGoBinForTesting(ctx)),
         "volumes": [pipelineVolumeGo],
     }
 
@@ -481,7 +513,7 @@ def buildOcisBinaryForTesting(ctx):
                 "refs/pull/**",
             ],
         },
-        "depends_on": getPipelineNames([getGoDepsForTesting(ctx)]),
+        "depends_on": getPipelineNames(getGoBinForTesting(ctx)),
         "volumes": [pipelineVolumeGo],
     }
 
