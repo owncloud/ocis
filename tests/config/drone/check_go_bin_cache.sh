@@ -11,7 +11,8 @@ fi
 BINGO_DIR="$ROOT_PATH/.bingo"
 
 # generate hash for .bingo folder
-BINGO_HASH=$(find "$BINGO_DIR" -type f -exec sha256sum {} \; | sort -k 2 | sha256sum | cut -d ' ' -f 1)
+# BINGO_HASH=$(find "$BINGO_DIR" -type f -exec sha256sum {} \; | sort -k 2 | sha256sum | cut -d ' ' -f 1)
+BINGO_HASH=$(cat $(ls -ad "$BINGO_DIR"/*) | sha256sum | cut -d ' ' -f 1)
 
 echo "[INOF] BINGO_HASH: $BINGO_HASH"
 

@@ -49,7 +49,8 @@ dirs = {
 }
 
 # command to get the hash of a directory
-SHA256_HASH_COMMAND = "find %s/.bingo -type f -exec sha256sum {} \\\\; | sort -k 2 | sha256sum | cut -d ' ' -f 1"
+# SHA256_HASH_COMMAND = "find %s/.bingo -type f -exec sha256sum {} \\\\; | sort -k 2 | sha256sum | cut -d ' ' -f 1"
+SHA256_HASH_COMMAND = "cat $(ls -ad %s/.bingo/*) | sha256sum | cut -d ' ' -f 1"
 
 # configuration
 config = {
@@ -539,7 +540,6 @@ def buildOcisBinaryForTesting(ctx):
         },
         "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                  makeNodeGenerate("") +
-                 restoreGoCache(ctx, "go-deps-for-testing", "/go") +
                  makeGoGenerate("") +
                  build() +
                  rebuildBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin"),
@@ -550,7 +550,6 @@ def buildOcisBinaryForTesting(ctx):
                 "refs/pull/**",
             ],
         },
-        "depends_on": getPipelineNames(getGoBinForTesting(ctx)),
         "volumes": [pipelineVolumeGo],
     }
 
@@ -2520,20 +2519,20 @@ def rebuildBuildArtifactCache(ctx, name, path):
 def purgeBuildArtifactCache(ctx):
     return genericBuildArtifactCache(ctx, "", "purge", [])
 
-def restoreGoCache(ctx, name, path):
-    return restoreBuildArtifactCache(ctx, name, path) + [
-        {
-            "name": "move-go-cache",
-            "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-            "commands": [
-                "du -sh ./go/*",
-                "rsync -a --remove-source-files %s/go/ /go" % dirs["base"],
-                "rm -rf %s/go" % dirs["base"],
-                "du -sh /go/*",
-            ],
-            "volumes": [stepVolumeGo],
-        },
-    ]
+# def restoreGoCache(ctx, name, path):
+#     return restoreBuildArtifactCache(ctx, name, path) + [
+#         {
+#             "name": "move-go-cache",
+#             "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
+#             "commands": [
+#                 "du -sh ./go/*",
+#                 "rsync -a --remove-source-files %s/go/ /go" % dirs["base"],
+#                 "rm -rf %s/go" % dirs["base"],
+#                 "du -sh /go/*",
+#             ],
+#             "volumes": [stepVolumeGo],
+#         },
+#     ]
 
 def pipelineSanityChecks(ctx, pipelines):
     """pipelineSanityChecks helps the CI developers to find errors before running it
