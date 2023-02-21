@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -156,10 +157,10 @@ func NewService(opts ...Option) (Graph, error) {
 
 	roleManager := options.RoleManager
 	if roleManager == nil {
-		storeOptions := store.OcisStoreOptions{
-			Type:    options.Config.CacheStore.Type,
-			Address: options.Config.CacheStore.Address,
-			Size:    options.Config.CacheStore.Size,
+		storeOptions := []store.Option{
+			store.Type(options.Config.CacheStore.Type),
+			store.Addresses(strings.Split(options.Config.CacheStore.Address, ",")...),
+			store.Size(options.Config.CacheStore.Size),
 		}
 		m := roles.NewManager(
 			roles.StoreOptions(storeOptions),

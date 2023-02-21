@@ -8,7 +8,7 @@ import (
 
 // Options are all the possible options.
 type Options struct {
-	storeOptions ocisstore.OcisStoreOptions
+	storeOptions []ocisstore.Option
 	logger       log.Logger
 	roleService  settingssvc.RoleService
 }
@@ -30,7 +30,8 @@ func RoleService(rs settingssvc.RoleService) Option {
 	}
 }
 
-func StoreOptions(storeOpts ocisstore.OcisStoreOptions) Option {
+// StoreOptions are the options for the store
+func StoreOptions(storeOpts []ocisstore.Option) Option {
 	return func(o *Options) {
 		o.storeOptions = storeOpts
 	}
