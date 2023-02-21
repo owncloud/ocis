@@ -58,6 +58,7 @@ func DefaultConfig() *config.Config {
 				UsersProviderEndpoint: "localhost:9144",
 			},
 			S3NG: config.S3NGDriver{
+				MetadataBackend:            "xattrs",
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),
 				ShareFolder:                "/Shares",
 				UserLayout:                 "{{.Id.OpaqueId}}",
@@ -69,6 +70,7 @@ func DefaultConfig() *config.Config {
 				LockCycleDurationFactor:    30,
 			},
 			OCIS: config.OCISDriver{
+				MetadataBackend:            "xattrs",
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),
 				ShareFolder:                "/Shares",
 				UserLayout:                 "{{.Id.OpaqueId}}",

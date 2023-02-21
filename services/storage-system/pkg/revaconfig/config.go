@@ -153,7 +153,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 func metadataDrivers(cfg *config.Config) map[string]interface{} {
 	return map[string]interface{}{
 		"ocis": map[string]interface{}{
-			"metadata_backend":           "ini",
+			"metadata_backend":           cfg.Drivers.OCIS.MetadataBackend,
 			"root":                       cfg.Drivers.OCIS.Root,
 			"user_layout":                "{{.Id.OpaqueId}}",
 			"treetime_accounting":        false,

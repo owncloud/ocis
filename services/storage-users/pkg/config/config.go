@@ -88,6 +88,7 @@ type Drivers struct {
 }
 
 type OCISDriver struct {
+	MetadataBackend string `yaml:"root" env:"STORAGE_SYSTEM_OCIS_METADATA_BACKEND" desc:"Backend to use for metadata. Can be 'xattrs' or 'ini'."`
 	// Root is the absolute path to the location of the data
 	Root                string `yaml:"root" env:"STORAGE_USERS_OCIS_ROOT" desc:"The directory where the filesystem storage will store blobs and metadata. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users."`
 	UserLayout          string `yaml:"user_layout" env:"STORAGE_USERS_OCIS_USER_LAYOUT" desc:"Template string for the user storage layout in the user directory."`
@@ -107,6 +108,7 @@ type OCISDriver struct {
 }
 
 type S3NGDriver struct {
+	MetadataBackend string `yaml:"root" env:"STORAGE_SYSTEM_OCIS_METADATA_BACKEND" desc:"Backend to use for metadata. Can be 'xattrs' or 'ini'."`
 	// Root is the absolute path to the location of the data
 	Root                string `yaml:"root" env:"STORAGE_USERS_S3NG_ROOT" desc:"The directory where the filesystem storage will store metadata for blobs. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users."`
 	UserLayout          string `yaml:"user_layout" env:"STORAGE_USERS_S3NG_USER_LAYOUT" desc:"Template string for the user storage layout in the user directory."`
