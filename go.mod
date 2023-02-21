@@ -44,7 +44,7 @@ require (
 	github.com/jellydator/ttlcache/v2 v2.11.1
 	github.com/jellydator/ttlcache/v3 v3.0.1
 	github.com/justinas/alice v1.2.0
-	github.com/libregraph/idm v0.4.1-0.20230202151932-ed881827cd10
+	github.com/libregraph/idm v0.4.1-0.20230221143410-3503963047a5
 	github.com/libregraph/lico v0.54.1-0.20220325072321-31efc3995d63
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
