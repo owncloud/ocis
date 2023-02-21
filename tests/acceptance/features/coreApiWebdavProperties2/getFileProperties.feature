@@ -306,19 +306,12 @@ Feature: get file properties
     And the value of the item "/d:error/s:message" in the response about user "Alice" should be "<message1>" or "<message2>"
     And the value of the item "/d:error/s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
 
-    @skipOnOcV10
     Examples:
       | url                                  | message1               | message2           |
       | /remote.php/dav/files/does-not-exist | Resource not found     | Resource not found |
       | /remote.php/dav/does-not-exist       | File not found in root |                    |
 
-    @skipOnOcis
-    Examples:
-      | url                                  | message1                                     | message2 |
-      | /remote.php/dav/files/does-not-exist | Principal with name does-not-exist not found |          |
-      | /remote.php/dav/does-not-exist       | File not found: does-not-exist in 'root'     |          |
-
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | url                                             | message1           | message2 |
       | /remote.php/dav/spaces/%spaceid%/does-not-exist | Resource not found |          |
