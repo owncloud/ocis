@@ -3,6 +3,7 @@ package svc
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	ldapv3 "github.com/go-ldap/ldap/v3"
 	"github.com/jellydator/ttlcache/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
@@ -366,6 +368,35 @@ func setIdentityBackends(options Options, svc *Graph) error {
 					svc.identityEducationBackend = errEduBackend
 				}
 			}
+
+			disableMechanismType, err := identity.ParseDisableMechanismType(options.Config.Identity.LDAP.DisableUserMechanism)
+			if err != nil {
+				options.Logger.Error().Err(err).Msg("Error initializing LDAP Backend")
+				return err
+			}
+
+			if disableMechanismType == identity.DisableMechanismGroup {
+				options.Logger.Info().Msg("LocalUserDisable is true, will create group if not exists")
+				err := lb.CreateLDAPGroupByDN(options.Config.Identity.LDAP.LdapDisabledUsersGroupDN)
+				if err != nil {
+					isAnError := false
+					var lerr *ldapv3.Error
+					if errors.As(err, &lerr) {
+						if lerr.ResultCode != ldapv3.LDAPResultEntryAlreadyExists {
+							isAnError = true
+						}
+					} else {
+						isAnError = true
+					}
+
+					if isAnError {
+						msg := "error adding group for disabling users"
+						options.Logger.Error().Err(err).Str("local_user_disable", options.Config.Identity.LDAP.LdapDisabledUsersGroupDN).Msg(msg)
+						return err
+					}
+				}
+			}
+
 		default:
 			err := fmt.Errorf("unknown identity backend: '%s'", options.Config.Identity.Backend)
 			options.Logger.Err(err)

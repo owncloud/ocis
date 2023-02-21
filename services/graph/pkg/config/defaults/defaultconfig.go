@@ -69,6 +69,8 @@ func DefaultConfig() *config.Config {
 				//        ideally this needs to	be constant for the lifetime of a users
 				UserIDAttribute:           "owncloudUUID",
 				UserEnabledAttribute:      "ownCloudUserEnabled",
+				DisableUserMechanism:      "attribute",
+				LdapDisabledUsersGroupDN:  "cn=DisabledUsersGroup,ou=groups,o=libregraph-idm",
 				GroupBaseDN:               "ou=groups,o=libregraph-idm",
 				GroupSearchScope:          "sub",
 				GroupFilter:               "",

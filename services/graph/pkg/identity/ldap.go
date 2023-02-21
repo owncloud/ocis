@@ -20,9 +20,28 @@ import (
 )
 
 const (
-	givenNameAttribute = "givenname"
-	surNameAttribute   = "sn"
+	_givenNameAttribute        = "givenname"
+	_surNameAttribute          = "sn"
+	_ldapGroupOfNamesAttribute = "(objectClass=groupOfNames)"
+	_ldapGroupMemberAttribute  = "member"
 )
+
+// DisableUserMechanismType is used instead of directly using the string values from the configuration.
+type DisableUserMechanismType int64
+
+// The different DisableMechanism* constants are used for managing the enabling/disabling of users.
+const (
+	DisableMechanismNone DisableUserMechanismType = iota
+	DisableMechanismAttribute
+	DisableMechanismGroup
+)
+
+var mechanismMap = map[string]DisableUserMechanismType{
+	"":          DisableMechanismNone,
+	"none":      DisableMechanismNone,
+	"attribute": DisableMechanismAttribute,
+	"group":     DisableMechanismGroup,
+}
 
 type LDAP struct {
 	useServerUUID   bool
@@ -35,6 +54,9 @@ type LDAP struct {
 	userObjectClass  string
 	userScope        int
 	userAttributeMap userAttributeMap
+
+	disableUserMechanism    DisableUserMechanismType
+	localUserDisableGroupDN string
 
 	groupBaseDN       string
 	groupFilter       string
@@ -60,6 +82,17 @@ type userAttributeMap struct {
 
 type ldapAttributeValues map[string][]string
 
+// ParseDisableMechanismType checks that the configuration option for how to disable users is correct.
+func ParseDisableMechanismType(disableMechanism string) (DisableUserMechanismType, error) {
+	disableMechanism = strings.ToLower(disableMechanism)
+	t, ok := mechanismMap[disableMechanism]
+	if !ok {
+		return -1, errors.New("invalid configuration option for disable user mechanism")
+	}
+
+	return t, nil
+}
+
 func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LDAP, error) {
 	if config.UserDisplayNameAttribute == "" || config.UserIDAttribute == "" ||
 		config.UserEmailAttribute == "" || config.UserNameAttribute == "" {
@@ -71,8 +104,8 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		mail:           config.UserEmailAttribute,
 		userName:       config.UserNameAttribute,
 		accountEnabled: config.UserEnabledAttribute,
-		givenName:      givenNameAttribute,
-		surname:        surNameAttribute,
+		givenName:      _givenNameAttribute,
+		surname:        _surNameAttribute,
 	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
@@ -81,7 +114,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 	gam := groupAttributeMap{
 		name:         config.GroupNameAttribute,
 		id:           config.GroupIDAttribute,
-		member:       "member",
+		member:       _ldapGroupMemberAttribute,
 		memberSyntax: "dn",
 	}
 
@@ -100,24 +133,31 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		return nil, fmt.Errorf("error setting up education resource config: %w", err)
 	}
 
+	disableMechanismType, err := ParseDisableMechanismType(config.DisableUserMechanism)
+	if err != nil {
+		return nil, fmt.Errorf("error configuring disable user mechanism: %w", err)
+	}
+
 	return &LDAP{
-		useServerUUID:     config.UseServerUUID,
-		usePwModifyExOp:   config.UsePasswordModExOp,
-		userBaseDN:        config.UserBaseDN,
-		userFilter:        config.UserFilter,
-		userObjectClass:   config.UserObjectClass,
-		userScope:         userScope,
-		userAttributeMap:  uam,
-		groupBaseDN:       config.GroupBaseDN,
-		groupFilter:       config.GroupFilter,
-		groupObjectClass:  config.GroupObjectClass,
-		groupScope:        groupScope,
-		groupAttributeMap: gam,
-		educationConfig:   educationConfig,
-		logger:            logger,
-		conn:              lc,
-		writeEnabled:      config.WriteEnabled,
-		refintEnabled:     config.RefintEnabled,
+		useServerUUID:           config.UseServerUUID,
+		usePwModifyExOp:         config.UsePasswordModExOp,
+		userBaseDN:              config.UserBaseDN,
+		userFilter:              config.UserFilter,
+		userObjectClass:         config.UserObjectClass,
+		userScope:               userScope,
+		userAttributeMap:        uam,
+		groupBaseDN:             config.GroupBaseDN,
+		groupFilter:             config.GroupFilter,
+		groupObjectClass:        config.GroupObjectClass,
+		groupScope:              groupScope,
+		groupAttributeMap:       gam,
+		educationConfig:         educationConfig,
+		disableUserMechanism:    disableMechanismType,
+		localUserDisableGroupDN: config.LdapDisabledUsersGroupDN,
+		logger:                  logger,
+		conn:                    lc,
+		writeEnabled:            config.WriteEnabled,
+		refintEnabled:           config.RefintEnabled,
 	}, nil
 }
 
@@ -129,6 +169,10 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 	logger.Debug().Str("backend", "ldap").Msg("CreateUser")
 	if !i.writeEnabled {
 		return nil, ErrReadOnly
+	}
+
+	if user.AccountEnabled != nil && i.disableUserMechanism == DisableMechanismNone {
+		return nil, errors.New("accountEnabled option not compatible with backend disable user mechanism")
 	}
 
 	ar, err := i.userToAddRequest(user)
@@ -254,14 +298,34 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 		}
 	}
 
+	// Behavior of enabling/disabling of users depends on the "disableUserMechanism" config option:
+	//
+	// "attribute": For the upstream user management service which modifies accountEnabled on the user entry
+	// "group": Makes it possible for local admins to disable users by adding them to a special group
 	if user.AccountEnabled != nil {
-		boolString := strings.ToUpper(strconv.FormatBool(*user.AccountEnabled))
-		ldapValue := e.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled)
-		updateNeeded = true
-		if ldapValue != "" {
-			mr.Replace(i.userAttributeMap.accountEnabled, []string{boolString})
-		} else {
-			mr.Add(i.userAttributeMap.accountEnabled, []string{boolString})
+		switch i.disableUserMechanism {
+		case DisableMechanismNone:
+			return nil, errors.New("accountEnabled option not compatible with backend disable user mechanism")
+		case DisableMechanismAttribute:
+			boolString := strings.ToUpper(strconv.FormatBool(user.GetAccountEnabled()))
+			ldapValue := e.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled)
+			if ldapValue != "" {
+				mr.Replace(i.userAttributeMap.accountEnabled, []string{boolString})
+			} else {
+				mr.Add(i.userAttributeMap.accountEnabled, []string{boolString})
+			}
+			updateNeeded = true
+		case DisableMechanismGroup:
+			if user.GetAccountEnabled() {
+				err = i.enableUser(logger, e.DN)
+			} else {
+				err = i.disableUser(logger, e.DN)
+			}
+
+			if err != nil {
+				return nil, err
+			}
+			updateNeeded = true
 		}
 	}
 
@@ -276,7 +340,16 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	if err != nil {
 		return nil, err
 	}
-	return i.createUserModelFromLDAP(e), nil
+
+	returnUser := i.createUserModelFromLDAP(e)
+
+	// To avoid an ldap lookup for group membership, set the enabled flag to same as input value
+	// since this would have been updated with group membership from the input anyway.
+	if user.AccountEnabled != nil && i.disableUserMechanism != DisableMechanismNone {
+		returnUser.AccountEnabled = user.AccountEnabled
+	}
+
+	return returnUser, nil
 }
 
 func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
@@ -320,7 +393,7 @@ func (i *LDAP) getEntryByDN(dn string, attrs []string, filter string) (*ldap.Ent
 		Msg("getEntryByDN")
 	res, err := i.conn.Search(searchRequest)
 	if err != nil {
-		i.logger.Error().Err(err).Str("backend", "ldap").Str("dn", dn).Msg("Search user by DN failed")
+		i.logger.Error().Err(err).Str("backend", "ldap").Str("dn", dn).Msg("Search ldap by DN failed")
 		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
 	}
 	if len(res.Entries) == 0 {
@@ -404,6 +477,13 @@ func (i *LDAP) GetUser(ctx context.Context, nameOrID string, oreq *godata.GoData
 		return nil, ErrNotFound
 	}
 
+	if i.disableUserMechanism != DisableMechanismNone {
+		userEnabled, err := i.UserEnabled(e)
+		if err == nil {
+			u.AccountEnabled = &userEnabled
+		}
+	}
+
 	exp, err := GetExpandValues(oreq.Query)
 	if err != nil {
 		return nil, err
@@ -472,6 +552,10 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 	}
 
 	users := make([]*libregraph.User, 0, len(res.Entries))
+	usersEnabledState, err := i.usersEnabledState(res.Entries)
+	if err != nil {
+		return nil, err
+	}
 
 	for _, e := range res.Entries {
 		u := i.createUserModelFromLDAP(e)
@@ -479,6 +563,12 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 		if u == nil {
 			continue
 		}
+
+		if i.disableUserMechanism != DisableMechanismNone {
+			userEnabled := usersEnabledState[e.DN]
+			u.AccountEnabled = &userEnabled
+		}
+
 		if slices.Contains(exp, "memberOf") {
 			userGroups, err := i.getGroupsForUser(e.DN)
 			if err != nil {
@@ -801,4 +891,136 @@ func replaceDN(fullDN *ldap.DN, newDN string) (string, error) {
 	}
 
 	return newDN, nil
+}
+
+// CreateLDAPGroupByDN is a helper method specifically intended for creating a "system" group
+// for managing locally disabled users on service startup
+func (i *LDAP) CreateLDAPGroupByDN(dn string) error {
+	ar := ldap.NewAddRequest(dn, nil)
+
+	attrs := map[string][]string{
+		"objectClass": {"groupOfNames", "top"},
+		"member":      {""},
+	}
+
+	for attrType, values := range attrs {
+		ar.Attribute(attrType, values)
+	}
+
+	return i.conn.Add(ar)
+}
+
+func (i *LDAP) disableUser(logger log.Logger, userDN string) (err error) {
+	group, err := i.getEntryByDN(i.localUserDisableGroupDN, []string{_ldapGroupMemberAttribute}, _ldapGroupOfNamesAttribute)
+
+	if err != nil {
+		return err
+	}
+
+	mr := ldap.ModifyRequest{DN: group.DN}
+	mr.Add(_ldapGroupMemberAttribute, []string{userDN})
+
+	err = i.conn.Modify(&mr)
+	var lerr *ldap.Error
+	if errors.As(err, &lerr) {
+		// If the user is already in the group, just log a message and return
+		if lerr.ResultCode == ldap.LDAPResultAttributeOrValueExists {
+			logger.Info().Msg("User already in group for disabled users")
+			return nil
+		}
+	}
+
+	return err
+}
+
+func (i *LDAP) enableUser(logger log.Logger, userDN string) (err error) {
+	group, err := i.getEntryByDN(i.localUserDisableGroupDN, []string{_ldapGroupMemberAttribute}, _ldapGroupOfNamesAttribute)
+
+	if err != nil {
+		return err
+	}
+
+	mr := ldap.ModifyRequest{DN: group.DN}
+	mr.Delete(_ldapGroupMemberAttribute, []string{userDN})
+
+	err = i.conn.Modify(&mr)
+	var lerr *ldap.Error
+	if errors.As(err, &lerr) {
+		// If the user is not in the group, just log a message and return
+		if lerr.ResultCode == ldap.LDAPResultNoSuchAttribute {
+			logger.Info().Msg("User was not in group for disabled users")
+			return nil
+		}
+	}
+
+	return err
+}
+
+func (i *LDAP) userEnabledByAttribute(user *ldap.Entry) bool {
+	enabledAttribute := booleanOrNil(user.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled))
+
+	if enabledAttribute == nil {
+		return true
+	}
+
+	return *enabledAttribute
+}
+
+func (i *LDAP) usersEnabledStateFromGroup(users []string) (usersEnabledState map[string]bool, err error) {
+	group, err := i.getEntryByDN(i.localUserDisableGroupDN, []string{_ldapGroupMemberAttribute}, _ldapGroupOfNamesAttribute)
+
+	if err != nil {
+		return nil, err
+	}
+
+	usersEnabledState = make(map[string]bool, len(users))
+	for _, user := range users {
+		usersEnabledState[user] = true
+	}
+
+	for _, memberDN := range group.GetEqualFoldAttributeValues(_ldapGroupMemberAttribute) {
+		usersEnabledState[memberDN] = false
+	}
+
+	return usersEnabledState, err
+}
+
+// UserEnabled returns if a user is enabled. This can depend on a flag in the user entry or group membership
+func (i *LDAP) UserEnabled(user *ldap.Entry) (bool, error) {
+	usersEnabledState, err := i.usersEnabledState([]*ldap.Entry{user})
+
+	if err != nil {
+		return false, err
+	}
+
+	return usersEnabledState[user.DN], nil
+}
+
+func (i *LDAP) usersEnabledState(users []*ldap.Entry) (usersEnabledState map[string]bool, err error) {
+	usersEnabledState = make(map[string]bool, len(users))
+	keys := make([]string, len(users))
+	for index, user := range users {
+		usersEnabledState[user.DN] = true
+		keys[index] = user.DN
+	}
+
+	switch i.disableUserMechanism {
+	case DisableMechanismAttribute:
+		for _, user := range users {
+			usersEnabledState[user.DN] = i.userEnabledByAttribute(user)
+		}
+
+	case DisableMechanismGroup:
+		userDisabledGroupState, err := i.usersEnabledStateFromGroup(keys)
+
+		if err != nil {
+			return nil, err
+		}
+
+		for _, user := range keys {
+			usersEnabledState[user] = userDisabledGroupState[user]
+		}
+	}
+
+	return usersEnabledState, nil
 }
