@@ -89,7 +89,7 @@ class GraphContext implements Context {
 			$displayName
 		);
 		$this->featureContext->setResponse($response);
-		$this->featureContext->theHttpStatusCodeShouldBe(200);
+		$this->featureContext->theHttpStatusCodeShouldBe(200); // TODO 204 when prefer=minimal header was sent
 	}
 
 	/**
@@ -597,26 +597,6 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 *
-	 * @param string $user
-	 * @param string|null $group
-	 *
-	 * @return ResponseInterface
-	 * @throws GuzzleException
-	 */
-	public function listSingleOrAllGroupsAlongWithAllMemberInformation(string $user, ?string $group = null): ResponseInterface {
-		$credentials = $this->getAdminOrUserCredentials($user);
-
-		return GraphHelper::getSingleOrAllGroupsAlongWithMembers(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$credentials["username"],
-			$credentials["password"],
-			($group) ? $this->featureContext->getAttributeOfCreatedGroup($group, 'id') : null
-		);
-	}
-
-	/**
 	 * returns list of users of a group
 	 *
 	 * @param ResponseInterface $response
@@ -1015,59 +995,6 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When user :user retrieves all groups along with their members using the Graph API
-	 * @When user :user gets all the members information of group :group using the Graph API
-	 *
-	 * @param string $user
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function userRetrievesAllMemberInformationOfSingleOrAllGroups(string $user, string $group = ''): void {
-		$this->featureContext->setResponse($this->listSingleOrAllGroupsAlongWithAllMemberInformation($user, $group));
-	}
-
-	/**
-	 * @Then the group :group should have the following member information
-	 *
-	 * @param string $group
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function theGroupShouldHaveTheFollowingMemberInformation(string $group, TableNode $table): void {
-		$response = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
-		$rows = $table->getHash();
-		$currentMemberIndex = 0;
-		if (isset($response['value'])) {
-			$response = $response['value'];
-			$groupFoundInResponse = false;
-			foreach ($response as $value) {
-				if ($value['displayName'] === $group) {
-					$groupFoundInResponse = true;
-					foreach ($rows as $row) {
-						$this->checkUserInformation($row, $value['members'][$currentMemberIndex]);
-						$currentMemberIndex++;
-					}
-					break;
-				}
-			}
-			if (!$groupFoundInResponse) {
-				throw new Error(
-					'Group ' . $group . " could not be found in the response."
-				);
-			}
-		} else {
-			foreach ($rows as $row) {
-				$this->checkUserInformation($row, $response['members'][$currentMemberIndex]);
-				$currentMemberIndex++;
-			}
-		}
-	}
-
-	/**
 	 * @Then the last response should be an unauthorized response
 	 *
 	 * @return void
@@ -1094,7 +1021,7 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userDeletesGroupUsingTheGraphApi(string $group, ?string $user): void {
+	public function userDeletesGroupUsingTheGraphApi(string $group, ?string $user = null): void {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$response = $this->userDeletesGroupWithGroupId($groupId, $user);
 		$this->featureContext->setResponse($response);
@@ -1357,14 +1284,15 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then the API response should contain all users with the following information:
+	 * @Then /^the API response should (not|)\s?contain following (user|users) with the information:$/
 	 *
+	 * @param string    $shouldOrNot   (not|)
 	 * @param TableNode $table
 	 *
 	 * @throws Exception
 	 * @return void
 	 */
-	public function theApiResponseShouldContainAllUserWithFollowingInformation(TableNode $table): void {
+	public function theApiResponseShouldContainAllUserWithFollowingInformation(string $shouldOrNot, TableNode $table): void {
 		$values = $table->getHash();
 		$apiResponse = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'];
 		foreach ($values as $expectedValue) {
@@ -1377,8 +1305,10 @@ class GraphContext implements Context {
 					break;
 				}
 			}
-			if (!$found) {
-				throw new Exception('User ' . $expectedValue["displayName"] . ' could not be found in the response.');
+			if ($shouldOrNot === 'not') {
+				Assert::assertFalse($found, $expectedValue["displayName"] . ' has been found in the response, but should not be.');
+			} else {
+				Assert::assertTrue($found, $expectedValue["displayName"] . ' could not be found in the response.');
 			}
 		}
 	}
@@ -1531,5 +1461,213 @@ class GraphContext implements Context {
 		} else {
 			throw new Error('Response is not an array or the array does not consist key "drive"');
 		}
+	}
+
+	/**
+	 * @When user :user gets all applications using the Graph API
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsAllApplicationsUsingTheGraphApi(string $user) {
+		$response = GraphHelper::getApplications(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then the user retrieve API response should contain the following applications information:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theResponseShouldContainTheFollowingApplicationsInformation(TableNode $table): void {
+		Assert::assertIsArray($responseArray = ($this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse()))['value'][0]);
+		foreach ($table->getHash() as $row) {
+			$key = $row["key"];
+			if ($key === 'id') {
+				Assert::assertTrue(
+					GraphHelper::isUUIDv4($responseArray[$key]),
+					__METHOD__ . ' Expected id to have UUIDv4 pattern but found: ' . $row["value"]
+				);
+			} else {
+				Assert::assertEquals($responseArray[$key], $row["value"]);
+			}
+		}
+	}
+
+	/**
+	 * @Then the user retrieve API response should contain the following app roles:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theResponseShouldContainTheFollowingAppRolesInformation(TableNode $table): void {
+		Assert::assertIsArray($responseArray = ($this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse()))['value'][0]);
+		foreach ($table->getRows() as $row) {
+			$foundRoleInResponse = false;
+			foreach ($responseArray['appRoles'] as $role) {
+				if ($role['displayName'] === $row[0]) {
+					$foundRoleInResponse = true;
+					break;
+				}
+			}
+			Assert::assertTrue($foundRoleInResponse, "the response does not contain the role $row[0]");
+		}
+	}
+
+	/**
+	 * @When the user :user gets all users of the group :group using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $group
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsAllUsersOfTheGroupUsingTheGraphApi(string $user, string $group) {
+		$groupId = $this->featureContext->getGroupIdByGroupName($group);
+		$response = GraphHelper::getUsersWithFilterMemberOf(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$groupId
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the user :user gets all users of two groups :groups using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $groups
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsAllUsersOfTwoGroupsUsingTheGraphApi(string $user, string $groups) {
+		$groupsIdArray = [];
+		foreach (explode(',', $groups) as $group) {
+			array_push($groupsIdArray, $this->featureContext->getGroupIdByGroupName($group));
+		}
+		$response = GraphHelper::getUsersOfTwoGroups(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$groupsIdArray
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * Get roleId by role name
+	 *
+	 * @param string $role
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 */
+	public function getRoleIdByRoleName(string $role): string {
+		$response = GraphHelper::getApplications(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword()
+		);
+		$responseData = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+		if (isset($responseData["value"][0]["appRoles"])) {
+			foreach ($responseData["value"][0]["appRoles"] as $value) {
+				if ($value["displayName"] === $role) {
+					return $value["id"];
+				}
+			}
+			throw new Exception(__METHOD__ . " role with name $role not found");
+		}
+	}
+
+	/**
+	 * @When the user :user gets all users with role :role using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $role
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsAllUsersWithRoleUsingTheGraphApi(string $user, string $role) {
+		$response = GraphHelper::getUsersWithFilterRoleAssignment(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$this->getRoleIdByRoleName($role)
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the user :user gets all users with role :role and member of the group :group using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $role
+	 * @param string $group
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsAllUsersWithRoleAndMemberOfGroupUsingTheGraphApi(string $user, string $role, string $group) {
+		$response = GraphHelper::getUsersWithFilterRolesAssignmentAndMemberOf(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$this->getRoleIdByRoleName($role),
+			$this->featureContext->getGroupIdByGroupName($group)
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When /^the administrator "([^"]*)" adds the following users to a group "([^"]*)" at once using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $group
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorAddsTheFollowingUsersToAGroupInASingleRequestUsingTheGraphApi(string $user, string $group, TableNode $table): void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$this->featureContext->verifyTableNodeColumns($table, ['username']);
+		$userIds = [];
+
+        $groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+
+		foreach ($table->getHash() as $row) {
+				$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
+		}
+
+		$this->featureContext->setResponse(
+			GraphHelper::addUsersToGroup(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials["username"],
+				$credentials["password"],
+                $groupId,
+				$userIds
+			)
+		);
 	}
 }

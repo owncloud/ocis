@@ -490,24 +490,59 @@ class GraphHelper {
 		string $adminUser,
 		string $adminPassword,
 		string $groupId,
-		array $users
+		array $userIds
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId . '/users');
-		$payload = [
-			"members@odata.bind" => []
-		];
-		foreach ($users as $user) {
-			$payload[0][] = self::getFullUrl($baseUrl, 'users/' . $user["id"]);
+		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId);
+		$payload = [ "members@odata.bind" => [] ];
+		foreach ($userIds as $userId) {
+			$payload["members@odata.bind"][] = self::getFullUrl($baseUrl, 'users/' . $userId);
 		}
-		return HttpRequestHelper::post(
-			$url,
-			$xRequestId,
-			$adminUser,
-			$adminPassword,
-			self::getRequestHeaders(),
-			\json_encode($payload)
-		);
+        return HttpRequestHelper::sendRequest(
+            $url,
+            $xRequestId,
+            'PATCH',
+            $adminUser,
+            $adminPassword,
+            self::getRequestHeaders(),
+            \json_encode($payload)
+        );
 	}
+
+    /**
+     * @param string $baseUrl
+     * @param string $xRequestId
+     * @param string $adminUser
+     * @param string $adminPassword
+     * @param array $userIds
+     * @param string $groupId
+     *
+     * @return ResponseInterface
+     * @throws GuzzleException
+     */
+    public static function addMultipleUsersToGroup(
+        string $baseUrl,
+        string $xRequestId,
+        string $adminUser,
+        string $adminPassword,
+        array $userIds,
+        string $groupId
+    ): ResponseInterface {
+        $url = self::getFullUrl($baseUrl, 'groups/' . $groupId);
+        $body = [ "members@odata.bind" => [] ];
+        foreach ($userIds as $userId) {
+            $body["members@odata.bind"][] = self::getFullUrl($baseUrl, 'users/' . $userId);
+        }
+
+        return HttpRequestHelper::sendRequest(
+            $url,
+            $xRequestId,
+            'PATCH',
+            $adminUser,
+            $adminPassword,
+            self::getRequestHeaders(),
+            \json_encode($body)
+        );
+    }
 
 	/**
 	 * @param string $baseUrl
