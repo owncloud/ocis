@@ -57,36 +57,36 @@ config = {
     "modules": [
         # if you add a module here please also add it to the root level Makefile
         "services/app-provider",
-        # "services/app-registry",
-        # "services/audit",
-        # "services/auth-basic",
-        # "services/auth-bearer",
-        # "services/auth-machine",
-        # "services/frontend",
-        # "services/gateway",
-        # "services/graph",
-        # "services/groups",
-        # "services/idm",
-        # "services/idp",
-        # "services/nats",
-        # "services/notifications",
-        # "services/ocdav",
-        # "services/ocs",
-        # "services/proxy",
-        # "services/search",
-        # "services/settings",
-        # "services/sharing",
-        # "services/storage-system",
-        # "services/storage-publiclink",
-        # "services/storage-shares",
-        # "services/storage-users",
-        # "services/store",
-        # "services/thumbnails",
-        # "services/users",
-        # "services/web",
-        # "services/webdav",
-        # "ocis-pkg",
-        # "ocis",
+        "services/app-registry",
+        "services/audit",
+        "services/auth-basic",
+        "services/auth-bearer",
+        "services/auth-machine",
+        "services/frontend",
+        "services/gateway",
+        "services/graph",
+        "services/groups",
+        "services/idm",
+        "services/idp",
+        "services/nats",
+        "services/notifications",
+        "services/ocdav",
+        "services/ocs",
+        "services/proxy",
+        "services/search",
+        "services/settings",
+        "services/sharing",
+        "services/storage-system",
+        "services/storage-publiclink",
+        "services/storage-shares",
+        "services/storage-users",
+        "services/store",
+        "services/thumbnails",
+        "services/users",
+        "services/web",
+        "services/webdav",
+        "ocis-pkg",
+        "ocis",
     ],
     "cs3ApiTests": {
         "skip": False,
@@ -223,8 +223,6 @@ def main(ctx):
     Returns:
       none
     """
-
-    return cancelPreviousBuilds() + getGoBinForTesting(ctx) + testOcisModules(ctx)
 
     pipelines = []
 
@@ -2438,7 +2436,6 @@ def genericCache(name, action, mounts, cache_path):
             "path": cache_path,
             "fallback_path": cache_path,
         },
-        "volumes": [stepVolumeGo],
     }
     return step
 
