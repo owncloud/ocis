@@ -29,6 +29,10 @@ func ParseConfig(cfg *config.Config) error {
 
 	defaults.Sanitize(cfg)
 
+	if err := defaults.LoadBundles(cfg); err != nil {
+		return err
+	}
+
 	return Validate(cfg)
 }
 
