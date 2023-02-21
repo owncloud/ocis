@@ -188,11 +188,7 @@ Feature: files and folders exist in the trashbin after being deleted
     And the last webdav response should not contain the following elements
       | path          | user            |
       | textfile1.txt | testtrashbin100 |
-    @skipOnOcis
-    Examples:
-      | dav-path | status-code |
-      | new      | 401         |
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path | status-code |
       | new      | 404         |
@@ -213,11 +209,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | path          | user            |
       | textfile0.txt | testtrashbin101 |
       | textfile2.txt | testtrashbin101 |
-    @skipOnOcis
-    Examples:
-      | dav-path | status-code |
-      | new      | 401         |
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path | status-code |
       | new      | 404         |
@@ -243,11 +235,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | textfile0.txt | testtrashbin102 |
       | textfile2.txt | testtrashbin102 |
       | textfile3.txt | testtrashbin102 |
-    @skipOnOcis
-    Examples:
-      | dav-path | status-code |
-      | new      | 401         |
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path | status-code |
       | new      | 404         |
@@ -260,11 +248,7 @@ Feature: files and folders exist in the trashbin after being deleted
     And user "testtrashbinempty" has uploaded file "filesForUpload/textfile.txt" to "/textfile1.txt"
     When user "Alice" tries to list the trashbin content for user "testtrashbinempty"
     Then the HTTP status code should be "<status-code>"
-    @skipOnOcis
-    Examples:
-      | dav-path | status-code |
-      | new      | 401         |
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path | status-code |
       | new      | 404         |
