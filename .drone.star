@@ -6,6 +6,7 @@ ALPINE_GIT = "alpine/git:latest"
 CHKO_DOCKER_PUSHRM = "chko/docker-pushrm:1"
 DRONE_CLI = "drone/cli:alpine"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
+BITNAMI_MINIO = "bitnami/minio:2023"
 OC_CI_ALPINE = "owncloudci/alpine:latest"
 OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier:latest"
 OC_CI_DRONE_ANSIBLE = "owncloudci/drone-ansible:latest"
@@ -49,8 +50,7 @@ dirs = {
 }
 
 # command to get the hash of a directory
-# SHA256_HASH_COMMAND = "find %s/.bingo -type f -exec sha256sum {} \\\\; | sort -k 2 | sha256sum | cut -d ' ' -f 1"
-SHA256_HASH_COMMAND = "cat $(ls -ad %s/.bingo/*) | sha256sum | cut -d ' ' -f 1"
+SHA256_HASH_COMMAND = "find %s -type f -exec sha256sum {} \\\\; | sort -k 2 | sha256sum | cut -d ' ' -f 1"
 
 # configuration
 config = {
@@ -371,7 +371,7 @@ def getGoBinForTesting(ctx):
     return [{
         "kind": "pipeline",
         "type": "docker",
-        "name": "get-go-bin",
+        "name": "get-go-bin-cache",
         "platform": {
             "os": "linux",
             "arch": "amd64",
@@ -418,11 +418,13 @@ def cacheGoBin():
         },
         {
             "name": "cache-go-bin",
-            "image": MINIO_MC,
+            "image": BITNAMI_MINIO,
             "environment": MINIO_MC_ENV,
             "commands": [
-                # cache using the minio/mc client to the public bucket (long term bucket)
+                # .bingo folder will change after 'bingo-get'
+                # so get the stored hash of a .bingo folder
                 "BINGO_HASH=$(cat %s/.bingo_hash)" % dirs["base"],
+                # cache using the minio client to the public bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
                 "mc cp -r /go/bin s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH",
             ],
@@ -434,10 +436,12 @@ def restoreGoBinCache():
     return [
         {
             "name": "restore-go-bin-cache",
-            "image": MINIO_MC,
+            "image": BITNAMI_MINIO,
             "environment": MINIO_MC_ENV,
+            # needs to be root to be able to write to /go/bin
+            "user": "0:0",
             "commands": [
-                "BINGO_HASH=$(" + SHA256_HASH_COMMAND % dirs["base"] + ")",
+                "BINGO_HASH=$(" + SHA256_HASH_COMMAND % (dirs["base"] + "/.bingo") + ")",
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
                 "mc cp -r -a s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH/bin /go",
                 "chmod +x /go/bin/*",
@@ -2499,21 +2503,6 @@ def rebuildBuildArtifactCache(ctx, name, path):
 
 def purgeBuildArtifactCache(ctx):
     return genericBuildArtifactCache(ctx, "", "purge", [])
-
-# def restoreGoCache(ctx, name, path):
-#     return restoreBuildArtifactCache(ctx, name, path) + [
-#         {
-#             "name": "move-go-cache",
-#             "image": OC_CI_PHP % DEFAULT_PHP_VERSION,
-#             "commands": [
-#                 "du -sh ./go/*",
-#                 "rsync -a --remove-source-files %s/go/ /go" % dirs["base"],
-#                 "rm -rf %s/go" % dirs["base"],
-#                 "du -sh /go/*",
-#             ],
-#             "volumes": [stepVolumeGo],
-#         },
-#     ]
 
 def pipelineSanityChecks(ctx, pipelines):
     """pipelineSanityChecks helps the CI developers to find errors before running it
