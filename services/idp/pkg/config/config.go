@@ -47,8 +47,9 @@ type Ldap struct {
 	UUIDAttribute     string `yaml:"uuid_attribute" env:"LDAP_USER_SCHEMA_ID;IDP_LDAP_UUID_ATTRIBUTE" desc:"LDAP User uuid attribute like 'uid'."`
 	UUIDAttributeType string `yaml:"uuid_attribute_type" env:"IDP_LDAP_UUID_ATTRIBUTE_TYPE" desc:"LDAP User uuid attribute type like 'text'."`
 
-	Filter      string `yaml:"filter" env:"LDAP_USER_FILTER;IDP_LDAP_FILTER" desc:"LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'."`
-	ObjectClass string `yaml:"objectclass" env:"LDAP_USER_OBJECTCLASS;IDP_LDAP_OBJECTCLASS" desc:"LDAP User ObjectClass like 'inetOrgPerson'."`
+	UserEnabledAttribute string `yaml:"user_enabled_attribute" env:"LDAP_USER_ENABLED_ATTRIBUTE;IDP_USER_ENABLED_ATTRIBUTE" desc:"LDAP Attribute to use as a flag telling if the user is enabled or disabled."`
+	Filter               string `yaml:"filter" env:"LDAP_USER_FILTER;IDP_LDAP_FILTER" desc:"LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'."`
+	ObjectClass          string `yaml:"objectclass" env:"LDAP_USER_OBJECTCLASS;IDP_LDAP_OBJECTCLASS" desc:"LDAP User ObjectClass like 'inetOrgPerson'."`
 }
 
 // Asset defines the available asset configuration.
