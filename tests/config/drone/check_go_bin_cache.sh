@@ -11,7 +11,7 @@ fi
 BINGO_DIR="$ROOT_PATH/.bingo"
 
 # generate hash of a .bingo folder
-BINGO_HASH=$(find "$BINGO_DIR" -type f -exec sha256sum {} \; | sort -k 2 | sha256sum | cut -d ' ' -f 1)
+BINGO_HASH=$(cat "$BINGO_DIR"/* | sha256sum | cut -d ' ' -f 1)
 
 URL="$CACHE_ENDPOINT/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH/bin/golangci-lint"
 if curl --output /dev/null --silent --head --fail "$URL"; then

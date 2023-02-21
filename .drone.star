@@ -6,7 +6,6 @@ ALPINE_GIT = "alpine/git:latest"
 CHKO_DOCKER_PUSHRM = "chko/docker-pushrm:1"
 DRONE_CLI = "drone/cli:alpine"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
-BITNAMI_MINIO = "bitnami/minio:2023"
 OC_CI_ALPINE = "owncloudci/alpine:latest"
 OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier:latest"
 OC_CI_DRONE_ANSIBLE = "owncloudci/drone-ansible:latest"
@@ -48,9 +47,6 @@ dirs = {
     "ocis": "/srv/app/tmp/ocis",
     "ocisRevaDataRoot": "/srv/app/tmp/ocis/owncloud/data",
 }
-
-# command to get the hash of a directory
-SHA256_HASH_COMMAND = "find %s -type f -exec sha256sum {} \\\\; | sort -k 2 | sha256sum | cut -d ' ' -f 1"
 
 # configuration
 config = {
@@ -416,7 +412,7 @@ def cacheGoBin():
         },
         {
             "name": "cache-go-bin",
-            "image": BITNAMI_MINIO,
+            "image": MINIO_MC,
             "environment": MINIO_MC_ENV,
             "commands": [
                 # .bingo folder will change after 'bingo-get'
@@ -434,12 +430,10 @@ def restoreGoBinCache():
     return [
         {
             "name": "restore-go-bin-cache",
-            "image": BITNAMI_MINIO,
+            "image": MINIO_MC,
             "environment": MINIO_MC_ENV,
-            # needs to be root to be able to write to /go/bin
-            "user": "0:0",
             "commands": [
-                "BINGO_HASH=$(" + SHA256_HASH_COMMAND % (dirs["base"] + "/.bingo") + ")",
+                "BINGO_HASH=$(cat %s/.bingo/* | sha256sum | cut -d ' ' -f 1)" % dirs["base"],
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
                 "mc cp -r -a s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH/bin /go",
                 "chmod +x /go/bin/*",
