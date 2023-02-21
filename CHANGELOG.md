@@ -26,6 +26,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Display surname and givenName attributes: [#5388](https://github.com/owncloud/ocis/pull/5388)
 * Enhancement - Extended search: [#5221](https://github.com/owncloud/ocis/pull/5221)
 * Enhancement - Resource tags: [#5227](https://github.com/owncloud/ocis/pull/5227)
+* Enhancement - Eventhistory service: [#5600](https://github.com/owncloud/ocis/pull/5600)
 * Enhancement - Expiration Notifications: [#5330](https://github.com/owncloud/ocis/pull/5330)
 * Enhancement - Add endpoint to list permissions: [#5594](https://github.com/owncloud/ocis/pull/5594)
 * Enhancement - Better config for postprocessing service: [#5457](https://github.com/owncloud/ocis/pull/5457)
