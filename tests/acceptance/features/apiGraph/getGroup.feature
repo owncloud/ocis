@@ -101,8 +101,5 @@ Feature: get groups and their members
     And user "Alice" has been added to group "tea-lover"
     And user "Brian" has been added to group "tea-lover"
     When user "Brian" gets all the members information of group "tea-lover" using the Graph API
-    Then the HTTP status code should be "200"
-    And the group 'tea-lover' should have the following member information
-      | displayName  | id        | mail              | onPremisesSamAccountName |
-      | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    |
-      | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
+    Then the HTTP status code should be "401"
+    And the last response should be an unauthorized response
