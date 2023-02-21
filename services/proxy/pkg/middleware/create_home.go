@@ -2,13 +2,17 @@ package middleware
 
 import (
 	"net/http"
+	"strconv"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -22,6 +26,7 @@ func CreateHome(optionSetters ...Option) func(next http.Handler) http.Handler {
 			next:              next,
 			logger:            logger,
 			revaGatewayClient: options.RevaGatewayClient,
+			roleQuotas:        options.RoleQuotas,
 		}
 	}
 }
@@ -30,6 +35,7 @@ type createHome struct {
 	next              http.Handler
 	logger            log.Logger
 	revaGatewayClient gateway.GatewayAPIClient
+	roleQuotas        map[string]uint64
 }
 
 func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
@@ -45,6 +51,19 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	ctx := metadata.AppendToOutgoingContext(req.Context(), revactx.TokenHeader, token)
 
 	createHomeReq := &provider.CreateHomeRequest{}
+	u, ok := revactx.ContextGetUser(ctx)
+	if ok {
+		roleIDs, err := m.getUserRoles(u)
+		if err != nil {
+			m.logger.Error().Err(err).Str("userid", u.Id.OpaqueId).Msg("failed to get roles for user")
+			errorcode.GeneralException.Render(w, req, http.StatusInternalServerError, "Unauthorized")
+			return
+		}
+		if limit, hasLimit := m.checkRoleQuotaLimit(roleIDs); hasLimit {
+			createHomeReq.Opaque = utils.AppendPlainToOpaque(nil, "quota", strconv.FormatUint(limit, 10))
+		}
+	}
+
 	createHomeRes, err := m.revaGatewayClient.CreateHome(ctx, createHomeReq)
 
 	if err != nil {
@@ -61,4 +80,28 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 func (m createHome) shouldServe(req *http.Request) bool {
 	return req.Header.Get("x-access-token") != ""
+}
+
+func (m createHome) getUserRoles(user *userv1beta1.User) ([]string, error) {
+	var roleIDs []string
+	if err := utils.ReadJSONFromOpaque(user.Opaque, "roles", &roleIDs); err != nil {
+		return nil, err
+	}
+
+	tmp := make(map[string]struct{})
+	for _, id := range roleIDs {
+		tmp[id] = struct{}{}
+	}
+
+	dedup := make([]string, 0, len(tmp))
+	for k := range tmp {
+		dedup = append(dedup, k)
+	}
+	return dedup, nil
+}
+
+func (m createHome) checkRoleQuotaLimit(roleIDs []string) (uint64, bool) {
+	id := roleIDs[0] // At the moment a user can only have one role.
+	quota, ok := m.roleQuotas[id]
+	return quota, ok
 }
