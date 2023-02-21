@@ -7,3 +7,4 @@ https://github.com/owncloud/ocis/pull/5285
 https://github.com/owncloud/ocis/pull/5310
 https://github.com/owncloud/ocis/pull/5404
 https://github.com/owncloud/ocis/pull/5460
+https://github.com/owncloud/ocis/pull/5613
