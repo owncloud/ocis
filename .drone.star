@@ -423,9 +423,7 @@ def cacheGoBin():
             "commands": [
                 # cache using the minio/mc client to the public bucket (long term bucket)
                 "BINGO_HASH=$(cat %s/.bingo_hash)" % dirs["base"],
-                "echo $BINGO_HASH",
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc rm -r --force s3/$CACHE_BUCKET/ocis/go-bin",
                 "mc cp -r /go/bin s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH",
             ],
             "volumes": [stepVolumeGo],
@@ -439,25 +437,13 @@ def restoreGoBinCache():
             "image": MINIO_MC,
             "environment": MINIO_MC_ENV,
             "commands": [
-                "mkdir -p /go",
                 "BINGO_HASH=$(" + SHA256_HASH_COMMAND % dirs["base"] + ")",
-                "echo $BINGO_HASH",
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc ls -r s3/$CACHE_BUCKET/ocis/go-bin",
                 "mc cp -r -a s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH/bin /go",
-                "ls -al",
-                "ls -al /go",
-                "ls -al /go/bin",
+                "chmod +x /go/bin/*",
             ],
             "volumes": [stepVolumeGo],
         },
-        # {
-        #     "name": "unzip-web-cache",
-        #     "image": OC_UBUNTU,
-        #     "commands": [
-        #         "tar -xvf %s -C ." % dirs["webZip"],
-        #     ],
-        # },
     ]
 
 def testOcisModule(ctx, module):
