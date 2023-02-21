@@ -346,6 +346,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 API key for the STORAGE-SYSTEM system user.
 
+a|`SETTINGS_BUNDLES_PATH` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The path to a JSON file with a list of bundles. If not definied, the default bundles will be loaded.
+
 a|`OCIS_ADMIN_USER_ID` +
 `SETTINGS_ADMIN_USER_ID` +
 
