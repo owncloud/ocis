@@ -171,9 +171,24 @@ func initCS3EnvVars(cs3Addr, machineAuthAPIKey string) error {
 // Init ldap backend vars which are currently not accessible via idp api
 func initLicoInternalLDAPEnvVars(ldap *config.Ldap) error {
 	filter := fmt.Sprintf("(objectclass=%s)", ldap.ObjectClass)
+
+	var needsAnd bool
 	if ldap.Filter != "" {
-		filter = fmt.Sprintf("(&%s%s)", ldap.Filter, filter)
+		filter += ldap.Filter
+		needsAnd = true
 	}
+
+	if ldap.UserEnabledAttribute != "" {
+		// Using a (!(enabled=FALSE)) filter here to allow user without
+		// any value for the enable flag to login
+		filter += fmt.Sprintf("(!(%s=FALSE))", ldap.UserEnabledAttribute)
+		needsAnd = true
+	}
+
+	if needsAnd {
+		filter = fmt.Sprintf("(&%s)", filter)
+	}
+
 	var defaults = map[string]string{
 		"LDAP_URI":                 ldap.URI,
 		"LDAP_BINDDN":              ldap.BindDN,
