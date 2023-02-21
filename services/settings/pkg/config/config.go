@@ -22,10 +22,11 @@ type Config struct {
 
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 
-	StoreType string                `yaml:"store_type" env:"SETTINGS_STORE_TYPE" desc:"Store type configures the persistency driver. Supported values are \"metadata\" and \"filesystem\"."`
-	DataPath  string                `yaml:"data_path" env:"SETTINGS_DATA_PATH" desc:"The directory where the filesystem storage will store ocis settings. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/settings."`
-	Metadata  Metadata              `yaml:"metadata_config"`
-	Bundles   []*settingsmsg.Bundle `yaml:"bundles"`
+	StoreType   string                `yaml:"store_type" env:"SETTINGS_STORE_TYPE" desc:"Store type configures the persistency driver. Supported values are \"metadata\" and \"filesystem\"."`
+	DataPath    string                `yaml:"data_path" env:"SETTINGS_DATA_PATH" desc:"The directory where the filesystem storage will store ocis settings. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/settings."`
+	Metadata    Metadata              `yaml:"metadata_config"`
+	BundlesPath string                `yaml:"bundles_path" env:"SETTINGS_BUNDLES_PATH" desc:"The path to a JSON file with a list of bundles. If not definied, the default bundles will be loaded."`
+	Bundles     []*settingsmsg.Bundle `yaml:"-"`
 
 	AdminUserID string `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID;SETTINGS_ADMIN_USER_ID" desc:"ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand."`
 

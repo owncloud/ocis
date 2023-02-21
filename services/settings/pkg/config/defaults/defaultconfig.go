@@ -1,14 +1,16 @@
 package defaults
 
 import (
+	"encoding/json"
+	"os"
 	"path"
 	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
-	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
 	rdefaults "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
+	"github.com/pkg/errors"
 )
 
 func FullDefaultConfig() *config.Config {
@@ -53,7 +55,8 @@ func DefaultConfig() *config.Config {
 			StorageAddress: "127.0.0.1:9215",
 			SystemUserIDP:  "internal",
 		},
-		Bundles: []*v0.Bundle{},
+		BundlesPath: "",
+		Bundles:     nil,
 	}
 }
 
@@ -123,12 +126,23 @@ func EnsureDefaults(cfg *config.Config) {
 }
 
 func Sanitize(cfg *config.Config) {
-	if len(cfg.Bundles) == 0 {
-		cfg.Bundles = rdefaults.GenerateBundlesDefaultRoles()
-	}
-
 	// sanitize config
 	if cfg.HTTP.Root != "/" {
 		cfg.HTTP.Root = strings.TrimSuffix(cfg.HTTP.Root, "/")
 	}
+}
+
+// LoadBundles loads setting bundles from a file or from defaults
+func LoadBundles(cfg *config.Config) error {
+	if cfg.BundlesPath != "" {
+		data, _ := os.ReadFile(cfg.BundlesPath)
+		err := json.Unmarshal(data, &cfg.Bundles)
+		if err != nil {
+			return errors.Wrapf(err, "Could not load bundles from path %s", cfg.BundlesPath)
+		}
+	}
+	if len(cfg.Bundles) == 0 {
+		cfg.Bundles = rdefaults.GenerateBundlesDefaultRoles()
+	}
+	return nil
 }
