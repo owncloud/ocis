@@ -341,6 +341,16 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enable asynchronous file uploads.
 
+a|`OCIS_SPACES_MAX_QUOTA` +
+`STORAGE_USERS_OCIS_MAX_QUOTA` +
+
+a| [subs=-attributes]
+++uint64 ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Set a global max quota for spaces. If you are not setting OCIS_SPACES_MAX_QUOTA then don't forget to set FRONTEND_MAX_QUOTA.
+
 a|`STORAGE_USERS_S3NG_ROOT` +
 
 a| [subs=-attributes]

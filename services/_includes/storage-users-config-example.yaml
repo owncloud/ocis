@@ -47,6 +47,7 @@ drivers:
     max_acquire_lock_cycles: 20
     lock_cycle_duration_factor: 30
     async_uploads: false
+    max_quota: 0
   s3ng:
     root: ~/.ocis/storage/users
     user_layout: '{{.Id.OpaqueId}}'

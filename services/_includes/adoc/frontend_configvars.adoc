@@ -301,6 +301,16 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Changing this value is NOT supported. Indicates to clients that the share jail is supposed to be used.
 
+a|`OCIS_SPACES_MAX_QUOTA` +
+`FRONTEND_MAX_QUOTA` +
+
+a| [subs=-attributes]
+++uint64 ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Set the global max quota value in the capabilities.
+
 a|`FRONTEND_UPLOAD_MAX_CHUNK_SIZE` +
 
 a| [subs=-attributes]

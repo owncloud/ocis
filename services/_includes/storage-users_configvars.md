@@ -36,6 +36,7 @@
 | STORAGE_USERS_OCIS_MAX_ACQUIRE_LOCK_CYCLES | int | 20 | When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used.|
 | STORAGE_USERS_OCIS_LOCK_CYCLE_DURATION_FACTOR | int | 30 | When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.|
 | STORAGE_USERS_OCIS_ASYNC_UPLOADS | bool | false | Enable asynchronous file uploads.|
+| OCIS_SPACES_MAX_QUOTA<br/>STORAGE_USERS_OCIS_MAX_QUOTA | uint64 | 0 | Set a global max quota for spaces. If you are not setting OCIS_SPACES_MAX_QUOTA then don't forget to set FRONTEND_MAX_QUOTA.|
 | STORAGE_USERS_S3NG_ROOT | string | ~/.ocis/storage/users | The directory where the filesystem storage will store metadata for blobs. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.|
 | STORAGE_USERS_S3NG_USER_LAYOUT | string | {{.Id.OpaqueId}} | Template string for the user storage layout in the user directory.|
 | STORAGE_USERS_PERMISSION_ENDPOINT<br/>STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT | string | 127.0.0.1:9191 | Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.|

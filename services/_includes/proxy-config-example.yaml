@@ -30,6 +30,7 @@ reva:
 grpc_client_tls:
   mode: ""
   cacert: ""
+role_quotas: {}
 policies:
 - name: ocis
   routes:
