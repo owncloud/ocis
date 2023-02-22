@@ -265,6 +265,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 								"enabled":    cfg.EnableProjectSpaces || cfg.EnableShareJail,
 								"projects":   cfg.EnableProjectSpaces,
 								"share_jail": cfg.EnableShareJail,
+								"max_quota":  cfg.MaxQuota,
 							},
 						},
 						"version": map[string]interface{}{
