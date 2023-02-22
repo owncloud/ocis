@@ -217,9 +217,11 @@ class SpacesContext implements Context {
 		if (isset($response['name']) && $response['name'] === $name) {
 			return $response;
 		}
-		foreach ($spaceAsArray["value"] as $spaceCandidate) {
-			if ($spaceCandidate['name'] === $name) {
-				return $spaceCandidate;
+		if (isset($spaceAsArray["value"])) {
+			foreach ($spaceAsArray["value"] as $spaceCandidate) {
+				if ($spaceCandidate['name'] === $name) {
+					return $spaceCandidate;
+				}
 			}
 		}
 		return [];
@@ -629,15 +631,17 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" looks up the single space "([^"]*)" via the GraphApi by using its id$/
+	 * @When /^user "([^"]*)" tries to look up the single space "([^"]*)" owned by the user "([^"]*)" by using its id$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
+	 * @param string $ownerUser
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function theUserLooksUpTheSingleSpaceUsingTheGraphApiByUsingItsId(string $user, string $spaceName): void {
-		$space = $this->getSpaceByName($user, $spaceName);
+	public function theUserLooksUpTheSingleSpaceUsingTheGraphApiByUsingItsId(string $user, string $spaceName, string $ownerUser = ''): void {
+		$space = $this->getSpaceByName(($ownerUser !== "") ? $ownerUser : $user, $spaceName);
 		Assert::assertIsArray($space);
 		Assert::assertNotEmpty($spaceId = $space["id"]);
 		Assert::assertNotEmpty($space["root"]["webDavUrl"]);
@@ -646,7 +650,7 @@ class SpacesContext implements Context {
 				$this->featureContext->getBaseUrl(),
 				$user,
 				$this->featureContext->getPasswordForUser($user),
-				$spaceId
+				$space["id"]
 			)
 		);
 	}
