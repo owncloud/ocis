@@ -388,3 +388,43 @@ Feature: Share spaces
       | manager |
       | editor  |
       | viewer  |
+
+
+  Scenario Outline: delete the expiration date of a space in user share
+    Given user "Alice" has shared a space "share space" with settings:
+      | shareWith  | Brian                    |
+      | role       | <role>                   |
+      | expireDate | 2042-03-25T23:59:59+0100 |
+    When user "Alice" updates the space "share space" with settings:
+      | shareWith  | Brian  |
+      | expireDate |        |
+      | role       | <role> |
+    Then the HTTP status code should be "200"
+    And the user "Brian" should have a space called "share space" granted to user "Brian" with role "<role>" and expiration date ""
+    Examples:
+      | role    |
+      | manager |
+      | editor  |
+      | viewer  |
+
+
+  Scenario Outline: update the expiration date of a space in group share
+    Given group "sales" has been created
+    And the administrator has added a user "Brian" to the group "sales" using GraphApi
+    And user "Alice" has shared a space "share space" with settings:
+      | shareWith  | sales                    |
+      | shareType  | 8                        |
+      | role       | <role>                   |
+      | expireDate | 2042-03-25T23:59:59+0100 |
+    When user "Alice" updates the space "share space" with settings:
+      | shareWith  | sales  |
+      | shareType  | 8      |
+      | expireDate |        |
+      | role       | <role> |
+    Then the HTTP status code should be "200"
+    And the user "Brian" should have a space called "share space" granted to group "sales" with role "<role>" and expiration date ""
+    Examples:
+      | role    |
+      | manager |
+      | editor  |
+      | viewer  |    

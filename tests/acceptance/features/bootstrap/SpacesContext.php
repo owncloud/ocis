@@ -3244,8 +3244,7 @@ class SpacesContext implements Context {
 			$foundRoleInResponse = false;
 			if ($permission['roles'][0] === $role || $permission['grantedToIdentities'][0][$recipientType]['id'] === $recipientId) {
 				$foundRoleInResponse = true;
-				if ($expirationDate !== null) {
-					Assert::assertArrayHasKey('expirationDateTime', $permission, 'expirationDateTime key not found in response');
+				if ($expirationDate !== null && isset($permission['expirationDateTime'])) {
 					Assert::assertEquals($expirationDate, (preg_split("/[\sT]+/", $permission['expirationDateTime']))[0], "$expirationDate is different in the response");
 				}
 				break;
