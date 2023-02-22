@@ -163,7 +163,7 @@ Feature: List and create spaces
 
 
   Scenario Outline: A user cannot list space by id if he is not member of the space
-    Given the administrator has given "Alice" the role "Space Admin" using the settings api
+    Given the administrator has given "Alice" the role "<role>" using the settings api
     And user "Admin" has created a space "Project Venus" with the default quota using the GraphApi
     When user "Alice" tries to look up the single space "Project Venus" owned by the user "Admin" by using its id
     Then the HTTP status code should be "404"
