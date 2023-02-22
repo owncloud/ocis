@@ -597,6 +597,9 @@ class GraphHelper {
 	}
 
 	/**
+	 * returns single group information along with its member information when groupId is provided
+	 * else return all group information along with its member information
+	 *
 	 * @param string $baseUrl
 	 * @param string $xRequestId
 	 * @param string $adminUser
@@ -606,7 +609,7 @@ class GraphHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function getAllGroupsAlongWithMembers(
+	public static function getSingleOrAllGroupsAlongWithMembers(
 		string $baseUrl,
 		string $xRequestId,
 		string $adminUser,
