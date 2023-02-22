@@ -54,5 +54,6 @@
 | LDAP_USER_SCHEMA_USERNAME<br/>IDP_LDAP_NAME_ATTRIBUTE | string | displayName | LDAP User name attribute like 'displayName'.|
 | LDAP_USER_SCHEMA_ID<br/>IDP_LDAP_UUID_ATTRIBUTE | string | uid | LDAP User uuid attribute like 'uid'.|
 | IDP_LDAP_UUID_ATTRIBUTE_TYPE | string | text | LDAP User uuid attribute type like 'text'.|
+| LDAP_USER_ENABLED_ATTRIBUTE<br/>IDP_USER_ENABLED_ATTRIBUTE | string | ownCloudUserEnabled | LDAP Attribute to use as a flag telling if the user is enabled or disabled.|
 | LDAP_USER_FILTER<br/>IDP_LDAP_FILTER | string |  | LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.|
 | LDAP_USER_OBJECTCLASS<br/>IDP_LDAP_OBJECTCLASS | string | inetOrgPerson | LDAP User ObjectClass like 'inetOrgPerson'.|

@@ -109,5 +109,6 @@ ldap:
   name_attribute: displayName
   uuid_attribute: uid
   uuid_attribute_type: text
+  user_enabled_attribute: ownCloudUserEnabled
   filter: ""
   objectclass: inetOrgPerson
