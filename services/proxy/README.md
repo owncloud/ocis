@@ -13,6 +13,19 @@ The following request authentication schemes are implemented:
 -   Signed URL
 -   Public Share Token
 
+## Automatic quota assignments
+
+It is possible to automatically assign a specific quota amount to new users depending on their role.
+To do this you need to add the following config snippet to the proxy.yaml config file.
+
+```yaml
+role_quotas:
+    <role ID1>: <quota1>
+    <role ID2>: <quota2>
+```
+
+There you need to configure the mapping between the roles by their ID and the quota in Bytes.
+
 ## Recommendations for Production Deployments
 
 In a production deployment, you want to have basic authentication (`PROXY_ENABLE_BASIC_AUTH`) disabled which is the default state. You also want to setup a firewall to only allow requests to the proxy service or the reverse proxy if you have one. Requests to the other services should be blocked by the firewall.

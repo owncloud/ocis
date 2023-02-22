@@ -123,6 +123,7 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 		"max_acquire_lock_cycles":     cfg.Drivers.OCIS.MaxAcquireLockCycles,
 		"lock_cycle_duration_factor":  cfg.Drivers.OCIS.LockCycleDurationFactor,
 		"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
+		"max_quota":                   cfg.Drivers.OCIS.MaxQuota,
 		"statcache": map[string]interface{}{
 			"cache_store":    cfg.Cache.Store,
 			"cache_nodes":    cfg.Cache.Nodes,
@@ -158,6 +159,7 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 		"permissionssvc_tls_mode":     cfg.Commons.GRPCClientTLS.Mode,
 		"max_acquire_lock_cycles":     cfg.Drivers.OCIS.MaxAcquireLockCycles,
 		"lock_cycle_duration_factor":  cfg.Drivers.OCIS.LockCycleDurationFactor,
+		"max_quota":                   cfg.Drivers.OCIS.MaxQuota,
 		"statcache": map[string]interface{}{
 			"cache_store":    cfg.Cache.Store,
 			"cache_nodes":    cfg.Cache.Nodes,

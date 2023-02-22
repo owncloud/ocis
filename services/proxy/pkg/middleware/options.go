@@ -60,6 +60,9 @@ type Options struct {
 	AccessTokenVerifyMethod string
 	// JWKS sets the options for fetching the JWKS from the IDP
 	JWKS config.JWKS
+	// RoleQuotas hold userid:quota mappings. These will be used when provisioning new users.
+	// The users will get as much quota as is set for their role.
+	RoleQuotas map[string]uint64
 }
 
 // newOptions initializes the available default options.
@@ -206,9 +209,16 @@ func AccessTokenVerifyMethod(method string) Option {
 	}
 }
 
-// JWKS sets the options for fetching the JWKS from the IDP
+// JWKSOptions sets the options for fetching the JWKS from the IDP
 func JWKSOptions(jo config.JWKS) Option {
 	return func(o *Options) {
 		o.JWKS = jo
+	}
+}
+
+// RoleQuotas sets the role quota mapping setting
+func RoleQuotas(roleQuotas map[string]uint64) Option {
+	return func(o *Options) {
+		o.RoleQuotas = roleQuotas
 	}
 }
