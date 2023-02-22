@@ -294,7 +294,7 @@ Feature: Share spaces
       | role      | viewer |
     When user "Brian" uploads a file inside space "share space" with content "Test" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "403"
-    When user "Alice" has shared a space "share space" with settings:
+    When user "Alice" shares a space "share space" with settings:
       | shareWith | Brian  |
       | role      | editor |
     Then the HTTP status code should be "200"
@@ -310,7 +310,7 @@ Feature: Share spaces
       | role      | viewer |
     When user "Brian" uploads a file inside space "share space" with content "Test" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "403"
-    When user "Alice" has shared a space "share space" with settings:
+    When user "Alice" shares a space "share space" with settings:
       | shareWith | sales  |
       | shareType | 8      |
       | role      | editor |
@@ -343,6 +343,46 @@ Feature: Share spaces
       | expireDate | 2042-03-25T23:59:59+0100 |
     Then the HTTP status code should be "200"
     And the user "Brian" should have a space called "share space" granted to group "sales" with role "<role>" and expiration date "2042-03-25"
+    Examples:
+      | role    |
+      | manager |
+      | editor  |
+      | viewer  |
+
+
+  Scenario Outline: update the expiration date of a space in user share
+    Given user "Alice" has shared a space "share space" with settings:
+      | shareWith  | Brian                    |
+      | role       | <role>                   |
+      | expireDate | 2042-03-25T23:59:59+0100 |
+    When user "Alice" updates the space "share space" with settings:
+      | shareWith  | Brian                         |
+      | expireDate | 2044-01-01T23:59:59.999+01:00 |
+      | role       | <role>                        |
+    Then the HTTP status code should be "200"
+    And the user "Brian" should have a space called "share space" granted to user "Brian" with role "<role>" and expiration date "2044-01-01"
+    Examples:
+      | role    |
+      | manager |
+      | editor  |
+      | viewer  |
+
+
+  Scenario Outline: update the expiration date of a space in group share
+    Given group "sales" has been created
+    And the administrator has added a user "Brian" to the group "sales" using GraphApi
+    And user "Alice" has shared a space "share space" with settings:
+      | shareWith  | sales                    |
+      | shareType  | 8                        |
+      | role       | <role>                   |
+      | expireDate | 2042-03-25T23:59:59+0100 |
+    When user "Alice" updates the space "share space" with settings:
+      | shareWith  | sales                         |
+      | shareType  | 8                             |
+      | expireDate | 2044-01-01T23:59:59.999+01:00 |
+      | role       | <role>                        |
+    Then the HTTP status code should be "200"
+    And the user "Brian" should have a space called "share space" granted to group "sales" with role "<role>" and expiration date "2044-01-01"
     Examples:
       | role    |
       | manager |

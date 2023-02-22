@@ -69,7 +69,7 @@ class SpacesContext implements Context {
 	 * @var ChecksumContext
 	 */
 	private ChecksumContext $checksumContext;
-	
+
 	/**
 	 * @var FilesVersionsContext
 	 */
@@ -1920,9 +1920,10 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$availableRoleToAssignToShareSpace = ['manager', 'editor', 'viewer'];
 		$rows = $table->getRowsHash();
-		if (!\in_array(\strtolower($rows['role']), $availableRoleToAssignToShareSpace)) {
+		if (isset($rows['role']) && !\in_array(\strtolower($rows['role']), $availableRoleToAssignToShareSpace)) {
 			throw new Error("The Selected " . $rows['role'] . " Cannot be Found");
 		}
+		$rows["role"] = \array_key_exists("role", $rows) ? $rows["role"] : "viewer";
 		$rows["shareType"] = \array_key_exists("shareType", $rows) ? $rows["shareType"] : 7;
 		$rows["expireDate"] = \array_key_exists("expireDate", $rows) ? $rows["expireDate"] : null;
 
