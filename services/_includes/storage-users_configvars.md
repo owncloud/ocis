@@ -76,5 +76,5 @@
 | STORAGE_USERS_READ_ONLY | bool | false | Set this storage to be read-only.|
 | STORAGE_USERS_UPLOAD_EXPIRATION | int64 | 86400 | Duration in seconds after which uploads will expire.|
 | OCIS_ADMIN_USER_ID<br/>STORAGE_USERS_PURGE_TRASH_BIN_USER_ID | string |  | ID of the user who collects all necessary information for deletion.|
-| STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE | Duration | 720h0m0s | Specifies the period of time in which items that have been in the personal trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion|
-| STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE | Duration | 720h0m0s | Specifies the period of time in which items that have been in the project trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion|
+| STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE | Duration | 720h0m0s | Specifies the period of time in which items that have been in the personal trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion. The value is human-readable, valid values are '24h', '60m', '60s' etc.|
+| STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE | Duration | 720h0m0s | Specifies the period of time in which items that have been in the project trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion. The value is human-readable, valid values are '24h', '60m', '60s' etc.|

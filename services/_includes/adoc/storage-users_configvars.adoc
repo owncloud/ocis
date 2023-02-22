@@ -716,7 +716,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++720h0m0s ++
 a| [subs=-attributes]
-Specifies the period of time in which items that have been in the personal trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion
+Specifies the period of time in which items that have been in the personal trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion. The value is human-readable, valid values are '24h', '60m', '60s' etc.
 
 a|`STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE` +
 
@@ -725,6 +725,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++720h0m0s ++
 a| [subs=-attributes]
-Specifies the period of time in which items that have been in the project trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion
+Specifies the period of time in which items that have been in the project trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion. The value is human-readable, valid values are '24h', '60m', '60s' etc.
 |===
 
