@@ -606,10 +606,10 @@ class GraphContext implements Context {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function listAllGroupsAlongWithAllMemberInformation(string $user, ?string $group = null): ResponseInterface {
+	public function listSingleOrAllGroupsAlongWithAllMemberInformation(string $user, ?string $group = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($user);
 
-		return GraphHelper::getAllGroupsAlongWithMembers(
+		return GraphHelper::getSingleOrAllGroupsAlongWithMembers(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$credentials["username"],
@@ -1017,7 +1017,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When user :user retrieves all groups along with their members using Graph API
+	 * @When user :user retrieves all groups along with their members using the Graph API
 	 * @When user :user gets all the members information of group :group using the Graph API
 	 *
 	 * @param string $user
@@ -1026,8 +1026,8 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function userRetrievesMembersOfAllGroupsUsingTheGraphAPI(string $user, string $group = ''): void {
-		$this->featureContext->setResponse($this->listAllGroupsAlongWithAllMemberInformation($user, $group));
+	public function userRetrievesAllMemberInformationOfSingleOrAllGroups(string $user, string $group = ''): void {
+		$this->featureContext->setResponse($this->listSingleOrAllGroupsAlongWithAllMemberInformation($user, $group));
 	}
 
 	/**
@@ -1042,7 +1042,7 @@ class GraphContext implements Context {
 	public function theGroupShouldHaveTheFollowingMemberInformation(string $group, TableNode $table): void {
 		$response = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
 		$rows = $table->getHash();
-		$nextMemberInformation = 0;
+		$currentMemberIndex = 0;
 		if (isset($response['value'])) {
 			$response = $response['value'];
 			$groupFoundInResponse = false;
@@ -1050,8 +1050,8 @@ class GraphContext implements Context {
 				if ($value['displayName'] === $group) {
 					$groupFoundInResponse = true;
 					foreach ($rows as $row) {
-						$this->checkUserInformation($row, $value['members'][$nextMemberInformation]);
-						$nextMemberInformation++;
+						$this->checkUserInformation($row, $value['members'][$currentMemberIndex]);
+						$currentMemberIndex++;
 					}
 					break;
 				}
@@ -1063,8 +1063,8 @@ class GraphContext implements Context {
 			}
 		} else {
 			foreach ($rows as $row) {
-				$this->checkUserInformation($row, $response['members'][$nextMemberInformation]);
-				$nextMemberInformation++;
+				$this->checkUserInformation($row, $response['members'][$currentMemberIndex]);
+				$currentMemberIndex++;
 			}
 		}
 	}
