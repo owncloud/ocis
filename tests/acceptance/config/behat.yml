@@ -158,7 +158,6 @@ default:
       contexts:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
-        - OccContext:
         - WebDavPropertiesContext:
         - FavoritesContext:
         - ChecksumContext:
