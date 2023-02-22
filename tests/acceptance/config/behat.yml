@@ -16,7 +16,6 @@ default:
         - RoleAssignmentContext:
         - GraphContext:
         - SpacesContext:
-        - OccContext:
         - FeatureContext: &common_feature_context_params
             baseUrl: http://localhost:8080
             adminUsername: admin
@@ -39,7 +38,6 @@ default:
       contexts:
         - RoleAssignmentContext:
         - SpacesContext:
-        - OccContext:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - ChecksumContext:
@@ -60,7 +58,6 @@ default:
       contexts:
         - RoleAssignmentContext:
         - SpacesContext:
-        - OccContext:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - ChecksumContext:
@@ -82,7 +79,6 @@ default:
       contexts:
         - RoleAssignmentContext:
         - SpacesContext:
-        - OccContext:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - ChecksumContext:
@@ -104,7 +100,6 @@ default:
         - RoleAssignmentContext:
         - ArchiverContext:
         - SpacesContext:
-        - OccContext:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - ChecksumContext:
@@ -123,7 +118,6 @@ default:
         - RoleAssignmentContext:
         - GraphContext:
         - SpacesContext:
-        - OccContext:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
         - ChecksumContext:
@@ -144,7 +138,6 @@ default:
       contexts:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
-        - OccContext:
         - WebDavPropertiesContext:
         - FavoritesContext:
         - ChecksumContext:
