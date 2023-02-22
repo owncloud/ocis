@@ -33,10 +33,10 @@ Feature: List and create spaces
     And user "Brian" has shared folder "folder" with user "Alice" with permissions "31"
     And user "Alice" has accepted share "/folder" offered by user "Brian"
     Then the user "Alice" should have a space called "Shares" with these key and value pairs:
-      | key       | value       |
-      | driveType | virtual     |
-      | id        | %space_id%  |
-      | name      | Shares      |
+      | key       | value      |
+      | driveType | virtual    |
+      | id        | %space_id% |
+      | name      | Shares     |
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"
     Then the HTTP status code should be "200"
     And the json responded should contain a space "Alice Hansen" with these key and value pairs:
@@ -70,13 +70,19 @@ Feature: List and create spaces
     Then the HTTP status code should be "207"
 
 
-  Scenario: An ordinary user cannot create a Space via Graph API
+  Scenario Outline: The user without permissions to create space cannot create a Space via Graph API
+    Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" creates a space "Project Mars" of type "project" with the default quota using the GraphApi
     Then the HTTP status code should be "401"
+    And the user "Alice" should not have a space called "share space"
+    Examples:
+      | role  |
+      | User  |
+      | Guest |
 
 
-  Scenario: An admin user can create a Space via the Graph API with default quota
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+  Scenario Outline: An admin or space admin user can create a Space via the Graph API with default quota
+    Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" creates a space "Project Mars" of type "project" with the default quota using the GraphApi
     Then the HTTP status code should be "201"
     And the json responded should contain a space "Project Mars" with these key and value pairs:
@@ -87,10 +93,14 @@ Feature: List and create spaces
       | quota@@@total    | 1000000000                       |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
       | webUrl           | %base_url%/f/%space_id%          |
+    Examples:
+      | role        |
+      | Admin       |
+      | Space Admin |
 
 
-  Scenario: An admin user can create a Space via the Graph API with certain quota
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+  Scenario Outline: An admin or space admin user can create a Space via the Graph API with certain quota
+    Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
     Then the HTTP status code should be "201"
     And the json responded should contain a space "Project Venus" with these key and value pairs:
@@ -100,6 +110,10 @@ Feature: List and create spaces
       | quota@@@total    | 2000                             |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
       | webUrl           | %base_url%/f/%space_id%          |
+    Examples:
+      | role        |
+      | Admin       |
+      | Space Admin |
 
 
   Scenario: A user can list his personal space via multiple endpoints
@@ -120,8 +134,8 @@ Feature: List and create spaces
       | webUrl           | %base_url%/f/%space_id%          |
 
 
-  Scenario: A user can list his created spaces via multiple endpoints
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+  Scenario Outline: A user can list his created spaces via multiple endpoints
+    Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
     Then the HTTP status code should be "201"
     And the json responded should contain a space "Project Venus" with these key and value pairs:
@@ -133,7 +147,8 @@ Feature: List and create spaces
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
       | webUrl           | %base_url%/f/%space_id%          |
     When user "Alice" looks up the single space "Project Venus" via the GraphApi by using its id
-    Then the json responded should contain a space "Project Venus" with these key and value pairs:
+    Then the HTTP status code should be "200"
+    And the json responded should contain a space "Project Venus" with these key and value pairs:
       | key              | value                            |
       | driveType        | project                          |
       | driveAlias       | project/project-venus            |
@@ -141,3 +156,21 @@ Feature: List and create spaces
       | quota@@@total    | 2000                             |
       | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
       | webUrl           | %base_url%/f/%space_id%          |
+    Examples:
+      | role        |
+      | Admin       |
+      | Space Admin |
+
+
+  Scenario Outline: A user cannot list space by id if he is not member of the space
+    Given the administrator has given "Alice" the role "<role>" using the settings api
+    And user "Admin" has created a space "Project Venus" with the default quota using the GraphApi
+    When user "Alice" tries to look up the single space "Project Venus" owned by the user "Admin" by using its id
+    Then the HTTP status code should be "404"
+    And the json responded should not contain a space with name "Project Venus"
+    Examples:
+      | role        |
+      | Admin       |
+      | Space Admin |
+      | User        |
+      | Guest       |
