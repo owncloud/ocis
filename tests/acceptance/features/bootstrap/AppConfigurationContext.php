@@ -132,7 +132,21 @@ class AppConfigurationContext implements Context {
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function userGetsCapabilities(string $username):void {
+	public function userRetrievesCapabilities(string $username): void {
+		$user = $this->featureContext->getActualUsername($username);
+		$this->userGetsCapabilities($user, true);
+	}
+
+	/**
+	 *
+	 * @param string $username
+	 * @param boolean $formatJson // if true then formats the response in json
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function userGetsCapabilities(string $username, ?bool $formatJson = false):void {
 		$user = $this->featureContext->getActualUsername($username);
 		$password = $this->featureContext->getPasswordForUser($user);
 		$this->featureContext->setResponse(
@@ -141,7 +155,7 @@ class AppConfigurationContext implements Context {
 				$user,
 				$password,
 				'GET',
-				'/cloud/capabilities',
+				'/cloud/capabilities' . ($formatJson ? '?format=json' : ''),
 				$this->featureContext->getStepLineRef(),
 				[],
 				$this->featureContext->getOcsApiVersion()
@@ -214,7 +228,8 @@ class AppConfigurationContext implements Context {
 	 * @return void
 	 */
 	public function theAdministratorGetsCapabilities():void {
-		$this->userGetsCapabilities($this->getAdminUsernameForCapabilitiesCheck());
+		$user = $this->getAdminUsernameForCapabilitiesCheck();
+		$this->userGetsCapabilities($user, true);
 	}
 
 	/**

@@ -24,6 +24,7 @@
 
 use Behat\Behat\Hook\Scope\BeforeStepScope;
 use GuzzleHttp\Exception\GuzzleException;
+use Helmich\JsonAssert\JsonAssertions;
 use rdx\behatvars\BehatVariablesContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
@@ -1640,6 +1641,55 @@ class FeatureContext extends BehatVariablesContext {
 			);
 		}
 		$this->emptyLastHTTPStatusCodesArray();
+	}
+
+	/**
+	 * @param PyStringNode $schemaString
+	 *
+	 * @return mixed
+	 */
+	private function getJSONSchema(PyStringNode $schemaString) {
+		$schemaRawString = $schemaString->getRaw();
+		// substitute the inline codes or values
+		$schemaRawString = $this->substituteInLineCodes($schemaRawString);
+		$schema = json_decode($schemaRawString);
+		Assert::assertNotNull($schema, 'schema is not valid JSON');
+		return $schema;
+	}
+
+	/**
+	 * returns json decoded body content of a json response as an object
+	 *
+	 * @param ResponseInterface|null $response
+	 *
+	 * @return object
+	 */
+	public function getJsonDecodedResponseBodyContent(ResponseInterface $response = null):?object {
+		$response = $response ?? $this->response;
+		if ($response !== null) {
+			$response->getBody()->rewind();
+			return json_decode($response->getBody()->getContents());
+		}
+		return null;
+	}
+
+	/**
+	 * @Then the JSON data of the response should match
+	 *
+	 * @param PyStringNode $schemaString
+	 *
+	 * @return void
+	 *
+	 * @throws Exception
+	 */
+	public function theDataOfTheResponseShouldMatch(
+		PyStringNode $schemaString
+	): void {
+		$jsonResponse = $this->getJsonDecodedResponseBodyContent();
+		JsonAssertions::assertJsonDocumentMatchesSchema(
+			$jsonResponse->ocs->data,
+			$this->getJSONSchema($schemaString)
+		);
 	}
 
 	/**
