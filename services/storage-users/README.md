@@ -12,7 +12,7 @@ When using Infinite Scale as user storage, a directory named `storage/users/uplo
 
 *   **If an upload succeeds**, the _blob_ file will be moved to the target and the _blob.info_ file will be deleted.
 
-*   **In case of incomplete uploads**, the _blob_ and _blob.info_ files will continue to recieve data until either the upload succeeds in time or the upload expires based on the `STORAGE_USERS_UPLOAD_EXPIRATION` variable, see the table below for details.
+*   **In case of incomplete uploads**, the _blob_ and _blob.info_ files will continue to receive data until either the upload succeeds in time or the upload expires based on the `STORAGE_USERS_UPLOAD_EXPIRATION` variable, see the table below for details.
 
 *   **In case of expired uploads**, the _blob_ and _blob.info_ files will _not_ be removed automatically. Thus a lot of data can pile up over time wasting storage space.
 
@@ -21,7 +21,7 @@ When using Infinite Scale as user storage, a directory named `storage/users/uplo
 Example cases for expired uploads
 
 *   When a user uploads a big file but the file exceeds the user-quota, the upload can't be moved to the target after it has finished. The file stays at the upload location until it is manually cleared.
-*   If the bandwith is limited and the file to transfer can't be transferred completely before the upload expiration time is reached, the file expires and can't be processed. 
+*   If the bandwidth is limited and the file to transfer can't be transferred completely before the upload expiration time is reached, the file expires and can't be processed. 
 
 There are two commands available to manage unfinished uploads
 
@@ -62,7 +62,7 @@ Cleaned uploads:
 
 <!-- referencing: https://github.com/owncloud/ocis/pull/5500 -->
 
-This command is about to purge old trash-bin items of `project` spaces (spaces that have been created manually) and `personal` spaces .
+This command is about purging old trash-bin items of `project` spaces (spaces that have been created manually) and `personal` spaces.
 
 ```bash
 ocis storage-users trash-bin <command>
