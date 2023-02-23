@@ -6,7 +6,6 @@ Feature: upload file
 
   Background:
     Given using OCS API version "1"
-    And the administrator has set the default folder for received shares to "Shares"
     And user "Alice" has been created with default attributes and without skeleton files
 
 
