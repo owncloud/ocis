@@ -27,6 +27,7 @@
 | OCIS_GRPC_CLIENT_TLS_CACERT | string |  | Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.|
 | STORAGE_USERS_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
 | STORAGE_USERS_DRIVER | string | ocis | The storage driver which should be used by the service. Defaults to 'ocis', Supported values are: 'ocis', 's3ng' and 'owncloudsql'. The 'ocis' driver stores all data (blob and meta data) in an POSIX compliant volume. The 's3ng' driver stores metadata in a POSIX compliant volume and uploads blobs to the s3 bucket.|
+| STORAGE_USERS_OCIS_METADATA_BACKEND | string | xattrs | The backend to use for storing metadata. Supported values are 'xattrs' and 'ini'. The setting 'xattrs' uses extended attributes to store file metadata while 'ini' uses a dedicated file to store file metadata. Defaults to 'xattrs'.|
 | STORAGE_USERS_OCIS_ROOT | string | ~/.ocis/storage/users | The directory where the filesystem storage will store blobs and metadata. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.|
 | STORAGE_USERS_OCIS_USER_LAYOUT | string | {{.Id.OpaqueId}} | Template string for the user storage layout in the user directory.|
 | STORAGE_USERS_PERMISSION_ENDPOINT,STORAGE_USERS_OCIS_PERMISSIONS_ENDPOINT | string | 127.0.0.1:9191 | Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.|
@@ -36,7 +37,8 @@
 | STORAGE_USERS_OCIS_MAX_ACQUIRE_LOCK_CYCLES | int | 20 | When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used.|
 | STORAGE_USERS_OCIS_LOCK_CYCLE_DURATION_FACTOR | int | 30 | When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.|
 | STORAGE_USERS_OCIS_ASYNC_UPLOADS | bool | false | Enable asynchronous file uploads.|
-| OCIS_SPACES_MAX_QUOTA<br/>STORAGE_USERS_OCIS_MAX_QUOTA | uint64 | 0 | Set a global max quota for spaces. If you are not setting OCIS_SPACES_MAX_QUOTA then don't forget to set FRONTEND_MAX_QUOTA.|
+| OCIS_SPACES_MAX_QUOTA<br/>STORAGE_USERS_OCIS_MAX_QUOTA | uint64 | 0 | Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.|
+| STORAGE_USERS_S3NG_METADATA_BACKEND | string | xattrs | The backend to use for storing metadata. Supported values are 'xattrs' and 'ini'. The setting 'xattrs' uses extended attributes to store file metadata while 'ini' uses a dedicated file to store file metadata. Defaults to 'xattrs'.|
 | STORAGE_USERS_S3NG_ROOT | string | ~/.ocis/storage/users | The directory where the filesystem storage will store metadata for blobs. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage/users.|
 | STORAGE_USERS_S3NG_USER_LAYOUT | string | {{.Id.OpaqueId}} | Template string for the user storage layout in the user directory.|
 | STORAGE_USERS_PERMISSION_ENDPOINT<br/>STORAGE_USERS_S3NG_PERMISSIONS_ENDPOINT | string | 127.0.0.1:9191 | Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.|

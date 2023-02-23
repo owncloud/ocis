@@ -309,7 +309,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-Set the global max quota value in the capabilities.
+Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
 
 a|`FRONTEND_UPLOAD_MAX_CHUNK_SIZE` +
 

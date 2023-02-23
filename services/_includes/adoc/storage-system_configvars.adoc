@@ -278,6 +278,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The driver which should be used by the service.
 
+a|`STORAGE_SYSTEM_OCIS_METADATA_BACKEND` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++xattrs ++
+a| [subs=-attributes]
+The backend to use for storing metadata. Supported values are 'xattrs' and 'ini'. The setting 'xattrs' uses extended attributes to store file metadata while 'ini' uses a dedicated file to store file metadata. Defaults to 'xattrs'.
+
 a|`STORAGE_SYSTEM_OCIS_ROOT` +
 
 a| [subs=-attributes]

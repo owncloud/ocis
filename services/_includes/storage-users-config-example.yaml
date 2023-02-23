@@ -38,6 +38,7 @@ skip_user_groups_in_token: false
 driver: ocis
 drivers:
   ocis:
+    metadata_backend: xattrs
     root: ~/.ocis/storage/users
     user_layout: '{{.Id.OpaqueId}}'
     permissions_endpoint: 127.0.0.1:9191
@@ -49,6 +50,7 @@ drivers:
     async_uploads: false
     max_quota: 0
   s3ng:
+    metadata_backend: xattrs
     root: ~/.ocis/storage/users
     user_layout: '{{.Id.OpaqueId}}'
     permissions_endpoint: 127.0.0.1:9191
