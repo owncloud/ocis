@@ -18,26 +18,19 @@ Feature: PROPFIND
 
   Scenario Outline: PROPFIND to "/remote.php/dav/(files|spaces)" with depth header
     Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator has set depth_infinity_allowed to <depth_infinity_allowed>
     When user "Alice" requests "<dav_path>" with "PROPFIND" using basic auth and with headers
       | header | value   |
       | depth  | <depth> |
     Then the HTTP status code should be "<http_status>"
-    @skipOnOcV10 @depthInfinityPropfindEnabled
     Examples:
-      | dav_path                    | depth_infinity_allowed | depth    | http_status |
-      | /remote.php/dav/files/alice | 1                      | 0        | 207         |
-      | /remote.php/dav/files/alice | 1                      | infinity | 207         |
-    @skipOnOcV10 @personalSpace @depthInfinityPropfindDisabled
+      | dav_path                    | depth    | http_status |
+      | /remote.php/dav/files/alice | 0        | 207         |
+      | /remote.php/dav/files/alice | infinity | 207         |
+    @personalSpace
     Examples:
-      | dav_path                         | depth_infinity_allowed | depth    | http_status |
-      | /remote.php/dav/spaces/%spaceid% | 0                      | 0        | 207         |
-      | /remote.php/dav/spaces/%spaceid% | 0                      | infinity | 207         |
-    @skipOnOcV10 @personalSpace @depthInfinityPropfindEnabled
-    Examples:
-      | dav_path                         | depth_infinity_allowed | depth    | http_status |
-      | /remote.php/dav/spaces/%spaceid% | 1                      | 0        | 207         |
-      | /remote.php/dav/spaces/%spaceid% | 1                      | infinity | 207         |
+      | dav_path                         | depth    | http_status |
+      | /remote.php/dav/spaces/%spaceid% | 0        | 207         |
+      | /remote.php/dav/spaces/%spaceid% | infinity | 207         |
 
 
   Scenario: send PROPFIND request to a public link
