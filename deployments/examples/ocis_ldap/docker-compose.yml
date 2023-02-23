@@ -60,7 +60,7 @@ services:
     command: [ "-c", "ocis init || true; ocis server" ]
     environment:
       # users/gropups from ldap
-      LDAP_URI: ldaps://ldap-server
+      LDAP_URI: ldaps://ldap-server:1636
       LDAP_INSECURE: "true"
       LDAP_BIND_DN: "cn=admin,dc=owncloud,dc=com"
       LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
@@ -72,7 +72,6 @@ services:
       LDAP_USER_OBJECTCLASS: "inetOrgPerson"
       LDAP_LOGIN_ATTRIBUTES: "uid"
       OCIS_ADMIN_USER_ID: "ddc2004c-0977-11eb-9d3f-a793888cd0f8"
-      IDP_LDAP_URI: ldap://ldap-server
       IDP_LDAP_LOGIN_ATTRIBUTE: "uid"
       IDP_LDAP_UUID_ATTRIBUTE: "ownclouduuid"
       IDP_LDAP_UUID_ATTRIBUTE_TYPE: binary
@@ -105,22 +104,27 @@ services:
     restart: always
 
   ldap-server:
-    image: osixia/openldap:latest
+    image: bitnami/openldap:2.6
     networks:
       ocis-net:
-    command: --copy-service --loglevel debug
+    entrypoint: ["/bin/sh", "/opt/bitnami/scripts/openldap/docker-entrypoint-override.sh", "/opt/bitnami/scripts/openldap/run.sh" ]
     environment:
+      BITNAMI_DEBUG: true
       LDAP_TLS_VERIFY_CLIENT: never
-      LDAP_DOMAIN: owncloud.com
-      LDAP_ORGANISATION: ownCloud
+      LDAP_ENABLE_TLS: "yes"
+      LDAP_TLS_CA_FILE: /opt/bitnami/openldap/certs/openldap.crt
+      LDAP_TLS_CERT_FILE: /opt/bitnami/openldap/certs/openldap.crt
+      LDAP_TLS_KEY_FILE: /opt/bitnami/openldap/certs/openldap.key
+      LDAP_ROOT: "dc=owncloud,dc=com"
       LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
-      LDAP_RFC2307BIS_SCHEMA: "true"
-      LDAP_REMOVE_CONFIG_AFTER_SETUP: "false"
     ports:
-      - "127.0.0.1:389:389"
-      - "127.0.0.1:636:636"
+      - "127.0.0.1:389:1389"
+      - "127.0.0.1:636:1636"
     volumes:
-      - ./config/ldap/ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom
+      - ./config/ldap/ldif:/ldifs
+      - ./config/ldap/schemas:/schemas
+      - ./config/ldap/docker-entrypoint-override.sh:/opt/bitnami/scripts/openldap/docker-entrypoint-override.sh
+      - ldap-certs:/opt/bitnami/openldap/certs
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
@@ -130,7 +134,7 @@ services:
     networks:
       ocis-net:
     environment:
-      PHPLDAPADMIN_LDAP_HOSTS: ldap-server
+      PHPLDAPADMIN_LDAP_HOSTS: "#PYTHON2BASH:[{'ldap-server': [{'server': [{'port': 1389}]}]}]"
       PHPLDAPADMIN_HTTPS: "false"
     labels:
       - "traefik.enable=true"
@@ -145,6 +149,7 @@ services:
 
 volumes:
   certs:
+  ldap-certs:
   ocis-config:
   ocis-data:
 
