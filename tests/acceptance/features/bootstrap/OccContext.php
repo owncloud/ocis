@@ -544,49 +544,6 @@ class OccContext implements Context {
 	}
 
 	/**
-	 * @When /^the administrator invokes occ command "([^"]*)"$/
-	 *
-	 * @param string $cmd
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorInvokesOccCommand(string $cmd):void {
-		$this->invokingTheCommand($cmd);
-	}
-
-	/**
-	 * @When /^the administrator invokes occ command "([^"]*)" for user "([^"]*)"$/
-	 *
-	 * @param string $cmd
-	 * @param string $user
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorInvokesOccCommandForUser(string $cmd, string $user):void {
-		$user = $this->featureContext->getActualUsername($user);
-		$cmd = $this->featureContext->substituteInLineCodes(
-			$cmd,
-			$user
-		);
-		$this->invokingTheCommand($cmd);
-	}
-
-	/**
-	 * @Given /^the administrator has invoked occ command "([^"]*)"$/
-	 *
-	 * @param string $cmd
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasInvokedOccCommand(string $cmd):void {
-		$this->invokingTheCommand($cmd);
-		$this->theCommandShouldHaveBeenSuccessful();
-	}
-
-	/**
 	 * @Given the administrator has selected master key encryption type using the occ command
 	 *
 	 * @return void
@@ -632,53 +589,6 @@ class OccContext implements Context {
 	public function theAdministratorRemovesTheSecurityCertificate(string $certificate):void {
 		$this->invokingTheCommand("security:certificates:remove " . $certificate);
 		\array_push($this->removedCertificates, $certificate);
-	}
-
-	/**
-	 * @When /^the administrator invokes occ command "([^"]*)" with environment variable "([^"]*)" set to "([^"]*)"$/
-	 *
-	 * @param string $cmd
-	 * @param string $envVariableName
-	 * @param string $envVariableValue
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorInvokesOccCommandWithEnvironmentVariable(
-		string $cmd,
-		string $envVariableName,
-		string $envVariableValue
-	):void {
-		$this->featureContext->setOccLastCode(
-			$this->invokingTheCommandWithEnvVariable(
-				$cmd,
-				$envVariableName,
-				$envVariableValue
-			)
-		);
-	}
-
-	/**
-	 * @Given /^the administrator has invoked occ command "([^"]*)" with environment variable "([^"]*)" set to "([^"]*)"$/
-	 *
-	 * @param string $cmd
-	 * @param string $envVariableName
-	 * @param string $envVariableValue
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasInvokedOccCommandWithEnvironmentVariable(
-		string $cmd,
-		string $envVariableName,
-		string $envVariableValue
-	):void {
-		$this->invokingTheCommandWithEnvVariable(
-			$cmd,
-			$envVariableName,
-			$envVariableValue
-		);
-		$this->theCommandShouldHaveBeenSuccessful();
 	}
 
 	/**
