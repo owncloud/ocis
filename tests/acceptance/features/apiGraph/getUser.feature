@@ -123,3 +123,54 @@ Feature: get users
       | displayName  | id        | mail              | onPremisesSamAccountName |
       | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    |
       | Carol King   | %uuid_v4% | carol@example.org | Carol                    |
+
+
+  Scenario Outline: non admin user tries to get users of certain groups
+    Given the administrator has given "Brian" the role "<role>" using the settings api
+    And group "tea-lover" has been created
+    And user "Alice" has been added to group "tea-lover"
+    When the user "Brian" gets all users of the group "tea-lover" using the Graph API
+    Then the HTTP status code should be "401"
+    And the last response should be an unauthorized response
+    Examples:
+      | role        |
+      | Space Admin |
+      | User        |
+      | Guest       |
+
+
+  Scenario: admin user gets all users with certain roles and members of a certain group
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And the administrator has given "Brian" the role "Space Admin" using the settings api
+    And the administrator has given "Carol" the role "Space Admin" using the settings api
+    And group "tea-lover" has been created
+    And user "Brian" has been added to group "tea-lover"
+    When the user "Alice" gets all users with role "Space Admin" using the Graph API
+    Then the HTTP status code should be "200"
+    And the API response should contain following users with the information:
+      | displayName  | id        | mail              | onPremisesSamAccountName |
+      | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
+      | Carol King   | %uuid_v4% | carol@example.org | Carol                    |
+    But the API response should not contain following user with the information:
+      | displayName  | id        | mail              | onPremisesSamAccountName |
+      | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    |
+    When the user "Alice" gets all users with role "Space Admin" and member of the group "tea-lover" using the Graph API
+    Then the HTTP status code should be "200"
+    And the API response should contain following users with the information:
+      | displayName  | id        | mail              | onPremisesSamAccountName |
+      | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
+    But the API response should not contain following user with the information:
+      | displayName | id        | mail              | onPremisesSamAccountName |
+      | Carol King  | %uuid_v4% | carol@example.org | Carol                    |
+
+
+  Scenario Outline: non-admin user tries to get users with a certain role
+    Given the administrator has given "Brian" the role "<role>" using the settings api
+    When the user "Brian" gets all users with role "Admin" using the Graph API
+    Then the HTTP status code should be "401"
+    And the last response should be an unauthorized response
+    Examples:
+      | role        |
+      | Space Admin |
+      | User        |
+      | Guest       |
