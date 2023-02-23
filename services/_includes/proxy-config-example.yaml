@@ -53,6 +53,8 @@ policies:
     unprotected: true
   - endpoint: /archiver
     service: com.owncloud.web.frontend
+  - endpoint: /ocs/v2.php/apps/notifications/api/v1/notifications
+    service: com.owncloud.userlog.userlog
   - type: regex
     endpoint: /ocs/v[12].php/cloud/user/signing-key
     service: com.owncloud.web.ocs

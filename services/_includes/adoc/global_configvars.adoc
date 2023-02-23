@@ -41,7 +41,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=libregraph,ou=sysusers,o=libregraph-idm ++
+++uid=idp,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -80,7 +80,7 @@ a| [subs=-attributes]
 ++~/.ocis/idm/ldap.crt ++
 
 a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/idp.
 
 a| `LDAP_GROUP_BASE_DN`
 
@@ -178,10 +178,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++owncloudUUID ++
+++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
 
 a| `LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -197,7 +197,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs.
 
 a| `LDAP_GROUP_SCHEMA_MAIL`
 
@@ -246,7 +246,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.
 
 a| `LDAP_INSECURE`
 
@@ -282,7 +282,7 @@ a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
 
 a| [subs=-attributes]
-URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
+Url of the LDAP service to use as IDP.
 
 a| `LDAP_USER_BASE_DN`
 
@@ -351,7 +351,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-The object class to use for users in the default user search filter ('inetOrgPerson').
+LDAP User ObjectClass like 'inetOrgPerson'.
 
 a| `LDAP_USER_SCHEMA_DISPLAYNAME`
 
@@ -382,10 +382,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++owncloudUUID ++
+++uid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
+LDAP User uuid attribute like 'uid'.
 
 a| `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -401,7 +401,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user id's.
+Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.
 
 a| `LDAP_USER_SCHEMA_MAIL`
 
@@ -419,7 +419,7 @@ a| [subs=-attributes]
 ++mail ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for the email address of users.
+LDAP User email attribute like 'mail'.
 
 a| `LDAP_USER_SCHEMA_USERNAME`
 
@@ -434,10 +434,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid ++
+++displayName ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for username of users.
+LDAP User name attribute like 'displayName'.
 
 a| `LDAP_USER_SCOPE`
 
@@ -471,7 +471,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the user who collects all necessary information for deletion.
+ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
 
 a| `OCIS_CACHE_STORE_ADDRESS`
 
@@ -528,6 +528,7 @@ a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/webdav.adoc[webdav] +
 * xref:{s-path}/webfinger.adoc[webfinger] +
 
@@ -546,6 +547,7 @@ a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/webdav.adoc[webdav] +
 * xref:{s-path}/webfinger.adoc[webfinger] +
 
@@ -553,7 +555,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override] ++
+++[Authorization Origin Content-Type Accept X-Requested-With] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -564,6 +566,7 @@ a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/webdav.adoc[webdav] +
 * xref:{s-path}/webfinger.adoc[webfinger] +
 
@@ -571,7 +574,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[OPTIONS HEAD GET PUT POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
+++[GET POST PUT PATCH DELETE OPTIONS] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
@@ -582,6 +585,7 @@ a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
+* xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/webdav.adoc[webdav] +
 * xref:{s-path}/webfinger.adoc[webfinger] +
 
@@ -606,6 +610,7 @@ a| [subs=attributes+]
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/sharing.adoc[sharing] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/userlog.adoc[userlog] +
 
 a| [subs=-attributes]
 ++bool ++
@@ -645,6 +650,7 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/store.adoc[store] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/webdav.adoc[webdav] +
 
@@ -686,6 +692,7 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/store.adoc[store] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/webdav.adoc[webdav] +
 
@@ -798,6 +805,7 @@ a| [subs=attributes+]
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
 * xref:{s-path}/webfinger.adoc[webfinger] +
@@ -818,6 +826,7 @@ a| [subs=attributes+]
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
 * xref:{s-path}/webfinger.adoc[webfinger] +
@@ -838,6 +847,7 @@ a| [subs=attributes+]
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
 * xref:{s-path}/webfinger.adoc[webfinger] +
@@ -871,6 +881,7 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
 
 a| [subs=-attributes]
 ++bool ++
@@ -879,7 +890,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Allow insecure connections to the frontend.
+Whether to verify the server TLS certificates.
 
 a| `OCIS_JWT_SECRET`
 
@@ -945,6 +956,7 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/store.adoc[store] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
@@ -990,6 +1002,7 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/store.adoc[store] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
@@ -1035,6 +1048,7 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/store.adoc[store] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
@@ -1080,6 +1094,7 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/store.adoc[store] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
@@ -1104,6 +1119,7 @@ a| [subs=attributes+]
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/search.adoc[search] +
+* xref:{s-path}/userlog.adoc[userlog] +
 
 a| [subs=-attributes]
 ++string ++
@@ -1112,7 +1128,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The machine auth API key used to validate internal requests necessary to access resources from other services.
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1133,7 +1149,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
+The OIDC issuer URL to use.
 
 a| `OCIS_SPACES_MAX_QUOTA`
 
@@ -1148,7 +1164,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
+Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
 
 a| `OCIS_SYSTEM_USER_API_KEY`
 
@@ -1420,6 +1436,7 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-system.adoc[storage-system] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
+* xref:{s-path}/userlog.adoc[userlog] +
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/webdav.adoc[webdav] +
 
@@ -1445,7 +1462,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Transfer secret for signing file up- and download requests.
+The storage transfer secret.
 
 a| `STORAGE_USERS_OCIS_ASYNC_UPLOADS`
 
