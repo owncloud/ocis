@@ -125,7 +125,7 @@ Feature: get users
       | Carol King   | %uuid_v4% | carol@example.org | Carol                    |
 
 
-  Scenario Outline: non admin user tries to gets users of certain groups
+  Scenario Outline: non admin user tries to get users of certain groups
     Given the administrator has given "Brian" the role "<role>" using the settings api
     And group "tea-lover" has been created
     And user "Alice" has been added to group "tea-lover"
@@ -139,7 +139,7 @@ Feature: get users
       | Guest       |
 
 
-  Scenario: admin user gets all users with certain role and members of a certain group
+  Scenario: admin user gets all users with certain roles and members of a certain group
     Given user "Carol" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "Space Admin" using the settings api
     And the administrator has given "Carol" the role "Space Admin" using the settings api
@@ -164,7 +164,7 @@ Feature: get users
       | Carol King  | %uuid_v4% | carol@example.org | Carol                    |
 
 
-  Scenario Outline: non admin user tries to gets users with certain role
+  Scenario Outline: non-admin user tries to get users with a certain role
     Given the administrator has given "Brian" the role "<role>" using the settings api
     When the user "Brian" gets all users with role "Admin" using the Graph API
     Then the HTTP status code should be "401"
