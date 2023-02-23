@@ -1,7 +1,3 @@
-dn: ou=users,dc=owncloud,dc=com
-objectClass: organizationalUnit
-ou: users
-
 # Start dn with uid (user identifier / login), not cn (Firstname + Surname)
 dn: uid=einstein,ou=users,dc=owncloud,dc=com
 objectClass: inetOrgPerson
@@ -20,7 +16,7 @@ mail: einstein@example.org
 uidNumber: 20000
 gidNumber: 30000
 homeDirectory: /home/einstein
-ownCloudUUID:: NGM1MTBhZGEtYzg2Yi00ODE1LTg4MjAtNDJjZGY4MmMzZDUx
+ownCloudUUID: 4c510ada-c86b-4815-8820-42cdf82c3d51
 userPassword:: e1NTSEF9TXJEcXpFNGdKbXZxbVRVTGhvWEZ1VzJBbkV3NWFLK3J3WTIvbHc9PQ==
 
 dn: uid=marie,ou=users,dc=owncloud,dc=com
@@ -40,7 +36,7 @@ mail: marie@example.org
 uidNumber: 20001
 gidNumber: 30000
 homeDirectory: /home/marie
-ownCloudUUID:: ZjdmYmY4YzgtMTM5Yi00Mzc2LWIzMDctY2YwYThjMmQwZDlj
+ownCloudUUID: f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c
 userPassword:: e1NTSEF9UmFvQWs3TU9jRHBIUWY3bXN3MGhHNnVraFZQWnRIRlhOSUNNZEE9PQ==
 
 dn: uid=richard,ou=users,dc=owncloud,dc=com
@@ -60,7 +56,7 @@ mail: richard@example.org
 uidNumber: 20002
 gidNumber: 30000
 homeDirectory: /home/richard
-ownCloudUUID:: OTMyYjQ1NDAtOGQxNi00ODFlLThlZjQtNTg4ZTRiNmIxNTFj
+ownCloudUUID: 932b4540-8d16-481e-8ef4-588e4b6b151c
 userPassword:: e1NTSEF9Z05LZTRreHdmOGRUREY5eHlhSmpySTZ3MGxSVUM1d1RGcWROTVE9PQ==
 
 dn: uid=moss,ou=users,dc=owncloud,dc=com
@@ -80,7 +76,7 @@ mail: moss@example.org
 uidNumber: 20003
 gidNumber: 30000
 homeDirectory: /home/moss
-ownCloudUUID:: MDU4YmZmOTUtNjcwOC00ZmU1LTkxZTQtOWVhM2QzNzc1ODhi
+ownCloudUUID: 058bff95-6708-4fe5-91e4-9ea3d377588b
 userPassword:: e1NTSEF9N0hEdTRoMkFDVExFWWt4U0RtSDZVQjhmUlpKRExDZDc=
 
 dn: uid=admin,ou=users,dc=owncloud,dc=com
@@ -100,5 +96,5 @@ mail: admin@example.org
 uidNumber: 20004
 gidNumber: 30000
 homeDirectory: /home/admin
-ownCloudUUID:: ZGRjMjAwNGMtMDk3Ny0xMWViLTlkM2YtYTc5Mzg4OGNkMGY4
+ownCloudUUID: ddc2004c-0977-11eb-9d3f-a793888cd0f8
 userPassword:: e1NTSEF9UWhmaFB3dERydTUydURoWFFObDRMbzVIckI3TkI5Nmo=
