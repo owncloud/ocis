@@ -12,7 +12,6 @@ Feature: users cannot move (rename) a file to or into an excluded directory
 
   Scenario Outline: rename a file to an excluded directory name
     Given using <dav_version> DAV path
-    And the administrator has updated system config key "excluded_directories" with value '[".github"]' and type "json"
     When user "Alice" moves file "/textfile0.txt" to "/.github" using the WebDAV API
     Then the HTTP status code should be "403"
     Examples:
@@ -24,12 +23,11 @@ Feature: users cannot move (rename) a file to or into an excluded directory
     Examples:
       | dav_version |
       | spaces      |
-      
+
 
   Scenario Outline: rename a file to an excluded directory name inside a parent directory
     Given using <dav_version> DAV path
     And user "Alice" has created folder "FOLDER"
-    And the administrator has updated system config key "excluded_directories" with value '[".github"]' and type "json"
     When user "Alice" moves file "/textfile0.txt" to "/FOLDER/.github" using the WebDAV API
     Then the HTTP status code should be "403"
     Examples:
@@ -46,9 +44,6 @@ Feature: users cannot move (rename) a file to or into an excluded directory
   Scenario Outline: rename a file to a filename that matches (or not) excluded_directories_regex
     Given using <dav_version> DAV path
     And user "Alice" has created folder "FOLDER"
-    # Note: we have to write JSON for the value, and to get a backslash in the double-quotes we have to escape it
-    # The actual regular expressions end up being endswith\.bad$ and ^\.git
-    And the administrator has updated system config key "excluded_directories_regex" with value '["endswith\\.bad$","^\\.git","containsvirusinthename"]' and type "json"
     When user "Alice" moves file "/textfile0.txt" to these filenames using the webDAV API then the results should be as listed
       | filename                                   | http-code | exists |
       | endswith.bad                               | 403       | no     |

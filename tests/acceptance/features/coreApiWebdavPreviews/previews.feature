@@ -114,8 +114,7 @@ Feature: previews of files downloaded through the webdav API
 
 
   Scenario: Download file previews when it is disabled by the administrator
-    Given the administrator has updated system config key "enable_previews" with value "false" and type "boolean"
-    And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
+    Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
     When user "Alice" downloads the preview of "/parent.txt" with width "32" and height "32" using the WebDAV API
     Then the HTTP status code should be "404"
     And the value of the item "/d:error/s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
@@ -123,8 +122,6 @@ Feature: previews of files downloaded through the webdav API
 
   Scenario: unset maximum size of previews
     Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
-    And the administrator has updated system config key "preview_max_x" with value "null"
-    And the administrator has updated system config key "preview_max_y" with value "null"
     When user "Alice" downloads the preview of "/parent.txt" with width "32" and height "32" using the WebDAV API
     Then the HTTP status code should be "404"
     And the value of the item "/d:error/s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
@@ -132,8 +129,6 @@ Feature: previews of files downloaded through the webdav API
 
   Scenario: download preview of size "null"
     Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
-    And the administrator has updated system config key "preview_max_x" with value "null"
-    And the administrator has updated system config key "preview_max_y" with value "null"
     When user "Alice" downloads the preview of "/parent.txt" with width "null" and height "null" using the WebDAV API
     Then the HTTP status code should be "400"
     And the value of the item "/d:error/s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\BadRequest"
@@ -141,8 +136,6 @@ Feature: previews of files downloaded through the webdav API
 
   Scenario Outline: download previews of different size smaller than the maximum size set
     Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
-    And the administrator has updated system config key "preview_max_x" with value "32"
-    And the administrator has updated system config key "preview_max_y" with value "32"
     When user "Alice" downloads the preview of "/parent.txt" with width "<width>" and height "<height>" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded image should be "<width>" pixels wide and "<height>" pixels high
@@ -156,8 +149,6 @@ Feature: previews of files downloaded through the webdav API
 
   Scenario Outline: download previews of different size larger than the maximum size set
     Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
-    And the administrator has updated system config key "preview_max_x" with value "32"
-    And the administrator has updated system config key "preview_max_y" with value "32"
     When user "Alice" downloads the preview of "/parent.txt" with width "<width>" and height "<height>" using the WebDAV API
     Then the HTTP status code should be "200"
     And the downloaded image should be "32" pixels wide and "32" pixels high
