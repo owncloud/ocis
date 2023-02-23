@@ -6,7 +6,6 @@ Feature: copy file
 
   Background:
     Given using OCS API version "1"
-    And the administrator has set the default folder for received shares to "Shares"
     And auto-accept shares has been disabled
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"

@@ -2,8 +2,7 @@
 Feature: cannot share resources with invalid permissions
 
   Background:
-    Given the administrator has set the default folder for received shares to "Shares"
-    And auto-accept shares has been disabled
+    Given auto-accept shares has been disabled
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has created folder "/PARENT"

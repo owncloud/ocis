@@ -2,8 +2,7 @@
 Feature: create a public link share when share_folder is set to Shares
 
   Background:
-    Given the administrator has set the default folder for received shares to "Shares"
-    And auto-accept shares has been disabled
+    Given auto-accept shares has been disabled
     And user "Alice" has been created with default attributes and without skeleton files
 
 

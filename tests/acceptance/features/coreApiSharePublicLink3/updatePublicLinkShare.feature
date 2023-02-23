@@ -249,8 +249,7 @@ Feature: update a public link share
 
 
   Scenario Outline: Adding public upload to a read only shared folder as recipient is not allowed using the public API
-    Given the administrator has set the default folder for received shares to "Shares"
-    And auto-accept shares has been disabled
+    Given auto-accept shares has been disabled
     And using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
@@ -274,8 +273,7 @@ Feature: update a public link share
 
 
   Scenario Outline: Adding public upload to a shared folder as recipient is allowed with permissions using the public API
-    Given the administrator has set the default folder for received shares to "Shares"
-    And auto-accept shares has been disabled
+    Given auto-accept shares has been disabled
     And using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
@@ -299,8 +297,7 @@ Feature: update a public link share
 
 
   Scenario Outline: Adding public link with all permissions to a read only shared folder as recipient is not allowed using the public API
-    Given the administrator has set the default folder for received shares to "Shares"
-    And auto-accept shares has been disabled
+    Given auto-accept shares has been disabled
     And using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
@@ -324,8 +321,7 @@ Feature: update a public link share
 
 
   Scenario Outline: Adding public link with all permissions to a read only shared folder as recipient is allowed with permissions using the public API
-    Given the administrator has set the default folder for received shares to "Shares"
-    And auto-accept shares has been disabled
+    Given auto-accept shares has been disabled
     And using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"

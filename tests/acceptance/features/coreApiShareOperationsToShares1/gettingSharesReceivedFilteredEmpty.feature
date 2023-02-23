@@ -5,8 +5,7 @@ Feature: get the received shares filtered by type (user, group etc)
   So that I can reduce the amount of data that has to be transferred to be just the data that I need
 
   Background:
-    Given the administrator has set the default folder for received shares to "Shares"
-    And auto-accept shares has been disabled
+    Given auto-accept shares has been disabled
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Alice    |
