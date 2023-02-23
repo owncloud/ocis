@@ -73,6 +73,7 @@ type Drivers struct {
 }
 
 type OCISDriver struct {
+	MetadataBackend string `yaml:"metadata_backend" env:"STORAGE_SYSTEM_OCIS_METADATA_BACKEND" desc:"The backend to use for storing metadata. Supported values are 'xattrs' and 'ini'. The setting 'xattrs' uses extended attributes to store file metadata while 'ini' uses a dedicated file to store file metadata. Defaults to 'xattrs'."`
 	// Root is the absolute path to the location of the data
 	Root string `yaml:"root" env:"STORAGE_SYSTEM_OCIS_ROOT" desc:"Path for the directory where the STORAGE-SYSTEM service stores it's persistent data. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage."`
 
