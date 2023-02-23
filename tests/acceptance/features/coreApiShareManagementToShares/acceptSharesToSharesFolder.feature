@@ -5,8 +5,7 @@ Feature: accept/decline shares coming from internal users to the Shares folder
   So that I can keep my file system clean
 
   Background:
-    Given the administrator has set the default folder for received shares to "Shares"
-    And parameter "shareapi_auto_accept_share" of app "core" has been set to "no"
+    Given parameter "shareapi_auto_accept_share" of app "core" has been set to "no"
     And using OCS API version "1"
     And using new DAV path
     And these users have been created with default attributes and without skeleton files:

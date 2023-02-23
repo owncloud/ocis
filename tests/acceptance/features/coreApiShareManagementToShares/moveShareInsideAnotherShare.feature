@@ -5,8 +5,7 @@ Feature: moving a share inside another share
   Because I need full flexibility when managing resources.
 
   Background:
-    Given the administrator has set the default folder for received shares to "Shares"
-    And auto-accept shares has been disabled
+    Given auto-accept shares has been disabled
     And using OCS API version "1"
     And these users have been created with default attributes and without skeleton files:
       | username |

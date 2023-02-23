@@ -9,8 +9,7 @@ Feature: sharing
 
 
   Scenario Outline: Creating a share of a file with a user
-    Given the administrator has set the default folder for received shares to "Shares"
-    And auto-accept shares has been disabled
+    Given auto-accept shares has been disabled
     And using OCS API version "<ocs_api_version>"
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"

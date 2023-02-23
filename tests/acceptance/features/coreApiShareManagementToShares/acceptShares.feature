@@ -5,8 +5,7 @@ Feature: accept/decline shares coming from internal users
   So that I can keep my file system clean
 
   Background:
-    Given the administrator has set the default folder for received shares to "Shares"
-    And auto-accept shares has been disabled
+    Given auto-accept shares has been disabled
     And using OCS API version "1"
     And using new DAV path
     And these users have been created with default attributes and without skeleton files:
