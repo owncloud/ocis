@@ -129,6 +129,53 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @When /^the user "([^"]*)" disables user "([^"]*)" using the Graph API$/
+	 * @When /^the user "([^"]*)" tries to disable user "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserDisablesUserToUsingTheGraphApi(string $byUser, string $user): void {
+		$response = $this->editUserUsingTheGraphApi($byUser, $user, null, null, null, null, false);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Given /^the user "([^"]*)" has disabled user "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserHasDisabledUserToUsingTheGraphApi(string $byUser, string $user): void {
+		$this->theUserDisablesUserToUsingTheGraphApi($byUser, $user);
+		$this->featureContext->thenTheHTTPStatusCodeShouldBe(200);
+	}
+
+	/**
+	 * @When /^the user "([^"]*)" enables user "([^"]*)" using the Graph API$/
+	 * @When /^the user "([^"]*)" tries to enable user "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserEnablesUserToUsingTheGraphApi(string $byUser, string $user): void {
+		$response = $this->editUserUsingTheGraphApi($byUser, $user, null, null, null, null, true);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * @Then /^the user "([^"]*)" should have information with these key and value pairs:$/
 	 *
 	 * @param string $user
@@ -162,11 +209,12 @@ class GraphContext implements Context {
 	 * @param string|null $password
 	 * @param string|null $email
 	 * @param string|null $displayName
+	 * @param bool|true $accountEnabled
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function editUserUsingTheGraphApi(string $byUser, string $user, string $userName = null, string $password = null, string $email = null, string $displayName = null): ResponseInterface {
+	public function editUserUsingTheGraphApi(string $byUser, string $user, string $userName = null, string $password = null, string $email = null, string $displayName = null, bool $accountEnabled = true): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
 		$userId = $userId ?? $user;
@@ -179,7 +227,8 @@ class GraphContext implements Context {
 			$userName,
 			$password,
 			$email,
-			$displayName
+			$displayName,
+			$accountEnabled
 		);
 	}
 
@@ -367,6 +416,21 @@ class GraphContext implements Context {
 	 */
 	public function theUserDeletesAUserUsingTheGraphAPI(string $byUser, string $user): void {
 		$this->adminDeletesUserUsingTheGraphApi($user, $byUser);
+	}
+
+	/**
+	 * @When /^the user "([^"]*)" has deleted a user "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function theUserHasDeletesAUserUsingTheGraphAPI(string $byUser, string $user): void {
+		$this->adminDeletesUserUsingTheGraphApi($user, $byUser);
+		$this->featureContext->thenTheHTTPStatusCodeShouldBe(204);
 	}
 
 	/**
@@ -1303,12 +1367,19 @@ class GraphContext implements Context {
 					}
 					Assert::assertTrue(GraphHelper::isUUIDv4($actualValue['id']), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualValue['id']);
 					break;
+				case "accountEnabled":
+					if ($expectedValue[$keyName] === 'true') {
+						Assert::assertTrue($actualValue[$keyName], ' Expected ' . $keyName . ' is not true ');
+					} else {
+						Assert::assertFalse($actualValue[$keyName], ' Expected ' . $keyName . ' is not false ');
+					}
+					break;
 				default:
 					Assert::assertEquals(
 						$expectedValue[$keyName],
 						$actualValue[$keyName],
 						__METHOD__ .
-						' Expected ' . $keyName . 'to have value' . $expectedValue[$keyName]
+						' Expected ' . $keyName . ' to have value ' . $expectedValue[$keyName]
 						. ' but got ' . $actualValue[$keyName]
 					);
 					break;

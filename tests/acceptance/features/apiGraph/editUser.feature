@@ -139,3 +139,59 @@ Feature: edit user
       | role        |
       | Space Admin |
       | User        |
+
+
+  Scenario: the admin user disables another user
+    When the user "Alice" disables user "Brian" using the Graph API
+    Then the HTTP status code should be "200"
+    When user "Alice" gets information of user "Brian" using Graph API
+    Then the HTTP status code should be "200"
+    And the user retrieve API response should contain the following information:
+      | displayName  | id        | mail              | onPremisesSamAccountName | accountEnabled |
+      | Brian Murphy | %uuid_v4% | brian@example.com | Brian                    | false          |
+
+
+  Scenario Outline: a normal user should not be able to disable another user
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And the administrator has given "Brian" the role "<role>" using the settings api
+    When the user "Brian" tries to disable user "Carol" using the Graph API
+    Then the HTTP status code should be "401"
+    When user "Alice" gets information of user "Carol" using Graph API
+    Then the HTTP status code should be "200"
+    And the user retrieve API response should contain the following information:
+      | displayName | id        | mail              | onPremisesSamAccountName | accountEnabled |
+      | Carol King  | %uuid_v4% | carol@example.org | Carol                    | true           |
+    Examples:
+      | role        |
+      | Space Admin |
+      | User        |
+      | Guest       |
+
+
+  Scenario: the admin user enables disabled user
+    Given the user "Alice" has disabled user "Brian" using the Graph API
+    When the user "Alice" enables user "Brian" using the Graph API
+    Then the HTTP status code should be "200"
+    When user "Alice" gets information of user "Brian" using Graph API
+    Then the HTTP status code should be "200"
+    And the user retrieve API response should contain the following information:
+      | displayName  | id        | mail              | onPremisesSamAccountName | accountEnabled |
+      | Brian Murphy | %uuid_v4% | brian@example.com | Brian                    | true           |
+
+
+  Scenario Outline: a normal user should not be able to enable another user
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And the user "Alice" has disabled user "Carol" using the Graph API
+    And the administrator has given "Brian" the role "<role>" using the settings api
+    When the user "Brian" tries to enable user "Carol" using the Graph API
+    Then the HTTP status code should be "401"
+    When user "Alice" gets information of user "Carol" using Graph API
+    Then the HTTP status code should be "200"
+    And the user retrieve API response should contain the following information:
+      | displayName | id        | mail              | onPremisesSamAccountName | accountEnabled |
+      | Carol King  | %uuid_v4% | carol@example.org | Carol                    | false          |
+    Examples:
+      | role        |
+      | Space Admin |
+      | User        |
+      | Guest       |

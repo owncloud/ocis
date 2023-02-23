@@ -71,3 +71,13 @@ Feature: delete user
       | role        |
       | Space Admin |
       | User        |
+
+
+  Scenario: the admin user deletes a disabled user
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    And user "Brian" has been created with default attributes and without skeleton files
+    And the user "Alice" has disabled user "Brian" using the Graph API
+    When the user "Alice" deletes a user "Brian" using the Graph API
+    Then the HTTP status code should be "204"
+    And user "Brian" should not exist
+    
