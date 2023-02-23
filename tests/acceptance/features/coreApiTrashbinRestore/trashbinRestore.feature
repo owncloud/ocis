@@ -133,7 +133,6 @@ Feature: Restore deleted files/folders
   @local_storage @files_external-app-required @skipOnEncryptionType:user-keys @encryption-issue-42 @skip_on_objectstore
   Scenario Outline: Deleting a file into external storage moves it to the trashbin and can be restored
     Given using <dav-path> DAV path
-    And the administrator has invoked occ command "files:scan --all"
     And user "Alice" has created folder "/local_storage/tmp"
     And user "Alice" has moved file "/textfile0.txt" to "/local_storage/tmp/textfile0.txt"
     And user "Alice" has deleted file "/local_storage/tmp/textfile0.txt"
@@ -156,7 +155,6 @@ Feature: Restore deleted files/folders
   @local_storage @files_external-app-required @skipOnEncryptionType:user-keys @encryption-issue-42 @skip_on_objectstore
   Scenario: Deleting an updated file into external storage moves it to the trashbin and can be restored
     Given using old DAV path
-    And the administrator has invoked occ command "files:scan --all"
     And user "Alice" has created folder "/local_storage/tmp"
     And user "Alice" has moved file "/textfile0.txt" to "/local_storage/tmp/textfile0.txt"
     And user "Alice" has uploaded chunk file "1" of "1" with "AA" to "/local_storage/tmp/textfile0.txt"
