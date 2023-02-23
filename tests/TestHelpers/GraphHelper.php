@@ -1137,4 +1137,60 @@ class GraphHelper {
 			self::getRequestHeaders()
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $roleId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getUsersWithFilterRoleAssignment(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $roleId
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users' . '?$filter=appRoleAssignments/any(m:m/appRoleId ' . "eq '$roleId')");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $roleId
+	 * @param string $groupId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getUsersWithFilterRolesAssignmentAndMemberOf(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $roleId,
+		string $groupId
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users' . '?$filter=appRoleAssignments/any(m:m/appRoleId ' . "eq '$roleId') " . "and memberOf/any(m:m/id eq '$groupId')");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
 }

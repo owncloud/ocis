@@ -1769,4 +1769,72 @@ class GraphContext implements Context {
 		);
 		$this->featureContext->setResponse($response);
 	}
+
+	/**
+	 * Get roleId by role name
+	 *
+	 * @param string $role
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 */
+	public function getRoleIdByRoleName(string $role): string {
+		$response = GraphHelper::getApplications(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword()
+		);
+		$responseData = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+		if (isset($responseData["value"][0]["appRoles"])) {
+			foreach ($responseData["value"][0]["appRoles"] as $value) {
+				if ($value["displayName"] === $role) {
+					return $value["id"];
+				}
+			}
+			throw new Exception(__METHOD__ . " role with name $role not found");
+		}
+	}
+
+	/**
+	 * @When the user :user gets all users with role :role using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $role
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsAllUsersWithRoleUsingTheGraphApi(string $user, string $role) {
+		$response = GraphHelper::getUsersWithFilterRoleAssignment(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$this->getRoleIdByRoleName($role)
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @When the user :user gets all users with role :role and member of the group :group using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $role
+	 * @param string $group
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsAllUsersWithRoleAndMemberOfGroupUsingTheGraphApi(string $user, string $role, string $group) {
+		$response = GraphHelper::getUsersWithFilterRolesAssignmentAndMemberOf(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$this->getRoleIdByRoleName($role),
+			$this->featureContext->getGroupIdByGroupName($group)
+		);
+		$this->featureContext->setResponse($response);
+	}
 }
