@@ -103,7 +103,7 @@ type OCISDriver struct {
 	MaxAcquireLockCycles    int    `yaml:"max_acquire_lock_cycles" env:"STORAGE_USERS_OCIS_MAX_ACQUIRE_LOCK_CYCLES" desc:"When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used."`
 	LockCycleDurationFactor int    `yaml:"lock_cycle_duration_factor" env:"STORAGE_USERS_OCIS_LOCK_CYCLE_DURATION_FACTOR" desc:"When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used."`
 	AsyncUploads            bool   `yaml:"async_uploads" env:"STORAGE_USERS_OCIS_ASYNC_UPLOADS" desc:"Enable asynchronous file uploads."`
-	MaxQuota                uint64 `yaml:"max_quota" env:"OCIS_SPACES_MAX_QUOTA;STORAGE_USERS_OCIS_MAX_QUOTA" desc:"Set a global max quota for spaces. If you are not setting OCIS_SPACES_MAX_QUOTA then don't forget to set FRONTEND_MAX_QUOTA."`
+	MaxQuota                uint64 `yaml:"max_quota" env:"OCIS_SPACES_MAX_QUOTA;STORAGE_USERS_OCIS_MAX_QUOTA" desc:"Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service."`
 }
 
 type S3NGDriver struct {

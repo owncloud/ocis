@@ -13,18 +13,18 @@ The following request authentication schemes are implemented:
 -   Signed URL
 -   Public Share Token
 
-## Automatic quota assignments
+## Automatic Quota Assignments
 
-It is possible to automatically assign a specific quota amount to new users depending on their role.
-To do this you need to add the following config snippet to the proxy.yaml config file.
+It is possible to automatically assign a specific quota to new users depending on their role.
+To do this, you need to configure a mapping between roles defined by their ID and the quota in bytes.
+The assignment can only be done via a `yaml` configuration and not via environment variables.
+See the following `proxy.yaml` config snippet for a configuration example.
 
 ```yaml
 role_quotas:
     <role ID1>: <quota1>
     <role ID2>: <quota2>
 ```
-
-There you need to configure the mapping between the roles by their ID and the quota in Bytes.
 
 ## Recommendations for Production Deployments
 
