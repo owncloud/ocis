@@ -248,8 +248,7 @@ Feature: sharees
 
 
   Scenario Outline: search for sharees when search min length is set to 2
-    Given the administrator has updated system config key "user.search_min_length" with value "2"
-    And user "sharee2" has been created with default attributes and without skeleton files
+    Given user "sharee2" has been created with default attributes and without skeleton files
     And using OCS API version "<ocs-api-version>"
     When user "sharee1" gets the sharees using the sharing API with parameters
       | search   | sh   |
@@ -273,8 +272,7 @@ Feature: sharees
 
 
   Scenario Outline: search for sharees with long name when search min length is set to 2
-    Given the administrator has updated system config key "user.search_min_length" with value "2"
-    And user "sharee2" has been created with default attributes and without skeleton files
+    Given user "sharee2" has been created with default attributes and without skeleton files
     And using OCS API version "<ocs-api-version>"
     When user "sharee1" gets the sharees using the sharing API with parameters
       | search   | sharee |

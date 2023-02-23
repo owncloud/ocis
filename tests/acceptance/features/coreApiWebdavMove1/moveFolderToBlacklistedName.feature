@@ -30,7 +30,6 @@ Feature: users cannot move (rename) a folder to a blacklisted name
   Scenario Outline: Rename a folder to a banned name
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/testshare"
-    And the administrator has updated system config key "blacklisted_files" with value '["blacklisted-file.txt",".htaccess"]' and type "json"
     When user "Alice" moves folder "/testshare" to "/blacklisted-file.txt" using the WebDAV API
     Then the HTTP status code should be "403"
     And user "Alice" should see the following elements
@@ -51,9 +50,6 @@ Feature: users cannot move (rename) a folder to a blacklisted name
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
     And user "Brian" has created folder "/FOLDER"
-    # Note: we have to write JSON for the value, and to get a backslash in the double-quotes we have to escape it
-    # The actual regular expressions end up being .*\.ext$ and ^bannedfilename\..+
-    And the administrator has updated system config key "blacklisted_files_regex" with value '[".*\\.ext$","^bannedfilename\\..+","containsbannedstring"]' and type "json"
     When user "Brian" moves folder "/testshare" to these foldernames using the webDAV API then the results should be as listed
       | foldername                             | http-code | exists |
       | .ext                                   | 403       | no     |

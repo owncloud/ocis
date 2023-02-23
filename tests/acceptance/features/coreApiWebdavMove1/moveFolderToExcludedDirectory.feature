@@ -12,7 +12,6 @@ Feature: users cannot move (rename) a folder to or into an excluded directory
   Scenario Outline: Rename a folder to an excluded directory name
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/testshare"
-    And the administrator has updated system config key "excluded_directories" with value '[".github"]' and type "json"
     When user "Alice" moves folder "/testshare" to "/.github" using the WebDAV API
     Then the HTTP status code should be "403"
     And user "Alice" should see the following elements
@@ -32,7 +31,6 @@ Feature: users cannot move (rename) a folder to or into an excluded directory
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/testshare"
     And user "Alice" has created folder "/FOLDER"
-    And the administrator has updated system config key "excluded_directories" with value '[".github"]' and type "json"
     When user "Alice" moves folder "/testshare" to "/FOLDER/.github" using the WebDAV API
     Then the HTTP status code should be "403"
     And user "Alice" should see the following elements
@@ -52,9 +50,6 @@ Feature: users cannot move (rename) a folder to or into an excluded directory
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/testshare"
     And user "Alice" has created folder "/FOLDER"
-    # Note: we have to write JSON for the value, and to get a backslash in the double-quotes we have to escape it
-    # The actual regular expressions end up being endswith\.bad$ and ^\.git
-    And the administrator has updated system config key "excluded_directories_regex" with value '["endswith\\.bad$","^\\.git","containsvirusinthename"]' and type "json"
     When user "Alice" moves folder "/testshare" to these foldernames using the webDAV API then the results should be as listed
       | foldername                                 | http-code | exists |
       | endswith.bad                               | 403       | no     |
