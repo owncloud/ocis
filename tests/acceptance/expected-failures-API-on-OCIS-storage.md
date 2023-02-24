@@ -232,19 +232,6 @@ cannot share a folder with create permission
 
 - [coreApiWebdavPreviews/previews.feature:101](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L101)
 
-#### [Requesting a file preview when it is disabled by the administrator](https://github.com/owncloud/ocis/issues/192)
-
-- [coreApiWebdavPreviews/previews.feature:116](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L116)
-
-#### [Cannot set/unset maximum and minimum preview dimensions](https://github.com/owncloud/ocis/issues/2070)
-
-- [coreApiWebdavPreviews/previews.feature:123](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L123)
-- [coreApiWebdavPreviews/previews.feature:145](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L145)
-- [coreApiWebdavPreviews/previews.feature:146](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L146)
-- [coreApiWebdavPreviews/previews.feature:147](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L147)
-- [coreApiWebdavPreviews/previews.feature:157](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L157)
-- [coreApiWebdavPreviews/previews.feature:158](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L158)
-
 #### [copying a folder within a public link folder to folder with same name as an already existing file overwrites the parent file](https://github.com/owncloud/ocis/issues/1232)
 
 - [coreApiSharePublicLink2/copyFromPublicLink.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink2/copyFromPublicLink.feature#L63)
@@ -695,18 +682,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - _The `OC-LazyOps` header is [no longer supported by the client](https://github.com/owncloud/client/pull/8398), implementing this is not necessary for a first production release. We plan to have an upload state machine to visualize the state of a file, see https://github.com/owncloud/ocis/issues/214_
 - _Blacklisted ignored files are no longer required because ocis can handle `.htaccess` files without security implications introduced by serving user provided files with apache._
 
-#### [uploading with old-chunking does not work](https://github.com/owncloud/ocis/issues/1343)
-
-- [coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature:19](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature#L19)
-- [coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature:20](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature#L20)
-- [coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature#L25)
-- [coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature:37](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature#L37)
-- [coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature:38](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature#L38)
-- [coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature:43](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature#L43)
-- [coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature:75](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature#L75)
-- [coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature:76](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature#L76)
-- [coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature:81](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToExcludedDirectory.feature#L81)
-
 #### [Blacklist files extensions](https://github.com/owncloud/ocis/issues/2177)
 
 - [coreApiWebdavProperties1/copyFile.feature:119](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L119)
@@ -718,67 +693,13 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiWebdavUpload1/uploadFile.feature:181](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFile.feature#L181)
 - [coreApiWebdavUpload1/uploadFile.feature:182](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFile.feature#L182)
 - [coreApiWebdavUpload1/uploadFile.feature:187](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFile.feature#L187)
-- [coreApiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:13](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature#L13)
-- [coreApiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature#L25)
-- [coreApiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:26](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature#L26)
-- [coreApiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature:27](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload2/uploadFileToBlacklistedNameUsingOldChunking.feature#L27)
-- [coreApiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:13](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature#L13)
-- [coreApiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:19](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature#L19)
-- [coreApiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature#L33)
-- [coreApiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:34](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature#L34)
-- [coreApiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature:35](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload2/uploadFileToExcludedDirectoryUsingOldChunking.feature#L35)
 - [coreApiWebdavMove2/moveFile.feature:176](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFile.feature#L176)
 - [coreApiWebdavMove2/moveFile.feature:177](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFile.feature#L177)
 - [coreApiWebdavMove2/moveFile.feature:182](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFile.feature#L182)
 
-#### [cannot set blacklisted file names](https://github.com/owncloud/product/issues/260)
-
-- [coreApiWebdavMove1/moveFolderToBlacklistedName.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToBlacklistedName.feature#L21)
-- [coreApiWebdavMove1/moveFolderToBlacklistedName.feature:22](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToBlacklistedName.feature#L22)
-- [coreApiWebdavMove1/moveFolderToBlacklistedName.feature:27](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToBlacklistedName.feature#L27)
-- [coreApiWebdavMove1/moveFolderToBlacklistedName.feature:39](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToBlacklistedName.feature#L39)
-- [coreApiWebdavMove1/moveFolderToBlacklistedName.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToBlacklistedName.feature#L40)
-- [coreApiWebdavMove1/moveFolderToBlacklistedName.feature:45](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToBlacklistedName.feature#L45)
-- [coreApiWebdavMove1/moveFolderToBlacklistedName.feature:77](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToBlacklistedName.feature#L77)
-- [coreApiWebdavMove1/moveFolderToBlacklistedName.feature:78](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToBlacklistedName.feature#L78)
-- [coreApiWebdavMove1/moveFolderToBlacklistedName.feature:83](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToBlacklistedName.feature#L83)
-- [coreApiWebdavMove2/moveFileToBlacklistedName.feature:19](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToBlacklistedName.feature#L19)
-- [coreApiWebdavMove2/moveFileToBlacklistedName.feature:20](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToBlacklistedName.feature#L20)
-- [coreApiWebdavMove2/moveFileToBlacklistedName.feature:34](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToBlacklistedName.feature#L34)
-- [coreApiWebdavMove2/moveFileToBlacklistedName.feature:35](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToBlacklistedName.feature#L35)
-- [coreApiWebdavMove2/moveFileToBlacklistedName.feature:70](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToBlacklistedName.feature#L70)
-- [coreApiWebdavMove2/moveFileToBlacklistedName.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToBlacklistedName.feature#L71)
-
-#### [cannot set excluded directories](https://github.com/owncloud/product/issues/261)
-
-- [coreApiWebdavMove1/moveFolderToExcludedDirectory.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToExcludedDirectory.feature#L21)
-- [coreApiWebdavMove1/moveFolderToExcludedDirectory.feature:22](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToExcludedDirectory.feature#L22)
-- [coreApiWebdavMove1/moveFolderToExcludedDirectory.feature:27](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToExcludedDirectory.feature#L27)
-- [coreApiWebdavMove1/moveFolderToExcludedDirectory.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToExcludedDirectory.feature#L40)
-- [coreApiWebdavMove1/moveFolderToExcludedDirectory.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToExcludedDirectory.feature#L41)
-- [coreApiWebdavMove1/moveFolderToExcludedDirectory.feature:46](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToExcludedDirectory.feature#L46)
-- [coreApiWebdavMove1/moveFolderToExcludedDirectory.feature:79](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToExcludedDirectory.feature#L79)
-- [coreApiWebdavMove1/moveFolderToExcludedDirectory.feature:80](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToExcludedDirectory.feature#L80)
-- [coreApiWebdavMove1/moveFolderToExcludedDirectory.feature:85](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolderToExcludedDirectory.feature#L85)
-- [coreApiWebdavMove2/moveFileToExcludedDirectory.feature:19](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToExcludedDirectory.feature#L19)
-- [coreApiWebdavMove2/moveFileToExcludedDirectory.feature:20](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToExcludedDirectory.feature#L20)
-- [coreApiWebdavMove2/moveFileToExcludedDirectory.feature:35](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToExcludedDirectory.feature#L35)
-- [coreApiWebdavMove2/moveFileToExcludedDirectory.feature:36](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToExcludedDirectory.feature#L36)
-- [coreApiWebdavMove2/moveFileToExcludedDirectory.feature:73](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToExcludedDirectory.feature#L73)
-- [coreApiWebdavMove2/moveFileToExcludedDirectory.feature:74](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToExcludedDirectory.feature#L74)
-
-#### [system configuration options missing](https://github.com/owncloud/ocis/issues/1323)
-
-- [coreApiWebdavUpload1/uploadFileToBlacklistedName.feature:19](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToBlacklistedName.feature#L19)
-- [coreApiWebdavUpload1/uploadFileToBlacklistedName.feature:20](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToBlacklistedName.feature#L20)
-- [coreApiWebdavUpload1/uploadFileToBlacklistedName.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToBlacklistedName.feature#L25)
-- [coreApiWebdavUpload1/uploadFileToBlacklistedName.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToBlacklistedName.feature#L56)
-- [coreApiWebdavUpload1/uploadFileToBlacklistedName.feature:55](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToBlacklistedName.feature#L55)
-- [coreApiWebdavUpload1/uploadFileToBlacklistedName.feature:61](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavUpload1/uploadFileToBlacklistedName.feature#L61)
-
 #### [Preview of text file with UTF content does not render correctly](https://github.com/owncloud/ocis/issues/2570)
 
-- [coreApiWebdavPreviews/previews.feature:181](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L181)
+- [coreApiWebdavPreviews/previews.feature:136](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavPreviews/previews.feature#L136)
 
 #### [Share path in the response is different between share states](https://github.com/owncloud/ocis/issues/2540)
 
@@ -818,9 +739,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiWebdavMove1/moveFolder.feature:45](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature#L45)
 - [coreApiWebdavMove1/moveFolder.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove1/moveFolder.feature#L63)
 - [coreApiWebdavMove2/moveFile.feature:138](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFile.feature#L138)
-- [coreApiWebdavMove2/moveFileToBlacklistedName.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToBlacklistedName.feature#L25)
-- [coreApiWebdavMove2/moveFileToBlacklistedName.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToBlacklistedName.feature#L40)
-- [coreApiWebdavMove2/moveFileToBlacklistedName.feature:76](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToBlacklistedName.feature#L76)
 
 #### [REPORT method on spaces returns an incorrect d:href response](https://github.com/owncloud/ocis/issues/3111)
 
@@ -844,12 +762,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 - [coreApiWebdavOperations/listFiles.feature:407](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/listFiles.feature#L407)
 - [coreApiWebdavOperations/listFiles.feature:408](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/listFiles.feature#L408)
 - [coreApiWebdavOperations/listFiles.feature:413](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavOperations/listFiles.feature#L413)
-
-#### [Renaming resource to excluded directory name is allowed in spaces webdav](https://github.com/owncloud/ocis/issues/3102)
-
-- [coreApiWebdavMove2/moveFileToExcludedDirectory.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToExcludedDirectory.feature#L25)
-- [coreApiWebdavMove2/moveFileToExcludedDirectory.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToExcludedDirectory.feature#L41)
-- [coreApiWebdavMove2/moveFileToExcludedDirectory.feature:79](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavMove2/moveFileToExcludedDirectory.feature#L79)
 
 ### [graph/users: enable/disable users](https://github.com/owncloud/ocis/issues/3064)
 

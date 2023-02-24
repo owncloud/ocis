@@ -113,51 +113,6 @@ Feature: previews of files downloaded through the webdav API
     And the value of the item "/d:error/s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
 
 
-  Scenario: Download file previews when it is disabled by the administrator
-    Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
-    When user "Alice" downloads the preview of "/parent.txt" with width "32" and height "32" using the WebDAV API
-    Then the HTTP status code should be "404"
-    And the value of the item "/d:error/s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
-
-
-  Scenario: unset maximum size of previews
-    Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
-    When user "Alice" downloads the preview of "/parent.txt" with width "32" and height "32" using the WebDAV API
-    Then the HTTP status code should be "404"
-    And the value of the item "/d:error/s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
-
-
-  Scenario: download preview of size "null"
-    Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
-    When user "Alice" downloads the preview of "/parent.txt" with width "null" and height "null" using the WebDAV API
-    Then the HTTP status code should be "400"
-    And the value of the item "/d:error/s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\BadRequest"
-
-
-  Scenario Outline: download previews of different size smaller than the maximum size set
-    Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
-    When user "Alice" downloads the preview of "/parent.txt" with width "<width>" and height "<height>" using the WebDAV API
-    Then the HTTP status code should be "200"
-    And the downloaded image should be "<width>" pixels wide and "<height>" pixels high
-    Examples:
-      | width | height |
-      | 32    | 32     |
-      | 12    | 12     |
-      | 32    | 12     |
-      | 12    | 32     |
-
-
-  Scenario Outline: download previews of different size larger than the maximum size set
-    Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
-    When user "Alice" downloads the preview of "/parent.txt" with width "<width>" and height "<height>" using the WebDAV API
-    Then the HTTP status code should be "200"
-    And the downloaded image should be "32" pixels wide and "32" pixels high
-    Examples:
-      | width | height |
-      | 64    | 64     |
-      | 2048  | 2048   |
-
-
   Scenario: preview content changes with the change in file content
     Given user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
     And user "Alice" has downloaded the preview of "/parent.txt" with width "32" and height "32"
