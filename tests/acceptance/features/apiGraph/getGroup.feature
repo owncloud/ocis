@@ -106,3 +106,13 @@ Feature: get groups and their members
     When user "Brian" gets all the members information of group "tea-lover" using the Graph API
     Then the HTTP status code should be "401"
     And the last response should be an unauthorized response
+
+
+  Scenario: Get details of a single group
+    Given group "tea-lover" has been created
+    When user "Alice" gets details of a group "tea-lover" using the Graph API
+    Then the HTTP status code should be "200"
+    And the json responded should contain a group with these key and value pairs:
+      | key         | value      |
+      | displayName | tea-lover  |
+      | id          | %group_id% |

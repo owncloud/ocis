@@ -1932,4 +1932,90 @@ class GraphContext implements Context {
 			. "\nExpected rolId for role '$role'' to be '" . $this->appEntity["appRoles"][$role] . "' but got '" . $response['appRoleId'] . "'"
 		);
 	}
+
+	/**
+	 * @When user :user gets details of a group :groupName using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $groupName
+	 *
+	 * @return void
+	 */
+	public function userGetsDetailsOfAGroupUsingTheGraphApi(string $user, string $groupName): void {
+		$groupId = $this->getGroupIdByName($this->getArrayOfGroupsResponded($this->listGroups($user)), $groupName);
+		$credentials = $this->getAdminOrUserCredentials($user);
+
+		$this->featureContext->setResponse(
+			GraphHelper::getSingleGroup(
+				$this->featureContext->getBaseUrl(),
+				$groupId,
+				$this->featureContext->getStepLineRef(),
+				$credentials["username"],
+				$credentials["password"]
+			)
+		);
+	}
+
+	/**
+	 * Get Group Id from response
+	 *
+	 * @param array|null $allGroups
+	 * @param string $groupName - name of the group
+	 *
+	 * @return string - id of the group
+	 * @throws Exception | GuzzleException
+	 */
+	public function getGroupIdByName(?array $allGroups, string $groupName): string {
+		if ($allGroups === null) {
+			$allGroups = $this->getArrayOfGroupsResponded(
+				$this->listGroups(
+					$this->featureContext->getCurrentUser()
+				)
+			);
+		}
+		foreach ($allGroups as $group) {
+			if ($group['displayName'] === $groupName) {
+				return $group['id'];
+			}
+		}
+		throw new Exception("Group with name $groupName not found in JSON response.");
+	}
+
+	/**
+	 * @Then the json responded should contain a group with these key and value pairs:
+	 *
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function theJsonRespondedShouldContainAGroupWithTheseKeyAndValuePairs(TableNode $table): void {
+		$actualGroup = $this->featureContext->getJsonDecodedResponse();
+		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
+
+		$expectedGroup = [];
+		foreach ($table->getHash() as $row) {
+			if ($row["key"] === "displayName") {
+				$groupName = $row["value"];
+			}
+			$row['value'] = $this->featureContext->substituteInLineCodes(
+				$row['value'],
+				$this->featureContext->getCurrentUser(),
+				[],
+				[
+					[
+						"code" => "%group_id%",
+						"function" =>
+							[$this, "getGroupIdByName"],
+						"parameter" => [null, $groupName]
+					],
+				]
+			);
+			$expectedGroup[$row["key"]] = $row["value"];
+		}
+		Assert::assertEqualsCanonicalizing(
+			$expectedGroup,
+			$actualGroup,
+			"Provided group do not match the group returned in the response."
+		);
+	}
 }
