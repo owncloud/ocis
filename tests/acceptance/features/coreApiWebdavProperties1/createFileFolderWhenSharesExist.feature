@@ -5,8 +5,7 @@ Feature: create file or folder named similar to Shares folder
   So that I can organise the files in my file system
 
   Background:
-    Given the administrator has set the default folder for received shares to "Shares"
-    And auto-accept shares has been disabled
+    Given auto-accept shares has been disabled
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Alice    |

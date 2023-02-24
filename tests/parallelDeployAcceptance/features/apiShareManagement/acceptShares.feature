@@ -7,7 +7,6 @@ Feature: sharing files and folders
 
   Background:
     Given using "oc10" as owncloud selector
-    And the administrator has set the default folder for received shares to "Shares"
     And auto-accept shares has been disabled
     And using OCS API version "1"
     And using new DAV path

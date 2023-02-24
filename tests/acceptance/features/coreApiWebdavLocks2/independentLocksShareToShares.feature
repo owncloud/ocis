@@ -3,8 +3,7 @@ Feature: independent locks
   Make sure all locks are independent and don't interact with other items that have the same name
 
   Background:
-    Given the administrator has set the default folder for received shares to "Shares"
-    And auto-accept shares has been disabled
+    Given auto-accept shares has been disabled
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Brian" has been created with default attributes and without skeleton files
 
