@@ -140,7 +140,7 @@ class AppConfigurationContext implements Context {
 	/**
 	 *
 	 * @param string $username
-	 * @param boolean $formatJson // this  parameter if true formats the response in json
+	 * @param boolean $formatJson // if true then formats the response in json
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -155,7 +155,7 @@ class AppConfigurationContext implements Context {
 				$user,
 				$password,
 				'GET',
-				($formatJson) ? '/cloud/capabilities?format=json' : '/cloud/capabilities',
+				'/cloud/capabilities' . ($formatJson ? '?format=json' : ''),
 				$this->featureContext->getStepLineRef(),
 				[],
 				$this->featureContext->getOcsApiVersion()
@@ -172,7 +172,7 @@ class AppConfigurationContext implements Context {
 	 * @throws Exception
 	 */
 	public function userGetsCapabilitiesCheckResponse(string $username):void {
-		$this->userGetsCapabilities($username, false);
+		$this->userGetsCapabilities($username);
 		$statusCode = $this->featureContext->getResponse()->getStatusCode();
 		if ($statusCode !== 200) {
 			throw new \Exception(
