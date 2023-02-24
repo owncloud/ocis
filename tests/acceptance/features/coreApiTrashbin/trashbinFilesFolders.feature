@@ -161,7 +161,6 @@ Feature: files and folders exist in the trashbin after being deleted
   @local_storage @files_external-app-required @skipOnEncryptionType:user-keys @encryption-issue-42 @skip_on_objectstore
   Scenario Outline: Deleting a folder into external storage moves it to the trashbin
     Given using <dav-path> DAV path
-    And the administrator has invoked occ command "files:scan --all"
     And user "Alice" has created folder "/local_storage/tmp"
     And user "Alice" has moved file "/textfile0.txt" to "/local_storage/tmp/textfile0.txt"
     When user "Alice" deletes folder "/local_storage/tmp" using the WebDAV API
