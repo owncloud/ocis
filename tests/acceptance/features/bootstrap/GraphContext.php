@@ -2081,4 +2081,26 @@ class GraphContext implements Context {
 			. "\nExpected rolId for role '$role'' to be '" . $this->appEntity["appRoles"][$role] . "' but got '" . $response['appRoleId'] . "'"
 		);
 	}
+
+	/**
+	 * @When user :user gets details of the group :groupName using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $groupName
+	 *
+	 * @return void
+	 */
+	public function userGetsDetailsOfTheGroupUsingTheGraphApi(string $user, string $groupName): void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+
+		$this->featureContext->setResponse(
+			GraphHelper::getGroup(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials["username"],
+				$credentials["password"],
+				$groupName
+			)
+		);
+	}
 }
