@@ -234,6 +234,7 @@ def main(ctx):
         cancelPreviousBuilds() + \
         codestyle(ctx) + \
         buildWebCache(ctx) + \
+        getGoBinForTesting(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
         testOcisModules(ctx) + \
         testPipelines(ctx)
@@ -364,8 +365,89 @@ def testPipelines(ctx):
 
     return pipelines
 
+def getGoBinForTesting(ctx):
+    return [{
+        "kind": "pipeline",
+        "type": "docker",
+        "name": "get-go-bin-cache",
+        "platform": {
+            "os": "linux",
+            "arch": "amd64",
+        },
+        "steps": skipIfUnchanged(ctx, "unit-tests") +
+                 checkGoBinCache() +
+                 cacheGoBin(),
+        "trigger": {
+            "ref": [
+                "refs/heads/master",
+                "refs/heads/stable-*",
+                "refs/pull/**",
+            ],
+        },
+        "volumes": [pipelineVolumeGo],
+    }]
+
+def checkGoBinCache():
+    return [{
+        "name": "check-go-bin-cache",
+        "image": OC_UBUNTU,
+        "environment": {
+            "CACHE_ENDPOINT": {
+                "from_secret": "cache_public_s3_server",
+            },
+            "CACHE_BUCKET": {
+                "from_secret": "cache_public_s3_bucket",
+            },
+        },
+        "commands": [
+            "bash -x %s/tests/config/drone/check_go_bin_cache.sh %s" % (dirs["base"], dirs["base"]),
+        ],
+    }]
+
+def cacheGoBin():
+    return [
+        {
+            "name": "bingo-get",
+            "image": OC_CI_GOLANG,
+            "commands": [
+                "make bingo-update",
+            ],
+            "volumes": [stepVolumeGo],
+        },
+        {
+            "name": "cache-go-bin",
+            "image": MINIO_MC,
+            "environment": MINIO_MC_ENV,
+            "commands": [
+                # .bingo folder will change after 'bingo-get'
+                # so get the stored hash of a .bingo folder
+                "BINGO_HASH=$(cat %s/.bingo_hash)" % dirs["base"],
+                # cache using the minio client to the public bucket (long term bucket)
+                "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
+                "mc cp -r /go/bin s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH",
+            ],
+            "volumes": [stepVolumeGo],
+        },
+    ]
+
+def restoreGoBinCache():
+    return [
+        {
+            "name": "restore-go-bin-cache",
+            "image": MINIO_MC,
+            "environment": MINIO_MC_ENV,
+            "commands": [
+                "BINGO_HASH=$(cat %s/.bingo/* | sha256sum | cut -d ' ' -f 1)" % dirs["base"],
+                "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
+                "mc cp -r -a s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH/bin /go",
+                "chmod +x /go/bin/*",
+            ],
+            "volumes": [stepVolumeGo],
+        },
+    ]
+
 def testOcisModule(ctx, module):
-    steps = skipIfUnchanged(ctx, "unit-tests") + makeGoGenerate(module) + [
+    steps = skipIfUnchanged(ctx, "unit-tests") + restoreGoBinCache() + makeGoGenerate(module) + [
         {
             "name": "golangci-lint",
             "image": OC_CI_GOLANG,
@@ -423,6 +505,7 @@ def testOcisModule(ctx, module):
                 "refs/pull/**",
             ],
         },
+        "depends_on": getPipelineNames(getGoBinForTesting(ctx)),
         "volumes": [pipelineVolumeGo],
     }
 
