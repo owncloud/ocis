@@ -38,8 +38,11 @@ thumbnail:
   - 32x32
   - 64x64
   - 128x128
+  - 1080x1920
   - 1920x1080
+  - 2160x3840
   - 3840x2160
+  - 4320x7680
   - 7680x4320
   filesystem_storage:
     root_directory: ~/.ocis/thumbnails
