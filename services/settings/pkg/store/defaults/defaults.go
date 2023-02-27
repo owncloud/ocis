@@ -33,10 +33,15 @@ const (
 	// LanguageReadWriteName is the hardcoded setting name for the language read write permission
 	LanguageReadWriteName string = "language-readwrite"
 
-	// SetSpaceQuotaPermissionID is the hardcoded setting UUID for the set space quota permission
-	SetSpaceQuotaPermissionID string = "4e6f9709-f9e7-44f1-95d4-b762d27b7896"
-	// SetSpaceQuotaPermissionName is the hardcoded setting name for the set space quota permission
-	SetSpaceQuotaPermissionName string = "set-space-quota"
+	// SetPersonalSpaceQuotaPermissionID is the hardcoded setting UUID for the set personal space quota permission
+	SetPersonalSpaceQuotaPermissionID string = "4e6f9709-f9e7-44f1-95d4-b762d27b7896"
+	// SetPersonalSpaceQuotaPermissionName is the hardcoded setting name for the set personal space quota permission
+	SetPersonalSpaceQuotaPermissionName string = "set-space-quota"
+
+	// SetProjectSpaceQuotaPermissionID is the hardcoded setting UUID for the set project space quota permission
+	SetProjectSpaceQuotaPermissionID string = "977f0ae6-0da2-4856-93f3-22e0a8482489"
+	// SetProjectSpaceQuotaPermissionName is the hardcoded setting name for the set project space quota permission
+	SetProjectSpaceQuotaPermissionName string = "Drive.ReadWriteQuota.Project"
 
 	// ListAllSpacesPermissionID is the hardcoded setting UUID for the list all spaces permission
 	ListAllSpacesPermissionID string = "016f6ddd-9501-4a0a-8ebe-64a20ee8ec82"
@@ -196,10 +201,25 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				},
 			},
 			{
-				Id:          SetSpaceQuotaPermissionID,
-				Name:        SetSpaceQuotaPermissionName,
-				DisplayName: "Set Space Quota",
-				Description: "This permission allows to manage space quotas.",
+				Id:          SetPersonalSpaceQuotaPermissionID,
+				Name:        SetPersonalSpaceQuotaPermissionName,
+				DisplayName: "Set Personal Space Quota",
+				Description: "This permission allows to manage personal space quotas.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SYSTEM,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+			{
+				Id:          SetProjectSpaceQuotaPermissionID,
+				Name:        SetProjectSpaceQuotaPermissionName,
+				DisplayName: "Set Project Space Quota",
+				Description: "This permission allows to manage project space quotas.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -346,10 +366,10 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 				},
 			},
 			{
-				Id:          SetSpaceQuotaPermissionID,
-				Name:        SetSpaceQuotaPermissionName,
-				DisplayName: "Set Space Quota",
-				Description: "This permission allows to manage space quotas.",
+				Id:          SetProjectSpaceQuotaPermissionID,
+				Name:        SetProjectSpaceQuotaPermissionName,
+				DisplayName: "Set Project Space Quota",
+				Description: "This permission allows to manage project space quotas.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
