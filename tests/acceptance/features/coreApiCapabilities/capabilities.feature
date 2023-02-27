@@ -9,59 +9,289 @@ Feature: capabilities
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
-    And the capabilities should contain
-      | capability    | path_to_element        | value |
-      | files_sharing | user@@@profile_picture | 1     |
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "capabilities"
+      ],
+      "properties": {
+        "capabilities": {
+          "type": "object",
+          "required": [
+            "files_sharing"
+          ],
+          "properties": {
+            "files_sharing": {
+              "type": "object",
+              "required": [
+                "user"
+              ],
+              "properties": {
+                "user": {
+                  "type": "object",
+                  "required": [
+                    "profile_picture"
+                  ],
+                  "properties": {
+                    "profile_picture": {
+                      "type": "boolean",
+                      "enum": [
+                        true
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
 
   @files_trashbin-app-required @skipOnReva
   Scenario: getting trashbin app capability with admin user
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
-    And the capabilities should contain
-      | capability | path_to_element | value |
-      | files      | undelete        | 1     |
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "capabilities"
+      ],
+      "properties": {
+        "capabilities": {
+          "type": "object",
+          "required": [
+            "files"
+          ],
+          "properties": {
+            "files": {
+              "type": "object",
+              "required": [
+                "undelete"
+              ],
+              "properties": {
+                "undelete": {
+                  "type": "boolean",
+                  "enum": [
+                    true
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
 
   @files_versions-app-required @skipOnReva
   Scenario: getting versions app capability with admin user
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
-    And the capabilities should contain
-      | capability | path_to_element | value |
-      | files      | versioning      | 1     |
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "capabilities"
+      ],
+      "properties": {
+        "capabilities": {
+          "type": "object",
+          "required": [
+            "files"
+          ],
+          "properties": {
+            "files": {
+              "type": "object",
+              "required": [
+                "versioning"
+              ],
+              "properties": {
+                "versioning": {
+                  "type": "boolean",
+                  "enum": [
+                    true
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
 
   @issue-ocis-1285
   Scenario: getting default_permissions capability with admin user
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
-    And the capabilities should contain
-      | capability    | path_to_element     | value |
-      | files_sharing | default_permissions | 31    |
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "capabilities"
+      ],
+      "properties": {
+        "capabilities": {
+          "type": "object",
+          "required": [
+            "files_sharing"
+          ],
+          "properties": {
+            "files_sharing": {
+              "type": "object",
+              "required": [
+                "default_permissions"
+              ],
+              "properties": {
+                "default_permissions": {
+                  "type": "number",
+                  "enum": [
+                    31
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
 
   @issue-ocis-1285
   Scenario: .htaccess is reported as a blacklisted file by default
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
-    And the capabilities should contain
-      | capability | path_to_element                | value     |
-      | files      | blacklisted_files@@@element[0] | .htaccess |
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "capabilities"
+      ],
+      "properties": {
+        "capabilities": {
+          "type": "object",
+          "required": [
+            "files"
+          ],
+          "properties": {
+            "files": {
+              "type": "object",
+              "required": [
+                "blacklisted_files"
+              ],
+              "properties": {
+                "blacklisted_files": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string",
+                    "enum": [".htaccess"]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
 
   @smokeTest
   Scenario: getting default capabilities with admin user
     When the administrator retrieves the capabilities using the capabilities API
-    Then the capabilities should contain
-      | capability    | path_to_element                           | value             |
-      | core          | status@@@edition                          | %edition%         |
-      | core          | status@@@product                          | %productname%     |
-      | core          | status@@@productname                      | %productname%     |
-      | core          | status@@@version                          | %version%         |
-      | core          | status@@@versionstring                    | %versionstring%   |
-    And the version data in the response should contain
-      | name    | value             |
-      | string  | %versionstring%   |
-      | edition | %edition%         |
-      | product | %productname%     |
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "capabilities",
+        "version"
+      ],
+      "properties": {
+        "capabilities": {
+          "type": "object",
+          "required": [
+            "core"
+          ],
+          "properties": {
+            "core": {
+              "type": "object",
+              "required": [
+                "status"
+              ],
+              "properties": {
+                "status": {
+                  "type": "object",
+                  "required": [
+                    "edition",
+                    "product",
+                    "productname",
+                    "version",
+                    "versionstring"
+                  ],
+                  "properties": {
+                    "edition": {
+                      "type": "string",
+                      "enum": ["%edition%"]
+                    },
+                    "product": {
+                      "type": "string",
+                      "enum": ["%productname%"]
+                    },
+                    "productname": {
+                      "type": "string",
+                      "enum": ["%productname%"]
+                    },
+                    "version": {
+                      "type": "string",
+                      "enum": ["%version%"]
+                    },
+                    "versionstring": {
+                      "type": "string",
+                      "enum": ["%versionstring%"]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "version": {
+          "type": "object",
+          "required": [
+            "string",
+            "edition",
+            "product"
+          ],
+          "properties": {
+            "string": {
+              "type": "string",
+              "enum": ["%versionstring%"]
+            },
+            "edition": {
+              "type": "string",
+              "enum": ["%edition%"]
+            },
+            "product": {
+              "type": "string",
+              "enum": ["%productname%"]
+            }
+          }
+        }
+      }
+    }
+    """
     And the major-minor-micro version data in the response should match the version string
