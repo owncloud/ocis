@@ -587,6 +587,37 @@ class GraphHelper {
 	}
 
 	/**
+	 * returns single group information along with its member information when groupId is provided
+	 * else return all group information along with its member information
+	 *
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
+	 * @param string|null $groupId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getSingleOrAllGroupsAlongWithMembers(
+		string $baseUrl,
+		string $xRequestId,
+		string $adminUser,
+		string $adminPassword,
+		?string $groupId = null
+	): ResponseInterface {
+		// we can expand to get list of members for a single group with groupId and also expand to get all groups with all its members
+		$endPath = ($groupId) ? '/' . $groupId . '?$expand=members' : '?$expand=members';
+		$url = self::getFullUrl($baseUrl, 'groups' . $endPath);
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$adminUser,
+			$adminPassword
+		);
+	}
+
+	/**
 	 * returns json encoded payload for user creating request
 	 *
 	 * @param string|null $userName

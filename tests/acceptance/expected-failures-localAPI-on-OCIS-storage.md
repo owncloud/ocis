@@ -105,5 +105,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Space admin should not not be able to change the user quota](https://github.com/owncloud/ocis/issues/5475)
 - [apiSpaces/spaceManagement.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/spaceManagement.feature#L69)
 
+#### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
+- [apiGraph/getGroup.feature:100](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L100)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
