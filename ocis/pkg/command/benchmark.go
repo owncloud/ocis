@@ -242,7 +242,7 @@ func client(o clientOptions) error {
 func BenchmarkSyscallsCommand(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:  "syscalls",
-		Usage: "test how fast syscalls are",
+		Usage: "test the performance of syscalls",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "path",
