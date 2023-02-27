@@ -112,9 +112,9 @@ services:
       BITNAMI_DEBUG: true
       LDAP_TLS_VERIFY_CLIENT: never
       LDAP_ENABLE_TLS: "yes"
-      LDAP_TLS_CA_FILE: /opt/bitnami/openldap/certs/openldap.crt
-      LDAP_TLS_CERT_FILE: /opt/bitnami/openldap/certs/openldap.crt
-      LDAP_TLS_KEY_FILE: /opt/bitnami/openldap/certs/openldap.key
+      LDAP_TLS_CA_FILE: /opt/bitnami/openldap/share/openldap.crt
+      LDAP_TLS_CERT_FILE: /opt/bitnami/openldap/share/openldap.crt
+      LDAP_TLS_KEY_FILE: /opt/bitnami/openldap/share/openldap.key
       LDAP_ROOT: "dc=owncloud,dc=com"
       LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD:-admin}
     ports:
@@ -124,7 +124,7 @@ services:
       - ./config/ldap/ldif:/ldifs
       - ./config/ldap/schemas:/schemas
       - ./config/ldap/docker-entrypoint-override.sh:/opt/bitnami/scripts/openldap/docker-entrypoint-override.sh
-      - ldap-certs:/opt/bitnami/openldap/certs
+      - ldap-certs:/opt/bitnami/openldap/share
     logging:
       driver: ${LOG_DRIVER:-local}
     restart: always
