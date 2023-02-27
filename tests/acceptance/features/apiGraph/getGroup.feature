@@ -108,7 +108,7 @@ Feature: get groups and their members
     And the last response should be an unauthorized response
 
 
-  Scenario: Get details of a single group
+  Scenario: Get details of a group
     Given group "tea-lover" has been created
     When user "Alice" gets details of a group "tea-lover" using the Graph API
     Then the HTTP status code should be "200"

@@ -1942,7 +1942,7 @@ class GraphContext implements Context {
 	 * @return void
 	 */
 	public function userGetsDetailsOfAGroupUsingTheGraphApi(string $user, string $groupName): void {
-		$groupId = $this->getGroupIdByName($this->getArrayOfGroupsResponded($this->listGroups($user)), $groupName);
+		$groupId = $this->getGroupIdByName($groupName);
 		$credentials = $this->getAdminOrUserCredentials($user);
 
 		$this->featureContext->setResponse(
@@ -1959,26 +1959,22 @@ class GraphContext implements Context {
 	/**
 	 * Get Group Id from response
 	 *
-	 * @param array|null $allGroups
 	 * @param string $groupName - name of the group
+	 * @param array|null $allGroups
 	 *
 	 * @return string - id of the group
 	 * @throws Exception | GuzzleException
 	 */
-	public function getGroupIdByName(?array $allGroups, string $groupName): string {
+	public function getGroupIdByName(string $groupName, ?array $allGroups = null): string {
 		if ($allGroups === null) {
-			$allGroups = $this->getArrayOfGroupsResponded(
-				$this->listGroups(
-					$this->featureContext->getCurrentUser()
-				)
-			);
+			$allGroups = $this->getArrayOfGroupsResponded($this->listGroups());
 		}
 		foreach ($allGroups as $group) {
 			if ($group['displayName'] === $groupName) {
 				return $group['id'];
 			}
 		}
-		throw new Exception("Group with name $groupName not found in JSON response.");
+		throw new Exception("Group with name '$groupName' not found in the groups list");
 	}
 
 	/**
@@ -1992,13 +1988,11 @@ class GraphContext implements Context {
 		$actualGroup = $this->featureContext->getJsonDecodedResponse();
 		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
 
-		$expectedGroup = [];
-		foreach ($table->getHash() as $row) {
-			if ($row["key"] === "displayName") {
-				$groupName = $row["value"];
-			}
-			$row['value'] = $this->featureContext->substituteInLineCodes(
-				$row['value'],
+		$data = $table->getRowsHash();
+		unset($data['key']);
+		foreach ($data as $key => $val) {
+			$val = $this->featureContext->substituteInLineCodes(
+				$val,
 				$this->featureContext->getCurrentUser(),
 				[],
 				[
@@ -2006,14 +2000,14 @@ class GraphContext implements Context {
 						"code" => "%group_id%",
 						"function" =>
 							[$this, "getGroupIdByName"],
-						"parameter" => [null, $groupName]
+						"parameter" => [$data['displayName']]
 					],
 				]
 			);
-			$expectedGroup[$row["key"]] = $row["value"];
+			$data[$key] = $val;
 		}
 		Assert::assertEqualsCanonicalizing(
-			$expectedGroup,
+			$data,
 			$actualGroup,
 			"Provided group do not match the group returned in the response."
 		);
