@@ -97,7 +97,7 @@ func (ul *UserlogService) MemorizeEvents() {
 		case events.FileTouched:
 			users, err = ul.findSpaceMembers(ul.impersonate(e.SpaceOwner), e.Ref.GetResourceId().GetSpaceId(), viewer)
 		case events.FileDownloaded:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.Owner), e.Ref.GetResourceId().GetSpaceId(), viewer) // no space owner in event
+			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.Ref.GetResourceId().GetSpaceId(), viewer) // no space owner in event
 		case events.FileVersionRestored:
 			users, err = ul.findSpaceMembers(ul.impersonate(e.SpaceOwner), e.Ref.GetResourceId().GetSpaceId(), editor)
 		case events.ItemMoved:
@@ -105,7 +105,7 @@ func (ul *UserlogService) MemorizeEvents() {
 		case events.ItemTrashed:
 			users, err = ul.findSpaceMembers(ul.impersonate(e.SpaceOwner), e.Ref.GetResourceId().GetSpaceId(), viewer)
 		case events.ItemPurged:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.Owner), e.Ref.GetResourceId().GetSpaceId(), editor) // no space owner in event
+			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.Ref.GetResourceId().GetSpaceId(), editor) // no space owner in event
 		case events.ItemRestored:
 			users, err = ul.findSpaceMembers(ul.impersonate(e.SpaceOwner), e.Ref.GetResourceId().GetSpaceId(), viewer)
 
