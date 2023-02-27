@@ -2505,65 +2505,6 @@ class OccContext implements Context {
 	}
 
 	/**
-	 * @When the administrator adds/updates system config key :key with value :value using the occ command
-	 * @When the administrator adds/updates system config key :key with value :value and type :type using the occ command
-	 *
-	 * @param string $key
-	 * @param string $value
-	 * @param string $type
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorAddsSystemConfigKeyWithValueUsingTheOccCommand(
-		string $key,
-		string $value,
-		string $type = "string"
-	):void {
-		$this->addSystemConfigKeyUsingTheOccCommand(
-			$key,
-			$value,
-			$type
-		);
-	}
-
-	/**
-	 * @Given the administrator has added/updated system config key :key with value :value
-	 * @Given the administrator has added/updated system config key :key with value :value and type :type
-	 *
-	 * @param string $key
-	 * @param string $value
-	 * @param string $type
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasAddedSystemConfigKeyWithValueUsingTheOccCommand(
-		string $key,
-		string $value,
-		string $type = "string"
-	):void {
-		$this->addSystemConfigKeyUsingTheOccCommand(
-			$key,
-			$value,
-			$type
-		);
-		$this->theCommandShouldHaveBeenSuccessful();
-	}
-
-	/**
-	 * @When the administrator deletes system config key :key using the occ command
-	 *
-	 * @param string $key
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorDeletesSystemConfigKeyUsingTheOccCommand(string $key):void {
-		$this->deleteSystemConfigKeyUsingTheOccCommand($key);
-	}
-
-	/**
 	 * @When the administrator empties the trashbin of user :user using the occ command
 	 *
 	 * @param string $user
@@ -2753,29 +2694,6 @@ class OccContext implements Context {
 	}
 
 	/**
-	 * @Then system config key :key should have value :value
-	 *
-	 * @param string $key
-	 * @param string $value
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function systemConfigKeyShouldHaveValue(string $key, string $value):void {
-		$config = \trim(
-			SetupHelper::getSystemConfigValue(
-				$key,
-				$this->featureContext->getStepLineRef()
-			)
-		);
-		Assert::assertSame(
-			$value,
-			$config,
-			"The system config key '$key' was expected to have value '$value', but got '$config'"
-		);
-	}
-
-	/**
 	 * @Then the command output table should contain the following text:
 	 *
 	 * @param TableNode $table table of patterns to find with table title as 'table_column'
@@ -2796,24 +2714,6 @@ class OccContext implements Context {
 				"Value: " . $row['table_column'] . " not found"
 			);
 		}
-	}
-
-	/**
-	 * @Then system config key :key should not exist
-	 *
-	 * @param string $key
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function systemConfigKeyShouldNotExist(string $key):void {
-		Assert::assertEmpty(
-			SetupHelper::getSystemConfig(
-				$key,
-				$this->featureContext->getStepLineRef()
-			)['stdOut'],
-			"The system config key '$key' was not expected to exist"
-		);
 	}
 
 	/**
@@ -2921,59 +2821,6 @@ class OccContext implements Context {
 			return $match[0];
 		}
 		return false;
-	}
-
-	/**
-	 * @Then the system config key :key from the last command output should match value :value of type :type
-	 *
-	 * @param string $key
-	 * @param string $value
-	 * @param string $type
-	 *
-	 * @return void
-	 */
-	public function theSystemConfigKeyFromLastCommandOutputShouldContainValue(
-		string $key,
-		string $value,
-		string $type
-	):void {
-		$configList = \json_decode(
-			$this->featureContext->getStdOutOfOccCommand(),
-			true
-		);
-		$systemConfig = $configList['system'];
-
-		// convert the value to it's respective type based on type given in the type column
-		if ($type === 'boolean') {
-			$value = $value === 'true' ? true : false;
-		} elseif ($type === 'integer') {
-			$value = (int) $value;
-		} elseif ($type === 'json') {
-			// if the expected value of the key is a json
-			// match the value with the regular expression
-			$actualKeyValuePair = \json_encode(
-				$systemConfig[$key],
-				JSON_UNESCAPED_SLASHES
-			);
-
-			Assert::assertThat(
-				$actualKeyValuePair,
-				Assert::matchesRegularExpression($value)
-			);
-			return;
-		}
-
-		if (!\array_key_exists($key, $systemConfig)) {
-			Assert::fail(
-				"system config doesn't contain key: " . $key
-			);
-		}
-
-		Assert::assertEquals(
-			$value,
-			$systemConfig[$key],
-			"config: $key doesn't contain value: $value"
-		);
 	}
 
 	/**
