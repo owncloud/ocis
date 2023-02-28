@@ -100,9 +100,14 @@ func (e ErrorCode) Render(w http.ResponseWriter, r *http.Request, status int, ms
 }
 
 func (e Error) Render(w http.ResponseWriter, r *http.Request) {
-	status := http.StatusInternalServerError
-	if e.errorCode == ItemNotFound {
+	var status int
+	switch e.errorCode {
+	case ItemNotFound:
 		status = http.StatusNotFound
+	case NameAlreadyExists:
+		status = http.StatusConflict
+	default:
+		status = http.StatusInternalServerError
 	}
 	e.errorCode.Render(w, r, status, e.msg)
 }
