@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
@@ -94,10 +95,11 @@ func (ul *UserlogService) convertEvent(ctx context.Context, event *ehmsg.Event) 
 		Timestamp: time.Now().Format(time.RFC3339Nano),
 	}
 
+	// TODO: strange bug with getting space -> fix postponed to make master panic-free
+	var space storageprovider.StorageSpace
 	switch ev := einterface.(type) {
 	// file related
 	case events.UploadReady:
-		space, _ := ul.getSpace(ctx, ev.FileRef.GetResourceId().GetSpaceId())
 		noti.UserID = ev.ExecutingUser.GetId().GetOpaqueId()
 		noti.Subject = "File uploaded"
 		noti.Message = fmt.Sprintf("File '%s' was uploaded to space '%s' by user '%s'", ev.Filename, space.GetName(), ev.ExecutingUser.GetUsername())
@@ -144,63 +146,51 @@ func (ul *UserlogService) convertEvent(ctx context.Context, event *ehmsg.Event) 
 		noti.Subject = "Space renamed"
 		noti.Message = fmt.Sprintf("Space '%s' was renamed", ev.Name)
 	case events.SpaceEnabled:
-		space, _ := ul.getSpace(ctx, ev.ID.GetOpaqueId())
 		noti.UserID = ev.Executant.GetOpaqueId()
 		noti.Subject = "Space enabled"
 		noti.Message = fmt.Sprintf("Space '%s' was renamed", space.Name)
 	case events.SpaceDisabled:
-		space, _ := ul.getSpace(ctx, ev.ID.GetOpaqueId())
 		noti.UserID = ev.Executant.GetOpaqueId()
 		noti.Subject = "Space disabled"
 		noti.Message = fmt.Sprintf("Space '%s' was disabled", space.Name)
 	case events.SpaceDeleted:
-		space, _ := ul.getSpace(ctx, ev.ID.GetOpaqueId())
 		noti.UserID = ev.Executant.GetOpaqueId()
 		noti.Subject = "Space deleted"
 		noti.Message = fmt.Sprintf("Space '%s' was deleted", space.Name)
 	case events.SpaceShared:
-		space, _ := ul.getSpace(ctx, ev.ID.GetOpaqueId())
 		noti.UserID = ev.Executant.GetOpaqueId()
 		noti.Subject = "Space shared"
 		noti.Message = fmt.Sprintf("Space '%s' was shared", space.Name)
 	case events.SpaceUnshared:
-		space, _ := ul.getSpace(ctx, ev.ID.GetOpaqueId())
 		noti.UserID = ev.Executant.GetOpaqueId()
 		noti.Subject = "Space unshared"
 		noti.Message = fmt.Sprintf("Space '%s' was unshared", space.Name)
 	case events.SpaceUpdated:
-		space, _ := ul.getSpace(ctx, ev.ID.GetOpaqueId())
 		noti.UserID = ev.Executant.GetOpaqueId()
 		noti.Subject = "Space updated"
 		noti.Message = fmt.Sprintf("Space '%s' was updated", space.Name)
 	case events.SpaceMembershipExpired:
-		space, _ := ul.getSpace(ctx, ev.SpaceID.GetOpaqueId())
 		noti.UserID = ""
 		noti.Subject = "Space membership expired"
 		noti.Message = fmt.Sprintf("A spacemembership for space '%s' has expired", space.Name)
 
 	// share related
 	case events.ShareCreated:
-		space, _ := ul.getSpace(ctx, ev.ItemID.GetSpaceId())
 		noti.UserID = ev.Executant.GetOpaqueId()
 		noti.Subject = "Share received"
 		noti.Message = fmt.Sprintf("A file was shared in space %s", space.Name)
 	case events.ShareUpdated:
-		space, _ := ul.getSpace(ctx, ev.ItemID.GetSpaceId())
 		noti.UserID = ev.Executant.GetOpaqueId()
 		noti.Subject = "Share updated"
 		noti.Message = fmt.Sprintf("A share was updated in space %s", space.Name)
 	case events.ShareExpired:
-		space, _ := ul.getSpace(ctx, ev.ItemID.GetSpaceId())
 		noti.Subject = "Share expired"
 		noti.Message = fmt.Sprintf("A share has expired in space %s", space.Name)
 	case events.LinkCreated:
-		space, _ := ul.getSpace(ctx, ev.ItemID.GetSpaceId())
 		noti.UserID = ev.Executant.GetOpaqueId()
 		noti.Subject = "Share received"
 		noti.Message = fmt.Sprintf("A link was created in space %s", space.Name)
 	case events.LinkUpdated:
-		space, _ := ul.getSpace(ctx, ev.ItemID.GetSpaceId())
 		noti.UserID = ev.Executant.GetOpaqueId()
 		noti.Subject = "Share received"
 		noti.Message = fmt.Sprintf("A link was updated in space %s", space.Name)

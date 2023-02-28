@@ -219,10 +219,15 @@ func (ul *UserlogService) DeleteEvents(userid string, evids []string) error {
 }
 
 func (ul *UserlogService) impersonate(u *user.UserId) context.Context {
+	if u == nil {
+		ul.log.Debug().Msg("cannot impersonate nil user")
+		return nil
+	}
+
 	ctx, _, err := utils.Impersonate(u, ul.gwClient, ul.cfg.MachineAuthAPIKey)
 	if err != nil {
 		ul.log.Error().Err(err).Str("userid", u.GetOpaqueId()).Msg("failed to impersonate user")
-		return context.Background()
+		return nil
 	}
 	return ctx
 }
@@ -288,6 +293,10 @@ func (ul *UserlogService) alterUserEventList(userid string, alter func([]string)
 // we need an owner to query space members
 // we need to check the user has the required role to see the event
 func (ul *UserlogService) findSpaceMembers(ctx context.Context, spaceID string, requiredRole permissionChecker) ([]string, error) {
+	if ctx == nil {
+		return nil, errors.New("need authenticated context to find space members")
+	}
+
 	space, err := ul.getSpace(ctx, spaceID)
 	if err != nil {
 		return nil, err
@@ -371,6 +380,10 @@ func (ul *UserlogService) gatherSpaceMembers(ctx context.Context, space *storage
 
 // resolves the users of a group
 func (ul *UserlogService) resolveGroup(ctx context.Context, groupID string) ([]string, error) {
+	if ctx == nil {
+		return nil, errors.New("need authenticated context to resolve groups")
+	}
+
 	r, err := ul.gwClient.GetGroup(ctx, &group.GetGroupRequest{GroupId: &group.GroupId{OpaqueId: groupID}})
 	if err != nil {
 		return nil, err
