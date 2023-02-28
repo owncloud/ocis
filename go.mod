@@ -1,6 +1,6 @@
 module github.com/owncloud/ocis/v2
 
-go 1.18
+go 1.19
 
 require (
 	github.com/CiscoM31/godata v1.0.6
