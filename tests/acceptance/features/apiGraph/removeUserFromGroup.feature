@@ -13,23 +13,23 @@ Feature: remove a user from a group
       | groupname       | comment                               |
       | brand-new-group | nothing special here                  |
       | España§àôœ€     | special European and other characters |
-      | नेपाली          | Unicode group name                    |
+      | नेपाली            | Unicode group name                    |
     And the following users have been added to the following groups
       | username | groupname       |
       | Alice    | brand-new-group |
       | Alice    | España§àôœ€     |
-      | Alice    | नेपाली          |
+      | Alice    | नेपाली            |
     When the administrator removes the following users from the following groups using the Graph API
       | username | groupname       |
       | Alice    | brand-new-group |
       | Alice    | España§àôœ€     |
-      | Alice    | नेपाली          |
+      | Alice    | नेपाली            |
     Then the HTTP status code of responses on all endpoints should be "204"
     And the following users should not belong to the following groups
       | username | groupname       |
       | Alice    | brand-new-group |
       | Alice    | España§àôœ€     |
-      | Alice    | नेपाली          |
+      | Alice    | नेपाली            |
 
 
   Scenario: admin removes a user from a group with special characters

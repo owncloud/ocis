@@ -13,18 +13,18 @@ Feature: add users to group
       | groupname   | comment                               |
       | simplegroup | nothing special here                  |
       | España§àôœ€ | special European and other characters |
-      | नेपाली      | Unicode group name                    |
+      | नेपाली        | Unicode group name                    |
     When the administrator adds the following users to the following groups using the Graph API
       | username | groupname   |
       | Alice    | simplegroup |
       | Alice    | España§àôœ€ |
-      | Alice    | नेपाली      |
+      | Alice    | नेपाली        |
     Then the HTTP status code of responses on all endpoints should be "204"
     And the following users should be listed in the following groups
       | username | groupname   |
       | Alice    | simplegroup |
       | Alice    | España§àôœ€ |
-      | Alice    | नेपाली      |
+      | Alice    | नेपाली        |
 
 
   Scenario: adding a user to a group with special character in its name
