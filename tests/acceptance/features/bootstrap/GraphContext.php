@@ -91,7 +91,7 @@ class GraphContext implements Context {
 			$displayName
 		);
 		$this->featureContext->setResponse($response);
-		$this->featureContext->theHttpStatusCodeShouldBe(200);
+		$this->featureContext->theHttpStatusCodeShouldBe(200); // TODO 204 when prefer=minimal header was sent
 	}
 
 	/**

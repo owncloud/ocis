@@ -309,21 +309,14 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$fullUrl = $this->baseUrl . $this->davSpacesUrl . $space["id"] . "/" . $fileName;
 
-		$this->featureContext->setResponse(
-			HttpRequestHelper::get(
-				$fullUrl,
-				"",
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				[],
-				"{}"
-			)
+		return HttpRequestHelper::get(
+			$fullUrl,
+			"",
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			[],
+			"{}"
 		);
-		$this->featureContext->theHTTPStatusCodeShouldBe(
-			200,
-			"file $fileName not found"
-		);
-		return $this->featureContext->getResponse();
 	}
 
 	/**
@@ -358,17 +351,15 @@ class SpacesContext implements Context {
 			$folderName = '';
 		}
 		$fullUrl = $this->baseUrl . $this->davSpacesUrl . $space["id"] . "/" . $folderName;
-		$this->featureContext->setResponse(
-			HttpRequestHelper::sendRequest(
-				$fullUrl,
-				$this->featureContext->getStepLineRef(),
-				'PROPFIND',
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				['Depth' => '0'],
-			)
+		$response = HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			'PROPFIND',
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			['Depth' => '0'],
 		);
-		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml()->xpath("//d:response/d:propstat/d:prop/oc:fileid")), true, 512, JSON_THROW_ON_ERROR);
+		$responseArray = json_decode(json_encode($this->featureContext->getResponseXml($response)->xpath("//d:response/d:propstat/d:prop/oc:fileid")), true, 512, JSON_THROW_ON_ERROR);
 		Assert::assertNotEmpty($responseArray, "the PROPFIND response for $folderName is empty");
 		return $responseArray[0][0];
 	}
@@ -490,22 +481,18 @@ class SpacesContext implements Context {
 
 		foreach ($drives as $value) {
 			if (!\array_key_exists("deleted", $value["root"])) {
-				$this->featureContext->setResponse(
-					GraphHelper::disableSpace(
-						$this->featureContext->getBaseUrl(),
-						$userAdmin,
-						$this->featureContext->getPasswordForUser($userAdmin),
-						$value["id"]
-					)
-				);
-			}
-			$this->featureContext->setResponse(
-				GraphHelper::deleteSpace(
+				GraphHelper::disableSpace(
 					$this->featureContext->getBaseUrl(),
 					$userAdmin,
 					$this->featureContext->getPasswordForUser($userAdmin),
 					$value["id"]
-				)
+				);
+			}
+			GraphHelper::deleteSpace(
+				$this->featureContext->getBaseUrl(),
+				$userAdmin,
+				$this->featureContext->getPasswordForUser($userAdmin),
+				$value["id"]
 			);
 		}
 	}
@@ -703,12 +690,18 @@ class SpacesContext implements Context {
 	/**
 	 * Remember the available Spaces
 	 *
+	 * @param ResponseInterface|null $response
+	 *
 	 * @return void
 	 *
 	 * @throws Exception
 	 */
-	public function rememberTheAvailableSpaces(): void {
-		$rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
+	public function rememberTheAvailableSpaces(?ResponseInterface $response = null): void {
+		if ($response) {
+			$rawBody =  $response->getBody()->getContents();
+		} else {
+			$rawBody =  $this->featureContext->getResponse()->getBody()->getContents();
+		}
 		$drives = json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
 		if (isset($drives["value"])) {
 			$drives = $drives["value"];
@@ -1635,7 +1628,7 @@ class SpacesContext implements Context {
 		);
 
 		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
-		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
+		$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
 	}
 
 	/**
@@ -1664,7 +1657,8 @@ class SpacesContext implements Context {
 
 		$fileSource = $this->escapePath(\trim($fileSource, "/"));
 		$fullUrl = $space["root"]["webDavUrl"] . '/' . $fileSource;
-		$this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+		$this->featureContext->setResponse($this->moveFilesAndFoldersRequest($user, $fullUrl, $headers));
+		$this->featureContext->pushToLastHttpStatusCodesArray();
 	}
 
 	/**
@@ -1705,22 +1699,17 @@ class SpacesContext implements Context {
 	 * @param string $fullUrl
 	 * @param array $headers
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function moveFilesAndFoldersRequest(string $user, string $fullUrl, array $headers):void {
-		$this->featureContext->setResponse(
-			HttpRequestHelper::sendRequest(
-				$fullUrl,
-				$this->featureContext->getStepLineRef(),
-				'MOVE',
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$headers,
-			)
-		);
-		$this->featureContext->pushToLastHttpStatusCodesArray(
-			(string)$this->featureContext->getResponse()->getStatusCode()
+	public function moveFilesAndFoldersRequest(string $user, string $fullUrl, array $headers): ResponseInterface {
+		return HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			'MOVE',
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$headers,
 		);
 	}
 
@@ -1746,7 +1735,7 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $fromSpaceName);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
 		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
-		$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
+		$this->featureContext->setResponse($this->copyFilesAndFoldersRequest($user, $fullUrl, $headers));
 	}
 
 	/**
@@ -1775,10 +1764,12 @@ class SpacesContext implements Context {
 		$headers['Overwrite'] = 'T';
 		$fullUrl = $space["root"]["webDavUrl"] . '/' . ltrim($fileSource, "/");
 		if ($action === 'copying') {
-			$this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
+			$response = $this->copyFilesAndFoldersRequest($user, $fullUrl, $headers);
 		} else {
-			$this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+			$response = $this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
 		}
+		$this->featureContext->setResponse($response);
+		$this->featureContext->pushToLastHttpStatusCodesArray();
 	}
 
 	/**
@@ -1835,7 +1826,8 @@ class SpacesContext implements Context {
 		$space = $this->getSpaceByName($user, $fromSpaceName);
 		$headers['Destination'] = $this->destinationHeaderValueWithSpaceName($user, $fileDestination, $toSpaceName);
 		$fullUrl = $space["root"]["webDavUrl"] . '/' . \ltrim($fileSource, "/");
-		$this->moveFilesAndFoldersRequest($user, $fullUrl, $headers);
+		$this->featureContext->setResponse($this->moveFilesAndFoldersRequest($user, $fullUrl, $headers));
+		$this->featureContext->pushToLastHttpStatusCodesArray();
 	}
 
 	/**
@@ -1863,19 +1855,17 @@ class SpacesContext implements Context {
 	 * @param string $fullUrl
 	 * @param array $headers
 	 *
-	 * @return void
+	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function copyFilesAndFoldersRequest(string $user, string $fullUrl, array $headers):void {
-		$this->featureContext->setResponse(
-			HttpRequestHelper::sendRequest(
-				$fullUrl,
-				$this->featureContext->getStepLineRef(),
-				'COPY',
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$headers,
-			)
+	public function copyFilesAndFoldersRequest(string $user, string $fullUrl, array $headers): ResponseInterface {
+		return HttpRequestHelper::sendRequest(
+			$fullUrl,
+			$this->featureContext->getStepLineRef(),
+			'COPY',
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$headers,
 		);
 	}
 
