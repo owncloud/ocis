@@ -24,7 +24,7 @@ require (
 	github.com/go-micro/plugins/v4/logger/zerolog v1.2.0
 	github.com/go-micro/plugins/v4/registry/consul v1.2.0
 	github.com/go-micro/plugins/v4/registry/etcd v1.2.0
-	github.com/go-micro/plugins/v4/registry/kubernetes v1.1.0
+	github.com/go-micro/plugins/v4/registry/kubernetes v1.1.1
 	github.com/go-micro/plugins/v4/registry/mdns v1.2.0
 	github.com/go-micro/plugins/v4/registry/memory v1.2.0
 	github.com/go-micro/plugins/v4/registry/nats v1.2.1
@@ -61,7 +61,9 @@ require (
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.2-0.20230119095249-5688a1b749dc
 	github.com/pkg/errors v0.9.1
+	github.com/pkg/xattr v0.4.9
 	github.com/prometheus/client_golang v1.14.0
+	github.com/rogpeppe/go-internal v1.8.0
 	github.com/rs/zerolog v1.28.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
@@ -101,8 +103,8 @@ require (
 	github.com/BurntSushi/toml v1.2.1 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
-	github.com/Microsoft/go-winio v0.5.2 // indirect
-	github.com/ProtonMail/go-crypto v0.0.0-20220824120805-4b6e5c587895 // indirect
+	github.com/Microsoft/go-winio v0.6.0 // indirect
+	github.com/ProtonMail/go-crypto v0.0.0-20220930113650-c6815a8c17ad // indirect
 	github.com/RoaringBitmap/roaring v0.9.4 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/ajg/form v1.5.1 // indirect
@@ -242,7 +244,6 @@ require (
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
-	github.com/pkg/xattr v0.4.9 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/pquerna/cachecontrol v0.1.0 // indirect
 	github.com/prometheus/alertmanager v0.24.0 // indirect
@@ -251,7 +252,6 @@ require (
 	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/prometheus/statsd_exporter v0.22.8 // indirect
 	github.com/rivo/uniseg v0.4.2 // indirect
-	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/rs/cors v1.8.2 // indirect
 	github.com/rs/xid v1.4.0 // indirect
 	github.com/russellhaering/goxmldsig v1.1.1 // indirect
