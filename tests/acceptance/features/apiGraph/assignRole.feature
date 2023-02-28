@@ -31,3 +31,17 @@ Feature: assign role
       | Space Admin | 401        |
       | User        | 401        |
       | Guest       | 401        |
+
+
+  Scenario Outline: assign role to the user with setting api and list role with graph api
+    Given user "Alice" has been created with default attributes and without skeleton files
+    And the administrator has given "Alice" the role "<userRole>" using the settings api
+    When the administrator retrieves the assigned role of user "Alice" using the Graph API
+    Then the HTTP status code should be "200"
+    And the Graph API response should have the role "<userRole>"
+    Examples:
+      | userRole    |
+      | Admin       |
+      | Space Admin |
+      | User        |
+      | Guest       |
