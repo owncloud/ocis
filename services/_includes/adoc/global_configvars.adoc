@@ -619,7 +619,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
 
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
@@ -890,7 +890,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments.
+Allow insecure connections to the frontend.
 
 a| `OCIS_JWT_SECRET`
 
@@ -1149,7 +1149,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
 
 a| `OCIS_SPACES_MAX_QUOTA`
 
@@ -1408,10 +1408,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++https://localhost:9200 ++
+++https://127.0.0.1:9200 ++
 
 a| [subs=-attributes]
-URL to load themes from. Will be prepended to the theme path.
+URL, where oCIS is reachable for users.
 
 a| `REVA_GATEWAY`
 
