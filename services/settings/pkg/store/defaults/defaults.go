@@ -87,6 +87,11 @@ const (
 	ChangeLogoPermissionID string = "ed83fc10-1f54-4a9e-b5a7-fb517f5f3e01"
 	// ChangeLogoPermissionName is the hardcoded setting name for the change-logo permission
 	ChangeLogoPermissionName string = "change-logo"
+
+	// WritePublicLinkPermissionID is the hardcoded setting UUID for the PublicLink.Write permission
+	WritePublicLinkPermissionID string = "11516bbd-7157-49e1-b6ac-d00c820f980b"
+	// WritePublicLinkPermissionName is the hardcoded setting name for the PublicLink.Write permission
+	WritePublicLinkPermissionName string = "PublicLink.Write"
 )
 
 // GenerateBundlesDefaultRoles bootstraps the default roles.
@@ -280,6 +285,21 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 					},
 				},
 			},
+			{
+				Id:          WritePublicLinkPermissionID,
+				Name:        WritePublicLinkPermissionName,
+				DisplayName: "Write publiclink",
+				Description: "This permission permits to write a public link.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SHARE,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_WRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
 		},
 	}
 }
@@ -416,6 +436,21 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 					},
 				},
 			},
+			{
+				Id:          WritePublicLinkPermissionID,
+				Name:        WritePublicLinkPermissionName,
+				DisplayName: "Write publiclink",
+				Description: "This permission permits to write a public link.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SHARE,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_WRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
 		},
 	}
 }
@@ -474,6 +509,21 @@ func generateBundleUserRole() *settingsmsg.Bundle {
 					PermissionValue: &settingsmsg.Permission{
 						Operation:  settingsmsg.Permission_OPERATION_CREATE,
 						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
+					},
+				},
+			},
+			{
+				Id:          WritePublicLinkPermissionID,
+				Name:        WritePublicLinkPermissionName,
+				DisplayName: "Write publiclink",
+				Description: "This permission permits to write a public link.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SHARE,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_WRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
 					},
 				},
 			},
