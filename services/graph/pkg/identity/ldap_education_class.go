@@ -80,6 +80,13 @@ func (i *LDAP) CreateEducationClass(ctx context.Context, class libregraph.Educat
 	}
 
 	if err := i.conn.Add(ar); err != nil {
+		var lerr *ldap.Error
+		logger.Debug().Err(err).Msg("error adding class")
+		if errors.As(err, &lerr) {
+			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
+				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
+			}
+		}
 		return nil, err
 	}
 

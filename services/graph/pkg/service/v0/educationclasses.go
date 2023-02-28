@@ -83,6 +83,11 @@ func (g Graph) PostEducationClass(w http.ResponseWriter, r *http.Request) {
 
 	if class, err = g.identityEducationBackend.CreateEducationClass(r.Context(), *class); err != nil {
 		logger.Debug().Interface("class", class).Msg("could not create class: backend error")
+		var eerr errorcode.Error
+		if errors.As(err, &eerr) {
+			eerr.Render(w, r)
+			return
+		}
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
