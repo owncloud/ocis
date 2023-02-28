@@ -278,7 +278,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The driver which should be used by the service.
 
-a|`STORAGE_SYSTEM_OCIS_METADATA_BACKEND` +
+a|`OCIS_DECOMPOSEDFS_METADATA_BACKEND` +
+`STORAGE_SYSTEM_OCIS_METADATA_BACKEND` +
 
 a| [subs=-attributes]
 ++string ++
