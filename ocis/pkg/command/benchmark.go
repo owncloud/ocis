@@ -188,10 +188,14 @@ func client(o clientOptions) error {
 				return
 			}
 
+			cookies := map[string]*http.Cookie{}
 			for {
 				req.Header.Set("Authorization", strings.TrimSpace(o.auth()))
 				for k, v := range o.headers {
 					req.Header.Set(k, v)
+				}
+				for _, cookie := range cookies {
+					req.AddCookie(cookie)
 				}
 
 				start := time.Now()
@@ -205,6 +209,9 @@ func client(o clientOptions) error {
 						job:      i,
 						duration: -time.Until(start),
 						status:   res.StatusCode,
+					}
+					for _, c := range res.Cookies() {
+						cookies[c.Name] = c
 					}
 				}
 			}
