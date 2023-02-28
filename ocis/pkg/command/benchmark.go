@@ -71,6 +71,11 @@ func BenchmarkClientCommand(cfg *config.Config) *cli.Command {
 				Aliases: []string{"H"},
 				Usage:   "Extra header to include in information sent.",
 			},
+			&cli.StringFlag{
+				Name: "rate",
+				Usage: `Specify the maximum transfer frequency you allow a client to use - in number of transfer starts per time unit (sometimes called request rate).
+	The request rate is provided as "N/U" where N is an integer number and U is a time unit. Supported units are 's' (second), 'm' (minute), 'h' (hour) and 'd' /(day, as in a 24 hour unit). The default time unit, if no "/U" is provided, is number of transfers per hour.`,
+			},
 			/*
 				&cli.StringFlag{
 					Name:    "oauth2-bearer",
@@ -121,6 +126,29 @@ func BenchmarkClientCommand(cfg *config.Config) *cli.Command {
 				opt.headers[parts[0]] = strings.TrimSpace(parts[1])
 			}
 
+			rate := c.String("rate")
+			if rate != "" {
+				parts := strings.SplitN(rate, "/", 2)
+				num, err := strconv.Atoi(parts[0])
+				if err != nil {
+					fmt.Println(err)
+				}
+				unit := time.Hour // default
+				if len(parts) == 2 {
+					switch parts[1] {
+					case "s":
+						unit = time.Second
+					case "m":
+						unit = time.Second
+					case "d":
+						unit = time.Hour * 24
+					default:
+						log.Fatal(errors.New("unsupported rate unit. Use s, m, h or d"))
+					}
+				}
+				opt.rateDelay = unit / time.Duration(num)
+			}
+
 			user := c.String("user")
 			opt.auth = func() string {
 				return "Basic " + base64.StdEncoding.EncodeToString([]byte(user))
@@ -157,14 +185,15 @@ func BenchmarkClientCommand(cfg *config.Config) *cli.Command {
 }
 
 type clientOptions struct {
-	request  string
-	url      string
-	auth     func() string
-	insecure bool
-	headers  map[string]string
-	data     []byte
-	ticker   *time.Ticker
-	jobs     int
+	request   string
+	url       string
+	auth      func() string
+	insecure  bool
+	headers   map[string]string
+	rateDelay time.Duration
+	data      []byte
+	ticker    *time.Ticker
+	jobs      int
 }
 
 func client(o clientOptions) error {
@@ -200,6 +229,7 @@ func client(o clientOptions) error {
 
 				start := time.Now()
 				res, err := client.Do(req)
+				duration := -time.Until(start)
 				if err != nil {
 					log.Printf("client %d: could not create request: %s\n", i, err)
 					time.Sleep(time.Second)
@@ -207,13 +237,14 @@ func client(o clientOptions) error {
 					res.Body.Close()
 					stats <- stat{
 						job:      i,
-						duration: -time.Until(start),
+						duration: duration,
 						status:   res.StatusCode,
 					}
 					for _, c := range res.Cookies() {
 						cookies[c.Name] = c
 					}
 				}
+				time.Sleep(o.rateDelay - duration)
 			}
 		}(i)
 	}
