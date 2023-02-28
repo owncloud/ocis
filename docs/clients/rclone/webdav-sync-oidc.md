@@ -35,7 +35,18 @@ oidc-gen \
 
 If you have dynamic client registration enabled on your OpenID Connect identity provider, you can skip the `--client-id`,  `--client-secret` and `--pub` options.
 
-If you're using a dedicated OpenID Connect client for the OIDC-agent, we recommend a public one with the following two redirect URIs: `http://127.0.0.1:*` and `http://localhost:*`. Alternatively you also may use the already existing OIDC client of the ownCloud Desktop Client (`--client-id=xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69` and `--client-secret=UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh`, no `--pub` set)
+If you're using a dedicated OpenID Connect client for the OIDC-agent, we recommend a public one with the following two redirect URIs: `http://127.0.0.1:*` and `http://localhost:*`. Alternatively you also may use the already existing OIDC client of the ownCloud Desktop Client (`--client-id=xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69` and `--client-secret=UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh`, no `--pub` set, request specific scope for oofline access), e.g.:
+``` bash
+oidc-gen /
+ --client-id=xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69 \
+ --client-secret=UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh \
+ --issuer https://cloud.ocis.test \
+ --redirect-uri=http://localhost:12345 \
+ --scope="openid offline_access profile email" \
+ my-client
+```
+
+When using a self signed certificate you have to provide the certificate chain using `--cp /etc/ssl/certs/test.cert.pem`. In case oidc-gen cannot determine the flow try with `--flow=code`.
 
 Please also note that the OIDC-agent will listen on your localhost interface on port 12345 for the time of the initial authentication. If that port is already occupied on your machine, you can easily change that by setting the `--redirect-uri` parameter to a different value.
 
