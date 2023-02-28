@@ -3241,12 +3241,16 @@ class SpacesContext implements Context {
 		$recipientType === 'user' ? $recipientId = $this->featureContext->getUserIdByUserName($recipient) : $recipientId = $this->featureContext->getGroupIdByGroupName($recipient);
 		$foundRoleInResponse = false;
 		foreach ($spaceAsArray['root']['permissions'] as $permission) {
-			if (isset($permission['grantedTo'][0][$recipientType]) && $permission['roles'][0] === $role && $permission['grantedTo'][0][$recipientType]['id'] === $recipientId) {
-				$foundRoleInResponse = true;
-				if ($expirationDate !== null && isset($permission['expirationDateTime'])) {
-					Assert::assertEquals($expirationDate, (preg_split("/[\sT]+/", $permission['expirationDateTime']))[0], "$expirationDate is different in the response");
+			if ($permission['roles'][0] === $role) {
+				foreach ($permission['grantedTo'] as $spaceRecipient) {
+					if (isset($spaceRecipient[$recipientType]) && $spaceRecipient[$recipientType]['id'] === $recipientId) {
+						$foundRoleInResponse = true;
+						if ($expirationDate !== null && isset($permission['expirationDateTime'])) {
+							Assert::assertEquals($expirationDate, (preg_split("/[\sT]+/", $permission['expirationDateTime']))[0], "$expirationDate is different in the response");
+						}
+						break;
+					}
 				}
-				break;
 			}
 		}
 		Assert::assertTrue($foundRoleInResponse, "the response does not contain the $recipientType $recipient");
