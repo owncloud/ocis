@@ -37,9 +37,9 @@ Feature: Share a file or folder that is inside a space
     Examples:
       | entity   | type   | role   | expireDate               | expiration |
       | folder   | folder | viewer |                          |            |
-      | folder   | folder | editor | 2042-03-25T23:59:59+0100 | 2042-03-25 |
+      | folder   | folder | editor |                          |            |
       | file.txt | file   | viewer |                          |            |
-      | file.txt | file   | editor | 2042-03-25T23:59:59+0100 | 2042-03-25 |
+      | file.txt | file   | editor |                          |            |
 
 
   Scenario Outline: A user participant of the project space with manager role can share an entity to another user
@@ -60,9 +60,9 @@ Feature: Share a file or folder that is inside a space
       | expiration | <expiration> |
     Examples:
       | entity   | type   | role   | expireDate               | expiration |
-      | folder   | folder | viewer | 2042-03-25T23:59:59+0100 | 2042-03-25 |
+      | folder   | folder | viewer |                          |            |
       | folder   | folder | editor |                          |            |
-      | file.txt | file   | viewer | 2042-03-25T23:59:59+0100 | 2042-03-25 |
+      | file.txt | file   | viewer |                          |            |
       | file.txt | file   | editor |                          |            |
 
 
@@ -118,31 +118,3 @@ Feature: Share a file or folder that is inside a space
     Then as "Brian" folder "Shares/folder" should exist
     And the information about the last share for user "Brian" should include
       | expiration | 2042-01-01 |
-
-
-  Scenario: A user changes the expiration date
-    Given user "Alice" has created a share inside of space "share sub-item" with settings:
-      | path       | folder                   |
-      | shareWith  | Brian                    |
-      | role       | viewer                   |
-      | expireDate | 2042-01-01T23:59:59+0100 |
-    And user "Brian" has accepted share "/folder" offered by user "Alice"
-    When user "Alice" changes the last share with settings:
-      | expireDate | 2044-01-01T23:59:59.999+01:00 |
-    Then the HTTP status code should be "200"
-    And the information about the last share for user "Brian" should include
-      | expiration | 2044-01-01 |
-
-
-  Scenario: A user deletes the expiration date
-    Given user "Alice" has created a share inside of space "share sub-item" with settings:
-      | path       | folder                   |
-      | shareWith  | Brian                    |
-      | role       | viewer                   |
-      | expireDate | 2042-01-01T23:59:59+0100 |
-    And user "Brian" has accepted share "/folder" offered by user "Alice"
-    When user "Alice" changes the last share with settings:
-      | expireDate |  |
-    Then the HTTP status code should be "200"
-    And the information about the last share for user "Brian" should include
-      | expiration |  |

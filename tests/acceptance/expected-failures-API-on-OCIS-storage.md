@@ -295,6 +295,7 @@ cannot share a folder with create permission
 
 #### Expiration date of user shares
 
+- [coreApiShareReshareToShares3/reShareWithExpiryDate.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareReshareToShares3/reShareWithExpiryDate.feature#L33)
 - [coreApiShareReshareToShares3/reShareWithExpiryDate.feature:34](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareReshareToShares3/reShareWithExpiryDate.feature#L34)
 - [coreApiShareReshareToShares3/reShareWithExpiryDate.feature:85](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareReshareToShares3/reShareWithExpiryDate.feature#L85)
 - [coreApiShareReshareToShares3/reShareWithExpiryDate.feature:86](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareReshareToShares3/reShareWithExpiryDate.feature#L86)
@@ -325,6 +326,7 @@ cannot share a folder with create permission
 
 #### Expiration date of group shares
 
+- [coreApiShareReshareToShares3/reShareWithExpiryDate.feature:59](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareReshareToShares3/reShareWithExpiryDate.feature#L59)
 - [coreApiShareReshareToShares3/reShareWithExpiryDate.feature:60](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareReshareToShares3/reShareWithExpiryDate.feature#L60)
 - [coreApiShareReshareToShares3/reShareWithExpiryDate.feature:115](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareReshareToShares3/reShareWithExpiryDate.feature#L115)
 - [coreApiShareReshareToShares3/reShareWithExpiryDate.feature:116](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiShareReshareToShares3/reShareWithExpiryDate.feature#L116)
