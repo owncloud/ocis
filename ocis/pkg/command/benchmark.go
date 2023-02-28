@@ -211,14 +211,13 @@ func client(o clientOptions) error {
 			}
 			client := &http.Client{Transport: tr}
 
-			req, err := http.NewRequest(o.request, o.url, bytes.NewReader(o.data))
-			if err != nil {
-				log.Printf("client %d: could not create request: %s\n", i, err)
-				return
-			}
-
 			cookies := map[string]*http.Cookie{}
 			for {
+				req, err := http.NewRequest(o.request, o.url, bytes.NewReader(o.data))
+				if err != nil {
+					log.Printf("client %d: could not create request: %s\n", i, err)
+					return
+				}
 				req.Header.Set("Authorization", strings.TrimSpace(o.auth()))
 				for k, v := range o.headers {
 					req.Header.Set(k, v)
