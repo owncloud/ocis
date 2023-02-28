@@ -48,9 +48,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 ### [Settings service user can list other peoples assignments](https://github.com/owncloud/ocis/issues/5032)
 - [apiAccountsHashDifficulty/assignRole.feature:27](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L27)
 - [apiAccountsHashDifficulty/assignRole.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L28)
-- [apiGraph/assignRole.feature:31](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/assignRole.feature#L31)
-- [apiGraph/assignRole.feature:32](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/assignRole.feature#L32)
-- [apiGraph/assignRole.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/assignRole.feature#L33)
 
 ### [Settings service user can see roles list](https://github.com/owncloud/ocis/issues/5079)
 - [apiAccountsHashDifficulty/assignRole.feature:15](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L15)
@@ -102,6 +99,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiAsyncUpload/delayPostprocessing.feature:14](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature#L14)
 - [apiAsyncUpload/delayPostprocessing.feature:15](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature#L15)
 - [apiAsyncUpload/delayPostprocessing.feature:16](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature#L16)
+
+#### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
+- [apiGraph/getGroup.feature:101](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L101)
 
 #### [Sharing to a group with an expiration date does not work #5442](https://github.com/owncloud/ocis/issues/5442)
 - [apiSpacesShares/shareSubItemOfSpace.feature:105](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L105)

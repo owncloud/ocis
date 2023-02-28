@@ -97,6 +97,7 @@ Feature: get groups and their members
       | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    |
       | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
 
+
   Scenario: normal user gets a group along with their members information
     Given user "Brian" has been created with default attributes and without skeleton files
     And group "tea-lover" has been created
