@@ -20,7 +20,6 @@ default:
             adminPassword: admin
             regularUserPassword: 1234
             ocPath: apps/testing/api/v1/occ
-        - OccContext:
 
     apiWebdavOperations:
       paths:

@@ -40,12 +40,6 @@ class PublicWebDavContext implements Context {
 	private $featureContext;
 
 	/**
-	 *
-	 * @var OccContext
-	 */
-	private $occContext;
-
-	/**
 	 * @When /^the public downloads the last public link shared file with range "([^"]*)" using the (old|new) public WebDAV API$/
 	 *
 	 * @param string $range ignore if empty
@@ -1592,7 +1586,6 @@ class PublicWebDavContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
-		$this->occContext = $environment->getContext('OccContext');
 	}
 
 	/**

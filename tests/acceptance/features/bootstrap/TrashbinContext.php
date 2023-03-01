@@ -40,12 +40,6 @@ class TrashbinContext implements Context {
 	private $featureContext;
 
 	/**
-	 *
-	 * @var OccContext
-	 */
-	private $occContext;
-
-	/**
 	 * @When user :user empties the trashbin using the trashbin API
 	 *
 	 * @param string|null $user user
@@ -1088,7 +1082,6 @@ class TrashbinContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
-		$this->occContext = $environment->getContext('OccContext');
 	}
 
 	/**
