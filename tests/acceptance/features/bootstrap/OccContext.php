@@ -868,27 +868,6 @@ class OccContext implements Context {
 	}
 
 	/**
-	 * @When the administrator has set depth_infinity_allowed to :depth_infinity_allowed
-	 *
-	 * @param int $depthInfinityAllowed
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasSetDepthInfinityAllowedTo($depthInfinityAllowed) {
-		$depthInfinityAllowedString = (string) $depthInfinityAllowed;
-		$this->addSystemConfigKeyUsingTheOccCommand(
-			"dav.propfind.depth_infinity",
-			$depthInfinityAllowedString
-		);
-		if ($depthInfinityAllowedString === "0") {
-			$this->featureContext->davPropfindDepthInfinityDisabled();
-		} else {
-			$this->featureContext->davPropfindDepthInfinityEnabled();
-		}
-	}
-
-	/**
 	 * @Given the administrator has set the mail smtpmode to :smtpmode
 	 *
 	 * @param string $smtpmode
