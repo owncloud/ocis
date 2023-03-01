@@ -3,13 +3,14 @@ package middleware
 import (
 	"crypto/sha256"
 	"crypto/subtle"
-	"errors"
 	"net/http"
+
+	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
 
 var (
 	// ErrInvalidToken is returned when the request token is invalid.
-	ErrInvalidToken = errors.New("invalid or missing token")
+	ErrInvalidToken = "invalid or missing token"
 )
 
 // Token provides a middleware to check access secured by a static token.
@@ -26,7 +27,7 @@ func Token(token string) func(http.Handler) http.Handler {
 			header := r.Header.Get("Authorization")
 
 			if header == "" {
-				http.Error(w, ErrInvalidToken.Error(), http.StatusUnauthorized)
+				errorcode.InvalidAuthenticationToken.Render(w, r, http.StatusUnauthorized, ErrInvalidToken)
 				return
 			}
 
@@ -34,7 +35,7 @@ func Token(token string) func(http.Handler) http.Handler {
 			providedTokenHash := h.Sum([]byte(header))
 
 			if subtle.ConstantTimeCompare(requiredTokenHash, providedTokenHash) == 0 {
-				http.Error(w, ErrInvalidToken.Error(), http.StatusUnauthorized)
+				errorcode.InvalidAuthenticationToken.Render(w, r, http.StatusUnauthorized, ErrInvalidToken)
 				return
 			}
 
