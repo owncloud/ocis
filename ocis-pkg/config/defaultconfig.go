@@ -14,6 +14,7 @@ import (
 	groups "github.com/owncloud/ocis/v2/services/groups/pkg/config/defaults"
 	idm "github.com/owncloud/ocis/v2/services/idm/pkg/config/defaults"
 	idp "github.com/owncloud/ocis/v2/services/idp/pkg/config/defaults"
+	invitations "github.com/owncloud/ocis/v2/services/invitations/pkg/config/defaults"
 	nats "github.com/owncloud/ocis/v2/services/nats/pkg/config/defaults"
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/config/defaults"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/config/defaults"
@@ -57,6 +58,7 @@ func DefaultConfig() *Config {
 		Groups:            groups.DefaultConfig(),
 		IDM:               idm.DefaultConfig(),
 		IDP:               idp.DefaultConfig(),
+		Invitations:       invitations.DefaultConfig(),
 		Nats:              nats.DefaultConfig(),
 		Notifications:     notifications.DefaultConfig(),
 		OCDav:             ocdav.DefaultConfig(),

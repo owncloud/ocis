@@ -31,6 +31,7 @@ import (
 	groups "github.com/owncloud/ocis/v2/services/groups/pkg/command"
 	idm "github.com/owncloud/ocis/v2/services/idm/pkg/command"
 	idp "github.com/owncloud/ocis/v2/services/idp/pkg/command"
+	invitations "github.com/owncloud/ocis/v2/services/invitations/pkg/command"
 	nats "github.com/owncloud/ocis/v2/services/nats/pkg/command"
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/command"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/command"
@@ -110,6 +111,7 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.StorageSystem.Service.Name] = storageSystem.NewSutureService
 	s.ServicesRegistry[opts.Config.Graph.Service.Name] = graph.NewSutureService
 	s.ServicesRegistry[opts.Config.IDM.Service.Name] = idm.NewSutureService
+	s.ServicesRegistry[opts.Config.Invitations.Service.Name] = invitations.NewSutureService
 	s.ServicesRegistry[opts.Config.OCS.Service.Name] = ocs.NewSutureService
 	s.ServicesRegistry[opts.Config.Store.Service.Name] = store.NewSutureService
 	s.ServicesRegistry[opts.Config.Thumbnails.Service.Name] = thumbnails.NewSutureService
