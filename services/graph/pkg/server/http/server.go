@@ -114,7 +114,7 @@ func Server(opts ...Option) (http.Service, error) {
 			return http.Service{}, errors.Wrap(err, "could not initialize gateway client")
 		}
 	} else {
-		middlewares = append(middlewares, middleware.Token(options.Config.HTTP.APIToken))
+		middlewares = append(middlewares, graphMiddleware.Token(options.Config.HTTP.APIToken))
 		// use a dummy admin middleware for the chi router
 		requireAdminMiddleware = func(next stdhttp.Handler) stdhttp.Handler {
 			return next

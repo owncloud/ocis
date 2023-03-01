@@ -8,6 +8,7 @@ import (
 	"github.com/justinas/alice"
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	graphMiddleware "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opencensus.io/zpages"
 )
@@ -18,7 +19,7 @@ func NewService(opts ...Option) *http.Server {
 	mux := http.NewServeMux()
 
 	mux.Handle("/metrics", alice.New(
-		middleware.Token(
+		graphMiddleware.Token(
 			dopts.Token,
 		),
 	).Then(
