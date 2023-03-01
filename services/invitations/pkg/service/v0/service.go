@@ -1,8 +1,13 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"crypto/tls"
+	"encoding/json"
+	"net/http"
 
+	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/config"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/invitations"
@@ -49,7 +54,65 @@ type svc struct {
 
 // Invite implements the service interface
 func (s svc) Invite(ctx context.Context, invitation *invitations.Invitation) (*invitations.Invitation, error) {
-	return &invitations.Invitation{
-		InvitedUserDisplayName: "Yay",
-	}, nil
+
+	if invitation == nil {
+		return nil, ErrBadRequest
+	}
+
+	if invitation.InvitedUserEmailAddress == "" {
+		return nil, ErrMissingEmail
+	}
+
+	user := &libregraph.User{
+		Mail: &invitation.InvitedUserEmailAddress,
+		// TODO we cannot set the user type here
+	}
+
+	if invitation.InvitedUserDisplayName != "" {
+		user.DisplayName = &invitation.InvitedUserDisplayName
+	}
+	// we don't really need a username as guests have to log in with their email address anyway
+	// what if later a user is provisioned with a guest accounts email address?
+
+	data, err := json.Marshal(user)
+	if err != nil {
+		return nil, err
+	}
+
+	// send a request to the provisioning endpoint
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true /*TODO make configurable*/},
+	}
+	client := &http.Client{Transport: tr}
+
+	req, err := http.NewRequest("POST", "/graph/v1.0/users", bytes.NewReader(data))
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO either forward current user token or use bearer token?
+	req.Header.Set("Authorization", "Bearer some-token")
+
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	invitedUser := &libregraph.User{}
+	err = json.NewDecoder(res.Body).Decode(invitedUser)
+	if err != nil {
+		return nil, err
+	}
+
+	response := &invitations.Invitation{
+		InvitedUser: invitedUser,
+	}
+	if res.StatusCode == http.StatusCreated {
+		response.Status = "Completed"
+	}
+
+	// optionally send an email
+
+	return response, nil
 }
