@@ -78,6 +78,9 @@ func ldapConfigFromString(cfg config.LDAPDriver) map[string]interface{} {
 		"group_filter":               cfg.GroupFilter,
 		"user_objectclass":           cfg.UserObjectClass,
 		"group_objectclass":          cfg.GroupObjectClass,
+		"user_disable_mechanism":     cfg.DisableUserMechanism,
+		"user_enabled_property":      cfg.UserSchema.Enabled,
+		"group_local_disabled_dn":    cfg.LdapDisabledUsersGroupDN,
 		"idp":                        cfg.IDP,
 		"user_schema": map[string]interface{}{
 			"id":              cfg.UserSchema.ID,
