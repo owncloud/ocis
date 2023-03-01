@@ -793,34 +793,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	}
 
 	/**
-	 * invokes an OCC command
-	 *
-	 * @param array|null $args anything behind "occ".
-	 *                    	   For example: "files:transfer-ownership"
-	 * @param string|null $xRequestId
-	 * @param string|null $adminUsername
-	 * @param string|null $adminPassword
-	 * @param string|null $baseUrl
-	 * @param string|null $ocPath
-	 * @param array|null $envVariables
-	 *
-	 * @return string[] associated array with "code", "stdOut", "stdErr"
-	 * @throws GuzzleException
-	 * @throws Exception
-	 */
-	public static function runOcc(
-		?array $args,
-		?string $xRequestId = '',
-		?string $adminUsername = null,
-		?string $adminPassword = null,
-		?string $baseUrl = null,
-		?string $ocPath = null,
-		?array $envVariables = null
-	):array {
-		return ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
-	}
-
-	/**
 	 * @param string $baseUrl
 	 * @param string $user
 	 * @param string $password
