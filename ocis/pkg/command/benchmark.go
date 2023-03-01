@@ -139,7 +139,7 @@ func BenchmarkClientCommand(cfg *config.Config) *cli.Command {
 					case "s":
 						unit = time.Second
 					case "m":
-						unit = time.Second
+						unit = time.Minute
 					case "d":
 						unit = time.Hour * 24
 					default:
