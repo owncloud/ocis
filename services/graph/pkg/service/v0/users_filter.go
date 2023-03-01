@@ -50,6 +50,12 @@ func (g Graph) applyFilterLogical(ctx context.Context, req *godata.GoDataRequest
 			return users, invalidFilterError()
 		}
 		return g.applyFilterLogicalAnd(ctx, req, root.Children[0], root.Children[1])
+	case "or":
+		// 'or' needs 2 operands
+		if len(root.Children) != 2 {
+			return users, invalidFilterError()
+		}
+		return g.applyFilterLogicalOr(ctx, req, root.Children[0], root.Children[1])
 	}
 	logger.Debug().Str("Token", root.Token.Value).Msg("unsupported logical filter")
 	return users, unsupportedFilterError()
@@ -109,6 +115,32 @@ func (g Graph) applyFilterLogicalAnd(ctx context.Context, req *godata.GoDataRequ
 	return filteredUsers, nil
 }
 
+func (g Graph) applyFilterLogicalOr(ctx context.Context, req *godata.GoDataRequest, operand1 *godata.ParseNode, operand2 *godata.ParseNode) (users []*libregraph.User, err error) {
+	//	logger := g.logger.SubloggerWithRequestID(ctx)
+	var res1, res2 []*libregraph.User
+
+	res1, err = g.applyUserFilter(ctx, req, operand1)
+	if err != nil {
+		return []*libregraph.User{}, err
+	}
+
+	res2, err = g.applyUserFilter(ctx, req, operand2)
+	if err != nil {
+		return []*libregraph.User{}, err
+	}
+
+	// We now have two slices with results of the subfilters. Now turn one of them
+	// into a map for efficiently getting the union of both slices
+	userSet := userSliceToMap(res1)
+	filteredUsers := make([]*libregraph.User, 0, len(res1)+len(res2))
+	filteredUsers = append(filteredUsers, res1...)
+	for _, user := range res2 {
+		if _, found := userSet[user.GetId()]; !found {
+			filteredUsers = append(filteredUsers, user)
+		}
+	}
+	return filteredUsers, nil
+}
 func (g Graph) applyFilterLambda(ctx context.Context, req *godata.GoDataRequest, nodes []*godata.ParseNode) (users []*libregraph.User, err error) {
 	logger := g.logger.SubloggerWithRequestID(ctx)
 	if len(nodes) != 2 {
