@@ -97,7 +97,7 @@
     "react-app-polyfill": "^2.0.0",
     "react-dom": "^17.0.2",
     "react-i18next": "^11.15.6",
-    "react-redux": "^7.2.5",
+    "react-redux": "^8.0.5",
     "react-router": "^5.2.1",
     "react-router-dom": "5.2.1",
     "redux": "^3.7.2",
