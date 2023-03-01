@@ -23,6 +23,7 @@ type Options struct {
 	HistoryClient    ehsvc.EventHistoryService
 	GatewayClient    gateway.GatewayAPIClient
 	RegisteredEvents []events.Unmarshaller
+	TemplatePath     string
 }
 
 // Logger configures a logger for the userlog service
@@ -78,5 +79,12 @@ func GatewayClient(gwc gateway.GatewayAPIClient) Option {
 func RegisteredEvents(e []events.Unmarshaller) Option {
 	return func(o *Options) {
 		o.RegisteredEvents = e
+	}
+}
+
+// TemplatePath registers the events the service should listen to
+func TemplatePath(tmpl string) Option {
+	return func(o *Options) {
+		o.TemplatePath = tmpl
 	}
 }

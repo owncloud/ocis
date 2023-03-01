@@ -25,36 +25,17 @@ import (
 
 // all events we care about
 var _registeredEvents = []events.Unmarshaller{
-	// file related
-	events.UploadReady{},
-	events.ContainerCreated{},
-	events.FileTouched{},
-	events.FileDownloaded{},
-	events.FileVersionRestored{},
-	events.ItemMoved{},
-	events.ItemTrashed{},
-	events.ItemPurged{},
-	events.ItemRestored{},
-
 	// space related
-	events.SpaceCreated{},
-	events.SpaceRenamed{},
-	events.SpaceEnabled{},
 	events.SpaceDisabled{},
 	events.SpaceDeleted{},
 	events.SpaceShared{},
 	events.SpaceUnshared{},
-	events.SpaceUpdated{},
 	events.SpaceMembershipExpired{},
 
 	// share related
 	events.ShareCreated{},
-	// events.ShareRemoved{}, // TODO: ShareRemoved doesn't hold sharee information
-	events.ShareUpdated{},
+	events.ShareRemoved{},
 	events.ShareExpired{},
-	events.LinkCreated{},
-	// events.LinkRemoved{}, // TODO: LinkRemoved doesn't hold sharee information
-	events.LinkUpdated{},
 }
 
 // Server is the entrypoint for the server command.

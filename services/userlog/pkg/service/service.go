@@ -32,6 +32,7 @@ type UserlogService struct {
 	historyClient    ehsvc.EventHistoryService
 	gwClient         gateway.GatewayAPIClient
 	registeredEvents map[string]events.Unmarshaller
+	templatePath     string // for custom notification templates
 }
 
 // NewUserlogService returns an EventHistory service
@@ -59,6 +60,7 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		historyClient:    o.HistoryClient,
 		gwClient:         o.GatewayClient,
 		registeredEvents: make(map[string]events.Unmarshaller),
+		templatePath:     o.TemplatePath,
 	}
 
 	for _, e := range o.RegisteredEvents {
@@ -85,46 +87,19 @@ func (ul *UserlogService) MemorizeEvents() {
 			users []string
 			err   error
 		)
+
+		fmt.Println("RECEIVED", event)
 		switch e := event.Event.(type) {
 		default:
 			err = errors.New("unhandled event")
-
-		// file related
-		case events.UploadReady:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.SpaceOwner), e.FileRef.GetResourceId().GetSpaceId(), viewer)
-		case events.ContainerCreated:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.SpaceOwner), e.Ref.GetResourceId().GetSpaceId(), viewer)
-		case events.FileTouched:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.SpaceOwner), e.Ref.GetResourceId().GetSpaceId(), viewer)
-		case events.FileDownloaded:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.Ref.GetResourceId().GetSpaceId(), viewer) // no space owner in event
-		case events.FileVersionRestored:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.SpaceOwner), e.Ref.GetResourceId().GetSpaceId(), editor)
-		case events.ItemMoved:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.SpaceOwner), e.Ref.GetResourceId().GetSpaceId(), viewer)
-		case events.ItemTrashed:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.SpaceOwner), e.Ref.GetResourceId().GetSpaceId(), viewer)
-		case events.ItemPurged:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.Ref.GetResourceId().GetSpaceId(), editor) // no space owner in event
-		case events.ItemRestored:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.SpaceOwner), e.Ref.GetResourceId().GetSpaceId(), viewer)
-
 		// space related // TODO: how to find spaceadmins?
-		case events.SpaceCreated:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ID.GetOpaqueId(), viewer)
-		case events.SpaceRenamed:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ID.GetOpaqueId(), viewer)
-		case events.SpaceEnabled:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ID.GetOpaqueId(), viewer)
 		case events.SpaceDisabled:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ID.GetOpaqueId(), manager)
+			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ID.GetOpaqueId(), viewer)
 		case events.SpaceDeleted:
 			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ID.GetOpaqueId(), manager)
 		case events.SpaceShared:
 			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ID.GetOpaqueId(), manager)
 		case events.SpaceUnshared:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ID.GetOpaqueId(), manager)
-		case events.SpaceUpdated:
 			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ID.GetOpaqueId(), manager)
 		case events.SpaceMembershipExpired:
 			users, err = ul.resolveShare(ul.impersonate(e.SpaceOwner), e.GranteeUserID, e.GranteeGroupID, e.SpaceID.GetOpaqueId())
@@ -132,15 +107,10 @@ func (ul *UserlogService) MemorizeEvents() {
 		// share related
 		case events.ShareCreated:
 			users, err = ul.resolveShare(ul.impersonate(e.Executant), e.GranteeUserID, e.GranteeGroupID, e.ItemID.GetSpaceId())
-		case events.ShareUpdated:
-			users, err = ul.resolveShare(ul.impersonate(e.Executant), e.GranteeUserID, e.GranteeGroupID, e.ItemID.GetSpaceId())
+		case events.ShareRemoved:
+			err = errors.New("no grantee in share removed event")
 		case events.ShareExpired:
 			users, err = ul.resolveShare(ul.impersonate(e.ShareOwner), e.GranteeUserID, e.GranteeGroupID, e.ItemID.GetSpaceId())
-		case events.LinkCreated:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ItemID.GetOpaqueId(), editor)
-		case events.LinkUpdated:
-			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ItemID.GetOpaqueId(), editor)
-
 		}
 
 		if err != nil {
@@ -421,6 +391,21 @@ func (ul *UserlogService) resolveShare(ctx context.Context, userid *user.UserId,
 	}
 
 	return append(users, usr...), nil
+}
+
+func (ul *UserlogService) getUser(ctx context.Context, userid *user.UserId) (*user.User, error) {
+	getUserResponse, err := ul.gwClient.GetUser(context.Background(), &user.GetUserRequest{
+		UserId: userid,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if getUserResponse.Status.Code != rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("error getting user: %s", getUserResponse.Status.Message)
+	}
+
+	return getUserResponse.GetUser(), nil
 }
 
 func listStorageSpaceRequest(spaceID string) *storageprovider.ListStorageSpacesRequest {
