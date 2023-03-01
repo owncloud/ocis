@@ -77,7 +77,7 @@ See the [Quick Guide](https://doc.owncloud.com/ocis/next/quickguide/quickguide.h
 
 ### Use the ocis Repo as Source
 
-Use this method to run an instance with the latest code. This is only recommended for development purposes. To build and run a local instance with demo users:
+Use this method to run an instance with the latest code. This is only recommended for development purposes. The minimum go version required is 1.19. To build and run a local instance with demo users:
 
 ```console
 # get the source
