@@ -3,7 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
-	"path/filepath"
+	"errors"
 	"text/template"
 	"time"
 
@@ -27,6 +27,7 @@ type OC10Notification struct {
 	ResourceID     string                 `json:"object_id"`
 	ResourceType   string                 `json:"object_type"`
 	Subject        string                 `json:"subject"`
+	SubjectRaw     string                 `json:"subjectRich"`
 	Message        string                 `json:"message"`
 	MessageRaw     string                 `json:"messageRich"`
 	MessageDetails map[string]interface{} `json:"messageRichParameters"`
@@ -44,8 +45,8 @@ func (ul *UserlogService) SpaceDisabled(ctx context.Context, eventid string, ev 
 		return OC10Notification{}, err
 	}
 
-	subj, msg, msgraw, err := ul.composeMessage("space-disabled", map[string]string{
-		"username":  user.GetUsername(),
+	subj, subjraw, msg, msgraw, err := ul.composeMessage(SpaceDisabled, map[string]string{
+		"username":  user.GetDisplayName(),
 		"spacename": space.GetName(),
 	})
 	if err != nil {
@@ -55,49 +56,53 @@ func (ul *UserlogService) SpaceDisabled(ctx context.Context, eventid string, ev 
 	return OC10Notification{
 		EventID:        eventid,
 		Service:        ul.cfg.Service.Name,
+		UserName:       user.GetUsername(),
 		Timestamp:      time.Now().Format(time.RFC3339Nano),
-		Subject:        subj,
 		ResourceID:     ev.ID.GetOpaqueId(),
 		ResourceType:   _resourceTypeSpace,
+		Subject:        subj,
+		SubjectRaw:     subjraw,
 		Message:        msg,
 		MessageRaw:     msgraw,
-		MessageDetails: ul.getMessageDetails(user, space, nil),
+		MessageDetails: ul.getDetails(user, space, nil),
 	}, nil
 
 }
 
-func (ul *UserlogService) composeMessage(eventname string, vars map[string]string) (string, string, string, error) {
-	subjtpl, err := ul.parseTemplate(eventname + "-subj")
-	if err != nil {
-		return "", "", "", err
+func (ul *UserlogService) composeMessage(eventname string, vars map[string]string) (string, string, string, string, error) {
+	tpl, ok := _templates[eventname]
+	if !ok {
+		return "", "", "", "", errors.New("unknown template name")
 	}
 
-	subject := ul.executeTemplate(subjtpl, vars)
+	subject := ul.executeTemplate(tpl.Subject, vars)
 
-	msgtpl, err := ul.parseTemplate(eventname + "-msg")
-	if err != nil {
-		return "", "", "", err
-	}
-
-	message := ul.executeTemplate(msgtpl, vars)
-
-	messageraw := ul.executeTemplate(msgtpl, map[string]string{
+	subjectraw := ul.executeTemplate(tpl.Subject, map[string]string{
 		"username":  "{user}",
 		"spacename": "{space}",
 		"resource":  "{resource}",
 	})
 
-	return subject, message, messageraw, nil
+	message := ul.executeTemplate(tpl.Message, vars)
+
+	messageraw := ul.executeTemplate(tpl.Message, map[string]string{
+		"username":  "{user}",
+		"spacename": "{space}",
+		"resource":  "{resource}",
+	})
+
+	return subject, subjectraw, message, messageraw, nil
 
 }
 
-func (ul *UserlogService) getMessageDetails(user *user.User, space *storageprovider.StorageSpace, item *storageprovider.ResourceInfo) map[string]interface{} {
+func (ul *UserlogService) getDetails(user *user.User, space *storageprovider.StorageSpace, item *storageprovider.ResourceInfo) map[string]interface{} {
 	details := make(map[string]interface{})
 
 	if user != nil {
 		details["user"] = map[string]string{
-			"id":   user.GetId().GetOpaqueId(),
-			"name": user.GetUsername(),
+			"id":          user.GetId().GetOpaqueId(),
+			"name":        user.GetUsername(),
+			"displayname": user.GetDisplayName(),
 		}
 	}
 
@@ -116,21 +121,6 @@ func (ul *UserlogService) getMessageDetails(user *user.User, space *storageprovi
 	}
 
 	return details
-}
-
-func (ul *UserlogService) parseTemplate(templateName string) (*template.Template, error) {
-	var (
-		tpl *template.Template
-		err error
-	)
-	switch ul.templatePath {
-	case "":
-		tpl, err = template.ParseFS(templatesFS, filepath.Join("templates/", templateName+".tmpl"))
-	default:
-		tpl, err = template.ParseFiles(filepath.Join(ul.templatePath, templateName+".tmpl"))
-	}
-
-	return tpl, err
 }
 
 func (ul *UserlogService) executeTemplate(tpl *template.Template, vars map[string]string) string {

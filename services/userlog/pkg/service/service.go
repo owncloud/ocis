@@ -25,14 +25,12 @@ import (
 // UserlogService is the service responsible for user activities
 type UserlogService struct {
 	log              log.Logger
-	ch               <-chan events.Event
 	m                *chi.Mux
 	store            store.Store
 	cfg              *config.Config
 	historyClient    ehsvc.EventHistoryService
 	gwClient         gateway.GatewayAPIClient
 	registeredEvents map[string]events.Unmarshaller
-	templatePath     string // for custom notification templates
 }
 
 // NewUserlogService returns an EventHistory service
@@ -53,14 +51,12 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 
 	ul := &UserlogService{
 		log:              o.Logger,
-		ch:               ch,
 		m:                o.Mux,
 		store:            o.Store,
 		cfg:              o.Config,
 		historyClient:    o.HistoryClient,
 		gwClient:         o.GatewayClient,
 		registeredEvents: make(map[string]events.Unmarshaller),
-		templatePath:     o.TemplatePath,
 	}
 
 	for _, e := range o.RegisteredEvents {
@@ -73,14 +69,14 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		r.Delete("/*", ul.HandleDeleteEvents)
 	})
 
-	go ul.MemorizeEvents()
+	go ul.MemorizeEvents(ch)
 
 	return ul, nil
 }
 
 // MemorizeEvents stores eventIDs a user wants to receive
-func (ul *UserlogService) MemorizeEvents() {
-	for event := range ul.ch {
+func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
+	for event := range ch {
 		// for each event we need to:
 		// I) find users eligible to receive the event
 		var (
@@ -88,7 +84,6 @@ func (ul *UserlogService) MemorizeEvents() {
 			err   error
 		)
 
-		fmt.Println("RECEIVED", event)
 		switch e := event.Event.(type) {
 		default:
 			err = errors.New("unhandled event")

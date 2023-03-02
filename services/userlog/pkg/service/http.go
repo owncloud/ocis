@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"embed"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,11 +12,6 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
-)
-
-var (
-	//go:embed templates
-	templatesFS embed.FS
 )
 
 // ServeHTTP fulfills Handler interface
