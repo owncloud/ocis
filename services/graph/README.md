@@ -4,7 +4,7 @@ The graph service provides the Graph API which is a RESTful web API used to acce
 
 ## Manual Filters
 
-Using the API, you can manually filter like for users. See the [Libre Graph API](https://owncloud.dev/libre-graph-api/#/users/ListUsers) for examples in the [developer documentation](https://owncloud.dev). Note that you can use `and` to refine results.
+Using the API, you can manually filter like for users. See the [Libre Graph API](https://owncloud.dev/libre-graph-api/#/users/ListUsers) for examples in the [developer documentation](https://owncloud.dev). Note that you can use `and` and `or` to refine results.
 
 ## Sequence Diagram
 
