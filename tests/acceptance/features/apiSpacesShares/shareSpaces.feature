@@ -42,7 +42,7 @@ Feature: Share spaces
       | role      | viewer |
     Then the user "Alice" should have a space called "share space" granted to user "Brian" with role "viewer"
 
-
+  @skipOnStable2.0
   Scenario: A user can see that the group has been granted access
     Given group "sales" has been created
     When user "Alice" shares a space "share space" with settings:
@@ -210,7 +210,7 @@ Feature: Share spaces
       | viewer | manager  |
       | viewer | editor   |
 
-
+  @skipOnStable2.0
   Scenario Outline: A user shares a space with a group
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using GraphApi
@@ -234,7 +234,7 @@ Feature: Share spaces
       | editor  |
       | viewer  |
 
-
+  @skipOnStable2.0
   Scenario Outline: The user has no access to the space if access for the group has been removed
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using GraphApi
@@ -251,7 +251,7 @@ Feature: Share spaces
       | editor  |
       | viewer  |
 
-
+  @skipOnStable2.0
   Scenario: The user has no access to the space if he has been removed from the group
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using GraphApi
@@ -270,7 +270,7 @@ Feature: Share spaces
       | driveType | project     |
       | name      | share space |
 
-
+  @skipOnStable2.0
   Scenario: Users don't have access to the space if the group has been deleted
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using GraphApi
@@ -284,7 +284,7 @@ Feature: Share spaces
     And the user "Brian" should not have a space called "share space"
     And the user "Bob" should not have a space called "share space"
 
-
+  @skipOnStable2.0
   Scenario: User increases permissions for one member of the group or for the entire group
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
@@ -301,7 +301,7 @@ Feature: Share spaces
     When user "Brian" uploads a file inside space "share space" with content "Test" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "201"
 
-
+  @skipOnStable2.0
   Scenario: User increases permissions for the group, so the user's permissions are increased
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
@@ -332,7 +332,7 @@ Feature: Share spaces
       | editor  |
       | viewer  |
 
-
+  @skipOnStable2.0
   Scenario Outline: A Space Admin can share a space to the group with an expiration date
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
@@ -367,7 +367,7 @@ Feature: Share spaces
       | editor  |
       | viewer  |
 
-
+  @skipOnStable2.0
   Scenario Outline: update the expiration date of a space in group share
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
@@ -407,7 +407,7 @@ Feature: Share spaces
       | editor  |
       | viewer  |
 
-
+  @skipOnStable2.0
   Scenario Outline: update the expiration date of a space in group share
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi

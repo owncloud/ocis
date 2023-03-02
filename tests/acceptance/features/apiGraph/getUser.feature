@@ -97,7 +97,7 @@ Feature: get users
     Then the HTTP status code should be "401"
     And the last response should be an unauthorized response
 
-
+  @skipOnStable2.0
   Scenario: admin user gets all users of certain groups
     Given user "Carol" has been created with default attributes and without skeleton files
     And group "tea-lover" has been created
@@ -138,7 +138,7 @@ Feature: get users
       | User        |
       | Guest       |
 
-
+  @skipOnStable2.0
   Scenario: admin user gets all users with certain roles and members of a certain group
     Given user "Carol" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "Space Admin" using the settings api
@@ -163,7 +163,7 @@ Feature: get users
       | displayName | id        | mail              | onPremisesSamAccountName |
       | Carol King  | %uuid_v4% | carol@example.org | Carol                    |
 
-
+  @skipOnStable2.0
   Scenario Outline: non-admin user tries to get users with a certain role
     Given the administrator has given "Brian" the role "<role>" using the settings api
     When the user "Brian" gets all users with role "Admin" using the Graph API

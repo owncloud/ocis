@@ -119,7 +119,7 @@ Feature: Share a file or folder that is inside a space
     And the information about the last share for user "Brian" should include
       | expiration | 2042-01-01 |
 
-
+  @skipOnStable2.0
   Scenario: A user changes the expiration date
     Given user "Alice" has created a share inside of space "share sub-item" with settings:
       | path       | folder                   |

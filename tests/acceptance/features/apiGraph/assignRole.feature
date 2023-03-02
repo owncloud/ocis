@@ -1,4 +1,4 @@
-@api
+@api @skipOnStable2.0
 Feature: assign role
   As an admin,
   I want to assign roles to users.
