@@ -110,9 +110,21 @@ Feature: get groups and their members
 
   Scenario: Get details of a group
     Given group "tea-lover" has been created
-    When user "Alice" gets details of a group "tea-lover" using the Graph API
+    When user "Alice" gets details of the group "tea-lover" using the Graph API
     Then the HTTP status code should be "200"
-    And the json responded should contain a group with these key and value pairs:
-      | key         | value      |
-      | displayName | tea-lover  |
-      | id          | %group_id% |
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "enum": ["tea-lover"]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^%group_id%$"
+        }
+      }
+    }
+    """

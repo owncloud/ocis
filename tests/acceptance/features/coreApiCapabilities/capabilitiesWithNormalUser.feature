@@ -12,7 +12,7 @@ Feature: default capabilities for normal user
     When user "Alice" retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
-    And the JSON data of the response should match
+    And the ocs JSON data of the response should match
     """
     {
       "type": "object",

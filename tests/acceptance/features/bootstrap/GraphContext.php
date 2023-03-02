@@ -1934,19 +1934,19 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When user :user gets details of a group :groupName using the Graph API
+	 * @When user :user gets details of the group :groupName using the Graph API
 	 *
 	 * @param string $user
 	 * @param string $groupName
 	 *
 	 * @return void
 	 */
-	public function userGetsDetailsOfAGroupUsingTheGraphApi(string $user, string $groupName): void {
+	public function userGetsDetailsOfTheGroupUsingTheGraphApi(string $user, string $groupName): void {
 		$groupId = $this->getGroupIdByName($groupName);
 		$credentials = $this->getAdminOrUserCredentials($user);
 
 		$this->featureContext->setResponse(
-			GraphHelper::getSingleGroup(
+			GraphHelper::getGroup(
 				$this->featureContext->getBaseUrl(),
 				$groupId,
 				$this->featureContext->getStepLineRef(),
@@ -1960,56 +1960,17 @@ class GraphContext implements Context {
 	 * Get Group Id from response
 	 *
 	 * @param string $groupName - name of the group
-	 * @param array|null $allGroups
 	 *
 	 * @return string - id of the group
 	 * @throws Exception | GuzzleException
 	 */
-	public function getGroupIdByName(string $groupName, ?array $allGroups = null): string {
-		if ($allGroups === null) {
-			$allGroups = $this->getArrayOfGroupsResponded($this->listGroups());
-		}
+	public function getGroupIdByName(string $groupName): string {
+		$allGroups = $this->getArrayOfGroupsResponded($this->listGroups());
 		foreach ($allGroups as $group) {
 			if ($group['displayName'] === $groupName) {
 				return $group['id'];
 			}
 		}
 		throw new Exception("Group with name '$groupName' not found in the groups list");
-	}
-
-	/**
-	 * @Then the json responded should contain a group with these key and value pairs:
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 */
-	public function theJsonRespondedShouldContainAGroupWithTheseKeyAndValuePairs(TableNode $table): void {
-		$actualGroup = $this->featureContext->getJsonDecodedResponse();
-		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
-
-		$data = $table->getRowsHash();
-		unset($data['key']);
-		foreach ($data as $key => $val) {
-			$val = $this->featureContext->substituteInLineCodes(
-				$val,
-				$this->featureContext->getCurrentUser(),
-				[],
-				[
-					[
-						"code" => "%group_id%",
-						"function" =>
-							[$this, "getGroupIdByName"],
-						"parameter" => [$data['displayName']]
-					],
-				]
-			);
-			$data[$key] = $val;
-		}
-		Assert::assertEqualsCanonicalizing(
-			$data,
-			$actualGroup,
-			"Provided group do not match the group returned in the response."
-		);
 	}
 }

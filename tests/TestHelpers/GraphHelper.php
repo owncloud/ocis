@@ -456,7 +456,7 @@ class GraphHelper {
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public static function getSingleGroup(
+	public static function getGroup(
 		string $baseUrl,
 		string $groupId,
 		string $xRequestId,
