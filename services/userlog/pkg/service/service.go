@@ -395,6 +395,19 @@ func (ul *UserlogService) getGroup(ctx context.Context, groupid string) (*group.
 	return r.GetGroup(), nil
 }
 
+func (ul *UserlogService) getResource(ctx context.Context, resourceid *storageprovider.ResourceId) (*storageprovider.ResourceInfo, error) {
+	res, err := ul.gwClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: resourceid}})
+	if err != nil {
+		return nil, err
+	}
+
+	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("Unexpected status code while getting space: %v", res.GetStatus().GetCode())
+	}
+
+	return res.GetInfo(), nil
+}
+
 func listStorageSpaceRequest(spaceID string) *storageprovider.ListStorageSpacesRequest {
 	return &storageprovider.ListStorageSpacesRequest{
 		Filters: []*storageprovider.ListStorageSpacesRequest_Filter{

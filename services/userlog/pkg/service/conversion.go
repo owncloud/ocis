@@ -2,7 +2,6 @@ package service
 
 import (
 	"bytes"
-	"context"
 	"errors"
 	"text/template"
 	"time"
@@ -11,10 +10,13 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
+	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 )
 
 var (
 	_resourceTypeSpace = "storagespace"
+	_resourceTypeShare = "share"
 )
 
 // OC10Notification is the oc10 style representation of an event
@@ -33,55 +35,57 @@ type OC10Notification struct {
 	MessageDetails map[string]interface{} `json:"messageRichParameters"`
 }
 
-// SpaceDisabled converts a SpaceDisabled event to an OC10Notification
-func (ul *UserlogService) SpaceDisabled(ctx context.Context, eventid string, ev events.SpaceDisabled) (OC10Notification, error) {
-	user, err := ul.getUser(ctx, ev.Executant)
-	if err != nil {
-		return OC10Notification{}, err
+// ConvertEvent converts an eventhistory event to an OC10Notification
+func (ul *UserlogService) ConvertEvent(event *ehmsg.Event) (OC10Notification, error) {
+	etype, ok := ul.registeredEvents[event.Type]
+	if !ok {
+		// this should not happen
+		return OC10Notification{}, errors.New("eventtype not registered")
 	}
 
-	space, err := ul.getSpace(ul.impersonate(user.GetId()), ev.ID.GetOpaqueId())
+	einterface, err := etype.Unmarshal(event.Event)
 	if err != nil {
-		return OC10Notification{}, err
+		// this shouldn't happen either
+		return OC10Notification{}, errors.New("cant unmarshal event")
 	}
 
-	subj, subjraw, msg, msgraw, err := ul.composeMessage(SpaceDisabled, map[string]string{
-		"username":  user.GetDisplayName(),
-		"spacename": space.GetName(),
-	})
-	if err != nil {
-		return OC10Notification{}, err
+	switch ev := einterface.(type) {
+	default:
+		return OC10Notification{}, errors.New("unknown event type")
+	// space related
+	case events.SpaceDisabled:
+		return ul.spaceMessage(event.Id, SpaceDisabled, ev.Executant, ev.ID.GetOpaqueId())
+	case events.SpaceDeleted:
+		return ul.spaceMessage(event.Id, SpaceDeleted, ev.Executant, ev.ID.GetOpaqueId())
+	case events.SpaceShared:
+		return ul.spaceMessage(event.Id, SpaceShared, ev.Executant, ev.ID.GetOpaqueId())
+	case events.SpaceUnshared:
+		return ul.spaceMessage(event.Id, SpaceUnshared, ev.Executant, ev.ID.GetOpaqueId())
+	case events.SpaceMembershipExpired:
+		return ul.spaceMessage(event.Id, SpaceMembershipExpired, ev.SpaceOwner, ev.SpaceID.GetOpaqueId())
+
+	// share related
+	case events.ShareCreated:
+		return ul.shareMessage(event.Id, ShareCreated, ev.Executant, ev.ItemID)
+	case events.ShareExpired:
+		return ul.shareMessage(event.Id, ShareExpired, ev.ShareOwner, ev.ItemID)
+	case events.ShareRemoved:
+		return ul.shareMessage(event.Id, ShareRemoved, ev.Executant, nil)
 	}
-
-	return OC10Notification{
-		EventID:        eventid,
-		Service:        ul.cfg.Service.Name,
-		UserName:       user.GetUsername(),
-		Timestamp:      time.Now().Format(time.RFC3339Nano),
-		ResourceID:     ev.ID.GetOpaqueId(),
-		ResourceType:   _resourceTypeSpace,
-		Subject:        subj,
-		SubjectRaw:     subjraw,
-		Message:        msg,
-		MessageRaw:     msgraw,
-		MessageDetails: ul.getDetails(user, space, nil),
-	}, nil
-
 }
 
-// SpaceShared converts a SpaceShared event to an OC10Notification
-func (ul *UserlogService) SpaceShared(ctx context.Context, eventid string, ev events.SpaceShared) (OC10Notification, error) {
-	user, err := ul.getUser(ctx, ev.Executant)
+func (ul *UserlogService) spaceMessage(eventid string, eventname string, executant *user.UserId, spaceid string) (OC10Notification, error) {
+	ctx, user, err := utils.Impersonate(executant, ul.gwClient, ul.cfg.MachineAuthAPIKey)
 	if err != nil {
 		return OC10Notification{}, err
 	}
 
-	space, err := ul.getSpace(ul.impersonate(user.GetId()), ev.ID.GetOpaqueId())
+	space, err := ul.getSpace(ctx, spaceid)
 	if err != nil {
 		return OC10Notification{}, err
 	}
 
-	subj, subjraw, msg, msgraw, err := ul.composeMessage(SpaceShared, map[string]string{
+	subj, subjraw, msg, msgraw, err := ul.composeMessage(eventname, map[string]string{
 		"username":  user.GetDisplayName(),
 		"spacename": space.GetName(),
 	})
@@ -94,7 +98,7 @@ func (ul *UserlogService) SpaceShared(ctx context.Context, eventid string, ev ev
 		Service:        ul.cfg.Service.Name,
 		UserName:       user.GetUsername(),
 		Timestamp:      time.Now().Format(time.RFC3339Nano),
-		ResourceID:     ev.ID.GetOpaqueId(),
+		ResourceID:     spaceid,
 		ResourceType:   _resourceTypeSpace,
 		Subject:        subj,
 		SubjectRaw:     subjraw,
@@ -102,7 +106,40 @@ func (ul *UserlogService) SpaceShared(ctx context.Context, eventid string, ev ev
 		MessageRaw:     msgraw,
 		MessageDetails: ul.getDetails(user, space, nil),
 	}, nil
+}
 
+func (ul *UserlogService) shareMessage(eventid string, eventname string, executant *user.UserId, resourceid *storageprovider.ResourceId) (OC10Notification, error) {
+	ctx, user, err := utils.Impersonate(executant, ul.gwClient, ul.cfg.MachineAuthAPIKey)
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	info, err := ul.getResource(ctx, resourceid)
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	subj, subjraw, msg, msgraw, err := ul.composeMessage(eventname, map[string]string{
+		"username":     user.GetDisplayName(),
+		"resourcename": info.GetName(),
+	})
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	return OC10Notification{
+		EventID:        eventid,
+		Service:        ul.cfg.Service.Name,
+		UserName:       user.GetUsername(),
+		Timestamp:      time.Now().Format(time.RFC3339Nano),
+		ResourceID:     storagespace.FormatResourceID(*info.GetId()),
+		ResourceType:   _resourceTypeShare,
+		Subject:        subj,
+		SubjectRaw:     subjraw,
+		Message:        msg,
+		MessageRaw:     msgraw,
+		MessageDetails: ul.getDetails(user, nil, info),
+	}, nil
 }
 
 func (ul *UserlogService) composeMessage(eventname string, vars map[string]string) (string, string, string, string, error) {
@@ -114,17 +151,17 @@ func (ul *UserlogService) composeMessage(eventname string, vars map[string]strin
 	subject := ul.executeTemplate(tpl.Subject, vars)
 
 	subjectraw := ul.executeTemplate(tpl.Subject, map[string]string{
-		"username":  "{user}",
-		"spacename": "{space}",
-		"resource":  "{resource}",
+		"username":     "{user}",
+		"spacename":    "{space}",
+		"resourcename": "{resource}",
 	})
 
 	message := ul.executeTemplate(tpl.Message, vars)
 
 	messageraw := ul.executeTemplate(tpl.Message, map[string]string{
-		"username":  "{user}",
-		"spacename": "{space}",
-		"resource":  "{resource}",
+		"username":     "{user}",
+		"spacename":    "{space}",
+		"resourcename": "{resource}",
 	})
 
 	return subject, subjectraw, message, messageraw, nil
