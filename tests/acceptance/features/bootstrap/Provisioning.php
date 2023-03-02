@@ -635,7 +635,6 @@ trait Provisioning {
 		if (!$this->skipImportLdif) {
 			$this->importLdifFile($ldifFile);
 		}
-		$this->theLdapUsersHaveBeenResynced();
 	}
 
 	/**
@@ -743,7 +742,6 @@ trait Provisioning {
 			$this->ldap->add($newDN, $entry);
 		}
 		$this->ldapCreatedUsers[] = $setting["userid"];
-		$this->theLdapUsersHaveBeenReSynced();
 	}
 
 	/**
@@ -850,7 +848,6 @@ trait Provisioning {
 			);
 			$this->rememberThatGroupIsNotExpectedToExist($group);
 		}
-		$this->theLdapUsersHaveBeenResynced();
 	}
 
 	/**
@@ -1098,8 +1095,6 @@ trait Provisioning {
 				$userAttributes['password'],
 				$this->getStepLineRef()
 			);
-			// We don't need to set displayName and email while running in oCIS
-				// As they are set when creating the user
 		}
 
 		if (isset($exceptionToThrow)) {
@@ -1451,11 +1446,11 @@ trait Provisioning {
 		$email = $user . '@owncloud.com';
 		$bodyTable = new TableNode(
 			[
-					['userid', $user],
-					['password', $password],
-					['username', $user],
-					['email', $email]
-				]
+				['userid', $user],
+				['password', $password],
+				['username', $user],
+				['email', $email]
+			]
 		);
 		$this->emptyLastHTTPStatusCodesArray();
 		$this->emptyLastOCSStatusCodesArray();
@@ -1518,11 +1513,11 @@ trait Provisioning {
 		$email = $userToCreate . '@owncloud.com';
 		$bodyTable = new TableNode(
 			[
-					['userid', $userToCreate],
-					['password', $password],
-					['username', $userToCreate],
-					['email', $email]
-				]
+				['userid', $userToCreate],
+				['password', $password],
+				['username', $userToCreate],
+				['email', $email]
+			]
 		);
 		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$user,
@@ -1560,12 +1555,12 @@ trait Provisioning {
 		$email = $user . '@owncloud.com';
 		$bodyTable = new TableNode(
 			[
-					['userid', $user],
-					['password', $password],
-					['username', $user],
-					['email', $email],
-					['groups[]', $group],
-				]
+				['userid', $user],
+				['password', $password],
+				['username', $user],
+				['email', $email],
+				['groups[]', $group],
+			]
 		);
 		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$this->getAdminUsername(),
@@ -1606,12 +1601,12 @@ trait Provisioning {
 		$email = $userToCreate . '@owncloud.com';
 		$bodyTable = new TableNode(
 			[
-					['userid', $userToCreate],
-					['password', $userToCreate],
-					['username', $userToCreate],
-					['email', $email],
-					['groups[]', $group],
-				]
+				['userid', $userToCreate],
+				['password', $userToCreate],
+				['username', $userToCreate],
+				['email', $email],
+				['groups[]', $group],
+			]
 		);
 		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$groupadmin,
@@ -1651,12 +1646,12 @@ trait Provisioning {
 		$email = $userToCreate . '@owncloud.com';
 		$bodyTable = new TableNode(
 			[
-					['userid', $userToCreate],
-					['password', $userToCreate],
-					['username', $userToCreate],
-					['email', $email],
-					['groups[]', $group],
-				]
+				['userid', $userToCreate],
+				['password', $userToCreate],
+				['username', $userToCreate],
+				['email', $email],
+				['groups[]', $group],
+			]
 		);
 		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
 			$groupadmin,
@@ -3971,7 +3966,6 @@ trait Provisioning {
 		$ldapEntry = $this->ldap->getEntry($entry . "," . $this->ldapBaseDN);
 		Laminas\Ldap\Attribute::setAttribute($ldapEntry, $attribute, $value, $append);
 		$this->ldap->update($entry . "," . $this->ldapBaseDN, $ldapEntry);
-		$this->theLdapUsersHaveBeenReSynced();
 	}
 
 	/**
@@ -4045,7 +4039,6 @@ trait Provisioning {
 			$memberAttr,
 			"cn=$group,ou=$ou"
 		);
-		$this->theLdapUsersHaveBeenReSynced();
 	}
 
 	/**
@@ -4056,7 +4049,6 @@ trait Provisioning {
 	 */
 	public function deleteTheLdapEntry(string $entry):void {
 		$this->ldap->delete($entry . "," . $this->ldapBaseDN);
-		$this->theLdapUsersHaveBeenReSynced();
 	}
 
 	/**
@@ -4072,7 +4064,6 @@ trait Provisioning {
 			$ou = $this->getLdapGroupsOU();
 		}
 		$this->deleteTheLdapEntry("cn=$group,ou=$ou");
-		$this->theLdapUsersHaveBeenReSynced();
 		$key = \array_search($group, $this->ldapCreatedGroups);
 		if ($key !== false) {
 			unset($this->ldapCreatedGroups[$key]);
@@ -4119,7 +4110,6 @@ trait Provisioning {
 			$entry,
 			$displayName
 		);
-		$this->theLdapUsersHaveBeenReSynced();
 	}
 
 	/**
@@ -5670,7 +5660,6 @@ trait Provisioning {
 	 */
 	public function afterScenario():void {
 		$this->waitForDavRequestsToFinish();
-		$this->restoreParametersAfterScenario();
 
 		if ($this->someUsersHaveBeenCreated()) {
 			foreach ($this->getCreatedUsers() as $user) {
