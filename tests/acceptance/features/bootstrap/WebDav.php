@@ -4466,12 +4466,6 @@ trait WebDav {
 		// slashes need to stay
 		$encodedPath = \str_replace('%2F', '/', \rawurlencode($path));
 		// in ocis even brackets are encoded
-		if (OcisHelper::isTestingOnOcisOrReva()) {
-			return $encodedPath;
-		}
-		// do not encode '(' and ')' for oc10
-		$encodedPath = \str_replace('%28', '(', $encodedPath);
-		$encodedPath = \str_replace('%29', ')', $encodedPath);
 		return $encodedPath;
 	}
 

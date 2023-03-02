@@ -423,17 +423,9 @@ trait Sharing {
 	 * @return void
 	 */
 	public function autoAcceptSharesHasBeenDisabled():void {
-		if (OcisHelper::isTestingOnOcisOrReva()) {
-			// auto-accept shares is disabled by default on OCIS.
-			// so there is nothing to do, just return
-			return;
-		}
-
-		$this->appConfigurationContext->serverParameterHasBeenSetTo(
-			"shareapi_auto_accept_share",
-			"core",
-			"no"
-		);
+		// auto-accept shares is disabled by default on OCIS.
+		// so there is nothing to do, just return
+		return;
 	}
 
 	/**

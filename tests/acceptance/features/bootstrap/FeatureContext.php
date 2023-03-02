@@ -1593,11 +1593,7 @@ class FeatureContext extends BehatVariablesContext {
 			$urlEnding = \substr($url, \strlen($this->getBaseUrl() . '/'));
 		}
 
-		if (OcisHelper::isTestingOnOcisOrReva()) {
-			$matchResult = \preg_match("%^(#/)?s/([a-zA-Z0-9]{15})$%", $urlEnding);
-		} else {
-			$matchResult = \preg_match("%^(index.php/)?s/([a-zA-Z0-9]{15})$%", $urlEnding);
-		}
+		$matchResult = \preg_match("%^(#/)?s/([a-zA-Z0-9]{15})$%", $urlEnding);
 
 		// preg_match returns (int) 1 for a match, we want to return a boolean.
 		if ($matchResult === 1) {
@@ -3943,24 +3939,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * After Scenario. clear file locks
-	 *
-	 * @AfterScenario
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function clearFileLocks(): void {
-		if (!OcisHelper::isTestingOnOcisOrReva()) {
-			$this->authContext->deleteTokenAuthEnforcedAfterScenario();
-			$this->clearFileLocksForServer($this->getBaseUrl());
-			if ($this->remoteBaseUrl !== $this->localBaseUrl) {
-				$this->clearFileLocksForServer($this->getRemoteBaseUrl());
-			}
-		}
-	}
-
-	/**
 	 * @AfterScenario
 	 *
 	 * clear space id reference
@@ -3983,49 +3961,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public static function useBigFileIDs(BeforeSuiteScope $scope): void {
-		if (OcisHelper::isTestingOnOcisOrReva()) {
-			return;
-		}
-		$fullUrl = \getenv('TEST_SERVER_URL');
-		if (\substr($fullUrl, -1) !== '/') {
-			$fullUrl .= '/';
-		}
-		$fullUrl .= "ocs/v1.php/apps/testing/api/v1/increasefileid";
-		$suiteSettingsContexts = $scope->getSuite()->getSettings()['contexts'];
-		$adminUsername = null;
-		$adminPassword = null;
-		foreach ($suiteSettingsContexts as $context) {
-			if (isset($context[__CLASS__])) {
-				$adminUsername = $context[__CLASS__]['adminUsername'];
-				$adminPassword = $context[__CLASS__]['adminPassword'];
-				break;
-			}
-		}
-
-		// get the admin username from the environment (if defined)
-		$adminUsernameFromEnvironment = self::getAdminUsernameFromEnvironment();
-		if ($adminUsernameFromEnvironment !== false) {
-			$adminUsername = $adminUsernameFromEnvironment;
-		}
-
-		// get the admin password from the environment (if defined)
-		$adminPasswordFromEnvironment = self::getAdminPasswordFromEnvironment();
-		if ($adminPasswordFromEnvironment !== false) {
-			$adminPassword = $adminPasswordFromEnvironment;
-		}
-
-		if (($adminUsername === null) || ($adminPassword === null)) {
-			throw new Exception(
-				"Could not find adminUsername and/or adminPassword in useBigFileIDs"
-			);
-		}
-
-		HttpRequestHelper::post(
-			$fullUrl,
-			'',
-			$adminUsername,
-			$adminPassword
-		);
+		return;
 	}
 
 	/**
@@ -4377,25 +4313,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function restoreParametersAfterScenario(): void {
-		if (!OcisHelper::isTestingOnOcisOrReva()) {
-			$this->authContext->deleteTokenAuthEnforcedAfterScenario();
-			$user = $this->getCurrentUser();
-			$this->setCurrentUser($this->getAdminUsername());
-			$this->runFunctionOnEveryServer(
-				function ($server) {
-					$this->restoreParameters($server);
-				}
-			);
-			$this->setCurrentUser($user);
-		}
-	}
-
-	/**
 	 * Get the array of trusted servers in format ["url" => "id"]
 	 *
 	 * @param string $server 'LOCAL'/'REMOTE'
@@ -4465,37 +4382,6 @@ class FeatureContext extends BehatVariablesContext {
 			$body = '';
 		}
 		return $body;
-	}
-
-	/**
-	 * @BeforeScenario
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function prepareParametersBeforeScenario(): void {
-		if (!OcisHelper::isTestingOnOcisOrReva()) {
-			$user = $this->getCurrentUser();
-			$this->setCurrentUser($this->getAdminUsername());
-			$previousServer = $this->getCurrentServer();
-			foreach (['LOCAL', 'REMOTE'] as $server) {
-				if (($server === 'LOCAL') || $this->federatedServerExists()) {
-					$this->usingServer($server);
-					$this->resetAppConfigs();
-					$result = SetupHelper::runOcc(
-						['config:list', '--private'],
-						$this->getStepLineRef(),
-						$this->getAdminUsername(),
-						$this->getAdminPassword(),
-						$this->getBaseUrl(),
-						$this->getOcPath()
-					);
-					$this->savedConfigList[$server] = \json_decode($result['stdOut'], true);
-				}
-			}
-			$this->usingServer($previousServer);
-			$this->setCurrentUser($user);
-		}
 	}
 
 	/**
