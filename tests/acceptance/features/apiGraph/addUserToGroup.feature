@@ -157,7 +157,7 @@ Feature: add users to group
       | username |
       | Brian    |
       | Carol    |
-    And user "Alice" creates a group "grp1" using the Graph API
+    And user "Alice" has created a group "grp1" using the Graph API
     When the administrator "Alice" adds the following users to a group "grp1" at once using the Graph API
       | username |
       | Brian    |
@@ -184,7 +184,7 @@ Feature: add users to group
 
   Scenario: admin tries to add multiple non-existing users to a group at once
     Given the administrator has given "Alice" the role "Admin" using the settings api
-    And user "Alice" creates a group "grp1" using the Graph API
+    And user "Alice" has created a group "grp1" using the Graph API
     When the administrator "Alice" tries to add the following non-existing users to a group "grp1" at once using the Graph API
       | username |
       | Brian    |
@@ -197,7 +197,7 @@ Feature: add users to group
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
-    And user "Alice" creates a group "grp1" using the Graph API
+    And user "Alice" has created a group "grp1" using the Graph API
     When the administrator "Alice" tries to add the following users to a group "grp1" at once using the Graph API
       | username |
       | Brian    |

@@ -891,6 +891,28 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @Given /^the administrator has created a group "([^"]*)" using the Graph API$/
+	 * @Given user :user has created a group :group using the Graph API
+	 *
+	 * @param string $group
+	 * @param ?string $user
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userHasCreatedGroupUsingTheGraphApi(string $group, ?string $user = null): void {
+		$response = $this->createGroup($group, $user);
+
+		if ($response->getStatusCode() === 200) {
+			$groupId = $this->featureContext->getJsonDecodedResponse($response)["id"];
+			$this->featureContext->addGroupToCreatedGroupsList($group, true, true, $groupId);
+		} else {
+			$this->throwHttpException($response, "Could not create group '$group'.");
+		}
+	}
+
+	/**
 	 * create group with provided data
 	 *
 	 * @param string $group
