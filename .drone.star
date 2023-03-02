@@ -71,6 +71,7 @@ config = {
         "services/notifications",
         "services/ocdav",
         "services/ocs",
+        "services/policies",
         "services/proxy",
         "services/search",
         "services/settings",

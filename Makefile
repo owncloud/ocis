@@ -33,6 +33,7 @@ OCIS_MODULES = \
 	services/notifications \
 	services/ocdav \
 	services/ocs \
+	services/policies \
 	services/postprocessing \
 	services/proxy \
 	services/search \

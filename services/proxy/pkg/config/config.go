@@ -21,21 +21,22 @@ type Config struct {
 	Reva          *shared.Reva          `yaml:"reva"`
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 
-	RoleQuotas            map[string]uint64 `yaml:"role_quotas"`
-	Policies              []Policy          `yaml:"policies"`
-	OIDC                  OIDC              `yaml:"oidc"`
-	TokenManager          *TokenManager     `mask:"struct" yaml:"token_manager"`
-	PolicySelector        *PolicySelector   `yaml:"policy_selector"`
-	PreSignedURL          PreSignedURL      `yaml:"pre_signed_url"`
-	AccountBackend        string            `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the PROXY service should use. Currently only 'cs3' is possible here."`
-	UserOIDCClaim         string            `yaml:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM" desc:"The name of an OpenID Connect claim that is used for resolving users with the account backend. The value of the claim must hold a per user unique, stable and non re-assignable identifier. The availability of claims depends on your Identity Provider. There are common claims available for most Identity providers like 'email' or 'preferred_user' but you can also add your own claim."`
-	UserCS3Claim          string            `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM" desc:"The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Supported values are 'username', 'mail' and 'userid'."`
-	MachineAuthAPIKey     string            `mask:"password" yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
-	AutoprovisionAccounts bool              `yaml:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS" desc:"Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running."`
-	EnableBasicAuth       bool              `yaml:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH" desc:"Set this to true to enable 'basic authentication' (username/password)."`
-	InsecureBackends      bool              `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS" desc:"Disable TLS certificate validation for all HTTP backend connections."`
-	BackendHTTPSCACert    string            `yaml:"backend_https_cacert" env:"PROXY_HTTPS_CACERT" desc:"Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services."`
-	AuthMiddleware        AuthMiddleware    `yaml:"auth_middleware"`
+	RoleQuotas            map[string]uint64  `yaml:"role_quotas"`
+	Policies              []Policy           `yaml:"policies"`
+	OIDC                  OIDC               `yaml:"oidc"`
+	TokenManager          *TokenManager      `mask:"struct" yaml:"token_manager"`
+	PolicySelector        *PolicySelector    `yaml:"policy_selector"`
+	PreSignedURL          PreSignedURL       `yaml:"pre_signed_url"`
+	AccountBackend        string             `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the PROXY service should use. Currently only 'cs3' is possible here."`
+	UserOIDCClaim         string             `yaml:"user_oidc_claim" env:"PROXY_USER_OIDC_CLAIM" desc:"The name of an OpenID Connect claim that is used for resolving users with the account backend. The value of the claim must hold a per user unique, stable and non re-assignable identifier. The availability of claims depends on your Identity Provider. There are common claims available for most Identity providers like 'email' or 'preferred_user' but you can also add your own claim."`
+	UserCS3Claim          string             `yaml:"user_cs3_claim" env:"PROXY_USER_CS3_CLAIM" desc:"The name of a CS3 user attribute (claim) that should be mapped to the 'user_oidc_claim'. Supported values are 'username', 'mail' and 'userid'."`
+	MachineAuthAPIKey     string             `mask:"password" yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;PROXY_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
+	AutoprovisionAccounts bool               `yaml:"auto_provision_accounts" env:"PROXY_AUTOPROVISION_ACCOUNTS" desc:"Set this to 'true' to automatically provision users that do not yet exist in the users service on-demand upon first sign-in. To use this a write-enabled libregraph user backend needs to be setup an running."`
+	EnableBasicAuth       bool               `yaml:"enable_basic_auth" env:"PROXY_ENABLE_BASIC_AUTH" desc:"Set this to true to enable 'basic authentication' (username/password)."`
+	InsecureBackends      bool               `yaml:"insecure_backends" env:"PROXY_INSECURE_BACKENDS" desc:"Disable TLS certificate validation for all HTTP backend connections."`
+	BackendHTTPSCACert    string             `yaml:"backend_https_cacert" env:"PROXY_HTTPS_CACERT" desc:"Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services."`
+	AuthMiddleware        AuthMiddleware     `yaml:"auth_middleware"`
+	PoliciesMiddleware    PoliciesMiddleware `yaml:"policies_middleware"`
 
 	Context context.Context `yaml:"-" json:"-"`
 }
@@ -82,6 +83,12 @@ var (
 // AuthMiddleware configures the proxy http auth middleware.
 type AuthMiddleware struct {
 	CredentialsByUserAgent map[string]string `yaml:"credentials_by_user_agent"`
+}
+
+// PoliciesMiddleware configures the proxy policies middleware.
+type PoliciesMiddleware struct {
+	Enabled bool   `yaml:"enabled" env:"PROXY_POLICIES_ENABLED" desc:"Activates policy evaluation."`
+	Query   string `yaml:"query" env:"PROXY_POLICIES_QUERY" desc:"Defines the policy query."`
 }
 
 const (

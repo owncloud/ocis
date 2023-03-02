@@ -13,13 +13,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
-
 	"github.com/mohae/deepcopy"
 	"github.com/olekukonko/tablewriter"
-
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	appProvider "github.com/owncloud/ocis/v2/services/app-provider/pkg/command"
 	appRegistry "github.com/owncloud/ocis/v2/services/app-registry/pkg/command"
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/command"

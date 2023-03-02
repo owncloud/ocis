@@ -199,7 +199,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		Logger:            logger,
 		RevaGatewayClient: revaClient,
 	})
-
 	authenticators = append(authenticators, middleware.SignedURLAuthenticator{
 		Logger:             logger,
 		PreSignedURLConfig: cfg.PreSignedURL,
@@ -219,9 +218,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			cfg.OIDC.RewriteWellKnown,
 			oidcHTTPClient,
 		),
-
 		router.Middleware(cfg.PolicySelector, cfg.Policies, logger),
-
 		middleware.Authentication(
 			authenticators,
 			middleware.CredentialsByUserAgent(cfg.AuthMiddleware.CredentialsByUserAgent),
@@ -237,13 +234,12 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			middleware.UserCS3Claim(cfg.UserCS3Claim),
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
 		),
-
 		middleware.SelectorCookie(
 			middleware.Logger(logger),
 			middleware.UserProvider(userProvider),
 			middleware.PolicySelectorConfig(*cfg.PolicySelector),
 		),
-
+		middleware.Policies(logger, cfg.PoliciesMiddleware.Enabled, cfg.PoliciesMiddleware.Query),
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(logger),

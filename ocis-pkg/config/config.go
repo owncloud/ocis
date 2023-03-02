@@ -2,7 +2,6 @@ package config
 
 import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
-
 	appProvider "github.com/owncloud/ocis/v2/services/app-provider/pkg/config"
 	appRegistry "github.com/owncloud/ocis/v2/services/app-registry/pkg/config"
 	audit "github.com/owncloud/ocis/v2/services/audit/pkg/config"
@@ -20,6 +19,7 @@ import (
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/config"
 	ocs "github.com/owncloud/ocis/v2/services/ocs/pkg/config"
+	policies "github.com/owncloud/ocis/v2/services/policies/pkg/config"
 	postprocessing "github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
 	proxy "github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	search "github.com/owncloud/ocis/v2/services/search/pkg/config"
@@ -36,14 +36,6 @@ import (
 	web "github.com/owncloud/ocis/v2/services/web/pkg/config"
 	webdav "github.com/owncloud/ocis/v2/services/webdav/pkg/config"
 	webfinger "github.com/owncloud/ocis/v2/services/webfinger/pkg/config"
-)
-
-const (
-	// SUPERVISED sets the runtime mode as supervised threads.
-	SUPERVISED = iota
-
-	// UNSUPERVISED sets the runtime mode as a single thread.
-	UNSUPERVISED
 )
 
 type Mode int
@@ -98,6 +90,7 @@ type Config struct {
 	OCDav             *ocdav.Config          `yaml:"ocdav"`
 	OCS               *ocs.Config            `yaml:"ocs"`
 	Postprocessing    *postprocessing.Config `yaml:"postprocessing"`
+	Policies          *policies.Config       `yaml:"policies"`
 	Proxy             *proxy.Config          `yaml:"proxy"`
 	Settings          *settings.Config       `yaml:"settings"`
 	Sharing           *sharing.Config        `yaml:"sharing"`

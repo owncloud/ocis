@@ -23,6 +23,7 @@ func NewPostprocessingService(stream events.Stream, logger log.Logger, c config.
 		events.StartPostprocessingStep{},
 		events.VirusscanFinished{},
 		events.UploadReady{},
+		events.PostprocessingStepFinished{},
 	)
 	if err != nil {
 		return nil, err
