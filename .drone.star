@@ -65,6 +65,7 @@ config = {
         "services/groups",
         "services/idm",
         "services/idp",
+        "services/invitations",
         "services/nats",
         "services/notifications",
         "services/ocdav",
