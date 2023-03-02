@@ -478,8 +478,7 @@ class GraphHelper {
 	 * @param string $adminUser
 	 * @param string $adminPassword
 	 * @param string $groupId
-	 * @param array $users expects users array with user ids
-	 *                     [ [ 'id' => 'some_id' ], ]
+	 * @param array $userIds
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -490,18 +489,17 @@ class GraphHelper {
 		string $adminUser,
 		string $adminPassword,
 		string $groupId,
-		array $users
+		array $userIds
 	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId . '/users');
-		$payload = [
-			"members@odata.bind" => []
-		];
-		foreach ($users as $user) {
-			$payload[0][] = self::getFullUrl($baseUrl, 'users/' . $user["id"]);
+		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId);
+		$payload = [ "members@odata.bind" => [] ];
+		foreach ($userIds as $userId) {
+			$payload["members@odata.bind"][] = self::getFullUrl($baseUrl, 'users/' . $userId);
 		}
-		return HttpRequestHelper::post(
+		return HttpRequestHelper::sendRequest(
 			$url,
 			$xRequestId,
+			'PATCH',
 			$adminUser,
 			$adminPassword,
 			self::getRequestHeaders(),

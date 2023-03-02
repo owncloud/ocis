@@ -891,6 +891,28 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @Given /^the administrator has created a group "([^"]*)" using the Graph API$/
+	 * @Given user :user has created a group :group using the Graph API
+	 *
+	 * @param string $group
+	 * @param ?string $user
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userHasCreatedGroupUsingTheGraphApi(string $group, ?string $user = null): void {
+		$response = $this->createGroup($group, $user);
+
+		if ($response->getStatusCode() === 200) {
+			$groupId = $this->featureContext->getJsonDecodedResponse($response)["id"];
+			$this->featureContext->addGroupToCreatedGroupsList($group, true, true, $groupId);
+		} else {
+			$this->throwHttpException($response, "Could not create group '$group'.");
+		}
+	}
+
+	/**
 	 * create group with provided data
 	 *
 	 * @param string $group
@@ -1531,5 +1553,116 @@ class GraphContext implements Context {
 		} else {
 			throw new Error('Response is not an array or the array does not consist key "drive"');
 		}
+	}
+
+	/**
+	 * add multiple users in a group at once
+	 *
+	 * @param string $user
+	 * @param array $userIds
+	 * @param string $groupId
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function addMultipleUsersToGroup(string $user, array $userIds, string $groupId, TableNode $table): void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$this->featureContext->verifyTableNodeColumns($table, ['username']);
+
+		$this->featureContext->setResponse(
+			GraphHelper::addUsersToGroup(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials["username"],
+				$credentials["password"],
+				$groupId,
+				$userIds
+			)
+		);
+	}
+
+	/**
+	 * @When /^the administrator "([^"]*)" adds the following users to a group "([^"]*)" at once using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $group
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorAddsTheFollowingUsersToAGroupInASingleRequestUsingTheGraphApi(string $user, string $group, TableNode $table): void {
+		$userIds = [];
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		foreach ($table->getHash() as $row) {
+			$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
+		}
+		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
+	}
+
+	/**
+	 * @When /^the administrator "([^"]*)" tries to add the following users to a non-existing group at once using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theAdministratorTriesToAddsTheFollowingUsersToANonExistingGroupAtOnceUsingTheGraphApi(string $user, TableNode $table): void {
+		$userIds = [];
+		$groupId = WebDavHelper::generateUUIDv4();
+		foreach ($table->getHash() as $row) {
+			$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
+		}
+		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
+	}
+
+	/**
+	 * @When /^the administrator "([^"]*)" tries to add the following non-existing users to a group "([^"]*)" at once using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $group
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theAdministratorTriesToAddTheFollowingNonExistingUsersToAGroupAtOnceUsingTheGraphApi(string $user, string $group, TableNode $table): void {
+		$userIds = [];
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		foreach ($table->getHash() as $row) {
+			$userIds[] = WebDavHelper::generateUUIDv4();
+		}
+		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
+	}
+
+	/**
+	 * @When /^the administrator "([^"]*)" tries to add the following users to a group "([^"]*)" at once using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $group
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theAdministratorTriesToAddTheFollowingUsersToAGroupAtOnceUsingTheGraphApi(string $user, string $group, TableNode $table): void {
+		$userIds = [];
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		foreach ($table->getHash() as $row) {
+			try {
+				$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
+			} catch (Exception $e) {
+				$userIds[] = WebDavHelper::generateUUIDv4();
+			}
+		}
+		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
 	}
 }
