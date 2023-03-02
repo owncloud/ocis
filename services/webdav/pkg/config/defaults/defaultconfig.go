@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/config"
 )
 
@@ -66,12 +67,8 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
-	if cfg.GRPCClientTLS == nil {
-		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
-		if cfg.Commons != nil && cfg.Commons.GRPCClientTLS != nil {
-			cfg.GRPCClientTLS.Mode = cfg.Commons.GRPCClientTLS.Mode
-			cfg.GRPCClientTLS.CACert = cfg.Commons.GRPCClientTLS.CACert
-		}
+	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
+		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}
 
 	if cfg.Commons != nil {

@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/app-provider/pkg/config"
 )
 
@@ -63,13 +64,8 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
-	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
-		cfg.Reva = &shared.Reva{
-			Address: cfg.Commons.Reva.Address,
-			TLS:     cfg.Commons.Reva.TLS,
-		}
-	} else if cfg.Reva == nil {
-		cfg.Reva = &shared.Reva{}
+	if cfg.Reva == nil && cfg.Commons != nil {
+		cfg.Reva = structs.CopyOrZeroValue(cfg.Commons.Reva)
 	}
 
 	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
@@ -80,13 +76,8 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.TokenManager = &config.TokenManager{}
 	}
 
-	if cfg.GRPC.TLS == nil {
-		cfg.GRPC.TLS = &shared.GRPCServiceTLS{}
-		if cfg.Commons != nil && cfg.Commons.GRPCServiceTLS != nil {
-			cfg.GRPC.TLS.Enabled = cfg.Commons.GRPCServiceTLS.Enabled
-			cfg.GRPC.TLS.Cert = cfg.Commons.GRPCServiceTLS.Cert
-			cfg.GRPC.TLS.Key = cfg.Commons.GRPCServiceTLS.Key
-		}
+	if cfg.GRPC.TLS == nil && cfg.Commons != nil {
+		cfg.GRPC.TLS = structs.CopyOrZeroValue(cfg.Commons.GRPCServiceTLS)
 	}
 }
 

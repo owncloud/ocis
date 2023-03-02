@@ -6,6 +6,7 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/idp/pkg/config"
 )
 
@@ -152,13 +153,8 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
-	if cfg.Reva == nil && cfg.Commons != nil && cfg.Commons.Reva != nil {
-		cfg.Reva = &shared.Reva{
-			Address: cfg.Commons.Reva.Address,
-			TLS:     cfg.Commons.Reva.TLS,
-		}
-	} else if cfg.Reva == nil {
-		cfg.Reva = &shared.Reva{}
+	if cfg.Reva == nil && cfg.Commons != nil {
+		cfg.Reva = structs.CopyOrZeroValue(cfg.Commons.Reva)
 	}
 
 	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {

@@ -3,7 +3,7 @@ package defaults
 import (
 	"time"
 
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config"
 )
 
@@ -51,20 +51,12 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Log = &config.Log{}
 	}
 
-	if cfg.GRPCClientTLS == nil {
-		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
-		if cfg.Commons != nil && cfg.Commons.GRPCClientTLS != nil {
-			cfg.GRPCClientTLS = cfg.Commons.GRPCClientTLS
-		}
+	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
+		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}
 
-	if cfg.GRPC.TLS == nil {
-		cfg.GRPC.TLS = &shared.GRPCServiceTLS{}
-		if cfg.Commons != nil && cfg.Commons.GRPCServiceTLS != nil {
-			cfg.GRPC.TLS.Enabled = cfg.Commons.GRPCServiceTLS.Enabled
-			cfg.GRPC.TLS.Cert = cfg.Commons.GRPCServiceTLS.Cert
-			cfg.GRPC.TLS.Key = cfg.Commons.GRPCServiceTLS.Key
-		}
+	if cfg.GRPC.TLS == nil && cfg.Commons != nil {
+		cfg.GRPC.TLS = structs.CopyOrZeroValue(cfg.Commons.GRPCServiceTLS)
 	}
 }
 

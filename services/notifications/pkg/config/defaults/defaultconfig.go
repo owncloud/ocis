@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 )
 
@@ -59,11 +60,8 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.Notifications.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
 		cfg.Notifications.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
-	if cfg.Notifications.GRPCClientTLS == nil {
-		cfg.Notifications.GRPCClientTLS = &shared.GRPCClientTLS{}
-		if cfg.Commons != nil && cfg.Commons.GRPCClientTLS != nil {
-			cfg.Notifications.GRPCClientTLS = cfg.Commons.GRPCClientTLS
-		}
+	if cfg.Notifications.GRPCClientTLS == nil && cfg.Commons != nil {
+		cfg.Notifications.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}
 }
 

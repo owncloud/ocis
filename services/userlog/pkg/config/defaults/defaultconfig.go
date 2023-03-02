@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
 )
 
@@ -62,11 +63,8 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
 
-	if cfg.GRPCClientTLS == nil {
-		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
-		if cfg.Commons != nil && cfg.Commons.GRPCClientTLS != nil {
-			cfg.GRPCClientTLS = cfg.Commons.GRPCClientTLS
-		}
+	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
+		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}
 
 	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
