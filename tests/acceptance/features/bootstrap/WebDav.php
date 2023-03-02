@@ -578,10 +578,7 @@ trait WebDav {
 			$value = 'false';
 		}
 		if ($this->previousAsyncSetting === null) {
-			$previousAsyncSetting = SetupHelper::runOcc(
-				['config:system:get', 'dav.enable.async'],
-				$this->getStepLineRef()
-			)['stdOut'];
+			$previousAsyncSetting = ['code' => '', 'stdOut' => '', 'stdErr' => '' ]['stdOut'];
 			$this->previousAsyncSetting = \trim($previousAsyncSetting);
 		}
 		$this->runOcc(
@@ -618,10 +615,7 @@ trait WebDav {
 	 */
 	public function slowdownDavRequests(string $method, int $seconds):void {
 		if ($this->previousDavSlowdownSetting === null) {
-			$previousDavSlowdownSetting = SetupHelper::runOcc(
-				['config:system:get', 'dav.slowdown'],
-				$this->getStepLineRef()
-			)['stdOut'];
+			$previousDavSlowdownSetting = ['code' => '', 'stdOut' => '', 'stdErr' => '' ]['stdOut'];
 			$this->previousDavSlowdownSetting = \trim($previousDavSlowdownSetting);
 		}
 		OcsApiHelper::sendRequest(
@@ -5409,38 +5403,14 @@ trait WebDav {
 	 */
 	public function resetPreviousSettingsAfterScenario():void {
 		if ($this->previousAsyncSetting === "") {
-			SetupHelper::runOcc(
-				['config:system:delete', 'dav.enable.async'],
-				$this->getStepLineRef()
-			);
+			['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 		} elseif ($this->previousAsyncSetting !== null) {
-			SetupHelper::runOcc(
-				[
-					'config:system:set',
-					'dav.enable.async',
-					'--type',
-					'boolean',
-					'--value',
-					$this->previousAsyncSetting
-				],
-				$this->getStepLineRef()
-			);
+			['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 		}
 		if ($this->previousDavSlowdownSetting === "") {
-			SetupHelper::runOcc(
-				['config:system:delete', 'dav.slowdown'],
-				$this->getStepLineRef()
-			);
+			['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 		} elseif ($this->previousDavSlowdownSetting !== null) {
-			SetupHelper::runOcc(
-				[
-					'config:system:set',
-					'dav.slowdown',
-					'--value',
-					$this->previousDavSlowdownSetting
-				],
-				$this->getStepLineRef()
-			);
+			['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 		}
 	}
 

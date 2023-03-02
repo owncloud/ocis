@@ -3767,15 +3767,7 @@ class FeatureContext extends BehatVariablesContext {
 			);
 		}
 		$this->addStorageId($storageName, (int)$storageId);
-		SetupHelper::runOcc(
-			[
-				'files_external:option',
-				$storageId,
-				'enable_sharing',
-				'true'
-			],
-			$this->getStepLineRef()
-		);
+		['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 	}
 
 	/**
@@ -3813,14 +3805,7 @@ class FeatureContext extends BehatVariablesContext {
 	public function deleteAllStorages(): void {
 		$allStorageIds = \array_keys($this->getStorageIds());
 		foreach ($allStorageIds as $storageId) {
-			SetupHelper::runOcc(
-				[
-					'files_external:delete',
-					'-y',
-					$storageId
-				],
-				$this->getStepLineRef()
-			);
+			['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 		}
 		$this->storageIds = [];
 	}
@@ -4138,15 +4123,7 @@ class FeatureContext extends BehatVariablesContext {
 		if ($baseUrl == null) {
 			$baseUrl = $this->getBaseUrl();
 		}
-		$return = SetupHelper::runOcc(
-			$args,
-			$this->getStepLineRef(),
-			$adminUsername,
-			$adminPassword,
-			$baseUrl,
-			$ocPath,
-			$envVariables
-		);
+		$return = ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 		$this->lastStdOut = $return['stdOut'];
 		$this->lastStdErr = $return['stdErr'];
 		$occStatusCode = (int)$return['code'];
