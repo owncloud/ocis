@@ -420,7 +420,7 @@ def cacheGoBin():
             "name": "archive-go-bin",
             "image": OC_UBUNTU,
             "commands": [
-                "tar -czvf %s -C /go/bin ." % dirs["gobinTarPath"],
+                "tar -czvf %s /go/bin" % dirs["gobinTarPath"],
             ],
             "volumes": [stepVolumeGo],
         },
@@ -457,9 +457,7 @@ def restoreGoBinCache():
             "name": "extract-go-bin-cache",
             "image": OC_UBUNTU,
             "commands": [
-                "mkdir -p /go/bin",
-                "tar -xvf %s -C /go/bin" % dirs["gobinTarPath"],
-                "chmod +x /go/bin/*",
+                "tar -xvmf %s -C /" % dirs["gobinTarPath"],
             ],
             "volumes": [stepVolumeGo],
         },
