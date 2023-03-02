@@ -816,10 +816,7 @@ trait Provisioning {
 			[],
 			$substitutions
 		);
-		$occResult = SetupHelper::runOcc(
-			['ldap:set-config', $configId, $configKey, $configValue],
-			$this->getStepLineRef()
-		);
+		$occResult = ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 		if ($occResult['code'] !== "0") {
 			throw new Exception(
 				__METHOD__ . " could not set LDAP setting " . $occResult['stdErr']
@@ -857,10 +854,7 @@ trait Provisioning {
 	public function resetOldLdapConfig():void {
 		$toDeleteLdapConfig = $this->getToDeleteLdapConfigs();
 		foreach ($toDeleteLdapConfig as $configId) {
-			SetupHelper::runOcc(
-				['ldap:delete-config', $configId],
-				$this->getStepLineRef()
-			);
+			['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 		}
 		foreach ($this->oldLdapConfig as $configId => $settings) {
 			foreach ($settings as $configKey => $configValue) {

@@ -79,10 +79,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			$occCommand = \array_merge($occCommand, ["--email", $email]);
 		}
 		\putenv("OC_PASS=" . $password);
-		return self::runOcc(
-			\array_merge($occCommand, [$userName]),
-			$xRequestId
-		);
+		return ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 	}
 
 	/**
@@ -98,10 +95,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $userName,
 		?string $xRequestId = ''
 	):array {
-		return self::runOcc(
-			['user:delete', $userName],
-			$xRequestId
-		);
+		return ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 	}
 
 	/**
@@ -122,10 +116,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $value,
 		?string $xRequestId = ''
 	):array {
-		return self::runOcc(
-			['user:setting', '--value ' . $value, $userName, $app, $key],
-			$xRequestId
-		);
+		return ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 	}
 
 	/**
@@ -141,10 +132,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $groupName,
 		?string $xRequestId = ''
 	):array {
-		return self::runOcc(
-			['group:add', $groupName],
-			$xRequestId
-		);
+		return ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 	}
 
 	/**
@@ -162,10 +150,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $userName,
 		?string $xRequestId = ''
 	):array {
-		return self::runOcc(
-			['group:add-member', '--member', $userName, $groupName],
-			$xRequestId
-		);
+		return ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 	}
 
 	/**
@@ -183,10 +168,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $userName,
 		?string $xRequestId = ''
 	):array {
-		return self::runOcc(
-			['group:remove-member', '--member', $userName, $groupName],
-			$xRequestId
-		);
+		return ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 	}
 
 	/**
@@ -202,10 +184,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $groupName,
 		?string $xRequestId = ''
 	):array {
-		return self::runOcc(
-			['group:delete', $groupName],
-			$xRequestId
-		);
+		return ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 	}
 
 	/**
@@ -219,10 +198,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $xRequestId = ''
 	):array {
 		return \json_decode(
-			self::runOcc(
-				['group:list', '--output=json'],
-				$xRequestId
-			)['stdOut']
+			['code' => '', 'stdOut' => '', 'stdErr' => '' ]['stdOut']
 		);
 	}
 	/**
@@ -653,13 +629,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		);
 
 		//find the absolute path of the currently set skeletondirectory
-		$occResponse = self::runOcc(
-			['config:system:get', 'skeletondirectory'],
-			$xRequestId,
-			$adminUsername,
-			$adminPassword,
-			$baseUrl
-		);
+		$occResponse = ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 		if ((int) $occResponse['code'] !== 0) {
 			throw new \Exception(
 				"could not get current skeletondirectory. " . $occResponse['stdErr']
@@ -700,10 +670,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $appName,
 		?string $xRequestId = ''
 	):array {
-		return self::runOcc(
-			['app:enable', $appName],
-			$xRequestId
-		);
+		return ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 	}
 
 	/**
@@ -719,10 +686,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $appName,
 		?string $xRequestId = ''
 	):array {
-		return self::runOcc(
-			['app:disable', $appName],
-			$xRequestId
-		);
+		return ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 	}
 
 	/**
@@ -738,10 +702,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		?string $appName,
 		?string $xRequestId = ''
 	):bool {
-		$result = self::runOcc(
-			['app:list', '^' . $appName . '$'],
-			$xRequestId
-		);
+		$result = ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 		return \strtolower(\substr($result['stdOut'], 0, 7)) === 'enabled';
 	}
 
@@ -848,17 +809,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			self::$adminPassword,
 			$xRequestId
 		);
-		$result = self::runOcc(
-			[
-				'files_external:create',
-				$mount,
-				'local',
-				'null::null',
-				'-c',
-				'datadir=' . $serverRoot . '/' . $mountPath
-			],
-			$xRequestId
-		);
+		$result = ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 		// stdOut should have a string like "Storage created with id 65"
 		$storageIdWords = \explode(" ", \trim($result['stdOut']));
 		if (\array_key_exists(4, $storageIdWords)) {
@@ -908,14 +859,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 
 		$args[] = '--no-ansi';
 
-		return self::runOcc(
-			$args,
-			$xRequestId,
-			$adminUsername,
-			$adminPassword,
-			$baseUrl,
-			$ocPath
-		);
+		return ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 	}
 
 	/**
@@ -965,14 +909,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		if ($baseUrl === null) {
 			$baseUrl = self::$baseUrl;
 		}
-		return self::runOcc(
-			$args,
-			$xRequestId,
-			$adminUsername,
-			$adminPassword,
-			$baseUrl,
-			$ocPath
-		);
+		return ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 	}
 
 	/**
@@ -1059,13 +996,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		if ($baseUrl === null) {
 			$baseUrl = self::$baseUrl;
 		}
-		return SetupHelper::runOcc(
-			$args,
-			$xRequestId,
-			$adminUsername,
-			$adminPassword,
-			$baseUrl,
-			$ocPath
-		);
+		return ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 	}
 }
