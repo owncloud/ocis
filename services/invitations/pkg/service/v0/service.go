@@ -5,7 +5,10 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
+	"text/template"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -41,15 +44,24 @@ type Service interface {
 func New(opts ...Option) (Service, error) {
 	options := newOptions(opts...)
 
+	urlTemplate, err := template.New("invitations-provisioning-endpoint-url").Parse(options.Config.Endpoint.URL)
+	bodyTemplate, err := template.New("invitations-provisioning-endpoint-url").Parse(options.Config.Endpoint.BodyTemplate)
+	if err != nil {
+		return nil, err
+	}
 	return svc{
-		log:    options.Logger,
-		config: options.Config,
+		log:          options.Logger,
+		config:       options.Config,
+		urlTemplate:  urlTemplate,
+		bodyTemplate: bodyTemplate,
 	}, nil
 }
 
 type svc struct {
-	config *config.Config
-	log    log.Logger
+	config       *config.Config
+	log          log.Logger
+	urlTemplate  *template.Template
+	bodyTemplate *template.Template
 }
 
 // Invite implements the service interface
@@ -74,8 +86,21 @@ func (s svc) Invite(ctx context.Context, invitation *invitations.Invitation) (*i
 	// we don't really need a username as guests have to log in with their email address anyway
 	// what if later a user is provisioned with a guest accounts email address?
 
-	data, err := json.Marshal(user)
-	if err != nil {
+	templateVars := map[string]string{
+		"redirectUrl": invitation.InviteRedirectUrl,
+		// TODO message and other options
+		"mail":        invitation.InvitedUserEmailAddress,
+		"displayName": invitation.InvitedUserDisplayName,
+		"userType":    invitation.InvitedUserType,
+	}
+
+	var urlWriter strings.Builder
+	if err := s.urlTemplate.Execute(&urlWriter, templateVars); err != nil {
+		return nil, err
+	}
+
+	var bodyWriter strings.Builder
+	if err := s.bodyTemplate.Execute(&bodyWriter, templateVars); err != nil {
 		return nil, err
 	}
 
@@ -85,19 +110,35 @@ func (s svc) Invite(ctx context.Context, invitation *invitations.Invitation) (*i
 	}
 	client := &http.Client{Transport: tr}
 
-	req, err := http.NewRequest("POST", "/graph/v1.0/users", bytes.NewReader(data))
+	req, err := http.NewRequest(s.config.Endpoint.Method, urlWriter.String(), bytes.NewBufferString(bodyWriter.String()))
 	if err != nil {
 		return nil, err
 	}
 
 	// TODO either forward current user token or use bearer token?
-	req.Header.Set("Authorization", "Bearer some-token")
+	switch s.config.Endpoint.Authorization {
+	case "token":
+		// TODO forward current reva access token
+	case "bearer":
+		req.Header.Set("Authorization", "Bearer "+s.config.Endpoint.Token)
+	default:
+		return nil, fmt.Errorf("unknown authorization: " + s.config.Endpoint.Authorization)
+	}
 
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer res.Body.Close()
+
+	// TODO hm ok so we expect the rosponse to be a libregraph user ... so much for a generic endpoint
+	// we could try parsing into a map[string]interface{} .... hm ... maybe better to be specific about
+	// the actual backend: libregraph, keycloak, scim or even oc10?
+
+	// Or we remember the mail of the user in memory and try to check if the user is already avilable via
+	// a local user api ... hm ... graph or cs3 user backend now?
+
+	// in any case this will require an additional endpoint to keep track of the ongoing invitations
 
 	invitedUser := &libregraph.User{}
 	err = json.NewDecoder(res.Body).Decode(invitedUser)

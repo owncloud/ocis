@@ -18,16 +18,18 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
+	Endpoint Endpoint `yaml:"enpoint"`
+
 	TokenManager *TokenManager `yaml:"token_manager"`
 
 	Context context.Context `yaml:"-"`
 }
 
-// Instance to use with a matching rule and titles
-type Instance struct {
-	Claim  string            `yaml:"claim"`
-	Regex  string            `yaml:"regex"`
-	Href   string            `yaml:"href"`
-	Titles map[string]string `yaml:"titles"`
-	Break  bool              `yaml:"break"`
+// Endpoint to use
+type Endpoint struct {
+	URL           string `yaml:"url" env:"INVITATIONS_PROVISIONING_URL" desc:"The endpoint provisioning requests are sent to."`
+	Method        string `yaml:"method" env:"INVITATIONS_PROVISIONING_METHOD" desc:"The method to use when making provisioning requests."`
+	BodyTemplate  string `yaml:"body_template" env:"INVITATIONS_PROVISIONING_BODY_TEMPLATE" desc:"The template to use as body of a provisioning request."`
+	Authorization string `yaml:"authorization" env:"INVITATIONS_PROVISIONING_AUTH" desc:"The authorization to use. Can be 'token' to reuse the access token or 'bearer' to send a static api token."`
+	Token         string `yaml:"authorization" env:"INVITATIONS_PROVISIONING_AUTH" desc:"The bearer token to send in provisioning requests."`
 }

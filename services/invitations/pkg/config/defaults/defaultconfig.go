@@ -32,6 +32,17 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "invitations",
 		},
+		Endpoint: config.Endpoint{
+			URL:    "{{.OCIS_URL}}/graph/v1.0/users",
+			Method: "POST",
+			BodyTemplate: `{
+				"inviteRedirectUrl": "{{.redirectUrl}}",
+				"invitedUserEmailAddress": "{{.mail}}",
+				"invitedUserDisplayName": "{{.displayName}}",
+				"sendInvitationMessage": true
+			}`,
+			Authorization: "token", // reuse existing token
+		},
 	}
 }
 
