@@ -82,12 +82,28 @@ Feature: Space management
       | quota@@@total | 10    |
 
 
+  Scenario: The space admin user changes the name of the project space
+    When user "Brian" changes the name of the "Project" space to "New Name" owned by user "Alice"
+    Then the HTTP status code should be "200"
+    And the user "Alice" should have a space called "New Name" with these key and value pairs:
+      | key  | value    |
+      | name | New Name |
+
+
   Scenario: The user without space admin permissions tries to change the name of the project space
     When user "Carol" tries to change the name of the "Project" space to "New Name" owned by user "Alice"
     Then the HTTP status code should be "403"
     And the user "Alice" should have a space called "Project" with these key and value pairs:
       | key  | value   |
       | name | Project |
+
+
+  Scenario: The space admin user changes the description of the project space
+    When user "Brian" changes the description of the "Project" space to "New description" owned by user "Alice"
+    Then the HTTP status code should be "200"
+    And the user "Alice" should have a space called "Project" with these key and value pairs:
+      | key         | value           |
+      | description | New description |
 
 
   Scenario: The user without space admin permissions tries to change the description of the project space
@@ -97,6 +113,15 @@ Feature: Space management
     And the user "Alice" should have a space called "Project" with these key and value pairs:
       | key         | value           |
       | description | old description |
+
+
+  Scenario: The space admin user disables the project space
+    When user "Brian" disables a space "Project" owned by user "Alice"
+    Then the HTTP status code should be "204"
+    And the user "Alice" should have a space called "Project" with these key and value pairs:
+      | key                    | value   |
+      | name                   | Project |
+      | root@@@deleted@@@state | trashed |
 
 
   Scenario: The user without space admin permissions tries to disable the project space
@@ -113,6 +138,13 @@ Feature: Space management
       | Carol |
 
 
+  Scenario: The space admin user deletes the project space
+    Given user "Alice" has disabled a space "Project"
+    When user "Brian" deletes a space "Project" owned by user "Alice"
+    Then the HTTP status code should be "204"
+    And the user "Alice" should not have a space called "Project"
+
+
   Scenario: The user without space admin permissions tries to delete the project space
     Given user "Alice" has disabled a space "Project"
     When user "Carol" tries to delete a space "Project" owned by user "Alice"
@@ -121,6 +153,12 @@ Feature: Space management
       | key                    | value   |
       | name                   | Project |
       | root@@@deleted@@@state | trashed |
+
+
+  Scenario: The space admin user enables the project space
+    Given user "Alice" has disabled a space "Project"
+    When user "Brian" restores a disabled space "Project" owned by user "Alice"
+    Then the HTTP status code should be "200"
 
 
   Scenario: The user without space admin permissions tries to enable the project space
