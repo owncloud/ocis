@@ -106,8 +106,7 @@ func (ul *UserlogService) convertEvent(ctx context.Context, event *ehmsg.Event) 
 		noti.Subject = "Space deleted"
 		noti.Message = fmt.Sprintf("Space '%s' was deleted", space.Name)
 	case events.SpaceShared:
-		noti.Subject = "Space shared"
-		noti.Message = fmt.Sprintf("Space '%s' was shared", space.Name)
+		return ul.SpaceShared(ctx, event.Id, ev)
 	case events.SpaceUnshared:
 		noti.Subject = "Space unshared"
 		noti.Message = fmt.Sprintf("Space '%s' was unshared", space.Name)

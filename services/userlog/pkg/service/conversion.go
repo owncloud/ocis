@@ -69,6 +69,42 @@ func (ul *UserlogService) SpaceDisabled(ctx context.Context, eventid string, ev 
 
 }
 
+// SpaceShared converts a SpaceShared event to an OC10Notification
+func (ul *UserlogService) SpaceShared(ctx context.Context, eventid string, ev events.SpaceShared) (OC10Notification, error) {
+	user, err := ul.getUser(ctx, ev.Executant)
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	space, err := ul.getSpace(ul.impersonate(user.GetId()), ev.ID.GetOpaqueId())
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	subj, subjraw, msg, msgraw, err := ul.composeMessage(SpaceShared, map[string]string{
+		"username":  user.GetDisplayName(),
+		"spacename": space.GetName(),
+	})
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	return OC10Notification{
+		EventID:        eventid,
+		Service:        ul.cfg.Service.Name,
+		UserName:       user.GetUsername(),
+		Timestamp:      time.Now().Format(time.RFC3339Nano),
+		ResourceID:     ev.ID.GetOpaqueId(),
+		ResourceType:   _resourceTypeSpace,
+		Subject:        subj,
+		SubjectRaw:     subjraw,
+		Message:        msg,
+		MessageRaw:     msgraw,
+		MessageDetails: ul.getDetails(user, space, nil),
+	}, nil
+
+}
+
 func (ul *UserlogService) composeMessage(eventname string, vars map[string]string) (string, string, string, string, error) {
 	tpl, ok := _templates[eventname]
 	if !ok {

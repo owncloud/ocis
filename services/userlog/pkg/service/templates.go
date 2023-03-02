@@ -5,8 +5,12 @@ import "text/template"
 // the available templates
 var (
 	SpaceDisabled        = "space-disabled"
-	SpaceDisabledSubject = "space disabled"
-	SpaceDisabledMessage = "{{ .username }} disabled space {{ .spacename }}"
+	SpaceDisabledSubject = "Space disabled"
+	SpaceDisabledMessage = "{{ .username }} disabled Space {{ .spacename }}"
+
+	SpaceShared        = "space-shared"
+	SpaceSharedSubject = "Space shared"
+	SpaceSharedMessage = "{{ .username }} shared Space {{ .spacename }} with you"
 )
 
 // NotificationTemplate is the data structure for the notifications
@@ -19,8 +23,12 @@ type NotificationTemplate struct {
 var (
 	_templates = map[string]NotificationTemplate{
 		SpaceDisabled: {
-			Subject: template.Must(template.New(SpaceDisabled).Parse(SpaceDisabledSubject)),
+			Subject: template.Must(template.New("").Parse(SpaceDisabledSubject)),
 			Message: template.Must(template.New("").Parse(SpaceDisabledMessage)),
+		},
+		SpaceShared: {
+			Subject: template.Must(template.New("").Parse(SpaceSharedSubject)),
+			Message: template.Must(template.New("").Parse(SpaceSharedMessage)),
 		},
 	}
 )
