@@ -18,6 +18,8 @@ type Config struct {
 	HTTP          HTTP                  `yaml:"http"`
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 
+	TokenManager *TokenManager `yaml:"token_manager"`
+
 	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;USERLOG_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
 	RevaGateway       string `yaml:"reva_gateway" env:"REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata"`
 	Events            Events `yaml:"events"`
@@ -59,4 +61,9 @@ type HTTP struct {
 	Root      string                `yaml:"root" env:"USERLOG_HTTP_ROOT" desc:"Subdirectory that serves as the root for this HTTP service."`
 	CORS      CORS                  `yaml:"cors"`
 	TLS       shared.HTTPServiceTLS `yaml:"tls"`
+}
+
+// TokenManager is the config for using the reva token manager
+type TokenManager struct {
+	JWTSecret string `yaml:"jwt_secret" env:"OCIS_JWT_SECRET;USERLOG_JWT_SECRET" desc:"The secret to mint and validate jwt tokens."`
 }
