@@ -23,6 +23,7 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token."`
 
+	Cache         Cache   `yaml:"cache"`
 	Driver        string  `yaml:"driver" env:"STORAGE_SYSTEM_DRIVER" desc:"The driver which should be used by the service."`
 	Drivers       Drivers `yaml:"drivers"`
 	DataServerURL string  `yaml:"data_server_url" env:"STORAGE_SYSTEM_DATA_SERVER_URL" desc:"URL of the data server, needs to be reachable by other services using this service."`
@@ -79,4 +80,11 @@ type OCISDriver struct {
 
 	MaxAcquireLockCycles    int `yaml:"max_acquire_lock_cycles" env:"STORAGE_SYSTEM_OCIS_MAX_ACQUIRE_LOCK_CYCLES" desc:"When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used."`
 	LockCycleDurationFactor int `yaml:"lock_cycle_duration_factor" env:"STORAGE_SYSTEM_OCIS_LOCK_CYCLE_DURATION_FACTOR" desc:"When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used."`
+}
+
+// Cache holds cache config
+type Cache struct {
+	Store    string   `yaml:"store" env:"OCIS_CACHE_STORE_TYPE;STORAGE_SYSTEM_CACHE_STORE" desc:"Store implementation for the cache. Valid values are \"memory\" (default), \"redis\", and \"etcd\"."`
+	Nodes    []string `yaml:"nodes" env:"OCIS_CACHE_STORE_ADDRESS;STORAGE_SYSTEM_CACHE_NODES" desc:"Node addresses to use for the cache store."`
+	Database string   `yaml:"database" env:"STORAGE_SYSTEM_CACHE_DATABASE" desc:"Database name of the cache."`
 }
