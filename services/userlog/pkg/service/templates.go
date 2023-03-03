@@ -6,7 +6,7 @@ import "text/template"
 var (
 	SpaceShared        = "space-shared"
 	SpaceSharedSubject = "Space shared"
-	SpaceSharedMessage = "{{ .username }} shared Space {{ .spacename }} with you"
+	SpaceSharedMessage = "{{ .username }} added you to Space {{ .spacename }}"
 
 	SpaceUnshared        = "space-unshared"
 	SpaceUnsharedSubject = "Removed from Space"
@@ -26,11 +26,11 @@ var (
 
 	ShareCreated        = "item-shared"
 	ShareCreatedSubject = "Resource shared"
-	ShareCreatedMessage = "{{ .username }} shared {{ .itemname }} with you"
+	ShareCreatedMessage = "{{ .username }} shared {{ .resourcename }} with you"
 
 	ShareRemoved        = "item-unshared"
 	ShareRemovedSubject = "Resource unshared"
-	ShareRemovedMessage = "{{ .username }} unshared {{ .itemname }} with you"
+	ShareRemovedMessage = "{{ .username }} unshared {{ .resourcename }} with you"
 
 	ShareExpired        = "share-expired"
 	ShareExpiredSubject = "Share expired"

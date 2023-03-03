@@ -53,14 +53,14 @@ func (ul *UserlogService) HandleDeleteEvents(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	var ids []string
-	if err := json.NewDecoder(r.Body).Decode(&ids); err != nil {
+	var req DeleteEventsRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		ul.log.Error().Err(err).Int("returned statuscode", http.StatusBadRequest).Msg("request body is malformed")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if err := ul.DeleteEvents(u.GetId().GetOpaqueId(), ids); err != nil {
+	if err := ul.DeleteEvents(u.GetId().GetOpaqueId(), req.IDs); err != nil {
 		ul.log.Error().Err(err).Int("returned statuscode", http.StatusInternalServerError).Msg("delete events failed")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -79,4 +79,9 @@ type GetEventResponseOC10 struct {
 		} `json:"meta"`
 		Data []OC10Notification `json:"data"`
 	} `json:"ocs"`
+}
+
+// DeleteEventsRequest is the expected body for the delete request
+type DeleteEventsRequest struct {
+	IDs []string `json:"ids"`
 }
