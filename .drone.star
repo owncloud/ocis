@@ -219,6 +219,7 @@ def main(ctx):
     Returns:
       none
     """
+    return dockerReleases(ctx)
 
     pipelines = []
 
@@ -1413,7 +1414,7 @@ def dockerRelease(ctx, arch):
         "REVISION=%s" % (ctx.build.commit),
         "VERSION=%s" % (ctx.build.ref.replace("refs/tags/", "") if ctx.build.event == "tag" else "latest"),
     ]
-    depends_on = getPipelineNames([purgeBuildArtifactCache(ctx)])
+    depends_on = []  #getPipelineNames([purgeBuildArtifactCache(ctx)])
 
     if ctx.build.event == "tag":
         depends_on = []
