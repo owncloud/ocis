@@ -33,6 +33,8 @@ http:
 grpc_client_tls:
   mode: ""
   cacert: ""
+token_manager:
+  jwt_secret: ""
 machine_auth_api_key: ""
 reva_gateway: 127.0.0.1:9142
 events:

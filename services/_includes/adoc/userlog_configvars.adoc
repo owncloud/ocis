@@ -205,6 +205,16 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
 
+a|`OCIS_JWT_SECRET` +
+`USERLOG_JWT_SECRET` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The secret to mint and validate jwt tokens.
+
 a|`OCIS_MACHINE_AUTH_API_KEY` +
 `USERLOG_MACHINE_AUTH_API_KEY` +
 
