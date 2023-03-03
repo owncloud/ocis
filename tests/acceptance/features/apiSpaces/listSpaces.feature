@@ -14,17 +14,62 @@ Feature: List and create spaces
   Scenario: An ordinary user can request information about their Space via the Graph API
     When user "Alice" lists all available spaces via the GraphApi
     Then the HTTP status code should be "200"
-    And the json responded should contain a space "Alice Hansen" owned by "Alice" with these key and value pairs:
-      | key               | value                            |
-      | driveType         | personal                         |
-      | driveAlias        | personal/alice                   |
-      | id                | %space_id%                       |
-      | name              | Alice Hansen                     |
-      | owner@@@user@@@id | %user_id%                        |
-      | quota@@@state     | normal                           |
-      | root@@@id         | %space_id%                       |
-      | root@@@webDavUrl  | %base_url%/dav/spaces/%space_id% |
-      | webUrl            | %base_url%/f/%space_id%          |
+    And the JSON response should contain space called "Alice Hansen" and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "driveType",
+        "driveAlias",
+        "name",
+        "id",
+        "quota",
+        "root"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Alice Hansen"]
+        },
+        "driveType": {
+           "type": "string",
+          "enum": ["personal"]
+        },
+        "driveAlias": {
+           "type": "string",
+          "enum": ["personal/alice"]
+        },
+        "id": {
+           "type": "string",
+          "enum": ["%space_id%"]
+        },
+        "quota": {
+           "type": "object",
+           "required": [
+            "state"
+           ],
+           "properties": {
+              "state": {
+                "type": "string",
+                "enum": ["normal"]
+              }
+           }
+        },
+        "root": {
+          "type": "object",
+          "required": [
+            "webDavUrl"
+          ],
+          "properties": {
+              "webDavUrl": {
+                "type": "string",
+                "enum": ["%base_url%/dav/spaces/%space_id%"]
+              }
+           }
+        }
+      }
+    }
+    """
 
 
   Scenario: An ordinary user can request information about their Space via the Graph API using a filter
@@ -32,21 +77,89 @@ Feature: List and create spaces
     And user "Brian" has created folder "folder"
     And user "Brian" has shared folder "folder" with user "Alice" with permissions "31"
     And user "Alice" has accepted share "/folder" offered by user "Brian"
-    Then the user "Alice" should have a space called "Shares" with these key and value pairs:
-      | key       | value      |
-      | driveType | virtual    |
-      | id        | %space_id% |
-      | name      | Shares     |
+    And for user "Alice" the JSON response should contain space called "Shares" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "driveType",
+        "id",
+        "name"
+      ],
+      "properties": {
+        "driveType": {
+          "type": "string",
+          "enum": ["virtual"]
+        },
+        "id": {
+          "type": "string",
+          "enum": ["%space_id%"]
+        },
+        "name": {
+          "type": "string",
+          "enum": ["Shares"]
+        }
+      }
+    }
+    """
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"
     Then the HTTP status code should be "200"
-    And the json responded should contain a space "Alice Hansen" with these key and value pairs:
-      | key              | value                            |
-      | driveType        | personal                         |
-      | id               | %space_id%                       |
-      | name             | Alice Hansen                     |
-      | quota@@@state    | normal                           |
-      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
-      | webUrl           | %base_url%/f/%space_id%          |
+    And the JSON response should contain space called "Alice Hansen" and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "driveType",
+        "driveAlias",
+        "name",
+        "id",
+        "quota",
+        "root"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Alice Hansen"]
+        },
+        "driveType": {
+           "type": "string",
+          "enum": ["personal"]
+        },
+        "driveAlias": {
+           "type": "string",
+          "enum": ["personal/alice"]
+        },
+        "id": {
+           "type": "string",
+          "enum": ["%space_id%"]
+        },
+        "quota": {
+           "type": "object",
+           "required": [
+            "state"
+           ],
+           "properties": {
+              "state": {
+                "type": "string",
+                "enum": ["normal"]
+              }
+           }
+        },
+        "root": {
+          "type": "object",
+          "required": [
+            "webDavUrl"
+          ],
+          "properties": {
+              "webDavUrl": {
+                "type": "string",
+                "enum": ["%base_url%/dav/spaces/%space_id%"]
+              }
+           }
+        }
+      }
+    }
+    """
     And the json responded should not contain a space with name "Shares"
     And the json responded should only contain spaces of type "personal"
 
@@ -56,11 +169,31 @@ Feature: List and create spaces
     And user "Alice" has created a space "my project" of type "project" with quota "20"
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'project'"
     Then the HTTP status code should be "200"
-    And the json responded should contain a space "my project" with these key and value pairs:
-      | key       | value      |
-      | driveType | project    |
-      | id        | %space_id% |
-      | name      | my project |
+    And the JSON response should contain space called "my project" and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "driveType",
+        "name",
+        "id"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["my project"]
+        },
+        "driveType": {
+           "type": "string",
+          "enum": ["project"]
+        },
+        "id": {
+           "type": "string",
+          "enum": ["%space_id%"]
+        }
+      }
+    }
+    """
     And the json responded should not contain a space with name "Alice Hansen"
 
 
@@ -85,14 +218,67 @@ Feature: List and create spaces
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" creates a space "Project Mars" of type "project" with the default quota using the GraphApi
     Then the HTTP status code should be "201"
-    And the json responded should contain a space "Project Mars" with these key and value pairs:
-      | key              | value                            |
-      | driveType        | project                          |
-      | driveAlias       | project/project-mars             |
-      | name             | Project Mars                     |
-      | quota@@@total    | 1000000000                       |
-      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
-      | webUrl           | %base_url%/f/%space_id%          |
+    And the JSON response should contain space called "Project Mars" and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "driveType",
+        "driveAlias",
+        "name",
+        "id",
+        "quota",
+        "root",
+        "webUrl"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Project Mars"]
+        },
+        "driveType": {
+           "type": "string",
+          "enum": ["project"]
+        },
+        "driveAlias": {
+           "type": "string",
+          "enum": ["project/project-mars"]
+        },
+        "id": {
+           "type": "string",
+          "enum": ["%space_id%"]
+        },
+        "quota": {
+           "type": "object",
+           "required": [
+            "total"
+           ],
+           "properties": {
+              "state": {
+                "type": "number",
+                "enum": [1000000000]
+              }
+           }
+        },
+        "root": {
+          "type": "object",
+          "required": [
+            "webDavUrl"
+          ],
+          "properties": {
+              "webDavUrl": {
+                "type": "string",
+                "enum": ["%base_url%/dav/spaces/%space_id%"]
+              }
+           }
+        },
+        "webUrl": {
+          "type": "string",
+          "enum": ["%base_url%/f/%space_id%"]
+        }
+      }
+    }
+    """
     Examples:
       | role        |
       | Admin       |
@@ -103,13 +289,62 @@ Feature: List and create spaces
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
     Then the HTTP status code should be "201"
-    And the json responded should contain a space "Project Venus" with these key and value pairs:
-      | key              | value                            |
-      | driveType        | project                          |
-      | name             | Project Venus                    |
-      | quota@@@total    | 2000                             |
-      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
-      | webUrl           | %base_url%/f/%space_id%          |
+    And the JSON response should contain space called "Project Venus" and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "driveType",
+        "name",
+        "id",
+        "quota",
+        "root",
+        "webUrl"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Project Venus"]
+        },
+        "driveType": {
+           "type": "string",
+          "enum": ["project"]
+        },
+        "id": {
+           "type": "string",
+          "enum": ["%space_id%"]
+        },
+        "quota": {
+           "type": "object",
+           "required": [
+            "total"
+           ],
+           "properties": {
+              "state": {
+                "type": "number",
+                "enum": [2000]
+              }
+           }
+        },
+        "root": {
+          "type": "object",
+          "required": [
+            "webDavUrl"
+          ],
+          "properties": {
+              "webDavUrl": {
+                "type": "string",
+                "enum": ["%base_url%/dav/spaces/%space_id%"]
+              }
+           }
+        },
+        "webUrl": {
+          "type": "string",
+          "enum": ["%base_url%/f/%space_id%"]
+        }
+      }
+    }
+    """
     Examples:
       | role        |
       | Admin       |
@@ -118,44 +353,218 @@ Feature: List and create spaces
 
   Scenario: A user can list his personal space via multiple endpoints
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"
-    Then the json responded should contain a space "Alice Hansen" owned by "Alice" with these key and value pairs:
-      | key               | value                            |
-      | driveType         | personal                         |
-      | name              | Alice Hansen                     |
-      | root@@@webDavUrl  | %base_url%/dav/spaces/%space_id% |
-      | owner@@@user@@@id | %user_id%                        |
-      | webUrl            | %base_url%/f/%space_id%          |
+    Then the HTTP status code should be "200"
+    And the JSON response should contain space called "Alice Hansen" owned by "Alice" and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "driveType",
+        "name",
+        "root",
+        "owner"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Alice Hansen"]
+        },
+        "driveType": {
+           "type": "string",
+          "enum": ["personal"]
+        },
+        "root": {
+          "type": "object",
+          "required": [
+            "webDavUrl"
+          ],
+          "properties": {
+              "webDavUrl": {
+                "type": "string",
+                "enum": ["%base_url%/dav/spaces/%space_id%"]
+              }
+           }
+        },
+        "owner": {
+          "type": "object",
+          "required": [
+            "user"
+          ],
+          "properties": {
+            "type": "object",
+            "required": [
+              "id"
+            ],
+            "properties": {
+              "type": "string",
+              "enum": ["%user_id%"]
+            }
+          }
+        }
+      }
+    }
+    """
     When user "Alice" looks up the single space "Alice Hansen" via the GraphApi by using its id
-    Then the json responded should contain a space "Alice Hansen" with these key and value pairs:
-      | key              | value                            |
-      | driveType        | personal                         |
-      | name             | Alice Hansen                     |
-      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
-      | webUrl           | %base_url%/f/%space_id%          |
+    Then the HTTP status code should be "200"
+    And the JSON response should contain space called "Alice Hansen" and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "driveType",
+        "name",
+        "root"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Alice Hansen"]
+        },
+        "driveType": {
+           "type": "string",
+          "enum": ["personal"]
+        },
+        "root": {
+          "type": "object",
+          "required": [
+            "webDavUrl"
+          ],
+          "properties": {
+              "webDavUrl": {
+                "type": "string",
+                "enum": ["%base_url%/dav/spaces/%space_id%"]
+              }
+           }
+        }
+      }
+    }
+    """
 
 
   Scenario Outline: A user can list his created spaces via multiple endpoints
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
     Then the HTTP status code should be "201"
-    And the json responded should contain a space "Project Venus" with these key and value pairs:
-      | key              | value                            |
-      | driveType        | project                          |
-      | driveAlias       | project/project-venus            |
-      | name             | Project Venus                    |
-      | quota@@@total    | 2000                             |
-      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
-      | webUrl           | %base_url%/f/%space_id%          |
+    And the JSON response should contain space called "Project Venus" and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "driveType",
+        "driveAlias",
+        "name",
+        "id",
+        "quota",
+        "root",
+        "webUrl"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Project Venus"]
+        },
+        "driveType": {
+           "type": "string",
+          "enum": ["project"]
+        },
+        "driveAlias": {
+          "type": "string",
+          "enum": ["project/project-venus"]
+        },
+        "id": {
+           "type": "string",
+          "enum": ["%space_id%"]
+        },
+        "quota": {
+           "type": "object",
+           "required": [
+            "total"
+           ],
+           "properties": {
+              "total": {
+                "type": "number",
+                "enum": [2000]
+              }
+           }
+        },
+        "root": {
+          "type": "object",
+          "required": [
+            "webDavUrl"
+          ],
+          "properties": {
+              "webDavUrl": {
+                "type": "string",
+                "enum": ["%base_url%/dav/spaces/%space_id%"]
+              }
+           }
+        }
+      }
+    }
+    """
     When user "Alice" looks up the single space "Project Venus" via the GraphApi by using its id
     Then the HTTP status code should be "200"
-    And the json responded should contain a space "Project Venus" with these key and value pairs:
-      | key              | value                            |
-      | driveType        | project                          |
-      | driveAlias       | project/project-venus            |
-      | name             | Project Venus                    |
-      | quota@@@total    | 2000                             |
-      | root@@@webDavUrl | %base_url%/dav/spaces/%space_id% |
-      | webUrl           | %base_url%/f/%space_id%          |
+    And the JSON response should contain space called "Project Venus" and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "driveType",
+        "driveAlias",
+        "name",
+        "id",
+        "quota",
+        "root",
+        "webUrl"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Project Venus"]
+        },
+        "driveType": {
+           "type": "string",
+          "enum": ["project"]
+        },
+        "driveAlias": {
+          "type": "string",
+          "enum": ["project/project-venus"]
+        },
+        "id": {
+           "type": "string",
+          "enum": ["%space_id%"]
+        },
+        "quota": {
+           "type": "object",
+           "required": [
+            "total"
+           ],
+           "properties": {
+              "total": {
+                "type": "number",
+                "enum": [2000]
+              }
+           }
+        },
+        "root": {
+          "type": "object",
+          "required": [
+            "webDavUrl"
+          ],
+          "properties": {
+              "webDavUrl": {
+                "type": "string",
+                "enum": ["%base_url%/dav/spaces/%space_id%"]
+              }
+           }
+        },
+        "webUrl": {
+          "type": "string",
+          "enum": ["%base_url%/f/%space_id%"]
+        }
+      }
+    }
+    """
     Examples:
       | role        |
       | Admin       |

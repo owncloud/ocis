@@ -82,11 +82,40 @@ Feature: Restore files, folder
     When user "Brian" restores version index "1" of file "/file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And the content of file "/file.txt" for user "Brian" should be "file is less than 30 bytes"
-    And the user "Brian" should have a space called "Brian Murphy" with these key and value pairs:
-      | key           | value    |
-      | quota@@@total | 30       |
-      | quota@@@used  | 38       |
-      | quota@@@state | exceeded |
+    And for user "Brian" the JSON response should contain space called "Brian Murphy" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "quota"
+      ],
+      "properties": {
+        "quota": {
+          "type": "object",
+          "required": [
+            "state",
+            "total",
+            "remaining",
+            "used"
+          ],
+          "properties": {
+            "state" : {
+              "type": "string",
+              "enum": ["exceeded"]
+            },
+            "total" : {
+              "type": "number",
+              "enum": [30]
+            },
+            "used": {
+              "type": "number",
+              "enum": [38]
+            }
+          }
+        }
+      }
+    }
+    """
 
 
   Scenario: The recipient can restore a file even if there is not enough owner's quota to do so
@@ -100,8 +129,37 @@ Feature: Restore files, folder
     When user "Alice" restores version index "1" of file "/Shares/file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And the content of file "/Shares/file.txt" for user "Alice" should be "file is less than 30 bytes"
-    And the user "Brian" should have a space called "Brian Murphy" with these key and value pairs:
-      | key           | value    |
-      | quota@@@total | 30       |
-      | quota@@@used  | 38       |
-      | quota@@@state | exceeded |
+    And for user "Brian" the JSON response should contain space called "Brian Murphy" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "quota"
+      ],
+      "properties": {
+        "quota": {
+          "type": "object",
+          "required": [
+            "state",
+            "total",
+            "remaining",
+            "used"
+          ],
+          "properties": {
+            "state" : {
+              "type": "string",
+              "enum": ["exceeded"]
+            },
+            "total" : {
+              "type": "number",
+              "enum": [30]
+            },
+            "used": {
+              "type": "number",
+              "enum": [38]
+            }
+          }
+        }
+      }
+    }
+    """
