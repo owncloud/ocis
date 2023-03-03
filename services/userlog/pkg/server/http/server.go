@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -49,7 +50,10 @@ func Server(opts ...Option) (http.Service, error) {
 		middleware.Logger(
 			options.Logger,
 		),
-		middleware.ExtractAccountUUID(),
+		middleware.ExtractAccountUUID(
+			account.Logger(options.Logger),
+			account.JWTSecret(options.Config.TokenManager.JWTSecret),
+		),
 	}
 
 	mux := chi.NewMux()

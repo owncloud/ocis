@@ -39,5 +39,9 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingMachineAuthApiKeyError(cfg.Service.Name)
 	}
 
+	if cfg.TokenManager.JWTSecret == "" {
+		return shared.MissingJWTTokenError(cfg.Service.Name)
+	}
+
 	return nil
 }

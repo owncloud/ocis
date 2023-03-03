@@ -69,6 +69,14 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	}
 
+	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {
+		cfg.TokenManager = &config.TokenManager{
+			JWTSecret: cfg.Commons.TokenManager.JWTSecret,
+		}
+	} else if cfg.TokenManager == nil {
+		cfg.TokenManager = &config.TokenManager{}
+	}
+
 	if cfg.Commons != nil {
 		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
 	}
