@@ -38,6 +38,7 @@ use TestHelpers\OcsApiHelper;
 use TestHelpers\SetupHelper;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\UploadHelper;
+use TestHelpers\GraphHelper;
 use TestHelpers\OcisHelper;
 use Laminas\Ldap\Ldap;
 use TestHelpers\WebDavHelper;
@@ -3318,6 +3319,22 @@ class FeatureContext extends BehatVariablesContext {
 				"function" => [
 					$this,
 					"getLastPublicShareToken"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%uuid_v4%",
+				"function" => [
+					   __NAMESPACE__ . "TestHelpers\GraphHelper",
+					"getUUIDv4Regex"
+				],
+				"parameter" => []
+			],
+			[
+				"code" => "%space_id%",
+				"function" => [
+					__NAMESPACE__ . "TestHelpers\GraphHelper",
+					"getSpaceIdRegex"
 				],
 				"parameter" => []
 			]

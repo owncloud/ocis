@@ -66,13 +66,119 @@ Feature: get groups and their members
     And user "Carol" has been added to group "tea-lover"
     When user "Alice" retrieves all groups along with their members using the Graph API
     Then the HTTP status code should be "200"
-    And the group 'coffee-lover' should have the following member information
-      | displayName  | id        | mail              | onPremisesSamAccountName |
-      | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
-    And the group 'tea-lover' should have the following member information
-      | displayName  | id        | mail              | onPremisesSamAccountName |
-      | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    |
-      | Carol King   | %uuid_v4% | carol@example.org | Carol                    |
+    And the JSON data of the response should contain group name "coffee-lover" and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "members"
+      ],
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "mail",
+                "onPremisesSamAccountName"
+              ],
+              "properties": {
+                "displayName": {
+                  "type": "string",
+                  "enum": ["Brian Murphy"]
+                },
+                "id" : {
+                  "type": "string",
+                  "pattern": "^%uuid_v4%$"
+                },
+                "mail": {
+                  "type": "string",
+                  "enum": ["brian@example.org"]
+                },
+                "onPremisesSamAccountName": {
+                  "type": "string",
+                  "enum": ["Brian"]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+    """
+    And the JSON data of the response should contain group name "tea-lover" and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "members"
+      ],
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "mail",
+                "onPremisesSamAccountName"
+              ],
+              "properties": {
+                "displayName": {
+                  "type": "string",
+                  "enum": ["Alice Hansen"]
+                },
+                "id" : {
+                  "type": "string",
+                  "pattern": "^%uuid_v4%$"
+                },
+                "mail": {
+                  "type": "string",
+                  "enum": ["alice@example.org"]
+                },
+                "onPremisesSamAccountName": {
+                  "type": "string",
+                  "enum": ["Alice"]
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "mail",
+                "onPremisesSamAccountName"
+              ],
+              "properties": {
+                "displayName": {
+                  "type": "string",
+                  "enum": ["Carol King"]
+                },
+                "id" : {
+                  "type": "string",
+                  "pattern": "^%uuid_v4%$"
+                },
+                "mail": {
+                  "type": "string",
+                  "enum": ["carol@example.org"]
+                },
+                "onPremisesSamAccountName": {
+                  "type": "string",
+                  "enum": ["Carol"]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+    """
 
 
   Scenario: normal user gets all groups along with their members information
@@ -83,7 +189,27 @@ Feature: get groups and their members
     And user "Brian" has been added to group "coffee-lover"
     When user "Brian" retrieves all groups along with their members using the Graph API
     Then the HTTP status code should be "401"
-    And the last response should be an unauthorized response
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "type": "string",
+            "enum": ["Unauthorized"]
+          }
+        }
+      }
+    }
+    """
 
 
   Scenario: admin user gets a group along with their members information
@@ -92,10 +218,76 @@ Feature: get groups and their members
     And user "Alice" has been added to group "tea-lover"
     And user "Brian" has been added to group "tea-lover"
     When user "Alice" gets all the members information of group "tea-lover" using the Graph API
-    And the group 'tea-lover' should have the following member information
-      | displayName  | id        | mail              | onPremisesSamAccountName |
-      | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    |
-      | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
+    And the JSON data of the response should contain group name "tea-lover" and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "members"
+      ],
+      "properties": {
+        "members": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "mail",
+                "onPremisesSamAccountName"
+              ],
+              "properties": {
+                "displayName": {
+                  "type": "string",
+                  "enum": ["Alice Hansen"]
+                },
+                "id" : {
+                  "type": "string",
+                  "pattern": "^%uuid_v4%$"
+                },
+                "mail": {
+                  "type": "string",
+                  "enum": ["alice@example.org"]
+                },
+                "onPremisesSamAccountName": {
+                  "type": "string",
+                  "enum": ["Alice"]
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id",
+                "mail",
+                "onPremisesSamAccountName"
+              ],
+              "properties": {
+                "displayName": {
+                  "type": "string",
+                  "enum": ["Brian Murphy"]
+                },
+                "id" : {
+                  "type": "string",
+                  "pattern": "^%uuid_v4%$"
+                },
+                "mail": {
+                  "type": "string",
+                  "enum": ["brian@example.org"]
+                },
+                "onPremisesSamAccountName": {
+                  "type": "string",
+                  "enum": ["Brian"]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+    """
 
   Scenario: normal user gets a group along with their members information
     Given user "Brian" has been created with default attributes and without skeleton files
@@ -104,4 +296,24 @@ Feature: get groups and their members
     And user "Brian" has been added to group "tea-lover"
     When user "Brian" gets all the members information of group "tea-lover" using the Graph API
     Then the HTTP status code should be "401"
-    And the last response should be an unauthorized response
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "type": "string",
+            "enum": ["Unauthorized"]
+          }
+        }
+      }
+    }
+    """

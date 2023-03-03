@@ -17,34 +17,82 @@ Feature: edit user
   Scenario: the admin user can edit another user email
     When the user "Alice" changes the email of user "Brian" to "newemail@example.com" using the Graph API
     Then the HTTP status code should be "200"
-    And the user "Brian" should have information with these key and value pairs:
-      | key  | value                |
-      | mail | newemail@example.com |
+    And for user "Brian" the JSON response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "mail"
+      ],
+      "properties": {
+        "mail": {
+          "type": "string",
+          "enum": ["newemail@example.com"]
+        }
+      }
+    }
+    """
 
 
   Scenario: the admin user can override an existing user email of another user
     When the user "Alice" changes the email of user "Brian" to "brian@example.com" using the Graph API
     Then the HTTP status code should be "200"
-    And the user "Brian" should have information with these key and value pairs:
-      | key  | value             |
-      | mail | brian@example.com |
+    And for user "Brian" the JSON response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "mail"
+      ],
+      "properties": {
+        "mail": {
+          "type": "string",
+          "enum": ["brian@example.com"]
+        }
+      }
+    }
+    """
 
 
   Scenario: the admin user cannot clear an existing user email
     When the user "Alice" tries to change the email of user "Brian" to "" using the Graph API
     Then the HTTP status code should be "400"
-    And the user "Brian" should have information with these key and value pairs:
-      | key  | value             |
-      | mail | brian@example.com |
+    And for user "Brian" the JSON response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "mail"
+      ],
+      "properties": {
+        "mail": {
+          "type": "string",
+          "enum": ["brian@example.com"]
+        }
+      }
+    }
+    """
 
 
   Scenario Outline: a normal user should not be able to change their email address
     Given the administrator has given "Brian" the role "<role>" using the settings api
     When the user "Brian" tries to change the email of user "Brian" to "newemail@example.com" using the Graph API
     Then the HTTP status code should be "401"
-    And the user "Brian" should have information with these key and value pairs:
-      | key  | value             |
-      | mail | brian@example.com |
+    And for user "Brian" the JSON response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "mail"
+      ],
+      "properties": {
+        "mail": {
+          "type": "string",
+          "enum": ["brian@example.com"]
+        }
+      }
+    }
+    """
     Examples:
       | role        |
       | Space Admin |
@@ -60,9 +108,21 @@ Feature: edit user
       | password    | 1234              |
     When the user "Brian" tries to change the email of user "Carol" to "newemail@example.com" using the Graph API
     Then the HTTP status code should be "401"
-    And the user "Carol" should have information with these key and value pairs:
-      | key  | value             |
-      | mail | carol@example.com |
+    And for user "Carol" the JSON response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "mail"
+      ],
+      "properties": {
+        "mail": {
+          "type": "string",
+          "enum": ["carol@example.com"]
+        }
+      }
+    }
+    """
     Examples:
       | role        |
       | Space Admin |
@@ -72,26 +132,62 @@ Feature: edit user
   Scenario: the admin user can edit another user display name
     When the user "Alice" changes the display name of user "Brian" to "Carol King" using the Graph API
     Then the HTTP status code should be "200"
-    And the user "Brian" should have information with these key and value pairs:
-      | key         | value      |
-      | displayName | Carol King |
+    And for user "Brian" the JSON response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "displayName"
+      ],
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "enum": ["Carol King"]
+        }
+      }
+    }
+    """
 
 
   Scenario: the admin user cannot clear another user display name
     When the user "Alice" tries to change the display name of user "Brian" to "" using the Graph API
     Then the HTTP status code should be "400"
-    And the user "Brian" should have information with these key and value pairs:
-      | key         | value        |
-      | displayName | Brian Murphy |
+    And for user "Brian" the JSON response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "displayName"
+      ],
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "enum": ["Brian Murphy"]
+        }
+      }
+    }
+    """
 
 
   Scenario Outline: a normal user should not be able to change his/her own display name
     Given the administrator has given "Brian" the role "<role>" using the settings api
     When the user "Brian" tries to change the display name of user "Brian" to "Brian Murphy" using the Graph API
     Then the HTTP status code should be "401"
-    And the user "Alice" should have information with these key and value pairs:
-      | key         | value        |
-      | displayName | Alice Hansen |
+    And for user "Alice" the JSON response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "displayName"
+      ],
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "enum": ["Alice Hansen"]
+        }
+      }
+    }
+    """
     Examples:
       | role        |
       | Space Admin |
@@ -107,9 +203,21 @@ Feature: edit user
       | password    | 1234              |
     When the user "Brian" tries to change the display name of user "Carol" to "Alice Hansen" using the Graph API
     Then the HTTP status code should be "401"
-    And the user "Carol" should have information with these key and value pairs:
-      | key         | value      |
-      | displayName | Carol King |
+    And for user "Carol" the JSON response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "displayName"
+      ],
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "enum": ["Carol King"]
+        }
+      }
+    }
+    """
     Examples:
       | role        |
       | Space Admin |

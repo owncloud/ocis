@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
@@ -127,28 +128,19 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then /^the user "([^"]*)" should have information with these key and value pairs:$/
+	 * @Then /^for user "([^"]*)" the JSON response should match$/
 	 *
 	 * @param string $user
-	 * @param TableNode $table
+	 * @param PyStringNode $schemaString
 	 *
 	 * @return void
 	 * @throws Exception
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function theUserShouldHaveInformationWithTheseKeyAndValuePairs(string $user, TableNode $table): void {
-		$rows = $table->getHash();
+	public function theUserShouldHaveInformationWithTheseKeyAndValuePairs(string $user, PyStringNode $schemaString): void {
 		$this->adminHasRetrievedUserUsingTheGraphApi($user);
-		foreach ($rows as $row) {
-			$key = $row['key'];
-			$expectedValue = $row['value'];
-			$responseValue = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())[$key];
-			Assert::assertEquals(
-				$expectedValue,
-				$responseValue
-			);
-		}
+		$this->featureContext->theDataOfTheResponseShouldMatch($schemaString);
 	}
 
 	/**
@@ -1097,7 +1089,6 @@ class GraphContext implements Context {
 	public function theLastResponseShouldBeUnauthorizedReponse(): void {
 		$response = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
 		$errorText = $response['error']['message'];
-
 		Assert::assertEquals(
 			'Unauthorized',
 			$errorText,
@@ -1376,6 +1367,34 @@ class GraphContext implements Context {
 			$credentials['password'],
 		);
 		$this->featureContext->setResponse($response);
+	}
+
+	/**
+	 * @Then /^the JSON data of the response should contain display name "([^"]*)" and match$/
+	 * @Then /^the JSON data of the response should contain group name "([^"]*)" and match$/
+	 *
+	 * @param string $displayName
+	 * @param PyStringNode $schemaString
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theJsonDataResponseShouldContainDisplayNameAndMatch(
+		string $displayName,
+		PyStringNode $schemaString
+	): void {
+		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->value)) {
+			$response = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
+		} else {
+			$response = $this->featureContext->getJsonDecodedResponseBodyContent();
+		}
+		foreach ($response as $value) {
+			if (isset($value->displayName) && $value->displayName === $displayName) {
+				$response = $value;
+				break;
+			}
+		}
+		$this->featureContext->theDataOfTheResponseShouldMatch($schemaString, (object) $response);
 	}
 
 	/**

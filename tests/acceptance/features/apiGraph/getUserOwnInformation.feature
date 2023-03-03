@@ -11,9 +11,31 @@ Feature: get user's own information
   Scenario: user gets his/her own information with no group involvement
     When the user "Alice" retrieves her information using the Graph API
     Then the HTTP status code should be "200"
-    And the user retrieve API response should contain the following information:
-      | displayName  | id        | mail              | onPremisesSamAccountName |
-      | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    |
+    And the JSON data of the response should contain display name "Alice Hansen" and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "id",
+        "mail",
+        "onPremisesSamAccountName"
+      ],
+      "properties": {
+        "id" : {
+          "type": "string",
+          "pattern": "^%uuid_v4%$"
+        },
+        "mail": {
+          "type": "string",
+          "enum": ["alice@example.org"]
+        },
+        "onPremisesSamAccountName": {
+          "type": "string",
+          "enum": ["Alice"]
+        }
+      }
+    }
+    """
 
 
   Scenario: user gets his/her own information with group involvement
@@ -23,6 +45,57 @@ Feature: get user's own information
     And user "Alice" has been added to group "coffee-lover"
     When the user "Alice" retrieves her information using the Graph API
     Then the HTTP status code should be "200"
-    And the user retrieve API response should contain the following information:
-      | displayName  | id        | mail              | onPremisesSamAccountName | memberOf                |
-      | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    | tea-lover, coffee-lover |
+    And the JSON data of the response should contain display name "Alice Hansen" and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "id",
+        "mail",
+        "onPremisesSamAccountName"
+      ],
+      "properties": {
+        "id" : {
+          "type": "string",
+          "pattern": "^%uuid_v4%$"
+        },
+        "mail": {
+          "type": "string",
+          "enum": ["alice@example.org"]
+        },
+        "onPremisesSamAccountName": {
+          "type": "string",
+          "enum": ["Alice"]
+        },
+        "memberOf": {
+          "type": "array",
+          "items": [
+            {
+              "type": "object",
+              "required": [
+                "displayName"
+              ],
+              "properties": {
+                "displayName": {
+                  "type": "string",
+                  "enum": ["tea-lover"]
+                }
+              }
+            },
+            {
+              "type": "object",
+              "required": [
+                "displayName"
+              ],
+              "properties": {
+                "displayName": {
+                  "type": "string",
+                  "enum": ["coffee-lover"]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+    """

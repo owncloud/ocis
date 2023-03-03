@@ -85,7 +85,6 @@ Feature: Change data of space
     When user "<user>" changes the quota of the "Project Jupiter" space to "100"
     Then the HTTP status code should be "<code>"
     And for user "<user>" the JSON response should contain space called "Project Jupiter" and match
-
     """
      {
       "type": "object",
