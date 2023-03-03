@@ -22,10 +22,42 @@ Feature: Disabling and deleting space
   Scenario Outline: A space admin user can disable a Space via the Graph API
     When user "Alice" disables a space "Project Moon"
     Then the HTTP status code should be "204"
-    And the user "Alice" should have a space called "Project Moon" with these key and value pairs:
-      | key                    | value        |
-      | name                   | Project Moon |
-      | root@@@deleted@@@state | trashed      |
+    And for user "Alice" the JSON response should contain space called "Project Moon" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name",
+        "root"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Project Moon"]
+        },
+        "root": {
+          "type": "object",
+          "required": [
+            "deleted"
+          ],
+          "properties": {
+            "deleted": {
+              "type": "object",
+              "required": [
+                "state"
+              ],
+              "properties": {
+                "state": {
+                  "type": "string",
+                  "enum": ["trashed"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
     And the user "<user>" should not have a space called "Project Moon"
     Examples:
       | user  |
@@ -36,9 +68,21 @@ Feature: Disabling and deleting space
   Scenario Outline: An user without space admin role cannot disable a Space via the Graph API
     When user "<user>" disables a space "Project Moon"
     Then the HTTP status code should be "403"
-    And the user "<user>" should have a space called "Project Moon" with these key and value pairs:
-      | key  | value        |
-      | name | Project Moon |
+    And for user "<user>" the JSON response should contain space called "Project Moon" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Project Moon"]
+        }
+      }
+    }
+    """
     Examples:
       | user  |
       | Brian |
@@ -65,6 +109,18 @@ Feature: Disabling and deleting space
   Scenario: An space manager cannot delete a space via the webDav API without first disabling it
     When user "Alice" deletes a space "Project Moon"
     Then the HTTP status code should be "400"
-    And the user "Alice" should have a space called "Project Moon" with these key and value pairs:
-      | key  | value        |
-      | name | Project Moon |
+    And for user "Alice" the JSON response should contain space called "Project Moon" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Project Moon"]
+        }
+      }
+    }
+    """

@@ -1643,15 +1643,16 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @param PyStringNode $schemaString
+	 * @param PyStringNode|string $schemaString
 	 *
 	 * @return mixed
 	 */
-	private function getJSONSchema(PyStringNode $schemaString) {
-		$schemaRawString = $schemaString->getRaw();
-		// substitute the inline codes or values
-		$schemaRawString = $this->substituteInLineCodes($schemaRawString);
-		$schema = json_decode($schemaRawString);
+	private function getJSONSchema($schemaString) {
+		if (\gettype($schemaString) !== 'string') {
+			$schemaString = $schemaString->getRaw();
+		}
+		$schemaString = $this->substituteInLineCodes($schemaString);
+		$schema = \json_decode($schemaString);
 		Assert::assertNotNull($schema, 'schema is not valid JSON');
 		return $schema;
 	}
@@ -1673,20 +1674,40 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @Then the JSON data of the response should match
+	 * @Then the ocs JSON data of the response should match
 	 *
-	 * @param PyStringNode $schemaString
+	 * @param PyStringNode|string $schemaString
 	 *
 	 * @return void
 	 *
 	 * @throws Exception
 	 */
-	public function theDataOfTheResponseShouldMatch(
-		PyStringNode $schemaString
+	public function theOCSDataOfTheResponseShouldMatch(
+		$schemaString
 	): void {
 		$jsonResponse = $this->getJsonDecodedResponseBodyContent();
 		JsonAssertions::assertJsonDocumentMatchesSchema(
 			$jsonResponse->ocs->data,
+			$this->getJSONSchema($schemaString)
+		);
+	}
+
+	/**
+	 * @Then the JSON data of the response should match
+	 *
+	 * @param PyStringNode|string $schemaString
+	 * @param object|null $response
+	 *
+	 * @return void
+	 *
+	 * @throws Exception
+	 */
+	public function theDataOfTheResponseShouldMatch($schemaString, ?object $response = null): void {
+		if ($response === null) {
+			$response = $this->getJsonDecodedResponseBodyContent();
+		}
+		JsonAssertions::assertJsonDocumentMatchesSchema(
+			$response,
 			$this->getJSONSchema($schemaString)
 		);
 	}
