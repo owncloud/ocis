@@ -65,10 +65,34 @@ Feature: Remove files, folder
     And for user "<user>" the space "delete objects" <shouldOrNotBeInSpace> contain these entries:
       | text.txt |
     And as "<user>" file "text.txt" <shouldOrNotBeInTrash> exist in the trashbin of the space "delete objects"
-    And the user "<user>" should have a space called "delete objects" with these key and value pairs:
-      | key          | value          |
-      | name         | delete objects |
-      | quota@@@used | <quotaValue>   |
+    And for user "<user>" the JSON response should contain space called "delete objects" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name",
+        "quota"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["delete objects"]
+        },
+        "quota": {
+          "type": "object",
+          "required": [
+            "used"
+          ],
+          "properties": {
+            "used": {
+              "type": "number",
+              "enum": [<quotaValue>]
+            }
+          }
+        }
+      }
+    }
+    """
     Examples:
       | user  | role    | code | shouldOrNotBeInSpace | shouldOrNotBeInTrash | quotaValue |
       | Alice | manager | 204  | should not           | should               | 0          |
@@ -80,6 +104,18 @@ Feature: Remove files, folder
   Scenario: An user is unable to delete a Space via the webDav API
     When user "Alice" removes the folder "" from space "delete objects"
     Then the HTTP status code should be "405"
-    And the user "Alice" should have a space called "delete objects" with these key and value pairs:
-      | key  | value          |
-      | name | delete objects |
+    And for user "Alice" the JSON response should contain space called "delete objects" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["delete objects"]
+        }
+      }
+    }
+    """
