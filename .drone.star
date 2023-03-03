@@ -17,7 +17,7 @@ OC_CI_PHP = "owncloudci/php:%s"
 OC_CI_WAIT_FOR = "owncloudci/wait-for:latest"
 OC_CS3_API_VALIDATOR = "owncloud/cs3api-validator:0.2.0"
 OC_LITMUS = "owncloudci/litmus:latest"
-OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.8.3"
+OC_OC_TEST_MIDDLEWARE = "owncloud/owncloud-test-middleware:1.8.5"
 OC_UBUNTU = "owncloud/ubuntu:20.04"
 PLUGINS_CODACY = "plugins/codacy:1"
 PLUGINS_DOCKER = "plugins/docker:latest"
@@ -152,7 +152,7 @@ config = {
         "os": ["linux", "darwin"],
     },
     "dockerReleases": {
-        "architectures": ["arm", "arm64", "amd64"],
+        "architectures": ["arm64", "amd64"],
     },
     "litmus": True,
     "codestyle": True,
@@ -1144,7 +1144,8 @@ def e2eTests(ctx):
         ocisServer("ocis", 4, []) + \
         e2e_test_ocis + \
         uploadTracingResult(ctx) + \
-        publishTracingResult(ctx, "e2e test")
+        buildTracingComment() + \
+        e2eGithubComment()
 
     if ("skip-e2e" in ctx.build.title.lower()):
         return []
@@ -1177,7 +1178,7 @@ def uploadTracingResult(ctx):
             "path_style": True,
             "source": "webTestRunner/reports/e2e/playwright/tracing/**/*",
             "strip_prefix": "webTestRunner/reports/e2e/playwright/tracing",
-            "target": "${DRONE_BUILD_NUMBER}/tracing",
+            "target": "/${DRONE_REPO}/${DRONE_BUILD_NUMBER}/tracing",
         },
         "environment": {
             "AWS_ACCESS_KEY_ID": {
@@ -1198,19 +1199,18 @@ def uploadTracingResult(ctx):
         },
     }]
 
-def publishTracingResult(ctx, suite):
+def buildTracingComment():
     return [{
-        "name": "publish-tracing-result",
+        "name": "build-tracing-comment",
         "image": OC_UBUNTU,
         "commands": [
             "cd %s/reports/e2e/playwright/tracing/" % dirs["web"],
             'echo "<details><summary>:boom: To see the trace, please open the link in the console ...</summary>\\n\\n<p>\\n\\n" >>  comments.file',
-            'for f in *.zip; do echo "#### npx playwright show-trace $CACHE_ENDPOINT/$CACHE_BUCKET/${DRONE_BUILD_NUMBER}/tracing/$f \n" >>  comments.file; done',
+            'for f in *.zip; do echo "#### npx playwright show-trace $CACHE_ENDPOINT/$CACHE_BUCKET/${DRONE_REPO}/${DRONE_BUILD_NUMBER}/tracing/$f \n" >>  comments.file; done',
             'echo "\n</p></details>" >>  comments.file',
             "more  comments.file",
         ],
         "environment": {
-            "TEST_CONTEXT": suite,
             "CACHE_ENDPOINT": {
                 "from_secret": "cache_public_s3_server",
             },
@@ -1225,6 +1225,34 @@ def publishTracingResult(ctx, suite):
             "event": [
                 "pull_request",
                 "cron",
+            ],
+        },
+    }]
+
+def e2eGithubComment():
+    prefix = "E2E tests failed: ${DRONE_BUILD_LINK}/${DRONE_JOB_NUMBER}${DRONE_STAGE_NUMBER}/1"
+    return [{
+        "name": "github-comment",
+        "image": THEGEEKLAB_DRONE_GITHUB_COMMENT,
+        "pull": "if-not-exists",
+        "settings": {
+            "message": "%s/reports/e2e/playwright/tracing/comments.file" % dirs["web"],
+            "key": "pr-${DRONE_PULL_REQUEST}",
+            "update": "true",
+            "api_key": {
+                "from_secret": "github_token",
+            },
+        },
+        "commands": [
+            "cd %s/reports/e2e/playwright/tracing/" % dirs["web"],
+            "if [ -s comments.file ]; then echo '%s' | cat - comments.file > temp && mv temp comments.file && /bin/drone-github-comment; fi" % prefix,
+        ],
+        "when": {
+            "status": [
+                "failure",
+            ],
+            "event": [
+                "pull_request",
             ],
         },
     }]

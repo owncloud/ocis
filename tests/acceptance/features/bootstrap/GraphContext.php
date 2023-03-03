@@ -1727,20 +1727,7 @@ class GraphContext implements Context {
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $user;
 
 		if (empty($this->appEntity)) {
-			$applicationEntity = (
-				$this->featureContext->getJsonDecodedResponse(
-					GraphHelper::getApplications(
-						$this->featureContext->getBaseUrl(),
-						$this->featureContext->getStepLineRef(),
-						$this->featureContext->getAdminUsername(),
-						$this->featureContext->getAdminPassword(),
-					)
-				)
-			)['value'][0];
-			$this->appEntity["id"] = $applicationEntity["id"];
-			foreach ($applicationEntity["appRoles"] as $value) {
-				$this->appEntity["appRoles"][$value['displayName']] = $value['id'];
-			}
+			$this->setApplicationEntity();
 		}
 
 		$response = GraphHelper::assignRole(
@@ -1783,15 +1770,42 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * set application Entity in global variable
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function setApplicationEntity(): void {
+		$applicationEntity = (
+			$this->featureContext->getJsonDecodedResponse(
+				GraphHelper::getApplications(
+					$this->featureContext->getBaseUrl(),
+					$this->featureContext->getStepLineRef(),
+					$this->featureContext->getAdminUsername(),
+					$this->featureContext->getAdminPassword(),
+				)
+			)
+		)['value'][0];
+		$this->appEntity["id"] = $applicationEntity["id"];
+		foreach ($applicationEntity["appRoles"] as $value) {
+			$this->appEntity["appRoles"][$value['displayName']] = $value['id'];
+		}
+	}
+
+	/**
 	 * @Then /^the Graph API response should have the role "([^"]*)"$/
 	 *
 	 * @param string $role
 	 *
 	 * @return void
 	 * @throws Exception
+	 * @throws GuzzleException
 	 */
 	public function theGraphApiResponseShouldHaveTheRole(string $role): void {
 		$response = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'][0];
+		if (empty($this->appEntity)) {
+			$this->setApplicationEntity();
+		}
 		Assert::assertEquals(
 			$this->appEntity["appRoles"][$role],
 			$response['appRoleId'],
