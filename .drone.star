@@ -152,7 +152,7 @@ config = {
         "os": ["linux", "darwin"],
     },
     "dockerReleases": {
-        "architectures": ["arm", "arm64", "amd64"],
+        "architectures": ["arm64", "amd64"],
     },
     "litmus": True,
     "codestyle": True,
