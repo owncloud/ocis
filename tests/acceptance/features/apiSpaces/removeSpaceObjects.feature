@@ -113,3 +113,18 @@ Feature: Remove files, folder
       }
     }
     """
+    And for user "Alice" the JSON response should contain space called "delete objects" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["delete objects"]
+        }
+      }
+    }
+    """
