@@ -419,7 +419,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^the user "([^"]*)" has deleted a user "([^"]*)" using the Graph API$/
+	 * @Given /^the user "([^"]*)" has deleted a user "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $byUser
 	 * @param string $user
