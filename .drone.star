@@ -43,6 +43,8 @@ dirs = {
     "zip": "/drone/src/zip",
     "webZip": "/drone/src/zip/web.tar.gz",
     "webPnpmZip": "/drone/src/zip/pnpm-store.tar.gz",
+    "gobinTar": "go-bin.tar.gz",
+    "gobinTarPath": "/drone/src/go-bin.tar.gz",
     "ocisConfig": "tests/config/drone/ocis-config.json",
     "ocis": "/srv/app/tmp/ocis",
     "ocisRevaDataRoot": "/srv/app/tmp/ocis/owncloud/data",
@@ -144,7 +146,7 @@ config = {
         "os": ["linux", "darwin"],
     },
     "dockerReleases": {
-        "architectures": ["arm", "arm64", "amd64"],
+        "architectures": ["arm64", "amd64"],
     },
     "litmus": True,
     "codestyle": True,
@@ -396,7 +398,7 @@ def checkGoBinCache():
             },
         },
         "commands": [
-            "bash -x %s/tests/config/drone/check_go_bin_cache.sh %s" % (dirs["base"], dirs["base"]),
+            "bash -x %s/tests/config/drone/check_go_bin_cache.sh %s %s" % (dirs["base"], dirs["base"], dirs["gobinTar"]),
         ],
     }]
 
@@ -411,6 +413,14 @@ def cacheGoBin():
             "volumes": [stepVolumeGo],
         },
         {
+            "name": "archive-go-bin",
+            "image": OC_UBUNTU,
+            "commands": [
+                "tar -czvf %s /go/bin" % dirs["gobinTarPath"],
+            ],
+            "volumes": [stepVolumeGo],
+        },
+        {
             "name": "cache-go-bin",
             "image": MINIO_MC,
             "environment": MINIO_MC_ENV,
@@ -420,7 +430,7 @@ def cacheGoBin():
                 "BINGO_HASH=$(cat %s/.bingo_hash)" % dirs["base"],
                 # cache using the minio client to the public bucket (long term bucket)
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc cp -r /go/bin s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH",
+                "mc cp -r %s s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH" % (dirs["gobinTarPath"]),
             ],
             "volumes": [stepVolumeGo],
         },
@@ -435,8 +445,15 @@ def restoreGoBinCache():
             "commands": [
                 "BINGO_HASH=$(cat %s/.bingo/* | sha256sum | cut -d ' ' -f 1)" % dirs["base"],
                 "mc alias set s3 $MC_HOST $AWS_ACCESS_KEY_ID $AWS_SECRET_ACCESS_KEY",
-                "mc cp -r -a s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH/bin /go",
-                "chmod +x /go/bin/*",
+                "mc cp -r -a s3/$CACHE_BUCKET/ocis/go-bin/$BINGO_HASH/%s %s" % (dirs["gobinTar"], dirs["base"]),
+            ],
+            "volumes": [stepVolumeGo],
+        },
+        {
+            "name": "extract-go-bin-cache",
+            "image": OC_UBUNTU,
+            "commands": [
+                "tar -xvmf %s -C /" % dirs["gobinTarPath"],
             ],
             "volumes": [stepVolumeGo],
         },
