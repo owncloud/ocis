@@ -7,6 +7,7 @@ import (
 	"time"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -66,11 +67,11 @@ func (ul *UserlogService) ConvertEvent(event *ehmsg.Event) (OC10Notification, er
 
 	// share related
 	case events.ShareCreated:
-		return ul.shareMessage(event.Id, ShareCreated, ev.Executant, ev.ItemID, utils.TSToTime(ev.CTime))
+		return ul.shareMessage(event.Id, ShareCreated, ev.Executant, ev.ItemID, ev.ShareID, utils.TSToTime(ev.CTime))
 	case events.ShareExpired:
-		return ul.shareMessage(event.Id, ShareExpired, ev.ShareOwner, ev.ItemID, ev.ExpiredAt)
+		return ul.shareMessage(event.Id, ShareExpired, ev.ShareOwner, ev.ItemID, ev.ShareID, ev.ExpiredAt)
 	case events.ShareRemoved:
-		return ul.shareMessage(event.Id, ShareRemoved, ev.Executant, ev.ItemID, ev.Timestamp)
+		return ul.shareMessage(event.Id, ShareRemoved, ev.Executant, ev.ItemID, ev.ShareID, ev.Timestamp)
 	}
 }
 
@@ -88,7 +89,7 @@ func (ul *UserlogService) spaceDeletedMessage(eventid string, executant *user.Us
 		return OC10Notification{}, err
 	}
 
-	details := ul.getDetails(user, nil, nil)
+	details := ul.getDetails(user, nil, nil, nil)
 	details["space"] = map[string]string{
 		"id":   spaceid,
 		"name": spacename,
@@ -139,11 +140,11 @@ func (ul *UserlogService) spaceMessage(eventid string, eventname string, executa
 		SubjectRaw:     subjraw,
 		Message:        msg,
 		MessageRaw:     msgraw,
-		MessageDetails: ul.getDetails(user, space, nil),
+		MessageDetails: ul.getDetails(user, space, nil, nil),
 	}, nil
 }
 
-func (ul *UserlogService) shareMessage(eventid string, eventname string, executant *user.UserId, resourceid *storageprovider.ResourceId, ts time.Time) (OC10Notification, error) {
+func (ul *UserlogService) shareMessage(eventid string, eventname string, executant *user.UserId, resourceid *storageprovider.ResourceId, shareid *collaboration.ShareId, ts time.Time) (OC10Notification, error) {
 	ctx, user, err := utils.Impersonate(executant, ul.gwClient, ul.cfg.MachineAuthAPIKey)
 	if err != nil {
 		return OC10Notification{}, err
@@ -173,7 +174,7 @@ func (ul *UserlogService) shareMessage(eventid string, eventname string, executa
 		SubjectRaw:     subjraw,
 		Message:        msg,
 		MessageRaw:     msgraw,
-		MessageDetails: ul.getDetails(user, nil, info),
+		MessageDetails: ul.getDetails(user, nil, info, shareid),
 	}, nil
 }
 
@@ -203,7 +204,7 @@ func (ul *UserlogService) composeMessage(eventname string, vars map[string]strin
 
 }
 
-func (ul *UserlogService) getDetails(user *user.User, space *storageprovider.StorageSpace, item *storageprovider.ResourceInfo) map[string]interface{} {
+func (ul *UserlogService) getDetails(user *user.User, space *storageprovider.StorageSpace, item *storageprovider.ResourceInfo, shareid *collaboration.ShareId) map[string]interface{} {
 	details := make(map[string]interface{})
 
 	if user != nil {
@@ -225,6 +226,12 @@ func (ul *UserlogService) getDetails(user *user.User, space *storageprovider.Sto
 		details["resource"] = map[string]string{
 			"id":   storagespace.FormatResourceID(*item.GetId()),
 			"name": item.GetName(),
+		}
+	}
+
+	if shareid != nil {
+		details["share"] = map[string]string{
+			"id": shareid.GetOpaqueId(),
 		}
 	}
 
