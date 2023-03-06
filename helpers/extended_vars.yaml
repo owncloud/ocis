@@ -33,7 +33,7 @@ variables:
   description: ""
   do_ignore: true
 - rawname: MICRO_LOG_LEVEL
-  path: ocis-pkg/log/log.go:31
+  path: ocis-pkg/log/log.go:35
   foundincode: true
   name: MICRO_LOG_LEVEL
   type: ""
@@ -41,7 +41,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: MICRO_LOG_LEVEL
-  path: ocis-pkg/log/log.go:35
+  path: ocis-pkg/log/log.go:31
   foundincode: true
   name: MICRO_LOG_LEVEL
   type: ""
