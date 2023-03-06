@@ -6,10 +6,10 @@ Purpose and description to be added
 
 The `storage-system` service caches file metadata via the configured store in `STORAGE_SYSTEM_CACHE_STORE`. Possible stores are:
   -   `memory`: Basic in-memory store and the default.
-  -   `redis`: Stores data in a configured Redis cluster.
-  -   `redis-sentinel`: Stores data in a configured Redis Sentinel cluster.
-  -   `etcd`: Stores data in a configured etcd cluster.
-  -   `nats-js`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
+  -   `redis`: Stores metadata in a configured Redis cluster.
+  -   `redis-sentinel`: Stores metadata in a configured Redis Sentinel cluster.
+  -   `etcd`: Stores metadata in a configured etcd cluster.
+  -   `nats-js`: Stores metadata using the key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
   -   `noop`: Stores nothing. Useful for testing. Not recommended in productive enviroments.
 
 1.  Note that in-memory stores are by nature not reboot persistent.
