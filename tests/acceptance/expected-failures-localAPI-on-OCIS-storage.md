@@ -23,8 +23,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/createGroupCaseSensitive.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroupCaseSensitive.feature#L21)
 - [apiGraph/createGroupCaseSensitive.feature:22](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroupCaseSensitive.feature#L22)
 - [apiGraph/createGroup.feature:26](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroup.feature#L26)
-- [apiGraph/createUser.feature:29](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createUser.feature#L29)
-- [apiGraph/createUser.feature:61](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createUser.feature#L61)
 
 ### [PROPFIND on accepted shares with identical names containing brackets exit with 404](https://github.com/owncloud/ocis/issues/4421)
 - [apiSpacesShares/changingFilesShare.feature:12](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/changingFilesShare.feature#L12)
@@ -109,9 +107,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Space admin should not not be able to change the user quota](https://github.com/owncloud/ocis/issues/5475)
 - [apiSpaces/spaceManagement.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/spaceManagement.feature#L69)
-
-#### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
-- [apiGraph/getGroup.feature:100](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L100)
 
 #### Change editUser test where we set empty value
 - [apiGraph/editUser.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L33)
