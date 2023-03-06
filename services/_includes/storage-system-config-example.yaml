@@ -36,6 +36,10 @@ reva:
 system_user_id: ""
 system_user_api_key: ""
 skip_user_groups_in_token: false
+cache:
+  store: memory
+  nodes: []
+  database: system
 driver: ocis
 drivers:
   ocis:

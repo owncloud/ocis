@@ -28,6 +28,9 @@
 | OCIS_SYSTEM_USER_ID | string |  | ID of the oCIS storage-system system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|
 | OCIS_SYSTEM_USER_API_KEY | string |  | API key for the STORAGE-SYSTEM system user.|
 | STORAGE_SYSTEM_SKIP_USER_GROUPS_IN_TOKEN | bool | false | Disables the loading of user's group memberships from the reva access token.|
+| OCIS_CACHE_STORE_TYPE<br/>STORAGE_SYSTEM_CACHE_STORE | string | memory | Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', 'etcd' and 'noop'. See the text description for details.|
+| OCIS_CACHE_STORE_ADDRESS<br/>STORAGE_SYSTEM_CACHE_NODES | []string | [] | A comma separated list of addresses to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how addresses are used is dependent on the library of the configured store.|
+| STORAGE_SYSTEM_CACHE_DATABASE | string | system | (optional) The database name the configured store should use. This has no effect when a 'memory', 'redis' or 'redis-sentinel' store is configured.|
 | STORAGE_SYSTEM_DRIVER | string | ocis | The driver which should be used by the service.|
 | OCIS_DECOMPOSEDFS_METADATA_BACKEND<br/>STORAGE_SYSTEM_OCIS_METADATA_BACKEND | string | xattrs | The backend to use for storing metadata. Supported values are 'xattrs' and 'ini'. The setting 'xattrs' uses extended attributes to store file metadata while 'ini' uses a dedicated file to store file metadata. Defaults to 'xattrs'.|
 | STORAGE_SYSTEM_OCIS_ROOT | string | ~/.ocis/storage/metadata | Path for the directory where the STORAGE-SYSTEM service stores it's persistent data. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|

@@ -71,9 +71,9 @@
 | STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT | string |  | The root CA certificate used to validate the server's TLS certificate. If provided STORAGE_USERS_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>STORAGE_USERS_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
 | STORAGE_USERS_EVENTS_NUM_CONSUMERS | int | 0 | The amount of concurrent event consumers to start. Event consumers are used for post-processing files. Multiple consumers increase parallelisation, but will also increase CPU and memory demands. The setting has no effect when the STORAGE_USERS_OCIS_ASYNC_UPLOADS is set to false. The default and minimum value is 1.|
-| OCIS_CACHE_STORE_TYPE<br/>STORAGE_USERS_CACHE_STORE_TYPE<br/>STORAGE_USERS_CACHE_STORE | string | memory | Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".|
-| OCIS_CACHE_STORE_ADDRESS<br/>STORAGE_USERS_CACHE_STORE_ADDRESS<br/>STORAGE_USERS_CACHE_NODES | []string | [] | Node addresses to use for the cache store.|
-| STORAGE_USERS_CACHE_DATABASE | string | users | Database name of the cache.|
+| OCIS_CACHE_STORE_TYPE<br/>STORAGE_USERS_CACHE_STORE_TYPE<br/>STORAGE_USERS_CACHE_STORE | string | memory | Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', and 'etcd'. See the text description for details.|
+| OCIS_CACHE_STORE_ADDRESS<br/>STORAGE_USERS_CACHE_STORE_ADDRESS<br/>STORAGE_USERS_CACHE_NODES | []string | [] | A comma separated list of addresses to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how addresses are used is dependent on the library of the configured store.|
+| STORAGE_USERS_CACHE_DATABASE | string | users | (optional) The database name the configured store should use. This has no effect when a 'memory', 'redis' or 'redis-sentinel' store is configured.|
 | STORAGE_USERS_MOUNT_ID | string |  | Mount ID of this storage.|
 | STORAGE_USERS_EXPOSE_DATA_SERVER | bool | false | Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users.|
 | STORAGE_USERS_READ_ONLY | bool | false | Set this storage to be read-only.|

@@ -269,6 +269,35 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Disables the loading of user's group memberships from the reva access token.
 
+a|`OCIS_CACHE_STORE_TYPE` +
+`STORAGE_SYSTEM_CACHE_STORE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++memory ++
+a| [subs=-attributes]
+Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', 'etcd' and 'noop'. See the text description for details.
+
+a|`OCIS_CACHE_STORE_ADDRESS` +
+`STORAGE_SYSTEM_CACHE_NODES` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+A comma separated list of addresses to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how addresses are used is dependent on the library of the configured store.
+
+a|`STORAGE_SYSTEM_CACHE_DATABASE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++system ++
+a| [subs=-attributes]
+(optional) The database name the configured store should use. This has no effect when a 'memory', 'redis' or 'redis-sentinel' store is configured.
+
 a|`STORAGE_SYSTEM_DRIVER` +
 
 a| [subs=-attributes]

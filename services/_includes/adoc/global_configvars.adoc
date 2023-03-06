@@ -471,7 +471,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the user who collects all necessary information for deletion.
+ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
 
 a| `OCIS_CACHE_STORE_ADDRESS`
 
@@ -479,6 +479,7 @@ a| [subs=attributes+]
 * xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
@@ -511,6 +512,7 @@ a| [subs=attributes+]
 * xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
@@ -1144,7 +1146,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+The machine auth API key used to validate internal requests necessary to access resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1165,7 +1167,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
 a| `OCIS_SPACES_MAX_QUOTA`
 
@@ -1180,7 +1182,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
+Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
 
 a| `OCIS_SYSTEM_USER_API_KEY`
 
@@ -1427,7 +1429,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The public facing URL of the oCIS frontend.
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
 a| `REVA_GATEWAY`
 
