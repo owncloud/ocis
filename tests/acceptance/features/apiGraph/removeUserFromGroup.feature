@@ -166,3 +166,20 @@ Feature: remove a user from a group
     Then the HTTP status code should be "401"
     And the last response should be an unauthorized response
     And user "Brian" should belong to group "grp1"
+
+
+  Scenario: admin removes a disabled user from a group
+    Given these groups have been created:
+      | groupname       | comment              |
+      | brand-new-group | nothing special here |
+    And the following users have been added to the following groups
+      | username | groupname       |
+      | Alice    | brand-new-group |
+    And the user "Admin" has disabled user "Alice" using the Graph API
+    When the administrator removes the following users from the following groups using the Graph API
+      | username | groupname       |
+      | Alice    | brand-new-group |
+    Then the HTTP status code of responses on all endpoints should be "204"
+    And the following users should not belong to the following groups
+      | username | groupname       |
+      | Alice    | brand-new-group |
