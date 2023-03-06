@@ -8,7 +8,7 @@ require (
 	github.com/MicahParks/keyfunc v1.5.1
 	github.com/armon/go-radix v1.0.0
 	github.com/bbalet/stopwords v1.0.0
-	github.com/blevesearch/bleve/v2 v2.3.5
+	github.com/blevesearch/bleve/v2 v2.3.6
 	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/cs3org/go-cs3apis v0.0.0-20221012090518-ef2996678965
 	github.com/cs3org/reva/v2 v2.12.1-0.20230306101206-3de7ec137baf
@@ -117,21 +117,21 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bits-and-blooms/bitset v1.2.1 // indirect
-	github.com/blevesearch/bleve_index_api v1.0.4 // indirect
-	github.com/blevesearch/geo v0.1.15 // indirect
+	github.com/blevesearch/bleve_index_api v1.0.5 // indirect
+	github.com/blevesearch/geo v0.1.16 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.3 // indirect
 	github.com/blevesearch/gtreap v0.1.1 // indirect
 	github.com/blevesearch/mmap-go v1.0.4 // indirect
-	github.com/blevesearch/scorch_segment_api/v2 v2.1.3 // indirect
+	github.com/blevesearch/scorch_segment_api/v2 v2.1.4 // indirect
 	github.com/blevesearch/segment v0.9.0 // indirect
 	github.com/blevesearch/snowballstem v0.9.0 // indirect
 	github.com/blevesearch/upsidedown_store_api v1.0.1 // indirect
 	github.com/blevesearch/vellum v1.0.9 // indirect
-	github.com/blevesearch/zapx/v11 v11.3.6 // indirect
-	github.com/blevesearch/zapx/v12 v12.3.6 // indirect
-	github.com/blevesearch/zapx/v13 v13.3.6 // indirect
-	github.com/blevesearch/zapx/v14 v14.3.6 // indirect
-	github.com/blevesearch/zapx/v15 v15.3.6 // indirect
+	github.com/blevesearch/zapx/v11 v11.3.7 // indirect
+	github.com/blevesearch/zapx/v12 v12.3.7 // indirect
+	github.com/blevesearch/zapx/v13 v13.3.7 // indirect
+	github.com/blevesearch/zapx/v14 v14.3.7 // indirect
+	github.com/blevesearch/zapx/v15 v15.3.8 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/bmizerany/pat v0.0.0-20210406213842-e4b6760bdd6f // indirect
 	github.com/bombsimon/logrusr/v3 v3.1.0 // indirect
