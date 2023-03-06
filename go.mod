@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/CiscoM31/godata v1.0.7
-	github.com/KimMachineGun/automemlimit v0.2.2
+	github.com/KimMachineGun/automemlimit v0.2.4
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.5.1
 	github.com/armon/go-radix v1.0.0
