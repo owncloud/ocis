@@ -4600,7 +4600,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return string
 	 * @throws Exception|GuzzleException
 	 */
-	public function getGroupIdByGroupName(string $groupName): string {
+	public function getGroupIdByGroupName(string $groupName):string {
 		$response = GraphHelper::getGroup(
 			$this->getBaseUrl(),
 			$this->getStepLineRef(),

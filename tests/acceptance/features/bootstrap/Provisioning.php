@@ -265,9 +265,7 @@ trait Provisioning {
 				);
 			}
 		} else {
-			throw new Exception(
-				__METHOD__ . ": User '$user' does not exist in the created list."
-			);
+			return false;
 		}
 	}
 
@@ -296,9 +294,7 @@ trait Provisioning {
 				);
 			}
 		} else {
-			throw new Exception(
-				__METHOD__ . ": Group '$group' does not exist in the created list."
-			);
+			return false;
 		}
 	}
 
