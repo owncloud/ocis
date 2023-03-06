@@ -136,7 +136,7 @@ Feature: add users to group
 
 
   Scenario: admin tries to add user to a non-existing group
-    When the administrator tries to add user "Alice" to group "nonexistentgroup" using the Graph API
+    When the administrator tries to add user "Alice" to a non-existing group using the Graph API
     Then the HTTP status code should be "404"
 
 
@@ -147,7 +147,7 @@ Feature: add users to group
 
 
   Scenario: admin tries to add user to a group without sending the group
-    When the administrator tries to add user "Alice" to group "" using the Graph API
+    When the administrator tries to add user "Alice" to a non-existing group using the Graph API
     Then the HTTP status code should be "404"
 
 
