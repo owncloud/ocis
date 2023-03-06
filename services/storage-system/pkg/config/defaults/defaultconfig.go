@@ -47,6 +47,10 @@ func DefaultConfig() *config.Config {
 				LockCycleDurationFactor: 30,
 			},
 		},
+		Cache: config.Cache{
+			Store:    "memory",
+			Database: "system",
+		},
 	}
 }
 

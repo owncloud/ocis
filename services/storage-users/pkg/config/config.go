@@ -169,9 +169,9 @@ type Events struct {
 
 // Cache holds cache config
 type Cache struct {
-	Store    string   `yaml:"store" env:"OCIS_CACHE_STORE_TYPE;STORAGE_USERS_CACHE_STORE_TYPE;STORAGE_USERS_CACHE_STORE" desc:"Store implementation for the cache. Valid values are \"memory\" (default), \"redis\", and \"etcd\"."`
-	Nodes    []string `yaml:"nodes" env:"OCIS_CACHE_STORE_ADDRESS;STORAGE_USERS_CACHE_STORE_ADDRESS;STORAGE_USERS_CACHE_NODES" desc:"Node addresses to use for the cache store."`
-	Database string   `yaml:"database" env:"STORAGE_USERS_CACHE_DATABASE" desc:"Database name of the cache."`
+	Store    string   `yaml:"store" env:"OCIS_CACHE_STORE_TYPE;STORAGE_USERS_CACHE_STORE_TYPE;STORAGE_USERS_CACHE_STORE" desc:"Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', and 'etcd'. See the text description for details."`
+	Nodes    []string `yaml:"nodes" env:"OCIS_CACHE_STORE_ADDRESS;STORAGE_USERS_CACHE_STORE_ADDRESS;STORAGE_USERS_CACHE_NODES" desc:"A comma separated list of addresses to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how addresses are used is dependent on the library of the configured store."`
+	Database string   `yaml:"database" env:"STORAGE_USERS_CACHE_DATABASE" desc:"(optional) The database name the configured store should use. This has no effect when a 'memory', 'redis' or 'redis-sentinel' store is configured."`
 }
 
 // S3Driver is the storage driver configuration when using 's3' storage driver

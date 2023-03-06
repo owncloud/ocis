@@ -130,6 +130,11 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 			"cache_nodes":    cfg.Cache.Nodes,
 			"cache_database": cfg.Cache.Database,
 		},
+		"filemetadatacache": map[string]interface{}{
+			"cache_store":    cfg.Cache.Store,
+			"cache_nodes":    cfg.Cache.Nodes,
+			"cache_database": cfg.Cache.Database,
+		},
 		"events": map[string]interface{}{
 			"natsaddress":          cfg.Events.Addr,
 			"natsclusterid":        cfg.Events.ClusterID,
@@ -163,6 +168,11 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 		"lock_cycle_duration_factor":  cfg.Drivers.OCIS.LockCycleDurationFactor,
 		"max_quota":                   cfg.Drivers.OCIS.MaxQuota,
 		"statcache": map[string]interface{}{
+			"cache_store":    cfg.Cache.Store,
+			"cache_nodes":    cfg.Cache.Nodes,
+			"cache_database": cfg.Cache.Database,
+		},
+		"filemetadatacache": map[string]interface{}{
 			"cache_store":    cfg.Cache.Store,
 			"cache_nodes":    cfg.Cache.Nodes,
 			"cache_database": cfg.Cache.Database,
@@ -209,6 +219,11 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 			"cache_nodes":    cfg.Cache.Nodes,
 			"cache_database": cfg.Cache.Database,
 		},
+		"filemetadatacache": map[string]interface{}{
+			"cache_store":    cfg.Cache.Store,
+			"cache_nodes":    cfg.Cache.Nodes,
+			"cache_database": cfg.Cache.Database,
+		},
 		"events": map[string]interface{}{
 			"natsaddress":          cfg.Events.Addr,
 			"natsclusterid":        cfg.Events.ClusterID,
@@ -246,6 +261,11 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 		"max_acquire_lock_cycles":     cfg.Drivers.S3NG.MaxAcquireLockCycles,
 		"lock_cycle_duration_factor":  cfg.Drivers.S3NG.LockCycleDurationFactor,
 		"statcache": map[string]interface{}{
+			"cache_store":    cfg.Cache.Store,
+			"cache_nodes":    cfg.Cache.Nodes,
+			"cache_database": cfg.Cache.Database,
+		},
+		"filemetadatacache": map[string]interface{}{
 			"cache_store":    cfg.Cache.Store,
 			"cache_nodes":    cfg.Cache.Nodes,
 			"cache_database": cfg.Cache.Database,
