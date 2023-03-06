@@ -164,10 +164,6 @@ func (m OIDCAuthenticator) shouldServe(req *http.Request) bool {
 	return strings.HasPrefix(header, _bearerPrefix)
 }
 
-type jwksJSON struct {
-	JWKSURL string `json:"jwks_uri"`
-}
-
 func (m *OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
 	m.jwksLock.Lock()
 	defer m.jwksLock.Unlock()
@@ -192,13 +188,13 @@ func (m *OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
 			return nil
 		}
 
-		var j jwksJSON
-		err = json.Unmarshal(body, &j)
+		var oidcMetadata oidc.ProviderMetadata
+		err = json.Unmarshal(body, &oidcMetadata)
 		if err != nil {
 			m.Logger.Error().Err(err).Msg("failed to decode provider openid-configuration")
 			return nil
 		}
-		m.Logger.Debug().Str("jwks", j.JWKSURL).Msg("discovered jwks endpoint")
+		m.Logger.Debug().Str("jwks", oidcMetadata.JwksURI).Msg("discovered jwks endpoint")
 		options := keyfunc.Options{
 			Client: m.HTTPClient,
 			RefreshErrorHandler: func(err error) {
@@ -209,7 +205,7 @@ func (m *OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
 			RefreshTimeout:    time.Second * time.Duration(m.JWKSOptions.RefreshTimeout),
 			RefreshUnknownKID: m.JWKSOptions.RefreshUnknownKID,
 		}
-		m.JWKS, err = keyfunc.Get(j.JWKSURL, options)
+		m.JWKS, err = keyfunc.Get(oidcMetadata.JwksURI, options)
 		if err != nil {
 			m.JWKS = nil
 			m.Logger.Error().Err(err).Msg("Failed to create JWKS from resource at the given URL.")
