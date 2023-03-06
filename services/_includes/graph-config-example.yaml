@@ -72,6 +72,8 @@ identity:
     user_name_attribute: uid
     user_id_attribute: owncloudUUID
     user_enabled_attribute: ownCloudUserEnabled
+    disable_user_mechanism: attribute
+    ldap_disabled_users_group_dn: cn=DisabledUsersGroup,ou=groups,o=libregraph-idm
     group_base_dn: ou=groups,o=libregraph-idm
     group_search_scope: sub
     group_filter: ""
