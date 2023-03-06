@@ -828,7 +828,9 @@ class GraphContext implements Context {
 	 * @When the administrator tries to add user :user to a non-existing group using the Graph API
 	 *
 	 * @param string $user
+	 *
 	 * @return void
+	 *
 	 * @throws GuzzleException
 	 */
 	public function theAdministratorTriesToAddUserToNonExistingGroupUsingTheGraphAPI(string $user): void {
@@ -836,8 +838,12 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @param string $user
+	 * @param string|null $byUser
+	 *
+	 * @return ResponseInterface
+	 *
 	 * @throws GuzzleException
-	 * @throws Exception
 	 */
 	public function addUserToNonExistingGroup(string $user, ?string $byUser = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
