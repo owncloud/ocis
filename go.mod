@@ -11,7 +11,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.5
 	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/cs3org/go-cs3apis v0.0.0-20221012090518-ef2996678965
-	github.com/cs3org/reva/v2 v2.12.1-0.20230303141425-83ae3a7e5333
+	github.com/cs3org/reva/v2 v2.12.1-0.20230306101206-3de7ec137baf
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
@@ -31,7 +31,7 @@ require (
 	github.com/go-micro/plugins/v4/server/grpc v1.2.0
 	github.com/go-micro/plugins/v4/server/http v1.2.0
 	github.com/go-micro/plugins/v4/store/nats-js v1.1.0
-	github.com/go-micro/plugins/v4/store/redis v1.1.0
+	github.com/go-micro/plugins/v4/store/redis v1.2.0
 	github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.2.0
 	github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.2.0
 	github.com/go-micro/plugins/v4/wrapper/trace/opencensus v1.1.0
@@ -57,7 +57,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/ginkgo/v2 v2.7.0
-	github.com/onsi/gomega v1.24.1
+	github.com/onsi/gomega v1.25.0
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.2-0.20230119095249-5688a1b749dc
 	github.com/pkg/errors v0.9.1
@@ -137,7 +137,7 @@ require (
 	github.com/bombsimon/logrusr/v3 v3.1.0 // indirect
 	github.com/cenkalti/backoff v2.2.1+incompatible // indirect
 	github.com/ceph/go-ceph v0.18.0 // indirect
-	github.com/cespare/xxhash/v2 v2.1.2 // indirect
+	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/cevaris/ordered_map v0.0.0-20190319150403-3adeae072e73 // indirect
 	github.com/cloudflare/circl v1.2.0 // indirect
 	github.com/coreos/go-oidc v2.2.1+incompatible // indirect
