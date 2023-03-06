@@ -2,8 +2,6 @@ package middleware
 
 import (
 	"context"
-	"encoding/json"
-	"io"
 	"net/http"
 	"strings"
 	"sync"
@@ -168,28 +166,7 @@ func (m *OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
 	m.jwksLock.Lock()
 	defer m.jwksLock.Unlock()
 	if m.JWKS == nil {
-		wellKnown := strings.TrimSuffix(m.OIDCIss, "/") + "/.well-known/openid-configuration"
-
-		resp, err := m.HTTPClient.Get(wellKnown)
-		if err != nil {
-			m.Logger.Error().Err(err).Msg("Failed to set request for .well-known/openid-configuration")
-			return nil
-		}
-		defer resp.Body.Close()
-
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			m.Logger.Error().Err(err).Msg("unable to read discovery response body")
-			return nil
-		}
-
-		if resp.StatusCode != http.StatusOK {
-			m.Logger.Error().Str("status", resp.Status).Str("body", string(body)).Msg("error requesting openid-configuration")
-			return nil
-		}
-
-		var oidcMetadata oidc.ProviderMetadata
-		err = json.Unmarshal(body, &oidcMetadata)
+		oidcMetadata, err := oidc.GetIDPMetadata(m.Logger, m.HTTPClient, m.OIDCIss)
 		if err != nil {
 			m.Logger.Error().Err(err).Msg("failed to decode provider openid-configuration")
 			return nil
