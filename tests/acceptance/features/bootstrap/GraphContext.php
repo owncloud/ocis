@@ -1264,13 +1264,12 @@ class GraphContext implements Context {
 	 * @When user :byUser tries to remove user :user from a nonexistent group using the Graph API
 	 *
 	 * @param string $user
-	 * @param string $group
 	 * @param string|null $byUser
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function theUserTriesToRemoveAnotherUserFromNonExistentGroupUsingTheGraphAPI(string $user, string $group, ?string $byUser = null): void {
+	public function theUserTriesToRemoveAnotherUserFromNonExistentGroupUsingTheGraphAPI(string $user, ?string $byUser = null): void {
 		$groupId = WebDavHelper::generateUUIDv4();
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		$this->featureContext->setResponse($this->removeUserFromGroup($groupId, $userId, $byUser));
@@ -1690,7 +1689,11 @@ class GraphContext implements Context {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		foreach ($table->getHash() as $row) {
-			$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
+			try {
+				$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
+			} catch (Exception $e) {
+				$userIds[] = WebDavHelper::generateUUIDv4();
+			}
 		}
 		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
 	}
