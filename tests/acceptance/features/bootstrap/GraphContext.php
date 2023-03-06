@@ -752,17 +752,8 @@ class GraphContext implements Context {
 	 */
 	public function addUserToGroup(string $group, string $user, ?string $byUser = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
-		try {
-			$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
-		} catch (Exception $e) {
-			// $groupId = WebDavHelper::generateUUIDv4();
-		}
-		try {
-			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		} catch (Exception $e) {
-			// $userId = WebDavHelper::generateUUIDv4();
-		}
-
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		return GraphHelper::addUserToGroup(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -825,37 +816,28 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When the administrator tries to add user :user to a non-existing group using the Graph API
+	 * @When the administrator tries to add user :user to a nonexistent group using the Graph API
+	 * @When the user :byUser tries to add user :user to a nonexistent group using the Graph API
 	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 *
-	 * @throws GuzzleException
-	 */
-	public function theAdministratorTriesToAddUserToNonExistingGroupUsingTheGraphAPI(string $user): void {
-		$this->featureContext->setResponse($this->addUserToNonExistingGroup($user));
-	}
-
-	/**
 	 * @param string $user
 	 * @param string|null $byUser
+	 * @return void
 	 *
-	 * @return ResponseInterface
-	 *
-	 * @throws GuzzleException
+	 * @throws GuzzleException | Exception
 	 */
-	public function addUserToNonExistingGroup(string $user, ?string $byUser = null): ResponseInterface {
+	public function theAdministratorTriesToAddUserToNonExistentGroupUsingTheGraphAPI(string $user, ?string $byUser = null): void {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
 		$groupId = WebDavHelper::generateUUIDv4();
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		return GraphHelper::addUserToGroup(
-			$this->featureContext->getBaseUrl(),
-			$this->featureContext->getStepLineRef(),
-			$credentials['username'],
-			$credentials['password'],
-			$userId,
-			$groupId
+		$this->featureContext->setResponse(
+			GraphHelper::addUserToGroup(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials['username'],
+				$credentials['password'],
+				$userId,
+				$groupId
+			)
 		);
 	}
 
@@ -1268,18 +1250,28 @@ class GraphContext implements Context {
 	 * @param string|null $byUser
 	 *
 	 * @return void
+	 * @throws Exception | GuzzleException
 	 */
 	public function theUserTriesToRemoveAnotherUserFromGroupUsingTheGraphAPI(string $user, string $group, ?string $byUser = null): void {
-		try {
-			$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
-		} catch (Exception $e) {
-			$groupId = WebDavHelper::generateUUIDv4();
-		}
-		try {
-			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		} catch (Exception $e) {
-			$userId = WebDavHelper::generateUUIDv4();
-		}
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		$this->featureContext->setResponse($this->removeUserFromGroup($groupId, $userId, $byUser));
+	}
+
+	/**
+	 * @When the administrator tries to remove user :user from a nonexistent group using the Graph API
+	 * @When user :byUser tries to remove user :user from a nonexistent group using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $group
+	 * @param string|null $byUser
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theUserTriesToRemoveAnotherUserFromNonExistentGroupUsingTheGraphAPI(string $user, string $group, ?string $byUser = null): void {
+		$groupId = WebDavHelper::generateUUIDv4();
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		$this->featureContext->setResponse($this->removeUserFromGroup($groupId, $userId, $byUser));
 	}
 
@@ -1552,27 +1544,27 @@ class GraphContext implements Context {
 			$actualKeyValue = GraphHelper::separateAndGetValueForKey($keyName, $actualDriveInformation);
 			switch ($expectedDriveInformation[$keyName]) {
 				case '%user_id%':
-					Assert::assertTrue(GraphHelper::isUUIDv4($actualKeyValue), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValue);
+                Assert::assertTrue(GraphHelper::isUUIDv4($actualKeyValue), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValue);
 					break;
 				case '%space_id%':
-					Assert::assertTrue(GraphHelper::isSpaceId($actualKeyValue), __METHOD__ . ' Expected space_id to have a UUIDv4:UUIDv4 pattern but found: ' . $actualKeyValue);
+                Assert::assertTrue(GraphHelper::isSpaceId($actualKeyValue), __METHOD__ . ' Expected space_id to have a UUIDv4:UUIDv4 pattern but found: ' . $actualKeyValue);
 					break;
 				default:
-					$expectedDriveInformation[$keyName] = $this->featureContext->substituteInLineCodes(
-						$expectedDriveInformation[$keyName],
-						$this->featureContext->getCurrentUser(),
-						[],
-						[
-							[
-								// the actual space_id is substituted from the actual drive information rather than making an API request and substituting
-								"code" => "%space_id%",
-								"function" =>
-									[$this, "getSpaceIdFromActualDriveinformation"],
-								"parameter" => [$actualDriveInformation]
-							],
-						]
-					);
-					Assert::assertEquals($expectedDriveInformation[$keyName], $actualKeyValue);
+                $expectedDriveInformation[$keyName] = $this->featureContext->substituteInLineCodes(
+                $expectedDriveInformation[$keyName],
+                $this->featureContext->getCurrentUser(),
+                [],
+                [
+                [
+                // the actual space_id is substituted from the actual drive information rather than making an API request and substituting
+                "code" => "%space_id%",
+                "function" =>
+                [$this, "getSpaceIdFromActualDriveinformation"],
+                "parameter" => [$actualDriveInformation]
+                ],
+                ]
+                );
+                Assert::assertEquals($expectedDriveInformation[$keyName], $actualKeyValue);
 			}
 		}
 	}
@@ -1644,7 +1636,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^the administrator "([^"]*)" tries to add the following users to a non-existing group at once using the Graph API$/
+	 * @When /^the administrator "([^"]*)" tries to add the following users to a nonexistent group at once using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -1663,7 +1655,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^the administrator "([^"]*)" tries to add the following non-existing users to a group "([^"]*)" at once using the Graph API$/
+	 * @When /^the administrator "([^"]*)" tries to add the following nonexistent users to a group "([^"]*)" at once using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $group
@@ -1697,11 +1689,7 @@ class GraphContext implements Context {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		foreach ($table->getHash() as $row) {
-			try {
-				$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
-			} catch (Exception $e) {
-				$userIds[] = WebDavHelper::generateUUIDv4();
-			}
+			$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
 		}
 		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
 	}

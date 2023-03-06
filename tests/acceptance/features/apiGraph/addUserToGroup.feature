@@ -136,7 +136,7 @@ Feature: add users to group
 
 
   Scenario: admin tries to add user to a non-existing group
-    When the administrator tries to add user "Alice" to a non-existing group using the Graph API
+    When the administrator tries to add user "Alice" to a nonexistent group using the Graph API
     Then the HTTP status code should be "404"
 
 
@@ -147,7 +147,7 @@ Feature: add users to group
 
 
   Scenario: admin tries to add user to a group without sending the group
-    When the administrator tries to add user "Alice" to a non-existing group using the Graph API
+    When the administrator tries to add user "Alice" to a nonexistent group using the Graph API
     Then the HTTP status code should be "404"
 
 
@@ -175,7 +175,7 @@ Feature: add users to group
       | username |
       | Brian    |
       | Carol    |
-    When the administrator "Alice" tries to add the following users to a non-existing group at once using the Graph API
+    When the administrator "Alice" tries to add the following users to a nonexistent group at once using the Graph API
       | username |
       | Brian    |
       | Carol    |
@@ -185,7 +185,7 @@ Feature: add users to group
   Scenario: admin tries to add multiple non-existing users to a group at once
     Given the administrator has given "Alice" the role "Admin" using the settings api
     And user "Alice" has created a group "grp1" using the Graph API
-    When the administrator "Alice" tries to add the following non-existing users to a group "grp1" at once using the Graph API
+    When the administrator "Alice" tries to add the following nonexistent users to a group "grp1" at once using the Graph API
       | username |
       | Brian    |
       | Carol    |
