@@ -451,6 +451,33 @@ class GraphHelper {
 	 * @param string $xRequestId
 	 * @param string $adminUser
 	 * @param string $adminPassword
+	 * @param string $groupName
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getGroup(
+		string $baseUrl,
+		string $xRequestId,
+		string $adminUser,
+		string $adminPassword,
+		string $groupName
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'groups/' . $groupName);
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$adminUser,
+			$adminPassword,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
 	 * @param string $groupId
 	 *
 	 * @return ResponseInterface
@@ -644,7 +671,9 @@ class GraphHelper {
 		$payload['onPremisesSamAccountName'] = $userName;
 		$payload['passwordProfile'] = ['password' => $password];
 		$payload['displayName'] = $displayName ?? $userName;
-		$payload['mail'] = $email ?? $userName . '@example.com';
+		if (!empty($email)) {
+			$payload['mail'] = $email ?? $userName . '@example.com';
+		}
 		return \json_encode($payload);
 	}
 
@@ -937,6 +966,296 @@ class GraphHelper {
 			$password,
 			self::getRequestHeaders(),
 			\json_encode($payload)
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $user
+	 * @param string $password
+	 * @param string $xRequestId
+	 * @param array $body
+	 * @param array $headers
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getTags(
+		string $baseUrl,
+		string $user,
+		string $password,
+		string $xRequestId = '',
+		array  $body = [],
+		array  $headers = []
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'extensions/org.libregraph/tags');
+
+		return HttpRequestHelper::get($url, $xRequestId, $user, $password, $headers, $body);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $resourceId
+	 * @param array $tagName
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function createTags(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $resourceId,
+		array $tagName
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'extensions/org.libregraph/tags');
+		$payload['resourceId'] = $resourceId;
+		$payload['tags'] = $tagName;
+
+		return HttpRequestHelper::sendRequest(
+			$url,
+			$xRequestId,
+			"PUT",
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			\json_encode($payload)
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $resourceId
+	 * @param array $tagName
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function deleteTags(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $resourceId,
+		array $tagName
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'extensions/org.libregraph/tags');
+		$payload['resourceId'] = $resourceId;
+		$payload['tags'] = $tagName;
+
+		return HttpRequestHelper::sendRequest(
+			$url,
+			$xRequestId,
+			"DELETE",
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			\json_encode($payload)
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getApplications(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'applications');
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $groupId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getUsersWithFilterMemberOf(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $groupId
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users' . '?$filter=memberOf/any(m:m/id ' . "eq '$groupId')");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param array $groupIdArray
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getUsersOfTwoGroups(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		array $groupIdArray
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users' . '?$filter=memberOf/any(m:m/id ' . "eq '$groupIdArray[0]') " . "and memberOf/any(m:m/id eq '$groupIdArray[1]')");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $roleId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getUsersWithFilterRoleAssignment(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $roleId
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users' . '?$filter=appRoleAssignments/any(m:m/appRoleId ' . "eq '$roleId')");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $roleId
+	 * @param string $groupId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getUsersWithFilterRolesAssignmentAndMemberOf(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $roleId,
+		string $groupId
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users' . '?$filter=appRoleAssignments/any(m:m/appRoleId ' . "eq '$roleId') " . "and memberOf/any(m:m/id eq '$groupId')");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $appRoleId
+	 * @param string $applicationId
+	 * @param string $userId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function assignRole(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $appRoleId,
+		string $applicationId,
+		string $userId
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users/' . $userId . '/appRoleAssignments');
+		$payload['principalId'] = $userId;
+		$payload['appRoleId'] = $appRoleId;
+		$payload['resourceId'] = $applicationId;
+		return HttpRequestHelper::sendRequest(
+			$url,
+			$xRequestId,
+			"POST",
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			\json_encode($payload)
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $userId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getAssignedRole(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $userId
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users/' . $userId . '/appRoleAssignments');
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
 		);
 	}
 }

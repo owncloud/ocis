@@ -18,7 +18,9 @@ Feature: Upload files into a space
 
 
   Scenario Outline: An user creates a folder in the Space via the Graph API
-    And user "Alice" has shared a space "Project Ceres" to user "Brian" with role "<role>"
+    Given user "Alice" has shared a space "Project Ceres" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     When user "Brian" creates a folder "mainFolder" in space "Project Ceres" using the WebDav Api
     Then the HTTP status code should be "<code>"
     And for user "Brian" the space "Project Ceres" <shouldOrNot> contain these entries:
@@ -31,7 +33,9 @@ Feature: Upload files into a space
 
 
   Scenario Outline: An user uploads a file in shared Space via the Graph API
-    And user "Alice" has shared a space "Project Ceres" to user "Brian" with role "<role>"
+    Given user "Alice" has shared a space "Project Ceres" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     When user "Brian" uploads a file inside space "Project Ceres" with content "Test" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "<code>"
     And for user "Brian" the space "Project Ceres" <shouldOrNot> contain these entries:

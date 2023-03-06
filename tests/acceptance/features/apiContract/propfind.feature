@@ -27,7 +27,9 @@ Feature: Propfind test
 
   Scenario Outline: space member with a different role checks the PROPFIND request of a space
     Given user "Alice" has uploaded a file inside space "new-space" with content "some content" to "testfile.txt"
-    And user "Alice" has shared a space "new-space" to user "Brian" with role "<role>"
+    And user "Alice" has shared a space "new-space" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     When user "Brian" sends PROPFIND request to space "new-space" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:

@@ -315,7 +315,6 @@ default:
         - SearchContext:
         - PublicWebDavContext:
         - WebDavPropertiesContext:
-        - TagsContext:
         - TrashbinContext:
 
     coreApiWebdavPreviews:

@@ -795,7 +795,7 @@ def localApiTests(suite, storage, extra_environment = {}):
         "SEND_SCENARIO_LINE_REFERENCES": "true",
         "STORAGE_DRIVER": storage,
         "BEHAT_SUITE": suite,
-        "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
+        "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage&&~@skipOnStable2.0" % ("OC" if storage == "owncloud" else "OCIS"),
         "EXPECTED_FAILURES_FILE": "%s/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (dirs["base"], storage.upper()),
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
     }

@@ -17,7 +17,9 @@ Feature: move (rename) file
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created a folder "newfolder" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     When user "Alice" moves file "insideSpace.txt" to "newfolder/insideSpace.txt" in space "Project" using the WebDAV API
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Project" should contain these entries:
@@ -35,7 +37,9 @@ Feature: move (rename) file
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created a folder "newfolder" in space "Project"
     And user "Brian" has uploaded a file inside space "Project" with content "some content" to "insideSpace.txt"
-    And user "Brian" has shared a space "Project" to user "Alice" with role "viewer"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | viewer |
     When user "Alice" moves file "insideSpace.txt" to "newfolder/insideSpace.txt" in space "Project" using the WebDAV API
     Then the HTTP status code should be "403"
     And for user "Alice" the space "Project" should not contain these entries:
@@ -49,8 +53,12 @@ Feature: move (rename) file
     And user "Brian" has created a space "Project1" with the default quota using the GraphApi
     And user "Brian" has created a space "Project2" with the default quota using the GraphApi
     And user "Brian" has uploaded a file inside space "Project1" with content "Project1 content" to "project1.txt"
-    And user "Brian" has shared a space "Project2" to user "Alice" with role "<to_role>"
-    And user "Brian" has shared a space "Project1" to user "Alice" with role "<from_role>"
+    And user "Brian" has shared a space "Project2" with settings:
+      | shareWith | Alice     |
+      | role      | <to_role> |
+    And user "Brian" has shared a space "Project1" with settings:
+      | shareWith | Alice       |
+      | role      | <from_role> |
     When user "Alice" moves file "project1.txt" from space "Project1" to "project1.txt" inside space "Project2" using the WebDAV API
     Then the HTTP status code should be "<https_status_code>"
     And for user "Alice" the space "Project1" should contain these entries:
@@ -74,7 +82,9 @@ Feature: move (rename) file
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "project.txt"
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     When user "Alice" moves file "project.txt" from space "Project" to "project.txt" inside space "Personal" using the WebDAV API
     Then the HTTP status code should be "<https_status_code>"
     And for user "Alice" the space "Project" should contain these entries:
@@ -93,7 +103,9 @@ Feature: move (rename) file
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded a file inside space "Project" with content "Project content" to "project.txt"
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"
     When user "Alice" moves file "project.txt" from space "Project" to "/testshare/project.txt" inside space "Shares" using the WebDAV API
@@ -115,7 +127,9 @@ Feature: move (rename) file
   Scenario Outline: User moves a file from space personal to space project with different role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     And user "Alice" has uploaded file with content "personal space content" to "/personal.txt"
     When user "Alice" moves file "personal.txt" from space "Personal" to "personal.txt" inside space "Project" using the WebDAV API
     Then the HTTP status code should be "<https_status_code>"
@@ -169,7 +183,9 @@ Feature: move (rename) file
   Scenario Outline: User moves a file from space Shares with different role (permissions) to space project with different role
     Given the administrator has given "Brian" the role "Space Admin" using the settings api
     And user "Brian" has created a space "Project" with the default quota using the GraphApi
-    And user "Brian" has shared a space "Project" to user "Alice" with role "<role>"
+    And user "Brian" has shared a space "Project" with settings:
+      | shareWith | Alice  |
+      | role      | <role> |
     And user "Brian" has created folder "/testshare"
     And user "Brian" has uploaded file with content "testshare content" to "/testshare/testshare.txt"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"

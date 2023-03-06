@@ -21,7 +21,9 @@ Feature: Remove files, folder
 
 
   Scenario Outline: An user deletes a folder with some subfolders in a Space via the webDav API
-    Given user "Alice" has shared a space "delete objects" to user "Brian" with role "<role>"
+    Given user "Alice" has shared a space "delete objects" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     When user "<user>" removes the folder "folderForDeleting" from space "delete objects"
     Then the HTTP status code should be "<code>"
     And for user "<user>" the space "delete objects" <shouldOrNotBeInSpace> contain these entries:
@@ -36,7 +38,9 @@ Feature: Remove files, folder
 
 
   Scenario Outline: An user deletes a subfolder in a Space via the webDav API
-    Given user "Alice" has shared a space "delete objects" to user "Brian" with role "<role>"
+    Given user "Alice" has shared a space "delete objects" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     When user "<user>" removes the folder "folderForDeleting/sub1" from space "delete objects"
     Then the HTTP status code should be "<code>"
     And for user "<user>" the space "delete objects" should contain these entries:
@@ -53,7 +57,9 @@ Feature: Remove files, folder
 
 
   Scenario Outline: An user deletes a file in a Space via the webDav API
-    Given user "Alice" has shared a space "delete objects" to user "Brian" with role "<role>"
+    Given user "Alice" has shared a space "delete objects" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     When user "<user>" removes the file "text.txt" from space "delete objects"
     Then the HTTP status code should be "<code>"
     And for user "<user>" the space "delete objects" <shouldOrNotBeInSpace> contain these entries:

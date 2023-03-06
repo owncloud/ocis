@@ -71,7 +71,9 @@ Feature: Share spaces via link
 
 
   Scenario Outline: An user without manager role cannot share a space to public via link
-    Given user "Alice" has shared a space "share space" to user "Brian" with role "<role>"
+    Given user "Alice" has shared a space "share space" with settings:
+      | shareWith | Brian  |
+      | role      | <role> |
     When user "Brian" creates a public link share of the space "share space" with settings:
       | permissions | 1 |
     Then the HTTP status code should be "404"
@@ -85,7 +87,9 @@ Feature: Share spaces via link
 
 
   Scenario: An user with manager role can share a space to public via link
-    Given user "Alice" has shared a space "share space" to user "Brian" with role "manager"
+    Given user "Alice" has shared a space "share space" with settings:
+      | shareWith | Brian   |
+      | role      | manager |
     When user "Brian" creates a public link share of the space "share space" with settings:
       | permissions | 1 |
     Then the HTTP status code should be "200"
