@@ -167,36 +167,33 @@ func (p Web) updateLogoThemeConfig(logoPath string) error {
 	var m map[string]interface{}
 	_ = json.NewDecoder(f).Decode(&m)
 
+	// change logo in common part
+	commonCfg, ok := m["common"].(map[string]interface{})
+	if !ok {
+		return errInvalidThemeConfig
+	}
+	commonCfg["logo"] = logoPath
+
 	webCfg, ok := m["web"].(map[string]interface{})
 	if !ok {
 		return errInvalidThemeConfig
 	}
 
-	defaultCfg, ok := webCfg["default"].(map[string]interface{})
-	if !ok {
-		return errInvalidThemeConfig
+	// iterate over all possible themes and replace logo
+	for theme := range webCfg {
+		themeCfg, ok := webCfg[theme].(map[string]interface{})
+		if !ok {
+			return errInvalidThemeConfig
+		}
+
+		logoCfg, ok := themeCfg["logo"].(map[string]interface{})
+		if !ok {
+			return errInvalidThemeConfig
+		}
+
+		logoCfg["login"] = logoPath
+		logoCfg["topbar"] = logoPath
 	}
-
-	logoCfg, ok := defaultCfg["logo"].(map[string]interface{})
-	if !ok {
-		return errInvalidThemeConfig
-	}
-
-	logoCfg["login"] = logoPath
-	logoCfg["topbar"] = logoPath
-
-	defaultDarkCfg, ok := webCfg["default-dark"].(map[string]interface{})
-	if !ok {
-		return errInvalidThemeConfig
-	}
-
-	logoDarkCfg, ok := defaultDarkCfg["logo"].(map[string]interface{})
-	if !ok {
-		return errInvalidThemeConfig
-	}
-
-	logoDarkCfg["login"] = logoPath
-	logoDarkCfg["topbar"] = logoPath
 
 	dst, err := p.fs.Create(_themesConfigPath)
 	if err != nil {
