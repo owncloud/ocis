@@ -821,6 +821,7 @@ class GraphContext implements Context {
 	 *
 	 * @param string $user
 	 * @param string|null $byUser
+	 *
 	 * @return void
 	 *
 	 * @throws GuzzleException | Exception
@@ -1544,27 +1545,27 @@ class GraphContext implements Context {
 			$actualKeyValue = GraphHelper::separateAndGetValueForKey($keyName, $actualDriveInformation);
 			switch ($expectedDriveInformation[$keyName]) {
 				case '%user_id%':
-                Assert::assertTrue(GraphHelper::isUUIDv4($actualKeyValue), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValue);
+					Assert::assertTrue(GraphHelper::isUUIDv4($actualKeyValue), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValue);
 					break;
 				case '%space_id%':
-                Assert::assertTrue(GraphHelper::isSpaceId($actualKeyValue), __METHOD__ . ' Expected space_id to have a UUIDv4:UUIDv4 pattern but found: ' . $actualKeyValue);
+					Assert::assertTrue(GraphHelper::isSpaceId($actualKeyValue), __METHOD__ . ' Expected space_id to have a UUIDv4:UUIDv4 pattern but found: ' . $actualKeyValue);
 					break;
 				default:
-                $expectedDriveInformation[$keyName] = $this->featureContext->substituteInLineCodes(
-                $expectedDriveInformation[$keyName],
-                $this->featureContext->getCurrentUser(),
-                [],
-                [
-                [
-                // the actual space_id is substituted from the actual drive information rather than making an API request and substituting
-                "code" => "%space_id%",
-                "function" =>
-                [$this, "getSpaceIdFromActualDriveinformation"],
-                "parameter" => [$actualDriveInformation]
-                ],
-                ]
-                );
-                Assert::assertEquals($expectedDriveInformation[$keyName], $actualKeyValue);
+					$expectedDriveInformation[$keyName] = $this->featureContext->substituteInLineCodes(
+						$expectedDriveInformation[$keyName],
+						$this->featureContext->getCurrentUser(),
+						[],
+						[
+							[
+								// the actual space_id is substituted from the actual drive information rather than making an API request and substituting
+								"code" => "%space_id%",
+								"function" =>
+									[$this, "getSpaceIdFromActualDriveinformation"],
+								"parameter" => [$actualDriveInformation]
+							],
+						]
+					);
+					Assert::assertEquals($expectedDriveInformation[$keyName], $actualKeyValue);
 			}
 		}
 	}
