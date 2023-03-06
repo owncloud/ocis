@@ -91,8 +91,9 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 		case events.SpaceDisabled:
 			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ID.GetOpaqueId(), viewer)
 		case events.SpaceDeleted:
-			// won't work - space is deleted
-			users, err = nil, errors.New("i do not know whom to inform")
+			for u, _ := range e.FinalMembers {
+				users = append(users, u)
+			}
 		case events.SpaceShared:
 			users, err = ul.resolveID(ul.impersonate(e.Executant), e.GranteeUserID, e.GranteeGroupID)
 		case events.SpaceUnshared:
@@ -104,7 +105,7 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 		case events.ShareCreated:
 			users, err = ul.resolveID(ul.impersonate(e.Executant), e.GranteeUserID, e.GranteeGroupID)
 		case events.ShareRemoved:
-			err = errors.New("no grantee in share removed event")
+			users, err = ul.resolveID(ul.impersonate(e.Executant), e.GranteeUserID, e.GranteeGroupID)
 		case events.ShareExpired:
 			users, err = ul.resolveID(ul.impersonate(e.ShareOwner), e.GranteeUserID, e.GranteeGroupID)
 		}

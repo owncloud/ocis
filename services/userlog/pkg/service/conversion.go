@@ -54,27 +54,62 @@ func (ul *UserlogService) ConvertEvent(event *ehmsg.Event) (OC10Notification, er
 		return OC10Notification{}, errors.New("unknown event type")
 	// space related
 	case events.SpaceDisabled:
-		return ul.spaceMessage(event.Id, SpaceDisabled, ev.Executant, ev.ID.GetOpaqueId())
+		return ul.spaceMessage(event.Id, SpaceDisabled, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
 	case events.SpaceDeleted:
-		return ul.spaceMessage(event.Id, SpaceDeleted, ev.Executant, ev.ID.GetOpaqueId())
+		return ul.spaceDeletedMessage(event.Id, ev.Executant, ev.ID.GetOpaqueId(), ev.SpaceName, ev.Timestamp)
 	case events.SpaceShared:
-		return ul.spaceMessage(event.Id, SpaceShared, ev.Executant, ev.ID.GetOpaqueId())
+		return ul.spaceMessage(event.Id, SpaceShared, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
 	case events.SpaceUnshared:
-		return ul.spaceMessage(event.Id, SpaceUnshared, ev.Executant, ev.ID.GetOpaqueId())
+		return ul.spaceMessage(event.Id, SpaceUnshared, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
 	case events.SpaceMembershipExpired:
-		return ul.spaceMessage(event.Id, SpaceMembershipExpired, ev.SpaceOwner, ev.SpaceID.GetOpaqueId())
+		return ul.spaceMessage(event.Id, SpaceMembershipExpired, ev.SpaceOwner, ev.SpaceID.GetOpaqueId(), ev.ExpiredAt)
 
 	// share related
 	case events.ShareCreated:
-		return ul.shareMessage(event.Id, ShareCreated, ev.Executant, ev.ItemID)
+		return ul.shareMessage(event.Id, ShareCreated, ev.Executant, ev.ItemID, utils.TSToTime(ev.CTime))
 	case events.ShareExpired:
-		return ul.shareMessage(event.Id, ShareExpired, ev.ShareOwner, ev.ItemID)
+		return ul.shareMessage(event.Id, ShareExpired, ev.ShareOwner, ev.ItemID, ev.ExpiredAt)
 	case events.ShareRemoved:
-		return ul.shareMessage(event.Id, ShareRemoved, ev.Executant, nil)
+		return ul.shareMessage(event.Id, ShareRemoved, ev.Executant, ev.ItemID, ev.Timestamp)
 	}
 }
 
-func (ul *UserlogService) spaceMessage(eventid string, eventname string, executant *user.UserId, spaceid string) (OC10Notification, error) {
+func (ul *UserlogService) spaceDeletedMessage(eventid string, executant *user.UserId, spaceid string, spacename string, ts time.Time) (OC10Notification, error) {
+	_, user, err := utils.Impersonate(executant, ul.gwClient, ul.cfg.MachineAuthAPIKey)
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	subj, subjraw, msg, msgraw, err := ul.composeMessage(SpaceDeleted, map[string]string{
+		"username":  user.GetDisplayName(),
+		"spacename": spacename,
+	})
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	details := ul.getDetails(user, nil, nil)
+	details["space"] = map[string]string{
+		"id":   spaceid,
+		"name": spacename,
+	}
+
+	return OC10Notification{
+		EventID:        eventid,
+		Service:        ul.cfg.Service.Name,
+		UserName:       user.GetUsername(),
+		Timestamp:      ts.Format(time.RFC3339Nano),
+		ResourceID:     spaceid,
+		ResourceType:   _resourceTypeSpace,
+		Subject:        subj,
+		SubjectRaw:     subjraw,
+		Message:        msg,
+		MessageRaw:     msgraw,
+		MessageDetails: details,
+	}, nil
+}
+
+func (ul *UserlogService) spaceMessage(eventid string, eventname string, executant *user.UserId, spaceid string, ts time.Time) (OC10Notification, error) {
 	ctx, user, err := utils.Impersonate(executant, ul.gwClient, ul.cfg.MachineAuthAPIKey)
 	if err != nil {
 		return OC10Notification{}, err
@@ -97,7 +132,7 @@ func (ul *UserlogService) spaceMessage(eventid string, eventname string, executa
 		EventID:        eventid,
 		Service:        ul.cfg.Service.Name,
 		UserName:       user.GetUsername(),
-		Timestamp:      time.Now().Format(time.RFC3339Nano),
+		Timestamp:      ts.Format(time.RFC3339Nano),
 		ResourceID:     spaceid,
 		ResourceType:   _resourceTypeSpace,
 		Subject:        subj,
@@ -108,7 +143,7 @@ func (ul *UserlogService) spaceMessage(eventid string, eventname string, executa
 	}, nil
 }
 
-func (ul *UserlogService) shareMessage(eventid string, eventname string, executant *user.UserId, resourceid *storageprovider.ResourceId) (OC10Notification, error) {
+func (ul *UserlogService) shareMessage(eventid string, eventname string, executant *user.UserId, resourceid *storageprovider.ResourceId, ts time.Time) (OC10Notification, error) {
 	ctx, user, err := utils.Impersonate(executant, ul.gwClient, ul.cfg.MachineAuthAPIKey)
 	if err != nil {
 		return OC10Notification{}, err
@@ -131,7 +166,7 @@ func (ul *UserlogService) shareMessage(eventid string, eventname string, executa
 		EventID:        eventid,
 		Service:        ul.cfg.Service.Name,
 		UserName:       user.GetUsername(),
-		Timestamp:      time.Now().Format(time.RFC3339Nano),
+		Timestamp:      ts.Format(time.RFC3339Nano),
 		ResourceID:     storagespace.FormatResourceID(*info.GetId()),
 		ResourceType:   _resourceTypeShare,
 		Subject:        subj,
