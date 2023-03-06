@@ -267,6 +267,9 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 								"share_jail": cfg.EnableShareJail,
 								"max_quota":  cfg.MaxQuota,
 							},
+							"notifications": map[string]interface{}{
+								"endpoints": []string{"list", "get", "delete"},
+							},
 						},
 						"version": map[string]interface{}{
 							"product":        "Infinite Scale",
