@@ -167,6 +167,7 @@ type Events struct {
 	NumConsumers      int    `yaml:"num_consumers" env:"STORAGE_USERS_EVENTS_NUM_CONSUMERS" desc:"The amount of concurrent event consumers to start. Event consumers are used for post-processing files. Multiple consumers increase parallelisation, but will also increase CPU and memory demands. The setting has no effect when the STORAGE_USERS_OCIS_ASYNC_UPLOADS is set to false. The default and minimum value is 1."`
 }
 
+// Cache holds cache config
 type Cache struct {
 	Store    string   `yaml:"store" env:"OCIS_CACHE_STORE_TYPE;STORAGE_USERS_CACHE_STORE_TYPE;STORAGE_USERS_CACHE_STORE" desc:"Store implementation for the cache. Supported values are 'memory' (default), 'redis', and 'etcd'. See the text description for details."`
 	Nodes    []string `yaml:"nodes" env:"OCIS_CACHE_STORE_ADDRESS;STORAGE_USERS_CACHE_STORE_ADDRESS;STORAGE_USERS_CACHE_NODES" desc:"A comma separated list of addresses to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how addresses are used is dependent on the library of the configured store."`
