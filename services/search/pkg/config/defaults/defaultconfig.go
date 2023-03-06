@@ -9,6 +9,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
 )
 
+// FullDefaultConfig returns a fully initialized default configuration
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
 
@@ -17,6 +18,7 @@ func FullDefaultConfig() *config.Config {
 	return cfg
 }
 
+// DefaultConfig returns a basic default configuration
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{

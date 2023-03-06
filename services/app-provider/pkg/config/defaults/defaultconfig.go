@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/app-provider/pkg/config"
 )
 
+// FullDefaultConfig returns a fully initialized default configuration
 func FullDefaultConfig() *config.Config {
 	cfg := DefaultConfig()
 	EnsureDefaults(cfg)
@@ -13,6 +14,7 @@ func FullDefaultConfig() *config.Config {
 	return cfg
 }
 
+// DefaultConfig returns a basic default configuration
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
@@ -40,6 +42,7 @@ func DefaultConfig() *config.Config {
 	}
 }
 
+// EnsureDefaults adds default values to the configuration if they are not set yet
 func EnsureDefaults(cfg *config.Config) {
 	// provide with defaults for shared logging, since we need a valid destination address for "envdecode".
 	if cfg.Log == nil && cfg.Commons != nil && cfg.Commons.Log != nil {
@@ -81,10 +84,13 @@ func EnsureDefaults(cfg *config.Config) {
 	}
 }
 
+// Sanitize sanitized the configuration
 func Sanitize(cfg *config.Config) {
 	// nothing to sanitize here atm
 }
 
+// Validate checks that all required configs are set. If a required config value
+// is missing an error will be returned.
 func Validate(cfg *config.Config) error {
 	if cfg.TokenManager.JWTSecret == "" {
 		return shared.MissingJWTTokenError(cfg.Service.Name)
