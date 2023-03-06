@@ -340,7 +340,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++any ++
 a| [subs=-attributes]
-Type of substring search filter to use for substring searches for groups. Possible values: 'initial' for doing prefix only searches, 'final' for doing suffix only searches or 'any' for doing full substring searches
+Type of substring search filter to use for substring searches for groups. Supported values are 'initial', 'final' and 'any'. The value 'initial' is used for doing prefix only searches, 'final' for doing suffix only searches or 'any' for doing full substring searches
 
 a|`LDAP_USER_FILTER` +
 `GROUPS_LDAP_USER_FILTER` +

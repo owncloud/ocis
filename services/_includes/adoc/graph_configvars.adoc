@@ -565,7 +565,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++attribute ++
 a| [subs=-attributes]
-An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'.
+An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'.
 
 a|`LDAP_DISABLED_USERS_GROUP_DN` +
 `GRAPH_DISABLED_USERS_GROUP_DN` +

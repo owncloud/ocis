@@ -31,6 +31,6 @@
 | OCIS_EVENTS_ENABLE_TLS<br/>USERLOG_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
 | USERLOG_STORE_TYPE | string | mem | The type of the userlog store. Supported values are: 'mem', 'ocmem', 'etcd', 'redis', 'nats-js', 'noop'. See the text description for details.|
 | USERLOG_STORE_ADDRESSES | string |  | A comma separated list of addresses to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how addresses are used is dependent on the library of the configured store.|
-| USERLOG_STORE_DATABASE | string |  | (optional) The database name the configured store should use. This has no effect when 'in-memory' stores are configured.|
+| USERLOG_STORE_DATABASE | string |  | (optional) The database name the configured store should use. This has no effect when 'in-memory' stores or 'redis' is configured.|
 | USERLOG_STORE_TABLE | string |  | (optional) The database table the store should use. This has no effect when 'in-memory' stores are configured.|
 | USERLOG_STORE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.|

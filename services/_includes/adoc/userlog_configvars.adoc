@@ -306,7 +306,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-(optional) The database name the configured store should use. This has no effect when 'in-memory' stores are configured.
+(optional) The database name the configured store should use. This has no effect when 'in-memory' stores or 'redis' is configured.
 
 a|`USERLOG_STORE_TABLE` +
 
