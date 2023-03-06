@@ -62,6 +62,8 @@ type LDAP struct {
 	UserNameAttribute        string `yaml:"user_name_attribute" env:"LDAP_USER_SCHEMA_USERNAME;GRAPH_LDAP_USER_NAME_ATTRIBUTE" desc:"LDAP Attribute to use for username of users."`
 	UserIDAttribute          string `yaml:"user_id_attribute" env:"LDAP_USER_SCHEMA_ID;GRAPH_LDAP_USER_UID_ATTRIBUTE" desc:"LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID."`
 	UserEnabledAttribute     string `yaml:"user_enabled_attribute" env:"LDAP_USER_ENABLED_ATTRIBUTE;GRAPH_USER_ENABLED_ATTRIBUTE" desc:"LDAP Attribute to use as a flag telling if the user is enabled or disabled."`
+	DisableUserMechanism     string `yaml:"disable_user_mechanism" env:"LDAP_DISABLE_USER_MECHANISM;GRAPH_DISABLE_USER_MECHANISM" desc:"An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'."`
+	LdapDisabledUsersGroupDN string `yaml:"ldap_disabled_users_group_dn" env:"LDAP_DISABLED_USERS_GROUP_DN;GRAPH_DISABLED_USERS_GROUP_DN" desc:"The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'."`
 
 	GroupBaseDN        string `yaml:"group_base_dn" env:"LDAP_GROUP_BASE_DN;GRAPH_LDAP_GROUP_BASE_DN" desc:"Search base DN for looking up LDAP groups."`
 	GroupSearchScope   string `yaml:"group_search_scope" env:"LDAP_GROUP_SCOPE;GRAPH_LDAP_GROUP_SEARCH_SCOPE" desc:"LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'."`

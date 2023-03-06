@@ -60,7 +60,7 @@ func Server(cfg *config.Config) *cli.Command {
 				)
 
 				if err != nil {
-					logger.Info().Err(err).Str("transport", "http").Msg("Failed to initialize server")
+					logger.Error().Err(err).Str("transport", "http").Msg("Failed to initialize server")
 					return err
 				}
 

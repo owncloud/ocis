@@ -21,6 +21,11 @@ func getMockedBackend(l ldap.Client, lc config.LDAP, logger *log.Logger) (*LDAP,
 	return NewLDAPBackend(l, lc, logger)
 }
 
+const (
+	disableUsersGroup = "cn=DisabledUsersGroup,ou=groups,o=testing"
+	groupSearchFilter = "(objectClass=groupOfNames)"
+)
+
 var lconfig = config.LDAP{
 	UserBaseDN:               "ou=people,dc=test",
 	UserObjectClass:          "inetOrgPerson",
@@ -31,6 +36,8 @@ var lconfig = config.LDAP{
 	UserEmailAttribute:       "mail",
 	UserNameAttribute:        "uid",
 	UserEnabledAttribute:     "userEnabledAttribute",
+	LdapDisabledUsersGroupDN: disableUsersGroup,
+	DisableUserMechanism:     "attribute",
 
 	GroupBaseDN:        "ou=groups,dc=test",
 	GroupObjectClass:   "groupOfNames",
@@ -285,16 +292,20 @@ func TestGetUsers(t *testing.T) {
 }
 
 func TestUpdateUser(t *testing.T) {
+	falseBool := false
+	trueBool := true
+
 	type userProps struct {
 		id                       string
 		mail                     string
 		displayName              string
 		onPremisesSamAccountName string
-		accountEnabled           bool
+		accountEnabled           *bool
 	}
 	type args struct {
-		nameOrID  string
-		userProps userProps
+		nameOrID             string
+		userProps            userProps
+		disableUserMechanism string
 	}
 	type mockInputs struct {
 		funcName string
@@ -359,7 +370,7 @@ func TestUpdateUser(t *testing.T) {
 				mail:                     "testuser@example.org",
 				displayName:              "testUser",
 				onPremisesSamAccountName: "testUser",
-				accountEnabled:           true,
+				accountEnabled:           nil,
 			},
 			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
 				return assert.Nil(t, err, args...)
@@ -397,7 +408,7 @@ func TestUpdateUser(t *testing.T) {
 										},
 										{
 											Name:   lconfig.UserEnabledAttribute,
-											Values: []string{"TRUE"},
+											Values: []string{""},
 										},
 									},
 								},
@@ -445,7 +456,7 @@ func TestUpdateUser(t *testing.T) {
 										},
 										{
 											Name:   lconfig.UserEnabledAttribute,
-											Values: []string{"TRUE"},
+											Values: []string{""},
 										},
 									},
 								},
@@ -488,7 +499,7 @@ func TestUpdateUser(t *testing.T) {
 				mail:                     "testuser@example.org",
 				displayName:              "newName",
 				onPremisesSamAccountName: "testUser",
-				accountEnabled:           true,
+				accountEnabled:           nil,
 			},
 			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
 				return assert.Nil(t, err, args...)
@@ -526,7 +537,7 @@ func TestUpdateUser(t *testing.T) {
 										},
 										{
 											Name:   lconfig.UserEnabledAttribute,
-											Values: []string{"TRUE"},
+											Values: []string{""},
 										},
 									},
 								},
@@ -574,7 +585,7 @@ func TestUpdateUser(t *testing.T) {
 										},
 										{
 											Name:   lconfig.UserEnabledAttribute,
-											Values: []string{"TRUE"},
+											Values: []string{""},
 										},
 									},
 								},
@@ -617,7 +628,7 @@ func TestUpdateUser(t *testing.T) {
 				mail:                     "testuser@example.org",
 				displayName:              "newName",
 				onPremisesSamAccountName: "newName",
-				accountEnabled:           true,
+				accountEnabled:           nil,
 			},
 			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
 				return assert.Nil(t, err, args...)
@@ -659,7 +670,7 @@ func TestUpdateUser(t *testing.T) {
 										},
 										{
 											Name:   lconfig.UserEnabledAttribute,
-											Values: []string{"TRUE"},
+											Values: []string{""},
 										},
 									},
 								},
@@ -755,7 +766,7 @@ func TestUpdateUser(t *testing.T) {
 										},
 										{
 											Name:   lconfig.UserEnabledAttribute,
-											Values: []string{"TRUE"},
+											Values: []string{""},
 										},
 									},
 								},
@@ -797,15 +808,16 @@ func TestUpdateUser(t *testing.T) {
 			args: args{
 				nameOrID: "testUser",
 				userProps: userProps{
-					accountEnabled: false,
+					accountEnabled: &falseBool,
 				},
+				disableUserMechanism: "attribute",
 			},
 			want: &userProps{
 				id:                       "testUser",
 				mail:                     "testuser@example.org",
 				displayName:              "testUser",
 				onPremisesSamAccountName: "testUser",
-				accountEnabled:           false,
+				accountEnabled:           &falseBool,
 			},
 			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
 				return assert.Nil(t, err, args...)
@@ -921,6 +933,338 @@ func TestUpdateUser(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "Test disabling user as local admin",
+			args: args{
+				nameOrID: "testUser",
+				userProps: userProps{
+					accountEnabled: &falseBool,
+				},
+				disableUserMechanism: "group",
+			},
+			want: &userProps{
+				id:                       "testUser",
+				mail:                     "testuser@example.org",
+				displayName:              "testUser",
+				onPremisesSamAccountName: "testUser",
+				accountEnabled:           &falseBool,
+			},
+			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+				return assert.Nil(t, err, args...)
+			},
+			ldapMocks: []mockInputs{
+				{
+					funcName: "Search",
+					args: []interface{}{
+						ldap.NewSearchRequest(
+							"ou=people,dc=test",
+							ldap.ScopeWholeSubtree,
+							ldap.NeverDerefAliases, 1, 0, false,
+							"(&(objectClass=inetOrgPerson)(|(uid=testUser)(entryUUID=testUser)))",
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							nil,
+						),
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "uid=name",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "displayname",
+											Values: []string{"testuser@example.org"},
+										},
+										{
+											Name:   "entryUUID",
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   "mail",
+											Values: []string{"testuser@example.org"},
+										},
+										{
+											Name:   lconfig.UserEnabledAttribute,
+											Values: []string{"TRUE"},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+				{
+					funcName: "Search",
+					args: []interface{}{
+						&ldap.SearchRequest{
+							BaseDN:       disableUsersGroup,
+							Scope:        0,
+							DerefAliases: 0,
+							SizeLimit:    1,
+							TimeLimit:    0,
+							TypesOnly:    false,
+							Filter:       groupSearchFilter,
+							Attributes:   []string{"member"},
+							Controls:     []ldap.Control(nil),
+						},
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "uid=name",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "member",
+											Values: []string{""},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+				{
+					funcName: "Modify",
+					args: []interface{}{
+						&ldap.ModifyRequest{
+							DN: "uid=name",
+							Changes: []ldap.Change{
+								{
+									Operation: ldap.AddAttribute,
+									Modification: ldap.PartialAttribute{
+										Type: "member",
+										Vals: []string{"uid=name"},
+									},
+								},
+							},
+							Controls: []ldap.Control(nil),
+						},
+					},
+					returns: []interface{}{nil},
+				},
+				{
+					funcName: "Modify",
+					args: []interface{}{
+						&ldap.ModifyRequest{
+							DN:       "uid=name",
+							Changes:  []ldap.Change(nil),
+							Controls: []ldap.Control(nil),
+						},
+					},
+					returns: []interface{}{nil},
+				},
+				{
+					funcName: "Search",
+					args: []interface{}{
+						ldap.NewSearchRequest(
+							"uid=name",
+							ldap.ScopeBaseObject,
+							ldap.NeverDerefAliases, 1, 0, false,
+							"(objectClass=inetOrgPerson)",
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							[]ldap.Control(nil),
+						),
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "uid=name",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "uid",
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   "displayname",
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   "entryUUID",
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   "mail",
+											Values: []string{"testuser@example.org"},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+			},
+		},
+		{
+			name: "Test enabling user as local admin",
+			args: args{
+				nameOrID: "testUser",
+				userProps: userProps{
+					accountEnabled: &trueBool,
+				},
+				disableUserMechanism: "group",
+			},
+			want: &userProps{
+				id:                       "testUser",
+				mail:                     "testuser@example.org",
+				displayName:              "testUser",
+				onPremisesSamAccountName: "testUser",
+				accountEnabled:           &trueBool,
+			},
+			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+				return assert.Nil(t, err, args...)
+			},
+			ldapMocks: []mockInputs{
+				{
+					funcName: "Search",
+					args: []interface{}{
+						ldap.NewSearchRequest(
+							"ou=people,dc=test",
+							ldap.ScopeWholeSubtree,
+							ldap.NeverDerefAliases, 1, 0, false,
+							"(&(objectClass=inetOrgPerson)(|(uid=testUser)(entryUUID=testUser)))",
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							nil,
+						),
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "uid=name",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "displayname",
+											Values: []string{"testuser@example.org"},
+										},
+										{
+											Name:   "entryUUID",
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   "mail",
+											Values: []string{"testuser@example.org"},
+										},
+										{
+											Name:   lconfig.UserEnabledAttribute,
+											Values: []string{"TRUE"},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+				{
+					funcName: "Search",
+					args: []interface{}{
+						&ldap.SearchRequest{
+							BaseDN:       disableUsersGroup,
+							Scope:        0,
+							DerefAliases: 0,
+							SizeLimit:    1,
+							TimeLimit:    0,
+							TypesOnly:    false,
+							Filter:       groupSearchFilter,
+							Attributes:   []string{"member"},
+							Controls:     []ldap.Control(nil),
+						},
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "uid=name",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "member",
+											Values: []string{""},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+				{
+					funcName: "Modify",
+					args: []interface{}{
+						&ldap.ModifyRequest{
+							DN: "uid=name",
+							Changes: []ldap.Change{
+								{
+									Operation: ldap.DeleteAttribute,
+									Modification: ldap.PartialAttribute{
+										Type: "member",
+										Vals: []string{"uid=name"},
+									},
+								},
+							},
+							Controls: []ldap.Control(nil),
+						},
+					},
+					returns: []interface{}{nil},
+				},
+				{
+					funcName: "Modify",
+					args: []interface{}{
+						&ldap.ModifyRequest{
+							DN:       "uid=name",
+							Changes:  []ldap.Change(nil),
+							Controls: []ldap.Control(nil),
+						},
+					},
+					returns: []interface{}{nil},
+				},
+				{
+					funcName: "Search",
+					args: []interface{}{
+						ldap.NewSearchRequest(
+							"uid=name",
+							ldap.ScopeBaseObject,
+							ldap.NeverDerefAliases, 1, 0, false,
+							"(objectClass=inetOrgPerson)",
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							[]ldap.Control(nil),
+						),
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "uid=name",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "uid",
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   "displayname",
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   "entryUUID",
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   "mail",
+											Values: []string{"testuser@example.org"},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -928,13 +1272,17 @@ func TestUpdateUser(t *testing.T) {
 			for _, mock := range tt.ldapMocks {
 				lm.On(mock.funcName, mock.args...).Return(mock.returns...)
 			}
-			i, _ := getMockedBackend(lm, lconfig, &logger)
+
+			ldapConfig := lconfig
+			ldapConfig.DisableUserMechanism = tt.args.disableUserMechanism
+			i, _ := getMockedBackend(lm, ldapConfig, &logger)
 
 			user := libregraph.User{
 				Id:                       &tt.args.userProps.id,
 				Mail:                     &tt.args.userProps.mail,
 				DisplayName:              &tt.args.userProps.displayName,
 				OnPremisesSamAccountName: &tt.args.userProps.onPremisesSamAccountName,
+				AccountEnabled:           tt.args.userProps.accountEnabled,
 			}
 
 			emptyString := ""
@@ -947,13 +1295,227 @@ func TestUpdateUser(t *testing.T) {
 					OnPremisesSamAccountName: &tt.want.onPremisesSamAccountName,
 					Surname:                  &emptyString,
 					GivenName:                &emptyString,
-					AccountEnabled:           &tt.want.accountEnabled,
+				}
+
+				if tt.want.accountEnabled != nil {
+					want.AccountEnabled = *&tt.want.accountEnabled
 				}
 			}
 
 			got, err := i.UpdateUser(context.Background(), tt.args.nameOrID, user)
 			tt.assertion(t, err)
 			assert.Equal(t, want, got)
+		})
+	}
+}
+
+func TestUsersEnabledState(t *testing.T) {
+	aliceEnabled := ldap.Entry{
+		DN: "alice",
+		Attributes: []*ldap.EntryAttribute{
+			{
+				Name:   lconfig.UserEnabledAttribute,
+				Values: []string{"TRUE"},
+			},
+		},
+	}
+
+	bobDisabled := ldap.Entry{
+		DN: "bob",
+		Attributes: []*ldap.EntryAttribute{
+			{
+				Name:   lconfig.UserEnabledAttribute,
+				Values: []string{"FALSE"},
+			},
+		},
+	}
+
+	carolImplicitlyEnabled := ldap.Entry{
+		DN: "carol",
+		Attributes: []*ldap.EntryAttribute{
+			{
+				Name: lconfig.UserEnabledAttribute,
+			},
+		},
+	}
+
+	type args struct {
+		usersToCheck         []*ldap.Entry
+		expectedUsers        map[string]bool
+		disableUserMechanism string
+	}
+	type mockInputs struct {
+		funcName string
+		args     []interface{}
+		returns  []interface{}
+	}
+	tests := []struct {
+		name      string
+		args      args
+		want      map[string]bool
+		assertion assert.ErrorAssertionFunc
+		ldapMocks []mockInputs
+	}{
+		{
+			name: "Test no users",
+			args: args{
+				usersToCheck:         []*ldap.Entry{},
+				expectedUsers:        map[string]bool{},
+				disableUserMechanism: "attribute",
+			},
+			want: map[string]bool{},
+			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+				return assert.Nil(t, err, args...)
+			},
+			ldapMocks: []mockInputs{},
+		},
+		{
+			name: "Test attribute enabled users",
+			args: args{
+				usersToCheck:         []*ldap.Entry{&aliceEnabled, &bobDisabled, &carolImplicitlyEnabled},
+				expectedUsers:        map[string]bool{"alice": true, "bob": false, "carol": true},
+				disableUserMechanism: "attribute",
+			},
+			want: map[string]bool{"alice": true, "bob": false, "carol": true},
+			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+				return assert.Nil(t, err, args...)
+			},
+			ldapMocks: []mockInputs{},
+		},
+		{
+			name: "Test attribute enabled users not in disabled group",
+			args: args{
+				usersToCheck:         []*ldap.Entry{&aliceEnabled, &bobDisabled, &carolImplicitlyEnabled},
+				expectedUsers:        map[string]bool{"alice": true, "bob": false, "carol": true},
+				disableUserMechanism: "group",
+			},
+			want: map[string]bool{"alice": true, "bob": true, "carol": true},
+			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+				return assert.Nil(t, err, args...)
+			},
+			ldapMocks: []mockInputs{
+				{
+					funcName: "Search",
+					args: []interface{}{
+						ldap.NewSearchRequest(
+							disableUsersGroup,
+							ldap.ScopeBaseObject,
+							ldap.NeverDerefAliases, 1, 0, false,
+							groupSearchFilter,
+							[]string{"member"},
+							[]ldap.Control(nil),
+						),
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "cn=DisabledGroup",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "member",
+											Values: []string{""},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+			},
+		},
+		{
+			name: "Test attribute enabled users in disabled group",
+			args: args{
+				usersToCheck:         []*ldap.Entry{&aliceEnabled, &bobDisabled, &carolImplicitlyEnabled},
+				expectedUsers:        map[string]bool{"alice": true, "bob": false, "carol": true},
+				disableUserMechanism: "group",
+			},
+			want: map[string]bool{"alice": false, "bob": true, "carol": false},
+			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+				return assert.Nil(t, err, args...)
+			},
+			ldapMocks: []mockInputs{
+				{
+					funcName: "Search",
+					args: []interface{}{
+						ldap.NewSearchRequest(
+							disableUsersGroup,
+							ldap.ScopeBaseObject,
+							ldap.NeverDerefAliases, 1, 0, false,
+							groupSearchFilter,
+							[]string{"member"},
+							[]ldap.Control(nil),
+						),
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "cn=DisabledGroup",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "member",
+											Values: []string{"alice", "carol"},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+			},
+		},
+		{
+			name: "Test local group disable when ldap is throwing error",
+			args: args{
+				usersToCheck:         []*ldap.Entry{&aliceEnabled, &bobDisabled, &carolImplicitlyEnabled},
+				expectedUsers:        map[string]bool{"alice": true, "bob": false, "carol": true},
+				disableUserMechanism: "group",
+			},
+			want: nil,
+			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+				return assert.NotNil(t, err, args...)
+			},
+			ldapMocks: []mockInputs{
+				{
+					funcName: "Search",
+					args: []interface{}{
+						ldap.NewSearchRequest(
+							disableUsersGroup,
+							ldap.ScopeBaseObject,
+							ldap.NeverDerefAliases, 1, 0, false,
+							groupSearchFilter,
+							[]string{"member"},
+							[]ldap.Control(nil),
+						),
+					},
+					returns: []interface{}{
+						nil,
+						&ldap.Error{
+							Err: fmt.Errorf("Very Problematic Problems"),
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lm := &mocks.Client{}
+			for _, mock := range tt.ldapMocks {
+				lm.On(mock.funcName, mock.args...).Return(mock.returns...)
+			}
+
+			ldapConfig := lconfig
+			ldapConfig.DisableUserMechanism = tt.args.disableUserMechanism
+			i, _ := getMockedBackend(lm, ldapConfig, &logger)
+
+			got, err := i.usersEnabledState(tt.args.usersToCheck)
+			tt.assertion(t, err)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
