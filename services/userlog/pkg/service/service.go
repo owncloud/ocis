@@ -12,6 +12,7 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
@@ -20,6 +21,7 @@ import (
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
 	"go-micro.dev/v4/store"
+	"google.golang.org/grpc/metadata"
 )
 
 // UserlogService is the service responsible for user activities
@@ -91,7 +93,7 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 		case events.SpaceDisabled:
 			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ID.GetOpaqueId(), viewer)
 		case events.SpaceDeleted:
-			for u, _ := range e.FinalMembers {
+			for u := range e.FinalMembers {
 				users = append(users, u)
 			}
 		case events.SpaceShared:
@@ -251,7 +253,7 @@ func (ul *UserlogService) findSpaceMembers(ctx context.Context, spaceID string, 
 		return nil, errors.New("need authenticated context to find space members")
 	}
 
-	space, err := ul.getSpace(ctx, spaceID)
+	space, err := getSpace(ctx, spaceID, ul.gwClient)
 	if err != nil {
 		return nil, err
 	}
@@ -325,7 +327,7 @@ func (ul *UserlogService) resolveID(ctx context.Context, userid *user.UserId, gr
 
 // resolves the users of a group
 func (ul *UserlogService) resolveGroup(ctx context.Context, groupID string) ([]string, error) {
-	grp, err := ul.getGroup(ctx, groupID)
+	grp, err := getGroup(ctx, groupID, ul.gwClient)
 	if err != nil {
 		return nil, err
 	}
@@ -338,22 +340,45 @@ func (ul *UserlogService) resolveGroup(ctx context.Context, groupID string) ([]s
 	return userIDs, nil
 }
 
-func (ul *UserlogService) impersonate(u *user.UserId) context.Context {
-	if u == nil {
-		ul.log.Debug().Msg("cannot impersonate nil user")
+func (ul *UserlogService) impersonate(uid *user.UserId) context.Context {
+	if uid == nil {
+		ul.log.Error().Msg("cannot impersonate nil user")
 		return nil
 	}
 
-	ctx, _, err := utils.Impersonate(u, ul.gwClient, ul.cfg.MachineAuthAPIKey)
+	u, err := getUser(context.Background(), uid, ul.gwClient)
 	if err != nil {
-		ul.log.Error().Err(err).Str("userid", u.GetOpaqueId()).Msg("failed to impersonate user")
+		ul.log.Error().Err(err).Msg("cannot get user")
+		return nil
+	}
+
+	ctx, err := authenticate(u, ul.gwClient, ul.cfg.MachineAuthAPIKey)
+	if err != nil {
+		ul.log.Error().Err(err).Str("userid", u.GetId().GetOpaqueId()).Msg("failed to impersonate user")
 		return nil
 	}
 	return ctx
 }
 
-func (ul *UserlogService) getSpace(ctx context.Context, spaceID string) (*storageprovider.StorageSpace, error) {
-	res, err := ul.gwClient.ListStorageSpaces(ctx, listStorageSpaceRequest(spaceID))
+func authenticate(usr *user.User, gwc gateway.GatewayAPIClient, machineAuthAPIKey string) (context.Context, error) {
+	ctx := revactx.ContextSetUser(context.Background(), usr)
+	authRes, err := gwc.Authenticate(ctx, &gateway.AuthenticateRequest{
+		Type:         "machine",
+		ClientId:     "userid:" + usr.GetId().GetOpaqueId(),
+		ClientSecret: machineAuthAPIKey,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if authRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		return nil, fmt.Errorf("error impersonating user: %s", authRes.Status.Message)
+	}
+
+	return metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, authRes.Token), nil
+}
+
+func getSpace(ctx context.Context, spaceID string, gwc gateway.GatewayAPIClient) (*storageprovider.StorageSpace, error) {
+	res, err := gwc.ListStorageSpaces(ctx, listStorageSpaceRequest(spaceID))
 	if err != nil {
 		return nil, err
 	}
@@ -369,8 +394,8 @@ func (ul *UserlogService) getSpace(ctx context.Context, spaceID string) (*storag
 	return res.StorageSpaces[0], nil
 }
 
-func (ul *UserlogService) getUser(ctx context.Context, userid *user.UserId) (*user.User, error) {
-	getUserResponse, err := ul.gwClient.GetUser(context.Background(), &user.GetUserRequest{
+func getUser(ctx context.Context, userid *user.UserId, gwc gateway.GatewayAPIClient) (*user.User, error) {
+	getUserResponse, err := gwc.GetUser(context.Background(), &user.GetUserRequest{
 		UserId: userid,
 	})
 	if err != nil {
@@ -384,8 +409,8 @@ func (ul *UserlogService) getUser(ctx context.Context, userid *user.UserId) (*us
 	return getUserResponse.GetUser(), nil
 }
 
-func (ul *UserlogService) getGroup(ctx context.Context, groupid string) (*group.Group, error) {
-	r, err := ul.gwClient.GetGroup(ctx, &group.GetGroupRequest{GroupId: &group.GroupId{OpaqueId: groupid}})
+func getGroup(ctx context.Context, groupid string, gwc gateway.GatewayAPIClient) (*group.Group, error) {
+	r, err := gwc.GetGroup(ctx, &group.GetGroupRequest{GroupId: &group.GroupId{OpaqueId: groupid}})
 	if err != nil {
 		return nil, err
 	}
@@ -397,8 +422,8 @@ func (ul *UserlogService) getGroup(ctx context.Context, groupid string) (*group.
 	return r.GetGroup(), nil
 }
 
-func (ul *UserlogService) getResource(ctx context.Context, resourceid *storageprovider.ResourceId) (*storageprovider.ResourceInfo, error) {
-	res, err := ul.gwClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: resourceid}})
+func getResource(ctx context.Context, resourceid *storageprovider.ResourceId, gwc gateway.GatewayAPIClient) (*storageprovider.ResourceInfo, error) {
+	res, err := gwc.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: resourceid}})
 	if err != nil {
 		return nil, err
 	}

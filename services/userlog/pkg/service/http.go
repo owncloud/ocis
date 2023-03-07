@@ -7,6 +7,9 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 )
 
+// HeaderPreferedLanguage is the header where the client can set the locale
+var HeaderPreferedLanguage = "Prefered-Language"
+
 // ServeHTTP fulfills Handler interface
 func (ul *UserlogService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ul.m.ServeHTTP(w, r)
@@ -28,11 +31,11 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	locale := r.Header.Get("Prefered-Language")
+	conv := NewConverter(r.Header.Get(HeaderPreferedLanguage), ul.gwClient, ul.cfg.MachineAuthAPIKey, ul.cfg.Service.Name, ul.registeredEvents)
 
 	resp := GetEventResponseOC10{}
 	for _, e := range evs {
-		noti, err := ul.ConvertEvent(e, locale)
+		noti, err := conv.ConvertEvent(e)
 		if err != nil {
 			ul.log.Error().Err(err).Str("eventid", e.Id).Str("eventtype", e.Type).Msg("failed to convert event")
 			continue

@@ -43,6 +43,13 @@ var (
 	}
 )
 
+// holds the information to link the raw template to the details
+var _placeholders = map[string]interface{}{
+	"username":     "{user}",
+	"spacename":    "{space}",
+	"resourcename": "{resource}",
+}
+
 // NotificationTemplate is the data structure for the notifications
 type NotificationTemplate struct {
 	Subject string

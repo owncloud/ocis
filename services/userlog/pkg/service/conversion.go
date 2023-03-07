@@ -2,10 +2,12 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"text/template"
 	"time"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -40,9 +42,39 @@ type OC10Notification struct {
 	MessageDetails map[string]interface{} `json:"messageRichParameters"`
 }
 
+// Converter is responsible for converting eventhistory events to OC10Notifications
+type Converter struct {
+	locale            string
+	gwClient          gateway.GatewayAPIClient
+	machineAuthAPIKey string
+	serviceName       string
+	registeredEvents  map[string]events.Unmarshaller
+
+	// cached within one request not query other service too much
+	spaces    map[string]*storageprovider.StorageSpace
+	users     map[string]*user.User
+	resources map[string]*storageprovider.ResourceInfo
+	contexts  map[string]context.Context
+}
+
+// NewConverter returns a new Converter
+func NewConverter(loc string, gwc gateway.GatewayAPIClient, machineAuthAPIKey string, name string, registeredEvents map[string]events.Unmarshaller) *Converter {
+	return &Converter{
+		locale:            loc,
+		gwClient:          gwc,
+		machineAuthAPIKey: machineAuthAPIKey,
+		serviceName:       name,
+		registeredEvents:  registeredEvents,
+		spaces:            make(map[string]*storageprovider.StorageSpace),
+		users:             make(map[string]*user.User),
+		resources:         make(map[string]*storageprovider.ResourceInfo),
+		contexts:          make(map[string]context.Context),
+	}
+}
+
 // ConvertEvent converts an eventhistory event to an OC10Notification
-func (ul *UserlogService) ConvertEvent(event *ehmsg.Event, locale string) (OC10Notification, error) {
-	etype, ok := ul.registeredEvents[event.Type]
+func (c *Converter) ConvertEvent(event *ehmsg.Event) (OC10Notification, error) {
+	etype, ok := c.registeredEvents[event.Type]
 	if !ok {
 		// this should not happen
 		return OC10Notification{}, errors.New("eventtype not registered")
@@ -59,50 +91,46 @@ func (ul *UserlogService) ConvertEvent(event *ehmsg.Event, locale string) (OC10N
 		return OC10Notification{}, errors.New("unknown event type")
 	// space related
 	case events.SpaceDisabled:
-		return ul.spaceMessage(event.Id, SpaceDisabled, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp, locale)
+		return c.spaceMessage(event.Id, SpaceDisabled, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
 	case events.SpaceDeleted:
-		return ul.spaceDeletedMessage(event.Id, ev.Executant, ev.ID.GetOpaqueId(), ev.SpaceName, ev.Timestamp, locale)
+		return c.spaceDeletedMessage(event.Id, ev.Executant, ev.ID.GetOpaqueId(), ev.SpaceName, ev.Timestamp)
 	case events.SpaceShared:
-		return ul.spaceMessage(event.Id, SpaceShared, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp, locale)
+		return c.spaceMessage(event.Id, SpaceShared, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
 	case events.SpaceUnshared:
-		return ul.spaceMessage(event.Id, SpaceUnshared, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp, locale)
+		return c.spaceMessage(event.Id, SpaceUnshared, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
 	case events.SpaceMembershipExpired:
-		return ul.spaceMessage(event.Id, SpaceMembershipExpired, ev.SpaceOwner, ev.SpaceID.GetOpaqueId(), ev.ExpiredAt, locale)
+		return c.spaceMessage(event.Id, SpaceMembershipExpired, ev.SpaceOwner, ev.SpaceID.GetOpaqueId(), ev.ExpiredAt)
 
 	// share related
 	case events.ShareCreated:
-		return ul.shareMessage(event.Id, ShareCreated, ev.Executant, ev.ItemID, ev.ShareID, utils.TSToTime(ev.CTime), locale)
+		return c.shareMessage(event.Id, ShareCreated, ev.Executant, ev.ItemID, ev.ShareID, utils.TSToTime(ev.CTime))
 	case events.ShareExpired:
-		return ul.shareMessage(event.Id, ShareExpired, ev.ShareOwner, ev.ItemID, ev.ShareID, ev.ExpiredAt, locale)
+		return c.shareMessage(event.Id, ShareExpired, ev.ShareOwner, ev.ItemID, ev.ShareID, ev.ExpiredAt)
 	case events.ShareRemoved:
-		return ul.shareMessage(event.Id, ShareRemoved, ev.Executant, ev.ItemID, ev.ShareID, ev.Timestamp, locale)
+		return c.shareMessage(event.Id, ShareRemoved, ev.Executant, ev.ItemID, ev.ShareID, ev.Timestamp)
 	}
 }
 
-func (ul *UserlogService) spaceDeletedMessage(eventid string, executant *user.UserId, spaceid string, spacename string, ts time.Time, locale string) (OC10Notification, error) {
-	_, user, err := utils.Impersonate(executant, ul.gwClient, ul.cfg.MachineAuthAPIKey)
+func (c *Converter) spaceDeletedMessage(eventid string, executant *user.UserId, spaceid string, spacename string, ts time.Time) (OC10Notification, error) {
+	usr, err := c.getUser(context.Background(), executant)
 	if err != nil {
 		return OC10Notification{}, err
 	}
 
-	subj, subjraw, msg, msgraw, err := ul.composeMessage(SpaceDeleted, locale, map[string]interface{}{
-		"username":  user.GetDisplayName(),
+	subj, subjraw, msg, msgraw, err := composeMessage(SpaceDeleted, c.locale, map[string]interface{}{
+		"username":  usr.GetDisplayName(),
 		"spacename": spacename,
 	})
 	if err != nil {
 		return OC10Notification{}, err
 	}
 
-	details := ul.getDetails(user, nil, nil, nil)
-	details["space"] = map[string]string{
-		"id":   spaceid,
-		"name": spacename,
-	}
+	space := &storageprovider.StorageSpace{Id: &storageprovider.StorageSpaceId{OpaqueId: spaceid}, Name: spacename}
 
 	return OC10Notification{
 		EventID:        eventid,
-		Service:        ul.cfg.Service.Name,
-		UserName:       user.GetUsername(),
+		Service:        c.serviceName,
+		UserName:       usr.GetUsername(),
 		Timestamp:      ts.Format(time.RFC3339Nano),
 		ResourceID:     spaceid,
 		ResourceType:   _resourceTypeSpace,
@@ -110,23 +138,28 @@ func (ul *UserlogService) spaceDeletedMessage(eventid string, executant *user.Us
 		SubjectRaw:     subjraw,
 		Message:        msg,
 		MessageRaw:     msgraw,
-		MessageDetails: details,
+		MessageDetails: generateDetails(usr, space, nil, nil),
 	}, nil
 }
 
-func (ul *UserlogService) spaceMessage(eventid string, nt NotificationTemplate, executant *user.UserId, spaceid string, ts time.Time, locale string) (OC10Notification, error) {
-	ctx, user, err := utils.Impersonate(executant, ul.gwClient, ul.cfg.MachineAuthAPIKey)
+func (c *Converter) spaceMessage(eventid string, nt NotificationTemplate, executant *user.UserId, spaceid string, ts time.Time) (OC10Notification, error) {
+	usr, err := c.getUser(context.Background(), executant)
 	if err != nil {
 		return OC10Notification{}, err
 	}
 
-	space, err := ul.getSpace(ctx, spaceid)
+	ctx, err := c.authenticate(usr)
 	if err != nil {
 		return OC10Notification{}, err
 	}
 
-	subj, subjraw, msg, msgraw, err := ul.composeMessage(nt, locale, map[string]interface{}{
-		"username":  user.GetDisplayName(),
+	space, err := c.getSpace(ctx, spaceid)
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, map[string]interface{}{
+		"username":  usr.GetDisplayName(),
 		"spacename": space.GetName(),
 	})
 	if err != nil {
@@ -135,8 +168,8 @@ func (ul *UserlogService) spaceMessage(eventid string, nt NotificationTemplate, 
 
 	return OC10Notification{
 		EventID:        eventid,
-		Service:        ul.cfg.Service.Name,
-		UserName:       user.GetUsername(),
+		Service:        c.serviceName,
+		UserName:       usr.GetUsername(),
 		Timestamp:      ts.Format(time.RFC3339Nano),
 		ResourceID:     spaceid,
 		ResourceType:   _resourceTypeSpace,
@@ -144,23 +177,28 @@ func (ul *UserlogService) spaceMessage(eventid string, nt NotificationTemplate, 
 		SubjectRaw:     subjraw,
 		Message:        msg,
 		MessageRaw:     msgraw,
-		MessageDetails: ul.getDetails(user, space, nil, nil),
+		MessageDetails: generateDetails(usr, space, nil, nil),
 	}, nil
 }
 
-func (ul *UserlogService) shareMessage(eventid string, nt NotificationTemplate, executant *user.UserId, resourceid *storageprovider.ResourceId, shareid *collaboration.ShareId, ts time.Time, locale string) (OC10Notification, error) {
-	ctx, user, err := utils.Impersonate(executant, ul.gwClient, ul.cfg.MachineAuthAPIKey)
+func (c *Converter) shareMessage(eventid string, nt NotificationTemplate, executant *user.UserId, resourceid *storageprovider.ResourceId, shareid *collaboration.ShareId, ts time.Time) (OC10Notification, error) {
+	usr, err := c.getUser(context.Background(), executant)
 	if err != nil {
 		return OC10Notification{}, err
 	}
 
-	info, err := ul.getResource(ctx, resourceid)
+	ctx, err := c.authenticate(usr)
 	if err != nil {
 		return OC10Notification{}, err
 	}
 
-	subj, subjraw, msg, msgraw, err := ul.composeMessage(nt, locale, map[string]interface{}{
-		"username":     user.GetDisplayName(),
+	info, err := c.getResource(ctx, resourceid)
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, map[string]interface{}{
+		"username":     usr.GetDisplayName(),
 		"resourcename": info.GetName(),
 	})
 	if err != nil {
@@ -169,8 +207,8 @@ func (ul *UserlogService) shareMessage(eventid string, nt NotificationTemplate, 
 
 	return OC10Notification{
 		EventID:        eventid,
-		Service:        ul.cfg.Service.Name,
-		UserName:       user.GetUsername(),
+		Service:        c.serviceName,
+		UserName:       usr.GetUsername(),
 		Timestamp:      ts.Format(time.RFC3339Nano),
 		ResourceID:     storagespace.FormatResourceID(*info.GetId()),
 		ResourceType:   _resourceTypeShare,
@@ -178,37 +216,105 @@ func (ul *UserlogService) shareMessage(eventid string, nt NotificationTemplate, 
 		SubjectRaw:     subjraw,
 		Message:        msg,
 		MessageRaw:     msgraw,
-		MessageDetails: ul.getDetails(user, nil, info, shareid),
+		MessageDetails: generateDetails(usr, nil, info, shareid),
 	}, nil
 }
 
-func (ul *UserlogService) composeMessage(nt NotificationTemplate, locale string, vars map[string]interface{}) (string, string, string, string, error) {
-	subj, msg, err := ul.parseTemplate(nt, locale)
+func (c *Converter) authenticate(usr *user.User) (context.Context, error) {
+	if ctx, ok := c.contexts[usr.GetId().GetOpaqueId()]; ok {
+		return ctx, nil
+	}
+	ctx, err := authenticate(usr, c.gwClient, c.machineAuthAPIKey)
+	if err == nil {
+		c.contexts[usr.GetId().GetOpaqueId()] = ctx
+	}
+	return ctx, err
+}
+
+func (c *Converter) getSpace(ctx context.Context, spaceID string) (*storageprovider.StorageSpace, error) {
+	if space, ok := c.spaces[spaceID]; ok {
+		return space, nil
+	}
+	space, err := getSpace(ctx, spaceID, c.gwClient)
+	if err == nil {
+		c.spaces[spaceID] = space
+	}
+	return space, err
+}
+
+func (c *Converter) getResource(ctx context.Context, resourceID *storageprovider.ResourceId) (*storageprovider.ResourceInfo, error) {
+	if r, ok := c.resources[resourceID.GetOpaqueId()]; ok {
+		return r, nil
+	}
+	resource, err := getResource(ctx, resourceID, c.gwClient)
+	if err == nil {
+		c.resources[resourceID.GetOpaqueId()] = resource
+	}
+	return resource, err
+}
+
+func (c *Converter) getUser(ctx context.Context, userID *user.UserId) (*user.User, error) {
+	if u, ok := c.users[userID.GetOpaqueId()]; ok {
+		return u, nil
+	}
+	usr, err := getUser(ctx, userID, c.gwClient)
+	if err == nil {
+		c.users[userID.GetOpaqueId()] = usr
+	}
+	return usr, err
+}
+
+func composeMessage(nt NotificationTemplate, locale string, vars map[string]interface{}) (string, string, string, string, error) {
+	subj, msg, err := parseTemplate(nt, locale)
 	if err != nil {
 		return "", "", "", "", err
 	}
 
-	subject := ul.executeTemplate(subj, vars)
+	subject, err := executeTemplate(subj, vars)
+	if err != nil {
+		return "", "", "", "", err
+	}
 
-	subjectraw := ul.executeTemplate(subj, map[string]interface{}{
-		"username":     "{user}",
-		"spacename":    "{space}",
-		"resourcename": "{resource}",
-	})
+	subjectraw, err := executeTemplate(subj, _placeholders)
+	if err != nil {
+		return "", "", "", "", err
+	}
 
-	message := ul.executeTemplate(msg, vars)
+	message, err := executeTemplate(msg, vars)
+	if err != nil {
+		return "", "", "", "", err
+	}
 
-	messageraw := ul.executeTemplate(msg, map[string]interface{}{
-		"username":     "{user}",
-		"spacename":    "{space}",
-		"resourcename": "{resource}",
-	})
-
-	return subject, subjectraw, message, messageraw, nil
+	messageraw, err := executeTemplate(msg, _placeholders)
+	return subject, subjectraw, message, messageraw, err
 
 }
 
-func (ul *UserlogService) getDetails(user *user.User, space *storageprovider.StorageSpace, item *storageprovider.ResourceInfo, shareid *collaboration.ShareId) map[string]interface{} {
+func parseTemplate(nt NotificationTemplate, locale string) (*template.Template, *template.Template, error) {
+	// Create Locale with library path and language code and load domain '.../default.po'
+	l := gotext.NewLocale(_pathToLocales, locale)
+	l.AddDomain("default")
+
+	subject, err := template.New("").Parse(l.Get(nt.Subject))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	message, err := template.New("").Parse(l.Get(nt.Message))
+	return subject, message, err
+
+}
+
+func executeTemplate(tpl *template.Template, vars map[string]interface{}) (string, error) {
+	var writer bytes.Buffer
+	if err := tpl.Execute(&writer, vars); err != nil {
+		return "", err
+	}
+
+	return writer.String(), nil
+}
+
+func generateDetails(user *user.User, space *storageprovider.StorageSpace, item *storageprovider.ResourceInfo, shareid *collaboration.ShareId) map[string]interface{} {
 	details := make(map[string]interface{})
 
 	if user != nil {
@@ -240,29 +346,4 @@ func (ul *UserlogService) getDetails(user *user.User, space *storageprovider.Sto
 	}
 
 	return details
-}
-
-func (ul *UserlogService) parseTemplate(nt NotificationTemplate, locale string) (*template.Template, *template.Template, error) {
-	// Create Locale with library path and language code and load domain '.../default.po'
-	l := gotext.NewLocale(_pathToLocales, locale)
-	l.AddDomain("default")
-
-	subject, err := template.New("").Parse(l.Get(nt.Subject))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	message, err := template.New("").Parse(l.Get(nt.Message))
-	return subject, message, err
-
-}
-
-func (ul *UserlogService) executeTemplate(tpl *template.Template, vars map[string]interface{}) string {
-	var writer bytes.Buffer
-	if err := tpl.Execute(&writer, vars); err != nil {
-		ul.log.Error().Err(err).Str("templateName", tpl.Name()).Msg("cannot execute template")
-		return ""
-	}
-
-	return writer.String()
 }
