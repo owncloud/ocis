@@ -152,8 +152,8 @@ Feature: remove a user from a group
       | Alice    | var/../etc       |
 
 
-  Scenario: admin tries to remove a user from a non-existing group
-    When the administrator tries to remove user "Alice" from group "nonexistentgroup" using the Graph API
+  Scenario: admin tries to remove a user from a nonexistent group
+    When the administrator tries to remove user "Alice" from a nonexistent group using the Graph API
     Then the HTTP status code should be "404"
 
 
