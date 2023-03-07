@@ -157,8 +157,9 @@ Feature: remove a user from a group
     Then the HTTP status code should be "404"
 
 
-  Scenario: normal user tries to remove a user in their group
+  Scenario Outline: normal user tries to remove a user in their group
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has given "Brian" the role "<role>" using the settings api
     And group "grp1" has been created
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
@@ -166,6 +167,11 @@ Feature: remove a user from a group
     Then the HTTP status code should be "401"
     And the last response should be an unauthorized response
     And user "Brian" should belong to group "grp1"
+    Examples:
+      | role        |
+      | Space Admin |
+      | User        |
+      | Guest       |
 
 
   Scenario: admin removes a disabled user from a group
