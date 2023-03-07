@@ -2050,6 +2050,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "FRONTEND_SEARCH_MIN_LENGTH": "2",
             "STORAGE_USERS_OCIS_ASYNC_UPLOADS": True,
             "OCIS_EVENTS_ENABLE_TLS": False,
+            "OCIS_DECOMPOSEDFS_METADATA_BACKEND": "ini",
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
@@ -2087,6 +2088,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL": "https://ocis-server:9200",
             "STORAGE_USERS_OCIS_ASYNC_UPLOADS": True,
             "OCIS_EVENTS_ENABLE_TLS": False,
+            "OCIS_DECOMPOSEDFS_METADATA_BACKEND": "ini",
         }
         wait_for_ocis = {
             "name": "wait-for-ocis-server",
