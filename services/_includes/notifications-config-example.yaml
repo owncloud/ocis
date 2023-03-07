@@ -32,6 +32,4 @@ notifications:
   machine_auth_api_key: ""
   email_template_path: ""
   reva_gateway: 127.0.0.1:9142
-  grpc_client_tls:
-    mode: ""
-    cacert: ""
+  grpc_client_tls: null

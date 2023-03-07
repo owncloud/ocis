@@ -15,9 +15,6 @@
 | STORAGE_PUBLICLINK_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | STORAGE_PUBLICLINK_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | STORAGE_PUBLICLINK_GRPC_ADDR | string | 127.0.0.1:9178 | The bind address of the GRPC service.|
-| OCIS_GRPC_TLS_ENABLED | bool | false | Activates TLS for the grpc based services using the server certifcate and key configured via OCIS_GRPC_TLS_CERTIFICATE and OCIS_GRPC_TLS_KEY. If OCIS_GRPC_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with OCIS_GRPC_CLIENT_TLS_MODE=insecure.|
-| OCIS_GRPC_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the grpc services.|
-| OCIS_GRPC_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the grpc services.|
 | STORAGE_PUBLICLINK_GRPC_PROTOCOL | string | tcp | The transport protocol of the GRPC service.|
 | OCIS_JWT_SECRET<br/>STORAGE_PUBLICLINK_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | The CS3 gateway endpoint.|

@@ -18,10 +18,7 @@ debug:
   zpages: false
 grpc:
   addr: 127.0.0.1:9144
-  tls:
-    enabled: false
-    cert: ""
-    key: ""
+  tls: null
   protocol: tcp
 token_manager:
   jwt_secret: ""
