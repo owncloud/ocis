@@ -9,7 +9,7 @@ Feature: capabilities
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
-    And the JSON data of the response should match
+    And the ocs JSON data of the response should match
     """
     {
       "type": "object",
@@ -56,7 +56,7 @@ Feature: capabilities
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
-    And the JSON data of the response should match
+    And the ocs JSON data of the response should match
     """
     {
       "type": "object",
@@ -95,7 +95,7 @@ Feature: capabilities
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
-    And the JSON data of the response should match
+    And the ocs JSON data of the response should match
     """
     {
       "type": "object",
@@ -134,7 +134,7 @@ Feature: capabilities
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
-    And the JSON data of the response should match
+    And the ocs JSON data of the response should match
     """
     {
       "type": "object",
@@ -173,7 +173,7 @@ Feature: capabilities
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
     And the HTTP status code should be "200"
-    And the JSON data of the response should match
+    And the ocs JSON data of the response should match
     """
     {
       "type": "object",
@@ -212,7 +212,7 @@ Feature: capabilities
   @smokeTest
   Scenario: getting default capabilities with admin user
     When the administrator retrieves the capabilities using the capabilities API
-    And the JSON data of the response should match
+    Then the ocs JSON data of the response should match
     """
     {
       "type": "object",
