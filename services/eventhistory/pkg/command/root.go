@@ -43,7 +43,7 @@ type SutureService struct {
 
 // NewSutureService creates a new eventhistory.SutureService
 func NewSutureService(cfg *ociscfg.Config) suture.Service {
-	cfg.Notifications.Commons = cfg.Commons
+	cfg.EventHistory.Commons = cfg.Commons
 	return SutureService{
 		cfg: cfg.EventHistory,
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/envdecode"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 )
 
 // ParseConfig loads the ocis configuration and
@@ -36,7 +37,7 @@ func ParseConfig(cfg *config.Config, skipValidate bool) error {
 	return Validate(cfg)
 }
 
-// EnsureDefaults, ensures that all pointers in the
+// EnsureDefaults ensures that all pointers in the
 // oCIS config (not the services configs) are initialized
 func EnsureDefaults(cfg *config.Config) {
 	if cfg.Tracing == nil {
@@ -67,39 +68,9 @@ func EnsureCommons(cfg *config.Config) {
 		cfg.Commons = &shared.Commons{}
 	}
 
-	// copy config to the commons part if set
-	if cfg.Log != nil {
-		cfg.Commons.Log = &shared.Log{
-			Level:  cfg.Log.Level,
-			Pretty: cfg.Log.Pretty,
-			Color:  cfg.Log.Color,
-			File:   cfg.File,
-		}
-	} else {
-		cfg.Commons.Log = &shared.Log{}
-	}
-
-	// copy tracing to the commons part if set
-	if cfg.Tracing != nil {
-		cfg.Commons.Tracing = &shared.Tracing{
-			Enabled:   cfg.Tracing.Enabled,
-			Type:      cfg.Tracing.Type,
-			Endpoint:  cfg.Tracing.Endpoint,
-			Collector: cfg.Tracing.Collector,
-		}
-	} else {
-		cfg.Commons.Tracing = &shared.Tracing{}
-	}
-
-	if cfg.CacheStore != nil {
-		cfg.Commons.CacheStore = &shared.CacheStore{
-			Type:    cfg.CacheStore.Type,
-			Address: cfg.CacheStore.Address,
-			Size:    cfg.CacheStore.Size,
-		}
-	} else {
-		cfg.Commons.CacheStore = &shared.CacheStore{}
-	}
+	cfg.Commons.Log = structs.CopyOrZeroValue(cfg.Log)
+	cfg.Commons.Tracing = structs.CopyOrZeroValue(cfg.Tracing)
+	cfg.Commons.CacheStore = structs.CopyOrZeroValue(cfg.CacheStore)
 
 	if cfg.GRPCClientTLS != nil {
 		cfg.Commons.GRPCClientTLS = cfg.GRPCClientTLS
@@ -111,12 +82,7 @@ func EnsureCommons(cfg *config.Config) {
 
 	cfg.Commons.HTTPServiceTLS = cfg.HTTPServiceTLS
 
-	// copy token manager to the commons part if set
-	if cfg.TokenManager != nil {
-		cfg.Commons.TokenManager = cfg.TokenManager
-	} else {
-		cfg.Commons.TokenManager = &shared.TokenManager{}
-	}
+	cfg.Commons.TokenManager = structs.CopyOrZeroValue(cfg.TokenManager)
 
 	// copy machine auth api key to the commons part if set
 	if cfg.MachineAuthAPIKey != "" {
@@ -147,6 +113,8 @@ func EnsureCommons(cfg *config.Config) {
 	}
 }
 
+// Validate checks that all required configs are set. If a required config value
+// is missing an error will be returned.
 func Validate(cfg *config.Config) error {
 	if cfg.TokenManager.JWTSecret == "" {
 		return shared.MissingJWTTokenError("ocis")
