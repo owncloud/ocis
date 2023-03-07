@@ -27,28 +27,75 @@ import (
 )
 
 type cs3backend struct {
-	graphSelector       selector.Selector
-	settingsRoleService settingssvc.RoleService
-	authProvider        RevaAuthenticator
-	oidcISS             string
-	machineAuthAPIKey   string
-	tokenManager        token.Manager
-	logger              log.Logger
+	graphSelector selector.Selector
+	Options
+}
+
+// Option defines a single option function.
+type Option func(o *Options)
+
+// Options defines the available options for this package.
+type Options struct {
+	logger            log.Logger
+	tokenManager      token.Manager
+	roleService       settingssvc.RoleService
+	authProvider      RevaAuthenticator
+	machineAuthAPIKey string
+	oidcISS           string
+}
+
+func WithLogger(l log.Logger) Option {
+	return func(o *Options) {
+		o.logger = l
+	}
+}
+
+func WithTokenManager(t token.Manager) Option {
+	return func(o *Options) {
+		o.tokenManager = t
+	}
+}
+
+func WithRoleService(rs settingssvc.RoleService) Option {
+	return func(o *Options) {
+		o.roleService = rs
+	}
+}
+
+func WithRevaAuthenticator(ra RevaAuthenticator) Option {
+	return func(o *Options) {
+		o.authProvider = ra
+	}
+}
+
+func WithMachineAuthAPIKey(ma string) Option {
+	return func(o *Options) {
+		o.machineAuthAPIKey = ma
+	}
+}
+
+func WithOIDCissuer(oidcISS string) Option {
+	return func(o *Options) {
+		o.oidcISS = oidcISS
+	}
 }
 
 // NewCS3UserBackend creates a user-provider which fetches users from a CS3 UserBackend
-func NewCS3UserBackend(rs settingssvc.RoleService, ap RevaAuthenticator, machineAuthAPIKey string, oidcISS string, tokenManager token.Manager, logger log.Logger) UserBackend {
+func NewCS3UserBackend(opts ...Option) UserBackend {
+	opt := Options{}
+	for _, o := range opts {
+		o(&opt)
+	}
+
 	reg := registry.GetRegistry()
 	sel := selector.NewSelector(selector.Registry(reg))
-	return &cs3backend{
-		graphSelector:       sel,
-		settingsRoleService: rs,
-		authProvider:        ap,
-		oidcISS:             oidcISS,
-		machineAuthAPIKey:   machineAuthAPIKey,
-		tokenManager:        tokenManager,
-		logger:              logger,
+
+	b := cs3backend{
+		Options:       opt,
+		graphSelector: sel,
 	}
+
+	return &b
 }
 
 func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string) (*cs3.User, string, error) {
@@ -77,7 +124,7 @@ func (c *cs3backend) GetUserRoles(ctx context.Context, user *cs3.User) (*cs3.Use
 	var roleIDs []string
 	if user.Id.Type != cs3.UserType_USER_TYPE_LIGHTWEIGHT {
 		var err error
-		roleIDs, err = loadRolesIDs(ctx, user.Id.OpaqueId, c.settingsRoleService)
+		roleIDs, err = loadRolesIDs(ctx, user.Id.OpaqueId, c.roleService)
 		if err != nil {
 			c.logger.Error().Err(err).Msgf("Could not load roles")
 			return nil, err
@@ -90,7 +137,7 @@ func (c *cs3backend) GetUserRoles(ctx context.Context, user *cs3.User) (*cs3.Use
 			if user.Id.Type == cs3.UserType_USER_TYPE_PRIMARY {
 				c.logger.Info().Str("userid", user.Id.OpaqueId).Msg("user has no role assigned, assigning default user role")
 				ctx = metadata.Set(ctx, middleware.AccountID, user.Id.OpaqueId)
-				_, err := c.settingsRoleService.AssignRoleToUser(ctx, &settingssvc.AssignRoleToUserRequest{
+				_, err := c.roleService.AssignRoleToUser(ctx, &settingssvc.AssignRoleToUserRequest{
 					AccountUuid: user.Id.OpaqueId,
 					RoleId:      settingsService.BundleUUIDRoleUser,
 				})
