@@ -27,6 +27,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
+use Helmich\JsonAssert\JsonAssertions;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
@@ -404,7 +405,6 @@ class SpacesContext implements Context {
 	public function getETag(string $user, string $spaceName, string $fileName): string {
 		$fileData = $this->getFileData($user, $spaceName, $fileName)->getHeaders();
 		return \str_replace('"', '\"', $fileData["Etag"][0]);
-		//        return $fileData["Etag"][0];
 	}
 
 	/**
@@ -1054,15 +1054,15 @@ class SpacesContext implements Context {
 		PyStringNode $schemaString
 	): void {
 		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->value)) {
-			$response = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
-			foreach ($response as $value) {
+			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
+			foreach ($responseBody as $value) {
 				if (isset($value->name) && $value->name === $spaceName) {
-					$response = $value;
+					$responseBody = $value;
 					break;
 				}
 			}
 		} else {
-			$response = $this->featureContext->getJsonDecodedResponseBodyContent();
+			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent();
 		}
 
 		// substitute the value here
@@ -1079,12 +1079,6 @@ class SpacesContext implements Context {
 					"parameter" => [$spaceName]
 				],
 				[
-					"code" => "%user_id%",
-					"function" =>
-						[$this, "getUserIdByUserName"],
-					"parameter" => [$userName]
-				],
-				[
 					"code" => "%file_id%",
 					"function" =>
 						[$this, "getFileId"],
@@ -1096,9 +1090,14 @@ class SpacesContext implements Context {
 						[$this, "getETag"],
 					"parameter" => [$userName, $spaceName, $fileName]
 				],
-			]
+			],
+			null,
+			$userName,
 		);
-		$this->featureContext->theDataOfTheResponseShouldMatch($schemaString, (object) $response);
+		JsonAssertions::assertJsonDocumentMatchesSchema(
+			$responseBody,
+			$this->featureContext->getJSONSchema($schemaString)
+		);
 	}
 
 	/**
