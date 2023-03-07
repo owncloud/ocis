@@ -18,6 +18,11 @@ debug:
   zpages: false
 grpc:
   addr: 127.0.0.1:9460
-  tls: null
-grpc_client_tls: null
+  tls:
+    enabled: false
+    cert: ""
+    key: ""
+grpc_client_tls:
+  mode: ""
+  cacert: ""
 data_path: ~/.ocis/store

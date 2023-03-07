@@ -18,7 +18,10 @@ debug:
   zpages: false
 grpc:
   addr: 127.0.0.1:9157
-  tls: null
+  tls:
+    enabled: false
+    cert: ""
+    key: ""
   protocol: tcp
 http:
   addr: 127.0.0.1:9158

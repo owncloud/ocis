@@ -38,7 +38,9 @@ reva:
     cacert: ""
 token_manager:
   jwt_secret: ""
-grpc_client_tls: null
+grpc_client_tls:
+  mode: ""
+  cacert: ""
 application:
   id: ""
   displayname: ownCloud Infinite Scale

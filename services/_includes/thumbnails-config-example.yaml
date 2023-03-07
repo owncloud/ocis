@@ -18,7 +18,10 @@ debug:
   zpages: false
 grpc:
   addr: 127.0.0.1:9185
-  tls: null
+  tls:
+    enabled: false
+    cert: ""
+    key: ""
 http:
   addr: 127.0.0.1:9186
   tls:
@@ -26,7 +29,9 @@ http:
     cert: ""
     key: ""
   root: /thumbnails
-grpc_client_tls: null
+grpc_client_tls:
+  mode: ""
+  cacert: ""
 thumbnail:
   resolutions:
   - 16x16

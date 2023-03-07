@@ -16,7 +16,9 @@ debug:
   token: ""
   pprof: false
   zpages: false
-grpc_client_tls: null
+grpc_client_tls:
+  mode: ""
+  cacert: ""
 http:
   addr: 127.0.0.1:9115
   root: /

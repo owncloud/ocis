@@ -42,8 +42,13 @@ http:
     allow_credentials: true
 grpc:
   addr: 127.0.0.1:9191
-  tls: null
-grpc_client_tls: null
+  tls:
+    enabled: false
+    cert: ""
+    key: ""
+grpc_client_tls:
+  mode: ""
+  cacert: ""
 store_type: metadata
 data_path: ~/.ocis/settings
 metadata_config:
