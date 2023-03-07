@@ -2,8 +2,6 @@ package middleware
 
 import (
 	"context"
-	"encoding/json"
-	"io"
 	"net/http"
 	"strings"
 	"sync"
@@ -164,41 +162,16 @@ func (m OIDCAuthenticator) shouldServe(req *http.Request) bool {
 	return strings.HasPrefix(header, _bearerPrefix)
 }
 
-type jwksJSON struct {
-	JWKSURL string `json:"jwks_uri"`
-}
-
 func (m *OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
 	m.jwksLock.Lock()
 	defer m.jwksLock.Unlock()
 	if m.JWKS == nil {
-		wellKnown := strings.TrimSuffix(m.OIDCIss, "/") + "/.well-known/openid-configuration"
-
-		resp, err := m.HTTPClient.Get(wellKnown)
-		if err != nil {
-			m.Logger.Error().Err(err).Msg("Failed to set request for .well-known/openid-configuration")
-			return nil
-		}
-		defer resp.Body.Close()
-
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			m.Logger.Error().Err(err).Msg("unable to read discovery response body")
-			return nil
-		}
-
-		if resp.StatusCode != http.StatusOK {
-			m.Logger.Error().Str("status", resp.Status).Str("body", string(body)).Msg("error requesting openid-configuration")
-			return nil
-		}
-
-		var j jwksJSON
-		err = json.Unmarshal(body, &j)
+		oidcMetadata, err := oidc.GetIDPMetadata(m.Logger, m.HTTPClient, m.OIDCIss)
 		if err != nil {
 			m.Logger.Error().Err(err).Msg("failed to decode provider openid-configuration")
 			return nil
 		}
-		m.Logger.Debug().Str("jwks", j.JWKSURL).Msg("discovered jwks endpoint")
+		m.Logger.Debug().Str("jwks", oidcMetadata.JwksURI).Msg("discovered jwks endpoint")
 		options := keyfunc.Options{
 			Client: m.HTTPClient,
 			RefreshErrorHandler: func(err error) {
@@ -209,7 +182,7 @@ func (m *OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
 			RefreshTimeout:    time.Second * time.Duration(m.JWKSOptions.RefreshTimeout),
 			RefreshUnknownKID: m.JWKSOptions.RefreshUnknownKID,
 		}
-		m.JWKS, err = keyfunc.Get(j.JWKSURL, options)
+		m.JWKS, err = keyfunc.Get(oidcMetadata.JwksURI, options)
 		if err != nil {
 			m.JWKS = nil
 			m.Logger.Error().Err(err).Msg("Failed to create JWKS from resource at the given URL.")
