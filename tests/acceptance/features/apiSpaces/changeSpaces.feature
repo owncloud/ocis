@@ -47,6 +47,7 @@ Feature: Change data of space
       | Brian | 403  | Project Jupiter    |
       | Bob   | 403  | Project Jupiter    |
 
+
   Scenario: Only space admin user can change the description(subtitle) of a Space via the Graph API
     When user "Alice" changes the description of the "Project Jupiter" space to "The Death Star is a fictional mobile space station"
     Then the HTTP status code should be "200"
@@ -75,6 +76,7 @@ Feature: Change data of space
       }
     }
     """
+
 
   Scenario Outline: Viewer and editor cannot change the description(subtitle) of a Space via the Graph API
     When user "<user>" changes the description of the "Project Jupiter" space to "The Death Star is a fictional mobile space station"

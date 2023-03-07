@@ -77,7 +77,7 @@ Feature: List and create spaces
     And user "Brian" has created folder "folder"
     And user "Brian" has shared folder "folder" with user "Alice" with permissions "31"
     And user "Alice" has accepted share "/folder" offered by user "Brian"
-    And for user "Alice" the JSON response should contain space called "Shares" and match
+    Then for user "Alice" the JSON response should contain space called "Shares" and match
     """
      {
       "type": "object",

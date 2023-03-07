@@ -1648,7 +1648,7 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @return mixed
 	 */
-	private function getJSONSchema($schemaString) {
+	public function getJSONSchema($schemaString) {
 		if (\gettype($schemaString) !== 'string') {
 			$schemaString = $schemaString->getRaw();
 		}
@@ -1703,12 +1703,10 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @throws Exception
 	 */
-	public function theDataOfTheResponseShouldMatch($schemaString, ?object $response = null): void {
-		if ($response === null) {
-			$response = $this->getJsonDecodedResponseBodyContent();
-		}
+	public function theDataOfTheResponseShouldMatch($schemaString): void {
+		$responseBody = $this->getJsonDecodedResponseBodyContent();
 		JsonAssertions::assertJsonDocumentMatchesSchema(
-			$response,
+			$responseBody,
 			$this->getJSONSchema($schemaString)
 		);
 	}
@@ -3335,16 +3333,18 @@ class FeatureContext extends BehatVariablesContext {
 				"parameter" => []
 			],
 			[
-			"code" => "%user_id%",
-			"function" =>
-			[$this, "getUserIdByUserName"],
-			"parameter" => [$userName]
-			],
+				"code" => "%user_id%",
+				"function" => [
+					$this, "getUserIdByUserName"
+				],
+					"parameter" => [$userName]
+				],
 			[
-			"code" => "%group_id%",
-			"function" =>
-			[$this, "getGroupIdByGroupName"],
-			"parameter" => [$group]
+				"code" => "%group_id%",
+				"function" => [
+					$this, "getGroupIdByGroupName"
+				],
+				"parameter" => [$group]
 			]
 		];
 		if ($user !== null) {
