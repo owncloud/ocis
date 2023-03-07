@@ -3325,7 +3325,7 @@ class FeatureContext extends BehatVariablesContext {
 				"parameter" => []
 			],
 			[
-				"code" => "%group_id%",
+				"code" => "%group_id_pattern%",
 				"function" => [
 					__NAMESPACE__ . '\TestHelpers\GraphHelper',
 					"getUUIDv4Regex"

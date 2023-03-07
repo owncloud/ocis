@@ -116,6 +116,10 @@ Feature: get groups and their members
     """
     {
       "type": "object",
+      "required": [
+        "displayName",
+        "id"
+      ],
       "properties": {
         "displayName": {
           "type": "string",
@@ -123,7 +127,7 @@ Feature: get groups and their members
         },
         "id": {
           "type": "string",
-          "pattern": "^%group_id%$"
+          "pattern": "^%group_id_pattern%$"
         }
       }
     }

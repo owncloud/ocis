@@ -1942,11 +1942,11 @@ class GraphContext implements Context {
 	 * @return void
 	 */
 	public function userGetsDetailsOfTheGroupUsingTheGraphApi(string $user, string $groupName): void {
-		$groupId = $this->getGroupIdByName($groupName);
+		$groupId = $this->featureContext->getGroupIdByGroupName($groupName);
 		$credentials = $this->getAdminOrUserCredentials($user);
 
 		$this->featureContext->setResponse(
-			GraphHelper::getGroup(
+			GraphHelper::getGroupByGroupId(
 				$this->featureContext->getBaseUrl(),
 				$groupId,
 				$this->featureContext->getStepLineRef(),
@@ -1954,23 +1954,5 @@ class GraphContext implements Context {
 				$credentials["password"]
 			)
 		);
-	}
-
-	/**
-	 * Get Group Id from response
-	 *
-	 * @param string $groupName - name of the group
-	 *
-	 * @return string - id of the group
-	 * @throws Exception | GuzzleException
-	 */
-	public function getGroupIdByName(string $groupName): string {
-		$allGroups = $this->getArrayOfGroupsResponded($this->listGroups());
-		foreach ($allGroups as $group) {
-			if ($group['displayName'] === $groupName) {
-				return $group['id'];
-			}
-		}
-		throw new Exception("Group with name '$groupName' not found in the groups list");
 	}
 }
