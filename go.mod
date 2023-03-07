@@ -214,6 +214,7 @@ require (
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/klauspost/cpuid/v2 v2.1.0 // indirect
+	github.com/leonelquinteros/gotext v1.5.2 // indirect
 	github.com/libregraph/oidc-go v1.0.0 // indirect
 	github.com/longsleep/go-metrics v1.0.0 // indirect
 	github.com/longsleep/rndm v1.2.0 // indirect
@@ -293,5 +294,3 @@ require (
 )
 
 replace github.com/cs3org/go-cs3apis => github.com/c0rby/go-cs3apis v0.0.0-20230110100311-5b424f1baa35
-
-replace github.com/cs3org/reva/v2 => github.com/kobergj/reva/v2 v2.0.0-20230306133911-885670aab8df

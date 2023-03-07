@@ -28,9 +28,11 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	locale := r.Header.Get("Prefered-Language")
+
 	resp := GetEventResponseOC10{}
 	for _, e := range evs {
-		noti, err := ul.ConvertEvent(e)
+		noti, err := ul.ConvertEvent(e, locale)
 		if err != nil {
 			ul.log.Error().Err(err).Str("eventid", e.Id).Str("eventtype", e.Type).Msg("failed to convert event")
 			continue

@@ -12,12 +12,16 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/leonelquinteros/gotext"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 )
 
 var (
 	_resourceTypeSpace = "storagespace"
 	_resourceTypeShare = "share"
+
+	// TODO: from config
+	_pathToLocales = "/home/jkoberg/ocis/services/userlog/pkg/service/locales"
 )
 
 // OC10Notification is the oc10 style representation of an event
@@ -37,7 +41,7 @@ type OC10Notification struct {
 }
 
 // ConvertEvent converts an eventhistory event to an OC10Notification
-func (ul *UserlogService) ConvertEvent(event *ehmsg.Event) (OC10Notification, error) {
+func (ul *UserlogService) ConvertEvent(event *ehmsg.Event, locale string) (OC10Notification, error) {
 	etype, ok := ul.registeredEvents[event.Type]
 	if !ok {
 		// this should not happen
@@ -55,33 +59,33 @@ func (ul *UserlogService) ConvertEvent(event *ehmsg.Event) (OC10Notification, er
 		return OC10Notification{}, errors.New("unknown event type")
 	// space related
 	case events.SpaceDisabled:
-		return ul.spaceMessage(event.Id, SpaceDisabled, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
+		return ul.spaceMessage(event.Id, SpaceDisabled, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp, locale)
 	case events.SpaceDeleted:
-		return ul.spaceDeletedMessage(event.Id, ev.Executant, ev.ID.GetOpaqueId(), ev.SpaceName, ev.Timestamp)
+		return ul.spaceDeletedMessage(event.Id, ev.Executant, ev.ID.GetOpaqueId(), ev.SpaceName, ev.Timestamp, locale)
 	case events.SpaceShared:
-		return ul.spaceMessage(event.Id, SpaceShared, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
+		return ul.spaceMessage(event.Id, SpaceShared, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp, locale)
 	case events.SpaceUnshared:
-		return ul.spaceMessage(event.Id, SpaceUnshared, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
+		return ul.spaceMessage(event.Id, SpaceUnshared, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp, locale)
 	case events.SpaceMembershipExpired:
-		return ul.spaceMessage(event.Id, SpaceMembershipExpired, ev.SpaceOwner, ev.SpaceID.GetOpaqueId(), ev.ExpiredAt)
+		return ul.spaceMessage(event.Id, SpaceMembershipExpired, ev.SpaceOwner, ev.SpaceID.GetOpaqueId(), ev.ExpiredAt, locale)
 
 	// share related
 	case events.ShareCreated:
-		return ul.shareMessage(event.Id, ShareCreated, ev.Executant, ev.ItemID, ev.ShareID, utils.TSToTime(ev.CTime))
+		return ul.shareMessage(event.Id, ShareCreated, ev.Executant, ev.ItemID, ev.ShareID, utils.TSToTime(ev.CTime), locale)
 	case events.ShareExpired:
-		return ul.shareMessage(event.Id, ShareExpired, ev.ShareOwner, ev.ItemID, ev.ShareID, ev.ExpiredAt)
+		return ul.shareMessage(event.Id, ShareExpired, ev.ShareOwner, ev.ItemID, ev.ShareID, ev.ExpiredAt, locale)
 	case events.ShareRemoved:
-		return ul.shareMessage(event.Id, ShareRemoved, ev.Executant, ev.ItemID, ev.ShareID, ev.Timestamp)
+		return ul.shareMessage(event.Id, ShareRemoved, ev.Executant, ev.ItemID, ev.ShareID, ev.Timestamp, locale)
 	}
 }
 
-func (ul *UserlogService) spaceDeletedMessage(eventid string, executant *user.UserId, spaceid string, spacename string, ts time.Time) (OC10Notification, error) {
+func (ul *UserlogService) spaceDeletedMessage(eventid string, executant *user.UserId, spaceid string, spacename string, ts time.Time, locale string) (OC10Notification, error) {
 	_, user, err := utils.Impersonate(executant, ul.gwClient, ul.cfg.MachineAuthAPIKey)
 	if err != nil {
 		return OC10Notification{}, err
 	}
 
-	subj, subjraw, msg, msgraw, err := ul.composeMessage(SpaceDeleted, map[string]string{
+	subj, subjraw, msg, msgraw, err := ul.composeMessage(SpaceDeleted, locale, map[string]interface{}{
 		"username":  user.GetDisplayName(),
 		"spacename": spacename,
 	})
@@ -110,7 +114,7 @@ func (ul *UserlogService) spaceDeletedMessage(eventid string, executant *user.Us
 	}, nil
 }
 
-func (ul *UserlogService) spaceMessage(eventid string, eventname string, executant *user.UserId, spaceid string, ts time.Time) (OC10Notification, error) {
+func (ul *UserlogService) spaceMessage(eventid string, nt NotificationTemplate, executant *user.UserId, spaceid string, ts time.Time, locale string) (OC10Notification, error) {
 	ctx, user, err := utils.Impersonate(executant, ul.gwClient, ul.cfg.MachineAuthAPIKey)
 	if err != nil {
 		return OC10Notification{}, err
@@ -121,7 +125,7 @@ func (ul *UserlogService) spaceMessage(eventid string, eventname string, executa
 		return OC10Notification{}, err
 	}
 
-	subj, subjraw, msg, msgraw, err := ul.composeMessage(eventname, map[string]string{
+	subj, subjraw, msg, msgraw, err := ul.composeMessage(nt, locale, map[string]interface{}{
 		"username":  user.GetDisplayName(),
 		"spacename": space.GetName(),
 	})
@@ -144,7 +148,7 @@ func (ul *UserlogService) spaceMessage(eventid string, eventname string, executa
 	}, nil
 }
 
-func (ul *UserlogService) shareMessage(eventid string, eventname string, executant *user.UserId, resourceid *storageprovider.ResourceId, shareid *collaboration.ShareId, ts time.Time) (OC10Notification, error) {
+func (ul *UserlogService) shareMessage(eventid string, nt NotificationTemplate, executant *user.UserId, resourceid *storageprovider.ResourceId, shareid *collaboration.ShareId, ts time.Time, locale string) (OC10Notification, error) {
 	ctx, user, err := utils.Impersonate(executant, ul.gwClient, ul.cfg.MachineAuthAPIKey)
 	if err != nil {
 		return OC10Notification{}, err
@@ -155,7 +159,7 @@ func (ul *UserlogService) shareMessage(eventid string, eventname string, executa
 		return OC10Notification{}, err
 	}
 
-	subj, subjraw, msg, msgraw, err := ul.composeMessage(eventname, map[string]string{
+	subj, subjraw, msg, msgraw, err := ul.composeMessage(nt, locale, map[string]interface{}{
 		"username":     user.GetDisplayName(),
 		"resourcename": info.GetName(),
 	})
@@ -178,23 +182,23 @@ func (ul *UserlogService) shareMessage(eventid string, eventname string, executa
 	}, nil
 }
 
-func (ul *UserlogService) composeMessage(eventname string, vars map[string]string) (string, string, string, string, error) {
-	tpl, ok := _templates[eventname]
-	if !ok {
-		return "", "", "", "", errors.New("unknown template name")
+func (ul *UserlogService) composeMessage(nt NotificationTemplate, locale string, vars map[string]interface{}) (string, string, string, string, error) {
+	subj, msg, err := ul.parseTemplate(nt, locale)
+	if err != nil {
+		return "", "", "", "", err
 	}
 
-	subject := ul.executeTemplate(tpl.Subject, vars)
+	subject := ul.executeTemplate(subj, vars)
 
-	subjectraw := ul.executeTemplate(tpl.Subject, map[string]string{
+	subjectraw := ul.executeTemplate(subj, map[string]interface{}{
 		"username":     "{user}",
 		"spacename":    "{space}",
 		"resourcename": "{resource}",
 	})
 
-	message := ul.executeTemplate(tpl.Message, vars)
+	message := ul.executeTemplate(msg, vars)
 
-	messageraw := ul.executeTemplate(tpl.Message, map[string]string{
+	messageraw := ul.executeTemplate(msg, map[string]interface{}{
 		"username":     "{user}",
 		"spacename":    "{space}",
 		"resourcename": "{resource}",
@@ -238,7 +242,22 @@ func (ul *UserlogService) getDetails(user *user.User, space *storageprovider.Sto
 	return details
 }
 
-func (ul *UserlogService) executeTemplate(tpl *template.Template, vars map[string]string) string {
+func (ul *UserlogService) parseTemplate(nt NotificationTemplate, locale string) (*template.Template, *template.Template, error) {
+	// Create Locale with library path and language code and load domain '.../default.po'
+	l := gotext.NewLocale(_pathToLocales, locale)
+	l.AddDomain("default")
+
+	subject, err := template.New("").Parse(l.Get(nt.Subject))
+	if err != nil {
+		return nil, nil, err
+	}
+
+	message, err := template.New("").Parse(l.Get(nt.Message))
+	return subject, message, err
+
+}
+
+func (ul *UserlogService) executeTemplate(tpl *template.Template, vars map[string]interface{}) string {
 	var writer bytes.Buffer
 	if err := tpl.Execute(&writer, vars); err != nil {
 		ul.log.Error().Err(err).Str("templateName", tpl.Name()).Msg("cannot execute template")
