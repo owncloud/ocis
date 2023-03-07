@@ -224,7 +224,6 @@ class GraphHelper {
 		string $adminPassword,
 		string $userName
 	): ResponseInterface {
-		var_dump($userName);
 		$url = self::getFullUrl($baseUrl, 'users/' . $userName);
 		return HttpRequestHelper::get(
 			$url,

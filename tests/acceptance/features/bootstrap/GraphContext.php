@@ -1757,10 +1757,8 @@ class GraphContext implements Context {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		foreach ($table->getHash() as $row) {
-			$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
-			if (\in_array('false', $userIds)) {
-				$userIds[] = WebDavHelper::generateUUIDv4();
-			}
+			$userId = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
+			$userIds[] = !$userId ? WebDavHelper::generateUUIDv4() : $userId;
 		}
 		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
 	}
