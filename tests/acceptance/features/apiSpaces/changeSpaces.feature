@@ -31,12 +31,17 @@ Feature: Change data of space
      {
       "type": "object",
       "required": [
-        "name"
+        "name",
+        "driveType"
       ],
       "properties": {
         "name": {
           "type": "string",
           "enum": ["<expectedName>"]
+        },
+        "driveType": {
+          "type": "string",
+          "enum": ["project"]
         }
       }
     }
