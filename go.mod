@@ -11,7 +11,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.6
 	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/cs3org/go-cs3apis v0.0.0-20221012090518-ef2996678965
-	github.com/cs3org/reva/v2 v2.12.1-0.20230309145911-3ddca079da2c
+	github.com/cs3org/reva/v2 v2.12.1-0.20230313151335-4339b8ab4759
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.7
@@ -261,6 +261,7 @@ require (
 	github.com/sciencemesh/meshdirectory-web v1.0.4 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sethvargo/go-password v0.2.0 // indirect
+	github.com/shamaton/msgpack/v2 v2.1.1 // indirect
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749 // indirect
 	github.com/shurcooL/vfsgen v0.0.0-20200824052919-0d455de96546 // indirect
 	github.com/sony/gobreaker v0.5.0 // indirect
