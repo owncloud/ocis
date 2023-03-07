@@ -147,7 +147,14 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 				Msg("Failed to create token manager")
 		}
 
-		userProvider = backend.NewCS3UserBackend(rolesClient, revaClient, cfg.MachineAuthAPIKey, cfg.OIDC.Issuer, tokenManager, logger)
+		userProvider = backend.NewCS3UserBackend(
+			backend.WithLogger(logger),
+			backend.WithRoleService(rolesClient),
+			backend.WithRevaAuthenticator(revaClient),
+			backend.WithMachineAuthAPIKey(cfg.MachineAuthAPIKey),
+			backend.WithOIDCissuer(cfg.OIDC.Issuer),
+			backend.WithTokenManager(tokenManager),
+		)
 	default:
 		logger.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
 	}
