@@ -151,6 +151,60 @@ Feature: add users to group
     Then the HTTP status code should be "404"
 
 
+  Scenario: add multiple users to a group at once
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    And these users have been created with default attributes and without skeleton files:
+      | username |
+      | Brian    |
+      | Carol    |
+    And user "Alice" has created a group "grp1" using the Graph API
+    When the administrator "Alice" adds the following users to a group "grp1" at once using the Graph API
+      | username |
+      | Brian    |
+      | Carol    |
+    Then the HTTP status code should be "204"
+    And the following users should be listed in the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+      | Carol    | grp1      |
+
+
+  Scenario: admin tries to add users to a non-existing group at once
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    And these users have been created with default attributes and without skeleton files:
+      | username |
+      | Brian    |
+      | Carol    |
+    When the administrator "Alice" tries to add the following users to a non-existing group at once using the Graph API
+      | username |
+      | Brian    |
+      | Carol    |
+    Then the HTTP status code should be "404"
+
+
+  Scenario: admin tries to add multiple non-existing users to a group at once
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    And user "Alice" has created a group "grp1" using the Graph API
+    When the administrator "Alice" tries to add the following non-existing users to a group "grp1" at once using the Graph API
+      | username |
+      | Brian    |
+      | Carol    |
+    Then the HTTP status code should be "404"
+
+
+  Scenario: admin tries to add non-existing and existing users to a group at once
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    And these users have been created with default attributes and without skeleton files:
+      | username |
+      | Brian    |
+    And user "Alice" has created a group "grp1" using the Graph API
+    When the administrator "Alice" tries to add the following users to a group "grp1" at once using the Graph API
+      | username |
+      | Brian    |
+      | Carol    |
+    Then the HTTP status code should be "404"
+
+
   Scenario: adding a disabled user to a group
     Given these groups have been created:
       | groupname | comment      |
