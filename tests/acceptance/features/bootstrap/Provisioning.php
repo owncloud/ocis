@@ -246,7 +246,7 @@ trait Provisioning {
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public function getAttributeOfCreatedUser(string $user, string $attribute) {
+	public function getAttributeOfCreatedUser(string $user, string $attribute): mixed {
 		$usersList = $this->getCreatedUsers();
 		$normalizedUsername = $this->normalizeUsername($user);
 		if (\array_key_exists($normalizedUsername, $usersList)) {
@@ -265,9 +265,7 @@ trait Provisioning {
 				);
 			}
 		} else {
-			throw new Exception(
-				__METHOD__ . ": User '$user' does not exist in the created list."
-			);
+			return false;
 		}
 	}
 
@@ -278,7 +276,7 @@ trait Provisioning {
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public function getAttributeOfCreatedGroup(string $group, string $attribute) {
+	public function getAttributeOfCreatedGroup(string $group, string $attribute): mixed {
 		$groupsList = $this->getCreatedGroups();
 		if (\array_key_exists($group, $groupsList)) {
 			// provide attributes only if the group exists
@@ -296,9 +294,7 @@ trait Provisioning {
 				);
 			}
 		} else {
-			throw new Exception(
-				__METHOD__ . ": Group '$group' does not exist in the created list."
-			);
+			return false;
 		}
 	}
 

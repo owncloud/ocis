@@ -198,7 +198,7 @@ Feature: add users to group
       | username |
       | Brian    |
     And user "Alice" has created a group "grp1" using the Graph API
-    When the administrator "Alice" tries to add the following users to a group "grp1" at once using the Graph API
+    When the administrator "Alice" tries to add the following existent and nonexistent users to a group "grp1" at once using the Graph API
       | username |
       | Brian    |
       | Carol    |
