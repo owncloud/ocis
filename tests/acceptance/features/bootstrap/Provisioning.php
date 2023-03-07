@@ -246,7 +246,7 @@ trait Provisioning {
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public function getAttributeOfCreatedUser(string $user, string $attribute): mixed {
+	public function getAttributeOfCreatedUser(string $user, string $attribute) {
 		$usersList = $this->getCreatedUsers();
 		$normalizedUsername = $this->normalizeUsername($user);
 		if (\array_key_exists($normalizedUsername, $usersList)) {
@@ -276,7 +276,7 @@ trait Provisioning {
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public function getAttributeOfCreatedGroup(string $group, string $attribute): mixed {
+	public function getAttributeOfCreatedGroup(string $group, string $attribute) {
 		$groupsList = $this->getCreatedGroups();
 		if (\array_key_exists($group, $groupsList)) {
 			// provide attributes only if the group exists
