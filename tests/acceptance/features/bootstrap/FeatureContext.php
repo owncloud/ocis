@@ -4570,10 +4570,10 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @param string $userName
 	 *
-	 * @return mixed
+	 * @return string
 	 * @throws Exception|GuzzleException
 	 */
-	public function getUserIdByUserName(string $userName) {
+	public function getUserIdByUserName(string $userName): string {
 		$response = GraphHelper::getUser(
 			$this->getBaseUrl(),
 			$this->getStepLineRef(),
@@ -4589,7 +4589,7 @@ class FeatureContext extends BehatVariablesContext {
 				throw new Exception(__METHOD__ . " accounts-list is empty");
 			}
 		}
-		return false;
+		throw new Exception(__METHOD__ . " user with name $userName not found");
 	}
 
 	/**
@@ -4597,10 +4597,10 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @param string $groupName
 	 *
-	 * @return mixed
+	 * @return string
 	 * @throws Exception|GuzzleException
 	 */
-	public function getGroupIdByGroupName(string $groupName) {
+	public function getGroupIdByGroupName(string $groupName):string {
 		$response = GraphHelper::getGroup(
 			$this->getBaseUrl(),
 			$this->getStepLineRef(),
@@ -4616,6 +4616,6 @@ class FeatureContext extends BehatVariablesContext {
 				throw new Exception(__METHOD__ . " accounts-list is empty");
 			}
 		}
-		return false;
+		throw new Exception(__METHOD__ . " Group with name $groupName not found");
 	}
 }

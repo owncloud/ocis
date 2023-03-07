@@ -242,7 +242,7 @@ class GraphContext implements Context {
 	public function adminHasRetrievedUserUsingTheGraphApi(string $user): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		$userId = !$userId ? $user : $userId;
+		$userId = $userId ? $userId : $user;
 		$result = GraphHelper::getUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -1758,7 +1758,7 @@ class GraphContext implements Context {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		foreach ($table->getHash() as $row) {
 			$userId = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
-			$userIds[] = !$userId ? WebDavHelper::generateUUIDv4() : $userId;
+			$userIds[] = $userId ? $userId : WebDavHelper::generateUUIDv4();
 		}
 		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
 	}
