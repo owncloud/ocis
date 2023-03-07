@@ -192,7 +192,17 @@ func (m SignedURLAuthenticator) Authenticate(r *http.Request) (*http.Request, bo
 		return nil, false
 	}
 
-	user, _, err := m.UserProvider.GetUserByClaims(r.Context(), "username", r.URL.Query().Get(_paramOCCredential), true)
+	user, _, err := m.UserProvider.GetUserByClaims(r.Context(), "username", r.URL.Query().Get(_paramOCCredential))
+	if err != nil {
+		m.Logger.Error().
+			Err(err).
+			Str("authenticator", "signed_url").
+			Str("path", r.URL.Path).
+			Msg("Could not get user by claim")
+		return nil, false
+	}
+
+	user, err = m.UserProvider.GetUserRoles(r.Context(), user)
 	if err != nil {
 		m.Logger.Error().
 			Err(err).

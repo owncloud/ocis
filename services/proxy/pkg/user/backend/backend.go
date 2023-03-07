@@ -25,10 +25,10 @@ var (
 
 // UserBackend allows the proxy to retrieve users from different user-backends (accounts-service, CS3)
 type UserBackend interface {
-	GetUserByClaims(ctx context.Context, claim, value string, withRoles bool) (*cs3.User, string, error)
+	GetUserByClaims(ctx context.Context, claim, value string) (*cs3.User, string, error)
+	GetUserRoles(ctx context.Context, user *cs3.User) (*cs3.User, error)
 	Authenticate(ctx context.Context, username string, password string) (*cs3.User, string, error)
 	CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*cs3.User, error)
-	GetUserGroups(ctx context.Context, userID string)
 }
 
 // RevaAuthenticator helper interface to mock auth-method from reva gateway-client.

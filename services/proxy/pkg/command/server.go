@@ -236,7 +236,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		),
 		middleware.SelectorCookie(
 			middleware.Logger(logger),
-			middleware.UserProvider(userProvider),
 			middleware.PolicySelectorConfig(*cfg.PolicySelector),
 		),
 		middleware.Policies(logger, cfg.PoliciesMiddleware.Query),
