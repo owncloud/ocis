@@ -122,6 +122,7 @@ func newMockAccountResolver(userBackendResult *userv1beta1.User, userBackendErr 
 
 	ub := mocks.UserBackend{}
 	ub.On("GetUserByClaims", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(userBackendResult, token, userBackendErr)
+	ub.On("GetUserRoles", mock.Anything, mock.Anything).Return(userBackendResult, nil)
 
 	return AccountResolver(
 		Logger(log.NewLogger()),

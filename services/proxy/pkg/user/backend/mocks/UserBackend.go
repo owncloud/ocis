@@ -67,13 +67,13 @@ func (_m *UserBackend) CreateUserFromClaims(ctx context.Context, claims map[stri
 	return r0, r1
 }
 
-// GetUserByClaims provides a mock function with given fields: ctx, claim, value, withRoles
-func (_m *UserBackend) GetUserByClaims(ctx context.Context, claim string, value string, withRoles bool) (*userv1beta1.User, string, error) {
-	ret := _m.Called(ctx, claim, value, withRoles)
+// GetUserByClaims provides a mock function with given fields: ctx, claim, value
+func (_m *UserBackend) GetUserByClaims(ctx context.Context, claim string, value string) (*userv1beta1.User, string, error) {
+	ret := _m.Called(ctx, claim, value)
 
 	var r0 *userv1beta1.User
-	if rf, ok := ret.Get(0).(func(context.Context, string, string, bool) *userv1beta1.User); ok {
-		r0 = rf(ctx, claim, value, withRoles)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) *userv1beta1.User); ok {
+		r0 = rf(ctx, claim, value)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*userv1beta1.User)
@@ -81,15 +81,15 @@ func (_m *UserBackend) GetUserByClaims(ctx context.Context, claim string, value 
 	}
 
 	var r1 string
-	if rf, ok := ret.Get(1).(func(context.Context, string, string, bool) string); ok {
-		r1 = rf(ctx, claim, value, withRoles)
+	if rf, ok := ret.Get(1).(func(context.Context, string, string) string); ok {
+		r1 = rf(ctx, claim, value)
 	} else {
 		r1 = ret.Get(1).(string)
 	}
 
 	var r2 error
-	if rf, ok := ret.Get(2).(func(context.Context, string, string, bool) error); ok {
-		r2 = rf(ctx, claim, value, withRoles)
+	if rf, ok := ret.Get(2).(func(context.Context, string, string) error); ok {
+		r2 = rf(ctx, claim, value)
 	} else {
 		r2 = ret.Error(2)
 	}
@@ -97,9 +97,27 @@ func (_m *UserBackend) GetUserByClaims(ctx context.Context, claim string, value 
 	return r0, r1, r2
 }
 
-// GetUserGroups provides a mock function with given fields: ctx, userID
-func (_m *UserBackend) GetUserGroups(ctx context.Context, userID string) {
-	_m.Called(ctx, userID)
+// GetUserRoles provides a mock function with given fields: ctx, user
+func (_m *UserBackend) GetUserRoles(ctx context.Context, user *userv1beta1.User) (*userv1beta1.User, error) {
+	ret := _m.Called(ctx, user)
+
+	var r0 *userv1beta1.User
+	if rf, ok := ret.Get(0).(func(context.Context, *userv1beta1.User) *userv1beta1.User); ok {
+		r0 = rf(ctx, user)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*userv1beta1.User)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *userv1beta1.User) error); ok {
+		r1 = rf(ctx, user)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
 }
 
 type mockConstructorTestingTNewUserBackend interface {

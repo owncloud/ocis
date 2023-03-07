@@ -51,7 +51,7 @@ func NewCS3UserBackend(rs settingssvc.RoleService, ap RevaAuthenticator, machine
 	}
 }
 
-func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, withRoles bool) (*cs3.User, string, error) {
+func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string) (*cs3.User, string, error) {
 	res, err := c.authProvider.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     claim + ":" + value,
@@ -70,16 +70,17 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 
 	user := res.User
 
-	if !withRoles {
-		return user, res.Token, nil
-	}
+	return user, res.Token, nil
+}
 
+func (c *cs3backend) GetUserRoles(ctx context.Context, user *cs3.User) (*cs3.User, error) {
 	var roleIDs []string
 	if user.Id.Type != cs3.UserType_USER_TYPE_LIGHTWEIGHT {
+		var err error
 		roleIDs, err = loadRolesIDs(ctx, user.Id.OpaqueId, c.settingsRoleService)
 		if err != nil {
 			c.logger.Error().Err(err).Msgf("Could not load roles")
-			return nil, "", err
+			return nil, err
 		}
 
 		if len(roleIDs) == 0 {
@@ -95,7 +96,7 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 				})
 				if err != nil {
 					c.logger.Error().Err(err).Msg("Could not add default role")
-					return nil, "", err
+					return nil, err
 				}
 				roleIDs = append(roleIDs, settingsService.BundleUUIDRoleUser)
 			}
@@ -105,6 +106,7 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 	enc, err := encodeRoleIDs(roleIDs)
 	if err != nil {
 		c.logger.Error().Err(err).Msg("Could not encode loaded roles")
+		return nil, err
 	}
 
 	if user.Opaque == nil {
@@ -116,8 +118,7 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string, w
 	} else {
 		user.Opaque.Map["roles"] = enc
 	}
-
-	return user, res.Token, nil
+	return user, nil
 }
 
 func (c *cs3backend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, string, error) {
@@ -196,10 +197,6 @@ func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string
 	cs3UserCreated := c.cs3UserFromLibregraph(newctx, created)
 
 	return &cs3UserCreated, nil
-}
-
-func (c cs3backend) GetUserGroups(ctx context.Context, userID string) {
-	panic("implement me")
 }
 
 func (c cs3backend) setupLibregraphClient(ctx context.Context, cs3token string) (*libregraph.APIClient, error) {

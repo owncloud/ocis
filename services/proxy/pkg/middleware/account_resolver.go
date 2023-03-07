@@ -62,7 +62,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		user, token, err = m.userProvider.GetUserByClaims(req.Context(), m.userCS3Claim, value, true)
+		user, token, err = m.userProvider.GetUserByClaims(req.Context(), m.userCS3Claim, value)
 
 		if errors.Is(err, backend.ErrAccountNotFound) {
 			m.logger.Debug().Str("claim", m.userOIDCClaim).Str("value", value).Msg("User by claim not found")
@@ -76,7 +76,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			if err != nil {
 				m.logger.Error().Err(err).Msg("Autoprovisioning user failed")
 			}
-			user, token, err = m.userProvider.GetUserByClaims(req.Context(), "userid", user.Id.OpaqueId, true)
+			user, token, err = m.userProvider.GetUserByClaims(req.Context(), "userid", user.Id.OpaqueId)
 			if err != nil {
 				m.logger.Error().Err(err).Str("userid", user.Id.OpaqueId).Msg("Error getting token for autoprovisioned user")
 			}
@@ -94,6 +94,14 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 
+		// resolve the user's roles
+		user, err = m.userProvider.GetUserRoles(ctx, user)
+		if err != nil {
+			m.logger.Error().Err(err).Msg("Could not get user roles")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		// add user to context for selectors
 		ctx = revactx.ContextSetUser(ctx, user)
 		req = req.WithContext(ctx)
@@ -101,7 +109,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		m.logger.Debug().Interface("claims", claims).Interface("user", user).Msg("associated claims with user")
 	} else if user != nil {
 		var err error
-		_, token, err = m.userProvider.GetUserByClaims(req.Context(), "username", user.Username, true)
+		_, token, err = m.userProvider.GetUserByClaims(req.Context(), "username", user.Username)
 
 		if errors.Is(err, backend.ErrAccountDisabled) {
 			m.logger.Debug().Interface("user", user).Msg("Disabled")
