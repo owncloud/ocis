@@ -1942,16 +1942,15 @@ class GraphContext implements Context {
 	 * @return void
 	 */
 	public function userGetsDetailsOfTheGroupUsingTheGraphApi(string $user, string $groupName): void {
-		$groupId = $this->featureContext->getGroupIdByGroupName($groupName);
 		$credentials = $this->getAdminOrUserCredentials($user);
 
 		$this->featureContext->setResponse(
-			GraphHelper::getGroupByGroupId(
+			GraphHelper::getGroup(
 				$this->featureContext->getBaseUrl(),
-				$groupId,
 				$this->featureContext->getStepLineRef(),
 				$credentials["username"],
-				$credentials["password"]
+				$credentials["password"],
+				$groupName
 			)
 		);
 	}

@@ -475,33 +475,6 @@ class GraphHelper {
 
 	/**
 	 * @param string $baseUrl
-	 * @param string $groupId
-	 * @param string $xRequestId
-	 * @param string $user
-	 * @param string $password
-	 *
-	 * @return ResponseInterface
-	 * @throws GuzzleException
-	 */
-	public static function getGroupByGroupId(
-		string $baseUrl,
-		string $groupId,
-		string $xRequestId,
-		string $user,
-		string $password
-	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId);
-		return HttpRequestHelper::get(
-			$url,
-			$xRequestId,
-			$user,
-			$password,
-			self::getRequestHeaders(),
-		);
-	}
-
-	/**
-	 * @param string $baseUrl
 	 * @param string $xRequestId
 	 * @param string $adminUser
 	 * @param string $adminPassword
