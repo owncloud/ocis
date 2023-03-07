@@ -30,9 +30,7 @@ http:
     enabled: false
     cert: ""
     key: ""
-grpc_client_tls:
-  mode: ""
-  cacert: ""
+grpc_client_tls: null
 token_manager:
   jwt_secret: ""
 machine_auth_api_key: ""

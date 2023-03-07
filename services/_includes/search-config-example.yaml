@@ -18,18 +18,13 @@ debug:
   zpages: false
 grpc:
   addr: 127.0.0.1:9220
-  tls:
-    enabled: false
-    cert: ""
-    key: ""
+  tls: null
 reva:
   address: 127.0.0.1:9142
   tls:
     mode: ""
     cacert: ""
-grpc_client_tls:
-  mode: ""
-  cacert: ""
+grpc_client_tls: null
 events:
   endpoint: 127.0.0.1:9233
   cluster: ocis-cluster

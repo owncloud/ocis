@@ -15,9 +15,6 @@
 | STORAGE_SYSTEM_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling|
 | STORAGE_SYSTEM_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | STORAGE_SYSTEM_GRPC_ADDR | string | 127.0.0.1:9215 | The bind address of the GRPC service.|
-| OCIS_GRPC_TLS_ENABLED | bool | false | Activates TLS for the grpc based services using the server certifcate and key configured via OCIS_GRPC_TLS_CERTIFICATE and OCIS_GRPC_TLS_KEY. If OCIS_GRPC_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with OCIS_GRPC_CLIENT_TLS_MODE=insecure.|
-| OCIS_GRPC_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the grpc services.|
-| OCIS_GRPC_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the grpc services.|
 | STORAGE_SYSTEM_GRPC_PROTOCOL | string | tcp | The transport protocol of the GPRC service.|
 | STORAGE_SYSTEM_HTTP_ADDR | string | 127.0.0.1:9216 | The bind address of the HTTP service.|
 | STORAGE_SYSTEM_HTTP_PROTOCOL | string | tcp | The transport protocol of the HTTP service.|
