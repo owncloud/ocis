@@ -507,6 +507,41 @@ class GraphHelper {
 	 * @param string $xRequestId
 	 * @param string $adminUser
 	 * @param string $adminPassword
+	 * @param string $groupId
+	 * @param array $userIds
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function addUsersToGroup(
+		string $baseUrl,
+		string $xRequestId,
+		string $adminUser,
+		string $adminPassword,
+		string $groupId,
+		array $userIds
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId);
+		$payload = [ "members@odata.bind" => [] ];
+		foreach ($userIds as $userId) {
+			$payload["members@odata.bind"][] = self::getFullUrl($baseUrl, 'users/' . $userId);
+		}
+		return HttpRequestHelper::sendRequest(
+			$url,
+			$xRequestId,
+			'PATCH',
+			$adminUser,
+			$adminPassword,
+			self::getRequestHeaders(),
+			\json_encode($payload)
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
 	 * @param string $userId
 	 * @param string $groupId
 	 *
@@ -678,7 +713,7 @@ class GraphHelper {
 			$payload['mail'] = $email;
 		}
 		$payload['accountEnabled'] = $accountEnabled;
-		
+
 		return \json_encode($payload);
 	}
 

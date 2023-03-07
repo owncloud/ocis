@@ -26,14 +26,14 @@ Feature: create group
   Scenario: admin user tries to create a group that already exists
     Given group "mygroup" has been created
     When user "Alice" tries to create a group "mygroup" using the Graph API
-    And the HTTP status code should be "400"
+    Then the HTTP status code should be "400"
     And group "mygroup" should exist
 
 
   Scenario: normal user tries to create a group
     Given user "Brian" has been created with default attributes and without skeleton files
     When user "Brian" tries to create a group "mygroup" using the Graph API
-    And the HTTP status code should be "401"
+    Then the HTTP status code should be "401"
     And group "mygroup" should not exist
 
 
