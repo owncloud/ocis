@@ -1634,9 +1634,10 @@
           "protocolMapper": "oidc-usermodel-realm-role-mapper",
           "consentRequired": false,
           "config": {
-            "user.attribute": "foo",
             "access.token.claim": "true",
-            "claim.name": "realm_access.roles",
+            "claim.name": "roles",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
             "jsonType.label": "String",
             "multivalued": "true"
           }
