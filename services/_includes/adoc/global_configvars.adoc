@@ -26,7 +26,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Flag to enable or disable the creation of the demo users.
+The default role assignments the demo users should be setup.
 
 a| `LDAP_BIND_DN`
 
@@ -466,13 +466,13 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
-++string ++
+++[]string ++
 
 a| [subs=-attributes]
-++ ++
+++[] ++
 
 a| [subs=-attributes]
-A comma-separated list of addresses to connect to. Only valid if the above setting is set to "etcd"
+Node addresses to use for the cache store.
 
 a| `OCIS_CACHE_STORE_SIZE`
 
@@ -501,10 +501,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ ++
+++memory ++
 
 a| [subs=-attributes]
-The type of the cache store. Valid options are "noop", "ocmem", "etcd" and "memory"
+Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -850,7 +850,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments.
+Allow insecure connections to the OIDC issuer.
 
 a| `OCIS_JWT_SECRET`
 
@@ -1071,7 +1071,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary to access resources from other services.
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1334,7 +1334,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+URL to load themes from. Will be prepended to the theme path.
 
 a| `REVA_GATEWAY`
 
@@ -1385,5 +1385,5 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Transfer secret for signing file up- and download requests.
+The storage transfer secret.
 |===
