@@ -23,7 +23,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/createGroupCaseSensitive.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroupCaseSensitive.feature#L21)
 - [apiGraph/createGroupCaseSensitive.feature:22](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroupCaseSensitive.feature#L22)
 - [apiGraph/createGroup.feature:26](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroup.feature#L26)
-- [apiGraph/createUser.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createUser.feature#L28)
 
 ### [PROPFIND on accepted shares with identical names containing brackets exit with 404](https://github.com/owncloud/ocis/issues/4421)
 - [apiSpacesShares/changingFilesShare.feature:12](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/changingFilesShare.feature#L12)
@@ -93,7 +92,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
 - [apiGraph/getUser.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L23)
-- [apiGraph/getUser.feature:92](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L92)
+- [apiGraph/getUser.feature:102](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L102)
 
 #### [GET a file while it's in processing doesn't return 425 code (async uploads)](https://github.com/owncloud/ocis/issues/5326)
 - [apiAsyncUpload/delayPostprocessing.feature:14](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature#L14)
@@ -109,5 +108,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Space admin should not not be able to change the user quota](https://github.com/owncloud/ocis/issues/5475)
 - [apiSpaces/spaceManagement.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/spaceManagement.feature#L69)
 
+#### Change editUser test where we set empty value
+- [apiGraph/editUser.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L33)
+- [apiGraph/editUser.feature:80](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L80)
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

@@ -171,6 +171,7 @@ class GraphHelper {
 	 * @param string|null $password
 	 * @param string|null $email
 	 * @param string|null $displayName
+	 * @param bool|true $accountEnabled
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -184,13 +185,15 @@ class GraphHelper {
 		?string $userName = null,
 		?string $password = null,
 		?string $email = null,
-		?string $displayName = null
+		?string $displayName = null,
+		?bool $accountEnabled = true
 	): ResponseInterface {
 		$payload = self::preparePatchUserPayload(
 			$userName,
 			$password,
 			$email,
-			$displayName
+			$displayName,
+			$accountEnabled
 		);
 		$url = self::getFullUrl($baseUrl, 'users/' . $userId);
 		return HttpRequestHelper::sendRequest(
@@ -674,6 +677,7 @@ class GraphHelper {
 		if (!empty($email)) {
 			$payload['mail'] = $email ?? $userName . '@example.com';
 		}
+		$payload['accountEnabled'] = true;
 		return \json_encode($payload);
 	}
 
@@ -684,6 +688,7 @@ class GraphHelper {
 	 * @param string|null $password
 	 * @param string|null $email
 	 * @param string|null $displayName
+	 * @param bool|true $accountEnabled
 	 *
 	 * @return string
 	 */
@@ -691,7 +696,8 @@ class GraphHelper {
 		?string $userName,
 		?string $password,
 		?string $email,
-		?string $displayName
+		?string $displayName,
+		?bool $accountEnabled
 	): string {
 		$payload = [];
 		if ($userName) {
@@ -706,6 +712,8 @@ class GraphHelper {
 		if ($email) {
 			$payload['mail'] = $email;
 		}
+		$payload['accountEnabled'] = $accountEnabled;
+		
 		return \json_encode($payload);
 	}
 
