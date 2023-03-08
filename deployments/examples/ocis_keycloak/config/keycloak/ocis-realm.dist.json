@@ -47,9 +47,36 @@
   "roles": {
     "realm": [
       {
+        "id": "0bb40fa2-4490-4687-9159-b1d27ec7423a",
+        "name": "ocisAdmin",
+        "description": "",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "ownCloud Infinite Scale Test",
+        "attributes": {}
+      },
+      {
         "id": "2d576514-4aae-46aa-9d9c-075f55f4d988",
         "name": "uma_authorization",
         "description": "${role_uma_authorization}",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "ownCloud Infinite Scale Test",
+        "attributes": {}
+      },
+      {
+        "id": "8c79ff81-c256-48fd-b0b9-795c7941eedf",
+        "name": "ocisUser",
+        "description": "",
+        "composite": false,
+        "clientRole": false,
+        "containerId": "ownCloud Infinite Scale Test",
+        "attributes": {}
+      },
+      {
+        "id": "bd5f5012-48bb-4ea4-bfe6-0623e3ca0552",
+        "name": "ocisSpaceAdmin",
+        "description": "",
         "composite": false,
         "clientRole": false,
         "containerId": "ownCloud Infinite Scale Test",
@@ -81,6 +108,15 @@
             ]
           }
         },
+        "clientRole": false,
+        "containerId": "ownCloud Infinite Scale Test",
+        "attributes": {}
+      },
+      {
+        "id": "7eedfa6d-a2d9-4296-b6db-e75e4e9c0963",
+        "name": "ocisGuest",
+        "description": "",
+        "composite": false,
         "clientRole": false,
         "containerId": "ownCloud Infinite Scale Test",
         "attributes": {}
@@ -479,6 +515,7 @@
       "requiredActions": [],
       "realmRoles": [
         "uma_authorization",
+        "ocisAdmin",
         "offline_access"
       ],
       "clientRoles": {
@@ -513,6 +550,7 @@
       "requiredActions": [],
       "realmRoles": [
         "uma_authorization",
+        "ocisUser",
         "offline_access"
       ],
       "clientRoles": {
@@ -521,6 +559,35 @@
           "view-profile"
         ]
       },
+      "notBefore": 0,
+      "groups": []
+    },
+    {
+      "id": "b44a81e2-e3ed-4241-a9ce-44604f7ac9eb",
+      "createdTimestamp": 1678101111607,
+      "username": "katherine",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": true,
+      "firstName": "Katherine",
+      "lastName": "Johnson",
+      "email": "katherine@example.org",
+      "credentials": [
+        {
+          "id": "be18ccc9-b80f-4895-bf06-8e8e4605c634",
+          "type": "password",
+          "userLabel": "My password",
+          "createdDate": 1678101159924,
+          "secretData": "{\"value\":\"/E/1yfcgM8deq6V544gEsTfsXZuUnzaofmM+AK+MpAsvRoNRtEyRN1pajhIpGDtEuPa/KVBDbcALE7WMbFhO1w==\",\"salt\":\"TXapvlOYBWqabQRo+fINFQ==\",\"additionalParameters\":{}}",
+          "credentialData": "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+        }
+      ],
+      "disableableCredentialTypes": [],
+      "requiredActions": [],
+      "realmRoles": [
+        "ocisSpaceAdmin",
+        "default-roles-ocis"
+      ],
       "notBefore": 0,
       "groups": []
     },
@@ -547,6 +614,7 @@
       "requiredActions": [],
       "realmRoles": [
         "uma_authorization",
+        "ocisUser",
         "offline_access"
       ],
       "clientRoles": {
@@ -581,6 +649,7 @@
       "requiredActions": [],
       "realmRoles": [
         "uma_authorization",
+        "ocisAdmin",
         "offline_access"
       ],
       "clientRoles": {
@@ -615,6 +684,7 @@
       "requiredActions": [],
       "realmRoles": [
         "uma_authorization",
+        "ocisUser",
         "offline_access"
       ],
       "clientRoles": {
@@ -1564,9 +1634,10 @@
           "protocolMapper": "oidc-usermodel-realm-role-mapper",
           "consentRequired": false,
           "config": {
-            "user.attribute": "foo",
             "access.token.claim": "true",
-            "claim.name": "realm_access.roles",
+            "claim.name": "roles",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
             "jsonType.label": "String",
             "multivalued": "true"
           }
