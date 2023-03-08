@@ -111,7 +111,8 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 		}
 
 		if err != nil {
-			ul.log.Error().Err(err).Interface("event", event).Msg("error gathering members for event")
+			// TODO: Find out why this errors on ci pipeline
+			ul.log.Debug().Err(err).Interface("event", event).Msg("error gathering members for event")
 			continue
 		}
 
