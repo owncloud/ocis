@@ -131,3 +131,35 @@ Feature: get groups and their members
       }
     }
     """
+
+
+  Scenario Outline: Get details of group with UTF-8 characters name
+    Given group "<group>" has been created
+    When user "Alice" gets details of the group "<group>" using the Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "displayName",
+        "id"
+      ],
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "enum": ["<group>"]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^%group_id_pattern%$"
+        }
+      }
+    }
+    """
+    Examples:
+      | group           |
+      | España§àôœ€     |
+      | नेपाली            |
+      | $x<=>[y*z^2+1]! |
+      | եòɴԪ˯ΗՐΛɔπ     |
