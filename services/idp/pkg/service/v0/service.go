@@ -14,7 +14,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/libregraph/lico/bootstrap"
 	guestBackendSupport "github.com/libregraph/lico/bootstrap/backends/guest"
-	kcBackendSupport "github.com/libregraph/lico/bootstrap/backends/kc"
 	ldapBackendSupport "github.com/libregraph/lico/bootstrap/backends/ldap"
 	libreGraphBackendSupport "github.com/libregraph/lico/bootstrap/backends/libregraph"
 	licoconfig "github.com/libregraph/lico/config"
@@ -74,7 +73,6 @@ func NewService(opts ...Option) Service {
 		}
 	default:
 		guestBackendSupport.MustRegister()
-		kcBackendSupport.MustRegister()
 		libreGraphBackendSupport.MustRegister()
 	}
 
