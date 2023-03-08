@@ -135,6 +135,26 @@ Feature: get users
       | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    | true           |
       | Carol King   | %uuid_v4% | carol@example.org | Carol                    | true           |
 
+  @skipOnStable2.0
+  Scenario: admin user gets all users of certain groups
+    Given user "Carol" has been created with default attributes and without skeleton files
+    And group "tea-lover" has been created
+    And group "coffee-lover" has been created
+    And group "wine-lover" has been created
+    And user "Alice" has been added to group "tea-lover"
+    And user "Brian" has been added to group "coffee-lover"
+    And user "Carol" has been added to group "wine-lover"
+    When the user "Alice" gets all users from that are members in the group "tea-lover" or the group "coffee-lover" using the Graph API
+    Then the HTTP status code should be "200"
+    And the API response should contain following users with the information:
+      | displayName  | id        | mail              | onPremisesSamAccountName | accountEnabled |
+      | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    | true           |
+      | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    | true           |
+    But the API response should not contain following user with the information:
+      | displayName | id        | mail              | onPremisesSamAccountName | accountEnabled |
+      | Carol King  | %uuid_v4% | carol@example.org | Carol                    | false          |
+
+
   Scenario Outline: non admin user tries to get users of certain groups
     Given the administrator has given "Brian" the role "<role>" using the settings api
     And group "tea-lover" has been created

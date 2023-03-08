@@ -1849,6 +1849,28 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 *@When the user :user gets all users from that are members in the group :firstGroup or the group :secondGroup using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $firstGroup
+	 * @param string $secondGroup
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userGetsAllUsersOfFirstGroupOderSecondGroupUsingTheGraphApi(string $user, string $firstGroup, string $secondGroup) {
+		$response = GraphHelper::getUsersFromOneOrOtherGroup(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$firstGroup,
+			$secondGroup
+		);
+		$this->featureContext->setResponse($response);
+	}
+
+	/**
 	 * Get roleId by role name
 	 *
 	 * @param string $role
