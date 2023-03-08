@@ -47,12 +47,15 @@ auth_providers:
     login_attributes:
     - uid
     idp: https://localhost:9200
+    disable_user_mechanism: none
+    ldap_disabled_users_group_dn: cn=DisabledUsersGroup,ou=groups,o=libregraph-idm
     user_schema:
       id: ownclouduuid
       id_is_octet_string: false
       mail: mail
       display_name: displayname
       user_name: uid
+      user_enabled: ownCloudUserEnabled
     group_schema:
       id: ownclouduuid
       id_is_octet_string: false

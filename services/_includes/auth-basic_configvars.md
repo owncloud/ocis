@@ -37,11 +37,14 @@
 | LDAP_GROUP_OBJECTCLASS<br/>AUTH_BASIC_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | The object class to use for groups in the default group search filter ('groupOfNames'). |
 | LDAP_LOGIN_ATTRIBUTES<br/>AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES | []string | [uid] | The user object attributes, that can be used for login.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>AUTH_BASIC_IDP_URL | string | https://localhost:9200 | The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.|
+| LDAP_DISABLE_USER_MECHANISM<br/>AUTH_BASIC_DISABLE_USER_MECHANISM | string | none | An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.|
+| LDAP_DISABLED_USERS_GROUP_DN<br/>AUTH_BASIC_DISABLED_USERS_GROUP_DN | string | cn=DisabledUsersGroup,ou=groups,o=libregraph-idm | The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'.|
 | LDAP_USER_SCHEMA_ID<br/>AUTH_BASIC_LDAP_USER_SCHEMA_ID | string | ownclouduuid | LDAP Attribute to use as the unique id for users. This should be a stable globally unique ID like a UUID.|
 | LDAP_USER_SCHEMA_ID_IS_OCTETSTRING<br/>AUTH_BASIC_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.|
 | LDAP_USER_SCHEMA_MAIL<br/>AUTH_BASIC_LDAP_USER_SCHEMA_MAIL | string | mail | LDAP Attribute to use for the email address of users.|
 | LDAP_USER_SCHEMA_DISPLAYNAME<br/>AUTH_BASIC_LDAP_USER_SCHEMA_DISPLAYNAME | string | displayname | LDAP Attribute to use for the displayname of users.|
 | LDAP_USER_SCHEMA_USERNAME<br/>AUTH_BASIC_LDAP_USER_SCHEMA_USERNAME | string | uid | LDAP Attribute to use for username of users.|
+| LDAP_USER_ENABLED_ATTRIBUTE<br/>AUTH_BASIC_LDAP_USER_ENABLED_ATTRIBUTE | string | ownCloudUserEnabled | LDAP attribute to use as a flag telling if the user is enabled or disabled.|
 | LDAP_GROUP_SCHEMA_ID<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_ID | string | ownclouduuid | LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).|
 | LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs.|
 | LDAP_GROUP_SCHEMA_MAIL<br/>AUTH_BASIC_LDAP_GROUP_SCHEMA_MAIL | string | mail | LDAP Attribute to use for the email address of groups (can be empty).|

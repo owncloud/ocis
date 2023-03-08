@@ -366,6 +366,26 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
+a|`LDAP_DISABLE_USER_MECHANISM` +
+`AUTH_BASIC_DISABLE_USER_MECHANISM` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++none ++
+a| [subs=-attributes]
+An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.
+
+a|`LDAP_DISABLED_USERS_GROUP_DN` +
+`AUTH_BASIC_DISABLED_USERS_GROUP_DN` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++cn=DisabledUsersGroup,ou=groups,o=libregraph-idm ++
+a| [subs=-attributes]
+The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'.
+
 a|`LDAP_USER_SCHEMA_ID` +
 `AUTH_BASIC_LDAP_USER_SCHEMA_ID` +
 
@@ -415,6 +435,16 @@ a| [subs=-attributes]
 ++uid ++
 a| [subs=-attributes]
 LDAP Attribute to use for username of users.
+
+a|`LDAP_USER_ENABLED_ATTRIBUTE` +
+`AUTH_BASIC_LDAP_USER_ENABLED_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ownCloudUserEnabled ++
+a| [subs=-attributes]
+LDAP attribute to use as a flag telling if the user is enabled or disabled.
 
 a|`LDAP_GROUP_SCHEMA_ID` +
 `AUTH_BASIC_LDAP_GROUP_SCHEMA_ID` +
