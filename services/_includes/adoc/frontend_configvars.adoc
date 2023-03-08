@@ -521,6 +521,16 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 EXPERIMENTAL: enable the feature to deny access on folders.
 
+a|`OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
+`FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.
+
 a|`FRONTEND_CHECKSUMS_SUPPORTED_TYPES` +
 
 a| [subs=-attributes]

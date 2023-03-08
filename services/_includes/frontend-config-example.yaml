@@ -99,6 +99,7 @@ ocs:
   resource_info_cache_ttl: 0
   resource_info_cache_type: memory
   enable_denials: false
+  public_sharing_writeableshare_must_have_password: false
 checksums:
   supported_types:
   - sha1
