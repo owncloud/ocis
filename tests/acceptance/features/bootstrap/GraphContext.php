@@ -147,7 +147,6 @@ class GraphContext implements Context {
 		if (!empty($userName)) {
 			$this->featureContext->addUserToCreatedUsersList($userName, '123');
 		}
-		
 	}
 
 	/**
