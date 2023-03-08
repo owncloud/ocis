@@ -31,7 +31,17 @@ ci-go-generate: $(MOCKERY) # CI runs ci-node-generate automatically before this 
 ci-node-generate:
 
 ############ translations ########
-include ../../.make/l10n.mk
+.PHONY: l10n-pull
+l10n-pull:
+	cd $(OUTPUT_DIR) && tx pull -a --skip --minimum-perc=75
+
+.PHONY: l10n-push
+l10n-push:
+	cd $(OUTPUT_DIR) && tx push -s --skip
+
+.PHONY: l10n-read
+l10n-read: 
+	go-xgettext -o $(OUTPUT_DIR)/locale/en/LC_MESSAGES/default.pot --keyword=Template -s pkg/service/templates.go
 
 ############ licenses ############
 .PHONY: ci-node-check-licenses

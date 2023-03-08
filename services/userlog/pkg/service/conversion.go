@@ -52,7 +52,7 @@ type Converter struct {
 	serviceName       string
 	registeredEvents  map[string]events.Unmarshaller
 
-	// cached within one request not query other service too much
+	// cached within one request not to query other service too much
 	spaces    map[string]*storageprovider.StorageSpace
 	users     map[string]*user.User
 	resources map[string]*storageprovider.ResourceInfo
