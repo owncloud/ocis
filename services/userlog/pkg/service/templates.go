@@ -7,50 +7,50 @@ func Template(s string) string { return s }
 var (
 	SpaceShared = NotificationTemplate{
 		Subject: Template("Space shared"),
-		Message: Template("{{ .username }} added you to Space {{ .spacename }}"),
+		Message: Template("{user} added you to Space {space}"),
 	}
 
 	SpaceUnshared = NotificationTemplate{
 		Subject: Template("Removed from Space"),
-		Message: Template("{{ .username }} removed you from Space {{ .spacename }}"),
+		Message: Template("{user} removed you from Space {space}"),
 	}
 
 	SpaceDisabled = NotificationTemplate{
 		Subject: Template("Space disabled"),
-		Message: Template("{{ .username }} disabled Space {{ .spacename }}"),
+		Message: Template("{user} disabled Space {space}"),
 	}
 
 	SpaceDeleted = NotificationTemplate{
 		Subject: Template("Space deleted"),
-		Message: Template("{{ .username }} deleted Space {{ .spacename }}"),
+		Message: Template("{user} deleted Space {space}"),
 	}
 
 	SpaceMembershipExpired = NotificationTemplate{
 		Subject: Template("Membership expired"),
-		Message: Template("Access to Space {{ .spacename }} lost"),
+		Message: Template("Access to Space {space} lost"),
 	}
 
 	ShareCreated = NotificationTemplate{
 		Subject: Template("Resource shared"),
-		Message: Template("{{ .username }} shared {{ .resourcename }} with you"),
+		Message: Template("{user} shared {resource} with you"),
 	}
 
 	ShareRemoved = NotificationTemplate{
 		Subject: Template("Resource unshared"),
-		Message: Template("{{ .username }} unshared {{ .resourcename }} with you"),
+		Message: Template("{user} unshared {resource} with you"),
 	}
 
 	ShareExpired = NotificationTemplate{
 		Subject: Template("Share expired"),
-		Message: Template("Access to {{ .resourcename }} expired"),
+		Message: Template("Access to {resource} expired"),
 	}
 )
 
-// holds the information to link the raw template to the details
-var _placeholders = map[string]interface{}{
-	"username":     "{user}",
-	"spacename":    "{space}",
-	"resourcename": "{resource}",
+// holds the information to turn the raw template into a parseable go template
+var _placeholders = map[string]string{
+	"{user}":     "{{ .username }}",
+	"{space}":    "{{ .spacename }}",
+	"{resource}": "{{ .resourcename }}",
 }
 
 // NotificationTemplate is the data structure for the notifications

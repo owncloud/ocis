@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"strings"
 	"text/template"
 	"time"
 
@@ -24,6 +25,7 @@ var (
 
 	// TODO: from config
 	_pathToLocales = "/home/jkoberg/ocis/services/userlog/pkg/service/locales"
+	_domain        = "default"
 )
 
 // OC10Notification is the oc10 style representation of an event
@@ -265,47 +267,33 @@ func (c *Converter) getUser(ctx context.Context, userID *user.UserId) (*user.Use
 }
 
 func composeMessage(nt NotificationTemplate, locale string, vars map[string]interface{}) (string, string, string, string, error) {
-	subj, msg, err := parseTemplate(nt, locale)
+	subjectraw, messageraw := loadTemplates(nt, locale)
+
+	subject, err := executeTemplate(subjectraw, vars)
 	if err != nil {
 		return "", "", "", "", err
 	}
 
-	subject, err := executeTemplate(subj, vars)
-	if err != nil {
-		return "", "", "", "", err
-	}
-
-	subjectraw, err := executeTemplate(subj, _placeholders)
-	if err != nil {
-		return "", "", "", "", err
-	}
-
-	message, err := executeTemplate(msg, vars)
-	if err != nil {
-		return "", "", "", "", err
-	}
-
-	messageraw, err := executeTemplate(msg, _placeholders)
+	message, err := executeTemplate(messageraw, vars)
 	return subject, subjectraw, message, messageraw, err
 
 }
 
-func parseTemplate(nt NotificationTemplate, locale string) (*template.Template, *template.Template, error) {
-	// Create Locale with library path and language code and load domain '.../default.po'
+func loadTemplates(nt NotificationTemplate, locale string) (string, string) {
+	// Create Locale with library path and language code and load default domain
 	l := gotext.NewLocale(_pathToLocales, locale)
-	l.AddDomain("default")
-
-	subject, err := template.New("").Parse(l.Get(nt.Subject))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	message, err := template.New("").Parse(l.Get(nt.Message))
-	return subject, message, err
-
+	l.AddDomain(_domain)
+	return l.Get(nt.Subject), l.Get(nt.Message)
 }
 
-func executeTemplate(tpl *template.Template, vars map[string]interface{}) (string, error) {
+func executeTemplate(raw string, vars map[string]interface{}) (string, error) {
+	for o, n := range _placeholders {
+		raw = strings.ReplaceAll(raw, o, n)
+	}
+	tpl, err := template.New("").Parse(raw)
+	if err != nil {
+		return "", err
+	}
 	var writer bytes.Buffer
 	if err := tpl.Execute(&writer, vars); err != nil {
 		return "", err
