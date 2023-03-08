@@ -117,12 +117,12 @@ type DataGateway struct {
 }
 
 type OCS struct {
-	Prefix                  string             `yaml:"prefix" env:"FRONTEND_OCS_PREFIX" desc:"Path prefix for the OCS service"`
-	SharePrefix             string             `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX" desc:"Path prefix for shares."`
+	Prefix                  string             `yaml:"prefix" env:"FRONTEND_OCS_PREFIX" desc:"URL prefix for the OCS service. Note that the sting must not start with '/'."`
+	SharePrefix             string             `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX" desc:"Path prefix for shares as part of an ocis ressource. Note that the path must start with '/'."`
 	HomeNamespace           string             `yaml:"home_namespace" env:"FRONTEND_OCS_HOME_NAMESPACE" desc:"Homespace namespace identifier."`
 	AdditionalInfoAttribute string             `yaml:"additional_info_attribute" env:"FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE" desc:"Additional information attribute for the user like {{.Mail}}."`
 	ResourceInfoCacheTTL    int                `yaml:"resource_info_cache_ttl" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL" desc:"Max TTL in seconds for the resource info cache. 0 disables the cache."`
-	ResourceInfoCacheType   string             `yaml:"resource_info_cache_type" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE" desc:"Resource info cache type. Supported values are 'memory' and 'redis'."`
+	ResourceInfoCacheType   string             `yaml:"resource_info_cache_type" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE" desc:"The type of the resource info cache. Supported values are 'memory' and 'redis'."`
 	ResourceInfoCaches      ResourceInfoCaches `yaml:"resource_info_caches,omitempty"` // only used for redis
 	CacheWarmupDriver       string             `yaml:"cache_warmup_driver,omitempty"`  // not supported by the oCIS product, therefore not part of docs
 	CacheWarmupDrivers      CacheWarmupDrivers `yaml:"cache_warmup_drivers,omitempty"` // not supported by the oCIS product, therefore not part of docs
@@ -136,9 +136,9 @@ type ResourceInfoCaches struct {
 
 // RedisDriver holds redis configuration
 type RedisDriver struct {
-	Address  string `yaml:"address" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_ADDR" desc:"Redis service address"`
-	Username string `yaml:"username" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_USERNAME" desc:"Redis username"`
-	Password string `yaml:"password" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_PASSWORD" desc:"Redis password"`
+	Address  string `yaml:"address" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_ADDR" desc:"A comma separated list of addresses to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how addresses are used is dependent on the library of the configured store."`
+	Username string `yaml:"username" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_USERNAME" desc:"The username to access the redis cache."`
+	Password string `yaml:"password" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_PASSWORD" desc:"The password to access the redis cache."`
 }
 
 type CacheWarmupDrivers struct {
