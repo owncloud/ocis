@@ -241,12 +241,8 @@ class GraphContext implements Context {
 	 */
 	public function adminHasRetrievedUserUsingTheGraphApi(string $user): void {
 		$user = $this->featureContext->getActualUsername($user);
-		try {
-			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-			$userId = $userId ?? $user;
-		} catch (Exception $e) {
-			$userId = $user;
-		}
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		$userId = $userId ? $userId : $user;
 		$result = GraphHelper::getUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -1747,6 +1743,7 @@ class GraphContext implements Context {
 
 	/**
 	 * @When /^the administrator "([^"]*)" tries to add the following users to a group "([^"]*)" at once using the Graph API$/
+	 * @When /^the administrator "([^"]*)" tries to add the following existent and nonexistent users to a group "([^"]*)" at once using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $group
@@ -1760,11 +1757,8 @@ class GraphContext implements Context {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		foreach ($table->getHash() as $row) {
-			try {
-				$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
-			} catch (Exception $e) {
-				$userIds[] = WebDavHelper::generateUUIDv4();
-			}
+			$userId = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
+			$userIds[] = $userId ? $userId : WebDavHelper::generateUUIDv4();
 		}
 		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
 	}
