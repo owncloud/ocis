@@ -700,20 +700,23 @@ class GraphHelper {
 		?bool $accountEnabled
 	): string {
 		$payload = [];
-		if ($userName) {
-			$payload['onPremisesSamAccountName'] = $userName;
+		if (!is_null($userName)) {
+      // comment on after fixing #5755 because now it crashes server
+      // if (empty($userName)) { 
+      //   $payload['onPremisesSamAccountName'] = ' ';
+      // } else $payload['onPremisesSamAccountName'] = $userName;
+      $payload['onPremisesSamAccountName'] = $userName;
 		}
-		if ($password) {
+		if (!is_null($password)) {
 			$payload['passwordProfile'] = ['password' => $password];
 		}
-		if ($displayName) {
+		if (!is_null($displayName)) {
 			$payload['displayName'] = $displayName;
 		}
-		if ($email) {
+		if (!is_null($email)) {
 			$payload['mail'] = $email;
 		}
 		$payload['accountEnabled'] = $accountEnabled;
-
 		return \json_encode($payload);
 	}
 
