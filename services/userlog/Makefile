@@ -30,6 +30,9 @@ ci-go-generate: $(MOCKERY) # CI runs ci-node-generate automatically before this 
 .PHONY: ci-node-generate
 ci-node-generate:
 
+############ translations ########
+include ../../.make/l10n.mk
+
 ############ licenses ############
 .PHONY: ci-node-check-licenses
 ci-node-check-licenses:
