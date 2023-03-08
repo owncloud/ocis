@@ -118,7 +118,7 @@ type DataGateway struct {
 }
 
 type OCS struct {
-	Prefix                  string             `yaml:"prefix" env:"FRONTEND_OCS_PREFIX" desc:"URL prefix for the OCS service. Note that the sting must not start with '/'."`
+	Prefix                  string             `yaml:"prefix" env:"FRONTEND_OCS_PREFIX" desc:"URL prefix for the OCS service. Note that the string must not start with '/'."`
 	SharePrefix             string             `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX" desc:"Path prefix for shares as part of an ocis resource. Note that the path must start with '/'."`
 	HomeNamespace           string             `yaml:"home_namespace" env:"FRONTEND_OCS_HOME_NAMESPACE" desc:"Homespace namespace identifier."`
 	AdditionalInfoAttribute string             `yaml:"additional_info_attribute" env:"FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE" desc:"Additional information attribute for the user like {{.Mail}}."`
