@@ -199,9 +199,15 @@ services:
     image: onlyoffice/documentserver:7.3.0
     networks:
       ocis-net:
+    entrypoint:
+      - /bin/sh
+      - /entrypoint-override.sh
     environment:
       WOPI_ENABLED: "true"
       USE_UNAUTHORIZED_STORAGE: "${INSECURE:-false}" # self signed certificates
+    volumes:
+      - ./config/onlyoffice/entrypoint-override.sh:/entrypoint-override.sh
+      - ./config/onlyoffice/local.json:/etc/onlyoffice/documentserver/local.dist.json
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.onlyoffice.entrypoints=https"
@@ -209,7 +215,7 @@ services:
       - "traefik.http.routers.onlyoffice.tls.certresolver=http"
       - "traefik.http.routers.onlyoffice.service=onlyoffice"
       - "traefik.http.services.onlyoffice.loadbalancer.server.port=80"
-      # websockets can't be opend when this is ommitted
+      # websockets can't be opened when this is ommitted
       - "traefik.http.middlewares.onlyoffice.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.onlyoffice.middlewares=onlyoffice"
     logging:
