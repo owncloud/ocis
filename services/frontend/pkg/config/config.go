@@ -118,16 +118,17 @@ type DataGateway struct {
 }
 
 type OCS struct {
-	Prefix                  string             `yaml:"prefix" env:"FRONTEND_OCS_PREFIX" desc:"URL prefix for the OCS service. Note that the string must not start with '/'."`
-	SharePrefix             string             `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX" desc:"Path prefix for shares as part of an ocis resource. Note that the path must start with '/'."`
-	HomeNamespace           string             `yaml:"home_namespace" env:"FRONTEND_OCS_HOME_NAMESPACE" desc:"Homespace namespace identifier."`
-	AdditionalInfoAttribute string             `yaml:"additional_info_attribute" env:"FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE" desc:"Additional information attribute for the user like {{.Mail}}."`
-	ResourceInfoCacheTTL    int                `yaml:"resource_info_cache_ttl" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL" desc:"Max TTL in seconds for the resource info cache. 0 disables the cache."`
-	ResourceInfoCacheType   string             `yaml:"resource_info_cache_type" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE" desc:"The type of the resource info cache. Supported values are 'memory' and 'redis'."`
-	ResourceInfoCaches      ResourceInfoCaches `yaml:"resource_info_caches,omitempty"` // only used for redis
-	CacheWarmupDriver       string             `yaml:"cache_warmup_driver,omitempty"`  // not supported by the oCIS product, therefore not part of docs
-	CacheWarmupDrivers      CacheWarmupDrivers `yaml:"cache_warmup_drivers,omitempty"` // not supported by the oCIS product, therefore not part of docs
-	EnableDenials           bool               `yaml:"enable_denials" env:"FRONTEND_OCS_ENABLE_DENIALS" desc:"EXPERIMENTAL: enable the feature to deny access on folders."`
+	Prefix                               string             `yaml:"prefix" env:"FRONTEND_OCS_PREFIX" desc:"URL prefix for the OCS service. Note that the string must not start with '/'."`
+	SharePrefix                          string             `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX" desc:"Path prefix for shares as part of an ocis resource. Note that the path must start with '/'."`
+	HomeNamespace                        string             `yaml:"home_namespace" env:"FRONTEND_OCS_HOME_NAMESPACE" desc:"Homespace namespace identifier."`
+	AdditionalInfoAttribute              string             `yaml:"additional_info_attribute" env:"FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE" desc:"Additional information attribute for the user like {{.Mail}}."`
+	ResourceInfoCacheTTL                 int                `yaml:"resource_info_cache_ttl" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL" desc:"Max TTL in seconds for the resource info cache. 0 disables the cache."`
+	ResourceInfoCacheType                string             `yaml:"resource_info_cache_type" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE" desc:"The type of the resource info cache. Supported values are 'memory' and 'redis'."`
+	ResourceInfoCaches                   ResourceInfoCaches `yaml:"resource_info_caches,omitempty"` // only used for redis
+	CacheWarmupDriver                    string             `yaml:"cache_warmup_driver,omitempty"`  // not supported by the oCIS product, therefore not part of docs
+	CacheWarmupDrivers                   CacheWarmupDrivers `yaml:"cache_warmup_drivers,omitempty"` // not supported by the oCIS product, therefore not part of docs
+	EnableDenials                        bool               `yaml:"enable_denials" env:"FRONTEND_OCS_ENABLE_DENIALS" desc:"EXPERIMENTAL: enable the feature to deny access on folders."`
+	WriteablePublicShareMustHavePassword bool               `yaml:"public_sharing_writeableshare_must_have_password" env:"OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares."`
 }
 
 // ResourceInfoCaches holds resource info cache configurations

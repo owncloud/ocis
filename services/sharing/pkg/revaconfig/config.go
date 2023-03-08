@@ -79,7 +79,8 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					},
 				},
 				"publicshareprovider": map[string]interface{}{
-					"driver": cfg.PublicSharingDriver,
+					"driver":                             cfg.PublicSharingDriver,
+					"writeable_share_must_have_password": cfg.WriteableShareMustHavePassword,
 					"drivers": map[string]interface{}{
 						"json": map[string]interface{}{
 							"file":         cfg.PublicSharingDrivers.JSON.File,
