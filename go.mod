@@ -3,7 +3,7 @@ module github.com/owncloud/ocis/v2
 go 1.19
 
 require (
-	github.com/CiscoM31/godata v1.0.6
+	github.com/CiscoM31/godata v1.0.7
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.5.1
 	github.com/armon/go-radix v1.0.0
