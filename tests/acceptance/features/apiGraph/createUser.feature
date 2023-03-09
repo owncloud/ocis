@@ -56,6 +56,7 @@ Feature: create user
       | role        |
       | Space Admin |
       | User        |
+      | Guest       |
 
 
   Scenario: a user cannot be created with the name of the disabled user

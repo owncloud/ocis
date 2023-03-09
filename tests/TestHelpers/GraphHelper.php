@@ -288,6 +288,33 @@ class GraphHelper {
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
+	 * @param string $adminUser
+	 * @param string $adminPassword
+	 * @param string $userId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function deleteUserByUserId(
+		string $baseUrl,
+		string $xRequestId,
+		string $adminUser,
+		string $adminPassword,
+		string $userId
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users/' . $userId);
+
+		return HttpRequestHelper::delete(
+			$url,
+			$xRequestId,
+			$adminUser,
+			$adminPassword,
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
 	 * @param string $byUser
 	 * @param string $userPassword
 	 * @param string|null $user
