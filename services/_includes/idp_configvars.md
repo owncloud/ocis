@@ -26,7 +26,7 @@
 | OCIS_MACHINE_AUTH_API_KEY<br/>IDP_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
 | IDP_ASSET_PATH | string |  | Serve IDP assets from a path on the filesystem instead of the builtin assets.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>IDP_ISS | string | https://localhost:9200 | The OIDC issuer URL to use.|
-| IDP_IDENTITY_MANAGER | string | ldap | The identity manager implementation to use. Supported identity managers are 'ldap', 'cs3', 'kc', 'libregraph', 'cookie' and 'guest'.|
+| IDP_IDENTITY_MANAGER | string | ldap | The identity manager implementation to use. Supported identity managers are 'ldap', 'cs3', 'libregraph' and 'guest'.|
 | IDP_URI_BASE_PATH | string |  | IDP uri base path (defaults to "").|
 | IDP_SIGN_IN_URI | string |  | IDP sign-in url.|
 | IDP_SIGN_OUT_URI | string |  | IDP sign-out url.|

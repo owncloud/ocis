@@ -260,7 +260,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ldap ++
 a| [subs=-attributes]
-The identity manager implementation to use. Supported identity managers are 'ldap', 'cs3', 'kc', 'libregraph', 'cookie' and 'guest'.
+The identity manager implementation to use. Supported identity managers are 'ldap', 'cs3', 'libregraph' and 'guest'.
 
 a|`IDP_URI_BASE_PATH` +
 
