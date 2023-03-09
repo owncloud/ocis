@@ -384,7 +384,7 @@ func getSpace(ctx context.Context, spaceID string, gwc gateway.GatewayAPIClient)
 	}
 
 	if res.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("Unexpected status code while getting space: %v", res.GetStatus().GetCode())
+		return nil, fmt.Errorf("Error while getting space: (%v) %s", res.GetStatus().GetCode(), res.GetStatus().GetMessage())
 	}
 
 	if len(res.StorageSpaces) == 0 {

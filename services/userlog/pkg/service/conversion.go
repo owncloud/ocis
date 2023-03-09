@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"embed"
 	"errors"
 	"strings"
 	"text/template"
@@ -19,12 +20,15 @@ import (
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 )
 
+//go:embed l10n/locale
+var _translationFS embed.FS
+
 var (
 	_resourceTypeSpace = "storagespace"
 	_resourceTypeShare = "share"
 
 	// TODO: from config
-	_pathToLocales = "/home/jkoberg/ocis/services/userlog/pkg/service/locales"
+	_pathToLocales = "/home/jkoberg/ocis/services/userlog/l10n/locale"
 	_domain        = "default"
 )
 
@@ -281,7 +285,7 @@ func composeMessage(nt NotificationTemplate, locale string, vars map[string]inte
 
 func loadTemplates(nt NotificationTemplate, locale string) (string, string) {
 	// Create Locale with library path and language code and load default domain
-	l := gotext.NewLocale(_pathToLocales, locale)
+	l := gotext.NewLocaleFS("l10n/locale", locale, _translationFS)
 	l.AddDomain(_domain)
 	return l.Get(nt.Subject), l.Get(nt.Message)
 }
