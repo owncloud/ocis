@@ -145,7 +145,7 @@ class GraphContext implements Context {
 		$this->featureContext->setResponse($response);
 		// need add user to list to delete him after test
 		if (!empty($userName)) {
-			$this->featureContext->addUserToCreatedUsersList($userName, '123');
+			$this->featureContext->addUserToCreatedUsersList($userName, $this->featureContext->getUserPassword($user));
 		}
 	}
 

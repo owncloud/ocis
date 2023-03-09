@@ -14,7 +14,7 @@ Feature: edit user
       | password    | 1234              |
 
 
-  Scenario Outline: the admin user can edit another user email
+  Scenario Outline: the admin user can edit another user's email
     When the user "Alice" changes the email of user "Brian" to "<newEmail>" using the Graph API
     Then the HTTP status code should be "<code>"
     And the user "Brian" should have information with these key and value pairs:
@@ -29,7 +29,7 @@ Feature: edit user
       | change to a invalid email | invalidEmail         | 400  | brian@example.com    |
 
 
-  Scenario Outline: the admin user can edit another user name
+  Scenario Outline: the admin user can edit another user's name
     Given user "Carol" has been created with default attributes and without skeleton files
     When the user "Alice" changes the user name of user "Carol" to "<userName>" using the Graph API
     Then the HTTP status code should be "<code>"
@@ -44,7 +44,7 @@ Feature: edit user
       | empty user name              |          | 400  | Brian            |
 
 
-  Scenario: the admin user changes the name to the disabled user name
+  Scenario: the admin user changes the name of a user to the name of an existing disabled user
     Given the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | sam             |
       | displayName | sam             |
@@ -58,7 +58,7 @@ Feature: edit user
       | onPremisesSamAccountName | sam   |
 
 
-  Scenario: the admin user changes the name to the deleted user name
+  Scenario: the admin user changes the name of a user to the name of a previously deleted user
     Given the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | sam             |
       | displayName | sam             |
