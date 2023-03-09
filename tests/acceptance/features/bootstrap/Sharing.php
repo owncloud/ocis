@@ -2376,7 +2376,7 @@ trait Sharing {
 	}
 
 	/**
-	 * @When the information about the last share for user :user should include
+	 * @Then the information about the last share for user :user should include
 	 *
 	 * @param string $user
 	 * @param TableNode $table
