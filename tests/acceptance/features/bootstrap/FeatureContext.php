@@ -2979,15 +2979,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public function theFileWithContentShouldExistInTheServerRoot(string $path, string $content): void {
-		if (OcisHelper::isTestingOnOcis()) {
-			$fileContent = $this->readFileInServerRootForOCIS($path);
-		} else {
-			$this->readFileInServerRootForCore($path);
-			$this->theHTTPStatusCodeShouldBe(200, 'Failed to read the file $path');
-			$fileContent = $this->getResponseXml();
-			$fileContent = (string)$fileContent->data->element->contentUrlEncoded;
-			$fileContent = \urldecode($fileContent);
-		}
+		$fileContent = $this->readFileInServerRootForOCIS($path);
 		Assert::assertSame(
 			$content,
 			$fileContent,
