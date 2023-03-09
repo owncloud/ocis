@@ -444,6 +444,10 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 			logger.Debug().Interface("id", rid).Msg("could not update drive, permission denied")
 			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, resp.GetStatus().GetMessage())
 			return
+		case cs3rpc.Code_CODE_INVALID_ARGUMENT:
+			logger.Debug().Interface("id", rid).Msg("could not update drive, invalid argument")
+			errorcode.NotAllowed.Render(w, r, http.StatusBadRequest, resp.GetStatus().GetMessage())
+			return
 		default:
 			logger.Debug().Interface("id", rid).Str("grpc", resp.GetStatus().GetMessage()).Msg("could not update drive: grpc error")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, resp.GetStatus().GetMessage())

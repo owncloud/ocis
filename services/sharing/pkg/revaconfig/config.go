@@ -79,8 +79,7 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 					},
 				},
 				"publicshareprovider": map[string]interface{}{
-					"driver":                             cfg.PublicSharingDriver,
-					"writeable_share_must_have_password": cfg.WriteableShareMustHavePassword,
+					"driver": cfg.PublicSharingDriver,
 					"drivers": map[string]interface{}{
 						"json": map[string]interface{}{
 							"file":         cfg.PublicSharingDrivers.JSON.File,
@@ -104,11 +103,12 @@ func SharingConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"machine_auth_apikey": cfg.PublicSharingDrivers.CS3.SystemUserAPIKey,
 						},
 						"jsoncs3": map[string]interface{}{
-							"gateway_addr":        cfg.Reva.Address,
-							"provider_addr":       cfg.PublicSharingDrivers.JSONCS3.ProviderAddr,
-							"service_user_id":     cfg.PublicSharingDrivers.JSONCS3.SystemUserID,
-							"service_user_idp":    cfg.PublicSharingDrivers.JSONCS3.SystemUserIDP,
-							"machine_auth_apikey": cfg.PublicSharingDrivers.JSONCS3.SystemUserAPIKey,
+							"gateway_addr":                       cfg.Reva.Address,
+							"provider_addr":                      cfg.PublicSharingDrivers.JSONCS3.ProviderAddr,
+							"service_user_id":                    cfg.PublicSharingDrivers.JSONCS3.SystemUserID,
+							"service_user_idp":                   cfg.PublicSharingDrivers.JSONCS3.SystemUserIDP,
+							"machine_auth_apikey":                cfg.PublicSharingDrivers.JSONCS3.SystemUserAPIKey,
+							"writeable_share_must_have_password": cfg.WriteableShareMustHavePassword,
 						},
 					},
 				},
