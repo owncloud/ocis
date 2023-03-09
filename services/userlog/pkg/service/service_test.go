@@ -64,7 +64,7 @@ var _ = Describe("UserlogService", func() {
 			service.GatewayClient(&gwc),
 			service.HistoryClient(&ehc),
 			service.RegisteredEvents([]events.Unmarshaller{
-				events.UploadReady{},
+				events.SpaceDisabled{},
 			}),
 		)
 		Expect(err).ToNot(HaveOccurred())
@@ -73,9 +73,11 @@ var _ = Describe("UserlogService", func() {
 
 	It("it stores, returns and deletes a couple of events", func() {
 		ids := make(map[string]struct{})
-		ids[bus.Publish(events.SpaceCreated{Executant: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
-		ids[bus.Publish(events.UploadReady{SpaceOwner: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
-		ids[bus.Publish(events.ContainerCreated{SpaceOwner: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
+		ids[bus.Publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
+		ids[bus.Publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
+		ids[bus.Publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
+		// ids[bus.Publish(events.SpaceMembershipExpired{SpaceOwner: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
+		// ids[bus.Publish(events.ShareCreated{Executant: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
 
 		time.Sleep(500 * time.Millisecond)
 
