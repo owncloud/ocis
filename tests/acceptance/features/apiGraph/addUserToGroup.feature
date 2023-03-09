@@ -217,4 +217,39 @@ Feature: add users to group
     And the following users should be listed in the following groups
       | username | groupname |
       | Alice    | sales     |
-      
+
+  @issue-5702
+  Scenario: try to add users to a group twice
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    And these users have been created with default attributes and without skeleton files:
+      | username |
+      | Brian    |
+      | Carol    |
+    And user "Alice" has created a group "grp1" using the Graph API
+    And the administrator "Alice" has added the following users to a group "grp1" at once using the Graph API
+      | username |
+      | Brian    |
+      | Carol    |
+    When the administrator "Alice" adds the following users to a group "grp1" at once using the Graph API
+      | username |
+      | Brian    |
+      | Carol    |
+    Then the HTTP status code should be "400"
+    And the following users should be listed in the following groups
+      | username | groupname |
+      | Brian    | grp1      |
+      | Carol    | grp1      |
+
+  @issue-5793
+  Scenario: try to add a group to a group
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    And these users have been created with default attributes and without skeleton files:
+      | username |
+      | Brian    |
+    And these groups have been created:
+      | groupname |
+      | student   |
+      | music     |
+    And user "Brian" has been added to group "music"
+    When the administrator "Alice" tries to add a group "music" to a group "student" using the Graph API
+    Then the HTTP status code should be "400"

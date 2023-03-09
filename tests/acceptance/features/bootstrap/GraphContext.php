@@ -2060,4 +2060,57 @@ class GraphContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @Given /^the administrator "([^"]*)" has added the following users to a group "([^"]*)" at once using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $group
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theAdministratorHasAddedTheFollowingUsersToAGroupAtOnceUsingTheGraphApi(string $user, string $group, TableNode $table) {
+		$userIds = [];
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		foreach ($table->getHash() as $row) {
+			$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
+		}
+		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
+		$response = $this->featureContext->getResponse();
+		if ($response->getStatusCode() !== 204) {
+			$$this->throwHttpException($response, "Cannot add users to group '$group'");
+		}
+		$this->featureContext->emptyLastHTTPStatusCodesArray();
+	}
+
+	/**
+	 * @When /^the administrator "([^"]*)" tries to add a group "([^"]*)" to a group "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $groupToAdd
+	 * @param string $group
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theAdministratorAddGroupToAGroupAtOnceUsingTheGraphApi(string $user, string $groupToAdd, string $group) {
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$groupIdToAdd = $this->featureContext->getAttributeOfCreatedGroup($groupToAdd, "id");
+		$credentials = $this->getAdminOrUserCredentials($user);
+
+		$this->featureContext->setResponse(
+			GraphHelper::addGroupToGroup(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials["username"],
+				$credentials["password"],
+				$groupId,
+				$groupIdToAdd
+			)
+		);
+	}
 }

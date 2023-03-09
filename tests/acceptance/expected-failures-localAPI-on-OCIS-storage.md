@@ -111,5 +111,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### Change editUser test where we set empty value
 - [apiGraph/editUser.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L33)
 - [apiGraph/editUser.feature:80](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L80)
+
+#### [Same users can be added in a group multiple time](https://github.com/owncloud/ocis/issues/5702)
+- [apiGraph/addUserToGroup.feature:222](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L222)
+
+#### [Try to add group to a group return 204](https://github.com/owncloud/ocis/issues/5793)
+- [apiGraph/addUserToGroup.feature:244](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L244)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
