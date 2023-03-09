@@ -26,7 +26,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Flag to enable or disable the creation of the demo users.
+The default role assignments the demo users should be setup.
 
 a| `LDAP_BIND_DN`
 
@@ -850,7 +850,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Allow insecure connections to the OIDC issuer.
+Allow insecure connections to the frontend.
 
 a| `OCIS_JWT_SECRET`
 
@@ -1092,7 +1092,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
 
 a| `OCIS_SYSTEM_USER_API_KEY`
 
@@ -1334,7 +1334,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+The public facing URL of the oCIS frontend.
 
 a| `REVA_GATEWAY`
 
