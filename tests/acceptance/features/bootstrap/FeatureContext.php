@@ -1593,11 +1593,7 @@ class FeatureContext extends BehatVariablesContext {
 			$urlEnding = \substr($url, \strlen($this->getBaseUrl() . '/'));
 		}
 
-		if (OcisHelper::isTestingOnOcisOrReva()) {
-			$matchResult = \preg_match("%^(#/)?s/([a-zA-Z0-9]{15})$%", $urlEnding);
-		} else {
-			$matchResult = \preg_match("%^(index.php/)?s/([a-zA-Z0-9]{15})$%", $urlEnding);
-		}
+		$matchResult = \preg_match("%^(#/)?s/([a-zA-Z0-9]{15})$%", $urlEnding);
 
 		// preg_match returns (int) 1 for a match, we want to return a boolean.
 		if ($matchResult === 1) {
@@ -3943,24 +3939,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * After Scenario. clear file locks
-	 *
-	 * @AfterScenario
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function clearFileLocks(): void {
-		if (!OcisHelper::isTestingOnOcisOrReva()) {
-			$this->authContext->deleteTokenAuthEnforcedAfterScenario();
-			$this->clearFileLocksForServer($this->getBaseUrl());
-			if ($this->remoteBaseUrl !== $this->localBaseUrl) {
-				$this->clearFileLocksForServer($this->getRemoteBaseUrl());
-			}
-		}
-	}
-
-	/**
 	 * @AfterScenario
 	 *
 	 * clear space id reference
@@ -3983,72 +3961,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public static function useBigFileIDs(BeforeSuiteScope $scope): void {
-		if (OcisHelper::isTestingOnOcisOrReva()) {
-			return;
-		}
-		$fullUrl = \getenv('TEST_SERVER_URL');
-		if (\substr($fullUrl, -1) !== '/') {
-			$fullUrl .= '/';
-		}
-		$fullUrl .= "ocs/v1.php/apps/testing/api/v1/increasefileid";
-		$suiteSettingsContexts = $scope->getSuite()->getSettings()['contexts'];
-		$adminUsername = null;
-		$adminPassword = null;
-		foreach ($suiteSettingsContexts as $context) {
-			if (isset($context[__CLASS__])) {
-				$adminUsername = $context[__CLASS__]['adminUsername'];
-				$adminPassword = $context[__CLASS__]['adminPassword'];
-				break;
-			}
-		}
-
-		// get the admin username from the environment (if defined)
-		$adminUsernameFromEnvironment = self::getAdminUsernameFromEnvironment();
-		if ($adminUsernameFromEnvironment !== false) {
-			$adminUsername = $adminUsernameFromEnvironment;
-		}
-
-		// get the admin password from the environment (if defined)
-		$adminPasswordFromEnvironment = self::getAdminPasswordFromEnvironment();
-		if ($adminPasswordFromEnvironment !== false) {
-			$adminPassword = $adminPasswordFromEnvironment;
-		}
-
-		if (($adminUsername === null) || ($adminPassword === null)) {
-			throw new Exception(
-				"Could not find adminUsername and/or adminPassword in useBigFileIDs"
-			);
-		}
-
-		HttpRequestHelper::post(
-			$fullUrl,
-			'',
-			$adminUsername,
-			$adminPassword
-		);
-	}
-
-	/**
-	 * runs a function on every server (LOCAL & REMOTE).
-	 * The callable function receives the server (LOCAL or REMOTE) as first argument
-	 *
-	 * @param callable $callback
-	 *
-	 * @return array
-	 */
-	public function runFunctionOnEveryServer(callable $callback): array {
-		$previousServer = $this->getCurrentServer();
-		$result = [];
-		foreach (['LOCAL', 'REMOTE'] as $server) {
-			$this->usingServer($server);
-			if (($server === 'LOCAL')
-				|| $this->federatedServerExists()
-			) {
-				$result[$server] = \call_user_func($callback, $server);
-			}
-		}
-		$this->usingServer($previousServer);
-		return $result;
+		return;
 	}
 
 	/**
@@ -4377,25 +4290,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function restoreParametersAfterScenario(): void {
-		if (!OcisHelper::isTestingOnOcisOrReva()) {
-			$this->authContext->deleteTokenAuthEnforcedAfterScenario();
-			$user = $this->getCurrentUser();
-			$this->setCurrentUser($this->getAdminUsername());
-			$this->runFunctionOnEveryServer(
-				function ($server) {
-					$this->restoreParameters($server);
-				}
-			);
-			$this->setCurrentUser($user);
-		}
-	}
-
-	/**
 	 * Get the array of trusted servers in format ["url" => "id"]
 	 *
 	 * @param string $server 'LOCAL'/'REMOTE'
@@ -4468,37 +4362,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @BeforeScenario
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function prepareParametersBeforeScenario(): void {
-		if (!OcisHelper::isTestingOnOcisOrReva()) {
-			$user = $this->getCurrentUser();
-			$this->setCurrentUser($this->getAdminUsername());
-			$previousServer = $this->getCurrentServer();
-			foreach (['LOCAL', 'REMOTE'] as $server) {
-				if (($server === 'LOCAL') || $this->federatedServerExists()) {
-					$this->usingServer($server);
-					$this->resetAppConfigs();
-					$result = SetupHelper::runOcc(
-						['config:list', '--private'],
-						$this->getStepLineRef(),
-						$this->getAdminUsername(),
-						$this->getAdminPassword(),
-						$this->getBaseUrl(),
-						$this->getOcPath()
-					);
-					$this->savedConfigList[$server] = \json_decode($result['stdOut'], true);
-				}
-			}
-			$this->usingServer($previousServer);
-			$this->setCurrentUser($user);
-		}
-	}
-
-	/**
 	 * Before Scenario to Save trusted Servers
 	 *
 	 * @BeforeScenario @federation-app-required
@@ -4511,85 +4374,6 @@ class FeatureContext extends BehatVariablesContext {
 			'LOCAL' => $this->getTrustedServers(),
 			'REMOTE' => $this->getTrustedServers('REMOTE')
 		];
-	}
-
-	/**
-	 * restore settings of the system and delete new settings that were created in the test runs
-	 *
-	 * @param string $server LOCAL|REMOTE
-	 *
-	 * @return void
-	 *
-	 * @throws Exception
-	 * @throws GuzzleException
-	 *
-	 */
-	private function restoreParameters(string $server): void {
-		$commands = [];
-		if ($this->isTestingWithLdap()) {
-			$this->resetOldLdapConfig();
-		}
-		$result = SetupHelper::runOcc(
-			['config:list'],
-			$this->getStepLineRef(),
-			$this->getAdminUsername(),
-			$this->getAdminPassword(),
-			$this->getBaseUrl(),
-			$this->getOcPath()
-		);
-		$currentConfigList = \json_decode($result['stdOut'], true);
-		foreach ($currentConfigList['system'] as $configKey => $configValue) {
-			if (!\array_key_exists(
-				$configKey,
-				$this->savedConfigList[$server]['system']
-			)
-			) {
-				$commands[] = ["command" => ['config:system:delete', $configKey]];
-			}
-		}
-		foreach ($this->savedConfigList[$server]['system'] as $configKey => $configValue) {
-			if (!\array_key_exists($configKey, $currentConfigList["system"])
-				|| $currentConfigList["system"][$configKey] !== $this->savedConfigList[$server]['system'][$configKey]
-			) {
-				$commands[] = ["command" => ['config:system:set', "--type=json", "--value=" . \json_encode($configValue), $configKey]];
-			}
-		}
-		foreach ($currentConfigList['apps'] as $appName => $appSettings) {
-			foreach ($appSettings as $configKey => $configValue) {
-				//only check if the app was there in the original configuration
-				if (\array_key_exists($appName, $this->savedConfigList[$server]['apps'])
-					&& !\array_key_exists(
-						$configKey,
-						$this->savedConfigList[$server]['apps'][$appName]
-					)
-				) {
-					$commands[] = ["command" => ['config:app:delete', $appName, $configKey]];
-				} elseif (\array_key_exists($appName, $this->savedConfigList[$server]['apps'])
-					&& \array_key_exists($configKey, $this->savedConfigList[$server]['apps'][$appName])
-					&& $this->savedConfigList[$server]['apps'][$appName][$configKey] !== $configValue
-				) {
-					// Do not accidentally disable apps here (perhaps too early)
-					// That is done in Provisioning.php restoreAppEnabledDisabledState()
-					if ($configKey !== "enabled") {
-						$commands[] = [
-							"command" => [
-								'config:app:set',
-								$appName,
-								$configKey,
-								"--value=" . $this->savedConfigList[$server]['apps'][$appName][$configKey]
-							]
-						];
-					}
-				}
-			}
-		}
-		SetupHelper::runBulkOcc(
-			$commands,
-			$this->getStepLineRef(),
-			$this->getAdminUsername(),
-			$this->getAdminPassword(),
-			$this->getBaseUrl()
-		);
 	}
 
 	/**
