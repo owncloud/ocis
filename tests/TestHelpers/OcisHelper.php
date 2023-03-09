@@ -50,13 +50,6 @@ class OcisHelper {
 	/**
 	 * @return bool
 	 */
-	public static function isTestingOnOc10():bool {
-		return false;
-	}
-
-	/**
-	 * @return bool
-	 */
 	public static function isTestingParallelDeployment(): bool {
 		return (\getenv("TEST_PARALLEL_DEPLOYMENT") === "true");
 	}
