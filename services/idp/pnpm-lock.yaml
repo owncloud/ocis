@@ -9817,7 +9817,7 @@ packages:
     resolution: {integrity: sha512-/6UZ2qgEyH2aqzYZgQPxEnz33NJ2gNsnHA2o5+o4wW9bLM/JYQitNP9xPhsXwC08hMMovfGe/8retsdDsczPRg==}
     dev: true
 
-  /react-i18next/11.17.4_lbe2taj3rsyaxmdd4qnhuc5z6q:
+  /react-i18next/11.17.4_iunkfnprfsbsde3j2gf563wwwi:
     resolution: {integrity: sha512-LswEIl8KNDTP4Wk3c22XDstbR++Vc4BZyNwvGFGaYbYDjdDLkHDLwrgd7DN28f8jufFHaYhQvCG5YWLxFhRt/g==}
     peerDependencies:
       i18next: '>= 19.0.0'
