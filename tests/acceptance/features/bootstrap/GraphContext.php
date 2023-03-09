@@ -241,12 +241,8 @@ class GraphContext implements Context {
 	 */
 	public function adminHasRetrievedUserUsingTheGraphApi(string $user): void {
 		$user = $this->featureContext->getActualUsername($user);
-		try {
-			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-			$userId = $userId ?? $user;
-		} catch (Exception $e) {
-			$userId = $user;
-		}
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		$userId = $userId ? $userId : $user;
 		$result = GraphHelper::getUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -816,17 +812,8 @@ class GraphContext implements Context {
 	 */
 	public function addUserToGroup(string $group, string $user, ?string $byUser = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($byUser);
-		try {
-			$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
-		} catch (Exception $e) {
-			$groupId = WebDavHelper::generateUUIDv4();
-		}
-		try {
-			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		} catch (Exception $e) {
-			$userId = WebDavHelper::generateUUIDv4();
-		}
-
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		return GraphHelper::addUserToGroup(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -886,6 +873,33 @@ class GraphContext implements Context {
 	 */
 	public function theAdministratorTriesToAddUserToGroupUsingTheGraphAPI(string $user, string $group): void {
 		$this->featureContext->setResponse($this->addUserToGroup($group, $user));
+	}
+
+	/**
+	 * @When the administrator tries to add user :user to a nonexistent group using the Graph API
+	 * @When the user :byUser tries to add user :user to a nonexistent group using the Graph API
+	 *
+	 * @param string $user
+	 * @param string|null $byUser
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException | Exception
+	 */
+	public function theAdministratorTriesToAddUserToNonExistentGroupUsingTheGraphAPI(string $user, ?string $byUser = null): void {
+		$credentials = $this->getAdminOrUserCredentials($byUser);
+		$groupId = WebDavHelper::generateUUIDv4();
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		$this->featureContext->setResponse(
+			GraphHelper::addUserToGroup(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials['username'],
+				$credentials['password'],
+				$userId,
+				$groupId
+			)
+		);
 	}
 
 	/**
@@ -1297,18 +1311,27 @@ class GraphContext implements Context {
 	 * @param string|null $byUser
 	 *
 	 * @return void
+	 * @throws Exception | GuzzleException
 	 */
 	public function theUserTriesToRemoveAnotherUserFromGroupUsingTheGraphAPI(string $user, string $group, ?string $byUser = null): void {
-		try {
-			$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
-		} catch (Exception $e) {
-			$groupId = WebDavHelper::generateUUIDv4();
-		}
-		try {
-			$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		} catch (Exception $e) {
-			$userId = WebDavHelper::generateUUIDv4();
-		}
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		$this->featureContext->setResponse($this->removeUserFromGroup($groupId, $userId, $byUser));
+	}
+
+	/**
+	 * @When the administrator tries to remove user :user from a nonexistent group using the Graph API
+	 * @When user :byUser tries to remove user :user from a nonexistent group using the Graph API
+	 *
+	 * @param string $user
+	 * @param string|null $byUser
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theUserTriesToRemoveAnotherUserFromNonExistentGroupUsingTheGraphAPI(string $user, ?string $byUser = null): void {
+		$groupId = WebDavHelper::generateUUIDv4();
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
 		$this->featureContext->setResponse($this->removeUserFromGroup($groupId, $userId, $byUser));
 	}
 
@@ -1680,7 +1703,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^the administrator "([^"]*)" tries to add the following users to a non-existing group at once using the Graph API$/
+	 * @When /^the administrator "([^"]*)" tries to add the following users to a nonexistent group at once using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -1699,7 +1722,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^the administrator "([^"]*)" tries to add the following non-existing users to a group "([^"]*)" at once using the Graph API$/
+	 * @When /^the administrator "([^"]*)" tries to add the following nonexistent users to a group "([^"]*)" at once using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $group
@@ -1720,6 +1743,7 @@ class GraphContext implements Context {
 
 	/**
 	 * @When /^the administrator "([^"]*)" tries to add the following users to a group "([^"]*)" at once using the Graph API$/
+	 * @When /^the administrator "([^"]*)" tries to add the following existent and nonexistent users to a group "([^"]*)" at once using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $group
@@ -1733,11 +1757,8 @@ class GraphContext implements Context {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		foreach ($table->getHash() as $row) {
-			try {
-				$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
-			} catch (Exception $e) {
-				$userIds[] = WebDavHelper::generateUUIDv4();
-			}
+			$userId = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
+			$userIds[] = $userId ? $userId : WebDavHelper::generateUUIDv4();
 		}
 		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
 	}
