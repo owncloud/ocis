@@ -47,6 +47,7 @@ require (
 	github.com/jellydator/ttlcache/v2 v2.11.1
 	github.com/jellydator/ttlcache/v3 v3.0.1
 	github.com/justinas/alice v1.2.0
+	github.com/leonelquinteros/gotext v1.5.2
 	github.com/libregraph/idm v0.4.1-0.20230221143410-3503963047a5
 	github.com/libregraph/lico v0.59.4
 	github.com/mitchellh/mapstructure v1.5.0
@@ -191,7 +192,6 @@ require (
 	github.com/gookit/goutil v0.6.0 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/gorilla/schema v1.2.0 // indirect
-	github.com/gosexy/gettext v0.0.0-20160830220431-74466a0a0c4a // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0 // indirect
 	github.com/hashicorp/consul/api v1.15.2 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
@@ -208,7 +208,6 @@ require (
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
-	github.com/jessevdk/go-flags v1.5.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/jonboulle/clockwork v0.2.2 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -216,7 +215,6 @@ require (
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/klauspost/cpuid/v2 v2.1.0 // indirect
-	github.com/leonelquinteros/gotext v1.5.2 // indirect
 	github.com/libregraph/oidc-go v1.0.0 // indirect
 	github.com/longsleep/go-metrics v1.0.0 // indirect
 	github.com/longsleep/rndm v1.2.0 // indirect
@@ -296,3 +294,5 @@ require (
 )
 
 replace github.com/cs3org/go-cs3apis => github.com/c0rby/go-cs3apis v0.0.0-20230110100311-5b424f1baa35
+
+replace github.com/leonelquinteros/gotext => github.com/kobergj/gotext v0.0.0-20230309141732-b909eb0b8956
