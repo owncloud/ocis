@@ -258,13 +258,13 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	var updateNeeded bool
 
 	// Don't allow updates of the ID
-	if user.Id != nil && *user.Id != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.id) != *user.Id {
+	if user.GetId() != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.id) != user.GetId() {
 			return nil, errorcode.New(errorcode.NotAllowed, "changing the UserId is not allowed")
 		}
 	}
-	if user.OnPremisesSamAccountName != nil && *user.OnPremisesSamAccountName != "" {
-		if eu := e.GetEqualFoldAttributeValue(i.userAttributeMap.userName); eu != *user.OnPremisesSamAccountName {
+	if user.GetOnPremisesSamAccountName() != "" {
+		if eu := e.GetEqualFoldAttributeValue(i.userAttributeMap.userName); eu != user.GetOnPremisesSamAccountName() {
 			e, err = i.changeUserName(ctx, e.DN, eu, user.GetOnPremisesSamAccountName())
 			if err != nil {
 				return nil, err
@@ -273,19 +273,31 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	}
 
 	mr := ldap.ModifyRequest{DN: e.DN}
-	if user.DisplayName != nil && *user.DisplayName != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName) != *user.DisplayName {
-			mr.Replace(i.userAttributeMap.displayName, []string{*user.DisplayName})
+	if user.GetDisplayName() != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName) != user.GetDisplayName() {
+			mr.Replace(i.userAttributeMap.displayName, []string{user.GetDisplayName()})
 			updateNeeded = true
 		}
 	}
-	if user.Mail != nil && *user.Mail != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.mail) != *user.Mail {
-			mr.Replace(i.userAttributeMap.mail, []string{*user.Mail})
+	if user.GetMail() != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.mail) != user.GetMail() {
+			mr.Replace(i.userAttributeMap.mail, []string{user.GetMail()})
 			updateNeeded = true
 		}
 	}
-	if user.PasswordProfile != nil && user.PasswordProfile.Password != nil && *user.PasswordProfile.Password != "" {
+	if user.GetSurname() != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.surname) != user.GetSurname() {
+			mr.Replace(i.userAttributeMap.surname, []string{user.GetSurname()})
+			updateNeeded = true
+		}
+	}
+	if user.GetGivenName() != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName) != user.GetGivenName() {
+			mr.Replace(i.userAttributeMap.givenName, []string{user.GetGivenName()})
+			updateNeeded = true
+		}
+	}
+	if user.PasswordProfile != nil && user.PasswordProfile.GetPassword() != "" {
 		if i.usePwModifyExOp {
 			if err := i.updateUserPassowrd(ctx, e.DN, user.PasswordProfile.GetPassword()); err != nil {
 				return nil, err
@@ -293,7 +305,7 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 		} else {
 			// password are hashed server side there is no need to check if the new password
 			// is actually different from the old one.
-			mr.Replace("userPassword", []string{*user.PasswordProfile.Password})
+			mr.Replace("userPassword", []string{user.PasswordProfile.GetPassword()})
 			updateNeeded = true
 		}
 	}

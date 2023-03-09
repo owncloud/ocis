@@ -322,7 +322,7 @@ var userByIDSearch1 *ldap.SearchRequest = &ldap.SearchRequest{
 	Scope:      2,
 	SizeLimit:  1,
 	Filter:     "(&(objectClass=ocEducationUser)(|(uid=abcd-defg)(entryUUID=abcd-defg)))",
-	Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass", "ocMemberOfSchool"},
+	Attributes: eduUserAttrs,
 	Controls:   []ldap.Control(nil),
 }
 
@@ -331,7 +331,7 @@ var userByIDSearch2 *ldap.SearchRequest = &ldap.SearchRequest{
 	Scope:      2,
 	SizeLimit:  1,
 	Filter:     "(&(objectClass=ocEducationUser)(|(uid=does-not-exist)(entryUUID=does-not-exist)))",
-	Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass", "ocMemberOfSchool"},
+	Attributes: eduUserAttrs,
 	Controls:   []ldap.Control(nil),
 }
 
@@ -439,7 +439,7 @@ var usersBySchoolIDSearch *ldap.SearchRequest = &ldap.SearchRequest{
 	Scope:      2,
 	SizeLimit:  0,
 	Filter:     "(&(objectClass=ocEducationUser)(ocMemberOfSchool=abcd-defg))",
-	Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass", "ocMemberOfSchool"},
+	Attributes: eduUserAttrs,
 	Controls:   []ldap.Control(nil),
 }
 

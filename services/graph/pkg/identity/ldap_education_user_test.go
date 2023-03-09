@@ -11,9 +11,23 @@ import (
 	"github.com/test-go/testify/mock"
 )
 
+var eduUserAttrs = []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "oCExternalIdentity", "userClass", "ocMemberOfSchool"}
+
 var eduUserEntry = ldap.NewEntry("uid=user,ou=people,dc=test",
 	map[string][]string{
 		"uid":         {"testuser"},
+		"displayname": {"Test User"},
+		"mail":        {"user@example"},
+		"entryuuid":   {"abcd-defg"},
+		"userClass":   {"student"},
+		"oCExternalIdentity": {
+			"$ http://idp $ testuser",
+			"xxx $ http://idpnew $ xxxxx-xxxxx-xxxxx",
+		},
+	})
+var renamedEduUserEntry = ldap.NewEntry("uid=newtestuser,ou=people,dc=test",
+	map[string][]string{
+		"uid":         {"newtestuser"},
 		"displayname": {"Test User"},
 		"mail":        {"user@example"},
 		"entryuuid":   {"abcd-defg"},
@@ -42,7 +56,7 @@ var sr1 *ldap.SearchRequest = &ldap.SearchRequest{
 	Scope:      2,
 	SizeLimit:  1,
 	Filter:     "(&(objectClass=ocEducationUser)(|(uid=abcd-defg)(entryUUID=abcd-defg)))",
-	Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass", "ocMemberOfSchool"},
+	Attributes: eduUserAttrs,
 	Controls:   []ldap.Control(nil),
 }
 var sr2 *ldap.SearchRequest = &ldap.SearchRequest{
@@ -50,7 +64,7 @@ var sr2 *ldap.SearchRequest = &ldap.SearchRequest{
 	Scope:      2,
 	SizeLimit:  1,
 	Filter:     "(&(objectClass=ocEducationUser)(|(uid=xxxx-xxxx)(entryUUID=xxxx-xxxx)))",
-	Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass", "ocMemberOfSchool"},
+	Attributes: eduUserAttrs,
 	Controls:   []ldap.Control(nil),
 }
 
@@ -133,7 +147,7 @@ func TestGetEducationUsers(t *testing.T) {
 		Scope:      2,
 		SizeLimit:  0,
 		Filter:     "(objectClass=ocEducationUser)",
-		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "oCExternalIdentity", "userClass", "ocMemberOfSchool"},
+		Attributes: eduUserAttrs,
 		Controls:   []ldap.Control(nil),
 	}
 	lm.On("Search", sr).Return(&ldap.SearchResult{Entries: []*ldap.Entry{eduUserEntry}}, nil)
@@ -142,4 +156,97 @@ func TestGetEducationUsers(t *testing.T) {
 	_, err = b.GetEducationUsers(context.Background())
 	lm.AssertNumberOfCalls(t, "Search", 1)
 	assert.Nil(t, err)
+}
+
+func TestUpdateEducationUser(t *testing.T) {
+	lm := &mocks.Client{}
+	b, err := getMockedBackend(lm, eduConfig, &logger)
+	assert.Nil(t, err)
+	userSearchReq := &ldap.SearchRequest{
+		BaseDN:     "ou=people,dc=test",
+		Scope:      2,
+		SizeLimit:  1,
+		Filter:     "(&(objectClass=ocEducationUser)(|(uid=testuser)(entryUUID=testuser)))",
+		Attributes: eduUserAttrs,
+	}
+	userLookupReq := &ldap.SearchRequest{
+		BaseDN:     "uid=newtestuser,ou=people,dc=test",
+		Scope:      0,
+		SizeLimit:  1,
+		Filter:     "(objectClass=inetOrgPerson)",
+		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+	}
+	eduUserLookupReq := &ldap.SearchRequest{
+		BaseDN:     "uid=newtestuser,ou=people,dc=test",
+		Scope:      0,
+		SizeLimit:  1,
+		Filter:     "(objectClass=ocEducationUser)",
+		Attributes: eduUserAttrs,
+	}
+	groupSearchReq := &ldap.SearchRequest{
+		BaseDN: "ou=groups,dc=test",
+		Scope:  2,
+		Filter: "(&(objectClass=groupOfNames)(member=uid=user,ou=people,dc=test))",
+		Attributes: []string{
+			"cn",
+			"entryUUID",
+		},
+	}
+	lm.On("Search", userLookupReq).
+		Return(
+			&ldap.SearchResult{
+				Entries: []*ldap.Entry{
+					renamedEduUserEntry,
+				},
+			},
+			nil)
+	lm.On("Search", eduUserLookupReq).
+		Return(
+			&ldap.SearchResult{
+				Entries: []*ldap.Entry{
+					renamedEduUserEntry,
+				},
+			},
+			nil)
+	lm.On("Search", userSearchReq).
+		Return(
+			&ldap.SearchResult{
+				Entries: []*ldap.Entry{
+					eduUserEntry,
+				},
+			},
+			nil)
+	lm.On("Search", groupSearchReq).
+		Return(
+			&ldap.SearchResult{
+				Entries: []*ldap.Entry{},
+			},
+			nil)
+	modReq := ldap.ModifyRequest{
+		DN: "uid=newtestuser,ou=people,dc=test",
+		Changes: []ldap.Change{
+			{
+				Operation: ldap.ReplaceAttribute,
+				Modification: ldap.PartialAttribute{
+					Type: "mail",
+					Vals: []string{"new@mail.org"},
+				},
+			},
+		},
+	}
+	modDNReq := ldap.ModifyDNRequest{
+		DN:           "uid=user,ou=people,dc=test",
+		NewRDN:       "uid=newtestuser",
+		DeleteOldRDN: true,
+	}
+	lm.On("ModifyDN", &modDNReq).Return(nil)
+	lm.On("Modify", &modReq).Return(nil)
+	user := libregraph.NewEducationUser()
+	user.SetOnPremisesSamAccountName("newtestuser")
+	user.SetMail("new@mail.org")
+	eduUser, err := b.UpdateEducationUser(context.Background(), "testuser", *user)
+	assert.NotNil(t, eduUser)
+	assert.Nil(t, err)
+	assert.Equal(t, eduUser.GetOnPremisesSamAccountName(), "newtestuser")
+	assert.Equal(t, "abcd-defg", eduUser.GetId())
 }
