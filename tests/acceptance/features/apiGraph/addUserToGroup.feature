@@ -124,7 +124,27 @@ Feature: add users to group
     Given group "groupA" has been created
     When user "Alice" tries to add himself to group "groupA" using the Graph API
     Then the HTTP status code should be "401"
-    And the last response should be an unauthorized response
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "type": "string",
+            "enum": ["Unauthorized"]
+          }
+        }
+      }
+    }
+    """
 
 
   Scenario: normal user tries to other user to a group
@@ -132,7 +152,27 @@ Feature: add users to group
     And group "groupA" has been created
     When user "Alice" tries to add user "Brian" to group "groupA" using the Graph API
     Then the HTTP status code should be "401"
-    And the last response should be an unauthorized response
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "type": "string",
+            "enum": ["Unauthorized"]
+          }
+        }
+      }
+    }
+    """
 
 
   Scenario: admin tries to add user to a non-existing group

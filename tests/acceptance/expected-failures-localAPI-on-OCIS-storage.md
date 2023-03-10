@@ -91,8 +91,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesShares/publicLinkDownload.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/publicLinkDownload.feature#L30)
 
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
-- [apiGraph/getUser.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L23)
-- [apiGraph/getUser.feature:102](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L102)
+- [apiGraph/getUser.feature:55](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L55)
+- [apiGraph/getUser.feature:545](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L545)
 
 #### [GET a file while it's in processing doesn't return 425 code (async uploads)](https://github.com/owncloud/ocis/issues/5326)
 - [apiAsyncUpload/delayPostprocessing.feature:14](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature#L14)
@@ -100,7 +100,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiAsyncUpload/delayPostprocessing.feature:16](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature#L16)
 
 #### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
-- [apiGraph/getGroup.feature:101](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L101)
+- [apiGraph/getGroup.feature:333](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L333)
 
 #### [Sharing to a group with an expiration date does not work #5442](https://github.com/owncloud/ocis/issues/5442)
 - [apiSpacesShares/shareSubItemOfSpace.feature:105](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L105)
@@ -109,14 +109,14 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpaces/spaceManagement.feature:149](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/spaceManagement.feature#L149)
 
 #### [Same users can be added in a group multiple time](https://github.com/owncloud/ocis/issues/5702)
-- [apiGraph/addUserToGroup.feature:222](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L222)
+- [apiGraph/addUserToGroup.feature:262](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L262)
 
 #### [Try to add group to a group return 204](https://github.com/owncloud/ocis/issues/5793)
-- [apiGraph/addUserToGroup.feature:244](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L244)
+- [apiGraph/addUserToGroup.feature:284](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L284)
 
 ### [Users are added in a group with wrong host in host-part of user](https://github.com/owncloud/ocis/issues/5871)
-- [apiGraph/addUserToGroup.feature:292](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L292)
-- [apiGraph/addUserToGroup.feature:306](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L306)
+- [apiGraph/addUserToGroup.feature:332](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L332)
+- [apiGraph/addUserToGroup.feature:346](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L346)
 
 ### [Space admin trying to set personal space quota returns status code 200](https://github.com/owncloud/ocis/issues/5947)
 - [apiSpaces/setQuota.feature:80](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L80)

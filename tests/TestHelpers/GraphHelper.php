@@ -35,16 +35,6 @@ class GraphHelper {
 	}
 
 	/**
-	 * @param string $id
-	 *
-	 * @return bool
-	 */
-	public static function isUUIDv4(string $id): bool {
-		$regex = "/^" . self::getUUIDv4Regex() . "$/i";
-		return (bool)preg_match($regex, $id);
-	}
-
-	/**
 	 * @param string $spaceId
 	 *
 	 * @return bool
