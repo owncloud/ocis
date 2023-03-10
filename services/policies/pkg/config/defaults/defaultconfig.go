@@ -8,6 +8,14 @@ import (
 	"github.com/owncloud/ocis/v2/services/policies/pkg/config"
 )
 
+// FullDefaultConfig returns a fully initialized default configuration which is needed for doc generation.
+func FullDefaultConfig() *config.Config {
+	cfg := DefaultConfig()
+	EnsureDefaults(cfg)
+	Sanitize(cfg)
+	return cfg
+}
+
 // DefaultConfig returns the default config
 func DefaultConfig() *config.Config {
 	return &config.Config{
