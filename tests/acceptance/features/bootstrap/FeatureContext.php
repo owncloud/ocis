@@ -1640,15 +1640,16 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @param PyStringNode $schemaString
+	 * @param PyStringNode|string $schemaString
 	 *
 	 * @return mixed
 	 */
-	private function getJSONSchema(PyStringNode $schemaString) {
-		$schemaRawString = $schemaString->getRaw();
-		// substitute the inline codes or values
-		$schemaRawString = $this->substituteInLineCodes($schemaRawString);
-		$schema = json_decode($schemaRawString);
+	public function getJSONSchema($schemaString) {
+		if (\gettype($schemaString) !== 'string') {
+			$schemaString = $schemaString->getRaw();
+		}
+		$schemaString = $this->substituteInLineCodes($schemaString);
+		$schema = \json_decode($schemaString);
 		Assert::assertNotNull($schema, 'schema is not valid JSON');
 		return $schema;
 	}
@@ -1697,12 +1698,10 @@ class FeatureContext extends BehatVariablesContext {
 	 *
 	 * @throws Exception
 	 */
-	public function theDataOfTheResponseShouldMatch(
-		PyStringNode $schemaString
-	): void {
-		$jsonResponse = $this->getJsonDecodedResponseBodyContent();
+	public function theDataOfTheResponseShouldMatch(PyStringNode $schemaString): void {
+		$responseBody = $this->getJsonDecodedResponseBodyContent();
 		JsonAssertions::assertJsonDocumentMatchesSchema(
-			$jsonResponse,
+			$responseBody,
 			$this->getJSONSchema($schemaString)
 		);
 	}
@@ -3303,16 +3302,18 @@ class FeatureContext extends BehatVariablesContext {
 				"parameter" => []
 			],
 			[
-			"code" => "%user_id%",
-			"function" =>
-			[$this, "getUserIdByUserName"],
-			"parameter" => [$userName]
-			],
+				"code" => "%user_id%",
+				"function" => [
+					$this, "getUserIdByUserName"
+				],
+					"parameter" => [$userName]
+				],
 			[
-			"code" => "%group_id%",
-			"function" =>
-			[$this, "getGroupIdByGroupName"],
-			"parameter" => [$group]
+				"code" => "%group_id%",
+				"function" => [
+					$this, "getGroupIdByGroupName"
+				],
+				"parameter" => [$group]
 			]
 		];
 		if ($user !== null) {
