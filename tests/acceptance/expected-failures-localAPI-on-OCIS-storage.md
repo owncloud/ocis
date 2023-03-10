@@ -104,8 +104,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
 - [apiGraph/getGroup.feature:100](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L100)
 
-#### Change editUser test where we set empty value
-- [apiGraph/editUser.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L33)
-- [apiGraph/editUser.feature:80](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L80)
+#### [Changing user with an uppercase name gives 404 error](https://github.com/owncloud/ocis/issues/5763)
+- [apiGraph/editUser.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L41)
+
+#### [Using # in the onPremisesSamAccountName breaks getting users](https://github.com/owncloud/ocis/issues/5755)
+- [apiGraph/editUser.feature:42](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L42)
+- [apiGraph/editUser.feature:44](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L44)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

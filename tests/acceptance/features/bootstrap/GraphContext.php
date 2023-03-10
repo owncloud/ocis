@@ -129,6 +129,27 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @When /^the user "([^"]*)" changes the user name of user "([^"]*)" to "([^"]*)" using the Graph API$/
+	 * @When /^the user "([^"]*)" tries to change the user name of user "([^"]*)" to "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $byUser
+	 * @param string $user
+	 * @param string $userName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserChangesTheUserNameOfUserToUsingTheGraphApi(string $byUser, string $user, string $userName): void {
+		$response = $this->editUserUsingTheGraphApi($byUser, $user, $userName);
+		$this->featureContext->setResponse($response);
+		// need add user to list to delete him after test
+		if (!empty($userName)) {
+			$this->featureContext->addUserToCreatedUsersList($userName, $this->featureContext->getUserPassword($user));
+		}
+	}
+
+	/**
 	 * @When /^the user "([^"]*)" disables user "([^"]*)" using the Graph API$/
 	 * @When /^the user "([^"]*)" tries to disable user "([^"]*)" using the Graph API$/
 	 *
