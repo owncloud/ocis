@@ -297,7 +297,65 @@ var _ = Describe("EducationUsers", func() {
 			svc.PostEducationUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			createdUser := libregraph.EducationUser{}
+			err = json.Unmarshal(data, &createdUser)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdUser.GetUserType()).To(Equal("Member"))
 		})
+
+		It("creates a guest user", func() {
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything).Return(&settingssvc.AssignRoleToUserResponse{}, nil)
+			identityEducationBackend.On("CreateEducationUser", mock.Anything, mock.Anything).Return(func(ctx context.Context, user libregraph.EducationUser) *libregraph.EducationUser {
+				user.SetId("/users/user")
+				return &user
+			}, nil)
+
+			user.SetUserType("Guest")
+			userJson, err := json.Marshal(user)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/users", bytes.NewBuffer(userJson))
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+			svc.PostEducationUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			createdUser := libregraph.EducationUser{}
+			err = json.Unmarshal(data, &createdUser)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdUser.GetUserType()).To(Equal("Guest"))
+		})
+
+		It("creates a member user", func() {
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything).Return(&settingssvc.AssignRoleToUserResponse{}, nil)
+			identityEducationBackend.On("CreateEducationUser", mock.Anything, mock.Anything).Return(func(ctx context.Context, user libregraph.EducationUser) *libregraph.EducationUser {
+				user.SetId("/users/user")
+				return &user
+			}, nil)
+
+			user.SetUserType("Member")
+			userJson, err := json.Marshal(user)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/users", bytes.NewBuffer(userJson))
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+			svc.PostEducationUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			createdUser := libregraph.EducationUser{}
+			err = json.Unmarshal(data, &createdUser)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdUser.GetUserType()).To(Equal("Member"))
+		})
+
 	})
 
 	Describe("DeleteEducationUser", func() {
@@ -394,6 +452,20 @@ var _ = Describe("EducationUsers", func() {
 
 		It("handles invalid email", func() {
 			user.SetMail("invalid")
+			data, err := json.Marshal(user)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/users?$invalid=true", bytes.NewBuffer(data))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", user.GetId())
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.PatchEducationUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
+		It("handles invalid userType", func() {
+			user.SetUserType("Clown")
 			data, err := json.Marshal(user)
 			Expect(err).ToNot(HaveOccurred())
 

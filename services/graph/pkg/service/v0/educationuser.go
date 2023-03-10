@@ -132,6 +132,16 @@ func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if u.HasUserType() {
+		if !isValidUserType(*u.UserType) {
+			logger.Debug().Interface("user", u).Msg("invalid userType attribute")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid userType attribute, valid options are 'Member' or 'Guest'")
+			return
+		}
+	} else {
+		u.SetUserType("Member")
+	}
+
 	if _, ok := u.GetPrimaryRoleOk(); !ok {
 		logger.Debug().Err(err).Interface("user", u).Msg("could not create education user: missing required Attribute: 'primaryRole'")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'primaryRole'")
@@ -366,6 +376,14 @@ func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 
 	if name, ok := changes.GetDisplayNameOk(); ok {
 		features = append(features, events.UserFeature{Name: "displayname", Value: *name})
+	}
+
+	if changes.HasUserType() {
+		if !isValidUserType(*changes.UserType) {
+			logger.Debug().Interface("user", changes).Msg("invalid userType attribute")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid userType attribute, valid options are 'Member' or 'Guest'")
+			return
+		}
 	}
 
 	logger.Debug().Str("nameid", nameOrID).Interface("changes", *changes).Msg("calling update education user on backend")

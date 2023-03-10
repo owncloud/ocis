@@ -588,6 +588,11 @@ var _ = Describe("Users", func() {
 			assertHandleBadAttributes(user)
 		})
 
+		It("handles invalid userType", func() {
+			user.SetUserType("Clown")
+			assertHandleBadAttributes(user)
+		})
+
 		It("creates a user", func() {
 			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{}, nil)
 			identityBackend.On("CreateUser", mock.Anything, mock.Anything).Return(func(ctx context.Context, user libregraph.User) *libregraph.User {
@@ -602,6 +607,63 @@ var _ = Describe("Users", func() {
 			svc.PostUser(rr, r)
 
 			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			createdUser := libregraph.User{}
+			err = json.Unmarshal(data, &createdUser)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdUser.GetUserType()).To(Equal("Member"))
+		})
+
+		It("creates a guest user", func() {
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{}, nil)
+			identityBackend.On("CreateUser", mock.Anything, mock.Anything).Return(func(ctx context.Context, user libregraph.User) *libregraph.User {
+				user.SetId("/users/user")
+				return &user
+			}, nil)
+
+			user.SetUserType("Guest")
+			userJson, err := json.Marshal(user)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users", bytes.NewBuffer(userJson))
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+			svc.PostUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			createdUser := libregraph.User{}
+			err = json.Unmarshal(data, &createdUser)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdUser.GetUserType()).To(Equal("Guest"))
+		})
+
+		It("creates a member user", func() {
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{}, nil)
+			identityBackend.On("CreateUser", mock.Anything, mock.Anything).Return(func(ctx context.Context, user libregraph.User) *libregraph.User {
+				user.SetId("/users/user")
+				return &user
+			}, nil)
+
+			user.SetUserType("Member")
+			userJson, err := json.Marshal(user)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users", bytes.NewBuffer(userJson))
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+			svc.PostUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			createdUser := libregraph.User{}
+			err = json.Unmarshal(data, &createdUser)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdUser.GetUserType()).To(Equal("Member"))
 		})
 
 		Describe("Handling usernames with spaces", func() {
@@ -768,9 +830,25 @@ var _ = Describe("Users", func() {
 			Expect(rr.Code).To(Equal(http.StatusBadRequest))
 		})
 
+		It("handles invalid userType", func() {
+			user.SetUserType("Clown")
+			data, err := json.Marshal(user)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users?$invalid=true", bytes.NewBuffer(data))
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("userID", user.GetId())
+			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+			svc.PatchUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusBadRequest))
+		})
+
 		It("updates attributes", func() {
+			user.SetUserType("Member")
 			identityBackend.On("UpdateUser", mock.Anything, user.GetId(), mock.Anything).Return(user, nil)
 
+			user.SetUserType(("Member"))
 			user.SetDisplayName("New Display Name")
 			data, err := json.Marshal(user)
 			Expect(err).ToNot(HaveOccurred())
@@ -788,6 +866,7 @@ var _ = Describe("Users", func() {
 			updatedUser := libregraph.User{}
 			err = json.Unmarshal(data, &updatedUser)
 			Expect(err).ToNot(HaveOccurred())
+			Expect(updatedUser.GetUserType()).To(Equal("Member"))
 			Expect(updatedUser.GetDisplayName()).To(Equal("New Display Name"))
 		})
 	})

@@ -305,6 +305,16 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if u.HasUserType() {
+		if !isValidUserType(*u.UserType) {
+			logger.Debug().Interface("user", u).Msg("invalid userType attribute")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid userType attribute, valid options are 'Member' or 'Guest'")
+			return
+		}
+	} else {
+		u.SetUserType("Member")
+	}
+
 	logger.Debug().Interface("user", u).Msg("calling create user on backend")
 	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {
 		logger.Debug().Err(err).Msg("could not create user: backend error")
@@ -652,6 +662,14 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		features = append(features, events.UserFeature{Name: "displayname", Value: *name})
 	}
 
+	if changes.HasUserType() {
+		if !isValidUserType(*changes.UserType) {
+			logger.Debug().Interface("user", changes).Msg("invalid userType attribute")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid userType attribute, valid options are 'Member' or 'Guest'")
+			return
+		}
+	}
+
 	logger.Debug().Str("nameid", nameOrID).Interface("changes", *changes).Msg("calling update user on backend")
 	u, err := g.identityBackend.UpdateUser(r.Context(), nameOrID, *changes)
 	if err != nil {
@@ -742,4 +760,16 @@ func sortUsers(req *godata.GoDataRequest, users []*libregraph.User) ([]*libregra
 		sort.Slice(users, less)
 	}
 	return users, nil
+}
+
+func isValidUserType(userType string) bool {
+	userType = strings.ToLower(userType)
+
+	for _, value := range []string{"member", "guest"} {
+		if userType == value {
+			return true
+		}
+	}
+
+	return false
 }

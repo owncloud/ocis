@@ -11,7 +11,19 @@ import (
 	"github.com/test-go/testify/mock"
 )
 
-var eduUserAttrs = []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "oCExternalIdentity", "userClass", "ocMemberOfSchool"}
+var eduUserAttrs = []string{
+	"displayname",
+	"entryUUID",
+	"mail",
+	"uid",
+	"sn",
+	"givenname",
+	"userEnabledAttribute",
+	"userTypeAttribute",
+	"oCExternalIdentity",
+	"userClass",
+	"ocMemberOfSchool",
+}
 
 var eduUserEntry = ldap.NewEntry("uid=user,ou=people,dc=test",
 	map[string][]string{
@@ -24,6 +36,7 @@ var eduUserEntry = ldap.NewEntry("uid=user,ou=people,dc=test",
 			"$ http://idp $ testuser",
 			"xxx $ http://idpnew $ xxxxx-xxxxx-xxxxx",
 		},
+		"userTypeAttribute": {"Member"},
 	})
 var renamedEduUserEntry = ldap.NewEntry("uid=newtestuser,ou=people,dc=test",
 	map[string][]string{
@@ -36,6 +49,7 @@ var renamedEduUserEntry = ldap.NewEntry("uid=newtestuser,ou=people,dc=test",
 			"$ http://idp $ testuser",
 			"xxx $ http://idpnew $ xxxxx-xxxxx-xxxxx",
 		},
+		"userTypeAttribute": {"Guest"},
 	})
 var eduUserEntryWithSchool = ldap.NewEntry("uid=user,ou=people,dc=test",
 	map[string][]string{
@@ -88,6 +102,7 @@ func TestCreateEducationUser(t *testing.T) {
 	user.SetOnPremisesSamAccountName("testuser")
 	user.SetMail("testuser@example.org")
 	user.SetPrimaryRole("student")
+	user.SetUserType(("Member"))
 	eduUser, err := b.CreateEducationUser(context.Background(), *user)
 	lm.AssertNumberOfCalls(t, "Add", 1)
 	lm.AssertNumberOfCalls(t, "Search", 1)
@@ -97,6 +112,7 @@ func TestCreateEducationUser(t *testing.T) {
 	assert.Equal(t, eduUser.GetOnPremisesSamAccountName(), user.GetOnPremisesSamAccountName())
 	assert.Equal(t, "abcd-defg", eduUser.GetId())
 	assert.Equal(t, eduUser.GetPrimaryRole(), user.GetPrimaryRole())
+	assert.Equal(t, eduUser.GetUserType(), user.GetUserType())
 }
 
 func TestDeleteEducationUser(t *testing.T) {
@@ -174,7 +190,7 @@ func TestUpdateEducationUser(t *testing.T) {
 		Scope:      0,
 		SizeLimit:  1,
 		Filter:     "(objectClass=inetOrgPerson)",
-		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+		Attributes: []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 	}
 	eduUserLookupReq := &ldap.SearchRequest{
 		BaseDN:     "uid=newtestuser,ou=people,dc=test",
@@ -249,4 +265,5 @@ func TestUpdateEducationUser(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, eduUser.GetOnPremisesSamAccountName(), "newtestuser")
 	assert.Equal(t, "abcd-defg", eduUser.GetId())
+	assert.Equal(t, "Guest", eduUser.GetUserType())
 }
