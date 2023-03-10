@@ -86,6 +86,7 @@ config = {
         "services/users",
         "services/web",
         "services/webdav",
+        "services/webfinger",
         "ocis-pkg",
         "ocis",
     ],
