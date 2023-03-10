@@ -1156,6 +1156,35 @@ class GraphHelper {
 	 * @param string $xRequestId
 	 * @param string $user
 	 * @param string $password
+	 * @param string $firstGroup
+	 * @param string $secondGroup
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getUsersFromOneOrOtherGroup(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $firstGroup,
+		string $secondGroup
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users' . '?$filter=memberOf/any(m:m/id ' . "eq '$firstGroup') " . "or memberOf/any(m:m/id eq '$secondGroup')");
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$user,
+			$password,
+			self::getRequestHeaders()
+		);
+	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
 	 * @param string $roleId
 	 *
 	 * @return ResponseInterface
