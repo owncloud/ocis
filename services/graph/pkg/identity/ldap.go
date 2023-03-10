@@ -77,6 +77,7 @@ type userAttributeMap struct {
 	givenName      string
 	surname        string
 	accountEnabled string
+	userType       string
 }
 
 type ldapAttributeValues map[string][]string
@@ -105,6 +106,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		accountEnabled: config.UserEnabledAttribute,
 		givenName:      _givenNameAttribute,
 		surname:        _surNameAttribute,
+		userType:       config.UserTypeAttribute,
 	}
 
 	if config.GroupNameAttribute == "" || config.GroupIDAttribute == "" {
@@ -296,6 +298,12 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 			updateNeeded = true
 		}
 	}
+	if user.GetUserType() != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.userType) != user.GetUserType() {
+			mr.Replace(i.userAttributeMap.userType, []string{user.GetUserType()})
+			updateNeeded = true
+		}
+	}
 	if user.PasswordProfile != nil && user.PasswordProfile.GetPassword() != "" {
 		if i.usePwModifyExOp {
 			if err := i.updateUserPassowrd(ctx, e.DN, user.PasswordProfile.GetPassword()); err != nil {
@@ -372,6 +380,7 @@ func (i *LDAP) getUserByDN(dn string) (*ldap.Entry, error) {
 		i.userAttributeMap.surname,
 		i.userAttributeMap.givenName,
 		i.userAttributeMap.accountEnabled,
+		i.userAttributeMap.userType,
 	}
 
 	filter := fmt.Sprintf("(objectClass=%s)", i.userObjectClass)
@@ -469,6 +478,7 @@ func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
 		i.userAttributeMap.surname,
 		i.userAttributeMap.givenName,
 		i.userAttributeMap.accountEnabled,
+		i.userAttributeMap.userType,
 	}
 	return i.searchLDAPEntryByFilter(i.userBaseDN, attrs, filter)
 }
@@ -707,6 +717,7 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 	id := e.GetEqualFoldAttributeValue(i.userAttributeMap.id)
 	givenName := e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName)
 	surname := e.GetEqualFoldAttributeValue(i.userAttributeMap.surname)
+	userType := e.GetEqualFoldAttributeValue(i.userAttributeMap.userType)
 
 	if id != "" && opsan != "" {
 		return &libregraph.User{
@@ -716,6 +727,7 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 			Id:                       &id,
 			GivenName:                &givenName,
 			Surname:                  &surname,
+			UserType:                 &userType,
 			AccountEnabled:           booleanOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled)),
 		}
 	}
@@ -730,6 +742,7 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 		i.userAttributeMap.mail:        {user.GetMail()},
 		"objectClass":                  {"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"},
 		"cn":                           {user.GetOnPremisesSamAccountName()},
+		i.userAttributeMap.userType:    {user.GetUserType()},
 	}
 
 	if !i.useServerUUID {
@@ -778,6 +791,7 @@ func (i *LDAP) getUserAttrTypes() []string {
 		"owncloudUUID",
 		"userPassword",
 		i.userAttributeMap.accountEnabled,
+		i.userAttributeMap.userType,
 	}
 }
 

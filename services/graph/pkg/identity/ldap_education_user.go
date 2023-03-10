@@ -133,6 +133,12 @@ func (i *LDAP) UpdateEducationUser(ctx context.Context, nameOrID string, user li
 			updateNeeded = true
 		}
 	}
+	if user.GetUserType() != "" {
+		if e.GetEqualFoldAttributeValue(i.userAttributeMap.userType) != user.GetUserType() {
+			mr.Replace(i.userAttributeMap.userType, []string{user.GetUserType()})
+			updateNeeded = true
+		}
+	}
 	if user.PasswordProfile != nil && user.PasswordProfile.GetPassword() != "" {
 		if i.usePwModifyExOp {
 			if err := i.updateUserPassowrd(ctx, e.DN, user.PasswordProfile.GetPassword()); err != nil {
@@ -250,6 +256,8 @@ func (i *LDAP) educationUserToUser(eduUser libregraph.EducationUser) *libregraph
 	user.GivenName = eduUser.GivenName
 	user.DisplayName = eduUser.DisplayName
 	user.Mail = eduUser.Mail
+	user.UserType = eduUser.UserType
+
 	return user
 }
 
@@ -262,6 +270,7 @@ func (i *LDAP) userToEducationUser(user libregraph.User, e *ldap.Entry) *libregr
 	eduUser.GivenName = user.GivenName
 	eduUser.DisplayName = user.DisplayName
 	eduUser.Mail = user.Mail
+	eduUser.UserType = user.UserType
 
 	if e != nil {
 		// Set the education User specific Attributes from the supplied LDAP Entry
@@ -345,6 +354,7 @@ func (i *LDAP) getEducationUserAttrTypes() []string {
 		i.userAttributeMap.surname,
 		i.userAttributeMap.givenName,
 		i.userAttributeMap.accountEnabled,
+		i.userAttributeMap.userType,
 		i.educationConfig.userAttributeMap.identities,
 		i.educationConfig.userAttributeMap.primaryRole,
 		i.educationConfig.memberOfSchoolAttribute,

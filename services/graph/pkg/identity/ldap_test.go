@@ -36,6 +36,7 @@ var lconfig = config.LDAP{
 	UserEmailAttribute:       "mail",
 	UserNameAttribute:        "uid",
 	UserEnabledAttribute:     "userEnabledAttribute",
+	UserTypeAttribute:        "userTypeAttribute",
 	LdapDisabledUsersGroupDN: disableUsersGroup,
 	DisableUserMechanism:     "attribute",
 
@@ -58,6 +59,7 @@ var userEntry = ldap.NewEntry("uid=user",
 		"sn":                   {"surname"},
 		"givenname":            {"givenName"},
 		"userenabledattribute": {"TRUE"},
+		"usertypeattribute":    {"Member"},
 	})
 
 var invalidUserEntry = ldap.NewEntry("uid=user",
@@ -107,6 +109,7 @@ func TestCreateUser(t *testing.T) {
 	userName := "user"
 	surname := "surname"
 	givenName := "givenName"
+	userType := "Member"
 
 	ar := ldap.NewAddRequest(fmt.Sprintf("uid=user,%s", lconfig.UserBaseDN), nil)
 	ar.Attribute(lconfig.UserDisplayNameAttribute, []string{displayName})
@@ -117,6 +120,7 @@ func TestCreateUser(t *testing.T) {
 	ar.Attribute("objectClass", []string{"inetOrgPerson", "organizationalPerson", "person", "top", "ownCloudUser"})
 	ar.Attribute("cn", []string{userName})
 	ar.Attribute(lconfig.UserEnabledAttribute, []string{"TRUE"})
+	ar.Attribute(lconfig.UserTypeAttribute, []string{"Member"})
 
 	l := &mocks.Client{}
 	l.On("Search", mock.Anything).
@@ -135,6 +139,7 @@ func TestCreateUser(t *testing.T) {
 	user.SetSurname(surname)
 	user.SetGivenName(givenName)
 	user.SetAccountEnabled(true)
+	user.SetUserType(userType)
 
 	c := lconfig
 	c.UseServerUUID = true
@@ -148,6 +153,7 @@ func TestCreateUser(t *testing.T) {
 	assert.Equal(t, givenName, newUser.GetGivenName())
 	assert.Equal(t, surname, newUser.GetSurname())
 	assert.True(t, newUser.GetAccountEnabled())
+	assert.Equal(t, userType, newUser.GetUserType())
 }
 
 func TestCreateUserModelFromLDAP(t *testing.T) {
@@ -301,6 +307,7 @@ func TestUpdateUser(t *testing.T) {
 		displayName              string
 		onPremisesSamAccountName string
 		accountEnabled           *bool
+		userType                 string
 	}
 	type args struct {
 		nameOrID             string
@@ -340,7 +347,7 @@ func TestUpdateUser(t *testing.T) {
 							ldap.ScopeWholeSubtree,
 							ldap.NeverDerefAliases, 1, 0, false,
 							"(&(objectClass=inetOrgPerson)(|(uid=testUser)(entryUUID=testUser)))",
-							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 							nil,
 						),
 					},
@@ -384,7 +391,7 @@ func TestUpdateUser(t *testing.T) {
 							ldap.ScopeWholeSubtree,
 							ldap.NeverDerefAliases, 1, 0, false,
 							"(&(objectClass=inetOrgPerson)(|(uid=testUser)(entryUUID=testUser)))",
-							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 							nil,
 						),
 					},
@@ -428,7 +435,7 @@ func TestUpdateUser(t *testing.T) {
 							TimeLimit:    0,
 							TypesOnly:    false,
 							Filter:       "(objectClass=inetOrgPerson)",
-							Attributes:   []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							Attributes:   []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 							Controls:     []ldap.Control(nil),
 						},
 					},
@@ -513,7 +520,7 @@ func TestUpdateUser(t *testing.T) {
 							ldap.ScopeWholeSubtree,
 							ldap.NeverDerefAliases, 1, 0, false,
 							"(&(objectClass=inetOrgPerson)(|(uid=testUser)(entryUUID=testUser)))",
-							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 							nil,
 						),
 					},
@@ -557,7 +564,7 @@ func TestUpdateUser(t *testing.T) {
 							TimeLimit:    0,
 							TypesOnly:    false,
 							Filter:       "(objectClass=inetOrgPerson)",
-							Attributes:   []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							Attributes:   []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 							Controls:     []ldap.Control(nil),
 						},
 					},
@@ -642,7 +649,7 @@ func TestUpdateUser(t *testing.T) {
 							ldap.ScopeWholeSubtree,
 							ldap.NeverDerefAliases, 1, 0, false,
 							"(&(objectClass=inetOrgPerson)(|(uid=testUser)(entryUUID=testUser)))",
-							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 							nil,
 						),
 					},
@@ -738,7 +745,7 @@ func TestUpdateUser(t *testing.T) {
 							TimeLimit:    0,
 							TypesOnly:    false,
 							Filter:       "(objectClass=inetOrgPerson)",
-							Attributes:   []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							Attributes:   []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 							Controls:     []ldap.Control(nil),
 						},
 					},
@@ -831,7 +838,7 @@ func TestUpdateUser(t *testing.T) {
 							ldap.ScopeWholeSubtree,
 							ldap.NeverDerefAliases, 1, 0, false,
 							"(&(objectClass=inetOrgPerson)(|(uid=testUser)(entryUUID=testUser)))",
-							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 							nil,
 						),
 					},
@@ -875,7 +882,7 @@ func TestUpdateUser(t *testing.T) {
 							TimeLimit:    0,
 							TypesOnly:    false,
 							Filter:       "(objectClass=inetOrgPerson)",
-							Attributes:   []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							Attributes:   []string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 							Controls:     []ldap.Control(nil),
 						},
 					},
@@ -961,7 +968,7 @@ func TestUpdateUser(t *testing.T) {
 							ldap.ScopeWholeSubtree,
 							ldap.NeverDerefAliases, 1, 0, false,
 							"(&(objectClass=inetOrgPerson)(|(uid=testUser)(entryUUID=testUser)))",
-							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 							nil,
 						),
 					},
@@ -1064,7 +1071,7 @@ func TestUpdateUser(t *testing.T) {
 							ldap.ScopeBaseObject,
 							ldap.NeverDerefAliases, 1, 0, false,
 							"(objectClass=inetOrgPerson)",
-							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 							[]ldap.Control(nil),
 						),
 					},
@@ -1127,7 +1134,7 @@ func TestUpdateUser(t *testing.T) {
 							ldap.ScopeWholeSubtree,
 							ldap.NeverDerefAliases, 1, 0, false,
 							"(&(objectClass=inetOrgPerson)(|(uid=testUser)(entryUUID=testUser)))",
-							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 							nil,
 						),
 					},
@@ -1230,7 +1237,7 @@ func TestUpdateUser(t *testing.T) {
 							ldap.ScopeBaseObject,
 							ldap.NeverDerefAliases, 1, 0, false,
 							"(objectClass=inetOrgPerson)",
-							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute"},
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
 							[]ldap.Control(nil),
 						),
 					},
@@ -1265,6 +1272,144 @@ func TestUpdateUser(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "Test changing userType",
+			args: args{
+				nameOrID: "testUser",
+				userProps: userProps{
+					userType: "Member",
+				},
+				disableUserMechanism: "group",
+			},
+			want: &userProps{
+				id:                       "testUser",
+				mail:                     "testuser@example.org",
+				displayName:              "testUser",
+				onPremisesSamAccountName: "testUser",
+				userType:                 "Member",
+			},
+			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+				return assert.Nil(t, err, args...)
+			},
+			ldapMocks: []mockInputs{
+				{
+					funcName: "Search",
+					args: []interface{}{
+						ldap.NewSearchRequest(
+							"ou=people,dc=test",
+							ldap.ScopeWholeSubtree,
+							ldap.NeverDerefAliases, 1, 0, false,
+							"(&(objectClass=inetOrgPerson)(|(uid=testUser)(entryUUID=testUser)))",
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
+							nil,
+						),
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "uid=name",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "displayname",
+											Values: []string{"testuser@example.org"},
+										},
+										{
+											Name:   "entryUUID",
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   "mail",
+											Values: []string{"testuser@example.org"},
+										},
+										{
+											Name:   lconfig.UserTypeAttribute,
+											Values: []string{"Guest"},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+				{
+					funcName: "Modify",
+					args: []interface{}{
+						&ldap.ModifyRequest{
+							DN: "uid=name",
+							Changes: []ldap.Change{
+								{
+									Operation: ldap.ReplaceAttribute,
+									Modification: ldap.PartialAttribute{
+										Type: "userTypeAttribute",
+										Vals: []string{"Member"},
+									},
+								},
+							},
+							Controls: []ldap.Control(nil),
+						},
+					},
+					returns: []interface{}{nil},
+				},
+				{
+					funcName: "Modify",
+					args: []interface{}{
+						&ldap.ModifyRequest{
+							DN:       "uid=name",
+							Changes:  []ldap.Change(nil),
+							Controls: []ldap.Control(nil),
+						},
+					},
+					returns: []interface{}{nil},
+				},
+				{
+					funcName: "Search",
+					args: []interface{}{
+						ldap.NewSearchRequest(
+							"uid=name",
+							ldap.ScopeBaseObject,
+							ldap.NeverDerefAliases, 1, 0, false,
+							"(objectClass=inetOrgPerson)",
+							[]string{"displayname", "entryUUID", "mail", "uid", "sn", "givenname", "userEnabledAttribute", "userTypeAttribute"},
+							[]ldap.Control(nil),
+						),
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "uid=name",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "uid",
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   "displayname",
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   "entryUUID",
+											Values: []string{"testUser"},
+										},
+										{
+											Name:   "mail",
+											Values: []string{"testuser@example.org"},
+										},
+										{
+											Name:   lconfig.UserTypeAttribute,
+											Values: []string{"Member"},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1283,6 +1428,7 @@ func TestUpdateUser(t *testing.T) {
 				DisplayName:              &tt.args.userProps.displayName,
 				OnPremisesSamAccountName: &tt.args.userProps.onPremisesSamAccountName,
 				AccountEnabled:           tt.args.userProps.accountEnabled,
+				UserType:                 &tt.args.userProps.userType,
 			}
 
 			emptyString := ""
@@ -1295,6 +1441,7 @@ func TestUpdateUser(t *testing.T) {
 					OnPremisesSamAccountName: &tt.want.onPremisesSamAccountName,
 					Surname:                  &emptyString,
 					GivenName:                &emptyString,
+					UserType:                 &tt.want.userType,
 				}
 
 				if tt.want.accountEnabled != nil {
