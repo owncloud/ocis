@@ -2015,13 +2015,6 @@ class SpacesContext implements Context {
 	): void {
 		$shareId = $this->featureContext->getLastPublicLinkShareId();
 		$rows = $table->getRowsHash();
-		$rows["role"] = \array_key_exists("role", $rows) ? $rows["role"] : 'viewer';
-		$rows["expireDate"] = \array_key_exists("expireDate", $rows) ? $rows["expireDate"] : null;
-
-		$body = [
-			"expireDate" => $rows["expireDate"],
-		];
-
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl . '/' . $shareId;
 		$this->featureContext->setResponse(
 			HttpRequestHelper::sendRequest(
@@ -2031,7 +2024,7 @@ class SpacesContext implements Context {
 				$this->featureContext->getActualUsername($user),
 				$this->featureContext->getPasswordForUser($user),
 				null,
-				$body
+				$rows
 			)
 		);
 	}
