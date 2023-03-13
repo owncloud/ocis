@@ -1022,7 +1022,7 @@ trait Sharing {
 			$this->shareFields
 		);
 		$bodyRows = $body->getRowsHash();
-		
+
 		if (\array_key_exists('password', $bodyRows)) {
 			$bodyRows['password'] = $this->getActualPassword($bodyRows['password']);
 		}
@@ -3335,19 +3335,6 @@ trait Sharing {
 		$dataResponded = $this->getAllSharesSharedWithUser($user);
 		$shareId = null;
 		foreach ($dataResponded as $shareElement) {
-			$shareFolder = \trim(
-				SetupHelper::getSystemConfigValue('share_folder', $this->getStepLineRef())
-			);
-
-			if ($shareFolder) {
-				$shareFolder = \ltrim($shareFolder, '/');
-			}
-
-			// Add share folder to share path if given
-			if ($shareFolder && !(strpos($share, "/$shareFolder") === 0)) {
-				$share = '/' . $shareFolder . $share;
-			}
-
 			// SharingHelper::SHARE_STATES has the mapping between the words for share states
 			// like "accepted", "pending",... and the integer constants 0, 1,... that are in
 			// the "state" field of the share data.

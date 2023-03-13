@@ -1099,12 +1099,7 @@ class AuthContext implements Context {
 		} else {
 			$value = 'false';
 		}
-		$occStatus = SetupHelper::setSystemConfig(
-			'token_auth_enforced',
-			$value,
-			$this->featureContext->getStepLineRef(),
-			'boolean'
-		);
+		$occStatus = ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 		if ($occStatus['code'] !== "0") {
 			throw new \Exception("setSystemConfig token_auth_enforced returned error code " . $occStatus['code']);
 		}
@@ -1135,22 +1130,6 @@ class AuthContext implements Context {
 	 */
 	public function deleteTokenAuthEnforcedAfterScenario():void {
 		if ($this->tokenAuthHasBeenSet) {
-			if ($this->tokenAuthHasBeenSetTo === 'true') {
-				// Because token auth is enforced, we have to use a token
-				// (app password) as the password to send to the testing app
-				// so it will authenticate us.
-				$appTokenForOccCommand = $this->generateAuthTokenForAdmin();
-			} else {
-				$appTokenForOccCommand = null;
-			}
-			SetupHelper::deleteSystemConfig(
-				'token_auth_enforced',
-				$this->featureContext->getStepLineRef(),
-				null,
-				$appTokenForOccCommand,
-				null,
-				null
-			);
 			$this->tokenAuthHasBeenSet = false;
 			$this->tokenAuthHasBeenSetTo = '';
 		}
