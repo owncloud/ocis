@@ -41,7 +41,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=reva,ou=sysusers,o=libregraph-idm ++
+++uid=idp,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -80,7 +80,7 @@ a| [subs=-attributes]
 ++~/.ocis/idm/ldap.crt ++
 
 a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/idp.
 
 a| `LDAP_DISABLED_USERS_GROUP_DN`
 
@@ -314,7 +314,7 @@ a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
 
 a| [subs=-attributes]
-URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
+Url of the LDAP service to use as IDP.
 
 a| `LDAP_USER_BASE_DN`
 
@@ -349,7 +349,7 @@ a| [subs=-attributes]
 ++ownCloudUserEnabled ++
 
 a| [subs=-attributes]
-LDAP attribute to use as a flag telling if the user is enabled or disabled.
+LDAP Attribute to use as a flag telling if the user is enabled or disabled.
 
 a| `LDAP_USER_FILTER`
 
@@ -385,7 +385,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-The object class to use for users in the default user search filter ('inetOrgPerson').
+LDAP User ObjectClass like 'inetOrgPerson'.
 
 a| `LDAP_USER_SCHEMA_DISPLAYNAME`
 
@@ -416,10 +416,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ownclouduuid ++
+++uid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique ID like a UUID.
+LDAP User uuid attribute like 'uid'.
 
 a| `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -453,7 +453,7 @@ a| [subs=-attributes]
 ++mail ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for the email address of users.
+LDAP User email attribute like 'mail'.
 
 a| `LDAP_USER_SCHEMA_USERNAME`
 
@@ -468,10 +468,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid ++
+++displayName ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for username of users.
+LDAP User name attribute like 'displayName'.
 
 a| `LDAP_USER_SCOPE`
 
@@ -489,7 +489,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
 
 a| `OCIS_ADMIN_USER_ID`
 
@@ -505,7 +505,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
+ID of the user who collects all necessary information for deletion.
 
 a| `OCIS_CACHE_STORE_ADDRESS`
 
@@ -523,7 +523,7 @@ a| [subs=-attributes]
 ++[] ++
 
 a| [subs=-attributes]
-Node addresses to use for the cache store.
+A comma separated list of addresses to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how addresses are used is dependent on the library of the configured store.
 
 a| `OCIS_CACHE_STORE_SIZE`
 
@@ -556,7 +556,7 @@ a| [subs=-attributes]
 ++memory ++
 
 a| [subs=-attributes]
-Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
+Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', and 'etcd'. See the text description for details.
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -1088,7 +1088,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 a| `OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD`
 
@@ -1365,7 +1365,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 a| `REVA_GATEWAY`
 
@@ -1416,7 +1416,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 
 a| `STORAGE_USERS_OCIS_ASYNC_UPLOADS`
 
