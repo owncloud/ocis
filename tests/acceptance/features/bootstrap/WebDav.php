@@ -5394,27 +5394,6 @@ trait WebDav {
 	}
 
 	/**
-	 * reset settings if they were set in the scenario
-	 *
-	 * @AfterScenario
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function resetPreviousSettingsAfterScenario():void {
-		if ($this->previousAsyncSetting === "") {
-			['code' => '', 'stdOut' => '', 'stdErr' => '' ];
-		} elseif ($this->previousAsyncSetting !== null) {
-			['code' => '', 'stdOut' => '', 'stdErr' => '' ];
-		}
-		if ($this->previousDavSlowdownSetting === "") {
-			['code' => '', 'stdOut' => '', 'stdErr' => '' ];
-		} elseif ($this->previousDavSlowdownSetting !== null) {
-			['code' => '', 'stdOut' => '', 'stdErr' => '' ];
-		}
-	}
-
-	/**
 	 * @Given /^the administrator has (enabled|disabled) the file version storage feature/
 	 *
 	 * @param string $enabledOrDisabled

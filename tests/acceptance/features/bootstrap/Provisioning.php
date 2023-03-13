@@ -846,27 +846,6 @@ trait Provisioning {
 	}
 
 	/**
-	 * Sets back old settings
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function resetOldLdapConfig():void {
-		$toDeleteLdapConfig = $this->getToDeleteLdapConfigs();
-		foreach ($toDeleteLdapConfig as $configId) {
-			['code' => '', 'stdOut' => '', 'stdErr' => '' ];
-		}
-		foreach ($this->oldLdapConfig as $configId => $settings) {
-			foreach ($settings as $configKey => $configValue) {
-				$this->setLdapSetting($configId, $configKey, $configValue);
-			}
-		}
-		foreach ($this->toDeleteDNs as $dn) {
-			$this->getLdap()->delete($dn, true);
-		}
-	}
-
-	/**
 	 * Manually add skeleton files for a single user on OCIS and reva systems
 	 *
 	 * @param string $user
@@ -3130,20 +3109,6 @@ trait Provisioning {
 		$user = \trim($user);
 		$method = \trim(\strtolower($method));
 		switch ($method) {
-			case "occ":
-				$result = SetupHelper::createUser(
-					$user,
-					$password,
-					$this->getStepLineRef(),
-					$displayName,
-					$email
-				);
-				if ($result["code"] !== "0") {
-					throw new Exception(
-						__METHOD__ . " could not create user. {$result['stdOut']} {$result['stdErr']}"
-					);
-				}
-				break;
 			case "api":
 			case "ldap":
 				$settings = [];
@@ -3611,18 +3576,6 @@ trait Provisioning {
 					$this->pushToLastStatusCodesArrays();
 				}
 				break;
-			case "occ":
-				$result = SetupHelper::addUserToGroup(
-					$group,
-					$user,
-					$this->getStepLineRef()
-				);
-				if ($checkResult && ($result["code"] !== "0")) {
-					throw new Exception(
-						"could not add user to group. {$result['stdOut']} {$result['stdErr']}"
-					);
-				}
-				break;
 			case "ldap":
 				try {
 					$this->addUserToLdapGroup(
@@ -3869,19 +3822,6 @@ trait Provisioning {
 					throw new Exception(
 						"could not create group '$group'. "
 						. $result->getStatusCode() . " " . $result->getBody()
-					);
-				}
-				break;
-			case "occ":
-				$result = SetupHelper::createGroup(
-					$group,
-					$this->getStepLineRef()
-				);
-				if ($result["code"] == 0) {
-					$groupCanBeDeleted = true;
-				} else {
-					throw new Exception(
-						"could not create group '$group'. {$result['stdOut']} {$result['stdErr']}"
 					);
 				}
 				break;
