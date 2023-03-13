@@ -34,14 +34,17 @@ To delete events for an user, use a `DELETE` request to `ocs/v2.php/apps/notific
 
 ## Translations
 
-The `userlog` service uses embedded translations to provide full functionality even in the single binary case. The service supports using custom translations instead. Set `USERLOG_TRANSLATION_PATH` to a folder that contains the translation files. In this folder translation files need to be named `userlog.po` (or `userlog.mo`) and need to be stored in a folder defining their language code. In general the pattern for a translation file needs to be:
-```
+The `userlog` service has embedded translations sourced via transifex to provide a basic set of translated languages. These embedded translations are available for all deployment scenarios. In addition, the service supports custom translations, though it is currently not possible to just add custom translations to embedded ones. If custom translations are configured, the embedded ones are not used. To configure custom translations, the `USERLOG_TRANSLATION_PATH` environment variable needs to point to a base folder that will further contain the translation files. This path must be available from all instances of the userlog service, a shared storage is recommended. Translation files must be of type [.po](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html#PO-Files) or [.mo](https://www.gnu.org/software/gettext/manual/html_node/Binaries.html). For each language, the filename needs to be `userlog.po` (or `userlog.mo`) and stored in a folder structure defining the language code. In general the path/name pattern for a translation file needs to be:
+
+```text
 {USERLOG_TRANSLATION_PATH}/{language-code}/LC_MESSAGES/userlog.po
 ```
-So for example for language `en_US` one needs to place the corresponding translation files to `{USERLOG_TRANSLATION_PATH}/en_US/LC_MESSAGES/userlog.po`.
 
-If a requested translation is not available the service falls back to the language default (so for example if `en_US` is not available, the service would fall back to translations in `en` folder).
+The language-code pattern is composed as `language[_territory]` where  `language` is the base language and `_territory` is optional defining a country.
 
-If the default language is also not available (for example the language code is `de_DE` and neither `de_DE` nor `de` folder is available, the service falls back to system default (dev `en`)
+As example, for the language `de_DE`, one needs to place the corresponding translation files to `{USERLOG_TRANSLATION_PATH}/de_DE/LC_MESSAGES/userlog.po`.
 
-It is currently not possible to mix custom and default translations.
+### Translation Rules
+
+*   If a requested language-code is not available, the service tries to fallback to the base language if available. As example, if `de_DE` is not available, the service tries to fall back to translations in `de` folder.
+*   If the base language is also not available like when the language code is `de_DE` and neither `de_DE` nor the `de` folder is available, the service falls back to the systems default `en`, which is the source of the texts provided by the code.

@@ -22,7 +22,7 @@ type Config struct {
 
 	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;USERLOG_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
 	RevaGateway       string `yaml:"reva_gateway" env:"REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata"`
-	TranslationPath   string `yaml:"translation_path" env:"USERLOG_TRANSLATION_PATH" desc:"(optional) Set this to a path with custom translations to overwrite buildin translations. See readme for details"`
+	TranslationPath   string `yaml:"translation_path" env:"USERLOG_TRANSLATION_PATH" desc:"(optional) Set this to a path with custom translations to overwrite the builtin translations. See the documentation for more details."`
 	Events            Events `yaml:"events"`
 	Store             Store  `yaml:"store"`
 
