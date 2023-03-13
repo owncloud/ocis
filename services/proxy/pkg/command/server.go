@@ -239,7 +239,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			middleware.UserProvider(userProvider),
 			middleware.PolicySelectorConfig(*cfg.PolicySelector),
 		),
-		middleware.Policies(logger, cfg.PoliciesMiddleware.Enabled, cfg.PoliciesMiddleware.Query),
+		middleware.Policies(logger, cfg.PoliciesMiddleware.Query),
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(logger),

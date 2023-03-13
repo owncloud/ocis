@@ -18,7 +18,7 @@ type Config struct {
 	MachineAuthAPIKey string                `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;POLICIES_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary for the access to resources from other services."`
 	Context           context.Context       `yaml:"-"`
 	Log               *Log                  `yaml:"log"`
-	Engine            Engine                `yaml:"engines"`
+	Engine            Engine                `yaml:"engine"`
 	Postprocessing    Postprocessing        `yaml:"postprocessing"`
 }
 
@@ -41,13 +41,13 @@ type TokenManager struct {
 
 // Engine configures the policy engine.
 type Engine struct {
-	Timeout  time.Duration `yaml:"timeout" env:"POLICIES_ENGINE_TIMEOUT" desc:"Sets the timeout."`
+	Timeout  time.Duration `yaml:"timeout" env:"POLICIES_ENGINE_TIMEOUT" desc:"Sets the timeout the rego expression evaluation can take. The timeout can be set as number followed by a unit identifier like ms, s, etc. Rules default to deny if the timeout was reached."`
 	Policies []string      `yaml:"policies"`
 }
 
 // Postprocessing defines the config options for the postprocessing policy handling.
 type Postprocessing struct {
-	Query string `yaml:"query" env:"POLICIES_POSTPROCESSING_QUERY" desc:"Sets the postprocessing query."`
+	Query string `yaml:"query" env:"POLICIES_POSTPROCESSING_QUERY" desc:"Defines the 'Complete Rules' variable defined in the rego rule set this step uses for its evaluation. Defaults to deny if the variable was not found."`
 }
 
 // Events combines the configuration options for the event bus.

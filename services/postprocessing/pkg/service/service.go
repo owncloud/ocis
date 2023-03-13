@@ -21,6 +21,7 @@ func NewPostprocessingService(stream events.Stream, logger log.Logger, c config.
 	evs, err := events.Consume(stream, "postprocessing",
 		events.BytesReceived{},
 		events.StartPostprocessingStep{},
+		events.VirusscanFinished{},
 		events.UploadReady{},
 		events.PostprocessingStepFinished{},
 	)

@@ -63,9 +63,6 @@ func DefaultConfig() *config.Config {
 		AutoprovisionAccounts: false,
 		EnableBasicAuth:       false,
 		InsecureBackends:      false,
-		PoliciesMiddleware: config.PoliciesMiddleware{
-			Query: "data.files.granted",
-		},
 	}
 }
 

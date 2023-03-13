@@ -32,15 +32,8 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
-		Postprocessing: config.Postprocessing{
-			Query: "data.files.granted",
-		},
 		Engine: config.Engine{
 			Timeout: 10 * time.Second,
-			Policies: []string{
-				"services/policies/pkg/config/policies/files.rego",
-				"services/policies/pkg/config/policies/utils.rego",
-			},
 		},
 	}
 }

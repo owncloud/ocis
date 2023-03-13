@@ -3,7 +3,6 @@ package engine
 import (
 	"context"
 	"encoding/json"
-
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/policies/v0"
@@ -51,16 +50,14 @@ type Environment struct {
 
 // UnmarshalJSON satisfies the encoding/json Unmarshaler interface.
 func (e *Environment) UnmarshalJSON(b []byte) error {
-	type TMP Environment
-	var tmp TMP
-
-	if err := json.Unmarshal(b, &tmp); err != nil {
+	tmp := struct {
+		Stage string
+	}{}
+	if err := json.Unmarshal(b, e); err != nil {
 		return err
 	}
 
-	*e = Environment(tmp)
-
-	switch string(e.Stage) {
+	switch tmp.Stage {
 	case v0.Stage_STAGE_HTTP.String():
 		e.Stage = StageHTTP
 	case v0.Stage_STAGE_PP.String():

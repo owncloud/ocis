@@ -31,7 +31,7 @@ func NewOPA(timeout time.Duration, conf config.Engine) (OPA, error) {
 		nil
 }
 
-// Evaluate evaluates the opa policies and returns teh result.
+// Evaluate evaluates the opa policies and returns the result.
 func (o OPA) Evaluate(ctx context.Context, qs string, env Environment) (bool, error) {
 	ctx, cancel := context.WithTimeout(ctx, o.timeout)
 	defer cancel()

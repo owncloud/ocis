@@ -87,8 +87,7 @@ type AuthMiddleware struct {
 
 // PoliciesMiddleware configures the proxy policies middleware.
 type PoliciesMiddleware struct {
-	Enabled bool   `yaml:"enabled" env:"PROXY_POLICIES_ENABLED" desc:"Activates policy evaluation."`
-	Query   string `yaml:"query" env:"PROXY_POLICIES_QUERY" desc:"Defines the policy query."`
+	Query string `yaml:"query" env:"PROXY_POLICIES_QUERY" desc:"Defines the 'Complete Rules' variable defined in the rego rule set this step uses for its evaluation. Rules default to deny if the variable was not found."`
 }
 
 const (

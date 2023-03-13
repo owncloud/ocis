@@ -41,25 +41,34 @@ func (s Service) Run() error {
 				continue
 			}
 
-			env := engine.Environment{
-				Stage: engine.StagePP,
-				User:  *ev.ExecutingUser,
-				Resource: engine.Resource{
-					ID:   *ev.ResourceID,
-					Name: ev.Filename,
-					URL:  ev.URL,
-					Size: ev.Filesize,
-				},
-			}
-
-			result, err := s.engine.Evaluate(context.TODO(), s.query, env)
-			if err != nil {
-				s.log.Error().Err(err).Msg("unable evaluate policy")
-			}
-
 			outcome := events.PPOutcomeContinue
-			if !result {
-				outcome = events.PPOutcomeDelete
+
+			if s.query != "" {
+				env := engine.Environment{
+					Stage: engine.StagePP,
+					Resource: engine.Resource{
+						Name: ev.Filename,
+						URL:  ev.URL,
+						Size: ev.Filesize,
+					},
+				}
+
+				if ev.ExecutingUser != nil {
+					env.User = *ev.ExecutingUser
+				}
+
+				if ev.ResourceID != nil {
+					env.Resource.ID = *ev.ResourceID
+				}
+
+				result, err := s.engine.Evaluate(context.TODO(), s.query, env)
+				if err != nil {
+					s.log.Error().Err(err).Msg("unable evaluate policy")
+				}
+
+				if !result {
+					outcome = events.PPOutcomeDelete
+				}
 			}
 
 			if err := events.Publish(s.stream, events.PostprocessingStepFinished{

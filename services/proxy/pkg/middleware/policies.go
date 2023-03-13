@@ -11,12 +11,12 @@ import (
 )
 
 // Policies verifies if a request is granted or not.
-func Policies(logger log.Logger, enabled bool, qs string) func(next http.Handler) http.Handler {
+func Policies(logger log.Logger, qs string) func(next http.Handler) http.Handler {
 	pClient := pService.NewPoliciesProviderService("com.owncloud.api.policies", grpc.DefaultClient())
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if !enabled {
+			if qs == "" {
 				next.ServeHTTP(w, r)
 				return
 			}
@@ -46,7 +46,7 @@ func Policies(logger log.Logger, enabled bool, qs string) func(next http.Handler
 
 			rsp, err := pClient.Evaluate(r.Context(), req)
 			if err != nil {
-				logger.Err(err)
+				logger.Err(err).Msg("error evaluating request")
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
