@@ -44,7 +44,7 @@ l10n-push:
 
 .PHONY: l10n-read
 l10n-read: 
-	go-xgettext -o $(OUTPUT_DIR)/locale/default.pot --keyword=Template -s pkg/service/templates.go
+	go-xgettext -o $(OUTPUT_DIR)/locale/userlog.pot --keyword=Template -s pkg/service/templates.go
 
 .PHONY: l10n-write
 l10n-write:

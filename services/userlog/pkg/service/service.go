@@ -33,6 +33,7 @@ type UserlogService struct {
 	historyClient    ehsvc.EventHistoryService
 	gwClient         gateway.GatewayAPIClient
 	registeredEvents map[string]events.Unmarshaller
+	translationPath  string
 }
 
 // NewUserlogService returns an EventHistory service

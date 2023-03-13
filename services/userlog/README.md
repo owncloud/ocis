@@ -31,3 +31,17 @@ The `userlog` service provides an API to retrieve configured events. For now, th
 ## Deleting
 
 To delete events for an user, use a `DELETE` request to `ocs/v2.php/apps/notifications/api/v1/notifications` containing the IDs to delete.
+
+## Translations
+
+The `userlog` service uses embedded translations to provide full functionality even in the single binary case. The service supports using custom translations instead. Set `USERLOG_TRANSLATION_PATH` to a folder that contains the translation files. In this folder translation files need to be named `userlog.po` (or `userlog.mo`) and need to be stored in a folder defining their language code. In general the pattern for a translation file needs to be:
+```
+{USERLOG_TRANSLATION_PATH}/{language-code}/LC_MESSAGES/userlog.po
+```
+So for example for language `en_US` one needs to place the corresponding translation files to `{USERLOG_TRANSLATION_PATH}/en_US/LC_MESSAGES/userlog.po`.
+
+If a requested translation is not available the service falls back to the language default (so for example if `en_US` is not available, the service would fall back to translations in `en` folder).
+
+If the default language is also not available (for example the language code is `de_DE` and neither `de_DE` nor `de` folder is available, the service falls back to system default (dev `en`)
+
+It is currently not possible to mix custom and default translations.

@@ -27,9 +27,7 @@ var (
 	_resourceTypeSpace = "storagespace"
 	_resourceTypeShare = "share"
 
-	// TODO: from config
-	_pathToLocales = "/home/jkoberg/ocis/services/userlog/l10n/locale"
-	_domain        = "default"
+	_domain = "userlog"
 )
 
 // OC10Notification is the oc10 style representation of an event
@@ -55,6 +53,7 @@ type Converter struct {
 	machineAuthAPIKey string
 	serviceName       string
 	registeredEvents  map[string]events.Unmarshaller
+	translationPath   string
 
 	// cached within one request not to query other service too much
 	spaces    map[string]*storageprovider.StorageSpace
@@ -64,13 +63,14 @@ type Converter struct {
 }
 
 // NewConverter returns a new Converter
-func NewConverter(loc string, gwc gateway.GatewayAPIClient, machineAuthAPIKey string, name string, registeredEvents map[string]events.Unmarshaller) *Converter {
+func NewConverter(loc string, gwc gateway.GatewayAPIClient, machineAuthAPIKey string, name string, translationPath string, registeredEvents map[string]events.Unmarshaller) *Converter {
 	return &Converter{
 		locale:            loc,
 		gwClient:          gwc,
 		machineAuthAPIKey: machineAuthAPIKey,
 		serviceName:       name,
 		registeredEvents:  registeredEvents,
+		translationPath:   translationPath,
 		spaces:            make(map[string]*storageprovider.StorageSpace),
 		users:             make(map[string]*user.User),
 		resources:         make(map[string]*storageprovider.ResourceInfo),
@@ -123,7 +123,7 @@ func (c *Converter) spaceDeletedMessage(eventid string, executant *user.UserId, 
 		return OC10Notification{}, err
 	}
 
-	subj, subjraw, msg, msgraw, err := composeMessage(SpaceDeleted, c.locale, map[string]interface{}{
+	subj, subjraw, msg, msgraw, err := composeMessage(SpaceDeleted, c.locale, c.translationPath, map[string]interface{}{
 		"username":  usr.GetDisplayName(),
 		"spacename": spacename,
 	})
@@ -164,7 +164,7 @@ func (c *Converter) spaceMessage(eventid string, nt NotificationTemplate, execut
 		return OC10Notification{}, err
 	}
 
-	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, map[string]interface{}{
+	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.translationPath, map[string]interface{}{
 		"username":  usr.GetDisplayName(),
 		"spacename": space.GetName(),
 	})
@@ -203,7 +203,7 @@ func (c *Converter) shareMessage(eventid string, nt NotificationTemplate, execut
 		return OC10Notification{}, err
 	}
 
-	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, map[string]interface{}{
+	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.translationPath, map[string]interface{}{
 		"username":     usr.GetDisplayName(),
 		"resourcename": info.GetName(),
 	})
@@ -270,8 +270,8 @@ func (c *Converter) getUser(ctx context.Context, userID *user.UserId) (*user.Use
 	return usr, err
 }
 
-func composeMessage(nt NotificationTemplate, locale string, vars map[string]interface{}) (string, string, string, string, error) {
-	subjectraw, messageraw := loadTemplates(nt, locale)
+func composeMessage(nt NotificationTemplate, locale string, path string, vars map[string]interface{}) (string, string, string, string, error) {
+	subjectraw, messageraw := loadTemplates(nt, locale, path)
 
 	subject, err := executeTemplate(subjectraw, vars)
 	if err != nil {
@@ -283,10 +283,15 @@ func composeMessage(nt NotificationTemplate, locale string, vars map[string]inte
 
 }
 
-func loadTemplates(nt NotificationTemplate, locale string) (string, string) {
+func loadTemplates(nt NotificationTemplate, locale string, path string) (string, string) {
 	// Create Locale with library path and language code and load default domain
-	l := gotext.NewLocaleFS("l10n/locale", locale, _translationFS)
-	l.AddDomain(_domain)
+	var l *gotext.Locale
+	if path == "" {
+		l = gotext.NewLocaleFS("l10n/locale", locale, _translationFS)
+	} else { // use custom path instead
+		l = gotext.NewLocale(path, locale)
+	}
+	l.AddDomain(_domain) // make domain configurable only if needed
 	return l.Get(nt.Subject), l.Get(nt.Message)
 }
 
