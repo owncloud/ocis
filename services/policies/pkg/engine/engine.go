@@ -3,9 +3,11 @@ package engine
 import (
 	"context"
 	"encoding/json"
+
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
-	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/policies/v0"
+	"github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/policies/v0"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 // Engine defines the granted handlers.
@@ -48,21 +50,25 @@ type Environment struct {
 	Resource Resource  `json:"resource"`
 }
 
-// UnmarshalJSON satisfies the encoding/json Unmarshaler interface.
-func (e *Environment) UnmarshalJSON(b []byte) error {
-	tmp := struct {
-		Stage string
-	}{}
-	if err := json.Unmarshal(b, e); err != nil {
-		return err
+// NewEnvironmentFromPB converts a PBEnvironment to Environment.
+func NewEnvironmentFromPB(pEnv *v0.Environment) (Environment, error) {
+	env := Environment{}
+
+	rData, err := protojson.Marshal(pEnv)
+	if err != nil {
+		return env, err
 	}
 
-	switch tmp.Stage {
-	case v0.Stage_STAGE_HTTP.String():
-		e.Stage = StageHTTP
-	case v0.Stage_STAGE_PP.String():
-		e.Stage = StagePP
+	if err := json.Unmarshal(rData, &env); err != nil {
+		return env, err
 	}
 
-	return nil
+	switch pEnv.Stage {
+	case v0.Stage_STAGE_HTTP:
+		env.Stage = StageHTTP
+	case v0.Stage_STAGE_PP:
+		env.Stage = StagePP
+	}
+
+	return env, nil
 }

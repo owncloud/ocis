@@ -39,8 +39,8 @@ func (o OPA) Evaluate(ctx context.Context, qs string, env Environment) (bool, er
 	q, err := rego.New(
 		rego.Query(qs),
 		rego.Load(o.policies, nil),
-		getMimetype,
-		getResource,
+		GetMimetype,
+		GetResource,
 	).PrepareForEval(ctx)
 	if err != nil {
 		return false, err
@@ -54,7 +54,7 @@ func (o OPA) Evaluate(ctx context.Context, qs string, env Environment) (bool, er
 	return result.Allowed(), nil
 }
 
-var getResource = rego.Function1(
+var GetResource = rego.Function1(
 	&rego.Function{
 		Name:             "ocis_get_resource",
 		Decl:             types.NewFunction(types.Args(types.S), types.A),
@@ -98,7 +98,7 @@ var getResource = rego.Function1(
 	},
 )
 
-var getMimetype = rego.Function1(
+var GetMimetype = rego.Function1(
 	&rego.Function{
 		Name:             "ocis_get_mimetype",
 		Decl:             types.NewFunction(types.Args(types.A), types.S),
