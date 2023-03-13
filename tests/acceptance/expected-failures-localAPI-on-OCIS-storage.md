@@ -108,10 +108,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Space admin should not not be able to change the user quota](https://github.com/owncloud/ocis/issues/5475)
 - [apiSpaces/spaceManagement.feature:149](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/spaceManagement.feature#L149)
 
-#### Change editUser test where we set empty value
-- [apiGraph/editUser.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L33)
-- [apiGraph/editUser.feature:80](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L80)
-
 #### [Same users can be added in a group multiple time](https://github.com/owncloud/ocis/issues/5702)
 - [apiGraph/addUserToGroup.feature:222](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L222)
 

@@ -14,28 +14,62 @@ Feature: edit user
       | password    | 1234              |
 
 
-  Scenario: the admin user can edit another user email
-    When the user "Alice" changes the email of user "Brian" to "newemail@example.com" using the Graph API
+  Scenario Outline: the admin user can edit another user's email
+    When the user "Alice" changes the email of user "Brian" to "<newEmail>" using the Graph API
+    Then the HTTP status code should be "<code>"
+    And the user "Brian" should have information with these key and value pairs:
+      | key  | value           |
+      | mail | <emailAsResult> |
+    Examples:
+      | action description        | newEmail             | code | emailAsResult        |
+      | change to a valid email   | newemail@example.com | 200  | newemail@example.com |
+      | override existing mail    | brian@example.com    | 200  | brian@example.com    |
+      | two users with same mail  | alice@example.org    | 200  | alice@example.org    |
+      | empty mail                |                      | 400  | brian@example.com    |
+      | change to a invalid email | invalidEmail         | 400  | brian@example.com    |
+
+  @skipOnStable2.0
+  Scenario Outline: the admin user can edit another user's name
+    Given user "Carol" has been created with default attributes and without skeleton files
+    When the user "Alice" changes the user name of user "Carol" to "<userName>" using the Graph API
+    Then the HTTP status code should be "<code>"
+    And the user "<userNameAsResult>" should have information with these key and value pairs:
+      | key                      | value              |
+      | onPremisesSamAccountName | <userNameAsResult> |
+    Examples:
+      | action description           | userName | code | userNameAsResult |
+      | change to a valid user name  | Lionel   | 200  | Lionel           |
+      | user name characters         | *:!;_+-& | 200  | *:!;_+-&         |
+      | change to existing user name | Brian    | 409  | Brian            |
+      | empty user name              |          | 400  | Brian            |
+
+  @skipOnStable2.0
+  Scenario: the admin user changes the name of a user to the name of an existing disabled user
+    Given the user "Alice" has created a new user using the Graph API with the following settings:
+      | userName    | sam             |
+      | displayName | sam             |
+      | email       | sam@example.com |
+      | password    | 1234            |
+    And the user "Alice" has disabled user "Brian" using the Graph API
+    When the user "Alice" changes the user name of user "sam" to "Brian" using the Graph API
+    Then the HTTP status code should be "409"
+    And the user "sam" should have information with these key and value pairs:
+      | key                      | value |
+      | onPremisesSamAccountName | sam   |
+
+  @skipOnStable2.0
+  Scenario: the admin user changes the name of a user to the name of a previously deleted user
+    Given the user "Alice" has created a new user using the Graph API with the following settings:
+      | userName    | sam             |
+      | displayName | sam             |
+      | email       | sam@example.com |
+      | password    | 1234            |
+    And the user "Alice" has deleted a user "sam" using the Graph API
+    When the user "Alice" changes the user name of user "Brian" to "sam" using the Graph API
     Then the HTTP status code should be "200"
-    And the user "Brian" should have information with these key and value pairs:
-      | key  | value                |
-      | mail | newemail@example.com |
-
-
-  Scenario: the admin user can override an existing user email of another user
-    When the user "Alice" changes the email of user "Brian" to "brian@example.com" using the Graph API
-    Then the HTTP status code should be "200"
-    And the user "Brian" should have information with these key and value pairs:
-      | key  | value             |
-      | mail | brian@example.com |
-
-
-  Scenario: the admin user cannot clear an existing user email
-    When the user "Alice" tries to change the email of user "Brian" to "" using the Graph API
-    Then the HTTP status code should be "400"
-    And the user "Brian" should have information with these key and value pairs:
-      | key  | value             |
-      | mail | brian@example.com |
+    And the user "sam" should have information with these key and value pairs:
+      | key                      | value |
+      | onPremisesSamAccountName | sam   |
 
 
   Scenario Outline: a normal user should not be able to change their email address
@@ -69,20 +103,18 @@ Feature: edit user
       | User        |
 
 
-  Scenario: the admin user can edit another user display name
-    When the user "Alice" changes the display name of user "Brian" to "Carol King" using the Graph API
+  Scenario Outline: the admin user can edit another user display name
+    When the user "Alice" changes the display name of user "Brian" to "<newDisplayName>" using the Graph API
     Then the HTTP status code should be "200"
     And the user "Brian" should have information with these key and value pairs:
-      | key         | value      |
-      | displayName | Carol King |
-
-
-  Scenario: the admin user cannot clear another user display name
-    When the user "Alice" tries to change the display name of user "Brian" to "" using the Graph API
-    Then the HTTP status code should be "400"
-    And the user "Brian" should have information with these key and value pairs:
-      | key         | value        |
-      | displayName | Brian Murphy |
+      | key         | value                 |
+      | displayName | <displayNameAsResult> |
+    Examples:
+      | action description                | newDisplayName | code | displayNameAsResult |
+      | change to a display name          | Olaf Scholz    | 200  | Olaf Scholz         |
+      | override to existing display name | Carol King     | 200  | Carol King          |
+      | change to an empty display name   |                | 400  | Brian Murphy        |
+      | displayName with characters       | *:!;_+-&#(?)   | 200  | *:!;_+-&#(?)        |
 
 
   Scenario Outline: a normal user should not be able to change his/her own display name
