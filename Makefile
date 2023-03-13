@@ -12,7 +12,9 @@ WHITE        := $(shell tput -Txterm setaf 7)
 
 RESET := $(shell tput -Txterm sgr0)
 
-L10N_MODULES := $(shell find . -path '*.tx*' -name 'config' | sed 's|/[^/]*$$||' | sed 's|/[^/]*$$||' | sed 's|/[^/]*$$||')
+# add a service here when it uses transifex
+L10N_MODULES := \
+	services/userlog
 
 # if you add a module here please also add it to the .drone.star file
 OCIS_MODULES = \
