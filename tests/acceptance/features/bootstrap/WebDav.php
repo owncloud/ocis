@@ -5344,7 +5344,7 @@ trait WebDav {
 		if ($multistatusResults !== null) {
 			foreach ($multistatusResults as $multistatusResult) {
 				$entryPath = $multistatusResult['value'][0]['value'];
-				if (OcisHelper::isTestingOnOcis() && $method === "REPORT") {
+				if ($method === "REPORT") {
 					if ($entryNameToSearch !== null && str_ends_with($entryPath, $entryNameToSearch)) {
 						return $multistatusResult;
 					} else {
