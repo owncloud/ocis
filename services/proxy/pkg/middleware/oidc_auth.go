@@ -68,51 +68,53 @@ type OIDCAuthenticator struct {
 
 func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[string]interface{}, error) {
 	var claims map[string]interface{}
-	record, _ := m.tokenCache.Read(token) // TODO log error in debug?
-	if len(record) < 1 {
-		aClaims, err := m.verifyAccessToken(token)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to verify access token")
+	record, err := m.tokenCache.Read(token)
+	if err != nil {
+		m.Logger.Error().Err(err).Msg("could not read from userinfo cache")
+	}
+	if len(record) > 1 {
+		if err = msgpack.Unmarshal(record[0].Value, &claims); err == nil {
+			m.Logger.Debug().Interface("claims", claims).Msg("cache hit for userinfo")
+			return claims, nil
 		}
+		m.Logger.Error().Err(err).Msg("could not unmarshal userinfo")
+	}
+	aClaims, err := m.verifyAccessToken(token)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to verify access token")
+	}
 
-		oauth2Token := &oauth2.Token{
-			AccessToken: token,
-		}
+	oauth2Token := &oauth2.Token{
+		AccessToken: token,
+	}
 
-		userInfo, err := m.getProvider().UserInfo(
-			context.WithValue(req.Context(), oauth2.HTTPClient, m.HTTPClient),
-			oauth2.StaticTokenSource(oauth2Token),
-		)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to get userinfo")
-		}
-		if err := userInfo.Claims(&claims); err != nil {
-			return nil, errors.Wrap(err, "failed to unmarshal userinfo claims")
-		}
+	userInfo, err := m.getProvider().UserInfo(
+		context.WithValue(req.Context(), oauth2.HTTPClient, m.HTTPClient),
+		oauth2.StaticTokenSource(oauth2Token),
+	)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get userinfo")
+	}
+	if err := userInfo.Claims(&claims); err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal userinfo claims")
+	}
 
-		expiration := m.extractExpiration(aClaims)
-		d, err := msgpack.Marshal(claims)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to marshal claims for cache")
-		}
+	expiration := m.extractExpiration(aClaims)
 
+	if d, err := msgpack.Marshal(claims); err != nil {
+		m.Logger.Error().Err(err).Msg("failed to marshal claims for userinfo cache")
+	} else {
 		err = m.tokenCache.Write(&store.Record{
 			Key:    token,
 			Value:  d,
 			Expiry: time.Until(expiration),
 		})
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to write to cache") // TODO log if cache does not work, but continue
+			m.Logger.Error().Err(err).Msg("failed to write to userinfo cache")
 		}
-
-		m.Logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Time("expiration", expiration.UTC()).Msg("unmarshalled and cached userinfo")
-		return claims, nil
 	}
 
-	if err := msgpack.Unmarshal(record[0].Value, &claims); err != nil {
-		return nil, errors.New("failed to unmarshal claims from the cache") // TODO log if cache does not work, but continue
-	}
-	m.Logger.Debug().Interface("claims", claims).Msg("cache hit for userinfo")
+	m.Logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Time("expiration", expiration.UTC()).Msg("unmarshalled and cached userinfo")
 	return claims, nil
 }
 
