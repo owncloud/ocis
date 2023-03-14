@@ -1998,9 +1998,22 @@ class SpacesContext implements Context {
 		string $spaceName,
 		TableNode $table
 	): void {
+		$rows = $table->getRowsHash();
+		$this->featureContext->setResponse($this->shareSpace($user, $spaceName, $rows));
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param array $rows
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 */
+	public function shareSpace(string $user, string $spaceName, array $rows): ResponseInterface {
 		$space = $this->getSpaceByName($user, $spaceName);
 		$availableRoleToAssignToShareSpace = ['manager', 'editor', 'viewer'];
-		$rows = $table->getRowsHash();
 		if (isset($rows['role']) && !\in_array(\strtolower($rows['role']), $availableRoleToAssignToShareSpace)) {
 			throw new Error("The Selected " . $rows['role'] . " Cannot be Found");
 		}
@@ -2017,14 +2030,32 @@ class SpacesContext implements Context {
 		];
 
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl;
-		$this->featureContext->setResponse(
-			$this->sendPostRequestToUrl(
-				$fullUrl,
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$body
-			)
+
+		return $this->sendPostRequestToUrl(
+			$fullUrl,
+			$user,
+			$this->featureContext->getPasswordForUser($user),
+			$body
 		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" expires the (user|group) share of space "([^"]*)" for (?:user|group) "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $shareType
+	 * @param  string $spaceName
+	 * @param  string $memberUser
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userExpiresTheShareOfSpaceForUser(string $user, string $shareType, string $spaceName, string $memberUser) {
+		$dateTime = new DateTime('yesterday');
+		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
+		$rows['shareWith'] = $memberUser;
+		$rows['shareType'] = ($shareType === 'user') ? 7 : 8;
+		$this->featureContext->setResponse($this->shareSpace($user, $spaceName, $rows));
 	}
 
 	/**
@@ -2100,26 +2131,49 @@ class SpacesContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function changeShareResource(
+	public function changeShareResourceWithSettings(
 		string $user,
 		TableNode $table
 	): void {
-		$shareId = $this->featureContext->getLastPublicLinkShareId();
 		$rows = $table->getRowsHash();
+		$this->featureContext->setResponse($this->updateSharedResource($user, $rows));
+	}
+
+	/**
+	 * @param string $user
+	 * @param array $rows
+	 *
+	 * @return ResponseInterface
+	 *
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function updateSharedResource(string $user, array $rows):ResponseInterface {
+		$shareId = $this->featureContext->getLastPublicLinkShareId();
 		$fullUrl = $this->baseUrl . $this->ocsApiUrl . '/' . $shareId;
-		$this->featureContext->setResponse(
-			HttpRequestHelper::sendRequest(
-				$fullUrl,
-				"",
-				"PUT",
-				$this->featureContext->getActualUsername($user),
-				$this->featureContext->getPasswordForUser($user),
-				null,
-				$rows
-			)
+		return  HttpRequestHelper::sendRequest(
+			$fullUrl,
+			"",
+			"PUT",
+			$this->featureContext->getActualUsername($user),
+			$this->featureContext->getPasswordForUser($user),
+			null,
+			$rows
 		);
 	}
 
+	/**
+	 * @When /^user "([^"]*)" expires the last share$/
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userExpiresLastResourceShare(string $user): void {
+		$dateTime = new DateTime('yesterday');
+		$rows['expireDate'] = $dateTime->format('Y-m-d\\TH:i:sP');
+		$this->featureContext->setResponse($this->updateSharedResource($user, $rows));
+	}
 	/**
 	 * @When /^user "([^"]*)" creates a public link share inside of space "([^"]*)" with settings:$/
 	 *
