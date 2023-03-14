@@ -99,6 +99,7 @@ type Identity struct {
 type API struct {
 	GroupMembersPatchLimit int    `yaml:"group_members_patch_limit" env:"GRAPH_GROUP_MEMBERS_PATCH_LIMIT" desc:"The amount of group members allowed to be added with a single patch request."`
 	UsernameMatch          string `yaml:"graph_username_match" env:"GRAPH_USERNAME_MATCH" desc:"Option to allow legacy usernames. Supported options are 'default' and 'none'."`
+	AssignDefaultUserRole  bool   `yaml:"graph_assign_default_user_role" env:"GRAPH_ASSIGN_DEFAULT_USER_ROLE" desc:"Whether to assign newly created users the default role 'User'. Set this to 'false' if you want to assign roles manually, or if the role assignment should happen at first login. Set this to 'true' (the default) to assign the role 'User' when creating a new user."`
 }
 
 // Events combines the configuration options for the event bus.

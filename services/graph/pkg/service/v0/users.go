@@ -328,7 +328,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// assign roles if possible
-	if g.roleService != nil {
+	if g.roleService != nil && g.config.API.AssignDefaultUserRole {
 		// All users get the user role by default currently.
 		// to all new users for now, as create Account request does not have any role field
 		if _, err = g.roleService.AssignRoleToUser(r.Context(), &settings.AssignRoleToUserRequest{

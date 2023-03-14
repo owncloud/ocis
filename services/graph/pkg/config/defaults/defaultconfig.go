@@ -40,6 +40,7 @@ func DefaultConfig() *config.Config {
 		API: config.API{
 			GroupMembersPatchLimit: 20,
 			UsernameMatch:          "default",
+			AssignDefaultUserRole:  true,
 		},
 		Reva: shared.DefaultRevaConfig(),
 		Spaces: config.Spaces{
