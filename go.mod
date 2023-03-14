@@ -14,7 +14,7 @@ require (
 	github.com/cs3org/reva/v2 v2.12.1-0.20230313151335-4339b8ab4759
 	github.com/disintegration/imaging v1.6.2
 	github.com/ggwhite/go-masker v1.0.9
-	github.com/go-chi/chi/v5 v5.0.7
+	github.com/go-chi/chi/v5 v5.0.8
 	github.com/go-chi/cors v1.2.1
 	github.com/go-chi/render v1.0.2
 	github.com/go-ldap/ldap/v3 v3.4.4
