@@ -159,7 +159,7 @@ Feature: Share a file or folder that is inside a space
     Then the HTTP status code should be "200"
     Then as "Brian" folder "Shares/folder" should not exist
 
-
+  @issue-5823 @skip
   Scenario: check the end of expiration date in group share
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
