@@ -17,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/server/grpc"
 	"github.com/urfave/cli/v2"
+	microstore "go-micro.dev/v4/store"
 )
 
 // Server is the entrypoint for the server command.
@@ -56,11 +57,13 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			st := store.Create(
-				store.Type(cfg.Store.Type),
-				store.Addresses(strings.Split(cfg.Store.Addresses, ",")...),
-				store.Database(cfg.Store.Database),
-				store.Table(cfg.Store.Table),
-				store.TTL(cfg.Store.RecordExpiry),
+				store.WithCacheOptions(store.CacheOptions{
+					Type: cfg.Store.Type,
+					TTL:  cfg.Store.RecordExpiry,
+				}),
+				microstore.Nodes(strings.Split(cfg.Store.Addresses, ",")...),
+				microstore.Database(cfg.Store.Database),
+				microstore.Table(cfg.Store.Table),
 			)
 
 			service := grpc.NewService(

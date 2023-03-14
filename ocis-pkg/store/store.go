@@ -2,10 +2,11 @@ package store
 
 import (
 	"context"
-	"time"
+	"strings"
 
 	natsjs "github.com/go-micro/plugins/v4/store/nats-js"
 	"github.com/go-micro/plugins/v4/store/redis"
+	redisopts "github.com/go-redis/redis/v8"
 	"github.com/nats-io/nats.go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/store/etcd"
 	"github.com/owncloud/ocis/v2/ocis-pkg/store/memory"
@@ -15,43 +16,14 @@ import (
 var ocMemStore *store.Store
 
 const (
-	TypeMem    = "mem"
-	TypeNoop   = "noop"
-	TypeEtcd   = "etcd"
-	TypeRedis  = "redis"
-	TypeOCMem  = "ocmem"
-	TypeNatsJS = "nats-js"
+	TypeMem           = "mem"
+	TypeNoop          = "noop"
+	TypeEtcd          = "etcd"
+	TypeRedis         = "redis"
+	TypeRedisSentinel = "redis-sentinel"
+	TypeOCMem         = "ocmem"
+	TypeNatsJS        = "nats-js"
 )
-
-// Options are the options to configure the store
-type Options struct {
-	// Type determines the implementation:
-	// * "noop", for a noop store (it does nothing)
-	// * "etcd", for etcd
-	// * "ocmem", custom in-memory implementation, with fixed size and optimized prefix
-	// and suffix search
-	// * "memory", for a in-memory implementation, which is the default if noone matches
-	Type string
-
-	// Address is a list of nodes that the store will use.
-	Addresses []string
-
-	// Size configures the maximum capacity of the cache for
-	// the "ocmem" implementation, in number of items that the cache can hold per table.
-	// You can use 5000 to make the cache hold up to 5000 elements.
-	// The parameter only affects to the "ocmem" implementation, the rest will ignore it.
-	// If an invalid value is used, the default of 512 will be used instead.
-	Size int
-
-	// Database the store should use (optional)
-	Database string
-
-	// Table the store should use (optional)
-	Table string
-
-	// TTL is the time to life for documents stored in the store
-	TTL time.Duration
-}
 
 // Create returns a configured key-value store
 //
@@ -60,32 +32,57 @@ type Options struct {
 // and table to prevent collisions with other microservices.
 // Recommended approach is to use "services" or "ocis-pkg" for the database,
 // and "services/<service-name>/" or "ocis-pkg/<pkg>/" for the package name.
-func Create(opts ...Option) store.Store {
-	options := &Options{}
+func Create(opts ...store.Option) store.Store {
+	options := &store.Options{}
 	for _, o := range opts {
 		o(options)
 	}
 
-	storeopts := storeOptions(options)
+	cacheOpts, ok := options.Context.Value(cacheOptionsContextKey{}).(CacheOptions)
+	if !ok {
+		cacheOpts = CacheOptions{}
+	}
 
-	switch options.Type {
+	switch cacheOpts.Type {
 	default:
 		// TODO: better to error in default case?
 		fallthrough
 	case TypeMem:
-		return store.NewMemoryStore(storeopts...)
+		return store.NewMemoryStore(opts...)
 	case TypeNoop:
-		return store.NewNoopStore(storeopts...)
+		return store.NewNoopStore(opts...)
 	case TypeEtcd:
-		return etcd.NewEtcdStore(storeopts...)
+		return etcd.NewEtcdStore(opts...)
 	case TypeRedis:
-		// FIXME redis plugin does not support redis cluster, sentinel or ring -> needs upstream patch or our implementation
-		return redis.NewStore(storeopts...)
+		// FIXME redis plugin does not support redis cluster or ring -> needs upstream patch or our implementation
+		return redis.NewStore(opts...)
+	case TypeRedisSentinel:
+		redisMaster := ""
+		redisNodes := []string{}
+		for _, node := range options.Nodes {
+			parts := strings.SplitN(node, "/", 2)
+			if len(parts) != 2 {
+				return nil
+			}
+			// the first node is used to retrieve the redis master
+			redisNodes = append(redisNodes, parts[0])
+			if redisMaster == "" {
+				redisMaster = parts[1]
+			}
+		}
+		return redis.NewStore(
+			store.Database(options.Database),
+			store.Table(options.Table),
+			store.Nodes(redisNodes...),
+			redis.WithRedisOptions(redisopts.UniversalOptions{
+				MasterName: redisMaster,
+			}),
+		)
 	case TypeOCMem:
 		if ocMemStore == nil {
 			var memStore store.Store
 
-			sizeNum := options.Size
+			sizeNum := cacheOpts.Size
 			if sizeNum <= 0 {
 				memStore = memory.NewMultiMemStore()
 			} else {
@@ -107,31 +104,9 @@ func Create(opts ...Option) store.Store {
 		// FIXME nats has restrictions on the key, we cannot use slashes AFAICT
 		// host, port, clusterid
 		return natsjs.NewStore(
-			append(storeopts,
+			append(opts,
 				natsjs.NatsOptions(nats.Options{Name: "TODO"}),
-				natsjs.DefaultTTL(options.TTL),
-			)...,
+				natsjs.DefaultTTL(cacheOpts.TTL))...,
 		) // TODO test with ocis nats
 	}
-}
-
-func storeOptions(o *Options) []store.Option {
-	var opts []store.Option
-
-	if o.Addresses != nil {
-		opts = append(opts, store.Nodes(o.Addresses...))
-	}
-
-	if o.Database != "" {
-		opts = append(opts, store.Database(o.Database))
-
-	}
-
-	if o.Table != "" {
-		opts = append(opts, store.Table(o.Table))
-
-	}
-
-	return opts
-
 }

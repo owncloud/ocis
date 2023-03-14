@@ -24,6 +24,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
 	graphm "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
+	microstore "go-micro.dev/v4/store"
 )
 
 const (
@@ -159,10 +160,12 @@ func NewService(opts ...Option) (Graph, error) {
 
 	roleManager := options.RoleManager
 	if roleManager == nil {
-		storeOptions := []store.Option{
-			store.Type(options.Config.CacheStore.Type),
-			store.Addresses(strings.Split(options.Config.CacheStore.Address, ",")...),
-			store.Size(options.Config.CacheStore.Size),
+		storeOptions := []microstore.Option{
+			store.WithCacheOptions(store.CacheOptions{
+				Type: options.Config.CacheStore.Type,
+				Size: options.Config.CacheStore.Size,
+			}),
+			microstore.Nodes(strings.Split(options.Config.CacheStore.Address, ",")...),
 		}
 		m := roles.NewManager(
 			roles.StoreOptions(storeOptions),

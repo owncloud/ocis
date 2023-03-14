@@ -9,7 +9,6 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
-	ocstore "github.com/owncloud/ocis/v2/ocis-pkg/store"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 
 	"github.com/MicahParks/keyfunc"
@@ -35,10 +34,6 @@ type OIDCProvider interface {
 func NewOIDCAuthenticator(opts ...Option) *OIDCAuthenticator {
 	options := newOptions(opts...)
 
-	// if no cache is configured use noop cache
-	if options.Cache == nil {
-		options.Cache = ocstore.Create(ocstore.Type("noop"))
-	}
 	return &OIDCAuthenticator{
 		Logger:                  options.Logger,
 		tokenCache:              options.Cache,

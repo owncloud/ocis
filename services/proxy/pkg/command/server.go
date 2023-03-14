@@ -17,7 +17,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
-	ocstore "github.com/owncloud/ocis/v2/ocis-pkg/store"
+	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
@@ -35,6 +35,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 	"github.com/urfave/cli/v2"
+	microstore "go-micro.dev/v4/store"
 	"golang.org/x/oauth2"
 )
 
@@ -211,12 +212,15 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		})
 	}
 
-	cache := ocstore.Create(
-		ocstore.Database("proxy"),
-		ocstore.Table("access-tokens"),
-		ocstore.Type(ocstore.TypeOCMem),
-		ocstore.Size(cfg.OIDC.UserinfoCache.Size),
-		ocstore.TTL(time.Duration(cfg.OIDC.UserinfoCache.TTL)*time.Second),
+	cache := store.Create(
+		store.WithCacheOptions(store.CacheOptions{
+			Type: store.TypeOCMem,
+			TTL:  time.Duration(cfg.OIDC.UserinfoCache.TTL) * time.Second,
+			Size: cfg.OIDC.UserinfoCache.Size,
+		}),
+		microstore.Database("proxy"),
+		microstore.Table("access-tokens"),
+		// TODO Nodes
 	)
 
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(

@@ -2,13 +2,13 @@ package roles
 
 import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	ocisstore "github.com/owncloud/ocis/v2/ocis-pkg/store"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"go-micro.dev/v4/store"
 )
 
 // Options are all the possible options.
 type Options struct {
-	storeOptions []ocisstore.Option
+	storeOptions []store.Option
 	logger       log.Logger
 	roleService  settingssvc.RoleService
 }
@@ -31,7 +31,7 @@ func RoleService(rs settingssvc.RoleService) Option {
 }
 
 // StoreOptions are the options for the store
-func StoreOptions(storeOpts []ocisstore.Option) Option {
+func StoreOptions(storeOpts []store.Option) Option {
 	return func(o *Options) {
 		o.storeOptions = storeOpts
 	}

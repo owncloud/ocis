@@ -1,50 +1,42 @@
 package store
 
-import "time"
+import (
+	"context"
+	"time"
 
-// Option provides an option to configure the store
-type Option func(*Options)
+	"go-micro.dev/v4/store"
+)
 
-// Type defines the type of the store
-func Type(typ string) Option {
-	return func(o *Options) {
-		o.Type = typ
-	}
+// CacheOptions are cache specific options to configure the store
+type CacheOptions struct {
+	// Type determines the implementation:
+	// * "noop", for a noop store (it does nothing)
+	// * "etcd", for etcd
+	// * "ocmem", custom in-memory implementation, with fixed size and optimized prefix
+	// and suffix search
+	// * "memory", for a in-memory implementation, which is the default if noone matches
+	Type string
+
+	// Size configures the maximum capacity of the cache for
+	// the "ocmem" implementation, in number of items that the cache can hold per table.
+	// You can use 5000 to make the cache hold up to 5000 elements.
+	// The parameter only affects to the "ocmem" implementation, the rest will ignore it.
+	// If an invalid value is used, the default of 512 will be used instead.
+	Size int
+
+	// TTL is the time to life for documents stored in the store
+	TTL time.Duration
 }
 
-// Addresses defines the addresses where the store can be reached
-func Addresses(addrs ...string) Option {
-	return func(o *Options) {
-		o.Addresses = addrs
-	}
-}
+type cacheOptionsContextKey struct{}
 
-// Database defines the Database the store should use
-func Database(db string) Option {
-	return func(o *Options) {
-		o.Database = db
-	}
-}
+// CacheOptions defines cache options when using a store.
+func WithCacheOptions(cacheOptions CacheOptions) store.Option {
+	return func(o *store.Options) {
+		if o.Context == nil {
+			o.Context = context.Background()
+		}
 
-// Table defines the table the store should use
-func Table(t string) Option {
-	return func(o *Options) {
-		o.Table = t
-	}
-}
-
-// Size defines the maximum capacity of the store.
-// Only applicable when using "ocmem" store
-func Size(s int) Option {
-	return func(o *Options) {
-		o.Size = s
-	}
-}
-
-// TTL defines the time to life for elements in the store.
-// Only applicable when using "natsjs" store
-func TTL(t time.Duration) Option {
-	return func(o *Options) {
-		o.TTL = t
+		o.Context = context.WithValue(o.Context, cacheOptionsContextKey{}, cacheOptions)
 	}
 }
