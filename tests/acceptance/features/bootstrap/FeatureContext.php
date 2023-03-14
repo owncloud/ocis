@@ -1151,16 +1151,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @param string $storageName
-	 * @param integer $storageId
-	 *
-	 * @return void
-	 */
-	public function addStorageId(string $storageName, int $storageId): void {
-		$this->storageIds[$storageId] = $storageName;
-	}
-
-	/**
 	 * @param integer $storageId
 	 *
 	 * @return void
@@ -1317,60 +1307,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function federatedServerExists(): bool {
 		return $this->federatedServerExists;
-	}
-
-	/**
-	 * disable CSRF
-	 *
-	 * @return string the previous setting of csrf.disabled
-	 * @throws Exception
-	 */
-	public function disableCSRF(): string {
-		return $this->setCSRFDotDisabled('true');
-	}
-
-	/**
-	 * enable CSRF
-	 *
-	 * @return string the previous setting of csrf.disabled
-	 * @throws Exception
-	 */
-	public function enableCSRF(): string {
-		return $this->setCSRFDotDisabled('false');
-	}
-
-	/**
-	 * set csrf.disabled
-	 *
-	 * @param string $setting "true", "false" or "" to delete the setting
-	 *
-	 * @return string the previous setting of csrf.disabled
-	 * @throws Exception
-	 */
-	public function setCSRFDotDisabled(string $setting): string {
-		$oldCSRFSetting = SetupHelper::getSystemConfigValue(
-			'csrf.disabled',
-			$this->getStepLineRef()
-		);
-
-		if ($setting === "") {
-			SetupHelper::deleteSystemConfig(
-				'csrf.disabled',
-				$this->getStepLineRef()
-			);
-		} elseif (($setting === 'true') || ($setting === 'false')) {
-			SetupHelper::setSystemConfig(
-				'csrf.disabled',
-				$setting,
-				$this->getStepLineRef(),
-				'boolean'
-			);
-		} else {
-			throw new \http\Exception\InvalidArgumentException(
-				'setting must be "true", "false" or ""'
-			);
-		}
-		return \trim($oldCSRFSetting);
 	}
 
 	/**
@@ -3721,36 +3657,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @BeforeScenario @local_storage
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function setupLocalStorageBefore(): void {
-		$storageName = "local_storage";
-		$result = SetupHelper::createLocalStorageMount(
-			$storageName,
-			$this->getStepLineRef()
-		);
-		$storageId = $result['storageId'];
-		if (!is_numeric($storageId)) {
-			throw new Exception(
-				__METHOD__ . " storageId '$storageId' is not numeric"
-			);
-		}
-		$this->addStorageId($storageName, (int)$storageId);
-		SetupHelper::runOcc(
-			[
-				'files_external:option',
-				$storageId,
-				'enable_sharing',
-				'true'
-			],
-			$this->getStepLineRef()
-		);
-	}
-
-	/**
 	 * @AfterScenario
 	 *
 	 * @return void
@@ -3773,52 +3679,6 @@ class FeatureContext extends BehatVariablesContext {
 	public function deleteAllResourceCreatedByAdmin(): void {
 		foreach ($this->adminResources as $resource) {
 			$this->userDeletesFile("admin", $resource);
-		}
-	}
-
-	/**
-	 * deletes all created storages
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function deleteAllStorages(): void {
-		$allStorageIds = \array_keys($this->getStorageIds());
-		foreach ($allStorageIds as $storageId) {
-			SetupHelper::runOcc(
-				[
-					'files_external:delete',
-					'-y',
-					$storageId
-				],
-				$this->getStepLineRef()
-			);
-		}
-		$this->storageIds = [];
-	}
-
-	/**
-	 * @AfterScenario @local_storage
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function removeLocalStorageAfter(): void {
-		$this->removeExternalStorage();
-		$this->removeTemporaryStorageOnServerAfter();
-	}
-
-	/**
-	 * This will remove test created external mount points
-	 *
-	 * @AfterScenario @external_storage
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function removeExternalStorage(): void {
-		if ($this->getStorageIds() !== null) {
-			$this->deleteAllStorages();
 		}
 	}
 
@@ -4110,15 +3970,7 @@ class FeatureContext extends BehatVariablesContext {
 		if ($baseUrl == null) {
 			$baseUrl = $this->getBaseUrl();
 		}
-		$return = SetupHelper::runOcc(
-			$args,
-			$this->getStepLineRef(),
-			$adminUsername,
-			$adminPassword,
-			$baseUrl,
-			$ocPath,
-			$envVariables
-		);
+		$return = ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
 		$this->lastStdOut = $return['stdOut'];
 		$this->lastStdErr = $return['stdErr'];
 		$occStatusCode = (int)$return['code'];
