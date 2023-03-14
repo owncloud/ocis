@@ -11,6 +11,7 @@ type Config struct {
 	Commons           *shared.Commons       `yaml:"-"` // don't use this directly as configuration for a service
 	GRPC              GRPC                  `yaml:"grpc"`
 	Service           Service               `yaml:"-"`
+	Debug             Debug                 `yaml:"debug"`
 	TokenManager      *TokenManager         `yaml:"token_manager"`
 	Events            Events                `yaml:"events"`
 	Reva              *shared.Reva          `yaml:"reva"`
@@ -65,4 +66,12 @@ type Log struct {
 	Pretty bool   `mapstructure:"pretty" env:"OCIS_LOG_PRETTY;POLICIES_LOG_PRETTY" desc:"Activates pretty log output."`
 	Color  bool   `mapstructure:"color" env:"OCIS_LOG_COLOR;POLICIES_LOG_COLOR" desc:"Activates colorized log output."`
 	File   string `mapstructure:"file" env:"OCIS_LOG_FILE;POLICIES_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set."`
+}
+
+// Debug defines the available debug configuration.
+type Debug struct {
+	Addr   string `yaml:"addr" env:"POLICIES_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed."`
+	Token  string `yaml:"token" env:"POLICIES_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint."`
+	Pprof  bool   `yaml:"pprof" env:"POLICIES_DEBUG_PPROF" desc:"Enables pprof, which can be used for profiling."`
+	Zpages bool   `yaml:"zpages" env:"POLICIES_DEBUG_ZPAGES" desc:"Enables zpages, which can be used for collecting and viewing in-memory traces."`
 }

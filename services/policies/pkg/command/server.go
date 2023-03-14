@@ -5,6 +5,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 
 	"github.com/cs3org/reva/v2/pkg/events/stream"
@@ -13,6 +15,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	svcProtogen "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
@@ -135,6 +138,51 @@ func Server(cfg *config.Config) *cli.Command {
 				}
 
 				gr.Add(eventSvc.Run, func(_ error) {
+					cancel()
+				})
+			}
+
+			{
+				server := debug.NewService(
+					debug.Logger(logger),
+					debug.Name(cfg.Service.Name),
+					debug.Version(version.GetString()),
+					debug.Address(cfg.Debug.Addr),
+					debug.Token(cfg.Debug.Token),
+					debug.Pprof(cfg.Debug.Pprof),
+					debug.Zpages(cfg.Debug.Zpages),
+					debug.Health(
+						func(w http.ResponseWriter, r *http.Request) {
+							w.Header().Set("Content-Type", "text/plain")
+							w.WriteHeader(http.StatusOK)
+
+							// TODO: check if services are up and running
+
+							_, err := io.WriteString(w, http.StatusText(http.StatusOK))
+							// io.WriteString should not fail but if it does we want to know.
+							if err != nil {
+								panic(err)
+							}
+						},
+					),
+					debug.Ready(
+						func(w http.ResponseWriter, r *http.Request) {
+							w.Header().Set("Content-Type", "text/plain")
+							w.WriteHeader(http.StatusOK)
+
+							// TODO: check if services are up and running
+
+							_, err := io.WriteString(w, http.StatusText(http.StatusOK))
+							// io.WriteString should not fail but if it does we want to know.
+							if err != nil {
+								panic(err)
+							}
+						},
+					),
+				)
+
+				gr.Add(server.ListenAndServe, func(_ error) {
+					_ = server.Shutdown(ctx)
 					cancel()
 				})
 			}

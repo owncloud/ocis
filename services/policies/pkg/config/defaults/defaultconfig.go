@@ -22,6 +22,12 @@ func DefaultConfig() *config.Config {
 		Service: config.Service{
 			Name: "policies",
 		},
+		Debug: config.Debug{
+			Addr:   "127.0.0.1:9129",
+			Token:  "",
+			Pprof:  false,
+			Zpages: false,
+		},
 		GRPC: config.GRPC{
 			Addr:      "127.0.0.1:9125",
 			Namespace: "com.owncloud.api",
