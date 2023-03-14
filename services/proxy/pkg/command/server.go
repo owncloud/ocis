@@ -226,7 +226,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
 		middleware.Logger(logger),
 		middleware.Cache(cache),
-		middleware.DefaultAccessTokenTTL(time.Duration(cfg.OIDC.UserinfoCache.TTL)*time.Second),
+		middleware.DefaultAccessTokenTTL(cfg.OIDC.UserinfoCache.TTL),
 		middleware.HTTPClient(oidcHTTPClient),
 		middleware.OIDCIss(cfg.OIDC.Issuer),
 		middleware.JWKSOptions(cfg.OIDC.JWKS),
