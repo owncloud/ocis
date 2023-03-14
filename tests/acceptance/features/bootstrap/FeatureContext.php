@@ -3945,67 +3945,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * Invokes an OCC command
-	 *
-	 * @param array|null $args of the occ command
-	 * @param string|null $adminUsername
-	 * @param string|null $adminPassword
-	 * @param string|null $baseUrl
-	 * @param string|null $ocPath
-	 *
-	 * @return int exit code
-	 * @throws Exception if ocPath has not been set yet or the testing app is not enabled
-	 */
-	public function runOcc(
-		?array  $args = [],
-		?string $adminUsername = null,
-		?string $adminPassword = null,
-		?string $baseUrl = null,
-		?string $ocPath = null
-	): int {
-		return $this->runOccWithEnvVariables(
-			$args,
-			null,
-			$adminUsername,
-			$adminPassword,
-			$baseUrl,
-			$ocPath
-		);
-	}
-
-	/**
-	 * Invokes an OCC command with an optional array of environment variables
-	 *
-	 * @param array|null $args of the occ command
-	 * @param array|null $envVariables to be defined before the command is run
-	 * @param string|null $adminUsername
-	 * @param string|null $adminPassword
-	 * @param string|null $baseUrl
-	 * @param string|null $ocPath
-	 *
-	 * @return int exit code
-	 * @throws Exception if ocPath has not been set yet or the testing app is not enabled
-	 */
-	public function runOccWithEnvVariables(
-		?array  $args = [],
-		?array  $envVariables = null,
-		?string $adminUsername = null,
-		?string $adminPassword = null,
-		?string $baseUrl = null,
-		?string $ocPath = null
-	): int {
-		$args[] = '--no-ansi';
-		if ($baseUrl == null) {
-			$baseUrl = $this->getBaseUrl();
-		}
-		$return = ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
-		$this->lastStdOut = $return['stdOut'];
-		$this->lastStdErr = $return['stdErr'];
-		$occStatusCode = (int)$return['code'];
-		return $occStatusCode;
-	}
-
-	/**
 	 * Find exception texts in stderr
 	 *
 	 * @return array of exception texts
