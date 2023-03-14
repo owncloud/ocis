@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package ocis.messages.policies.v0;
+
+option go_package = "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/policies/v0";
+
+message User {
+	message ID {
+			string opaque_id = 1;
+	}
+
+	ID id = 1;
+	string username = 2;
+	string mail = 3;
+	string display_name = 4;
+	repeated string groups = 5;
+}
+
+message Resource {
+	message ID {
+		string storage_id = 1;
+		string opaque_id = 2;
+		string space_id = 3;
+	}
+
+	ID id = 1;
+	string name = 2;
+	uint64 size = 3;
+	string url = 4;
+}
+
+message Request {
+	string method = 1;
+	string path = 2;
+}
+
+enum Stage {
+	STAGE_PP = 0;
+	STAGE_HTTP = 1;
+}
+
+message Environment {
+	Stage stage = 1;
+	User user = 2;
+	Request request = 3;
+	Resource resource = 4;
+}
+
+

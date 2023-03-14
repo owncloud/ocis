@@ -23,7 +23,9 @@ plugins:
          ocis.services.store.v0;\
          ocis.messages.store.v0;\
          ocis.services.eventhistory.v0;\
-         ocis.messages.eventhistory.v0"
+         ocis.messages.eventhistory.v0;\
+         ocis.services.policies.v0;\
+         ocis.messages.policies.v0"
 
   - name: openapiv2
     path: ../../.bingo/protoc-gen-openapiv2
