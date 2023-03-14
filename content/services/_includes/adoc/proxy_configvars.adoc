@@ -398,5 +398,14 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Path/File for the root CA certificate used to validate the server’s TLS certificate for https enabled backend services.
+
+a|`PROXY_POLICIES_QUERY` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Defines the 'Complete Rules' variable defined in the rego rule set this step uses for its evaluation. Rules default to deny if the variable was not found.
 |===
 

@@ -26,7 +26,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-The default role assignments the demo users should be setup.
+Flag to enable or disable the creation of the demo users.
 
 a| `LDAP_BIND_DN`
 
@@ -572,7 +572,7 @@ a| [subs=-attributes]
 ++bool ++
 
 a| [subs=-attributes]
-++true ++
+++false ++
 
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
@@ -591,7 +591,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With] ++
+++[] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -610,7 +610,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET POST PUT PATCH DELETE OPTIONS] ++
+++[] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
@@ -657,6 +657,7 @@ a| [subs=attributes+]
 * xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/nats.adoc[nats] +
 * xref:{s-path}/notifications.adoc[notifications] +
+* xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/postprocessing.adoc[postprocessing] +
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/sharing.adoc[sharing] +
@@ -686,6 +687,7 @@ a| [subs=attributes+]
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/idp.adoc[idp] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/sharing.adoc[sharing] +
@@ -718,6 +720,7 @@ a| [subs=attributes+]
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/idp.adoc[idp] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/sharing.adoc[sharing] +
@@ -811,6 +814,7 @@ a| [subs=attributes+]
 * xref:{s-path}/nats.adoc[nats] +
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/postprocessing.adoc[postprocessing] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/search.adoc[search] +
@@ -828,7 +832,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Allow insecure connections to the frontend.
+Whether the NATS server should skip the client certificate verification during the TLS handshake.
 
 a| `OCIS_JWT_SECRET`
 
@@ -844,6 +848,7 @@ a| [subs=attributes+]
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sharing.adoc[sharing] +
@@ -862,7 +867,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The secret to mint and validate jwt tokens.
+The secret to mint and validate JWT tokens.
 
 a| `OCIS_LOG_COLOR`
 
@@ -884,6 +889,7 @@ a| [subs=attributes+]
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/postprocessing.adoc[postprocessing] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/search.adoc[search] +
@@ -930,6 +936,7 @@ a| [subs=attributes+]
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/postprocessing.adoc[postprocessing] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/search.adoc[search] +
@@ -976,6 +983,7 @@ a| [subs=attributes+]
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/postprocessing.adoc[postprocessing] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/search.adoc[search] +
@@ -1022,6 +1030,7 @@ a| [subs=attributes+]
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/postprocessing.adoc[postprocessing] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/search.adoc[search] +
@@ -1056,6 +1065,7 @@ a| [subs=attributes+]
 * xref:{s-path}/idp.adoc[idp] +
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/userlog.adoc[userlog] +
@@ -1067,7 +1077,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The machine auth API key used to validate internal requests necessary to access resources from other services.
+Machine auth API key used to validate internal requests necessary to access resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1103,7 +1113,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.
+Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.
 
 a| `OCIS_SPACES_MAX_QUOTA`
 
@@ -1118,7 +1128,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
+Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
 
 a| `OCIS_SYSTEM_USER_API_KEY`
 
@@ -1365,7 +1375,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The public facing URL of the oCIS frontend.
+The public facing URL of the oCIS Web UI, used e.g. when sending notification eMails
 
 a| `REVA_GATEWAY`
 
@@ -1382,6 +1392,7 @@ a| [subs=attributes+]
 * xref:{s-path}/idp.adoc[idp] +
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
+* xref:{s-path}/policies.adoc[policies] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/search.adoc[search] +
 * xref:{s-path}/sharing.adoc[sharing] +
@@ -1401,7 +1412,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-The CS3 gateway endpoint.
+CS3 gateway used to look up user metadata
 
 a| `STORAGE_TRANSFER_SECRET`
 
