@@ -29,18 +29,18 @@ type OIDCProvider interface {
 }
 
 // NewOIDCAuthenticator returns a ready to use authenticator which can handle OIDC authentication.
-func NewOIDCAuthenticator(logger log.Logger, tokenCacheTTL int, oidcHTTPClient *http.Client, oidcIss string, providerFunc func() (OIDCProvider, error),
-	jwksOptions config.JWKS, accessTokenVerifyMethod string) *OIDCAuthenticator {
-	tokenCache := osync.NewCache(tokenCacheTTL)
+func NewOIDCAuthenticator(opts ...Option) *OIDCAuthenticator {
+	options := newOptions(opts...)
+	tokenCache := osync.NewCache(options.CacheSize)
 	return &OIDCAuthenticator{
-		Logger:                  logger,
+		Logger:                  options.Logger,
 		tokenCache:              &tokenCache,
-		TokenCacheTTL:           time.Duration(tokenCacheTTL),
-		HTTPClient:              oidcHTTPClient,
-		OIDCIss:                 oidcIss,
-		ProviderFunc:            providerFunc,
-		JWKSOptions:             jwksOptions,
-		AccessTokenVerifyMethod: accessTokenVerifyMethod,
+		TokenCacheTTL:           options.CacheTTL,
+		HTTPClient:              options.HTTPClient,
+		OIDCIss:                 options.OIDCIss,
+		ProviderFunc:            options.OIDCProviderFunc,
+		JWKSOptions:             options.JWKS,
+		AccessTokenVerifyMethod: options.AccessTokenVerifyMethod,
 		providerLock:            &sync.Mutex{},
 		jwksLock:                &sync.Mutex{},
 	}

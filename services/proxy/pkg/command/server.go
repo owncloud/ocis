@@ -210,11 +210,14 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		})
 	}
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
-		logger,
-		cfg.OIDC.UserinfoCache.TTL,
-		oidcHTTPClient,
-		cfg.OIDC.Issuer,
-		func() (middleware.OIDCProvider, error) {
+		middleware.Logger(logger),
+		middleware.CacheSize(cfg.OIDC.UserinfoCache.Size),
+		middleware.CacheTTL(time.Duration(cfg.OIDC.UserinfoCache.TTL)*time.Second), // TODO replace with store
+		middleware.HTTPClient(oidcHTTPClient),
+		middleware.OIDCIss(cfg.OIDC.Issuer),
+		middleware.JWKSOptions(cfg.OIDC.JWKS),
+		middleware.AccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
+		middleware.OIDCProviderFunc(func() (middleware.OIDCProvider, error) {
 			// Initialize a provider by specifying the issuer URL.
 			// it will fetch the keys from the issuer using the .well-known
 			// endpoint
@@ -222,9 +225,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 				context.WithValue(ctx, oauth2.HTTPClient, oidcHTTPClient),
 				cfg.OIDC.Issuer,
 			)
-		},
-		cfg.OIDC.JWKS,
-		cfg.OIDC.AccessTokenVerifyMethod,
+		}),
 	))
 	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
 		Logger:            logger,

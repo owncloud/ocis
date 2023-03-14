@@ -4,15 +4,14 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
-
-	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
-
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
+	store "go-micro.dev/v4/store"
 )
 
 // Option defines a single option function.
@@ -52,10 +51,12 @@ type Options struct {
 	AutoprovisionAccounts bool
 	// EnableBasicAuth to allow basic auth
 	EnableBasicAuth bool
-	// UserinfoCacheSize defines the max number of entries in the userinfo cache, intended for the oidc_auth middleware
-	UserinfoCacheSize int
-	// UserinfoCacheTTL sets the max cache duration for the userinfo cache, intended for the oidc_auth middleware
-	UserinfoCacheTTL time.Duration
+	// CacheSize defines the max number of entries in a cache
+	CacheSize int
+	// CacheTTL sets the max cache duration for a cache
+	CacheTTL time.Duration
+	// Cache sets the access token cache store
+	Cache store.Store
 	// CredentialsByUserAgent sets the auth challenges on a per user-agent basis
 	CredentialsByUserAgent map[string]string
 	// AccessTokenVerifyMethod configures how access_tokens should be verified but the oidc_auth middleware.
@@ -184,17 +185,24 @@ func EnableBasicAuth(enableBasicAuth bool) Option {
 	}
 }
 
-// TokenCacheSize provides a function to set the TokenCacheSize
-func TokenCacheSize(size int) Option {
+// CacheSize provides a function to set the CacheSize
+func CacheSize(size int) Option {
 	return func(o *Options) {
-		o.UserinfoCacheSize = size
+		o.CacheSize = size
 	}
 }
 
-// TokenCacheTTL provides a function to set the TokenCacheTTL
-func TokenCacheTTL(ttl time.Duration) Option {
+// CacheTTL provides a function to set the TokenCacheTTL
+func CacheTTL(ttl time.Duration) Option {
 	return func(o *Options) {
-		o.UserinfoCacheTTL = ttl
+		o.CacheTTL = ttl
+	}
+}
+
+// Cache provides a function to set the Cache
+func Cache(val store.Store) Option {
+	return func(o *Options) {
+		o.Cache = val
 	}
 }
 
