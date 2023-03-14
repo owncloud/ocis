@@ -31,3 +31,20 @@ The `userlog` service provides an API to retrieve configured events. For now, th
 ## Deleting
 
 To delete events for an user, use a `DELETE` request to `ocs/v2.php/apps/notifications/api/v1/notifications` containing the IDs to delete.
+
+## Translations
+
+The `userlog` service has embedded translations sourced via transifex to provide a basic set of translated languages. These embedded translations are available for all deployment scenarios. In addition, the service supports custom translations, though it is currently not possible to just add custom translations to embedded ones. If custom translations are configured, the embedded ones are not used. To configure custom translations, the `USERLOG_TRANSLATION_PATH` environment variable needs to point to a base folder that will further contain the translation files. This path must be available from all instances of the userlog service, a shared storage is recommended. Translation files must be of type [.po](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html#PO-Files) or [.mo](https://www.gnu.org/software/gettext/manual/html_node/Binaries.html). For each language, the filename needs to be `userlog.po` (or `userlog.mo`) and stored in a folder structure defining the language code. In general the path/name pattern for a translation file needs to be:
+
+```text
+{USERLOG_TRANSLATION_PATH}/{language-code}/LC_MESSAGES/userlog.po
+```
+
+The language-code pattern is composed as `language[_territory]` where  `language` is the base language and `_territory` is optional defining a country.
+
+As example, for the language `de_DE`, one needs to place the corresponding translation files to `{USERLOG_TRANSLATION_PATH}/de_DE/LC_MESSAGES/userlog.po`.
+
+### Translation Rules
+
+*   If a requested language-code is not available, the service tries to fallback to the base language if available. As example, if `de_DE` is not available, the service tries to fall back to translations in `de` folder.
+*   If the base language is also not available like when the language code is `de_DE` and neither `de_DE` nor the `de` folder is available, the service falls back to the systems default `en`, which is the source of the texts provided by the code.

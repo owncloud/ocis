@@ -1,65 +1,60 @@
 package service
 
-import "text/template"
+// Template marks the string as a translatable template
+func Template(s string) string { return s }
 
 // the available templates
 var (
-	SpaceShared        = "space-shared"
-	SpaceSharedSubject = "Space shared"
-	SpaceSharedMessage = "{{ .username }} added you to Space {{ .spacename }}"
+	SpaceShared = NotificationTemplate{
+		Subject: Template("Space shared"),
+		Message: Template("{user} added you to Space {space}"),
+	}
 
-	SpaceUnshared        = "space-unshared"
-	SpaceUnsharedSubject = "Removed from Space"
-	SpaceUnsharedMessage = "{{ .username }} removed you from Space {{ .spacename }}"
+	SpaceUnshared = NotificationTemplate{
+		Subject: Template("Removed from Space"),
+		Message: Template("{user} removed you from Space {space}"),
+	}
 
-	SpaceDisabled        = "space-disabled"
-	SpaceDisabledSubject = "Space disabled"
-	SpaceDisabledMessage = "{{ .username }} disabled Space {{ .spacename }}"
+	SpaceDisabled = NotificationTemplate{
+		Subject: Template("Space disabled"),
+		Message: Template("{user} disabled Space {space}"),
+	}
 
-	SpaceDeleted        = "space-deleted"
-	SpaceDeletedSubject = "Space deleted"
-	SpaceDeletedMessage = "{{ .username }} deleted Space {{ .spacename }}"
+	SpaceDeleted = NotificationTemplate{
+		Subject: Template("Space deleted"),
+		Message: Template("{user} deleted Space {space}"),
+	}
 
-	SpaceMembershipExpired        = "space-membership-expired"
-	SpaceMembershipExpiredSubject = "Membership expired"
-	SpaceMembershipExpiredMessage = "Access to Space {{ .spacename }} lost"
+	SpaceMembershipExpired = NotificationTemplate{
+		Subject: Template("Membership expired"),
+		Message: Template("Access to Space {space} lost"),
+	}
 
-	ShareCreated        = "item-shared"
-	ShareCreatedSubject = "Resource shared"
-	ShareCreatedMessage = "{{ .username }} shared {{ .resourcename }} with you"
+	ShareCreated = NotificationTemplate{
+		Subject: Template("Resource shared"),
+		Message: Template("{user} shared {resource} with you"),
+	}
 
-	ShareRemoved        = "item-unshared"
-	ShareRemovedSubject = "Resource unshared"
-	ShareRemovedMessage = "{{ .username }} unshared {{ .resourcename }} with you"
+	ShareRemoved = NotificationTemplate{
+		Subject: Template("Resource unshared"),
+		Message: Template("{user} unshared {resource} with you"),
+	}
 
-	ShareExpired        = "share-expired"
-	ShareExpiredSubject = "Share expired"
-	ShareExpiredMessage = "Access to {{ .resourcename }} expired"
-)
-
-// rendered templates
-var (
-	_templates = map[string]NotificationTemplate{
-		SpaceShared:            notiTmpl(SpaceSharedSubject, SpaceSharedMessage),
-		SpaceUnshared:          notiTmpl(SpaceUnsharedSubject, SpaceUnsharedMessage),
-		SpaceDisabled:          notiTmpl(SpaceDisabledSubject, SpaceDisabledMessage),
-		SpaceDeleted:           notiTmpl(SpaceDeletedSubject, SpaceDeletedMessage),
-		SpaceMembershipExpired: notiTmpl(SpaceMembershipExpiredSubject, SpaceMembershipExpiredMessage),
-		ShareCreated:           notiTmpl(ShareCreatedSubject, ShareCreatedMessage),
-		ShareRemoved:           notiTmpl(ShareRemovedSubject, ShareRemovedMessage),
-		ShareExpired:           notiTmpl(ShareExpiredSubject, ShareExpiredMessage),
+	ShareExpired = NotificationTemplate{
+		Subject: Template("Share expired"),
+		Message: Template("Access to {resource} expired"),
 	}
 )
+
+// holds the information to turn the raw template into a parseable go template
+var _placeholders = map[string]string{
+	"{user}":     "{{ .username }}",
+	"{space}":    "{{ .spacename }}",
+	"{resource}": "{{ .resourcename }}",
+}
 
 // NotificationTemplate is the data structure for the notifications
 type NotificationTemplate struct {
-	Subject *template.Template
-	Message *template.Template
-}
-
-func notiTmpl(subjectname string, messagename string) NotificationTemplate {
-	return NotificationTemplate{
-		Subject: template.Must(template.New("").Parse(subjectname)),
-		Message: template.Must(template.New("").Parse(messagename)),
-	}
+	Subject string
+	Message string
 }
