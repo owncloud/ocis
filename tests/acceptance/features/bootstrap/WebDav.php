@@ -563,37 +563,6 @@ trait WebDav {
 	}
 
 	/**
-	 * @Given /^the administrator has (enabled|disabled) async operations$/
-	 *
-	 * @param string $enabledOrDisabled
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function triggerAsyncUpload(string $enabledOrDisabled):void {
-		$switch = ($enabledOrDisabled !== "disabled");
-		if ($switch) {
-			$value = 'true';
-		} else {
-			$value = 'false';
-		}
-		if ($this->previousAsyncSetting === null) {
-			$previousAsyncSetting = ['code' => '', 'stdOut' => '', 'stdErr' => '' ]['stdOut'];
-			$this->previousAsyncSetting = \trim($previousAsyncSetting);
-		}
-		$this->runOcc(
-			[
-				'config:system:set',
-				'dav.enable.async',
-				'--type',
-				'boolean',
-				'--value',
-				$value
-			]
-		);
-	}
-
-	/**
 	 * @Given the HTTP-Request-timeout is set to :seconds seconds
 	 *
 	 * @param int $timeout
@@ -5391,32 +5360,6 @@ trait WebDav {
 		) {
 			\sleep($uploadWaitTime);
 		}
-	}
-
-	/**
-	 * @Given /^the administrator has (enabled|disabled) the file version storage feature/
-	 *
-	 * @param string $enabledOrDisabled
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasEnabledTheFileVersionStorage(string $enabledOrDisabled): void {
-		$switch = ($enabledOrDisabled !== "disabled");
-		if ($switch) {
-			$value = 'true';
-		} else {
-			$value = 'false';
-		}
-		$this->runOcc(
-			[
-				'config:system:set',
-				'file_storage.save_version_author',
-				'--type',
-				'boolean',
-				'--value',
-				$value]
-		);
 	}
 
 	/**
