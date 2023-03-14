@@ -300,6 +300,7 @@ func TestGetUsers(t *testing.T) {
 func TestUpdateUser(t *testing.T) {
 	falseBool := false
 	trueBool := true
+	memberType := "Member"
 
 	type userProps struct {
 		id                       string
@@ -307,7 +308,7 @@ func TestUpdateUser(t *testing.T) {
 		displayName              string
 		onPremisesSamAccountName string
 		accountEnabled           *bool
-		userType                 string
+		userType                 *string
 	}
 	type args struct {
 		nameOrID             string
@@ -1277,7 +1278,7 @@ func TestUpdateUser(t *testing.T) {
 			args: args{
 				nameOrID: "testUser",
 				userProps: userProps{
-					userType: "Member",
+					userType: &memberType,
 				},
 				disableUserMechanism: "group",
 			},
@@ -1286,7 +1287,7 @@ func TestUpdateUser(t *testing.T) {
 				mail:                     "testuser@example.org",
 				displayName:              "testUser",
 				onPremisesSamAccountName: "testUser",
-				userType:                 "Member",
+				userType:                 &memberType,
 			},
 			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
 				return assert.Nil(t, err, args...)
@@ -1428,7 +1429,7 @@ func TestUpdateUser(t *testing.T) {
 				DisplayName:              &tt.args.userProps.displayName,
 				OnPremisesSamAccountName: &tt.args.userProps.onPremisesSamAccountName,
 				AccountEnabled:           tt.args.userProps.accountEnabled,
-				UserType:                 &tt.args.userProps.userType,
+				UserType:                 tt.args.userProps.userType,
 			}
 
 			emptyString := ""
@@ -1441,7 +1442,7 @@ func TestUpdateUser(t *testing.T) {
 					OnPremisesSamAccountName: &tt.want.onPremisesSamAccountName,
 					Surname:                  &emptyString,
 					GivenName:                &emptyString,
-					UserType:                 &tt.want.userType,
+					UserType:                 tt.want.userType,
 				}
 
 				if tt.want.accountEnabled != nil {

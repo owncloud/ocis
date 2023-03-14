@@ -557,6 +557,7 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 			i.userAttributeMap.surname,
 			i.userAttributeMap.givenName,
 			i.userAttributeMap.accountEnabled,
+			i.userAttributeMap.userType,
 		},
 		nil,
 	)
@@ -717,7 +718,6 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 	id := e.GetEqualFoldAttributeValue(i.userAttributeMap.id)
 	givenName := e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName)
 	surname := e.GetEqualFoldAttributeValue(i.userAttributeMap.surname)
-	userType := e.GetEqualFoldAttributeValue(i.userAttributeMap.userType)
 
 	if id != "" && opsan != "" {
 		return &libregraph.User{
@@ -727,7 +727,7 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 			Id:                       &id,
 			GivenName:                &givenName,
 			Surname:                  &surname,
-			UserType:                 &userType,
+			UserType:                 pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.userType)),
 			AccountEnabled:           booleanOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled)),
 		}
 	}
