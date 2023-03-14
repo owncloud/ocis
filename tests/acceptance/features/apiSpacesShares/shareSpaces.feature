@@ -430,19 +430,19 @@ Feature: Share spaces
       | viewer  |
 
 
-    Scenario Outline: check the end of expiration of a space in user share
-      Given user "Alice" has shared a space "share space" with settings:
-        | shareWith  | Brian                    |
-        | role       | <role>                   |
-        | expireDate | 2042-03-25T23:59:59+0100 |
-      When user "Alice" expires the user share of space "share space" for user "Brian"
-      Then the HTTP status code should be "200"
-      And the user "Brian" should not have a space called "share space"
-      Examples:
-        | role    |
-        | manager |
-        | editor  |
-        | viewer  |
+  Scenario Outline: check the end of expiration of a space in user share
+    Given user "Alice" has shared a space "share space" with settings:
+      | shareWith  | Brian                    |
+      | role       | <role>                   |
+      | expireDate | 2042-03-25T23:59:59+0100 |
+    When user "Alice" expires the user share of space "share space" for user "Brian"
+    Then the HTTP status code should be "200"
+    And the user "Brian" should not have a space called "share space"
+    Examples:
+      | role    |
+      | manager |
+      | editor  |
+      | viewer  |
 
 
   Scenario Outline: check the end of expiration of a space in group share
