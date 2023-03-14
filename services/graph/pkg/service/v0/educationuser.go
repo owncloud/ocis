@@ -17,9 +17,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	settings "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
-	settingssvc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 )
 
 // GetEducationUsers implements the Service interface.
@@ -148,21 +146,6 @@ func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		}
 		return
-	}
-
-	// assign roles if possible
-	if g.roleService != nil {
-		// All users get the user role by default currently.
-		// to all new users for now, as create Account request does not have any role field
-		if _, err = g.roleService.AssignRoleToUser(r.Context(), &settings.AssignRoleToUserRequest{
-			AccountUuid: *u.Id,
-			RoleId:      settingssvc.BundleUUIDRoleUser,
-		}); err != nil {
-			// log as error, admin eventually needs to do something
-			logger.Error().Err(err).Str("id", *u.Id).Str("role", settingssvc.BundleUUIDRoleUser).Msg("could not create education user: role assignment failed")
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "role assignment failed")
-			return
-		}
 	}
 
 	e := events.UserCreated{UserID: *u.Id}
