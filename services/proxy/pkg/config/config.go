@@ -119,12 +119,12 @@ type JWKS struct {
 
 // UserinfoCache is a TTL cache configuration.
 type UserinfoCache struct {
-	Type      string        `yaml:"type" env:"PROXY_OIDC_USERINFO_CACHE_TYPE" desc:"The type of the userinfo cache store. Supported values are: 'mem', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
-	Addresses []string      `yaml:"addresses" env:"PROXY_OIDC_USERINFO_CACHE_ADDRESSES" desc:"A comma separated list of addresses to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how addresses are used is dependent on the library of the configured store."`
+	Type      string        `yaml:"type" env:"OCIS_CACHE_STORE_TYPE;PROXY_OIDC_USERINFO_CACHE_TYPE" desc:"The type of the userinfo cache store. Supported values are: 'mem', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	Addresses []string      `yaml:"addresses" env:"OCIS_CACHE_STORE_ADDRESSES;PROXY_OIDC_USERINFO_CACHE_ADDRESSES" desc:"A comma separated list of addresses to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how addresses are used is dependent on the library of the configured store."`
 	Database  string        `yaml:"database" env:"PROXY_OIDC_USERINFO_CACHE_DATABASE" desc:"The database name the configured store should use."`
 	Table     string        `yaml:"table" env:"PROXY_OIDC_USERINFO_CACHE_TABLE" desc:"The database table the store should use."`
-	TTL       time.Duration `yaml:"ttl" env:"PROXY_OIDC_USERINFO_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds)."`
-	Size      int           `yaml:"size" env:"PROXY_OIDC_USERINFO_CACHE_SIZE" desc:"The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512."`
+	TTL       time.Duration `yaml:"ttl" env:"OCIS_CACHE_STORE_TTL;PROXY_OIDC_USERINFO_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds)."`
+	Size      int           `yaml:"size" env:"OCIS_CACHE_STORE_SIZE;PROXY_OIDC_USERINFO_CACHE_SIZE" desc:"The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512."`
 }
 
 // RoleAssignment contains the configuration for how to assign roles to users during login
