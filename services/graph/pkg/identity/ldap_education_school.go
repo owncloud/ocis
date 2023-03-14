@@ -8,7 +8,6 @@ import (
 	"github.com/go-ldap/ldap/v3"
 	"github.com/gofrs/uuid"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	oldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
@@ -112,9 +111,13 @@ func (i *LDAP) CreateEducationSchool(ctx context.Context, school libregraph.Educ
 
 	// Here we should verify that the school number is not already used
 
-	dn := fmt.Sprintf("%s=%s,%s",
-		i.educationConfig.schoolAttributeMap.displayName,
-		oldap.EscapeDNAttributeValue(school.GetDisplayName()),
+	attributeTypeAndValue := ldap.AttributeTypeAndValue{
+		Type:  i.educationConfig.schoolAttributeMap.displayName,
+		Value: school.GetDisplayName(),
+	}
+
+	dn := fmt.Sprintf("%s,%s",
+		attributeTypeAndValue.String(),
 		i.educationConfig.schoolBaseDN,
 	)
 	ar := ldap.NewAddRequest(dn, nil)
@@ -171,13 +174,12 @@ func (i *LDAP) UpdateEducationSchoolOperation(
 // updateDisplayName updates the school OU in the identity backend
 func (i *LDAP) updateDisplayName(ctx context.Context, dn string, providedDisplayName string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
-	newDisplayName := fmt.Sprintf(
-		"%s=%s",
-		i.educationConfig.schoolAttributeMap.displayName,
-		providedDisplayName,
-	)
+	attributeTypeAndValue := ldap.AttributeTypeAndValue{
+		Type:  i.educationConfig.schoolAttributeMap.displayName,
+		Value: providedDisplayName,
+	}
 
-	mrdn := ldap.NewModifyDNRequest(dn, newDisplayName, true, "")
+	mrdn := ldap.NewModifyDNRequest(dn, attributeTypeAndValue.String(), true, "")
 	i.logger.Debug().Str("backend", "ldap").
 		Str("dn", mrdn.DN).
 		Str("newrdn", mrdn.NewRDN).
