@@ -36,8 +36,8 @@ type GRPCConfig struct {
 type Store struct {
 	Type         string        `yaml:"type" env:"OCIS_PERSISTENT_STORE_TYPE;EVENTHISTORY_STORE_TYPE" desc:"The type of the eventhistory store. Supported values are: 'mem', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
 	Addresses    []string      `yaml:"addresses" env:"OCIS_PERSISTENT_STORE_ADDRESSES;EVENTHISTORY_STORE_ADDRESSES" desc:"A comma separated list of addresses to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how addresses are used is dependent on the library of the configured store."`
-	Database     string        `yaml:"database" env:"EVENTHISTORY_STORE_DATABASE" desc:"The database name the configured store should use. This has no effect when 'in-memory' stores are configured."`
-	Table        string        `yaml:"table" env:"EVENTHISTORY_STORE_TABLE" desc:"The database table the store should use. This has no effect when 'in-memory' stores are configured."`
+	Database     string        `yaml:"database" env:"EVENTHISTORY_STORE_DATABASE" desc:"The database name the configured store should use."`
+	Table        string        `yaml:"table" env:"EVENTHISTORY_STORE_TABLE" desc:"The database table the store should use."`
 	RecordExpiry time.Duration `yaml:"record_expiry" env:"EVENTHISTORY_RECORD_EXPIRY" desc:"Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks)."`
 	Size         int           `yaml:"size" env:"EVENTHISTORY_STORE_SIZE" desc:"The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512."`
 }
