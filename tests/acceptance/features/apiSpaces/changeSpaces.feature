@@ -152,12 +152,17 @@ Feature: Change data of space
         "quota": {
           "type": "object",
           "required": [
-            "used"
+            "used",
+            "total"
           ],
           "properties": {
             "used" : {
               "type": "number",
               "enum": [12]
+            },
+            "total" : {
+              "type": "number",
+              "enum": [0]
             }
           }
         }

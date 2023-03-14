@@ -24,7 +24,8 @@ Feature: List and create spaces
         "name",
         "id",
         "quota",
-        "root"
+        "root",
+        "webUrl"
       ],
       "properties": {
         "name": {
@@ -66,6 +67,10 @@ Feature: List and create spaces
                 "enum": ["%base_url%/dav/spaces/%space_id%"]
               }
            }
+        },
+        "webUrl": {
+          "type": "string",
+          "enum": ["%base_url%/f/%space_id%"]
         }
       }
     }
@@ -156,6 +161,10 @@ Feature: List and create spaces
                 "enum": ["%base_url%/dav/spaces/%space_id%"]
               }
            }
+        },
+        "webUrl": {
+          "type": "string",
+          "enum": ["%base_url%/f/%space_id%"]
         }
       }
     }
@@ -362,7 +371,8 @@ Feature: List and create spaces
         "driveType",
         "name",
         "root",
-        "owner"
+        "owner",
+        "webUrl"
       ],
       "properties": {
         "name": {
@@ -400,6 +410,10 @@ Feature: List and create spaces
               "enum": ["%user_id%"]
             }
           }
+        },
+        "webUrl": {
+          "type": "string",
+          "enum": ["%base_url%/f/%space_id%"]
         }
       }
     }
@@ -413,7 +427,8 @@ Feature: List and create spaces
       "required": [
         "driveType",
         "name",
-        "root"
+        "root",
+        "webUrl"
       ],
       "properties": {
         "name": {
@@ -435,6 +450,10 @@ Feature: List and create spaces
                 "enum": ["%base_url%/dav/spaces/%space_id%"]
               }
            }
+        },
+        "webUrl": {
+          "type": "string",
+          "enum": ["%base_url%/f/%space_id%"]
         }
       }
     }
