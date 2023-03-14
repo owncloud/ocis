@@ -427,4 +427,37 @@ Feature: Share spaces
       | role    |
       | manager |
       | editor  |
-      | viewer  |    
+      | viewer  |
+
+
+    Scenario Outline: check the end of expiration of a space in user share
+      Given user "Alice" has shared a space "share space" with settings:
+        | shareWith  | Brian                    |
+        | role       | <role>                   |
+        | expireDate | 2042-03-25T23:59:59+0100 |
+      When user "Alice" expires the user share of space "share space" for user "Brian"
+      Then the HTTP status code should be "200"
+      And the user "Brian" should not have a space called "share space"
+      Examples:
+        | role    |
+        | manager |
+        | editor  |
+        | viewer  |
+
+
+  Scenario Outline: check the end of expiration of a space in group share
+    Given group "sales" has been created
+    And the administrator has added a user "Brian" to the group "sales" using GraphApi
+    And user "Alice" has shared a space "share space" with settings:
+      | shareWith  | sales                    |
+      | shareType  | 8                        |
+      | role       | <role>                   |
+      | expireDate | 2042-03-25T23:59:59+0100 |
+    When user "Alice" expires the group share of space "share space" for group "sales"
+    Then the HTTP status code should be "200"
+    And the user "Brian" should not have a space called "share space"
+    Examples:
+      | role    |
+      | manager |
+      | editor  |
+      | viewer  |
