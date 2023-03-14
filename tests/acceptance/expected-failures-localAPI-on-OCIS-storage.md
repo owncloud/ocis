@@ -108,7 +108,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/editUser.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L41)
 
 #### [Using # in the onPremisesSamAccountName breaks getting users](https://github.com/owncloud/ocis/issues/5755)
-- [apiGraph/editUser.feature:42](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L42)
 - [apiGraph/editUser.feature:44](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L44)
 
 Note: always have an empty line at the end of this file.
