@@ -37,7 +37,7 @@ The [ocis proxy](../proxy) already includes such a middleware which uses the [GR
 
 ## Example Policies
 
-The policies service contains a set of pre-configured example policies. Those policies can be found in the [examples directory](./examples). The contained policies disallows ocis to create certain filetypes, both for the proxy middleware and the events service.
+The policies service contains a set of pre-configured example policies. Those policies can be found in the [examples directory](../../deployments/examples/service_policies/policies). The contained policies disallows ocis to create certain filetypes, both for the proxy middleware and the events service.
 
 To use the example policies, it's required to configure ocis to use these files which can be done by adding:
 

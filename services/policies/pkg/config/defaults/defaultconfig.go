@@ -23,7 +23,7 @@ func DefaultConfig() *config.Config {
 			Name: "policies",
 		},
 		GRPC: config.GRPC{
-			Addr:      "127.0.0.1:9180",
+			Addr:      "127.0.0.1:9125",
 			Namespace: "com.owncloud.api",
 		},
 		Reva: shared.DefaultRevaConfig(),
