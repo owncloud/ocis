@@ -45,7 +45,7 @@
 | FRONTEND_ARCHIVER_MAX_SIZE | int64 | 1073741824 | Max size in bytes of the zip archive the archiver can create.|
 | OCIS_INSECURE<br/>FRONTEND_ARCHIVER_INSECURE | bool | false | Allow insecure connections to the archiver.|
 | FRONTEND_DATA_GATEWAY_PREFIX | string | data | Path prefix for the data gateway.|
-| FRONTEND_OCS_PREFIX | string | ocs | URL prefix for the OCS service. Note that the string must not start with '/'.|
+| FRONTEND_OCS_PREFIX | string | ocs | URL path prefix for the OCS service. Note that the string must not start with '/'.|
 | FRONTEND_OCS_SHARE_PREFIX | string | /Shares | Path prefix for shares as part of an ocis resource. Note that the path must start with '/'.|
 | FRONTEND_OCS_HOME_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Homespace namespace identifier.|
 | FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE | string | {{.Mail}} | Additional information attribute for the user like {{.Mail}}.|
