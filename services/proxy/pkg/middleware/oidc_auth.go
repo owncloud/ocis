@@ -7,14 +7,17 @@ import (
 	"sync"
 	"time"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	ocstore "github.com/owncloud/ocis/v2/ocis-pkg/store"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+
 	"github.com/MicahParks/keyfunc"
 	gOidc "github.com/coreos/go-oidc/v3/oidc"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
-	osync "github.com/owncloud/ocis/v2/ocis-pkg/sync"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/pkg/errors"
+	"github.com/shamaton/msgpack/v2"
+	store "go-micro.dev/v4/store"
 	"golang.org/x/oauth2"
 )
 
@@ -31,11 +34,15 @@ type OIDCProvider interface {
 // NewOIDCAuthenticator returns a ready to use authenticator which can handle OIDC authentication.
 func NewOIDCAuthenticator(opts ...Option) *OIDCAuthenticator {
 	options := newOptions(opts...)
-	tokenCache := osync.NewCache(options.CacheSize)
+
+	// if no cache is configured use noop cache
+	if options.Cache == nil {
+		options.Cache = ocstore.Create(ocstore.Type("noop"))
+	}
 	return &OIDCAuthenticator{
 		Logger:                  options.Logger,
-		tokenCache:              &tokenCache,
-		TokenCacheTTL:           options.CacheTTL,
+		tokenCache:              options.Cache,
+		DefaultTokenCacheTTL:    options.DefaultAccessTokenTTL,
 		HTTPClient:              options.HTTPClient,
 		OIDCIss:                 options.OIDCIss,
 		ProviderFunc:            options.OIDCProviderFunc,
@@ -51,8 +58,8 @@ type OIDCAuthenticator struct {
 	Logger                  log.Logger
 	HTTPClient              *http.Client
 	OIDCIss                 string
-	tokenCache              *osync.Cache
-	TokenCacheTTL           time.Duration
+	tokenCache              store.Store
+	DefaultTokenCacheTTL    time.Duration
 	ProviderFunc            func() (OIDCProvider, error)
 	AccessTokenVerifyMethod string
 	JWKSOptions             config.JWKS
@@ -66,8 +73,8 @@ type OIDCAuthenticator struct {
 
 func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[string]interface{}, error) {
 	var claims map[string]interface{}
-	hit := m.tokenCache.Load(token)
-	if hit == nil {
+	record, _ := m.tokenCache.Read(token) // TODO log error in debug?
+	if len(record) < 1 {
 		aClaims, err := m.verifyAccessToken(token)
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to verify access token")
@@ -89,15 +96,26 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 		}
 
 		expiration := m.extractExpiration(aClaims)
-		m.tokenCache.Store(token, claims, expiration)
+		d, err := msgpack.Marshal(claims)
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to marshal claims for cache")
+		}
+
+		err = m.tokenCache.Write(&store.Record{
+			Key:    token,
+			Value:  d,
+			Expiry: time.Until(expiration),
+		})
+		if err != nil {
+			return nil, errors.Wrap(err, "failed to write to cache") // TODO log if cache does not work, but continue
+		}
 
 		m.Logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Time("expiration", expiration.UTC()).Msg("unmarshalled and cached userinfo")
 		return claims, nil
 	}
 
-	var ok bool
-	if claims, ok = hit.V.(map[string]interface{}); !ok {
-		return nil, errors.New("failed to cast claims from the cache")
+	if err := msgpack.Unmarshal(record[0].Value, &claims); err != nil {
+		return nil, errors.New("failed to unmarshal claims from the cache") // TODO log if cache does not work, but continue
 	}
 	m.Logger.Debug().Interface("claims", claims).Msg("cache hit for userinfo")
 	return claims, nil
@@ -145,7 +163,7 @@ func (m OIDCAuthenticator) verifyAccessTokenJWT(token string) (jwt.RegisteredCla
 // If the access token does not have an exp claim it will fallback to the configured
 // default expiration
 func (m OIDCAuthenticator) extractExpiration(aClaims jwt.RegisteredClaims) time.Time {
-	defaultExpiration := time.Now().Add(m.TokenCacheTTL)
+	defaultExpiration := time.Now().Add(m.DefaultTokenCacheTTL)
 	if aClaims.ExpiresAt != nil {
 		m.Logger.Debug().Str("exp", aClaims.ExpiresAt.String()).Msg("Expiration Time from access_token")
 		return aClaims.ExpiresAt.Time

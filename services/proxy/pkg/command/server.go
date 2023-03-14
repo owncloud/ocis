@@ -17,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	ocstore "github.com/owncloud/ocis/v2/ocis-pkg/store"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
@@ -209,10 +210,19 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			UserProvider: userProvider,
 		})
 	}
+
+	cache := ocstore.Create(
+		ocstore.Database("proxy"),
+		ocstore.Table("access-tokens"),
+		ocstore.Type(ocstore.TypeOCMem),
+		ocstore.Size(cfg.OIDC.UserinfoCache.Size),
+		ocstore.TTL(time.Duration(cfg.OIDC.UserinfoCache.TTL)*time.Second),
+	)
+
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
 		middleware.Logger(logger),
-		middleware.CacheSize(cfg.OIDC.UserinfoCache.Size),
-		middleware.CacheTTL(time.Duration(cfg.OIDC.UserinfoCache.TTL)*time.Second), // TODO replace with store
+		middleware.Cache(cache),
+		middleware.DefaultAccessTokenTTL(time.Duration(cfg.OIDC.UserinfoCache.TTL)*time.Second),
 		middleware.HTTPClient(oidcHTTPClient),
 		middleware.OIDCIss(cfg.OIDC.Issuer),
 		middleware.JWKSOptions(cfg.OIDC.JWKS),

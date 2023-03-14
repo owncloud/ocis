@@ -14,6 +14,15 @@ import (
 
 var ocMemStore *store.Store
 
+const (
+	TypeMem    = "mem"
+	TypeNoop   = "noop"
+	TypeEtcd   = "etcd"
+	TypeRedis  = "redis"
+	TypeOCMem  = "ocmem"
+	TypeNatsJS = "nats-js"
+)
+
 // Options are the options to configure the store
 type Options struct {
 	// Type determines the implementation:
@@ -63,16 +72,16 @@ func Create(opts ...Option) store.Store {
 	default:
 		// TODO: better to error in default case?
 		fallthrough
-	case "mem":
+	case TypeMem:
 		return store.NewMemoryStore(storeopts...)
-	case "noop":
+	case TypeNoop:
 		return store.NewNoopStore(storeopts...)
-	case "etcd":
+	case TypeEtcd:
 		return etcd.NewEtcdStore(storeopts...)
-	case "redis":
+	case TypeRedis:
 		// FIXME redis plugin does not support redis cluster, sentinel or ring -> needs upstream patch or our implementation
 		return redis.NewStore(storeopts...)
-	case "ocmem":
+	case TypeOCMem:
 		if ocMemStore == nil {
 			var memStore store.Store
 
@@ -93,7 +102,7 @@ func Create(opts ...Option) store.Store {
 			ocMemStore = &memStore
 		}
 		return *ocMemStore
-	case "nats-js":
+	case TypeNatsJS:
 		// TODO nats needs a DefaultTTL option as it does not support per Write TTL ...
 		// FIXME nats has restrictions on the key, we cannot use slashes AFAICT
 		// host, port, clusterid

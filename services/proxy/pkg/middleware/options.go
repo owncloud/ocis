@@ -51,10 +51,8 @@ type Options struct {
 	AutoprovisionAccounts bool
 	// EnableBasicAuth to allow basic auth
 	EnableBasicAuth bool
-	// CacheSize defines the max number of entries in a cache
-	CacheSize int
-	// CacheTTL sets the max cache duration for a cache
-	CacheTTL time.Duration
+	// DefaultAccessTokenTTL is used to calculate the expiration when an access token has no expiration set
+	DefaultAccessTokenTTL time.Duration
 	// Cache sets the access token cache store
 	Cache store.Store
 	// CredentialsByUserAgent sets the auth challenges on a per user-agent basis
@@ -185,17 +183,10 @@ func EnableBasicAuth(enableBasicAuth bool) Option {
 	}
 }
 
-// CacheSize provides a function to set the CacheSize
-func CacheSize(size int) Option {
+// DefaultAccessTokenTTL provides a function to set the DefaultAccessTokenTTL
+func DefaultAccessTokenTTL(ttl time.Duration) Option {
 	return func(o *Options) {
-		o.CacheSize = size
-	}
-}
-
-// CacheTTL provides a function to set the TokenCacheTTL
-func CacheTTL(ttl time.Duration) Option {
-	return func(o *Options) {
-		o.CacheTTL = ttl
+		o.DefaultAccessTokenTTL = ttl
 	}
 }
 
