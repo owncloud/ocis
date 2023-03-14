@@ -36,7 +36,7 @@ func NewOIDCAuthenticator(opts ...Option) *OIDCAuthenticator {
 
 	return &OIDCAuthenticator{
 		Logger:                  options.Logger,
-		tokenCache:              options.Cache,
+		userInfoCache:           options.Cache,
 		DefaultTokenCacheTTL:    options.DefaultAccessTokenTTL,
 		HTTPClient:              options.HTTPClient,
 		OIDCIss:                 options.OIDCIss,
@@ -53,7 +53,7 @@ type OIDCAuthenticator struct {
 	Logger                  log.Logger
 	HTTPClient              *http.Client
 	OIDCIss                 string
-	tokenCache              store.Store
+	userInfoCache           store.Store
 	DefaultTokenCacheTTL    time.Duration
 	ProviderFunc            func() (OIDCProvider, error)
 	AccessTokenVerifyMethod string
@@ -68,8 +68,8 @@ type OIDCAuthenticator struct {
 
 func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[string]interface{}, error) {
 	var claims map[string]interface{}
-	record, err := m.tokenCache.Read(token)
-	if err != nil {
+	record, err := m.userInfoCache.Read(token)
+	if err != nil && err != store.ErrNotFound {
 		m.Logger.Error().Err(err).Msg("could not read from userinfo cache")
 	}
 	if len(record) > 1 {
@@ -104,7 +104,7 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 	if d, err := msgpack.Marshal(claims); err != nil {
 		m.Logger.Error().Err(err).Msg("failed to marshal claims for userinfo cache")
 	} else {
-		err = m.tokenCache.Write(&store.Record{
+		err = m.userInfoCache.Write(&store.Record{
 			Key:    token,
 			Value:  d,
 			Expiry: time.Until(expiration),
