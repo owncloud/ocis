@@ -5,10 +5,10 @@ import (
 	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	ocisstore "github.com/owncloud/ocis/v2/ocis-pkg/store"
+	store "github.com/owncloud/ocis/v2/ocis-pkg/store"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	"go-micro.dev/v4/store"
+	microstore "go-micro.dev/v4/store"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
@@ -21,7 +21,7 @@ const (
 // Manager manages a cache of roles by fetching unknown roles from the settings.RoleService.
 type Manager struct {
 	logger      log.Logger
-	cache       store.Store
+	cache       microstore.Store
 	roleService settingssvc.RoleService
 }
 
@@ -29,7 +29,7 @@ type Manager struct {
 func NewManager(o ...Option) Manager {
 	opts := newOptions(o...)
 
-	nStore := ocisstore.Create(opts.storeOptions...)
+	nStore := store.Create(opts.storeOptions...)
 	return Manager{
 		cache:       nStore,
 		roleService: opts.roleService,
@@ -42,7 +42,7 @@ func (m *Manager) List(ctx context.Context, roleIDs []string) []*settingsmsg.Bun
 	result := make([]*settingsmsg.Bundle, 0)
 	lookup := make([]string, 0)
 	for _, roleID := range roleIDs {
-		if records, err := m.cache.Read(roleID, store.ReadFrom(cacheDatabase, cacheTableName)); err != nil {
+		if records, err := m.cache.Read(roleID, microstore.ReadFrom(cacheDatabase, cacheTableName)); err != nil {
 			lookup = append(lookup, roleID)
 		} else {
 			role := &settingsmsg.Bundle{}
@@ -77,15 +77,15 @@ func (m *Manager) List(ctx context.Context, roleIDs []string) []*settingsmsg.Bun
 		}
 		for _, role := range res.Bundles {
 			jsonbytes, _ := protojson.Marshal(role)
-			record := &store.Record{
+			record := &microstore.Record{
 				Key:    role.Id,
 				Value:  jsonbytes,
 				Expiry: cacheTTL,
 			}
 			err := m.cache.Write(
 				record,
-				store.WriteTo(cacheDatabase, cacheTableName),
-				store.WriteTTL(cacheTTL),
+				microstore.WriteTo(cacheDatabase, cacheTableName),
+				microstore.WriteTTL(cacheTTL),
 			)
 			if err != nil {
 				m.logger.Debug().Err(err).Msg("failed to cache roles")

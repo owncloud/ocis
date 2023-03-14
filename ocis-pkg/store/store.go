@@ -33,7 +33,9 @@ const (
 // Recommended approach is to use "services" or "ocis-pkg" for the database,
 // and "services/<service-name>/" or "ocis-pkg/<pkg>/" for the package name.
 func Create(opts ...store.Option) store.Store {
-	options := &store.Options{}
+	options := &store.Options{
+		Context: context.Background(),
+	}
 	for _, o := range opts {
 		o(options)
 	}

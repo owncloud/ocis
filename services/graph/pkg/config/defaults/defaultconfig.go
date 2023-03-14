@@ -85,6 +85,12 @@ func DefaultConfig() *config.Config {
 				EducationResourcesEnabled: false,
 			},
 		},
+		CacheStore: &config.CacheStore{
+			Type:     "ocmem",
+			Database: "graph",
+			Table:    "roles",
+			TTL:      time.Hour * 336,
+		},
 		Events: config.Events{
 			Endpoint:  "127.0.0.1:9233",
 			Cluster:   "ocis-cluster",
@@ -120,9 +126,9 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.CacheStore == nil && cfg.Commons != nil && cfg.Commons.CacheStore != nil {
 		cfg.CacheStore = &config.CacheStore{
-			Type:    cfg.Commons.CacheStore.Type,
-			Address: cfg.Commons.CacheStore.Address,
-			Size:    cfg.Commons.CacheStore.Size,
+			Type:      cfg.Commons.CacheStore.Type,
+			Addresses: cfg.Commons.CacheStore.Addresses,
+			Size:      cfg.Commons.CacheStore.Size,
 		}
 	} else if cfg.CacheStore == nil {
 		cfg.CacheStore = &config.CacheStore{}

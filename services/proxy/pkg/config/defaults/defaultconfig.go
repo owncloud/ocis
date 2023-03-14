@@ -3,6 +3,7 @@ package defaults
 import (
 	"path"
 	"strings"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -41,8 +42,11 @@ func DefaultConfig() *config.Config {
 
 			AccessTokenVerifyMethod: config.AccessTokenVerificationJWT,
 			UserinfoCache: config.UserinfoCache{
-				Size: 1024,
-				TTL:  10,
+				Type:     "ocmem",
+				Database: "proxy",
+				Table:    "userinfo",
+				Size:     1024,
+				TTL:      time.Second * 10,
 			},
 			JWKS: config.JWKS{
 				RefreshInterval:   60, // minutes

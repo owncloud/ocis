@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/oklog/run"
@@ -60,8 +59,9 @@ func Server(cfg *config.Config) *cli.Command {
 				store.WithCacheOptions(store.CacheOptions{
 					Type: cfg.Store.Type,
 					TTL:  cfg.Store.RecordExpiry,
+					Size: cfg.Store.Size,
 				}),
-				microstore.Nodes(strings.Split(cfg.Store.Addresses, ",")...),
+				microstore.Nodes(cfg.Store.Addresses...),
 				microstore.Database(cfg.Store.Database),
 				microstore.Table(cfg.Store.Table),
 			)

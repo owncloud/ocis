@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -163,9 +162,12 @@ func NewService(opts ...Option) (Graph, error) {
 		storeOptions := []microstore.Option{
 			store.WithCacheOptions(store.CacheOptions{
 				Type: options.Config.CacheStore.Type,
+				TTL:  options.Config.CacheStore.TTL,
 				Size: options.Config.CacheStore.Size,
 			}),
-			microstore.Nodes(strings.Split(options.Config.CacheStore.Address, ",")...),
+			microstore.Nodes(options.Config.CacheStore.Addresses...),
+			microstore.Database(options.Config.CacheStore.Database),
+			microstore.Table(options.Config.CacheStore.Table),
 		}
 		m := roles.NewManager(
 			roles.StoreOptions(storeOptions),

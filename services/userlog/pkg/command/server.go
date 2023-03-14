@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
@@ -77,8 +76,10 @@ func Server(cfg *config.Config) *cli.Command {
 			st := store.Create(
 				store.WithCacheOptions(store.CacheOptions{
 					Type: cfg.Store.Type,
+					TTL:  cfg.Store.TTL,
+					Size: cfg.Store.Size,
 				}),
-				microstore.Nodes(strings.Split(cfg.Store.Addresses, ",")...),
+				microstore.Nodes(cfg.Store.Addresses...),
 				microstore.Database(cfg.Store.Database),
 				microstore.Table(cfg.Store.Table),
 			)

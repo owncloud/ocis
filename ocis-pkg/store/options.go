@@ -24,7 +24,7 @@ type CacheOptions struct {
 	// If an invalid value is used, the default of 512 will be used instead.
 	Size int
 
-	// TTL is the time to life for documents stored in the store
+	// TTL is the time to live for documents stored in the store
 	TTL time.Duration
 }
 

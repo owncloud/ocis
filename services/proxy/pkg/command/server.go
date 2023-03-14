@@ -214,13 +214,13 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 
 	cache := store.Create(
 		store.WithCacheOptions(store.CacheOptions{
-			Type: store.TypeOCMem,
-			TTL:  time.Duration(cfg.OIDC.UserinfoCache.TTL) * time.Second,
+			Type: cfg.OIDC.UserinfoCache.Type,
+			TTL:  cfg.OIDC.UserinfoCache.TTL,
 			Size: cfg.OIDC.UserinfoCache.Size,
 		}),
-		microstore.Database("proxy"),
-		microstore.Table("access-tokens"),
-		// TODO Nodes
+		microstore.Nodes(cfg.OIDC.UserinfoCache.Addresses...),
+		microstore.Database(cfg.OIDC.UserinfoCache.Database),
+		microstore.Table(cfg.OIDC.UserinfoCache.Table),
 	)
 
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(

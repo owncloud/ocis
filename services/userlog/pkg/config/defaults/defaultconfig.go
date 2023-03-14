@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"strings"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
@@ -28,7 +29,10 @@ func DefaultConfig() *config.Config {
 			EnableTLS: false,
 		},
 		Store: config.Store{
-			Type: "mem",
+			Type:     "mem",
+			Database: "userlog",
+			Table:    "events",
+			TTL:      time.Hour * 336,
 		},
 		RevaGateway: shared.DefaultRevaConfig().Address,
 		HTTP: config.HTTP{
