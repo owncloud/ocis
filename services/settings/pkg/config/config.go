@@ -32,7 +32,7 @@ type Config struct {
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 
-	SetupDefaultAssignments bool `yaml:"set_default_assignments" env:"SETTINGS_SETUP_DEFAULT_ASSIGNMENTS;ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"The default role assignments the demo users should be setup."`
+	SetupDefaultAssignments bool `yaml:"set_default_assignments" env:"SETTINGS_SETUP_DEFAULT_ASSIGNMENTS;IDM_CREATE_DEMO_USERS" desc:"The default role assignments the demo users should be setup."`
 
 	Context context.Context `yaml:"-"`
 }

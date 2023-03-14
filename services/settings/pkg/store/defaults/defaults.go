@@ -653,30 +653,40 @@ var languageSetting = settingsmsg.Setting_SingleChoiceValue{
 
 // DefaultRoleAssignments returns (as one might guess) the default role assignments
 func DefaultRoleAssignments(cfg *config.Config) []*settingsmsg.UserRoleAssignment {
-	return []*settingsmsg.UserRoleAssignment{
-		// default admin users
-		{
+	assignments := []*settingsmsg.UserRoleAssignment{}
+
+	if cfg.SetupDefaultAssignments {
+		assignments = []*settingsmsg.UserRoleAssignment{
+			// default users with role "user"
+			{
+				AccountUuid: "4c510ada-c86b-4815-8820-42cdf82c3d51",
+				RoleId:      BundleUUIDRoleUser,
+			}, {
+				AccountUuid: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c",
+				RoleId:      BundleUUIDRoleUser,
+			}, {
+				AccountUuid: "932b4540-8d16-481e-8ef4-588e4b6b151c",
+				RoleId:      BundleUUIDRoleUser,
+			},
+			{
+				// additional admin user
+				AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b", // demo user "moss"
+				RoleId:      BundleUUIDRoleAdmin,
+			}, {
+				// default users with role "spaceadmin"
+				AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
+				RoleId:      BundleUUIDRoleSpaceAdmin,
+			},
+		}
+	}
+
+	if cfg.AdminUserID != "" {
+		// default admin user
+		assignments = append(assignments, &settingsmsg.UserRoleAssignment{
 			AccountUuid: cfg.AdminUserID,
 			RoleId:      BundleUUIDRoleAdmin,
-		},
-		// default users with role "user"
-		{
-			AccountUuid: "4c510ada-c86b-4815-8820-42cdf82c3d51",
-			RoleId:      BundleUUIDRoleUser,
-		}, {
-			AccountUuid: "f7fbf8c8-139b-4376-b307-cf0a8c2d0d9c",
-			RoleId:      BundleUUIDRoleUser,
-		}, {
-			AccountUuid: "932b4540-8d16-481e-8ef4-588e4b6b151c",
-			RoleId:      BundleUUIDRoleUser,
-		},
-		// default users with role "spaceadmin"
-		{
-			AccountUuid: "058bff95-6708-4fe5-91e4-9ea3d377588b", // demo user "moss"
-			RoleId:      BundleUUIDRoleAdmin,
-		}, {
-			AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
-			RoleId:      BundleUUIDRoleSpaceAdmin,
-		},
+		})
 	}
+
+	return assignments
 }
