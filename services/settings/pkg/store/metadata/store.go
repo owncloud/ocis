@@ -131,11 +131,21 @@ func (s *Store) initMetadataClient(mdc MetadataClient) error {
 			return err
 		}
 
+		assIDs, err := mdc.ReadDir(ctx, accountPath(accountUUID))
+		if err != nil {
+			return err
+		}
+		if len(assIDs) > 0 {
+			// There is already a role assignment for this ID, skip to the next
+			continue
+		}
+
 		ass := &settingsmsg.UserRoleAssignment{
 			Id:          uuid.Must(uuid.NewV4()).String(),
 			AccountUuid: accountUUID,
 			RoleId:      roleID,
 		}
+
 		b, err := json.Marshal(ass)
 		if err != nil {
 			return err
