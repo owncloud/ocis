@@ -11,7 +11,6 @@ import (
 	"github.com/gofrs/uuid"
 	ldapdn "github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	oldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	"golang.org/x/exp/slices"
 )
@@ -313,7 +312,11 @@ func (i *LDAP) groupToAddRequest(group libregraph.Group) (*ldap.AddRequest, erro
 }
 
 func (i *LDAP) getGroupLDAPDN(group libregraph.Group) string {
-	return fmt.Sprintf("cn=%s,%s", oldap.EscapeDNAttributeValue(group.GetDisplayName()), i.groupBaseDN)
+	attributeTypeAndValue := ldap.AttributeTypeAndValue{
+		Type:  "cn",
+		Value: group.GetDisplayName(),
+	}
+	return fmt.Sprintf("%s,%s", attributeTypeAndValue.String(), i.groupBaseDN)
 }
 
 func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]string, error) {

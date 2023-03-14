@@ -12,7 +12,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	oldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
@@ -596,14 +595,18 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 func (i *LDAP) changeUserName(ctx context.Context, dn, originalUserName, newUserName string) (*ldap.Entry, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 
-	newDN := fmt.Sprintf("%s=%s", i.userAttributeMap.userName, newUserName)
+	attributeTypeAndValue := ldap.AttributeTypeAndValue{
+		Type:  i.userAttributeMap.userName,
+		Value: newUserName,
+	}
+	newDNString := attributeTypeAndValue.String()
 
-	logger.Debug().Str("originalDN", dn).Str("newDN", newDN).Msg("Modifying DN")
-	mrdn := ldap.NewModifyDNRequest(dn, newDN, true, "")
+	logger.Debug().Str("originalDN", dn).Str("newDN", newDNString).Msg("Modifying DN")
+	mrdn := ldap.NewModifyDNRequest(dn, newDNString, true, "")
 
 	if err := i.conn.ModifyDN(mrdn); err != nil {
 		var lerr *ldap.Error
-		logger.Debug().Str("originalDN", dn).Str("newDN", newDN).Err(err).Msg("Failed to modify DN")
+		logger.Debug().Str("originalDN", dn).Str("newDN", newDNString).Err(err).Msg("Failed to modify DN")
 		if errors.As(err, &lerr) {
 			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
 				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
@@ -617,7 +620,7 @@ func (i *LDAP) changeUserName(ctx context.Context, dn, originalUserName, newUser
 		return nil, err
 	}
 
-	newFullDN, err := replaceDN(parsed, newDN)
+	newFullDN, err := replaceDN(parsed, newDNString)
 	if err != nil {
 		return nil, err
 	}
@@ -779,7 +782,11 @@ func (i *LDAP) getUserAttrTypes() []string {
 }
 
 func (i *LDAP) getUserLDAPDN(user libregraph.User) string {
-	return fmt.Sprintf("uid=%s,%s", oldap.EscapeDNAttributeValue(*user.OnPremisesSamAccountName), i.userBaseDN)
+	attributeTypeAndValue := ldap.AttributeTypeAndValue{
+		Type:  "uid",
+		Value: *user.OnPremisesSamAccountName,
+	}
+	return fmt.Sprintf("%s,%s", attributeTypeAndValue.String(), i.userBaseDN)
 }
 
 func (i *LDAP) userToAddRequest(user libregraph.User) (*ldap.AddRequest, error) {

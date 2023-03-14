@@ -8,7 +8,6 @@ import (
 	"github.com/go-ldap/ldap/v3"
 	"github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	oldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
 
@@ -334,7 +333,11 @@ func (i *LDAP) groupToEducationClass(group libregraph.Group, e *ldap.Entry) *lib
 }
 
 func (i *LDAP) getEducationClassLDAPDN(class libregraph.EducationClass) string {
-	return fmt.Sprintf("ocEducationExternalId=%s,%s", oldap.EscapeDNAttributeValue(class.GetExternalId()), i.groupBaseDN)
+	attributeTypeAndValue := ldap.AttributeTypeAndValue{
+		Type:  "ocEducationExternalId",
+		Value: class.GetExternalId(),
+	}
+	return fmt.Sprintf("%s,%s", attributeTypeAndValue.String(), i.groupBaseDN)
 }
 
 func (i *LDAP) getEducationClassByID(nameOrID string, requestMembers bool) (*ldap.Entry, error) {

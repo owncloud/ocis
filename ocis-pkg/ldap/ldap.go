@@ -4,7 +4,6 @@ import (
 	"crypto/x509"
 	"errors"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -13,20 +12,6 @@ import (
 const (
 	caCheckRetries = 3
 	caCheckSleep   = 2
-)
-
-var (
-	dnEscaper = strings.NewReplacer(
-		"\\", "\\\\",
-		",", "\\,",
-		"+", "\\+",
-		`"`, `\\"`,
-		"<", "\\<",
-		">", "\\>",
-		";", "\\;",
-		"=", "\\=",
-		"\000", "\\00",
-	)
 )
 
 func WaitForCA(log log.Logger, insecure bool, caCert string) error {
@@ -51,21 +36,4 @@ func WaitForCA(log log.Logger, insecure bool, caCert string) error {
 		}
 	}
 	return nil
-}
-
-// EscapeDNAttributeValue escapes special characters in an attribute value as [described in RFC4514](https://datatracker.ietf.org/doc/html/rfc4514).
-func EscapeDNAttributeValue(v string) string {
-	if v == "" {
-		return v
-	}
-
-	v = dnEscaper.Replace(v)
-
-	if strings.HasSuffix(v, " ") {
-		v = v[:len(v)-1] + "\\ "
-	}
-	if strings.HasPrefix(v, "#") || strings.HasPrefix(v, " ") {
-		v = "\\" + v
-	}
-	return v
 }
