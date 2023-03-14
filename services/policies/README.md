@@ -21,6 +21,7 @@ Note that each query setting defines the [Complete Rules](https://www.openpolicy
 To activate a the policies service for a module, it must be started with a yaml configuration that points to one or more rego files. Note that if the service is scaled horizontally, each instance should have access to the same rego files to avoid unpredictable results. If a file path has been configured but the file it is not present or accessible, the evaluation defaults to deny.
 
 When using async post-processing which is done via the postprocessing service, the value `policies` must be added to the `POSTPROCESSING_STEPS` configuration in postprocessing service in the order where the evaluation should take place.
+
 ## Modules
 
 ### GRPC Service
