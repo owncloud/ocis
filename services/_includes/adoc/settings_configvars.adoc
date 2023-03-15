@@ -331,7 +331,7 @@ a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
 
 a|`SETTINGS_SETUP_DEFAULT_ASSIGNMENTS` +
-`ACCOUNTS_DEMO_USERS_AND_GROUPS` +
+`IDM_CREATE_DEMO_USERS` +
 
 a| [subs=-attributes]
 ++bool ++

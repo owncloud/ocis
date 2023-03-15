@@ -142,3 +142,5 @@ insecure_backends: false
 backend_https_cacert: ""
 auth_middleware:
   credentials_by_user_agent: {}
+policies_middleware:
+  query: ""

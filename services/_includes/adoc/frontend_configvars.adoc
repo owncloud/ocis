@@ -438,7 +438,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ocs ++
 a| [subs=-attributes]
-URL prefix for the OCS service. Note that the string must not start with '/'.
+URL path prefix for the OCS service. Note that the string must not start with '/'.
 
 a|`FRONTEND_OCS_SHARE_PREFIX` +
 

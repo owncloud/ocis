@@ -34,4 +34,4 @@
 | SETTINGS_BUNDLES_PATH | string |  | The path to a JSON file with a list of bundles. If not definied, the default bundles will be loaded.|
 | OCIS_ADMIN_USER_ID<br/>SETTINGS_ADMIN_USER_ID | string |  | ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.|
 | OCIS_JWT_SECRET<br/>SETTINGS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| SETTINGS_SETUP_DEFAULT_ASSIGNMENTS<br/>ACCOUNTS_DEMO_USERS_AND_GROUPS | bool | false | The default role assignments the demo users should be setup.|
+| SETTINGS_SETUP_DEFAULT_ASSIGNMENTS<br/>IDM_CREATE_DEMO_USERS | bool | false | The default role assignments the demo users should be setup.|
