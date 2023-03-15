@@ -15,6 +15,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend/mocks"
+	userRoleMocks "github.com/owncloud/ocis/v2/services/proxy/pkg/userroles/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/test-go/testify/mock"
 )
@@ -124,9 +125,13 @@ func newMockAccountResolver(userBackendResult *userv1beta1.User, userBackendErr 
 	ub.On("GetUserByClaims", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(userBackendResult, token, userBackendErr)
 	ub.On("GetUserRoles", mock.Anything, mock.Anything).Return(userBackendResult, nil)
 
+	ra := userRoleMocks.UserRoleAssigner{}
+	ra.On("UpdateUserRoleAssignment", mock.Anything, mock.Anything, mock.Anything).Return(userBackendResult, nil)
+
 	return AccountResolver(
 		Logger(log.NewLogger()),
 		UserProvider(&ub),
+		UserRoleAssigner(&ra),
 		TokenManagerConfig(config.TokenManager{JWTSecret: "secret"}),
 		UserOIDCClaim(oidcclaim),
 		UserCS3Claim(cs3claim),

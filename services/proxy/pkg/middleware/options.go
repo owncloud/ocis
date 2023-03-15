@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
@@ -27,8 +28,10 @@ type Options struct {
 	PolicySelector config.PolicySelector
 	// HTTPClient to use for communication with the oidcAuth provider
 	HTTPClient *http.Client
-	// UP
+	// UserProvider backend to use for resolving User
 	UserProvider backend.UserBackend
+	// UserRoleAssigner to user for assign a users default role
+	UserRoleAssigner userroles.UserRoleAssigner
 	// SettingsRoleService for the roles API in settings
 	SettingsRoleService settingssvc.RoleService
 	// OIDCProviderFunc to lazily initialize an oidc provider, must be set for the oidc_auth middleware
@@ -199,6 +202,13 @@ func TokenCacheTTL(ttl time.Duration) Option {
 func UserProvider(up backend.UserBackend) Option {
 	return func(o *Options) {
 		o.UserProvider = up
+	}
+}
+
+// UserRoleAssigner sets the mechanism for assigning the default user roles
+func UserRoleAssigner(ra userroles.UserRoleAssigner) Option {
+	return func(o *Options) {
+		o.UserRoleAssigner = ra
 	}
 }
 

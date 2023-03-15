@@ -17,6 +17,7 @@ import (
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 	"golang.org/x/crypto/pbkdf2"
 )
 
@@ -43,6 +44,7 @@ type SignedURLAuthenticator struct {
 	Logger             log.Logger
 	PreSignedURLConfig config.PreSignedURL
 	UserProvider       backend.UserBackend
+	UserRoleAssigner   userroles.UserRoleAssigner
 	Store              storesvc.StoreService
 }
 
@@ -202,7 +204,7 @@ func (m SignedURLAuthenticator) Authenticate(r *http.Request) (*http.Request, bo
 		return nil, false
 	}
 
-	user, err = m.UserProvider.GetUserRoles(r.Context(), user)
+	user, err = m.UserRoleAssigner.ApplyUserRole(r.Context(), user)
 	if err != nil {
 		m.Logger.Error().
 			Err(err).

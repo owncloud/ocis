@@ -97,29 +97,6 @@ func (_m *UserBackend) GetUserByClaims(ctx context.Context, claim string, value 
 	return r0, r1, r2
 }
 
-// GetUserRoles provides a mock function with given fields: ctx, user
-func (_m *UserBackend) GetUserRoles(ctx context.Context, user *userv1beta1.User) (*userv1beta1.User, error) {
-	ret := _m.Called(ctx, user)
-
-	var r0 *userv1beta1.User
-	if rf, ok := ret.Get(0).(func(context.Context, *userv1beta1.User) *userv1beta1.User); ok {
-		r0 = rf(ctx, user)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*userv1beta1.User)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *userv1beta1.User) error); ok {
-		r1 = rf(ctx, user)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 type mockConstructorTestingTNewUserBackend interface {
 	mock.TestingT
 	Cleanup(func())
