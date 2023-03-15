@@ -2,6 +2,7 @@ package eventSVC
 
 import (
 	"context"
+
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/policies/pkg/engine"
@@ -37,7 +38,7 @@ func (s Service) Run() error {
 	for e := range ch {
 		switch ev := e.Event.(type) {
 		case events.StartPostprocessingStep:
-			if ev.StepToStart != "policies" {
+			if ev.StepToStart != events.PPStepPolicies {
 				continue
 			}
 

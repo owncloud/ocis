@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	antivirus "github.com/owncloud/ocis/v2/services/antivirus/pkg/config"
 	appProvider "github.com/owncloud/ocis/v2/services/app-provider/pkg/config"
 	appRegistry "github.com/owncloud/ocis/v2/services/app-registry/pkg/config"
 	audit "github.com/owncloud/ocis/v2/services/audit/pkg/config"
@@ -72,6 +73,7 @@ type Config struct {
 	AdminUserID       string               `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID" desc:"ID of a user, that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand."`
 	Runtime           Runtime              `yaml:"runtime"`
 
+	Antivirus         *antivirus.Config      `yaml:"antivirus"`
 	AppProvider       *appProvider.Config    `yaml:"app_provider"`
 	AppRegistry       *appRegistry.Config    `yaml:"app_registry"`
 	Audit             *audit.Config          `yaml:"audit"`

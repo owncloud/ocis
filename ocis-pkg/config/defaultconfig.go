@@ -1,6 +1,7 @@
 package config
 
 import (
+	antivirus "github.com/owncloud/ocis/v2/services/antivirus/pkg/config/defaults"
 	appProvider "github.com/owncloud/ocis/v2/services/app-provider/pkg/config/defaults"
 	appRegistry "github.com/owncloud/ocis/v2/services/app-registry/pkg/config/defaults"
 	audit "github.com/owncloud/ocis/v2/services/audit/pkg/config/defaults"
@@ -45,6 +46,7 @@ func DefaultConfig() *Config {
 			Host: "localhost",
 		},
 
+		Antivirus:         antivirus.DefaultConfig(),
 		AppProvider:       appProvider.DefaultConfig(),
 		AppRegistry:       appRegistry.DefaultConfig(),
 		Audit:             audit.DefaultConfig(),
