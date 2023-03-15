@@ -126,10 +126,6 @@ func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("%v is not a valid email address", *u.Mail))
 			return
 		}
-	} else {
-		logger.Debug().Interface("user", u).Msg("could not create education user: missing required Attribute: 'mail'")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'mail'")
-		return
 	}
 
 	if u.HasUserType() {
