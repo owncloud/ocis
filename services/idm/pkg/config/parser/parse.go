@@ -33,7 +33,7 @@ func ParseConfig(cfg *config.Config) error {
 }
 
 func Validate(cfg *config.Config) error {
-	if cfg.AdminUserID == "" {
+	if cfg.CreateDemoUsers && cfg.AdminUserID == "" {
 		return shared.MissingAdminUserID(cfg.Service.Name)
 	}
 
@@ -41,7 +41,7 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingServiceUserPassword(cfg.Service.Name, "IDM")
 	}
 
-	if cfg.ServiceUserPasswords.OcisAdmin == "" {
+	if cfg.AdminUserID != "" && cfg.ServiceUserPasswords.OcisAdmin == "" {
 		return shared.MissingServiceUserPassword(cfg.Service.Name, "admin")
 	}
 

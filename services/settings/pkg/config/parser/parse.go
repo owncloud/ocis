@@ -45,7 +45,7 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingSystemUserApiKeyError(cfg.Service.Name)
 	}
 
-	if cfg.AdminUserID == "" {
+	if cfg.SetupDefaultAssignments && cfg.AdminUserID == "" {
 		return shared.MissingAdminUserID(cfg.Service.Name)
 	}
 
