@@ -31,6 +31,7 @@ http:
 api:
   group_members_patch_limit: 20
   graph_username_match: default
+  graph_assign_default_user_role: true
 reva:
   address: 127.0.0.1:9142
   tls:

@@ -244,6 +244,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Option to allow legacy usernames. Supported options are 'default' and 'none'.
 
+a|`GRAPH_ASSIGN_DEFAULT_USER_ROLE` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Whether to assign newly created users the default role 'User'. Set this to 'false' if you want to assign roles manually, or if the role assignment should happen at first login. Set this to 'true' (the default) to assign the role 'User' when creating a new user.
+
 a|`REVA_GATEWAY` +
 
 a| [subs=-attributes]
