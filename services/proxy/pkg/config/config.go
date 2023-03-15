@@ -25,6 +25,7 @@ type Config struct {
 	Policies              []Policy           `yaml:"policies"`
 	OIDC                  OIDC               `yaml:"oidc"`
 	TokenManager          *TokenManager      `mask:"struct" yaml:"token_manager"`
+	RoleAssignment        RoleAssignment     `yaml:"role_assignment"`
 	PolicySelector        *PolicySelector    `yaml:"policy_selector"`
 	PreSignedURL          PreSignedURL       `yaml:"pre_signed_url"`
 	AccountBackend        string             `yaml:"account_backend" env:"PROXY_ACCOUNT_BACKEND_TYPE" desc:"Account backend the PROXY service should use. Currently only 'cs3' is possible here."`
@@ -119,6 +120,18 @@ type JWKS struct {
 type UserinfoCache struct {
 	Size int `yaml:"size" env:"PROXY_OIDC_USERINFO_CACHE_SIZE" desc:"Cache size for OIDC user info."`
 	TTL  int `yaml:"ttl" env:"PROXY_OIDC_USERINFO_CACHE_TTL" desc:"Max TTL in seconds for the OIDC user info cache."`
+}
+
+// RoleAssignment contains the configuration for how to assign roles to users during login
+type RoleAssignment struct {
+	Driver         string         `yaml:"driver" env:"PROXY_ROLE_ASSIGNMENT_DRIVER" desc:"The mechanism that should be used to assign roles to user upon login. Supported values: 'default' or 'oidc'. 'default' will assign the role 'user' to users which don't have a role assigned at the time they login. 'oidc' will assign the role based on the value of a claim (configured via PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM) from the users OIDC claims."`
+	OIDCRoleMapper OIDCRoleMapper `yaml:"oidc_role_mapper"`
+}
+
+// OIDCRoleMapper contains the configuration for the "oidc" role assignment driber
+type OIDCRoleMapper struct {
+	RoleClaim   string            `yaml:"role_claim" env:"PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM" desc:"The OIDC claim used to create the users role assignment."`
+	RoleMapping map[string]string `yaml:"role_mapping" desc:"A mapping of ocis role names to PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM claim values. This setting can only be configured in the configuration file and not via environment variables."`
 }
 
 // PolicySelector is the toplevel-configuration for different selectors

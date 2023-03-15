@@ -20,6 +20,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/autoprovision"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/logging"
@@ -137,32 +138,50 @@ func Server(cfg *config.Config) *cli.Command {
 func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config) alice.Chain {
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
 	revaClient, err := pool.GetGatewayServiceClient(cfg.Reva.Address, cfg.Reva.GetRevaOptions()...)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("Failed to get gateway client")
+	}
+	tokenManager, err := jwt.New(map[string]interface{}{
+		"secret": cfg.TokenManager.JWTSecret,
+	})
+	if err != nil {
+		logger.Fatal().Err(err).
+			Msg("Failed to create token manager")
+	}
+	autoProvsionCreator := autoprovision.NewCreator(autoprovision.WithTokenManager(tokenManager))
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
 	case "cs3":
-		tokenManager, err := jwt.New(map[string]interface{}{
-			"secret": cfg.TokenManager.JWTSecret,
-		})
-		if err != nil {
-			logger.Error().Err(err).
-				Msg("Failed to create token manager")
-		}
 
 		userProvider = backend.NewCS3UserBackend(
 			backend.WithLogger(logger),
 			backend.WithRevaAuthenticator(revaClient),
 			backend.WithMachineAuthAPIKey(cfg.MachineAuthAPIKey),
 			backend.WithOIDCissuer(cfg.OIDC.Issuer),
-			backend.WithTokenManager(tokenManager),
+			backend.WithAutoProvisonCreator(autoProvsionCreator),
 		)
 	default:
 		logger.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
 	}
 
-	roleAssigner := userroles.NewDefaultRoleAssigner(
-		userroles.WithRoleService(rolesClient),
-		userroles.WithLogger(logger),
-	)
+	var roleAssigner userroles.UserRoleAssigner
+	switch cfg.RoleAssignment.Driver {
+	case "default":
+		roleAssigner = userroles.NewDefaultRoleAssigner(
+			userroles.WithRoleService(rolesClient),
+			userroles.WithLogger(logger),
+		)
+	case "oidc":
+		roleAssigner = userroles.NewOIDCRoleAssigner(
+			userroles.WithRoleService(rolesClient),
+			userroles.WithLogger(logger),
+			userroles.WithRolesClaim(cfg.RoleAssignment.OIDCRoleMapper.RoleClaim),
+			userroles.WithRoleMapping(cfg.RoleAssignment.OIDCRoleMapper.RoleMapping),
+			userroles.WithAutoProvisonCreator(autoProvsionCreator),
+		)
+	default:
+		logger.Fatal().Msgf("Invalid role assignment driver '%s'", cfg.RoleAssignment.Driver)
+	}
 
 	storeClient := storesvc.NewStoreService("com.owncloud.api.store", grpc.DefaultClient())
 	if err != nil {
@@ -243,7 +262,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			middleware.Logger(logger),
 			middleware.UserProvider(userProvider),
 			middleware.UserRoleAssigner(roleAssigner),
-			middleware.TokenManagerConfig(*cfg.TokenManager),
 			middleware.UserOIDCClaim(cfg.UserOIDCClaim),
 			middleware.UserCS3Claim(cfg.UserCS3Claim),
 			middleware.AutoprovisionAccounts(cfg.AutoprovisionAccounts),
@@ -256,7 +274,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(logger),
-			middleware.TokenManagerConfig(*cfg.TokenManager),
 			middleware.RevaGatewayClient(revaClient),
 			middleware.RoleQuotas(cfg.RoleQuotas),
 		),

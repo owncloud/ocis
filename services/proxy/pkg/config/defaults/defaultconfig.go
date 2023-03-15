@@ -52,7 +52,20 @@ func DefaultConfig() *config.Config {
 			},
 		},
 		PolicySelector: nil,
-		Reva:           shared.DefaultRevaConfig(),
+		RoleAssignment: config.RoleAssignment{
+			Driver: "default",
+			// this default is only relevant when Driver is set to "oidc"
+			OIDCRoleMapper: config.OIDCRoleMapper{
+				RoleClaim: "roles",
+				RoleMapping: map[string]string{
+					"admin":      "ocisAdmin",
+					"spaceadmin": "ocisSpaceAdmin",
+					"user":       "ocisUser",
+					"guest":      "ocisGuest",
+				},
+			},
+		},
+		Reva: shared.DefaultRevaConfig(),
 		PreSignedURL: config.PreSignedURL{
 			AllowedHTTPMethods: []string{"GET"},
 			Enabled:            true,

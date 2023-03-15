@@ -10,16 +10,13 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/auth/scope"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/cs3org/reva/v2/pkg/token"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
-	settingsService "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/autoprovision"
 	"go-micro.dev/v4/selector"
 )
 
@@ -33,22 +30,16 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	logger            log.Logger
-	tokenManager      token.Manager
-	authProvider      RevaAuthenticator
-	machineAuthAPIKey string
-	oidcISS           string
+	logger              log.Logger
+	authProvider        RevaAuthenticator
+	machineAuthAPIKey   string
+	oidcISS             string
+	autoProvsionCreator autoprovision.Creator
 }
 
 func WithLogger(l log.Logger) Option {
 	return func(o *Options) {
 		o.logger = l
-	}
-}
-
-func WithTokenManager(t token.Manager) Option {
-	return func(o *Options) {
-		o.tokenManager = t
 	}
 }
 
@@ -67,6 +58,12 @@ func WithMachineAuthAPIKey(ma string) Option {
 func WithOIDCissuer(oidcISS string) Option {
 	return func(o *Options) {
 		o.oidcISS = oidcISS
+	}
+}
+
+func WithAutoProvisonCreator(c autoprovision.Creator) Option {
+	return func(o *Options) {
+		o.autoProvsionCreator = c
 	}
 }
 
@@ -133,7 +130,7 @@ func (c *cs3backend) Authenticate(ctx context.Context, username string, password
 // function will just return the existing user.
 func (c *cs3backend) CreateUserFromClaims(ctx context.Context, claims map[string]interface{}) (*cs3.User, error) {
 	newctx := context.Background()
-	token, err := c.generateAutoProvisionAdminToken(newctx)
+	token, err := c.autoProvsionCreator.GetAutoProvisionAdminToken(newctx)
 	if err != nil {
 		c.logger.Error().Err(err).Msg("Error generating token for autoprovisioning user.")
 		return nil, err
@@ -265,52 +262,4 @@ func (c cs3backend) cs3UserFromLibregraph(ctx context.Context, lu *libregraph.Us
 	cs3user.DisplayName = lu.GetDisplayName()
 	cs3user.Mail = lu.GetMail()
 	return cs3user
-}
-
-// This returns an hardcoded internal User, that is privileged to create new User via
-// the Graph API. This user is needed for autoprovisioning of users from incoming OIDC
-// claims.
-func getAutoProvisionUserCreator() (*cs3.User, error) {
-	roleIDsJSON, err := json.Marshal([]string{settingsService.BundleUUIDRoleAdmin})
-	if err != nil {
-		return nil, err
-	}
-
-	autoProvisionUserCreator := &cs3.User{
-		DisplayName: "Autoprovision User",
-		Username:    "autoprovisioner",
-		Id: &cs3.UserId{
-			Idp:      "internal",
-			OpaqueId: "autoprov-user-id00-0000-000000000000",
-		},
-		Opaque: &types.Opaque{
-			Map: map[string]*types.OpaqueEntry{
-				"roles": &types.OpaqueEntry{
-					Decoder: "json",
-					Value:   roleIDsJSON,
-				},
-			},
-		},
-	}
-	return autoProvisionUserCreator, nil
-}
-
-func (c cs3backend) generateAutoProvisionAdminToken(ctx context.Context) (string, error) {
-	userCreator, err := getAutoProvisionUserCreator()
-	if err != nil {
-		return "", err
-	}
-
-	s, err := scope.AddOwnerScope(nil)
-	if err != nil {
-		c.logger.Error().Err(err).Msg("could not get owner scope")
-		return "", err
-	}
-
-	token, err := c.tokenManager.MintToken(ctx, userCreator, s)
-	if err != nil {
-		c.logger.Error().Err(err).Msg("could not mint token")
-		return "", err
-	}
-	return token, nil
 }
