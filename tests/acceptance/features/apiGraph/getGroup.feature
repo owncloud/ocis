@@ -163,3 +163,8 @@ Feature: get groups and their members
       | नेपाली            |
       | $x<=>[y*z^2+1]! |
       | եòɴԪ˯ΗՐΛɔπ     |
+
+
+  Scenario: admin user tries to get group information of non-existing group
+    When user "Alice" gets details of the group "non-existing" using the Graph API
+    Then the HTTP status code should be "404"
