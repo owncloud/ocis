@@ -92,11 +92,6 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 
 	serviceUsers := []svcUser{
 		{
-			Name:     "admin",
-			Password: cfg.ServiceUserPasswords.OcisAdmin,
-			ID:       cfg.AdminUserID,
-		},
-		{
 			Name:     "libregraph",
 			Password: cfg.ServiceUserPasswords.Idm,
 		},
@@ -108,6 +103,14 @@ func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) erro
 			Name:     "reva",
 			Password: cfg.ServiceUserPasswords.Reva,
 		},
+	}
+
+	if cfg.AdminUserID != "" {
+		serviceUsers = append(serviceUsers, svcUser{
+			Name:     "admin",
+			Password: cfg.ServiceUserPasswords.OcisAdmin,
+			ID:       cfg.AdminUserID,
+		})
 	}
 
 	bdb := &ldbbolt.LdbBolt{}

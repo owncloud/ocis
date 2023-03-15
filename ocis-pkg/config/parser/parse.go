@@ -132,9 +132,5 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingSystemUserID("ocis")
 	}
 
-	if cfg.AdminUserID == "" {
-		return shared.MissingAdminUserID("ocis")
-	}
-
 	return nil
 }
