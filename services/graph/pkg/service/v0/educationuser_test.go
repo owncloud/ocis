@@ -271,9 +271,6 @@ var _ = Describe("EducationUsers", func() {
 		})
 
 		It("handles bad Mails", func() {
-			user.Mail = nil
-			assertHandleBadAttributes(user)
-
 			user.SetMail("not-a-mail-address")
 			assertHandleBadAttributes(user)
 		})
@@ -356,6 +353,29 @@ var _ = Describe("EducationUsers", func() {
 			Expect(createdUser.GetUserType()).To(Equal("Member"))
 		})
 
+		It("creates a user without email", func() {
+			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything).Return(&settingssvc.AssignRoleToUserResponse{}, nil)
+			identityEducationBackend.On("CreateEducationUser", mock.Anything, mock.Anything).Return(func(ctx context.Context, user libregraph.EducationUser) *libregraph.EducationUser {
+				user.SetId("/users/user")
+				return &user
+			}, nil)
+			user.Mail = nil
+			userJson, err := json.Marshal(user)
+			Expect(err).ToNot(HaveOccurred())
+
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/education/users", bytes.NewBuffer(userJson))
+			r = r.WithContext(revactx.ContextSetUser(ctx, currentUser))
+			svc.PostEducationUser(rr, r)
+
+			Expect(rr.Code).To(Equal(http.StatusOK))
+			data, err := io.ReadAll(rr.Body)
+			Expect(err).ToNot(HaveOccurred())
+
+			createdUser := libregraph.EducationUser{}
+			err = json.Unmarshal(data, &createdUser)
+			Expect(err).ToNot(HaveOccurred())
+			Expect(createdUser.GetMail()).To(Equal(""))
+		})
 	})
 
 	Describe("DeleteEducationUser", func() {
