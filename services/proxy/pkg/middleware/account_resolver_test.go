@@ -14,8 +14,9 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend/test"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend/mocks"
 	"github.com/stretchr/testify/assert"
+	"github.com/test-go/testify/mock"
 )
 
 func TestTokenIsAddedWithMailClaim(t *testing.T) {
@@ -119,15 +120,12 @@ func newMockAccountResolver(userBackendResult *userv1beta1.User, userBackendErr 
 		token, _ = tokenManager.MintToken(context.Background(), userBackendResult, s)
 	}
 
-	mock := &test.UserBackendMock{
-		GetUserByClaimsFunc: func(ctx context.Context, claim string, value string, withRoles bool) (*userv1beta1.User, string, error) {
-			return userBackendResult, token, userBackendErr
-		},
-	}
+	ub := mocks.UserBackend{}
+	ub.On("GetUserByClaims", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(userBackendResult, token, userBackendErr)
 
 	return AccountResolver(
 		Logger(log.NewLogger()),
-		UserProvider(mock),
+		UserProvider(&ub),
 		TokenManagerConfig(config.TokenManager{JWTSecret: "secret"}),
 		UserOIDCClaim(oidcclaim),
 		UserCS3Claim(cs3claim),
