@@ -68,16 +68,16 @@ Feature: delete user
       | Guest       |
 
 
-  Scenario: the admin user tries to delete a non-existent user
+  Scenario: the admin user tries to delete a nonexistent user
     Given the administrator has given "Alice" the role "Admin" using the settings api
-    When the user "Alice" tries to delete a non-existing user using the Graph API
+    When the user "Alice" tries to delete a nonexistent user using the Graph API
     Then the HTTP status code should be "404"
 
-
-  Scenario Outline: Non-admin user tries to delete a non-existent user
+  
+  Scenario Outline: Non-admin user tries to delete a nonexistent user
     Given the administrator has given "Alice" the role "<role>" using the settings api
-    When the user "Alice" tries to delete a non-existing user using the Graph API
-    Then the HTTP status code should be "404"
+    When the user "Alice" tries to delete a nonexistent user using the Graph API
+    Then the HTTP status code should be "401"
     Examples:
       | role        |
       | Space Admin |

@@ -104,9 +104,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/getUser.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L40)
 - [apiGraph/getUser.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L41)
 - [apiGraph/getUser.feature:42](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L42)
-- [apiGraph/getUser.feature:140](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L140)
-- [apiGraph/getUser.feature:141](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L141)
-- [apiGraph/getUser.feature:142](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L142)
 - [apiGraph/getUser.feature:143](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L143)
 - [apiGraph/getUser.feature:144](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L144)
 - [apiGraph/getUser.feature:145](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L145)
@@ -116,17 +113,15 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/getUser.feature:149](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L149)
 - [apiGraph/getUser.feature:150](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L150)
 - [apiGraph/getUser.feature:151](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L151)
+- [apiGraph/getUser.feature:152](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L152)
+- [apiGraph/getUser.feature:153](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L153)
+- [apiGraph/getUser.feature:154](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L154)
 
 #### [Sharing to a group with an expiration date does not work #5442](https://github.com/owncloud/ocis/issues/5442)
 - [apiSpacesShares/shareSubItemOfSpace.feature:105](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L105)
 
 #### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
 - [apiGraph/getGroup.feature:100](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L100)
-
-#### [Non-admin user tries to delete non-existing result 401](https://github.com/owncloud/ocis/issues/5738)
-- [apiGraph/deleteUser.feature:83](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteUser.feature#L83)
-- [apiGraph/deleteUser.feature:84](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteUser.feature#L84)
-- [apiGraph/deleteUser.feature:85](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteUser.feature#L85)
 
 #### [Changing user with an uppercase name gives 404 error](https://github.com/owncloud/ocis/issues/5763)
 - [apiGraph/editUser.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L41)

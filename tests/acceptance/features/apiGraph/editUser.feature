@@ -186,7 +186,7 @@ Feature: edit user
       | displayName | Carol King        |
       | email       | carol@example.com |
       | password    | 1234              |
-    Given the administrator has given "Carol" the role "<role>" using the settings api
+    And the administrator has given "Carol" the role "<role>" using the settings api
     And user "Carol" has uploaded file with content "test file for reset password" to "/resetpassword.txt"
     When the user "Brian" resets the password of user "Carol" to "newpassword" using the Graph API
     Then the HTTP status code should be "401"
