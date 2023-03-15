@@ -86,7 +86,7 @@ func DefaultConfig() *config.Config {
 			},
 		},
 		CacheStore: &config.CacheStore{
-			Type:     "ocmem",
+			Type:     "memory",
 			Database: "graph",
 			Table:    "roles",
 			TTL:      time.Hour * 336,

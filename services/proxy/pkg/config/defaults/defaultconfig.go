@@ -42,11 +42,11 @@ func DefaultConfig() *config.Config {
 
 			AccessTokenVerifyMethod: config.AccessTokenVerificationJWT,
 			UserinfoCache: config.UserinfoCache{
-				Type:     "ocmem",
+				Type:     "memory",
 				Database: "proxy",
 				Table:    "userinfo",
-				Size:     1024,
-				TTL:      time.Second * 10,
+				//Size:     1024,
+				TTL: time.Second * 10,
 			},
 			JWKS: config.JWKS{
 				RefreshInterval:   60, // minutes
