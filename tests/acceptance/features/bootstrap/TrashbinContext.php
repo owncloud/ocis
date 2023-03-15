@@ -1116,46 +1116,4 @@ class TrashbinContext implements Context {
 			"$resource expected to be listed in response with mtime '$expectedMtime' but found '$responseMtime'"
 		);
 	}
-
-	/**
-	 * @Given the administrator has set the following file extensions to be skipped from the trashbin
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasSetFollowingFileExtensionsToBeSkippedFromTrashbin(TableNode $table):void {
-		$this->featureContext->verifyTableNodeColumns($table, ['extension']);
-		foreach ($table->getHash() as $idx => $row) {
-			$this->featureContext->runOcc(['config:system:set', 'trashbin_skip_extensions', $idx, '--value=' . $row['extension']]);
-		}
-	}
-
-	/**
-	 * @Given the administrator has set the following directories to be skipped from the trashbin
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasSetFollowingDirectoriesToBeSkippedFromTrashbin(TableNode $table):void {
-		$this->featureContext->verifyTableNodeColumns($table, ['directory']);
-		foreach ($table->getHash() as $idx => $row) {
-			$this->featureContext->runOcc(['config:system:set', 'trashbin_skip_directories', $idx, '--value=' . $row['directory']]);
-		}
-	}
-
-	/**
-	 * @Given the administrator has set the trashbin skip size threshold to :threshold
-	 *
-	 * @param string $threshold
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasSetTrashbinSkipSizethreshold(string $threshold) {
-		$this->featureContext->runOcc(['config:system:set', 'trashbin_skip_size_threshold', '--value=' . $threshold]);
-	}
 }

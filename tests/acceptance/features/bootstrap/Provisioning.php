@@ -533,20 +533,6 @@ trait Provisioning {
 	}
 
 	/**
-	 * @Given the administrator has set the system language to :defaultLanguage
-	 *
-	 * @param string $defaultLanguage
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasSetTheSystemLanguageTo(string $defaultLanguage):void {
-		$this->runOcc(
-			["config:system:set default_language --value $defaultLanguage"]
-		);
-	}
-
-	/**
 	 *
 	 * @param string $path
 	 *
@@ -5731,41 +5717,6 @@ trait Provisioning {
 			$this->getAdminPassword()
 		);
 		return ($this->getArrayOfAppsResponded($this->response));
-	}
-
-	/**
-	 * Removes skeleton directory config from config.php and returns the config value
-	 *
-	 * @param string|null $baseUrl
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	public function popSkeletonDirectoryConfig(?string $baseUrl = null):string {
-		$path = $this->getSkeletonDirectory($baseUrl);
-		$this->runOcc(
-			["config:system:delete skeletondirectory"],
-			null,
-			null,
-			$baseUrl
-		);
-		return $path;
-	}
-
-	/**
-	 * @param string|null $baseUrl
-	 *
-	 * @return string
-	 * @throws Exception
-	 */
-	private function getSkeletonDirectory(?string $baseUrl = null):string {
-		$this->runOcc(
-			["config:system:get skeletondirectory"],
-			null,
-			null,
-			$baseUrl
-		);
-		return \trim($this->getStdOutOfOccCommand());
 	}
 
 	/**
