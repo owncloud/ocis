@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -24,6 +25,7 @@ func AccountResolver(optionSetters ...Option) func(next http.Handler) http.Handl
 			userProvider:          options.UserProvider,
 			userOIDCClaim:         options.UserOIDCClaim,
 			userCS3Claim:          options.UserCS3Claim,
+			userRoleAssigner:      options.UserRoleAssigner,
 			autoProvisionAccounts: options.AutoprovisionAccounts,
 		}
 	}
@@ -33,6 +35,7 @@ type accountResolver struct {
 	next                  http.Handler
 	logger                log.Logger
 	userProvider          backend.UserBackend
+	userRoleAssigner      userroles.UserRoleAssigner
 	autoProvisionAccounts bool
 	userOIDCClaim         string
 	userCS3Claim          string
@@ -95,7 +98,7 @@ func (m accountResolver) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 
 		// resolve the user's roles
-		user, err = m.userProvider.GetUserRoles(ctx, user)
+		user, err = m.userRoleAssigner.UpdateUserRoleAssignment(ctx, user, claims)
 		if err != nil {
 			m.logger.Error().Err(err).Msg("Could not get user roles")
 			w.WriteHeader(http.StatusInternalServerError)

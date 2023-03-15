@@ -31,6 +31,7 @@ import (
 	proxyHTTP "github.com/owncloud/ocis/v2/services/proxy/pkg/server/http"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/oauth2"
 )
@@ -149,7 +150,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 
 		userProvider = backend.NewCS3UserBackend(
 			backend.WithLogger(logger),
-			backend.WithRoleService(rolesClient),
 			backend.WithRevaAuthenticator(revaClient),
 			backend.WithMachineAuthAPIKey(cfg.MachineAuthAPIKey),
 			backend.WithOIDCissuer(cfg.OIDC.Issuer),
@@ -158,6 +158,11 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 	default:
 		logger.Fatal().Msgf("Invalid accounts backend type '%s'", cfg.AccountBackend)
 	}
+
+	roleAssigner := userroles.NewDefaultRoleAssigner(
+		userroles.WithRoleService(rolesClient),
+		userroles.WithLogger(logger),
+	)
 
 	storeClient := storesvc.NewStoreService("com.owncloud.api.store", grpc.DefaultClient())
 	if err != nil {
@@ -210,6 +215,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		Logger:             logger,
 		PreSignedURLConfig: cfg.PreSignedURL,
 		UserProvider:       userProvider,
+		UserRoleAssigner:   roleAssigner,
 		Store:              storeClient,
 	})
 
@@ -236,6 +242,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		middleware.AccountResolver(
 			middleware.Logger(logger),
 			middleware.UserProvider(userProvider),
+			middleware.UserRoleAssigner(roleAssigner),
 			middleware.TokenManagerConfig(*cfg.TokenManager),
 			middleware.UserOIDCClaim(cfg.UserOIDCClaim),
 			middleware.UserCS3Claim(cfg.UserCS3Claim),

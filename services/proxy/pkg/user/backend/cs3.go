@@ -16,13 +16,10 @@ import (
 	"github.com/cs3org/reva/v2/pkg/token"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
-	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	settingsService "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
-	"go-micro.dev/v4/metadata"
 	"go-micro.dev/v4/selector"
 )
 
@@ -38,7 +35,6 @@ type Option func(o *Options)
 type Options struct {
 	logger            log.Logger
 	tokenManager      token.Manager
-	roleService       settingssvc.RoleService
 	authProvider      RevaAuthenticator
 	machineAuthAPIKey string
 	oidcISS           string
@@ -53,12 +49,6 @@ func WithLogger(l log.Logger) Option {
 func WithTokenManager(t token.Manager) Option {
 	return func(o *Options) {
 		o.tokenManager = t
-	}
-}
-
-func WithRoleService(rs settingssvc.RoleService) Option {
-	return func(o *Options) {
-		o.roleService = rs
 	}
 }
 
@@ -118,54 +108,6 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string) (
 	user := res.User
 
 	return user, res.Token, nil
-}
-
-func (c *cs3backend) GetUserRoles(ctx context.Context, user *cs3.User) (*cs3.User, error) {
-	var roleIDs []string
-	if user.Id.Type != cs3.UserType_USER_TYPE_LIGHTWEIGHT {
-		var err error
-		roleIDs, err = loadRolesIDs(ctx, user.Id.OpaqueId, c.roleService)
-		if err != nil {
-			c.logger.Error().Err(err).Msgf("Could not load roles")
-			return nil, err
-		}
-
-		if len(roleIDs) == 0 {
-			// This user doesn't have a role assignment yet. Assign a
-			// default user role. At least until proper roles are provided. See
-			// https://github.com/owncloud/ocis/v2/issues/1825 for more context.
-			if user.Id.Type == cs3.UserType_USER_TYPE_PRIMARY {
-				c.logger.Info().Str("userid", user.Id.OpaqueId).Msg("user has no role assigned, assigning default user role")
-				ctx = metadata.Set(ctx, middleware.AccountID, user.Id.OpaqueId)
-				_, err := c.roleService.AssignRoleToUser(ctx, &settingssvc.AssignRoleToUserRequest{
-					AccountUuid: user.Id.OpaqueId,
-					RoleId:      settingsService.BundleUUIDRoleUser,
-				})
-				if err != nil {
-					c.logger.Error().Err(err).Msg("Could not add default role")
-					return nil, err
-				}
-				roleIDs = append(roleIDs, settingsService.BundleUUIDRoleUser)
-			}
-		}
-	}
-
-	enc, err := encodeRoleIDs(roleIDs)
-	if err != nil {
-		c.logger.Error().Err(err).Msg("Could not encode loaded roles")
-		return nil, err
-	}
-
-	if user.Opaque == nil {
-		user.Opaque = &types.Opaque{
-			Map: map[string]*types.OpaqueEntry{
-				"roles": enc,
-			},
-		}
-	} else {
-		user.Opaque.Map["roles"] = enc
-	}
-	return user, nil
 }
 
 func (c *cs3backend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, string, error) {
@@ -329,7 +271,7 @@ func (c cs3backend) cs3UserFromLibregraph(ctx context.Context, lu *libregraph.Us
 // the Graph API. This user is needed for autoprovisioning of users from incoming OIDC
 // claims.
 func getAutoProvisionUserCreator() (*cs3.User, error) {
-	encRoleID, err := encodeRoleIDs([]string{settingsService.BundleUUIDRoleAdmin})
+	roleIDsJSON, err := json.Marshal([]string{settingsService.BundleUUIDRoleAdmin})
 	if err != nil {
 		return nil, err
 	}
@@ -343,7 +285,10 @@ func getAutoProvisionUserCreator() (*cs3.User, error) {
 		},
 		Opaque: &types.Opaque{
 			Map: map[string]*types.OpaqueEntry{
-				"roles": encRoleID,
+				"roles": &types.OpaqueEntry{
+					Decoder: "json",
+					Value:   roleIDsJSON,
+				},
 			},
 		},
 	}
