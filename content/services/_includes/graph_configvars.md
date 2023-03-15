@@ -55,6 +55,7 @@
 | LDAP_USER_SCHEMA_DISPLAY_NAME<br/>GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE | string | displayName | LDAP Attribute to use for the displayname of users.|
 | LDAP_USER_SCHEMA_USERNAME<br/>GRAPH_LDAP_USER_NAME_ATTRIBUTE | string | uid | LDAP Attribute to use for username of users.|
 | LDAP_USER_SCHEMA_ID<br/>GRAPH_LDAP_USER_UID_ATTRIBUTE | string | owncloudUUID | LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.|
+| LDAP_USER_SCHEMA_USER_TYPE<br/>GRAPH_LDAP_USER_TYPE_ATTRIBUTE | string | ownCloudUserType | LDAP Attribute to distinguish between 'Member' and 'Guest' users. Default is 'ownCloudUserType'.|
 | LDAP_USER_ENABLED_ATTRIBUTE<br/>GRAPH_USER_ENABLED_ATTRIBUTE | string | ownCloudUserEnabled | LDAP Attribute to use as a flag telling if the user is enabled or disabled.|
 | LDAP_DISABLE_USER_MECHANISM<br/>GRAPH_DISABLE_USER_MECHANISM | string | attribute | An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'.|
 | LDAP_DISABLED_USERS_GROUP_DN<br/>GRAPH_DISABLED_USERS_GROUP_DN | string | cn=DisabledUsersGroup,ou=groups,o=libregraph-idm | The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'.|

@@ -529,6 +529,16 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.
 
+a|`LDAP_USER_SCHEMA_USER_TYPE` +
+`GRAPH_LDAP_USER_TYPE_ATTRIBUTE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ownCloudUserType ++
+a| [subs=-attributes]
+LDAP Attribute to distinguish between 'Member' and 'Guest' users. Default is 'ownCloudUserType'.
+
 a|`LDAP_USER_ENABLED_ATTRIBUTE` +
 `GRAPH_USER_ENABLED_ATTRIBUTE` +
 
