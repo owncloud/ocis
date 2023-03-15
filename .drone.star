@@ -1914,7 +1914,8 @@ def docs():
                     "password": {
                         "from_secret": "github_token",
                     },
-                    "pages_directory": "docs/hugo/content",
+                    "pages_directory": "docs/hugo/content/",
+                    "copy_contents": "true",
                     "target_branch": "docs",
                 },
                 "when": {
