@@ -228,9 +228,10 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 									"password": map[string]interface{}{
 										"enforced": false,
 										"enforced_for": map[string]interface{}{
-											"read_only":   false,
-											"read_write":  cfg.OCS.WriteablePublicShareMustHavePassword,
-											"upload_only": cfg.OCS.WriteablePublicShareMustHavePassword,
+											"read_only":         false,
+											"read_write":        cfg.OCS.WriteablePublicShareMustHavePassword,
+											"read_write_delete": cfg.OCS.WriteablePublicShareMustHavePassword,
+											"upload_only":       cfg.OCS.WriteablePublicShareMustHavePassword,
 										},
 									},
 									"expire_date": map[string]interface{}{
