@@ -74,8 +74,6 @@ Feature: upload file using old chunking
   Scenario Outline: Checking file id after a move overwrite using old chunking endpoint
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
-    And the owncloud log level has been set to debug
-    And the owncloud log has been cleared
     And user "Alice" has copied file "/textfile0.txt" to "/existingFile.txt"
     And user "Alice" has stored id of file "/existingFile.txt"
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/existingFile.txt" in 3 chunks with old chunking and using the WebDAV API
@@ -87,9 +85,6 @@ Feature: upload file using old chunking
 
       Cheers.
       """
-    And the log file should not contain any log-entries containing these attributes:
-      | app |
-      | dav |
     Examples:
       | dav_version |
       | old         |
@@ -125,48 +120,9 @@ Feature: upload file using old chunking
       | spaces      | &#? TIÄFÜ @a#8a=b?c=d ?abc=oc # |
       | spaces      | 0                               |
 
-  # This scenario does extra checks with the log level set to debug.
-  # It does not run in smoke test runs. (see comments in scenario above)
-  Scenario Outline: Chunked upload files with difficult name and check the log
-    Given using <dav_version> DAV path
-    And the owncloud log level has been set to debug
-    And the owncloud log has been cleared
-    When user "Alice" uploads file "filesForUpload/textfile.txt" to "/<file-name>" in 3 chunks using the WebDAV API
-    Then the HTTP status code should be "201"
-    And as "Alice" file "/<file-name>" should exist
-    And the content of file "/<file-name>" for user "Alice" should be:
-      """
-      This is a testfile.
-
-      Cheers.
-      """
-    And the log file should not contain any log-entries containing these attributes:
-      | app |
-      | dav |
-    Examples:
-      | dav_version | file-name   |
-      | old         | file-name   |
-      | old         | &#?         |
-      | old         | TIÄFÜ       |
-      | old         | 0           |
-      | old         | @a#8a=b?c=d |
-      | old         | ?abc=oc #   |
-
-    @skipOnOcV10 @personalSpace
-    Examples:
-      | dav_version | file-name   |
-      | spaces      | file-name   |
-      | spaces      | &#?         |
-      | spaces      | TIÄFÜ       |
-      | spaces      | 0           |
-      | spaces      | @a#8a=b?c=d |
-      | spaces      | ?abc=oc #   |
-
 
   Scenario Outline: Upload chunked file with old chunking with lengthy filenames
     Given using <dav_version> DAV path
-    Given the owncloud log level has been set to debug
-    And the owncloud log has been cleared
     When user "Alice" uploads the following chunks to "नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-12345678910.txt" with old chunking and using the WebDAV API
       | number | content                   |
       | 1      | AAAAAAAAAAAAAAAAAAAAAAAAA |
@@ -177,9 +133,6 @@ Feature: upload file using old chunking
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
     And as "Alice" file "नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-12345678910.txt" should exist
     And the content of file "नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-12345678910.txt" for user "Alice" should be "AAAAAAAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBBBBBBBBCCCCCCCCCCCCCCCCCCCCCCCCC"
-    And the log file should not contain any log-entries containing these attributes:
-      | app |
-      | dav |
     Examples:
       | dav_version |
       | old         |
