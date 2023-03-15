@@ -139,6 +139,17 @@ func (i *LDAP) UpdateEducationUser(ctx context.Context, nameOrID string, user li
 			updateNeeded = true
 		}
 	}
+	if user.AccountEnabled != nil {
+		un, err := i.updateAccountEnabledState(logger, user.GetAccountEnabled(), e, &mr)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if un {
+			updateNeeded = true
+		}
+	}
 	if user.PasswordProfile != nil && user.PasswordProfile.GetPassword() != "" {
 		if i.usePwModifyExOp {
 			if err := i.updateUserPassowrd(ctx, e.DN, user.PasswordProfile.GetPassword()); err != nil {
@@ -183,6 +194,12 @@ func (i *LDAP) UpdateEducationUser(ctx context.Context, nameOrID string, user li
 	}
 
 	returnUser := i.createEducationUserModelFromLDAP(e)
+
+	// To avoid an ldap lookup for group membership, set the enabled flag to same as input value
+	// since this would have been updated with group membership from the input anyway.
+	if user.AccountEnabled != nil && i.disableUserMechanism == DisableMechanismGroup {
+		returnUser.AccountEnabled = user.AccountEnabled
+	}
 
 	return returnUser, nil
 }

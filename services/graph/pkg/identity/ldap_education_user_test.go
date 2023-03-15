@@ -36,7 +36,8 @@ var eduUserEntry = ldap.NewEntry("uid=user,ou=people,dc=test",
 			"$ http://idp $ testuser",
 			"xxx $ http://idpnew $ xxxxx-xxxxx-xxxxx",
 		},
-		"userTypeAttribute": {"Member"},
+		"userTypeAttribute":    {"Member"},
+		"userEnabledAttribute": {"FALSE"},
 	})
 var renamedEduUserEntry = ldap.NewEntry("uid=newtestuser,ou=people,dc=test",
 	map[string][]string{
@@ -49,7 +50,8 @@ var renamedEduUserEntry = ldap.NewEntry("uid=newtestuser,ou=people,dc=test",
 			"$ http://idp $ testuser",
 			"xxx $ http://idpnew $ xxxxx-xxxxx-xxxxx",
 		},
-		"userTypeAttribute": {"Guest"},
+		"userTypeAttribute":    {"Guest"},
+		"userEnabledAttribute": {"TRUE"},
 	})
 var eduUserEntryWithSchool = ldap.NewEntry("uid=user,ou=people,dc=test",
 	map[string][]string{
@@ -103,6 +105,7 @@ func TestCreateEducationUser(t *testing.T) {
 	user.SetMail("testuser@example.org")
 	user.SetPrimaryRole("student")
 	user.SetUserType(("Member"))
+	user.SetAccountEnabled(false)
 	eduUser, err := b.CreateEducationUser(context.Background(), *user)
 	lm.AssertNumberOfCalls(t, "Add", 1)
 	lm.AssertNumberOfCalls(t, "Search", 1)
@@ -113,6 +116,7 @@ func TestCreateEducationUser(t *testing.T) {
 	assert.Equal(t, "abcd-defg", eduUser.GetId())
 	assert.Equal(t, eduUser.GetPrimaryRole(), user.GetPrimaryRole())
 	assert.Equal(t, eduUser.GetUserType(), user.GetUserType())
+	assert.Equal(t, eduUser.GetAccountEnabled(), false)
 }
 
 func TestDeleteEducationUser(t *testing.T) {
@@ -248,6 +252,13 @@ func TestUpdateEducationUser(t *testing.T) {
 					Vals: []string{"new@mail.org"},
 				},
 			},
+			{
+				Operation: ldap.ReplaceAttribute,
+				Modification: ldap.PartialAttribute{
+					Type: "userEnabledAttribute",
+					Vals: []string{"TRUE"},
+				},
+			},
 		},
 	}
 	modDNReq := ldap.ModifyDNRequest{
@@ -260,10 +271,12 @@ func TestUpdateEducationUser(t *testing.T) {
 	user := libregraph.NewEducationUser()
 	user.SetOnPremisesSamAccountName("newtestuser")
 	user.SetMail("new@mail.org")
+	user.SetAccountEnabled(true)
 	eduUser, err := b.UpdateEducationUser(context.Background(), "testuser", *user)
 	assert.NotNil(t, eduUser)
 	assert.Nil(t, err)
 	assert.Equal(t, eduUser.GetOnPremisesSamAccountName(), "newtestuser")
 	assert.Equal(t, "abcd-defg", eduUser.GetId())
 	assert.Equal(t, "Guest", eduUser.GetUserType())
+	assert.Equal(t, eduUser.GetAccountEnabled(), true)
 }
