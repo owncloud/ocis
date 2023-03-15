@@ -40,6 +40,34 @@ Feature: Upload files into a space
     Then the HTTP status code should be "<code>"
     And for user "Brian" the space "Project Ceres" <shouldOrNot> contain these entries:
       | test.txt |
+    And for user "Brian" the JSON response should contain space called "Project Ceres" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name",
+        "quota"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Project Ceres"]
+        },
+        "quota": {
+          "type": "object",
+          "required": [
+            "used"
+          ],
+          "properties": {
+            "used": {
+              "type": "number",
+              "enum": [<usedQuota>]
+            }
+          }
+        }
+      }
+    }
+    """
     And the user "Brian" should have a space called "Project Ceres" with these key and value pairs:
       | key          | value         |
       | name         | Project Ceres |

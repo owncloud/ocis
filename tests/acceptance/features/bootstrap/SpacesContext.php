@@ -24,8 +24,10 @@ declare(strict_types=1);
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
+use Helmich\JsonAssert\JsonAssertions;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
@@ -402,7 +404,7 @@ class SpacesContext implements Context {
 	 */
 	public function getETag(string $user, string $spaceName, string $fileName): string {
 		$fileData = $this->getFileData($user, $spaceName, $fileName)->getHeaders();
-		return $fileData["Etag"][0];
+		return \str_replace('"', '\"', $fileData["Etag"][0]);
 	}
 
 	/**
@@ -1032,6 +1034,95 @@ class SpacesContext implements Context {
 			"Expected response status code should be 200"
 		);
 		$this->jsonRespondedShouldContain($spaceName, null, null, $grantedGroup, $table);
+	}
+
+	/**
+	 * @Then /^the JSON response should contain space called "([^"]*)" (?:|(?:owned by|granted to) "([^"]*)" )(?:|(?:with description file|with space image) "([^"]*)" )and match$/
+	 *
+	 * @param string $spaceName
+	 * @param string|null $userName
+	 * @param string|null $fileName
+	 * @param PyStringNode $schemaString
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theJsonDataFromLastResponseShouldMatch(
+		string $spaceName,
+		?string $userName = null,
+		?string $fileName = null,
+		PyStringNode $schemaString
+	): void {
+		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->value)) {
+			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
+			foreach ($responseBody as $value) {
+				if (isset($value->name) && $value->name === $spaceName) {
+					$responseBody = $value;
+					break;
+				}
+			}
+		} else {
+			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent();
+		}
+
+		// substitute the value here
+		$schemaString = $schemaString->getRaw();
+		$schemaString = $this->featureContext->substituteInLineCodes(
+			$schemaString,
+			$this->featureContext->getCurrentUser(),
+			[],
+			[
+				[
+					"code" => "%space_id%",
+					"function" =>
+						[$this, "getSpaceIdByNameFromResponse"],
+					"parameter" => [$spaceName]
+				],
+				[
+					"code" => "%file_id%",
+					"function" =>
+						[$this, "getFileId"],
+					"parameter" => [$userName, $spaceName, $fileName]
+				],
+				[
+					"code" => "%eTag%",
+					"function" =>
+						[$this, "getETag"],
+					"parameter" => [$userName, $spaceName, $fileName]
+				],
+			],
+			null,
+			$userName,
+		);
+		JsonAssertions::assertJsonDocumentMatchesSchema(
+			$responseBody,
+			$this->featureContext->getJSONSchema($schemaString)
+		);
+	}
+
+	/**
+	 * @Then /^for user "([^"]*)" the JSON response of space project should match$/
+	 * @Then /^for user "([^"]*)" the JSON response should contain space called "([^"]*)" and match$/
+	 * @Then /^for user "([^"]*)" the JSON response should contain space called "([^"]*)" (?:owned by|granted to) "([^"]*)" (?:with description file|with space image) "([^"]*)" and match$/
+
+	 * @param string $user
+	 * @param string $spaceName
+	 * @param string|null $grantedUser
+	 * @param string|null $fileName
+	 * @param PyStringNode $schemaString
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function forUserTheJSONDataOfTheResponseShouldMatch(
+		string $user,
+		?string $spaceName = null,
+		?string $grantedUser = null,
+		?string $fileName = null,
+		PyStringNode $schemaString
+	): void {
+		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
+		$this->theJsonDataFromLastResponseShouldMatch($spaceName, $grantedUser, $fileName, $schemaString);
 	}
 
 	/**

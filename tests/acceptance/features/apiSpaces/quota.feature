@@ -20,13 +20,49 @@ Feature: State of the quota
   Scenario Outline: Quota information is returned in the list of spaces returned via the Graph API
     Given user "Alice" has created a space "<spaceName>" of type "project" with quota "<total>"
     When user "Alice" uploads a file inside space "<spaceName>" with content "<fileContent>" to "test.txt" using the WebDAV API
-    Then the user "Alice" should have a space called "<spaceName>" with these key and value pairs:
-      | key              | value       |
-      | name             | <spaceName> |
-      | quota@@@state    | <state>     |
-      | quota@@@total    | <total>     |
-      | quota@@@remaining| <remaining> |
-      | quota@@@used     | <used>      |
+    Then for user "Alice" the JSON response should contain space called "<spaceName>" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name",
+        "quota"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["<spaceName>"]
+        },
+        "quota": {
+          "type": "object",
+          "required": [
+            "state",
+            "total",
+            "remaining",
+            "used"
+          ],
+          "properties": {
+            "state" : {
+              "type": "string",
+              "enum": ["<state>"]
+            },
+            "total" : {
+              "type": "number",
+              "enum": [<total>]
+            },
+            "remaining" : {
+              "type": "number",
+              "enum": [<remaining>]
+            },
+            "used": {
+              "type": "number",
+              "enum": [<used>]
+            }
+          }
+        }
+      }
+    }
+    """
     Examples:
       | spaceName | fileContent                                                                                           | state    | total | remaining | used |
       | Quota1%   | 1                                                                                                    | normal   | 100   | 99        | 1    |
