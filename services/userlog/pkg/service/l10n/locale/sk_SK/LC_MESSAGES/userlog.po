@@ -1,0 +1,82 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: EMAIL\n"
+"POT-Creation-Date: 2023-03-15 09:04+0000\n"
+"PO-Revision-Date: 2023-03-15 08:28+0000\n"
+"Language-Team: Slovak (Slovakia) (https://www.transifex.com/owncloud-org/teams/6149/sk_SK/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sk_SK\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n >= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);\n"
+
+#: pkg/service/templates.go:30
+msgid "Access to Space {space} lost"
+msgstr ""
+
+#: pkg/service/templates.go:45
+msgid "Access to {resource} expired"
+msgstr ""
+
+#: pkg/service/templates.go:29
+msgid "Membership expired"
+msgstr ""
+
+#: pkg/service/templates.go:14
+msgid "Removed from Space"
+msgstr ""
+
+#: pkg/service/templates.go:34
+msgid "Resource shared"
+msgstr ""
+
+#: pkg/service/templates.go:39
+msgid "Resource unshared"
+msgstr ""
+
+#: pkg/service/templates.go:44
+msgid "Share expired"
+msgstr ""
+
+#: pkg/service/templates.go:24
+msgid "Space deleted"
+msgstr ""
+
+#: pkg/service/templates.go:19
+msgid "Space disabled"
+msgstr ""
+
+#: pkg/service/templates.go:9
+msgid "Space shared"
+msgstr ""
+
+#: pkg/service/templates.go:10
+msgid "{user} added you to Space {space}"
+msgstr ""
+
+#: pkg/service/templates.go:25
+msgid "{user} deleted Space {space}"
+msgstr ""
+
+#: pkg/service/templates.go:20
+msgid "{user} disabled Space {space}"
+msgstr ""
+
+#: pkg/service/templates.go:15
+msgid "{user} removed you from Space {space}"
+msgstr ""
+
+#: pkg/service/templates.go:35
+msgid "{user} shared {resource} with you"
+msgstr ""
+
+#: pkg/service/templates.go:40
+msgid "{user} unshared {resource} with you"
+msgstr ""
