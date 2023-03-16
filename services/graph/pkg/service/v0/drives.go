@@ -17,6 +17,7 @@ import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
@@ -30,7 +31,7 @@ import (
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
-	settingsServiceExt "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
+	settingsServiceExt "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/pkg/errors"
 	merrors "go-micro.dev/v4/errors"
 )
@@ -408,7 +409,21 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 
 	if drive.Quota.HasTotal() {
 		user := revactx.ContextMustGetUser(r.Context())
-		canSetSpaceQuota, err := g.canSetSpaceQuota(r.Context(), user)
+
+		// NOTE: a space admin cannot get a space by ID. We need to fetch all spaces and search for it
+		dt := _spaceTypePersonal
+		filters := []*storageprovider.ListStorageSpacesRequest_Filter{listStorageSpacesTypeFilter(_spaceTypeProject)}
+		res, err := g.ListStorageSpacesWithFilters(r.Context(), filters, true)
+		if err == nil && res.GetStatus().GetCode() == rpc.Code_CODE_OK {
+			for _, sp := range res.StorageSpaces {
+				id, _ := storagespace.ParseID(sp.GetId().GetOpaqueId())
+				if id.GetSpaceId() == rid.GetSpaceId() {
+					dt = _spaceTypeProject
+				}
+			}
+		}
+
+		canSetSpaceQuota, err := g.canSetSpaceQuota(r.Context(), user, dt)
 		if err != nil {
 			logger.Error().Err(err).Msg("could not update drive: failed to check if the user can set space quota")
 			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
@@ -832,8 +847,12 @@ func getQuota(quota *libregraph.Quota, defaultQuota string) *storageprovider.Quo
 	}
 }
 
-func (g Graph) canSetSpaceQuota(ctx context.Context, user *userv1beta1.User) (bool, error) {
-	_, err := g.permissionsService.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{PermissionId: settingsServiceExt.SetSpaceQuotaPermissionID})
+func (g Graph) canSetSpaceQuota(ctx context.Context, user *userv1beta1.User, typ string) (bool, error) {
+	permID := settingsServiceExt.SetPersonalSpaceQuotaPermissionID
+	if typ == _spaceTypeProject {
+		permID = settingsServiceExt.SetProjectSpaceQuotaPermissionID
+	}
+	_, err := g.permissionsService.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{PermissionId: permID})
 	if err != nil {
 		merror := merrors.FromError(err)
 		if merror.Status == http.StatusText(http.StatusNotFound) {
