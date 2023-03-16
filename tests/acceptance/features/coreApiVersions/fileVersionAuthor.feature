@@ -7,7 +7,6 @@ Feature: file versions remember the author of each version
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
-    And the administrator has enabled the file version storage feature
 
 
   Scenario: enable file versioning and check the history of changes from multiple users
@@ -360,54 +359,3 @@ Feature: file versions remember the author of each version
       | index | author |
       | 1     | Carol  |
       | 2     | Alice  |
-
-
-  Scenario: check the author of the file version which was created before enabling the version storage
-    Given the administrator has disabled the file version storage feature
-    And user "Alice" has uploaded file with content "uploaded content alice" to "/textfile0.txt"
-    And user "Alice" has shared folder "/textfile0.txt" with user "Brian"
-    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
-    And the administrator has enabled the file version storage feature
-    And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/textfile0.txt"
-    When user "Brian" restores version index "1" of file "/Shares/textfile0.txt" using the WebDAV API
-    Then the HTTP status code should be "204"
-    And as user "Alice" the authors of the versions of file "/textfile0.txt" should be:
-      | index | author |
-      | 1     | Brian  |
-    And as user "Brian" the authors of the versions of file "/Shares/textfile0.txt" should be:
-      | index | author |
-      | 1     | Brian  |
-    When user "Brian" restores version index "1" of file "/Shares/textfile0.txt" using the WebDAV API
-    Then the HTTP status code should be "204"
-    And as user "Alice" the authors of the versions of file "/textfile0.txt" should be:
-      | index | author |
-      | 1     |        |
-    And as user "Brian" the authors of the versions of file "/Shares/textfile0.txt" should be:
-      | index | author |
-      | 1     |        |
-
-
-  Scenario: check the author of the file version (inside a folder) which was created before enabling the version storage
-    Given user "Alice" has created folder "/test"
-    And the administrator has disabled the file version storage feature
-    And user "Alice" has uploaded file with content "uploaded content alice" to "/test/textfile0.txt"
-    And user "Alice" has shared folder "/test" with user "Brian" with permissions "all"
-    And user "Brian" has accepted share "/test" offered by user "Alice"
-    And the administrator has enabled the file version storage feature
-    And user "Brian" has uploaded file with content "uploaded content brian" to "/Shares/test/textfile0.txt"
-    When user "Brian" restores version index "1" of file "/Shares/test/textfile0.txt" using the WebDAV API
-    Then the HTTP status code should be "204"
-    And as user "Alice" the authors of the versions of file "/test/textfile0.txt" should be:
-      | index | author |
-      | 1     | Brian  |
-    And as user "Brian" the authors of the versions of file "/Shares/test/textfile0.txt" should be:
-      | index | author |
-      | 1     | Brian  |
-    When user "Brian" restores version index "1" of file "/Shares/test/textfile0.txt" using the WebDAV API
-    Then the HTTP status code should be "204"
-    And as user "Alice" the authors of the versions of file "/test/textfile0.txt" should be:
-      | index | author |
-      | 1     |        |
-    And as user "Brian" the authors of the versions of file "/Shares/test/textfile0.txt" should be:
-      | index | author |
-      | 1     |        |
