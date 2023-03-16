@@ -45,26 +45,9 @@ class AuthContext implements Context {
 	private $appTokens;
 
 	/**
-	 * @var boolean
-	 */
-	private $tokenAuthHasBeenSet = false;
-
-	/**
 	 * @var FeatureContext
 	 */
 	private $featureContext;
-
-	/**
-	 * @var string 'true' or 'false' or ''
-	 */
-	private $tokenAuthHasBeenSetTo = '';
-
-	/**
-	 * @return string
-	 */
-	public function getTokenAuthHasBeenSetTo():string {
-		return $this->tokenAuthHasBeenSetTo;
-	}
 
 	/**
 	 * get the client token that was last generated
@@ -1084,32 +1067,6 @@ class AuthContext implements Context {
 	}
 
 	/**
-	 * @When /^the administrator (enforces|does not enforce)\s?token auth$/
-	 * @Given /^token auth has (not|)\s?been enforced$/
-	 *
-	 * @param string $hasOrNot
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function tokenAuthHasBeenEnforced(string $hasOrNot):void {
-		$enforce = (($hasOrNot !== "not") && ($hasOrNot !== "does not enforce"));
-		if ($enforce) {
-			$value = 'true';
-		} else {
-			$value = 'false';
-		}
-		$occStatus = ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
-		if ($occStatus['code'] !== "0") {
-			throw new \Exception("setSystemConfig token_auth_enforced returned error code " . $occStatus['code']);
-		}
-
-		// Remember that we set this value, so it can be removed after the scenario
-		$this->tokenAuthHasBeenSet = true;
-		$this->tokenAuthHasBeenSetTo = $value;
-	}
-
-	/**
 	 *
 	 * @return string
 	 */
@@ -1117,22 +1074,6 @@ class AuthContext implements Context {
 		$this->aNewBrowserSessionForHasBeenStarted($this->featureContext->getAdminUsername());
 		$this->userGeneratesNewAppPasswordNamed('acceptance-test ' . \microtime());
 		return $this->appToken;
-	}
-
-	/**
-	 * delete token_auth_enforced if it was set in the scenario
-	 *
-	 * @AfterScenario
-	 *
-	 * @return void
-	 * @throws Exception
-	 * @throws \GuzzleHttp\Exception\GuzzleException
-	 */
-	public function deleteTokenAuthEnforcedAfterScenario():void {
-		if ($this->tokenAuthHasBeenSet) {
-			$this->tokenAuthHasBeenSet = false;
-			$this->tokenAuthHasBeenSetTo = '';
-		}
 	}
 
 	/**

@@ -464,16 +464,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			"readSkeletonFile"
 		);
 
-		//find the absolute path of the currently set skeletondirectory
-		$occResponse = ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
-		if ((int) $occResponse['code'] !== 0) {
-			throw new \Exception(
-				"could not get current skeletondirectory. " . $occResponse['stdErr']
-			);
-		}
-		$skeletonRoot = \trim($occResponse['stdOut']);
-
-		$fileInSkeletonFolder = \rawurlencode("$skeletonRoot/$fileInSkeletonFolder");
+		$fileInSkeletonFolder = \rawurlencode("/$fileInSkeletonFolder");
 		$response = OcsApiHelper::sendRequest(
 			$baseUrl,
 			$adminUsername,
@@ -491,23 +482,5 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		$localContent = (string)$localContent->data->element->contentUrlEncoded;
 		$localContent = \urldecode($localContent);
 		return $localContent;
-	}
-
-	/**
-	 * Finds all lines containing the given text
-	 *
-	 * @param string|null $input stdout or stderr output
-	 * @param string|null $text text to search for
-	 *
-	 * @return array array of lines that matched
-	 */
-	public static function findLines(?string $input, ?string $text):array {
-		$results = [];
-		foreach (\explode("\n", $input) as $line) {
-			if (\strpos($line, $text) !== false) {
-				$results[] = $line;
-			}
-		}
-		return $results;
 	}
 }

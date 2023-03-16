@@ -131,58 +131,6 @@ Feature: delete file/folder
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
 
-  @issue-ocis-reva-60
-  Scenario: send DELETE requests to webDav endpoints using token authentication should not work
-    Given token auth has been enforced
-    And a new browser session for "Alice" has been started
-    And the user has generated a new app password named "my-client"
-    When the user requests these endpoints with "DELETE" using the generated app password about user "Alice"
-      | endpoint                                           |
-      | /remote.php/webdav/textfile0.txt                   |
-      | /remote.php/dav/files/%username%/textfile0.txt     |
-      | /remote.php/webdav/PARENT                          |
-      | /remote.php/dav/files/%username%/PARENT            |
-      | /remote.php/dav/files/%username%/PARENT/parent.txt |
-    Then the HTTP status code of responses on all endpoints should be "401"
-
-  @issue-ocis-reva-60 @skipOnOcV10 @personalSpace
-  Scenario: send DELETE requests to webDav endpoints using token authentication should not work using the spaces WebDAV API
-    Given token auth has been enforced
-    And a new browser session for "Alice" has been started
-    And the user has generated a new app password named "my-client"
-    When the user requests these endpoints with "DELETE" using the generated app password about user "Alice"
-      | endpoint                                           |
-      | /remote.php/dav/spaces/%spaceid%/textfile0.txt     |
-      | /remote.php/dav/spaces/%spaceid%/PARENT            |
-      | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
-    Then the HTTP status code of responses on all endpoints should be "401"
-
-  @issue-ocis-reva-60
-  Scenario: send DELETE requests to webDav endpoints using app password token as password
-    Given token auth has been enforced
-    And a new browser session for "Alice" has been started
-    And the user has generated a new app password named "my-client"
-    When the user "Alice" requests these endpoints with "DELETE" using basic auth and generated app password about user "Alice"
-      | endpoint                                           |
-      | /remote.php/webdav/textfile0.txt                   |
-      | /remote.php/dav/files/%username%/textfile1.txt     |
-      | /remote.php/dav/files/%username%/PARENT/parent.txt |
-      | /remote.php/webdav/PARENT                          |
-      | /remote.php/dav/files/%username%/FOLDER            |
-    Then the HTTP status code of responses on all endpoints should be "204"
-
-  @issue-ocis-reva-60 @skipOnOcV10 @personalSpace
-  Scenario: send DELETE requests to webDav endpoints using app password token as password using the spaces WebDAV API
-    Given token auth has been enforced
-    And a new browser session for "Alice" has been started
-    And the user has generated a new app password named "my-client"
-    When the user "Alice" requests these endpoints with "DELETE" using basic auth and generated app password about user "Alice"
-      | endpoint                                           |
-      | /remote.php/dav/spaces/%spaceid%/textfile0.txt     |
-      | /remote.php/dav/spaces/%spaceid%/PARENT            |
-      | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
-    Then the HTTP status code of responses on all endpoints should be "204"
-
   @skipOnOcV10
   Scenario: send DELETE requests to webDav endpoints with body as normal user
     When user "Alice" requests these endpoints with "DELETE" including body "doesnotmatter" about user "Alice"

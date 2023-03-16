@@ -79,13 +79,6 @@ trait WebDav {
 
 	private $previousAsyncSetting = null;
 
-	private $previousDavSlowdownSetting = null;
-
-	/**
-	 * @var int
-	 */
-	private $currentDavSlowdownSettingSeconds = 0;
-
 	/**
 	 * response content parsed from XML to an array
 	 *
@@ -571,45 +564,6 @@ trait WebDav {
 	 */
 	public function setHttpTimeout(int $timeout):void {
 		$this->httpRequestTimeout = (int) $timeout;
-	}
-
-	/**
-	 * @Given the :method DAV requests are slowed down by :seconds seconds
-	 *
-	 * @param string $method
-	 * @param int $seconds
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function slowdownDavRequests(string $method, int $seconds):void {
-		if ($this->previousDavSlowdownSetting === null) {
-			$previousDavSlowdownSetting = ['code' => '', 'stdOut' => '', 'stdErr' => '' ]['stdOut'];
-			$this->previousDavSlowdownSetting = \trim($previousDavSlowdownSetting);
-		}
-		OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$this->getAdminUsername(),
-			$this->getAdminPassword(),
-			"PUT",
-			"/apps/testing/api/v1/davslowdown/$method/$seconds",
-			$this->getStepLineRef()
-		);
-		$this->currentDavSlowdownSettingSeconds = $seconds;
-	}
-
-	/**
-	 * Wait for possible slowed-down DAV requests to finish
-	 *
-	 * @return void
-	 */
-	public function waitForDavRequestsToFinish():void {
-		if ($this->currentDavSlowdownSettingSeconds > 0) {
-			// There could be a slowed-down request still happening on the server
-			// Wait just-in-case so that we do not accidentally have an effect on
-			// the next scenario.
-			\sleep($this->currentDavSlowdownSettingSeconds);
-		}
 	}
 
 	/**
