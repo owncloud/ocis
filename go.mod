@@ -1,6 +1,6 @@
 module github.com/owncloud/ocis/v2
 
-go 1.19
+go 1.20
 
 require (
 	github.com/CiscoM31/godata v1.0.7
@@ -10,7 +10,6 @@ require (
 	github.com/armon/go-radix v1.0.0
 	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.6
-	github.com/c2h5oh/datasize v0.0.0-20220606134207-859f65c6625b
 	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/cs3org/go-cs3apis v0.0.0-20221012090518-ef2996678965
 	github.com/cs3org/reva/v2 v2.12.1-0.20230316154023-890c222e8de8
