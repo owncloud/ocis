@@ -37,30 +37,35 @@ type Options struct {
 	autoProvsionCreator autoprovision.Creator
 }
 
+// WithLogger sets the logger option
 func WithLogger(l log.Logger) Option {
 	return func(o *Options) {
 		o.logger = l
 	}
 }
 
+// WithRevaAuthenticator set the RevaAuthenticator option
 func WithRevaAuthenticator(ra RevaAuthenticator) Option {
 	return func(o *Options) {
 		o.authProvider = ra
 	}
 }
 
+// WithMachineAuthAPIKey configures the machine auth API key
 func WithMachineAuthAPIKey(ma string) Option {
 	return func(o *Options) {
 		o.machineAuthAPIKey = ma
 	}
 }
 
+// WithOIDCissuer set the OIDC issuer URL
 func WithOIDCissuer(oidcISS string) Option {
 	return func(o *Options) {
 		o.oidcISS = oidcISS
 	}
 }
 
+// WithAutoProvisonCreator configures the autoprovision creator to use
 func WithAutoProvisonCreator(c autoprovision.Creator) Option {
 	return func(o *Options) {
 		o.autoProvsionCreator = c
