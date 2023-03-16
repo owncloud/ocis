@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"encoding/base64"
 	"net/http"
 	"strings"
 	"sync"
@@ -17,6 +18,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
 	store "go-micro.dev/v4/store"
+	"golang.org/x/crypto/sha3"
 	"golang.org/x/oauth2"
 )
 
@@ -68,7 +70,13 @@ type OIDCAuthenticator struct {
 
 func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[string]interface{}, error) {
 	var claims map[string]interface{}
-	record, err := m.userInfoCache.Read(token)
+
+	// usea 64 bytes long hash to have 256-bit collision resistance.
+	hash := make([]byte, 64)
+	sha3.ShakeSum256(hash, []byte(token))
+	encodedHash := base64.URLEncoding.EncodeToString(hash)
+
+	record, err := m.userInfoCache.Read(encodedHash)
 	if err != nil && err != store.ErrNotFound {
 		m.Logger.Error().Err(err).Msg("could not read from userinfo cache")
 	}
@@ -105,7 +113,7 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 			m.Logger.Error().Err(err).Msg("failed to marshal claims for userinfo cache")
 		} else {
 			err = m.userInfoCache.Write(&store.Record{
-				Key:    token,
+				Key:    encodedHash,
 				Value:  d,
 				Expiry: time.Until(expiration),
 			})
