@@ -3,7 +3,6 @@ package main
 import (
 	"os"
 
-	_ "github.com/KimMachineGun/automemlimit"
 	"github.com/owncloud/ocis/v2/ocis/pkg/command"
 )
 
