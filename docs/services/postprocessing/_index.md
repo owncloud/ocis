@@ -1,6 +1,19 @@
-# Postprocessing Service
+---
+title: Postprocessing
+weight: 20
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/services/postprocessing
+geekdocFilePath: _index.md
+geekdocCollapseSection: true
+---
 
-The `postprocessing` service handles the coordination of asynchronous postprocessing steps. 
+## Abstract
+
+The `postprocessing` service handles the coordination of asynchronous postprocessing steps.
+
+## Table of Contents
+
+{{< toc-tree >}}
 
 ## General Prerequisites
 

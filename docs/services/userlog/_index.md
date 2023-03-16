@@ -1,6 +1,19 @@
-# Userlog Service
+---
+title: Userlog
+weight: 20
+geekdocRepo: https://github.com/owncloud/ocis
+geekdocEditPath: edit/master/docs/services/userlog
+geekdocFilePath: _index.md
+geekdocCollapseSection: true
+---
+
+## Abstract
 
 The `userlog` service is a mediator between the `eventhistory` service and clients who want to be informed about user related events. It provides an API to retrieve those.
+
+## Table of Contents
+
+{{< toc-tree >}}
 
 ## Prerequisites
 

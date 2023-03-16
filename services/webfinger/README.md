@@ -1,12 +1,13 @@
 # Webfinger Service
 
-The webfinger service provides an RFC7033 WebFinger lookup of ownCloud instances relevant for a given user account.
+The webfinger service provides an RFC7033 WebFinger lookup of ownCloud instances relevant for a given user account via endpoints a the /.well-known/webfinger implementation.
 
 It is based on https://github.com/owncloud/lookup-webfinger-sciebo but also returns localized `titles` in addition to the `href` property.
 
 ## OpenID Connect Discovery
 
 Clients can make an unauthenticated `GET https://drive.ocis.test/.well-known/webfinger?resource=https%3A%2F%2Fcloud.ocis.test` request to discover the OpenID Connect Issuer in the `http://openid.net/specs/connect/1.0/issuer` relation:
+
 ```json
 {
     "subject": "acct:einstein@drive.ocis.test",
@@ -24,6 +25,7 @@ Here, the `resource` takes the instance domain URI, but an `acct:` URI works as 
 ## Authenticated Instance Discovery
 
 When using OpenID connect to authenticate requests, clients can look up the owncloud instances a user has access to.
+
 *   Authentication is necessary to prevent leaking information about existing users.
 *   Basic auth is not supported.
 
@@ -51,6 +53,7 @@ The default configuration will simply return the `OCIS_URL` and direct clients t
 ## Configure Different Instances Based on OpenidConnect UserInfo Claims
 
 A more complex example for configuring different instances could look like this:
+
 ```yaml
 webfinger:
   instances:

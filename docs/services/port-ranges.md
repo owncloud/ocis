@@ -4,12 +4,11 @@ date: 2018-05-02T00:00:00+00:00
 weight: 0
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/extensions
-geekdocFilePath: port-ranges.go
+geekdocFilePath: port-ranges.md
 geekdocCollapseSection: true
 ---
 
-oCIS services often need a port to expose their services to other services or the outside world.
-As users may have many different extensions running on the same machine, we should track port usage in the oCIS ecosystem. In the best case we ensure that each extension uses a non colliding port range, to make life of users easier.
+oCIS services often need a port to expose their services to other services or the outside world. As users may have many different extensions running on the same machine, we should track port usage in the oCIS ecosystem. In the best case we ensure that each extension uses a non colliding port range, to make life of users easier.
 
 This page tracks the knowingly used port ranges.
 
