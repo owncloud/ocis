@@ -12,8 +12,10 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.6
 	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/cs3org/go-cs3apis v0.0.0-20221012090518-ef2996678965
-	github.com/cs3org/reva/v2 v2.12.1-0.20230316154706-3c11349102b7
+	github.com/cs3org/reva/v2 v2.12.1-0.20230321085342-13f8b522b0d8
 	github.com/disintegration/imaging v1.6.2
+	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
+	github.com/egirna/icap-client v0.1.1
 	github.com/gabriel-vasile/mimetype v1.4.1
 	github.com/ggwhite/go-masker v1.0.9
 	github.com/go-chi/chi/v5 v5.0.8
@@ -163,6 +165,7 @@ require (
 	github.com/dlclark/regexp2 v1.4.0 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
+	github.com/egirna/icap v0.0.0-20181108071049-d5ee18bd70bc // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/emvi/iso-639-1 v1.0.1 // indirect
 	github.com/evanphx/json-patch/v5 v5.5.0 // indirect

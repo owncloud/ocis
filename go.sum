@@ -623,8 +623,8 @@ github.com/crewjam/httperr v0.2.0 h1:b2BfXR8U3AlIHwNeFFvZ+BV1LFvKLlzMjzaTnZMybNo
 github.com/crewjam/httperr v0.2.0/go.mod h1:Jlz+Sg/XqBQhyMjdDiC+GNNRzZTD7x39Gu3pglZ5oH4=
 github.com/crewjam/saml v0.4.10 h1:Rjs6x4s/aQFXiaPjw3uhB4VdxRqoxHXOJrrj4BsMn9o=
 github.com/crewjam/saml v0.4.10/go.mod h1:9Zh6dWPtB3MSzTRt8fIFH60Z351QQ+s7hCU3J/tTlA4=
-github.com/cs3org/reva/v2 v2.12.1-0.20230316154706-3c11349102b7 h1:5VPGJ4gTxSvbSmbI5H+n+X6PD8JsoOxVQynW0ddZ9so=
-github.com/cs3org/reva/v2 v2.12.1-0.20230316154706-3c11349102b7/go.mod h1:FNAYs5H3xs8v0OFmNgZtiMAzIMXd/6TJmO0uZuNn8pQ=
+github.com/cs3org/reva/v2 v2.12.1-0.20230321085342-13f8b522b0d8 h1:1J0z1BZTppSILfrVveamCIdMm8AZMKUcY5gQHKke16Y=
+github.com/cs3org/reva/v2 v2.12.1-0.20230321085342-13f8b522b0d8/go.mod h1:FNAYs5H3xs8v0OFmNgZtiMAzIMXd/6TJmO0uZuNn8pQ=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
@@ -658,9 +658,15 @@ github.com/docker/go-units v0.4.0 h1:3uh0PgVws3nIA0Q+MwDC8yjEPf9zjRfZZWXZYDct3Tw
 github.com/docker/go-units v0.4.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
 github.com/dustin/go-humanize v1.0.0 h1:VSnTsYCnlFHaM2/igO1h6X3HA71jcobQuxemgkq4zYo=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
+github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e h1:rcHHSQqzCgvlwP0I/fQ8rQMn/MpHE5gWSLdtpxtP6KQ=
+github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e/go.mod h1:Byz7q8MSzSPkouskHJhX0er2mZY/m0Vj5bMeMCkkyY4=
 github.com/eapache/go-resiliency v1.1.0/go.mod h1:kFI+JgMyC7bLPUVY133qvEBtVayf5mFgVsvEsIPBvNs=
 github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21/go.mod h1:+020luEh2TKB4/GOp8oxxtq0Daoen/Cii55CzbTV6DU=
 github.com/eapache/queue v1.1.0/go.mod h1:6eCeP0CKFpHLu8blIFXhExK/dRa7WDZfr6jVFPTqq+I=
+github.com/egirna/icap v0.0.0-20181108071049-d5ee18bd70bc h1:6IxmRbXV8WXVkcYcTzkU219A3UZeNMX/e6X2sve1wXA=
+github.com/egirna/icap v0.0.0-20181108071049-d5ee18bd70bc/go.mod h1:FdVN2WHg7zOHhJ7kZQdDorfFhIfqZaHttjAzDDvAXHE=
+github.com/egirna/icap-client v0.1.1 h1:UURZRA7+36bBmMgJZHB+W4d3hfp20pDUA/QL794C0ck=
+github.com/egirna/icap-client v0.1.1/go.mod h1:6yHhnak1cKRyhDoRxnzlRKJbOTXPgh9Oe3tOs7Sq3vw=
 github.com/emirpasic/gods v1.12.0/go.mod h1:YfzfFFoVP/catgzJb4IKIqXjX78Ha8FMSDh3ymbK86o=
 github.com/emirpasic/gods v1.18.1 h1:FXtiHYKDGKCW2KzwZKx0iC0PQmdlorYgdFG9jPXJ1Bc=
 github.com/emirpasic/gods v1.18.1/go.mod h1:8tpGGwCnJ5H4r6BWwaV6OrWmMoPhUl5jm/FMNAnJvWQ=
