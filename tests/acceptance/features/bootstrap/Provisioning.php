@@ -493,7 +493,6 @@ trait Provisioning {
 	 */
 	public function userHasBeenCreatedWithDefaultAttributesAndWithoutSkeletonFiles(string $user):void {
 		$this->userHasBeenCreatedWithDefaultAttributes($user);
-		$this->resetOccLastCode();
 	}
 
 	/**
@@ -755,59 +754,6 @@ trait Provisioning {
 
 		$this->ldap->add($newDN, $entry);
 		$this->ldapCreatedGroups[] = $group;
-	}
-
-	/**
-	 *
-	 * @param string $configId
-	 * @param string $configKey
-	 * @param string $configValue
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function setLdapSetting(string $configId, string $configKey, string $configValue):void {
-		if ($configValue === "") {
-			$configValue = "''";
-		}
-		$substitutions = [
-			[
-				"code" => "%ldap_host_without_scheme%",
-				"function" => [
-					$this,
-					"getLdapHostWithoutScheme"
-				],
-				"parameter" => []
-			],
-			[
-				"code" => "%ldap_host%",
-				"function" => [
-					$this,
-					"getLdapHost"
-				],
-				"parameter" => []
-			],
-			[
-				"code" => "%ldap_port%",
-				"function" => [
-					$this,
-					"getLdapPort"
-				],
-				"parameter" => []
-			]
-		];
-		$configValue = $this->substituteInLineCodes(
-			$configValue,
-			null,
-			[],
-			$substitutions
-		);
-		$occResult = ['code' => '', 'stdOut' => '', 'stdErr' => '' ];
-		if ($occResult['code'] !== "0") {
-			throw new Exception(
-				__METHOD__ . " could not set LDAP setting " . $occResult['stdErr']
-			);
-		}
 	}
 
 	/**
@@ -5545,8 +5491,6 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function afterScenario():void {
-		$this->waitForDavRequestsToFinish();
-
 		if ($this->someUsersHaveBeenCreated()) {
 			foreach ($this->getCreatedUsers() as $user) {
 				OcisHelper::deleteRevaUserData($user["actualUsername"]);
@@ -5586,7 +5530,6 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function cleanupDatabaseUsers():void {
-		$this->authContext->deleteTokenAuthEnforcedAfterScenario();
 		$previousServer = $this->currentServer;
 		$this->usingServer('LOCAL');
 		foreach ($this->createdUsers as $user => $userData) {
@@ -5605,7 +5548,6 @@ trait Provisioning {
 	 * @throws Exception
 	 */
 	public function cleanupDatabaseGroups():void {
-		$this->authContext->deleteTokenAuthEnforcedAfterScenario();
 		$previousServer = $this->currentServer;
 		$this->usingServer('LOCAL');
 		foreach ($this->createdGroups as $group => $groupData) {
