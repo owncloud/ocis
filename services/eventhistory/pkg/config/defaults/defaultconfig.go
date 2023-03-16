@@ -27,7 +27,7 @@ func DefaultConfig() *config.Config {
 			EnableTLS: false,
 		},
 		Store: config.Store{
-			Type:         "mem",
+			Type:         "memory",
 			RecordExpiry: 336 * time.Hour,
 		},
 		GRPC: config.GRPCConfig{

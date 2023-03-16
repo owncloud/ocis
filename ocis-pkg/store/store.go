@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"strings"
+	"time"
 
 	natsjs "github.com/go-micro/plugins/v4/store/nats-js"
 	"github.com/go-micro/plugins/v4/store/redis"
@@ -10,13 +11,14 @@ import (
 	"github.com/nats-io/nats.go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/store/etcd"
 	"github.com/owncloud/ocis/v2/ocis-pkg/store/memory"
+	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/store"
 )
 
 var ocMemStore *store.Store
 
 const (
-	TypeMem           = "mem"
+	TypeMemory        = "memory"
 	TypeNoop          = "noop"
 	TypeEtcd          = "etcd"
 	TypeRedis         = "redis"
@@ -40,17 +42,9 @@ func Create(opts ...store.Option) store.Store {
 		o(options)
 	}
 
-	cacheOpts, ok := options.Context.Value(cacheOptionsContextKey{}).(CacheOptions)
-	if !ok {
-		cacheOpts = CacheOptions{}
-	}
+	storeType, _ := options.Context.Value(typeContextKey{}).(string)
 
-	switch cacheOpts.Type {
-	default:
-		// TODO: better to error in default case?
-		fallthrough
-	case TypeMem:
-		return store.NewMemoryStore(opts...)
+	switch storeType {
 	case TypeNoop:
 		return store.NewNoopStore(opts...)
 	case TypeEtcd:
@@ -84,7 +78,7 @@ func Create(opts ...store.Option) store.Store {
 		if ocMemStore == nil {
 			var memStore store.Store
 
-			sizeNum := cacheOpts.Size
+			sizeNum, _ := options.Context.Value(sizeContextKey{}).(int)
 			if sizeNum <= 0 {
 				memStore = memory.NewMultiMemStore()
 			} else {
@@ -102,13 +96,23 @@ func Create(opts ...store.Option) store.Store {
 		}
 		return *ocMemStore
 	case TypeNatsJS:
+		ttl, _ := options.Context.Value(ttlContextKey{}).(time.Duration)
 		// TODO nats needs a DefaultTTL option as it does not support per Write TTL ...
 		// FIXME nats has restrictions on the key, we cannot use slashes AFAICT
 		// host, port, clusterid
 		return natsjs.NewStore(
 			append(opts,
 				natsjs.NatsOptions(nats.Options{Name: "TODO"}),
-				natsjs.DefaultTTL(cacheOpts.TTL))...,
+				natsjs.DefaultTTL(ttl))...,
 		) // TODO test with ocis nats
+	case TypeMemory, "mem", "": // allow existing short form and use as default
+		return store.NewMemoryStore(opts...)
+	default:
+		// try to log an error
+		if options.Logger == nil {
+			options.Logger = logger.DefaultLogger
+		}
+		options.Logger.Logf(logger.ErrorLevel, "unknown store type: '%s', falling back to memory", storeType)
+		return store.NewMemoryStore(opts...)
 	}
 }

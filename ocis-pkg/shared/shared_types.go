@@ -56,7 +56,7 @@ type HTTPServiceTLS struct {
 }
 
 type CacheStore struct {
-	Type      string        `yaml:"type" env:"OCIS_CACHE_STORE_TYPE" desc:"The type of the cache store. Supported values are: 'mem', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	Type      string        `yaml:"type" env:"OCIS_CACHE_STORE_TYPE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
 	Addresses []string      `yaml:"addresses" env:"OCIS_CACHE_STORE_ADDRESSES" desc:"A comma separated list of addresses to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how addresses are used is dependent on the library of the configured store."`
 	Database  string        `yaml:"database" env:"OCIS_CACHE_STORE_DATABASE" desc:"The database name the configured store should use. This has no effect when 'in-memory' stores are configured."`
 	Table     string        `yaml:"table" env:"OCIS_CACHE_STORE_TABLE" desc:"The database table the store should use. This has no effect when 'in-memory' stores are configured."`

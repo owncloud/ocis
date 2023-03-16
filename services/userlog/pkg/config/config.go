@@ -32,7 +32,7 @@ type Config struct {
 
 // Store configures the store to use
 type Store struct {
-	Type      string        `yaml:"type" env:"OCIS_PERSISTENT_STORE_TYPE;USERLOG_STORE_TYPE" desc:"The type of the userlog store. Supported values are: 'mem', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	Type      string        `yaml:"type" env:"OCIS_PERSISTENT_STORE_TYPE;USERLOG_STORE_TYPE" desc:"The type of the userlog store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
 	Addresses []string      `yaml:"addresses" env:"OCIS_PERSISTENT_STORE_ADDRESSES;USERLOG_STORE_ADDRESSES" desc:"A comma separated list of addresses to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how addresses are used is dependent on the library of the configured store."`
 	Database  string        `yaml:"database" env:"USERLOG_STORE_DATABASE" desc:"The database name the configured store should use."`
 	Table     string        `yaml:"table" env:"USERLOG_STORE_TABLE" desc:"The database table the store should use."`

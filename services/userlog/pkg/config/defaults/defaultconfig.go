@@ -29,7 +29,7 @@ func DefaultConfig() *config.Config {
 			EnableTLS: false,
 		},
 		Store: config.Store{
-			Type:     "mem",
+			Type:     "memory",
 			Database: "userlog",
 			Table:    "events",
 			TTL:      time.Hour * 336,

@@ -213,11 +213,9 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 	}
 
 	cache := store.Create(
-		store.WithCacheOptions(store.CacheOptions{
-			Type: cfg.OIDC.UserinfoCache.Type,
-			TTL:  cfg.OIDC.UserinfoCache.TTL,
-			Size: cfg.OIDC.UserinfoCache.Size,
-		}),
+		store.Type(cfg.OIDC.UserinfoCache.Type),
+		store.TTL(cfg.OIDC.UserinfoCache.TTL),
+		store.Size(cfg.OIDC.UserinfoCache.Size),
 		microstore.Nodes(cfg.OIDC.UserinfoCache.Addresses...),
 		microstore.Database(cfg.OIDC.UserinfoCache.Database),
 		microstore.Table(cfg.OIDC.UserinfoCache.Table),

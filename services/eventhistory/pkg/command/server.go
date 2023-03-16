@@ -56,11 +56,9 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			st := store.Create(
-				store.WithCacheOptions(store.CacheOptions{
-					Type: cfg.Store.Type,
-					TTL:  cfg.Store.RecordExpiry,
-					Size: cfg.Store.Size,
-				}),
+				store.Type(cfg.Store.Type),
+				store.TTL(cfg.Store.RecordExpiry),
+				store.Size(cfg.Store.Size),
 				microstore.Nodes(cfg.Store.Addresses...),
 				microstore.Database(cfg.Store.Database),
 				microstore.Table(cfg.Store.Table),

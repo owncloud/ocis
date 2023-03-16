@@ -4,7 +4,7 @@ import "time"
 
 // CacheStore defines the available configuration for a cache store
 type CacheStore struct {
-	Type      string        `yaml:"type" env:"OCIS_CACHE_STORE_TYPE;GRAPH_CACHE_STORE_TYPE" desc:"The type of the cache store. Supported values are: 'mem', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	Type      string        `yaml:"type" env:"OCIS_CACHE_STORE_TYPE;GRAPH_CACHE_STORE_TYPE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
 	Addresses []string      `yaml:"addresses" env:"OCIS_CACHE_STORE_ADDRESSES;GRAPH_CACHE_STORE_ADDRESSES" desc:"A comma-separated list of addresses to connect to. Only valid if the above setting is set to \"etcd\""`
 	Database  string        `yaml:"database" env:"GRAPH_CACHE_STORE_DATABASE" desc:"The database name the configured store should use."`
 	Table     string        `yaml:"table" env:"GRAPH_CACHE_STORE_TABLE" desc:"The database table the store should use."`

@@ -160,11 +160,9 @@ func NewService(opts ...Option) (Graph, error) {
 	roleManager := options.RoleManager
 	if roleManager == nil {
 		storeOptions := []microstore.Option{
-			store.WithCacheOptions(store.CacheOptions{
-				Type: options.Config.CacheStore.Type,
-				TTL:  options.Config.CacheStore.TTL,
-				Size: options.Config.CacheStore.Size,
-			}),
+			store.Type(options.Config.CacheStore.Type),
+			store.TTL(options.Config.CacheStore.TTL),
+			store.Size(options.Config.CacheStore.Size),
 			microstore.Nodes(options.Config.CacheStore.Addresses...),
 			microstore.Database(options.Config.CacheStore.Database),
 			microstore.Table(options.Config.CacheStore.Table),
