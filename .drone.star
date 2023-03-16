@@ -54,6 +54,7 @@ dirs = {
 config = {
     "modules": [
         # if you add a module here please also add it to the root level Makefile
+        "services/antivirus",
         "services/app-provider",
         "services/app-registry",
         "services/audit",

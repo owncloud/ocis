@@ -54,6 +54,7 @@ func (s ICAP) Scan(file io.Reader) (ScanResult, error) {
 		return sr, err
 	}
 
+	// TODO: make header configurable. See oc10 documentation: https://doc.owncloud.com/server/10.12/admin_manual/configuration/server/virus-scanner-support.html
 	if data, infected := resp.Header["X-Infection-Found"]; infected {
 		sr.Infected = infected
 		re := regexp.MustCompile(`Threat=(.*);`)
