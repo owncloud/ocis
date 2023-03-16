@@ -100,21 +100,22 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 	}
 
 	expiration := m.extractExpiration(aClaims)
-
-	if d, err := msgpack.Marshal(claims); err != nil {
-		m.Logger.Error().Err(err).Msg("failed to marshal claims for userinfo cache")
-	} else {
-		err = m.userInfoCache.Write(&store.Record{
-			Key:    token,
-			Value:  d,
-			Expiry: time.Until(expiration),
-		})
-		if err != nil {
-			m.Logger.Error().Err(err).Msg("failed to write to userinfo cache")
+	go func() {
+		if d, err := msgpack.Marshal(claims); err != nil {
+			m.Logger.Error().Err(err).Msg("failed to marshal claims for userinfo cache")
+		} else {
+			err = m.userInfoCache.Write(&store.Record{
+				Key:    token,
+				Value:  d,
+				Expiry: time.Until(expiration),
+			})
+			if err != nil {
+				m.Logger.Error().Err(err).Msg("failed to write to userinfo cache")
+			}
 		}
-	}
+	}()
 
-	m.Logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Time("expiration", expiration.UTC()).Msg("unmarshalled and cached userinfo")
+	m.Logger.Debug().Interface("claims", claims).Msg("extracted claims")
 	return claims, nil
 }
 
