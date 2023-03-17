@@ -28,10 +28,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 )
 
-type classList struct {
-	Value []*libregraph.EducationClass
-}
-
 var _ = Describe("EducationClass", func() {
 	var (
 		svc                      service.Service
