@@ -5,6 +5,7 @@ import (
 	"context"
 	"embed"
 	"errors"
+	"io/fs"
 	"strings"
 	"text/template"
 	"time"
@@ -287,7 +288,8 @@ func loadTemplates(nt NotificationTemplate, locale string, path string) (string,
 	// Create Locale with library path and language code and load default domain
 	var l *gotext.Locale
 	if path == "" {
-		l = gotext.NewLocaleFS("l10n/locale", locale, _translationFS)
+		filesystem, _ := fs.Sub(_translationFS, "l10n/locale")
+		l = gotext.NewLocaleFS(locale, filesystem)
 	} else { // use custom path instead
 		l = gotext.NewLocale(path, locale)
 	}
