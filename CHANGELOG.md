@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Add portrait thumbnail resolutions: [#5656](https://github.com/owncloud/ocis/pull/5656)
 * Change - Bump libregraph lico: [#5768](https://github.com/owncloud/ocis/pull/5768)
 * Change - Remove the settings ui: [#5463](https://github.com/owncloud/ocis/pull/5463)
+* Enhancement - Add 'ocis decomposedfs metadata' command: [#5858](https://github.com/owncloud/ocis/pull/5858)
 * Enhancement - Add global env variable extractor: [#5164](https://github.com/owncloud/ocis/pull/5164)
 * Enhancement - Async Postprocessing: [#5207](https://github.com/owncloud/ocis/pull/5207)
 * Enhancement - Add endpoints to upload a custom logo: [#5735](https://github.com/owncloud/ocis/pull/5735)
