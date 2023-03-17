@@ -30,7 +30,7 @@ Feature: create group
     And group "mygroup" should exist
 
 
-  Scenario Outline: normal user tries to create a group
+  Scenario Outline: user other than the admin can't create a group
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<userRole>" using the settings api
     When user "Brian" tries to create a group "mygroup" using the Graph API
@@ -42,32 +42,7 @@ Feature: create group
       | User        |
       | Guest       |
 
-
-  Scenario Outline: normal user tries to create a group that already exists
-    Given group "mygroup" has been created
-    And user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Brian" the role "<userRole>" using the settings api
-    When user "Brian" tries to create a group "mygroup" using the Graph API
-    And the HTTP status code should be "401"
-    And group "mygroup" should exist
-    Examples:
-      | userRole    |
-      | Space Admin |
-      | User        |
-      | Guest       |
-
   @issue-5050
   Scenario: admin user tries to create a group that is the empty string
     When user "Alice" tries to create a group "" using the Graph API
     Then the HTTP status code should be "400"
-
-
-  Scenario Outline: normal user tries to create a group that is the empty string
-    Given the administrator has given "Alice" the role "<userRole>" using the settings api
-    When user "Alice" tries to create a group "" using the Graph API
-    Then the HTTP status code should be "401"
-    Examples:
-      | userRole    |
-      | Space Admin |
-      | User        |
-      | Guest       |

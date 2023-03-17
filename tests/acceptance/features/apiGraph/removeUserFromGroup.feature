@@ -157,7 +157,7 @@ Feature: remove a user from a group
     Then the HTTP status code should be "404"
 
 
-  Scenario Outline: normal user tries to remove a user in their group
+  Scenario Outline: user other than the admin can't remove a user from their group
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<role>" using the settings api
     And group "grp1" has been created

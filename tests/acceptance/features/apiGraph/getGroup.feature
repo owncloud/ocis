@@ -21,7 +21,7 @@ Feature: get groups and their members
       | h2o-lover    |
 
 
-  Scenario Outline: normal user cannot get the groups list
+  Scenario Outline: user other than the admin shouldn't get the groups list
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<role>" using the settings api
     And group "tea-lover" has been created
@@ -52,7 +52,7 @@ Feature: get groups and their members
       | Carol |
 
 
-  Scenario Outline: normal user tries to get users of a group
+  Scenario Outline: user other than the admin shouldn't get users of a group
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<role>" using the settings api
     And group "tea-lover" has been created
@@ -87,7 +87,7 @@ Feature: get groups and their members
       | Carol King   | %uuid_v4% | carol@example.org | Carol                    |
 
 
-  Scenario Outline: normal user gets all groups along with their members information
+  Scenario Outline: user other than the admin shouldn't get all groups along with its member's information
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<role>" using the settings api
     And group "tea-lover" has been created
@@ -104,7 +104,7 @@ Feature: get groups and their members
       | Guest       |
 
 
-  Scenario: admin user gets a group along with their members information
+  Scenario: admin user gets a group along with its member's information
     Given user "Brian" has been created with default attributes and without skeleton files
     And group "tea-lover" has been created
     And user "Alice" has been added to group "tea-lover"
@@ -116,7 +116,7 @@ Feature: get groups and their members
       | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    |
 
   @issue-5604
-  Scenario Outline: normal user gets a group along with their members information
+  Scenario Outline: user other than the admin gets a group along with its member's information
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<role>" using the settings api
     And group "tea-lover" has been created

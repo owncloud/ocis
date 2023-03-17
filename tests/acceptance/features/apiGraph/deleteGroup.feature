@@ -51,7 +51,7 @@ Feature: delete groups
       | 50%2Fix             | %2F literal looks like an escaped slash |
 
 
-  Scenario Outline: normal user tries to delete a group
+  Scenario Outline: user other than the admin can't delete a group
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<role>" using the settings api
     And group "new-group" has been created

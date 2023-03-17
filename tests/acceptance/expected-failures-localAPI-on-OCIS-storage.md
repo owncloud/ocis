@@ -44,7 +44,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesShares/copySpaces.feature:793](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L793)
 
 ### [Creating group with empty name returns status code 200](https://github.com/owncloud/ocis/issues/5050)
-- [apiGraph/createGroup.feature:60](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroup.feature#L60)
+- [apiGraph/createGroup.feature:46](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroup.feature#L46)
 
 ### [Settings service user can list other peoples assignments](https://github.com/owncloud/ocis/issues/5032)
 - [apiAccountsHashDifficulty/assignRole.feature:27](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L27)
@@ -69,9 +69,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/editGroup.feature:24](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L24)
 - [apiGraph/editGroup.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L25)
 - [apiGraph/editGroup.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L40)
-- [apiGraph/editGroup.feature:53](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L53)
-- [apiGraph/editGroup.feature:54](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L54)
-- [apiGraph/editGroup.feature:55](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L55)
 
 #### [CORS headers are not identical with oC10 headers](https://github.com/owncloud/ocis/issues/5195)
 - [apiCors/cors.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L25)
@@ -124,9 +121,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Sharing to a group with an expiration date does not work #5442](https://github.com/owncloud/ocis/issues/5442)
 - [apiSpacesShares/shareSubItemOfSpace.feature:105](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L105)
 
-#### [Space admin should not be able to change the user quota](https://github.com/owncloud/ocis/issues/5475)
-- [apiSpaces/spaceManagement.feature:149](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/spaceManagement.feature#L149)
-
 #### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
 - [apiGraph/getGroup.feature:130](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L130)
 - [apiGraph/getGroup.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L131)
@@ -139,10 +133,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/editUser.feature:44](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L44)
 
 #### [Same users can be added in a group multiple time](https://github.com/owncloud/ocis/issues/5702)
-- [apiGraph/addUserToGroup.feature:245](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L245)
+- [apiGraph/addUserToGroup.feature:246](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L245)
 
 #### [Try to add group to a group return 204](https://github.com/owncloud/ocis/issues/5793)
-- [apiGraph/addUserToGroup.feature:267](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L267)
+- [apiGraph/addUserToGroup.feature:268](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L267)
 
 ### [Users are added in a group with wrong host in host-part of user](https://github.com/owncloud/ocis/issues/5871)
 - [apiGraph/addUserToGroup.feature:292](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L292)

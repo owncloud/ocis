@@ -1329,7 +1329,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When user :user tries to rename non-existent group to :newGroup using the Graph API
+	 * @When user :user tries to rename a nonexistent group to :newGroup using the Graph API
 	 *
 	 * @param string $user
 	 * @param string $newGroup
@@ -1338,7 +1338,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function userTriesToRenamesGroupNonExistentGroupToUsingTheGraphApi(string $user, string $newGroup): void {
+	public function userTriesToRenameNonExistentGroupToNewGroupName(string $user, string $newGroup): void {
 		$oldGroupId = WebDavHelper::generateUUIDv4();
 		$this->featureContext->setResponse($this->renameGroup($oldGroupId, $newGroup, $user));
 	}

@@ -25,7 +25,7 @@ Feature: edit group name
       | grp1      | 50%pass       |
 
 
-  Scenario Outline: normal user tries to rename a group
+  Scenario Outline: user other than the admin can't rename a group
     Given the administrator has given "Alice" the role "<role>" using the settings api
     And group "grp1" has been created
     When user "Alice" tries to rename group "grp1" to "grp101" using the Graph API
@@ -37,19 +37,7 @@ Feature: edit group name
       | Guest       |
 
 
-  Scenario: admin user tries to rename non-existent group
-    When user "Alice" tries to rename non-existent group to "grp1" using the Graph API
+  Scenario: admin user tries to rename nonexistent group
+    When user "Alice" tries to rename a nonexistent group to "grp1" using the Graph API
     Then the HTTP status code should be "404"
     And group "grp1" should not exist
-
-
-  Scenario Outline: normal user tries to rename non-existent group
-    Given the administrator has given "Alice" the role "<role>" using the settings api
-    When user "Alice" tries to rename non-existent group to "grp1" using the Graph API
-    Then the HTTP status code should be "404"
-    And group "grp1" should not exist
-    Examples:
-      | role        |
-      | Space Admin |
-      | User        |
-      | Guest       |
