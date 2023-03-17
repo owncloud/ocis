@@ -274,36 +274,23 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	}
 
 	mr := ldap.ModifyRequest{DN: e.DN}
-	if user.GetDisplayName() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName) != user.GetDisplayName() {
-			mr.Replace(i.userAttributeMap.displayName, []string{user.GetDisplayName()})
-			updateNeeded = true
+	properties := map[string]string{
+		i.userAttributeMap.displayName: user.GetDisplayName(),
+		i.userAttributeMap.mail:        user.GetMail(),
+		i.userAttributeMap.surname:     user.GetSurname(),
+		i.userAttributeMap.givenName:   user.GetGivenName(),
+		i.userAttributeMap.userType:    user.GetUserType(),
+	}
+
+	for attribute, value := range properties {
+		if value != "" {
+			if e.GetEqualFoldAttributeValue(attribute) != value {
+				mr.Replace(attribute, []string{value})
+				updateNeeded = true
+			}
 		}
 	}
-	if user.GetMail() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.mail) != user.GetMail() {
-			mr.Replace(i.userAttributeMap.mail, []string{user.GetMail()})
-			updateNeeded = true
-		}
-	}
-	if user.GetSurname() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.surname) != user.GetSurname() {
-			mr.Replace(i.userAttributeMap.surname, []string{user.GetSurname()})
-			updateNeeded = true
-		}
-	}
-	if user.GetGivenName() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName) != user.GetGivenName() {
-			mr.Replace(i.userAttributeMap.givenName, []string{user.GetGivenName()})
-			updateNeeded = true
-		}
-	}
-	if user.GetUserType() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.userType) != user.GetUserType() {
-			mr.Replace(i.userAttributeMap.userType, []string{user.GetUserType()})
-			updateNeeded = true
-		}
-	}
+
 	if user.PasswordProfile != nil && user.PasswordProfile.GetPassword() != "" {
 		if i.usePwModifyExOp {
 			if err := i.updateUserPassowrd(ctx, e.DN, user.PasswordProfile.GetPassword()); err != nil {

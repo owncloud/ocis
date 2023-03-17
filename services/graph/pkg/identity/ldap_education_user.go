@@ -109,36 +109,24 @@ func (i *LDAP) UpdateEducationUser(ctx context.Context, nameOrID string, user li
 	}
 
 	mr := ldap.ModifyRequest{DN: e.DN}
-	if user.GetDisplayName() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName) != user.GetDisplayName() {
-			mr.Replace(i.userAttributeMap.displayName, []string{user.GetDisplayName()})
-			updateNeeded = true
+	properties := map[string]string{
+		i.userAttributeMap.displayName:                 user.GetDisplayName(),
+		i.userAttributeMap.mail:                        user.GetMail(),
+		i.userAttributeMap.surname:                     user.GetSurname(),
+		i.userAttributeMap.givenName:                   user.GetGivenName(),
+		i.userAttributeMap.userType:                    user.GetUserType(),
+		i.educationConfig.userAttributeMap.primaryRole: user.GetPrimaryRole(),
+	}
+
+	for attribute, value := range properties {
+		if value != "" {
+			if e.GetEqualFoldAttributeValue(attribute) != value {
+				mr.Replace(attribute, []string{value})
+				updateNeeded = true
+			}
 		}
 	}
-	if user.GetMail() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.mail) != user.GetMail() {
-			mr.Replace(i.userAttributeMap.mail, []string{user.GetMail()})
-			updateNeeded = true
-		}
-	}
-	if user.GetSurname() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.surname) != user.GetSurname() {
-			mr.Replace(i.userAttributeMap.surname, []string{user.GetSurname()})
-			updateNeeded = true
-		}
-	}
-	if user.GetGivenName() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName) != user.GetGivenName() {
-			mr.Replace(i.userAttributeMap.givenName, []string{user.GetGivenName()})
-			updateNeeded = true
-		}
-	}
-	if user.GetUserType() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.userType) != user.GetUserType() {
-			mr.Replace(i.userAttributeMap.userType, []string{user.GetUserType()})
-			updateNeeded = true
-		}
-	}
+
 	if user.AccountEnabled != nil {
 		un, err := i.updateAccountEnabledState(logger, user.GetAccountEnabled(), e, &mr)
 
@@ -159,12 +147,6 @@ func (i *LDAP) UpdateEducationUser(ctx context.Context, nameOrID string, user li
 			// password are hashed server side there is no need to check if the new password
 			// is actually different from the old one.
 			mr.Replace("userPassword", []string{user.PasswordProfile.GetPassword()})
-			updateNeeded = true
-		}
-	}
-	if user.GetPrimaryRole() != "" {
-		if e.GetEqualFoldAttributeValue(i.educationConfig.userAttributeMap.primaryRole) != user.GetPrimaryRole() {
-			mr.Replace(i.educationConfig.userAttributeMap.primaryRole, []string{user.GetPrimaryRole()})
 			updateNeeded = true
 		}
 	}
