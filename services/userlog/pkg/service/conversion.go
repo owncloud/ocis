@@ -25,8 +25,9 @@ import (
 var _translationFS embed.FS
 
 var (
-	_resourceTypeSpace = "storagespace"
-	_resourceTypeShare = "share"
+	_resourceTypeResource = "resource"
+	_resourceTypeSpace    = "storagespace"
+	_resourceTypeShare    = "share"
 
 	_domain = "userlog"
 )
@@ -96,6 +97,13 @@ func (c *Converter) ConvertEvent(event *ehmsg.Event) (OC10Notification, error) {
 	switch ev := einterface.(type) {
 	default:
 		return OC10Notification{}, errors.New("unknown event type")
+		// file related
+	case events.PostprocessingStepFinished:
+		if ev.FinishedStep != events.PPStepAntivirus {
+			return OC10Notification{}, errors.New("unknown event type")
+		}
+		res := ev.Result.(events.VirusscanResult)
+		return c.virusMessage(event.Id, VirusFound, ev.ExecutingUser, res.ResourceID, ev.Filename, res.Description, res.Scandate)
 	// space related
 	case events.SpaceDisabled:
 		return c.spaceMessage(event.Id, SpaceDisabled, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
@@ -224,6 +232,30 @@ func (c *Converter) shareMessage(eventid string, nt NotificationTemplate, execut
 		Message:        msg,
 		MessageRaw:     msgraw,
 		MessageDetails: generateDetails(usr, nil, info, shareid),
+	}, nil
+}
+
+func (c *Converter) virusMessage(eventid string, nt NotificationTemplate, executant *user.User, rid *storageprovider.ResourceId, filename string, virus string, ts time.Time) (OC10Notification, error) {
+	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.translationPath, map[string]interface{}{
+		"resourcename":     filename,
+		"virusdescription": virus,
+	})
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	return OC10Notification{
+		EventID:        eventid,
+		Service:        c.serviceName,
+		UserName:       executant.GetUsername(),
+		Timestamp:      ts.Format(time.RFC3339Nano),
+		ResourceID:     storagespace.FormatResourceID(*rid),
+		ResourceType:   _resourceTypeResource,
+		Subject:        subj,
+		SubjectRaw:     subjraw,
+		Message:        msg,
+		MessageRaw:     msgraw,
+		MessageDetails: generateDetails(nil, nil, nil, nil),
 	}, nil
 }
 

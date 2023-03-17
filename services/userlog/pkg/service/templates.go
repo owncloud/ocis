@@ -5,6 +5,10 @@ func Template(s string) string { return s }
 
 // the available templates
 var (
+	VirusFound = NotificationTemplate{
+		Subject: Template("Virus found"),
+		Message: Template("Virus found in {resource}. Upload not possible. Virus: {virus}"),
+	}
 	SpaceShared = NotificationTemplate{
 		Subject: Template("Space shared"),
 		Message: Template("{user} added you to Space {space}"),
@@ -51,6 +55,7 @@ var _placeholders = map[string]string{
 	"{user}":     "{{ .username }}",
 	"{space}":    "{{ .spacename }}",
 	"{resource}": "{{ .resourcename }}",
+	"{virus}":    "{{ .virusdescription }}",
 }
 
 // NotificationTemplate is the data structure for the notifications

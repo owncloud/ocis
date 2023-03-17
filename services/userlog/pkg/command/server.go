@@ -25,6 +25,9 @@ import (
 
 // all events we care about
 var _registeredEvents = []events.Unmarshaller{
+	// file related
+	events.PostprocessingStepFinished{},
+
 	// space related
 	events.SpaceDisabled{},
 	events.SpaceDeleted{},
