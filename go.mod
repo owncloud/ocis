@@ -48,7 +48,7 @@ require (
 	github.com/jellydator/ttlcache/v2 v2.11.1
 	github.com/jellydator/ttlcache/v3 v3.0.1
 	github.com/justinas/alice v1.2.0
-	github.com/leonelquinteros/gotext v1.5.2
+	github.com/leonelquinteros/gotext v1.5.3-0.20230317130943-71a59c05b2c1
 	github.com/libregraph/idm v0.4.1-0.20230221143410-3503963047a5
 	github.com/libregraph/lico v0.59.4
 	github.com/mitchellh/mapstructure v1.5.0
@@ -306,5 +306,3 @@ require (
 )
 
 replace github.com/cs3org/go-cs3apis => github.com/c0rby/go-cs3apis v0.0.0-20230110100311-5b424f1baa35
-
-replace github.com/leonelquinteros/gotext => github.com/kobergj/gotext v0.0.0-20230309141732-b909eb0b8956
