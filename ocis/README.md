@@ -20,3 +20,7 @@ To configure which registry to use, you have to set the environment variable `MI
 ### etcd
 
 To authenticate the connection to the etcd registry, you have to set `ETCD_USERNAME` and `ETCD_PASSWORD`.
+
+## Memory limits
+
+oCIS will automatically set the go native `GOMEMLIMIT` to `0.9`. To disable the limit set `AUTOMEMEMLIMIT=off`. For more information take a look at the official [Guide to the Go Garbage Collector](https://go.dev/doc/gc-guide).
