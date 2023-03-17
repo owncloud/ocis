@@ -13,7 +13,7 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	InfectedFileHandling string `yaml:"infected-file-handling" env:"ANTIVIRUS_INFECTED_FILE_HANDLING" desc:"Defines the behaviour when a virus has been found. Options are: 'delete', 'continue' and 'abort '. Delete will delete the file. Continue will mark the file as infected but continues further processing. Abort will keep the file in the upload folder for further admin inspection and will not move it to its target space."`
+	InfectedFileHandling string `yaml:"infected-file-handling" env:"ANTIVIRUS_INFECTED_FILE_HANDLING" desc:"Defines the behaviour when a virus has been found. Supported options are: 'delete', 'continue' and 'abort '. Delete will delete the file. Continue will mark the file as infected but continues further processing. Abort will keep the file in the uploads folder for further admin inspection and will not move it to its final destination."`
 	Events               Events
 	Scanner              Scanner
 	MaxScanSize          string `yaml:"max-scan-size" env:"ANTIVIRUS_MAX_SCAN_SIZE" desc:"The maximum scan size the virusscanner can handle. Only that much bytes of a file will be scanned. 0 means unlimited and is the default. Usable common abbreviations: [KB, KiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB."`
@@ -53,7 +53,7 @@ type Events struct {
 
 // Scanner provides configuration options for the antivirusscanner
 type Scanner struct {
-	Type string `yaml:"type" env:"ANTIVIRUS_SCANNER_TYPE" desc:"The scanner to use. Must be one of: clamav, icap"`
+	Type string `yaml:"type" env:"ANTIVIRUS_SCANNER_TYPE" desc:"The antivirus scanner to use. Supported values are 'clamav' and 'icap'."`
 
 	ClamAV ClamAV // only if Type == clamav
 	ICAP   ICAP   // only if Type == icap
@@ -68,5 +68,5 @@ type ClamAV struct {
 type ICAP struct {
 	Timeout int64  `yaml:"timeout" env:"ANTIVIRUS_ICAP_TIMEOUT" desc:"Timeout for the ICAP client."`
 	URL     string `yaml:"url" env:"ANTIVIRUS_ICAP_URL" desc:"URL of the ICAP server."`
-	Service string `yaml:"service" env:"ANTIVIRUS_ICAP_SERVICE" desc:"Name of the ICAP server."`
+	Service string `yaml:"service" env:"ANTIVIRUS_ICAP_SERVICE" desc:"The name of the ICAP service."`
 }

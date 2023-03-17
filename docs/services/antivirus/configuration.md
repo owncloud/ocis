@@ -10,6 +10,3 @@ geekdocCollapseSection: true
 
 ## Example YAML Config
 
-{{< include file="services/_includes/antivirus.yaml"  language="yaml" >}}
-
-{{< include file="services/_includes/antivirus_configvars.md" >}}

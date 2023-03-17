@@ -1,36 +1,38 @@
 # Antivirus Service
 
-The `antivirus` service is responsible for scanning files for viruses
+The `antivirus` service is responsible for scanning files for viruses.
 
 ## Configuration
 
 ### Antivirus Scanner Type
 
-The antivirus service currently supports `icap` and `clamav` as antivirus scanners. Use `ANTIVIRUS_SCANNER_TYPE` to configure this. 
-Note that configuration depends heavily on chosen antivirus scanner. See Enviroment Variable descriptions for details.
+The antivirus service currently supports [icap](https://tools.ietf.org/html/rfc3507) and [clamav](http://www.clamav.net/index.html) as antivirus scanners. The `ANTIVIRUS_SCANNER_TYPE` environment variable is used to select the scanner. The detailed configuration for each scanner heavily depends on the scanner type selected. See the environment variables for more details.
+
+  -   For `icap`, only scanners using the `X-Infection-Found` header are currently supported.
+  -   For `clamav` only local sockets can currently be configured.
 
 ### Maximum Scan size
 
-Since several factors might make need necessary to limit the maximum filesize the `antivirus` service has an option to set a max scan size.
-Use `ANTIVIRUS_MAX_SCAN_SIZE` to scan only that amount of bytes of a file. Obviously it is recommended to set this as high as possible, but several factors (scanner type and version, bandwith and performance issues, ...) might force to set this to a certain filesize.
+Several factors can make it necessary to limit the maximum filesize the antivirus service will use for scanning. Use the `ANTIVIRUS_MAX_SCAN_SIZE` environment variable to scan only a given amount of bytes. Obviously it is recommended to scan the whole file, but several factors like scanner type and version, bandwith, performance issues, etc. might make a limit necessary.
 
 ### Infected File Handling
 
-The `antivirus` service allows three different ways of handling infected files. Those can be set via the `ANTIVIRUS_INFECTED_FILE_HANDLING` envvar:
-  -   `delete` (default): Infected files will be deleted immediately. Further postprocessing is cancelled.
-  -   `abort`: Infected files will be kept. Further postprocessing is cancelled. Files can be manually retrieved and inspected by an admin. (Advanced option)
-  -   `continue`: Infected files will be marked as infected but postprocessing continues normally. Note: Infected Files are not prevented from download. Risk of spreading viruses. (Obviously not recommended)
+The antivirus service allows three different ways of handling infected files. Those can be set via the `ANTIVIRUS_INFECTED_FILE_HANDLING` environment variable:
+
+  -   `delete`: (default): Infected files will be deleted immediately, further postprocessing is cancelled.
+  -   `abort`:  (advanced option): Infected files will be kept, further postprocessing is cancelled. Files can be manually retrieved and inspected by an admin. To identify the file for further investigation, the antivirus service logs the abort/infected state including the file ID. The file is located in the `storage/users/uploads` folder of the ocis data directory and persists until it is manually deleted by the admin via the [Manage Unfinished Uploads](https://doc.owncloud.com/ocis/next/deployment/services/s-list/storage-users.html#manage-unfinished-uploads) command.
+  -   `continue`:  (obviously not recommended): Infected files will be marked via metadata as infected but postprocessing continues normally. Note: Infected Files are moved to their final destination and therefore not prevented from download which includes the risk of spreading viruses.
+
+In all cases, a log entry is added declaring the infection and handling method and a notification via the `userlog` service sent.
+
+### Scanner Inaccessability
+
+In case a scanner is not accessible by the antivirus service like a network outage, service outage or hardware outage, the antivirus service uses the `abort` case for further processing, independent of the actual setting made. In any case, an error is logged noting the inaccessability of the scanner used.
 
 ## Operation Modes
 
-The `antivirus` service can scan files during postprocessing. `on demand` scanning will be added in the future.
+The antivirus service can scan files during `postprocessing`. `on demand` scanning is currently not available and might be added in a future release.
 
 ### Postprocessing
 
-Note: Needs to be configured via the [postprocessing service](https://github.com/owncloud/ocis/tree/master/services/postprocessing) 
-
-The `antivirus` service will scan files during postprocessing. It listens for a postprocessing step called `"virusscan"`
-
-### On Demand
-
-On demand scanning is currently not supported
+The antivirus service will scan files during postprocessing. It listens for a postprocessing step called `"virusscan"`. This step can be added in the environment variable `POSTPROCESSING_STEPS`. Read the documentation of the [postprocessing service](https://github.com/owncloud/ocis/tree/master/services/postprocessing) for more details.
