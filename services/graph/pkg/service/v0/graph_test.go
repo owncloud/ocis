@@ -1031,6 +1031,10 @@ var _ = Describe("Graph", func() {
 			driveJson, err := json.Marshal(drive)
 			Expect(err).ToNot(HaveOccurred())
 
+			gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
+				Status:        status.NewOK(ctx),
+				StorageSpaces: []*provider.StorageSpace{{SpaceType: "project"}},
+			}, nil)
 			gatewayClient.On("UpdateStorageSpace", mock.Anything, mock.Anything).Return(func(_ context.Context, req *provider.UpdateStorageSpaceRequest, _ ...grpc.CallOption) *provider.UpdateStorageSpaceResponse {
 				return &provider.UpdateStorageSpaceResponse{
 					Status:       status.NewOK(ctx),

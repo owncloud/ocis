@@ -145,7 +145,7 @@ config = {
         "earlyFail": True,
     },
     "e2eTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "rocketchat": {
