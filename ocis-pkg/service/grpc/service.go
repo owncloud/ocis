@@ -26,6 +26,7 @@ func NewService(opts ...Option) (Service, error) {
 	sopts := newOptions(opts...)
 	tlsConfig := &tls.Config{}
 	if sopts.TLSEnabled {
+		// TODO reuse ocis-pkg/config and pass a real tls.Config
 		var cert tls.Certificate
 		var err error
 		if sopts.TLSCert != "" {

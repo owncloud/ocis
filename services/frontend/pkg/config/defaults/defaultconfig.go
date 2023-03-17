@@ -27,7 +27,12 @@ func DefaultConfig() *config.Config {
 			Addr:      "127.0.0.1:9140",
 			Namespace: "com.owncloud.web",
 			Protocol:  "tcp",
-			Prefix:    "",
+			TLS: shared.HTTPServiceTLS{
+				Enabled: true,
+				Cert:    "/etc/ssl/certs/test.cert.pem",
+				Key:     "/etc/ssl/certs/test.key.pem",
+			},
+			Prefix: "",
 			CORS: config.CORS{
 				AllowedOrigins: []string{"*"},
 				AllowedMethods: []string{

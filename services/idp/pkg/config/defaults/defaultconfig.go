@@ -30,7 +30,7 @@ func DefaultConfig() *config.Config {
 			Namespace: "com.owncloud.web",
 			TLSCert:   filepath.Join(defaults.BaseDataPath(), "idp", "server.crt"),
 			TLSKey:    filepath.Join(defaults.BaseDataPath(), "idp", "server.key"),
-			TLS:       false,
+			TLS:       true,
 		},
 		Reva: shared.DefaultRevaConfig(),
 		Service: config.Service{

@@ -284,6 +284,8 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 					},
 				},
 			},
+			"certfile": cfg.HTTP.TLS.Cert,
+			"keyfile":  cfg.HTTP.TLS.Key,
 		},
 	}, nil
 }

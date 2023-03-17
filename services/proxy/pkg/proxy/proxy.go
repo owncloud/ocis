@@ -5,13 +5,12 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"net"
 	"net/http"
 	"net/http/httputil"
 	"os"
-	"time"
 
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"golang.org/x/net/http2"
 
 	"go.opentelemetry.io/otel/attribute"
 
@@ -53,6 +52,7 @@ func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 	tlsConf := &tls.Config{
 		MinVersion:         tls.VersionTLS12,
 		InsecureSkipVerify: options.Config.InsecureBackends, //nolint:gosec
+		NextProtos:         []string{"h2", "http/1.1"},
 	}
 	if options.Config.BackendHTTPSCACert != "" {
 		certs := x509.NewCertPool()
@@ -66,9 +66,9 @@ func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 		tlsConf.RootCAs = certs
 	}
 	// equals http.DefaultTransport except TLSClientConfig
-	rp.Transport = &http.Transport{
-		Proxy: http.ProxyFromEnvironment,
-		DialContext: (&net.Dialer{
+	rp.Transport = &http2.Transport{
+		//Proxy: http.ProxyFromEnvironment,
+		/*DialContext: (&net.Dialer{
 			Timeout:   30 * time.Second,
 			KeepAlive: 30 * time.Second,
 			DualStack: true,
@@ -78,7 +78,8 @@ func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 		IdleConnTimeout:       90 * time.Second,
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
-		TLSClientConfig:       tlsConf,
+		*/
+		TLSClientConfig: tlsConf,
 	}
 	return rp, nil
 }
