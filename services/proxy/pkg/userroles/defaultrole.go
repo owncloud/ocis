@@ -42,7 +42,7 @@ func (d defaultRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user 
 		if len(roleIDs) == 0 {
 			// This user doesn't have a role assignment yet. Assign a
 			// default user role. At least until proper roles are provided. See
-			// https://github.com/owncloud/ocis/v2/issues/1825 for more context.
+			// https://github.com/owncloud/ocis/issues/1825 for more context.
 			if user.Id.Type == cs3.UserType_USER_TYPE_PRIMARY {
 				d.logger.Info().Str("userid", user.Id.OpaqueId).Msg("user has no role assigned, assigning default user role")
 				ctx = metadata.Set(ctx, middleware.AccountID, user.Id.OpaqueId)
