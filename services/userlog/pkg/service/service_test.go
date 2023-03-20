@@ -73,9 +73,9 @@ var _ = Describe("UserlogService", func() {
 
 	It("it stores, returns and deletes a couple of events", func() {
 		ids := make(map[string]struct{})
-		ids[bus.Publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
-		ids[bus.Publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
-		ids[bus.Publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
+		ids[bus.Publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "executinguserid"}})] = struct{}{}
+		ids[bus.Publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "executinguserid"}})] = struct{}{}
+		ids[bus.Publish(events.SpaceDisabled{Executant: &user.UserId{OpaqueId: "executinguserid"}})] = struct{}{}
 		// ids[bus.Publish(events.SpaceMembershipExpired{SpaceOwner: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
 		// ids[bus.Publish(events.ShareCreated{Executant: &user.UserId{OpaqueId: "userid"}})] = struct{}{}
 
