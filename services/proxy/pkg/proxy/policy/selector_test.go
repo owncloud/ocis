@@ -74,6 +74,7 @@ func TestClaimsSelector(t *testing.T) {
 	sel := NewClaimsSelector(&config.ClaimsSelectorConf{
 		DefaultPolicy:         "default",
 		UnauthenticatedPolicy: "unauthenticated",
+		SelectorCookieName:    SelectorCookieName,
 	})
 
 	var tests = []testCase{
