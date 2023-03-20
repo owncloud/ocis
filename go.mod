@@ -113,6 +113,7 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
 	github.com/Microsoft/go-winio v0.6.0 // indirect
 	github.com/OneOfOne/xxhash v1.2.8 // indirect
+	github.com/Nerzal/gocloak/v13 v13.1.0 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20220930113650-c6815a8c17ad // indirect
 	github.com/RoaringBitmap/roaring v0.9.4 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
@@ -185,6 +186,8 @@ require (
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/go-redis/redis/v8 v8.11.5 // indirect
+	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
@@ -260,6 +263,7 @@ require (
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/opencontainers/runtime-spec v1.0.2 // indirect
+	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -276,6 +280,7 @@ require (
 	github.com/russellhaering/goxmldsig v1.2.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sciencemesh/meshdirectory-web v1.0.4 // indirect
+	github.com/segmentio/ksuid v1.0.4 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sethvargo/go-password v0.2.0 // indirect
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749 // indirect
