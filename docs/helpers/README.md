@@ -77,9 +77,11 @@ It can happen that extended envvars are found but do not need to be published as
 
 IMPORTANT:
 
-- Once a extended envvar has been identified, it is added to the `extended_vars.yaml` file found in this folder but never changed or touched by the process. There is one exception with respect to single/double quote usage. While you can (and will) manually define a text like: `"'/var/lib/ocis'"`, quotes are transformed by the process in the .yaml file to: `'''/var/lib/ocis'''`. There is no need to change this back, as the final step transforms this correctly for the adoc table.
+- Once an extended envvar has been identified, it is added to the `extended_vars.yaml` file found in this folder but never changed or touched by the process anymore. There is one exception with respect to single/double quote usage. While you can (and will) manually define a text like: `"'/var/lib/ocis'"`, quotes are transformed by the process in the .yaml file to: `'''/var/lib/ocis'''`. There is no need to change this back, as the final step transforms this correctly for the adoc table.
 
-- Because extended envvars do not have the same structural setup as "normal" envvars (like type, description or defaults), this info needs to be provided manually once - even if found multiple times. Any change of this info will be noticed during the next CI run and published in the next admin docs build.
+- Because extended envvars do not have the same structural setup as "normal" envvars (like type, description or defaults), this info needs to be provided manually once - even if found multiple times. Any change of this info will be noticed during the next CI run, the corresponding adoc file generated, changes transported to the docs branch and published in the next admin docs build.
+
+- The identification if an envvar is in the yaml file already present is made via the `rawname` and the `path` identifyer which includes the line number. If there is a change in the source file shifting line numbers, new items will get added and the old ones not touched. Though technically ok, this can cause confusion to identify which items have a correct path reference. To get rid of items with wrong line numbers, correct the existing ones, especially the one containing the description and which is marked to be shown. Only items that have a real line number match need to be present, orphanded items can safely be deleted. You can double check valid items by creating a dummy branch, delete the `extended_vars.yaml` and run `make docs-generate` to regenerate the file having only items with valid path references.
 
 - Do not change the sort order of extended envvar blocks as they are automatically reordered alphabetically.
 
