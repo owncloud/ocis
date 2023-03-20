@@ -33,6 +33,8 @@
 | PROXY_OIDC_JWKS_REFRESH_UNKNOWN_KID | bool | true | If set to 'true', the JWKS refresh request will occur every time an unknown KEY ID (KID) is seen. Always set a 'refresh_limit' when enabling this.|
 | PROXY_OIDC_REWRITE_WELLKNOWN | bool | false | Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider.|
 | OCIS_JWT_SECRET<br/>PROXY_JWT_SECRET | string |  | The secret to mint and validate JWT tokens.|
+| PROXY_ROLE_ASSIGNMENT_DRIVER | string | default | The mechanism that should be used to assign roles to user upon login. Supported values: 'default' or 'oidc'. 'default' will assign the role 'user' to users which don't have a role assigned at the time they login. 'oidc' will assign the role based on the value of a claim (configured via PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM) from the users OIDC claims.|
+| PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM | string | roles | The OIDC claim used to create the users role assignment.|
 | PROXY_ENABLE_PRESIGNEDURLS | bool | true | Allow OCS to get a signing key to sign requests.|
 | PROXY_ACCOUNT_BACKEND_TYPE | string | cs3 | Account backend the PROXY service should use. Currently only 'cs3' is possible here.|
 | PROXY_USER_OIDC_CLAIM | string | preferred_username | The name of an OpenID Connect claim that is used for resolving users with the account backend. The value of the claim must hold a per user unique, stable and non re-assignable identifier. The availability of claims depends on your Identity Provider. There are common claims available for most Identity providers like 'email' or 'preferred_user' but you can also add your own claim.|

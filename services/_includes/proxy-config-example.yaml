@@ -123,6 +123,15 @@ oidc:
   rewrite_well_known: false
 token_manager:
   jwt_secret: ""
+role_assignment:
+  driver: default
+  oidc_role_mapper:
+    role_claim: roles
+    role_mapping:
+      admin: ocisAdmin
+      guest: ocisGuest
+      spaceadmin: ocisSpaceAdmin
+      user: ocisUser
 policy_selector:
   static:
     policy: ocis

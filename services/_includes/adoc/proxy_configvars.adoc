@@ -317,6 +317,24 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The secret to mint and validate JWT tokens.
 
+a|`PROXY_ROLE_ASSIGNMENT_DRIVER` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++default ++
+a| [subs=-attributes]
+The mechanism that should be used to assign roles to user upon login. Supported values: 'default' or 'oidc'. 'default' will assign the role 'user' to users which don't have a role assigned at the time they login. 'oidc' will assign the role based on the value of a claim (configured via PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM) from the users OIDC claims.
+
+a|`PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++roles ++
+a| [subs=-attributes]
+The OIDC claim used to create the users role assignment.
+
 a|`PROXY_ENABLE_PRESIGNEDURLS` +
 
 a| [subs=-attributes]
