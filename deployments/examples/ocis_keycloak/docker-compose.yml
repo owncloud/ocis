@@ -60,6 +60,7 @@ services:
     environment:
       # Keycloak IDP specific configuration
       PROXY_AUTOPROVISION_ACCOUNTS: "true"
+      PROXY_ROLE_ASSIGNMENT_DRIVER: "oidc"
       OCIS_OIDC_ISSUER: https://${KEYCLOAK_DOMAIN:-keycloak.owncloud.test}/realms/${KEYCLOAK_REALM:-oCIS}
       PROXY_OIDC_REWRITE_WELLKNOWN: "true"
       WEB_OIDC_CLIENT_ID: ${OCIS_OIDC_CLIENT_ID:-web}
@@ -70,6 +71,8 @@ services:
       PROXY_TLS: "false" # do not use SSL between Traefik and oCIS
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-false}"
+      OCIS_ADMIN_USER_ID: ""
+      GRAPH_ASSIGN_DEFAULT_USER_ROLE: "false"
     volumes:
       - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis
