@@ -705,14 +705,16 @@ trait Provisioning {
 		}
 		if (isset($setting["email"])) {
 			$entry['mail'] = $setting["email"];
-		} else {
+		} elseif (!OcisHelper::isTestingOnReva()) {
 			$entry['mail'] = $userId . '@owncloud.com';
 		}
 		$entry['gidNumber'] = 5000;
 		$entry['uidNumber'] = $uidNumber;
 
-		$entry['objectclass'][] = 'ownCloud';
-		$entry['ownCloudUUID'] = WebDavHelper::generateUUIDv4();
+		if (!OcisHelper::isTestingOnReva()) {
+			$entry['objectclass'][] = 'ownCloud';
+			$entry['ownCloudUUID'] = WebDavHelper::generateUUIDv4();
+		}
 
 		if (OcisHelper::isTestingParallelDeployment()) {
 			$entry['ownCloudSelector'] = $this->getOCSelector();
@@ -749,8 +751,10 @@ trait Provisioning {
 			$entry['objectclass'][] = 'groupOfNames';
 			$entry['member'] = "";
 		}
-		$entry['objectclass'][] = 'ownCloud';
-		$entry['ownCloudUUID'] = WebDavHelper::generateUUIDv4();
+		if (!OcisHelper::isTestingOnReva()) {
+			$entry['objectclass'][] = 'ownCloud';
+			$entry['ownCloudUUID'] = WebDavHelper::generateUUIDv4();
+		}
 
 		$this->ldap->add($newDN, $entry);
 		$this->ldapCreatedGroups[] = $group;
@@ -774,6 +778,18 @@ trait Provisioning {
 				"cn=" . ldap_escape($group, "", LDAP_ESCAPE_DN) . ",ou=" . $this->ldapGroupsOU . "," . $this->ldapBaseDN,
 			);
 			$this->rememberThatGroupIsNotExpectedToExist($group);
+		}
+		if (!$this->skipImportLdif) {
+			//delete all created ldap users
+			$this->ldap->delete(
+				"ou=" . $this->ldapUsersOU . "," . $this->ldapBaseDN,
+				true
+			);
+			//delete all created ldap groups
+			$this->ldap->delete(
+				"ou=" . $this->ldapGroupsOU . "," . $this->ldapBaseDN,
+				true
+			);
 		}
 	}
 
@@ -3151,9 +3167,12 @@ trait Provisioning {
 		} elseif (OcisHelper::isTestingWithGraphApi()) {
 			$requestingUser = $this->getAdminUsername();
 			$requestingPassword = $this->getAdminPassword();
-		} else {
+		} elseif (!OcisHelper::isTestingOnReva()) {
 			$requestingUser = 'moss';
 			$requestingPassword = 'vista';
+		} else {
+			$requestingUser = $this->getActualUsername($user);
+			$requestingPassword = $this->getPasswordForUser($requestingUser);
 		}
 
 		$path = (OcisHelper::isTestingWithGraphApi())
