@@ -26,6 +26,54 @@ role_quotas:
     <role ID2>: <quota2>
 ```
 
+## Automatic Role Assignments
+
+When users login, they do automatically get a role assigned. The automatic role assignment can be
+configured in different ways. The `PROXY_ROLE_ASSIGNMENT_DRIVER` environment variable (or the `driver`
+setting in the `role_assignment` section of the configuration file select which mechanism to use for
+the automatic role assignment.
+
+When set to `default`, all users which do not have a role assigned at the time for the first login will
+get the role 'user' assigned. (This is also the default behavior if `PROXY_ROLE_ASSIGNMENT_DRIVER`
+is unset.
+
+When `PROXY_ROLE_ASSIGNMENT_DRIVER` is set to `oidc` the role assignment for a user will happen
+based on the values of an OpenID Connect Claim of that user. The name of the OpenID Connect Claim to
+be used for the role assignment can be configured via the `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM`
+environment variable. It is also possible to define a mapping of claim values to role names defined
+in ownCloud Infinite Scale via a `yaml` configuration. See the following `proxy.yaml` snippet for an
+example.
+
+```yaml
+role_assignment:
+    driver: oidc
+    oidc_role_mapper:
+        role_claim: ocisRoles
+        role_mapping:
+            admin: myAdminRole
+            user: myUserRole
+            spaceadmin: mySpaceAdminRole
+            guest: myGuestRole
+```
+
+This would assign the role `admin` to users with the value `myAdminRole` in the claim `ocisRoles`.
+The role `user` to users with the values `myUserRole` in the claims `ocisRoles` and so on.
+
+Claim values that are not mapped to a specific ownCloud Infinite Scale role will be ignored.
+
+Note: An ownCloud Infinite Scale user can only have a single role assigned. If the configured
+`role_mapping` and a user's claim values result in multiple possible roles for a user, an error
+will be logged and the user will not be able to login.
+
+The default `role_claim` (or `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM`) is `roles`. The `role_mapping` is:
+
+```yaml
+admin: ocisAdmin
+user: ocisUser
+spaceadmin: ocisSpaceAdmin
+guest: ocisGuest
+```
+
 ## Recommendations for Production Deployments
 
 In a production deployment, you want to have basic authentication (`PROXY_ENABLE_BASIC_AUTH`) disabled which is the default state. You also want to setup a firewall to only allow requests to the proxy service or the reverse proxy if you have one. Requests to the other services should be blocked by the firewall.
