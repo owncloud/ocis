@@ -1,17 +1,11 @@
 package service
 
 import (
-	"bytes"
 	"context"
-	"crypto/tls"
-	"encoding/json"
 	"fmt"
-	"net/http"
-	"strings"
-	"text/template"
 
-	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/invitations/pkg/backends/keycloak"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/config"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/invitations"
 )
@@ -40,33 +34,46 @@ type Service interface {
 	Invite(ctx context.Context, invitation *invitations.Invitation) (*invitations.Invitation, error)
 }
 
+// Backend defines the behaviour of a user backend.
+type Backend interface {
+	// CreateUser creates a user in the backend and returns an identifier string.
+	CreateUser(ctx context.Context, invitation *invitations.Invitation) (string, error)
+	// CanSendMail should return true if the backend can send mail
+	CanSendMail() bool
+	// SendMail sends a mail to the user with details on how to reedeem the invitation.
+	SendMail(ctx context.Context, identifier string) error
+}
+
 // New returns a new instance of Service
 func New(opts ...Option) (Service, error) {
 	options := newOptions(opts...)
 
-	urlTemplate, err := template.New("invitations-provisioning-endpoint-url").Parse(options.Config.Endpoint.URL)
-	bodyTemplate, err := template.New("invitations-provisioning-endpoint-url").Parse(options.Config.Endpoint.BodyTemplate)
-	if err != nil {
-		return nil, err
-	}
+	// Harcode keycloak backend for now, but this should be configurable in the future.
+	backend := keycloak.New(
+		options.Logger,
+		options.Config.Keycloak.BasePath,
+		options.Config.Keycloak.ClientID,
+		options.Config.Keycloak.ClientSecret,
+		options.Config.Keycloak.ClientRealm,
+		options.Config.Keycloak.UserRealm,
+		options.Config.Keycloak.InsecureSkipVerify,
+	)
+
 	return svc{
-		log:          options.Logger,
-		config:       options.Config,
-		urlTemplate:  urlTemplate,
-		bodyTemplate: bodyTemplate,
+		log:     options.Logger,
+		config:  options.Config,
+		backend: backend,
 	}, nil
 }
 
 type svc struct {
-	config       *config.Config
-	log          log.Logger
-	urlTemplate  *template.Template
-	bodyTemplate *template.Template
+	config  *config.Config
+	log     log.Logger
+	backend Backend
 }
 
 // Invite implements the service interface
 func (s svc) Invite(ctx context.Context, invitation *invitations.Invitation) (*invitations.Invitation, error) {
-
 	if invitation == nil {
 		return nil, ErrBadRequest
 	}
@@ -75,85 +82,19 @@ func (s svc) Invite(ctx context.Context, invitation *invitations.Invitation) (*i
 		return nil, ErrMissingEmail
 	}
 
-	user := &libregraph.User{
-		Mail: &invitation.InvitedUserEmailAddress,
-		// TODO we cannot set the user type here
-	}
-
-	if invitation.InvitedUserDisplayName != "" {
-		user.DisplayName = &invitation.InvitedUserDisplayName
-	}
-	// we don't really need a username as guests have to log in with their email address anyway
-	// what if later a user is provisioned with a guest accounts email address?
-
-	templateVars := map[string]string{
-		"redirectUrl": invitation.InviteRedirectUrl,
-		// TODO message and other options
-		"mail":        invitation.InvitedUserEmailAddress,
-		"displayName": invitation.InvitedUserDisplayName,
-		"userType":    invitation.InvitedUserType,
-	}
-
-	var urlWriter strings.Builder
-	if err := s.urlTemplate.Execute(&urlWriter, templateVars); err != nil {
-		return nil, err
-	}
-
-	var bodyWriter strings.Builder
-	if err := s.bodyTemplate.Execute(&bodyWriter, templateVars); err != nil {
-		return nil, err
-	}
-
-	// send a request to the provisioning endpoint
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true /*TODO make configurable*/},
-	}
-	client := &http.Client{Transport: tr}
-
-	req, err := http.NewRequest(s.config.Endpoint.Method, urlWriter.String(), bytes.NewBufferString(bodyWriter.String()))
+	id, err := s.backend.CreateUser(ctx, invitation)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("%w: %s", ErrBackend, err)
 	}
 
-	// TODO either forward current user token or use bearer token?
-	switch s.config.Endpoint.Authorization {
-	case "token":
-		// TODO forward current reva access token
-	case "bearer":
-		req.Header.Set("Authorization", "Bearer "+s.config.Endpoint.Token)
-	default:
-		return nil, fmt.Errorf("unknown authorization: " + s.config.Endpoint.Authorization)
+	// As we only have a single backend, and that backend supports email, we don't have
+	// any code to handle mailing ourself yet.
+	if s.backend.CanSendMail() {
+		err := s.backend.SendMail(ctx, id)
+		if err != nil {
+			return nil, fmt.Errorf("%w: %s", ErrBackend, err)
+		}
 	}
 
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-
-	// TODO hm ok so we expect the rosponse to be a libregraph user ... so much for a generic endpoint
-	// we could try parsing into a map[string]interface{} .... hm ... maybe better to be specific about
-	// the actual backend: libregraph, keycloak, scim or even oc10?
-
-	// Or we remember the mail of the user in memory and try to check if the user is already avilable via
-	// a local user api ... hm ... graph or cs3 user backend now?
-
-	// in any case this will require an additional endpoint to keep track of the ongoing invitations
-
-	invitedUser := &libregraph.User{}
-	err = json.NewDecoder(res.Body).Decode(invitedUser)
-	if err != nil {
-		return nil, err
-	}
-
-	response := &invitations.Invitation{
-		InvitedUser: invitedUser,
-	}
-	if res.StatusCode == http.StatusCreated {
-		response.Status = "Completed"
-	}
-
-	// optionally send an email
-
-	return response, nil
+	return invitation, nil
 }

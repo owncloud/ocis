@@ -91,7 +91,7 @@ func InvitationHandler(service svc.Service) func(w http.ResponseWriter, r *http.
 		i := &invitations.Invitation{}
 		err := json.NewDecoder(r.Body).Decode(i)
 		if err != nil {
-			//logger.Debug().Err(err).Interface("body", r.Body).Msg("could not invite user: invalid request body")
+			// logger.Debug().Err(err).Interface("body", r.Body).Msg("could not invite user: invalid request body")
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %v", err.Error()))
 			return
 		}
@@ -103,7 +103,7 @@ func InvitationHandler(service svc.Service) func(w http.ResponseWriter, r *http.
 			return
 		}
 
-		//w.Header().Set("Content-type", "application/json")
+		// w.Header().Set("Content-type", "application/json")
 		render.Status(r, http.StatusCreated)
 		render.JSON(w, r, res)
 	}

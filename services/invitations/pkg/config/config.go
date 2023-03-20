@@ -18,18 +18,18 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
-	Endpoint Endpoint `yaml:"enpoint"`
-
+	Keycloak     Keycloak      `yaml:"keycloak"`
 	TokenManager *TokenManager `yaml:"token_manager"`
 
 	Context context.Context `yaml:"-"`
 }
 
-// Endpoint to use
-type Endpoint struct {
-	URL           string `yaml:"url" env:"INVITATIONS_PROVISIONING_URL" desc:"The endpoint provisioning requests are sent to."`
-	Method        string `yaml:"method" env:"INVITATIONS_PROVISIONING_METHOD" desc:"The method to use when making provisioning requests."`
-	BodyTemplate  string `yaml:"body_template" env:"INVITATIONS_PROVISIONING_BODY_TEMPLATE" desc:"The template to use as body of a provisioning request."`
-	Authorization string `yaml:"authorization" env:"INVITATIONS_PROVISIONING_AUTH" desc:"The authorization to use. Can be 'token' to reuse the access token or 'bearer' to send a static api token."`
-	Token         string `yaml:"authorization" env:"INVITATIONS_PROVISIONING_AUTH" desc:"The bearer token to send in provisioning requests."`
+// Keycloak configuration
+type Keycloak struct {
+	BasePath           string `yaml:"base_path" env:"INVITATIONS_KEYCLOAK_BASE_PATH" desc:"The URL to keycloak."`
+	ClientID           string `yaml:"client_id" env:"INVITATIONS_KEYCLOAK_CLIENT_ID" desc:"The client id to authenticate with keycloak."`
+	ClientSecret       string `yaml:"client_secret" env:"INVITATIONS_KEYCLOAK_CLIENT_SECRET" desc:"The client secret to use in authentication."`
+	ClientRealm        string `yaml:"client_realm" env:"INVITATIONS_KEYCLOAK_CLIENT_REALM" desc:"The realm the client is defined in."`
+	UserRealm          string `yaml:"user_realm" env:"INVITATIONS_KEYCLOAK_USER_REALM" desc:"The realm the users are in."`
+	InsecureSkipVerify bool   `yaml:"insecure_skip_verify" env:"INVITATIONS_KEYCLOAK_INSECURE_SKIP_VERIFY" desc:"Skip the check of the TLS certificate."`
 }
