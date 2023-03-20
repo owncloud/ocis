@@ -287,3 +287,17 @@ Feature: add users to group
       | {'members@odata.bind': ['https://localhost:9200/graph/v1.0/users/%user_id%',,'https://localhost:9200/graph/v1.0/users/%user_id%']} |
       | {'members@odata.bind'- ['https://localhost:9200/graph/v1.0/users/%user_id%','https://localhost:9200/graph/v1.0/users/%user_id%']}  |
       | {'members@odata.bind': ['https://localhost:9200/graph/v1.0/users/%user_id%'.'https://localhost:9200/graph/v1.0/users/%user_id%']}  |
+
+
+  Scenario: admin tries to add multiple users with wrong host
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    And these users have been created with default attributes and without skeleton files:
+      | username |
+      | Brian    |
+      | Carol    |
+    And user "Alice" has created a group "grp1" using the Graph API
+    When the administrator "Alice" adds the following users to a group "grp1" at once with invalid host using the Graph API
+      | username |
+      | Brian    |
+      | Carol    |
+    Then the HTTP status code should be "405"

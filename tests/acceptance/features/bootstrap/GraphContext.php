@@ -1725,6 +1725,39 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @When /^the administrator "([^"]*)" adds the following users to a group "([^"]*)" at once with invalid host using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $group
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function theAdministratorAddsTheFollowingUsersToAGroupAtOnceWithInvalidHostUsingTheGraphApi(string $user, string $group, TableNode $table) {
+		$userIds = [];
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		foreach ($table->getHash() as $row) {
+			$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
+		}
+
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$this->featureContext->verifyTableNodeColumns($table, ['username']);
+
+		$this->featureContext->setResponse(
+			GraphHelper::addUsersToGroupWithInvalidHost(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials["username"],
+				$credentials["password"],
+				$groupId,
+				$userIds
+			)
+		);
+	}
+
+	/**
 	 * @When /^the administrator "([^"]*)" tries to add the following users to a nonexistent group at once using the Graph API$/
 	 *
 	 * @param string $user
