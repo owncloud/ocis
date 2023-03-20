@@ -65,9 +65,31 @@ Feature: Restoring space
       | shareWith | Brian  |
       | role      | <role> |
     And user "Alice" has disabled a space "restore a space"
-    When user "Brian" restores a disabled space "restore a space" owned by user "Alice"
+    When user "Brian" tries to restore a disabled space "restore a space" owned by user "Alice"
     Then the HTTP status code should be "404"
     Examples:
       | role   |
       | viewer |
       | editor |
+
+
+  Scenario Outline: User with role User and Guest cannot restore space
+    Given the administrator has given "Brian" the role "<role>" using the settings api
+    And user "Alice" has disabled a space "restore a space"
+    When user "Brian" tries to restore a disabled space "restore a space" owned by user "Alice"
+    Then the HTTP status code should be "404"
+    Examples:
+      | role  |
+      | User  |
+      | Guest |
+
+
+  Scenario Outline: Admin and Space Admin can restore others space
+    Given the administrator has given "Brian" the role "<role>" using the settings api
+    And user "Alice" has disabled a space "restore a space"
+    When user "Brian" tries to restore a disabled space "restore a space" owned by user "Alice"
+    Then the HTTP status code should be "200"
+    Examples:
+      | role        |
+      | Admin       |
+      | Space Admin |

@@ -13,6 +13,7 @@ Feature: Disabling and deleting space
       | Alice    |
       | Brian    |
       | Bob      |
+      | Carol    |
     And the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "Project Moon" with the default quota using the GraphApi
     And user "Alice" has shared a space "Project Moon" with settings:
@@ -23,7 +24,8 @@ Feature: Disabling and deleting space
       | role      | viewer |
 
 
-  Scenario Outline: A space admin user can disable a Space via the Graph API
+  Scenario Outline: user can disable their own Space via the Graph API
+    Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" disables a space "Project Moon"
     Then the HTTP status code should be "204"
     And for user "Alice" the JSON response should contain space called "Project Moon" and match
@@ -62,17 +64,36 @@ Feature: Disabling and deleting space
       }
     }
     """
-    And the user "<user>" should not have a space called "Project Moon"
+    And the user "Brian" should not have a space called "Project Moon"
+    And the user "Bob" should not have a space called "Project Moon"
     Examples:
-      | user  |
-      | Brian |
-      | Bob   |
+      | role        |
+      | Admin       |
+      | Space Admin |
+      | User        |
+      | Guest       |
 
 
-  Scenario Outline: An user without space admin role cannot disable a Space via the Graph API
-    When user "<user>" disables a space "Project Moon"
+  Scenario Outline: User with role User and Guest cannot disable others Space via the Graph API
+    Given the administrator has given "Carol" the role "<role>" using the settings api
+    When user "Carol" tries to disable a space "Project Moon" owned by user "Alice"
     Then the HTTP status code should be "403"
-    And for user "<user>" the JSON response should contain space called "Project Moon" and match
+    And for user "Brian" the JSON response should contain space called "Project Moon" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Project Moon"]
+        }
+      }
+    }
+    """
+    And for user "Bob" the JSON response should contain space called "Project Moon" and match
     """
      {
       "type": "object",
@@ -88,16 +109,9 @@ Feature: Disabling and deleting space
     }
     """
     Examples:
-      | user  |
-      | Brian |
-      | Bob   |
-
-
-  Scenario: A space manager can delete a disabled Space via the webDav API
-    Given user "Alice" has disabled a space "Project Moon"
-    When user "Alice" deletes a space "Project Moon"
-    Then the HTTP status code should be "204"
-    And the user "Alice" should not have a space called "Project Moon"
+      | role  |
+      | User  |
+      | Guest |
 
 
   Scenario: An space manager can disable and delete Space in which files and folders exist via the webDav API
@@ -110,7 +124,8 @@ Feature: Disabling and deleting space
     And the user "Alice" should not have a space called "Project Moon"
 
 
-  Scenario: An space manager cannot delete a space via the webDav API without first disabling it
+  Scenario Outline: user cannot delete their own space without first disabling it
+    Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" deletes a space "Project Moon"
     Then the HTTP status code should be "400"
     And for user "Alice" the JSON response should contain space called "Project Moon" and match
@@ -128,3 +143,92 @@ Feature: Disabling and deleting space
       }
     }
     """
+    Examples:
+      | role        |
+      | Admin       |
+      | Space Admin |
+      | User        |
+      | Guest       |
+
+
+  Scenario Outline: user can delete their own disabled Space via the Graph API
+    Given the administrator has given "Alice" the role "<role>" using the settings api
+    And user "Alice" has disabled a space "Project Moon"
+    When user "Alice" deletes a space "Project Moon"
+    Then the HTTP status code should be "204"
+    And the user "Alice" should not have a space called "Project Moon"
+    Examples:
+      | role        |
+      | Admin       |
+      | Space Admin |
+      | User        |
+      | Guest       |
+
+
+  Scenario Outline: Admin and Space manager can disable others Space via the Graph API
+    Given the administrator has given "Carol" the role "<role>" using the settings api
+    When user "Carol" tries to disable a space "Project Moon" owned by user "Alice"
+    Then the HTTP status code should be "204"
+    And for user "Alice" the JSON response should contain space called "Project Moon" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name",
+        "root"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Project Moon"]
+        },
+        "root": {
+          "type": "object",
+          "required": [
+            "deleted"
+          ],
+          "properties": {
+            "deleted": {
+              "type": "object",
+              "required": [
+                "state"
+              ],
+              "properties": {
+                "state": {
+                  "type": "string",
+                  "enum": ["trashed"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    Examples:
+      | role        |
+      | Admin       |
+      | Space Admin |
+
+
+  Scenario Outline: Admin and Space manager can delete others disabled Space
+    Given the administrator has given "Carol" the role "<role>" using the settings api
+    And user "Alice" has disabled a space "Project Moon"
+    When user "Carol" tries to delete a space "Project Moon" owned by user "Alice"
+    Then the HTTP status code should be "204"
+    And the user "Alice" should not have a space called "Project Moon"
+    Examples:
+      | role        |
+      | Admin       |
+      | Space Admin |
+
+
+  Scenario Outline: User with role User and Guest cannot delete others disabled Space via the Graph API
+    Given the administrator has given "Carol" the role "<role>" using the settings api
+    And user "Alice" has disabled a space "Project Moon"
+    When user "Carol" tries to delete a space "Project Moon" owned by user "Alice"
+    Then the HTTP status code should be "403"
+    Examples:
+      | role  |
+      | User  |
+      | Guest |
