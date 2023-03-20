@@ -45,8 +45,7 @@ func DefaultConfig() *config.Config {
 				Type:     "memory",
 				Database: "proxy",
 				Table:    "userinfo",
-				//Size:     1024,
-				TTL: time.Second * 10,
+				TTL:      time.Second * 10,
 			},
 			JWKS: config.JWKS{
 				RefreshInterval:   60, // minutes
