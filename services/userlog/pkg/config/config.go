@@ -21,23 +21,23 @@ type Config struct {
 
 	TokenManager *TokenManager `yaml:"token_manager"`
 
-	MachineAuthAPIKey string `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;USERLOG_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
-	RevaGateway       string `yaml:"reva_gateway" env:"REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata"`
-	TranslationPath   string `yaml:"translation_path" env:"USERLOG_TRANSLATION_PATH" desc:"(optional) Set this to a path with custom translations to overwrite the builtin translations. See the documentation for more details."`
-	Events            Events `yaml:"events"`
-	Store             Store  `yaml:"store"`
+	MachineAuthAPIKey string      `yaml:"machine_auth_api_key" env:"OCIS_MACHINE_AUTH_API_KEY;USERLOG_MACHINE_AUTH_API_KEY" desc:"Machine auth API key used to validate internal requests necessary to access resources from other services."`
+	RevaGateway       string      `yaml:"reva_gateway" env:"REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata"`
+	TranslationPath   string      `yaml:"translation_path" env:"USERLOG_TRANSLATION_PATH" desc:"(optional) Set this to a path with custom translations to overwrite the builtin translations. See the documentation for more details."`
+	Events            Events      `yaml:"events"`
+	Persistence       Persistence `yaml:"persistence"`
 
 	Context context.Context `yaml:"-"`
 }
 
-// Store configures the store to use
-type Store struct {
-	Type      string        `yaml:"type" env:"OCIS_PERSISTENT_STORE_TYPE;USERLOG_STORE_TYPE" desc:"The type of the userlog store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
-	Addresses []string      `yaml:"addresses" env:"OCIS_PERSISTENT_STORE_ADDRESSES;USERLOG_STORE_ADDRESSES" desc:"A comma separated list of addresses to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how addresses are used is dependent on the library of the configured store."`
-	Database  string        `yaml:"database" env:"USERLOG_STORE_DATABASE" desc:"The database name the configured store should use."`
-	Table     string        `yaml:"table" env:"USERLOG_STORE_TABLE" desc:"The database table the store should use."`
-	TTL       time.Duration `yaml:"ttl" env:"OCIS_PERSISTENT_STORE_TTL;USERLOG_STORE_TTL" desc:"Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks)."`
-	Size      int           `yaml:"size" env:"OCIS_PERSISTENT_STORE_SIZE;USERLOG_STORE_SIZE" desc:"The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512."`
+// Persistence configures the store to use
+type Persistence struct {
+	Store    string        `yaml:"store" env:"OCIS_PERSISTENT_STORE;USERLOG_STORE;USERLOG_STORE_TYPE" desc:"The type of the userlog store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	Nodes    []string      `yaml:"nodes" env:"OCIS_PERSISTENT_STORE_NODES;USERLOG_STORE_ADDRESSES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`
+	Database string        `yaml:"database" env:"USERLOG_STORE_DATABASE" desc:"The database name the configured store should use."`
+	Table    string        `yaml:"table" env:"USERLOG_STORE_TABLE" desc:"The database table the store should use."`
+	TTL      time.Duration `yaml:"ttl" env:"OCIS_PERSISTENT_STORE_TTL;USERLOG_STORE_TTL" desc:"Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks)."`
+	Size     int           `yaml:"size" env:"OCIS_PERSISTENT_STORE_SIZE;USERLOG_STORE_SIZE" desc:"The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512."`
 }
 
 // Events combines the configuration options for the event bus.

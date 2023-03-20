@@ -31,7 +31,7 @@ func NewService(opts ...Option) grpc.Service {
 		return grpc.Service{}
 	}
 
-	eh, err := svc.NewEventHistoryService(options.Config, options.Consumer, options.Store, options.Logger)
+	eh, err := svc.NewEventHistoryService(options.Config, options.Consumer, options.Persistence, options.Logger)
 	if err != nil {
 		options.Logger.Fatal().Err(err).Msg("Error creating event history service")
 		return grpc.Service{}

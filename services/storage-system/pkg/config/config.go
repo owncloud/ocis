@@ -84,7 +84,7 @@ type OCISDriver struct {
 
 // Cache holds cache config
 type Cache struct {
-	Store    string   `yaml:"store" env:"OCIS_CACHE_STORE_TYPE;STORAGE_SYSTEM_CACHE_STORE" desc:"Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', 'etcd' and 'noop'. See the text description for details."`
-	Nodes    []string `yaml:"nodes" env:"OCIS_CACHE_STORE_ADDRESS;STORAGE_SYSTEM_CACHE_NODES" desc:"A comma separated list of addresses to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how addresses are used is dependent on the library of the configured store."`
+	Store    string   `yaml:"store" env:"OCIS_CACHE_STORE;STORAGE_SYSTEM_CACHE_STORE;OCIS_CACHE_STORE_TYPE" desc:"Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', 'etcd' and 'noop'. See the text description for details."`
+	Nodes    []string `yaml:"nodes" env:"OCIS_CACHE_STORE_NODES;STORAGE_SYSTEM_CACHE_NODES;OCIS_CACHE_STORE_ADDRESS" desc:"A comma separated list of nodes to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`
 	Database string   `yaml:"database" env:"STORAGE_SYSTEM_CACHE_DATABASE" desc:"The database name the configured store should use."`
 }

@@ -13,11 +13,11 @@ import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
+	"github.com/owncloud/ocis/v2/ocis-pkg/cache"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
-	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
@@ -35,7 +35,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 	"github.com/urfave/cli/v2"
-	microstore "go-micro.dev/v4/store"
+	"go-micro.dev/v4/store"
 	"golang.org/x/oauth2"
 )
 
@@ -212,13 +212,13 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		})
 	}
 
-	cache := store.Create(
-		store.Type(cfg.OIDC.UserinfoCache.Type),
-		store.TTL(cfg.OIDC.UserinfoCache.TTL),
-		store.Size(cfg.OIDC.UserinfoCache.Size),
-		microstore.Nodes(cfg.OIDC.UserinfoCache.Addresses...),
-		microstore.Database(cfg.OIDC.UserinfoCache.Database),
-		microstore.Table(cfg.OIDC.UserinfoCache.Table),
+	cache := cache.Create(
+		cache.Store(cfg.OIDC.UserinfoCache.Store),
+		cache.TTL(cfg.OIDC.UserinfoCache.TTL),
+		cache.Size(cfg.OIDC.UserinfoCache.Size),
+		store.Nodes(cfg.OIDC.UserinfoCache.Nodes...),
+		store.Database(cfg.OIDC.UserinfoCache.Database),
+		store.Table(cfg.OIDC.UserinfoCache.Table),
 	)
 
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(

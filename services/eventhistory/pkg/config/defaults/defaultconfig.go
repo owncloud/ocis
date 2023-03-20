@@ -27,7 +27,9 @@ func DefaultConfig() *config.Config {
 			EnableTLS: false,
 		},
 		Store: config.Store{
-			Type:         "memory",
+			Store:        "memory",
+			Database:     "eventhistory",
+			Table:        "events",
 			RecordExpiry: 336 * time.Hour,
 		},
 		GRPC: config.GRPCConfig{

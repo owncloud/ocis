@@ -1,4 +1,4 @@
-package store
+package cache
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 
 type typeContextKey struct{}
 
-// Type determines the implementation:
+// Store determines the implementation:
 //   - "memory", for a in-memory implementation, which is also the default if noone matches
 //   - "noop", for a noop store (it does nothing)
 //   - "etcd", for etcd
@@ -18,7 +18,7 @@ type typeContextKey struct{}
 //   - "redis-sentinel", for redis-sentinel
 //   - "ocmem", custom in-memory implementation, with fixed size and optimized prefix
 //     and suffix search
-func Type(val string) store.Option {
+func Store(val string) store.Option {
 	return func(o *store.Options) {
 		if o.Context == nil {
 			o.Context = context.Background()

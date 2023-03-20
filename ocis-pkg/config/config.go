@@ -54,7 +54,7 @@ type Config struct {
 
 	Tracing        *shared.Tracing        `yaml:"tracing"`
 	Log            *shared.Log            `yaml:"log"`
-	CacheStore     *shared.CacheStore     `yaml:"cache_store"`
+	Cache          *shared.Cache          `yaml:"cache"`
 	GRPCClientTLS  *shared.GRPCClientTLS  `yaml:"grpc_client_tls"`
 	GRPCServiceTLS *shared.GRPCServiceTLS `yaml:"grpc_service_tls"`
 	HTTPServiceTLS shared.HTTPServiceTLS  `yaml:"http_service_tls"`

@@ -85,8 +85,8 @@ func DefaultConfig() *config.Config {
 				EducationResourcesEnabled: false,
 			},
 		},
-		CacheStore: &config.CacheStore{
-			Type:     "memory",
+		Cache: &config.Cache{
+			Store:    "memory",
 			Database: "graph",
 			Table:    "roles",
 			TTL:      time.Hour * 336,
@@ -124,14 +124,14 @@ func EnsureDefaults(cfg *config.Config) {
 		cfg.Tracing = &config.Tracing{}
 	}
 
-	if cfg.CacheStore == nil && cfg.Commons != nil && cfg.Commons.CacheStore != nil {
-		cfg.CacheStore = &config.CacheStore{
-			Type:      cfg.Commons.CacheStore.Type,
-			Addresses: cfg.Commons.CacheStore.Addresses,
-			Size:      cfg.Commons.CacheStore.Size,
+	if cfg.Cache == nil && cfg.Commons != nil && cfg.Commons.Cache != nil {
+		cfg.Cache = &config.Cache{
+			Store: cfg.Commons.Cache.Store,
+			Nodes: cfg.Commons.Cache.Nodes,
+			Size:  cfg.Commons.Cache.Size,
 		}
-	} else if cfg.CacheStore == nil {
-		cfg.CacheStore = &config.CacheStore{}
+	} else if cfg.Cache == nil {
+		cfg.Cache = &config.Cache{}
 	}
 
 	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {

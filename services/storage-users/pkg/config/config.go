@@ -169,8 +169,8 @@ type Events struct {
 
 // Cache holds cache config
 type Cache struct {
-	Store    string   `yaml:"store" env:"OCIS_CACHE_STORE_TYPE;STORAGE_USERS_CACHE_STORE_TYPE;STORAGE_USERS_CACHE_STORE" desc:"Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', and 'etcd'. See the text description for details."`
-	Nodes    []string `yaml:"nodes" env:"OCIS_CACHE_STORE_ADDRESS;STORAGE_USERS_CACHE_STORE_ADDRESS;STORAGE_USERS_CACHE_NODES" desc:"A comma separated list of addresses to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how addresses are used is dependent on the library of the configured store."`
+	Store    string   `yaml:"store" env:"OCIS_CACHE_STORE;STORAGE_USERS_CACHE_STORE;STORAGE_USERS_CACHE_STORE_TYPE" desc:"Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', and 'etcd'. See the text description for details."`
+	Nodes    []string `yaml:"nodes" env:"OCIS_CACHE_STORE_NODES;STORAGE_USERS_CACHE_STORE_NODES;OCIS_CACHE_STORE_ADDRESS;STORAGE_USERS_CACHE_STORE_ADDRESS;STORAGE_USERS_CACHE_NODES" desc:"A comma separated list of nodes to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`
 	Database string   `yaml:"database" env:"STORAGE_USERS_CACHE_DATABASE" desc:"The database name the configured store should use."`
 }
 

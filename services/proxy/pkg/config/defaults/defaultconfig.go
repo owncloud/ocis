@@ -41,8 +41,8 @@ func DefaultConfig() *config.Config {
 			Issuer: "https://localhost:9200",
 
 			AccessTokenVerifyMethod: config.AccessTokenVerificationJWT,
-			UserinfoCache: config.UserinfoCache{
-				Type:     "memory",
+			UserinfoCache: &config.Cache{
+				Store:    "memory",
 				Database: "proxy",
 				Table:    "userinfo",
 				TTL:      time.Second * 10,
@@ -255,6 +255,16 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.OIDC.UserinfoCache == nil && cfg.Commons != nil && cfg.Commons.Cache != nil {
+		cfg.OIDC.UserinfoCache = &config.Cache{
+			Store: cfg.Commons.Cache.Store,
+			Nodes: cfg.Commons.Cache.Nodes,
+			Size:  cfg.Commons.Cache.Size,
+		}
+	} else if cfg.OIDC.UserinfoCache == nil {
+		cfg.OIDC.UserinfoCache = &config.Cache{}
 	}
 
 	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {

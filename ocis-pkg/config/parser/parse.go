@@ -49,8 +49,8 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.TokenManager == nil {
 		cfg.TokenManager = &shared.TokenManager{}
 	}
-	if cfg.CacheStore == nil {
-		cfg.CacheStore = &shared.CacheStore{}
+	if cfg.Cache == nil {
+		cfg.Cache = &shared.Cache{}
 	}
 	if cfg.GRPCClientTLS == nil {
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
@@ -70,7 +70,7 @@ func EnsureCommons(cfg *config.Config) {
 
 	cfg.Commons.Log = structs.CopyOrZeroValue(cfg.Log)
 	cfg.Commons.Tracing = structs.CopyOrZeroValue(cfg.Tracing)
-	cfg.Commons.CacheStore = structs.CopyOrZeroValue(cfg.CacheStore)
+	cfg.Commons.Cache = structs.CopyOrZeroValue(cfg.Cache)
 
 	if cfg.GRPCClientTLS != nil {
 		cfg.Commons.GRPCClientTLS = cfg.GRPCClientTLS

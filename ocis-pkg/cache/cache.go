@@ -1,4 +1,4 @@
-package store
+package cache
 
 import (
 	"context"
@@ -9,8 +9,8 @@ import (
 	"github.com/go-micro/plugins/v4/store/redis"
 	redisopts "github.com/go-redis/redis/v8"
 	"github.com/nats-io/nats.go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/store/etcd"
-	"github.com/owncloud/ocis/v2/ocis-pkg/store/memory"
+	"github.com/owncloud/ocis/v2/ocis-pkg/cache/etcd"
+	"github.com/owncloud/ocis/v2/ocis-pkg/cache/memory"
 	"go-micro.dev/v4/logger"
 	"go-micro.dev/v4/store"
 )
@@ -27,7 +27,7 @@ const (
 	TypeNatsJS        = "nats-js"
 )
 
-// Create returns a configured key-value store
+// Create returns a configured key-value micro store
 //
 // Each microservice (or whatever piece is using the store) should use the
 // options available in the interface's operations to choose the right database

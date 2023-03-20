@@ -28,8 +28,8 @@ func DefaultConfig() *config.Config {
 			Cluster:   "ocis-cluster",
 			EnableTLS: false,
 		},
-		Store: config.Store{
-			Type:     "memory",
+		Persistence: config.Persistence{
+			Store:    "memory",
 			Database: "userlog",
 			Table:    "events",
 			TTL:      time.Hour * 336,
