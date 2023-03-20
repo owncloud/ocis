@@ -27,6 +27,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Make the group members addition limit configurable: [#5357](https://github.com/owncloud/ocis/pull/5357)
 * Enhancement - Allow username to be changed: [#5509](https://github.com/owncloud/ocis/pull/5509)
 * Enhancement - Graph Drives IdentitySet displayName: [#5347](https://github.com/owncloud/ocis/pull/5347)
+* Enhancement - Update to go 1.20 to use memlimit: [#5732](https://github.com/owncloud/ocis/pull/5732)
 * Enhancement - Display surname and givenName attributes: [#5388](https://github.com/owncloud/ocis/pull/5388)
 * Enhancement - Extended search: [#5221](https://github.com/owncloud/ocis/pull/5221)
 * Enhancement - Resource tags: [#5227](https://github.com/owncloud/ocis/pull/5227)
