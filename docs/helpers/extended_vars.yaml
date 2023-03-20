@@ -16,7 +16,7 @@ variables:
   description: ""
   do_ignore: true
 - rawname: MICRO_LOG_LEVEL
-  path: ocis-pkg/log/log.go:34
+  path: ocis-pkg/log/log.go:31
   foundincode: true
   name: MICRO_LOG_LEVEL
   type: string
@@ -25,7 +25,7 @@ variables:
     on supervision of ownCloud Support.
   do_ignore: false
 - rawname: MICRO_LOG_LEVEL
-  path: ocis-pkg/log/log.go:30
+  path: ocis-pkg/log/log.go:35
   foundincode: true
   name: MICRO_LOG_LEVEL
   type: ""
