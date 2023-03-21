@@ -79,7 +79,7 @@ require (
 	github.com/xhit/go-simple-mail/v2 v2.13.0
 	go-micro.dev/v4 v4.9.0
 	go.etcd.io/bbolt v1.3.7
-	go.etcd.io/etcd/client/v3 v3.5.6
+	go.etcd.io/etcd/client/v3 v3.5.7
 	go.opencensus.io v0.24.0
 	go.opentelemetry.io/otel v1.14.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.14.0
@@ -291,8 +291,8 @@ require (
 	github.com/xo/terminfo v0.0.0-20210125001918-ca9a967f8778 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	github.com/yashtewari/glob-intersection v0.1.0 // indirect
-	go.etcd.io/etcd/api/v3 v3.5.6 // indirect
-	go.etcd.io/etcd/client/pkg/v3 v3.5.6 // indirect
+	go.etcd.io/etcd/api/v3 v3.5.7 // indirect
+	go.etcd.io/etcd/client/pkg/v3 v3.5.7 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.36.4 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
