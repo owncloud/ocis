@@ -1760,7 +1760,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^the administrator "([^"]*)" adds the following users to a group "([^"]*)" at once with invalid host using the Graph API$/
+	 * @When /^user "([^"]*)" tries to add the following users to a group "([^"]*)" at once with an invalid host using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $group
@@ -1770,24 +1770,62 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 * @throws GuzzleException
 	 */
-	public function theAdministratorAddsTheFollowingUsersToAGroupAtOnceWithInvalidHostUsingTheGraphApi(string $user, string $group, TableNode $table) {
+	public function userTriesToAddTheFollowingUsersToAGroupAtOnceWithInvalidHostUsingTheGraphApi(string $user, string $group, TableNode $table): void {
 		$userIds = [];
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$this->featureContext->verifyTableNodeColumns($table, ['username']);
+		
 		foreach ($table->getHash() as $row) {
 			$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
 		}
 
-		$credentials = $this->getAdminOrUserCredentials($user);
-		$this->featureContext->verifyTableNodeColumns($table, ['username']);
+		$payload = [ "members@odata.bind" => [] ];
+		foreach ($userIds as $userId) {
+			$payload["members@odata.bind"][] = GraphHelper::getFullUrl('https://invalid/', 'users/' . $userId);
+		}
 
 		$this->featureContext->setResponse(
-			GraphHelper::addUsersToGroupWithInvalidHost(
-				$this->featureContext->getBaseUrl(),
+			HttpRequestHelper::sendRequest(
+				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupId),
+				$this->featureContext->getStepLineRef(),
+				'PATCH',
+				$credentials["username"],
+				$credentials["password"],
+				['Content-Type' => 'application/json'],
+				\json_encode($payload)
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" tries to add user "([^"]*)" to group "([^"]*)" with an invalid host using the Graph API$/
+	 *
+	 * @param string $adminUser
+	 * @param string $user
+	 * @param string $group
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userTriesToAddUserToGroupWithInvalidHostUsingTheGraphApi(string $adminUser, string $user, string $group): void {
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		$credentials = $this->getAdminOrUserCredentials($adminUser);
+
+		$body = [
+			"@odata.id" => GraphHelper::getFullUrl('https://invalid/', 'users/' . $userId)
+		];
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::post(
+				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupId . '/members/$ref'),
 				$this->featureContext->getStepLineRef(),
 				$credentials["username"],
 				$credentials["password"],
-				$groupId,
-				$userIds
+				['Content-Type' => 'application/json'],
+				\json_encode($body)
 			)
 		);
 	}
