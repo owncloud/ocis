@@ -83,8 +83,9 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 		// for each event we need to:
 		// I) find users eligible to receive the event
 		var (
-			users []string
-			err   error
+			users     []string
+			executant *user.UserId
+			err       error
 		)
 
 		switch e := event.Event.(type) {
@@ -92,22 +93,28 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 			err = errors.New("unhandled event")
 		// space related // TODO: how to find spaceadmins?
 		case events.SpaceDisabled:
+			executant = e.Executant
 			users, err = ul.findSpaceMembers(ul.impersonate(e.Executant), e.ID.GetOpaqueId(), viewer)
 		case events.SpaceDeleted:
+			executant = e.Executant
 			for u := range e.FinalMembers {
 				users = append(users, u)
 			}
 		case events.SpaceShared:
+			executant = e.Executant
 			users, err = ul.resolveID(ul.impersonate(e.Executant), e.GranteeUserID, e.GranteeGroupID)
 		case events.SpaceUnshared:
+			executant = e.Executant
 			users, err = ul.resolveID(ul.impersonate(e.Executant), e.GranteeUserID, e.GranteeGroupID)
 		case events.SpaceMembershipExpired:
 			users, err = ul.resolveID(ul.impersonate(e.SpaceOwner), e.GranteeUserID, e.GranteeGroupID)
 
 		// share related
 		case events.ShareCreated:
+			executant = e.Executant
 			users, err = ul.resolveID(ul.impersonate(e.Executant), e.GranteeUserID, e.GranteeGroupID)
 		case events.ShareRemoved:
+			executant = e.Executant
 			users, err = ul.resolveID(ul.impersonate(e.Executant), e.GranteeUserID, e.GranteeGroupID)
 		case events.ShareExpired:
 			users, err = ul.resolveID(ul.impersonate(e.ShareOwner), e.GranteeUserID, e.GranteeGroupID)
@@ -122,6 +129,8 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 		// II) filter users who want to receive the event
 		// This step is postponed for later.
 		// For now each user should get all events she is eligible to receive
+		// ...except notifications for their own actions
+		users = removeExecutant(users, executant)
 
 		// III) store the eventID for each user
 		for _, id := range users {
@@ -449,6 +458,16 @@ func listStorageSpaceRequest(spaceID string) *storageprovider.ListStorageSpacesR
 			},
 		},
 	}
+}
+
+func removeExecutant(users []string, executant *user.UserId) []string {
+	var usrs []string
+	for _, u := range users {
+		if u != executant.GetOpaqueId() {
+			usrs = append(usrs, u)
+		}
+	}
+	return usrs
 }
 
 type permissionChecker func(*storageprovider.ResourcePermissions) bool
