@@ -123,6 +123,7 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 		"permissionssvc_tls_mode":     cfg.Commons.GRPCClientTLS.Mode,
 		"max_acquire_lock_cycles":     cfg.Drivers.OCIS.MaxAcquireLockCycles,
 		"lock_cycle_duration_factor":  cfg.Drivers.OCIS.LockCycleDurationFactor,
+		"max_concurrency":             cfg.Drivers.OCIS.MaxConcurrency,
 		"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
 		"max_quota":                   cfg.Drivers.OCIS.MaxQuota,
 		"statcache": map[string]interface{}{
@@ -166,6 +167,7 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 		"permissionssvc_tls_mode":     cfg.Commons.GRPCClientTLS.Mode,
 		"max_acquire_lock_cycles":     cfg.Drivers.OCIS.MaxAcquireLockCycles,
 		"lock_cycle_duration_factor":  cfg.Drivers.OCIS.LockCycleDurationFactor,
+		"max_concurrency":             cfg.Drivers.OCIS.MaxConcurrency,
 		"max_quota":                   cfg.Drivers.OCIS.MaxQuota,
 		"statcache": map[string]interface{}{
 			"cache_store":    cfg.Cache.Store,
@@ -213,6 +215,7 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 		"s3.bucket":                   cfg.Drivers.S3NG.Bucket,
 		"max_acquire_lock_cycles":     cfg.Drivers.S3NG.MaxAcquireLockCycles,
 		"lock_cycle_duration_factor":  cfg.Drivers.S3NG.LockCycleDurationFactor,
+		"max_concurrency":             cfg.Drivers.S3NG.MaxConcurrency,
 		"asyncfileuploads":            cfg.Drivers.OCIS.AsyncUploads,
 		"statcache": map[string]interface{}{
 			"cache_store":    cfg.Cache.Store,
@@ -259,6 +262,7 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 		"s3.endpoint":                 cfg.Drivers.S3NG.Endpoint,
 		"s3.bucket":                   cfg.Drivers.S3NG.Bucket,
 		"max_acquire_lock_cycles":     cfg.Drivers.S3NG.MaxAcquireLockCycles,
+		"max_concurrency":             cfg.Drivers.S3NG.MaxConcurrency,
 		"lock_cycle_duration_factor":  cfg.Drivers.S3NG.LockCycleDurationFactor,
 		"statcache": map[string]interface{}{
 			"cache_store":    cfg.Cache.Store,
