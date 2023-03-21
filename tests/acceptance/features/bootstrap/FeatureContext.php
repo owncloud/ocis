@@ -302,28 +302,10 @@ class FeatureContext extends BehatVariablesContext {
 	public $appConfigurationContext;
 
 	/**
-	 * @var array saved configuration of the system before test runs as reported
-	 *            by occ config:list
-	 */
-	private $savedConfigList = [];
-
-	/**
 	 * @var array
 	 */
 	private $initialTrustedServer;
 
-	/**
-	 * @var int return code of last command
-	 */
-	private $occLastCode;
-	/**
-	 * @var string stdout of last command
-	 */
-	private $lastStdOut;
-	/**
-	 * @var string stderr of last command
-	 */
-	private $lastStdErr;
 	/**
 	 * The codes are stored as strings, even though they are numbers
 	 *
@@ -377,22 +359,6 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function getOCSelector(): string {
 		return $this->oCSelector;
-	}
-
-	/**
-	 * @return void
-	 */
-	public function resetOccLastCode(): void {
-		$this->occLastCode = null;
-	}
-
-	/**
-	 * @param int $statusCode
-	 *
-	 * @return void
-	 */
-	public function setOccLastCode(?int $statusCode = null): void {
-		$this->occLastCode = $statusCode;
 	}
 
 	/**
@@ -1055,47 +1021,6 @@ class FeatureContext extends BehatVariablesContext {
 			return $this->scenarioString;
 		}
 		return $this->stepLineRef;
-	}
-
-	/**
-	 * get the exit status of the last occ command
-	 * app acceptance tests that have their own step code may need to process this
-	 *
-	 * @return int exit status code of the last occ command
-	 */
-	public function getExitStatusCodeOfOccCommand(): ?int {
-		return $this->occLastCode;
-	}
-
-	/**
-	 * get the normal output of the last occ command
-	 * app acceptance tests that have their own step code may need to process this
-	 *
-	 * @return string normal output of the last occ command
-	 */
-	public function getStdOutOfOccCommand(): string {
-		return $this->lastStdOut;
-	}
-
-	/**
-	 * set the normal output of the last occ command
-	 *
-	 * @param string $stdOut
-	 *
-	 * @return void
-	 */
-	public function setStdOutOfOccCommand(string $stdOut): void {
-		$this->lastStdOut = $stdOut;
-	}
-
-	/**
-	 * get the error output of the last occ command
-	 * app acceptance tests that have their own step code may need to process this
-	 *
-	 * @return string error output of the last occ command
-	 */
-	public function getStdErrOfOccCommand(): string {
-		return $this->lastStdErr;
 	}
 
 	/**
@@ -2496,25 +2421,6 @@ class FeatureContext extends BehatVariablesContext {
 			$content
 		);
 		$this->setResponse($response);
-	}
-
-	/**
-	 * @Given the administrator has created a file :path in temporary storage with the last exported content using the testing API
-	 *
-	 * @param string $path
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasCreatedAFileInTemporaryStorageWithLastExportedContent(
-		string $path
-	): void {
-		$commandOutput = $this->getStdOutOfOccCommand();
-		$this->copyContentToFileInTemporaryStorageOnSystemUnderTest($path, $commandOutput);
-		$this->theFileWithContentShouldExistInTheServerRoot(
-			TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER . "/$path",
-			$commandOutput
-		);
 	}
 
 	/**
@@ -3942,46 +3848,6 @@ class FeatureContext extends BehatVariablesContext {
 		if ($this->federatedServerExists()) {
 			$this->restoreTrustedServers('REMOTE');
 		}
-	}
-
-	/**
-	 * Find exception texts in stderr
-	 *
-	 * @return array of exception texts
-	 */
-	public function findExceptions(): array {
-		$exceptions = [];
-		$captureNext = false;
-		// the exception text usually appears after an "[Exception]" row
-		foreach (\explode("\n", $this->lastStdErr) as $line) {
-			if (\preg_match('/\[Exception\]/', $line)) {
-				$captureNext = true;
-				continue;
-			}
-			if ($captureNext) {
-				$exceptions[] = \trim($line);
-				$captureNext = false;
-			}
-		}
-
-		return $exceptions;
-	}
-
-	/**
-	 * remember the result of the last occ command
-	 *
-	 * @param string[] $result associated array with "code", "stdOut", "stdErr"
-	 *
-	 * @return void
-	 */
-	public function setResultOfOccCommand(array $result): void {
-		Assert::assertIsArray($result);
-		Assert::assertArrayHasKey('code', $result);
-		Assert::assertArrayHasKey('stdOut', $result);
-		Assert::assertArrayHasKey('stdErr', $result);
-		$this->occLastCode = (int)$result['code'];
-		$this->lastStdOut = $result['stdOut'];
-		$this->lastStdErr = $result['stdErr'];
 	}
 
 	/**
