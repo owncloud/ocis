@@ -220,7 +220,7 @@ func (i *LDAP) DeleteGroup(ctx context.Context, id string) error {
 func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs []string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("AddMembersToGroup")
-	ge, err := i.getLDAPGroupByID(groupID, true)
+	ge, err := i.getLDAPGroupByNameOrID(groupID, true)
 	if err != nil {
 		return err
 	}
