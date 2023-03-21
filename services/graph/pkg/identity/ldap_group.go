@@ -270,6 +270,14 @@ func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs 
 		mr.Add(i.groupAttributeMap.member, newMemberDN)
 
 		if err := i.conn.Modify(&mr); err != nil {
+			if lerr, ok := err.(*ldap.Error); ok {
+				if lerr.ResultCode == ldap.LDAPResultAttributeOrValueExists {
+					err = fmt.Errorf("Duplicate member entries in request")
+				} else {
+					logger.Info().Err(err).Msg("Failed to modify group member entries on PATCH group")
+					err = fmt.Errorf("Unknown error when trying to modify group member entries")
+				}
+			}
 			return err
 		}
 	}
