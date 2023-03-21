@@ -10,8 +10,8 @@ import (
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/owncloud/ocis/v2/ocis-pkg/cache"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/service"
@@ -30,7 +30,7 @@ var _ = Describe("EventHistoryService", func() {
 
 	BeforeEach(func() {
 		var err error
-		sto = cache.Create()
+		sto = store.Create()
 		bus = testBus(make(chan events.Event))
 		eh, err = service.NewEventHistoryService(cfg, bus, sto, log.Logger{})
 		Expect(err).ToNot(HaveOccurred())

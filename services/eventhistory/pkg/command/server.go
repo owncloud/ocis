@@ -6,9 +6,9 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/oklog/run"
-	"github.com/owncloud/ocis/v2/ocis-pkg/cache"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config/parser"
@@ -16,7 +16,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/server/grpc"
 	"github.com/urfave/cli/v2"
-	"go-micro.dev/v4/store"
+	microstore "go-micro.dev/v4/store"
 )
 
 // Server is the entrypoint for the server command.
@@ -55,13 +55,13 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			st := cache.Create(
-				cache.Store(cfg.Store.Store),
-				cache.TTL(cfg.Store.RecordExpiry),
-				cache.Size(cfg.Store.Size),
-				store.Nodes(cfg.Store.Nodes...),
-				store.Database(cfg.Store.Database),
-				store.Table(cfg.Store.Table),
+			st := store.Create(
+				store.Store(cfg.Store.Store),
+				store.TTL(cfg.Store.RecordExpiry),
+				store.Size(cfg.Store.Size),
+				microstore.Nodes(cfg.Store.Nodes...),
+				microstore.Database(cfg.Store.Database),
+				microstore.Table(cfg.Store.Table),
 			)
 
 			service := grpc.NewService(

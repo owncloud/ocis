@@ -15,15 +15,15 @@ import (
 	ldapv3 "github.com/go-ldap/ldap/v3"
 	"github.com/jellydator/ttlcache/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/owncloud/ocis/v2/ocis-pkg/cache"
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
 	graphm "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
-	"go-micro.dev/v4/store"
+	microstore "go-micro.dev/v4/store"
 )
 
 const (
@@ -159,13 +159,13 @@ func NewService(opts ...Option) (Graph, error) {
 
 	roleManager := options.RoleManager
 	if roleManager == nil {
-		storeOptions := []store.Option{
-			cache.Store(options.Config.Cache.Store),
-			cache.TTL(options.Config.Cache.TTL),
-			cache.Size(options.Config.Cache.Size),
-			store.Nodes(options.Config.Cache.Nodes...),
-			store.Database(options.Config.Cache.Database),
-			store.Table(options.Config.Cache.Table),
+		storeOptions := []microstore.Option{
+			store.Store(options.Config.Cache.Store),
+			store.TTL(options.Config.Cache.TTL),
+			store.Size(options.Config.Cache.Size),
+			microstore.Nodes(options.Config.Cache.Nodes...),
+			microstore.Database(options.Config.Cache.Database),
+			microstore.Table(options.Config.Cache.Table),
 		}
 		m := roles.NewManager(
 			roles.StoreOptions(storeOptions),
