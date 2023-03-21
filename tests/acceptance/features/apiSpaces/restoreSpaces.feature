@@ -83,7 +83,7 @@ Feature: Restoring space
       | User  |
       | Guest |
 
-
+  @issue-5872
   Scenario Outline: Admin and Space Admin can restore others space
     Given the administrator has given "Brian" the role "<role>" using the settings api
     And user "Alice" has disabled a space "restore a space"

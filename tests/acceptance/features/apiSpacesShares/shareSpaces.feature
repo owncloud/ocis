@@ -18,7 +18,6 @@ Feature: Share spaces
 
 
   Scenario Outline: A Space Admin can share a space to another user
-    And the administrator has given "Alice" the role "User" using the settings api
     When user "Alice" shares a space "share space" with settings:
       | shareWith | Brian  |
       | role      | <role> |
