@@ -36,6 +36,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Expiration Notifications: [#5330](https://github.com/owncloud/ocis/pull/5330)
 * Enhancement - Make graph/education API errors more consistent: [#5682](https://github.com/owncloud/ocis/pull/5682)
 * Enhancement - Add endpoint to list permissions: [#5594](https://github.com/owncloud/ocis/pull/5594)
+* Enhancement - No Notifications for own actions: [#5871](https://github.com/owncloud/ocis/pull/5871)
 * Enhancement - Introduce policies-service: [#5714](https://github.com/owncloud/ocis/pull/5714)
 * Enhancement - Better config for postprocessing service: [#5457](https://github.com/owncloud/ocis/pull/5457)
 * Enhancement - Add config option to enforce passwords on public links: [#5848](https://github.com/owncloud/ocis/pull/5848)
