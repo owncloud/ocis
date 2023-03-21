@@ -304,7 +304,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++https://localhost:9200/ ++
 a| [subs=-attributes]
-Base url to navigate back from the app the containing folder in the file list.
+Base url to navigate back from the app to the containing folder in the file list.
 
 a|`APP_PROVIDER_WOPI_FOLDER_URL_PATH_TEMPLATE` +
 
@@ -313,6 +313,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/f/{{.ResourceID}} ++
 a| [subs=-attributes]
-Path template to navigate back from the app the containing folder in the file list. Possible template variables are {{.ResourceInfo.ResourceID}}, {{.ResourceInfo.Mtime.Seconds}}, {{.ResourceInfo.Name}}, {{.ResourceInfo.Path}}, {{.ResourceInfo.Type}}, {{.ResourceInfo.Id.SpaceId}}, {{.ResourceInfo.Id.StorageId}}, {{.ResourceInfo.Id.OpaqueId}}, {{.ResourceInfo.MimeType}}
+Path template to navigate back from the app to the containing folder in the file list. Supported template variables are {{.ResourceInfo.ResourceID}}, {{.ResourceInfo.Mtime.Seconds}}, {{.ResourceInfo.Name}}, {{.ResourceInfo.Path}}, {{.ResourceInfo.Type}}, {{.ResourceInfo.Id.SpaceId}}, {{.ResourceInfo.Id.StorageId}}, {{.ResourceInfo.Id.OpaqueId}}, {{.ResourceInfo.MimeType}}
 |===
 
