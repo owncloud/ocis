@@ -46,6 +46,7 @@ Feature: delete user
       | Admin       |
       | Space Admin |
       | User        |
+      | Guest       |
 
 
   Scenario: the admin user tries to delete his/her own account
@@ -55,22 +56,56 @@ Feature: delete user
     And user "Alice" should exist
 
 
-  Scenario: the admin user tries to delete a non-existent user
-    Given the administrator has given "Alice" the role "Admin" using the settings api
-    When the user "Alice" deletes a user "nonExistentUser" using the Graph API
-    Then the HTTP status code should be "404"
-
-
-  Scenario Outline: Non-admin user tries to delete another user with different role
-    Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "<role>" using the settings api
-    When the user "Alice" deletes a user "Brian" using the Graph API
+  Scenario Outline: Non-admin user tries to delete his/her own account
+    Given the administrator has given "Alice" the role "<role>" using the settings api
+    When the user "Alice" deletes a user "Alice" using the Graph API
     Then the HTTP status code should be "401"
-    And user "Brian" should exist
+    And user "Alice" should exist
     Examples:
       | role        |
       | Space Admin |
       | User        |
+      | Guest       |
+
+
+  Scenario: the admin user tries to delete a nonexistent user
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    When the user "Alice" tries to delete a nonexistent user using the Graph API
+    Then the HTTP status code should be "404"
+
+  
+  Scenario Outline: Non-admin user tries to delete a nonexistent user
+    Given the administrator has given "Alice" the role "<role>" using the settings api
+    When the user "Alice" tries to delete a nonexistent user using the Graph API
+    Then the HTTP status code should be "401"
+    Examples:
+      | role        |
+      | Space Admin |
+      | User        |
+      | Guest       |
+
+
+  Scenario Outline: Non-admin user tries to delete another user with different role
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has given "Brian" the role "<role>" using the settings api
+    And the administrator has given "Alice" the role "<userRole>" using the settings api
+    When the user "Alice" deletes a user "Brian" using the Graph API
+    Then the HTTP status code should be "401"
+    And user "Brian" should exist
+    Examples:
+      | userRole    | role        |
+      | Space Admin | Space Admin |
+      | Space Admin | User        |
+      | Space Admin | Guest       |
+      | Space Admin | Admin       |
+      | User        | Space Admin |
+      | User        | User        |
+      | User        | Guest       |
+      | User        | Admin       |
+      | Guest       | Space Admin |
+      | Guest       | User        |
+      | Guest       | Guest       |
+      | Guest       | Admin       |
 
 
   Scenario: the admin user deletes a disabled user
@@ -80,4 +115,29 @@ Feature: delete user
     When the user "Alice" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "204"
     And user "Brian" should not exist
-    
+
+
+  Scenario Outline: normal user tries to delete a disabled user
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Carol" has been created with default attributes and without skeleton files
+    And the administrator has given "Brian" the role "<role>" using the settings api
+    And the administrator has given "Carol" the role "<userRole>" using the settings api
+    And the user "Alice" has disabled user "Brian" using the Graph API
+    When the user "Carol" deletes a user "Brian" using the Graph API
+    Then the HTTP status code should be "401"
+    And user "Brian" should exist
+    Examples:
+      | userRole    | role        |
+      | Space Admin | Space Admin |
+      | Space Admin | User        |
+      | Space Admin | Guest       |
+      | Space Admin | Admin       |
+      | User        | Space Admin |
+      | User        | User        |
+      | User        | Guest       |
+      | User        | Admin       |
+      | Guest       | Space Admin |
+      | Guest       | User        |
+      | Guest       | Guest       |
+      | Guest       | Admin       |
