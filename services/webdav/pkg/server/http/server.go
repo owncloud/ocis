@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
@@ -16,8 +17,22 @@ import (
 func Server(opts ...Option) (http.Service, error) {
 	options := newOptions(opts...)
 
+	tlsConfig, err := config.BuildTLSConfig(
+		options.Logger,
+		options.Config.HTTP.TLS.Enabled,
+		options.Config.HTTP.TLS.Cert,
+		options.Config.HTTP.TLS.Key,
+		options.Config.HTTP.Addr,
+	)
+	if err != nil {
+		options.Logger.Error().
+			Err(err).
+			Msg("could not build certificate")
+		return http.Service{}, fmt.Errorf("could not build certificate: %w", err)
+	}
+
 	service, err := http.NewService(
-		http.TLSConfig(options.Config.HTTP.TLS),
+		http.TLSConfig(tlsConfig),
 		http.Logger(options.Logger),
 		http.Namespace(options.Config.HTTP.Namespace),
 		http.Name(options.Config.Service.Name),

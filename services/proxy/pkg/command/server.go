@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
@@ -34,6 +33,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 	"github.com/urfave/cli/v2"
+	"golang.org/x/net/http2"
 	"golang.org/x/oauth2"
 )
 
@@ -191,14 +191,14 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 	}
 
 	var oidcHTTPClient = &http.Client{
-		Transport: &http.Transport{
+		Transport: &http2.Transport{
 			TLSClientConfig: &tls.Config{
 				MinVersion:         tls.VersionTLS12,
 				InsecureSkipVerify: cfg.OIDC.Insecure, //nolint:gosec
 			},
-			DisableKeepAlives: true,
+			//DisableKeepAlives: true,
 		},
-		Timeout: time.Second * 10,
+		//Timeout: time.Second * 10,
 	}
 
 	var authenticators []middleware.Authenticator

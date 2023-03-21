@@ -62,10 +62,11 @@ type Debug struct {
 }
 
 type HTTPConfig struct {
-	Addr      string `yaml:"addr" env:"OCDAV_HTTP_ADDR" desc:"The bind address of the HTTP service."`
-	Namespace string `yaml:"-"`
-	Protocol  string `yaml:"protocol" env:"OCDAV_HTTP_PROTOCOL" desc:"The transport protocol of the HTTP service."`
-	Prefix    string `yaml:"prefix" env:"OCDAV_HTTP_PREFIX" desc:"A URL path prefix for the handler."`
+	Addr      string                `yaml:"addr" env:"OCDAV_HTTP_ADDR" desc:"The bind address of the HTTP service."`
+	Namespace string                `yaml:"-"`
+	Protocol  string                `yaml:"protocol" env:"OCDAV_HTTP_PROTOCOL" desc:"The transport protocol of the HTTP service."`
+	TLS       shared.HTTPServiceTLS `yaml:"tls"`
+	Prefix    string                `yaml:"prefix" env:"OCDAV_HTTP_PREFIX" desc:"A URL path prefix for the handler."`
 }
 
 // Status holds the configurable values for the status.php

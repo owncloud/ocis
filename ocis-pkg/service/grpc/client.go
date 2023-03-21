@@ -64,6 +64,7 @@ func Configure(opts ...ClientOption) error {
 			}
 			cOpts = append(cOpts, mgrpcc.AuthTLS(tlsConfig))
 		case "on":
+			// TODO use function to add cert to cert pool?
 			tlsConfig = &tls.Config{}
 			// Note: If caCert is empty we use the system's default set of trusted CAs
 			if options.caCert != "" {

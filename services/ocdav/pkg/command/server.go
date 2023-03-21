@@ -8,6 +8,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/broker"
+	pkgconfig "github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/ocdav/pkg/config"
@@ -50,6 +51,21 @@ func Server(cfg *config.Config) *cli.Command {
 				if err := sharedconf.Decode(sc); err != nil {
 					logger.Error().Err(err).Msg("error decoding shared config for ocdav")
 				}
+
+				tlsConfig, err := pkgconfig.BuildTLSConfig(
+					logger,
+					cfg.HTTP.TLS.Enabled,
+					cfg.HTTP.TLS.Cert,
+					cfg.HTTP.TLS.Key,
+					cfg.HTTP.Addr,
+				)
+				if err != nil {
+					logger.Error().
+						Err(err).
+						Msg("could not build certificate")
+					return fmt.Errorf("could not build certificate: %w", err)
+				}
+
 				opts := []ocdav.Option{
 					ocdav.Name(cfg.HTTP.Namespace + "." + cfg.Service.Name),
 					ocdav.Version(version.GetString()),
@@ -75,7 +91,7 @@ func Server(cfg *config.Config) *cli.Command {
 					ocdav.Broker(broker.NoOp{}),
 					// ocdav.FavoriteManager() // FIXME needs a proper persistence implementation https://github.com/owncloud/ocis/issues/1228
 					// ocdav.LockSystem(), // will default to the CS3 lock system
-					// ocdav.TLSConfig() // tls config for the http server
+					ocdav.TLSConfig(tlsConfig),
 					ocdav.MetricsEnabled(true),
 					ocdav.MetricsNamespace("ocis"),
 				}

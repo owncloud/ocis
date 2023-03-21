@@ -76,11 +76,12 @@ type Debug struct {
 }
 
 type HTTPConfig struct {
-	Addr      string `yaml:"addr" env:"FRONTEND_HTTP_ADDR" desc:"The bind address of the HTTP service."`
-	Namespace string `yaml:"-"`
-	Protocol  string `yaml:"protocol" env:"FRONTEND_HTTP_PROTOCOL" desc:"The transport protocol of the HTTP service."`
-	Prefix    string `yaml:"prefix" env:"FRONTEND_HTTP_PREFIX" desc:"The Path prefix where the frontend can be accessed (defaults to /)."`
-	CORS      CORS   `yaml:"cors"`
+	Addr      string                `yaml:"addr" env:"FRONTEND_HTTP_ADDR" desc:"The bind address of the HTTP service."`
+	Namespace string                `yaml:"-"`
+	Protocol  string                `yaml:"protocol" env:"FRONTEND_HTTP_PROTOCOL" desc:"The transport protocol of the HTTP service."`
+	TLS       shared.HTTPServiceTLS `yaml:"tls"`
+	Prefix    string                `yaml:"prefix" env:"FRONTEND_HTTP_PREFIX" desc:"The Path prefix where the frontend can be accessed (defaults to /)."`
+	CORS      CORS                  `yaml:"cors"`
 }
 
 // CORS defines the available cors configuration.
