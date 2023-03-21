@@ -274,36 +274,23 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	}
 
 	mr := ldap.ModifyRequest{DN: e.DN}
-	if user.GetDisplayName() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.displayName) != user.GetDisplayName() {
-			mr.Replace(i.userAttributeMap.displayName, []string{user.GetDisplayName()})
-			updateNeeded = true
+	properties := map[string]string{
+		i.userAttributeMap.displayName: user.GetDisplayName(),
+		i.userAttributeMap.mail:        user.GetMail(),
+		i.userAttributeMap.surname:     user.GetSurname(),
+		i.userAttributeMap.givenName:   user.GetGivenName(),
+		i.userAttributeMap.userType:    user.GetUserType(),
+	}
+
+	for attribute, value := range properties {
+		if value != "" {
+			if e.GetEqualFoldAttributeValue(attribute) != value {
+				mr.Replace(attribute, []string{value})
+				updateNeeded = true
+			}
 		}
 	}
-	if user.GetMail() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.mail) != user.GetMail() {
-			mr.Replace(i.userAttributeMap.mail, []string{user.GetMail()})
-			updateNeeded = true
-		}
-	}
-	if user.GetSurname() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.surname) != user.GetSurname() {
-			mr.Replace(i.userAttributeMap.surname, []string{user.GetSurname()})
-			updateNeeded = true
-		}
-	}
-	if user.GetGivenName() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName) != user.GetGivenName() {
-			mr.Replace(i.userAttributeMap.givenName, []string{user.GetGivenName()})
-			updateNeeded = true
-		}
-	}
-	if user.GetUserType() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.userType) != user.GetUserType() {
-			mr.Replace(i.userAttributeMap.userType, []string{user.GetUserType()})
-			updateNeeded = true
-		}
-	}
+
 	if user.PasswordProfile != nil && user.PasswordProfile.GetPassword() != "" {
 		if i.usePwModifyExOp {
 			if err := i.updateUserPassowrd(ctx, e.DN, user.PasswordProfile.GetPassword()); err != nil {
@@ -322,28 +309,13 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	// "attribute": For the upstream user management service which modifies accountEnabled on the user entry
 	// "group": Makes it possible for local admins to disable users by adding them to a special group
 	if user.AccountEnabled != nil {
-		switch i.disableUserMechanism {
-		case DisableMechanismNone:
-			return nil, errors.New("accountEnabled option not compatible with backend disable user mechanism")
-		case DisableMechanismAttribute:
-			boolString := strings.ToUpper(strconv.FormatBool(user.GetAccountEnabled()))
-			ldapValue := e.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled)
-			if ldapValue != "" {
-				mr.Replace(i.userAttributeMap.accountEnabled, []string{boolString})
-			} else {
-				mr.Add(i.userAttributeMap.accountEnabled, []string{boolString})
-			}
-			updateNeeded = true
-		case DisableMechanismGroup:
-			if user.GetAccountEnabled() {
-				err = i.enableUser(logger, e.DN)
-			} else {
-				err = i.disableUser(logger, e.DN)
-			}
+		un, err := i.updateAccountEnabledState(logger, user.GetAccountEnabled(), e, &mr)
 
-			if err != nil {
-				return nil, err
-			}
+		if err != nil {
+			return nil, err
+		}
+
+		if un {
 			updateNeeded = true
 		}
 	}
@@ -364,7 +336,7 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 
 	// To avoid an ldap lookup for group membership, set the enabled flag to same as input value
 	// since this would have been updated with group membership from the input anyway.
-	if user.AccountEnabled != nil && i.disableUserMechanism != DisableMechanismNone {
+	if user.AccountEnabled != nil && i.disableUserMechanism == DisableMechanismGroup {
 		returnUser.AccountEnabled = user.AccountEnabled
 	}
 
@@ -1056,4 +1028,33 @@ func (i *LDAP) usersEnabledState(users []*ldap.Entry) (usersEnabledState map[str
 	}
 
 	return usersEnabledState, nil
+}
+
+// Behavior of enabling/disabling of users depends on the "disableUserMechanism" config option:
+//
+// "attribute": For the upstream user management service which modifies accountEnabled on the user entry
+// "group": Makes it possible for local admins to disable users by adding them to a special group
+func (i *LDAP) updateAccountEnabledState(logger log.Logger, accountEnabled bool, e *ldap.Entry, mr *ldap.ModifyRequest) (updateNeeded bool, err error) {
+	switch i.disableUserMechanism {
+	case DisableMechanismNone:
+		err = errors.New("accountEnabled option not compatible with backend disable user mechanism")
+	case DisableMechanismAttribute:
+		boolString := strings.ToUpper(strconv.FormatBool(accountEnabled))
+		ldapValue := e.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled)
+		if ldapValue != "" {
+			mr.Replace(i.userAttributeMap.accountEnabled, []string{boolString})
+		} else {
+			mr.Add(i.userAttributeMap.accountEnabled, []string{boolString})
+		}
+		updateNeeded = true
+	case DisableMechanismGroup:
+		if accountEnabled {
+			err = i.enableUser(logger, e.DN)
+		} else {
+			err = i.disableUser(logger, e.DN)
+		}
+		updateNeeded = true
+	}
+
+	return updateNeeded, err
 }

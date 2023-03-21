@@ -449,6 +449,7 @@ var _ = Describe("EducationUsers", func() {
 			user.SetOnPremisesSamAccountName("user")
 			user.SetMail("user@example.com")
 			user.SetId("/users/user")
+			user.SetAccountEnabled(true)
 
 			identityEducationBackend.On("GetEducationUser", mock.Anything, mock.Anything, mock.Anything).Return(&user, nil)
 		})
@@ -502,6 +503,7 @@ var _ = Describe("EducationUsers", func() {
 			identityEducationBackend.On("UpdateEducationUser", mock.Anything, user.GetId(), mock.Anything).Return(user, nil)
 
 			user.SetDisplayName("New Display Name")
+			user.SetAccountEnabled(false)
 			data, err := json.Marshal(user)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -519,6 +521,7 @@ var _ = Describe("EducationUsers", func() {
 			err = json.Unmarshal(data, &updatedUser)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(updatedUser.GetDisplayName()).To(Equal("New Display Name"))
+			Expect(updatedUser.GetAccountEnabled()).To(Equal(false))
 		})
 	})
 })
