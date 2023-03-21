@@ -1,4 +1,4 @@
-Change: Updatet Cache Configuration
+Change: Updated Cache Configuration
 
 We updated all cache related environment vars to more closely follow the go micro naming pattern:
 - `{service}_CACHE_STORE_TYPE` becomes `{service}_CACHE_STORE` or `{service}_PERSISTENT_STORE`
