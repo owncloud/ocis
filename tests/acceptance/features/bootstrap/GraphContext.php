@@ -423,6 +423,26 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * sends a request to delete a user with the help of userID using the Graph API
+	 *
+	 * @param string $userId
+	 * @param string $byUser
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public function deleteUserByUserIdUsingTheGraphApi(string $userId, string $byUser): ResponseInterface {
+		$credentials = $this->getAdminOrUserCredentials($byUser);
+		return GraphHelper::deleteUserByUserId(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$credentials["username"],
+			$credentials["password"],
+			$userId
+		);
+	}
+
+	/**
 	 * @When /^the user "([^"]*)" deletes a user "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $byUser
@@ -433,7 +453,22 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function theUserDeletesAUserUsingTheGraphAPI(string $byUser, string $user): void {
-		$this->adminDeletesUserUsingTheGraphApi($user, $byUser);
+		$userId = $this->featureContext->getUserIdByUserName($user);
+		$this->featureContext->setResponse($this->deleteUserByUserIdUsingTheGraphApi($userId, $byUser));
+	}
+
+	/**
+	 * @When /^the user "([^"]*)" tries to delete a nonexistent user using the Graph API$/
+	 *
+	 * @param string $byUser
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserTriesToDeleteNonExistingUser(string $byUser): void {
+		$userId = WebDavHelper::generateUUIDv4();
+		$this->featureContext->setResponse($this->deleteUserByUserIdUsingTheGraphApi($userId, $byUser));
 	}
 
 	/**

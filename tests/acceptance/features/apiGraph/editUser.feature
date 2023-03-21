@@ -83,24 +83,36 @@ Feature: edit user
       | role        |
       | Space Admin |
       | User        |
+      | Guest       |
 
 
   Scenario Outline: a normal user should not be able to edit another user's email
-    Given the administrator has given "Brian" the role "<role>" using the settings api
+    Given the administrator has given "Brian" the role "<userRole>" using the settings api
     And the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | Carol             |
       | displayName | Carol King        |
       | email       | carol@example.com |
       | password    | 1234              |
+    And the administrator has given "Carol" the role "<role>" using the settings api
     When the user "Brian" tries to change the email of user "Carol" to "newemail@example.com" using the Graph API
     Then the HTTP status code should be "401"
     And the user "Carol" should have information with these key and value pairs:
       | key  | value             |
       | mail | carol@example.com |
     Examples:
-      | role        |
-      | Space Admin |
-      | User        |
+      | userRole    | role        |
+      | Space Admin | Space Admin |
+      | Space Admin | User        |
+      | Space Admin | Guest       |
+      | Space Admin | Admin       |
+      | User        | Space Admin |
+      | User        | User        |
+      | User        | Guest       |
+      | User        | Admin       |
+      | Guest       | Space Admin |
+      | Guest       | User        |
+      | Guest       | Guest       |
+      | Guest       | Admin       |
 
 
   Scenario Outline: the admin user can edit another user display name
@@ -128,24 +140,36 @@ Feature: edit user
       | role        |
       | Space Admin |
       | User        |
+      | Guest       |
 
 
   Scenario Outline: a normal user should not be able to edit another user's display name
-    Given the administrator has given "Brian" the role "<role>" using the settings api
+    Given the administrator has given "Brian" the role "<userRole>" using the settings api
     And the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | Carol             |
       | displayName | Carol King        |
       | email       | carol@example.com |
       | password    | 1234              |
+    And the administrator has given "Carol" the role "<role>" using the settings api
     When the user "Brian" tries to change the display name of user "Carol" to "Alice Hansen" using the Graph API
     Then the HTTP status code should be "401"
     And the user "Carol" should have information with these key and value pairs:
       | key         | value      |
       | displayName | Carol King |
     Examples:
-      | role        |
-      | Space Admin |
-      | User        |
+      | userRole    | role        |
+      | Space Admin | Space Admin |
+      | Space Admin | User        |
+      | Space Admin | Guest       |
+      | Space Admin | Admin       |
+      | User        | Space Admin |
+      | User        | User        |
+      | User        | Guest       |
+      | User        | Admin       |
+      | Guest       | Space Admin |
+      | Guest       | User        |
+      | Guest       | Guest       |
+      | Guest       | Admin       |
 
 
   Scenario: the admin user resets password of another user
@@ -156,21 +180,32 @@ Feature: edit user
 
 
   Scenario Outline: a normal user should not be able to reset the password of another user
-    Given the administrator has given "Brian" the role "<role>" using the settings api
+    Given the administrator has given "Brian" the role "<userRole>" using the settings api
     And the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | Carol             |
       | displayName | Carol King        |
       | email       | carol@example.com |
       | password    | 1234              |
+    And the administrator has given "Carol" the role "<role>" using the settings api
     And user "Carol" has uploaded file with content "test file for reset password" to "/resetpassword.txt"
     When the user "Brian" resets the password of user "Carol" to "newpassword" using the Graph API
     Then the HTTP status code should be "401"
     And the content of file "resetpassword.txt" for user "Carol" using password "1234" should be "test file for reset password"
     But user "Carol" using password "newpassword" should not be able to download file "resetpassword.txt"
     Examples:
-      | role        |
-      | Space Admin |
-      | User        |
+      | userRole    | role        |
+      | Space Admin | Space Admin |
+      | Space Admin | User        |
+      | Space Admin | Guest       |
+      | Space Admin | Admin       |
+      | User        | Space Admin |
+      | User        | User        |
+      | User        | Guest       |
+      | User        | Admin       |
+      | Guest       | Space Admin |
+      | Guest       | User        |
+      | Guest       | Guest       |
+      | Guest       | Admin       |
 
   @skipOnStable2.0
   Scenario: the admin user disables another user

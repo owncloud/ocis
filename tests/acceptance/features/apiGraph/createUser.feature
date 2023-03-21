@@ -8,7 +8,7 @@ Feature: create user
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
-
+  @issue-3516
   Scenario Outline: the admin creates a user
     Given the administrator has given "Alice" the role "Admin" using the settings api
     When the user "Alice" creates a new user using GraphAPI with the following settings:
@@ -59,8 +59,9 @@ Feature: create user
       | role        |
       | Space Admin |
       | User        |
+      | Guest       |
 
-  @skipOnStable2.0
+  @issue-3516 @skipOnStable2.0
   Scenario: a user cannot be created with the name of the disabled user
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "Admin" using the settings api
