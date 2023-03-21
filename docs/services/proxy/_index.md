@@ -43,7 +43,7 @@ role_quotas:
 
 When users login, they do automatically get a role assigned. The automatic role assignment can be
 configured in different ways. The `PROXY_ROLE_ASSIGNMENT_DRIVER` environment variable (or the `driver`
-setting in the `role_assignment` section of the configuration file select which mechanism to use for
+setting in the `role_assignment` section of the configuration file) select which mechanism to use for
 the automatic role assignment.
 
 When set to `default`, all users which do not have a role assigned at the time for the first login will
