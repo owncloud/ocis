@@ -26,7 +26,7 @@ type Config struct {
 
 // Keycloak configuration
 type Keycloak struct {
-	BasePath           string `yaml:"base_path" env:"INVITATIONS_KEYCLOAK_BASE_PATH" desc:"The URL to keycloak."`
+	BasePath           string `yaml:"base_path" env:"INVITATIONS_KEYCLOAK_BASE_PATH" desc:"The URL to access keycloak."`
 	ClientID           string `yaml:"client_id" env:"INVITATIONS_KEYCLOAK_CLIENT_ID" desc:"The client id to authenticate with keycloak."`
 	ClientSecret       string `yaml:"client_secret" env:"INVITATIONS_KEYCLOAK_CLIENT_SECRET" desc:"The client secret to use in authentication."`
 	ClientRealm        string `yaml:"client_realm" env:"INVITATIONS_KEYCLOAK_CLIENT_REALM" desc:"The realm the client is defined in."`
