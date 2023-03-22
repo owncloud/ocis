@@ -4,4 +4,5 @@ func main() {
 	RenderTemplates()
 	GetRogueEnvs()
 	RenderGlobalVarsTemplate()
+	GenerateMarkdowns()
 }
