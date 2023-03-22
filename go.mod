@@ -6,6 +6,7 @@ require (
 	github.com/CiscoM31/godata v1.0.6
 	github.com/Masterminds/semver v1.5.0
 	github.com/MicahParks/keyfunc v1.5.1
+	github.com/Nerzal/gocloak/v13 v13.1.0
 	github.com/armon/go-radix v1.0.0
 	github.com/bbalet/stopwords v1.0.0
 	github.com/blevesearch/bleve/v2 v2.3.5
@@ -104,7 +105,6 @@ require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
 	github.com/Microsoft/go-winio v0.6.0 // indirect
-	github.com/Nerzal/gocloak/v13 v13.1.0 // indirect
 	github.com/ProtonMail/go-crypto v0.0.0-20220930113650-c6815a8c17ad // indirect
 	github.com/RoaringBitmap/roaring v0.9.4 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
