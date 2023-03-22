@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -101,12 +102,12 @@ const (
 // OIDC is the config for the OpenID-Connect middleware. If set the proxy will try to authenticate every request
 // with the configured oidc-provider
 type OIDC struct {
-	Issuer                  string        `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP."`
-	Insecure                bool          `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments."`
-	AccessTokenVerifyMethod string        `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'."`
-	UserinfoCache           UserinfoCache `yaml:"user_info_cache"`
-	JWKS                    JWKS          `yaml:"jwks"`
-	RewriteWellKnown        bool          `yaml:"rewrite_well_known" env:"PROXY_OIDC_REWRITE_WELLKNOWN" desc:"Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider."`
+	Issuer                  string `yaml:"issuer" env:"OCIS_URL;OCIS_OIDC_ISSUER;PROXY_OIDC_ISSUER" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP."`
+	Insecure                bool   `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments."`
+	AccessTokenVerifyMethod string `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'."`
+	UserinfoCache           *Cache `yaml:"user_info_cache"`
+	JWKS                    JWKS   `yaml:"jwks"`
+	RewriteWellKnown        bool   `yaml:"rewrite_well_known" env:"PROXY_OIDC_REWRITE_WELLKNOWN" desc:"Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider."`
 }
 
 type JWKS struct {
@@ -116,10 +117,14 @@ type JWKS struct {
 	RefreshUnknownKID bool   `yaml:"refresh_unknown_kid" env:"PROXY_OIDC_JWKS_REFRESH_UNKNOWN_KID" desc:"If set to 'true', the JWKS refresh request will occur every time an unknown KEY ID (KID) is seen. Always set a 'refresh_limit' when enabling this."`
 }
 
-// UserinfoCache is a TTL cache configuration.
-type UserinfoCache struct {
-	Size int `yaml:"size" env:"PROXY_OIDC_USERINFO_CACHE_SIZE" desc:"Cache size for OIDC user info."`
-	TTL  int `yaml:"ttl" env:"PROXY_OIDC_USERINFO_CACHE_TTL" desc:"Max TTL in seconds for the OIDC user info cache."`
+// Cache is a TTL cache configuration.
+type Cache struct {
+	Store    string        `yaml:"store" env:"OCIS_CACHE_STORE;PROXY_OIDC_USERINFO_CACHE_STORE;OCIS_CACHE_STORE_TYPE;PROXY_OIDC_USERINFO_CACHE_TYPE" desc:"The type of the userinfo cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	Nodes    []string      `yaml:"addresses" env:"OCIS_CACHE_STORE_NODES;PROXY_OIDC_USERINFO_CACHE_NODES;OCIS_CACHE_STORE_ADDRESSES;PROXY_OIDC_USERINFO_CACHE_ADDRESSES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`
+	Database string        `yaml:"database" env:"PROXY_OIDC_USERINFO_CACHE_DATABASE" desc:"The database name the configured store should use."`
+	Table    string        `yaml:"table" env:"PROXY_OIDC_USERINFO_CACHE_TABLE" desc:"The database table the store should use."`
+	TTL      time.Duration `yaml:"ttl" env:"OCIS_CACHE_STORE_TTL;PROXY_OIDC_USERINFO_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds)."`
+	Size     int           `yaml:"size" env:"OCIS_CACHE_STORE_SIZE;PROXY_OIDC_USERINFO_CACHE_SIZE" desc:"The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512."`
 }
 
 // RoleAssignment contains the configuration for how to assign roles to users during login

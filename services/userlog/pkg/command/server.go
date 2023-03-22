@@ -3,14 +3,12 @@ package command
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -21,6 +19,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/server/http"
 	"github.com/urfave/cli/v2"
+	microstore "go-micro.dev/v4/store"
 )
 
 // all events we care about
@@ -74,10 +73,12 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			st := store.Create(
-				store.Type(cfg.Store.Type),
-				store.Addresses(strings.Split(cfg.Store.Addresses, ",")...),
-				store.Database(cfg.Store.Database),
-				store.Table(cfg.Store.Table),
+				store.Store(cfg.Persistence.Store),
+				store.TTL(cfg.Persistence.TTL),
+				store.Size(cfg.Persistence.Size),
+				microstore.Nodes(cfg.Persistence.Nodes...),
+				microstore.Database(cfg.Persistence.Database),
+				microstore.Table(cfg.Persistence.Table),
 			)
 
 			tm, err := pool.StringToTLSMode(cfg.GRPCClientTLS.Mode)
@@ -93,7 +94,7 @@ func Server(cfg *config.Config) *cli.Command {
 				return fmt.Errorf("could not get reva client: %s", err)
 			}
 
-			hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", grpc.DefaultClient())
+			hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", ogrpc.DefaultClient())
 
 			{
 				server, err := http.Server(

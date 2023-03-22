@@ -3,6 +3,7 @@ package defaults
 import (
 	"path"
 	"strings"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -40,9 +41,11 @@ func DefaultConfig() *config.Config {
 			Issuer: "https://localhost:9200",
 
 			AccessTokenVerifyMethod: config.AccessTokenVerificationJWT,
-			UserinfoCache: config.UserinfoCache{
-				Size: 1024,
-				TTL:  10,
+			UserinfoCache: &config.Cache{
+				Store:    "memory",
+				Database: "proxy",
+				Table:    "userinfo",
+				TTL:      time.Second * 10,
 			},
 			JWKS: config.JWKS{
 				RefreshInterval:   60, // minutes
@@ -252,6 +255,16 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.Tracing == nil {
 		cfg.Tracing = &config.Tracing{}
+	}
+
+	if cfg.OIDC.UserinfoCache == nil && cfg.Commons != nil && cfg.Commons.Cache != nil {
+		cfg.OIDC.UserinfoCache = &config.Cache{
+			Store: cfg.Commons.Cache.Store,
+			Nodes: cfg.Commons.Cache.Nodes,
+			Size:  cfg.Commons.Cache.Size,
+		}
+	} else if cfg.OIDC.UserinfoCache == nil {
+		cfg.OIDC.UserinfoCache = &config.Cache{}
 	}
 
 	if cfg.TokenManager == nil && cfg.Commons != nil && cfg.Commons.TokenManager != nil {

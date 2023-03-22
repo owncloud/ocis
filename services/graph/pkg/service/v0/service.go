@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -24,6 +23,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
 	graphm "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
+	microstore "go-micro.dev/v4/store"
 )
 
 const (
@@ -159,10 +159,13 @@ func NewService(opts ...Option) (Graph, error) {
 
 	roleManager := options.RoleManager
 	if roleManager == nil {
-		storeOptions := []store.Option{
-			store.Type(options.Config.CacheStore.Type),
-			store.Addresses(strings.Split(options.Config.CacheStore.Address, ",")...),
-			store.Size(options.Config.CacheStore.Size),
+		storeOptions := []microstore.Option{
+			store.Store(options.Config.Cache.Store),
+			store.TTL(options.Config.Cache.TTL),
+			store.Size(options.Config.Cache.Size),
+			microstore.Nodes(options.Config.Cache.Nodes...),
+			microstore.Database(options.Config.Cache.Database),
+			microstore.Table(options.Config.Cache.Table),
 		}
 		m := roles.NewManager(
 			roles.StoreOptions(storeOptions),

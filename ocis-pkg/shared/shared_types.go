@@ -1,5 +1,7 @@
 package shared
 
+import "time"
+
 // EnvBinding represents a direct binding from an env variable to a go kind. Along with gookit/config, its primal goal
 // is to unpack environment variables into a Go value. We do so with reflection, and this data structure is just a step
 // in between.
@@ -53,10 +55,13 @@ type HTTPServiceTLS struct {
 	Key  string `yaml:"key" env:"OCIS_HTTP_TLS_KEY" desc:"Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services."`
 }
 
-type CacheStore struct {
-	Type    string `yaml:"type" env:"OCIS_CACHE_STORE_TYPE" desc:"The type of the cache store. Valid options are \"noop\", \"ocmem\", \"etcd\" and \"memory\""`
-	Address string `yaml:"address" env:"OCIS_CACHE_STORE_ADDRESS" desc:"A comma-separated list of addresses to connect to. Only valid if the above setting is set to \"etcd\""`
-	Size    int    `yaml:"size" env:"OCIS_CACHE_STORE_SIZE" desc:"Maximum size for the cache store. Only ocmem will use this option, in number of items per table. The rest will ignore the option and can grow indefinitely"`
+type Cache struct {
+	Store    string        `yaml:"store" env:"OCIS_CACHE_STORE;OCIS_CACHE_STORE_TYPE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	Nodes    []string      `yaml:"nodes" env:"OCIS_CACHE_STORE_NODES;OCIS_CACHE_STORE_ADDRESSES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`
+	Database string        `yaml:"database" env:"OCIS_CACHE_STORE_DATABASE" desc:"The database name the configured store should use."`
+	Table    string        `yaml:"table" env:"OCIS_CACHE_STORE_TABLE" desc:"The database table the store should use."`
+	TTL      time.Duration `yaml:"ttl" env:"OCIS_CACHE_STORE_TTL" desc:"Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h."`
+	Size     int           `yaml:"size" env:"OCIS_CACHE_STORE_SIZE" desc:"The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured."`
 }
 
 // Commons holds configuration that are common to all extensions. Each extension can then decide whether
@@ -64,7 +69,7 @@ type CacheStore struct {
 type Commons struct {
 	Log               *Log            `yaml:"log"`
 	Tracing           *Tracing        `yaml:"tracing"`
-	CacheStore        *CacheStore     `yaml:"cache_store"`
+	Cache             *Cache          `yaml:"cache"`
 	GRPCClientTLS     *GRPCClientTLS  `yaml:"grpc_client_tls"`
 	GRPCServiceTLS    *GRPCServiceTLS `yaml:"grpc_service_tls"`
 	HTTPServiceTLS    HTTPServiceTLS  `yaml:"http_service_tls"`

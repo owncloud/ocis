@@ -1148,6 +1148,7 @@ def e2eTests(ctx):
             "RETRY": "1",
             "WEB_UI_CONFIG": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
             "LOCAL_UPLOAD_DIR": "/uploads",
+            "SLOW_MO": "50",
         },
         "commands": [
             "cd %s" % dirs["web"],

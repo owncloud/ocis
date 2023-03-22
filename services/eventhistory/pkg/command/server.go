@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/oklog/run"
@@ -17,6 +16,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/metrics"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/server/grpc"
 	"github.com/urfave/cli/v2"
+	microstore "go-micro.dev/v4/store"
 )
 
 // Server is the entrypoint for the server command.
@@ -56,11 +56,12 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			st := store.Create(
-				store.Type(cfg.Store.Type),
-				store.Addresses(strings.Split(cfg.Store.Addresses, ",")...),
-				store.Database(cfg.Store.Database),
-				store.Table(cfg.Store.Table),
+				store.Store(cfg.Store.Store),
 				store.TTL(cfg.Store.RecordExpiry),
+				store.Size(cfg.Store.Size),
+				microstore.Nodes(cfg.Store.Nodes...),
+				microstore.Database(cfg.Store.Database),
+				microstore.Table(cfg.Store.Table),
 			)
 
 			service := grpc.NewService(
@@ -72,7 +73,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Address(cfg.GRPC.Addr),
 				grpc.Metrics(metrics),
 				grpc.Consumer(consumer),
-				grpc.Store(st),
+				grpc.Persistence(st),
 			)
 
 			gr.Add(service.Run, func(err error) {

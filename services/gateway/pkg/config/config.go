@@ -88,10 +88,10 @@ type StorageRegistry struct {
 
 // Cache holds cache config
 type Cache struct {
-	Store              string   `yaml:"store" env:"OCIS_CACHE_STORE_TYPE;GATEWAY_CACHE_STORE_TYPE;GATEWAY_CACHE_STORE" desc:"Store implementation for the cache. Valid values are \"memory\" (default), \"redis\", and \"etcd\"."`
-	Nodes              []string `yaml:"nodes" env:"OCIS_CACHE_STORE_ADDRESS;GATEWAY_CACHE_STORE_ADDRESS;GATEWAY_CACHE_NODES" desc:"Node addresses to use for the cache store."`
+	Store              string   `yaml:"store" env:"OCIS_CACHE_STORE;GATEWAY_CACHE_STORE;OCIS_CACHE_STORE_TYPE;GATEWAY_CACHE_STORE_TYPE" desc:"Store implementation for the cache. Valid values are \"memory\" (default), \"redis\", and \"etcd\"."`
+	Nodes              []string `yaml:"nodes" env:"OCIS_CACHE_STORE_NODES;GATEWAY_CACHE_STORE_NODES;OCIS_CACHE_STORE_ADDRESS;GATEWAY_CACHE_STORE_ADDRESS;GATEWAY_CACHE_NODES" desc:"Nodes to use for the cache store."`
 	Database           string   `yaml:"database" env:"GATEWAY_CACHE_DATABASE" desc:"Database name of the cache."`
-	StatCacheTTL       int      `yaml:"stat_cache_ttl" env:"GATEWAY_STAT_CACHE_TTL" desc:"Max TTL in seconds for the gateway's stat cache."`
-	ProviderCacheTTL   int      `yaml:"provider_cache_ttl" env:"GATEWAY_PROVIDER_CACHE_TTL" desc:"Max TTL in seconds for the gateway's provider cache."`
-	CreateHomeCacheTTL int      `yaml:"create_home_cache_ttl" env:"GATEWAY_CREATE_HOME_CACHE_TTL" desc:"Max TTL in seconds for the gateway's create home cache."`
+	StatCacheTTL       int      `yaml:"stat_cache_ttl" env:"OCIS_CACHE_STORE_TTL;GATEWAY_STAT_CACHE_TTL" desc:"Max TTL in seconds for the gateway's stat cache."`
+	ProviderCacheTTL   int      `yaml:"provider_cache_ttl" env:"OCIS_CACHE_STORE_TTL;GATEWAY_PROVIDER_CACHE_TTL" desc:"Max TTL in seconds for the gateway's provider cache."`
+	CreateHomeCacheTTL int      `yaml:"create_home_cache_ttl" env:"OCIS_CACHE_STORE_TTL;GATEWAY_CREATE_HOME_CACHE_TTL" desc:"Max TTL in seconds for the gateway's create home cache."`
 }

@@ -17,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
@@ -34,6 +35,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 	"github.com/urfave/cli/v2"
+	microstore "go-micro.dev/v4/store"
 	"golang.org/x/oauth2"
 )
 
@@ -209,12 +211,25 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			UserProvider: userProvider,
 		})
 	}
+
+	cache := store.Create(
+		store.Store(cfg.OIDC.UserinfoCache.Store),
+		store.TTL(cfg.OIDC.UserinfoCache.TTL),
+		store.Size(cfg.OIDC.UserinfoCache.Size),
+		microstore.Nodes(cfg.OIDC.UserinfoCache.Nodes...),
+		microstore.Database(cfg.OIDC.UserinfoCache.Database),
+		microstore.Table(cfg.OIDC.UserinfoCache.Table),
+	)
+
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
-		logger,
-		cfg.OIDC.UserinfoCache.TTL,
-		oidcHTTPClient,
-		cfg.OIDC.Issuer,
-		func() (middleware.OIDCProvider, error) {
+		middleware.Logger(logger),
+		middleware.Cache(cache),
+		middleware.DefaultAccessTokenTTL(cfg.OIDC.UserinfoCache.TTL),
+		middleware.HTTPClient(oidcHTTPClient),
+		middleware.OIDCIss(cfg.OIDC.Issuer),
+		middleware.JWKSOptions(cfg.OIDC.JWKS),
+		middleware.AccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
+		middleware.OIDCProviderFunc(func() (middleware.OIDCProvider, error) {
 			// Initialize a provider by specifying the issuer URL.
 			// it will fetch the keys from the issuer using the .well-known
 			// endpoint
@@ -222,9 +237,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 				context.WithValue(ctx, oauth2.HTTPClient, oidcHTTPClient),
 				cfg.OIDC.Issuer,
 			)
-		},
-		cfg.OIDC.JWKS,
-		cfg.OIDC.AccessTokenVerifyMethod,
+		}),
 	))
 	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
 		Logger:            logger,

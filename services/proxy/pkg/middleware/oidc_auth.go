@@ -2,19 +2,23 @@ package middleware
 
 import (
 	"context"
+	"encoding/base64"
 	"net/http"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+
 	"github.com/MicahParks/keyfunc"
 	gOidc "github.com/coreos/go-oidc/v3/oidc"
 	"github.com/golang-jwt/jwt/v4"
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
-	osync "github.com/owncloud/ocis/v2/ocis-pkg/sync"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"github.com/pkg/errors"
+	"github.com/shamaton/msgpack/v2"
+	store "go-micro.dev/v4/store"
+	"golang.org/x/crypto/sha3"
 	"golang.org/x/oauth2"
 )
 
@@ -29,18 +33,18 @@ type OIDCProvider interface {
 }
 
 // NewOIDCAuthenticator returns a ready to use authenticator which can handle OIDC authentication.
-func NewOIDCAuthenticator(logger log.Logger, tokenCacheTTL int, oidcHTTPClient *http.Client, oidcIss string, providerFunc func() (OIDCProvider, error),
-	jwksOptions config.JWKS, accessTokenVerifyMethod string) *OIDCAuthenticator {
-	tokenCache := osync.NewCache(tokenCacheTTL)
+func NewOIDCAuthenticator(opts ...Option) *OIDCAuthenticator {
+	options := newOptions(opts...)
+
 	return &OIDCAuthenticator{
-		Logger:                  logger,
-		tokenCache:              &tokenCache,
-		TokenCacheTTL:           time.Duration(tokenCacheTTL),
-		HTTPClient:              oidcHTTPClient,
-		OIDCIss:                 oidcIss,
-		ProviderFunc:            providerFunc,
-		JWKSOptions:             jwksOptions,
-		AccessTokenVerifyMethod: accessTokenVerifyMethod,
+		Logger:                  options.Logger,
+		userInfoCache:           options.Cache,
+		DefaultTokenCacheTTL:    options.DefaultAccessTokenTTL,
+		HTTPClient:              options.HTTPClient,
+		OIDCIss:                 options.OIDCIss,
+		ProviderFunc:            options.OIDCProviderFunc,
+		JWKSOptions:             options.JWKS,
+		AccessTokenVerifyMethod: options.AccessTokenVerifyMethod,
 		providerLock:            &sync.Mutex{},
 		jwksLock:                &sync.Mutex{},
 	}
@@ -51,8 +55,8 @@ type OIDCAuthenticator struct {
 	Logger                  log.Logger
 	HTTPClient              *http.Client
 	OIDCIss                 string
-	tokenCache              *osync.Cache
-	TokenCacheTTL           time.Duration
+	userInfoCache           store.Store
+	DefaultTokenCacheTTL    time.Duration
 	ProviderFunc            func() (OIDCProvider, error)
 	AccessTokenVerifyMethod string
 	JWKSOptions             config.JWKS
@@ -66,40 +70,60 @@ type OIDCAuthenticator struct {
 
 func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[string]interface{}, error) {
 	var claims map[string]interface{}
-	hit := m.tokenCache.Load(token)
-	if hit == nil {
-		aClaims, err := m.verifyAccessToken(token)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to verify access token")
-		}
 
-		oauth2Token := &oauth2.Token{
-			AccessToken: token,
-		}
+	// usea 64 bytes long hash to have 256-bit collision resistance.
+	hash := make([]byte, 64)
+	sha3.ShakeSum256(hash, []byte(token))
+	encodedHash := base64.URLEncoding.EncodeToString(hash)
 
-		userInfo, err := m.getProvider().UserInfo(
-			context.WithValue(req.Context(), oauth2.HTTPClient, m.HTTPClient),
-			oauth2.StaticTokenSource(oauth2Token),
-		)
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to get userinfo")
+	record, err := m.userInfoCache.Read(encodedHash)
+	if err != nil && err != store.ErrNotFound {
+		m.Logger.Error().Err(err).Msg("could not read from userinfo cache")
+	}
+	if len(record) > 1 {
+		if err = msgpack.Unmarshal(record[0].Value, &claims); err == nil {
+			m.Logger.Debug().Interface("claims", claims).Msg("cache hit for userinfo")
+			return claims, nil
 		}
-		if err := userInfo.Claims(&claims); err != nil {
-			return nil, errors.Wrap(err, "failed to unmarshal userinfo claims")
-		}
-
-		expiration := m.extractExpiration(aClaims)
-		m.tokenCache.Store(token, claims, expiration)
-
-		m.Logger.Debug().Interface("claims", claims).Interface("userInfo", userInfo).Time("expiration", expiration.UTC()).Msg("unmarshalled and cached userinfo")
-		return claims, nil
+		m.Logger.Error().Err(err).Msg("could not unmarshal userinfo")
+	}
+	aClaims, err := m.verifyAccessToken(token)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to verify access token")
 	}
 
-	var ok bool
-	if claims, ok = hit.V.(map[string]interface{}); !ok {
-		return nil, errors.New("failed to cast claims from the cache")
+	oauth2Token := &oauth2.Token{
+		AccessToken: token,
 	}
-	m.Logger.Debug().Interface("claims", claims).Msg("cache hit for userinfo")
+
+	userInfo, err := m.getProvider().UserInfo(
+		context.WithValue(req.Context(), oauth2.HTTPClient, m.HTTPClient),
+		oauth2.StaticTokenSource(oauth2Token),
+	)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get userinfo")
+	}
+	if err := userInfo.Claims(&claims); err != nil {
+		return nil, errors.Wrap(err, "failed to unmarshal userinfo claims")
+	}
+
+	expiration := m.extractExpiration(aClaims)
+	go func() {
+		if d, err := msgpack.Marshal(claims); err != nil {
+			m.Logger.Error().Err(err).Msg("failed to marshal claims for userinfo cache")
+		} else {
+			err = m.userInfoCache.Write(&store.Record{
+				Key:    encodedHash,
+				Value:  d,
+				Expiry: time.Until(expiration),
+			})
+			if err != nil {
+				m.Logger.Error().Err(err).Msg("failed to write to userinfo cache")
+			}
+		}
+	}()
+
+	m.Logger.Debug().Interface("claims", claims).Msg("extracted claims")
 	return claims, nil
 }
 
@@ -145,7 +169,7 @@ func (m OIDCAuthenticator) verifyAccessTokenJWT(token string) (jwt.RegisteredCla
 // If the access token does not have an exp claim it will fallback to the configured
 // default expiration
 func (m OIDCAuthenticator) extractExpiration(aClaims jwt.RegisteredClaims) time.Time {
-	defaultExpiration := time.Now().Add(m.TokenCacheTTL)
+	defaultExpiration := time.Now().Add(m.DefaultTokenCacheTTL)
 	if aClaims.ExpiresAt != nil {
 		m.Logger.Debug().Str("exp", aClaims.ExpiresAt.String()).Msg("Expiration Time from access_token")
 		return aClaims.ExpiresAt.Time
