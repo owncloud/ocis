@@ -5,7 +5,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"strings"
 
 	"github.com/Nerzal/gocloak/v13"
 	"github.com/google/uuid"
@@ -74,17 +73,14 @@ func (b Backend) CreateUser(ctx context.Context, invitation *invitations.Invitat
 	}
 	u := uuid.New()
 
-	firstName, lastName := splitDisplayName(invitation.InvitedUserDisplayName)
 	b.logger.Info().
 		Str(idAttr, u.String()).
 		Str("email", invitation.InvitedUserEmailAddress).
 		Msg("Creating new user")
 	user := gocloak.User{
-		FirstName: &firstName,
-		LastName:  &lastName,
-		Email:     &invitation.InvitedUserEmailAddress,
-		Enabled:   gocloak.BoolP(true),
-		Username:  &invitation.InvitedUserEmailAddress,
+		Email:    &invitation.InvitedUserEmailAddress,
+		Enabled:  gocloak.BoolP(true),
+		Username: &invitation.InvitedUserEmailAddress,
 		Attributes: &map[string][]string{
 			idAttr:       {u.String()},
 			userTypeAttr: {userTypeVal},
@@ -141,15 +137,4 @@ func (b Backend) getToken(ctx context.Context) (*gocloak.JWT, error) {
 	}
 
 	return token, nil
-}
-
-// Quick and dirty way to split the last name off from the first name(s), imperfect, because
-// every culture has a different conception of names.
-func splitDisplayName(displayName string) (string, string) {
-	parts := strings.Split(displayName, " ")
-	if len(parts) <= 1 {
-		return parts[0], ""
-	}
-
-	return strings.Join(parts[:len(parts)-1], " "), parts[len(parts)-1]
 }
