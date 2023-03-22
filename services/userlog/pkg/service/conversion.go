@@ -5,6 +5,7 @@ import (
 	"context"
 	"embed"
 	"errors"
+	"fmt"
 	"io/fs"
 	"strings"
 	"text/template"
@@ -96,11 +97,11 @@ func (c *Converter) ConvertEvent(event *ehmsg.Event) (OC10Notification, error) {
 
 	switch ev := einterface.(type) {
 	default:
-		return OC10Notification{}, errors.New("unknown event type")
+		return OC10Notification{}, fmt.Errorf("unknown event type: %T", ev)
 		// file related
 	case events.PostprocessingStepFinished:
 		if ev.FinishedStep != events.PPStepAntivirus {
-			return OC10Notification{}, errors.New("unknown event type")
+			return OC10Notification{}, fmt.Errorf("unknown event type: %T", ev)
 		}
 		res := ev.Result.(events.VirusscanResult)
 		return c.virusMessage(event.Id, VirusFound, ev.ExecutingUser, res.ResourceID, ev.Filename, res.Description, res.Scandate)

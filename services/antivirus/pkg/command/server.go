@@ -3,11 +3,10 @@ package command
 import (
 	"context"
 	"fmt"
-	"io"
-	"net/http"
 
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -65,34 +64,8 @@ func Server(cfg *config.Config) *cli.Command {
 					debug.Token(cfg.Debug.Token),
 					debug.Pprof(cfg.Debug.Pprof),
 					debug.Zpages(cfg.Debug.Zpages),
-					debug.Health(
-						func(w http.ResponseWriter, r *http.Request) {
-							w.Header().Set("Content-Type", "text/plain")
-							w.WriteHeader(http.StatusOK)
-
-							// TODO: check if services are up and running
-
-							_, err := io.WriteString(w, http.StatusText(http.StatusOK))
-							// io.WriteString should not fail but if it does we want to know.
-							if err != nil {
-								panic(err)
-							}
-						},
-					),
-					debug.Ready(
-						func(w http.ResponseWriter, r *http.Request) {
-							w.Header().Set("Content-Type", "text/plain")
-							w.WriteHeader(http.StatusOK)
-
-							// TODO: check if services are up and running
-
-							_, err := io.WriteString(w, http.StatusText(http.StatusOK))
-							// io.WriteString should not fail but if it does we want to know.
-							if err != nil {
-								panic(err)
-							}
-						},
-					),
+					debug.Health(handlers.Health),
+					debug.Ready(handlers.Ready),
 				)
 
 				gr.Add(server.ListenAndServe, func(_ error) {
