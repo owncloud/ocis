@@ -41,7 +41,7 @@ var _ = Describe("TestMarkdown", func() {
 			for i, h := range md.Headings {
 				Expect(h).To(Equal(expectedMD.Headings[i]))
 			}
-			Expect(string(md.Bytes())).To(Equal(mdfile))
+			Expect(md.String()).To(Equal(mdfile))
 		},
 		Entry("converts a small markdown", SmallMarkdown, SmallMD),
 	)

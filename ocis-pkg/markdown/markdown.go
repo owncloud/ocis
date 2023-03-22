@@ -4,17 +4,15 @@ package markdown
 import (
 	"bytes"
 	"fmt"
-	"html/template"
-	"os"
+	"io"
 	"strings"
-	"time"
 )
 
 // Heading represents a markdown Heading
 type Heading struct {
-	Content string
-	Level   int
-	Header  string
+	Level   int    // the level of the heading. 1 means it's the H1
+	Content string // the text of the heading
+	Header  string // the heading itself
 }
 
 // MD represents a markdown file
@@ -22,25 +20,66 @@ type MD struct {
 	Headings []Heading
 }
 
-// Bytes returns the markdown as []bytes to be written to a file
+// Bytes returns the markdown as []bytes, ignoring errors
 func (md MD) Bytes() []byte {
-	b, num := bytes.NewBuffer(nil), len(md.Headings)
-	for i, h := range md.Headings {
-		b.Write([]byte(strings.Repeat("#", h.Level) + " " + h.Header + "\n"))
-		b.Write([]byte("\n"))
-		if len(h.Content) > 0 {
-			b.Write([]byte(h.Content))
-			if i < num-1 {
-				b.Write([]byte("\n"))
-			}
-		}
-	}
+	var b bytes.Buffer
+	_, _ = md.WriteContent(&b)
 	return b.Bytes()
 }
 
-// Toc returns the table of contents as []byte
-func (md MD) Toc() []byte {
-	b := bytes.NewBuffer(nil)
+// String returns the markdown as string, ignoring errors
+func (md MD) String() string {
+	var b strings.Builder
+	_, _ = md.WriteContent(&b)
+	return b.String()
+}
+
+// TocBytes returns the table of contents as []byte, ignoring errors
+func (md MD) TocBytes() []byte {
+	var b bytes.Buffer
+	_, _ = md.WriteToc(&b)
+	return b.Bytes()
+}
+
+// TocString returns the table of contents as string, ignoring errors
+func (md MD) TocString() string {
+	var b strings.Builder
+	_, _ = md.WriteToc(&b)
+	return b.String()
+}
+
+// WriteContent writes the MDs content to the given writer
+func (md MD) WriteContent(w io.Writer) (int64, error) {
+	max, written := len(md.Headings), int64(0)
+	write := func(s string) error {
+		n, err := w.Write([]byte(s))
+		written += int64(n)
+		return err
+	}
+	for i, h := range md.Headings {
+		if err := write(strings.Repeat("#", h.Level) + " " + h.Header + "\n"); err != nil {
+			return written, err
+		}
+		if err := write("\n"); err != nil {
+			return written, err
+		}
+		if len(h.Content) > 0 {
+			if err := write(h.Content); err != nil {
+				return written, err
+			}
+			if i < max-1 {
+				if err := write("\n"); err != nil {
+					return written, err
+				}
+			}
+		}
+	}
+	return written, nil
+}
+
+// WriteToc writes the table of contents to the given writer
+func (md MD) WriteToc(w io.Writer) (int64, error) {
+	var written int64
 	for _, h := range md.Headings {
 		if h.Level == 1 {
 			// main title not in toc
@@ -48,68 +87,51 @@ func (md MD) Toc() []byte {
 		}
 		link := fmt.Sprintf("#%s", strings.ToLower(strings.Replace(h.Header, " ", "-", -1)))
 		s := fmt.Sprintf("%s* [%s](%s)\n", strings.Repeat("  ", h.Level-2), h.Header, link)
-		b.Write([]byte(s))
+		n, err := w.Write([]byte(s))
+		if err != nil {
+			return written, err
+		}
+		written += int64(n)
 	}
-	return b.Bytes()
+	return written, nil
 }
 
 // NewMD parses a new Markdown
 func NewMD(b []byte) MD {
-	md := MD{}
-	var heading Heading
+	var (
+		md      MD
+		heading Heading
+		content strings.Builder
+	)
+	sendHeading := func() {
+		if heading.Header != "" {
+			heading.Content = content.String()
+			md.Headings = append(md.Headings, heading)
+			content = strings.Builder{}
+		}
+	}
 	parts := strings.Split(string(b), "\n")
 	for _, p := range parts {
 		if p == "" {
 			continue
 		}
 		if p[:1] == "#" { // this is a header
-			if heading.Header != "" {
-				md.Headings = append(md.Headings, heading)
-			}
-			heading = Heading{}
-			i := strings.LastIndex(p, "#")
-			levs, con := p[:i+1], p[i+1:]
-			heading.Header = strings.TrimPrefix(con, " ")
-			heading.Level = len(levs)
+			sendHeading()
+			heading = headingFromString(p)
 		} else {
-			heading.Content += p + "\n"
+			// readd lost "\n"
+			_, _ = content.WriteString(p + "\n")
 		}
 	}
-	if heading.Header != "" {
-		md.Headings = append(md.Headings, heading)
-	}
-
+	sendHeading()
 	return md
 }
 
-func main() {
-	f, err := os.ReadFile("/home/jkoberg/ocis/services/antivirus/README.md")
-	if err != nil {
-		fmt.Println("ERROR", err)
-		return
-	}
-
-	md := NewMD(f)
-	head := md.Headings[0]
-	md.Headings = md.Headings[1:]
-
-	tpl := template.Must(template.ParseFiles("index.tmpl"))
-	b := bytes.NewBuffer(nil)
-	err = tpl.Execute(b, map[string]interface{}{
-		"ServiceName":  head.Header,
-		"CreationTime": time.Now().Format(time.RFC3339Nano),
-		"service":      "unknown",
-		"Abstract":     head.Content,
-		"TocTree":      string(md.Toc()),
-		"Content":      string(md.Bytes()),
-	})
-	if err != nil {
-		fmt.Println("ERROR", err)
-		return
-	}
-	err = os.WriteFile("test.md", b.Bytes(), os.ModePerm)
-	if err != nil {
-		fmt.Println("ERROR", err)
-		return
+func headingFromString(s string) Heading {
+	i := strings.LastIndex(s, "#")
+	levs, con := s[:i+1], s[i+1:]
+	return Heading{
+		Level:  len(levs),
+		Header: strings.TrimPrefix(con, " "),
 	}
 }

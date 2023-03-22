@@ -60,8 +60,8 @@ func generateMarkdown(filepath string, servicename string) error {
 		"CreationTime": time.Now().Format(time.RFC3339Nano),
 		"service":      servicename,
 		"Abstract":     head.Content,
-		"TocTree":      string(md.Toc()),
-		"Content":      string(md.Bytes()),
+		"TocTree":      md.TocString(),
+		"Content":      md.String(),
 	}); err != nil {
 		return err
 	}
