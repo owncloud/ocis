@@ -4,9 +4,20 @@ title: ownCloud
 
 {{< toc >}}
 
+## Admin Documentation
+
+Before you start reading, if you are interested in:
+
+- learning ocis from an admin perspective,
+- different deployment scenarios,
+- deployment examples,
+- detailed settings and more
+
+we would recommend to continue with the [ownCloud Admin Documentation for Infinite Scale](https://doc.owncloud.com/ocis/next/).
+
 ## Developer Documentation
 
-Welcome to our developer documentation. Here you can find developer documentation on:
+Welcome to our developer documentation. Here you find documentation with focus for *developers*:
 
 - [oCIS]({{< ref "./ocis" >}}) server
 - oCIS Services
