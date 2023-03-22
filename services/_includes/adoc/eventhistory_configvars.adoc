@@ -158,41 +158,45 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
 
-a|`EVENTHISTORY_STORE_TYPE` +
+a|`OCIS_PERSISTENT_STORE` +
+`EVENTHISTORY_STORE` +
+`OCIS_PERSISTENT_STORE_TYPE` +
+`EVENTHISTORY_STORE_TYPE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++mem ++
+++memory ++
 a| [subs=-attributes]
-The type of the eventhistory store. Supported values are: 'mem', 'ocmem', 'etcd', 'redis', 'nats-js', 'noop'. See the text description for details.
+The type of the eventhistory store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
-a|`EVENTHISTORY_STORE_ADDRESSES` +
+a|`OCIS_PERSISTENT_STORE_NODES` +
+`EVENTHISTORY_STORE_ADDRESSES` +
 
 a| [subs=-attributes]
-++string ++
+++[]string ++
 a| [subs=-attributes]
-++ ++
+++[] ++
 a| [subs=-attributes]
-A comma separated list of addresses to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how addresses are used is dependent on the library of the configured store.
+A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
 
 a|`EVENTHISTORY_STORE_DATABASE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ ++
+++eventhistory ++
 a| [subs=-attributes]
-(optional) The database name the configured store should use. This has no effect when 'in-memory' stores are configured.
+The database name the configured store should use.
 
 a|`EVENTHISTORY_STORE_TABLE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ ++
+++events ++
 a| [subs=-attributes]
-(optional) The database table the store should use. This has no effect when 'in-memory' stores are configured.
+The database table the store should use.
 
 a|`EVENTHISTORY_RECORD_EXPIRY` +
 
@@ -201,7 +205,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++336h0m0s ++
 a| [subs=-attributes]
-Time to life for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
+Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
 
 a|`EVENTHISTORY_STORE_SIZE` +
 

@@ -113,8 +113,12 @@ oidc:
   insecure: false
   access_token_verify_method: jwt
   user_info_cache:
-    size: 1024
-    ttl: 10
+    store: memory
+    addresses: []
+    database: proxy
+    table: userinfo
+    ttl: 10s
+    size: 0
   jwks:
     refresh_interval: 60
     refresh_timeout: 10

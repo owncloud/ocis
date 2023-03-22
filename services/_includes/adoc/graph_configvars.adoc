@@ -106,25 +106,57 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
 
-a|`OCIS_CACHE_STORE_TYPE` +
+a|`OCIS_CACHE_STORE` +
+`GRAPH_CACHE_STORE` +
+`OCIS_CACHE_STORE_TYPE` +
 `GRAPH_CACHE_STORE_TYPE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ ++
+++memory ++
 a| [subs=-attributes]
-The type of the cache store. Valid options are "noop", "ocmem", "etcd" and "memory"
+The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
-a|`OCIS_CACHE_STORE_ADDRESS` +
-`GRAPH_CACHE_STORE_ADDRESS` +
+a|`OCIS_CACHE_STORE_NODES` +
+`GRAPH_CACHE_STORE_NODES` +
+`OCIS_CACHE_STORE_ADDRESSES` +
+`GRAPH_CACHE_STORE_ADDRESSES` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+A comma-separated list of nodes to connect to. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+
+a|`GRAPH_CACHE_STORE_DATABASE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ ++
+++graph ++
 a| [subs=-attributes]
-A comma-separated list of addresses to connect to. Only valid if the above setting is set to "etcd"
+The database name the configured store should use.
+
+a|`GRAPH_CACHE_STORE_TABLE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++roles ++
+a| [subs=-attributes]
+The database table the store should use.
+
+a|`OCIS_CACHE_STORE_TTL` +
+`GRAPH_CACHE_STORE_TTL` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++336h0m0s ++
+a| [subs=-attributes]
+Time to live for cache records in the graph. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
 
 a|`OCIS_CACHE_STORE_SIZE` +
 `GRAPH_CACHE_STORE_SIZE` +
@@ -134,7 +166,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++0 ++
 a| [subs=-attributes]
-Maximum number of items per table in the ocmem cache store. Other cache stores will ignore the option and can grow indefinitely.
+The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
 a|`GRAPH_DEBUG_ADDR` +
 

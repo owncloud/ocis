@@ -634,9 +634,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The amount of concurrent event consumers to start. Event consumers are used for post-processing files. Multiple consumers increase parallelisation, but will also increase CPU and memory demands. The setting has no effect when the STORAGE_USERS_OCIS_ASYNC_UPLOADS is set to false. The default and minimum value is 1.
 
-a|`OCIS_CACHE_STORE_TYPE` +
-`STORAGE_USERS_CACHE_STORE_TYPE` +
+a|`OCIS_CACHE_STORE` +
 `STORAGE_USERS_CACHE_STORE` +
+`STORAGE_USERS_CACHE_STORE_TYPE` +
 
 a| [subs=-attributes]
 ++string ++
@@ -645,7 +645,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', and 'etcd'. See the text description for details.
 
-a|`OCIS_CACHE_STORE_ADDRESS` +
+a|`OCIS_CACHE_STORE_NODES` +
+`STORAGE_USERS_CACHE_STORE_NODES` +
+`OCIS_CACHE_STORE_ADDRESS` +
 `STORAGE_USERS_CACHE_STORE_ADDRESS` +
 `STORAGE_USERS_CACHE_NODES` +
 
@@ -654,7 +656,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[] ++
 a| [subs=-attributes]
-A comma separated list of addresses to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how addresses are used is dependent on the library of the configured store.
+A comma separated list of nodes to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
 
 a|`STORAGE_USERS_CACHE_DATABASE` +
 
@@ -663,7 +665,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++users ++
 a| [subs=-attributes]
-(optional) The database name the configured store should use. This has no effect when a 'memory', 'redis' or 'redis-sentinel' store is configured.
+The database name the configured store should use.
 
 a|`STORAGE_USERS_MOUNT_ID` +
 

@@ -251,9 +251,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Expiry for the gateway tokens.
 
-a|`OCIS_CACHE_STORE_TYPE` +
-`GATEWAY_CACHE_STORE_TYPE` +
+a|`OCIS_CACHE_STORE` +
 `GATEWAY_CACHE_STORE` +
+`OCIS_CACHE_STORE_TYPE` +
+`GATEWAY_CACHE_STORE_TYPE` +
 
 a| [subs=-attributes]
 ++string ++
@@ -262,7 +263,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
 
-a|`OCIS_CACHE_STORE_ADDRESS` +
+a|`OCIS_CACHE_STORE_NODES` +
+`GATEWAY_CACHE_STORE_NODES` +
+`OCIS_CACHE_STORE_ADDRESS` +
 `GATEWAY_CACHE_STORE_ADDRESS` +
 `GATEWAY_CACHE_NODES` +
 
@@ -271,7 +274,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++[] ++
 a| [subs=-attributes]
-Node addresses to use for the cache store.
+Nodes to use for the cache store.
 
 a|`GATEWAY_CACHE_DATABASE` +
 
@@ -282,7 +285,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Database name of the cache.
 
-a|`GATEWAY_STAT_CACHE_TTL` +
+a|`OCIS_CACHE_STORE_TTL` +
+`GATEWAY_STAT_CACHE_TTL` +
 
 a| [subs=-attributes]
 ++int ++
@@ -291,7 +295,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Max TTL in seconds for the gateway's stat cache.
 
-a|`GATEWAY_PROVIDER_CACHE_TTL` +
+a|`OCIS_CACHE_STORE_TTL` +
+`GATEWAY_PROVIDER_CACHE_TTL` +
 
 a| [subs=-attributes]
 ++int ++
@@ -300,7 +305,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Max TTL in seconds for the gateway's provider cache.
 
-a|`GATEWAY_CREATE_HOME_CACHE_TTL` +
+a|`OCIS_CACHE_STORE_TTL` +
+`GATEWAY_CREATE_HOME_CACHE_TTL` +
 
 a| [subs=-attributes]
 ++int ++

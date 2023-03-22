@@ -11,9 +11,12 @@ log:
   pretty: false
   color: false
   file: ""
-cache_store:
-  type: ""
-  address: ""
+cache:
+  store: memory
+  nodes: []
+  database: graph
+  table: roles
+  ttl: 336h0m0s
   size: 0
 debug:
   addr: 127.0.0.1:9124

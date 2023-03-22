@@ -244,23 +244,67 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'.
 
-a|`PROXY_OIDC_USERINFO_CACHE_SIZE` +
+a|`OCIS_CACHE_STORE` +
+`PROXY_OIDC_USERINFO_CACHE_STORE` +
+`OCIS_CACHE_STORE_TYPE` +
+`PROXY_OIDC_USERINFO_CACHE_TYPE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++memory ++
+a| [subs=-attributes]
+The type of the userinfo cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+
+a|`OCIS_CACHE_STORE_NODES` +
+`PROXY_OIDC_USERINFO_CACHE_NODES` +
+`OCIS_CACHE_STORE_ADDRESSES` +
+`PROXY_OIDC_USERINFO_CACHE_ADDRESSES` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+
+a|`PROXY_OIDC_USERINFO_CACHE_DATABASE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++proxy ++
+a| [subs=-attributes]
+The database name the configured store should use.
+
+a|`PROXY_OIDC_USERINFO_CACHE_TABLE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++userinfo ++
+a| [subs=-attributes]
+The database table the store should use.
+
+a|`OCIS_CACHE_STORE_TTL` +
+`PROXY_OIDC_USERINFO_CACHE_TTL` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++10s ++
+a| [subs=-attributes]
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
+
+a|`OCIS_CACHE_STORE_SIZE` +
+`PROXY_OIDC_USERINFO_CACHE_SIZE` +
 
 a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++1024 ++
+++0 ++
 a| [subs=-attributes]
-Cache size for OIDC user info.
-
-a|`PROXY_OIDC_USERINFO_CACHE_TTL` +
-
-a| [subs=-attributes]
-++int ++
-a| [subs=-attributes]
-++10 ++
-a| [subs=-attributes]
-Max TTL in seconds for the OIDC user info cache.
+The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
 a|`PROXY_OIDC_JWKS_REFRESH_INTERVAL` +
 

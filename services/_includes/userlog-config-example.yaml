@@ -42,9 +42,10 @@ events:
   tls_insecure: false
   tls_root_ca_certificate: ""
   enable_tls: false
-store:
-  type: mem
-  addresses: ""
-  database: ""
-  table: ""
+persistence:
+  store: memory
+  nodes: []
+  database: userlog
+  table: events
+  ttl: 336h0m0s
   size: 0

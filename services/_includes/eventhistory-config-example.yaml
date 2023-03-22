@@ -22,9 +22,9 @@ events:
   tls_root_ca_certificate: ""
   enable_tls: false
 store:
-  type: mem
-  addresses: ""
-  database: ""
-  table: ""
+  store: memory
+  nodes: []
+  database: eventhistory
+  table: events
   record_expiry: 336h0m0s
   size: 0
