@@ -21,7 +21,7 @@ import (
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
 		Name:     "server",
-		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", "authz"),
+		Usage:    fmt.Sprintf("start the %s service without runtime (unsupervised mode)", cfg.Service.Name),
 		Category: "server",
 		Before: func(c *cli.Context) error {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))

@@ -16,7 +16,7 @@ type Config struct {
 	InfectedFileHandling string `yaml:"infected-file-handling" env:"ANTIVIRUS_INFECTED_FILE_HANDLING" desc:"Defines the behaviour when a virus has been found. Supported options are: 'delete', 'continue' and 'abort '. Delete will delete the file. Continue will mark the file as infected but continues further processing. Abort will keep the file in the uploads folder for further admin inspection and will not move it to its final destination."`
 	Events               Events
 	Scanner              Scanner
-	MaxScanSize          string `yaml:"max-scan-size" env:"ANTIVIRUS_MAX_SCAN_SIZE" desc:"The maximum scan size the virusscanner can handle. Only that much bytes of a file will be scanned. 0 means unlimited and is the default. Usable common abbreviations: [KB, KiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB."`
+	MaxScanSize          string `yaml:"max-scan-size" env:"ANTIVIRUS_MAX_SCAN_SIZE" desc:"The maximum scan size the virusscanner can handle. Only this many bytes of a file will be scanned. 0 means unlimited and is the default. Usable common abbreviations: [KB, KiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB."`
 
 	Context context.Context `yaml:"-" json:"-"`
 }
@@ -28,27 +28,27 @@ type Service struct {
 
 // Log defines the available log configuration.
 type Log struct {
-	Level  string `mapstructure:"level" env:"OCIS_LOG_LEVEL;POLICIES_LOG_LEVEL" desc:"The log level. Valid values are: \"panic\", \"fatal\", \"error\", \"warn\", \"info\", \"debug\", \"trace\"."`
-	Pretty bool   `mapstructure:"pretty" env:"OCIS_LOG_PRETTY;POLICIES_LOG_PRETTY" desc:"Activates pretty log output."`
-	Color  bool   `mapstructure:"color" env:"OCIS_LOG_COLOR;POLICIES_LOG_COLOR" desc:"Activates colorized log output."`
-	File   string `mapstructure:"file" env:"OCIS_LOG_FILE;POLICIES_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set."`
+	Level  string `mapstructure:"level" env:"OCIS_LOG_LEVEL;ANTIVIRUS_LOG_LEVEL" desc:"The log level. Valid values are: \"panic\", \"fatal\", \"error\", \"warn\", \"info\", \"debug\", \"trace\"."`
+	Pretty bool   `mapstructure:"pretty" env:"OCIS_LOG_PRETTY;ANTIVIRUS_LOG_PRETTY" desc:"Activates pretty log output."`
+	Color  bool   `mapstructure:"color" env:"OCIS_LOG_COLOR;ANTIVIRUS_LOG_COLOR" desc:"Activates colorized log output."`
+	File   string `mapstructure:"file" env:"OCIS_LOG_FILE;ANTIVIRUS_LOG_FILE" desc:"The path to the log file. Activates logging to this file if set."`
 }
 
 // Debug defines the available debug configuration.
 type Debug struct {
-	Addr   string `yaml:"addr" env:"POLICIES_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed."`
-	Token  string `yaml:"token" env:"POLICIES_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint."`
-	Pprof  bool   `yaml:"pprof" env:"POLICIES_DEBUG_PPROF" desc:"Enables pprof, which can be used for profiling."`
-	Zpages bool   `yaml:"zpages" env:"POLICIES_DEBUG_ZPAGES" desc:"Enables zpages, which can be used for collecting and viewing in-memory traces."`
+	Addr   string `yaml:"addr" env:"ANTIVIRUS_DEBUG_ADDR" desc:"Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed."`
+	Token  string `yaml:"token" env:"ANTIVIRUS_DEBUG_TOKEN" desc:"Token to secure the metrics endpoint."`
+	Pprof  bool   `yaml:"pprof" env:"ANTIVIRUS_DEBUG_PPROF" desc:"Enables pprof, which can be used for profiling."`
+	Zpages bool   `yaml:"zpages" env:"ANTIVIRUS_DEBUG_ZPAGES" desc:"Enables zpages, which can be used for collecting and viewing in-memory traces."`
 }
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint             string `yaml:"endpoint" env:"USERLOG_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture."`
-	Cluster              string `yaml:"cluster" env:"USERLOG_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system."`
-	TLSInsecure          bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;USERLOG_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates."`
-	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"USERLOG_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false."`
-	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;USERLOG_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.."`
+	Endpoint             string `yaml:"endpoint" env:"ANTIVIRUS_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture."`
+	Cluster              string `yaml:"cluster" env:"ANTIVIRUS_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system."`
+	TLSInsecure          bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;ANTIVIRUS_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates."`
+	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"ANTIVIRUS_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided ANTIVIRUS_EVENTS_TLS_INSECURE will be seen as false."`
+	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;ANTIVIRUS_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services."`
 }
 
 // Scanner provides configuration options for the antivirusscanner

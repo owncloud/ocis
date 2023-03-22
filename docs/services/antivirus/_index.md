@@ -22,14 +22,14 @@ The `antivirus` service is responsible for scanning files for viruses.
 
 #### Antivirus Scanner Type
 
-The antivirus service currently supports [icap](https://tools.ietf.org/html/rfc3507) and [clamav](http://www.clamav.net/index.html) as antivirus scanners. The `ANTIVIRUS_SCANNER_TYPE` environment variable is used to select the scanner. The detailed configuration for each scanner heavily depends on the scanner type selected. See the environment variables for more details.
+The antivirus service currently supports [ICAP](https://tools.ietf.org/html/rfc3507) and [ClamAV](http://www.clamav.net/index.html) as antivirus scanners. The `ANTIVIRUS_SCANNER_TYPE` environment variable is used to select the scanner. The detailed configuration for each scanner heavily depends on the scanner type selected. See the environment variables for more details.
 
   -   For `icap`, only scanners using the `X-Infection-Found` header are currently supported.
   -   For `clamav` only local sockets can currently be configured.
 
 #### Maximum Scan size
 
-Several factors can make it necessary to limit the maximum filesize the antivirus service will use for scanning. Use the `ANTIVIRUS_MAX_SCAN_SIZE` environment variable to scan only a given amount of bytes. Obviously it is recommended to scan the whole file, but several factors like scanner type and version, bandwith, performance issues, etc. might make a limit necessary.
+Several factors can make it necessary to limit the maximum filesize the antivirus service will use for scanning. Use the `ANTIVIRUS_MAX_SCAN_SIZE` environment variable to scan only a given amount of bytes. Obviously, it is recommended to scan the whole file, but several factors like scanner type and version, bandwith, performance issues, etc. might make a limit necessary.
 
 #### Infected File Handling
 
@@ -41,9 +41,9 @@ The antivirus service allows three different ways of handling infected files. Th
 
 In all cases, a log entry is added declaring the infection and handling method and a notification via the `userlog` service sent.
 
-#### Scanner Inaccessability
+#### Scanner Inaccessibility
 
-In case a scanner is not accessible by the antivirus service like a network outage, service outage or hardware outage, the antivirus service uses the `abort` case for further processing, independent of the actual setting made. In any case, an error is logged noting the inaccessability of the scanner used.
+In case a scanner is not accessible by the antivirus service like a network outage, service outage or hardware outage, the antivirus service uses the `abort` case for further processing, independent of the actual setting made. In any case, an error is logged noting the inaccessibility of the scanner used.
 
 ### Operation Modes
 
@@ -51,4 +51,4 @@ The antivirus service can scan files during `postprocessing`. `on demand` scanni
 
 #### Postprocessing
 
-The antivirus service will scan files during postprocessing. It listens for a postprocessing step called `"virusscan"`. This step can be added in the environment variable `POSTPROCESSING_STEPS`. Read the documentation of the [postprocessing service](https://github.com/owncloud/ocis/tree/master/services/postprocessing) for more details.
+The antivirus service will scan files during postprocessing. It listens for a postprocessing step called `virusscan`. This step can be added in the environment variable `POSTPROCESSING_STEPS`. Read the documentation of the [postprocessing service](https://github.com/owncloud/ocis/tree/master/services/postprocessing) for more details.
