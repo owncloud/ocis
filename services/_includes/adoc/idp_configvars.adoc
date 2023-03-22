@@ -194,7 +194,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
-Enable/Disable HTTPS for the IDP service.
+Disable or Enable HTTPS for the communication between the Proxy service and the IDP service. If set to 'true', the key and cert files need to be configured and present.
 
 a|`REVA_GATEWAY` +
 
