@@ -1,6 +1,4 @@
 // Package keycloak offers an invitation backend for the invitation service.
-// TODO: Maybe move this outside of the invitation service and make it more generic?
-
 package keycloak
 
 import (
@@ -26,14 +24,14 @@ var userRequiredActions = []string{"UPDATE_PASSWORD", "VERIFY_EMAIL"}
 // Backend represents the keycloak backend.
 type Backend struct {
 	logger       log.Logger
-	client       *gocloak.GoCloak
+	client       GoCloak
 	clientID     string
 	clientSecret string
 	clientRealm  string
 	userRealm    string
 }
 
-// New returns a new keycloak.Backend, with all the config options set.
+// New instantiates a new keycloak.Backend with a default gocloak client.
 func New(
 	logger log.Logger,
 	baseURL, clientID, clientSecret, clientRealm, userRealm string,
@@ -41,12 +39,20 @@ func New(
 ) *Backend {
 	client := gocloak.NewClient(baseURL)
 	restyClient := client.RestyClient()
-	restyClient.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: insecureSkipVerify})
+	restyClient.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: insecureSkipVerify}) //nolint:gosec
+	return NewWithClient(logger, client, clientID, clientSecret, clientRealm, userRealm)
+}
+
+// NewWithClient creates a new backend with the supplied GoCloak client.
+func NewWithClient(
+	logger log.Logger,
+	client GoCloak,
+	clientID, clientSecret, clientRealm, userRealm string,
+) *Backend {
 	return &Backend{
 		logger: log.Logger{
-			logger.With().
+			Logger: logger.With().
 				Str("invitationBackend", "keycloak").
-				Str("baseURL", baseURL).
 				Str("clientID", clientID).
 				Str("clientRealm", clientRealm).
 				Str("userRealm", userRealm).
