@@ -108,9 +108,14 @@ func (av Antivirus) Run() error {
 			errmsg = err.Error()
 		}
 
-		outcome := events.PPOutcomeContinue
-		if res.Infected {
+		var outcome events.PostprocessingOutcome
+		switch {
+		case res.Infected:
 			outcome = av.o
+		case !res.Infected && err == nil:
+			outcome = events.PPOutcomeContinue
+		default:
+			outcome = events.PPOutcomeAbort
 		}
 
 		av.l.Info().Str("uploadid", ev.UploadID).Interface("resourceID", ev.ResourceID).Str("virus", res.Description).Str("outcome", string(outcome)).Str("filename", ev.Filename).Str("user", ev.ExecutingUser.GetId().GetOpaqueId()).Bool("infected", res.Infected).Msg("File scanned")
