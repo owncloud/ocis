@@ -18,6 +18,7 @@ L10N_MODULES := \
 
 # if you add a module here please also add it to the .drone.star file
 OCIS_MODULES = \
+	services/antivirus \
 	services/app-provider \
 	services/app-registry \
 	services/audit \
