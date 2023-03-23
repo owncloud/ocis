@@ -314,7 +314,7 @@ Feature: List and create spaces
 
   Scenario Outline: A user can list his created spaces via multiple endpoints
     Given the administrator has given "Alice" the role "<role>" using the settings api
-    When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
+    When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the Graph API
     Then the HTTP status code should be "201"
     And the JSON response should contain space called "Project Venus" and match
     """

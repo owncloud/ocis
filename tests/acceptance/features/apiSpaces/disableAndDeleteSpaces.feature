@@ -2,7 +2,7 @@
 Feature: Disabling and deleting space
   As a manager of space
   I want to be able to disable the space first, then delete it.
-  I want to make sure that a disabled spaces isn't accessible by shared users.
+  So that a disabled spaces isn't accessible by shared users.
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -24,7 +24,7 @@ Feature: Disabling and deleting space
       | role      | viewer |
 
 
-  Scenario Outline: user can disable their own Space via the Graph API
+  Scenario Outline: user can disable their own space via the Graph API
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" disables a space "Project Moon"
     Then the HTTP status code should be "204"
@@ -74,7 +74,7 @@ Feature: Disabling and deleting space
       | Guest       |
 
 
-  Scenario Outline: User with role User and Guest cannot disable others Space via the Graph API
+  Scenario Outline: user with role user and guest cannot disable other space via the Graph API
     Given the administrator has given "Carol" the role "<role>" using the settings api
     When user "Carol" tries to disable a space "Project Moon" owned by user "Alice"
     Then the HTTP status code should be "403"
@@ -114,7 +114,7 @@ Feature: Disabling and deleting space
       | Guest |
 
 
-  Scenario: An space manager can disable and delete Space in which files and folders exist via the webDav API
+  Scenario: a space manager can disable and delete space in which files and folders exist via the webDav API
     Given user "Alice" has uploaded a file inside space "Project Moon" with content "test" to "test.txt"
     And user "Alice" has created a folder "MainFolder" in space "Project Moon"
     When user "Alice" disables a space "Project Moon"
@@ -151,7 +151,7 @@ Feature: Disabling and deleting space
       | Guest       |
 
 
-  Scenario Outline: user can delete their own disabled Space via the Graph API
+  Scenario Outline: user can delete their own disabled space via the Graph API
     Given the administrator has given "Alice" the role "<role>" using the settings api
     And user "Alice" has disabled a space "Project Moon"
     When user "Alice" deletes a space "Project Moon"
@@ -165,7 +165,7 @@ Feature: Disabling and deleting space
       | Guest       |
 
 
-  Scenario Outline: Admin and Space manager can disable others Space via the Graph API
+  Scenario Outline: an admin and space manager can disable other space via the Graph API
     Given the administrator has given "Carol" the role "<role>" using the settings api
     When user "Carol" tries to disable a space "Project Moon" owned by user "Alice"
     Then the HTTP status code should be "204"
@@ -211,7 +211,7 @@ Feature: Disabling and deleting space
       | Space Admin |
 
 
-  Scenario Outline: Admin and Space manager can delete others disabled Space
+  Scenario Outline: an admin and space manager can delete other disabled Space
     Given the administrator has given "Carol" the role "<role>" using the settings api
     And user "Alice" has disabled a space "Project Moon"
     When user "Carol" tries to delete a space "Project Moon" owned by user "Alice"
@@ -223,7 +223,7 @@ Feature: Disabling and deleting space
       | Space Admin |
 
 
-  Scenario Outline: User with role User and Guest cannot delete others disabled Space via the Graph API
+  Scenario Outline: user with role user and guest cannot delete others disabled Space via the Graph API
     Given the administrator has given "Carol" the role "<role>" using the settings api
     And user "Alice" has disabled a space "Project Moon"
     When user "Carol" tries to delete a space "Project Moon" owned by user "Alice"

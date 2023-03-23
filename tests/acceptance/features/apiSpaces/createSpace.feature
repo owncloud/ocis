@@ -1,15 +1,17 @@
 @api
 Feature: create space
-  Only user with admin and SpaceAdmin permissions can create new spaces
+  As an admin and space admin
+  I want to create new spaces
+  So that I can organize a set of resources in a hierarchical tree
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: The user without permissions to create space cannot create a Space via Graph API
+  Scenario Outline: user with role user and guest can't create Space via Graph API
     Given the administrator has given "Alice" the role "<role>" using the settings api
-    When user "Alice" creates a space "Project Mars" of type "project" with the default quota using the GraphApi
-    Then the HTTP status code should be "401"
+    When user "Alice" tries to create a space "Project Mars" of type "project" with the default quota using the Graph API
+    Then the HTTP status code should be "403"
     And the user "Alice" should not have a space called "share space"
     Examples:
       | role  |
@@ -17,9 +19,9 @@ Feature: create space
       | Guest |
 
 
-  Scenario Outline: An admin or space admin user can create a Space via the Graph API with default quota
+  Scenario Outline: an admin or space admin user can create a Space via the Graph API with a default quota
     Given the administrator has given "Alice" the role "<role>" using the settings api
-    When user "Alice" creates a space "Project Mars" of type "project" with the default quota using the GraphApi
+    When user "Alice" creates a space "Project Mars" of type "project" with the default quota using the Graph API
     Then the HTTP status code should be "201"
     And the JSON response should contain space called "Project Mars" and match
     """
@@ -88,9 +90,9 @@ Feature: create space
       | Space Admin |
 
 
-  Scenario Outline: An admin or space admin user can create a Space via the Graph API with certain quota
+  Scenario Outline: an admin or space admin user can create a Space via the Graph API with certain quota
     Given the administrator has given "Alice" the role "<role>" using the settings api
-    When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the GraphApi
+    When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the Graph API
     Then the HTTP status code should be "201"
     And the JSON response should contain space called "Project Venus" and match
     """

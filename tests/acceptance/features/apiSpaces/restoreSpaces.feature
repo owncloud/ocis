@@ -47,7 +47,7 @@ Feature: Restoring space
       | mainFolder |
 
 
-  Scenario: Participant can create data in the space after restoring
+  Scenario: participant can create data in the space after restoring
     Given user "Alice" has shared a space "restore a space" with settings:
       | shareWith | Brian  |
       | role      | editor |
@@ -60,7 +60,7 @@ Feature: Restoring space
       | mainFolder |
 
 
-  Scenario Outline: User without space manager role cannot restore space
+  Scenario Outline: user without space manager role cannot restore space
     Given user "Alice" has shared a space "restore a space" with settings:
       | shareWith | Brian  |
       | role      | <role> |
@@ -73,7 +73,7 @@ Feature: Restoring space
       | editor |
 
 
-  Scenario Outline: User with role User and Guest cannot restore space
+  Scenario Outline: user with role user and guest cannot restore space
     Given the administrator has given "Brian" the role "<role>" using the settings api
     And user "Alice" has disabled a space "restore a space"
     When user "Brian" tries to restore a disabled space "restore a space" owned by user "Alice"
@@ -84,10 +84,10 @@ Feature: Restoring space
       | Guest |
 
   @issue-5872
-  Scenario Outline: Admin and Space Admin can restore others space
+  Scenario Outline: admin and space admin can restore other space
     Given the administrator has given "Brian" the role "<role>" using the settings api
     And user "Alice" has disabled a space "restore a space"
-    When user "Brian" tries to restore a disabled space "restore a space" owned by user "Alice"
+    When user "Brian" restores a disabled space "restore a space" owned by user "Alice"
     Then the HTTP status code should be "200"
     Examples:
       | role        |
