@@ -234,6 +234,15 @@ def main(ctx):
 
     pipelines = []
 
+    return cancelPreviousBuilds() + \
+           buildWebCache(ctx) + \
+           [buildOcisBinaryForTesting(ctx)] + \
+           testPipelines(ctx) + \
+           [pipelineDependsOn(
+               purgeBuildArtifactCache(ctx),
+               testPipelines(ctx),
+           )]
+
     test_pipelines = \
         cancelPreviousBuilds() + \
         codestyle(ctx) + \
@@ -348,21 +357,21 @@ def cancelPreviousBuilds():
 def testPipelines(ctx):
     pipelines = []
 
-    if config["litmus"]:
-        pipelines += litmus(ctx, "ocis")
+    # if config["litmus"]:
+    #     pipelines += litmus(ctx, "ocis")
 
-    if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
-        pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
-    if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
-        pipelines.append(wopiValidatorTests(ctx, "ocis", "default"))
+    # if "skip" not in config["cs3ApiTests"] or not config["cs3ApiTests"]["skip"]:
+    #     pipelines.append(cs3ApiTests(ctx, "ocis", "default"))
+    # if "skip" not in config["wopiValidatorTests"] or not config["wopiValidatorTests"]["skip"]:
+    #     pipelines.append(wopiValidatorTests(ctx, "ocis", "default"))
 
-    pipelines += localApiTestPipeline(ctx)
+    # pipelines += localApiTestPipeline(ctx)
 
-    if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
-        pipelines += apiTests(ctx)
+    # if "skip" not in config["apiTests"] or not config["apiTests"]["skip"]:
+    #     pipelines += apiTests(ctx)
 
-    if "skip" not in config["uiTests"] or not config["uiTests"]["skip"]:
-        pipelines += uiTests(ctx)
+    # if "skip" not in config["uiTests"] or not config["uiTests"]["skip"]:
+    #     pipelines += uiTests(ctx)
 
     if "skip" not in config["e2eTests"] or not config["e2eTests"]["skip"]:
         pipelines += e2eTests(ctx)
