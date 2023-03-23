@@ -47,6 +47,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add expiration to user and group shares: [#5389](https://github.com/owncloud/ocis/pull/5389)
 * Enhancement - Space Management permissions: [#5441](https://github.com/owncloud/ocis/pull/5441)
 * Enhancement - Cli to purge expired trash-bin items: [#5500](https://github.com/owncloud/ocis/pull/5500)
+* Enhancement - Use Accept-Language Header: [#5918](https://github.com/owncloud/ocis/pull/5918)
 * Enhancement - Use gotext master: [#5867](https://github.com/owncloud/ocis/pull/5867)
 * Enhancement - Userlog: [#5699](https://github.com/owncloud/ocis/pull/5699)
 * Enhancement - Userlog Service: [#5610](https://github.com/owncloud/ocis/pull/5610)
