@@ -9,6 +9,12 @@ var (
 		Subject: Template("Virus found"),
 		Message: Template("Virus found in {resource}. Upload not possible. Virus: {virus}"),
 	}
+
+	PoliciesEnforced = NotificationTemplate{
+		Subject: Template("Policies enforced"),
+		Message: Template("File {resource} was deleted because it violates the policies"),
+	}
+
 	SpaceShared = NotificationTemplate{
 		Subject: Template("Space shared"),
 		Message: Template("{user} added you to Space {space}"),
