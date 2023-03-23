@@ -140,7 +140,7 @@ type S3NGDriver struct {
 	ShareFolder             string `yaml:"share_folder" env:"STORAGE_USERS_S3NG_SHARE_FOLDER" desc:"Name of the folder jailing all shares."`
 	MaxAcquireLockCycles    int    `yaml:"max_acquire_lock_cycles" env:"STORAGE_USERS_S3NG_MAX_ACQUIRE_LOCK_CYCLES" desc:"When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used."`
 	LockCycleDurationFactor int    `yaml:"lock_cycle_duration_factor" env:"STORAGE_USERS_S3NG_LOCK_CYCLE_DURATION_FACTOR" desc:"When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used."`
-	MaxConcurrency          int    `yaml:"max_concurrency" env:"STORAGE_USERS_S3NG_MAX_CONCURRENCY" desc:"Maximum number of concurrent goroutines. Higher values can cause more load on the system but potentially get work done faster. Values of 0 or below will be ignored and the default value of 100 will be used."`
+	MaxConcurrency          int    `yaml:"max_concurrency" env:"STORAGE_USERS_S3NG_MAX_CONCURRENCY" desc:"Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used."`
 }
 
 // OwnCloudSQLDriver is the storage driver configuration when using 'owncloudsql' storage driver
