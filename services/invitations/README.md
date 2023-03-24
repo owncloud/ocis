@@ -15,10 +15,7 @@ This service introduces the `invitations` subcommand to `ocis`.
 
 ### Keycloak
 
-The default (and currently only) backend used to handle Invitations is [Keycloak](https://www.keycloak.org/).
-Keycloak is an open source identity and access management (IAM) system that other OCIS services also support as an
-authentication and authorization backend.
-
+The default and currently only available backend used to handle Invitations is [Keycloak](https://www.keycloak.org/). Keycloak is an open source identity and access management (IAM) system which is also integrated by other OCIS services as an authentication and authorization backend.
 
 #### Realm configuration
 
