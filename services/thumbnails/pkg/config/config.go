@@ -28,7 +28,7 @@ type Config struct {
 
 // FileSystemStorage defines the available filesystem storage configuration.
 type FileSystemStorage struct {
-	RootDirectory string `yaml:"root_directory" env:"THUMBNAILS_FILESYSTEMSTORAGE_ROOT" desc:"The directory where the filesystem storage will store the thumbnails. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/thumbnails."`
+	RootDirectory string `yaml:"root_directory" env:"THUMBNAILS_FILESYSTEMSTORAGE_ROOT" desc:"The directory where the filesystem storage will store the thumbnails. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/thumbnails."`
 }
 
 // Thumbnail defines the available thumbnail related configuration.
