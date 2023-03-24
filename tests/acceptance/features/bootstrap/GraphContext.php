@@ -16,6 +16,7 @@ use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
 use TestHelpers\WebDavHelper;
 use PHPUnit\Framework\Assert;
+use TestHelpers\HttpRequestHelper;
 
 require_once 'bootstrap.php';
 
@@ -2131,6 +2132,82 @@ class GraphContext implements Context {
 				$credentials["password"],
 				$groupId,
 				$groupIdToAdd
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" tries to add user "([^"]*)" to group "([^"]*)" with invalid JSON "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $adminUser
+	 * @param string $user
+	 * @param string $group
+	 * @param string $invalidJSON
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userTriesToAddUserToGroupWithInvalidJsonUsingTheGraphApi(string $adminUser, string $user, string $group, string $invalidJSON): void {
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$credentials = $this->getAdminOrUserCredentials($adminUser);
+
+		$invalidJSON = $this->featureContext->substituteInLineCodes(
+			$invalidJSON,
+			null,
+			[],
+			[],
+			null,
+			$user
+		);
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::post(
+				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupId . '/members/$ref'),
+				$this->featureContext->getStepLineRef(),
+				$credentials["username"],
+				$credentials["password"],
+				['Content-Type' => 'application/json'],
+				\json_encode($invalidJSON)
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" tries to add the following users to a group "([^"]*)" at once with invalid JSON "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $group
+	 * @param string $invalidJSON
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userTriesToAddTheFollowingUsersToAGroupAtOnceWithInvalidJsonUsingTheGraphApi(string $user, string $group, string $invalidJSON, TableNode $table): void {
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$credentials = $this->getAdminOrUserCredentials($user);
+		foreach ($table->getHash() as $row) {
+			$invalidJSON = $this->featureContext->substituteInLineCodes(
+				$invalidJSON,
+				null,
+				[],
+				[],
+				null,
+				$row['username']
+			);
+		}
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupId),
+				$this->featureContext->getStepLineRef(),
+				'PATCH',
+				$credentials["username"],
+				$credentials["password"],
+				['Content-Type' => 'application/json'],
+				\json_encode($invalidJSON)
 			)
 		);
 	}
