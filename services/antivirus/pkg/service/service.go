@@ -120,6 +120,7 @@ func (av Antivirus) Run() error {
 
 		av.l.Info().Str("uploadid", ev.UploadID).Interface("resourceID", ev.ResourceID).Str("virus", res.Description).Str("outcome", string(outcome)).Str("filename", ev.Filename).Str("user", ev.ExecutingUser.GetId().GetOpaqueId()).Bool("infected", res.Infected).Msg("File scanned")
 		if err := events.Publish(stream, events.PostprocessingStepFinished{
+			FinishedStep:  events.PPStepAntivirus,
 			Outcome:       outcome,
 			UploadID:      ev.UploadID,
 			ExecutingUser: ev.ExecutingUser,
