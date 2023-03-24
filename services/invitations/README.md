@@ -2797,7 +2797,7 @@ as they will be disabled.
 
 The most relevant bits here are the mappers for the `OWNCLOUD_ID` and `OWNCLOUD_USER_TYPE` user properties.
 
-#### Backend configuration
+#### Backend Configuration
 
 After keycloak has been configured, you need to configure the backend with the following environment variables:
 
