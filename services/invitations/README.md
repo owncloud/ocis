@@ -7,9 +7,26 @@ Users invited via this Invitation Manager (libre graph API) will have `userType=
 The corresponding CS3 API [user types](https://cs3org.github.io/cs3apis/#cs3.identity.user.v1beta1.UserType) used to reperesent this are: `USER_TYPE_GUEST` and `USER_TYPE_PRIMARY`.
 
 
-## Subcommand
+## Commands
 
-This service introduces the `invitations` subcommand to `ocis`.
+Right now, the invitations server supplies the following commands:
+
+```
+COMMANDS:
+   server   start the invitations service without runtime (unsupervised mode)
+   health   check health status
+   version  print the version of this binary and the running service instances
+   help, h  Shows a list of commands or help for one command
+```
+
+### Command examples
+
+**Start the invitiations service**
+
+```sh
+$ ocis invitations server
+```
+
 
 ## Provisioning backends
 
