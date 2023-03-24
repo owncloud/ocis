@@ -249,6 +249,16 @@ func (c *Converter) virusMessage(eventid string, nt NotificationTemplate, execut
 		return OC10Notification{}, err
 	}
 
+	dets := map[string]interface{}{
+		"resource": map[string]string{
+			"name": filename,
+		},
+		"virus": map[string]interface{}{
+			"name":     virus,
+			"scandate": ts,
+		},
+	}
+
 	return OC10Notification{
 		EventID:        eventid,
 		Service:        c.serviceName,
@@ -260,7 +270,7 @@ func (c *Converter) virusMessage(eventid string, nt NotificationTemplate, execut
 		SubjectRaw:     subjraw,
 		Message:        msg,
 		MessageRaw:     msgraw,
-		MessageDetails: generateDetails(nil, nil, nil, nil),
+		MessageDetails: dets,
 	}, nil
 }
 
@@ -270,6 +280,12 @@ func (c *Converter) policiesMessage(eventid string, nt NotificationTemplate, exe
 	})
 	if err != nil {
 		return OC10Notification{}, err
+	}
+
+	dets := map[string]interface{}{
+		"resource": map[string]string{
+			"name": filename,
+		},
 	}
 
 	return OC10Notification{
@@ -282,7 +298,7 @@ func (c *Converter) policiesMessage(eventid string, nt NotificationTemplate, exe
 		SubjectRaw:     subjraw,
 		Message:        msg,
 		MessageRaw:     msgraw,
-		MessageDetails: generateDetails(nil, nil, nil, nil),
+		MessageDetails: dets,
 	}, nil
 }
 
