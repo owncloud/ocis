@@ -1,6 +1,6 @@
 ---
-title: WebDAV
-date: 2018-05-02T00:00:00+00:00
+title: Webdav Service
+date: 2023-03-24T12:01:23.08170506Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/webdav
@@ -10,8 +10,37 @@ geekdocCollapseSection: true
 
 ## Abstract
 
-This service provides preview (thumbnails) endpoints on the WebDAV API and therefore extends the main WebDAV API provided by the [oCDAV service]({{ ../../ocdav }}).
+The webdav service, like the [ocdav](https://github.com/owncloud/ocis/tree/master/services/ocdav) service, provides a HTTP API following the webdav protocol. It receives HTTP calls from requestors like clients and issues gRPC calls to other services executing these requests. After the called service has finished the request, the webdav service will render their responses in `xml` and sends them back to the requestor.
 
 ## Table of Contents
 
-{{< toc-tree >}}
+* [Endpoints Overview](#endpoints-overview)
+  * [Thumbnails](#thumbnails)
+  * [Search](#search)
+* [Scalability](#scalability)
+* [Example Yaml Config](#example-yaml-config)
+
+## Endpoints Overview
+
+Currently, the webdav service handles request for two functionalities, which are `Thumbnails` and `Search`.
+
+### Thumbnails
+
+The webdav service provides various `GET` endpoints to get the thumbnails of a file in authenticated and unauthenticated contexts. It also provides thumbnails for spaces on different endpoints. 
+See the [thumbnail](https://github.com/owncloud/ocis/tree/master/services/thumbnails) service for more information about thumbnails.
+
+### Search
+
+The webdav service provides access to the search functionality. It offers multiple `REPORT` endpoints for getting search results. 
+See the [search](https://github.com/owncloud/ocis/tree/master/services/search) service for more details about search functionality. 
+
+## Scalability
+
+The webdav service does not persist any data and does not cache any information. Therefore multiple instances of this service can be spawned in a bigger deployment like when using container orchestration with Kubernetes, without any extra configuration.
+
+## Example Yaml Config
+
+{{< include file="services/_includes/webdav-config-example.yaml"  language="yaml" >}}
+
+{{< include file="services/_includes/webdav_configvars.md" >}}
+

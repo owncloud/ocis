@@ -1,6 +1,6 @@
 ---
-title: Auth-Bearer
-date: 2022-03-02T00:00:00+00:00
+title: Auth-Bearer Service
+date: 2023-03-24T12:01:23.07776222Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/auth-bearer
@@ -10,7 +10,26 @@ geekdocCollapseSection: true
 
 ## Abstract
 
+The oCIS Auth Bearer service communicates with the configured OpenID Connect identity provider to authenticate requests. OpenID Connect is the default authentication mechanism for all clients: web, desktop and mobile. Basic auth is only used for testing and has to be explicity enabled.
 
 ## Table of Contents
 
-{{< toc-tree >}}
+* [Built in OpenID Connect identity provider](#built-in-openid-connect-identity-provider)
+* [Scalability](#scalability)
+* [Example Yaml Config](#example-yaml-config)
+
+## Built in OpenID Connect identity provider
+
+A default oCIS deployment will start a [built in OpenID Connect identity provider](https://github.com/owncloud/ocis/tree/master/services/idp) but can be configured to use an external one as well.
+
+## Scalability
+
+There is no persistance or caching. The proxy caches verified auth bearer tokens. Requests will be forwarded to the identity provider. Therefore, multiple instances of the `auth-bearer` service can be started without further configuration. Currently, the auth registry used by the gateway can only use a single instance of the service. To use more than one auth provider per deployment you need to scale the gateway.
+This will change when we use the service registry in more places and use micro clients to select an instance of a service.
+
+## Example Yaml Config
+
+{{< include file="services/_includes/auth-bearer-config-example.yaml"  language="yaml" >}}
+
+{{< include file="services/_includes/auth-bearer_configvars.md" >}}
+

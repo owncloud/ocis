@@ -1,6 +1,6 @@
 ---
-title: Webfinger
-date: 2023-02-03T00:00:00+00:00
+title: Webfinger Service
+date: 2023-03-24T12:01:23.08187574Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/webfinger
@@ -11,17 +11,18 @@ geekdocCollapseSection: true
 ## Abstract
 
 The webfinger service provides an RFC7033 WebFinger lookup of ownCloud instances relevant for a given user account via endpoints a the /.well-known/webfinger implementation.
-
 It is based on https://github.com/owncloud/lookup-webfinger-sciebo but also returns localized `titles` in addition to the `href` property.
 
 ## Table of Contents
 
-{{< toc-tree >}}
+* [OpenID Connect Discovery](#openid-connect-discovery)
+* [Authenticated Instance Discovery](#authenticated-instance-discovery)
+* [Configure Different Instances Based on OpenidConnect UserInfo Claims](#configure-different-instances-based-on-openidconnect-userinfo-claims)
+* [Example Yaml Config](#example-yaml-config)
 
 ## OpenID Connect Discovery
 
 Clients can make an unauthenticated `GET https://drive.ocis.test/.well-known/webfinger?resource=https%3A%2F%2Fcloud.ocis.test` request to discover the OpenID Connect Issuer in the `http://openid.net/specs/connect/1.0/issuer` relation:
-
 ```json
 {
     "subject": "acct:einstein@drive.ocis.test",
@@ -33,18 +34,14 @@ Clients can make an unauthenticated `GET https://drive.ocis.test/.well-known/web
     ]
 }
 ```
-
 Here, the `resource` takes the instance domain URI, but an `acct:` URI works as well. 
 
 ## Authenticated Instance Discovery
 
 When using OpenID connect to authenticate requests, clients can look up the owncloud instances a user has access to.
-
 *   Authentication is necessary to prevent leaking information about existing users.
 *   Basic auth is not supported.
-
 The default configuration will simply return the `OCIS_URL` and direct clients to that domain:
-
 ```json
 {
     "subject": "acct:einstein@drive.ocis.test",
@@ -67,7 +64,6 @@ The default configuration will simply return the `OCIS_URL` and direct clients t
 ## Configure Different Instances Based on OpenidConnect UserInfo Claims
 
 A more complex example for configuring different instances could look like this:
-
 ```yaml
 webfinger:
   instances:
@@ -107,9 +103,7 @@ webfinger:
        "de": "oCIS Instanz"
      break: true
 ```
-
 Now, an authenticated webfinger request for `acct:me@example.org` (when logged in as marie) would return two instances, based on her `email` claim, the regex matches and break flags:
-
 ```json
 {
     "subject": "acct:marie@example.org",
@@ -137,3 +131,10 @@ Now, an authenticated webfinger request for `acct:me@example.org` (when logged i
     ]
 }
 ```
+
+## Example Yaml Config
+
+{{< include file="services/_includes/webfinger-config-example.yaml"  language="yaml" >}}
+
+{{< include file="services/_includes/webfinger_configvars.md" >}}
+

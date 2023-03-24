@@ -1,6 +1,6 @@
 ---
-title: NATS
-date: 2022-03-02T00:00:00+00:00
+title: Nats Service
+date: 2023-03-24T12:01:23.078977712Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/nats
@@ -10,7 +10,33 @@ geekdocCollapseSection: true
 
 ## Abstract
 
+The nats service is the event broker of the system. It distributes events among all other services and enables other services to communicate asynchronous.
+Services can `Publish` events to the nats service and nats will store these events on disk and distribute these events to other services eventually. Services can `Consume` events from the nats service by registering to a `ConsumerGroup`. Each `ConsumerGroup` is guaranteed to get each event exactly once. In most cases, each service will register its own `ConsumerGroup`. When there are multiple instances of a service, those instances will usually use that `ConsumerGroup` as common resource.
 
 ## Table of Contents
 
-{{< toc-tree >}}
+* [Underlying technology](#underlying-technology)
+* [Persistance](#persistance)
+* [TLS Encryption](#tls-encryption)
+* [Example Yaml Config](#example-yaml-config)
+
+## Underlying technology
+
+As the service name suggests, this service is based on [NATS](https://nats.io/) specifically on [NATS Jetstream](https://docs.nats.io/nats-concepts/jetstream) to enable persistence.
+
+## Persistance
+
+To be able to deliver events even after a system or service restart, nats will store events in a folder on the local filesystem. This folder can be specified by setting the `NATS_NATS_STORE_DIR` enviroment variable. If not set, the service will fall back to `$OCIS_BASE_DATA_PATH:/nats`.
+
+## TLS Encryption
+
+Connections to the nats service (`Publisher`/`Consumer` see above) can be TLS encrypted by setting the corresponding env vars `NATS_TLS_CERT`, `NATS_TLS_KEY` to the cert and key files and `ENABLE_TLS` to true. Checking the certificate of incoming request can be disabled with the `NATS_EVENTS_ENABLE_TLS` environment variable.
+Certificate files can also be set via global variables starting with `OCIS_`, for details see the environment variable list.
+Note that using TLS is highly recommended for productive environments, especially when using container orchestration with Kubernetes.
+
+## Example Yaml Config
+
+{{< include file="services/_includes/nats-config-example.yaml"  language="yaml" >}}
+
+{{< include file="services/_includes/nats_configvars.md" >}}
+

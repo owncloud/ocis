@@ -1,5 +1,6 @@
 ---
-title: Eventhistory
+title: Eventhistory Service
+date: 2023-03-24T12:01:23.077969898Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/eventhistory
@@ -13,7 +14,11 @@ The `eventhistory` consumes all events from the configured event system like NAT
 
 ## Table of Contents
 
-{{< toc-tree >}}
+* [Prerequisites](#prerequisites)
+* [Consuming](#consuming)
+* [Storing](#storing)
+* [Retrieving](#retrieving)
+* [Example Yaml Config](#example-yaml-config)
 
 ## Prerequisites
 
@@ -32,7 +37,6 @@ The `eventhistory` service stores each consumed event via the configured store i
   -   `etcd`: Stores data in a configured etcd cluster.
   -   `nats-js`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
   -   `noop`: Stores nothing. Useful for testing. Not recommended in productive enviroments.
-
 1.  Note that in-memory stores are by nature not reboot persistent.
 2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicapable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store applies.
 3.  Events stay in the store for 2 weeks by default. Use `EVENTHISTORY_RECORD_EXPIRY` to adjust this value.
@@ -41,3 +45,10 @@ The `eventhistory` service stores each consumed event via the configured store i
 ## Retrieving
 
 Other services can call the `eventhistory` service via a grpc call to retrieve events. The request must contain the eventid that should be retrieved.
+
+## Example Yaml Config
+
+{{< include file="services/_includes/eventhistory-config-example.yaml"  language="yaml" >}}
+
+{{< include file="services/_includes/eventhistory_configvars.md" >}}
+

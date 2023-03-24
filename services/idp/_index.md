@@ -1,5 +1,6 @@
 ---
-title: IDP
+title: IDP Service
+date: 2023-03-24T12:01:23.078793889Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/idp
@@ -9,8 +10,22 @@ geekdocCollapseSection: true
 
 ## Abstract
 
-This service provides an OpenID Connect provider which is the default way to authenticate in oCIS.
+This service provides a builtin minimal OpenID Connect provider based on
+[LibreGraph Connect (lico)](https://github.com/libregraph/lico) for oCIS.
+It is mainly targeted at smaller installations. For larger setups it is
+recommended to replace IDP with and external OpenID Connect Provider.
+By default, it is configured to use the ocis IDM service as its LDAP backend for
+looking up and authenticating users. Other backends like an external LDAP
+server can be configured via a set of
+[enviroment variables](https://owncloud.dev/services/idp/configuration/#environment-variables).
 
 ## Table of Contents
 
-{{< toc-tree >}}
+* [Example Yaml Config](#example-yaml-config)
+
+## Example Yaml Config
+
+{{< include file="services/_includes/idp-config-example.yaml"  language="yaml" >}}
+
+{{< include file="services/_includes/idp_configvars.md" >}}
+

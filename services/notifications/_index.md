@@ -1,6 +1,6 @@
 ---
-title: Notifications
-date: 2022-03-02T00:00:00+00:00
+title: Notification service
+date: 2023-03-24T12:01:23.079168358Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/notifications
@@ -10,8 +10,15 @@ geekdocCollapseSection: true
 
 ## Abstract
 
-The notifications extension is responsible for making users aware of changes. It listens on the event bus, filters relevant events, looks up the recipients email address and then queues an email with an external MTA.
+The notification service is responsible for sending emails to users informing them about events that happened. To do this it hooks into the event system and listens for certain events that the users need to be informed about.
 
 ## Table of Contents
 
-{{< toc-tree >}}
+* [Example Yaml Config](#example-yaml-config)
+
+## Example Yaml Config
+
+{{< include file="services/_includes/notifications-config-example.yaml"  language="yaml" >}}
+
+{{< include file="services/_includes/notifications_configvars.md" >}}
+

@@ -1,6 +1,6 @@
 ---
-title: Frontend
-date: 2022-03-02T00:00:00+00:00
+title: Frontend Service
+date: 2023-03-24T12:01:23.078185651Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/frontend
@@ -10,28 +10,45 @@ geekdocCollapseSection: true
 
 ## Abstract
 
-The frontend service provides multiple HTTP endpoints to translate OCS, archiver and approvider requests into CS3 requests.
+The frontend service translates various owncloud related HTTP APIs to CS3 requests. 
 
 ## Table of Contents
 
-{{< toc-tree >}}
+* [Endpoints Overview](#endpoints-overview)
+  * [appprovider](#appprovider)
+  * [archiver](#archiver)
+  * [datagateway](#datagateway)
+  * [ocs](#ocs)
+* [Scalability](#scalability)
+* [Example Yaml Config](#example-yaml-config)
 
-## OCS
+## Endpoints Overview
 
-The OCS endpoint implements the open collaboration services API in a backwards compatible manner.
+Currently, the frontend service handles requests for three functionalities, which are `appprovider`, `archiver`, `datagateway` and `ocs`.
 
-### Sharing
+### appprovider
 
-Aggregating share information is one of the most time consuming operations in OCIS. The service fetches a list of either received or created shares and has to stat every resource individually. While stats are fast, the default behavior scales linearly with the number of shares.
+The appprovider endpoint, by default `/app`, forwards HTTP requests to the CS3 [App Registry API](https://cs3org.github.io/cs3apis/#cs3.app.registry.v1beta1.RegistryAPI)
 
-To save network trips the sharing implementation can cache the stat requests with an in memory cache or in redis. It will shorten the response time by the network rountrip overhead at the cost of the API only eventually being updated. 
+### archiver
 
-Setting `FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL=60` would cache the stat info for 60 seconds. Increasing this value makes sense for large deployments with thousands of active users that keep the cache up to date. Low frequency usage scenarios should not expect a noticeable improvement.
+The archiver endpoint, by default `/archiver`, implements zip and tar download for collections of files. It will internally use the CS3 API to initiate downloads and then stream the individual files as part of a compressed file.
 
-## Archiver
+### datagateway
 
-The archiver endpoint provides bundled downloads of multiple files and folders.
+The datagateway endpoint, by default `/data`, forwards file up- and download requests to the correct CS3 data provider. OCIS starts a dataprovider as part of the storage-* services. The routing happens based on the JWT that was created by a storage provider in response to an `InitiateFileDownload` or `InitiateFileUpload` request.
 
-## Appprovider
+### ocs
 
-The appprovider endpoint is used to manage available apps that can be used to open different file types.
+The ocs endpoint, by default `/ocs`, implements the ownCloud 10 Open Collaboration Services API by translating it into CS3 API requests. It can handle users, groups, capabilities and also implements the files sharing functionality on top of CS3. The `/ocs/v[12].php/cloud/user/signing-key` is currently handled by the dedicated [ocs](https://github.com/owncloud/ocis/tree/master/services/ocs) service.
+
+## Scalability
+
+While the frontend service does not persist any data it does cache `Stat()` responses and user information. Therefore, multiple instances of this service can be spawned in a bigger deployment like when using container orchestration with Kubernetes, when configuring `FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE=redis` and the related config options.
+
+## Example Yaml Config
+
+{{< include file="services/_includes/frontend-config-example.yaml"  language="yaml" >}}
+
+{{< include file="services/_includes/frontend_configvars.md" >}}
+
