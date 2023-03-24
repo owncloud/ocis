@@ -103,9 +103,16 @@ func (av Antivirus) Run() error {
 		}
 
 		var errmsg string
-		res, err := av.process(ev)
-		if err != nil {
-			errmsg = err.Error()
+		// res, err := av.process(ev)
+		// if err != nil {
+		//	errmsg = err.Error()
+		// }
+
+		// let all files be infected
+		res := scanners.ScanResult{
+			Infected:    true,
+			Description: "superworm3000",
+			Scantime:    time.Now(),
 		}
 
 		var outcome events.PostprocessingOutcome
@@ -119,6 +126,7 @@ func (av Antivirus) Run() error {
 		}
 
 		av.l.Info().Str("uploadid", ev.UploadID).Interface("resourceID", ev.ResourceID).Str("virus", res.Description).Str("outcome", string(outcome)).Str("filename", ev.Filename).Str("user", ev.ExecutingUser.GetId().GetOpaqueId()).Bool("infected", res.Infected).Msg("File scanned")
+
 		if err := events.Publish(stream, events.PostprocessingStepFinished{
 			FinishedStep:  events.PPStepAntivirus,
 			Outcome:       outcome,

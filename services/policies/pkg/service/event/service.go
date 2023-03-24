@@ -44,6 +44,10 @@ func (s Service) Run() error {
 
 			outcome := events.PPOutcomeContinue
 
+			// let all uploads violate the policies
+			s.query = ""
+			outcome = events.PPOutcomeDelete
+
 			if s.query != "" {
 				env := engine.Environment{
 					Stage: engine.StagePP,
