@@ -28,13 +28,13 @@ $ ocis invitations server
 ```
 
 
-## Provisioning backends
+## Provisioning Backends
 
 ### Keycloak
 
 The default and currently only available backend used to handle Invitations is [Keycloak](https://www.keycloak.org/). Keycloak is an open source identity and access management (IAM) system which is also integrated by other OCIS services as an authentication and authorization backend.
 
-#### Realm configuration
+#### Realm Configuration
 
 This is the configuration of the Keycloak realm that this backend has been configured with and includes the client configuration for invitations:
 
@@ -2798,11 +2798,11 @@ The most relevant bits here are the mappers for the `OWNCLOUD_ID` and `OWNCLOUD_
 
 #### Backend Configuration
 
-After keycloak has been configured, you need to configure the backend with the following environment variables:
+After Keycloak has been configured, the invitation service needs to be configured with the following environment variables:
 
-* `INVITATIONS_KEYCLOAK_BASE_PATH`: The URL on which Keycloak is available.
-* `INVITATIONS_KEYCLOAK_CLIENT_ID`: The client ID of the client to use, in the above example, this would be `invitations`.
-* `INVITATIONS_KEYCLOAK_CLIENT_SECRET`: The client secret to use to authenticate, you can find this in the keycloak UI.
-* `INVITATIONS_KEYCLOAK_CLIENT_REALM`: The realm where the client was added, in the example above it would be `ocis`
-* `INVITATIONS_KEYCLOAK_USER_REALM`: The realm where to add the users, in the example above it would also be `ocis`.
-* `INVITATIONS_KEYCLOAK_INSECURE_SKIP_VERIFY`: If set to true, it will skip the verification of the keycloak https certificate. Not recommended in production enviroments.
+* `INVITATIONS_KEYCLOAK_BASE_PATH`: The URL to access Keycloak.
+* `INVITATIONS_KEYCLOAK_CLIENT_ID`: The client ID of the client to use. In the above example, `invitations` is used.
+* `INVITATIONS_KEYCLOAK_CLIENT_SECRET`: The client secret used to authenticate. This can be found in the Keycloak UI.
+* `INVITATIONS_KEYCLOAK_CLIENT_REALM`: The realm where the client was added. In the example above, `ocis` is used.
+* `INVITATIONS_KEYCLOAK_USER_REALM`: The realm where to add the users. In the example above, `ocis` is used.
+* `INVITATIONS_KEYCLOAK_INSECURE_SKIP_VERIFY`: If set to true, the verification of the Keycloak https certificate is skipped. This is not recommended in production enviroments.
