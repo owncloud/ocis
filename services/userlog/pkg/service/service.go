@@ -93,16 +93,24 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 			err = errors.New("unhandled event")
 		// file related
 		case events.PostprocessingStepFinished:
-			if e.FinishedStep != events.PPStepAntivirus {
-				continue
-			}
-			result := e.Result.(events.VirusscanResult)
-			if !result.Infected {
-				continue
-			}
+			switch e.FinishedStep {
+			case events.PPStepAntivirus:
+				result := e.Result.(events.VirusscanResult)
+				if !result.Infected {
+					continue
+				}
 
-			// TODO: should space mangers also be informed?
-			users = append(users, e.ExecutingUser.GetId().GetOpaqueId())
+				// TODO: should space mangers also be informed?
+				users = append(users, e.ExecutingUser.GetId().GetOpaqueId())
+			case events.PPStepPolicies:
+				if e.Outcome == events.PPOutcomeContinue {
+					continue
+				}
+				users = append(users, e.ExecutingUser.GetId().GetOpaqueId())
+			default:
+				continue
+
+			}
 		// space related // TODO: how to find spaceadmins?
 		case events.SpaceDisabled:
 			executant = e.Executant

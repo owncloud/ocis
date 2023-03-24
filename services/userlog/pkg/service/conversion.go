@@ -100,11 +100,15 @@ func (c *Converter) ConvertEvent(event *ehmsg.Event) (OC10Notification, error) {
 		return OC10Notification{}, fmt.Errorf("unknown event type: %T", ev)
 		// file related
 	case events.PostprocessingStepFinished:
-		if ev.FinishedStep != events.PPStepAntivirus {
-			return OC10Notification{}, fmt.Errorf("unknown event type: %T", ev)
+		switch ev.FinishedStep {
+		case events.PPStepAntivirus:
+			res := ev.Result.(events.VirusscanResult)
+			return c.virusMessage(event.Id, VirusFound, ev.ExecutingUser, res.ResourceID, ev.Filename, res.Description, res.Scandate)
+		case events.PPStepPolicies:
+			return c.policiesMessage(event.Id, PoliciesEnforced, ev.ExecutingUser, ev.Filename, time.Now())
+		default:
+			return OC10Notification{}, fmt.Errorf("unknown postprocessing step: %s", ev.FinishedStep)
 		}
-		res := ev.Result.(events.VirusscanResult)
-		return c.virusMessage(event.Id, VirusFound, ev.ExecutingUser, res.ResourceID, ev.Filename, res.Description, res.Scandate)
 	// space related
 	case events.SpaceDisabled:
 		return c.spaceMessage(event.Id, SpaceDisabled, ev.Executant, ev.ID.GetOpaqueId(), ev.Timestamp)
@@ -251,6 +255,28 @@ func (c *Converter) virusMessage(eventid string, nt NotificationTemplate, execut
 		UserName:       executant.GetUsername(),
 		Timestamp:      ts.Format(time.RFC3339Nano),
 		ResourceID:     storagespace.FormatResourceID(*rid),
+		ResourceType:   _resourceTypeResource,
+		Subject:        subj,
+		SubjectRaw:     subjraw,
+		Message:        msg,
+		MessageRaw:     msgraw,
+		MessageDetails: generateDetails(nil, nil, nil, nil),
+	}, nil
+}
+
+func (c *Converter) policiesMessage(eventid string, nt NotificationTemplate, executant *user.User, filename string, ts time.Time) (OC10Notification, error) {
+	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.translationPath, map[string]interface{}{
+		"resourcename": filename,
+	})
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	return OC10Notification{
+		EventID:        eventid,
+		Service:        c.serviceName,
+		UserName:       executant.GetUsername(),
+		Timestamp:      ts.Format(time.RFC3339Nano),
 		ResourceType:   _resourceTypeResource,
 		Subject:        subj,
 		SubjectRaw:     subjraw,
