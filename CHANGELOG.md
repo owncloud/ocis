@@ -19,6 +19,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add 'ocis decomposedfs metadata' command: [#5858](https://github.com/owncloud/ocis/pull/5858)
 * Enhancement - Add global env variable extractor: [#5164](https://github.com/owncloud/ocis/pull/5164)
 * Enhancement - Async Postprocessing: [#5207](https://github.com/owncloud/ocis/pull/5207)
+* Enhancement - Automate md creation: [#5901](https://github.com/owncloud/ocis/pull/5901)
 * Enhancement - Add endpoints to upload a custom logo: [#5735](https://github.com/owncloud/ocis/pull/5735)
 * Enhancement - Bump libre-graph-api-go: [#5309](https://github.com/owncloud/ocis/pull/5309)
 * Enhancement - Bump reva version: [#5243](https://github.com/owncloud/ocis/pull/5243)
