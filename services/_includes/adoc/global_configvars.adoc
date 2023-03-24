@@ -163,7 +163,7 @@ a| [subs=-attributes]
 ++groupOfNames ++
 
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter ('groupOfNames').
+The object class to use for groups in the default group search filter ('groupOfNames'). 
 
 a| `LDAP_GROUP_SCHEMA_DISPLAYNAME`
 
@@ -213,7 +213,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
 
 a| `LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -229,7 +229,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs.
 
 a| `LDAP_GROUP_SCHEMA_MAIL`
 
@@ -278,7 +278,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up groups. Supported scopes are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.
 
 a| `LDAP_INSECURE`
 
@@ -419,7 +419,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
+LDAP Attribute to use as the unique id for users. This should be a stable globally unique ID like a UUID.
 
 a| `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -435,7 +435,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user id's.
+Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.
 
 a| `LDAP_USER_SCHEMA_MAIL`
 
@@ -489,7 +489,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
 
 a| `OCIS_ADMIN_USER_ID`
 
@@ -521,10 +521,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ ++
+++memory ++
 
 a| [subs=-attributes]
-The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
 
 a| `OCIS_CACHE_STORE_ADDRESS`
 
@@ -540,7 +540,7 @@ a| [subs=-attributes]
 ++[] ++
 
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+Nodes to use for the cache store.
 
 a| `OCIS_CACHE_STORE_ADDRESSES`
 
@@ -575,7 +575,7 @@ a| [subs=-attributes]
 ++[] ++
 
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+Nodes to use for the cache store.
 
 a| `OCIS_CACHE_STORE_SIZE`
 
@@ -604,13 +604,13 @@ a| [subs=attributes+]
 * xref:{s-path}/proxy.adoc[proxy] +
 
 a| [subs=-attributes]
-++Duration ++
+++int ++
 
 a| [subs=-attributes]
-++0s ++
+++300 ++
 
 a| [subs=-attributes]
-Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
+Max TTL in seconds for the gateway's stat cache.
 
 a| `OCIS_CACHE_STORE_TYPE`
 
@@ -625,10 +625,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ ++
+++memory ++
 
 a| [subs=-attributes]
-The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -644,7 +644,7 @@ a| [subs=-attributes]
 ++bool ++
 
 a| [subs=-attributes]
-++true ++
+++false ++
 
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
@@ -663,7 +663,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With] ++
+++[] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -682,7 +682,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET POST PUT PATCH DELETE OPTIONS] ++
+++[] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
@@ -744,7 +744,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
 
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
@@ -906,7 +906,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Allow insecure connections to the GATEWAY service.
+Allow insecure connections to the OIDC issuer.
 
 a| `OCIS_JWT_SECRET`
 
@@ -1155,7 +1155,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+The machine auth API key used to validate internal requests necessary to access resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1173,10 +1173,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++https://localhost:9200 ++
+++ ++
 
 a| [subs=-attributes]
-The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
+The identity provider href for the openid-discovery relation.
 
 a| `OCIS_PERSISTENT_STORE`
 
@@ -1191,7 +1191,7 @@ a| [subs=-attributes]
 ++memory ++
 
 a| [subs=-attributes]
-The type of the eventhistory store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+The type of the userlog store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
 a| `OCIS_PERSISTENT_STORE_NODES`
 
@@ -1236,7 +1236,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
+Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
 
 a| `OCIS_SYSTEM_USER_API_KEY`
 
@@ -1480,10 +1480,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++https://localhost:9200 ++
+++ ++
 
 a| [subs=-attributes]
-URL where oCIS is reachable for users.
+The identity provider href for the openid-discovery relation.
 
 a| `REVA_GATEWAY`
 
