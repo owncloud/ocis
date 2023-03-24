@@ -36,8 +36,7 @@ The default and currently only available backend used to handle Invitations is [
 
 #### Realm configuration
 
-This is the configuration of the Keycloak realm that this backend has been configured with, this includes
-the configuration of the client (invitations):
+This is the configuration of the Keycloak realm that this backend has been configured with and includes the client configuration for invitations:
 
 ```json
 {
