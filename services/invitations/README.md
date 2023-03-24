@@ -6,11 +6,9 @@ Users invited via this Invitation Manager (libre graph API) will have `userType=
 
 The corresponding CS3 API [user types](https://cs3org.github.io/cs3apis/#cs3.identity.user.v1beta1.UserType) used to reperesent this are: `USER_TYPE_GUEST` and `USER_TYPE_PRIMARY`.
 
-
 ## Provisioning backends
 
 When oCIS is used for user management the users are created using the `/graph/v1.0/users` endpoint. For larger deployments the keycloak admin API can be used to provision users. We might even make the endpoint, credentials and body configurable using templates.
-
 
 ## Bridging provisioning delay
 
