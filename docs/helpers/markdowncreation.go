@@ -18,8 +18,8 @@ var _configMarkdown = `{{< include file="services/_includes/%s-config-example.ya
 {{< include file="services/_includes/%s_configvars.md" >}}
 `
 
-// GenerateMarkdowns generates the _index.md files for the dev docu
-func GenerateMarkdowns() {
+// GenerateServiceIndexMarkdowns generates the _index.md files for the dev docu
+func GenerateServiceIndexMarkdowns() {
 	paths, err := filepath.Glob("../../services/*/README.md")
 	if err != nil {
 		log.Fatal(err)
