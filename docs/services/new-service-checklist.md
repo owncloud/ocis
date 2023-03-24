@@ -17,7 +17,9 @@ Use this checklist with copy/paste in your PR - right from the beginning. It ren
 ```markdown
 - [ ] Provide a README.md for that service in the root folder of that service.
   - Use CamelCase for section headers.
-- [ ] For images, you currenly have to create a folder named `images` on the same lavel where readme.md is located and put all the images used in readme.md. For the time being, the imagefolder needs to be manually copied to `docs/servcies/<service name>`. This is also true for image changes post merging.
+- [ ] For images and example files used in README.md:
+  - Create a folder named `md-sources` on the same level where README.md is located. Put all the images and example files referenced by README.md into this folder.
+  - Use absolute references like `https://github.com/owncloud/ocis/blob/master/services/<service-name>/md-sources/file` to make the content accessible for both README.md and owncloud.dev
 - [ ] If new CLI command are introduced, that command must be described in readme.md.
 - [ ] Add the service to the makefile in the ocis repo root.
 - [ ] Make the service startable for binary and individual startup:
