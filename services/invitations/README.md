@@ -27,7 +27,6 @@ COMMANDS:
 $ ocis invitations server
 ```
 
-
 ## Provisioning Backends
 
 ### Keycloak
@@ -36,9 +35,7 @@ The default and currently only available backend used to handle Invitations is [
 
 #### Realm Configuration
 
-We supply an example configuration of a Keycloak realm that the backend will work with [here](https://github.com/owncloud/ocis/blob/master/services/invitations/examples/keycloak/example-realm.json).
-This file includes the `invitations` client, which is relevant for this service.
-
+We supply an [example configuration json file](https://github.com/owncloud/ocis/blob/master/services/invitations/examples/keycloak/example-realm.json) of a Keycloak realm that the backend will work with. This file includes the `invitations` client, which is relevant for this service.
 
 Importing this into keycloak will give you a realm that federates with an LDAP server, has the right
 clients configured, and all the mappers correctly set. Be sure to set all the credentials after the import,
