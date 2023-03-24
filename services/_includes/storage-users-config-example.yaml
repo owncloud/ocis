@@ -44,6 +44,7 @@ drivers:
     share_folder: /Shares
     max_acquire_lock_cycles: 20
     lock_cycle_duration_factor: 30
+    max_concurrency: 0
     async_uploads: false
     max_quota: 0
   s3ng:
@@ -61,6 +62,7 @@ drivers:
     share_folder: /Shares
     max_acquire_lock_cycles: 20
     lock_cycle_duration_factor: 30
+    max_concurrency: 0
   owncloudsql:
     root: ~/.ocis/storage/owncloud
     share_folder: /Shares

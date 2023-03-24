@@ -315,6 +315,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.
 
+a|`STORAGE_USERS_OCIS_MAX_CONCURRENCY` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used.
+
 a|`STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
 
 a| [subs=-attributes]
@@ -460,6 +469,15 @@ a| [subs=-attributes]
 ++30 ++
 a| [subs=-attributes]
 When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.
+
+a|`STORAGE_USERS_S3NG_MAX_CONCURRENCY` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used.
 
 a|`STORAGE_USERS_OWNCLOUDSQL_DATADIR` +
 
