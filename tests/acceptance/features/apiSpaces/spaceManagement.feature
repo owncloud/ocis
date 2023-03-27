@@ -201,7 +201,7 @@ Feature: Space management
     }
     """
 
-
+  @skipOnStable2.0
   Scenario: The space admin user changes the name of the project space
     When user "Brian" changes the name of the "Project" space to "New Name" owned by user "Alice"
     Then the HTTP status code should be "200"
@@ -241,7 +241,7 @@ Feature: Space management
     }
     """
 
-
+  @skipOnStable2.0
   Scenario: The space admin user changes the description of the project space
     When user "Brian" changes the description of the "Project" space to "New description" owned by user "Alice"
     Then the HTTP status code should be "200"
@@ -282,7 +282,7 @@ Feature: Space management
     }
     """
 
-
+  @skipOnStable2.0
   Scenario: The space admin user disables the project space
     When user "Brian" disables a space "Project" owned by user "Alice"
     Then the HTTP status code should be "204"
@@ -337,7 +337,7 @@ Feature: Space management
       | Brian |
       | Carol |
 
-
+  @skipOnStable2.0
   Scenario: The space admin user deletes the project space
     Given user "Alice" has disabled a space "Project"
     When user "Brian" deletes a space "Project" owned by user "Alice"
@@ -386,7 +386,7 @@ Feature: Space management
     }
     """
 
-
+  @skipOnStable2.0
   Scenario: The space admin user enables the project space
     Given user "Alice" has disabled a space "Project"
     When user "Brian" restores a disabled space "Project" owned by user "Alice"

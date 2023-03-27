@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api @skipOnOcV10 @skipOnStable2.0
 Feature: Tag
   The user can add a tag to resources for sorting and quick search
 

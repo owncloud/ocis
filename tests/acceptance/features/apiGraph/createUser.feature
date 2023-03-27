@@ -25,10 +25,14 @@ Feature: create user
       | withoutPassSameEmail         | without pass    | alice@example.org   |                              | 200  | true   | should      |
       | name                         | pass with space | example@example.org | my pass                      | 200  | true   | should      |
       | nameWithCharacters(*:!;_+-&) | user            | new@example.org     | 123                          | 400  | true   | should not  |
-      | withoutEmail                 | without email   |                     | 123                          | 200  | true   | should      |
-      | Alice                        | same userName   | new@example.org     | 123                          | 400  | true   | should      |
       | name with space              | name with space | example@example.org | 123                          | 400  | true   | should not  |
       | createDisabledUser           | disabled user   | example@example.org | 123                          | 200  | false  | should      |
+
+    @skipOnStable2.0
+    Examples:
+      | userName                     | displayName     | email               | password                     | code | enable | shouldOrNot |
+      | withoutEmail                 | without email   |                     | 123                          | 200  | true   | should      |
+      | Alice                        | same userName   | new@example.org     | 123                          | 400  | true   | should      |
 
 
   Scenario: a user cannot be created with empty name
@@ -58,7 +62,7 @@ Feature: create user
       | User        |
       | Guest       |
 
-  @issue-3516
+  @issue-3516 @skipOnStable2.0
   Scenario: a user cannot be created with the name of the disabled user
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "Admin" using the settings api
@@ -71,7 +75,7 @@ Feature: create user
       | accountEnabled | true                  |
     Then the HTTP status code should be "400"
 
-
+  @skipOnStable2.0
   Scenario: a user can be created with the name of the deleted user
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "Admin" using the settings api
