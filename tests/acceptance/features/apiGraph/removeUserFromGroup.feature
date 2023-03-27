@@ -168,7 +168,7 @@ Feature: remove a user from a group
     And user "Brian" should belong to group "grp1"
 
 
-  @skipOnStable2.0
+
   Scenario: admin removes a disabled user from a group
     Given these groups have been created:
       | groupname       | comment              |
