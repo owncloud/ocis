@@ -1725,6 +1725,77 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" tries to add the following users to a group "([^"]*)" at once with an invalid host using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $group
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userTriesToAddTheFollowingUsersToAGroupAtOnceWithInvalidHostUsingTheGraphApi(string $user, string $group, TableNode $table): void {
+		$userIds = [];
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$this->featureContext->verifyTableNodeColumns($table, ['username']);
+		
+		foreach ($table->getHash() as $row) {
+			$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
+		}
+
+		$payload = [ "members@odata.bind" => [] ];
+		foreach ($userIds as $userId) {
+			$payload["members@odata.bind"][] = GraphHelper::getFullUrl('https://invalid/', 'users/' . $userId);
+		}
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::sendRequest(
+				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupId),
+				$this->featureContext->getStepLineRef(),
+				'PATCH',
+				$credentials["username"],
+				$credentials["password"],
+				['Content-Type' => 'application/json'],
+				\json_encode($payload)
+			)
+		);
+	}
+
+	/**
+	 * @When /^user "([^"]*)" tries to add user "([^"]*)" to group "([^"]*)" with an invalid host using the Graph API$/
+	 *
+	 * @param string $adminUser
+	 * @param string $user
+	 * @param string $group
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function userTriesToAddUserToGroupWithInvalidHostUsingTheGraphApi(string $adminUser, string $user, string $group): void {
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
+		$credentials = $this->getAdminOrUserCredentials($adminUser);
+
+		$body = [
+			"@odata.id" => GraphHelper::getFullUrl('https://invalid/', 'users/' . $userId)
+		];
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::post(
+				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupId . '/members/$ref'),
+				$this->featureContext->getStepLineRef(),
+				$credentials["username"],
+				$credentials["password"],
+				['Content-Type' => 'application/json'],
+				\json_encode($body)
+			)
+		);
+	}
+
+	/**
 	 * @When /^the administrator "([^"]*)" tries to add the following users to a nonexistent group at once using the Graph API$/
 	 *
 	 * @param string $user
