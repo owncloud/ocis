@@ -19,16 +19,36 @@ Feature: Share spaces
 
   Scenario Outline: A Space Admin can share a space to another user
     When user "Alice" shares a space "share space" with settings:
-      | shareWith | Brian  |
+      | shareWith | Brian   |
       | role      | <role> |
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    And the user "Brian" should have a space called "share space" with these key and value pairs:
-      | key       | value       |
-      | driveType | project     |
-      | id        | %space_id%  |
-      | name      | share space |
+    And for user "Brian" the JSON response should contain space called "share space" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name",
+        "driveType",
+        "id"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["share space"]
+        },
+        "driveType": {
+          "type": "string",
+          "enum": ["project"]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^%space_id_pattern%$"
+        }
+      }
+    }
+    """
     Examples:
       | role    |
       | manager |
@@ -69,14 +89,34 @@ Feature: Share spaces
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian  |
       | role      | viewer |
-    And the user "Brian" should have a space called "share space" with these key and value pairs:
-      | key       | value       |
-      | driveType | project     |
-      | id        | %space_id%  |
-      | name      | share space |
+    And for user "Brian" the JSON response should contain space called "share space" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name",
+        "driveType",
+        "id"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["share space"]
+        },
+        "driveType": {
+          "type": "string",
+          "enum": ["project"]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^%space_id_pattern%$"
+        }
+      }
+    }
+    """
     When user "Alice" unshares a space "share space" to user "Brian"
     Then the HTTP status code should be "200"
-    And the user "Brian" should not have a space called "share space"
+    But the user "Brian" should not have a space called "share space"
 
 
   Scenario Outline: Owner of a space cannot see the space after removing his access to the space
@@ -85,11 +125,31 @@ Feature: Share spaces
       | role      | manager |
     When user "<user>" unshares a space "share space" to user "Alice"
     Then the HTTP status code should be "200"
-    And the user "Brian" should have a space called "share space" owned by "Alice" with these key and value pairs:
-      | key       | value       |
-      | driveType | project     |
-      | id        | %space_id%  |
-      | name      | share space |
+    And for user "Brian" the JSON response should contain space called "share space" owned by "Alice" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name",
+        "driveType",
+        "id"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["share space"]
+        },
+        "driveType": {
+          "type": "string",
+          "enum": ["project"]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^%space_id_pattern%$"
+        }
+      }
+    }
+    """
     But the user "Alice" should not have a space called "share space"
     Examples:
       | user  |
@@ -119,7 +179,7 @@ Feature: Share spaces
     Then the HTTP status code should be "404"
     And the OCS status code should be "404"
     And the OCS status message should be "Wrong path, file/folder doesn't exist"
-    And the user "Brian" should not have a space called "share space"
+    But the user "Brian" should not have a space called "share space"
     Examples:
       | role    |
       | manager |
@@ -137,11 +197,31 @@ Feature: Share spaces
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    And the user "Bob" should have a space called "share space" with these key and value pairs:
-      | key       | value       |
-      | driveType | project     |
-      | id        | %space_id%  |
-      | name      | share space |
+    And for user "Brian" the JSON response should contain space called "share space" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name",
+        "driveType",
+        "id"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["share space"]
+        },
+        "driveType": {
+          "type": "string",
+          "enum": ["project"]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^%space_id_pattern%$"
+        }
+      }
+    }
+    """
     Examples:
       | role    |
       | manager |
@@ -220,14 +300,56 @@ Feature: Share spaces
       | shareType | 8      |
       | role      | <role> |
     Then the HTTP status code should be "200"
-    And the user "Brian" should have a space called "share space" with these key and value pairs:
-      | key       | value       |
-      | driveType | project     |
-      | name      | share space |
-    And the user "Bob" should have a space called "share space" with these key and value pairs:
-      | key       | value       |
-      | driveType | project     |
-      | name      | share space |
+    And for user "Brian" the JSON response should contain space called "share space" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name",
+        "driveType",
+        "id"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["share space"]
+        },
+        "driveType": {
+          "type": "string",
+          "enum": ["project"]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^%space_id_pattern%$"
+        }
+      }
+    }
+    """
+    And for user "Bob" the JSON response should contain space called "share space" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name",
+        "driveType",
+        "id"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["share space"]
+        },
+        "driveType": {
+          "type": "string",
+          "enum": ["project"]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^%space_id_pattern%$"
+        }
+      }
+    }
+    """
     Examples:
       | role    |
       | manager |
@@ -265,10 +387,31 @@ Feature: Share spaces
       | Brian    | group2    |
     Then the HTTP status code of responses on all endpoints should be "204"
     And the user "Brian" should not have a space called "share space"
-    But the user "Bob" should have a space called "share space" with these key and value pairs:
-      | key       | value       |
-      | driveType | project     |
-      | name      | share space |
+    But for user "Bob" the JSON response should contain space called "share space" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name",
+        "driveType",
+        "id"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["share space"]
+        },
+        "driveType": {
+          "type": "string",
+          "enum": ["project"]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^%space_id_pattern%$"
+        }
+      }
+    }
+    """
 
   @skipOnStable2.0
   Scenario: Users don't have access to the space if the group has been deleted
@@ -281,8 +424,8 @@ Feature: Share spaces
       | role      | editor |
     When the administrator deletes group "group2" using the Graph API
     Then the HTTP status code should be "204"
-    And the user "Brian" should not have a space called "share space"
     And the user "Bob" should not have a space called "share space"
+    And the user "Brian" should not have a space called "share space"
 
   @skipOnStable2.0
   Scenario: User increases permissions for one member of the group or for the entire group
