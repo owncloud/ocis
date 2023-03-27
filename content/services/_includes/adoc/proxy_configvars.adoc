@@ -167,7 +167,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/proxy/server.crt ++
 a| [subs=-attributes]
-Path/File name of the TLS server certificate (in PEM format) for the external http services. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/proxy.
+Path/File name of the TLS server certificate (in PEM format) for the external http services. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/proxy.
 
 a|`PROXY_TRANSPORT_TLS_KEY` +
 
@@ -176,7 +176,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/proxy/server.key ++
 a| [subs=-attributes]
-Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the external http services. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/proxy.
+Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the external http services. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/proxy.
 
 a|`PROXY_TLS` +
 
