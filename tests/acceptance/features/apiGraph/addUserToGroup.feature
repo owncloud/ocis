@@ -204,7 +204,7 @@ Feature: add users to group
       | Carol    |
     Then the HTTP status code should be "404"
 
-  @skipOnStable2.0
+
   Scenario: adding a disabled user to a group
     Given these groups have been created:
       | groupname | comment      |
