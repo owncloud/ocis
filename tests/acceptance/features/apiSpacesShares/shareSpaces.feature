@@ -19,7 +19,7 @@ Feature: Share spaces
 
   Scenario Outline: A Space Admin can share a space to another user
     When user "Alice" shares a space "share space" with settings:
-      | shareWith | Brian   |
+      | shareWith | Brian  |
       | role      | <role> |
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
