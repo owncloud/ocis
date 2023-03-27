@@ -1,6 +1,6 @@
 ---
 title: Notification service
-date: 2023-03-27T04:57:09.971467916Z
+date: 2023-03-27T04:57:51.18945363Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/notifications
