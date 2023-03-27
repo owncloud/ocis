@@ -252,7 +252,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/settings ++
 a| [subs=-attributes]
-The directory where the filesystem storage will store ocis settings. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/settings.
+The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/settings.
 
 a|`STORAGE_GATEWAY_GRPC_ADDR` +
 
@@ -308,7 +308,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The path to a JSON file with a list of bundles. If not definied, the default bundles will be loaded.
+The path to a JSON file with a list of bundles. If not defined, the default bundles will be loaded.
 
 a|`OCIS_ADMIN_USER_ID` +
 `SETTINGS_ADMIN_USER_ID` +

@@ -30,7 +30,7 @@
 | STORAGE_SYSTEM_CACHE_DATABASE | string | system | The database name the configured store should use.|
 | STORAGE_SYSTEM_DRIVER | string | ocis | The driver which should be used by the service.|
 | OCIS_DECOMPOSEDFS_METADATA_BACKEND<br/>STORAGE_SYSTEM_OCIS_METADATA_BACKEND | string | xattrs | The backend to use for storing metadata. Supported values are 'xattrs' and 'ini'. The setting 'xattrs' uses extended attributes to store file metadata while 'ini' uses a dedicated file to store file metadata. Defaults to 'xattrs'.|
-| STORAGE_SYSTEM_OCIS_ROOT | string | ~/.ocis/storage/metadata | Path for the directory where the STORAGE-SYSTEM service stores it's persistent data. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
+| STORAGE_SYSTEM_OCIS_ROOT | string | ~/.ocis/storage/metadata | Path for the directory where the STORAGE-SYSTEM service stores it's persistent data. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/storage.|
 | STORAGE_SYSTEM_OCIS_MAX_ACQUIRE_LOCK_CYCLES | int | 20 | When trying to lock files, ocis will try this amount of times to acquire the lock before failing. After each try it will wait for an increasing amount of time. Values of 0 or below will be ignored and the default value of 20 will be used.|
 | STORAGE_SYSTEM_OCIS_LOCK_CYCLE_DURATION_FACTOR | int | 30 | When trying to lock files, ocis will multiply the cycle with this factor and use it as a millisecond timeout. Values of 0 or below will be ignored and the default value of 30 will be used.|
 | STORAGE_SYSTEM_DATA_SERVER_URL | string | http://localhost:9216/data | URL of the data server, needs to be reachable by other services using this service.|

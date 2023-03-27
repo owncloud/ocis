@@ -233,7 +233,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/idm/ldap.crt ++
 a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
 
 a|`LDAP_INSECURE` +
 `USERS_LDAP_INSECURE` +

@@ -158,6 +158,6 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++~/.ocis/store ++
 a| [subs=-attributes]
-The directory where the filesystem storage will store ocis settings. If not definied, the root directory derives from $OCIS_BASE_DATA_PATH:/store.
+The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/store.
 |===
 
