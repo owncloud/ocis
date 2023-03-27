@@ -135,5 +135,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Try to add group to a group return 204](https://github.com/owncloud/ocis/issues/5793)
 - [apiGraph/addUserToGroup.feature:244](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L244)
 
+### [Users are added in a group with wrong host in host-part of user](https://github.com/owncloud/ocis/issues/5871)
+- [apiGraph/addUserToGroup.feature:292](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L292)
+- [apiGraph/addUserToGroup.feature:306](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L306)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
