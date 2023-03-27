@@ -164,7 +164,7 @@ Feature: remove a user from a group
     And user "Alice" has been added to group "grp1"
     And user "Brian" has been added to group "grp1"
     When user "Alice" tries to remove user "Brian" from group "grp1" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the last response should be an unauthorized response
     And user "Brian" should belong to group "grp1"
     Examples:

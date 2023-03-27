@@ -28,7 +28,7 @@ Feature: get groups and their members
     And group "coffee-lover" has been created
     And group "h2o-lover" has been created
     When user "Brian" gets all the groups using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the last response should be an unauthorized response
     Examples:
       | role        |
@@ -57,7 +57,7 @@ Feature: get groups and their members
     And the administrator has given "Brian" the role "<role>" using the settings api
     And group "tea-lover" has been created
     When user "Brian" gets all the members of group "tea-lover" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the last response should be an unauthorized response
     Examples:
       | role        |
@@ -95,7 +95,7 @@ Feature: get groups and their members
     And user "Alice" has been added to group "tea-lover"
     And user "Brian" has been added to group "coffee-lover"
     When user "Brian" retrieves all groups along with their members using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the last response should be an unauthorized response
     Examples:
       | role        |
@@ -123,7 +123,7 @@ Feature: get groups and their members
     And user "Alice" has been added to group "tea-lover"
     And user "Brian" has been added to group "tea-lover"
     When user "Brian" gets all the members information of group "tea-lover" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the last response should be an unauthorized response
     Examples:
       | role        |

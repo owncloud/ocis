@@ -124,7 +124,7 @@ Feature: add users to group
     Given the administrator has given "Alice" the role "<role>" using the settings api
     And group "groupA" has been created
     When user "Alice" tries to add himself to group "groupA" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the last response should be an unauthorized response
     Examples:
       | role        |
@@ -138,7 +138,7 @@ Feature: add users to group
     And the administrator has given "Brian" the role "<role>" using the settings api
     And group "groupA" has been created
     When user "Alice" tries to add user "Brian" to group "groupA" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the last response should be an unauthorized response
     Examples:
       | role        |
@@ -156,7 +156,7 @@ Feature: add users to group
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "<role>" using the settings api
     When the user "Alice" tries to add user "Brian" to a nonexistent group using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "404"
     Examples:
       | role        |
       | Space Admin |

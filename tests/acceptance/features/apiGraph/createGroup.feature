@@ -34,7 +34,7 @@ Feature: create group
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<userRole>" using the settings api
     When user "Brian" tries to create a group "mygroup" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And group "mygroup" should not exist
     Examples:
       | userRole    |

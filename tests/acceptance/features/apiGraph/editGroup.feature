@@ -29,7 +29,7 @@ Feature: edit group name
     Given the administrator has given "Alice" the role "<role>" using the settings api
     And group "grp1" has been created
     When user "Alice" tries to rename group "grp1" to "grp101" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     Examples:
       | role        |
       | Space Admin |

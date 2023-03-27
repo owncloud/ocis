@@ -56,7 +56,7 @@ Feature: delete groups
     And the administrator has given "Brian" the role "<role>" using the settings api
     And group "new-group" has been created
     When user "Brian" tries to delete group "new-group" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And group "new-group" should exist
     Examples:
       | role        |
