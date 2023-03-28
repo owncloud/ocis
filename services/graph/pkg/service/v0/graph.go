@@ -45,6 +45,10 @@ type GatewayClient interface {
 	// Returns the resource information at the provided reference.
 	// MUST return CODE_NOT_FOUND if the reference does not exist.
 	Stat(ctx context.Context, in *provider.StatRequest, opts ...grpc.CallOption) (*provider.StatResponse, error)
+	// TouchFile allows to touch a file
+	TouchFile(ctx context.Context, req *provider.TouchFileRequest, opts ...grpc.CallOption) (*provider.TouchFileResponse, error)
+	// Initiates the upload of a file using an out-of-band data transfer mechanism.
+	InitiateFileUpload(ctx context.Context, in *provider.InitiateFileUploadRequest, opts ...grpc.CallOption) (*gateway.InitiateFileUploadResponse, error)
 	// Initiates the download of a file using an
 	// out-of-band data transfer mechanism.
 	InitiateFileDownload(ctx context.Context, in *provider.InitiateFileDownloadRequest, opts ...grpc.CallOption) (*gateway.InitiateFileDownloadResponse, error)
