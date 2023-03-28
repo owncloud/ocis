@@ -118,5 +118,11 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/addUserToGroup.feature:292](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L292)
 - [apiGraph/addUserToGroup.feature:306](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L306)
 
+### [Space admin trying to set personal space quota returns status code 200](https://github.com/owncloud/ocis/issues/5947)
+- [apiSpaces/setQuota.feature:80](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L80)
+- [apiSpaces/setQuota.feature:81](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L81)
+- [apiSpaces/setQuota.feature:82](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L82)
+- [apiSpaces/setQuota.feature:83](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L83)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
