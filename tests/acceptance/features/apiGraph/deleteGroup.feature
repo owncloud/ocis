@@ -51,12 +51,18 @@ Feature: delete groups
       | 50%2Fix             | %2F literal looks like an escaped slash |
 
 
-  Scenario: normal user tries to delete a group
+  Scenario Outline: user other than the admin can't delete a group
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has given "Brian" the role "<role>" using the settings api
     And group "new-group" has been created
     When user "Brian" tries to delete group "new-group" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And group "new-group" should exist
+    Examples:
+      | role        |
+      | Space Admin |
+      | User        |
+      | Guest       |
 
   @issue-903
   Scenario: deleted group should not be listed in the sharees list

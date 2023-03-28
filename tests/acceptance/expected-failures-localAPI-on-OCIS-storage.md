@@ -44,7 +44,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesShares/copySpaces.feature:793](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/copySpaces.feature#L793)
 
 ### [Creating group with empty name returns status code 200](https://github.com/owncloud/ocis/issues/5050)
-- [apiGraph/createGroup.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroup.feature#L40)
+- [apiGraph/createGroup.feature:46](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroup.feature#L46)
 
 ### [Settings service user can list other peoples assignments](https://github.com/owncloud/ocis/issues/5032)
 - [apiAccountsHashDifficulty/assignRole.feature:27](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L27)
@@ -60,7 +60,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/deleteGroup.feature:51](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L51)
 
 #### [Share lists deleted user as 'user'](https://github.com/owncloud/ocis/issues/903)
-- [apiGraph/deleteGroup.feature:62](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L62)
+- [apiGraph/deleteGroup.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L68)
 
 #### [Updating group displayName request seems OK but group is not being renamed](https://github.com/owncloud/ocis/issues/5099)
 - [apiGraph/editGroup.feature:20](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L20)
@@ -129,14 +129,56 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Sharing to a group with an expiration date does not work #5442](https://github.com/owncloud/ocis/issues/5442)
 - [apiSpacesShares/shareSubItemOfSpace.feature:105](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L105)
 
-#### [Space admin should not not be able to change the user quota](https://github.com/owncloud/ocis/issues/5475)
-- [apiSpaces/spaceManagement.feature:149](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/spaceManagement.feature#L149)
+#### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
+- [apiGraph/getGroup.feature:130](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L130)
+- [apiGraph/getGroup.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L131)
+- [apiGraph/getGroup.feature:132](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L132)
+
+#### [Changing user with an uppercase name gives 404 error](https://github.com/owncloud/ocis/issues/5763)
+- [apiGraph/editUser.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L41)
+
+#### [Using # in the onPremisesSamAccountName breaks getting users](https://github.com/owncloud/ocis/issues/5755)
+- [apiGraph/editUser.feature:44](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L44)
 
 #### [Same users can be added in a group multiple time](https://github.com/owncloud/ocis/issues/5702)
-- [apiGraph/addUserToGroup.feature:222](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L222)
+- [apiGraph/addUserToGroup.feature:246](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L246)
 
 #### [Try to add group to a group return 204](https://github.com/owncloud/ocis/issues/5793)
-- [apiGraph/addUserToGroup.feature:244](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L244)
+- [apiGraph/addUserToGroup.feature:268](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L268)
+
+#### [API requests from an unauthorized user should return 403](https://github.com/owncloud/ocis/issues/5938)
+- [apiGraph/addUserToGroup.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L131)
+- [apiGraph/addUserToGroup.feature:132](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L132)
+- [apiGraph/addUserToGroup.feature:133](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L133)
+- [apiGraph/addUserToGroup.feature:145](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L145)
+- [apiGraph/addUserToGroup.feature:146](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L146)
+- [apiGraph/addUserToGroup.feature:147](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L147)
+- [apiGraph/createGroup.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroup.feature#L41)
+- [apiGraph/createGroup.feature:42](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroup.feature#L42)
+- [apiGraph/createGroup.feature:43](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroup.feature#L43)
+- [apiGraph/deleteGroup.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L63)
+- [apiGraph/deleteGroup.feature:64](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L64)
+- [apiGraph/deleteGroup.feature:65](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L65)
+- [apiGraph/editGroup.feature:35](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L35)
+- [apiGraph/editGroup.feature:36](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L36)
+- [apiGraph/editGroup.feature:37](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L37)
+- [apiGraph/getGroup.feature:35](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L35)
+- [apiGraph/getGroup.feature:36](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L36)
+- [apiGraph/getGroup.feature:37](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L37)
+- [apiGraph/getGroup.feature:64](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L64)
+- [apiGraph/getGroup.feature:65](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L65)
+- [apiGraph/getGroup.feature:66](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L66)
+- [apiGraph/getGroup.feature:102](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L102)
+- [apiGraph/getGroup.feature:103](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L103)
+- [apiGraph/getGroup.feature:104](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L104)
+- [apiGraph/removeUserFromGroup.feature:172](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/removeUserFromGroup.feature#L172)
+- [apiGraph/removeUserFromGroup.feature:173](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/removeUserFromGroup.feature#L173)
+- [apiGraph/removeUserFromGroup.feature:174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/removeUserFromGroup.feature#L174)
+
+#### [API requests for a non-existent resources should return 404](https://github.com/owncloud/ocis/issues/5939)
+- [apiGraph/addUserToGroup.feature:162](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L162)
+- [apiGraph/addUserToGroup.feature:163](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L163)
+- [apiGraph/addUserToGroup.feature:164](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L164)
 
 ### [Users are added in a group with wrong host in host-part of user](https://github.com/owncloud/ocis/issues/5871)
 - [apiGraph/addUserToGroup.feature:292](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L292)
