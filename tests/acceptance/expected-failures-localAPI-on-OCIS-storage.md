@@ -176,5 +176,12 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/addUserToGroup.feature:316](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L316)
 - [apiGraph/addUserToGroup.feature:330](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L330)
 
+#### [Admin user can't restore other user spaces](https://github.com/owncloud/ocis/issues/5872)
+- [apiSpaces/restoreSpaces.feature:94](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/restoreSpaces.feature#L94)
+
+#### [https://github.com/owncloud/ocis/issues/5938](https://github.com/owncloud/ocis/issues/5938)
+- [apiSpaces/createSpace.feature:18](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/createSpace.feature#L18)
+- [apiSpaces/createSpace.feature:19](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/createSpace.feature#L19)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

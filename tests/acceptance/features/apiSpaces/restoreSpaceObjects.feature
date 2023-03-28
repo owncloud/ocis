@@ -16,7 +16,7 @@ Feature: Restore files, folder
       | Carol    |
     And using spaces DAV path
     And the administrator has given "Alice" the role "Space Admin" using the settings api
-    And user "Alice" creates a space "restore objects" of type "project" with the default quota using the GraphApi
+    And user "Alice" has created a space "restore objects" with the default quota using the GraphApi
     And user "Alice" has created a folder "newFolder" in space "restore objects"
     And user "Alice" has uploaded a file inside space "restore objects" with content "test" to "newFolder/file.txt"
 
