@@ -23,8 +23,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/createGroupCaseSensitive.feature:21](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroupCaseSensitive.feature#L21)
 - [apiGraph/createGroupCaseSensitive.feature:22](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroupCaseSensitive.feature#L22)
 - [apiGraph/createGroup.feature:26](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroup.feature#L26)
-- [apiGraph/createUser.feature:29](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createUser.feature#L29)
-- [apiGraph/createUser.feature:62](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createUser.feature#L62)
 
 ### [PROPFIND on accepted shares with identical names containing brackets exit with 404](https://github.com/owncloud/ocis/issues/4421)
 - [apiSpacesShares/changingFilesShare.feature:12](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/changingFilesShare.feature#L12)
@@ -93,7 +91,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesShares/publicLinkDownload.feature:30](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/publicLinkDownload.feature#L30)
 
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
-- [apiGraph/getUser.feature:31](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L31)
 - [apiGraph/getUser.feature:32](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L32)
 - [apiGraph/getUser.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L33)
 - [apiGraph/getUser.feature:34](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L34)
@@ -105,9 +102,10 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/getUser.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L40)
 - [apiGraph/getUser.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L41)
 - [apiGraph/getUser.feature:42](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L42)
-- [apiGraph/getUser.feature:143](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L143)
-- [apiGraph/getUser.feature:144](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L144)
-- [apiGraph/getUser.feature:145](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L145)
+- [apiGraph/getUser.feature:43](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L43)
+- [apiGraph/getUser.feature:155](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L155)
+- [apiGraph/getUser.feature:156](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L156)
+- [apiGraph/getUser.feature:157](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L157)
 - [apiGraph/getUser.feature:146](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L146)
 - [apiGraph/getUser.feature:147](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L147)
 - [apiGraph/getUser.feature:148](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L148)
@@ -123,22 +121,16 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiAsyncUpload/delayPostprocessing.feature:15](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature#L15)
 - [apiAsyncUpload/delayPostprocessing.feature:16](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature#L16)
 
-#### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
-- [apiGraph/getGroup.feature:101](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L101)
-
 #### [Sharing to a group with an expiration date does not work #5442](https://github.com/owncloud/ocis/issues/5442)
 - [apiSpacesShares/shareSubItemOfSpace.feature:105](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L105)
+
+#### [Space admin should not be able to change the user quota](https://github.com/owncloud/ocis/issues/5475)
+- [apiSpaces/spaceManagement.feature:149](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/spaceManagement.feature#L149)
 
 #### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
 - [apiGraph/getGroup.feature:130](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L130)
 - [apiGraph/getGroup.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L131)
 - [apiGraph/getGroup.feature:132](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L132)
-
-#### [Changing user with an uppercase name gives 404 error](https://github.com/owncloud/ocis/issues/5763)
-- [apiGraph/editUser.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L41)
-
-#### [Using # in the onPremisesSamAccountName breaks getting users](https://github.com/owncloud/ocis/issues/5755)
-- [apiGraph/editUser.feature:44](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L44)
 
 #### [Same users can be added in a group multiple time](https://github.com/owncloud/ocis/issues/5702)
 - [apiGraph/addUserToGroup.feature:246](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L246)
@@ -174,6 +166,8 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/removeUserFromGroup.feature:172](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/removeUserFromGroup.feature#L172)
 - [apiGraph/removeUserFromGroup.feature:173](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/removeUserFromGroup.feature#L173)
 - [apiGraph/removeUserFromGroup.feature:174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/removeUserFromGroup.feature#L174)
+- [apiSpaces/createSpace.feature:18](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/createSpace.feature#L18)
+- [apiSpaces/createSpace.feature:19](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/createSpace.feature#L19)
 
 #### [API requests for a non-existent resources should return 404](https://github.com/owncloud/ocis/issues/5939)
 - [apiGraph/addUserToGroup.feature:162](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L162)
@@ -181,8 +175,11 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/addUserToGroup.feature:164](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L164)
 
 ### [Users are added in a group with wrong host in host-part of user](https://github.com/owncloud/ocis/issues/5871)
-- [apiGraph/addUserToGroup.feature:292](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L292)
-- [apiGraph/addUserToGroup.feature:306](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L306)
+- [apiGraph/addUserToGroup.feature:316](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L316)
+- [apiGraph/addUserToGroup.feature:330](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L330)
+
+#### [[Stable 2.0] Admin user rename nonexistent group return 204 http status code](https://github.com/owncloud/ocis/issues/5948)
+- [apiGraph/editGroup.feature:40](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L40)
 
 ### [Space admin trying to set personal space quota returns status code 200](https://github.com/owncloud/ocis/issues/5947)
 - [apiSpaces/setQuota.feature:80](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L80)
