@@ -28,7 +28,7 @@ Feature: edit user
       | empty mail                |                      | 400  | brian@example.com    |
       | change to a invalid email | invalidEmail         | 400  | brian@example.com    |
 
-
+  @skipOnStable2.0
   Scenario Outline: the admin user can edit another user's name
     Given user "Carol" has been created with default attributes and without skeleton files
     When the user "Alice" changes the user name of user "Carol" to "<userName>" using the Graph API
@@ -43,7 +43,7 @@ Feature: edit user
       | change to existing user name | Brian    | 409  | Brian            |
       | empty user name              |          | 400  | Brian            |
 
-
+  @skipOnStable2.0
   Scenario: the admin user changes the name of a user to the name of an existing disabled user
     Given the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | sam             |
@@ -57,7 +57,7 @@ Feature: edit user
       | key                      | value |
       | onPremisesSamAccountName | sam   |
 
-
+  @skipOnStable2.0
   Scenario: the admin user changes the name of a user to the name of a previously deleted user
     Given the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | sam             |
@@ -207,7 +207,7 @@ Feature: edit user
       | Guest       | Guest       |
       | Guest       | Admin       |
 
-
+  @skipOnStable2.0
   Scenario: the admin user disables another user
     When the user "Alice" disables user "Brian" using the Graph API
     Then the HTTP status code should be "200"
@@ -217,7 +217,7 @@ Feature: edit user
       | displayName  | id        | mail              | onPremisesSamAccountName | accountEnabled |
       | Brian Murphy | %uuid_v4% | brian@example.com | Brian                    | false          |
 
-
+  @skipOnStable2.0
   Scenario Outline: a normal user should not be able to disable another user
     Given user "Carol" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<role>" using the settings api
@@ -234,7 +234,7 @@ Feature: edit user
       | User        |
       | Guest       |
 
-
+  @skipOnStable2.0
   Scenario: the admin user enables disabled user
     Given the user "Alice" has disabled user "Brian" using the Graph API
     When the user "Alice" enables user "Brian" using the Graph API
@@ -245,7 +245,7 @@ Feature: edit user
       | displayName  | id        | mail              | onPremisesSamAccountName | accountEnabled |
       | Brian Murphy | %uuid_v4% | brian@example.com | Brian                    | true           |
 
-
+  @skipOnStable2.0
   Scenario Outline: a normal user should not be able to enable another user
     Given user "Carol" has been created with default attributes and without skeleton files
     And the user "Alice" has disabled user "Carol" using the Graph API

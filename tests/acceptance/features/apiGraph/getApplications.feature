@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api @skipOnOcV10 @skipOnStable2.0
 Feature: get applications
   As an user
   I want to be able to get applications information with existings roles

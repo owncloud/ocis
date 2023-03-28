@@ -10,7 +10,7 @@ Feature: get users
       | Alice    |
       | Brian    |
 
-
+  @skipOnStable2.0
   Scenario: admin user gets the information of a user
     Given the administrator has given "Alice" the role "Admin" using the settings api
     When user "Alice" gets information of user "Brian" using Graph API
@@ -41,7 +41,7 @@ Feature: get users
       | Guest       | Guest       |
       | Guest       | Admin       |
 
-
+  @skipOnStable2.0
   Scenario: admin user gets all users
     Given the administrator has given "Alice" the role "Admin" using the settings api
     When user "Alice" gets all users using the Graph API
@@ -51,7 +51,7 @@ Feature: get users
       | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    | true           |
       | Brian Murphy | %uuid_v4% | brian@example.org | Brian                    | true           |
 
-
+  @skipOnStable2.0
   Scenario: admin user gets all users include disabled users
     Given the administrator has given "Alice" the role "Admin" using the settings api
     And the user "Alice" has disabled user "Brian" using the Graph API
@@ -74,7 +74,7 @@ Feature: get users
       | User        |
       | Guest       |
 
-
+  @skipOnStable2.0
   Scenario: admin user gets the drive information of a user
     Given the administrator has given "Alice" the role "Admin" using the settings api
     When the user "Alice" gets user "Brian" along with his drive information using Graph API
@@ -93,7 +93,7 @@ Feature: get users
       | root@@@webDavUrl  | %base_url%/dav/spaces/%space_id% |
       | webUrl            | %base_url%/f/%space_id%          |
 
-
+  @skipOnStable2.0
   Scenario Outline: non-admin user gets his/her own drive information
     Given the administrator has given "Brian" the role "<userRole>" using the settings api
     When the user "Brian" gets his drive information using Graph API
@@ -117,6 +117,7 @@ Feature: get users
       | User        |
       | Guest       |
 
+  @skipOnStable2.0
   Scenario: admin user gets the group information of a user
     Given the administrator has given "Alice" the role "Admin" using the settings api
     And group "tea-lover" has been created
@@ -153,7 +154,7 @@ Feature: get users
       | Guest       | Guest       |
       | Guest       | Admin       |
 
-
+  @skipOnStable2.0
   Scenario: admin user gets all users of certain groups
     Given the administrator has given "Alice" the role "Admin" using the settings api
     And user "Carol" has been created with default attributes and without skeleton files
@@ -202,7 +203,7 @@ Feature: get users
       | displayName | id        | mail              | onPremisesSamAccountName | accountEnabled |
       | Carol King  | %uuid_v4% | carol@example.org | Carol                    | false          |
 
-
+  @skipOnStable2.0
   Scenario Outline: non admin user tries to get users of certain groups
     Given the administrator has given "Alice" the role "Admin" using the settings api
     And the administrator has given "Brian" the role "<role>" using the settings api
@@ -217,7 +218,7 @@ Feature: get users
       | User        |
       | Guest       |
 
-
+  @skipOnStable2.0
   Scenario: admin user gets all users with certain roles and members of a certain group
     Given the administrator has given "Alice" the role "Admin" using the settings api
     And user "Carol" has been created with default attributes and without skeleton files
@@ -243,7 +244,7 @@ Feature: get users
       | displayName | id        | mail              | onPremisesSamAccountName | accountEnabled |
       | Carol King  | %uuid_v4% | carol@example.org | Carol                    | true           |
 
-
+  @skipOnStable2.0
   Scenario Outline: non-admin user tries to get users with a certain role
     Given the administrator has given "Alice" the role "<userRole>" using the settings api
     When the user "Alice" gets all users with role "<role>" using the Graph API
