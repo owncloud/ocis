@@ -539,7 +539,7 @@ a| [subs=-attributes]
 ++memory ++
 
 a| [subs=-attributes]
-Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', 'etcd' and 'noop'. See the text description for details.
+The type of the userinfo cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
 a| `OCIS_CACHE_STORE_ADDRESS`
 
@@ -571,7 +571,7 @@ a| [subs=-attributes]
 ++[] ++
 
 a| [subs=-attributes]
-A comma-separated list of nodes to connect to. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
 
 a| `OCIS_CACHE_STORE_NODES`
 
@@ -590,7 +590,7 @@ a| [subs=-attributes]
 ++[] ++
 
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
 
 a| `OCIS_CACHE_STORE_SIZE`
 
@@ -606,7 +606,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.
+The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
 a| `OCIS_CACHE_STORE_TTL`
 
@@ -619,13 +619,13 @@ a| [subs=attributes+]
 * xref:{s-path}/proxy.adoc[proxy] +
 
 a| [subs=-attributes]
-++int ++
+++Duration ++
 
 a| [subs=-attributes]
-++300 ++
+++10s ++
 
 a| [subs=-attributes]
-Max TTL in seconds for the gateway's stat cache.
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
 
 a| `OCIS_CACHE_STORE_TYPE`
 
@@ -643,12 +643,13 @@ a| [subs=-attributes]
 ++memory ++
 
 a| [subs=-attributes]
-Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', 'etcd' and 'noop'. See the text description for details.
+The type of the userinfo cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/userlog.adoc[userlog] +
@@ -668,6 +669,7 @@ a| `OCIS_CORS_ALLOW_HEADERS`
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/userlog.adoc[userlog] +
@@ -687,6 +689,7 @@ a| `OCIS_CORS_ALLOW_METHODS`
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/userlog.adoc[userlog] +
@@ -706,6 +709,7 @@ a| `OCIS_CORS_ALLOW_ORIGINS`
 
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/userlog.adoc[userlog] +
@@ -831,6 +835,7 @@ a| `OCIS_HTTP_TLS_CERTIFICATE`
 
 a| [subs=attributes+]
 * xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
@@ -852,6 +857,7 @@ a| `OCIS_HTTP_TLS_ENABLED`
 
 a| [subs=attributes+]
 * xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
@@ -873,6 +879,7 @@ a| `OCIS_HTTP_TLS_KEY`
 
 a| [subs=attributes+]
 * xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/thumbnails.adoc[thumbnails] +
@@ -921,7 +928,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Allow insecure connections to the OIDC issuer.
+Whether the NATS server should skip the client certificate verification during the TLS handshake.
 
 a| `OCIS_JWT_SECRET`
 
@@ -935,6 +942,7 @@ a| [subs=attributes+]
 * xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/groups.adoc[groups] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/policies.adoc[policies] +
@@ -956,7 +964,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The secret to mint and validate jwt tokens.
+The secret to mint and validate JWT tokens.
 
 a| `OCIS_LOG_COLOR`
 
@@ -975,6 +983,7 @@ a| [subs=attributes+]
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/idm.adoc[idm] +
 * xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/nats.adoc[nats] +
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
@@ -1023,6 +1032,7 @@ a| [subs=attributes+]
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/idm.adoc[idm] +
 * xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/nats.adoc[nats] +
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
@@ -1071,6 +1081,7 @@ a| [subs=attributes+]
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/idm.adoc[idm] +
 * xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/nats.adoc[nats] +
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
@@ -1119,6 +1130,7 @@ a| [subs=attributes+]
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/idm.adoc[idm] +
 * xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/nats.adoc[nats] +
 * xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
@@ -1206,7 +1218,7 @@ a| [subs=-attributes]
 ++memory ++
 
 a| [subs=-attributes]
-The type of the eventhistory store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+The type of the userlog store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
 a| `OCIS_PERSISTENT_STORE_NODES`
 
@@ -1289,7 +1301,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the oCIS storage-system system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
+ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
 
 a| `OCIS_SYSTEM_USER_IDP`
 
@@ -1323,6 +1335,7 @@ a| [subs=attributes+]
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/idm.adoc[idm] +
 * xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
@@ -1363,6 +1376,7 @@ a| [subs=attributes+]
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/idm.adoc[idm] +
 * xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
@@ -1403,6 +1417,7 @@ a| [subs=attributes+]
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/idm.adoc[idm] +
 * xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
@@ -1443,6 +1458,7 @@ a| [subs=attributes+]
 * xref:{s-path}/groups.adoc[groups] +
 * xref:{s-path}/idm.adoc[idm] +
 * xref:{s-path}/idp.adoc[idp] +
+* xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
@@ -1550,7 +1566,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 
 a| `STORAGE_USERS_OCIS_ASYNC_UPLOADS`
 

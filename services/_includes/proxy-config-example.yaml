@@ -104,6 +104,8 @@ policies:
     unprotected: true
   - endpoint: /app/
     service: com.owncloud.web.frontend
+  - endpoint: /graph/v1.0/invitations
+    service: com.owncloud.graph.invitations
   - endpoint: /graph/
     service: com.owncloud.graph.graph
   - endpoint: /api/v0/settings
