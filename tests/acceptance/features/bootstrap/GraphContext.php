@@ -1292,38 +1292,55 @@ class GraphContext implements Context {
 	/**
 	 * rename group name
 	 *
-	 * @param string $oldGroup
+	 * @param string $oldGroupId
 	 * @param string $newGroup
 	 * @param string $user
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
-	public function renameGroup(string $oldGroup, string $newGroup, ?string $user = null): ResponseInterface {
+	public function renameGroup(string $oldGroupId, string $newGroup, ?string $user = null): ResponseInterface {
 		$credentials = $this->getAdminOrUserCredentials($user);
-		$groupId = $this->featureContext->getAttributeOfCreatedGroup($oldGroup, "id");
 
 		return GraphHelper::updateGroup(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
 			$credentials['username'],
 			$credentials['password'],
-			$groupId,
+			$oldGroupId,
 			$newGroup
 		);
 	}
 
 	/**
 	 * @When user :user renames group :oldGroup to :newGroup using the Graph API
+	 * @When user :user tries to rename group :oldGroup to :newGroup using the Graph API
 	 *
 	 * @param string $user
 	 * @param string $oldGroup
 	 * @param string $newGroup
 	 *
 	 * @return void
+	 * @throws GuzzleException
 	 */
 	public function userRenamesGroupUsingTheGraphApi(string $user, string $oldGroup, string $newGroup): void {
-		$this->featureContext->setResponse($this->renameGroup($oldGroup, $newGroup, $user));
+		$oldGroupId = $this->featureContext->getAttributeOfCreatedGroup($oldGroup, "id");
+		$this->featureContext->setResponse($this->renameGroup($oldGroupId, $newGroup, $user));
+	}
+
+	/**
+	 * @When user :user tries to rename a nonexistent group to :newGroup using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $newGroup
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userTriesToRenameNonExistentGroupToNewGroupName(string $user, string $newGroup): void {
+		$oldGroupId = WebDavHelper::generateUUIDv4();
+		$this->featureContext->setResponse($this->renameGroup($oldGroupId, $newGroup, $user));
 	}
 
 	/**

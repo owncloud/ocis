@@ -120,27 +120,51 @@ Feature: add users to group
       | Alice    | var/../etc       |
 
 
-  Scenario: normal user tries to add himself to a group
-    Given group "groupA" has been created
+  Scenario Outline: user other than the admin tries to add himself to a group
+    Given the administrator has given "Alice" the role "<role>" using the settings api
+    And group "groupA" has been created
     When user "Alice" tries to add himself to group "groupA" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the last response should be an unauthorized response
+    Examples:
+      | role        |
+      | Space Admin |
+      | User        |
+      | Guest       |
 
 
-  Scenario: normal user tries to other user to a group
+  Scenario Outline: user other than the admin tries to add other user to a group
     Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has given "Brian" the role "<role>" using the settings api
     And group "groupA" has been created
     When user "Alice" tries to add user "Brian" to group "groupA" using the Graph API
-    Then the HTTP status code should be "401"
+    Then the HTTP status code should be "403"
     And the last response should be an unauthorized response
+    Examples:
+      | role        |
+      | Space Admin |
+      | User        |
+      | Guest       |
 
 
-  Scenario: admin tries to add user to a non-existing group
+  Scenario: admin tries to add user to a nonexistent group
     When the administrator tries to add user "Alice" to a nonexistent group using the Graph API
     Then the HTTP status code should be "404"
 
 
-  Scenario: admin tries to add a non-existing user to a group
+  Scenario Outline: user other than the admin tries to add user to a nonexistent group
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has given "Alice" the role "<role>" using the settings api
+    When the user "Alice" tries to add user "Brian" to a nonexistent group using the Graph API
+    Then the HTTP status code should be "404"
+    Examples:
+      | role        |
+      | Space Admin |
+      | User        |
+      | Guest       |
+
+
+  Scenario: admin tries to add a nonexistent user to a group
     Given group "groupA" has been created
     When the administrator tries to add user "nonexistentuser" to group "groupA" using the provisioning API
     Then the HTTP status code should be "405"
@@ -169,7 +193,7 @@ Feature: add users to group
       | Carol    | grp1      |
 
 
-  Scenario: admin tries to add users to a non-existing group at once
+  Scenario: admin tries to add users to a nonexistent group at once
     Given the administrator has given "Alice" the role "Admin" using the settings api
     And these users have been created with default attributes and without skeleton files:
       | username |
@@ -182,7 +206,7 @@ Feature: add users to group
     Then the HTTP status code should be "404"
 
 
-  Scenario: admin tries to add multiple non-existing users to a group at once
+  Scenario: admin tries to add multiple nonexistent users to a group at once
     Given the administrator has given "Alice" the role "Admin" using the settings api
     And user "Alice" has created a group "grp1" using the Graph API
     When the administrator "Alice" tries to add the following nonexistent users to a group "grp1" at once using the Graph API
@@ -192,7 +216,7 @@ Feature: add users to group
     Then the HTTP status code should be "404"
 
 
-  Scenario: admin tries to add non-existing and existing users to a group at once
+  Scenario: admin tries to add nonexistent and existing users to a group at once
     Given the administrator has given "Alice" the role "Admin" using the settings api
     And these users have been created with default attributes and without skeleton files:
       | username |
