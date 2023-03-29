@@ -123,6 +123,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpaces/setQuota.feature:81](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L81)
 - [apiSpaces/setQuota.feature:82](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L82)
 - [apiSpaces/setQuota.feature:83](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L83)
+- [apiSpaces/setQuota.feature:239](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L239)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
