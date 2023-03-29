@@ -232,7 +232,7 @@ a|`INVITATIONS_KEYCLOAK_BASE_PATH` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++https://keycloak.example.org/ ++
+++ ++
 a| [subs=-attributes]
 The URL to access keycloak.
 
@@ -241,7 +241,7 @@ a|`INVITATIONS_KEYCLOAK_CLIENT_ID` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++invitations-service ++
+++ ++
 a| [subs=-attributes]
 The client id to authenticate with keycloak.
 
@@ -250,7 +250,7 @@ a|`INVITATIONS_KEYCLOAK_CLIENT_SECRET` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++fake-secret ++
+++ ++
 a| [subs=-attributes]
 The client secret to use in authentication.
 
@@ -259,7 +259,7 @@ a|`INVITATIONS_KEYCLOAK_CLIENT_REALM` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++someRealm ++
+++ ++
 a| [subs=-attributes]
 The realm the client is defined in.
 
@@ -268,7 +268,7 @@ a|`INVITATIONS_KEYCLOAK_USER_REALM` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++someRealm ++
+++ ++
 a| [subs=-attributes]
 The realm users are defined.
 

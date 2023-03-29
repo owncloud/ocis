@@ -23,10 +23,10 @@
 | OCIS_HTTP_TLS_ENABLED | bool | false | Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.|
 | OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|
 | OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
-| INVITATIONS_KEYCLOAK_BASE_PATH | string | https://keycloak.example.org/ | The URL to access keycloak.|
-| INVITATIONS_KEYCLOAK_CLIENT_ID | string | invitations-service | The client id to authenticate with keycloak.|
-| INVITATIONS_KEYCLOAK_CLIENT_SECRET | string | fake-secret | The client secret to use in authentication.|
-| INVITATIONS_KEYCLOAK_CLIENT_REALM | string | someRealm | The realm the client is defined in.|
-| INVITATIONS_KEYCLOAK_USER_REALM | string | someRealm | The realm users are defined.|
+| INVITATIONS_KEYCLOAK_BASE_PATH | string |  | The URL to access keycloak.|
+| INVITATIONS_KEYCLOAK_CLIENT_ID | string |  | The client id to authenticate with keycloak.|
+| INVITATIONS_KEYCLOAK_CLIENT_SECRET | string |  | The client secret to use in authentication.|
+| INVITATIONS_KEYCLOAK_CLIENT_REALM | string |  | The realm the client is defined in.|
+| INVITATIONS_KEYCLOAK_USER_REALM | string |  | The realm users are defined.|
 | INVITATIONS_KEYCLOAK_INSECURE_SKIP_VERIFY | bool | false | Disable TLS certificate validation for Keycloak connections. Do not set this in production environments.|
 | OCIS_JWT_SECRET<br/>INVITATIONS_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|

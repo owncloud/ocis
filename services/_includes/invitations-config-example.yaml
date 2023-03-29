@@ -30,11 +30,11 @@ http:
     cert: ""
     key: ""
 keycloak:
-  base_path: https://keycloak.example.org/
-  client_id: invitations-service
-  client_secret: fake-secret
-  client_realm: someRealm
-  user_realm: someRealm
+  base_path: ""
+  client_id: ""
+  client_secret: ""
+  client_realm: ""
+  user_realm: ""
   insecure_skip_verify: false
 token_manager:
   jwt_secret: ""

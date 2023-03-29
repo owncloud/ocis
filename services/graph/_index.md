@@ -1,6 +1,6 @@
 ---
 title: Graph service
-date: 2023-03-29T10:49:09.422183611Z
+date: 2023-03-29T11:45:37.681590884Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/graph
