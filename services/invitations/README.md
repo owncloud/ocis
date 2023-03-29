@@ -19,7 +19,7 @@ The default and currently only available backend used to handle invitations is [
 
 <!--- Note that the link below must be an absolute URL and not a relative file path --->
 
-See the [example configuration json file](https://github.com/owncloud/ocis/blob/master/services/invitations/md-sources/example-realm.md) of a Keycloak realm the backend will work with. This file includes the `invitations` client, which is relevant for this service.
+See the [example configuration json file](https://github.com/owncloud/ocis/blob/master/services/invitations/md-sources/example-realm.json) of a Keycloak realm the backend will work with. This file includes the `invitations` client, which is relevant for this service.
 
 To use the example json, set the `INVITATIONS_KEYCLOAK_CLIENT_ID` setting to `invitations`, though any other client ID can be configured. 
 
