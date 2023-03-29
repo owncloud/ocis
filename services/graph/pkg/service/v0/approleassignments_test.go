@@ -10,6 +10,7 @@ import (
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-chi/chi/v5"
 	"github.com/golang/protobuf/ptypes/empty"
 	. "github.com/onsi/ginkgo/v2"
@@ -37,7 +38,7 @@ var _ = Describe("AppRoleAssignments", func() {
 		svc             service.Service
 		ctx             context.Context
 		cfg             *config.Config
-		gatewayClient   *mocks.GatewayClient
+		gatewayClient   *cs3mocks.GatewayAPIClient
 		eventsPublisher mocks.Publisher
 		roleService     *mocks.RoleService
 		identityBackend *identitymocks.Backend
@@ -56,7 +57,7 @@ var _ = Describe("AppRoleAssignments", func() {
 
 		identityBackend = &identitymocks.Backend{}
 		roleService = &mocks.RoleService{}
-		gatewayClient = &mocks.GatewayClient{}
+		gatewayClient = &cs3mocks.GatewayAPIClient{}
 
 		rr = httptest.NewRecorder()
 		ctx = context.Background()

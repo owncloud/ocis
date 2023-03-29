@@ -13,6 +13,7 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/stretchr/testify/mock"
 
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
@@ -33,7 +34,7 @@ var _ = Describe("Applications", func() {
 		svc             service.Service
 		ctx             context.Context
 		cfg             *config.Config
-		gatewayClient   *mocks.GatewayClient
+		gatewayClient   *cs3mocks.GatewayAPIClient
 		eventsPublisher mocks.Publisher
 		roleService     *mocks.RoleService
 		identityBackend *identitymocks.Backend
@@ -46,7 +47,7 @@ var _ = Describe("Applications", func() {
 
 		identityBackend = &identitymocks.Backend{}
 		roleService = &mocks.RoleService{}
-		gatewayClient = &mocks.GatewayClient{}
+		gatewayClient = &cs3mocks.GatewayAPIClient{}
 
 		rr = httptest.NewRecorder()
 		ctx = context.Background()
