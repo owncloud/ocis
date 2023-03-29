@@ -283,7 +283,6 @@ var _ = Describe("Groups", func() {
 
 			It("fails when the number of users is exceeded - spec says 20 max", func() {
 				updatedGroup := libregraph.NewGroup()
-				updatedGroup.SetDisplayName("group1 updated")
 				updatedGroup.SetMembersodataBind([]string{
 					"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18",
 					"19", "20", "21",
@@ -306,7 +305,6 @@ var _ = Describe("Groups", func() {
 
 			It("succeeds when the number of users is over 20 but the limit is raised to 21", func() {
 				updatedGroup := libregraph.NewGroup()
-				updatedGroup.SetDisplayName("group1 updated")
 				updatedGroup.SetMembersodataBind([]string{
 					"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18",
 					"19", "20", "21",
@@ -337,7 +335,6 @@ var _ = Describe("Groups", func() {
 
 			It("fails on invalid user refs", func() {
 				updatedGroup := libregraph.NewGroup()
-				updatedGroup.SetDisplayName("group1 updated")
 				updatedGroup.SetMembersodataBind([]string{"invalid"})
 				updatedGroupJson, err := json.Marshal(updatedGroup)
 				Expect(err).ToNot(HaveOccurred())
@@ -353,7 +350,6 @@ var _ = Describe("Groups", func() {
 
 			It("fails when the adding non-users users", func() {
 				updatedGroup := libregraph.NewGroup()
-				updatedGroup.SetDisplayName("group1 updated")
 				updatedGroup.SetMembersodataBind([]string{"/non-users/user1"})
 				updatedGroupJson, err := json.Marshal(updatedGroup)
 				Expect(err).ToNot(HaveOccurred())
@@ -371,7 +367,6 @@ var _ = Describe("Groups", func() {
 				identityBackend.On("AddMembersToGroup", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 				updatedGroup := libregraph.NewGroup()
-				updatedGroup.SetDisplayName("group1 updated")
 				updatedGroup.SetMembersodataBind([]string{"/users/user1"})
 				updatedGroupJson, err := json.Marshal(updatedGroup)
 				Expect(err).ToNot(HaveOccurred())
@@ -385,6 +380,25 @@ var _ = Describe("Groups", func() {
 				Expect(rr.Code).To(Equal(http.StatusNoContent))
 				identityBackend.AssertNumberOfCalls(GinkgoT(), "AddMembersToGroup", 1)
 			})
+
+			It("updates the group name", func() {
+				identityBackend.On("UpdateGroupName", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+
+				updatedGroup := libregraph.NewGroup()
+				updatedGroup.SetDisplayName("group1 updated")
+				updatedGroupJson, err := json.Marshal(updatedGroup)
+				Expect(err).ToNot(HaveOccurred())
+
+				r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/groups", bytes.NewBuffer(updatedGroupJson))
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("groupID", *newGroup.Id)
+				r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				svc.PatchGroup(rr, r)
+
+				Expect(rr.Code).To(Equal(http.StatusNoContent))
+				identityBackend.AssertNumberOfCalls(GinkgoT(), "UpdateGroupName", 1)
+			})
+
 		})
 	})
 

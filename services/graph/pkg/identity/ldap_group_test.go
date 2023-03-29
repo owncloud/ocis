@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-ldap/ldap/v3"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
+	"github.com/stretchr/testify/assert"
 	"github.com/test-go/testify/mock"
 )
 
@@ -222,5 +223,140 @@ func TestGetGroups(t *testing.T) {
 		case g[0].Members[0].GetId() != userEntry.GetEqualFoldAttributeValue(b.userAttributeMap.id):
 			t.Errorf("Expected GetGroup to return group with correct member")
 		}
+	}
+}
+func TestUpdateGroupName(t *testing.T) {
+	groupDn := "cn=TheGroup,ou=groups,dc=owncloud,dc=com"
+
+	type args struct {
+		groupId   string
+		groupName string
+		newName   string
+	}
+
+	type mockInputs struct {
+		funcName string
+		args     []interface{}
+		returns  []interface{}
+	}
+
+	tests := []struct {
+		name      string
+		args      args
+		assertion assert.ErrorAssertionFunc
+		ldapMocks []mockInputs
+	}{
+		{
+			name: "Test with no name change",
+			args: args{
+				groupId: "some-uuid-string",
+				newName: "TheGroup",
+			},
+			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+				return assert.Nil(t, err, args...)
+			},
+			ldapMocks: []mockInputs{
+				{
+					funcName: "Search",
+					args: []interface{}{
+						ldap.NewSearchRequest(
+							"ou=groups,dc=test",
+							ldap.ScopeWholeSubtree,
+							ldap.NeverDerefAliases, 1, 0, false,
+							"(&(objectClass=groupOfNames)(entryUUID=some-uuid-string))",
+							[]string{"cn", "entryUUID", "member"},
+							nil,
+						),
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: groupDn,
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "cn",
+											Values: []string{"TheGroup"},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+			},
+		},
+		{
+			name: "Test with name change",
+			args: args{
+				groupId: "some-uuid-string",
+				newName: "TheGroupWithShinyNewName",
+			},
+			assertion: func(t assert.TestingT, err error, args ...interface{}) bool {
+				return assert.Nil(t, err, args...)
+			},
+			ldapMocks: []mockInputs{
+				{
+					funcName: "Search",
+					args: []interface{}{
+						ldap.NewSearchRequest(
+							"ou=groups,dc=test",
+							ldap.ScopeWholeSubtree,
+							ldap.NeverDerefAliases, 1, 0, false,
+							"(&(objectClass=groupOfNames)(entryUUID=some-uuid-string))",
+							[]string{"cn", "entryUUID", "member"},
+							nil,
+						),
+					},
+					returns: []interface{}{
+						&ldap.SearchResult{
+							Entries: []*ldap.Entry{
+								{
+									DN: "cn=TheGroup,ou=groups,dc=owncloud,dc=com",
+									Attributes: []*ldap.EntryAttribute{
+										{
+											Name:   "cn",
+											Values: []string{"TheGroup"},
+										},
+									},
+								},
+							},
+						},
+						nil,
+					},
+				},
+				{
+					funcName: "ModifyDN",
+					args: []interface{}{
+						&ldap.ModifyDNRequest{
+							DN:           groupDn,
+							NewRDN:       "cn=TheGroupWithShinyNewName",
+							DeleteOldRDN: true,
+							NewSuperior:  "",
+							Controls:     []ldap.Control(nil),
+						},
+					},
+					returns: []interface{}{
+						nil,
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			lm := &mocks.Client{}
+			for _, mock := range tt.ldapMocks {
+				lm.On(mock.funcName, mock.args...).Return(mock.returns...)
+			}
+
+			ldapConfig := lconfig
+			i, _ := getMockedBackend(lm, ldapConfig, &logger)
+
+			err := i.UpdateGroupName(context.Background(), tt.args.groupId, tt.args.newName)
+			tt.assertion(t, err)
+		})
 	}
 }

@@ -126,6 +126,11 @@ func (g Graph) PatchGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if changes.HasDisplayName() {
+		groupName := changes.GetDisplayName()
+		err = g.identityBackend.UpdateGroupName(r.Context(), groupID, groupName)
+	}
+
 	if memberRefs, ok := changes.GetMembersodataBindOk(); ok {
 		// The spec defines a limit of 20 members maxium per Request
 		if len(memberRefs) > g.config.API.GroupMembersPatchLimit {

@@ -2,6 +2,7 @@ package identity
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"strings"
@@ -211,6 +212,43 @@ func (i *LDAP) DeleteGroup(ctx context.Context, id string) error {
 	if err = i.conn.Del(&dr); err != nil {
 		return err
 	}
+	return nil
+}
+
+// UpdateGroupName implements the Backend Interface.
+func (i *LDAP) UpdateGroupName(ctx context.Context, groupID string, groupName string) error {
+	logger := i.logger.SubloggerWithRequestID(ctx)
+	logger.Debug().Str("backend", "ldap").Msg("AddMembersToGroup")
+
+	ge, err := i.getLDAPGroupByID(groupID, true)
+	if err != nil {
+		return err
+	}
+
+	if ge.GetEqualFoldAttributeValue(i.groupAttributeMap.name) == groupName {
+		return nil
+	}
+
+	attributeTypeAndValue := ldap.AttributeTypeAndValue{
+		Type:  i.groupAttributeMap.name,
+		Value: groupName,
+	}
+	newDNString := attributeTypeAndValue.String()
+
+	logger.Debug().Str("originalDN", ge.DN).Str("newDN", newDNString).Msg("Modifying DN")
+	mrdn := ldap.NewModifyDNRequest(ge.DN, newDNString, true, "")
+
+	if err := i.conn.ModifyDN(mrdn); err != nil {
+		var lerr *ldap.Error
+		logger.Debug().Str("originalDN", ge.DN).Str("newDN", newDNString).Err(err).Msg("Failed to modify DN")
+		if errors.As(err, &lerr) {
+			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
+				err = errorcode.New(errorcode.NameAlreadyExists, "Group name already in use")
+			}
+		}
+		return err
+	}
+
 	return nil
 }
 

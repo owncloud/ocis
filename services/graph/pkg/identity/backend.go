@@ -33,6 +33,8 @@ type Backend interface {
 	CreateGroup(ctx context.Context, group libregraph.Group) (*libregraph.Group, error)
 	// DeleteGroup deletes a given group, identified by id
 	DeleteGroup(ctx context.Context, id string) error
+	// UpdateGroupName updates the group name
+	UpdateGroupName(ctx context.Context, groupID string, groupName string) error
 	GetGroup(ctx context.Context, nameOrID string, queryParam url.Values) (*libregraph.Group, error)
 	GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error)
 	// GetGroupMembers list all members of a group
