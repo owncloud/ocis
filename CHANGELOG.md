@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Return 425 on Thumbnails: [#5300](https://github.com/owncloud/ocis/pull/5300)
 * Bugfix - Disassociate users from deleted school: [#5343](https://github.com/owncloud/ocis/pull/5343)
 * Bugfix - Fix default role assignment for demo users: [#3432](https://github.com/owncloud/ocis/issues/3432)
+* Bugfix - Fix so that PATCH requests for groups actually updates the group name: [#5949](https://github.com/owncloud/ocis/pull/5949)
 * Bugfix - Fix Postprocessing events: [#5269](https://github.com/owncloud/ocis/pull/5269)
 * Bugfix - Fix Search tag indexing: [#5405](https://github.com/owncloud/ocis/pull/5405)
 * Bugfix - Populate expanded properties: [#5421](https://github.com/owncloud/ocis/pull/5421)
