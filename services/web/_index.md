@@ -1,6 +1,6 @@
 ---
 title: Web Service
-date: 2023-03-29T11:45:37.686529849Z
+date: 2023-03-29T12:36:16.148955465Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/web

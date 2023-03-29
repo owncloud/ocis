@@ -1,6 +1,6 @@
 ---
 title: Invitations Service
-date: 2023-03-29T11:45:37.68190166Z
+date: 2023-03-29T12:36:16.146506488Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/invitations
@@ -35,7 +35,7 @@ The default and currently only available backend used to handle invitations is [
 #### Keycloak Realm Configuration
 
 <!--- Note that the link below must be an absolute URL and not a relative file path --->
-See the [example configuration json file](https://github.com/owncloud/ocis/blob/master/services/invitations/md-sources/example-realm.md) of a Keycloak realm the backend will work with. This file includes the `invitations` client, which is relevant for this service.
+See the [example configuration json file](https://github.com/owncloud/ocis/blob/master/services/invitations/md-sources/example-realm.json) of a Keycloak realm the backend will work with. This file includes the `invitations` client, which is relevant for this service.
 To use the example json, set the `INVITATIONS_KEYCLOAK_CLIENT_ID` setting to `invitations`, though any other client ID can be configured. 
 Importing this example into Keycloak will give you a realm that federates with an LDAP server, has the right
 clients configured and all mappers correctly set. Be sure to set all the credentials after the import,
