@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/go-chi/chi/v5"
 	"github.com/jellydator/ttlcache/v3"
@@ -21,12 +20,14 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"go-micro.dev/v4/client"
 	mevents "go-micro.dev/v4/events"
-	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 //go:generate make -C ../../.. generate
 
+type GatewayClient = gateway.GatewayAPIClient
+
+/*
 // GatewayClient is the subset of the gateway.GatewayAPIClient that is being used to interact with the gateway
 type GatewayClient interface {
 	//gateway.GatewayAPIClient
@@ -67,6 +68,7 @@ type GatewayClient interface {
 	GetQuota(ctx context.Context, in *gateway.GetQuotaRequest, opts ...grpc.CallOption) (*provider.GetQuotaResponse, error)
 	SetArbitraryMetadata(ctx context.Context, request *provider.SetArbitraryMetadataRequest, opts ...grpc.CallOption) (*provider.SetArbitraryMetadataResponse, error)
 }
+*/
 
 // Publisher is the interface for events publisher
 type Publisher interface {

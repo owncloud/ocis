@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"path/filepath"
+	"strconv"
 	"time"
 
-	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -25,6 +26,9 @@ var (
 	TokenTransportHeader = "X-Reva-Transfer"
 )
 
+// Marshaller is the common interface for a marshaller
+type Marshaller func(any) ([]byte, error)
+
 // ExportPersonalDataRequest is the body of the request
 type ExportPersonalDataRequest struct {
 	StorageLocation string `json:"storageLocation"`
@@ -35,9 +39,18 @@ func (g Graph) ExportPersonalData(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	u := revactx.ContextMustGetUser(ctx)
 	// Get location from request
-	loc := ""
-	if loc == "" {
-		loc = _backupFileName
+	loc := getLocation(r)
+
+	// prepare marshaller
+	var marsh Marshaller
+	switch filepath.Ext(loc) {
+	default:
+		g.logger.Info().Str("path", loc).Msg("invalid location")
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("only json format is supported for personal data export"))
+		return
+	case ".json":
+		marsh = json.Marshal
 	}
 
 	ref := &provider.Reference{
@@ -58,35 +71,46 @@ func (g Graph) ExportPersonalData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// go start gathering
-	go func() {
-		time.Sleep(10 * time.Second)
-		by, _ := json.Marshal(map[string]string{u.GetId().GetOpaqueId(): "no data stored"})
-		b := bytes.NewBuffer(by)
-		th := r.Header.Get(revaCtx.TokenHeader)
-		err := g.upload(u, b, ref, th)
-		fmt.Println("Upload error", err)
-	}()
+	go g.GatherPersonalData(u, ref, r.Header.Get(revaCtx.TokenHeader), marsh)
 
 	w.WriteHeader(http.StatusOK)
-	return
 }
 
-func (g Graph) upload(u *user.User, data io.Reader, ref *provider.Reference, th string) error {
+// GatherPersonalData will all gather all personal data of the user and save it to a file in the users personal space
+func (g Graph) GatherPersonalData(usr *user.User, ref *provider.Reference, token string, marsh Marshaller) {
+	// TMP - Delay processing - comment if you read this on PR
+	time.Sleep(10 * time.Second)
+
+	// create data
+	data := make(map[string]interface{})
+
+	// reva user
+	data["user"] = usr
+
+	// marshal
+	by, err := marsh(data)
+	if err != nil {
+		g.logger.Error().Err(err).Msg("cannot marshal personal user data")
+		return
+	}
+
+	// upload
+	if err := g.upload(usr, by, ref, token); err != nil {
+		g.logger.Error().Err(err).Msg("failed uploading personal data export")
+	}
+}
+
+func (g Graph) upload(u *user.User, data []byte, ref *provider.Reference, th string) error {
 	uReq := &provider.InitiateFileUploadRequest{
-		Ref: ref,
-		//Opaque: &typespb.Opaque{
-		//Map: map[string]*typespb.OpaqueEntry{
-		//"Upload-Length": {
-		//Decoder: "plain",
-		//// TODO: handle case where size is not known in advance
-		//Value: []byte(strconv.FormatUint(cp.sourceInfo.GetSize(), 10)),
-		//},
-		//},
-		//},
+		Ref:    ref,
+		Opaque: utils.AppendPlainToOpaque(nil, "Upload-Length", strconv.FormatUint(uint64(len(data)), 10)),
 	}
 
 	gwc := g.GetGatewayClient()
-	ctx, _, err := utils.Impersonate(u.GetId(), gwc.(gateway.GatewayAPIClient), g.config.MachineAuthAPIKey)
+	ctx, err := utils.ImpersonateUser(u, gwc, g.config.MachineAuthAPIKey)
+	if err != nil {
+		return err
+	}
 	ctx = revaCtx.ContextSetToken(ctx, th)
 	uRes, err := gwc.InitiateFileUpload(ctx, uReq)
 	if err != nil {
@@ -104,16 +128,13 @@ func (g Graph) upload(u *user.User, data io.Reader, ref *provider.Reference, th 
 		}
 	}
 
-	httpUploadReq, err := rhttp.NewRequest(ctx, "PUT", uploadEP, data)
+	httpUploadReq, err := rhttp.NewRequest(ctx, "PUT", uploadEP, bytes.NewBuffer(data))
 	if err != nil {
 		return err
 	}
 	httpUploadReq.Header.Set(TokenTransportHeader, uploadToken)
 
-	httpUploadRes, err := rhttp.GetHTTPClient(
-		// rhttp.Timeout(time.Duration(conf.Timeout*int64(time.Second))),
-		rhttp.Insecure(true),
-	).Do(httpUploadReq)
+	httpUploadRes, err := rhttp.GetHTTPClient(rhttp.Insecure(true)).Do(httpUploadReq)
 	if err != nil {
 		return err
 	}
@@ -123,4 +144,18 @@ func (g Graph) upload(u *user.User, data io.Reader, ref *provider.Reference, th 
 	}
 
 	return nil
+}
+
+func getLocation(r *http.Request) string {
+	// from body
+	var req ExportPersonalDataRequest
+	if b, err := io.ReadAll(r.Body); err == nil {
+		if err := json.Unmarshal(b, &req); err == nil && req.StorageLocation != "" {
+			return req.StorageLocation
+		}
+	}
+
+	// from header?
+
+	return _backupFileName
 }
