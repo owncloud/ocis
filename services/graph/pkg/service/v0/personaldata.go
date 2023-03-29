@@ -9,12 +9,14 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/utils"
 )
@@ -47,7 +49,7 @@ func (g Graph) ExportPersonalData(w http.ResponseWriter, r *http.Request) {
 	default:
 		g.logger.Info().Str("path", loc).Msg("invalid location")
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("only json format is supported for personal data export"))
+		_, _ = w.Write([]byte("only json format is supported for personal data export"))
 		return
 	case ".json":
 		marsh = json.Marshal
@@ -87,8 +89,18 @@ func (g Graph) GatherPersonalData(usr *user.User, ref *provider.Reference, token
 	}
 
 	// upload
+	var errmsg string
 	if err := g.upload(usr, by, ref, token); err != nil {
 		g.logger.Error().Err(err).Msg("failed uploading personal data export")
+		errmsg = err.Error()
+	}
+
+	if err := events.Publish(g.eventsPublisher, events.PersonalDataExtracted{
+		Executant: usr.GetId(),
+		Timestamp: time.Now(),
+		ErrorMsg:  errmsg,
+	}); err != nil {
+		g.logger.Error().Err(err).Msg("cannot publish event")
 	}
 }
 
@@ -138,7 +150,7 @@ func (g Graph) upload(u *user.User, data []byte, ref *provider.Reference, th str
 	return nil
 }
 
-// touches the file, creating folders if neccessary
+// touches the file, creating folders if necessary
 func mustTouchFile(ctx context.Context, ref *provider.Reference, gwc gateway.GatewayAPIClient) error {
 	if err := touchFile(ctx, ref, gwc); err == nil {
 		return nil
