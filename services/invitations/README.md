@@ -2,8 +2,8 @@
 
 The invitations service provides an [Invitation Manager](https://learn.microsoft.com/en-us/graph/api/invitation-post?view=graph-rest-1.0&tabs=http) that can be used to invite external users, aka guests, to an organization.
 
-* Users invited via the Invitation Manager (via the libre graph API) will have the `userType="Guest"`.
-* Users belonging to the organization have the `userType="Member"`.
+*   Users invited via the Invitation Manager (via the libre graph API) will have the `userType="Guest"`.
+*   Users belonging to the organization have the `userType="Member"`.
 
 The corresponding CS3 API [user types](https://cs3org.github.io/cs3apis/#cs3.identity.user.v1beta1.UserType) used to reperesent this are: `USER_TYPE_GUEST` and `USER_TYPE_PRIMARY`.
 
