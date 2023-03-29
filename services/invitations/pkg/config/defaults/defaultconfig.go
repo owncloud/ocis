@@ -33,11 +33,11 @@ func DefaultConfig() *config.Config {
 			Name: "invitations",
 		},
 		Keycloak: config.Keycloak{
-			BasePath:     "https://keycloak.example.org/",
-			ClientID:     "invitations-service",
-			ClientSecret: "fake-secret",
-			ClientRealm:  "someRealm",
-			UserRealm:    "someRealm",
+			BasePath:     "",
+			ClientID:     "",
+			ClientSecret: "",
+			ClientRealm:  "",
+			UserRealm:    "",
 		},
 	}
 }
