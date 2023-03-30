@@ -3,31 +3,28 @@ package keycloak
 
 import (
 	"context"
-	"crypto/tls"
-	"fmt"
 
-	"github.com/Nerzal/gocloak/v13"
 	"github.com/google/uuid"
+	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/invitations"
 )
 
 const (
-	idAttr       = "OWNCLOUD_ID"
-	userTypeAttr = "OWNCLOUD_USER_TYPE"
-	userTypeVal  = "Guest"
+	userType = "Guest"
 )
 
-var userRequiredActions = []string{"UPDATE_PASSWORD", "VERIFY_EMAIL"}
+var userRequiredActions = []keycloak.UserAction{
+	keycloak.UserActionUpdatePassword,
+	keycloak.UserActionVerifyEmail,
+}
 
 // Backend represents the keycloak backend.
 type Backend struct {
-	logger       log.Logger
-	client       GoCloak
-	clientID     string
-	clientSecret string
-	clientRealm  string
-	userRealm    string
+	logger    log.Logger
+	client    keycloak.Client
+	userRealm string
 }
 
 // New instantiates a new keycloak.Backend with a default gocloak client.
@@ -36,62 +33,50 @@ func New(
 	baseURL, clientID, clientSecret, clientRealm, userRealm string,
 	insecureSkipVerify bool,
 ) *Backend {
-	client := gocloak.NewClient(baseURL)
-	restyClient := client.RestyClient()
-	restyClient.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: insecureSkipVerify}) //nolint:gosec
-	return NewWithClient(logger, client, clientID, clientSecret, clientRealm, userRealm)
+	logger = log.Logger{
+		Logger: logger.With().
+			Str("invitationBackend", "keycloak").
+			Str("clientID", clientID).
+			Str("clientRealm", clientRealm).
+			Str("userRealm", userRealm).
+			Logger(),
+	}
+	client := keycloak.New(baseURL, clientID, clientSecret, clientRealm, insecureSkipVerify)
+	return NewWithClient(logger, client, userRealm)
 }
 
-// NewWithClient creates a new backend with the supplied GoCloak client.
+// NewWithClient creates a new backend with the supplied keycloak client.
 func NewWithClient(
 	logger log.Logger,
-	client GoCloak,
-	clientID, clientSecret, clientRealm, userRealm string,
+	client keycloak.Client,
+	userRealm string,
 ) *Backend {
 	return &Backend{
-		logger: log.Logger{
-			Logger: logger.With().
-				Str("invitationBackend", "keycloak").
-				Str("clientID", clientID).
-				Str("clientRealm", clientRealm).
-				Str("userRealm", userRealm).
-				Logger(),
-		},
-		client:       client,
-		clientID:     clientID,
-		clientSecret: clientSecret,
-		clientRealm:  clientRealm,
-		userRealm:    userRealm,
+		logger:    logger,
+		client:    client,
+		userRealm: userRealm,
 	}
 }
 
 // CreateUser creates a user in the keycloak backend.
 func (b Backend) CreateUser(ctx context.Context, invitation *invitations.Invitation) (string, error) {
-	token, err := b.getToken(ctx)
-	if err != nil {
-		return "", err
-	}
 	u := uuid.New()
 
 	b.logger.Info().
-		Str(idAttr, u.String()).
 		Str("email", invitation.InvitedUserEmailAddress).
 		Msg("Creating new user")
-	user := gocloak.User{
-		Email:    &invitation.InvitedUserEmailAddress,
-		Enabled:  gocloak.BoolP(true),
-		Username: &invitation.InvitedUserEmailAddress,
-		Attributes: &map[string][]string{
-			idAttr:       {u.String()},
-			userTypeAttr: {userTypeVal},
-		},
-		RequiredActions: &userRequiredActions,
+	user := &libregraph.User{
+		Mail:                     &invitation.InvitedUserEmailAddress,
+		AccountEnabled:           boolP(true),
+		OnPremisesSamAccountName: &invitation.InvitedUserEmailAddress,
+		Id:                       stringP(u.String()),
+		UserType:                 stringP(userType),
 	}
 
-	id, err := b.client.CreateUser(ctx, token.AccessToken, b.userRealm, user)
+	id, err := b.client.CreateUser(ctx, b.userRealm, user, userRequiredActions)
 	if err != nil {
 		b.logger.Error().
-			Str(idAttr, u.String()).
+			Str("userID", u.String()).
 			Str("email", invitation.InvitedUserEmailAddress).
 			Err(err).
 			Msg("Failed to create user")
@@ -106,35 +91,8 @@ func (b Backend) CanSendMail() bool { return true }
 
 // SendMail sends a mail to the user with details on how to reedeem the invitation.
 func (b Backend) SendMail(ctx context.Context, id string) error {
-	token, err := b.getToken(ctx)
-	if err != nil {
-		return err
-	}
-	params := gocloak.ExecuteActionsEmail{
-		UserID:  &id,
-		Actions: &userRequiredActions,
-	}
-	return b.client.ExecuteActionsEmail(ctx, token.AccessToken, b.userRealm, params)
+	return b.client.SendActionsMail(ctx, b.userRealm, id, userRequiredActions)
 }
 
-func (b Backend) getToken(ctx context.Context) (*gocloak.JWT, error) {
-	b.logger.Debug().Msg("Logging into keycloak")
-	token, err := b.client.LoginClient(ctx, b.clientID, b.clientSecret, b.clientRealm)
-	if err != nil {
-		b.logger.Error().Err(err).Msg("failed to get token")
-		return nil, fmt.Errorf("failed to get token: %w", err)
-	}
-
-	rRes, err := b.client.RetrospectToken(ctx, token.AccessToken, b.clientID, b.clientSecret, b.clientRealm)
-	if err != nil {
-		b.logger.Error().Err(err).Msg("failed to introspect token")
-		return nil, fmt.Errorf("failed to retrospect token: %w", err)
-	}
-
-	if !*rRes.Active {
-		b.logger.Error().Msg("token not active")
-		return nil, fmt.Errorf("token is not active")
-	}
-
-	return token, nil
-}
+func boolP(b bool) *bool       { return &b }
+func stringP(s string) *string { return &s }

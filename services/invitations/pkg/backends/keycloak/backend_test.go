@@ -7,7 +7,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/Nerzal/gocloak/v13"
+	kcpkg "github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/backends/keycloak"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/invitations"
@@ -34,11 +34,11 @@ func TestBackend_CreateUser(t *testing.T) {
 		returns  []interface{}
 	}
 	tests := []struct {
-		name          string
-		args          args
-		want          string
-		keycloakMocks []mockInputs
-		assertion     assert.ErrorAssertionFunc
+		name        string
+		args        args
+		want        string
+		clientMocks []mockInputs
+		assertion   assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Test without diplay name",
@@ -48,46 +48,17 @@ func TestBackend_CreateUser(t *testing.T) {
 				},
 			},
 			want: "test-id",
-			keycloakMocks: []mockInputs{
-				{
-					funcName: "LoginClient",
-					args: []interface{}{
-						mock.Anything,
-						clientID,
-						clientSecret,
-						clientRealm,
-					},
-					returns: []interface{}{
-						&gocloak.JWT{
-							AccessToken: jwtToken,
-						},
-						nil,
-					},
-				},
-				{
-					funcName: "RetrospectToken",
-					args: []interface{}{
-						mock.Anything,
-						jwtToken,
-						clientID,
-						clientSecret,
-						clientRealm,
-					},
-					returns: []interface{}{
-						&gocloak.IntroSpectTokenResult{
-							Active: gocloak.BoolP(true),
-						},
-						nil,
-					},
-				},
+			clientMocks: []mockInputs{
 				{
 					funcName: "CreateUser",
 					args: []interface{}{
 						mock.Anything,
-						jwtToken,
 						userRealm,
 						mock.Anything, // can't match on the user because it generates a UUID internally.
-						// might be worth refactoring the UUID generation to outside of the func
+						[]kcpkg.UserAction{
+							kcpkg.UserActionUpdatePassword,
+							kcpkg.UserActionVerifyEmail,
+						},
 					},
 					returns: []interface{}{
 						"test-id",
@@ -103,11 +74,11 @@ func TestBackend_CreateUser(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
-			c := &mocks.GoCloak{}
-			for _, m := range tt.keycloakMocks {
+			c := &mocks.Client{}
+			for _, m := range tt.clientMocks {
 				c.On(m.funcName, m.args...).Return(m.returns...)
 			}
-			b := keycloak.NewWithClient(log.NopLogger(), c, clientID, clientSecret, clientRealm, userRealm)
+			b := keycloak.NewWithClient(log.NopLogger(), c, userRealm)
 			got, err := b.CreateUser(ctx, tt.args.invitation)
 			tt.assertion(t, err)
 			assert.Equal(t, tt.want, got)
@@ -125,57 +96,26 @@ func TestBackend_SendMail(t *testing.T) {
 		returns  []interface{}
 	}
 	tests := []struct {
-		name          string
-		args          args
-		keycloakMocks []mockInputs
-		assertion     assert.ErrorAssertionFunc
+		name        string
+		args        args
+		clientMocks []mockInputs
+		assertion   assert.ErrorAssertionFunc
 	}{
 		{
 			name: "Mail successfully sent",
 			args: args{
 				id: "test-id",
 			},
-			keycloakMocks: []mockInputs{
+			clientMocks: []mockInputs{
 				{
-					funcName: "LoginClient",
+					funcName: "SendActionsMail",
 					args: []interface{}{
 						mock.Anything,
-						clientID,
-						clientSecret,
-						clientRealm,
-					},
-					returns: []interface{}{
-						&gocloak.JWT{
-							AccessToken: jwtToken,
-						},
-						nil,
-					},
-				},
-				{
-					funcName: "RetrospectToken",
-					args: []interface{}{
-						mock.Anything,
-						jwtToken,
-						clientID,
-						clientSecret,
-						clientRealm,
-					},
-					returns: []interface{}{
-						&gocloak.IntroSpectTokenResult{
-							Active: gocloak.BoolP(true),
-						},
-						nil,
-					},
-				},
-				{
-					funcName: "ExecuteActionsEmail",
-					args: []interface{}{
-						mock.Anything,
-						jwtToken,
 						userRealm,
-						gocloak.ExecuteActionsEmail{
-							UserID:  gocloak.StringP("test-id"),
-							Actions: &[]string{"UPDATE_PASSWORD", "VERIFY_EMAIL"},
+						"test-id",
+						[]kcpkg.UserAction{
+							kcpkg.UserActionUpdatePassword,
+							kcpkg.UserActionVerifyEmail,
 						},
 					},
 					returns: []interface{}{
@@ -191,11 +131,11 @@ func TestBackend_SendMail(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx := context.Background()
-			c := &mocks.GoCloak{}
-			for _, m := range tt.keycloakMocks {
+			c := &mocks.Client{}
+			for _, m := range tt.clientMocks {
 				c.On(m.funcName, m.args...).Return(m.returns...)
 			}
-			b := keycloak.NewWithClient(log.NopLogger(), c, clientID, clientSecret, clientRealm, userRealm)
+			b := keycloak.NewWithClient(log.NopLogger(), c, userRealm)
 			tt.assertion(t, b.SendMail(ctx, tt.args.id))
 		})
 	}
