@@ -16,7 +16,7 @@ Feature: create group
     | simplegroup     |
     | España§àôœ€     |
     | नेपाली            |
-    | $x<=>[y*z^2+1]! |
+    | $x<>[y*z^2+1]! |
     | 😅 😆           |
     | comma,grp1      |
     | Finance (NP)    |

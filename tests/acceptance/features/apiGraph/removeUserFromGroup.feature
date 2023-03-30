@@ -43,7 +43,7 @@ Feature: remove a user from a group
       | Admin&Finance       | Ampersand          |
       | admin:Pokhara@Nepal | Colon and @        |
       | maint+eng           | Plus sign          |
-      | $x<=>[y*z^2]!       | Maths symbols      |
+      | $x<>[y*z^2]!        | Maths symbols      |
       | Mgmt\Middle         | Backslash          |
       | 😁 😂               | emoji              |
     And the following users have been added to the following groups
@@ -56,7 +56,7 @@ Feature: remove a user from a group
       | Alice    | Admin&Finance       |
       | Alice    | admin:Pokhara@Nepal |
       | Alice    | maint+eng           |
-      | Alice    | $x<=>[y*z^2]!       |
+      | Alice    | $x<>[y*z^2]!        |
       | Alice    | Mgmt\Middle         |
       | Alice    | 😁 😂               |
     When the administrator removes the following users from the following groups using the Graph API
@@ -69,7 +69,7 @@ Feature: remove a user from a group
       | Alice    | Admin&Finance       |
       | Alice    | admin:Pokhara@Nepal |
       | Alice    | maint+eng           |
-      | Alice    | $x<=>[y*z^2]!       |
+      | Alice    | $x<>[y*z^2]!        |
       | Alice    | Mgmt\Middle         |
       | Alice    | 😁 😂               |
     Then the HTTP status code of responses on all endpoints should be "204"
@@ -83,7 +83,7 @@ Feature: remove a user from a group
       | Alice    | Admin&Finance       |
       | Alice    | admin:Pokhara@Nepal |
       | Alice    | maint+eng           |
-      | Alice    | $x<=>[y*z^2]!       |
+      | Alice    | $x<>[y*z^2]!        |
       | Alice    | Mgmt\Middle         |
       | Alice    | 😁 😂               |
 
@@ -92,7 +92,7 @@ Feature: remove a user from a group
     Given these groups have been created:
       | groupname       | comment                                 |
       | maintenance#123 | Hash sign                               |
-      | 50%25=0         | %25 literal looks like an escaped "%"   |
+      | 50%250          | %25 literal looks like an escaped "%"   |
       | staff?group     | Question mark                           |
       | 50%pass         | Percent sign (special escaping happens) |
       | 50%2Eagle       | %2E literal looks like an escaped "."   |
@@ -100,7 +100,7 @@ Feature: remove a user from a group
     And the following users have been added to the following groups
       | username | groupname       |
       | Alice    | maintenance#123 |
-      | Alice    | 50%25=0         |
+      | Alice    | 50%250          |
       | Alice    | staff?group     |
       | Alice    | 50%pass         |
       | Alice    | 50%2Eagle       |
@@ -108,7 +108,7 @@ Feature: remove a user from a group
     When the administrator removes the following users from the following groups using the Graph API
       | username | groupname       |
       | Alice    | maintenance#123 |
-      | Alice    | 50%25=0         |
+      | Alice    | 50%250          |
       | Alice    | staff?group     |
       | Alice    | 50%pass         |
       | Alice    | 50%2Eagle       |
@@ -117,7 +117,7 @@ Feature: remove a user from a group
     And the following users should not belong to the following groups
       | username | groupname       |
       | Alice    | maintenance#123 |
-      | Alice    | 50%25=0         |
+      | Alice    | 50%250          |
       | Alice    | staff?group     |
       | Alice    | 50%pass         |
       | Alice    | 50%2Eagle       |

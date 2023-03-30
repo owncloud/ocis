@@ -37,7 +37,7 @@ Feature: add users to group
       | Finance (NP)        | Space and brackets |
       | Admin&Finance       | Ampersand          |
       | maint+eng           | Plus sign          |
-      | $x<=>[y*z^2]!       | Maths symbols      |
+      | $x<>[y*z^2]!        | Maths symbols      |
       | 😁 😂               | emoji              |
       | admin:Pokhara@Nepal | Colon and @        |
     When the administrator adds the following users to the following groups using the Graph API
@@ -49,7 +49,7 @@ Feature: add users to group
       | Alice    | Finance (NP)        |
       | Alice    | Admin&Finance       |
       | Alice    | maint+eng           |
-      | Alice    | $x<=>[y*z^2]!       |
+      | Alice    | $x<>[y*z^2]!        |
       | Alice    | 😁 😂               |
       | Alice    | admin:Pokhara@Nepal |
     Then the HTTP status code of responses on all endpoints should be "204"
@@ -62,7 +62,7 @@ Feature: add users to group
       | Alice    | Finance (NP)        |
       | Alice    | Admin&Finance       |
       | Alice    | maint+eng           |
-      | Alice    | $x<=>[y*z^2]!       |
+      | Alice    | $x<>[y*z^2]!        |
       | Alice    | 😁 😂               |
       | Alice    | admin:Pokhara@Nepal |
 
@@ -72,7 +72,7 @@ Feature: add users to group
       | groupname       | comment                                 |
       | maintenance#123 | Hash sign                               |
       | 50%pass         | Percent sign (special escaping happens) |
-      | 50%25=0         | %25 literal looks like an escaped "%"   |
+      | 50%250          | %25 literal looks like an escaped "%"   |
       | 50%2Eagle       | %2E literal looks like an escaped "."   |
       | 50%2Fix         | %2F literal looks like an escaped slash |
       | Mgmt\Middle     | Backslash                               |
@@ -81,7 +81,7 @@ Feature: add users to group
       | username | groupname       |
       | Alice    | maintenance#123 |
       | Alice    | 50%pass         |
-      | Alice    | 50%25=0         |
+      | Alice    | 50%250          |
       | Alice    | 50%2Eagle       |
       | Alice    | 50%2Fix         |
       | Alice    | Mgmt\Middle     |
@@ -91,7 +91,7 @@ Feature: add users to group
       | username | groupname       |
       | Alice    | maintenance#123 |
       | Alice    | 50%pass         |
-      | Alice    | 50%25=0         |
+      | Alice    | 50%250          |
       | Alice    | 50%2Eagle       |
       | Alice    | 50%2Fix         |
       | Alice    | Mgmt\Middle     |

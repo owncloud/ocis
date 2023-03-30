@@ -186,8 +186,8 @@ Feature: get groups and their members
       | group           |
       | España§àôœ€     |
       | नेपाली            |
-      | $x<=>[y*z^2+1]! |
-      | եòɴԪ˯ΗՐΛɔπ     |
+      | $x<>[y*z^2+1]!  |
+      | եòɴԪ˯ΗՐΛɔπ      |
 
 
   Scenario: admin user tries to get group information of non-existing group

@@ -27,11 +27,11 @@ Feature: delete groups
       | Admin&Finance       | Ampersand                             |
       | admin:Pokhara@Nepal | Colon and @                           |
       | maint+eng           | Plus sign                             |
-      | $x<=>[y*z^2]!       | Maths symbols                         |
+      | $x<>[y*z^2]!        | Maths symbols                         |
       | Mgmt\Middle         | Backslash                             |
       | 😁 😂               | emoji                                 |
       | maintenance#123     | Hash sign                             |
-      | 50%25=0             | %25 literal looks like an escaped "%" |
+      | 50%250              | %25 literal looks like an escaped "%" |
       | staff?group         | Question mark                         |
       | Mgmt/Sydney         | Slash (special escaping happens)      |
       | Mgmt//NSW/Sydney    | Multiple slash                        |

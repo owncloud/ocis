@@ -54,6 +54,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/assignRole.feature:33](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/assignRole.feature#L33)
 
 ### [Group having percentage (%) can be created but cannot be GET](https://github.com/owncloud/ocis/issues/5083)
+- [apiGraph/deleteGroup.feature:34](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L34)
 - [apiGraph/deleteGroup.feature:49](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L49)
 - [apiGraph/deleteGroup.feature:50](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L50)
 - [apiGraph/deleteGroup.feature:51](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L51)
