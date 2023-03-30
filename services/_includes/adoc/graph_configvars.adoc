@@ -796,5 +796,15 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+
+a|`OCIS_MACHINE_AUTH_API_KEY` +
+`USERLOG_MACHINE_AUTH_API_KEY` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Machine auth API key used to validate internal requests necessary to access resources from other services.
 |===
 
