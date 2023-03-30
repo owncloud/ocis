@@ -1792,7 +1792,7 @@ class GraphContext implements Context {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$credentials = $this->getAdminOrUserCredentials($user);
 		$this->featureContext->verifyTableNodeColumns($table, ['username']);
-		
+
 		foreach ($table->getHash() as $row) {
 			$userIds[] = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
 		}
@@ -2354,6 +2354,88 @@ class GraphContext implements Context {
 				['Content-Type' => 'application/json'],
 				\json_encode($invalidJSON)
 			)
+		);
+	}
+
+	/**
+	 * @When /^the administrator "([^"]*)" tries to add the following invalid user ids to a group "([^"]*)" at once using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $group
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theAdministratorTriesToAddTheFollowingUserIdWithInvalidCharacterToAGroup(string $user, string $group, TableNode $table) {
+		$userIds = [];
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		foreach ($table->getHash() as $row) {
+			$userIds[] = \implode(" ", $row);
+		}
+		$this->featureContext->setResponse(
+			GraphHelper::addUsersToGroup(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials["username"],
+				$credentials["password"],
+				$groupId,
+				$userIds
+			)
+		);
+	}
+
+	/**
+	 * @When /^the administrator "([^"]*)" tries to add an invalid user id "([^"]*)" to a group "([^"]*)" using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $userId
+	 * @param string $group
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theAdministratorTriesToAddUserIdWithInvalidCharactersToAGroup(string $user, string $userId, string $group): void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$this->featureContext->setResponse(
+			GraphHelper::addUserToGroup(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials['username'],
+				$credentials['password'],
+				$userId,
+				$groupId
+			)
+		);
+	}
+
+	/**
+	 * @Then the user :user should be listed once in the group :group
+	 *
+	 * @param string $user
+	 * @param string $group
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function theUsersShouldBeListedOnceToAGroup(string $user, string $group): void {
+		$count = 0;
+		$members = $this->listGroupMembers($group);
+		$members = $this->featureContext->getJsonDecodedResponse($members);
+
+		foreach ($members as $member) {
+			if ($member['onPremisesSamAccountName'] === $user) {
+				$count++;
+			}
+		}
+		Assert::assertEquals(
+			1,
+			$count,
+			"Expected user '" . $user . "' to be added once to group '" . $group . "' but the user is listed '" . $count . "' times"
 		);
 	}
 }
