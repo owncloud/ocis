@@ -13,8 +13,8 @@ import (
 // Some attribute constants.
 // TODO: Make these configurable in the future.
 const (
-	idAttr       = "OWNCLOUD_ID"
-	userTypeAttr = "OWNCLOUD_USER_TYPE"
+	_idAttr       = "OWNCLOUD_ID"
+	_userTypeAttr = "OWNCLOUD_USER_TYPE"
 )
 
 // ConcreteClient represents a concrete implementation of a keycloak client
@@ -68,8 +68,8 @@ func (c *ConcreteClient) CreateUser(ctx context.Context, realm string, user *lib
 		FirstName: user.GivenName,
 		LastName:  user.Surname,
 		Attributes: &map[string][]string{
-			idAttr:       {user.GetId()},
-			userTypeAttr: {user.GetUserType()},
+			_idAttr:       {user.GetId()},
+			_userTypeAttr: {user.GetUserType()},
 		},
 		RequiredActions: convertUserActions(userActions),
 	}
@@ -166,13 +166,13 @@ func (c *ConcreteClient) getToken(ctx context.Context) (*gocloak.JWT, error) {
 func (c *ConcreteClient) keycloakUserToLibregraph(u *gocloak.User) *libregraph.User {
 	attrs := *u.Attributes
 	ldapID := ""
-	ldapIDs, ok := attrs[idAttr]
+	ldapIDs, ok := attrs[_idAttr]
 	if ok {
 		ldapID = ldapIDs[0]
 	}
 
 	var userType *string
-	userTypes, ok := attrs[userTypeAttr]
+	userTypes, ok := attrs[_userTypeAttr]
 	if ok {
 		userType = &userTypes[0]
 	}
