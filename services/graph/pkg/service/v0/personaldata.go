@@ -70,7 +70,7 @@ func (g Graph) ExportPersonalData(w http.ResponseWriter, r *http.Request) {
 	// go start gathering
 	go g.GatherPersonalData(u, ref, r.Header.Get(revactx.TokenHeader), marsh)
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 }
 
 // GatherPersonalData will all gather all personal data of the user and save it to a file in the users personal space
