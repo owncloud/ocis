@@ -150,7 +150,12 @@ func (i *LDAP) UpdateEducationClass(ctx context.Context, id string, class libreg
 	var updateNeeded bool
 
 	if class.GetId() != "" {
-		if g.GetEqualFoldAttributeValue(i.groupAttributeMap.id) != class.GetId() {
+		id, err := i.ldapUUIDtoString(g, i.groupAttributeMap.id, i.groupIDisOctetString)
+		if err != nil {
+			i.logger.Warn().Str("dn", g.DN).Str(i.userAttributeMap.id, g.GetAttributeValue(i.userAttributeMap.id)).Msg("Invalid class. Cannot convert UUID")
+			return nil, errorcode.New(errorcode.GeneralException, "error converting uuid")
+		}
+		if id != class.GetId() {
 			return nil, errorcode.New(errorcode.NotAllowed, "changing the GroupID is not allowed")
 		}
 	}

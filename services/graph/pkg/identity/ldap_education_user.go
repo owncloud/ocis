@@ -91,7 +91,12 @@ func (i *LDAP) UpdateEducationUser(ctx context.Context, nameOrID string, user li
 
 	// Don't allow updates of the ID
 	if user.GetId() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.id) != user.GetId() {
+		id, err := i.ldapUUIDtoString(e, i.userAttributeMap.id, i.userIDisOctetString)
+		if err != nil {
+			i.logger.Warn().Str("dn", e.DN).Str(i.userAttributeMap.id, e.GetAttributeValue(i.userAttributeMap.id)).Msg("Invalid User. Cannot convert UUID")
+			return nil, errorcode.New(errorcode.GeneralException, "error converting uuid")
+		}
+		if id != user.GetId() {
 			return nil, errorcode.New(errorcode.NotAllowed, "changing the UserId is not allowed")
 		}
 	}

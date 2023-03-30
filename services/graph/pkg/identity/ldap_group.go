@@ -416,14 +416,24 @@ func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]strin
 }
 
 func (i *LDAP) getLDAPGroupByID(id string, requestMembers bool) (*ldap.Entry, error) {
-	id = ldap.EscapeFilter(id)
-	filter := fmt.Sprintf("(%s=%s)", i.groupAttributeMap.id, id)
+	idString, err := filterEscapeUUID(i.groupIDisOctetString, id)
+	if err != nil {
+		return nil, fmt.Errorf("Invalid group id: %w", err)
+	}
+	filter := fmt.Sprintf("(%s=%s)", i.groupAttributeMap.id, idString)
 	return i.getLDAPGroupByFilter(filter, requestMembers)
 }
 
 func (i *LDAP) getLDAPGroupByNameOrID(nameOrID string, requestMembers bool) (*ldap.Entry, error) {
-	nameOrID = ldap.EscapeFilter(nameOrID)
-	filter := fmt.Sprintf("(|(%s=%s)(%s=%s))", i.groupAttributeMap.name, nameOrID, i.groupAttributeMap.id, nameOrID)
+	idString, err := filterEscapeUUID(i.groupIDisOctetString, nameOrID)
+	// err != nil just means that this is not a uuid so we can skip the uuid filterpart
+	// and just filter by name
+	filter := ""
+	if err == nil {
+		filter = fmt.Sprintf("(|(%s=%s)(%s=%s))", i.groupAttributeMap.name, ldap.EscapeFilter(nameOrID), i.groupAttributeMap.id, idString)
+	} else {
+		filter = fmt.Sprintf("(%s=%s)", i.userAttributeMap.userName, ldap.EscapeFilter(nameOrID))
+	}
 	return i.getLDAPGroupByFilter(filter, requestMembers)
 }
 
@@ -510,7 +520,10 @@ func (i *LDAP) getGroupsForUser(dn string) ([]*ldap.Entry, error) {
 
 func (i *LDAP) createGroupModelFromLDAP(e *ldap.Entry) *libregraph.Group {
 	name := e.GetEqualFoldAttributeValue(i.groupAttributeMap.name)
-	id := e.GetEqualFoldAttributeValue(i.groupAttributeMap.id)
+	id, err := i.ldapUUIDtoString(e, i.groupAttributeMap.id, i.groupIDisOctetString)
+	if err != nil {
+		i.logger.Warn().Str("dn", e.DN).Str(i.groupAttributeMap.id, e.GetAttributeValue(i.groupAttributeMap.id)).Msg("Invalid User. Cannot convert UUID")
+	}
 	groupTypes := []string{}
 
 	if i.isLDAPGroupReadOnly(e) {
