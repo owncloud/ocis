@@ -17,9 +17,9 @@ Feature: Notification
     And user "Alice" has shared a space "notificaton checking" with settings:
       | shareWith | Brian  |
       | role      | editor |
-    When user "Brian" list all notifications
+    When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
-    And the JSON response should contain message with type "Space shared" and match
+    And the JSON response should contain a notification message with the subject "Space shared" and the message-details should match
     """
     {
     "type": "object",
@@ -64,7 +64,8 @@ Feature: Notification
               ],
               "properties": {
                 "id": {
-                  "type": "string"
+                  "type": "string",
+                  "pattern": "^[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}\\$[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}![a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}$"
                 },
                 "name": {
                   "type": "string",

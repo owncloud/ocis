@@ -1688,7 +1688,7 @@ class GraphContext implements Context {
 					Assert::assertTrue(GraphHelper::isUUIDv4($actualKeyValue), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValue);
 					break;
 				case '%space_id%':
-					Assert::assertTrue(GraphHelper::isSpaceId($actualKeyValue), __METHOD__ . ' Expected space_id to have a UUIDv4:UUIDv4 pattern but found: ' . $actualKeyValue);
+          Assert::assertTrue(GraphHelper::isSpaceId($actualKeyValue), __METHOD__ . ' Expected space_id to have a UUIDv4:UUIDv4 pattern but found: ' . $actualKeyValue);
 					break;
 				default:
 					$expectedDriveInformation[$keyName] = $this->featureContext->substituteInLineCodes(

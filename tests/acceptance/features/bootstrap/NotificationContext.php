@@ -43,7 +43,7 @@ class NotificationContext implements Context {
 	/**
 	 * @return array[]
 	 */
-	public function getLastNotificationIds():array {
+	public function getLastNotificationId():array {
 		return \end($this->notificationIds);
 	}
 
@@ -84,7 +84,7 @@ class NotificationContext implements Context {
 	}
 
 	/**
-	 * @Then /^user "([^"]*)" list all notifications$/
+	 * @Then /^user "([^"]*)" lists all notifications$/
 	 *
 	 * @param string $user
 	 *
@@ -104,24 +104,22 @@ class NotificationContext implements Context {
 	}
 
 	/**
-	 * @Then /^the JSON response should contain message with type "([^"]*)" and match$/
+	 * @Then /^the JSON response should contain a notification message with the subject "([^"]*)" and the message-details should match$/
 	 *
-	 * @param string $messageType
-	 * @param string|null $spaceName
+	 * @param string $subject
 	 * @param PyStringNode $schemaString
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
 	public function theJsonDataFromLastResponseShouldMatch(
-		string $messageType,
-		?string $spaceName = null,
+		string $subject,
 		PyStringNode $schemaString
 	): void {
 		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data)) {
 			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data;
 			foreach ($responseBody as $value) {
-				if (isset($value->subject) && $value->subject === $messageType) {
+				if (isset($value->subject) && $value->subject === $subject) {
 					$responseBody = $value;
 					// set notificationId
 					$this->notificationIds[] = $value->notification_id;
@@ -138,14 +136,7 @@ class NotificationContext implements Context {
 			$schemaString,
 			$this->featureContext->getCurrentUser(),
 			[],
-			[
-				[
-					"code" => "%space_id%",
-					"function" =>
-						[$this, "getSpaceIdByNameFromResponse"],
-					"parameter" => [$spaceName]
-				]
-			],
+			[],
 			null,
 			$this->getUserRecipient(),
 		);
