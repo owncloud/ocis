@@ -207,6 +207,7 @@ func NewService(opts ...Option) (Graph, error) {
 				r.Route("/{userID}", func(r chi.Router) {
 					r.Get("/", svc.GetUser)
 					r.Get("/drive", svc.GetUserDrive)
+					r.Post("/exportPersonalData", svc.ExportPersonalData)
 					r.With(requireAdmin).Delete("/", svc.DeleteUser)
 					r.With(requireAdmin).Patch("/", svc.PatchUser)
 					if svc.roleService != nil {

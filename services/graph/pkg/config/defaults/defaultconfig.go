@@ -149,6 +149,10 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.Commons != nil {
 		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
 	}
+
+	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
+		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
+	}
 }
 
 // Sanitize sanitized the configuration

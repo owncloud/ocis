@@ -17,6 +17,7 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -38,7 +39,7 @@ import (
 var _ = Describe("Graph", func() {
 	var (
 		svc               service.Service
-		gatewayClient     *mocks.GatewayClient
+		gatewayClient     *cs3mocks.GatewayAPIClient
 		eventsPublisher   mocks.Publisher
 		permissionService mocks.Permissions
 		ctx               context.Context
@@ -63,7 +64,7 @@ var _ = Describe("Graph", func() {
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 
 		_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
-		gatewayClient = &mocks.GatewayClient{}
+		gatewayClient = &cs3mocks.GatewayAPIClient{}
 		eventsPublisher = mocks.Publisher{}
 		permissionService = mocks.Permissions{}
 		svc, _ = service.NewService(

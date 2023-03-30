@@ -11,6 +11,7 @@ import (
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -36,7 +37,7 @@ var _ = Describe("Groups", func() {
 		svc             service.Service
 		ctx             context.Context
 		cfg             *config.Config
-		gatewayClient   *mocks.GatewayClient
+		gatewayClient   *cs3mocks.GatewayAPIClient
 		eventsPublisher mocks.Publisher
 		identityBackend *identitymocks.Backend
 
@@ -54,7 +55,7 @@ var _ = Describe("Groups", func() {
 		eventsPublisher.On("Publish", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
 		identityBackend = &identitymocks.Backend{}
-		gatewayClient = &mocks.GatewayClient{}
+		gatewayClient = &cs3mocks.GatewayAPIClient{}
 		newGroup = libregraph.NewGroup()
 		newGroup.SetMembersodataBind([]string{"/users/user1"})
 		newGroup.SetId("group1")

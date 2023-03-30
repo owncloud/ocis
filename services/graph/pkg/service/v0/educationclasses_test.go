@@ -11,6 +11,7 @@ import (
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -33,7 +34,7 @@ var _ = Describe("EducationClass", func() {
 		svc                      service.Service
 		ctx                      context.Context
 		cfg                      *config.Config
-		gatewayClient            *mocks.GatewayClient
+		gatewayClient            *cs3mocks.GatewayAPIClient
 		eventsPublisher          mocks.Publisher
 		identityBackend          *identitymocks.Backend
 		identityEducationBackend *identitymocks.EducationBackend
@@ -53,7 +54,7 @@ var _ = Describe("EducationClass", func() {
 
 		identityEducationBackend = &identitymocks.EducationBackend{}
 		identityBackend = &identitymocks.Backend{}
-		gatewayClient = &mocks.GatewayClient{}
+		gatewayClient = &cs3mocks.GatewayAPIClient{}
 		newClass = libregraph.NewEducationClass("math", "course")
 		newClass.SetMembersodataBind([]string{"/users/user1"})
 		newClass.SetId("math")

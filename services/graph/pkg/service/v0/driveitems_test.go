@@ -11,6 +11,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/stretchr/testify/mock"
@@ -34,7 +35,7 @@ var _ = Describe("Driveitems", func() {
 		svc             service.Service
 		ctx             context.Context
 		cfg             *config.Config
-		gatewayClient   *mocks.GatewayClient
+		gatewayClient   *cs3mocks.GatewayAPIClient
 		eventsPublisher mocks.Publisher
 		identityBackend *identitymocks.Backend
 
@@ -49,7 +50,7 @@ var _ = Describe("Driveitems", func() {
 		rr = httptest.NewRecorder()
 
 		identityBackend = &identitymocks.Backend{}
-		gatewayClient = &mocks.GatewayClient{}
+		gatewayClient = &cs3mocks.GatewayAPIClient{}
 		newGroup = libregraph.NewGroup()
 		newGroup.SetMembersodataBind([]string{"/users/user1"})
 		newGroup.SetId("group1")

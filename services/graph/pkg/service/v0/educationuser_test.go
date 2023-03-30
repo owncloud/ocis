@@ -13,6 +13,7 @@ import (
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -38,7 +39,7 @@ var _ = Describe("EducationUsers", func() {
 		svc                      service.Service
 		ctx                      context.Context
 		cfg                      *config.Config
-		gatewayClient            *mocks.GatewayClient
+		gatewayClient            *cs3mocks.GatewayAPIClient
 		eventsPublisher          mocks.Publisher
 		roleService              *mocks.RoleService
 		identityEducationBackend *identitymocks.EducationBackend
@@ -57,7 +58,7 @@ var _ = Describe("EducationUsers", func() {
 
 		identityEducationBackend = &identitymocks.EducationBackend{}
 		roleService = &mocks.RoleService{}
-		gatewayClient = &mocks.GatewayClient{}
+		gatewayClient = &cs3mocks.GatewayAPIClient{}
 
 		rr = httptest.NewRecorder()
 		ctx = context.Background()

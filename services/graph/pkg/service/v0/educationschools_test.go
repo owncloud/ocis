@@ -11,6 +11,7 @@ import (
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -19,7 +20,6 @@ import (
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
-	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
@@ -36,7 +36,7 @@ var _ = Describe("Schools", func() {
 		svc                      service.Service
 		ctx                      context.Context
 		cfg                      *config.Config
-		gatewayClient            *mocks.GatewayClient
+		gatewayClient            *cs3mocks.GatewayAPIClient
 		identityEducationBackend *identitymocks.EducationBackend
 
 		rr *httptest.ResponseRecorder
@@ -51,7 +51,7 @@ var _ = Describe("Schools", func() {
 
 	BeforeEach(func() {
 		identityEducationBackend = &identitymocks.EducationBackend{}
-		gatewayClient = &mocks.GatewayClient{}
+		gatewayClient = &cs3mocks.GatewayAPIClient{}
 		newSchool = libregraph.NewEducationSchool()
 		newSchool.SetId("school1")
 

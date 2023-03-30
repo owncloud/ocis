@@ -13,7 +13,7 @@ require (
 	github.com/blevesearch/bleve/v2 v2.3.6
 	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/cs3org/go-cs3apis v0.0.0-20221012090518-ef2996678965
-	github.com/cs3org/reva/v2 v2.12.1-0.20230324102706-36c2ef95b29d
+	github.com/cs3org/reva/v2 v2.12.1-0.20230330074121-1f0e39b47ee7
 	github.com/disintegration/imaging v1.6.2
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1

@@ -7,6 +7,7 @@ import (
 	stdhttp "net/http"
 	"os"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
@@ -101,7 +102,7 @@ func Server(opts ...Option) (http.Service, error) {
 	// how do we secure the api?
 	var requireAdminMiddleware func(stdhttp.Handler) stdhttp.Handler
 	var roleService svc.RoleService
-	var gatewayClient svc.GatewayClient
+	var gatewayClient gateway.GatewayAPIClient
 	if options.Config.HTTP.APIToken == "" {
 		middlewares = append(middlewares,
 			graphMiddleware.Auth(
