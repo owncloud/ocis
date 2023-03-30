@@ -258,7 +258,7 @@ func (i *LDAP) UpdateGroupName(ctx context.Context, groupID string, groupName st
 func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs []string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("AddMembersToGroup")
-	ge, err := i.getLDAPGroupByID(groupID, true)
+	ge, err := i.getLDAPGroupByNameOrID(groupID, true)
 	if err != nil {
 		return err
 	}
