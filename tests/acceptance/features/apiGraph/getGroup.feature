@@ -20,7 +20,7 @@ Feature: get groups and their members
       | coffee-lover |
       | h2o-lover    |
 
-
+  @issue-5938
   Scenario Outline: user other than the admin shouldn't get the groups list
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<role>" using the settings api
@@ -51,7 +51,7 @@ Feature: get groups and their members
       | Brian |
       | Carol |
 
-
+  @issue-5938
   Scenario Outline: user other than the admin shouldn't get users of a group
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<role>" using the settings api
@@ -86,7 +86,7 @@ Feature: get groups and their members
       | Alice Hansen | %uuid_v4% | alice@example.org | Alice                    |
       | Carol King   | %uuid_v4% | carol@example.org | Carol                    |
 
-
+  @issue-5938
   Scenario Outline: user other than the admin shouldn't get all groups along with its member's information
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<role>" using the settings api

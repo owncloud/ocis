@@ -1,4 +1,4 @@
-@api @skipOnOcV10 @issue-5099
+@api @skipOnOcV10 
 Feature: edit group name
   As an admin
   I want to be able to edit group name
@@ -8,7 +8,7 @@ Feature: edit group name
     Given user "Alice" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "Admin" using the settings api
 
-
+  @issue-5977
   Scenario Outline: admin user renames a group
     Given group "<old_group>" has been created
     When user "Alice" renames group "<old_group>" to "<new_group>" using the Graph API
@@ -24,7 +24,7 @@ Feature: edit group name
       | grp1      | staff?group   |
       | grp1      | 50%pass       |
 
-
+  @issue-5938
   Scenario Outline: user other than the admin can't rename a group
     Given the administrator has given "Alice" the role "<role>" using the settings api
     And group "grp1" has been created

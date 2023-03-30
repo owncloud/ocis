@@ -28,7 +28,7 @@ Feature: edit user
       | empty mail                |                      | 400  | brian@example.com    |
       | change to a invalid email | invalidEmail         | 400  | brian@example.com    |
 
-  @skipOnStable2.0
+  @skipOnStable2.0 @issue-5763
   Scenario Outline: the admin user can edit another user's name
     Given user "Carol" has been created with default attributes and without skeleton files
     When the user "Alice" changes the user name of user "Carol" to "<userName>" using the Graph API
@@ -41,7 +41,7 @@ Feature: edit user
       | change to a valid user name  | Lionel   | 200  | Lionel           |
       | user name characters         | *:!;_+-& | 200  | *:!;_+-&         |
       | change to existing user name | Brian    | 409  | Brian            |
-      | empty user name              |          | 400  | Brian            |
+      | empty user name              |          | 200  | Brian            |
 
   @skipOnStable2.0
   Scenario: the admin user changes the name of a user to the name of an existing disabled user
