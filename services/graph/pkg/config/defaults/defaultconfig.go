@@ -153,6 +153,10 @@ func EnsureDefaults(cfg *config.Config) {
 	if cfg.MachineAuthAPIKey == "" && cfg.Commons != nil && cfg.Commons.MachineAuthAPIKey != "" {
 		cfg.MachineAuthAPIKey = cfg.Commons.MachineAuthAPIKey
 	}
+
+	if cfg.Identity.LDAP.GroupCreateBaseDN == "" {
+		cfg.Identity.LDAP.GroupCreateBaseDN = cfg.Identity.LDAP.GroupBaseDN
+	}
 }
 
 // Sanitize sanitized the configuration

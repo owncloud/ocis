@@ -21,22 +21,42 @@ var groupEntry = ldap.NewEntry("cn=group",
 			"uid=invalid,ou=people,dc=test",
 		},
 	})
+
 var invalidGroupEntry = ldap.NewEntry("cn=invalid",
 	map[string][]string{
 		"cn": {"invalid"},
 	})
+
+var queryParamExpand = url.Values{
+	"$expand": []string{"members"},
+}
+
+var queryParamSelect = url.Values{
+	"$select": []string{"members"},
+}
+
+var groupLookupSearchRequest = &ldap.SearchRequest{
+	BaseDN:     "ou=groups,dc=test",
+	Scope:      2,
+	SizeLimit:  1,
+	Filter:     "(&(objectClass=groupOfNames)(|(cn=group)(entryUUID=group)))",
+	Attributes: []string{"cn", "entryUUID", "member"},
+	Controls:   []ldap.Control(nil),
+}
+
+var groupListSeachRequest = &ldap.SearchRequest{
+	BaseDN:     "ou=groups,dc=test",
+	Scope:      2,
+	Filter:     "(&(objectClass=groupOfNames))",
+	Attributes: []string{"cn", "entryUUID", "member"},
+	Controls:   []ldap.Control(nil),
+}
 
 func TestGetGroup(t *testing.T) {
 	// Mock a Sizelimit Error
 	lm := &mocks.Client{}
 	lm.On("Search", mock.Anything).Return(nil, ldap.NewError(ldap.LDAPResultSizeLimitExceeded, errors.New("mock")))
 
-	queryParamExpand := url.Values{
-		"$expand": []string{"members"},
-	}
-	queryParamSelect := url.Values{
-		"$select": []string{"members"},
-	}
 	b, _ := getMockedBackend(lm, lconfig, &logger)
 	_, err := b.GetGroup(context.Background(), "group", nil)
 	if err == nil || err.Error() != "itemNotFound" {
@@ -89,14 +109,6 @@ func TestGetGroup(t *testing.T) {
 
 	// Mock a valid	Search Result
 	lm = &mocks.Client{}
-	sr1 := &ldap.SearchRequest{
-		BaseDN:     "ou=groups,dc=test",
-		Scope:      2,
-		SizeLimit:  1,
-		Filter:     "(&(objectClass=groupOfNames)(|(cn=group)(entryUUID=group)))",
-		Attributes: []string{"cn", "entryUUID", "member"},
-		Controls:   []ldap.Control(nil),
-	}
 	sr2 := &ldap.SearchRequest{
 		BaseDN:     "uid=user,ou=people,dc=test",
 		SizeLimit:  1,
@@ -112,7 +124,7 @@ func TestGetGroup(t *testing.T) {
 		Controls:   []ldap.Control(nil),
 	}
 
-	lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
+	lm.On("Search", groupLookupSearchRequest).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
 	lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{userEntry}}, nil)
 	lm.On("Search", sr3).Return(&ldap.SearchResult{Entries: []*ldap.Entry{invalidUserEntry}}, nil)
 	b, _ = getMockedBackend(lm, lconfig, &logger)
@@ -146,13 +158,80 @@ func TestGetGroup(t *testing.T) {
 	}
 }
 
+func TestGetGroupReadOnlyBackend(t *testing.T) {
+	readOnlyConfig := lconfig
+	readOnlyConfig.WriteEnabled = false
+
+	lm := &mocks.Client{}
+	lm.On("Search", groupLookupSearchRequest).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
+	b, _ := getMockedBackend(lm, readOnlyConfig, &logger)
+	g, err := b.GetGroup(context.Background(), "group", url.Values{})
+	switch {
+	case err != nil:
+		t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
+	case g.GetId() != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id):
+		t.Errorf("Expected GetGroup to return a valid group")
+	}
+	types := g.GetGroupTypes()
+	switch {
+	case len(types) == 0:
+		t.Errorf("No groupTypes attribute on readonly Group")
+	case len(types) > 1:
+		t.Errorf("Expected a single groupTypes value on readonly Group")
+	case types[0] != "ReadOnly":
+		t.Errorf("Expected a groupTypes 'ReadOnly' on readonly Group")
+	}
+}
+func TestGetGroupReadOnlySubtree(t *testing.T) {
+	readOnlyTreeConfig := lconfig
+	readOnlyTreeConfig.GroupCreateBaseDN = "ou=write,ou=groups,dc=test"
+	var writeGroupEntry = ldap.NewEntry("cn=group,ou=write,ou=groups,dc=test",
+		map[string][]string{
+			"cn":        {"group"},
+			"entryuuid": {"abcd-defg"},
+			"member": {
+				"uid=user,ou=people,dc=test",
+				"uid=invalid,ou=people,dc=test",
+			},
+		})
+
+	lm := &mocks.Client{}
+	lm.On("Search", groupLookupSearchRequest).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
+	b, _ := getMockedBackend(lm, readOnlyTreeConfig, &logger)
+	g, err := b.GetGroup(context.Background(), "group", url.Values{})
+	switch {
+	case err != nil:
+		t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
+	case g.GetId() != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id):
+		t.Errorf("Expected GetGroup to return a valid group")
+	}
+	types := g.GetGroupTypes()
+	switch {
+	case len(types) == 0:
+		t.Errorf("No groupTypes attribute on readonly Group")
+	case len(types) > 1:
+		t.Errorf("Expected a single groupTypes value on readonly Group")
+	case types[0] != "ReadOnly":
+		t.Errorf("Expected a groupTypes 'ReadOnly' on readonly Group")
+	}
+
+	lm = &mocks.Client{}
+	lm.On("Search", groupLookupSearchRequest).Return(&ldap.SearchResult{Entries: []*ldap.Entry{writeGroupEntry}}, nil)
+	b, _ = getMockedBackend(lm, readOnlyTreeConfig, &logger)
+	g, err = b.GetGroup(context.Background(), "group", url.Values{})
+	switch {
+	case err != nil:
+		t.Errorf("Expected GetGroup to succeed. Got %s", err.Error())
+	case g.GetId() != groupEntry.GetEqualFoldAttributeValue(b.groupAttributeMap.id):
+		t.Errorf("Expected GetGroup to return a valid group")
+	}
+	types = g.GetGroupTypes()
+	if len(types) != 0 {
+		t.Errorf("No groupTypes attribute expected on writeable Group")
+	}
+}
+
 func TestGetGroups(t *testing.T) {
-	queryParamExpand := url.Values{
-		"$expand": []string{"members"},
-	}
-	queryParamSelect := url.Values{
-		"$select": []string{"members"},
-	}
 	lm := &mocks.Client{}
 	lm.On("Search", mock.Anything).Return(nil, ldap.NewError(ldap.LDAPResultOperationsError, errors.New("mock")))
 	b, _ := getMockedBackend(lm, lconfig, &logger)
@@ -185,13 +264,6 @@ func TestGetGroups(t *testing.T) {
 
 	// Mock a valid	Search Result with expanded group members
 	lm = &mocks.Client{}
-	sr1 := &ldap.SearchRequest{
-		BaseDN:     "ou=groups,dc=test",
-		Scope:      2,
-		Filter:     "(&(objectClass=groupOfNames))",
-		Attributes: []string{"cn", "entryUUID", "member"},
-		Controls:   []ldap.Control(nil),
-	}
 	sr2 := &ldap.SearchRequest{
 		BaseDN:     "uid=user,ou=people,dc=test",
 		SizeLimit:  1,
@@ -208,7 +280,7 @@ func TestGetGroups(t *testing.T) {
 	}
 
 	for _, param := range []url.Values{queryParamSelect, queryParamExpand} {
-		lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
+		lm.On("Search", groupListSeachRequest).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
 		lm.On("Search", sr2).Return(&ldap.SearchResult{Entries: []*ldap.Entry{userEntry}}, nil)
 		lm.On("Search", sr3).Return(&ldap.SearchResult{Entries: []*ldap.Entry{invalidUserEntry}}, nil)
 		b, _ = getMockedBackend(lm, lconfig, &logger)
