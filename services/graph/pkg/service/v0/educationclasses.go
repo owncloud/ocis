@@ -66,9 +66,13 @@ func (g Graph) PostEducationClass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, ok := class.GetDisplayNameOk(); !ok {
+	name, ok := class.GetDisplayNameOk()
+	if !ok {
 		logger.Debug().Err(err).Interface("class", class).Msg("could not create class: missing required attribute")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Missing Required Attribute")
+		return
+	}
+	if !nameAccepted(*name, w, r, logger) {
 		return
 	}
 
@@ -129,6 +133,9 @@ func (g Graph) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
 
 	var features []events.GroupFeature
 	if displayName, ok := changes.GetDisplayNameOk(); ok {
+		if !nameAccepted(*displayName, w, r, logger) {
+			return
+		}
 		features = append(features, events.GroupFeature{Name: "displayname", Value: *displayName})
 	}
 

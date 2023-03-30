@@ -271,9 +271,13 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, ok := u.GetDisplayNameOk(); !ok {
+	name, ok := u.GetDisplayNameOk()
+	if !ok {
 		logger.Debug().Err(err).Interface("user", u).Msg("could not create user: missing required Attribute: 'displayName'")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'displayName'")
+		return
+	}
+	if !nameAccepted(*name, w, r, logger) {
 		return
 	}
 	if accountName, ok := u.GetOnPremisesSamAccountNameOk(); ok {
@@ -659,6 +663,9 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if name, ok := changes.GetDisplayNameOk(); ok {
+		if !nameAccepted(*name, w, r, logger) {
+			return
+		}
 		features = append(features, events.UserFeature{Name: "displayname", Value: *name})
 	}
 

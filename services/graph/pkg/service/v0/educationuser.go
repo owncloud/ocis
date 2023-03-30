@@ -76,9 +76,13 @@ func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, ok := u.GetDisplayNameOk(); !ok {
+	name, ok := u.GetDisplayNameOk()
+	if !ok {
 		logger.Debug().Err(err).Interface("user", u).Msg("could not create education user: missing required Attribute: 'displayName'")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'displayName'")
+		return
+	}
+	if !nameAccepted(*name, w, r, logger) {
 		return
 	}
 
@@ -354,6 +358,9 @@ func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if name, ok := changes.GetDisplayNameOk(); ok {
+		if !nameAccepted(*name, w, r, logger) {
+			return
+		}
 		features = append(features, events.UserFeature{Name: "displayname", Value: *name})
 	}
 

@@ -73,9 +73,13 @@ func (g Graph) PostEducationSchool(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, ok := school.GetDisplayNameOk(); !ok {
+	name, ok := school.GetDisplayNameOk()
+	if !ok {
 		logger.Debug().Interface("school", school).Msg("could not create school: missing required attribute")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Missing Required Attribute")
+		return
+	}
+	if !nameAccepted(*name, w, r, logger) {
 		return
 	}
 
@@ -133,6 +137,10 @@ func (g Graph) PatchEducationSchool(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update school: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+
+	if !nameAccepted(*school.DisplayName, w, r, logger) {
 		return
 	}
 

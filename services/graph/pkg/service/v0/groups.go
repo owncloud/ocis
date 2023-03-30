@@ -67,9 +67,13 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, ok := grp.GetDisplayNameOk(); !ok {
+	groupName, ok := grp.GetDisplayNameOk()
+	if !ok {
 		logger.Debug().Err(err).Interface("group", grp).Msg("could not create group: missing required attribute")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Missing Required Attribute")
+		return
+	}
+	if !nameAccepted(*groupName, w, r, logger) {
 		return
 	}
 
@@ -128,6 +132,9 @@ func (g Graph) PatchGroup(w http.ResponseWriter, r *http.Request) {
 
 	if changes.HasDisplayName() {
 		groupName := changes.GetDisplayName()
+		if !nameAccepted(groupName, w, r, logger) {
+			return
+		}
 		err = g.identityBackend.UpdateGroupName(r.Context(), groupID, groupName)
 	}
 

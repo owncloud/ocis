@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -16,6 +17,7 @@ import (
 	"github.com/jellydator/ttlcache/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/store"
@@ -23,6 +25,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
 	graphm "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
 	microstore "go-micro.dev/v4/store"
 )
 
@@ -422,5 +425,21 @@ func parsePurgeHeader(h http.Header) bool {
 	if b, err := strconv.ParseBool(val); err == nil {
 		return b
 	}
+	return false
+}
+
+// ldap is using `=` signs as delimiter for key-values when doing requests
+// underlying go library is having problems when trying to parse names (keys) that contain `=`
+// this causes our internal idm to panic. As a quick "fix" we forbid `=` signs in group/class/school ... names.
+// this should be revisited when upstream library is fixed or the need for `=` in names arises
+//
+// nameAccepted is a convenience function setting status code to `400` and logging it
+func nameAccepted(name string, w http.ResponseWriter, r *http.Request, logger log.Logger) bool {
+	if !strings.Contains(name, "=") {
+		return true
+	}
+
+	logger.Debug().Str("name", name).Msg("name contained '='")
+	errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "name must not contain '='")
 	return false
 }
