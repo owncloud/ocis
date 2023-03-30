@@ -176,5 +176,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 ### [Adding the same user as multiple members in a single request results in listing the same user twice in the group](https://github.com/owncloud/ocis/issues/5855)
 - [apiGraph/addUserToGroup.feature:367](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L367)
 
+### [API requests from an unauthorized user should return 403](https://github.com/owncloud/ocis/issues/5938)
+- [apiSpaces/setQuota.feature:50](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L50)
+- [apiSpaces/setQuota.feature:134](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L134)
+- [apiSpaces/setQuota.feature:210](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L210)
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
