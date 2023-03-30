@@ -178,14 +178,14 @@ func touchFile(ctx context.Context, ref *provider.Reference, gwc gateway.Gateway
 }
 
 func createFolders(ctx context.Context, ref *provider.Reference, gwc gateway.GatewayAPIClient) error {
-	var pathes []string
+	var paths []string
 	p := filepath.Dir(ref.GetPath())
 	for p != "." {
-		pathes = append([]string{p}, pathes...)
+		paths = append([]string{p}, paths...)
 		p = filepath.Dir(p)
 	}
 
-	for _, p := range pathes {
+	for _, p := range paths {
 		r := &provider.Reference{ResourceId: ref.GetResourceId(), Path: p}
 		resp, err := gwc.CreateContainer(ctx, &provider.CreateContainerRequest{Ref: r})
 		if err != nil {
