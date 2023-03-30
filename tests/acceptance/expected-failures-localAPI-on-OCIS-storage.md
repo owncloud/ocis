@@ -105,9 +105,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Sharing to a group with an expiration date does not work #5442](https://github.com/owncloud/ocis/issues/5442)
 - [apiSpacesShares/shareSubItemOfSpace.feature:105](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L105)
 
-#### [Space admin should not not be able to change the user quota](https://github.com/owncloud/ocis/issues/5475)
-- [apiSpaces/spaceManagement.feature:149](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/spaceManagement.feature#L149)
-
 #### [Same users can be added in a group multiple time](https://github.com/owncloud/ocis/issues/5702)
 - [apiGraph/addUserToGroup.feature:222](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L222)
 
@@ -125,5 +122,9 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpaces/setQuota.feature:83](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L83)
 - [apiSpaces/setQuota.feature:239](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L239)
 
+### [API requests from an unauthorized user should return 403](https://github.com/owncloud/ocis/issues/5938)
+- [apiSpaces/setQuota.feature:50](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L50)
+- [apiSpaces/setQuota.feature:134](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L134)
+- [apiSpaces/setQuota.feature:210](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/setQuota.feature#L210)
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
