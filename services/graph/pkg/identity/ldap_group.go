@@ -204,10 +204,16 @@ func (i *LDAP) DeleteGroup(ctx context.Context, id string) error {
 	if !i.writeEnabled {
 		return errorcode.New(errorcode.NotAllowed, "server is configured read-only")
 	}
+
 	e, err := i.getLDAPGroupByID(id, false)
 	if err != nil {
 		return err
 	}
+
+	if i.isLDAPGroupReadOnly(e) {
+		return errorcode.New(errorcode.NotAllowed, "group is read-only")
+	}
+
 	dr := ldap.DelRequest{DN: e.DN}
 	if err = i.conn.Del(&dr); err != nil {
 		return err
@@ -219,10 +225,17 @@ func (i *LDAP) DeleteGroup(ctx context.Context, id string) error {
 func (i *LDAP) UpdateGroupName(ctx context.Context, groupID string, groupName string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("AddMembersToGroup")
+	if !i.writeEnabled {
+		return errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+	}
 
 	ge, err := i.getLDAPGroupByID(groupID, true)
 	if err != nil {
 		return err
+	}
+
+	if i.isLDAPGroupReadOnly(ge) {
+		return errorcode.New(errorcode.NotAllowed, "group is read-only")
 	}
 
 	if ge.GetEqualFoldAttributeValue(i.groupAttributeMap.name) == groupName {
@@ -258,9 +271,16 @@ func (i *LDAP) UpdateGroupName(ctx context.Context, groupID string, groupName st
 func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs []string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("AddMembersToGroup")
+	if !i.writeEnabled {
+		return errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+	}
 	ge, err := i.getLDAPGroupByNameOrID(groupID, true)
 	if err != nil {
 		return err
+	}
+
+	if i.isLDAPGroupReadOnly(ge) {
+		return errorcode.New(errorcode.NotAllowed, "group is read-only")
 	}
 
 	mr := ldap.ModifyRequest{DN: ge.DN}
@@ -326,11 +346,20 @@ func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs 
 func (i *LDAP) RemoveMemberFromGroup(ctx context.Context, groupID string, memberID string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("RemoveMemberFromGroup")
+	if !i.writeEnabled {
+		return errorcode.New(errorcode.NotAllowed, "server is configured read-only")
+	}
+
 	ge, err := i.getLDAPGroupByID(groupID, true)
 	if err != nil {
 		logger.Debug().Str("backend", "ldap").Str("groupID", groupID).Msg("Error looking up group")
 		return err
 	}
+
+	if i.isLDAPGroupReadOnly(ge) {
+		return errorcode.New(errorcode.NotAllowed, "group is read-only")
+	}
+
 	me, err := i.getLDAPUserByID(memberID)
 	if err != nil {
 		logger.Debug().Str("backend", "ldap").Str("memberID", memberID).Msg("Error looking up group member")
@@ -345,7 +374,7 @@ func (i *LDAP) RemoveMemberFromGroup(ctx context.Context, groupID string, member
 }
 
 func (i *LDAP) groupToAddRequest(group libregraph.Group) (*ldap.AddRequest, error) {
-	ar := ldap.NewAddRequest(i.getGroupLDAPDN(group), nil)
+	ar := ldap.NewAddRequest(i.getGroupCreateLDAPDN(group), nil)
 
 	attrMap, err := i.groupToLDAPAttrValues(group)
 	if err != nil {
@@ -357,12 +386,12 @@ func (i *LDAP) groupToAddRequest(group libregraph.Group) (*ldap.AddRequest, erro
 	return ar, nil
 }
 
-func (i *LDAP) getGroupLDAPDN(group libregraph.Group) string {
+func (i *LDAP) getGroupCreateLDAPDN(group libregraph.Group) string {
 	attributeTypeAndValue := ldap.AttributeTypeAndValue{
 		Type:  "cn",
 		Value: group.GetDisplayName(),
 	}
-	return fmt.Sprintf("%s,%s", attributeTypeAndValue.String(), i.groupBaseDN)
+	return fmt.Sprintf("%s,%s", attributeTypeAndValue.String(), i.groupCreateBaseDN)
 }
 
 func (i *LDAP) groupToLDAPAttrValues(group libregraph.Group) (map[string][]string, error) {
@@ -482,15 +511,41 @@ func (i *LDAP) getGroupsForUser(dn string) ([]*ldap.Entry, error) {
 func (i *LDAP) createGroupModelFromLDAP(e *ldap.Entry) *libregraph.Group {
 	name := e.GetEqualFoldAttributeValue(i.groupAttributeMap.name)
 	id := e.GetEqualFoldAttributeValue(i.groupAttributeMap.id)
+	groupTypes := []string{}
+
+	if i.isLDAPGroupReadOnly(e) {
+		groupTypes = []string{"ReadOnly"}
+	}
 
 	if id != "" && name != "" {
 		return &libregraph.Group{
 			DisplayName: &name,
 			Id:          &id,
+			GroupTypes:  groupTypes,
 		}
 	}
 	i.logger.Warn().Str("dn", e.DN).Msg("Group is missing name or id")
 	return nil
+}
+
+func (i *LDAP) isLDAPGroupReadOnly(e *ldap.Entry) bool {
+	if !i.writeEnabled {
+		return true
+	}
+
+	groupDN, err := ldap.ParseDN(e.DN)
+	if err != nil {
+		i.logger.Warn().Err(err).Str("dn", e.DN).Msg("Failed to parse DN")
+		return false
+	}
+
+	baseDN, err := ldap.ParseDN(i.groupCreateBaseDN)
+	if err != nil {
+		i.logger.Warn().Err(err).Str("dn", i.groupCreateBaseDN).Msg("Failed to parse DN")
+		return false
+	}
+
+	return !baseDN.AncestorOfFold(groupDN)
 }
 
 func (i *LDAP) groupsFromLDAPEntries(e []*ldap.Entry) []libregraph.Group {

@@ -58,6 +58,7 @@ type LDAP struct {
 	localUserDisableGroupDN string
 
 	groupBaseDN       string
+	groupCreateBaseDN string
 	groupFilter       string
 	groupObjectClass  string
 	groupScope        int
@@ -148,6 +149,7 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		userScope:               userScope,
 		userAttributeMap:        uam,
 		groupBaseDN:             config.GroupBaseDN,
+		groupCreateBaseDN:       config.GroupCreateBaseDN,
 		groupFilter:             config.GroupFilter,
 		groupObjectClass:        config.GroupObjectClass,
 		groupScope:              groupScope,

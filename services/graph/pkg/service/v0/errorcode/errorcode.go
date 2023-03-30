@@ -106,6 +106,8 @@ func (e Error) Render(w http.ResponseWriter, r *http.Request) {
 		status = http.StatusNotFound
 	case NameAlreadyExists:
 		status = http.StatusConflict
+	case NotAllowed:
+		status = http.StatusForbidden
 	default:
 		status = http.StatusInternalServerError
 	}
