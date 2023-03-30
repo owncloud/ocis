@@ -23,7 +23,7 @@ var userRequiredActions = []keycloak.UserAction{
 // Backend represents the keycloak backend.
 type Backend struct {
 	logger    log.Logger
-	client    *keycloak.Client
+	client    keycloak.Client
 	userRealm string
 }
 
@@ -48,7 +48,7 @@ func New(
 // NewWithClient creates a new backend with the supplied keycloak client.
 func NewWithClient(
 	logger log.Logger,
-	client *keycloak.Client,
+	client keycloak.Client,
 	userRealm string,
 ) *Backend {
 	return &Backend{

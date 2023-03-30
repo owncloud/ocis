@@ -17,8 +17,8 @@ const (
 	userTypeAttr = "OWNCLOUD_USER_TYPE"
 )
 
-// Client represents a keycloak client
-type Client struct {
+// ConcreteClient represents a concrete implementation of a keycloak client
+type ConcreteClient struct {
 	keycloak     GoCloak
 	clientID     string
 	clientSecret string
@@ -26,34 +26,11 @@ type Client struct {
 	baseURL      string
 }
 
-// PIIReport is a structure of all the PersonalIdentifiableInformation contained in keycloak.
-type PIIReport struct {
-	UserData    *libregraph.User
-	Credentials []*gocloak.CredentialRepresentation
-}
-
-// UserAction defines a type for user actions
-type UserAction int8
-
-// An incomplete list of UserActions
-const (
-	// UserActionUpdatePassword sets it that the user needs to change their password.
-	UserActionUpdatePassword UserAction = iota
-	// UserActionVerifyEmail sets it that the user needs to verify their email address.
-	UserActionVerifyEmail
-)
-
-// A lookup table to translate user actions to their string equivalents
-var userActionsToString = map[UserAction]string{
-	UserActionUpdatePassword: "UPDATE_PASSWORD",
-	UserActionVerifyEmail:    "VERIFY_EMAIL",
-}
-
 // New instantiates a new keycloak.Backend with a default gocloak client.
 func New(
 	baseURL, clientID, clientSecret, realm string,
 	insecureSkipVerify bool,
-) *Client {
+) *ConcreteClient {
 	gc := gocloak.NewClient(baseURL)
 	restyClient := gc.RestyClient()
 	restyClient.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: insecureSkipVerify}) //nolint:gosec
@@ -64,8 +41,8 @@ func New(
 func NewWithClient(
 	gocloakClient GoCloak,
 	baseURL, clientID, clientSecret, realm string,
-) *Client {
-	return &Client{
+) *ConcreteClient {
+	return &ConcreteClient{
 		keycloak:     gocloakClient,
 		baseURL:      baseURL,
 		clientID:     clientID,
@@ -78,7 +55,7 @@ func NewWithClient(
 // TODO: For now we only call this from the invitation service where all the attributes are set correctly.
 //
 //	For more wider use, do some sanity checking on the user instance.
-func (c *Client) CreateUser(ctx context.Context, realm string, user *libregraph.User, userActions []UserAction) (string, error) {
+func (c *ConcreteClient) CreateUser(ctx context.Context, realm string, user *libregraph.User, userActions []UserAction) (string, error) {
 	token, err := c.getToken(ctx)
 	if err != nil {
 		return "", err
@@ -100,7 +77,7 @@ func (c *Client) CreateUser(ctx context.Context, realm string, user *libregraph.
 }
 
 // SendActionsMail sends a mail to the user with userID instructing them to do the actions defined in userActions.
-func (c *Client) SendActionsMail(ctx context.Context, realm, userID string, userActions []UserAction) error {
+func (c *ConcreteClient) SendActionsMail(ctx context.Context, realm, userID string, userActions []UserAction) error {
 	token, err := c.getToken(ctx)
 	if err != nil {
 		return err
@@ -114,7 +91,7 @@ func (c *Client) SendActionsMail(ctx context.Context, realm, userID string, user
 }
 
 // GetUserByEmail looks up a user by email.
-func (c *Client) GetUserByEmail(ctx context.Context, realm, mail string) (*libregraph.User, error) {
+func (c *ConcreteClient) GetUserByEmail(ctx context.Context, realm, mail string) (*libregraph.User, error) {
 	token, err := c.getToken(ctx)
 	if err != nil {
 		return nil, err
@@ -139,7 +116,7 @@ func (c *Client) GetUserByEmail(ctx context.Context, realm, mail string) (*libre
 }
 
 // GetPIIReport returns a structure with all the PII for the user.
-func (c *Client) GetPIIReport(ctx context.Context, realm string, user *libregraph.User) (*PIIReport, error) {
+func (c *ConcreteClient) GetPIIReport(ctx context.Context, realm string, user *libregraph.User) (*PIIReport, error) {
 	u, err := c.GetUserByEmail(ctx, realm, *user.Mail)
 	if err != nil {
 		return nil, err
@@ -168,7 +145,7 @@ func (c *Client) GetPIIReport(ctx context.Context, realm string, user *libregrap
 
 // getToken gets a fresh token for the request.
 // TODO: set a token on the struct and check if it's still valid before requesting a new one.
-func (c *Client) getToken(ctx context.Context) (*gocloak.JWT, error) {
+func (c *ConcreteClient) getToken(ctx context.Context) (*gocloak.JWT, error) {
 	token, err := c.keycloak.LoginClient(ctx, c.clientID, c.clientSecret, c.realm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get token: %w", err)
@@ -186,7 +163,7 @@ func (c *Client) getToken(ctx context.Context) (*gocloak.JWT, error) {
 	return token, nil
 }
 
-func (c *Client) keycloakUserToLibregraph(u *gocloak.User) *libregraph.User {
+func (c *ConcreteClient) keycloakUserToLibregraph(u *gocloak.User) *libregraph.User {
 	attrs := *u.Attributes
 	ldapID := ""
 	ldapIDs, ok := attrs[idAttr]
@@ -216,7 +193,7 @@ func (c *Client) keycloakUserToLibregraph(u *gocloak.User) *libregraph.User {
 	}
 }
 
-func (c *Client) getKeyCloakID(u *libregraph.User) (string, error) {
+func (c *ConcreteClient) getKeyCloakID(u *libregraph.User) (string, error) {
 	for _, i := range u.Identities {
 		if *i.Issuer == c.baseURL {
 			return *i.IssuerAssignedId, nil
