@@ -9,7 +9,7 @@ import (
 
 	"github.com/CiscoM31/godata"
 	"github.com/go-ldap/ldap/v3"
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	"github.com/libregraph/idm/pkg/ldapdn"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -48,21 +48,23 @@ type LDAP struct {
 	refintEnabled   bool
 	usePwModifyExOp bool
 
-	userBaseDN       string
-	userFilter       string
-	userObjectClass  string
-	userScope        int
-	userAttributeMap userAttributeMap
+	userBaseDN          string
+	userFilter          string
+	userObjectClass     string
+	userIDisOctetString bool
+	userScope           int
+	userAttributeMap    userAttributeMap
 
 	disableUserMechanism    DisableUserMechanismType
 	localUserDisableGroupDN string
 
-	groupBaseDN       string
-	groupCreateBaseDN string
-	groupFilter       string
-	groupObjectClass  string
-	groupScope        int
-	groupAttributeMap groupAttributeMap
+	groupBaseDN          string
+	groupCreateBaseDN    string
+	groupFilter          string
+	groupObjectClass     string
+	groupIDisOctetString bool
+	groupScope           int
+	groupAttributeMap    groupAttributeMap
 
 	educationConfig educationConfig
 
@@ -146,12 +148,14 @@ func NewLDAPBackend(lc ldap.Client, config config.LDAP, logger *log.Logger) (*LD
 		userBaseDN:              config.UserBaseDN,
 		userFilter:              config.UserFilter,
 		userObjectClass:         config.UserObjectClass,
+		userIDisOctetString:     config.UserIDIsOctetString,
 		userScope:               userScope,
 		userAttributeMap:        uam,
 		groupBaseDN:             config.GroupBaseDN,
 		groupCreateBaseDN:       config.GroupCreateBaseDN,
 		groupFilter:             config.GroupFilter,
 		groupObjectClass:        config.GroupObjectClass,
+		groupIDisOctetString:    config.GroupIDIsOctetString,
 		groupScope:              groupScope,
 		groupAttributeMap:       gam,
 		educationConfig:         educationConfig,
@@ -262,7 +266,12 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 
 	// Don't allow updates of the ID
 	if user.GetId() != "" {
-		if e.GetEqualFoldAttributeValue(i.userAttributeMap.id) != user.GetId() {
+		id, err := i.ldapUUIDtoString(e, i.userAttributeMap.id, i.userIDisOctetString)
+		if err != nil {
+			i.logger.Warn().Str("dn", e.DN).Str(i.userAttributeMap.id, e.GetAttributeValue(i.userAttributeMap.id)).Msg("Invalid User. Cannot convert UUID")
+			return nil, errorcode.New(errorcode.GeneralException, "error converting uuid")
+		}
+		if id != user.GetId() {
 			return nil, errorcode.New(errorcode.NotAllowed, "changing the UserId is not allowed")
 		}
 	}
@@ -430,15 +439,43 @@ func (i *LDAP) searchLDAPEntryByFilter(basedn string, attrs []string, filter str
 	return res.Entries[0], nil
 }
 
+func filterEscapeUUID(binary bool, id string) (string, error) {
+	var escaped string
+	if binary {
+		pid, err := uuid.Parse(id)
+		if err != nil {
+			err := fmt.Errorf("error parsing id '%s' as UUID: %w", id, err)
+			return "", err
+		}
+		for _, b := range pid {
+			escaped = fmt.Sprintf("%s\\%02x", escaped, b)
+		}
+	} else {
+		escaped = ldap.EscapeFilter(id)
+	}
+	return escaped, nil
+}
+
 func (i *LDAP) getLDAPUserByID(id string) (*ldap.Entry, error) {
-	id = ldap.EscapeFilter(id)
-	filter := fmt.Sprintf("(%s=%s)", i.userAttributeMap.id, id)
+	idString, err := filterEscapeUUID(i.userIDisOctetString, id)
+	if err != nil {
+		return nil, fmt.Errorf("Invalid User id: %w", err)
+	}
+	filter := fmt.Sprintf("(%s=%s)", i.userAttributeMap.id, idString)
 	return i.getLDAPUserByFilter(filter)
 }
 
 func (i *LDAP) getLDAPUserByNameOrID(nameOrID string) (*ldap.Entry, error) {
-	nameOrID = ldap.EscapeFilter(nameOrID)
-	filter := fmt.Sprintf("(|(%s=%s)(%s=%s))", i.userAttributeMap.userName, nameOrID, i.userAttributeMap.id, nameOrID)
+	idString, err := filterEscapeUUID(i.userIDisOctetString, nameOrID)
+	// err != nil just means that this is not a uuid so we can skip the uuid filterpart
+	// and just filter by name
+	filter := ""
+	if err == nil {
+		filter = fmt.Sprintf("(|(%s=%s)(%s=%s))", i.userAttributeMap.userName, ldap.EscapeFilter(nameOrID), i.userAttributeMap.id, idString)
+	} else {
+		filter = fmt.Sprintf("(%s=%s)", i.userAttributeMap.userName, ldap.EscapeFilter(nameOrID))
+	}
+
 	return i.getLDAPUserByFilter(filter)
 }
 
@@ -451,6 +488,7 @@ func (i *LDAP) getLDAPUserByFilter(filter string) (*ldap.Entry, error) {
 		i.userAttributeMap.userName,
 		i.userAttributeMap.surname,
 		i.userAttributeMap.givenName,
+
 		i.userAttributeMap.accountEnabled,
 		i.userAttributeMap.userType,
 	}
@@ -683,13 +721,28 @@ func (i *LDAP) updateUserPassowrd(ctx context.Context, dn, password string) erro
 	return err
 }
 
+func (i *LDAP) ldapUUIDtoString(e *ldap.Entry, attrType string, binary bool) (string, error) {
+	if binary {
+		rawValue := e.GetEqualFoldRawAttributeValue(attrType)
+		value, err := uuid.FromBytes(rawValue)
+		if err == nil {
+			return value.String(), nil
+		}
+		return "", err
+	}
+	return e.GetEqualFoldAttributeValue(attrType), nil
+}
+
 func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 	if e == nil {
 		return nil
 	}
 
 	opsan := e.GetEqualFoldAttributeValue(i.userAttributeMap.userName)
-	id := e.GetEqualFoldAttributeValue(i.userAttributeMap.id)
+	id, err := i.ldapUUIDtoString(e, i.userAttributeMap.id, i.userIDisOctetString)
+	if err != nil {
+		i.logger.Warn().Str("dn", e.DN).Str(i.userAttributeMap.id, e.GetAttributeValue(i.userAttributeMap.id)).Msg("Invalid User. Cannot convert UUID")
+	}
 	givenName := e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName)
 	surname := e.GetEqualFoldAttributeValue(i.userAttributeMap.surname)
 
@@ -720,7 +773,7 @@ func (i *LDAP) userToLDAPAttrValues(user libregraph.User) (map[string][]string, 
 	}
 
 	if !i.useServerUUID {
-		attrs["owncloudUUID"] = []string{uuid.Must(uuid.NewV4()).String()}
+		attrs["owncloudUUID"] = []string{uuid.New().String()}
 	}
 
 	if user.AccountEnabled != nil {
