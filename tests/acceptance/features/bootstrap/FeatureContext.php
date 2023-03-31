@@ -3708,7 +3708,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @throws Exception
 	 */
 	public function verifyTableNodeColumns(?TableNode $table, ?array $requiredHeader = [], ?array $allowedHeader = []): void {
-		if (is_null($table) || \count($table->getHash()) < 1) {
+		if ($table === null || \count($table->getHash()) < 1) {
 			throw new Exception("Table should have at least one row.");
 		}
 		$tableHeaders = $table->getRows()[0];
