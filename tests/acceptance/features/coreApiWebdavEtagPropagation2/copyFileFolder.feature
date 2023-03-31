@@ -107,7 +107,7 @@ Feature: propagation of etags when copying files or folders
     And these etags should not have changed:
       | user  | path             |
       | Alice | /upload/file.txt |
-    @issue-ocis-4091
+    @issue-4091
     Examples:
       | dav_version |
       | old         |
@@ -140,7 +140,7 @@ Feature: propagation of etags when copying files or folders
     And these etags should not have changed:
       | user  | path             |
       | Alice | /upload/file.txt |
-    @issue-ocis-4091
+    @issue-4091
     Examples:
       | dav_version |
       | old         |

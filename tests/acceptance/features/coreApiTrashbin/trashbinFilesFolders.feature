@@ -1,4 +1,4 @@
-@api @files_trashbin-app-required @issue-ocis-reva-52
+@api @files_trashbin-app-required @issue-1324
 Feature: files and folders exist in the trashbin after being deleted
   As a user
   I want deleted files and folders to be available in the trashbin
@@ -175,7 +175,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | spaces   |
 
-  @issue-ocis-3561 @skipOnLDAP @skip_on_objectstore
+  @issue-3561 @skipOnLDAP @skip_on_objectstore
   Scenario Outline: Listing other user's trashbin is prohibited
     Given using <dav-path> DAV path
     And user "testtrashbin100" has been created with default attributes and without skeleton files
@@ -193,7 +193,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | new      | 404         |
       | spaces   | 404         |
 
-  @issue-ocis-3561 @smokeTest @skipOnLDAP @skip_on_objectstore
+  @issue-3561 @smokeTest @skipOnLDAP @skip_on_objectstore
   Scenario Outline: Listing other user's trashbin is prohibited with multiple files on trashbin
     Given using <dav-path> DAV path
     And user "testtrashbin101" has been created with default attributes and without skeleton files
@@ -214,7 +214,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | new      | 404         |
       | spaces   | 404         |
 
-  @issue-ocis-3561 @skipOnLDAP @skip_on_objectstore  @provisioning_api-app-required
+  @issue-3561 @skipOnLDAP @skip_on_objectstore  @provisioning_api-app-required
   Scenario Outline: Listing other user's trashbin is prohibited for newly recreated user with same name
     Given using <dav-path> DAV path
     And user "testtrashbin102" has been created with default attributes and without skeleton files
@@ -240,7 +240,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | new      | 404         |
       | spaces   | 404         |
 
-  @issue-ocis-3561 @skipOnLDAP @skip_on_objectstore
+  @issue-3561 @skipOnLDAP @skip_on_objectstore
   Scenario Outline: Listing other user's empty unused trashbin is prohibited
     Given using <dav-path> DAV path
     And user "testtrashbinempty" has been created with default attributes and without skeleton files
@@ -253,7 +253,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | new      | 404         |
       | spaces   | 404         |
 
-  @issue-ocis-3561 @skipOnLDAP @skip_on_objectstore
+  @issue-3561 @skipOnLDAP @skip_on_objectstore
   Scenario Outline: Listing non-existent user's trashbin is prohibited
     Given using <dav-path> DAV path
     When user "Alice" tries to list the trashbin content for user "testtrashbinnotauser"
@@ -370,7 +370,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | spaces   |
 
-  @issue-ocis-541
+  @issue-541
   Scenario Outline: deleted file has appropriate deletion time information
     Given using <dav-path> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2018 04:18:13 GMT" using the WebDAV API
@@ -387,7 +387,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | spaces   |
 
-  @issue-ocis-1547
+  @issue-1547
   Scenario Outline: deleting files with special characters moves it to trashbin
     Given using <dav-path> DAV path
     And user "Alice" has uploaded the following files with content "special character file"
@@ -424,7 +424,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | spaces   |
 
-  @issue-ocis-1547
+  @issue-1547
   Scenario Outline: deleting folders with special characters moves it to trashbin
     Given using <dav-path> DAV path
     And user "Alice" has created the following folders

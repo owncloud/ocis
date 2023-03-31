@@ -4,7 +4,7 @@ Feature: capabilities
   Background:
     Given using OCS API version "1"
 
-  @smokeTest @issue-ocis-1285
+  @smokeTest @issue-1285
   Scenario: getting default capabilities with admin user
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
@@ -129,7 +129,7 @@ Feature: capabilities
     }
     """
 
-  @issue-ocis-1285
+  @issue-1285
   Scenario: getting default_permissions capability with admin user
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
@@ -168,7 +168,7 @@ Feature: capabilities
     }
     """
 
-  @issue-ocis-1285
+  @issue-1285
   Scenario: .htaccess is reported as a blacklisted file by default
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"

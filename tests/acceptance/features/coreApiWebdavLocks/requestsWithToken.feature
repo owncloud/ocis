@@ -1,4 +1,4 @@
-@api @issue-ocis-reva-172
+@api @issue-1284
 Feature: actions on a locked item are possible if the token is sent with the request
 
   Background:

@@ -120,7 +120,7 @@ Feature: previews of files downloaded through the webdav API
     Then the HTTP status code should be "204"
     And as user "Alice" the preview of "/parent.txt" with width "32" and height "32" should have been changed
 
-  @issue-ocis-2538
+  @issue-2538
   Scenario: when owner updates a shared file, previews for sharee are also updated (to shared folder)
     Given auto-accept shares has been disabled
     And user "Brian" has been created with default attributes and without skeleton files

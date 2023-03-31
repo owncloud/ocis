@@ -51,7 +51,7 @@ Feature: MOVE file/folder
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
 
-  @issue-ocis-reva-14
+
   Scenario: send MOVE requests to another user's webDav endpoints as normal user
     When user "Brian" requests these endpoints with "MOVE" about user "Alice"
       | endpoint                                           |
@@ -60,7 +60,7 @@ Feature: MOVE file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "403"
 
-  @skipOnOcV10 @personalSpace @issue-ocis-reva-14
+  @skipOnOcV10 @personalSpace
   Scenario: send MOVE requests to another user's webDav endpoints as normal user using the spaces WebDAV API
     When user "Brian" requests these endpoints with "MOVE" about user "Alice"
       | endpoint                                           |

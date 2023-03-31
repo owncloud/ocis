@@ -1,4 +1,4 @@
-@api @issue-ocis-reva-172
+@api @issue-1284
 Feature: there can be only one exclusive lock on a resource
 
   Background:

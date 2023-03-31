@@ -8,7 +8,7 @@ Feature: create files and folder
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and without skeleton files
 
-  @issue-ocis-reva-269
+
   Scenario Outline: create a folder
     Given using <dav_version> DAV path
     When user "Alice" creates folder "<folder_name>" using the WebDAV API
@@ -83,7 +83,7 @@ Feature: create files and folder
       | dav_version |
       | spaces      |
 
-  @issue-ocis-reva-15
+  @issue-1345
   Scenario Outline: Creating a directory which contains .part should not be possible
     Given using <dav_version> DAV path
     When user "Alice" creates folder "/folder.with.ext.part" using the WebDAV API
@@ -103,7 +103,7 @@ Feature: create files and folder
       | dav_version |
       | spaces      |
 
-  @issue-ocis-reva-168
+  @issue-1283
   Scenario Outline: try to create a folder that already exists
     Given using <dav_version> DAV path
     And user "Alice" has created folder "my-data"
@@ -122,7 +122,7 @@ Feature: create files and folder
       | dav_version |
       | spaces      |
 
-  @issue-ocis-reva-168
+  @issue-1283
   Scenario Outline: try to create a folder with a name of an existing file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "uploaded data" to "/my-data.txt"

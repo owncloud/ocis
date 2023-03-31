@@ -51,7 +51,7 @@ Feature: get file info using PROPFIND
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
 
-  @issue-ocis-reva-9
+  @issue-1347
   Scenario: send PROPFIND requests to another user's webDav endpoints as normal user
     When user "Brian" requests these endpoints with "PROPFIND" to get property "d:getetag" about user "Alice"
       | endpoint                                           |
@@ -60,7 +60,7 @@ Feature: get file info using PROPFIND
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "404"
 
-  @skipOnOcV10 @personalSpace @issue-ocis-reva-9
+  @skipOnOcV10 @personalSpace @issue-1347
   Scenario: send PROPFIND requests to another user's webDav endpoints as normal user using the spaces WebDAV API
     When user "Brian" requests these endpoints with "PROPFIND" to get property "d:getetag" about user "Alice"
       | endpoint                                           |

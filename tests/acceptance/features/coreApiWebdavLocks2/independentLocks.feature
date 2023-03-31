@@ -1,4 +1,4 @@
-@api @issue-ocis-reva-172
+@api @issue-1284
 Feature: independent locks
   Make sure all locks are independent and don't interact with other items that have the same name
 
