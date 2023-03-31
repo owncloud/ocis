@@ -335,3 +335,44 @@ Feature: add users to group
     And user "Alice" has created a group "grp1" using the Graph API
     When user "Alice" tries to add user "Brian" to group "grp1" with an invalid host using the Graph API
     Then the HTTP status code should be "400"
+
+
+  Scenario Outline: try to add invalid user id to a group
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    And user "Alice" has created a group "grp1" using the Graph API
+    When the administrator "Alice" tries to add an invalid user id "<invalid-uuidv4>" to a group "grp1" using the Graph API
+    Then the HTTP status code should be "404"
+    Examples:
+      | invalid-uuidv4                        | comment                                                |
+      | �ϰ�Ϧ-@$@^-¶Ëøœ-ɧɸɱʨΌϖЁϿ               | UTF characters                                         |
+      | 4c510ada-c86b-4815-8820-42cdf82c3d511 | adding an extra character at end of valid UUID pattern |
+      | 4c510adac8-6b-4815-882042cdf-82c3d51  | invalid UUID pattern                                   |
+
+
+  Scenario Outline: try to add invalid user ids to a group at once
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    And user "Alice" has created a group "grp1" using the Graph API
+    When the administrator "Alice" tries to add the following invalid user ids to a group "grp1" at once using the Graph API
+      | user-id          |
+      | <invalid-uuidv4> |
+      | <invalid-uuidv4> |
+    Then the HTTP status code should be "404"
+    Examples:
+      | invalid-uuidv4                        | comment                                                |
+      | �ϰ�Ϧ-@$@^-¶Ëøœ-ɧɸɱʨΌϖЁϿ               | UTF characters                                         |
+      | 4c510ada-c86b-4815-8820-42cdf82c3d511 | adding an extra character at end of valid UUID pattern |
+      | 4c510adac8-6b-4815-882042cdf-82c3d51  | invalid UUID pattern                                   |
+
+  @issue-5855
+  Scenario: add same user twice to a group at once
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    And these users have been created with default attributes and without skeleton files:
+      | username |
+      | Brian    |
+    And user "Alice" has created a group "grp1" using the Graph API
+    When the administrator "Alice" adds the following users to a group "grp1" at once using the Graph API
+      | username |
+      | Brian    |
+      | Brian    |
+    Then the HTTP status code should be "204"
+    And the user "Brian" should be listed once in the group "grp1"
