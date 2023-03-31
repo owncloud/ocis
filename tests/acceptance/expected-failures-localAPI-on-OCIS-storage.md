@@ -57,13 +57,13 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/deleteGroup.feature:49](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L49)
 - [apiGraph/deleteGroup.feature:50](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L50)
 - [apiGraph/deleteGroup.feature:51](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L51)
+- [apiGraph/editGroup.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L25)
 
 #### [Share lists deleted user as 'user'](https://github.com/owncloud/ocis/issues/903)
 - [apiGraph/deleteGroup.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L68)
 
-#### [Updating group displayName request seems OK but group is not being renamed](https://github.com/owncloud/ocis/issues/5099)
+#### [Renaming the group with = character in it doesn't work](https://github.com/owncloud/ocis/issues/5969)
 - [apiGraph/editGroup.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L23)
-- [apiGraph/editGroup.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L25)
 
 #### [CORS headers are not identical with oC10 headers](https://github.com/owncloud/ocis/issues/5195)
 - [apiCors/cors.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L25)
