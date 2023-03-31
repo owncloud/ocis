@@ -7,7 +7,7 @@ Feature: create space
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
-
+  @issue-5938
   Scenario Outline: user with role user and guest can't create Space via Graph API
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" tries to create a space "Project Mars" of type "project" with the default quota using the Graph API

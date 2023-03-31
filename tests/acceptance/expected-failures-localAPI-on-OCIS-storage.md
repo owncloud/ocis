@@ -62,7 +62,7 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Share lists deleted user as 'user'](https://github.com/owncloud/ocis/issues/903)
 - [apiGraph/deleteGroup.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L68)
 
-#### [Renaming the group with = character in it doesn't work](https://github.com/owncloud/ocis/issues/5969)
+#### [Updating group displayName request seems OK but group is not being renamed](https://github.com/owncloud/ocis/issues/5977)
 - [apiGraph/editGroup.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L23)
 
 #### [CORS headers are not identical with oC10 headers](https://github.com/owncloud/ocis/issues/5195)
@@ -123,9 +123,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 #### [Changing user with an uppercase name gives 404 error](https://github.com/owncloud/ocis/issues/5763)
 - [apiGraph/editUser.feature:41](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L41)
-
-#### [Using # in the onPremisesSamAccountName breaks getting users](https://github.com/owncloud/ocis/issues/5755)
-- [apiGraph/editUser.feature:44](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editUser.feature#L44)
 
 #### [Same users can be added in a group multiple time](https://github.com/owncloud/ocis/issues/5702)
 - [apiGraph/addUserToGroup.feature:246](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L246)

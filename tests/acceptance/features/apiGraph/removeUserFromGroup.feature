@@ -156,7 +156,7 @@ Feature: remove a user from a group
     When the administrator tries to remove user "Alice" from a nonexistent group using the Graph API
     Then the HTTP status code should be "404"
 
-
+  @issue-5938
   Scenario Outline: user other than the admin can't remove a user from their group
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<role>" using the settings api

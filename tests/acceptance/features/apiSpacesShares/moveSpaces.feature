@@ -318,7 +318,7 @@ Feature: move (rename) file
     And for user "Brian" the space "Personal" should not contain these entries:
       | /testshare/testsubfolder |
 
-
+  @issue-4797
   Scenario: Overwriting a file while moving
     Given user "Brian" has created folder "/folder"
     And user "Brian" has uploaded file with content "old content version 1" to "/folder/testfile.txt"

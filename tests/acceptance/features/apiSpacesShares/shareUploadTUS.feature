@@ -200,7 +200,7 @@ Feature: upload resources on share using TUS protocol
       | textFile.txt |
     And for user "Alice" the content of the file "FOLDER/textFile.txt" of the space "Personal" should be "uploaded content"
 
-
+  @issue-1755
   Scenario: Sharee uploads a file to a received share folder with wrong checksum should not work
     Given user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
@@ -215,7 +215,7 @@ Feature: upload resources on share using TUS protocol
     And for user "Alice" folder "FOLDER" of the space "Personal" should not contain these entries:
       | textFile.txt |
 
-
+  @issue-1755
   Scenario: Sharer uploads a file to shared folder with wrong checksum should not work
     Given user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
@@ -280,7 +280,7 @@ Feature: upload resources on share using TUS protocol
     Then the HTTP status code should be "204"
     And for user "Alice" the content of the file "/textFile.txt" of the space "Personal" should be "overwritten content"
 
-
+  @issue-1755
   Scenario: Sharer uploads a file with checksum and as a sharee overwrites the shared file with new data and invalid checksum
     Given user "Alice" has created a new TUS resource for the space "Personal" with content "" using the WebDAV API with these headers:
       | Upload-Length   | 16                        |

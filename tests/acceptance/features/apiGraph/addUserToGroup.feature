@@ -119,7 +119,7 @@ Feature: add users to group
       | Alice    | priv/subadmins/1 |
       | Alice    | var/../etc       |
 
-
+  @issue-5938
   Scenario Outline: user other than the admin tries to add himself to a group
     Given the administrator has given "Alice" the role "<role>" using the settings api
     And group "groupA" has been created
@@ -132,7 +132,7 @@ Feature: add users to group
       | User        |
       | Guest       |
 
-
+  @issue-5938
   Scenario Outline: user other than the admin tries to add other user to a group
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<role>" using the settings api
@@ -151,7 +151,7 @@ Feature: add users to group
     When the administrator tries to add user "Alice" to a nonexistent group using the Graph API
     Then the HTTP status code should be "404"
 
-
+  @issue-5939
   Scenario Outline: user other than the admin tries to add user to a nonexistent group
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "<role>" using the settings api
