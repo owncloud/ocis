@@ -1042,17 +1042,17 @@ class SpacesContext implements Context {
 	 * @param string $spaceName
 	 * @param string|null $userName
 	 * @param string|null $fileName
-	 * @param string|PyStringNode $schemaString
+	 * @param PyStringNode|null $schemaString
 	 *
 	 * @return void
-	 * @throws Exception
 	 */
 	public function theJsonDataFromLastResponseShouldMatch(
 		string $spaceName,
 		?string $userName = null,
 		?string $fileName = null,
-		PyStringNode|string $schemaString = ""
+		?PyStringNode $schemaString = null
 	): void {
+		Assert::assertNotNull($schemaString, 'schema is not valid JSON');
 		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->value)) {
 			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
 			foreach ($responseBody as $value) {
@@ -1110,7 +1110,7 @@ class SpacesContext implements Context {
 	 * @param string|null $spaceName
 	 * @param string|null $grantedUser
 	 * @param string|null $fileName
-	 * @param PyStringNode|string $schemaString
+	 * @param PyStringNode|null $schemaString
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -1120,7 +1120,7 @@ class SpacesContext implements Context {
 		?string $spaceName = null,
 		?string $grantedUser = null,
 		?string $fileName = null,
-		PyStringNode|string $schemaString = ""
+		?PyStringNode $schemaString = null
 	): void {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
 		$this->theJsonDataFromLastResponseShouldMatch($spaceName, $grantedUser, $fileName, $schemaString);
