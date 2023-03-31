@@ -31,7 +31,9 @@ func OIDCWellKnownRewrite(logger log.Logger, oidcISS string, rewrite bool, oidcC
 						Str("url", oidcURL.String()).
 						Msg("get information from url failed")
 					w.WriteHeader(http.StatusInternalServerError)
+					return
 				}
+
 				defer wellKnownRes.Body.Close()
 
 				copyHeader(w.Header(), wellKnownRes.Header)
