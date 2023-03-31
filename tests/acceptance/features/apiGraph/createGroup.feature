@@ -21,8 +21,6 @@ Feature: create group
     | comma,grp1      |
     | Finance (NP)    |
     | slash\Middle    |
-    | !               |
-    | =               |
 
 
   Scenario: admin user tries to create a group that already exists

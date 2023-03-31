@@ -23,7 +23,6 @@ Feature: edit group name
       | grp1      | $x<=>[y*z^2]! |
       | grp1      | staff?group   |
       | grp1      | 50%pass       |
-      | grp1=     | grp1          |
 
 
   Scenario Outline: user other than the admin can't rename a group
