@@ -921,7 +921,7 @@ class SpacesContext implements Context {
 	 * @param string|null $userName
 	 * @param string|null $fileName
 	 * @param string|null $groupName
-	 * @param TableNode $table
+	 * @param TableNode|null $table
 	 *
 	 * @return void
 	 * @throws Exception
@@ -931,7 +931,7 @@ class SpacesContext implements Context {
 		?string $userName = null,
 		?string $fileName = null,
 		?string $groupName = null,
-		TableNode $table
+		?TableNode $table = null
 	): void {
 		$this->featureContext->verifyTableNodeColumns($table, ['key', 'value']);
 		Assert::assertIsArray($spaceAsArray = $this->getSpaceByNameFromResponse($spaceName), "No space with name $spaceName found");
@@ -991,17 +991,17 @@ class SpacesContext implements Context {
 	 * @param string $spaceName
 	 * @param string|null $grantedUser
 	 * @param string|null $fileName
-	 * @param TableNode $table
+	 * @param TableNode|null $table
 	 *
 	 * @return void
-	 * @throws Exception|GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function userHasSpaceWith(
 		string $user,
 		string $spaceName,
 		?string $grantedUser = null,
 		?string $fileName = null,
-		TableNode $table
+		?TableNode $table = null
 	): void {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(
@@ -1042,7 +1042,7 @@ class SpacesContext implements Context {
 	 * @param string $spaceName
 	 * @param string|null $userName
 	 * @param string|null $fileName
-	 * @param PyStringNode $schemaString
+	 * @param string|PyStringNode $schemaString
 	 *
 	 * @return void
 	 * @throws Exception
@@ -1051,7 +1051,7 @@ class SpacesContext implements Context {
 		string $spaceName,
 		?string $userName = null,
 		?string $fileName = null,
-		PyStringNode $schemaString
+		PyStringNode|string $schemaString = ""
 	): void {
 		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->value)) {
 			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
@@ -1066,7 +1066,9 @@ class SpacesContext implements Context {
 		}
 
 		// substitute the value here
-		$schemaString = $schemaString->getRaw();
+		if (\gettype($schemaString) !== 'string') {
+			$schemaString = $schemaString->getRaw();
+		}
 		$schemaString = $this->featureContext->substituteInLineCodes(
 			$schemaString,
 			$this->featureContext->getCurrentUser(),
@@ -1104,22 +1106,21 @@ class SpacesContext implements Context {
 	 * @Then /^for user "([^"]*)" the JSON response of space project should match$/
 	 * @Then /^for user "([^"]*)" the JSON response should contain space called "([^"]*)" and match$/
 	 * @Then /^for user "([^"]*)" the JSON response should contain space called "([^"]*)" (?:owned by|granted to) "([^"]*)" (?:with description file|with space image) "([^"]*)" and match$/
-
 	 * @param string $user
-	 * @param string $spaceName
+	 * @param string|null $spaceName
 	 * @param string|null $grantedUser
 	 * @param string|null $fileName
-	 * @param PyStringNode $schemaString
+	 * @param PyStringNode|string $schemaString
 	 *
 	 * @return void
-	 * @throws Exception|GuzzleException
+	 * @throws GuzzleException
 	 */
 	public function forUserTheJSONDataOfTheResponseShouldMatch(
 		string $user,
 		?string $spaceName = null,
 		?string $grantedUser = null,
 		?string $fileName = null,
-		PyStringNode $schemaString
+		PyStringNode|string $schemaString = ""
 	): void {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
 		$this->theJsonDataFromLastResponseShouldMatch($spaceName, $grantedUser, $fileName, $schemaString);
