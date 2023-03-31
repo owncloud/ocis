@@ -13,6 +13,7 @@ import (
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
+	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
@@ -98,6 +99,14 @@ func Server(opts ...Option) (http.Service, error) {
 		middleware.Logger(
 			options.Logger,
 		),
+		middleware.Cors(
+			cors.Logger(options.Logger),
+			cors.AllowedOrigins(options.Config.HTTP.CORS.AllowedOrigins),
+			cors.AllowedMethods(options.Config.HTTP.CORS.AllowedMethods),
+			cors.AllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),
+			cors.AllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
+		),
+		middleware.Secure,
 	}
 	// how do we secure the api?
 	var requireAdminMiddleware func(stdhttp.Handler) stdhttp.Handler
