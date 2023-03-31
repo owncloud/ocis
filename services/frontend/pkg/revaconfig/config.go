@@ -197,6 +197,9 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 								},
 								"support_url_signing": true,
 							},
+							"graph": map[string]interface{}{
+								"personal_data_export": true,
+							},
 							"checksums": map[string]interface{}{
 								"supported_types":       cfg.Checksums.SupportedTypes,
 								"preferred_upload_type": cfg.Checksums.PreferredUploadType,
