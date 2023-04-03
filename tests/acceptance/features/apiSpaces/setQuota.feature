@@ -46,7 +46,7 @@ Feature: Set quota
       | User        |
       | Guest       |
 
-  @issue-5938
+
   Scenario Outline: non-admin user tries to set the personal space quota of other users
     Given the administrator has given "Alice" the role "<role>" using the settings api
     And the administrator has given "Brian" the role "<userRole>" using the settings api
@@ -130,7 +130,7 @@ Feature: Set quota
       | Admin       |
       | Space Admin |
 
-  @issue-5938
+
   Scenario Outline: normal or guest user tries to set quota of a space
     Given the administrator has given "Alice" the role "Space Admin" using the settings api
     And the administrator has given "Brian" the role "<userRole>" using the settings api
@@ -206,7 +206,7 @@ Feature: Set quota
     }
     """
 
-  @issue-5938
+
   Scenario Outline: non-admin user tries to set their own personal space quota
     Given the administrator has given "Alice" the role "<userRole>" using the settings api
     When user "Alice" changes the quota of the "Alice Hansen" space to "100" owned by user "Alice"

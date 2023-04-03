@@ -127,8 +127,8 @@ Feature: Change data of space
     Examples:
       | user  | code | expectedQuataValue |
       | Alice | 200  | 100                |
-      | Brian | 401  | 20                 |
-      | Bob   | 401  | 20                 |
+      | Brian | 403  | 20                 |
+      | Bob   | 403  | 20                 |
 
 
   Scenario Outline: An space admin user set no restriction quota of a Space via the Graph API
