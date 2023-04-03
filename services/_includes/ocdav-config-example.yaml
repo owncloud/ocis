@@ -20,6 +20,47 @@ http:
   addr: 127.0.0.1:0
   protocol: tcp
   prefix: ""
+  cors:
+    allow_origins:
+    - '*'
+    allow_methods:
+    - OPTIONS
+    - HEAD
+    - GET
+    - PUT
+    - POST
+    - DELETE
+    - MKCOL
+    - PROPFIND
+    - PROPPATCH
+    - MOVE
+    - COPY
+    - REPORT
+    - SEARCH
+    allow_headers:
+    - Origin
+    - Accept
+    - Content-Type
+    - Depth
+    - Authorization
+    - Ocs-Apirequest
+    - If-None-Match
+    - If-Match
+    - Destination
+    - Overwrite
+    - X-Request-Id
+    - X-Requested-With
+    - Tus-Resumable
+    - Tus-Checksum-Algorithm
+    - Upload-Concat
+    - Upload-Length
+    - Upload-Metadata
+    - Upload-Defer-Length
+    - Upload-Expires
+    - Upload-Checksum
+    - Upload-Offset
+    - X-HTTP-Method-Override
+    allow_credentials: true
 token_manager:
   jwt_secret: ""
 reva:

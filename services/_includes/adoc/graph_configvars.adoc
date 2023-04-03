@@ -258,6 +258,46 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 An optional API bearer token
 
+a|`OCIS_CORS_ALLOW_ORIGINS` +
+`GRAPH_CORS_ALLOW_ORIGINS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[*] ++
+a| [subs=-attributes]
+A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
+
+a|`OCIS_CORS_ALLOW_METHODS` +
+`GRAPH_CORS_ALLOW_METHODS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[GET POST PUT PATCH DELETE OPTIONS] ++
+a| [subs=-attributes]
+A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
+
+a|`OCIS_CORS_ALLOW_HEADERS` +
+`GRAPH_CORS_ALLOW_HEADERS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[Authorization Origin Content-Type Accept X-Requested-With Purge Restore] ++
+a| [subs=-attributes]
+A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
+
+a|`OCIS_CORS_ALLOW_CREDENTIALS` +
+`GRAPH_CORS_ALLOW_CREDENTIALS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
+
 a|`GRAPH_GROUP_MEMBERS_PATCH_LIMIT` +
 
 a| [subs=-attributes]

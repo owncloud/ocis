@@ -26,6 +26,10 @@
 | OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|
 | OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
 | GRAPH_HTTP_API_TOKEN | string |  | An optional API bearer token|
+| OCIS_CORS_ALLOW_ORIGINS<br/>GRAPH_CORS_ALLOW_ORIGINS | []string | [*] | A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin|
+| OCIS_CORS_ALLOW_METHODS<br/>GRAPH_CORS_ALLOW_METHODS | []string | [GET POST PUT PATCH DELETE OPTIONS] | A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method|
+| OCIS_CORS_ALLOW_HEADERS<br/>GRAPH_CORS_ALLOW_HEADERS | []string | [Authorization Origin Content-Type Accept X-Requested-With Purge Restore] | A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.|
+| OCIS_CORS_ALLOW_CREDENTIALS<br/>GRAPH_CORS_ALLOW_CREDENTIALS | bool | true | Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
 | GRAPH_GROUP_MEMBERS_PATCH_LIMIT | int | 20 | The amount of group members allowed to be added with a single patch request.|
 | GRAPH_USERNAME_MATCH | string | default | Option to allow legacy usernames. Supported options are 'default' and 'none'.|
 | GRAPH_ASSIGN_DEFAULT_USER_ROLE | bool | true | Whether to assign newly created users the default role 'User'. Set this to 'false' if you want to assign roles manually, or if the role assignment should happen at first login. Set this to 'true' (the default) to assign the role 'User' when creating a new user.|
