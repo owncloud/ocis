@@ -21,6 +21,7 @@ import (
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
+	"github.com/r3labs/sse/v2"
 	"go-micro.dev/v4/store"
 	"google.golang.org/grpc/metadata"
 )
@@ -33,6 +34,7 @@ type UserlogService struct {
 	cfg              *config.Config
 	historyClient    ehsvc.EventHistoryService
 	gatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
+	sse              *sse.Server
 	registeredEvents map[string]events.Unmarshaller
 	translationPath  string
 }
@@ -60,6 +62,7 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		cfg:              o.Config,
 		historyClient:    o.HistoryClient,
 		gatewaySelector:  o.GatewaySelector,
+		sse:              sse.New(),
 		registeredEvents: make(map[string]events.Unmarshaller),
 	}
 
@@ -68,9 +71,10 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		ul.registeredEvents[typ.String()] = e
 	}
 
-	ul.m.Route("/", func(r chi.Router) {
-		r.Get("/*", ul.HandleGetEvents)
-		r.Delete("/*", ul.HandleDeleteEvents)
+	ul.m.Route("/ocs/v2.php/apps/notifications/api/v1/notifications", func(r chi.Router) {
+		r.Get("/", ul.HandleGetEvents)
+		r.Get("/sse", ul.HandleSSE)
+		r.Delete("/", ul.HandleDeleteEvents)
 	})
 
 	go ul.MemorizeEvents(ch)
@@ -155,7 +159,7 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 
 		// III) store the eventID for each user
 		for _, id := range users {
-			if err := ul.addEventsToUser(id, event.ID); err != nil {
+			if err := ul.addEventToUser(id, event); err != nil {
 				ul.log.Error().Err(err).Str("userID", id).Str("eventid", event.ID).Msg("failed to store event for user")
 				continue
 			}
@@ -219,9 +223,14 @@ func (ul *UserlogService) DeleteEvents(userid string, evids []string) error {
 	})
 }
 
-func (ul *UserlogService) addEventsToUser(userid string, eventids ...string) error {
+func (ul *UserlogService) addEventToUser(userid string, event events.Event) error {
+	loc := "en" // TODO: where to get the locale from?
+	ev, _ := NewConverter(loc, ul.gatewaySelector, ul.cfg.MachineAuthAPIKey, ul.cfg.Service.Name, ul.cfg.TranslationPath).ConvertEvent(event.ID, event.Event)
+	b, _ := json.Marshal(ev)
+
+	ul.sse.Publish(userid, &sse.Event{Data: b})
 	return ul.alterUserEventList(userid, func(ids []string) []string {
-		return append(ids, eventids...)
+		return append(ids, event.ID)
 	})
 }
 
