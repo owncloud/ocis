@@ -90,14 +90,16 @@ func (eh *EventHistoryService) GetEventsForUser(ctx context.Context, req *ehsvc.
 	}
 
 	// Match all events that contains the user ID between two non-word characters.
-	userID := regexp.MustCompile(fmt.Sprintf(`\W%s\W`, req.UserID))
+	userID, err := regexp.Compile(fmt.Sprintf(`\W%s\W`, req.UserID))
+	if err != nil {
+		eh.log.Error().Err(err).Str("userID", req.UserID).Msg("could not compile regex")
+		return err
+	}
 
 	for _, i := range idx {
 		e, err := eh.store.Read(i)
 		if err != nil {
-			if err != store.ErrNotFound {
-				eh.log.Error().Err(err).Str("eventid", i).Msg("could not read event")
-			}
+			eh.log.Error().Err(err).Str("eventid", i).Msg("could not read event")
 			continue
 		}
 
