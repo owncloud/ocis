@@ -1,11 +1,18 @@
 package service
 
 import (
+	"embed"
 	"encoding/json"
+	"io/fs"
 	"net/http"
+	"os"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/owncloud/ocis/v2/ocis-pkg/messaging"
 )
+
+//go:embed l10n/locale
+var _translationFS embed.FS
 
 // HeaderAcceptLanguage is the header where the client can set the locale
 var HeaderAcceptLanguage = "Accept-Language"
@@ -31,11 +38,30 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	conv := NewConverter(r.Header.Get(HeaderAcceptLanguage), ul.gwClient, ul.cfg.MachineAuthAPIKey, ul.cfg.Service.Name, ul.cfg.TranslationPath, ul.registeredEvents)
+	filesystem, _ := fs.Sub(_translationFS, "l10n/locale")
+	if ul.cfg.TranslationPath != "" {
+		filesystem = os.DirFS(ul.cfg.TranslationPath)
+	}
+
+	conv := messaging.NewConverter(r.Header.Get(HeaderAcceptLanguage), ul.gwClient, ul.cfg.MachineAuthAPIKey, ul.cfg.Service.Name, filesystem)
 
 	resp := GetEventResponseOC10{}
 	for _, e := range evs {
-		noti, err := conv.ConvertEvent(e)
+		etype, ok := ul.registeredEvents[e.Type]
+		if !ok {
+			// this should not happen
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		ev, err := etype.Unmarshal(e.Event)
+		if err != nil {
+			// this shouldn't happen either
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		noti, err := conv.ConvertEvent(e.Id, ev)
 		if err != nil {
 			ul.log.Error().Err(err).Str("eventid", e.Id).Str("eventtype", e.Type).Msg("failed to convert event")
 			continue
@@ -82,7 +108,7 @@ type GetEventResponseOC10 struct {
 			Status     string `json:"status"`
 			StatusCode int    `json:"statuscode"`
 		} `json:"meta"`
-		Data []OC10Notification `json:"data"`
+		Data []messaging.OC10Notification `json:"data"`
 	} `json:"ocs"`
 }
 

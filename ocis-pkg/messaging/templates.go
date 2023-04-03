@@ -1,4 +1,4 @@
-package service
+package messaging
 
 // Template marks the string as a translatable template
 func Template(s string) string { return s }
