@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -57,7 +56,7 @@ func (g Graph) PostEducationSchool(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling post school")
 	school := libregraph.NewEducationSchool()
-	err := json.NewDecoder(r.Body).Decode(school)
+	err := StrictJSONUnmarshal(r.Body, school)
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create school: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
@@ -129,7 +128,7 @@ func (g Graph) PatchEducationSchool(w http.ResponseWriter, r *http.Request) {
 	}
 
 	school := libregraph.NewEducationSchool()
-	err = json.NewDecoder(r.Body).Decode(school)
+	err = StrictJSONUnmarshal(r.Body, school)
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update school: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
@@ -315,7 +314,7 @@ func (g Graph) PostEducationSchoolUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	memberRef := libregraph.NewMemberReference()
-	err = json.NewDecoder(r.Body).Decode(memberRef)
+	err = StrictJSONUnmarshal(r.Body, memberRef)
 	if err != nil {
 		logger.Debug().
 			Err(err).
@@ -485,7 +484,7 @@ func (g Graph) PostEducationSchoolClass(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	memberRef := libregraph.NewMemberReference()
-	err = json.NewDecoder(r.Body).Decode(memberRef)
+	err = StrictJSONUnmarshal(r.Body, memberRef)
 	if err != nil {
 		logger.Debug().
 			Err(err).

@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -46,7 +45,7 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 	logger.Info().Interface("query", r.URL.Query()).Msg("calling create appRoleAssignment")
 
 	appRoleAssignment := libregraph.NewAppRoleAssignmentWithDefaults()
-	err := json.NewDecoder(r.Body).Decode(appRoleAssignment)
+	err := StrictJSONUnmarshal(r.Body, appRoleAssignment)
 	if err != nil {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %v", err.Error()))
 		return

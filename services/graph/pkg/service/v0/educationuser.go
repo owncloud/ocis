@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -60,7 +59,7 @@ func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Interface("body", r.Body).Msg("calling create education user")
 	u := libregraph.NewEducationUser()
-	err := json.NewDecoder(r.Body).Decode(u)
+	err := StrictJSONUnmarshal(r.Body, u)
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create education user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %v", err.Error()))
@@ -334,7 +333,7 @@ func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	changes := libregraph.NewEducationUser()
-	err = json.NewDecoder(r.Body).Decode(changes)
+	err = StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update education user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,

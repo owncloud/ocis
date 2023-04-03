@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -34,7 +33,7 @@ func (g Graph) ChangeOwnPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	cpw := libregraph.NewPasswordChangeWithDefaults()
-	err = json.NewDecoder(r.Body).Decode(cpw)
+	err = StrictJSONUnmarshal(r.Body, cpw)
 	if err != nil {
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
 		return

@@ -2,7 +2,6 @@ package svc
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -264,7 +263,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Interface("body", r.Body).Msg("calling create user")
 	u := libregraph.NewUser()
-	err := json.NewDecoder(r.Body).Decode(u)
+	err := StrictJSONUnmarshal(r.Body, u)
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %v", err.Error()))
@@ -639,7 +638,7 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	changes := libregraph.NewUser()
-	err = json.NewDecoder(r.Body).Decode(changes)
+	err = StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,

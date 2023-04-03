@@ -127,9 +127,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Same users can be added in a group multiple time](https://github.com/owncloud/ocis/issues/5702)
 - [apiGraph/addUserToGroup.feature:246](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L246)
 
-#### [Try to add group to a group return 204](https://github.com/owncloud/ocis/issues/5793)
-- [apiGraph/addUserToGroup.feature:268](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L268)
-
 #### [API requests from an unauthorized user should return 403](https://github.com/owncloud/ocis/issues/5938)
 - [apiGraph/addUserToGroup.feature:131](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L131)
 - [apiGraph/addUserToGroup.feature:132](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L132)

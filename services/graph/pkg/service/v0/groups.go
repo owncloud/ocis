@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -60,7 +59,7 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling post group")
 	grp := libregraph.NewGroup()
-	err := json.NewDecoder(r.Body).Decode(grp)
+	err := StrictJSONUnmarshal(r.Body, grp)
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create group: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
@@ -119,7 +118,7 @@ func (g Graph) PatchGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	changes := libregraph.NewGroup()
-	err = json.NewDecoder(r.Body).Decode(changes)
+	err = StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not change group: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
@@ -325,7 +324,7 @@ func (g Graph) PostGroupMember(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	memberRef := libregraph.NewMemberReference()
-	err = json.NewDecoder(r.Body).Decode(memberRef)
+	err = StrictJSONUnmarshal(r.Body, memberRef)
 	if err != nil {
 		logger.Debug().
 			Err(err).
