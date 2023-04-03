@@ -9,4 +9,5 @@ type HTTP struct {
 	Root      string                `yaml:"root" env:"GRAPH_HTTP_ROOT" desc:"Subdirectory that serves as the root for this HTTP service."`
 	TLS       shared.HTTPServiceTLS `yaml:"tls"`
 	APIToken  string                `yaml:"apitoken" env:"GRAPH_HTTP_API_TOKEN" desc:"An optional API bearer token"`
+	CORS      CORS                  `yaml:"cors"`
 }

@@ -30,6 +30,12 @@ func DefaultConfig() *config.Config {
 			Addr:      "127.0.0.1:9120",
 			Namespace: "com.owncloud.graph",
 			Root:      "/graph",
+			CORS: config.CORS{
+				AllowedOrigins:   []string{"*"},
+				AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+				AllowedHeaders:   []string{"Authorization", "Origin", "Content-Type", "Accept", "X-Requested-With", "Purge", "Restore"},
+				AllowCredentials: true,
+			},
 		},
 		Service: config.Service{
 			Name: "graph",

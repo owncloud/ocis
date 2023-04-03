@@ -8,6 +8,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
+	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -54,6 +55,14 @@ func Server(opts ...Option) (http.Service, error) {
 			account.Logger(options.Logger),
 			account.JWTSecret(options.Config.TokenManager.JWTSecret),
 		),
+		middleware.Cors(
+			cors.Logger(options.Logger),
+			cors.AllowedOrigins(options.Config.HTTP.CORS.AllowedOrigins),
+			cors.AllowedMethods(options.Config.HTTP.CORS.AllowedMethods),
+			cors.AllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),
+			cors.AllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
+		),
+		middleware.Secure,
 	}
 
 	mux := chi.NewMux()
