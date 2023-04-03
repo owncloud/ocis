@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix Search tag indexing: [#5405](https://github.com/owncloud/ocis/pull/5405)
 * Bugfix - Populate expanded properties: [#5421](https://github.com/owncloud/ocis/pull/5421)
 * Bugfix - Add portrait thumbnail resolutions: [#5656](https://github.com/owncloud/ocis/pull/5656)
+* Bugfix - Fix authenticate headers for API requests: [#5992](https://github.com/owncloud/ocis/pull/5992)
 * Change - Bump libregraph lico: [#5768](https://github.com/owncloud/ocis/pull/5768)
 * Change - Updated Cache Configuration: [#5829](https://github.com/owncloud/ocis/pull/5829)
 * Change - Remove the settings ui: [#5463](https://github.com/owncloud/ocis/pull/5463)
