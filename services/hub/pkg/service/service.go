@@ -88,7 +88,7 @@ func eventsConsumer(evtsCfg config.Events) (<-chan events.Event, error) {
 		return nil, err
 	}
 
-	evts, err := events.Consume(client, "hub", events.UploadReady{})
+	evts, err := events.Consume(client, "hub", events.UploadReady{}, events.SpaceShared{})
 	if err != nil {
 		return nil, err
 	}

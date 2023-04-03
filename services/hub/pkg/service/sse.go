@@ -17,8 +17,8 @@ import (
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
-	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/owncloud/ocis/v2/ocis-pkg/messaging"
 	"github.com/owncloud/ocis/v2/services/hub/pkg/config"
 	"github.com/r3labs/sse/v2"
 	"google.golang.org/grpc/metadata"
@@ -76,7 +76,7 @@ func (s *SSE) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // ListenForEvents listens for events to inform clients about changes. Blocking. Start in seperate go routine.
 func (s *SSE) ListenForEvents(evts <-chan events.Event) {
 	for e := range evts {
-		rcps, ev := s.extractDetails(e.Event)
+		rcps, ev := s.extractDetails(e)
 
 		for r := range rcps {
 			s.server.Publish(r, &sse.Event{Data: ev})
@@ -85,26 +85,18 @@ func (s *SSE) ListenForEvents(evts <-chan events.Event) {
 }
 
 // extracts recipients and builds event to send to client
-func (s *SSE) extractDetails(e interface{}) (<-chan string, []byte) {
+func (s *SSE) extractDetails(e events.Event) (<-chan string, []byte) {
 
 	// determining recipients can take longer. We spawn a seperate go routine to do it
 	ch := make(chan string)
 	go s.determineRecipients(e, ch)
 
-	var event interface{}
+	loc := "en" // TODO: get locale
 
-	switch ev := e.(type) {
-	case events.UploadReady:
-		t := ev.Timestamp.Format("2006-01-02 15:04:05")
-		id, _ := storagespace.FormatReference(ev.FileRef)
-		event = UploadReady{
-			FileID:    id,
-			SpaceID:   ev.FileRef.GetResourceId().GetSpaceId(),
-			Filename:  ev.Filename,
-			Timestamp: t,
-			Message:   fmt.Sprintf("[%s] Hello! The file %s is ready to work with", t, ev.Filename),
-		}
-
+	event, err := messaging.NewConverter(loc, s.gwc, s.cfg.MachineAuthAPIKey, s.cfg.Service.Name, nil).ConvertEvent(e.ID, e.Event)
+	if err != nil {
+		// WHAT TO DO NOW?
+		return ch, nil
 	}
 
 	b, err := json.Marshal(event)
@@ -115,28 +107,34 @@ func (s *SSE) extractDetails(e interface{}) (<-chan string, []byte) {
 	return ch, b
 }
 
-func (s *SSE) determineRecipients(e interface{}, ch chan<- string) {
+func (s *SSE) determineRecipients(e events.Event, ch chan<- string) {
 	defer close(ch)
 
 	var (
-		ref  *provider.Reference
-		user *user.User
+		spaceid string
+		user    *user.UserId
 	)
-	switch ev := e.(type) {
+	switch ev := e.Event.(type) {
 	case events.UploadReady:
-		ref = ev.FileRef
-		user = ev.ExecutingUser
+		spaceid = ev.FileRef.GetResourceId().GetSpaceId()
+		user = ev.ExecutingUser.GetId()
+	case events.SpaceShared:
+		spaceid = ev.ID.GetOpaqueId()
+		user = ev.Executant
+	default:
+		log.Println("unknown event", e)
+		return
 	}
 
 	// impersonate executing user to stat the resource
 	// FIXME: What to do if executing user is not member of the space?
-	ctx, err := s.impersonate(user.GetId())
+	ctx, err := s.impersonate(user)
 	if err != nil {
 		log.Println("ERROR:", err)
 		return
 	}
 
-	space, err := s.getStorageSpace(ctx, ref.GetResourceId().GetSpaceId())
+	space, err := s.getStorageSpace(ctx, spaceid)
 	if err != nil {
 		log.Println("ERROR:", err)
 		return
@@ -154,7 +152,7 @@ func (s *SSE) determineRecipients(e interface{}, ch chan<- string) {
 	}
 
 	// inform executing user first and foremost
-	inform(user.GetId().GetOpaqueId())
+	inform(user.GetOpaqueId())
 
 	// inform space members next
 	var grants map[string]*provider.ResourcePermissions
@@ -174,20 +172,22 @@ func (s *SSE) determineRecipients(e interface{}, ch chan<- string) {
 
 	// inform share recipients also
 	// TODO: How to get all shares pointing to the resource?
-	resp, err := s.gwc.ListShares(ctx, listSharesRequest(ref.GetResourceId()))
-	if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
-		log.Println("ERROR:", err, resp.GetStatus().GetCode())
-		return
-	}
-
-	for _, share := range resp.GetShares() {
-		users := []string{share.GetGrantee().GetUserId().GetOpaqueId()}
-		if users[0] == "" {
-			users = s.getGroupMembers(ctx, share.GetGrantee().GetGroupId().GetOpaqueId())
+	/*
+		resp, err := s.gwc.ListShares(ctx, listSharesRequest(ref.GetResourceId()))
+		if err != nil || resp.GetStatus().GetCode() != rpc.Code_CODE_OK {
+			log.Println("ERROR:", err, resp.GetStatus().GetCode())
+			return
 		}
 
-		inform(users...)
-	}
+		for _, share := range resp.GetShares() {
+			users := []string{share.GetGrantee().GetUserId().GetOpaqueId()}
+			if users[0] == "" {
+				users = s.getGroupMembers(ctx, share.GetGrantee().GetGroupId().GetOpaqueId())
+			}
+
+			inform(users...)
+		}
+	*/
 }
 
 // resolve group members for all groups of a space
