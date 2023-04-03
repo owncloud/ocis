@@ -66,6 +66,7 @@ config = {
         "services/gateway",
         "services/graph",
         "services/groups",
+        "services/hub",
         "services/idm",
         "services/idp",
         "services/invitations",

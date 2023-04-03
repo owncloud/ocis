@@ -18,7 +18,7 @@ func HubCommand(cfg *config.Config) *cli.Command {
 		Category: "services",
 		Before: func(c *cli.Context) error {
 			configlog.Error(parser.ParseConfig(cfg, true))
-			cfg.WebDAV.Commons = cfg.Commons
+			cfg.Hub.Commons = cfg.Commons
 			return nil
 		},
 		Subcommands: command.GetCommands(cfg.Hub),

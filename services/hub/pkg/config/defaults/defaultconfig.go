@@ -22,7 +22,7 @@ func DefaultConfig() *config.Config {
 			Name: "hub",
 		},
 		HTTP: config.HTTP{
-			Addr:      "127.0.0.1:9180",
+			Addr:      "127.0.0.1:0",
 			Namespace: "com.owncloud.web",
 			Root:      "/",
 		},
