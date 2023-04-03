@@ -8,7 +8,7 @@ Feature: sharing
       | Alice    |
       | Brian    |
 
-  @smokeTest @issue-ocis-reva-262
+  @smokeTest @issue-1258
   Scenario Outline: getting all shares of a user using that user
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "some data" to "/file_to_share.txt"
@@ -23,7 +23,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @issue-ocis-reva-65
+  @issue-1319
   Scenario Outline: getting all shares of a user using another user
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
@@ -105,7 +105,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @smokeTest @issue-ocis-reva-357 @issue-ocis-reva-301 @issue-ocis-reva-302
+  @smokeTest @issue-1226 @issue-1270 @issue-1271
   Scenario Outline: getting share info of a share
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "some data" to "/file_to_share.txt"
@@ -136,7 +136,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @issue-ocis-reva-374
+  @issue-1233
   Scenario Outline: Get a share with a user that didn't receive the share
     Given using OCS API version "<ocs_api_version>"
     And user "Carol" has been created with default attributes and without skeleton files
@@ -150,7 +150,7 @@ Feature: sharing
       | 1               | 200              |
       | 2               | 404              |
 
-  @skipOnLDAP @issue-ocis-reva-194 @skipOnGraph
+  @skipOnLDAP @issue-1289 @skipOnGraph
   Scenario: Share of folder to a group, remove user from that group
     Given using OCS API version "1"
     And user "Carol" has been created with default attributes and without skeleton files
@@ -171,7 +171,7 @@ Feature: sharing
       | /Shares/PARENT/           |
       | /Shares/PARENT/parent.txt |
 
-  @issue-ocis-reva-372
+  @issue-1231
   Scenario Outline: getting all the shares inside the folder
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/PARENT"

@@ -1,4 +1,4 @@
-@api @files_versions-app-required @issue-ocis-reva-275
+@api @files_versions-app-required @issue-1262
 
 Feature: dav-versions
 
@@ -13,7 +13,7 @@ Feature: dav-versions
     Then the HTTP status code should be "201"
     And the version folder of file "/davtest.txt" for user "Alice" should contain "0" elements
 
-  @issue-ocis-reva-17 @issue-ocis-reva-56
+  @issue-1343 @issue-1321
   Scenario: Upload file and no version is available using various chunking methods (except new chunking)
     When user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms except new chunking using the WebDAV API
     Then the HTTP status code should be "200"
@@ -29,7 +29,7 @@ Feature: dav-versions
     And the version folder of file "/davtest.txt" for user "Alice" should contain "1" element
     And the content length of file "/davtest.txt" with version index "1" for user "Alice" in versions folder should be "8"
 
-  @issue-ocis-reva-17 @issue-ocis-reva-56
+  @issue-1343 @issue-1321
   Scenario: Upload a file twice and versions are available using various chunking methods (except new chunking)
     When user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms except new chunking using the WebDAV API
     And user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms except new chunking using the WebDAV API
@@ -66,7 +66,7 @@ Feature: dav-versions
     Then the HTTP status code should be "204"
     And the content of file "/davtest.txt" for user "Alice" should be "Back To The Future."
 
-  @smokeTest @skipOnStorage:ceph @files_primary_s3-issue-161 @issue-ocis-reva-17 @issue-ocis-reva-56
+  @smokeTest @skipOnStorage:ceph @files_primary_s3-issue-161 @issue-1343 @issue-1321
   Scenario Outline: Uploading a chunked file does create the correct version that can be restored
     Given using <dav-path> DAV path
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
@@ -127,7 +127,7 @@ Feature: dav-versions
     Then the HTTP status code should be "204"
     And the content of file "/renamedfile.txt" for user "Alice" should be "old content"
 
-  @issue-ocis-1238
+  @issue-1238
   Scenario: User can access version number after moving a file
     Given user "Alice" has created folder "testFolder"
     And user "Alice" has uploaded file with content "uploaded content" to "textfile0.txt"
@@ -146,7 +146,7 @@ Feature: dav-versions
     Then the HTTP status code should be "207"
     And the number of versions should be "0"
 
-  @issue-ocis-1234
+  @issue-1234
   Scenario: the number of etag elements in response changes according to version of the file
     Given user "Alice" has uploaded file with content "uploaded content" to "textfile0.txt"
     And user "Alice" has uploaded file with content "version 1" to "textfile0.txt"
@@ -388,7 +388,7 @@ Feature: dav-versions
     And the content of file "/sharingfolder/sharefile.txt" for user "Alice" should be "old content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "old content"
 
-  @files_sharing-app-required @issue-ocis-reva-34
+  @files_sharing-app-required
   Scenario: sharer can restore a file inside a group shared folder modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
@@ -408,7 +408,7 @@ Feature: dav-versions
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "First content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Carol" should be "First content"
 
-  @files_sharing-app-required @issue-ocis-reva-386
+  @files_sharing-app-required @issue-1238
   Scenario Outline: Moving a file (with versions) into a shared folder as the sharee and as the sharer
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -434,7 +434,7 @@ Feature: dav-versions
       | old         | Brian | /testshare        |
       | new         | Brian | /testshare        |
 
-  @files_sharing-app-required @issue-ocis-reva-386
+  @files_sharing-app-required @issue-1238
   Scenario Outline: Moving a file (with versions) out of a shared folder as the sharee and as the sharer
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files

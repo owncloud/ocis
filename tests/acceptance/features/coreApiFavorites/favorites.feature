@@ -13,7 +13,7 @@ Feature: favorite
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
 
-  @issue-ocis-reva-276
+  @issue-1263
   Scenario Outline: Favorite a folder
     Given using <dav_version> DAV path
     When user "Alice" favorites element "/FOLDER" using the WebDAV API
@@ -34,7 +34,7 @@ Feature: favorite
       | dav_version |
       | spaces      |
 
-  @issue-ocis-reva-276
+  @issue-1263
   Scenario Outline: Unfavorite a folder
     Given using <dav_version> DAV path
     And user "Alice" has favorited element "/FOLDER"
@@ -56,7 +56,7 @@ Feature: favorite
       | dav_version |
       | spaces      |
 
-  @smokeTest @issue-ocis-reva-276
+  @smokeTest @issue-1263
   Scenario Outline: Favorite a file
     Given using <dav_version> DAV path
     When user "Alice" favorites element "/textfile0.txt" using the WebDAV API
@@ -77,7 +77,7 @@ Feature: favorite
       | dav_version |
       | spaces      |
 
-  @smokeTest @issue-ocis-reva-276
+  @smokeTest @issue-1263
   Scenario Outline: Unfavorite a file
     Given using <dav_version> DAV path
     And user "Alice" has favorited element "/textfile0.txt"
@@ -147,7 +147,7 @@ Feature: favorite
       | dav_version |
       | spaces      |
 
-  @issue-33840 @skipOnOcV10
+
   Scenario Outline: Get favorited elements and limit count of entries
     Given using <dav_version> DAV path
     And user "Alice" has favorited element "/textfile0.txt"
@@ -172,7 +172,7 @@ Feature: favorite
       | dav_version |
       | spaces      |
 
-  @issue-33840 @skipOnOcV10
+
   Scenario Outline: Get favorited elements paginated in subfolder
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/subfolder"

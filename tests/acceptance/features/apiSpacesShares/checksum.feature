@@ -7,7 +7,7 @@ Feature: checksums
     And using spaces DAV path
     And user "Brian" has been created with default attributes and without skeleton files
 
-  @files_sharing-app-required @issue-ocis-reva-196
+  @files_sharing-app-required @issue-1291
   Scenario: Sharing a file with checksum should return the checksum in the propfind using new DAV path
     Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     And user "Alice" has shared file "/myChecksumFile.txt" with user "Brian"
@@ -16,7 +16,7 @@ Feature: checksums
     Then the HTTP status code should be "207"
     And the webdav checksum should match "SHA1:3ee962b839762adb0ad8ba6023a4690be478de6f MD5:d70b40f177b14b470d1756a3c12b963a ADLER32:8ae90960"
 
-  @files_sharing-app-required @issue-ocis-reva-196
+  @files_sharing-app-required @issue-1291
   Scenario: Modifying a shared file should return correct checksum in the propfind using new DAV path
     Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     And user "Alice" has shared file "/myChecksumFile.txt" with user "Brian"

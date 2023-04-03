@@ -48,7 +48,7 @@ Feature: create folder using MKCOL
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
 
-  @skipOnOcV10 @issue-ocis-5049 @issue-ocis-reva-9 @issue-ocis-reva-197
+  @skipOnOcV10 @issue-5049 @issue-1347 @issue-1292
   Scenario: send MKCOL requests to another user's webDav endpoints as normal user
     Given user "Brian" has been created with default attributes and without skeleton files
     When user "Brian" requests these endpoints with "MKCOL" including body "" about user "Alice"
@@ -59,7 +59,7 @@ Feature: create folder using MKCOL
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "404"
 
-  @skipOnOcV10 @issue-ocis-5049 @issue-ocis-reva-9 @issue-ocis-reva-197
+  @skipOnOcV10 @issue-5049 @issue-1347 @issue-1292
   Scenario: send MKCOL requests to non-existent user's webDav endpoints as normal user
     Given user "Brian" has been created with default attributes and without skeleton files
     When user "Brian" requests these endpoints with "MKCOL" including body "" about user "non-existent-user"
@@ -70,7 +70,7 @@ Feature: create folder using MKCOL
       | /remote.php/dav/files/non-existent-user/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "404"
 
-  @skipOnOcV10 @personalSpace @issue-ocis-reva-9 @issue-ocis-reva-197
+  @personalSpace @issue-1347 @issue-1292
   Scenario: send MKCOL requests to another user's webDav endpoints as normal user using the spaces WebDAV API
     Given user "Brian" has been created with default attributes and without skeleton files
     When user "Brian" requests these endpoints with "MKCOL" including body "" about user "Alice"
@@ -81,7 +81,7 @@ Feature: create folder using MKCOL
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "404"
 
-  @skipOnOcV10 @issue-ocis-5049 @personalSpace @issue-ocis-reva-9 @issue-ocis-reva-197
+  @skipOnOcV10 @issue-5049 @personalSpace @issue-1347 @issue-1292
   Scenario: send MKCOL requests to non-existent user's webDav endpoints as normal user using the spaces WebDAV API
     Given user "Brian" has been created with default attributes and without skeleton files
     When user "Brian" requests these endpoints with "MKCOL" including body "" about user "non-existent-user"

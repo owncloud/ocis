@@ -29,7 +29,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @issue-ocis-1289
+  @issue-1289
   Scenario Outline: keep group permissions in sync when the share is renamed by the receiver and then the permissions are updated by sharer
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
@@ -77,7 +77,7 @@ Feature: sharing
       | 1               | 200              |
       | 2               | 400              |
 
-  @issue-ocis-2173
+  @issue-2173
   Scenario Outline: Cannot update a share of a file with a user to have only create and/or delete permission
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
@@ -99,7 +99,7 @@ Feature: sharing
       | 1               | 200              | create,delete |
       | 2               | 400              | create,delete |
 
-  @issue-ocis-2173
+  @issue-2173
   Scenario Outline: Cannot update a share of a file with a group to have only create and/or delete permission
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
@@ -123,7 +123,7 @@ Feature: sharing
       | 1               | 200              | create,delete |
       | 2               | 400              | create,delete |
 
-  @skipOnFilesClassifier @issue-files-classifier-291 @toFixOnOCIS @issue-ocis-2201
+  @skipOnFilesClassifier @issue-files-classifier-291 @toFixOnOCIS @issue-2201
   Scenario Outline: Share ownership change after moving a shared file outside of an outer share
     Given these users have been created with default attributes and without skeleton files:
       | username |
@@ -194,7 +194,7 @@ Feature: sharing
       | path          |
       | /Carol-folder |
 
-  @toFixOnOCIS @toFixOnOcV10 @issue-ocis-reva-349 @issue-ocis-reva-350 @issue-ocis-reva-352 @issue-37653
+  @toFixOnOCIS @toFixOnOcV10 @issue-1253 @issue-1224 @issue-1225
   #after fixing all the issues merge this scenario with the one below
   Scenario Outline: API responds with a full set of parameters when owner changes the permission of a share
     Given using OCS API version "<ocs_api_version>"

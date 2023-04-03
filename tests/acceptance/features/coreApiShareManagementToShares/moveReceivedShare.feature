@@ -1,4 +1,4 @@
-@api @files_sharing-app-required @issue-ocis-1289 @issue-ocis-1328
+@api @files_sharing-app-required @issue-1289 @issue-1328
 Feature: sharing
 
   Background:
@@ -162,7 +162,7 @@ Feature: sharing
     And as "Brian" folder "/Shares/myFolder" should exist
     But as "Alice" folder "/Shares/myFolder" should not exist
 
-  @issue-ocis-2141
+  @issue-2141
   Scenario Outline: receiver renames a received folder share to name with special characters in group sharing
     Given group "grp1" has been created
     And user "Carol" has been added to group "grp1"
@@ -185,7 +185,7 @@ Feature: sharing
       | ?abc=oc #     | ?abc=oc g%rp#   | # oc?test=oc&a  |
       | @a#8a=b?c=d   | @a#8a=b?c=d grp | ?a#8 a=b?c=d    |
 
-  @issue-ocis-2141
+  @issue-2141
   Scenario Outline: receiver renames a received file share to name with special characters with share, read, change permissions in group sharing
     Given group "grp1" has been created
     And user "Carol" has been added to group "grp1"

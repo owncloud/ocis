@@ -1,4 +1,4 @@
-@api @public_link_share-feature-required @files_sharing-app-required @issue-ocis-reva-288 @issue-ocis-reva-252
+@api @public_link_share-feature-required @files_sharing-app-required
 Feature: multilinksharing
 
   Background:
@@ -209,7 +209,7 @@ Feature: multilinksharing
       | dav-path |
       | spaces   |
 
-  @issue-ocis-reva-335
+  @issue-1251
   Scenario Outline: Renaming a folder doesn't remove its public shares
     Given using OCS API version "1"
     And using <dav-path> DAV path

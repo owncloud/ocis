@@ -1,4 +1,4 @@
-@api @files_sharing-app-required @public_link_share-feature-required @issue-ocis-reva-315 @issue-ocis-reva-316 @issue-ocis-2079 @issue-ocis-reva-292
+@api @files_sharing-app-required @public_link_share-feature-required @issue-1276 @issue-1277 @issue-2079 @issue-1269
 
 Feature: changing a public link share
 

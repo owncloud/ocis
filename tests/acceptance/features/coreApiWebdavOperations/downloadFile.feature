@@ -25,7 +25,7 @@ Feature: download file
       | dav_version |
       | spaces      |
 
-  @issue-ocis-reva-12
+  @issue-1346
   Scenario Outline: download a file with range
     Given using <dav_version> DAV path
     When user "Alice" downloads file "/welcome.txt" with range "bytes=24-50" using the WebDAV API
@@ -77,7 +77,7 @@ Feature: download file
       | dav_version |
       | spaces      |
 
-  @issue-ocis-reva-98
+  @issue-1316
   Scenario Outline: Get the content-length response header of a pdf file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/simple.pdf" to "/simple.pdf"
@@ -96,7 +96,7 @@ Feature: download file
       | dav_version |
       | spaces      |
 
-  @issue-ocis-reva-98
+  @issue-1316
   Scenario Outline: Get the content-length response header of an image file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/testavatar.png" to "/testavatar.png"
