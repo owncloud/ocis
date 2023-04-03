@@ -1105,6 +1105,7 @@ class SpacesContext implements Context {
 	/**
 	 * @Then /^for user "([^"]*)" the JSON response of space project should match$/
 	 * @Then /^for user "([^"]*)" the JSON response should contain space called "([^"]*)" and match$/
+	 * @Then /^for user "([^"]*)" the JSON response should contain space called "([^"]*)" (?:owned by|granted to) "([^"]*)" and match$/
 	 * @Then /^for user "([^"]*)" the JSON response should contain space called "([^"]*)" (?:owned by|granted to) "([^"]*)" (?:with description file|with space image) "([^"]*)" and match$/
 	 *
 	 * @param string $user
