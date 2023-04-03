@@ -9,9 +9,10 @@ Running the `userlog` service without running the `eventhistory` service is not 
 ## Storing
 
 The `userlog` service persists information via the configured store in `USERLOG_STORE_TYPE`. Possible stores are:
-  -   `mem`: Basic in-memory store and the default.
+  -   `memory`: Basic in-memory store and the default.
   -   `ocmem`: Advanced in-memory store allowing max size.
   -   `redis`: Stores data in a configured redis cluster.
+  -   `redis-sentinel`: Stores data in a configured redis sentinel cluster.
   -   `etcd`: Stores data in a configured etcd cluster.
   -   `nats-js`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
   -   `noop`: Stores nothing. Useful for testing. Not recommended in productive enviroments.
