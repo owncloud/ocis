@@ -4,8 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"reflect"
+	"sort"
 	"time"
 
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/google/uuid"
 	. "github.com/onsi/ginkgo/v2"
@@ -34,7 +36,6 @@ var _ = Describe("EventHistoryService", func() {
 		bus = testBus(make(chan events.Event))
 		eh, err = service.NewEventHistoryService(cfg, bus, sto, log.Logger{})
 		Expect(err).ToNot(HaveOccurred())
-
 	})
 
 	AfterEach(func() {
@@ -54,7 +55,49 @@ var _ = Describe("EventHistoryService", func() {
 
 		Expect(len(resp.Events)).To(Equal(1))
 		Expect(resp.Events[0].Id).To(Equal(id))
+	})
 
+	It("Gets all events", func() {
+		ids := make([]string, 3)
+		ids[0] = bus.Publish(events.UploadReady{
+			ExecutingUser: &userv1beta1.User{
+				Id: &userv1beta1.UserId{
+					OpaqueId: "test-id",
+				},
+			},
+			Failed:    false,
+			Timestamp: time.Time{},
+		})
+		ids[1] = bus.Publish(events.UserCreated{
+			UserID: "another-id",
+		})
+		ids[2] = bus.Publish(events.UserDeleted{
+			Executant: &userv1beta1.UserId{
+				OpaqueId: "another-id",
+			},
+			UserID: "test-id",
+		})
+
+		time.Sleep(500 * time.Millisecond)
+
+		resp := &ehsvc.GetEventsResponse{}
+		err := eh.GetEventsForUser(context.Background(), &ehsvc.GetEventsForUserRequest{UserID: "test-id"}, resp)
+		Expect(err).ToNot(HaveOccurred())
+		Expect(resp).ToNot(BeNil())
+
+		// Events don't always come back in the same order as they were sent, so we need to sort them and
+		// do the same for the expcted IDs as well.
+		expectedIDs := []string{ids[0], ids[2]}
+		sort.Strings(expectedIDs)
+		var gotIDs []string
+		for _, ev := range resp.Events {
+			gotIDs = append(gotIDs, ev.Id)
+		}
+		sort.Strings(gotIDs)
+
+		Expect(len(gotIDs)).To(Equal(len(expectedIDs)))
+		Expect(gotIDs[0]).To(Equal(expectedIDs[0]))
+		Expect(gotIDs[1]).To(Equal(expectedIDs[1]))
 	})
 })
 
