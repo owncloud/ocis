@@ -147,7 +147,9 @@ func configureSupportedChallenges(options Options) {
 func writeSupportedAuthenticateHeader(w http.ResponseWriter, r *http.Request) {
 	caser := cases.Title(language.Und)
 	for _, s := range SupportedAuthStrategies {
-		w.Header().Add(WwwAuthenticate, fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", caser.String(s), r.Host))
+		if r.Header.Get("X-Requested-With") != "XMLHttpRequest" {
+			w.Header().Add(WwwAuthenticate, fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", caser.String(s), r.Host))
+		}
 	}
 }
 
