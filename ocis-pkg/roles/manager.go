@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	microstore "go-micro.dev/v4/store"
