@@ -40,6 +40,8 @@ func NewEventHistoryServiceEndpoints() []*api.Endpoint {
 type EventHistoryService interface {
 	// returns the specified events
 	GetEvents(ctx context.Context, in *GetEventsRequest, opts ...client.CallOption) (*GetEventsResponse, error)
+	// returns all events for the specified userID
+	GetEventsForUser(ctx context.Context, in *GetEventsForUserRequest, opts ...client.CallOption) (*GetEventsResponse, error)
 }
 
 type eventHistoryService struct {
@@ -64,16 +66,29 @@ func (c *eventHistoryService) GetEvents(ctx context.Context, in *GetEventsReques
 	return out, nil
 }
 
+func (c *eventHistoryService) GetEventsForUser(ctx context.Context, in *GetEventsForUserRequest, opts ...client.CallOption) (*GetEventsResponse, error) {
+	req := c.c.NewRequest(c.name, "EventHistoryService.GetEventsForUser", in)
+	out := new(GetEventsResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for EventHistoryService service
 
 type EventHistoryServiceHandler interface {
 	// returns the specified events
 	GetEvents(context.Context, *GetEventsRequest, *GetEventsResponse) error
+	// returns all events for the specified userID
+	GetEventsForUser(context.Context, *GetEventsForUserRequest, *GetEventsResponse) error
 }
 
 func RegisterEventHistoryServiceHandler(s server.Server, hdlr EventHistoryServiceHandler, opts ...server.HandlerOption) error {
 	type eventHistoryService interface {
 		GetEvents(ctx context.Context, in *GetEventsRequest, out *GetEventsResponse) error
+		GetEventsForUser(ctx context.Context, in *GetEventsForUserRequest, out *GetEventsResponse) error
 	}
 	type EventHistoryService struct {
 		eventHistoryService
@@ -88,4 +103,8 @@ type eventHistoryServiceHandler struct {
 
 func (h *eventHistoryServiceHandler) GetEvents(ctx context.Context, in *GetEventsRequest, out *GetEventsResponse) error {
 	return h.EventHistoryServiceHandler.GetEvents(ctx, in, out)
+}
+
+func (h *eventHistoryServiceHandler) GetEventsForUser(ctx context.Context, in *GetEventsForUserRequest, out *GetEventsResponse) error {
+	return h.EventHistoryServiceHandler.GetEventsForUser(ctx, in, out)
 }

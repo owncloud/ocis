@@ -36,12 +36,20 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service EventHistoryService {
     // returns the specified events
     rpc GetEvents(GetEventsRequest) returns (GetEventsResponse);
+    // returns all events for the specified userID
+    rpc GetEventsForUser(GetEventsForUserRequest) returns (GetEventsResponse);
 }
 
 // A request to retrieve events
 message GetEventsRequest {
     // the ids of the events we want to get
     repeated string ids = 1;
+}
+
+// A request to retrieve events belonging to a userID
+message GetEventsForUserRequest {
+    // the userID of the events we want to get
+    string userID = 1;
 }
 
 // The service response
