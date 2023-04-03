@@ -80,7 +80,7 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 	if err != nil && err != store.ErrNotFound {
 		m.Logger.Error().Err(err).Msg("could not read from userinfo cache")
 	}
-	if len(record) > 1 {
+	if len(record) > 0 {
 		if err = msgpack.Unmarshal(record[0].Value, &claims); err == nil {
 			m.Logger.Debug().Interface("claims", claims).Msg("cache hit for userinfo")
 			return claims, nil
