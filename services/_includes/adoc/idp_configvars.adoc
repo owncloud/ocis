@@ -1,6 +1,6 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
@@ -13,6 +13,11 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacment
+
+| IDP_INSECURE is confusing
+| 3.0
+| 3.1
+| IDP_LDAP_INSECURE
 |===
 
 endif::[]
@@ -299,8 +304,9 @@ a| [subs=-attributes]
 URL of the IDP endpoint.
 
 a|`LDAP_INSECURE` +
+`IDP_LDAP_INSECURE` +
 `IDP_INSECURE` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
