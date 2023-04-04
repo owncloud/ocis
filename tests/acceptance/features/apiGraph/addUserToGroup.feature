@@ -125,7 +125,27 @@ Feature: add users to group
     And group "groupA" has been created
     When user "Alice" tries to add himself to group "groupA" using the Graph API
     Then the HTTP status code should be "403"
-    And the last response should be an unauthorized response
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "type": "string",
+            "enum": ["Unauthorized"]
+          }
+        }
+      }
+    }
+    """
     Examples:
       | role        |
       | Space Admin |
@@ -139,7 +159,27 @@ Feature: add users to group
     And group "groupA" has been created
     When user "Alice" tries to add user "Brian" to group "groupA" using the Graph API
     Then the HTTP status code should be "403"
-    And the last response should be an unauthorized response
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "message"
+          ],
+          "properties": {
+            "type": "string",
+            "enum": ["Unauthorized"]
+          }
+        }
+      }
+    }
+    """
     Examples:
       | role        |
       | Space Admin |

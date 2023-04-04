@@ -10,8 +10,10 @@ declare(strict_types=1);
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
+use Helmich\JsonAssert\JsonAssertions;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
 use TestHelpers\WebDavHelper;
@@ -198,28 +200,19 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then /^the user "([^"]*)" should have information with these key and value pairs:$/
+	 * @Then /^the user information of "([^"]*)" should match this JSON schema$/
 	 *
 	 * @param string $user
-	 * @param TableNode $table
+	 * @param PyStringNode $schemaString
 	 *
 	 * @return void
 	 * @throws Exception
 	 * @throws GuzzleException
 	 * @throws JsonException
 	 */
-	public function theUserShouldHaveInformationWithTheseKeyAndValuePairs(string $user, TableNode $table): void {
-		$rows = $table->getHash();
+	public function theUserInformationShouldMatchTheJSON(string $user, PyStringNode $schemaString): void {
 		$this->adminHasRetrievedUserUsingTheGraphApi($user);
-		foreach ($rows as $row) {
-			$key = $row['key'];
-			$expectedValue = $row['value'];
-			$responseValue = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())[$key];
-			Assert::assertEquals(
-				$expectedValue,
-				$responseValue
-			);
-		}
+		$this->featureContext->theDataOfTheResponseShouldMatch($schemaString);
 	}
 
 	/**
@@ -1188,62 +1181,6 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then the group :group should have the following member information
-	 *
-	 * @param string $group
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function theGroupShouldHaveTheFollowingMemberInformation(string $group, TableNode $table): void {
-		$response = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
-		$rows = $table->getHash();
-		$currentMemberIndex = 0;
-		if (isset($response['value'])) {
-			$response = $response['value'];
-			$groupFoundInResponse = false;
-			foreach ($response as $value) {
-				if ($value['displayName'] === $group) {
-					$groupFoundInResponse = true;
-					foreach ($rows as $row) {
-						$this->checkUserInformation($row, $value['members'][$currentMemberIndex]);
-						$currentMemberIndex++;
-					}
-					break;
-				}
-			}
-			if (!$groupFoundInResponse) {
-				throw new Error(
-					'Group ' . $group . " could not be found in the response."
-				);
-			}
-		} else {
-			foreach ($rows as $row) {
-				$this->checkUserInformation($row, $response['members'][$currentMemberIndex]);
-				$currentMemberIndex++;
-			}
-		}
-	}
-
-	/**
-	 * @Then the last response should be an unauthorized response
-	 *
-	 * @return void
-	 */
-	public function theLastResponseShouldBeUnauthorizedReponse(): void {
-		$response = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
-		$errorText = $response['error']['message'];
-
-		Assert::assertEquals(
-			'Unauthorized',
-			$errorText,
-			__METHOD__
-			. "\nExpected unauthorized message but got '" . $errorText . "'"
-		);
-	}
-
-	/**
 	 * @When user :user deletes group :group using the Graph API
 	 * @When the administrator deletes group :group using the Graph API
 	 * @When user :user tries to delete group :group using the Graph API
@@ -1444,69 +1381,6 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then /^the user retrieve API response should contain the following information:$/
-	 *
-	 * @param TableNode $table
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function theUserRetrieveApiResponseShouldContainTheFollowingInformation(TableNode $table): void {
-		$rows = $table->getHash();
-		$apiResponse = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
-		foreach ($rows as $row) {
-			$this->checkUserInformation($row, $apiResponse);
-		}
-	}
-
-	/**
-	 * @param array $expectedValue
-	 * @param array $actualValue
-	 *
-	 * @throws GuzzleException
-	 * @return void
-	 */
-	public function checkUserInformation(array $expectedValue, array  $actualValue):void {
-		foreach (array_keys($expectedValue) as $keyName) {
-			switch ($keyName) {
-				case "memberOf":
-					$memberOfFromApiReponse = [];
-					$memberOf = preg_split('/\s*,\s*/', trim($expectedValue['memberOf']));
-					foreach ($actualValue['memberOf'] as $member) {
-						$memberOfFromApiReponse[] = $member['displayName'];
-					}
-					Assert::assertEqualsCanonicalizing($memberOf, $memberOfFromApiReponse);
-					break;
-				case "id":
-					if ($expectedValue[$keyName] !== '%uuid_v4%') {
-						throw new Error(
-							'Only UUIDv4 patterned user id can be checked' . ' but got '
-							. trim($expectedValue[$keyName], '%')
-						);
-					}
-					Assert::assertTrue(GraphHelper::isUUIDv4($actualValue['id']), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualValue['id']);
-					break;
-				case "accountEnabled":
-					if ($expectedValue[$keyName] === 'true') {
-						Assert::assertTrue($actualValue[$keyName], ' Expected ' . $keyName . ' is not true ');
-					} else {
-						Assert::assertFalse($actualValue[$keyName], ' Expected ' . $keyName . ' is not false ');
-					}
-					break;
-				default:
-					Assert::assertEquals(
-						$expectedValue[$keyName],
-						$actualValue[$keyName],
-						__METHOD__ .
-						' Expected ' . $keyName . ' to have value ' . $expectedValue[$keyName]
-						. ' but got ' . $actualValue[$keyName]
-					);
-					break;
-			}
-		}
-	}
-
-	/**
 	 * @When user :byUser tries to get information of user :user using Graph API
 	 * @When user :byUser gets information of user :user using Graph API
 	 *
@@ -1546,36 +1420,6 @@ class GraphContext implements Context {
 			$credentials['password'],
 		);
 		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @Then /^the API response should (not|)\s?contain following (user|users) with the information:$/
-	 *
-	 * @param string    $shouldOrNot   (not|)
-	 * @param TableNode $table
-	 *
-	 * @throws Exception
-	 * @return void
-	 */
-	public function theApiResponseShouldContainAllUserWithFollowingInformation(string $shouldOrNot, TableNode $table): void {
-		$values = $table->getHash();
-		$apiResponse = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'];
-		foreach ($values as $expectedValue) {
-			$found = false;
-			foreach ($apiResponse as $key => $actualResponseValue) {
-				if ($expectedValue["displayName"] === $actualResponseValue["displayName"]) {
-					$found = true;
-					$this->checkUserInformation($expectedValue, $actualResponseValue);
-					unset($apiResponse[$key]);
-					break;
-				}
-			}
-			if ($shouldOrNot === 'not') {
-				Assert::assertFalse($found, $expectedValue["displayName"] . ' has been found in the response, but should not be.');
-			} else {
-				Assert::assertTrue($found, $expectedValue["displayName"] . ' could not be found in the response.');
-			}
-		}
 	}
 
 	/**
@@ -1661,71 +1505,6 @@ class GraphContext implements Context {
 	public function userTriesToGetOwnDriveInformation(string $user) {
 		$response = $this->retrieveUserInformationAlongWithDriveUsingGraphApi($user);
 		$this->featureContext->setResponse($response);
-	}
-
-	/**
-	 * @param array $driveInformation
-	 *
-	 * @return string
-	 */
-	public static function getSpaceIdFromActualDriveinformation(array $driveInformation): string {
-		return $driveInformation['id'];
-	}
-
-	/**
-	 * check if single drive information is correct
-	 *
-	 * @param array $expectedDriveInformation
-	 * @param array $actualDriveInformation
-	 *
-	 * @return void
-	 */
-	public function checkUserDriveInformation(array $expectedDriveInformation, array  $actualDriveInformation):void {
-		foreach (array_keys($expectedDriveInformation) as $keyName) {
-			$actualKeyValue = GraphHelper::separateAndGetValueForKey($keyName, $actualDriveInformation);
-			switch ($expectedDriveInformation[$keyName]) {
-				case '%user_id%':
-					Assert::assertTrue(GraphHelper::isUUIDv4($actualKeyValue), __METHOD__ . ' Expected user_id to have UUIDv4 pattern but found: ' . $actualKeyValue);
-					break;
-				case '%space_id%':
-					Assert::assertTrue(GraphHelper::isSpaceId($actualKeyValue), __METHOD__ . ' Expected space_id to have a UUIDv4:UUIDv4 pattern but found: ' . $actualKeyValue);
-					break;
-				default:
-					$expectedDriveInformation[$keyName] = $this->featureContext->substituteInLineCodes(
-						$expectedDriveInformation[$keyName],
-						$this->featureContext->getCurrentUser(),
-						[],
-						[
-							[
-								// the actual space_id is substituted from the actual drive information rather than making an API request and substituting
-								"code" => "%space_id%",
-								"function" =>
-									[$this, "getSpaceIdFromActualDriveinformation"],
-								"parameter" => [$actualDriveInformation]
-							],
-						]
-					);
-					Assert::assertEquals($expectedDriveInformation[$keyName], $actualKeyValue);
-			}
-		}
-	}
-
-	/**
-	 * @param TableNode $table
-	 *
-	 * @Then the user retrieve API response should contain the following drive information:
-	 *
-	 * @return void
-	 */
-	public function theResponseShouldContainTheFollowingDriveInformation(TableNode $table): void {
-		$expectedDriveInformation = $table->getRowsHash();
-		// array of user drive information (Personal Drive Information Only)
-		$actualDriveInformation = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse());
-		if (\is_array($actualDriveInformation) && \array_key_exists('drive', $actualDriveInformation)) {
-			$this->checkUserDriveInformation($expectedDriveInformation, $actualDriveInformation['drive']);
-		} else {
-			throw new Error('Response is not an array or the array does not consist key "drive"');
-		}
 	}
 
 	/**
@@ -2225,6 +2004,40 @@ class GraphContext implements Context {
 				$credentials["password"],
 				$groupName
 			)
+		);
+	}
+
+	/**
+	 * @Then /^the JSON data of the response should (not )?contain the user "([^"]*)" in the item 'value'(?:, the user-details should match)?$/
+	 * @Then /^the JSON data of the response should (not )?contain the group "([^"]*)" in the item 'value'(?:, the group-details should match)?$/
+	 *
+	 * @param string $shouldOrNot (not| )
+	 * @param string $user
+	 * @param PyStringNode|null $schemaString
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theJsonDataResponseShouldContainDisplayNameAndMatch(
+		string $shouldOrNot,
+		string $user,
+		?PyStringNode $schemaString = null
+	): void {
+		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
+		$displayNameFound = false;
+		foreach ($responseBody as $value) {
+			if (isset($value->displayName) && $value->displayName === $user) {
+				$responseBody = $value;
+				$displayNameFound = true;
+				break;
+			}
+		}
+		if ($shouldOrNot === 'not ' && !$displayNameFound) {
+			return;
+		}
+		JsonAssertions::assertJsonDocumentMatchesSchema(
+			$responseBody,
+			$this->featureContext->getJSONSchema($schemaString)
 		);
 	}
 
