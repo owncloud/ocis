@@ -433,7 +433,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 			logger.Debug().
 				Bool("cansetspacequota", canSetSpaceQuota).
 				Msg("could not update drive: user is not allowed to set the space quota")
-			errorcode.NotAllowed.Render(w, r, http.StatusUnauthorized, "user is not allowed to set the space quota")
+			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "user is not allowed to set the space quota")
 			return
 		}
 		updateSpaceRequest.StorageSpace.Quota = &storageprovider.Quota{
