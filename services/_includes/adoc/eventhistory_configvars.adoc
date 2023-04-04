@@ -1,6 +1,6 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
@@ -13,6 +13,11 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacment
+
+| EVENTHISTORY_STORE_ADDRESSES name needs to be harmonized
+| 3.0
+| 3.1
+| EVENTHISTORY_STORE_NODES
 |===
 
 endif::[]
@@ -171,8 +176,9 @@ a| [subs=-attributes]
 The type of the eventhistory store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
 a|`OCIS_PERSISTENT_STORE_NODES` +
+`EVENTHISTORY_STORE_NODES` +
 `EVENTHISTORY_STORE_ADDRESSES` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
