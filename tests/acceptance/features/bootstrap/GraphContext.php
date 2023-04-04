@@ -2012,29 +2012,34 @@ class GraphContext implements Context {
 	 * @Then /^the JSON data of the response should (not )?contain the group "([^"]*)" in the item 'value'(?:, the group-details should match)?$/
 	 *
 	 * @param string $shouldOrNot (not| )
-	 * @param string $user
+	 * @param string $userOrGroup
 	 * @param PyStringNode|null $schemaString
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theJsonDataResponseShouldContainDisplayNameAndMatch(
+	public function theJsonDataResponseShouldOrNotContainUserOrGroupAndMatch(
 		string $shouldOrNot,
-		string $user,
+		string $userOrGroup,
 		?PyStringNode $schemaString = null
 	): void {
 		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
-		$displayNameFound = false;
+		$userOrGroupFound = false;
 		foreach ($responseBody as $value) {
-			if (isset($value->displayName) && $value->displayName === $user) {
+			if (isset($value->displayName) && $value->displayName === $userOrGroup) {
 				$responseBody = $value;
-				$displayNameFound = true;
+				$userOrGroupFound = true;
 				break;
 			}
 		}
-		if ($shouldOrNot === 'not ' && !$displayNameFound) {
+		$shouldContain = \trim($shouldOrNot) !== 'not';
+		if (!$shouldContain && !$userOrGroupFound) {
 			return;
 		}
+		Assert::assertFalse(
+			!$shouldContain && $userOrGroupFound,
+			'Response contains user or group "' . $userOrGroup . '" but should not have.'
+		);
 		JsonAssertions::assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->featureContext->getJSONSchema($schemaString)

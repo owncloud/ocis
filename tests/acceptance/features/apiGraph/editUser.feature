@@ -45,7 +45,7 @@ Feature: edit user
     Given user "Carol" has been created with default attributes and without skeleton files
     When the user "Alice" changes the user name of user "Carol" to "<userName>" using the Graph API
     Then the HTTP status code should be "<code>"
-    And the user information of "<newuserName>" should match this JSON schema
+    And the user information of "<newUserName>" should match this JSON schema
     """
     {
       "type": "object",
@@ -55,13 +55,13 @@ Feature: edit user
       "properties": {
           "type": "string",
         "onPremisesSamAccountName": {
-          "enum": ["<newuserName>"]
+          "enum": ["<newUserName>"]
         }
       }
     }
     """
     Examples:
-      | action description           | userName | code | newuserName |
+      | action description           | userName | code | newUserName |
       | change to a valid user name  | Lionel   | 200  | Lionel      |
       | user name characters         | *:!;_+-& | 200  | *:!;_+-&    |
       | change to existing user name | Brian    | 409  | Brian       |
