@@ -1,6 +1,6 @@
 ---
 title: Eventhistory Service
-date: 2023-04-04T08:25:19.627387816Z
+date: 2023-04-04T08:47:13.616519818Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/eventhistory
@@ -31,9 +31,10 @@ The `eventhistory` services consumes all events from the configured event sytem.
 ## Storing
 
 The `eventhistory` service stores each consumed event via the configured store in `EVENTHISTORY_STORE_TYPE`. Possible stores are:
-  -   `mem`: Basic in-memory store and the default.
+  -   `memory`: Basic in-memory store and the default.
   -   `ocmem`: Advanced in-memory store allowing max size.
   -   `redis`: Stores data in a configured redis cluster.
+  -   `redis-sentinel`: Stores data in a configured redis sentinel cluster.
   -   `etcd`: Stores data in a configured etcd cluster.
   -   `nats-js`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
   -   `noop`: Stores nothing. Useful for testing. Not recommended in productive enviroments.
@@ -41,6 +42,7 @@ The `eventhistory` service stores each consumed event via the configured store i
 2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicapable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store applies.
 3.  Events stay in the store for 2 weeks by default. Use `EVENTHISTORY_RECORD_EXPIRY` to adjust this value.
 4.  The eventhistory service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
+5.  When using `redis-sentinel`, the Redis master to use is configured via `EVENTHISTORY_STORE_ADDRESSES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
 
 ## Retrieving
 

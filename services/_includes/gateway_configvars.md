@@ -26,7 +26,7 @@
 | GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN | bool | true | Disable creation of the home space on login.|
 | STORAGE_TRANSFER_SECRET | string |  | The storage transfer secret.|
 | GATEWAY_TRANSFER_EXPIRES | int | 86400 | Expiry for the gateway tokens.|
-| OCIS_CACHE_STORE<br/>GATEWAY_CACHE_STORE<br/>OCIS_CACHE_STORE_TYPE<br/>GATEWAY_CACHE_STORE_TYPE | string | memory | Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".|
+| OCIS_CACHE_STORE<br/>GATEWAY_CACHE_STORE<br/>OCIS_CACHE_STORE_TYPE<br/>GATEWAY_CACHE_STORE_TYPE | string | memory | Store implementation for the cache. Supported values are 'memory' (default), 'redis', and 'etcd'.|
 | OCIS_CACHE_STORE_NODES<br/>GATEWAY_CACHE_STORE_NODES<br/>OCIS_CACHE_STORE_ADDRESS<br/>GATEWAY_CACHE_STORE_ADDRESS<br/>GATEWAY_CACHE_NODES | []string | [] | Nodes to use for the cache store.|
 | GATEWAY_CACHE_DATABASE | string | users | Database name of the cache.|
 | OCIS_CACHE_STORE_TTL<br/>GATEWAY_STAT_CACHE_TTL | int | 300 | Max TTL in seconds for the gateway's stat cache.|

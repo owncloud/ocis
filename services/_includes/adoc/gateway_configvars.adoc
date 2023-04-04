@@ -261,7 +261,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++memory ++
 a| [subs=-attributes]
-Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
+Store implementation for the cache. Supported values are 'memory' (default), 'redis', and 'etcd'.
 
 a|`OCIS_CACHE_STORE_NODES` +
 `GATEWAY_CACHE_STORE_NODES` +
