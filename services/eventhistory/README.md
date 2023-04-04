@@ -25,7 +25,7 @@ The `eventhistory` service stores each consumed event via the configured store i
 2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicapable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store applies.
 3.  Events stay in the store for 2 weeks by default. Use `EVENTHISTORY_RECORD_EXPIRY` to adjust this value.
 4.  The eventhistory service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
-5.  When using `redis-sentinel`, the Redis master to use is configured via `EVENTHISTORY_STORE_ADDRESSES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+5.  When using `redis-sentinel`, the Redis master to use is configured via `EVENTHISTORY_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
 
 ## Retrieving
 
