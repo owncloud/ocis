@@ -26,7 +26,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-The default role assignments the demo users should be setup.
+Flag to enable or disable the creation of the demo users.
 
 a| `LDAP_BIND_DN`
 
@@ -536,10 +536,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ ++
+++memory ++
 
 a| [subs=-attributes]
-The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
 
 a| `OCIS_CACHE_STORE_ADDRESS`
 
@@ -555,7 +555,7 @@ a| [subs=-attributes]
 ++[] ++
 
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+Nodes to use for the cache store.
 
 a| `OCIS_CACHE_STORE_ADDRESSES`
 
@@ -590,7 +590,7 @@ a| [subs=-attributes]
 ++[] ++
 
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+Nodes to use for the cache store.
 
 a| `OCIS_CACHE_STORE_SIZE`
 
@@ -619,13 +619,13 @@ a| [subs=attributes+]
 * xref:{s-path}/proxy.adoc[proxy] +
 
 a| [subs=-attributes]
-++Duration ++
+++int ++
 
 a| [subs=-attributes]
-++0s ++
+++300 ++
 
 a| [subs=-attributes]
-Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
+Max TTL in seconds for the gateway's stat cache.
 
 a| `OCIS_CACHE_STORE_TYPE`
 
@@ -640,10 +640,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ ++
+++memory ++
 
 a| [subs=-attributes]
-The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+Store implementation for the cache. Valid values are "memory" (default), "redis", and "etcd".
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -771,7 +771,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..
+Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.
 
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
@@ -936,7 +936,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Allow insecure connections to the frontend.
+Allow insecure connections to the OIDC issuer.
 
 a| `OCIS_JWT_SECRET`
 
@@ -1191,7 +1191,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The machine auth API key used to validate internal requests necessary to access resources from other services.
+Machine auth API key used to validate internal requests necessary for the access to resources from other services.
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1227,7 +1227,7 @@ a| [subs=-attributes]
 ++memory ++
 
 a| [subs=-attributes]
-The type of the eventhistory store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+The type of the userlog store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
 a| `OCIS_PERSISTENT_STORE_NODES`
 
@@ -1257,7 +1257,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.
+Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.
 
 a| `OCIS_SPACES_MAX_QUOTA`
 
@@ -1523,7 +1523,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The public facing URL of the oCIS frontend.
+URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
 a| `REVA_GATEWAY`
 
@@ -1575,7 +1575,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Transfer secret for signing file up- and download requests.
+The storage transfer secret.
 
 a| `STORAGE_USERS_OCIS_ASYNC_UPLOADS`
 
