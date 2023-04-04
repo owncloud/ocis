@@ -62,9 +62,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 #### [Share lists deleted user as 'user'](https://github.com/owncloud/ocis/issues/903)
 - [apiGraph/deleteGroup.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/deleteGroup.feature#L68)
 
-#### [Updating group displayName request seems OK but group is not being renamed](https://github.com/owncloud/ocis/issues/5977)
-- [apiGraph/editGroup.feature:23](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/editGroup.feature#L23)
-
 #### [CORS headers are not identical with oC10 headers](https://github.com/owncloud/ocis/issues/5195)
 - [apiCors/cors.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L25)
 - [apiCors/cors.feature:26](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L26)
