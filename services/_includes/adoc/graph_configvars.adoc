@@ -660,6 +660,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Search base DN for looking up LDAP groups.
 
+a|`GRAPH_LDAP_GROUP_CREATE_BASE_DN` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ou=groups,o=libregraph-idm ++
+a| [subs=-attributes]
+Parent DN under which new groups are created. This DN needs to be subordinate to the 'GRAPH_LDAP_GROUP_BASE_DN'. This setting is only relevant when 'GRAPH_LDAP_SERVER_WRITE_ENABLED' is 'true'. It defaults to the value of 'GRAPH_LDAP_GROUP_BASE_DN'. All groups outside of this subtree are treated as readonly groups and cannot be updated.
+
 a|`LDAP_GROUP_SCOPE` +
 `GRAPH_LDAP_GROUP_SEARCH_SCOPE` +
 
