@@ -17,7 +17,7 @@ type Config struct {
 	Debug   Debug    `yaml:"debug"`
 
 	IDM             Settings `yaml:"idm"`
-	CreateDemoUsers bool     `yaml:"create_demo_users" env:"IDM_CREATE_DEMO_USERS;ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"Flag to enable or disable the creation of the demo users."`
+	CreateDemoUsers bool     `yaml:"create_demo_users" env:"IDM_CREATE_DEMO_USERS;OCIS_ACCOUNTS_DEMO_USERS_AND_GROUPS;ACCOUNTS_DEMO_USERS_AND_GROUPS" desc:"Flag to enable or disable the creation of the demo users." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"ACCOUNTS_DEMO_USERS_AND_GROUPS changing name for consistency" deprecationReplacement:"OCIS_ACCOUNTS_DEMO_USERS_AND_GROUPS"`
 
 	ServiceUserPasswords ServiceUserPasswords `yaml:"service_user_passwords"`
 	AdminUserID          string               `yaml:"admin_user_id" env:"OCIS_ADMIN_USER_ID;IDM_ADMIN_USER_ID" desc:"ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand."`

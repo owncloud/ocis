@@ -32,24 +32,24 @@ type Config struct {
 
 // Ldap defines the available LDAP configuration.
 type Ldap struct {
-	URI       string `yaml:"uri" env:"LDAP_URI;IDP_LDAP_URI" desc:"Url of the LDAP service to use as IDP."`
-	TLSCACert string `yaml:"cacert" env:"LDAP_CACERT;IDP_LDAP_TLS_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp."`
+	URI       string `yaml:"uri" env:"OCIS_LDAP_URI;LDAP_URI;IDP_LDAP_URI" desc:"Url of the LDAP service to use as IDP." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_URI changing name for consistency" deprecationReplacement:"OCIS_LDAP_URI"`
+	TLSCACert string `yaml:"cacert" env:"OCIS_LDAP_CACERT;LDAP_CACERT;IDP_LDAP_TLS_CACERT" desc:"Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_CACERT changing name for consistency" deprecationReplacement:"OCIS_LDAP_CACERT"`
 
-	BindDN       string `yaml:"bind_dn" env:"LDAP_BIND_DN;IDP_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server."`
+	BindDN       string `yaml:"bind_dn" env:"OCIS_LDAP_BIND_DN;LDAP_BIND_DN;IDP_LDAP_BIND_DN" desc:"LDAP DN to use for simple bind authentication with the target LDAP server." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_BIND_DN changing name for consistency" deprecationReplacement:"OCIS_LDAP_BIND_DN"`
 	BindPassword string `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;IDP_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'."`
 
-	BaseDN string `yaml:"base_dn" env:"LDAP_USER_BASE_DN;IDP_LDAP_BASE_DN" desc:"Search base DN for looking up LDAP users."`
-	Scope  string `yaml:"scope" env:"LDAP_USER_SCOPE;IDP_LDAP_SCOPE" desc:"LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'."`
+	BaseDN string `yaml:"base_dn" env:"OCIS_LDAP_USER_BASE_DN;LDAP_USER_BASE_DN;IDP_LDAP_BASE_DN" desc:"Search base DN for looking up LDAP users." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_USER_BASE_DN changing name for consistency" deprecationReplacement:"OCIS_LDAP_USER_BASE_DN"`
+	Scope  string `yaml:"scope" env:"OCIS_LDAP_USER_SCOPE;LDAP_USER_SCOPE;IDP_LDAP_SCOPE" desc:"LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_USER_SCOPE changing name for consistency" deprecationReplacement:"OCIS_LDAP_USER_SCOPE"`
 
 	LoginAttribute    string `yaml:"login_attribute" env:"IDP_LDAP_LOGIN_ATTRIBUTE" desc:"LDAP User attribute to use for login like 'uid'."`
-	EmailAttribute    string `yaml:"email_attribute" env:"LDAP_USER_SCHEMA_MAIL;IDP_LDAP_EMAIL_ATTRIBUTE" desc:"LDAP User email attribute like 'mail'."`
-	NameAttribute     string `yaml:"name_attribute" env:"LDAP_USER_SCHEMA_USERNAME;IDP_LDAP_NAME_ATTRIBUTE" desc:"LDAP User name attribute like 'displayName'."`
-	UUIDAttribute     string `yaml:"uuid_attribute" env:"LDAP_USER_SCHEMA_ID;IDP_LDAP_UUID_ATTRIBUTE" desc:"LDAP User uuid attribute like 'uid'."`
+	EmailAttribute    string `yaml:"email_attribute" env:"OCIS_LDAP_USER_SCHEMA_MAIL;LDAP_USER_SCHEMA_MAIL;IDP_LDAP_EMAIL_ATTRIBUTE" desc:"LDAP User email attribute like 'mail'." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_USER_SCHEMA_MAIL changing name for consistency" deprecationReplacement:"OCIS_LDAP_USER_SCHEMA_MAIL"`
+	NameAttribute     string `yaml:"name_attribute" env:"OCIS_LDAP_USER_SCHEMA_USERNAME;LDAP_USER_SCHEMA_USERNAME;IDP_LDAP_NAME_ATTRIBUTE" desc:"LDAP User name attribute like 'displayName'." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_USER_SCHEMA_USERNAME changing name for consistency" deprecationReplacement:"OCIS_LDAP_USER_SCHEMA_USERNAME"`
+	UUIDAttribute     string `yaml:"uuid_attribute" env:"OCIS_LDAP_USER_SCHEMA_ID;LDAP_USER_SCHEMA_ID;IDP_LDAP_UUID_ATTRIBUTE" desc:"LDAP User uuid attribute like 'uid'." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_USER_SCHEMA_ID changing name for consistency" deprecationReplacement:"OCIS_LDAP_USER_SCHEMA_ID"`
 	UUIDAttributeType string `yaml:"uuid_attribute_type" env:"IDP_LDAP_UUID_ATTRIBUTE_TYPE" desc:"LDAP User uuid attribute type like 'text'."`
 
-	UserEnabledAttribute string `yaml:"user_enabled_attribute" env:"LDAP_USER_ENABLED_ATTRIBUTE;IDP_USER_ENABLED_ATTRIBUTE" desc:"LDAP Attribute to use as a flag telling if the user is enabled or disabled."`
-	Filter               string `yaml:"filter" env:"LDAP_USER_FILTER;IDP_LDAP_FILTER" desc:"LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'."`
-	ObjectClass          string `yaml:"objectclass" env:"LDAP_USER_OBJECTCLASS;IDP_LDAP_OBJECTCLASS" desc:"LDAP User ObjectClass like 'inetOrgPerson'."`
+	UserEnabledAttribute string `yaml:"user_enabled_attribute" env:"OCIS_LDAP_USER_ENABLED_ATTRIBUTE;LDAP_USER_ENABLED_ATTRIBUTE;IDP_USER_ENABLED_ATTRIBUTE" desc:"LDAP Attribute to use as a flag telling if the user is enabled or disabled." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_USER_ENABLED_ATTRIBUTE changing name for consistency" deprecationReplacement:"OCIS_LDAP_USER_ENABLED_ATTRIBUTE"`
+	Filter               string `yaml:"filter" env:"OCIS_LDAP_USER_FILTER;LDAP_USER_FILTER;IDP_LDAP_FILTER" desc:"LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_USER_FILTER changing name for consistency" deprecationReplacement:"OCIS_LDAP_USER_FILTER"`
+	ObjectClass          string `yaml:"objectclass" env:"OCIS_LDAP_USER_OBJECTCLASS;LDAP_USER_OBJECTCLASS;IDP_LDAP_OBJECTCLASS" desc:"LDAP User ObjectClass like 'inetOrgPerson'." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_USER_OBJECTCLASS changing name for consistency" deprecationReplacement:"OCIS_LDAP_USER_OBJECTCLASS"`
 }
 
 // Asset defines the available asset configuration.
@@ -83,7 +83,7 @@ type Settings struct {
 	AuthorizationEndpointURI string `yaml:"authorization_endpoint_uri" env:"IDP_ENDPOINT_URI" desc:"URL of the IDP endpoint."`
 	EndsessionEndpointURI    string `yaml:"-"` // unused, not supported by lico-idp
 
-	Insecure bool `yaml:"insecure" env:"LDAP_INSECURE;IDP_LDAP_INSECURE;IDP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments."  deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"IDP_INSECURE needs context clearification" deprecationReplacement:"IDP_LDAP_INSECURE"`
+	Insecure bool `yaml:"insecure" env:"OCIS_LDAP_INSECURE;LDAP_INSECURE;IDP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_INSECURE changing name for consistency" deprecationReplacement:"OCIS_LDAP_INSECURE"`
 
 	TrustedProxy []string `yaml:"trusted_proxy"` //TODO: how to configure this via env?
 
