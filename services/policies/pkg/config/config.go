@@ -2,8 +2,9 @@ package config
 
 import (
 	"context"
-	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"time"
+
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
 
 // Config combines all available configuration parts.
@@ -53,8 +54,8 @@ type Postprocessing struct {
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint             string `yaml:"endpoint" env:"POLICIES_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture."`
-	Cluster              string `yaml:"cluster" env:"POLICIES_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system."`
+	Endpoint             string `yaml:"endpoint" env:"OCIS_EVENTS_ENDPOINT;POLICIES_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture."`
+	Cluster              string `yaml:"cluster" env:"OCIS_EVENTS_CLUSTER;POLICIES_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system."`
 	TLSInsecure          bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;POLICIES_EVENTS_TLS_INSECURE" desc:"Whether the server should skip the client certificate verification during the TLS handshake."`
 	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"POLICIES_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided POLICIES_EVENTS_TLS_INSECURE will be seen as false."`
 	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;POLICIES_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services."`
