@@ -26,6 +26,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Async Postprocessing: [#5207](https://github.com/owncloud/ocis/pull/5207)
 * Enhancement - Automate md creation: [#5901](https://github.com/owncloud/ocis/pull/5901)
 * Enhancement - Add endpoints to upload a custom logo: [#5735](https://github.com/owncloud/ocis/pull/5735)
+* Enhancement - Bump go-ldap version: [#6004](https://github.com/owncloud/ocis/pull/6004)
 * Enhancement - Bump libre-graph-api-go: [#5309](https://github.com/owncloud/ocis/pull/5309)
 * Enhancement - Bump reva version: [#5243](https://github.com/owncloud/ocis/pull/5243)
 * Enhancement - Collect global envvars: [#5367](https://github.com/owncloud/ocis/pull/5367)
