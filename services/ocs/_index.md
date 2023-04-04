@@ -1,6 +1,6 @@
 ---
 title: OCS Service
-date: 2023-04-04T10:15:12.258764291Z
+date: 2023-04-04T10:27:09.205647331Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/ocs
@@ -29,7 +29,7 @@ The `ocs` service can use a configured store via `OCS_STORE_TYPE`. Possible stor
   -   `noop`: Stores nothing. Useful for testing. Not recommended in productive enviroments.
 1.  Note that in-memory stores are by nature not reboot persistent.
 2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicapable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store applies.
-3.  The proxy service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
+3.  The ocs service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
 4.  When using `redis-sentinel`, the Redis master to use is configured via `OCS_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
 
 ## Example Yaml Config
