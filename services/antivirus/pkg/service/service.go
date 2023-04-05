@@ -102,6 +102,7 @@ func (av Antivirus) Run() error {
 			continue
 		}
 
+		av.l.Debug().Str("uploadid", ev.UploadID).Str("filename", ev.Filename).Msg("Starting virus scan.")
 		var errmsg string
 		res, err := av.process(ev)
 		if err != nil {
@@ -144,6 +145,7 @@ func (av Antivirus) Run() error {
 // process the scan
 func (av Antivirus) process(ev events.StartPostprocessingStep) (scanners.ScanResult, error) {
 	if ev.Filesize == 0 || (0 < av.m && av.m < ev.Filesize) {
+		av.l.Info().Str("uploadid", ev.UploadID).Uint64("limit", av.m).Uint64("filesize", ev.Filesize).Msg("Skipping file to be virus scanned because its file size is higher than the defined limit.")
 		return scanners.ScanResult{
 			Scantime: time.Now(),
 		}, nil
@@ -163,6 +165,7 @@ func (av Antivirus) process(ev events.StartPostprocessingStep) (scanners.ScanRes
 		return scanners.ScanResult{}, err
 	}
 	defer rrc.Close()
+	av.l.Debug().Str("uploadid", ev.UploadID).Msg("Downloaded file successfully, starting virusscan")
 
 	res, err := av.s.Scan(rrc)
 	if err != nil {
