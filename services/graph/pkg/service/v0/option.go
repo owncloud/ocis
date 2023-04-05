@@ -131,16 +131,16 @@ func EventsPublisher(val events.Publisher) Option {
 	}
 }
 
-// KeycloakCient provides a function to set the KeycloakCient option.
-func KeycloakCient(val keycloak.Client) Option {
+// KeycloakClient provides a function to set the KeycloakCient option.
+func KeycloakClient(val keycloak.Client) Option {
 	return func(o *Options) {
 		o.KeycloakClient = val
 	}
 }
 
 // EventHistoryClient provides a function to set the EventHistoryClient option.
-func KeycloakCient(val keycloak.Client) Option {
+func EventHistoryClient(val ehsvc.EventHistoryService) Option {
 	return func(o *Options) {
-		o.KeycloakClient = val
+		o.EventHistoryClient = val
 	}
 }

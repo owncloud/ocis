@@ -144,6 +144,7 @@ func NewService(opts ...Option) (Graph, error) {
 		searchService:            options.SearchService,
 		identityEducationBackend: options.IdentityEducationBackend,
 		keycloakClient:           options.KeycloakClient,
+		historyClient:            options.EventHistoryClient,
 	}
 
 	if err := setIdentityBackends(options, &svc); err != nil {

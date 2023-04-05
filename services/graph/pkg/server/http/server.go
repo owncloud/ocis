@@ -140,7 +140,7 @@ func Server(opts ...Option) (http.Service, error) {
 	if options.Config.Keycloak.BasePath != "" {
 		kcc := options.Config.Keycloak
 		if kcc.ClientID == "" || kcc.ClientSecret == "" || kcc.ClientRealm == "" || kcc.UserRealm == "" {
-			return nil, errors.New("keycloak client id, secret, client realm and user realm must be set")
+			return http.Service{}, errors.New("keycloak client id, secret, client realm and user realm must be set")
 		}
 		keyCloakClient = keycloak.New(kcc.BasePath, kcc.ClientID, kcc.ClientSecret, kcc.ClientRealm, kcc.InsecureSkipVerify)
 	}
@@ -157,7 +157,8 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.WithRequireAdminMiddleware(requireAdminMiddleware),
 		svc.WithGatewayClient(gatewayClient),
 		svc.WithSearchService(searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient())),
-		svc.KeycloakCient(keyCloakClient),
+		svc.KeycloakClient(keyCloakClient),
+		svc.EventHistoryClient(hClient),
 	)
 
 	if err != nil {

@@ -19,6 +19,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	libregraph "github.com/owncloud/libre-graph-api-go"
+	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 )
 
 var (
@@ -68,13 +70,19 @@ func (g Graph) ExportPersonalData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// go start gathering
-	go g.GatherPersonalData(ctx, u, ref, r.Header.Get(revactx.TokenHeader), marsh)
+	go g.GatherPersonalData(u, ref, r.Header.Get(revactx.TokenHeader), marsh)
 
 	w.WriteHeader(http.StatusCreated)
 }
 
 // GatherPersonalData will all gather all personal data of the user and save it to a file in the users personal space
-func (g Graph) GatherPersonalData(ctx context.Context, usr *user.User, ref *provider.Reference, token string, marsh Marshaller) {
+func (g Graph) GatherPersonalData(usr *user.User, ref *provider.Reference, token string, marsh Marshaller) {
+	// the context might already be cancelled. We need to impersonate the acting user again
+	ctx, err := utils.ImpersonateUser(usr, g.gatewayClient, g.config.MachineAuthAPIKey)
+	if err != nil {
+		g.logger.Error().Err(err).Str("userID", usr.GetId().GetOpaqueId()).Msg("cannot impersonate user")
+
+	}
 	// create data
 	data := make(map[string]interface{})
 
@@ -82,12 +90,22 @@ func (g Graph) GatherPersonalData(ctx context.Context, usr *user.User, ref *prov
 	data["user"] = usr
 
 	// Check if we have a keycloak client, and if so, get the keycloak export.
-	if g.keycloakClient != nil {
-		kcd, err := g.keycloakClient.GetPIIReport(ctx, g.config.Keycloak.ClientID, usr)
+	if ctx != nil && g.keycloakClient != nil {
+		id := usr.GetId().GetOpaqueId()
+		kcd, err := g.keycloakClient.GetPIIReport(ctx, g.config.Keycloak.ClientID, &libregraph.User{Id: &id})
 		if err != nil {
-			g.logger.Error().Err(err).Str("userID").Msg("cannot get keycloak personal data")
+			g.logger.Error().Err(err).Str("userID", id).Msg("cannot get keycloak personal data")
 		}
 		data["keycloak"] = kcd
+	}
+
+	// get event data
+	if ctx != nil && g.historyClient != nil {
+		resp, err := g.historyClient.GetEventsForUser(ctx, &ehsvc.GetEventsForUserRequest{UserID: usr.GetId().GetOpaqueId()})
+		if err != nil {
+			g.logger.Error().Err(err).Str("userID", usr.GetId().GetOpaqueId()).Msg("cannot get event personal data")
+		}
+		data["events"] = convertEvents(resp)
 	}
 
 	// marshal
@@ -221,4 +239,19 @@ func getLocation(r *http.Request) string {
 	// from header?
 
 	return _backupFileName
+}
+
+// we want the events to look nice in the file, don't we?
+func convertEvents(resp *ehsvc.GetEventsResponse) []map[string]interface{} {
+	var out []map[string]interface{}
+	for _, e := range resp.GetEvents() {
+		var content map[string]interface{}
+		_ = json.Unmarshal(e.Event, &content)
+		out = append(out, map[string]interface{}{
+			"id":    e.GetId(),
+			"type":  e.GetType(),
+			"event": content,
+		})
+	}
+	return out
 }
