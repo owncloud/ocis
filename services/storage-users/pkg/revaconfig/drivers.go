@@ -130,11 +130,15 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 			"cache_store":    cfg.Cache.Store,
 			"cache_nodes":    cfg.Cache.Nodes,
 			"cache_database": cfg.Cache.Database,
+			"cache_ttl":      cfg.Cache.TTL,
+			"cache_size":     cfg.Cache.Size,
 		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":    cfg.Cache.Store,
 			"cache_nodes":    cfg.Cache.Nodes,
 			"cache_database": cfg.Cache.Database,
+			"cache_ttl":      cfg.Cache.TTL,
+			"cache_size":     cfg.Cache.Size,
 		},
 		"events": map[string]interface{}{
 			"natsaddress":          cfg.Events.Addr,
@@ -173,11 +177,15 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_store":    cfg.Cache.Store,
 			"cache_nodes":    cfg.Cache.Nodes,
 			"cache_database": cfg.Cache.Database,
+			"cache_ttl":      cfg.Cache.TTL,
+			"cache_size":     cfg.Cache.Size,
 		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":    cfg.Cache.Store,
 			"cache_nodes":    cfg.Cache.Nodes,
 			"cache_database": cfg.Cache.Database,
+			"cache_ttl":      cfg.Cache.TTL,
+			"cache_size":     cfg.Cache.Size,
 		},
 	}
 }
@@ -221,11 +229,15 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 			"cache_store":    cfg.Cache.Store,
 			"cache_nodes":    cfg.Cache.Nodes,
 			"cache_database": cfg.Cache.Database,
+			"cache_ttl":      cfg.Cache.TTL,
+			"cache_size":     cfg.Cache.Size,
 		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":    cfg.Cache.Store,
 			"cache_nodes":    cfg.Cache.Nodes,
 			"cache_database": cfg.Cache.Database,
+			"cache_ttl":      cfg.Cache.TTL,
+			"cache_size":     cfg.Cache.Size,
 		},
 		"events": map[string]interface{}{
 			"natsaddress":          cfg.Events.Addr,
@@ -268,11 +280,15 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_store":    cfg.Cache.Store,
 			"cache_nodes":    cfg.Cache.Nodes,
 			"cache_database": cfg.Cache.Database,
+			"cache_ttl":      cfg.Cache.TTL,
+			"cache_size":     cfg.Cache.Size,
 		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":    cfg.Cache.Store,
 			"cache_nodes":    cfg.Cache.Nodes,
 			"cache_database": cfg.Cache.Database,
+			"cache_ttl":      cfg.Cache.TTL,
+			"cache_size":     cfg.Cache.Size,
 		},
 	}
 }

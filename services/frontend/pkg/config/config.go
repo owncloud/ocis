@@ -123,8 +123,12 @@ type OCS struct {
 	SharePrefix                          string             `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX" desc:"Path prefix for shares as part of an ocis resource. Note that the path must start with '/'."`
 	HomeNamespace                        string             `yaml:"home_namespace" env:"FRONTEND_OCS_PERSONAL_NAMESPACE;FRONTEND_OCS_HOME_NAMESPACE" desc:"Homespace namespace identifier." deprecationVersion:"3.0" removalVersion:"4.0.0" deprecationInfo:"FRONTEND_OCS_HOME_NAMESPACE changing name for consistency" deprecationReplacement:"FRONTEND_OCS_PERSONAL_NAMESPACE"`
 	AdditionalInfoAttribute              string             `yaml:"additional_info_attribute" env:"FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE" desc:"Additional information attribute for the user like {{.Mail}}."`
-	ResourceInfoCacheTTL                 int                `yaml:"resource_info_cache_ttl" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL" desc:"Max TTL in seconds for the resource info cache. 0 disables the cache."`
+	ResourceInfoCacheTTL                 int                `yaml:"resource_info_cache_ttl" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL" desc:"Max TTL in seconds for the resource info cache."`
+	ResourceInfoCacheSize                int                `yaml:"resource_info_cache_size" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_SIZE" desc:"Max number of entries to hold in the cache."`
 	ResourceInfoCacheType                string             `yaml:"resource_info_cache_type" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE" desc:"The type of the resource info cache. Supported values are 'memory' and 'redis'."`
+	ResourceInfoCacheNodes               []string           `yaml:"resource_info_cache_nodes" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_NODES" desc:"The type of the resource info cache. Supported values are 'memory' and 'redis'."`
+	ResourceInfoCacheDatabase            string             `yaml:"resource_info_cache_database" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_DATABASE" desc:"The type of the resource info cache. Supported values are 'memory' and 'redis'."`
+	ResourceInfoCacheTable               string             `yaml:"resource_info_cache_table" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TABLE" desc:"The type of the resource info cache. Supported values are 'memory' and 'redis'."`
 	ResourceInfoCaches                   ResourceInfoCaches `yaml:"resource_info_caches,omitempty"` // only used for redis
 	CacheWarmupDriver                    string             `yaml:"cache_warmup_driver,omitempty"`  // not supported by the oCIS product, therefore not part of docs
 	CacheWarmupDrivers                   CacheWarmupDrivers `yaml:"cache_warmup_drivers,omitempty"` // not supported by the oCIS product, therefore not part of docs

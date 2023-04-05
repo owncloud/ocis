@@ -165,6 +165,8 @@ func metadataDrivers(cfg *config.Config) map[string]interface{} {
 				"cache_store":    cfg.Cache.Store,
 				"cache_nodes":    cfg.Cache.Nodes,
 				"cache_database": cfg.Cache.Database,
+				"cache_ttl":      cfg.Cache.TTL,
+				"cache_size":     cfg.Cache.Size,
 			},
 		},
 	}

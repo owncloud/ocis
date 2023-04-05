@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/cs3org/reva/v2/pkg/storage/cache"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
@@ -157,7 +158,7 @@ func backend(root, backend string) metadata.Backend {
 	case "xattrs":
 		return metadata.XattrsBackend{}
 	case "mpk":
-		return metadata.NewMessagePackBackend(root, options.CacheOptions{})
+		return metadata.NewMessagePackBackend(root, cache.Config{})
 	}
 	return metadata.NullBackend{}
 }
