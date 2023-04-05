@@ -230,7 +230,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 (optional) Set this to a path with custom translations to overwrite the builtin translations. See the documentation for more details.
 
-a|`USERLOG_EVENTS_ENDPOINT` +
+a|`OCIS_EVENTS_ENDPOINT` +
+`USERLOG_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
 ++string ++
@@ -239,7 +240,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 
-a|`USERLOG_EVENTS_CLUSTER` +
+a|`OCIS_EVENTS_CLUSTER` +
+`USERLOG_EVENTS_CLUSTER` +
 
 a| [subs=-attributes]
 ++string ++

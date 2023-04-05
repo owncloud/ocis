@@ -71,7 +71,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
 
-a|`POSTPROCESSING_EVENTS_ENDPOINT` +
+a|`OCIS_EVENTS_ENDPOINT` +
+`POSTPROCESSING_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
 ++string ++
@@ -80,7 +81,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 
-a|`POSTPROCESSING_EVENTS_CLUSTER` +
+a|`OCIS_EVENTS_CLUSTER` +
+`POSTPROCESSING_EVENTS_CLUSTER` +
 
 a| [subs=-attributes]
 ++string ++

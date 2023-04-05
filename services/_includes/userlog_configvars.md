@@ -23,8 +23,8 @@
 | OCIS_MACHINE_AUTH_API_KEY<br/>USERLOG_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary to access resources from other services.|
 | REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to look up user metadata|
 | USERLOG_TRANSLATION_PATH | string |  | (optional) Set this to a path with custom translations to overwrite the builtin translations. See the documentation for more details.|
-| USERLOG_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
-| USERLOG_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
+| OCIS_EVENTS_ENDPOINT<br/>USERLOG_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
+| OCIS_EVENTS_CLUSTER<br/>USERLOG_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>USERLOG_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | USERLOG_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>USERLOG_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|

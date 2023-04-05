@@ -596,7 +596,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 the time after which the token for upload postprocessing expires
 
-a|`STORAGE_USERS_EVENTS_ENDPOINT` +
+a|`OCIS_EVENTS_ENDPOINT` +
+`STORAGE_USERS_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
 ++string ++
@@ -605,7 +606,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 
-a|`STORAGE_USERS_EVENTS_CLUSTER` +
+a|`OCIS_EVENTS_CLUSTER` +
+`STORAGE_USERS_EVENTS_CLUSTER` +
 
 a| [subs=-attributes]
 ++string ++

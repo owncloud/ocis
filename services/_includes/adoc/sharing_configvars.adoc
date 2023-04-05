@@ -197,7 +197,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the go-micro based grpc services.
 
-a|`SHARING_EVENTS_ENDPOINT` +
+a|`OCIS_EVENTS_ENDPOINT` +
+`SHARING_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
 ++string ++
@@ -206,7 +207,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 
-a|`SHARING_EVENTS_CLUSTER` +
+a|`OCIS_EVENTS_CLUSTER` +
+`SHARING_EVENTS_CLUSTER` +
 
 a| [subs=-attributes]
 ++string ++

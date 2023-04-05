@@ -8,8 +8,8 @@
 | POLICIES_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | POLICIES_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | OCIS_JWT_SECRET<br/>POLICIES_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| POLICIES_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
-| POLICIES_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
+| OCIS_EVENTS_ENDPOINT<br/>POLICIES_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
+| OCIS_EVENTS_CLUSTER<br/>POLICIES_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>POLICIES_EVENTS_TLS_INSECURE | bool | false | Whether the server should skip the client certificate verification during the TLS handshake.|
 | POLICIES_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided POLICIES_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>POLICIES_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.|

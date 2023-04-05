@@ -111,7 +111,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Defines the behaviour when a virus has been found. Supported options are: 'delete', 'continue' and 'abort '. Delete will delete the file. Continue will mark the file as infected but continues further processing. Abort will keep the file in the uploads folder for further admin inspection and will not move it to its final destination.
 
-a|`ANTIVIRUS_EVENTS_ENDPOINT` +
+a|`OCIS_EVENTS_ENDPOINT` +
+`ANTIVIRUS_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
 ++string ++
@@ -120,7 +121,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 
-a|`ANTIVIRUS_EVENTS_CLUSTER` +
+a|`OCIS_EVENTS_CLUSTER` +
+`ANTIVIRUS_EVENTS_CLUSTER` +
 
 a| [subs=-attributes]
 ++string ++

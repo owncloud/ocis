@@ -184,7 +184,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Encryption method for the SMTP communication. Possible values  are 'starttls', 'ssl', 'ssltls', 'tls'  and 'none'.
 
-a|`NOTIFICATIONS_EVENTS_ENDPOINT` +
+a|`OCIS_EVENTS_ENDPOINT` +
+`NOTIFICATIONS_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
 ++string ++
@@ -193,7 +194,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 
-a|`NOTIFICATIONS_EVENTS_CLUSTER` +
+a|`OCIS_EVENTS_CLUSTER` +
+`NOTIFICATIONS_EVENTS_CLUSTER` +
 
 a| [subs=-attributes]
 ++string ++

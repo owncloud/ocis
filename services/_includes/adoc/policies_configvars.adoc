@@ -81,7 +81,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
 
-a|`POLICIES_EVENTS_ENDPOINT` +
+a|`OCIS_EVENTS_ENDPOINT` +
+`POLICIES_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
 ++string ++
@@ -90,7 +91,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 
-a|`POLICIES_EVENTS_CLUSTER` +
+a|`OCIS_EVENTS_CLUSTER` +
+`POLICIES_EVENTS_CLUSTER` +
 
 a| [subs=-attributes]
 ++string ++

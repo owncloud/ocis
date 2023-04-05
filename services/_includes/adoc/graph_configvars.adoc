@@ -799,7 +799,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP Attribute to use as the unique id for schools. This should be a stable globally unique ID like a UUID.
 
-a|`GRAPH_EVENTS_ENDPOINT` +
+a|`OCIS_EVENTS_ENDPOINT` +
+`GRAPH_EVENTS_ENDPOINT` +
 
 a| [subs=-attributes]
 ++string ++
@@ -808,7 +809,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.
 
-a|`GRAPH_EVENTS_CLUSTER` +
+a|`OCIS_EVENTS_CLUSTER` +
+`GRAPH_EVENTS_CLUSTER` +
 
 a| [subs=-attributes]
 ++string ++

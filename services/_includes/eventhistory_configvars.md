@@ -11,8 +11,8 @@
 | EVENTHISTORY_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | EVENTHISTORY_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
 | EVENTHISTORY_GRPC_ADDR | string | 127.0.0.1:0 | The bind address of the GRPC service.|
-| EVENTHISTORY_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
-| EVENTHISTORY_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
+| OCIS_EVENTS_ENDPOINT<br/>EVENTHISTORY_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
+| OCIS_EVENTS_CLUSTER<br/>EVENTHISTORY_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>EVENTHISTORY_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | EVENTHISTORY_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>EVENTHISTORY_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|

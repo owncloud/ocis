@@ -82,8 +82,8 @@
 | LDAP_SCHOOL_SCHEMA_SCHOOL_NAME<br/>GRAPH_LDAP_SCHOOL_NAME_ATTRIBUTE | string |  | LDAP Attribute to use for the name of a school.|
 | LDAP_SCHOOL_SCHEMA_SCHOOL_NUMBER<br/>GRAPH_LDAP_SCHOOL_NUMBER_ATTRIBUTE | string |  | LDAP Attribute to use for the number of a school.|
 | LDAP_SCHOOL_SCHEMA_ID<br/>GRAPH_LDAP_SCHOOL_ID_ATTRIBUTE | string |  | LDAP Attribute to use as the unique id for schools. This should be a stable globally unique ID like a UUID.|
-| GRAPH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.|
-| GRAPH_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
+| OCIS_EVENTS_ENDPOINT<br/>GRAPH_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.|
+| OCIS_EVENTS_CLUSTER<br/>GRAPH_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_INSECURE<br/>GRAPH_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
 | GRAPH_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided GRAPH_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>GRAPH_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
