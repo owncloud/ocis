@@ -703,6 +703,15 @@
       "roles": [
         "offline_access"
       ]
+    },
+    {
+      "clientScope": "roles",
+      "roles": [
+        "ocisSpaceAdmin",
+        "ocisGuest",
+        "ocisUser",
+        "ocisAdmin"
+      ]
     }
   ],
   "clientScopeMappings": {
@@ -1165,7 +1174,7 @@
     {
       "id": "fc7d8a8e-cb92-4cb0-b404-d723c07d8d4f",
       "clientId": "xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69",
-      "name": "ownCloud desktop client",
+      "name": "ownCloud Desktop Client",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -2581,7 +2590,7 @@
     "cibaInterval": "5",
     "realmReusableOtpCode": "false"
   },
-  "keycloakVersion": "20.0.3",
+  "keycloakVersion": "20.0.5",
   "userManagedAccessAllowed": false,
   "clientProfiles": {
     "profiles": []

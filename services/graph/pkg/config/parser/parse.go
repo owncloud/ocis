@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/go-ldap/ldap/v3"
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
 	defaults2 "github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -40,8 +41,10 @@ func Validate(cfg *config.Config) error {
 		return shared.MissingJWTTokenError(cfg.Service.Name)
 	}
 
-	if cfg.Identity.Backend == "ldap" && cfg.Identity.LDAP.BindPassword == "" {
-		return shared.MissingLDAPBindPassword(cfg.Service.Name)
+	if cfg.Identity.Backend == "ldap" {
+		if err := validateLDAPSettings(cfg); err != nil {
+			return err
+		}
 	}
 
 	if cfg.Application.ID == "" {
@@ -62,5 +65,28 @@ func Validate(cfg *config.Config) error {
 			"graph", defaults2.BaseConfigPath())
 	}
 
+	return nil
+}
+
+func validateLDAPSettings(cfg *config.Config) error {
+	if cfg.Identity.LDAP.BindPassword == "" {
+		return shared.MissingLDAPBindPassword(cfg.Service.Name)
+	}
+
+	// ensure that "GroupBaseDN" is below "GroupBaseDN"
+	if cfg.Identity.LDAP.WriteEnabled && cfg.Identity.LDAP.GroupCreateBaseDN != cfg.Identity.LDAP.GroupBaseDN {
+		baseDN, err := ldap.ParseDN(cfg.Identity.LDAP.GroupBaseDN)
+		if err != nil {
+			return fmt.Errorf("Unable to parse the LDAP Group Base DN '%s': %w ", cfg.Identity.LDAP.GroupBaseDN, err)
+		}
+		createBaseDN, err := ldap.ParseDN(cfg.Identity.LDAP.GroupCreateBaseDN)
+		if err != nil {
+			return fmt.Errorf("Unable to parse the LDAP Group Create Base DN '%s': %w ", cfg.Identity.LDAP.GroupCreateBaseDN, err)
+		}
+
+		if !baseDN.AncestorOfFold(createBaseDN) {
+			return fmt.Errorf("The LDAP Group Create Base DN (%s) must be subordinate to the LDAP Group Base DN (%s)", cfg.Identity.LDAP.GroupCreateBaseDN, cfg.Identity.LDAP.GroupBaseDN)
+		}
+	}
 	return nil
 }

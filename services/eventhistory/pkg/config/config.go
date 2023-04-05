@@ -35,7 +35,7 @@ type GRPCConfig struct {
 // Store configures the store to use
 type Store struct {
 	Store        string        `yaml:"store" env:"OCIS_PERSISTENT_STORE;EVENTHISTORY_STORE;OCIS_PERSISTENT_STORE_TYPE;EVENTHISTORY_STORE_TYPE" desc:"The type of the eventhistory store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
-	Nodes        []string      `yaml:"nodes" env:"OCIS_PERSISTENT_STORE_NODES;EVENTHISTORY_STORE_ADDRESSES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`
+	Nodes        []string      `yaml:"nodes" env:"OCIS_PERSISTENT_STORE_NODES;EVENTHISTORY_STORE_NODES;EVENTHISTORY_STORE_ADDRESSES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"EVENTHISTORY_STORE_ADDRESSES name needs to be harmonized" deprecationReplacement:"EVENTHISTORY_STORE_NODES"`
 	Database     string        `yaml:"database" env:"EVENTHISTORY_STORE_DATABASE" desc:"The database name the configured store should use."`
 	Table        string        `yaml:"table" env:"EVENTHISTORY_STORE_TABLE" desc:"The database table the store should use."`
 	RecordExpiry time.Duration `yaml:"record_expiry" env:"EVENTHISTORY_RECORD_EXPIRY" desc:"Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks)."`
@@ -44,8 +44,8 @@ type Store struct {
 
 // Events combines the configuration options for the event bus.
 type Events struct {
-	Endpoint             string `yaml:"endpoint" env:"EVENTHISTORY_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture."`
-	Cluster              string `yaml:"cluster" env:"EVENTHISTORY_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system."`
+	Endpoint             string `yaml:"endpoint" env:"OCIS_EVENTS_ENDPOINT;EVENTHISTORY_EVENTS_ENDPOINT" desc:"The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture."`
+	Cluster              string `yaml:"cluster" env:"OCIS_EVENTS_CLUSTER;EVENTHISTORY_EVENTS_CLUSTER" desc:"The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system."`
 	TLSInsecure          bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;EVENTHISTORY_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates."`
 	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"EVENTHISTORY_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false."`
 	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;EVENTHISTORY_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.."`
