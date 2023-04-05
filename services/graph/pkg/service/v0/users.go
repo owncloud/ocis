@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"regexp"
 	"sort"
 	"strings"
@@ -117,13 +116,7 @@ func (g Graph) GetUserDrive(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Interface("query", r.URL.Query()).Msg("calling get user drive")
 
-	userID, err := url.PathUnescape(chi.URLParam(r, "userID"))
-	if err != nil {
-		logger.Debug().Err(err).Str("userID", chi.URLParam(r, "userID")).Msg("could not get drive: unescaping drive id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
-		return
-	}
-
+	userID := chi.URLParam(r, "userID")
 	if userID == "" {
 		u, ok := revactx.ContextGetUser(r.Context())
 		if !ok {
@@ -359,13 +352,6 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 
 	userID := chi.URLParam(r, "userID")
-	userID, err := url.PathUnescape(userID)
-	if err != nil {
-		logger.Debug().Err(err).Str("id", userID).Msg("could not get user: unescaping user id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
-		return
-	}
-
 	if userID == "" {
 		logger.Debug().Msg("could not get user: missing user id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
@@ -499,21 +485,15 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling delete user")
-	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
-	userID := chi.URLParam(r, "userID")
-	userID, err := url.PathUnescape(userID)
-	if err != nil {
-		logger.Debug().Err(err).Str("id", userID).Msg("could not delete user: unescaping user id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
-		return
-	}
 
+	userID := chi.URLParam(r, "userID")
 	if userID == "" {
 		logger.Debug().Msg("could not delete user: missing user id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
 		return
 	}
 
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: query error")
@@ -625,12 +605,6 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling patch user")
 	nameOrID := chi.URLParam(r, "userID")
-	nameOrID, err := url.PathUnescape(nameOrID)
-	if err != nil {
-		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not update user: unescaping user id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping user id failed")
-		return
-	}
 
 	if nameOrID == "" {
 		logger.Debug().Msg("could not update user: missing user id")
@@ -638,7 +612,7 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	changes := libregraph.NewUser()
-	err = StrictJSONUnmarshal(r.Body, changes)
+	err := StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,

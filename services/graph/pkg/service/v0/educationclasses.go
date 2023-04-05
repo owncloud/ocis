@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"sort"
 	"strings"
 
@@ -105,21 +104,15 @@ func (g Graph) PostEducationClass(w http.ResponseWriter, r *http.Request) {
 func (g Graph) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling patch education class")
-	classID := chi.URLParam(r, "classID")
-	classID, err := url.PathUnescape(classID)
-	if err != nil {
-		logger.Debug().Str("id", classID).Msg("could not change class: unescaping class id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping class id failed")
-		return
-	}
 
+	classID := chi.URLParam(r, "classID")
 	if classID == "" {
 		logger.Debug().Msg("could not change class: missing class id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing class id")
 		return
 	}
 	changes := libregraph.NewEducationClassWithDefaults()
-	err = StrictJSONUnmarshal(r.Body, changes)
+	err := StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not change class: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
@@ -213,13 +206,8 @@ func (g Graph) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
 func (g Graph) GetEducationClass(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling get education class")
-	classID := chi.URLParam(r, "classID")
-	classID, err := url.PathUnescape(classID)
-	if err != nil {
-		logger.Debug().Str("id", classID).Msg("could not get class: unescaping class id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping class id failed")
-	}
 
+	classID := chi.URLParam(r, "classID")
 	if classID == "" {
 		logger.Debug().Msg("could not get class: missing class id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing class id")
@@ -249,14 +237,8 @@ func (g Graph) GetEducationClass(w http.ResponseWriter, r *http.Request) {
 func (g Graph) DeleteEducationClass(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling delete class")
-	classID := chi.URLParam(r, "classID")
-	classID, err := url.PathUnescape(classID)
-	if err != nil {
-		logger.Debug().Err(err).Str("id", classID).Msg("could not delete class: unescaping class id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping class id failed")
-		return
-	}
 
+	classID := chi.URLParam(r, "classID")
 	if classID == "" {
 		logger.Debug().Msg("could not delete class: missing class id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing class id")
@@ -264,7 +246,7 @@ func (g Graph) DeleteEducationClass(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Debug().Str("id", classID).Msg("calling delete class on backend")
-	err = g.identityEducationBackend.DeleteEducationClass(r.Context(), classID)
+	err := g.identityEducationBackend.DeleteEducationClass(r.Context(), classID)
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete class: backend error")
@@ -290,14 +272,8 @@ func (g Graph) DeleteEducationClass(w http.ResponseWriter, r *http.Request) {
 func (g Graph) GetEducationClassMembers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling get class members")
-	classID := chi.URLParam(r, "classID")
-	classID, err := url.PathUnescape(classID)
-	if err != nil {
-		logger.Debug().Str("id", classID).Msg("could not get class members: unescaping class id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping class id failed")
-		return
-	}
 
+	classID := chi.URLParam(r, "classID")
 	if classID == "" {
 		logger.Debug().Msg("could not get class members: missing class id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing class id")
@@ -327,23 +303,13 @@ func (g Graph) PostEducationClassMember(w http.ResponseWriter, r *http.Request) 
 	logger.Info().Msg("Calling post class member")
 
 	classID := chi.URLParam(r, "classID")
-	classID, err := url.PathUnescape(classID)
-	if err != nil {
-		logger.Debug().
-			Err(err).
-			Str("id", classID).
-			Msg("could not add member to class: unescaping class id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping class id failed")
-		return
-	}
-
 	if classID == "" {
 		logger.Debug().Msg("could not add class member: missing class id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing class id")
 		return
 	}
 	memberRef := libregraph.NewMemberReference()
-	err = StrictJSONUnmarshal(r.Body, memberRef)
+	err := StrictJSONUnmarshal(r.Body, memberRef)
 	if err != nil {
 		logger.Debug().
 			Err(err).
@@ -400,13 +366,6 @@ func (g Graph) DeleteEducationClassMember(w http.ResponseWriter, r *http.Request
 	logger.Info().Msg("calling delete class member")
 
 	classID := chi.URLParam(r, "classID")
-	classID, err := url.PathUnescape(classID)
-	if err != nil {
-		logger.Debug().Err(err).Str("id", classID).Msg("could not delete class member: unescaping class id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping class id failed")
-		return
-	}
-
 	if classID == "" {
 		logger.Debug().Msg("could not delete class member: missing class id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing class id")
@@ -414,20 +373,13 @@ func (g Graph) DeleteEducationClassMember(w http.ResponseWriter, r *http.Request
 	}
 
 	memberID := chi.URLParam(r, "memberID")
-	memberID, err = url.PathUnescape(memberID)
-	if err != nil {
-		logger.Debug().Err(err).Str("id", memberID).Msg("could not delete class member: unescaping member id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping member id failed")
-		return
-	}
-
 	if memberID == "" {
 		logger.Debug().Msg("could not delete class member: missing member id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing member id")
 		return
 	}
 	logger.Debug().Str("classID", classID).Str("memberID", memberID).Msg("calling delete member on backend")
-	err = g.identityBackend.RemoveMemberFromGroup(r.Context(), classID, memberID)
+	err := g.identityBackend.RemoveMemberFromGroup(r.Context(), classID, memberID)
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete class member: backend error")
@@ -451,14 +403,8 @@ func (g Graph) DeleteEducationClassMember(w http.ResponseWriter, r *http.Request
 func (g Graph) GetEducationClassTeachers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling get class teachers")
-	classID := chi.URLParam(r, "classID")
-	classID, err := url.PathUnescape(classID)
-	if err != nil {
-		logger.Debug().Str("id", classID).Msg("could not get class teachers: unescaping class id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping class id failed")
-		return
-	}
 
+	classID := chi.URLParam(r, "classID")
 	if classID == "" {
 		logger.Debug().Msg("could not get class teachers: missing class id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing class id")
@@ -488,23 +434,13 @@ func (g Graph) PostEducationClassTeacher(w http.ResponseWriter, r *http.Request)
 	logger.Info().Msg("Calling post class teacher")
 
 	classID := chi.URLParam(r, "classID")
-	classID, err := url.PathUnescape(classID)
-	if err != nil {
-		logger.Debug().
-			Err(err).
-			Str("id", classID).
-			Msg("could not add teacher to class: unescaping class id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping class id failed")
-		return
-	}
-
 	if classID == "" {
 		logger.Debug().Msg("could not add class teacher: missing class id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing class id")
 		return
 	}
 	memberRef := libregraph.NewMemberReference()
-	err = StrictJSONUnmarshal(r.Body, memberRef)
+	err := StrictJSONUnmarshal(r.Body, memberRef)
 	if err != nil {
 		logger.Debug().
 			Err(err).
@@ -561,13 +497,6 @@ func (g Graph) DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Reques
 	logger.Info().Msg("calling delete class teacher")
 
 	classID := chi.URLParam(r, "classID")
-	classID, err := url.PathUnescape(classID)
-	if err != nil {
-		logger.Debug().Err(err).Str("id", classID).Msg("could not delete class teacher: unescaping class id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping class id failed")
-		return
-	}
-
 	if classID == "" {
 		logger.Debug().Msg("could not delete class teacher: missing class id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing class id")
@@ -575,20 +504,13 @@ func (g Graph) DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Reques
 	}
 
 	teacherID := chi.URLParam(r, "teacherID")
-	teacherID, err = url.PathUnescape(teacherID)
-	if err != nil {
-		logger.Debug().Err(err).Str("id", teacherID).Msg("could not delete class teacher: unescaping teacher id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping teacher id failed")
-		return
-	}
-
 	if teacherID == "" {
 		logger.Debug().Msg("could not delete class teacher: missing teacher id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing teacher id")
 		return
 	}
 	logger.Debug().Str("classID", classID).Str("teacherID", teacherID).Msg("calling delete teacher on backend")
-	err = g.identityEducationBackend.RemoveTeacherFromEducationClass(r.Context(), classID, teacherID)
+	err := g.identityEducationBackend.RemoveTeacherFromEducationClass(r.Context(), classID, teacherID)
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete class teacher: backend error")

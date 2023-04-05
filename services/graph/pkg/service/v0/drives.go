@@ -143,14 +143,8 @@ func (g Graph) getDrives(w http.ResponseWriter, r *http.Request, unrestricted bo
 func (g Graph) GetSingleDrive(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Interface("query", r.URL.Query()).Msg("calling get drive")
-	driveID, err := url.PathUnescape(chi.URLParam(r, "driveID"))
 
-	if err != nil {
-		logger.Debug().Err(err).Str("driveID", chi.URLParam(r, "driveID")).Msg("could not get drive: unescaping drive id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping drive id failed")
-		return
-	}
-
+	driveID := chi.URLParam(r, "driveID")
 	if driveID == "" {
 		logger.Debug().Msg("could not get drive: missing drive id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing drive id")
@@ -328,13 +322,8 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling update drive")
-	driveID, err := url.PathUnescape(chi.URLParam(r, "driveID"))
-	if err != nil {
-		logger.Debug().Err(err).Str("id", chi.URLParam(r, "driveID")).Msg("could not update drive, unescaping drive id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping drive id failed")
-		return
-	}
 
+	driveID := chi.URLParam(r, "driveID")
 	if driveID == "" {
 		logger.Debug().Msg("Could not update drive, missing drive id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing drive id")
@@ -342,7 +331,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 	}
 
 	drive := libregraph.Drive{}
-	if err = StrictJSONUnmarshal(r.Body, &drive); err != nil {
+	if err := StrictJSONUnmarshal(r.Body, &drive); err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update drive, invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: error: %v", err.Error()))
 		return
@@ -916,13 +905,8 @@ func listStorageSpacesTypeFilter(spaceType string) *storageprovider.ListStorageS
 func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling delete drive")
-	driveID, err := url.PathUnescape(chi.URLParam(r, "driveID"))
-	if err != nil {
-		logger.Debug().Err(err).Str("id", chi.URLParam(r, "driveID")).Msg("could not delete drive: unescaping drive id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping drive id failed")
-		return
-	}
 
+	driveID := chi.URLParam(r, "driveID")
 	if driveID == "" {
 		logger.Debug().Msg("could not delete drive: missing drive id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing drive id")

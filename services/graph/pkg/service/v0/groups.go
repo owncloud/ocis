@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"sort"
 	"strings"
 
@@ -109,21 +108,15 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 func (g Graph) PatchGroup(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling patch group")
-	groupID := chi.URLParam(r, "groupID")
-	groupID, err := url.PathUnescape(groupID)
-	if err != nil {
-		logger.Debug().Str("id", groupID).Msg("could not change group: unescaping group id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping group id failed")
-		return
-	}
 
+	groupID := chi.URLParam(r, "groupID")
 	if groupID == "" {
 		logger.Debug().Msg("could not change group: missing group id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing group id")
 		return
 	}
 	changes := libregraph.NewGroup()
-	err = StrictJSONUnmarshal(r.Body, changes)
+	err := StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not change group: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
@@ -189,13 +182,8 @@ func (g Graph) PatchGroup(w http.ResponseWriter, r *http.Request) {
 func (g Graph) GetGroup(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling get group")
-	groupID := chi.URLParam(r, "groupID")
-	groupID, err := url.PathUnescape(groupID)
-	if err != nil {
-		logger.Debug().Str("id", groupID).Msg("could not get group: unescaping group id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping group id failed")
-	}
 
+	groupID := chi.URLParam(r, "groupID")
 	if groupID == "" {
 		logger.Debug().Msg("could not get group: missing group id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing group id")
@@ -225,14 +213,8 @@ func (g Graph) GetGroup(w http.ResponseWriter, r *http.Request) {
 func (g Graph) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling delete group")
-	groupID := chi.URLParam(r, "groupID")
-	groupID, err := url.PathUnescape(groupID)
-	if err != nil {
-		logger.Debug().Err(err).Str("id", groupID).Msg("could not delete group: unescaping group id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping group id failed")
-		return
-	}
 
+	groupID := chi.URLParam(r, "groupID")
 	if groupID == "" {
 		logger.Debug().Msg("could not delete group: missing group id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing group id")
@@ -240,7 +222,7 @@ func (g Graph) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Debug().Str("id", groupID).Msg("calling delete group on backend")
-	err = g.identityBackend.DeleteGroup(r.Context(), groupID)
+	err := g.identityBackend.DeleteGroup(r.Context(), groupID)
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete group: backend error")
@@ -269,14 +251,8 @@ func (g Graph) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling get group members")
 	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
-	groupID := chi.URLParam(r, "groupID")
-	groupID, err := url.PathUnescape(groupID)
-	if err != nil {
-		logger.Debug().Str("id", groupID).Msg("could not get group members: unescaping group id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping group id failed")
-		return
-	}
 
+	groupID := chi.URLParam(r, "groupID")
 	if groupID == "" {
 		logger.Debug().Msg("could not get group members: missing group id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing group id")
@@ -313,23 +289,13 @@ func (g Graph) PostGroupMember(w http.ResponseWriter, r *http.Request) {
 	logger.Info().Msg("Calling post group member")
 
 	groupID := chi.URLParam(r, "groupID")
-	groupID, err := url.PathUnescape(groupID)
-	if err != nil {
-		logger.Debug().
-			Err(err).
-			Str("id", groupID).
-			Msg("could not add member to group: unescaping group id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping group id failed")
-		return
-	}
-
 	if groupID == "" {
 		logger.Debug().Msg("could not add group member: missing group id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing group id")
 		return
 	}
 	memberRef := libregraph.NewMemberReference()
-	err = StrictJSONUnmarshal(r.Body, memberRef)
+	err := StrictJSONUnmarshal(r.Body, memberRef)
 	if err != nil {
 		logger.Debug().
 			Err(err).
@@ -390,13 +356,6 @@ func (g Graph) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 	logger.Info().Msg("calling delete group member")
 
 	groupID := chi.URLParam(r, "groupID")
-	groupID, err := url.PathUnescape(groupID)
-	if err != nil {
-		logger.Debug().Err(err).Str("id", groupID).Msg("could not delete group member: unescaping group id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping group id failed")
-		return
-	}
-
 	if groupID == "" {
 		logger.Debug().Msg("could not delete group member: missing group id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing group id")
@@ -404,20 +363,13 @@ func (g Graph) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 	}
 
 	memberID := chi.URLParam(r, "memberID")
-	memberID, err = url.PathUnescape(memberID)
-	if err != nil {
-		logger.Debug().Err(err).Str("id", memberID).Msg("could not delete group member: unescaping member id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping member id failed")
-		return
-	}
-
 	if memberID == "" {
 		logger.Debug().Msg("could not delete group member: missing member id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing member id")
 		return
 	}
 	logger.Debug().Str("groupID", groupID).Str("memberID", memberID).Msg("calling delete member on backend")
-	err = g.identityBackend.RemoveMemberFromGroup(r.Context(), groupID, memberID)
+	err := g.identityBackend.RemoveMemberFromGroup(r.Context(), groupID, memberID)
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete group member: backend error")

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/url"
 	"sort"
 	"strings"
 
@@ -167,14 +166,8 @@ func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 func (g Graph) GetEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling get education user")
-	userID := chi.URLParam(r, "userID")
-	userID, err := url.PathUnescape(userID)
-	if err != nil {
-		logger.Debug().Err(err).Str("id", userID).Msg("could not get education user: unescaping education user id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping education user id failed")
-		return
-	}
 
+	userID := chi.URLParam(r, "userID")
 	if userID == "" {
 		logger.Debug().Msg("could not get user: missing education user id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing education user id")
@@ -203,14 +196,8 @@ func (g Graph) GetEducationUser(w http.ResponseWriter, r *http.Request) {
 func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling delete education user")
-	userID := chi.URLParam(r, "userID")
-	userID, err := url.PathUnescape(userID)
-	if err != nil {
-		logger.Debug().Err(err).Str("id", userID).Msg("could not delete education user: unescaping education user id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping education user id failed")
-		return
-	}
 
+	userID := chi.URLParam(r, "userID")
 	if userID == "" {
 		logger.Debug().Msg("could not delete education user: missing education user id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing education user id")
@@ -319,21 +306,15 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 	logger.Info().Msg("calling patch education user")
-	nameOrID := chi.URLParam(r, "userID")
-	nameOrID, err := url.PathUnescape(nameOrID)
-	if err != nil {
-		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not update education user: unescaping education user id failed")
-		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "unescaping education user id failed")
-		return
-	}
 
+	nameOrID := chi.URLParam(r, "userID")
 	if nameOrID == "" {
 		logger.Debug().Msg("could not update education user: missing education user id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing education user id")
 		return
 	}
 	changes := libregraph.NewEducationUser()
-	err = StrictJSONUnmarshal(r.Body, changes)
+	err := StrictJSONUnmarshal(r.Body, changes)
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not update education user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest,
