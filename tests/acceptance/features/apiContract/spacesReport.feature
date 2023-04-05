@@ -33,7 +33,7 @@ Feature: Report test
       | oc:shareroot     | /folderMain          |
       | oc:name          | SubFolder1           |
       | d:getcontenttype | httpd/unix-directory |
-      | oc:permissions   | SR                   |
+      | oc:permissions   | S                    |
       | oc:size          | 12                   |
 
 
@@ -52,5 +52,5 @@ Feature: Report test
       | oc:shareroot       | /folderMain                                      |
       | oc:name            | insideTheFolder.txt                              |
       | d:getcontenttype   | text/plain                                       |
-      | oc:permissions     | SRDNVW                                           |
+      | oc:permissions     | SD                                               |
       | d:getcontentlength | 12                                               |
