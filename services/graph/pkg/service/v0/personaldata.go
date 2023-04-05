@@ -19,7 +19,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/utils"
-	libregraph "github.com/owncloud/libre-graph-api-go"
+	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 )
 
@@ -91,10 +91,9 @@ func (g Graph) GatherPersonalData(usr *user.User, ref *provider.Reference, token
 
 	// Check if we have a keycloak client, and if so, get the keycloak export.
 	if ctx != nil && g.keycloakClient != nil {
-		id := usr.GetId().GetOpaqueId()
-		kcd, err := g.keycloakClient.GetPIIReport(ctx, g.config.Keycloak.ClientID, &libregraph.User{Id: &id})
+		kcd, err := g.keycloakClient.GetPIIReport(ctx, g.config.Keycloak.UserRealm, usr.GetMail())
 		if err != nil {
-			g.logger.Error().Err(err).Str("userID", id).Msg("cannot get keycloak personal data")
+			g.logger.Error().Err(err).Str("userID", usr.GetId().GetOpaqueId()).Msg("cannot get keycloak personal data")
 		}
 		data["keycloak"] = kcd
 	}
@@ -105,7 +104,7 @@ func (g Graph) GatherPersonalData(usr *user.User, ref *provider.Reference, token
 		if err != nil {
 			g.logger.Error().Err(err).Str("userID", usr.GetId().GetOpaqueId()).Msg("cannot get event personal data")
 		}
-		data["events"] = convertEvents(resp)
+		data["events"] = convertEvents(resp.GetEvents())
 	}
 
 	// marshal
@@ -242,16 +241,16 @@ func getLocation(r *http.Request) string {
 }
 
 // we want the events to look nice in the file, don't we?
-func convertEvents(resp *ehsvc.GetEventsResponse) []map[string]interface{} {
-	var out []map[string]interface{}
-	for _, e := range resp.GetEvents() {
+func convertEvents(evs []*ehmsg.Event) []map[string]interface{} {
+	out := make([]map[string]interface{}, len(evs))
+	for i, e := range evs {
 		var content map[string]interface{}
-		_ = json.Unmarshal(e.Event, &content)
-		out = append(out, map[string]interface{}{
+		_ = json.Unmarshal(e.GetEvent(), &content)
+		out[i] = map[string]interface{}{
 			"id":    e.GetId(),
 			"type":  e.GetType(),
 			"event": content,
-		})
+		}
 	}
 	return out
 }

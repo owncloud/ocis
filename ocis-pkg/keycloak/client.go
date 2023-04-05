@@ -116,8 +116,8 @@ func (c *ConcreteClient) GetUserByEmail(ctx context.Context, realm, mail string)
 }
 
 // GetPIIReport returns a structure with all the PII for the user.
-func (c *ConcreteClient) GetPIIReport(ctx context.Context, realm string, user *libregraph.User) (*PIIReport, error) {
-	u, err := c.GetUserByEmail(ctx, realm, *user.Mail)
+func (c *ConcreteClient) GetPIIReport(ctx context.Context, realm string, email string) (*PIIReport, error) {
+	u, err := c.GetUserByEmail(ctx, realm, email)
 	if err != nil {
 		return nil, err
 	}

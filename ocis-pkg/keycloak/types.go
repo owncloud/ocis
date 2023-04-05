@@ -35,5 +35,5 @@ type Client interface {
 	CreateUser(ctx context.Context, realm string, user *libregraph.User, userActions []UserAction) (string, error)
 	SendActionsMail(ctx context.Context, realm, userID string, userActions []UserAction) error
 	GetUserByEmail(ctx context.Context, realm, email string) (*libregraph.User, error)
-	GetPIIReport(ctx context.Context, realm string, user *libregraph.User) (*PIIReport, error)
+	GetPIIReport(ctx context.Context, realm string, email string) (*PIIReport, error)
 }
