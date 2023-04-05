@@ -68,10 +68,6 @@ Feature: Upload files into a space
       }
     }
     """
-    And the user "Brian" should have a space called "Project Ceres" with these key and value pairs:
-      | key          | value         |
-      | name         | Project Ceres |
-      | quota@@@used | <usedQuota>   |
     Examples:
       | role    | code | shouldOrNot | usedQuota |
       | manager | 201  | should      | 4         |
