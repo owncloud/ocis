@@ -23,7 +23,7 @@ Feature: Download file in project space
       | role      | viewer |
 
 
-  Scenario Outline: An user downloads a file in the project space
+  Scenario Outline: A user downloads a file in the project space
     When user "<user>" downloads the file "file.txt" of the space "download file" using the WebDAV API
     Then the HTTP status code should be "200"
     And the following headers should be set
@@ -36,7 +36,7 @@ Feature: Download file in project space
       | Bob   |
 
 
-  Scenario Outline: An user downloads an old version of the file in the project space
+  Scenario Outline: users with role manager and editor can download an old version of the file in the project space
     Given user "Alice" has uploaded a file inside space "download file" with content "new content" to "file.txt"
     And user "Alice" has uploaded a file inside space "download file" with content "newest content" to "file.txt"
     When user "<user>" downloads version of the file "file.txt" with the index "1" of the space "download file" using the WebDAV API
@@ -53,4 +53,9 @@ Feature: Download file in project space
       | user  |
       | Alice |
       | Brian |
-      | Bob   |
+
+  Scenario: A user viewer cannot get the old version of the file in the project space
+    Given user "Alice" has uploaded a file inside space "download file" with content "new content" to "file.txt"
+    When user "Bob" tries to get version of the file "file.txt" with the index "1" of the space "download file" using the WebDAV API
+    Then the HTTP status code should be "403"
+    

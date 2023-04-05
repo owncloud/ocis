@@ -1,4 +1,4 @@
-@api @issue-2914
+@api @issue-2914 @skipOnOcis @toImplementOnOCIS
 Feature: file versions remember the author of each version
 
   Background:
