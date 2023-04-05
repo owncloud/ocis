@@ -24,7 +24,7 @@ type Config struct {
 	CommitShareToStorageGrant  bool   `yaml:"commit_share_to_storage_grant" env:"GATEWAY_COMMIT_SHARE_TO_STORAGE_GRANT" desc:"Commit shares to storage grants. This grants access to shared resources for the share receiver directly on the storage."`
 	ShareFolder                string `yaml:"share_folder_name" env:"GATEWAY_SHARE_FOLDER_NAME" desc:"Name of the share folder in users' home space."`
 	DisableHomeCreationOnLogin bool   `yaml:"disable_home_creation_on_login" env:"GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN" desc:"Disable creation of the home space on login."`
-	TransferSecret             string `yaml:"transfer_secret" env:"OCIS_STORAGE_TRANSFER_SECRET;STORAGE_TRANSFER_SECRET" desc:"The storage transfer secret." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"STORAGE_TRANSFER_SECRET changing name for consistency" deprecationReplacement:"OCIS_STORAGE_TRANSFER_SECRET"`
+	TransferSecret             string `yaml:"transfer_secret" env:"OCIS_TRANSFER_SECRET;STORAGE_TRANSFER_SECRET" desc:"The storage transfer secret." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"STORAGE_TRANSFER_SECRET changing name for consistency" deprecationReplacement:"OCIS_TRANSFER_SECRET"`
 	TransferExpires            int    `yaml:"transfer_expires" env:"GATEWAY_TRANSFER_EXPIRES" desc:"Expiry for the gateway tokens."`
 	Cache                      Cache  `yaml:"cache"`
 

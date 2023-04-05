@@ -17,7 +17,7 @@ type Config struct {
 
 	// JWTSecret used to verify reva access token
 
-	TransferSecret string `yaml:"transfer_secret" env:"OCIS_STORAGE_TRANSFER_SECRET;STORAGE_TRANSFER_SECRET" desc:"Transfer secret for signing file up- and download requests." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"STORAGE_TRANSFER_SECRET changing name for consistency" deprecationReplacement:"OCIS_STORAGE_TRANSFER_SECRET"`
+	TransferSecret string `yaml:"transfer_secret" env:"OCIS_TRANSFER_SECRET;STORAGE_TRANSFER_SECRET" desc:"Transfer secret for signing file up- and download requests." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"STORAGE_TRANSFER_SECRET changing name for consistency" deprecationReplacement:"OCIS_TRANSFER_SECRET"`
 
 	TokenManager      *TokenManager `yaml:"token_manager"`
 	Reva              *shared.Reva  `yaml:"reva"`
