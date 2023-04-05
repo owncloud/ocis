@@ -15,10 +15,13 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
+	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
+	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	graphMiddleware "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
@@ -132,6 +135,18 @@ func Server(opts ...Option) (http.Service, error) {
 		// no gatewayclient needed
 	}
 
+	// Keycloak client is optional, so if it stays nil, it's fine.
+	var keyCloakClient keycloak.Client
+	if options.Config.Keycloak.BasePath != "" {
+		kcc := options.Config.Keycloak
+		if kcc.ClientID == "" || kcc.ClientSecret == "" || kcc.ClientRealm == "" || kcc.UserRealm == "" {
+			return nil, errors.New("keycloak client id, secret, client realm and user realm must be set")
+		}
+		keyCloakClient = keycloak.New(kcc.BasePath, kcc.ClientID, kcc.ClientSecret, kcc.ClientRealm, kcc.InsecureSkipVerify)
+	}
+
+	hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", ogrpc.DefaultClient())
+
 	var handle svc.Service
 	handle, err = svc.NewService(
 		svc.Logger(options.Logger),
@@ -142,6 +157,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.WithRequireAdminMiddleware(requireAdminMiddleware),
 		svc.WithGatewayClient(gatewayClient),
 		svc.WithSearchService(searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient())),
+		svc.KeycloakCient(keyCloakClient),
 	)
 
 	if err != nil {

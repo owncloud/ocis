@@ -68,18 +68,27 @@ func (g Graph) ExportPersonalData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// go start gathering
-	go g.GatherPersonalData(u, ref, r.Header.Get(revactx.TokenHeader), marsh)
+	go g.GatherPersonalData(ctx, u, ref, r.Header.Get(revactx.TokenHeader), marsh)
 
 	w.WriteHeader(http.StatusCreated)
 }
 
 // GatherPersonalData will all gather all personal data of the user and save it to a file in the users personal space
-func (g Graph) GatherPersonalData(usr *user.User, ref *provider.Reference, token string, marsh Marshaller) {
+func (g Graph) GatherPersonalData(ctx context.Context, usr *user.User, ref *provider.Reference, token string, marsh Marshaller) {
 	// create data
 	data := make(map[string]interface{})
 
 	// reva user
 	data["user"] = usr
+
+	// Check if we have a keycloak client, and if so, get the keycloak export.
+	if g.keycloakClient != nil {
+		kcd, err := g.keycloakClient.GetPIIReport(ctx, g.config.Keycloak.ClientID, usr)
+		if err != nil {
+			g.logger.Error().Err(err).Str("userID").Msg("cannot get keycloak personal data")
+		}
+		data["keycloak"] = kcd
+	}
 
 	// marshal
 	by, err := marsh(data)
@@ -198,7 +207,6 @@ func createFolders(ctx context.Context, ref *provider.Reference, gwc gateway.Gat
 		}
 	}
 	return nil
-
 }
 
 func getLocation(r *http.Request) string {

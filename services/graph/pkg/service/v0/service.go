@@ -143,6 +143,7 @@ func NewService(opts ...Option) (Graph, error) {
 		gatewayClient:            options.GatewayClient,
 		searchService:            options.SearchService,
 		identityEducationBackend: options.IdentityEducationBackend,
+		keycloakClient:           options.KeycloakClient,
 	}
 
 	if err := setIdentityBackends(options, &svc); err != nil {

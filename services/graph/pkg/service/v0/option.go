@@ -5,8 +5,10 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
+	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
@@ -30,6 +32,8 @@ type Options struct {
 	RoleManager              *roles.Manager
 	EventsPublisher          events.Publisher
 	SearchService            searchsvc.SearchProviderService
+	KeycloakClient           keycloak.Client
+	EventHistoryClient       ehsvc.EventHistoryService
 }
 
 // newOptions initializes the available default options.
@@ -124,5 +128,19 @@ func RoleManager(val *roles.Manager) Option {
 func EventsPublisher(val events.Publisher) Option {
 	return func(o *Options) {
 		o.EventsPublisher = val
+	}
+}
+
+// KeycloakCient provides a function to set the KeycloakCient option.
+func KeycloakCient(val keycloak.Client) Option {
+	return func(o *Options) {
+		o.KeycloakClient = val
+	}
+}
+
+// EventHistoryClient provides a function to set the EventHistoryClient option.
+func KeycloakCient(val keycloak.Client) Option {
+	return func(o *Options) {
+		o.KeycloakClient = val
 	}
 }
