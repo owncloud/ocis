@@ -1,6 +1,6 @@
 ---
 title: Audit service
-date: 2023-04-06T09:53:04.88991647Z
+date: 2023-04-06T09:52:41.788786106Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/audit
