@@ -2054,7 +2054,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "IDM_CREATE_DEMO_USERS": True,
             "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
             "FRONTEND_SEARCH_MIN_LENGTH": "2",
-            "STORAGE_USERS_OCIS_ASYNC_UPLOADS": True,
+            "OCIS_ASYNC_UPLOADS": True,
             "OCIS_EVENTS_ENABLE_TLS": False,
             "OCIS_DECOMPOSEDFS_METADATA_BACKEND": "messagepack",
         }
@@ -2092,7 +2092,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "APP_PROVIDER_WOPI_INSECURE": "true",
             "APP_PROVIDER_WOPI_WOPI_SERVER_EXTERNAL_URL": "http://wopiserver:8880",
             "APP_PROVIDER_WOPI_FOLDER_URL_BASE_URL": "https://ocis-server:9200",
-            "STORAGE_USERS_OCIS_ASYNC_UPLOADS": True,
+            "OCIS_ASYNC_UPLOADS": True,
             "OCIS_EVENTS_ENABLE_TLS": False,
             "OCIS_DECOMPOSEDFS_METADATA_BACKEND": "messagepack",
         }
