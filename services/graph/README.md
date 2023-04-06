@@ -11,8 +11,9 @@ Using the API, you can manually filter like for users. See the [Libre Graph API]
 The following image gives an overview of the scenario when a client requests to list available spaces the user has access to. To do so, the client is directed with his request automatically via the proxy service to the graph service.
 
 <!-- referencing: https://github.com/owncloud/ocis/pull/3816 ([docs-only] add client protocol overview) -->
+<!-- The image source needs to be the raw source !! -->
 
-<img src="https://github.com/owncloud/ocis/blob/master/services/graph/images/mermaid-graph.svg" width="500" />
+<img src="https://raw.githubusercontent.com/owncloud/ocis/master/services/graph/images/mermaid-graph.svg" width="500" />
 
 ## Caching
 
