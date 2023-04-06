@@ -2740,6 +2740,22 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" tries to get version of the file "([^"]*)" with the index "([^"]*)" of the space "([^"]*)" using the WebDAV API$/
+	 *
+	 * @param string $user
+	 * @param string $file
+	 * @param string $index
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userTriesToDownloadFileVersions(string $user, string $file, string $index, string $spaceName):void {
+		$this->setSpaceIDByName($user, $spaceName);
+		$this->filesVersionsContext->userGetsFileVersions($user, $file);
+	}
+
+	/**
 	 * return the etag for an element inside a space
 	 *
 	 * @param string $user requestor

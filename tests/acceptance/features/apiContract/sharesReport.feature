@@ -25,7 +25,7 @@ Feature: REPORT request to Shares space
       | oc:shareroot     | /folderMain          |
       | oc:name          | SubFolder1           |
       | d:getcontenttype | httpd/unix-directory |
-      | oc:permissions   | SR                   |
+      | oc:permissions   | S                    |
     Examples:
       | dav_version |
       | old         |
@@ -44,7 +44,7 @@ Feature: REPORT request to Shares space
       | oc:shareroot       | /folderMain                            |
       | oc:name            | frodo.txt                              |
       | d:getcontenttype   | text/plain                             |
-      | oc:permissions     | SR                                     |
+      | oc:permissions     | S                                      |
       | d:getcontentlength | 34                                     |
     Examples:
       | dav_version |
