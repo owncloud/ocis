@@ -310,7 +310,7 @@ Feature: dav-versions
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "First content"
 
   @files_sharing-app-required
-  Scenario: sharer can see a version of a file inside a shared folder when modified by sharee
+  Scenario: sharee cannot see a version of a file inside a shared folder when modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
     And user "Alice" has shared folder "/sharingfolder" with user "Brian" with permissions "all"

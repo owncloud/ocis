@@ -54,6 +54,7 @@ Feature: Download file in project space
       | Alice |
       | Brian |
 
+  
   Scenario: A user viewer cannot get the old version of the file in the project space
     Given user "Alice" has uploaded a file inside space "download file" with content "new content" to "file.txt"
     When user "Bob" tries to get version of the file "file.txt" with the index "1" of the space "download file" using the WebDAV API
