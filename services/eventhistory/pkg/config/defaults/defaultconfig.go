@@ -27,10 +27,10 @@ func DefaultConfig() *config.Config {
 			EnableTLS: false,
 		},
 		Store: config.Store{
-			Store:        "memory",
-			Database:     "eventhistory",
-			Table:        "events",
-			RecordExpiry: 336 * time.Hour,
+			Store:    "memory",
+			Database: "eventhistory",
+			Table:    "events",
+			TTL:      336 * time.Hour,
 		},
 		GRPC: config.GRPCConfig{
 			Addr:      "127.0.0.1:0",

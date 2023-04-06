@@ -61,7 +61,7 @@ func (eh *EventHistoryService) StoreEvents() {
 		if err := eh.store.Write(&store.Record{
 			Key:    event.ID,
 			Value:  ev,
-			Expiry: eh.cfg.Store.RecordExpiry,
+			Expiry: eh.cfg.Store.TTL,
 			Metadata: map[string]interface{}{
 				"type": event.Type,
 			},
