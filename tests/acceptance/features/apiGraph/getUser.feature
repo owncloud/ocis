@@ -1005,3 +1005,224 @@ Feature: get users
       | Guest       | User        |
       | Guest       | Guest       |
       | Guest       | Admin       |
+
+  @issue-6017
+  Scenario Outline: admin user gets the drive information of a user with different user role
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
+    And user "Brian" has created folder "my_data"
+    When user "Alice" gets the personal drive information of user "Brian" using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "driveAlias",
+        "driveType",
+        "id",
+        "name",
+        "webUrl",
+        "owner",
+        "quota",
+        "root"
+      ],
+      "properties": {
+        "driveAlias": {
+          "type": "string",
+          "enum": ["personal/brian"]
+        },
+        "driveType": {
+          "type": "string",
+          "enum": ["personal"]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^%space_id_pattern%$"
+        },
+        "name": {
+          "type": "string",
+          "enum": ["Brian Murphy"]
+        },
+        "webUrl": {
+          "type": "string",
+          "pattern": "^%base_url%/f/%space_id_pattern%$"
+        },
+        "owner": {
+          "type": "object",
+          "required": [
+            "user"
+          ],
+          "properties": {
+            "user": {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id"
+              ],
+              "properties": {
+                "displayName": {
+                  "type": "string",
+                  "enum": [""]
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                }
+              }
+            }
+          }
+        },
+        "qouta": {
+          "type": "object",
+          "required": [
+            "state"
+          ],
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": ["normal"]
+            }
+          }
+        },
+        "root": {
+          "type": "object",
+          "required": [
+            "webDavUrl"
+          ],
+          "properties": {
+            "webDavUrl": {
+              "type": "string",
+              "pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"
+            }
+          }
+        }
+      }
+    }
+    """
+    Examples:
+      | userRole    |
+      | Admin       |
+      | Space Admin |
+      | User        |
+      | Guest       |
+
+
+  Scenario Outline: non-admin user tries to get drive information of other user with different user role
+    Given the administrator has assigned the role "<user-role-1>" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<user-role-2>" to user "Brian" using the Graph API
+    When user "Alice" gets the personal drive information of user "Brian" using Graph API
+    Then the HTTP status code should be "404"
+    Examples:
+      | user-role-1 | user-role-2 |
+      | Space Admin | Admin       |
+      | Space Admin | Space Admin |
+      | Space Admin | User        |
+      | Space Admin | Guest       |
+      | User        | Admin       |
+      | User        | Space Admin |
+      | User        | User        |
+      | User        | Guest       |
+      | Guest       | Admin       |
+      | Guest       | Space Admin |
+      | Guest       | User        |
+      | Guest       | Guest       |
+
+
+  Scenario Outline: user with different user role gets his/her own drive information
+    Given the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
+    When user "Alice" gets own personal drive information using Graph API
+    Then the HTTP status code should be "200"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "driveAlias",
+        "driveType",
+        "id",
+        "name",
+        "webUrl",
+        "owner",
+        "quota",
+        "root"
+      ],
+      "properties": {
+        "driveAlias": {
+          "type": "string",
+          "enum": ["personal/alice"]
+        },
+        "driveType": {
+          "type": "string",
+          "enum": ["personal"]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^%space_id_pattern%$"
+        },
+        "name": {
+          "type": "string",
+          "enum": ["Alice Hansen"]
+        },
+        "webUrl": {
+          "type": "string",
+          "pattern": "^%base_url%/f/%space_id_pattern%$"
+        },
+        "owner": {
+          "type": "object",
+          "required": [
+            "user"
+          ],
+          "properties": {
+            "user": {
+              "type": "object",
+              "required": [
+                "displayName",
+                "id"
+              ],
+              "properties": {
+                "displayName": {
+                  "type": "string",
+                  "enum": [""]
+                },
+                "id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                }
+              }
+            }
+          }
+        },
+        "qouta": {
+          "type": "object",
+          "required": [
+            "state"
+          ],
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": ["normal"]
+            }
+          }
+        },
+        "root": {
+          "type": "object",
+          "required": [
+            "webDavUrl"
+          ],
+          "properties": {
+            "webDavUrl": {
+              "type": "string",
+              "pattern": "^%base_url%/dav/spaces/%space_id_pattern%$"
+            }
+          }
+        }
+      }
+    }
+    """
+    Examples:
+      | userRole    |
+      | Admin       |
+      | Space Admin |
+      | User        |
+      | Guest       |

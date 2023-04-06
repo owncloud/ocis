@@ -164,5 +164,11 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 ### [Adding the same user as multiple members in a single request results in listing the same user twice in the group](https://github.com/owncloud/ocis/issues/5855)
 - [apiGraph/addUserToGroup.feature:421](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L421)
 
+### [Admin user trying to get the personal drive information of other users returns 404](https://github.com/owncloud/ocis/issues/6017)
+- [apiGraph/getUser.feature:1105](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L1105)
+- [apiGraph/getUser.feature:1106](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L1106)
+- [apiGraph/getUser.feature:1107](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L1107)
+- [apiGraph/getUser.feature:1108](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L1108)
+
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

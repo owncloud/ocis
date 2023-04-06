@@ -2293,4 +2293,28 @@ class GraphContext implements Context {
 			"Expected user '" . $user . "' to be added once to group '" . $group . "' but the user is listed '" . $count . "' times"
 		);
 	}
+
+	/**
+	 * @When /^user "([^"]*)" gets the personal drive information of user "([^"]*)" using Graph API$/
+	 * @When /^user "([^"]*)" gets own personal drive information using Graph API$/
+	 *
+	 * @param string $byUser
+	 * @param string|null $user
+	 *
+	 * @return  void
+	 */
+	public function userGetsThePersonalDriveInformationOfUserUsingGraphApi(string $byUser, ?string $user = null): void {
+		$user = $user ?? $byUser;
+		$credentials = $this->getAdminOrUserCredentials($byUser);
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
+		$this->featureContext->setResponse(
+			GraphHelper::getPersonalDriveInformationByUserId(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials["username"],
+				$credentials["password"],
+				$userId
+			)
+		);
+	}
 }
