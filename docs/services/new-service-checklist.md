@@ -19,7 +19,9 @@ Use this checklist with copy/paste in your PR - right from the beginning. It ren
   - Use CamelCase for section headers.
 - [ ] For images and example files used in README.md:
   - Create a folder named `md-sources` on the same level where README.md is located. Put all the images and example files referenced by README.md into this folder.
-  - Use absolute references like `https://github.com/owncloud/ocis/blob/master/services/<service-name>/md-sources/file` to make the content accessible for both README.md and owncloud.dev
+  - Use absolute references like `https://raw.githubusercontent.com/owncloud/ocis/master/services/<service-name>/md-sources/file` to make the content accessible for both README.md and owncloud.dev
+    bad `<img src="https://github.com/owncloud/ocis/blob/master/services/graph/images/mermaid-graph.svg" width="500" />`  
+    good `<img src="https://raw.githubusercontent.com/owncloud/ocis/master/services/graph/images/mermaid-graph.svg" width="500" />`
 - [ ] If new CLI command are introduced, that command must be described in readme.md.
 - [ ] Add the service to the makefile in the ocis repo root.
 - [ ] Make the service startable for binary and individual startup:
