@@ -83,7 +83,7 @@ type Settings struct {
 	AuthorizationEndpointURI string `yaml:"authorization_endpoint_uri" env:"IDP_ENDPOINT_URI" desc:"URL of the IDP endpoint."`
 	EndsessionEndpointURI    string `yaml:"-"` // unused, not supported by lico-idp
 
-	Insecure bool `yaml:"insecure" env:"OCIS_LDAP_INSECURE;LDAP_INSECURE;IDP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_INSECURE changing name for consistency" deprecationReplacement:"OCIS_LDAP_INSECURE"`
+	Insecure bool `yaml:"ldap_insecure" env:"OCIS_LDAP_INSECURE;LDAP_INSECURE;IDP_INSECURE" desc:"Disable TLS certificate validation for the LDAP connections. Do not set this in production environments." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_INSECURE changing name for consistency" deprecationReplacement:"OCIS_LDAP_INSECURE"`
 
 	TrustedProxy []string `yaml:"trusted_proxy"` //TODO: how to configure this via env?
 
