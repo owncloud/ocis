@@ -47,5 +47,6 @@ http:
     enabled: false
     cert: ""
     key: ""
+grpc_client_tls: null
 token_manager:
   jwt_secret: ""
