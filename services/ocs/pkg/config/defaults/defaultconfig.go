@@ -3,6 +3,7 @@ package defaults
 import (
 	"strings"
 
+	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/config"
 )
 
@@ -85,6 +86,10 @@ func EnsureDefaults(cfg *config.Config) {
 
 	if cfg.Commons != nil {
 		cfg.HTTP.TLS = cfg.Commons.HTTPServiceTLS
+	}
+
+	if cfg.GRPCClientTLS == nil && cfg.Commons != nil {
+		cfg.GRPCClientTLS = structs.CopyOrZeroValue(cfg.Commons.GRPCClientTLS)
 	}
 }
 
