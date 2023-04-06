@@ -537,7 +537,7 @@ xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ ++
+++ownCloudUserType ++
 a| [subs=-attributes]
 LDAP Attribute to distinguish between 'Member' and 'Guest' users. Default is 'ownCloudUserType'.
 

@@ -47,7 +47,7 @@ drivers:
     group_object_class: groupOfNames
     idp: https://localhost:9200
     disable_user_mechanism: none
-    user_type_attribute: ""
+    user_type_attribute: ownCloudUserType
     ldap_disabled_users_group_dn: cn=DisabledUsersGroup,ou=groups,o=libregraph-idm
     user_schema:
       id: ownclouduuid
