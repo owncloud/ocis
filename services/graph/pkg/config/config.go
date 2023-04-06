@@ -76,14 +76,14 @@ type LDAP struct {
 	GroupNameAttribute string `yaml:"group_name_attribute" env:"OCIS_LDAP_GROUP_SCHEMA_GROUPNAME;LDAP_GROUP_SCHEMA_GROUPNAME;GRAPH_LDAP_GROUP_NAME_ATTRIBUTE" desc:"LDAP Attribute to use for the name of groups." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_GROUP_SCHEMA_GROUPNAME changing name for consistency" deprecationReplacement:"OCIS_LDAP_GROUP_SCHEMA_GROUPNAME"`
 	GroupIDAttribute   string `yaml:"group_id_attribute" env:"OCIS_LDAP_GROUP_SCHEMA_ID;LDAP_GROUP_SCHEMA_ID;GRAPH_LDAP_GROUP_ID_ATTRIBUTE" desc:"LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_GROUP_SCHEMA_ID changing name for consistency" deprecationReplacement:"OCIS_LDAP_GROUP_SCHEMA_ID"`
 
-	EducationResourcesEnabled bool `yaml:"education_resources_enabled" env:"OCIS_LDAP_EDUCATION_RESOURCES_ENABLED;LDAP_EDUCATION_RESOURCES_ENABLED;GRAPH_LDAP_EDUCATION_RESOURCES_ENABLED" desc:"Enable LDAP support for managing education related resources" deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_EDUCATION_RESOURCES_ENABLED changing name for consistency" deprecationReplacement:"OCIS_LDAP_EDUCATION_RESOURCES_ENABLED"`
+	EducationResourcesEnabled bool `yaml:"education_resources_enabled" env:"GRAPH_LDAP_EDUCATION_RESOURCES_ENABLED" desc:"Enable LDAP support for managing education related resources."`
 	EducationConfig           LDAPEducationConfig
 }
 
 // LDAPEducationConfig represents the LDAP configuration for education related resources
 type LDAPEducationConfig struct {
-	SchoolBaseDN      string `yaml:"school_base_dn" env:"OCIS_LDAP_SCHOOL_BASE_DN;LDAP_SCHOOL_BASE_DN;GRAPH_LDAP_SCHOOL_BASE_DN" desc:"Search base DN for looking up LDAP schools." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_SCHOOL_BASE_DN changing name for consistency" deprecationReplacement:"OCIS_LDAP_SCHOOL_BASE_DN"`
-	SchoolSearchScope string `yaml:"school_search_scope" env:"OCIS_LDAP_SCHOOL_SCOPE;LDAP_SCHOOL_SCOPE;GRAPH_LDAP_SCHOOL_SEARCH_SCOPE" desc:"LDAP search scope to use when looking up schools. Supported scopes are 'base', 'one' and 'sub'." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_SCHOOL_SCOPE changing name for consistency" deprecationReplacement:"OCIS_LDAP_SCHOOL_SCOPE"`
+	SchoolBaseDN      string `yaml:"school_base_dn" env:"GRAPH_LDAP_SCHOOL_BASE_DN" desc:"Search base DN for looking up LDAP schools."`
+	SchoolSearchScope string `yaml:"school_search_scope" env:"GRAPH_LDAP_SCHOOL_SEARCH_SCOPE" desc:"LDAP search scope to use when looking up schools. Supported scopes are 'base', 'one' and 'sub'."`
 
 	SchoolFilter      string `yaml:"school_filter" env:"OCIS_LDAP_SCHOOL_FILTER;LDAP_SCHOOL_FILTER;GRAPH_LDAP_SCHOOL_FILTER" desc:"LDAP filter to add to the default filters for school searches." deprecationVersion:"3.0" removalVersion:"3.1" deprecationInfo:"LDAP_SCHOOL_FILTER changing name for consistency" deprecationReplacement:"OCIS_LDAP_SCHOOL_FILTER"`
 	SchoolObjectClass string `yaml:"school_objectclass" env:"LDAP_SCHOOL_OBJECTCLASS;GRAPH_LDAP_SCHOOL_OBJECTCLASS" desc:"The object class to use for schools in the default school search filter."`
