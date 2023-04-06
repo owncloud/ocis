@@ -20,6 +20,7 @@ The following sections list the changes for unreleased.
 * Change - Bump libregraph lico: [#5768](https://github.com/owncloud/ocis/pull/5768)
 * Change - Updated Cache Configuration: [#5829](https://github.com/owncloud/ocis/pull/5829)
 * Change - Remove the settings ui: [#5463](https://github.com/owncloud/ocis/pull/5463)
+* Change - Do not share versions: [#5531](https://github.com/owncloud/ocis/pull/5531)
 * Enhancement - Add 'ocis decomposedfs metadata' command: [#5858](https://github.com/owncloud/ocis/pull/5858)
 * Enhancement - Add global env variable extractor: [#5164](https://github.com/owncloud/ocis/pull/5164)
 * Enhancement - Add MessageRichParameters: [#5927](https://github.com/owncloud/ocis/pull/5927)
