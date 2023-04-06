@@ -37,7 +37,7 @@ idp:
   sign_in_uri: ""
   signed_out_uri: ""
   authorization_endpoint_uri: ""
-  insecure: false
+  ldap_insecure: false
   trusted_proxy: []
   allow_scope: []
   allow_client_guests: false
