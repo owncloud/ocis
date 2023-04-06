@@ -53,6 +53,7 @@ func DefaultConfig() *config.Config {
 				BindDN:                   "uid=reva,ou=sysusers,o=libregraph-idm",
 				DisableUserMechanism:     "none",
 				LdapDisabledUsersGroupDN: "cn=DisabledUsersGroup,ou=groups,o=libregraph-idm",
+				UserTypeAttribute:        "ownCloudUserType",
 				IDP:                      "https://localhost:9200",
 				UserSchema: config.LDAPUserSchema{
 					ID:          "ownclouduuid",
