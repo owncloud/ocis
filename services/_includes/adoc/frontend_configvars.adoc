@@ -1,6 +1,6 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
@@ -13,6 +13,21 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacment
+
+| STORAGE_TRANSFER_SECRET changing name for consistency
+| 3.0
+| 3.1
+| OCIS_TRANSFER_SECRET
+
+| REVA_GATEWAY changing name for consistency
+| 3.0
+| 3.1
+| OCIS_REVA_GATEWAY
+
+| FRONTEND_OCS_HOME_NAMESPACE changing name for consistency
+| 3.0
+| 3.1
+| FRONTEND_OCS_PERSONAL_NAMESPACE
 |===
 
 endif::[]
@@ -209,8 +224,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
 
-a|`STORAGE_TRANSFER_SECRET` +
-
+a|`OCIS_TRANSFER_SECRET` +
+`STORAGE_TRANSFER_SECRET` +
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -228,8 +244,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
 
-a|`REVA_GATEWAY` +
-
+a|`OCIS_REVA_GATEWAY` +
+`REVA_GATEWAY` +
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -449,8 +466,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Path prefix for shares as part of an ocis resource. Note that the path must start with '/'.
 
-a|`FRONTEND_OCS_HOME_NAMESPACE` +
-
+a|`FRONTEND_OCS_PERSONAL_NAMESPACE` +
+`FRONTEND_OCS_HOME_NAMESPACE` +
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

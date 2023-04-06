@@ -21,7 +21,7 @@
 | OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
 | OCIS_JWT_SECRET<br/>USERLOG_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | OCIS_MACHINE_AUTH_API_KEY<br/>USERLOG_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary to access resources from other services.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to look up user metadata|
+| OCIS_REVA_GATEWAY<br/>REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to look up user metadata|
 | USERLOG_TRANSLATION_PATH | string |  | (optional) Set this to a path with custom translations to overwrite the builtin translations. See the documentation for more details.|
 | OCIS_EVENTS_ENDPOINT<br/>USERLOG_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_EVENTS_CLUSTER<br/>USERLOG_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|

@@ -14,6 +14,11 @@ ifeval::[{show-deprecation} == true]
 | Removal Version
 | Deprecation Replacment
 
+| REVA_GATEWAY changing name for consistency
+| 3.0
+| 3.1
+| OCIS_REVA_GATEWAY
+
 | USERLOG_STORE_ADDRESSES name needs to be harmonized
 | 3.0
 | 3.1
@@ -212,8 +217,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Machine auth API key used to validate internal requests necessary to access resources from other services.
 
-a|`REVA_GATEWAY` +
-
+a|`OCIS_REVA_GATEWAY` +
+`REVA_GATEWAY` +
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

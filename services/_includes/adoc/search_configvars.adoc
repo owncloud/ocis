@@ -1,6 +1,6 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
@@ -13,6 +13,16 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacment
+
+| REVA_GATEWAY changing name for consistency
+| 3.0
+| 3.1
+| OCIS_REVA_GATEWAY
+
+| STORAGE_USERS_OCIS_ASYNC_UPLOADS changing name for consistency
+| 3.0
+| 3.1
+| OCIS_ASYNC_UPLOADS
 |===
 
 endif::[]
@@ -151,8 +161,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The bind address of the GRPC service.
 
-a|`REVA_GATEWAY` +
-
+a|`OCIS_REVA_GATEWAY` +
+`REVA_GATEWAY` +
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -198,9 +209,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
 
-a|`STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
+a|`OCIS_ASYNC_UPLOADS` +
+`STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
 `SEARCH_EVENTS_ASYNC_UPLOADS` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]

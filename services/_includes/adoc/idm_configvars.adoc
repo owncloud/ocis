@@ -1,6 +1,6 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
@@ -13,6 +13,11 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacment
+
+| ACCOUNTS_DEMO_USERS_AND_GROUPS changing name for consistency
+| 3.0
+| 3.1
+| OCIS_ACCOUNTS_DEMO_USERS_AND_GROUPS
 |===
 
 endif::[]
@@ -179,8 +184,9 @@ a| [subs=-attributes]
 Full path to the IDM backend database. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
 
 a|`IDM_CREATE_DEMO_USERS` +
+`OCIS_ACCOUNTS_DEMO_USERS_AND_GROUPS` +
 `ACCOUNTS_DEMO_USERS_AND_GROUPS` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]

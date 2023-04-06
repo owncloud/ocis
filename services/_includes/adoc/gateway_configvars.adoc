@@ -1,6 +1,6 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
@@ -13,6 +13,16 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacment
+
+| REVA_GATEWAY changing name for consistency
+| 3.0
+| 3.1
+| OCIS_REVA_GATEWAY
+
+| STORAGE_TRANSFER_SECRET changing name for consistency
+| 3.0
+| 3.1
+| OCIS_TRANSFER_SECRET
 |===
 
 endif::[]
@@ -170,8 +180,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
 
-a|`REVA_GATEWAY` +
-
+a|`OCIS_REVA_GATEWAY` +
+`REVA_GATEWAY` +
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -233,8 +244,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Disable creation of the home space on login.
 
-a|`STORAGE_TRANSFER_SECRET` +
-
+a|`OCIS_TRANSFER_SECRET` +
+`STORAGE_TRANSFER_SECRET` +
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

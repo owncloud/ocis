@@ -1,6 +1,6 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
@@ -13,6 +13,21 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacment
+
+| REVA_GATEWAY changing name for consistency
+| 3.0
+| 3.1
+| OCIS_REVA_GATEWAY
+
+| STORAGE_USERS_OCIS_ASYNC_UPLOADS changing name for consistency
+| 3.0
+| 3.1
+| OCIS_ASYNC_UPLOADS
+
+| STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT changing name for consistency
+| 3.0
+| 3.1
+| STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE
 |===
 
 endif::[]
@@ -188,8 +203,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
 
-a|`REVA_GATEWAY` +
-
+a|`OCIS_REVA_GATEWAY` +
+`REVA_GATEWAY` +
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -324,8 +340,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Maximum number of concurrent go-routines. Higher values can potentially get work done faster but will also cause more load on the system. Values of 0 or below will be ignored and the default value of 100 will be used.
 
-a|`STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
-
+a|`OCIS_ASYNC_UPLOADS` +
+`STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -626,8 +643,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Whether to verify the server TLS certificates.
 
-a|`STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT` +
-
+a|`STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+`STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT` +
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

@@ -1,6 +1,6 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
@@ -13,6 +13,16 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacment
+
+| REVA_GATEWAY changing name for consistency
+| 3.0
+| 3.1
+| OCIS_REVA_GATEWAY
+
+| SHARING_EVENTS_TLS_ROOT_CA_CERT changing name for consistency
+| 3.0
+| 3.1
+| SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE
 |===
 
 endif::[]
@@ -170,8 +180,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
 
-a|`REVA_GATEWAY` +
-
+a|`OCIS_REVA_GATEWAY` +
+`REVA_GATEWAY` +
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -227,8 +238,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Whether to verify the server TLS certificates.
 
-a|`SHARING_EVENTS_TLS_ROOT_CA_CERT` +
-
+a|`SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
+`SHARING_EVENTS_TLS_ROOT_CA_CERT` +
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

@@ -24,7 +24,7 @@
 | THUMBNAILS_FILESYSTEMSTORAGE_ROOT | string | ~/.ocis/thumbnails | The directory where the filesystem storage will store the thumbnails. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/thumbnails.|
 | OCIS_INSECURE<br/>THUMBNAILS_WEBDAVSOURCE_INSECURE | bool | false | Ignore untrusted SSL certificates when connecting to the webdav source.|
 | OCIS_INSECURE<br/>THUMBNAILS_CS3SOURCE_INSECURE | bool | false | Ignore untrusted SSL certificates when connecting to the CS3 source.|
-| REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to look up user metadata|
+| OCIS_REVA_GATEWAY<br/>REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to look up user metadata|
 | THUMBNAILS_TXT_FONTMAP_FILE | string |  | The path to a font file for txt thumbnails.|
 | THUMBNAILS_TRANSFER_TOKEN | string |  | The secret to sign JWT to download the actual thumbnail file.|
 | THUMBNAILS_DATA_ENDPOINT | string | http://127.0.0.1:9186/thumbnails/data | The HTTP endpoint where the actual thumbnail file can be downloaded.|

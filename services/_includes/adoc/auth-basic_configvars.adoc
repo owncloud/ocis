@@ -1,6 +1,6 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
@@ -13,6 +13,141 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacment
+
+| REVA_GATEWAY changing name for consistency
+| 3.0
+| 3.1
+| OCIS_REVA_GATEWAY
+
+| LDAP_URI changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_URI
+
+| LDAP_CACERT changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_CACERT
+
+| LDAP_INSECURE changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_INSECURE
+
+| LDAP_BIND_DN changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_BIND_DN
+
+| LDAP_USER_BASE_DN changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_USER_BASE_DN
+
+| LDAP_GROUP_BASE_DN changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_GROUP_BASE_DN
+
+| LDAP_USER_SCOPE changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_USER_SCOPE
+
+| LDAP_GROUP_SCOPE changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_GROUP_SCOPE
+
+| LDAP_USER_FILTER changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_USER_FILTER
+
+| LDAP_GROUP_FILTER changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_GROUP_FILTER
+
+| LDAP_USER_OBJECTCLASS changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_USER_OBJECTCLASS
+
+| LDAP_GROUP_OBJECTCLASS changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_GROUP_OBJECTCLASS
+
+| LDAP_DISABLE_USER_MECHANISM changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_DISABLE_USER_MECHANISM
+
+| LDAP_DISABLED_USERS_GROUP_DN changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_DISABLED_USERS_GROUP_DN
+
+| LDAP_USER_SCHEMA_ID changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_USER_SCHEMA_ID
+
+| LDAP_USER_SCHEMA_ID_IS_OCTETSTRING changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING
+
+| LDAP_USER_SCHEMA_MAIL changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_USER_SCHEMA_MAIL
+
+| LDAP_USER_SCHEMA_DISPLAYNAME changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_USER_SCHEMA_DISPLAYNAME
+
+| LDAP_USER_SCHEMA_USERNAME changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_USER_SCHEMA_USERNAME
+
+| LDAP_USER_ENABLED_ATTRIBUTE changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_USER_ENABLED_ATTRIBUTE
+
+| LDAP_GROUP_SCHEMA_ID changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_GROUP_SCHEMA_ID
+
+| LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING
+
+| LDAP_GROUP_SCHEMA_MAIL changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_GROUP_SCHEMA_MAIL
+
+| LDAP_GROUP_SCHEMA_DISPLAYNAME changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME
+
+| LDAP_GROUP_SCHEMA_GROUPNAME changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_GROUP_SCHEMA_GROUPNAME
+
+| LDAP_GROUP_SCHEMA_MEMBER changing name for consistency
+| 3.0
+| 3.1
+| OCIS_LDAP_GROUP_SCHEMA_MEMBER
 |===
 
 endif::[]
@@ -170,8 +305,9 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The secret to mint and validate jwt tokens.
 
-a|`REVA_GATEWAY` +
-
+a|`OCIS_REVA_GATEWAY` +
+`REVA_GATEWAY` +
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -215,9 +351,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The authentication manager to check if credentials are valid. Supported value is 'ldap'.
 
-a|`LDAP_URI` +
+a|`OCIS_LDAP_URI` +
+`LDAP_URI` +
 `AUTH_BASIC_LDAP_URI` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -225,9 +362,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
 
-a|`LDAP_CACERT` +
+a|`OCIS_LDAP_CACERT` +
+`LDAP_CACERT` +
 `AUTH_BASIC_LDAP_CACERT` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -235,9 +373,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
 
-a|`LDAP_INSECURE` +
+a|`OCIS_LDAP_INSECURE` +
+`LDAP_INSECURE` +
 `AUTH_BASIC_LDAP_INSECURE` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -245,9 +384,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Disable TLS certificate validation for the LDAP connections. Do not set this in production environments.
 
-a|`LDAP_BIND_DN` +
+a|`OCIS_LDAP_BIND_DN` +
+`LDAP_BIND_DN` +
 `AUTH_BASIC_LDAP_BIND_DN` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -265,9 +405,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Password to use for authenticating the 'bind_dn'.
 
-a|`LDAP_USER_BASE_DN` +
+a|`OCIS_LDAP_USER_BASE_DN` +
+`LDAP_USER_BASE_DN` +
 `AUTH_BASIC_LDAP_USER_BASE_DN` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -275,9 +416,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Search base DN for looking up LDAP users.
 
-a|`LDAP_GROUP_BASE_DN` +
+a|`OCIS_LDAP_GROUP_BASE_DN` +
+`LDAP_GROUP_BASE_DN` +
 `AUTH_BASIC_LDAP_GROUP_BASE_DN` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -285,9 +427,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Search base DN for looking up LDAP groups.
 
-a|`LDAP_USER_SCOPE` +
+a|`OCIS_LDAP_USER_SCOPE` +
+`LDAP_USER_SCOPE` +
 `AUTH_BASIC_LDAP_USER_SCOPE` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -295,9 +438,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
 
-a|`LDAP_GROUP_SCOPE` +
+a|`OCIS_LDAP_GROUP_SCOPE` +
+`LDAP_GROUP_SCOPE` +
 `AUTH_BASIC_LDAP_GROUP_SCOPE` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -305,9 +449,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP search scope to use when looking up groups. Supported values are 'base', 'one' and 'sub'.
 
-a|`LDAP_USER_FILTER` +
+a|`OCIS_LDAP_USER_FILTER` +
+`LDAP_USER_FILTER` +
 `AUTH_BASIC_LDAP_USER_FILTER` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -315,9 +460,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.
 
-a|`LDAP_GROUP_FILTER` +
+a|`OCIS_LDAP_GROUP_FILTER` +
+`LDAP_GROUP_FILTER` +
 `AUTH_BASIC_LDAP_GROUP_FILTER` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -325,9 +471,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP filter to add to the default filters for group searches.
 
-a|`LDAP_USER_OBJECTCLASS` +
+a|`OCIS_LDAP_USER_OBJECTCLASS` +
+`LDAP_USER_OBJECTCLASS` +
 `AUTH_BASIC_LDAP_USER_OBJECTCLASS` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -335,15 +482,16 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The object class to use for users in the default user search filter ('inetOrgPerson').
 
-a|`LDAP_GROUP_OBJECTCLASS` +
+a|`OCIS_LDAP_GROUP_OBJECTCLASS` +
+`LDAP_GROUP_OBJECTCLASS` +
 `AUTH_BASIC_LDAP_GROUP_OBJECTCLASS` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++groupOfNames ++
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter ('groupOfNames'). 
+The object class to use for groups in the default group search filter ('groupOfNames').
 
 a|`LDAP_LOGIN_ATTRIBUTES` +
 `AUTH_BASIC_LDAP_LOGIN_ATTRIBUTES` +
@@ -366,9 +514,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
-a|`LDAP_DISABLE_USER_MECHANISM` +
+a|`OCIS_LDAP_DISABLE_USER_MECHANISM` +
+`LDAP_DISABLE_USER_MECHANISM` +
 `AUTH_BASIC_DISABLE_USER_MECHANISM` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -376,9 +525,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.
 
-a|`LDAP_DISABLED_USERS_GROUP_DN` +
+a|`OCIS_LDAP_DISABLED_USERS_GROUP_DN` +
+`LDAP_DISABLED_USERS_GROUP_DN` +
 `AUTH_BASIC_DISABLED_USERS_GROUP_DN` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -386,9 +536,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The distinguished name of the group to which added users will be classified as disabled when 'disable_user_mechanism' is set to 'group'.
 
-a|`LDAP_USER_SCHEMA_ID` +
+a|`OCIS_LDAP_USER_SCHEMA_ID` +
+`LDAP_USER_SCHEMA_ID` +
 `AUTH_BASIC_LDAP_USER_SCHEMA_ID` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -396,9 +547,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP Attribute to use as the unique id for users. This should be a stable globally unique ID like a UUID.
 
-a|`LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
+a|`OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
+`LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
 `AUTH_BASIC_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -406,9 +558,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.
 
-a|`LDAP_USER_SCHEMA_MAIL` +
+a|`OCIS_LDAP_USER_SCHEMA_MAIL` +
+`LDAP_USER_SCHEMA_MAIL` +
 `AUTH_BASIC_LDAP_USER_SCHEMA_MAIL` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -416,9 +569,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP Attribute to use for the email address of users.
 
-a|`LDAP_USER_SCHEMA_DISPLAYNAME` +
+a|`OCIS_LDAP_USER_SCHEMA_DISPLAYNAME` +
+`LDAP_USER_SCHEMA_DISPLAYNAME` +
 `AUTH_BASIC_LDAP_USER_SCHEMA_DISPLAYNAME` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -426,9 +580,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP Attribute to use for the displayname of users.
 
-a|`LDAP_USER_SCHEMA_USERNAME` +
+a|`OCIS_LDAP_USER_SCHEMA_USERNAME` +
+`LDAP_USER_SCHEMA_USERNAME` +
 `AUTH_BASIC_LDAP_USER_SCHEMA_USERNAME` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -436,9 +591,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP Attribute to use for username of users.
 
-a|`LDAP_USER_ENABLED_ATTRIBUTE` +
+a|`OCIS_LDAP_USER_ENABLED_ATTRIBUTE` +
+`LDAP_USER_ENABLED_ATTRIBUTE` +
 `AUTH_BASIC_LDAP_USER_ENABLED_ATTRIBUTE` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -446,9 +602,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP attribute to use as a flag telling if the user is enabled or disabled.
 
-a|`LDAP_GROUP_SCHEMA_ID` +
+a|`OCIS_LDAP_GROUP_SCHEMA_ID` +
+`LDAP_GROUP_SCHEMA_ID` +
 `AUTH_BASIC_LDAP_GROUP_SCHEMA_ID` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -456,9 +613,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
 
-a|`LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
+a|`OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
+`LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
 `AUTH_BASIC_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -466,9 +624,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs.
 
-a|`LDAP_GROUP_SCHEMA_MAIL` +
+a|`OCIS_LDAP_GROUP_SCHEMA_MAIL` +
+`LDAP_GROUP_SCHEMA_MAIL` +
 `AUTH_BASIC_LDAP_GROUP_SCHEMA_MAIL` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -476,9 +635,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP Attribute to use for the email address of groups (can be empty).
 
-a|`LDAP_GROUP_SCHEMA_DISPLAYNAME` +
+a|`OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME` +
+`LDAP_GROUP_SCHEMA_DISPLAYNAME` +
 `AUTH_BASIC_LDAP_GROUP_SCHEMA_DISPLAYNAME` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -486,9 +646,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP Attribute to use for the displayname of groups (often the same as groupname attribute).
 
-a|`LDAP_GROUP_SCHEMA_GROUPNAME` +
+a|`OCIS_LDAP_GROUP_SCHEMA_GROUPNAME` +
+`LDAP_GROUP_SCHEMA_GROUPNAME` +
 `AUTH_BASIC_LDAP_GROUP_SCHEMA_GROUPNAME` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -496,9 +657,10 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 LDAP Attribute to use for the name of groups.
 
-a|`LDAP_GROUP_SCHEMA_MEMBER` +
+a|`OCIS_LDAP_GROUP_SCHEMA_MEMBER` +
+`LDAP_GROUP_SCHEMA_MEMBER` +
 `AUTH_BASIC_LDAP_GROUP_SCHEMA_MEMBER` +
-
+xref:deprecation-note[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
