@@ -625,10 +625,39 @@ Feature: Change data of space
     Then the HTTP status code should be "200"
     When user "Brian" uploads a file inside space "Brian Murphy" with content "file is more than 15 bytes" to "file.txt" using the WebDAV API
     Then the HTTP status code should be <code>
-    Then the user "Brian" should have a space called "Brian Murphy" with these key and value pairs:
-      | key           | value   |
-      | quota@@@total | <total> |
-      | quota@@@used  | <used>  |
+    And for user "Brian" the JSON response should contain space called "Brian Murphy" and match
+    """
+     {
+      "type": "object",
+      "required": [
+        "name",
+        "quota"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": ["Brian Murphy"]
+        },
+        "quota": {
+          "type": "object",
+          "required": [
+            "used",
+            "total"
+          ],
+          "properties": {
+            "used" : {
+              "type": "number",
+              "enum": [<used>]
+            },
+            "total" : {
+              "type": "number",
+              "enum": [<total>]
+            }
+          }
+        }
+      }
+    }
+    """
     Examples:
       | quotaValue | code                    | total | used |
       | 15         | "507"                   | 15    | 0    |
