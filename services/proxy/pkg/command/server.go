@@ -8,9 +8,13 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
+	ocisLogoutVerifier "github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
+	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/render"
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
@@ -39,6 +43,22 @@ import (
 	"golang.org/x/oauth2"
 )
 
+type LogoutHandler struct {
+	cache  microstore.Store
+	logger log.Logger
+	config config.Config
+}
+
+type LogoutToken struct {
+	iss    string              `json:iss`    // example "https://server.example.com"
+	sub    int64               `json:sub`    //"248289761001"
+	aud    string              `json:aud`    // "s6BhdRkqt3"
+	iat    int64               `json:iat`    // 1471566154
+	jti    string              `json:jti`    // "bWJq"
+	sid    string              `json:sid`    // "08a5019c-17e1-4977-8f42-65a12843ea02"
+	events map[string][]string `json:events` // {"http://schemas.openid.net/event/backchannel-logout": {}}
+}
+
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
@@ -49,6 +69,15 @@ func Server(cfg *config.Config) *cli.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
+			cache := store.Create(
+				store.Store(cfg.OIDC.UserinfoCache.Store),
+				store.TTL(cfg.OIDC.UserinfoCache.TTL),
+				store.Size(cfg.OIDC.UserinfoCache.Size),
+				microstore.Nodes(cfg.OIDC.UserinfoCache.Nodes...),
+				microstore.Database(cfg.OIDC.UserinfoCache.Database),
+				microstore.Table(cfg.OIDC.UserinfoCache.Table),
+			)
+
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 			err := tracing.Configure(cfg)
 			if err != nil {
@@ -84,13 +113,14 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
+				middlewares := loadMiddlewares(ctx, logger, cfg, cache)
 				server, err := proxyHTTP.Server(
-					proxyHTTP.Handler(rp),
+					proxyHTTP.Handler(handlePredefinedRoutes(cfg, logger, rp, cache, middlewares)),
 					proxyHTTP.Logger(logger),
 					proxyHTTP.Context(ctx),
 					proxyHTTP.Config(cfg),
 					proxyHTTP.Metrics(metrics.New()),
-					proxyHTTP.Middlewares(loadMiddlewares(ctx, logger, cfg)),
+					proxyHTTP.Middlewares(middlewares),
 				)
 
 				if err != nil {
@@ -137,7 +167,50 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config) alice.Chain {
+func handlePredefinedRoutes(cfg *config.Config, logger log.Logger, handler http.Handler, cache microstore.Store, middlewares alice.Chain) http.Handler {
+	m := chi.NewMux()
+	var methods = []string{"PROPFIND", "DELETE", "PROPPATCH", "MKCOL", "COPY", "MOVE", "LOCK", "UNLOCK"}
+	for _, k := range methods {
+		chi.RegisterMethod(k)
+	}
+
+	p := LogoutHandler{
+		cache:  cache,
+		logger: logger,
+		config: *cfg,
+	}
+
+	m.Route(cfg.HTTP.Root, func(r chi.Router) {
+		// Wrapper for backchannel logout
+		// TODO: remove the GET for the backchannel_logout
+		r.Get("/backchannel_logout", p.backchannelLogout)
+		r.Post("/backchannel_logout", p.backchannelLogout)
+		// TODO: migrate oidc well knowns here in a second wrapper
+		r.HandleFunc("/*", handler.ServeHTTP)
+	})
+	return m
+}
+
+func (p *LogoutHandler) backchannelLogout(w http.ResponseWriter, r *http.Request) {
+	var oidcHTTPClient = &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				MinVersion:         tls.VersionTLS12,
+				InsecureSkipVerify: p.config.OIDC.Insecure, //nolint:gosec
+			},
+			DisableKeepAlives: true,
+		},
+		Timeout: time.Second * 10,
+	}
+	prov, _ := oidc.NewProvider(
+		context.WithValue(context.Background(), oauth2.HTTPClient, oidcHTTPClient),
+		p.config.OIDC.Issuer,
+	)
+	logoutVerifier := ocisLogoutVerifier.NewLogoutVerifier(p.config.OIDC)
+	render.Status(r, http.StatusOK)
+}
+
+func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, cache microstore.Store) alice.Chain {
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
 	revaClient, err := pool.GetGatewayServiceClient(cfg.Reva.Address, cfg.Reva.GetRevaOptions()...)
 	if err != nil {
@@ -211,15 +284,6 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			UserProvider: userProvider,
 		})
 	}
-
-	cache := store.Create(
-		store.Store(cfg.OIDC.UserinfoCache.Store),
-		store.TTL(cfg.OIDC.UserinfoCache.TTL),
-		store.Size(cfg.OIDC.UserinfoCache.Size),
-		microstore.Nodes(cfg.OIDC.UserinfoCache.Nodes...),
-		microstore.Database(cfg.OIDC.UserinfoCache.Database),
-		microstore.Table(cfg.OIDC.UserinfoCache.Table),
-	)
 
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
 		middleware.Logger(logger),
