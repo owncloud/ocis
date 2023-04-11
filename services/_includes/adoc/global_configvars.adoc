@@ -109,10 +109,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++none ++
+++attribute ++
 
 a| [subs=-attributes]
-An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.
+An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'.
 
 a| `LDAP_GROUP_BASE_DN`
 
@@ -349,7 +349,7 @@ a| [subs=-attributes]
 ++ownCloudUserEnabled ++
 
 a| [subs=-attributes]
-LDAP attribute to use as a flag telling if the user is enabled or disabled.
+LDAP Attribute to use as a flag telling if the user is enabled or disabled.
 
 a| `LDAP_USER_FILTER`
 
@@ -520,7 +520,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the user who collects all necessary information for deletion.
+ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
 
 a| `OCIS_ASYNC_UPLOADS`
 
@@ -554,7 +554,7 @@ a| [subs=-attributes]
 ++memory ++
 
 a| [subs=-attributes]
-The type of the userinfo cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', 'etcd' and 'noop'. See the text description for details.
 
 a| `OCIS_CACHE_STORE_ADDRESS`
 
@@ -586,7 +586,7 @@ a| [subs=-attributes]
 ++[] ++
 
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+A comma-separated list of nodes to connect to. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
 
 a| `OCIS_CACHE_STORE_NODES`
 
@@ -605,7 +605,7 @@ a| [subs=-attributes]
 ++[] ++
 
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+A comma separated list of nodes to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
 
 a| `OCIS_CACHE_STORE_SIZE`
 
@@ -621,7 +621,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
+The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
 a| `OCIS_CACHE_STORE_TTL`
 
@@ -634,13 +634,13 @@ a| [subs=attributes+]
 * xref:{s-path}/proxy.adoc[proxy] +
 
 a| [subs=-attributes]
-++Duration ++
+++int ++
 
 a| [subs=-attributes]
-++10s ++
+++300 ++
 
 a| [subs=-attributes]
-Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
+Max TTL in seconds for the gateway's stat cache.
 
 a| `OCIS_CACHE_STORE_TYPE`
 
@@ -658,7 +658,7 @@ a| [subs=-attributes]
 ++memory ++
 
 a| [subs=-attributes]
-The type of the userinfo cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', 'etcd' and 'noop'. See the text description for details.
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -1100,10 +1100,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++none ++
+++attribute ++
 
 a| [subs=-attributes]
-An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.
+An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'.
 
 a| `OCIS_LDAP_GROUP_BASE_DN`
 
@@ -1340,7 +1340,7 @@ a| [subs=-attributes]
 ++ownCloudUserEnabled ++
 
 a| [subs=-attributes]
-LDAP attribute to use as a flag telling if the user is enabled or disabled.
+LDAP Attribute to use as a flag telling if the user is enabled or disabled.
 
 a| `OCIS_LDAP_USER_FILTER`
 
@@ -1802,7 +1802,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-CS3 gateway used to look up user metadata
+The CS3 gateway endpoint.
 
 a| `OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD`
 
@@ -1817,7 +1817,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.
+Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.
 
 a| `OCIS_SPACES_MAX_QUOTA`
 
@@ -1870,7 +1870,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
+ID of the oCIS storage-system system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.
 
 a| `OCIS_SYSTEM_USER_IDP`
 
@@ -2095,10 +2095,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++https://127.0.0.1:9200 ++
+++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL, where oCIS is reachable for users.
+The identity provider value to set in the group IDs of the CS3 group objects for groups returned by this group provider.
 
 a| `REVA_GATEWAY`
 
@@ -2135,7 +2135,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9142 ++
 
 a| [subs=-attributes]
-CS3 gateway used to look up user metadata
+The CS3 gateway endpoint.
 
 a| `STORAGE_TRANSFER_SECRET`
 
