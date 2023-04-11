@@ -33,6 +33,22 @@ type Asset struct {
 	Path string `yaml:"path" env:"WEB_ASSET_PATH" desc:"Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets."`
 }
 
+// CustomStyle references additional css to be loaded into ownCloud Web.
+type CustomStyle struct {
+	Href string `json:"href" yaml:"href"`
+}
+
+// CustomScript references an additional script to be loaded into ownCloud Web.
+type CustomScript struct {
+	Src   string `json:"src" yaml:"src"`
+	Async bool   `json:"async,omitempty" yaml:"async"`
+}
+
+// CustomTranslation references a json file for overwriting translations in ownCloud Web.
+type CustomTranslation struct {
+	Url string `json:"url" yaml:"url"`
+}
+
 // WebConfig defines the available web configuration for a dynamically rendered config.json.
 type WebConfig struct {
 	Server        string                 `json:"server,omitempty" yaml:"server" env:"OCIS_URL;WEB_UI_CONFIG_SERVER" desc:"URL, where the oCIS APIs are reachable for ownCloud Web."`
@@ -42,6 +58,9 @@ type WebConfig struct {
 	Applications  []Application          `json:"applications,omitempty" yaml:"applications"`
 	ExternalApps  []ExternalApp          `json:"external_apps,omitempty" yaml:"external_apps"`
 	Options       map[string]interface{} `json:"options,omitempty" yaml:"options"`
+	Styles        []CustomStyle          `json:"styles,omitempty" yaml:"styles"`
+	Scripts       []CustomScript         `json:"scripts,omitempty" yaml:"scripts"`
+	Translations  []CustomTranslation    `json:"customTranslations,omitempty" yaml:"custom_translations"`
 }
 
 // OIDC defines the available oidc configuration
