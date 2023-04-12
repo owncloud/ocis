@@ -1,4 +1,4 @@
-# Auth-Basic Service
+# Auth-Basic
 
 The oCIS Auth Basic service provides basic authentication for those clients who cannot handle OpenID Connect. This should only be enabled for tests and development.
 

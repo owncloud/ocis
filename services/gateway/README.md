@@ -1,4 +1,4 @@
-# Gateway Service
+# Gateway
 
 The gateway service is an ...
 

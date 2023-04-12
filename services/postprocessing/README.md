@@ -1,4 +1,4 @@
-# Postprocessing Service
+# Postprocessing
 
 The `postprocessing` service handles the coordination of asynchronous postprocessing steps. 
 

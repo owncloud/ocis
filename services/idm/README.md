@@ -1,4 +1,4 @@
-# Idm
+# IDM
 
 The IDM service provides a minimal LDAP Service, based on [Libregraph idm](https://github.com/libregraph/idm), for oCIS. It is started as part of the default configuration and serves as a central place for storing user and group information.
 

@@ -1,4 +1,4 @@
-# OCS Service
+# OCS
 
 The ocs service is an ...
 

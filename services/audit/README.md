@@ -1,4 +1,4 @@
-# Audit service
+# Audit
 
 The audit service logs all events of the system as an audit log. Per default, it will be logged to standard out, but can also be configured to a file output. Supported log formats are json or a minimal human-readable format.
 

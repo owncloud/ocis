@@ -1,4 +1,4 @@
-# IDP Service
+# IDP
 
 This service provides a builtin minimal OpenID Connect provider based on
 [LibreGraph Connect (lico)](https://github.com/libregraph/lico) for oCIS.

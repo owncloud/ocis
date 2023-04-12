@@ -1,4 +1,4 @@
-# Nats Service
+# Nats
 
 The nats service is the event broker of the system. It distributes events among all other services and enables other services to communicate asynchronous.
 

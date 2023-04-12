@@ -1,4 +1,4 @@
-# Storage-Users Service
+# Storage-Users
 
 Purpose and description to be added
 

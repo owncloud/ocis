@@ -1,4 +1,4 @@
-# Antivirus Service
+# Antivirus
 
 The `antivirus` service is responsible for scanning files for viruses.
 

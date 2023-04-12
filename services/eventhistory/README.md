@@ -1,4 +1,4 @@
-# Eventhistory Service
+# Eventhistory
 
 The `eventhistory` consumes all events from the configured event system like NATS, stores them and allows other services to retrieve them via an eventid.
 
