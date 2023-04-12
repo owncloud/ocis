@@ -1,6 +1,7 @@
 package oidc
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -18,12 +19,14 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"golang.org/x/oauth2"
+	"gopkg.in/square/go-jose.v2"
 )
 
 // OIDCProvider used to mock the oidc provider during tests
 type OIDCProvider interface {
 	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*UserInfo, error)
 	VerifyAccessToken(ctx context.Context, token string) (jwt.RegisteredClaims, []string, error)
+	VerifyLogoutToken(ctx context.Context, token string) (*LogoutToken, error)
 }
 
 // KeySet is a set of publc JSON Web Keys that can be used to validate the signature
@@ -279,13 +282,95 @@ func (c *oidcClient) VerifyAccessToken(ctx context.Context, token string) (jwt.R
 	}
 }
 
+func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawIDToken string) (*LogoutToken, error) {
+	jws, err := jose.ParseSigned(rawIDToken)
+	if err != nil {
+		return nil, err
+	}
+	// Throw out tokens with invalid claims before trying to verify the token. This lets
+	// us do cheap checks before possibly re-syncing keys.
+	payload, err := parseJWT(rawIDToken)
+	if err != nil {
+		return nil, fmt.Errorf("oidc: malformed jwt: %v", err)
+	}
+	var token LogoutToken
+	if err := json.Unmarshal(payload, &token); err != nil {
+		return nil, fmt.Errorf("oidc: failed to unmarshal claims: %v", err)
+	}
+
+	//4. Verify that the Logout Token contains a sub Claim, a sid Claim, or both.
+	if token.Subject == "" && token.SessionId == "" {
+		return nil, fmt.Errorf("oidc: logout token must contain either sub or sid and MAY contain both")
+	}
+	//5. Verify that the Logout Token contains an events Claim whose value is JSON object containing the member name http://schemas.openid.net/event/backchannel-logout.
+	if token.Events.Event == nil {
+		return nil, fmt.Errorf("oidc: logout token must contain logout event")
+	}
+	//6. Verify that the Logout Token does not contain a nonce Claim.
+	type nonce struct {
+		Nonce *string `json:"nonce"`
+	}
+	var n nonce
+	json.Unmarshal(payload, &n)
+	if n.Nonce != nil {
+		return nil, fmt.Errorf("oidc: nonce on logout token MUST NOT be present")
+	}
+	// Check issuer.
+	if !v.config.SkipIssuerCheck && token.Issuer != v.issuer {
+		return nil, fmt.Errorf("oidc: id token issued by a different provider, expected %q got %q", v.issuer, token.Issuer)
+	}
+
+	// If a client ID has been provided, make sure it's part of the audience. SkipClientIDCheck must be true if ClientID is empty.
+	//
+	// This check DOES NOT ensure that the ClientID is the party to which the ID Token was issued (i.e. Authorized party).
+	if !v.config.SkipClientIDCheck {
+		if v.config.ClientID != "" {
+			if !contains(token.Audience, v.config.ClientID) {
+				return nil, fmt.Errorf("oidc: expected audience %q got %q", v.config.ClientID, token.Audience)
+			}
+		} else {
+			return nil, fmt.Errorf("oidc: invalid configuration, clientID must be provided or SkipClientIDCheck must be set")
+		}
+	}
+
+	switch len(jws.Signatures) {
+	case 0:
+		return nil, fmt.Errorf("oidc: id token not signed")
+	case 1:
+	default:
+		return nil, fmt.Errorf("oidc: multiple signatures on id token not supported")
+	}
+
+	sig := jws.Signatures[0]
+	supportedSigAlgs := v.config.SupportedSigningAlgs
+	if len(supportedSigAlgs) == 0 {
+		supportedSigAlgs = []string{gOidc.RS256}
+	}
+
+	if !contains(supportedSigAlgs, sig.Header.Algorithm) {
+		return nil, fmt.Errorf("oidc: id token signed with unsupported algorithm, expected %q got %q", supportedSigAlgs, sig.Header.Algorithm)
+	}
+
+	gotPayload, err := v.keySet.VerifySignature(ctx, rawIDToken)
+	if err != nil {
+		return nil, fmt.Errorf("failed to verify signature: %v", err)
+	}
+
+	// Ensure that the payload returned by the square actually matches the payload parsed earlier.
+	if !bytes.Equal(gotPayload, payload) {
+		return nil, errors.New("oidc: internal error, payload parsed did not match previous payload")
+	}
+
+	return &token, nil
+}
+
 // verifyAccessTokenJWT tries to parse and verify the access token as a JWT.
 func (c *oidcClient) verifyAccessTokenJWT(token string) (jwt.RegisteredClaims, []string, error) {
 	var claims jwt.RegisteredClaims
 	var mapClaims []string
 	jwks := c.getKeyfunc()
 	if jwks == nil {
-		return claims, mapClaims, errors.New("Error initializing jwks keyfunc")
+		return claims, mapClaims, errors.New("error initializing jwks keyfunc")
 	}
 
 	_, err := jwt.ParseWithClaims(token, &claims, jwks.Keyfunc)

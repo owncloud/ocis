@@ -11,96 +11,10 @@ import (
 
 	"gopkg.in/square/go-jose.v2"
 
-	"time"
-
 	gOidc "github.com/coreos/go-oidc/v3/oidc"
 )
 
 // This adds the ability to verify Logout Tokens as specified in https://openid.net/specs/openid-connect-backchannel-1_0.html
-
-type logoutEvent struct {
-	Event *struct{} `json:"http://schemas.openid.net/event/backchannel-logout"`
-}
-
-type audience []string
-
-func (a *audience) UnmarshalJSON(b []byte) error {
-	var s string
-	if json.Unmarshal(b, &s) == nil {
-		*a = audience{s}
-		return nil
-	}
-	var auds []string
-	if err := json.Unmarshal(b, &auds); err != nil {
-		return err
-	}
-	*a = auds
-	return nil
-}
-
-type jsonTime time.Time
-
-func (j *jsonTime) UnmarshalJSON(b []byte) error {
-	var n json.Number
-	if err := json.Unmarshal(b, &n); err != nil {
-		return err
-	}
-	var unix int64
-
-	if t, err := n.Int64(); err == nil {
-		unix = t
-	} else {
-		f, err := n.Float64()
-		if err != nil {
-			return err
-		}
-		unix = int64(f)
-	}
-	*j = jsonTime(time.Unix(unix, 0))
-	return nil
-}
-
-// logoutToken
-type logoutToken struct {
-	Issuer   string      `json:"iss"`
-	Subject  string      `json:"sub"`
-	Audience audience    `json:"aud"`
-	IssuedAt jsonTime    `json:"iat"`
-	JwtID    string      `json:"jti"`
-	Events   logoutEvent `json:"events"`
-	Sid      string      `json:"sid"`
-}
-
-// Logout Token
-type LogoutToken struct {
-	// The URL of the server which issued this token. OpenID Connect
-	// requires this value always be identical to the URL used for
-	// initial discovery.
-	//
-	// Note: Because of a known issue with Google Accounts' implementation
-	// this value may differ when using Google.
-	//
-	// See: https://developers.google.com/identity/protocols/OpenIDConnect#obtainuserinfo
-	Issuer string
-
-	// A unique string which identifies the end user.
-	Subject string
-
-	// The client ID, or set of client IDs, that this token is issued for. For
-	// common uses, this is the client that initialized the auth flow.
-	//
-	// This package ensures the audience contains an expected value.
-	Audience []string
-
-	// When the token was issued by the provider.
-	IssuedAt time.Time
-
-	// The Session Id
-	SessionId string
-
-	// Jwt Id
-	JwtID string
-}
 
 // LogoutTokenVerifier provides verification for Logout Tokens.
 type LogoutTokenVerifier struct {
@@ -136,13 +50,13 @@ func (v *LogoutTokenVerifier) Verify(ctx context.Context, rawIDToken string) (*L
 	if err != nil {
 		return nil, fmt.Errorf("oidc: malformed jwt: %v", err)
 	}
-	var token logoutToken
+	var token LogoutToken
 	if err := json.Unmarshal(payload, &token); err != nil {
 		return nil, fmt.Errorf("oidc: failed to unmarshal claims: %v", err)
 	}
 
 	//4. Verify that the Logout Token contains a sub Claim, a sid Claim, or both.
-	if token.Subject == "" && token.Sid == "" {
+	if token.Subject == "" && token.SessionId == "" {
 		return nil, fmt.Errorf("oidc: logout token must contain either sub or sid and MAY contain both")
 	}
 	//5. Verify that the Logout Token contains an events Claim whose value is JSON object containing the member name http://schemas.openid.net/event/backchannel-logout.
@@ -204,16 +118,7 @@ func (v *LogoutTokenVerifier) Verify(ctx context.Context, rawIDToken string) (*L
 		return nil, errors.New("oidc: internal error, payload parsed did not match previous payload")
 	}
 
-	t := &LogoutToken{
-		Issuer:    token.Issuer,
-		Subject:   token.Subject,
-		Audience:  token.Audience,
-		IssuedAt:  time.Time(token.IssuedAt),
-		SessionId: token.Sid,
-		JwtID:     token.JwtID,
-	}
-
-	return t, nil
+	return &token, nil
 }
 
 func parseJWT(p string) ([]byte, error) {

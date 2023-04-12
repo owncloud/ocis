@@ -3,7 +3,9 @@ package command
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -40,20 +42,14 @@ import (
 	microstore "go-micro.dev/v4/store"
 )
 
-type LogoutHandler struct {
-	cache  microstore.Store
-	logger log.Logger
-	config config.Config
-}
-
-type LogoutToken struct {
-	iss    string              `json:iss`    // example "https://server.example.com"
-	sub    int64               `json:sub`    //"248289761001"
-	aud    string              `json:aud`    // "s6BhdRkqt3"
-	iat    int64               `json:iat`    // 1471566154
-	jti    string              `json:jti`    // "bWJq"
-	sid    string              `json:sid`    // "08a5019c-17e1-4977-8f42-65a12843ea02"
-	events map[string][]string `json:events` // {"http://schemas.openid.net/event/backchannel-logout": {}}
+type StaticRouteHandler struct {
+	prefix           string
+	proxy            http.Handler
+	sidCache         microstore.Store
+	accessTokenCache microstore.Store
+	logger           log.Logger
+	config           config.Config
+	oidcClient       oidc.OIDCProvider
 }
 
 // Server is the entrypoint for the server command.
@@ -85,6 +81,25 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
+			var oidcHTTPClient = &http.Client{
+				Transport: &http.Transport{
+					TLSClientConfig: &tls.Config{
+						MinVersion:         tls.VersionTLS12,
+						InsecureSkipVerify: cfg.OIDC.Insecure, //nolint:gosec
+					},
+					DisableKeepAlives: true,
+				},
+				Timeout: time.Second * 10,
+			}
+
+			oidcClient := oidc.NewOIDCClient(
+				oidc.WithAccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
+				oidc.WithLogger(logger),
+				oidc.WithHTTPClient(oidcHTTPClient),
+				oidc.WithOidcIssuer(cfg.OIDC.Issuer),
+				oidc.WithJWKSOptions(cfg.OIDC.JWKS),
+			)
+
 			var (
 				m = metrics.New()
 			)
@@ -105,14 +120,24 @@ func Server(cfg *config.Config) *cli.Command {
 				proxy.Logger(logger),
 				proxy.Config(cfg),
 			)
+
+			lh := StaticRouteHandler{
+				prefix:           cfg.HTTP.Root,
+				sidCache:         cache, // FIXME use correct cache
+				accessTokenCache: cache, // FIXME use correct cache
+				logger:           logger,
+				config:           *cfg,
+				oidcClient:       oidcClient,
+				proxy:            rp,
+			}
 			if err != nil {
-				return fmt.Errorf("Failed to initialize reverse proxy: %w", err)
+				return fmt.Errorf("failed to initialize reverse proxy: %w", err)
 			}
 
 			{
 				middlewares := loadMiddlewares(ctx, logger, cfg, cache)
 				server, err := proxyHTTP.Server(
-					proxyHTTP.Handler(handlePredefinedRoutes(cfg, logger, rp, cache, middlewares)),
+					proxyHTTP.Handler(lh.handler()),
 					proxyHTTP.Logger(logger),
 					proxyHTTP.Context(ctx),
 					proxyHTTP.Config(cfg),
@@ -164,49 +189,53 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-func handlePredefinedRoutes(cfg *config.Config, logger log.Logger, handler http.Handler, cache microstore.Store, middlewares alice.Chain) http.Handler {
+func (h *StaticRouteHandler) handler() http.Handler {
 	m := chi.NewMux()
 	var methods = []string{"PROPFIND", "DELETE", "PROPPATCH", "MKCOL", "COPY", "MOVE", "LOCK", "UNLOCK"}
 	for _, k := range methods {
 		chi.RegisterMethod(k)
 	}
 
-	p := LogoutHandler{
-		cache:  cache,
-		logger: logger,
-		config: *cfg,
-	}
-
-	m.Route(cfg.HTTP.Root, func(r chi.Router) {
+	m.Route(h.prefix, func(r chi.Router) {
 		// Wrapper for backchannel logout
-		// TODO: remove the GET for the backchannel_logout
-		r.Get("/backchannel_logout", p.backchannelLogout)
-		r.Post("/backchannel_logout", p.backchannelLogout)
+		r.Post("/backchannel_logout", h.backchannelLogout)
+
 		// TODO: migrate oidc well knowns here in a second wrapper
-		r.HandleFunc("/*", handler.ServeHTTP)
+		r.HandleFunc("/*", h.proxy.ServeHTTP)
+
 	})
 	return m
 }
 
-func (p *LogoutHandler) backchannelLogout(w http.ResponseWriter, r *http.Request) {
-	/*
-		var oidcHTTPClient = &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: &tls.Config{
-					MinVersion:         tls.VersionTLS12,
-					InsecureSkipVerify: p.config.OIDC.Insecure, //nolint:gosec
-				},
-				DisableKeepAlives: true,
-			},
-			Timeout: time.Second * 10,
+func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Request) {
+
+	defer r.Body.Close()
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		render.Status(r, http.StatusBadRequest)
+		return
+	}
+
+	logoutToken, err := h.oidcClient.VerifyLogoutToken(r.Context(), string(body))
+	if err != nil {
+		render.Status(r, http.StatusBadRequest)
+		return
+	}
+
+	records, err := h.sidCache.Read(logoutToken.SessionId)
+	if errors.Is(err, microstore.ErrNotFound) || len(records) == 0 {
+		render.Status(r, http.StatusOK)
+		return
+	}
+
+	for _, record := range records {
+		err = h.accessTokenCache.Delete(string(record.Value))
+		if errors.Is(err, microstore.ErrNotFound) {
+			render.Status(r, http.StatusOK)
+			return
 		}
-		prov, _ := oidc.NewProvider(
-			context.WithValue(context.Background(), oauth2.HTTPClient, oidcHTTPClient),
-			p.config.OIDC.Issuer,
-		)
-		logoutVerifier := ocisLogoutVerifier.NewLogoutVerifier(p.config.OIDC)
-	*/
-	w.Header().Set("Location", "https://todo")
+	}
+
 	render.Status(r, http.StatusOK)
 }
 

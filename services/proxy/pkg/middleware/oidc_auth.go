@@ -73,15 +73,7 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 	}
 
 	// TODO: use mClaims
-	aClaims, mClaims, err := m.oidcClient.VerifyAccessToken(req.Context(), token)
-
-	vals := make([]string, len(mClaims))
-	for k, v := range mClaims {
-		s, _ := base64.StdEncoding.DecodeString(v)
-		vals[k] = string(s)
-	}
-	fmt.Println(vals)
-
+	aClaims, _, err := m.oidcClient.VerifyAccessToken(req.Context(), token)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to verify access token")
 	}
