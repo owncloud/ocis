@@ -286,6 +286,37 @@ func (c *oidcClient) VerifyAccessToken(ctx context.Context, token string) (jwt.R
 	}
 }
 
+// verifyAccessTokenJWT tries to parse and verify the access token as a JWT.
+func (c *oidcClient) verifyAccessTokenJWT(token string) (jwt.RegisteredClaims, []string, error) {
+	var claims jwt.RegisteredClaims
+	var mapClaims []string
+	jwks := c.getKeyfunc()
+	if jwks == nil {
+		return claims, mapClaims, errors.New("error initializing jwks keyfunc")
+	}
+
+	_, err := jwt.ParseWithClaims(token, &claims, jwks.Keyfunc)
+	if err != nil {
+		return claims, mapClaims, err
+	}
+	_, mapClaims, err = new(jwt.Parser).ParseUnverified(token, jwt.MapClaims{})
+	// TODO: decode mapClaims to sth readable
+	c.Logger.Debug().Interface("access token", &claims).Msg("parsed access token")
+	if err != nil {
+		c.Logger.Info().Err(err).Msg("Failed to parse/verify the access token.")
+		return claims, mapClaims, err
+	}
+
+	if !claims.VerifyIssuer(c.issuer, true) {
+		vErr := jwt.ValidationError{}
+		vErr.Inner = jwt.ErrTokenInvalidIssuer
+		vErr.Errors |= jwt.ValidationErrorIssuer
+		return claims, mapClaims, vErr
+	}
+
+	return claims, mapClaims, nil
+}
+
 func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawIDToken string) (*LogoutToken, error) {
 	jws, err := jose.ParseSigned(rawIDToken)
 	if err != nil {
@@ -366,42 +397,6 @@ func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawIDToken string) (
 	}
 
 	return &token, nil
-}
-
-// verifyAccessTokenJWT tries to parse and verify the access token as a JWT.
-func (c *oidcClient) verifyAccessTokenJWT(token string) (jwt.RegisteredClaims, []string, error) {
-	var claims jwt.RegisteredClaims
-	var mapClaims []string
-	jwks := c.getKeyfunc()
-	if jwks == nil {
-		return claims, mapClaims, errors.New("error initializing jwks keyfunc")
-	}
-
-	_, err := jwt.ParseWithClaims(token, &claims, jwks.Keyfunc)
-	if err != nil {
-		return claims, mapClaims, err
-	}
-	_, mapClaims, err = new(jwt.Parser).ParseUnverified(token, jwt.MapClaims{})
-	// TODO: decode mapClaims to sth readable
-	c.Logger.Debug().Interface("access token", &claims).Msg("parsed access token")
-	if err != nil {
-		c.Logger.Info().Err(err).Msg("Failed to parse/verify the access token.")
-		return claims, mapClaims, err
-	}
-	c.Logger.Debug().Interface("access token", &claims).Msg("parsed access token")
-	if err != nil {
-		c.Logger.Info().Err(err).Msg("Failed to parse/verify the access token.")
-		return claims, mapClaims, err
-	}
-
-	if !claims.VerifyIssuer(c.issuer, true) {
-		vErr := jwt.ValidationError{}
-		vErr.Inner = jwt.ErrTokenInvalidIssuer
-		vErr.Errors |= jwt.ValidationErrorIssuer
-		return claims, mapClaims, vErr
-	}
-
-	return claims, mapClaims, nil
 }
 
 func unmarshalResp(r *http.Response, body []byte, v interface{}) error {
