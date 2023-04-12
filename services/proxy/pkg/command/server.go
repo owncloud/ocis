@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"time"
 
@@ -207,16 +206,15 @@ func (h *StaticRouteHandler) handler() http.Handler {
 	return m
 }
 
+// handle backchannel logout requests as per https://openid.net/specs/openid-connect-backchannel-1_0.html#BCRequest
 func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Request) {
-
-	defer r.Body.Close()
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
+	// parse the application/x-www-form-urlencoded POST request
+	if err := r.ParseForm(); err != nil {
 		render.Status(r, http.StatusBadRequest)
 		return
 	}
 
-	logoutToken, err := h.oidcClient.VerifyLogoutToken(r.Context(), string(body))
+	logoutToken, err := h.oidcClient.VerifyLogoutToken(r.Context(), r.PostFormValue("logout_token"))
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
 		return

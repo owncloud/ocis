@@ -317,14 +317,14 @@ func (c *oidcClient) verifyAccessTokenJWT(token string) (jwt.RegisteredClaims, [
 	return claims, mapClaims, nil
 }
 
-func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawIDToken string) (*LogoutToken, error) {
-	jws, err := jose.ParseSigned(rawIDToken)
+func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*LogoutToken, error) {
+	jws, err := jose.ParseSigned(rawToken)
 	if err != nil {
 		return nil, err
 	}
 	// Throw out tokens with invalid claims before trying to verify the token. This lets
 	// us do cheap checks before possibly re-syncing keys.
-	payload, err := parseJWT(rawIDToken)
+	payload, err := parseJWT(rawToken)
 	if err != nil {
 		return nil, fmt.Errorf("oidc: malformed jwt: %v", err)
 	}
@@ -386,7 +386,7 @@ func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawIDToken string) (
 		return nil, fmt.Errorf("oidc: id token signed with unsupported algorithm, expected %q got %q", supportedSigAlgs, sig.Header.Algorithm)
 	}
 
-	gotPayload, err := c.remoteKeySet.VerifySignature(ctx, rawIDToken)
+	gotPayload, err := c.remoteKeySet.VerifySignature(ctx, rawToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to verify signature: %v", err)
 	}
