@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 )
 
 // Option defines a single option function.
@@ -17,6 +18,11 @@ type Options struct {
 	Logger log.Logger
 	// The OpenID Connect Issuer URL
 	OidcIssuer string
+	// JWKSOptions to use when retrieving keys
+	JWKSOptions config.JWKS
+	// AccessTokenVerifyMethod to use when verifying access tokens
+	// TODO pass a function or interface to verify? an AccessTokenVerifier?
+	AccessTokenVerifyMethod string
 }
 
 // newOptions initializes the available default options.
@@ -44,8 +50,19 @@ func WithLogger(val log.Logger) Option {
 	}
 }
 
+// WithAccessTokenVerifyMethod provides a function to set the accessTokenVerifyMethod option.
+func WithAccessTokenVerifyMethod(val string) Option {
+	return func(o *Options) {
+		o.AccessTokenVerifyMethod = val
+	}
+}
 func WithHTTPClient(val *http.Client) Option {
 	return func(o *Options) {
 		o.HTTPClient = val
+	}
+}
+func WithJWKSOptions(val config.JWKS) Option {
+	return func(o *Options) {
+		o.JWKSOptions = val
 	}
 }

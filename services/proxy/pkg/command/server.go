@@ -291,12 +291,12 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		middleware.DefaultAccessTokenTTL(cfg.OIDC.UserinfoCache.TTL),
 		middleware.HTTPClient(oidcHTTPClient),
 		middleware.OIDCIss(cfg.OIDC.Issuer),
-		middleware.JWKSOptions(cfg.OIDC.JWKS),
-		middleware.AccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
 		middleware.OIDCClient(oidc.NewOIDCClient(
+			oidc.WithAccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
 			oidc.WithLogger(logger),
 			oidc.WithHTTPClient(oidcHTTPClient),
 			oidc.WithOidcIssuer(cfg.OIDC.Issuer),
+			oidc.WithJWKSOptions(cfg.OIDC.JWKS),
 		)),
 	))
 	authenticators = append(authenticators, middleware.PublicShareAuthenticator{

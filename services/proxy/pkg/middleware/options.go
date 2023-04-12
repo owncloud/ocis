@@ -219,13 +219,6 @@ func AccessTokenVerifyMethod(method string) Option {
 	}
 }
 
-// JWKSOptions sets the options for fetching the JWKS from the IDP
-func JWKSOptions(jo config.JWKS) Option {
-	return func(o *Options) {
-		o.JWKS = jo
-	}
-}
-
 // RoleQuotas sets the role quota mapping setting
 func RoleQuotas(roleQuotas map[string]uint64) Option {
 	return func(o *Options) {

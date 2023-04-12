@@ -10,15 +10,20 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
+	"github.com/MicahParks/keyfunc"
 	gOidc "github.com/coreos/go-oidc/v3/oidc"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 	"golang.org/x/oauth2"
 )
 
 // OIDCProvider used to mock the oidc provider during tests
 type OIDCProvider interface {
 	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*UserInfo, error)
+	VerifyAccessToken(ctx context.Context, token string) (jwt.RegisteredClaims, []string, error)
 }
 
 // KeySet is a set of publc JSON Web Keys that can be used to validate the signature
@@ -37,16 +42,22 @@ type KeySet interface {
 }
 
 type oidcClient struct {
-	issuer               string
-	provider             *ProviderMetadata
-	providerLock         *sync.Mutex
-	skipIssuerValidation bool
-	remoteKeySet         KeySet
-	algorithms           []string
 	// Logger to use for logging, must be set
 	Logger log.Logger
 
-	client *http.Client
+	issuer                  string
+	provider                *ProviderMetadata
+	providerLock            *sync.Mutex
+	skipIssuerValidation    bool
+	accessTokenVerifyMethod string
+	remoteKeySet            KeySet // TODO replace usage with keyfunc?
+	algorithms              []string
+
+	JWKSOptions config.JWKS
+	JWKS        *keyfunc.JWKS
+	jwksLock    *sync.Mutex
+
+	httpClient *http.Client
 }
 
 // supportedAlgorithms is a list of algorithms explicitly supported by this
@@ -69,10 +80,13 @@ func NewOIDCClient(opts ...Option) OIDCProvider {
 	options := newOptions(opts...)
 
 	return &oidcClient{
-		Logger:       options.Logger,
-		issuer:       options.OidcIssuer,
-		client:       options.HTTPClient,
-		providerLock: &sync.Mutex{},
+		Logger:                  options.Logger,
+		issuer:                  options.OidcIssuer,
+		httpClient:              options.HTTPClient,
+		accessTokenVerifyMethod: options.AccessTokenVerifyMethod,
+		JWKSOptions:             options.JWKSOptions, // TODO I don't like that we pass down config options ...
+		providerLock:            &sync.Mutex{},
+		jwksLock:                &sync.Mutex{},
 	}
 }
 
@@ -85,7 +99,7 @@ func (c *oidcClient) lookupWellKnownOpenidConfiguration(ctx context.Context) err
 		if err != nil {
 			return err
 		}
-		resp, err := c.client.Do(req.WithContext(ctx))
+		resp, err := c.httpClient.Do(req.WithContext(ctx))
 		if err != nil {
 			return err
 		}
@@ -120,6 +134,32 @@ func (c *oidcClient) lookupWellKnownOpenidConfiguration(ctx context.Context) err
 		c.remoteKeySet = gOidc.NewRemoteKeySet(ctx, p.JwksURI)
 	}
 	return nil
+}
+
+func (c *oidcClient) getKeyfunc() *keyfunc.JWKS {
+	c.jwksLock.Lock()
+	defer c.jwksLock.Unlock()
+	if c.JWKS == nil {
+		var err error
+		c.Logger.Debug().Str("jwks", c.provider.JwksURI).Msg("discovered jwks endpoint")
+		options := keyfunc.Options{
+			Client: c.httpClient,
+			RefreshErrorHandler: func(err error) {
+				c.Logger.Error().Err(err).Msg("There was an error with the jwt.Keyfunc")
+			},
+			RefreshInterval:   time.Minute * time.Duration(c.JWKSOptions.RefreshInterval),
+			RefreshRateLimit:  time.Second * time.Duration(c.JWKSOptions.RefreshRateLimit),
+			RefreshTimeout:    time.Second * time.Duration(c.JWKSOptions.RefreshTimeout),
+			RefreshUnknownKID: c.JWKSOptions.RefreshUnknownKID,
+		}
+		c.JWKS, err = keyfunc.Get(c.provider.JwksURI, options)
+		if err != nil {
+			c.JWKS = nil
+			c.Logger.Error().Err(err).Msg("Failed to create JWKS from resource at the given URL.")
+			return nil
+		}
+	}
+	return c.JWKS
 }
 
 type stringAsBool bool
@@ -186,7 +226,7 @@ func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSourc
 	}
 	token.SetAuthHeader(req)
 
-	resp, err := c.client.Do(req.WithContext(ctx))
+	resp, err := c.httpClient.Do(req.WithContext(ctx))
 	if err != nil {
 		return nil, err
 	}
@@ -220,6 +260,59 @@ func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSourc
 		EmailVerified: bool(userInfo.EmailVerified),
 		claims:        body,
 	}, nil
+}
+
+func (c *oidcClient) VerifyAccessToken(ctx context.Context, token string) (jwt.RegisteredClaims, []string, error) {
+	var mapClaims []string
+	if err := c.lookupWellKnownOpenidConfiguration(ctx); err != nil {
+		return jwt.RegisteredClaims{}, mapClaims, err
+	}
+	switch c.accessTokenVerifyMethod {
+	case config.AccessTokenVerificationJWT:
+		return c.verifyAccessTokenJWT(token)
+	case config.AccessTokenVerificationNone:
+		c.Logger.Debug().Msg("Access Token verification disabled")
+		return jwt.RegisteredClaims{}, mapClaims, nil
+	default:
+		c.Logger.Error().Str("access_token_verify_method", c.accessTokenVerifyMethod).Msg("Unknown Access Token verification setting")
+		return jwt.RegisteredClaims{}, mapClaims, errors.New("unknown Access Token Verification method")
+	}
+}
+
+// verifyAccessTokenJWT tries to parse and verify the access token as a JWT.
+func (c *oidcClient) verifyAccessTokenJWT(token string) (jwt.RegisteredClaims, []string, error) {
+	var claims jwt.RegisteredClaims
+	var mapClaims []string
+	jwks := c.getKeyfunc()
+	if jwks == nil {
+		return claims, mapClaims, errors.New("Error initializing jwks keyfunc")
+	}
+
+	_, err := jwt.ParseWithClaims(token, &claims, jwks.Keyfunc)
+	if err != nil {
+		return claims, mapClaims, err
+	}
+	_, mapClaims, err = new(jwt.Parser).ParseUnverified(token, jwt.MapClaims{})
+	// TODO: decode mapClaims to sth readable
+	c.Logger.Debug().Interface("access token", &claims).Msg("parsed access token")
+	if err != nil {
+		c.Logger.Info().Err(err).Msg("Failed to parse/verify the access token.")
+		return claims, mapClaims, err
+	}
+	c.Logger.Debug().Interface("access token", &claims).Msg("parsed access token")
+	if err != nil {
+		c.Logger.Info().Err(err).Msg("Failed to parse/verify the access token.")
+		return claims, mapClaims, err
+	}
+
+	if !claims.VerifyIssuer(c.issuer, true) {
+		vErr := jwt.ValidationError{}
+		vErr.Inner = jwt.ErrTokenInvalidIssuer
+		vErr.Errors |= jwt.ValidationErrorIssuer
+		return claims, mapClaims, vErr
+	}
+
+	return claims, mapClaims, nil
 }
 
 func unmarshalResp(r *http.Response, body []byte, v interface{}) error {

@@ -6,14 +6,11 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 
-	"github.com/MicahParks/keyfunc"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
@@ -39,9 +36,7 @@ func NewOIDCAuthenticator(opts ...Option) *OIDCAuthenticator {
 		HTTPClient:              options.HTTPClient,
 		OIDCIss:                 options.OIDCIss,
 		oidcClient:              options.OIDCClient,
-		JWKSOptions:             options.JWKS,
 		AccessTokenVerifyMethod: options.AccessTokenVerifyMethod,
-		jwksLock:                &sync.Mutex{},
 	}
 }
 
@@ -55,16 +50,12 @@ type OIDCAuthenticator struct {
 	DefaultTokenCacheTTL    time.Duration
 	oidcClient              oidc.OIDCProvider
 	AccessTokenVerifyMethod string
-	JWKSOptions             config.JWKS
-
-	jwksLock *sync.Mutex
-	JWKS     *keyfunc.JWKS
 }
 
 func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[string]interface{}, error) {
 	var claims map[string]interface{}
 
-	// usea 64 bytes long hash to have 256-bit collision resistance.
+	// use a 64 bytes long hash to have 256-bit collision resistance.
 	hash := make([]byte, 64)
 	sha3.ShakeSum256(hash, []byte(token))
 	encodedHash := base64.URLEncoding.EncodeToString(hash)
@@ -80,9 +71,10 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 		}
 		m.Logger.Error().Err(err).Msg("could not unmarshal userinfo")
 	}
+
 	// TODO: use mClaims
-	aClaims, mClaims, err := m.verifyAccessToken(token)
-	//fmt.Println(mClaims)
+	aClaims, mClaims, err := m.oidcClient.VerifyAccessToken(req.Context(), token)
+
 	vals := make([]string, len(mClaims))
 	for k, v := range mClaims {
 		s, _ := base64.StdEncoding.DecodeString(v)
@@ -140,57 +132,6 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 	return claims, nil
 }
 
-// TODO: update jwt lib to have access to session id, or extract the session id and return it
-func (m OIDCAuthenticator) verifyAccessToken(token string) (jwt.RegisteredClaims, []string, error) {
-	var mapClaims []string
-	switch m.AccessTokenVerifyMethod {
-	case config.AccessTokenVerificationJWT:
-		return m.verifyAccessTokenJWT(token)
-	case config.AccessTokenVerificationNone:
-		m.Logger.Debug().Msg("Access Token verification disabled")
-		return jwt.RegisteredClaims{}, mapClaims, nil
-	default:
-		m.Logger.Error().Str("access_token_verify_method", m.AccessTokenVerifyMethod).Msg("Unknown Access Token verification setting")
-		return jwt.RegisteredClaims{}, mapClaims, errors.New("Unknown Access Token Verification method")
-	}
-}
-
-// verifyAccessTokenJWT tries to parse and verify the access token as a JWT.
-func (m OIDCAuthenticator) verifyAccessTokenJWT(token string) (jwt.RegisteredClaims, []string, error) {
-	var claims jwt.RegisteredClaims
-	var mapClaims []string
-	jwks := m.getKeyfunc()
-	if jwks == nil {
-		return claims, mapClaims, errors.New("Error initializing jwks keyfunc")
-	}
-
-	_, err := jwt.ParseWithClaims(token, &claims, jwks.Keyfunc)
-	if err != nil {
-		return claims, mapClaims, err
-	}
-	_, mapClaims, err = new(jwt.Parser).ParseUnverified(token, jwt.MapClaims{})
-	// TODO: decode mapClaims to sth readable
-	m.Logger.Debug().Interface("access token", &claims).Msg("parsed access token")
-	if err != nil {
-		m.Logger.Info().Err(err).Msg("Failed to parse/verify the access token.")
-		return claims, mapClaims, err
-	}
-	m.Logger.Debug().Interface("access token", &claims).Msg("parsed access token")
-	if err != nil {
-		m.Logger.Info().Err(err).Msg("Failed to parse/verify the access token.")
-		return claims, mapClaims, err
-	}
-
-	if !claims.VerifyIssuer(m.OIDCIss, true) {
-		vErr := jwt.ValidationError{}
-		vErr.Inner = jwt.ErrTokenInvalidIssuer
-		vErr.Errors |= jwt.ValidationErrorIssuer
-		return claims, mapClaims, vErr
-	}
-
-	return claims, mapClaims, nil
-}
-
 // extractExpiration tries to extract the expriration time from the access token
 // If the access token does not have an exp claim it will fallback to the configured
 // default expiration
@@ -212,36 +153,6 @@ func (m OIDCAuthenticator) shouldServe(req *http.Request) bool {
 	return strings.HasPrefix(header, _bearerPrefix)
 }
 
-func (m *OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
-	m.jwksLock.Lock()
-	defer m.jwksLock.Unlock()
-	if m.JWKS == nil {
-		oidcMetadata, err := oidc.GetIDPMetadata(m.Logger, m.HTTPClient, m.OIDCIss)
-		if err != nil {
-			m.Logger.Error().Err(err).Msg("failed to decode provider openid-configuration")
-			return nil
-		}
-		m.Logger.Debug().Str("jwks", oidcMetadata.JwksURI).Msg("discovered jwks endpoint")
-		options := keyfunc.Options{
-			Client: m.HTTPClient,
-			RefreshErrorHandler: func(err error) {
-				m.Logger.Error().Err(err).Msg("There was an error with the jwt.Keyfunc")
-			},
-			RefreshInterval:   time.Minute * time.Duration(m.JWKSOptions.RefreshInterval),
-			RefreshRateLimit:  time.Second * time.Duration(m.JWKSOptions.RefreshRateLimit),
-			RefreshTimeout:    time.Second * time.Duration(m.JWKSOptions.RefreshTimeout),
-			RefreshUnknownKID: m.JWKSOptions.RefreshUnknownKID,
-		}
-		m.JWKS, err = keyfunc.Get(oidcMetadata.JwksURI, options)
-		if err != nil {
-			m.JWKS = nil
-			m.Logger.Error().Err(err).Msg("Failed to create JWKS from resource at the given URL.")
-			return nil
-		}
-	}
-	return m.JWKS
-}
-
 // Authenticate implements the authenticator interface to authenticate requests via oidc auth.
 func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	// there is no bearer token on the request,
@@ -249,11 +160,6 @@ func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) 
 		// The authentication of public path requests is handled by another authenticator.
 		// Since we can't guarantee the order of execution of the authenticators, we better
 		// implement an early return here for paths we can't authenticate in this authenticator.
-		return nil, false
-	}
-
-	// Force init of jwks keyfunc if needed (contacts the .well-known and jwks endpoints on first call)
-	if m.AccessTokenVerifyMethod == config.AccessTokenVerificationJWT && m.getKeyfunc() == nil {
 		return nil, false
 	}
 	token := strings.TrimPrefix(r.Header.Get(_headerAuthorization), _bearerPrefix)
