@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"mime"
 	"net/http"
 	"strings"
@@ -80,7 +80,7 @@ func (c *oidcClient) lookupWellKnownOpenidConfiguration(ctx context.Context) err
 	c.providerLock.Lock()
 	defer c.providerLock.Unlock()
 	if c.provider == nil {
-		wellKnown := strings.TrimSuffix(c.issuer, "/") + "/.well-known/openid-configuration"
+		wellKnown := strings.TrimSuffix(c.issuer, "/") + wellknownPath
 		req, err := http.NewRequest("GET", wellKnown, nil)
 		if err != nil {
 			return err
@@ -91,7 +91,7 @@ func (c *oidcClient) lookupWellKnownOpenidConfiguration(ctx context.Context) err
 		}
 		defer resp.Body.Close()
 
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return fmt.Errorf("unable to read response body: %v", err)
 		}
@@ -191,7 +191,7 @@ func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSourc
 		return nil, err
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
