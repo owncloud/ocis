@@ -1,7 +1,7 @@
 ---
-title: Environment Variable Naming Scope
+title: Envvar Naming Scope
 date: 2023-03-23T00:00:00+00:00
-weight: 10
+weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/general-info
 geekdocFilePath: envvar-scopes.md
@@ -36,4 +36,4 @@ To get a list of global envvars used in all services, see the [Global Environmen
 
 ## Deprecations
 
-All environment variable types that are used in a service follow the same deprecation rules independent of their scope.
+All environment variable types that are used in a service follow the same [deprecation rules]({{< ref "ocis/development/deprecating-variables/_index.md" >}}) independent of their scope.

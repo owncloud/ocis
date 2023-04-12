@@ -1,7 +1,7 @@
 ---
 title: New Service Checklist
 date: 2023-03-23T00:00:00+00:00
-weight: 10
+weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/general-info
 geekdocFilePath: new-service-checklist.md
