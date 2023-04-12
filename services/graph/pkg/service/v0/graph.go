@@ -76,6 +76,8 @@ type Graph struct {
 
 // ServeHTTP implements the Service interface.
 func (g Graph) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// unset raw path, otherwise chi uses it to route and then fails to match percent encoded path segments
+	r.URL.RawPath = ""
 	g.mux.ServeHTTP(w, r)
 }
 
