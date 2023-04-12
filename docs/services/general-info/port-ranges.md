@@ -1,9 +1,9 @@
 ---
 title: Port Ranges
 date: 2018-05-02T00:00:00+00:00
-weight: 0
+weight: 10
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/services
+geekdocEditPath: edit/master/docs/services/general-info
 geekdocFilePath: port-ranges.md
 geekdocCollapseSection: true
 ---
