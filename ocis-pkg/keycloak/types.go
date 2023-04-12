@@ -26,8 +26,8 @@ var userActionsToString = map[UserAction]string{
 
 // PIIReport is a structure of all the PersonalIdentifiableInformation contained in keycloak.
 type PIIReport struct {
-	UserData    *libregraph.User
-	Credentials []*gocloak.CredentialRepresentation
+	UserData    *libregraph.User                    `json:"user_data,omitempty"`
+	Credentials []*gocloak.CredentialRepresentation `json:"credentials,omitempty"`
 }
 
 // Client represents a keycloak client.

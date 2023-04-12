@@ -81,7 +81,6 @@ func (g Graph) GatherPersonalData(usr *user.User, ref *provider.Reference, token
 	ctx, err := utils.ImpersonateUser(usr, g.gatewayClient, g.config.MachineAuthAPIKey)
 	if err != nil {
 		g.logger.Error().Err(err).Str("userID", usr.GetId().GetOpaqueId()).Msg("cannot impersonate user")
-
 	}
 	// create data
 	data := make(map[string]interface{})
