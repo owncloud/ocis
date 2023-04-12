@@ -31,19 +31,18 @@ The `graph` service can use a configured store via `GRAPH_STORE_TYPE`. Possible 
 3.  The graph service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
 4.  When using `redis-sentinel`, the Redis master to use is configured via `GRAPH_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
 
-
 ## Keycloak configuration for the personal data export
 
 If Keycloak is used for authentication, the GDPR requires us to add all the personal identifiable
 information that keycloak has about the user to the personal data export. To do this, set the following
 environment variables:
 
-* `KEYCLOAK_BASE_PATH` - The URL to the keycloak instance.
-* `KEYCLOAK_CLIENT_ID` - The client ID of the client that is used to authenticate with keycloak, this client has to be able to list users and get the credential data. 
-* `KEYCLOAK_CLIENT_SECRET` - The client secret of the client that is used to authenticate with keycloak.
-* `KEYCLOAK_CLIENT_REALM` - The realm the client is defined in.
-* `KEYCLOAK_USER_REALM` - The realm the oCIS users are defined in.
-* `KEYCLOAK_INSECURE_SKIP_VERIFY` - If set to true, the TLS certificate of the keycloak instance is not verified.
+  * `KEYCLOAK_BASE_PATH` - The URL to the keycloak instance.
+  * `KEYCLOAK_CLIENT_ID` - The client ID of the client that is used to authenticate with keycloak, this client has to be able to list users and get the credential data. 
+  * `KEYCLOAK_CLIENT_SECRET` - The client secret of the client that is used to authenticate with keycloak.
+  * `KEYCLOAK_CLIENT_REALM` - The realm the client is defined in.
+  * `KEYCLOAK_USER_REALM` - The realm the oCIS users are defined in.
+  * `KEYCLOAK_INSECURE_SKIP_VERIFY` - If set to true, the TLS certificate of the keycloak instance is not verified.
 
 These variables are the same as the ones used by the invitations service, but can be configured separateley
 by prefixing `GRAPH_` to the variable name.
