@@ -30,8 +30,8 @@ func NewOIDCAuthenticator(opts ...Option) *OIDCAuthenticator {
 
 	return &OIDCAuthenticator{
 		Logger:                  options.Logger,
-		userInfoCache:           options.Cache,
-		sessionLookupCache:      options.Cache,
+		userInfoCache:           options.UserInfoCache,
+		sessionLookupCache:      options.SessionLookupCache,
 		DefaultTokenCacheTTL:    options.DefaultAccessTokenTTL,
 		HTTPClient:              options.HTTPClient,
 		OIDCIss:                 options.OIDCIss,

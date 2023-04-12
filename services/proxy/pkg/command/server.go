@@ -43,13 +43,13 @@ import (
 )
 
 type StaticRouteHandler struct {
-	prefix           string
-	proxy            http.Handler
-	sidCache         microstore.Store
-	accessTokenCache microstore.Store
-	logger           log.Logger
-	config           config.Config
-	oidcClient       oidc.OIDCProvider
+	prefix             string
+	proxy              http.Handler
+	userInfoCache      microstore.Store
+	sessionLookupCache microstore.Store
+	logger             log.Logger
+	config             config.Config
+	oidcClient         oidc.OIDCProvider
 }
 
 // Server is the entrypoint for the server command.
@@ -62,13 +62,22 @@ func Server(cfg *config.Config) *cli.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
-			cache := store.Create(
+			userInfoCache := store.Create(
 				store.Store(cfg.OIDC.UserinfoCache.Store),
 				store.TTL(cfg.OIDC.UserinfoCache.TTL),
 				store.Size(cfg.OIDC.UserinfoCache.Size),
 				microstore.Nodes(cfg.OIDC.UserinfoCache.Nodes...),
 				microstore.Database(cfg.OIDC.UserinfoCache.Database),
 				microstore.Table(cfg.OIDC.UserinfoCache.Table),
+			)
+
+			sessionLookupCache := store.Create(
+				store.Store(cfg.OIDC.SessionLookupCache.Store),
+				store.TTL(cfg.OIDC.SessionLookupCache.TTL),
+				store.Size(cfg.OIDC.SessionLookupCache.Size),
+				microstore.Nodes(cfg.OIDC.SessionLookupCache.Nodes...),
+				microstore.Database(cfg.OIDC.SessionLookupCache.Database),
+				microstore.Table(cfg.OIDC.SessionLookupCache.Table),
 			)
 
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
@@ -122,20 +131,20 @@ func Server(cfg *config.Config) *cli.Command {
 			)
 
 			lh := StaticRouteHandler{
-				prefix:           cfg.HTTP.Root,
-				sidCache:         cache, // FIXME use correct cache
-				accessTokenCache: cache, // FIXME use correct cache
-				logger:           logger,
-				config:           *cfg,
-				oidcClient:       oidcClient,
-				proxy:            rp,
+				prefix:             cfg.HTTP.Root,
+				userInfoCache:      userInfoCache,
+				sessionLookupCache: sessionLookupCache,
+				logger:             logger,
+				config:             *cfg,
+				oidcClient:         oidcClient,
+				proxy:              rp,
 			}
 			if err != nil {
 				return fmt.Errorf("failed to initialize reverse proxy: %w", err)
 			}
 
 			{
-				middlewares := loadMiddlewares(ctx, logger, cfg, cache)
+				middlewares := loadMiddlewares(ctx, logger, cfg, userInfoCache, sessionLookupCache)
 				server, err := proxyHTTP.Server(
 					proxyHTTP.Handler(lh.handler()),
 					proxyHTTP.Logger(logger),
@@ -222,14 +231,14 @@ func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	records, err := h.sidCache.Read(logoutToken.SessionId)
+	records, err := h.userInfoCache.Read(logoutToken.SessionId)
 	if errors.Is(err, microstore.ErrNotFound) || len(records) == 0 {
 		render.Status(r, http.StatusOK)
 		return
 	}
 
 	for _, record := range records {
-		err = h.accessTokenCache.Delete(string(record.Value))
+		err = h.sessionLookupCache.Delete(string(record.Value))
 		if errors.Is(err, microstore.ErrNotFound) {
 			render.Status(r, http.StatusOK)
 			return
@@ -239,7 +248,7 @@ func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 	render.Status(r, http.StatusOK)
 }
 
-func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, cache microstore.Store) alice.Chain {
+func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache microstore.Store, sessionLookupCache microstore.Store) alice.Chain {
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
 	revaClient, err := pool.GetGatewayServiceClient(cfg.Reva.Address, cfg.Reva.GetRevaOptions()...)
 	if err != nil {
@@ -316,7 +325,8 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
 		middleware.Logger(logger),
-		middleware.Cache(cache),
+		middleware.UserInfoCache(userInfoCache),
+		middleware.SessionLookupCache(sessionLookupCache),
 		middleware.DefaultAccessTokenTTL(cfg.OIDC.UserinfoCache.TTL),
 		middleware.HTTPClient(oidcHTTPClient),
 		middleware.OIDCIss(cfg.OIDC.Issuer),

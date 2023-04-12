@@ -54,8 +54,10 @@ type Options struct {
 	EnableBasicAuth bool
 	// DefaultAccessTokenTTL is used to calculate the expiration when an access token has no expiration set
 	DefaultAccessTokenTTL time.Duration
-	// Cache sets the access token cache store
-	Cache store.Store
+	// UserInfoCache sets the access token cache store
+	UserInfoCache store.Store
+	// SessionLookupCache maps the session to a hashed jwt token
+	SessionLookupCache store.Store
 	// CredentialsByUserAgent sets the auth challenges on a per user-agent basis
 	CredentialsByUserAgent map[string]string
 	// AccessTokenVerifyMethod configures how access_tokens should be verified but the oidc_auth middleware.
@@ -191,10 +193,17 @@ func DefaultAccessTokenTTL(ttl time.Duration) Option {
 	}
 }
 
-// Cache provides a function to set the Cache
-func Cache(val store.Store) Option {
+// UserInfoCache provides a function to set the UserInfoCache
+func UserInfoCache(val store.Store) Option {
 	return func(o *Options) {
-		o.Cache = val
+		o.UserInfoCache = val
+	}
+}
+
+// SessionLookupCache provides a function to set the SessionLookupCache
+func SessionLookupCache(val store.Store) Option {
+	return func(o *Options) {
+		o.SessionLookupCache = val
 	}
 }
 
