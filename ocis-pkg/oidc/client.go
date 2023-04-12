@@ -9,6 +9,7 @@ import (
 	"mime"
 	"net/http"
 	"strings"
+	"sync"
 
 	gOidc "github.com/coreos/go-oidc/v3/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -37,7 +38,8 @@ type KeySet interface {
 
 type oidcClient struct {
 	issuer               string
-	provider             ProviderMetadata
+	provider             *ProviderMetadata
+	providerLock         *sync.Mutex
 	skipIssuerValidation bool
 	remoteKeySet         KeySet
 	algorithms           []string
@@ -67,52 +69,56 @@ func NewOIDCClient(opts ...Option) OIDCProvider {
 	options := newOptions(opts...)
 
 	return &oidcClient{
-		Logger: options.Logger,
-		issuer: options.OidcIssuer,
+		Logger:       options.Logger,
+		issuer:       options.OidcIssuer,
+		client:       options.HTTPClient,
+		providerLock: &sync.Mutex{},
 	}
 }
 
 func (c *oidcClient) lookupWellKnownOpenidConfiguration(ctx context.Context) error {
-
-	wellKnown := strings.TrimSuffix(c.issuer, "/") + "/.well-known/openid-configuration"
-	req, err := http.NewRequest("GET", wellKnown, nil)
-	if err != nil {
-		return err
-	}
-	resp, err := c.client.Do(req.WithContext(ctx))
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("unable to read response body: %v", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("%s: %s", resp.Status, body)
-	}
-
-	var p ProviderMetadata
-	err = unmarshalResp(resp, body, &p)
-	if err != nil {
-		return fmt.Errorf("oidc: failed to decode provider discovery object: %v", err)
-	}
-
-	if !c.skipIssuerValidation && p.Issuer != c.issuer {
-		return fmt.Errorf("oidc: issuer did not match the issuer returned by provider, expected %q got %q", c.issuer, p.Issuer)
-	}
-	var algs []string
-	for _, a := range p.IDTokenSigningAlgValuesSupported {
-		if supportedAlgorithms[a] {
-			algs = append(algs, a)
+	c.providerLock.Lock()
+	defer c.providerLock.Unlock()
+	if c.provider == nil {
+		wellKnown := strings.TrimSuffix(c.issuer, "/") + "/.well-known/openid-configuration"
+		req, err := http.NewRequest("GET", wellKnown, nil)
+		if err != nil {
+			return err
 		}
-	}
-	c.provider = p
-	c.algorithms = algs
-	c.remoteKeySet = gOidc.NewRemoteKeySet(ctx, p.JwksURI)
+		resp, err := c.client.Do(req.WithContext(ctx))
+		if err != nil {
+			return err
+		}
+		defer resp.Body.Close()
 
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("unable to read response body: %v", err)
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			return fmt.Errorf("%s: %s", resp.Status, body)
+		}
+
+		var p ProviderMetadata
+		err = unmarshalResp(resp, body, &p)
+		if err != nil {
+			return fmt.Errorf("oidc: failed to decode provider discovery object: %v", err)
+		}
+
+		if !c.skipIssuerValidation && p.Issuer != c.issuer {
+			return fmt.Errorf("oidc: issuer did not match the issuer returned by provider, expected %q got %q", c.issuer, p.Issuer)
+		}
+		var algs []string
+		for _, a := range p.IDTokenSigningAlgValuesSupported {
+			if supportedAlgorithms[a] {
+				algs = append(algs, a)
+			}
+		}
+		c.provider = &p
+		c.algorithms = algs
+		c.remoteKeySet = gOidc.NewRemoteKeySet(ctx, p.JwksURI)
+	}
 	return nil
 }
 
@@ -159,11 +165,11 @@ func (u *UserInfo) Claims(v interface{}) error {
 }
 
 func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSource) (*UserInfo, error) {
+	if err := c.lookupWellKnownOpenidConfiguration(ctx); err != nil {
+		return nil, err
+	}
+
 	if c.provider.UserinfoEndpoint == "" {
-		// try lazy initialization TODO use sync.once
-		if err := c.lookupWellKnownOpenidConfiguration(ctx); err != nil {
-			return nil, err
-		}
 		if c.provider.UserinfoEndpoint == "" {
 			return nil, errors.New("oidc: user info endpoint is not supported by this provider")
 		}

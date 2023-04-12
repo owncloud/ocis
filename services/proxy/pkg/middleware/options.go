@@ -6,6 +6,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
@@ -34,7 +35,7 @@ type Options struct {
 	// SettingsRoleService for the roles API in settings
 	SettingsRoleService settingssvc.RoleService
 	// OIDCProviderFunc to lazily initialize an oidc provider, must be set for the oidc_auth middleware
-	OIDCProviderFunc func() (OIDCProvider, error)
+	OIDCClient oidc.OIDCProvider
 	// OIDCIss is the oidcAuth-issuer
 	OIDCIss string
 	// RevaGatewayClient to send requests to the reva gateway
@@ -113,10 +114,10 @@ func SettingsRoleService(rc settingssvc.RoleService) Option {
 	}
 }
 
-// OIDCProviderFunc provides a function to set the the oidc provider function option.
-func OIDCProviderFunc(f func() (OIDCProvider, error)) Option {
+// OIDCClient provides a function to set the the oidc client option.
+func OIDCClient(val oidc.OIDCProvider) Option {
 	return func(o *Options) {
-		o.OIDCProviderFunc = f
+		o.OIDCClient = val
 	}
 }
 

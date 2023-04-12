@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/coreos/go-oidc/v3/oidc"
-
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/go-chi/chi/v5"
@@ -19,6 +17,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -39,7 +38,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 	"github.com/urfave/cli/v2"
 	microstore "go-micro.dev/v4/store"
-	"golang.org/x/oauth2"
 )
 
 type LogoutHandler struct {
@@ -295,15 +293,11 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		middleware.OIDCIss(cfg.OIDC.Issuer),
 		middleware.JWKSOptions(cfg.OIDC.JWKS),
 		middleware.AccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
-		middleware.OIDCProviderFunc(func() (middleware.OIDCProvider, error) {
-			// Initialize a provider by specifying the issuer URL.
-			// it will fetch the keys from the issuer using the .well-known
-			// endpoint
-			return oidc.NewProvider(
-				context.WithValue(ctx, oauth2.HTTPClient, oidcHTTPClient),
-				cfg.OIDC.Issuer,
-			)
-		}),
+		middleware.OIDCClient(oidc.NewOIDCClient(
+			oidc.WithLogger(logger),
+			oidc.WithHTTPClient(oidcHTTPClient),
+			oidc.WithOidcIssuer(cfg.OIDC.Issuer),
+		)),
 	))
 	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
 		Logger:            logger,

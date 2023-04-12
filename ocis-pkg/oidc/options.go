@@ -1,6 +1,8 @@
 package oidc
 
 import (
+	"net/http"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
@@ -9,6 +11,8 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
+	// HTTPClient to use for requests
+	HTTPClient *http.Client
 	// Logger to use for logging, must be set
 	Logger log.Logger
 	// The OpenID Connect Issuer URL
@@ -37,5 +41,11 @@ func WithOidcIssuer(val string) Option {
 func WithLogger(val log.Logger) Option {
 	return func(o *Options) {
 		o.Logger = val
+	}
+}
+
+func WithHTTPClient(val *http.Client) Option {
+	return func(o *Options) {
+		o.HTTPClient = val
 	}
 }

@@ -14,7 +14,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 
 	"github.com/MicahParks/keyfunc"
-	gOidc "github.com/coreos/go-oidc/v3/oidc"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
@@ -28,11 +27,6 @@ const (
 	_bearerPrefix        = "Bearer "
 )
 
-// OIDCProvider used to mock the oidc provider during tests
-type OIDCProvider interface {
-	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*gOidc.UserInfo, error)
-}
-
 // NewOIDCAuthenticator returns a ready to use authenticator which can handle OIDC authentication.
 func NewOIDCAuthenticator(opts ...Option) *OIDCAuthenticator {
 	options := newOptions(opts...)
@@ -44,10 +38,9 @@ func NewOIDCAuthenticator(opts ...Option) *OIDCAuthenticator {
 		DefaultTokenCacheTTL:    options.DefaultAccessTokenTTL,
 		HTTPClient:              options.HTTPClient,
 		OIDCIss:                 options.OIDCIss,
-		ProviderFunc:            options.OIDCProviderFunc,
+		oidcClient:              options.OIDCClient,
 		JWKSOptions:             options.JWKS,
 		AccessTokenVerifyMethod: options.AccessTokenVerifyMethod,
-		providerLock:            &sync.Mutex{},
 		jwksLock:                &sync.Mutex{},
 	}
 }
@@ -60,12 +53,9 @@ type OIDCAuthenticator struct {
 	userInfoCache           store.Store
 	sessionLookupCache      store.Store
 	DefaultTokenCacheTTL    time.Duration
-	ProviderFunc            func() (OIDCProvider, error)
+	oidcClient              oidc.OIDCProvider
 	AccessTokenVerifyMethod string
 	JWKSOptions             config.JWKS
-
-	providerLock *sync.Mutex
-	provider     OIDCProvider
 
 	jwksLock *sync.Mutex
 	JWKS     *keyfunc.JWKS
@@ -108,7 +98,7 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 		AccessToken: token,
 	}
 
-	userInfo, err := m.getProvider().UserInfo(
+	userInfo, err := m.oidcClient.UserInfo(
 		context.WithValue(req.Context(), oauth2.HTTPClient, m.HTTPClient),
 		oauth2.StaticTokenSource(oauth2Token),
 	)
@@ -252,26 +242,6 @@ func (m *OIDCAuthenticator) getKeyfunc() *keyfunc.JWKS {
 	return m.JWKS
 }
 
-func (m *OIDCAuthenticator) getProvider() OIDCProvider {
-	m.providerLock.Lock()
-	defer m.providerLock.Unlock()
-	if m.provider == nil {
-		// Lazily initialize a provider
-
-		// provider needs to be cached as when it is created
-		// it will fetch the keys from the issuer using the .well-known
-		// endpoint
-		provider, err := m.ProviderFunc()
-		if err != nil {
-			m.Logger.Error().Err(err).Msg("could not initialize oidcAuth provider")
-			return nil
-		}
-
-		m.provider = provider
-	}
-	return m.provider
-}
-
 // Authenticate implements the authenticator interface to authenticate requests via oidc auth.
 func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) {
 	// there is no bearer token on the request,
@@ -279,10 +249,6 @@ func (m *OIDCAuthenticator) Authenticate(r *http.Request) (*http.Request, bool) 
 		// The authentication of public path requests is handled by another authenticator.
 		// Since we can't guarantee the order of execution of the authenticators, we better
 		// implement an early return here for paths we can't authenticate in this authenticator.
-		return nil, false
-	}
-
-	if m.getProvider() == nil {
 		return nil, false
 	}
 
