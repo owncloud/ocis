@@ -31,7 +31,6 @@ func NewOIDCAuthenticator(opts ...Option) *OIDCAuthenticator {
 	return &OIDCAuthenticator{
 		Logger:                  options.Logger,
 		userInfoCache:           options.UserInfoCache,
-		sessionLookupCache:      options.SessionLookupCache,
 		DefaultTokenCacheTTL:    options.DefaultAccessTokenTTL,
 		HTTPClient:              options.HTTPClient,
 		OIDCIss:                 options.OIDCIss,
@@ -46,7 +45,6 @@ type OIDCAuthenticator struct {
 	HTTPClient              *http.Client
 	OIDCIss                 string
 	userInfoCache           store.Store
-	sessionLookupCache      store.Store
 	DefaultTokenCacheTTL    time.Duration
 	oidcClient              oidc.OIDCProvider
 	AccessTokenVerifyMethod string
@@ -108,7 +106,8 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 			}
 
 			if sid, ok := claims["sid"]; ok {
-				err = m.sessionLookupCache.Write(&store.Record{
+				// reuse user cache for session id lookup
+				err = m.userInfoCache.Write(&store.Record{
 					Key:    fmt.Sprintf("%s", sid),
 					Value:  []byte(encodedHash),
 					Expiry: time.Until(expiration),

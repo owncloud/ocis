@@ -106,9 +106,10 @@ type OIDC struct {
 	Insecure                bool   `yaml:"insecure" env:"OCIS_INSECURE;PROXY_OIDC_INSECURE" desc:"Disable TLS certificate validation for connections to the IDP. Note that this is not recommended for production environments."`
 	AccessTokenVerifyMethod string `yaml:"access_token_verify_method" env:"PROXY_OIDC_ACCESS_TOKEN_VERIFY_METHOD" desc:"Sets how OIDC access tokens should be verified. Possible values are 'none' and 'jwt'. When using 'none', no special validation apart from using it for accessing the IPD's userinfo endpoint will be done. When using 'jwt', it tries to parse the access token as a jwt token and verifies the signature using the keys published on the IDP's 'jwks_uri'."`
 	UserinfoCache           *Cache `yaml:"user_info_cache"`
-	SessionLookupCache      *Cache `yaml:"session_lookup_cache"`
 	JWKS                    JWKS   `yaml:"jwks"`
 	RewriteWellKnown        bool   `yaml:"rewrite_well_known" env:"PROXY_OIDC_REWRITE_WELLKNOWN" desc:"Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider."`
+	ClientID                string `yaml:"client_id" env:"OCIS_OIDC_CLIENT_ID;PROXY_OIDC_CLIENT_ID" desc:"OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP."`
+	SkipClientIDCheck       bool   `yaml:"skip_client_id_check" env:"PROXY_OIDC_SKIP_CLIENT_ID_CHECK" desc:"If true will skip checking the configured client id is present in audience claims."`
 }
 
 type JWKS struct {

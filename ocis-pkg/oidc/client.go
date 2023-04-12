@@ -48,6 +48,8 @@ type oidcClient struct {
 	// Logger to use for logging, must be set
 	Logger log.Logger
 
+	clientID                string
+	skipClientIDCheck       bool
 	issuer                  string
 	provider                *ProviderMetadata
 	providerLock            *sync.Mutex
@@ -90,6 +92,8 @@ func NewOIDCClient(opts ...Option) OIDCProvider {
 		JWKSOptions:             options.JWKSOptions, // TODO I don't like that we pass down config options ...
 		providerLock:            &sync.Mutex{},
 		jwksLock:                &sync.Mutex{},
+		clientID:                options.ClientID,
+		skipClientIDCheck:       options.SkipClientIDCheck,
 	}
 }
 
@@ -316,17 +320,17 @@ func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawIDToken string) (
 		return nil, fmt.Errorf("oidc: nonce on logout token MUST NOT be present")
 	}
 	// Check issuer.
-	if !v.config.SkipIssuerCheck && token.Issuer != v.issuer {
-		return nil, fmt.Errorf("oidc: id token issued by a different provider, expected %q got %q", v.issuer, token.Issuer)
+	if !c.skipIssuerValidation && token.Issuer != c.issuer {
+		return nil, fmt.Errorf("oidc: id token issued by a different provider, expected %q got %q", c.issuer, token.Issuer)
 	}
 
 	// If a client ID has been provided, make sure it's part of the audience. SkipClientIDCheck must be true if ClientID is empty.
 	//
 	// This check DOES NOT ensure that the ClientID is the party to which the ID Token was issued (i.e. Authorized party).
-	if !v.config.SkipClientIDCheck {
-		if v.config.ClientID != "" {
-			if !contains(token.Audience, v.config.ClientID) {
-				return nil, fmt.Errorf("oidc: expected audience %q got %q", v.config.ClientID, token.Audience)
+	if !c.skipClientIDCheck {
+		if c.clientID != "" {
+			if !contains(token.Audience, c.clientID) {
+				return nil, fmt.Errorf("oidc: expected audience %q got %q", c.clientID, token.Audience)
 			}
 		} else {
 			return nil, fmt.Errorf("oidc: invalid configuration, clientID must be provided or SkipClientIDCheck must be set")
@@ -342,16 +346,16 @@ func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawIDToken string) (
 	}
 
 	sig := jws.Signatures[0]
-	supportedSigAlgs := v.config.SupportedSigningAlgs
+	supportedSigAlgs := c.algorithms
 	if len(supportedSigAlgs) == 0 {
-		supportedSigAlgs = []string{gOidc.RS256}
+		supportedSigAlgs = []string{RS256}
 	}
 
 	if !contains(supportedSigAlgs, sig.Header.Algorithm) {
 		return nil, fmt.Errorf("oidc: id token signed with unsupported algorithm, expected %q got %q", supportedSigAlgs, sig.Header.Algorithm)
 	}
 
-	gotPayload, err := v.keySet.VerifySignature(ctx, rawIDToken)
+	gotPayload, err := c.remoteKeySet.VerifySignature(ctx, rawIDToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to verify signature: %v", err)
 	}

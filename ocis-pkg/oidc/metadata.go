@@ -5,8 +5,8 @@ import (
 	"io"
 	"net/http"
 	"strings"
-	"time"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
@@ -64,19 +64,19 @@ type LogoutToken struct {
 	// this value may differ when using Google.
 	//
 	// See: https://developers.google.com/identity/protocols/OpenIDConnect#obtainuserinfo
-	Issuer string `json:iss` // example "https://server.example.com"
+	Issuer string `json:"iss"` // example "https://server.example.com"
 
 	// A unique string which identifies the end user.
-	Subject string `json:sub` //"248289761001"
+	Subject string `json:"sub"` //"248289761001"
 
 	// The client ID, or set of client IDs, that this token is issued for. For
 	// common uses, this is the client that initialized the auth flow.
 	//
 	// This package ensures the audience contains an expected value.
-	Audience audience `json:aud` // "s6BhdRkqt3"
+	Audience jwt.ClaimStrings `json:"aud"` // "s6BhdRkqt3"
 
 	// When the token was issued by the provider.
-	IssuedAt jsonTime `json:"iat"`
+	IssuedAt *jwt.NumericDate `json:"iat"`
 
 	// The Session Id
 	SessionId string `json:"sid"`
@@ -89,44 +89,6 @@ type LogoutToken struct {
 
 type logoutEvent struct {
 	Event *struct{} `json:"http://schemas.openid.net/event/backchannel-logout"`
-}
-
-type audience []string
-
-func (a *audience) UnmarshalJSON(b []byte) error {
-	var s string
-	if json.Unmarshal(b, &s) == nil {
-		*a = audience{s}
-		return nil
-	}
-	var auds []string
-	if err := json.Unmarshal(b, &auds); err != nil {
-		return err
-	}
-	*a = auds
-	return nil
-}
-
-type jsonTime time.Time
-
-func (j *jsonTime) UnmarshalJSON(b []byte) error {
-	var n json.Number
-	if err := json.Unmarshal(b, &n); err != nil {
-		return err
-	}
-	var unix int64
-
-	if t, err := n.Int64(); err == nil {
-		unix = t
-	} else {
-		f, err := n.Float64()
-		if err != nil {
-			return err
-		}
-		unix = int64(f)
-	}
-	*j = jsonTime(time.Unix(unix, 0))
-	return nil
 }
 
 func GetIDPMetadata(logger log.Logger, client *http.Client, idpURI string) (ProviderMetadata, error) {
