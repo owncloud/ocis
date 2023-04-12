@@ -164,17 +164,20 @@ func (c *ConcreteClient) getToken(ctx context.Context) (*gocloak.JWT, error) {
 }
 
 func (c *ConcreteClient) keycloakUserToLibregraph(u *gocloak.User) *libregraph.User {
-	attrs := *u.Attributes
-	ldapID := ""
-	ldapIDs, ok := attrs[_idAttr]
-	if ok {
-		ldapID = ldapIDs[0]
-	}
-
+	var ldapID string
 	var userType *string
-	userTypes, ok := attrs[_userTypeAttr]
-	if ok {
-		userType = &userTypes[0]
+
+	if u.Attributes != nil {
+		attrs := *u.Attributes
+		ldapIDs, ok := attrs[_idAttr]
+		if ok {
+			ldapID = ldapIDs[0]
+		}
+
+		userTypes, ok := attrs[_userTypeAttr]
+		if ok {
+			userType = &userTypes[0]
+		}
 	}
 
 	return &libregraph.User{
