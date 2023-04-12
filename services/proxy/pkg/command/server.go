@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
-	ocisLogoutVerifier "github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
@@ -192,21 +191,24 @@ func handlePredefinedRoutes(cfg *config.Config, logger log.Logger, handler http.
 }
 
 func (p *LogoutHandler) backchannelLogout(w http.ResponseWriter, r *http.Request) {
-	var oidcHTTPClient = &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				MinVersion:         tls.VersionTLS12,
-				InsecureSkipVerify: p.config.OIDC.Insecure, //nolint:gosec
+	/*
+		var oidcHTTPClient = &http.Client{
+			Transport: &http.Transport{
+				TLSClientConfig: &tls.Config{
+					MinVersion:         tls.VersionTLS12,
+					InsecureSkipVerify: p.config.OIDC.Insecure, //nolint:gosec
+				},
+				DisableKeepAlives: true,
 			},
-			DisableKeepAlives: true,
-		},
-		Timeout: time.Second * 10,
-	}
-	prov, _ := oidc.NewProvider(
-		context.WithValue(context.Background(), oauth2.HTTPClient, oidcHTTPClient),
-		p.config.OIDC.Issuer,
-	)
-	logoutVerifier := ocisLogoutVerifier.NewLogoutVerifier(p.config.OIDC)
+			Timeout: time.Second * 10,
+		}
+		prov, _ := oidc.NewProvider(
+			context.WithValue(context.Background(), oauth2.HTTPClient, oidcHTTPClient),
+			p.config.OIDC.Issuer,
+		)
+		logoutVerifier := ocisLogoutVerifier.NewLogoutVerifier(p.config.OIDC)
+	*/
+	w.Header().Set("Location", "https://todo")
 	render.Status(r, http.StatusOK)
 }
 

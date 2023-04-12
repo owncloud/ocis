@@ -175,6 +175,9 @@ func (m OIDCAuthenticator) verifyAccessTokenJWT(token string) (jwt.RegisteredCla
 	}
 
 	_, err := jwt.ParseWithClaims(token, &claims, jwks.Keyfunc)
+	if err != nil {
+		return claims, mapClaims, err
+	}
 	_, mapClaims, err = new(jwt.Parser).ParseUnverified(token, jwt.MapClaims{})
 	// TODO: decode mapClaims to sth readable
 	m.Logger.Debug().Interface("access token", &claims).Msg("parsed access token")
