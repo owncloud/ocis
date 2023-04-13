@@ -135,8 +135,14 @@ type RoleAssignment struct {
 
 // OIDCRoleMapper contains the configuration for the "oidc" role assignment driber
 type OIDCRoleMapper struct {
-	RoleClaim   string            `yaml:"role_claim" env:"PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM" desc:"The OIDC claim used to create the users role assignment."`
-	RoleMapping map[string]string `yaml:"role_mapping" desc:"A mapping of ocis role names to PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM claim values. This setting can only be configured in the configuration file and not via environment variables."`
+	RoleClaim string        `yaml:"role_claim" env:"PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM" desc:"The OIDC claim used to create the users role assignment."`
+	RolesMap  []RoleMapping `yaml:"role_mapping" desc:"A list of mappings of ocis role names to PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM claim values. This setting can only be configured in the configuration file and not via environment variables."`
+}
+
+// RoleMapping defines which ocis role matches a specific claim value
+type RoleMapping struct {
+	RoleName   string `yaml:"role_name" desc:"The name of an ocis role that this mapping should apply for."`
+	ClaimValue string `yaml:"claim_value" desc:"The value of the 'PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM' that matches the role defined in 'role_name'."`
 }
 
 // PolicySelector is the toplevel-configuration for different selectors

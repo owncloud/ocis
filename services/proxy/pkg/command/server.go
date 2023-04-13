@@ -178,7 +178,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 			userroles.WithRoleService(rolesClient),
 			userroles.WithLogger(logger),
 			userroles.WithRolesClaim(cfg.RoleAssignment.OIDCRoleMapper.RoleClaim),
-			userroles.WithRoleMapping(cfg.RoleAssignment.OIDCRoleMapper.RoleMapping),
+			userroles.WithRoleMapping(cfg.RoleAssignment.OIDCRoleMapper.RolesMap),
 			userroles.WithAutoProvisonCreator(autoProvsionCreator),
 		)
 	default:

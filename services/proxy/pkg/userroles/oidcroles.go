@@ -34,47 +34,55 @@ func NewOIDCRoleAssigner(opts ...Option) UserRoleAssigner {
 // already has a different role assigned.
 func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *cs3.User, claims map[string]interface{}) (*cs3.User, error) {
 	logger := ra.logger.SubloggerWithRequestID(ctx).With().Str("userid", user.GetId().GetOpaqueId()).Logger()
-	claimValueToRoleID, err := ra.oidcClaimvaluesToRoleIDs()
+	roleNamesToRoleIDs, err := ra.roleNamesToRoleIDs()
 	if err != nil {
-		logger.Error().Err(err).Msg("Error mapping claims to roles ids")
+		logger.Error().Err(err).Msg("Error mapping role names to role ids")
 		return nil, err
 	}
 
-	roleIDsFromClaim := make([]string, 0, 1)
-	claimRoles, ok := claims[ra.rolesClaim].([]interface{})
+	claimRolesRaw, ok := claims[ra.rolesClaim].([]interface{})
 	if !ok {
-		logger.Error().Err(err).Str("rolesClaim", ra.rolesClaim).Msg("No roles in user claims")
-		return nil, err
+		logger.Error().Str("rolesClaim", ra.rolesClaim).Msg("No roles in user claims")
+		return nil, errors.New("no roles in user claims")
 	}
+
 	logger.Debug().Str("rolesClaim", ra.rolesClaim).Interface("rolesInClaim", claims[ra.rolesClaim]).Msg("got roles in claim")
-	for _, cri := range claimRoles {
+	claimRoles := map[string]struct{}{}
+	for _, cri := range claimRolesRaw {
 		cr, ok := cri.(string)
 		if !ok {
 			err := errors.New("invalid role in claims")
 			logger.Error().Err(err).Interface("claimValue", cri).Msg("Is not a valid string.")
 			return nil, err
 		}
-		id, ok := claimValueToRoleID[cr]
-		if !ok {
-			logger.Debug().Str("role", cr).Msg("No mapping for claim role. Skipped.")
-			continue
-		}
-		roleIDsFromClaim = append(roleIDsFromClaim, id)
-	}
-	logger.Debug().Interface("roleIDs", roleIDsFromClaim).Msg("Mapped claim roles to roleids")
 
-	switch len(roleIDsFromClaim) {
-	default:
-		err := errors.New("too many roles found in claims")
-		logger.Error().Err(err).Msg("Only one role per user is allowed.")
-		return nil, err
-	case 0:
-		err := errors.New("no role in claim, maps to a ocis role")
+		claimRoles[cr] = struct{}{}
+	}
+
+	if len(claimRoles) == 0 {
+		err := errors.New("no roles set in claim")
 		logger.Error().Err(err).Msg("")
 		return nil, err
-	case 1:
-		// exactly one mapping. This is right
 	}
+
+	// the roleMapping config is supposed to have the role mappings ordered from the highest privileged role
+	// down to the lowest privileged role. Since ocis currently only can handle a single role assignment we
+	// pick the highest privileged role that matches a value from the claims
+	roleIDFromClaim := ""
+	for _, mapping := range ra.Options.roleMapping {
+		if _, ok := claimRoles[mapping.ClaimValue]; ok {
+			logger.Debug().Str("ocisRole", mapping.RoleName).Str("role id", roleNamesToRoleIDs[mapping.RoleName]).Msg("first matching role")
+			roleIDFromClaim = roleNamesToRoleIDs[mapping.RoleName]
+			break
+		}
+	}
+
+	if roleIDFromClaim == "" {
+		err := errors.New("no role in claim maps to an ocis role")
+		logger.Error().Err(err).Msg("")
+		return nil, err
+	}
+
 	assignedRoles, err := loadRolesIDs(ctx, user.GetId().GetOpaqueId(), ra.roleService)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not load roles")
@@ -86,8 +94,9 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 		return nil, err
 	}
 	logger.Debug().Interface("assignedRoleIds", assignedRoles).Msg("Currently assigned roles")
-	if len(assignedRoles) == 0 || (assignedRoles[0] != roleIDsFromClaim[0]) {
-		logger.Debug().Interface("assignedRoleIds", assignedRoles).Interface("newRoleIds", roleIDsFromClaim).Msg("Updating role assignment for user")
+
+	if len(assignedRoles) == 0 || (assignedRoles[0] != roleIDFromClaim) {
+		logger.Debug().Interface("assignedRoleIds", assignedRoles).Interface("newRoleId", roleIDFromClaim).Msg("Updating role assignment for user")
 		newctx, err := ra.prepareAdminContext()
 		if err != nil {
 			logger.Error().Err(err).Msg("Error creating admin context")
@@ -95,14 +104,14 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 		}
 		if _, err = ra.roleService.AssignRoleToUser(newctx, &settingssvc.AssignRoleToUserRequest{
 			AccountUuid: user.GetId().GetOpaqueId(),
-			RoleId:      roleIDsFromClaim[0],
+			RoleId:      roleIDFromClaim,
 		}); err != nil {
 			logger.Error().Err(err).Msg("Role assignment failed")
 			return nil, err
 		}
 	}
 
-	user.Opaque = utils.AppendJSONToOpaque(user.Opaque, "roles", roleIDsFromClaim)
+	user.Opaque = utils.AppendJSONToOpaque(user.Opaque, "roles", []string{roleIDFromClaim})
 	return user, nil
 }
 
@@ -136,32 +145,32 @@ func (ra oidcRoleAssigner) prepareAdminContext() (context.Context, error) {
 	return newctx, nil
 }
 
-type roleClaimToIDCache struct {
-	roleClaimToID map[string]string
-	lastRead      time.Time
-	lock          sync.RWMutex
+type roleNameToIDCache struct {
+	roleNameToID map[string]string
+	lastRead     time.Time
+	lock         sync.RWMutex
 }
 
-var roleClaimToID roleClaimToIDCache
+var roleNameToID roleNameToIDCache
 
-func (ra oidcRoleAssigner) oidcClaimvaluesToRoleIDs() (map[string]string, error) {
+func (ra oidcRoleAssigner) roleNamesToRoleIDs() (map[string]string, error) {
 	cacheTTL := 5 * time.Minute
-	roleClaimToID.lock.RLock()
+	roleNameToID.lock.RLock()
 
-	if !roleClaimToID.lastRead.IsZero() && time.Since(roleClaimToID.lastRead) < cacheTTL {
-		defer roleClaimToID.lock.RUnlock()
-		return roleClaimToID.roleClaimToID, nil
+	if !roleNameToID.lastRead.IsZero() && time.Since(roleNameToID.lastRead) < cacheTTL {
+		defer roleNameToID.lock.RUnlock()
+		return roleNameToID.roleNameToID, nil
 	}
 	ra.logger.Debug().Msg("refreshing roles ids")
 
 	// cache needs Refresh get a write lock
-	roleClaimToID.lock.RUnlock()
-	roleClaimToID.lock.Lock()
-	defer roleClaimToID.lock.Unlock()
+	roleNameToID.lock.RUnlock()
+	roleNameToID.lock.Lock()
+	defer roleNameToID.lock.Unlock()
 
 	// check again, another goroutine might have updated while we "upgraded" the lock
-	if !roleClaimToID.lastRead.IsZero() && time.Since(roleClaimToID.lastRead) < cacheTTL {
-		return roleClaimToID.roleClaimToID, nil
+	if !roleNameToID.lastRead.IsZero() && time.Since(roleNameToID.lastRead) < cacheTTL {
+		return roleNameToID.roleNameToID, nil
 	}
 
 	// Get all roles to find the role IDs.
@@ -183,16 +192,10 @@ func (ra oidcRoleAssigner) oidcClaimvaluesToRoleIDs() (map[string]string, error)
 	newIDs := map[string]string{}
 	for _, role := range res.Bundles {
 		ra.logger.Debug().Str("role", role.Name).Str("id", role.Id).Msg("Got Role")
-		roleClaim, ok := ra.roleMapping[role.Name]
-		if !ok {
-			err := errors.New("Incomplete role mapping")
-			ra.logger.Error().Err(err).Str("role", role.Name).Msg("Role not mapped to a claim value")
-			return map[string]string{}, err
-		}
-		newIDs[roleClaim] = role.Id
+		newIDs[role.Name] = role.Id
 	}
-	ra.logger.Debug().Interface("roleMap", newIDs).Msg("Claim Role to role ID map")
-	roleClaimToID.roleClaimToID = newIDs
-	roleClaimToID.lastRead = time.Now()
-	return roleClaimToID.roleClaimToID, nil
+	ra.logger.Debug().Interface("roleMap", newIDs).Msg("Role Name to role ID map")
+	roleNameToID.roleNameToID = newIDs
+	roleNameToID.lastRead = time.Now()
+	return roleNameToID.roleNameToID, nil
 }
