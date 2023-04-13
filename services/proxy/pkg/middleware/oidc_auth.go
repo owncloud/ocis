@@ -46,7 +46,7 @@ type OIDCAuthenticator struct {
 	OIDCIss                 string
 	userInfoCache           store.Store
 	DefaultTokenCacheTTL    time.Duration
-	oidcClient              oidc.OIDCProvider
+	oidcClient              oidc.OIDCClient
 	AccessTokenVerifyMethod string
 }
 

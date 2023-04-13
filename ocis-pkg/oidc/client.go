@@ -3,6 +3,7 @@ package oidc
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -22,8 +23,8 @@ import (
 	"gopkg.in/square/go-jose.v2"
 )
 
-// OIDCProvider used to mock the oidc provider during tests
-type OIDCProvider interface {
+// OIDCClient used to mock the oidc client during tests
+type OIDCClient interface {
 	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*UserInfo, error)
 	VerifyAccessToken(ctx context.Context, token string) (jwt.RegisteredClaims, []string, error)
 	VerifyLogoutToken(ctx context.Context, token string) (*LogoutToken, error)
@@ -55,7 +56,7 @@ type oidcClient struct {
 	providerLock            *sync.Mutex
 	skipIssuerValidation    bool
 	accessTokenVerifyMethod string
-	remoteKeySet            KeySet // TODO replace usage with keyfunc?
+	remoteKeySet            KeySet
 	algorithms              []string
 
 	JWKSOptions config.JWKS
@@ -81,7 +82,7 @@ var supportedAlgorithms = map[string]bool{
 }
 
 // NewOIDCClient returns an OIDC client for the given issuer
-func NewOIDCClient(opts ...Option) OIDCProvider {
+func NewOIDCClient(opts ...Option) OIDCClient {
 	options := newOptions(opts...)
 
 	return &oidcClient{
@@ -94,6 +95,8 @@ func NewOIDCClient(opts ...Option) OIDCProvider {
 		jwksLock:                &sync.Mutex{},
 		clientID:                options.ClientID,
 		skipClientIDCheck:       options.SkipClientIDCheck,
+		remoteKeySet:            options.KeySet,
+		provider:                options.ProviderMetadata,
 	}
 }
 
@@ -413,4 +416,25 @@ func unmarshalResp(r *http.Response, body []byte, v interface{}) error {
 		return fmt.Errorf("got Content-Type = application/json, but could not unmarshal as JSON: %v", err)
 	}
 	return fmt.Errorf("expected Content-Type = application/json, got %q: %v", ct, err)
+}
+
+func contains(sli []string, ele string) bool {
+	for _, s := range sli {
+		if s == ele {
+			return true
+		}
+	}
+	return false
+}
+
+func parseJWT(p string) ([]byte, error) {
+	parts := strings.Split(p, ".")
+	if len(parts) < 2 {
+		return nil, fmt.Errorf("oidc: malformed jwt, expected 3 parts got %d", len(parts))
+	}
+	payload, err := base64.RawURLEncoding.DecodeString(parts[1])
+	if err != nil {
+		return nil, fmt.Errorf("oidc: malformed jwt payload: %v", err)
+	}
+	return payload, nil
 }

@@ -47,7 +47,7 @@ type StaticRouteHandler struct {
 	userInfoCache microstore.Store
 	logger        log.Logger
 	config        config.Config
-	oidcClient    oidc.OIDCProvider
+	oidcClient    oidc.OIDCClient
 }
 
 // Server is the entrypoint for the server command.

@@ -35,7 +35,7 @@ type Options struct {
 	// SettingsRoleService for the roles API in settings
 	SettingsRoleService settingssvc.RoleService
 	// OIDCProviderFunc to lazily initialize an oidc provider, must be set for the oidc_auth middleware
-	OIDCClient oidc.OIDCProvider
+	OIDCClient oidc.OIDCClient
 	// OIDCIss is the oidcAuth-issuer
 	OIDCIss string
 	// RevaGatewayClient to send requests to the reva gateway
@@ -115,7 +115,7 @@ func SettingsRoleService(rc settingssvc.RoleService) Option {
 }
 
 // OIDCClient provides a function to set the the oidc client option.
-func OIDCClient(val oidc.OIDCProvider) Option {
+func OIDCClient(val oidc.OIDCClient) Option {
 	return func(o *Options) {
 		o.OIDCClient = val
 	}

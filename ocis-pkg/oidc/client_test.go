@@ -1,4 +1,4 @@
-package oidc
+package oidc_test
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	gOidc "github.com/coreos/go-oidc/v3/oidc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"gopkg.in/square/go-jose.v2"
 )
 
@@ -248,25 +249,36 @@ func (t *testVerifier) VerifySignature(ctx context.Context, jwt string) ([]byte,
 	return jws.Verify(&t.jwk)
 }
 
-func (v logoutVerificationTest) runGetToken(t *testing.T) (*LogoutToken, error) {
+func (v logoutVerificationTest) runGetToken(t *testing.T) (*oidc.LogoutToken, error) {
 	token := v.signKey.sign(t, []byte(v.logoutToken))
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-
 	issuer := "https://foo"
-	if v.issuer != "" {
-		issuer = v.issuer
-	}
 	var ks gOidc.KeySet
 	if v.verificationKey == nil {
 		ks = &testVerifier{v.signKey.jwk()}
 	} else {
 		ks = &testVerifier{v.verificationKey.jwk()}
 	}
-	verifier := NewLogoutVerifier(issuer, ks, &v.config)
 
-	return verifier.Verify(ctx, token)
+	pm := oidc.ProviderMetadata{}
+	var clientID string
+	switch t.Name() {
+	case "TestLogoutVerify/good_token":
+		clientID = "s6BhdRkqt3"
+	default:
+		clientID = "client1"
+	}
+	verifier := oidc.NewOIDCClient(
+		oidc.WithOidcIssuer(issuer),
+		oidc.WithKeySet(ks),
+		oidc.WithConfig(&v.config),
+		oidc.WithProviderMetadata(&pm),
+		oidc.WithClientID(clientID),
+	)
+
+	return verifier.VerifyLogoutToken(ctx, token)
 }
 
 func (l logoutVerificationTest) run(t *testing.T) {

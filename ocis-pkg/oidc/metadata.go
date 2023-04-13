@@ -81,13 +81,13 @@ type LogoutToken struct {
 	// The Session Id
 	SessionId string `json:"sid"`
 
-	Events logoutEvent `json:"events"`
+	Events LogoutEvent `json:"events"`
 
 	// Jwt Id
 	JwtID string `json:"jti"`
 }
 
-type logoutEvent struct {
+type LogoutEvent struct {
 	Event *struct{} `json:"http://schemas.openid.net/event/backchannel-logout"`
 }
 

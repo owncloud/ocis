@@ -5,6 +5,8 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
+
+	gOidc "github.com/coreos/go-oidc/v3/oidc"
 )
 
 // Option defines a single option function.
@@ -20,6 +22,8 @@ type Options struct {
 	OidcIssuer string
 	// JWKSOptions to use when retrieving keys
 	JWKSOptions config.JWKS
+	// KeySet to use when verifiing signatures
+	KeySet KeySet
 	// AccessTokenVerifyMethod to use when verifying access tokens
 	// TODO pass a function or interface to verify? an AccessTokenVerifier?
 	AccessTokenVerifyMethod string
@@ -28,6 +32,11 @@ type Options struct {
 	ClientID string
 	// SkipClientIDCheck must be true if ClientID is empty
 	SkipClientIDCheck bool
+	// Config to use
+	Config *gOidc.Config
+
+	// ProviderMetadata to use
+	ProviderMetadata *ProviderMetadata
 }
 
 // newOptions initializes the available default options.
@@ -76,6 +85,13 @@ func WithJWKSOptions(val config.JWKS) Option {
 	}
 }
 
+// WithKeySet provides a function to set the KeySet option.
+func WithKeySet(val KeySet) Option {
+	return func(o *Options) {
+		o.KeySet = val
+	}
+}
+
 // WithClientID provides a function to set the clientID option.
 func WithClientID(val string) Option {
 	return func(o *Options) {
@@ -87,5 +103,19 @@ func WithClientID(val string) Option {
 func WithSkipClientIDCheck(val bool) Option {
 	return func(o *Options) {
 		o.SkipClientIDCheck = val
+	}
+}
+
+// WithSkipClientIDCheck provides a function to set the skipClientIDCheck option.
+func WithConfig(val *gOidc.Config) Option {
+	return func(o *Options) {
+		o.Config = val
+	}
+}
+
+// WithProviderMetadata provides a function to set the provider option.
+func WithProviderMetadata(val *ProviderMetadata) Option {
+	return func(o *Options) {
+		o.ProviderMetadata = val
 	}
 }
