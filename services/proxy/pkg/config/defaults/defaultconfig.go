@@ -60,11 +60,11 @@ func DefaultConfig() *config.Config {
 			// this default is only relevant when Driver is set to "oidc"
 			OIDCRoleMapper: config.OIDCRoleMapper{
 				RoleClaim: "roles",
-				RoleMapping: map[string]string{
-					"admin":      "ocisAdmin",
-					"spaceadmin": "ocisSpaceAdmin",
-					"user":       "ocisUser",
-					"guest":      "ocisGuest",
+				RolesMap: []config.RoleMapping{
+					config.RoleMapping{RoleName: "admin", ClaimValue: "ocisAdmin"},
+					config.RoleMapping{RoleName: "spaceadmin", ClaimValue: "ocisSpaceAdmin"},
+					config.RoleMapping{RoleName: "user", ClaimValue: "ocisUser"},
+					config.RoleMapping{RoleName: "guest", ClaimValue: "ocisGuest"},
 				},
 			},
 		},

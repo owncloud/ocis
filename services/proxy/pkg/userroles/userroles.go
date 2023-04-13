@@ -7,6 +7,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/autoprovision"
+	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
 )
 
 //go:generate mockery --name=UserRoleAssigner
@@ -26,7 +27,7 @@ type UserRoleAssigner interface {
 type Options struct {
 	roleService         settingssvc.RoleService
 	rolesClaim          string
-	roleMapping         map[string]string
+	roleMapping         []config.RoleMapping
 	autoProvsionCreator autoprovision.Creator
 	logger              log.Logger
 }
@@ -56,7 +57,7 @@ func WithRolesClaim(claim string) Option {
 }
 
 // WithRoleMapping configures the map of ocis role names to claims values
-func WithRoleMapping(roleMap map[string]string) Option {
+func WithRoleMapping(roleMap []config.RoleMapping) Option {
 	return func(o *Options) {
 		o.roleMapping = roleMap
 	}

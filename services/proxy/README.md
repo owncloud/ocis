@@ -50,10 +50,14 @@ role_assignment:
     oidc_role_mapper:
         role_claim: ocisRoles
         role_mapping:
-            admin: myAdminRole
-            user: myUserRole
-            spaceadmin: mySpaceAdminRole
-            guest: myGuestRole
+            - role_name: admin
+              claim_value: myAdminRole
+            - role_name: spaceadmin
+              claim_value: mySpaceAdminRole
+            - role_name: user
+              claim_value: myUserRole
+            - role_name: guest:
+              claim_value: myGuestRole
 ```
 
 This would assign the role `admin` to users with the value `myAdminRole` in the claim `ocisRoles`.
@@ -62,16 +66,27 @@ The role `user` to users with the values `myUserRole` in the claims `ocisRoles` 
 Claim values that are not mapped to a specific ownCloud Infinite Scale role will be ignored.
 
 Note: An ownCloud Infinite Scale user can only have a single role assigned. If the configured
-`role_mapping` and a user's claim values result in multiple possible roles for a user, an error
-will be logged and the user will not be able to login.
+`role_mapping` and a user's claim values result in multiple possible roles for a user, the order in
+which the role mappings are defined in the configuration is important. The first role in the
+`role_mappings` where the `claim_value` matches a value from the user's roles claim will be assigned
+to the user. So if e.g. a user's `ocisRoles` claim has the values `myUserRole` and
+`mySpaceAdminRole` that user will get the ocis role `spaceadmin` assigned (because `spaceadmin`
+appears before `user` in the above sample configuration).
 
-The default `role_claim` (or `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM`) is `roles`. The `role_mapping` is:
+If a user's claim values don't match any of the configured role mappings an error will be logged and
+the user will not be able to login.
+
+The default `role_claim` (or `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM`) is `roles`. The default `role_mapping` is:
 
 ```yaml
-admin: ocisAdmin
-user: ocisUser
-spaceadmin: ocisSpaceAdmin
-guest: ocisGuest
+- role_name: admin
+  claim_value: ocisAdmin
+- role_name: spaceadmin
+  claim_value: ocisSpaceAdmin
+- role_name: user
+  claim_value: ocisUser
+- role_name: guest:
+  claim_value: ocisGuest
 ```
 
 ## Recommendations for Production Deployments
