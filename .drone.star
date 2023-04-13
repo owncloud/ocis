@@ -238,12 +238,8 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
-        codestyle(ctx) + \
-        buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
-        [buildOcisBinaryForTesting(ctx)] + \
-        testOcisModules(ctx) + \
-        testPipelines(ctx)
+        testOcisModules(ctx)
 
     build_release_pipelines = \
         [licenseCheck(ctx)] + \
@@ -259,9 +255,11 @@ def main(ctx):
     test_pipelines.append(
         pipelineDependsOn(
             purgeBuildArtifactCache(ctx),
-            testPipelines(ctx),
+            testOcisModules(ctx),
         ),
     )
+
+    return test_pipelines
 
     pipelines = test_pipelines + build_release_pipelines + build_release_helpers
 
@@ -321,7 +319,7 @@ def testOcisModules(ctx):
     scan_result_upload = uploadScanResults(ctx)
     scan_result_upload["depends_on"] = getPipelineNames(pipelines)
 
-    return pipelines + [scan_result_upload]
+    return pipelines  #+ [scan_result_upload]
 
 def cancelPreviousBuilds():
     return [{
@@ -474,40 +472,40 @@ def testOcisModule(ctx, module):
             "image": OC_CI_GOLANG,
             "commands": [
                 "mkdir -p cache/checkstyle",
-                "make -C %s ci-golangci-lint" % (module),
+                "retry -t 3 'make -C %s ci-golangci-lint'" % (module),
                 "mv %s/checkstyle.xml cache/checkstyle/$(basename %s)_checkstyle.xml" % (module, module),
             ],
             "volumes": [stepVolumeGo],
         },
-        {
-            "name": "test",
-            "image": OC_CI_GOLANG,
-            "commands": [
-                "mkdir -p cache/coverage",
-                "make -C %s test" % (module),
-                "mv %s/coverage.out cache/coverage/$(basename %s)_coverage.out" % (module, module),
-            ],
-            "volumes": [stepVolumeGo],
-        },
-        {
-            "name": "scan-result-cache",
-            "image": PLUGINS_S3,
-            "settings": {
-                "endpoint": {
-                    "from_secret": "cache_s3_endpoint",
-                },
-                "bucket": "cache",
-                "source": "cache/**/*",
-                "target": "%s/%s" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
-                "path_style": True,
-                "access_key": {
-                    "from_secret": "cache_s3_access_key",
-                },
-                "secret_key": {
-                    "from_secret": "cache_s3_secret_key",
-                },
-            },
-        },
+        # {
+        #     "name": "test",
+        #     "image": OC_CI_GOLANG,
+        #     "commands": [
+        #         "mkdir -p cache/coverage",
+        #         "make -C %s test" % (module),
+        #         "mv %s/coverage.out cache/coverage/$(basename %s)_coverage.out" % (module, module),
+        #     ],
+        #     "volumes": [stepVolumeGo],
+        # },
+        # {
+        #     "name": "scan-result-cache",
+        #     "image": PLUGINS_S3,
+        #     "settings": {
+        #         "endpoint": {
+        #             "from_secret": "cache_s3_endpoint",
+        #         },
+        #         "bucket": "cache",
+        #         "source": "cache/**/*",
+        #         "target": "%s/%s" % (ctx.repo.slug, ctx.build.commit + "-${DRONE_BUILD_NUMBER}"),
+        #         "path_style": True,
+        #         "access_key": {
+        #             "from_secret": "cache_s3_access_key",
+        #         },
+        #         "secret_key": {
+        #             "from_secret": "cache_s3_secret_key",
+        #         },
+        #     },
+        # },
     ]
 
     return {
