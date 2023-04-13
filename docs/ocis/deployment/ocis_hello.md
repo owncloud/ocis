@@ -9,6 +9,9 @@ geekdocFilePath: ocis_hello.md
 
 {{< toc >}}
 
+**IMPORTANT:**
+The `ocis-hello` example is currently under revision and does not work due to latest changes in master.
+
 ## Overview
 
 - oCIS running behind Traefik as reverse proxy
