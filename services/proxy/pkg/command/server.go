@@ -206,23 +206,31 @@ func (h *StaticRouteHandler) handler() http.Handler {
 	return m
 }
 
+type jse struct {
+	Error            string `json:"error"`
+	ErrorDescription string `json:"error_description"`
+}
+
 // handle backchannel logout requests as per https://openid.net/specs/openid-connect-backchannel-1_0.html#BCRequest
 func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Request) {
 	// parse the application/x-www-form-urlencoded POST request
 	if err := r.ParseForm(); err != nil {
 		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, jse{Error: "invalid_request", ErrorDescription: err.Error()})
 		return
 	}
 
 	logoutToken, err := h.oidcClient.VerifyLogoutToken(r.Context(), r.PostFormValue("logout_token"))
 	if err != nil {
 		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, jse{Error: "invalid_request", ErrorDescription: err.Error()})
 		return
 	}
 
 	records, err := h.userInfoCache.Read(logoutToken.SessionId)
 	if errors.Is(err, microstore.ErrNotFound) || len(records) == 0 {
 		render.Status(r, http.StatusOK)
+		render.JSON(w, r, nil)
 		return
 	}
 
@@ -232,6 +240,7 @@ func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 			// Spec requires us to return a 400 BadRequest when the session could not be destroyed
 			h.logger.Err(err).Msg("could not delete user info from cache")
 			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, jse{Error: "invalid_request", ErrorDescription: err.Error()})
 			return
 		}
 	}
@@ -240,6 +249,7 @@ func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 	_ = h.userInfoCache.Delete(logoutToken.SessionId)
 
 	render.Status(r, http.StatusOK)
+	render.JSON(w, r, nil)
 }
 
 func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache microstore.Store) alice.Chain {

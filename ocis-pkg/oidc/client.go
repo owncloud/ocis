@@ -138,7 +138,7 @@ func (c *oidcClient) lookupWellKnownOpenidConfiguration(ctx context.Context) err
 		}
 		c.provider = &p
 		c.algorithms = algs
-		c.remoteKeySet = gOidc.NewRemoteKeySet(ctx, p.JwksURI)
+		c.remoteKeySet = gOidc.NewRemoteKeySet(gOidc.ClientContext(ctx, c.httpClient), p.JwksURI)
 	}
 	return nil
 }
@@ -249,7 +249,7 @@ func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSourc
 	ct := resp.Header.Get("Content-Type")
 	mediaType, _, parseErr := mime.ParseMediaType(ct)
 	if parseErr == nil && mediaType == "application/jwt" {
-		payload, err := c.remoteKeySet.VerifySignature(ctx, string(body))
+		payload, err := c.remoteKeySet.VerifySignature(gOidc.ClientContext(ctx, c.httpClient), string(body))
 		if err != nil {
 			return nil, fmt.Errorf("oidc: invalid userinfo jwt signature %v", err)
 		}
@@ -318,6 +318,9 @@ func (c *oidcClient) verifyAccessTokenJWT(token string) (jwt.RegisteredClaims, [
 }
 
 func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*LogoutToken, error) {
+	if err := c.lookupWellKnownOpenidConfiguration(ctx); err != nil {
+		return nil, err
+	}
 	jws, err := jose.ParseSigned(rawToken)
 	if err != nil {
 		return nil, err
@@ -352,7 +355,7 @@ func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*L
 	}
 	// Check issuer.
 	if !c.skipIssuerValidation && token.Issuer != c.issuer {
-		return nil, fmt.Errorf("oidc: id token issued by a different provider, expected %q got %q", c.issuer, token.Issuer)
+		return nil, fmt.Errorf("oidc: logout token issued by a different provider, expected %q got %q", c.issuer, token.Issuer)
 	}
 
 	// If a client ID has been provided, make sure it's part of the audience. SkipClientIDCheck must be true if ClientID is empty.
@@ -370,10 +373,10 @@ func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*L
 
 	switch len(jws.Signatures) {
 	case 0:
-		return nil, fmt.Errorf("oidc: id token not signed")
+		return nil, fmt.Errorf("oidc: logout token not signed")
 	case 1:
 	default:
-		return nil, fmt.Errorf("oidc: multiple signatures on id token not supported")
+		return nil, fmt.Errorf("oidc: multiple signatures on logout token not supported")
 	}
 
 	sig := jws.Signatures[0]
@@ -383,10 +386,10 @@ func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*L
 	}
 
 	if !contains(supportedSigAlgs, sig.Header.Algorithm) {
-		return nil, fmt.Errorf("oidc: id token signed with unsupported algorithm, expected %q got %q", supportedSigAlgs, sig.Header.Algorithm)
+		return nil, fmt.Errorf("oidc: logout token signed with unsupported algorithm, expected %q got %q", supportedSigAlgs, sig.Header.Algorithm)
 	}
 
-	gotPayload, err := c.remoteKeySet.VerifySignature(ctx, rawToken)
+	gotPayload, err := c.remoteKeySet.VerifySignature(gOidc.ClientContext(ctx, c.httpClient), rawToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to verify signature: %v", err)
 	}
