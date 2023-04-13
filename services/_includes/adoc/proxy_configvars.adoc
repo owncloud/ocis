@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-13-14-37-38]
+[#deprecation-note-2023-04-13-15-21-30]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -194,7 +194,7 @@ Enable/Disable HTTPS for the external HTTP services.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-13-14-37-38[Deprecation Note]
+xref:deprecation-note-2023-04-13-15-21-30[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

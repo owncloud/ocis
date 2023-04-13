@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-13-14-37-38]
+[#deprecation-note-2023-04-13-15-21-30]
 [caption=]
 .Deprecation notes for the sharing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -182,7 +182,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-13-14-37-38[Deprecation Note]
+xref:deprecation-note-2023-04-13-15-21-30[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -240,7 +240,7 @@ Whether to verify the server TLS certificates.
 
 a|`SHARING_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `SHARING_EVENTS_TLS_ROOT_CA_CERT` +
-xref:deprecation-note-2023-04-13-14-37-38[Deprecation Note]
+xref:deprecation-note-2023-04-13-15-21-30[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

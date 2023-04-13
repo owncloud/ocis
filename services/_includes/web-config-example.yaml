@@ -64,6 +64,9 @@ web:
       - image/tiff
       - image/bmp
       - image/x-ms-bmp
+    styles: []
+    scripts: []
+    custom_translations: []
 token_manager:
   jwt_secret: ""
 gateway_addr: 127.0.0.1:9142
