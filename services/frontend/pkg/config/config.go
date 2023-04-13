@@ -39,11 +39,12 @@ type Config struct {
 
 	PublicURL string `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL" desc:"The public facing URL of the oCIS frontend."`
 
-	AppHandler  AppHandler  `yaml:"app_handler"`
-	Archiver    Archiver    `yaml:"archiver"`
-	DataGateway DataGateway `yaml:"data_gateway"`
-	OCS         OCS         `yaml:"ocs"`
-	Checksums   Checksums   `yaml:"checksums"`
+	AppHandler          AppHandler          `yaml:"app_handler"`
+	Archiver            Archiver            `yaml:"archiver"`
+	DataGateway         DataGateway         `yaml:"data_gateway"`
+	OCS                 OCS                 `yaml:"ocs"`
+	Checksums           Checksums           `yaml:"checksums"`
+	ReadyOnlyAttributes ReadyOnlyAttributes `yaml:"read_only_attributes"`
 
 	Middleware Middleware `yaml:"middleware"`
 
@@ -159,4 +160,15 @@ type CBOXDriver struct {
 type Checksums struct {
 	SupportedTypes      []string `yaml:"supported_types" env:"FRONTEND_CHECKSUMS_SUPPORTED_TYPES" desc:"Define the checksum types that indicate to clients which hashes the server can use to verify upload integrity. You can provide multiple types separated by blank or comma. Supported types are 'sha1', 'md5' and 'adler32'."`
 	PreferredUploadType string   `yaml:"preferred_upload_type" env:"FRONTEND_CHECKSUMS_PREFERRED_UPLOAD_TYPE" desc:"The supported checksum type for uploads that indicates to clients supporting multiple hash algorithms which one is preferred by the server. Must be one out of the defined list of SUPPORTED_TYPES."`
+}
+
+type ReadyOnlyAttributes struct {
+	AccountEnabled           bool `yaml:"account_enabled" env:"FRONTEND_READONLY_ATTRIBUTES_ACCOUNT_ENABLED" desc:"Flag to indicate if account_enabled attribute is read-only. Default is false."`
+	DisplayName              bool `yaml:"display_name" env:"FRONTEND_READONLY_ATTRIBUTES_DISPLAY_NAME" desc:"Flag to indicate if display_name attribute is read-only. Default is true."`
+	GivenName                bool `yaml:"given_name" env:"FRONTEND_READONLY_ATTRIBUTES_GIVEN_NAME" desc:"Flag to indicate if given_name attribute is read-only. Default is true."`
+	ID                       bool `yaml:"id" env:"FRONTEND_READONLY_ATTRIBUTES_ID" desc:"Flag to indicate if id attribute is read-only. Default is true."`
+	Mail                     bool `yaml:"mail" env:"FRONTEND_READONLY_ATTRIBUTES_MAIL" desc:"Flag to indicate if mail attribute is read-only. Default is true."`
+	OnPremisesSamAccountName bool `yaml:"on_premises_sam_account_name" env:"FRONTEND_READONLY_ATTRIBUTES_ON_PREMISES_SAM_ACCOUNT_NAME" desc:"Flag to indicate if on_premises_sam_account_name attribute is read-only. Default is true."`
+	Surname                  bool `yaml:"surname" env:"FRONTEND_READONLY_ATTRIBUTES_SURNAME" desc:"Flag to indicate if surname attribute is read-only.  Default is true."`
+	Quota                    bool `yaml:"quota" env:"FRONTEND_READONLY_ATTRIBUTES_QUOTA" desc:"Flag to indicate if quota attribute read-only. Default is false."`
 }

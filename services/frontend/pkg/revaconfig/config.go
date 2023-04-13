@@ -63,6 +63,24 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 		}
 	}
 
+	read_only_attributes_map := map[string]bool{
+		"account_enabled":              cfg.ReadyOnlyAttributes.AccountEnabled,
+		"display_name":                 cfg.ReadyOnlyAttributes.DisplayName,
+		"given_name":                   cfg.ReadyOnlyAttributes.GivenName,
+		"id":                           cfg.ReadyOnlyAttributes.ID,
+		"mail":                         cfg.ReadyOnlyAttributes.Mail,
+		"on_premises_sam_account_name": cfg.ReadyOnlyAttributes.OnPremisesSamAccountName,
+		"surname":                      cfg.ReadyOnlyAttributes.Surname,
+		"quota":                        cfg.ReadyOnlyAttributes.Quota,
+	}
+
+	var read_only_attributes []string
+	for k, v := range read_only_attributes_map {
+		if v {
+			read_only_attributes = append(read_only_attributes, k)
+		}
+	}
+
 	return map[string]interface{}{
 		"core": map[string]interface{}{
 			"tracing_enabled":      cfg.Tracing.Enabled,
@@ -199,6 +217,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 							},
 							"graph": map[string]interface{}{
 								"personal_data_export": true,
+								"read_only_attributes": read_only_attributes,
 							},
 							"checksums": map[string]interface{}{
 								"supported_types":       cfg.Checksums.SupportedTypes,
