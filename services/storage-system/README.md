@@ -1,4 +1,4 @@
-# Storage-System Service
+# Storage-System
 
 Purpose and description to be added
 

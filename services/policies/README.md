@@ -1,4 +1,4 @@
-# Policies Service
+# Policies
 
 The policies service provides a new gRPC API which can be used to check whether a requested operation is allowed or not. To do so, Open Policy Agent (OPA) is used to define the set of rules of what is permitted and what is not.
 

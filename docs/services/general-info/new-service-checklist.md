@@ -1,9 +1,9 @@
 ---
 title: New Service Checklist
 date: 2023-03-23T00:00:00+00:00
-weight: 0
+weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/services
+geekdocEditPath: edit/master/docs/services/general-info
 geekdocFilePath: new-service-checklist.md
 geekdocCollapseSection: true
 ---
@@ -23,6 +23,7 @@ Use this checklist with copy/paste in your PR - right from the beginning. It ren
     bad `<img src="https://github.com/owncloud/ocis/blob/master/services/graph/images/mermaid-graph.svg" width="500" />`  
     good `<img src="https://raw.githubusercontent.com/owncloud/ocis/master/services/graph/images/mermaid-graph.svg" width="500" />`
 - [ ] If new CLI command are introduced, that command must be described in readme.md.
+- [ ] If new global envvar is introduced, the name must start with `OCIS_`.
 - [ ] Add the service to the makefile in the ocis repo root.
 - [ ] Make the service startable for binary and individual startup:
   - For single binary add service to `ocis/pkg/runtime`

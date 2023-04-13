@@ -1,4 +1,4 @@
-# Userlog Service
+# Userlog
 
 The `userlog` service is a mediator between the `eventhistory` service and clients who want to be informed about user related events. It provides an API to retrieve those.
 

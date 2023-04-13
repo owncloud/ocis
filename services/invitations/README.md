@@ -1,4 +1,4 @@
-# Invitations Service
+# Invitations
 
 The invitations service provides an [Invitation Manager](https://learn.microsoft.com/en-us/graph/api/invitation-post?view=graph-rest-1.0&tabs=http) that can be used to invite external users, aka guests, to an organization.
 

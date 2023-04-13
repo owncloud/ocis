@@ -1,4 +1,4 @@
-# Web Service
+# Web
 
 The web service embeds and serves the static files for the [Infinite Scale Web Client](https://github.com/owncloud/web).  
 Note that clients will respond with a connection error if the web service is not available.

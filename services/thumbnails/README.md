@@ -1,4 +1,4 @@
-# Thumbnails Service
+# Thumbnails
 
 The thumbnails service provides methods to generate thumbnails for various files and resolutions based on requests. It retrieves the sources at the location where the user files are stored and saves the thumbnails where system files are stored. Those locations have defaults but can be manually defined via environment variables.
 

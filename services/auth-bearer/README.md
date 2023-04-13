@@ -1,4 +1,4 @@
-# Auth-Bearer Service
+# Auth-Bearer
 
 The oCIS Auth Bearer service communicates with the configured OpenID Connect identity provider to authenticate requests. OpenID Connect is the default authentication mechanism for all clients: web, desktop and mobile. Basic auth is only used for testing and has to be explicity enabled.
 

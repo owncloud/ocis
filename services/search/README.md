@@ -1,4 +1,4 @@
-# Search Service
+# Search
 
 The search service is responsible for metadata and content extraction, stores that data as index and makes it searchable. The following clarifies the extraction terms _metadata_ and _content_:
 

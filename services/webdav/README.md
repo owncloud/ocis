@@ -1,4 +1,4 @@
-# Webdav Service
+# Webdav
 
 The webdav service, like the [ocdav](https://github.com/owncloud/ocis/tree/master/services/ocdav) service, provides a HTTP API following the webdav protocol. It receives HTTP calls from requestors like clients and issues gRPC calls to other services executing these requests. After the called service has finished the request, the webdav service will render their responses in `xml` and sends them back to the requestor.
 

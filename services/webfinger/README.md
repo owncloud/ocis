@@ -1,4 +1,4 @@
-# Webfinger Service
+# Webfinger
 
 The webfinger service provides an RFC7033 WebFinger lookup of ownCloud instances relevant for a given user account via endpoints a the /.well-known/webfinger implementation.
 

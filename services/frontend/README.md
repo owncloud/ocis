@@ -1,4 +1,4 @@
-# Frontend Service
+# Frontend
 
 The frontend service translates various owncloud related HTTP APIs to CS3 requests. 
 
