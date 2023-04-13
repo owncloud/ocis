@@ -125,10 +125,10 @@ type CORS struct {
 
 // Keycloak configuration
 type Keycloak struct {
-	BasePath           string `yaml:"base_path" env:"KEYCLOAK_BASE_PATH;GRAPH_KEYCLOAK_BASE_PATH" desc:"The URL to access keycloak."`
-	ClientID           string `yaml:"client_id" env:"KEYCLOAK_CLIENT_ID;GRAPH_KEYCLOAK_CLIENT_ID" desc:"The client id to authenticate with keycloak."`
-	ClientSecret       string `yaml:"client_secret" env:"KEYCLOAK_CLIENT_SECRET;GRAPH_KEYCLOAK_CLIENT_SECRET" desc:"The client secret to use in authentication."`
-	ClientRealm        string `yaml:"client_realm" env:"KEYCLOAK_CLIENT_REALM;GRAPH_KEYCLOAK_CLIENT_REALM" desc:"The realm the client is defined in."`
-	UserRealm          string `yaml:"user_realm" env:"KEYCLOAK_USER_REALM;GRAPH_KEYCLOAK_USER_REALM" desc:"The realm users are defined."`
-	InsecureSkipVerify bool   `yaml:"insecure_skip_verify" env:"KEYCLOAK_INSECURE_SKIP_VERIFY;GRAPH_KEYCLOAK_INSECURE_SKIP_VERIFY" desc:"Disable TLS certificate validation for Keycloak connections. Do not set this in production environments."`
+	BasePath           string `yaml:"base_path" env:"OCIS_KEYCLOAK_BASE_PATH;GRAPH_KEYCLOAK_BASE_PATH" desc:"The URL to access keycloak."`
+	ClientID           string `yaml:"client_id" env:"OCIS_KEYCLOAK_CLIENT_ID;GRAPH_KEYCLOAK_CLIENT_ID" desc:"The client id to authenticate with keycloak."`
+	ClientSecret       string `yaml:"client_secret" env:"OCIS_KEYCLOAK_CLIENT_SECRET;GRAPH_KEYCLOAK_CLIENT_SECRET" desc:"The client secret to use in authentication."`
+	ClientRealm        string `yaml:"client_realm" env:"OCIS_KEYCLOAK_CLIENT_REALM;GRAPH_KEYCLOAK_CLIENT_REALM" desc:"The realm the client is defined in."`
+	UserRealm          string `yaml:"user_realm" env:"OCIS_KEYCLOAK_USER_REALM;GRAPH_KEYCLOAK_USER_REALM" desc:"The realm users are defined."`
+	InsecureSkipVerify bool   `yaml:"insecure_skip_verify" env:"OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY;GRAPH_KEYCLOAK_INSECURE_SKIP_VERIFY" desc:"Disable TLS certificate validation for Keycloak connections. Do not set this in production environments."`
 }
