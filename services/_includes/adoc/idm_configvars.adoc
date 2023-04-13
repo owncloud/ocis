@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[[deprecation-note]]
+[#deprecation-note-2023-04-13-14-37-38]
 [caption=]
 .Deprecation notes for the idm service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -186,7 +186,7 @@ Full path to the IDM backend database. If not defined, the root directory derive
 a|`IDM_CREATE_DEMO_USERS` +
 `OCIS_ACCOUNTS_DEMO_USERS_AND_GROUPS` +
 `ACCOUNTS_DEMO_USERS_AND_GROUPS` +
-xref:deprecation-note[Deprecation Note]
+xref:deprecation-note-2023-04-13-14-37-38[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]

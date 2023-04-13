@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strings"
 	"text/template"
+	"time"
 	"sort"
 
     {{- range $key, $value := .}}
@@ -48,6 +49,7 @@ type templateData struct {
 	Fields          []ConfigField
 	Deprecations    []DeprecationField
 	HasDeprecations bool
+	Timestamp 	string
 }
 
 func main() {
@@ -83,7 +85,8 @@ func main() {
 	all := make(map[string]EnvVar)
 	for pkg, conf := range m {
 	    service := replacer.Replace(pkg)
-	    fields, deprecations = GetAnnotatedVariables(conf)
+	    timestamp := time.Now().Format("2006-01-02-15-04-05")
+	    fields, deprecations = GetAnnotatedVariables(conf, timestamp)
 	    var hasDeprecations bool
 	    if len(deprecations) > 0 {
 		    hasDeprecations = true
@@ -115,7 +118,8 @@ func main() {
 			ExtensionName: service,
 			Fields:        fields,
 			Deprecations: deprecations,
-			HasDeprecations: hasDeprecations ,
+			HasDeprecations: hasDeprecations,
+			Timestamp: timestamp,
 		}
 		adocFile, err = os.Create(filepath.Join(targetFolder, service + "_configvars.adoc"))
 		if err != nil {
@@ -176,7 +180,7 @@ func main() {
 	fmt.Println("done")
 }
 
-func GetAnnotatedVariables(s interface{}) ([]ConfigField, []DeprecationField) {
+func GetAnnotatedVariables(s interface{}, timestamp string) ([]ConfigField, []DeprecationField) {
 	t := reflect.TypeOf(s)
 	v := reflect.ValueOf(s)
 
@@ -202,7 +206,7 @@ func GetAnnotatedVariables(s interface{}) ([]ConfigField, []DeprecationField) {
 				removalVersion != "" ||
 				deprecationInfo != "" ||
 				deprecationReplacement != "" {
-				deprecationLink = "xref:deprecation-note[Deprecation Note]"
+				deprecationLink = fmt.Sprintf("xref:deprecation-note-%s[Deprecation Note]", timestamp)
 			}
 			v := fmt.Sprintf("%v", value.Interface())
 			td := strings.Split(env, ";")
@@ -239,12 +243,12 @@ func GetAnnotatedVariables(s interface{}) ([]ConfigField, []DeprecationField) {
 			// they are probably added to the Sanitize() function
 			// and this should not be an issue then
 			if !value.IsZero() && value.Elem().CanInterface() {
-				f, d := GetAnnotatedVariables(value.Elem().Interface())
+				f, d := GetAnnotatedVariables(value.Elem().Interface(), timestamp)
 				fields = append(fields, f...)
 				deprecations = append(deprecations, d...)
 			}
 		case reflect.Struct:
-			f, d := GetAnnotatedVariables(value.Interface())
+			f, d := GetAnnotatedVariables(value.Interface(), timestamp)
 			fields = append(fields, f...)
 			deprecations = append(deprecations, d...)
 		}
