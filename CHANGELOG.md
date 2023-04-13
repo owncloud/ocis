@@ -45,6 +45,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Extended search: [#5221](https://github.com/owncloud/ocis/pull/5221)
 * Enhancement - Resource tags: [#5227](https://github.com/owncloud/ocis/pull/5227)
 * Enhancement - Allow users to be disabled: [#5588](https://github.com/owncloud/ocis/pull/5588)
+* Enhancement - Web config additions: [#6032](https://github.com/owncloud/ocis/pull/6032)
 * Enhancement - Eventhistory service: [#5600](https://github.com/owncloud/ocis/pull/5600)
 * Enhancement - Expiration Notifications: [#5330](https://github.com/owncloud/ocis/pull/5330)
 * Enhancement - GDPR Export: [#5950](https://github.com/owncloud/ocis/pull/5950)
