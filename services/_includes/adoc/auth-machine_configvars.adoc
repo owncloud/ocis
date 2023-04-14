@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-14-01-40-53]
+[#deprecation-note-2023-04-14-07-43-44]
 [caption=]
 .Deprecation notes for the auth-machine service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -177,7 +177,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-14-01-40-53[Deprecation Note]
+xref:deprecation-note-2023-04-14-07-43-44[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
