@@ -163,12 +163,12 @@ type Checksums struct {
 }
 
 type ReadyOnlyAttributes struct {
-	AccountEnabled           bool `yaml:"account_enabled" env:"FRONTEND_READONLY_ATTRIBUTES_ACCOUNT_ENABLED" desc:"Flag to indicate if account_enabled attribute is read-only. Default is false."`
-	DisplayName              bool `yaml:"display_name" env:"FRONTEND_READONLY_ATTRIBUTES_DISPLAY_NAME" desc:"Flag to indicate if display_name attribute is read-only. Default is true."`
-	GivenName                bool `yaml:"given_name" env:"FRONTEND_READONLY_ATTRIBUTES_GIVEN_NAME" desc:"Flag to indicate if given_name attribute is read-only. Default is true."`
-	ID                       bool `yaml:"id" env:"FRONTEND_READONLY_ATTRIBUTES_ID" desc:"Flag to indicate if id attribute is read-only. Default is true."`
-	Mail                     bool `yaml:"mail" env:"FRONTEND_READONLY_ATTRIBUTES_MAIL" desc:"Flag to indicate if mail attribute is read-only. Default is true."`
-	OnPremisesSamAccountName bool `yaml:"on_premises_sam_account_name" env:"FRONTEND_READONLY_ATTRIBUTES_ON_PREMISES_SAM_ACCOUNT_NAME" desc:"Flag to indicate if on_premises_sam_account_name attribute is read-only. Default is true."`
-	Surname                  bool `yaml:"surname" env:"FRONTEND_READONLY_ATTRIBUTES_SURNAME" desc:"Flag to indicate if surname attribute is read-only.  Default is true."`
-	Quota                    bool `yaml:"quota" env:"FRONTEND_READONLY_ATTRIBUTES_QUOTA" desc:"Flag to indicate if quota attribute read-only. Default is false."`
+	AccountEnabled           bool `yaml:"account_enabled" env:"FRONTEND_READONLY_ATTRIBUTES_ACCOUNT_ENABLED" desc:"Flag to indicate if account_enabled attribute is read-only. Defaults to false."`
+	DisplayName              bool `yaml:"display_name" env:"FRONTEND_READONLY_ATTRIBUTES_DISPLAY_NAME" desc:"Flag to indicate if display_name attribute is read-only. Defaults to true."`
+	GivenName                bool `yaml:"given_name" env:"FRONTEND_READONLY_ATTRIBUTES_GIVEN_NAME" desc:"Flag to indicate if given_name attribute is read-only. Defaults to true."`
+	ID                       bool `yaml:"id" env:"FRONTEND_READONLY_ATTRIBUTES_ID" desc:"Flag to indicate if id attribute is read-only. Defaults to true."`
+	Mail                     bool `yaml:"mail" env:"FRONTEND_READONLY_ATTRIBUTES_MAIL" desc:"Flag to indicate if mail attribute is read-only. Defaults to true."`
+	OnPremisesSamAccountName bool `yaml:"on_premises_sam_account_name" env:"FRONTEND_READONLY_ATTRIBUTES_ON_PREMISES_SAM_ACCOUNT_NAME" desc:"Flag to indicate if on_premises_sam_account_name attribute is read-only. Defaults to true."`
+	Surname                  bool `yaml:"surname" env:"FRONTEND_READONLY_ATTRIBUTES_SURNAME" desc:"Flag to indicate if surname attribute is read-only.  Defaults to true."`
+	Quota                    bool `yaml:"quota" env:"FRONTEND_READONLY_ATTRIBUTES_QUOTA" desc:"Flag to indicate if quota attribute read-only. Defaults to false."`
 }

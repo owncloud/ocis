@@ -26,21 +26,16 @@ The ocs endpoint, by default `/ocs`, implements the ownCloud 10 Open Collaborati
 
 While the frontend service does not persist any data it does cache `Stat()` responses and user information. Therefore, multiple instances of this service can be spawned in a bigger deployment like when using container orchestration with Kubernetes, when configuring `FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE=redis` and the related config options.
 
-## libregraph service interactions
+## Libregraph Service Interactions
 
-A lot of user management is done via a standardized libregraph API.
-Depending on how the system is configured there might be some attributes
-for users that an instance admin user can't change because of properties
-coming from an external LDAP server, or similar. To make life easier for
-admin users there are hints as capabilites telling which attributes are
-read-only or not. To configure these hints we have the following
-environment variables:
+A lot of user management is done via a standardized libregraph API. Depending on how the system is configured, there might be some attributes for users that an ocis instance admin user can't change because of properties
+coming from an external LDAP server, or similar. This can be the case when the ocis admin is not the LDAP admin. To make life easier for admin users, there are hints as capabilites telling the frontend which attributes are read-only or not, so they can be shown in the frontend differently. To configure these hints the following environment variables are available:
 
-- FRONTEND_READONLY_ATTRIBUTES_ACCOUNT_ENABLED: Default is false
-- FRONTEND_READONLY_ATTRIBUTES_DISPLAY_NAME: Default is true
-- FRONTEND_READONLY_ATTRIBUTES_GIVEN_NAME: Default is true
-- FRONTEND_READONLY_ATTRIBUTES_ID: Default is true
-- FRONTEND_READONLY_ATTRIBUTES_MAIL: Default is true
-- FRONTEND_READONLY_ATTRIBUTES_ON_PREMISES_SAM_ACCOUNT_NAME: Default is true
-- FRONTEND_READONLY_ATTRIBUTES_SURNAME: Default is true
-- FRONTEND_READONLY_ATTRIBUTES_QUOTA: Default is false
+-   FRONTEND_READONLY_ATTRIBUTES_ACCOUNT_ENABLED: Defaults to false
+-   FRONTEND_READONLY_ATTRIBUTES_DISPLAY_NAME: Defaults to true
+-   FRONTEND_READONLY_ATTRIBUTES_GIVEN_NAME: Defaults to true
+-   FRONTEND_READONLY_ATTRIBUTES_ID: Defaults to true
+-   FRONTEND_READONLY_ATTRIBUTES_MAIL: Defaults to true
+-   FRONTEND_READONLY_ATTRIBUTES_ON_PREMISES_SAM_ACCOUNT_NAME: Defaults to true
+-   FRONTEND_READONLY_ATTRIBUTES_SURNAME: Defaults to true
+-   FRONTEND_READONLY_ATTRIBUTES_QUOTA: Defaults to false
