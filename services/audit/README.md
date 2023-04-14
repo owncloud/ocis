@@ -18,7 +18,7 @@ Example json:
 {"RemoteAddr":"","User":"user_id","URL":"","Method":"","UserAgent":"","Time":"","App":"admin_audit","Message":"user 'user_id' removed file 'item_id' from trashbin","Action":"file_trash_delete","CLI":false,"Level":1,"Path":"path","Owner":"user_id","FileID":"item_id"}
 ```
 
-The autit service is not started automatically when running as single binary started via `ocis server` or when running as docker container and must be started and stopped manually on demand.
+The audit service is not started automatically when running as single binary started via `ocis server` or when running as docker container and must be started and stopped manually on demand.
 
 The audit service logs:
 
