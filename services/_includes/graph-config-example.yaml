@@ -119,3 +119,10 @@ events:
   tls_root_ca_certificate: ""
   enable_tls: false
 machine_auth_api_key: ""
+keycloak:
+  base_path: ""
+  client_id: ""
+  client_secret: ""
+  client_realm: ""
+  user_realm: ""
+  insecure_skip_verify: false

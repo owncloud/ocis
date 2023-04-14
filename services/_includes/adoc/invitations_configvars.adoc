@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-14-12-27-30]
+[#deprecation-note-2023-04-14-14-11-03]
 [caption=]
 .Deprecation notes for the invitations service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -227,7 +227,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.
 
-a|`INVITATIONS_KEYCLOAK_BASE_PATH` +
+a|`OCIS_KEYCLOAK_BASE_PATH` +
+`INVITATIONS_KEYCLOAK_BASE_PATH` +
 
 a| [subs=-attributes]
 ++string ++
@@ -236,7 +237,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The URL to access keycloak.
 
-a|`INVITATIONS_KEYCLOAK_CLIENT_ID` +
+a|`OCIS_KEYCLOAK_CLIENT_ID` +
+`INVITATIONS_KEYCLOAK_CLIENT_ID` +
 
 a| [subs=-attributes]
 ++string ++
@@ -245,7 +247,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The client id to authenticate with keycloak.
 
-a|`INVITATIONS_KEYCLOAK_CLIENT_SECRET` +
+a|`OCIS_KEYCLOAK_CLIENT_SECRET` +
+`INVITATIONS_KEYCLOAK_CLIENT_SECRET` +
 
 a| [subs=-attributes]
 ++string ++
@@ -254,7 +257,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The client secret to use in authentication.
 
-a|`INVITATIONS_KEYCLOAK_CLIENT_REALM` +
+a|`OCIS_KEYCLOAK_CLIENT_REALM` +
+`INVITATIONS_KEYCLOAK_CLIENT_REALM` +
 
 a| [subs=-attributes]
 ++string ++
@@ -263,7 +267,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The realm the client is defined in.
 
-a|`INVITATIONS_KEYCLOAK_USER_REALM` +
+a|`OCIS_KEYCLOAK_USER_REALM` +
+`INVITATIONS_KEYCLOAK_USER_REALM` +
 
 a| [subs=-attributes]
 ++string ++
@@ -272,7 +277,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The realm users are defined.
 
-a|`INVITATIONS_KEYCLOAK_INSECURE_SKIP_VERIFY` +
+a|`OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY` +
+`INVITATIONS_KEYCLOAK_INSECURE_SKIP_VERIFY` +
 
 a| [subs=-attributes]
 ++bool ++

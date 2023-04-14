@@ -1,6 +1,6 @@
 ---
 title: Graph
-date: 2023-04-14T12:27:32.630287358Z
+date: 2023-04-14T14:11:06.167499741Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/graph
@@ -17,6 +17,8 @@ The graph service provides the Graph API which is a RESTful web API used to acce
 * [Manual Filters](#manual-filters)
 * [Sequence Diagram](#sequence-diagram)
 * [Caching](#caching)
+* [Keycloak Configuration For The Personal Data Export](#keycloak-configuration-for-the-personal-data-export)
+  * [Keycloak Client Configuration](#keycloak-client-configuration)
 * [Example Yaml Config](#example-yaml-config)
 
 ## Manual Filters
@@ -44,6 +46,27 @@ The `graph` service can use a configured store via `GRAPH_STORE_TYPE`. Possible 
 2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicapable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store applies.
 3.  The graph service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
 4.  When using `redis-sentinel`, the Redis master to use is configured via `GRAPH_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+
+## Keycloak Configuration For The Personal Data Export
+
+If Keycloak is used for authentication, GDPR regulations require to add all personal identifiable information that Keycloak has about the user to the personal data export. To do this, the following environment variables must be set:
+*   `OCIS_KEYCLOAK_BASE_PATH` - The URL to the keycloak instance.
+*   `OCIS_KEYCLOAK_CLIENT_ID` - The client ID of the client that is used to authenticate with keycloak, this client has to be able to list users and get the credential data. 
+*   `OCIS_KEYCLOAK_CLIENT_SECRET` - The client secret of the client that is used to authenticate with keycloak.
+*   `OCIS_KEYCLOAK_CLIENT_REALM` - The realm the client is defined in.
+*   `OCIS_KEYCLOAK_USER_REALM` - The realm the oCIS users are defined in.
+*   `OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY` - If set to true, the TLS certificate of the keycloak instance is not verified.
+
+### Keycloak Client Configuration
+
+The client that is used to authenticate with keycloak has to be able to list users and get the credential data. To do this, the following  roles have to be assigned to the client and they have to be about the realm that contains the oCIS users:
+*   `view-users`
+*   `view-identity-providers`
+*   `view-realm`
+*   `view-clients`
+*   `view-events`
+*   `view-authorization`
+Note that these roles are only available to assign if the client is in the `master` realm.
 
 ## Example Yaml Config
 
