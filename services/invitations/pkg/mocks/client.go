@@ -40,25 +40,25 @@ func (_m *Client) CreateUser(ctx context.Context, realm string, user *libregraph
 	return r0, r1
 }
 
-// GetPIIReport provides a mock function with given fields: ctx, realm, user
-func (_m *Client) GetPIIReport(ctx context.Context, realm string, user *libregraph.User) (*keycloak.PIIReport, error) {
-	ret := _m.Called(ctx, realm, user)
+// GetPIIReport provides a mock function with given fields: ctx, realm, email
+func (_m *Client) GetPIIReport(ctx context.Context, realm string, email string) (*keycloak.PIIReport, error) {
+	ret := _m.Called(ctx, realm, email)
 
 	var r0 *keycloak.PIIReport
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, *libregraph.User) (*keycloak.PIIReport, error)); ok {
-		return rf(ctx, realm, user)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*keycloak.PIIReport, error)); ok {
+		return rf(ctx, realm, email)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, *libregraph.User) *keycloak.PIIReport); ok {
-		r0 = rf(ctx, realm, user)
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) *keycloak.PIIReport); ok {
+		r0 = rf(ctx, realm, email)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*keycloak.PIIReport)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, string, *libregraph.User) error); ok {
-		r1 = rf(ctx, realm, user)
+	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
+		r1 = rf(ctx, realm, email)
 	} else {
 		r1 = ret.Error(1)
 	}

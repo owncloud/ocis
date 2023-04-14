@@ -13,7 +13,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/jellydator/ttlcache/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
+	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
@@ -68,6 +70,8 @@ type Graph struct {
 	groupsCache              *ttlcache.Cache[string, libregraph.Group]
 	eventsPublisher          events.Publisher
 	searchService            searchsvc.SearchProviderService
+	keycloakClient           keycloak.Client
+	historyClient            ehsvc.EventHistoryService
 }
 
 // ServeHTTP implements the Service interface.

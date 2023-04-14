@@ -19,6 +19,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
+	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 )
 
 var (
@@ -75,11 +77,34 @@ func (g Graph) ExportPersonalData(w http.ResponseWriter, r *http.Request) {
 
 // GatherPersonalData will all gather all personal data of the user and save it to a file in the users personal space
 func (g Graph) GatherPersonalData(usr *user.User, ref *provider.Reference, token string, marsh Marshaller) {
+	// the context might already be cancelled. We need to impersonate the acting user again
+	ctx, err := utils.ImpersonateUser(usr, g.gatewayClient, g.config.MachineAuthAPIKey)
+	if err != nil {
+		g.logger.Error().Err(err).Str("userID", usr.GetId().GetOpaqueId()).Msg("cannot impersonate user")
+	}
 	// create data
 	data := make(map[string]interface{})
 
 	// reva user
 	data["user"] = usr
+
+	// Check if we have a keycloak client, and if so, get the keycloak export.
+	if ctx != nil && g.keycloakClient != nil {
+		kcd, err := g.keycloakClient.GetPIIReport(ctx, g.config.Keycloak.UserRealm, usr.GetMail())
+		if err != nil {
+			g.logger.Error().Err(err).Str("userID", usr.GetId().GetOpaqueId()).Msg("cannot get keycloak personal data")
+		}
+		data["keycloak"] = kcd
+	}
+
+	// get event data
+	if ctx != nil && g.historyClient != nil {
+		resp, err := g.historyClient.GetEventsForUser(ctx, &ehsvc.GetEventsForUserRequest{UserID: usr.GetId().GetOpaqueId()})
+		if err != nil {
+			g.logger.Error().Err(err).Str("userID", usr.GetId().GetOpaqueId()).Msg("cannot get event personal data")
+		}
+		data["events"] = convertEvents(resp.GetEvents())
+	}
 
 	// marshal
 	by, err := marsh(data)
@@ -198,7 +223,6 @@ func createFolders(ctx context.Context, ref *provider.Reference, gwc gateway.Gat
 		}
 	}
 	return nil
-
 }
 
 func getLocation(r *http.Request) string {
@@ -213,4 +237,19 @@ func getLocation(r *http.Request) string {
 	// from header?
 
 	return _backupFileName
+}
+
+// we want the events to look nice in the file, don't we?
+func convertEvents(evs []*ehmsg.Event) []map[string]interface{} {
+	out := make([]map[string]interface{}, len(evs))
+	for i, e := range evs {
+		var content map[string]interface{}
+		_ = json.Unmarshal(e.GetEvent(), &content)
+		out[i] = map[string]interface{}{
+			"id":    e.GetId(),
+			"type":  e.GetType(),
+			"event": content,
+		}
+	}
+	return out
 }
