@@ -2007,6 +2007,14 @@ def makeGoGenerate(module):
             "commands": [
                 "retry -t 3 '%s ci-go-generate'" % (make),
             ],
+            "environment": {
+                "HTTP_PROXY": {
+                    "from_secret": "drone_http_proxy",
+                },
+                "HTTPS_PROXY": {
+                    "from_secret": "drone_http_proxy",
+                },
+            },
             "volumes": [stepVolumeGo],
         },
     ]
