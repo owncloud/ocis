@@ -477,6 +477,14 @@ def testOcisModule(ctx, module):
                 "make -C %s ci-golangci-lint" % (module),
                 "mv %s/checkstyle.xml cache/checkstyle/$(basename %s)_checkstyle.xml" % (module, module),
             ],
+            "environment": {
+                "HTTP_PROXY": {
+                    "from_secret": "drone_http_proxy",
+                },
+                "HTTPS_PROXY": {
+                    "from_secret": "drone_http_proxy",
+                },
+            },
             "volumes": [stepVolumeGo],
         },
         {
