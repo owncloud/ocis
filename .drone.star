@@ -1920,6 +1920,9 @@ def docs():
                     "pages_directory": "docs/hugo/content/",
                     "copy_contents": "true",
                     "target_branch": "docs",
+                    "rsync": {
+                        "delete": "true",
+                    }
                 },
                 "when": {
                     "ref": {
