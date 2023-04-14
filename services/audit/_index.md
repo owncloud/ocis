@@ -1,6 +1,6 @@
 ---
 title: Audit
-date: 2023-04-14T10:33:39.3140533Z
+date: 2023-04-14T10:34:06.02414351Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/audit
@@ -24,7 +24,7 @@ Example json:
 {"RemoteAddr":"","User":"user_id","URL":"","Method":"","UserAgent":"","Time":"","App":"admin_audit","Message":"user 'user_id' trashed file 'item_id'","Action":"file_delete","CLI":false,"Level":1,"Path":"path","Owner":"user_id","FileID":"item_id"}
 {"RemoteAddr":"","User":"user_id","URL":"","Method":"","UserAgent":"","Time":"","App":"admin_audit","Message":"user 'user_id' removed file 'item_id' from trashbin","Action":"file_trash_delete","CLI":false,"Level":1,"Path":"path","Owner":"user_id","FileID":"item_id"}
 ```
-The autit service is not started automatically when running as single binary started via `ocis server` or when running as docker container and must be started and stopped manually on demand.
+The audit service is not started automatically when running as single binary started via `ocis server` or when running as docker container and must be started and stopped manually on demand.
 The audit service logs:
 -   File system operations  
 (create/delete/move; including actions on the trash bin and versioning)
