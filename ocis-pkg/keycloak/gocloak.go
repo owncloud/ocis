@@ -16,4 +16,5 @@ type GoCloak interface {
 	LoginClient(ctx context.Context, clientID, clientSecret, realm string) (*gocloak.JWT, error)
 	RetrospectToken(ctx context.Context, accessToken, clientID, clientSecret, realm string) (*gocloak.IntroSpectTokenResult, error)
 	GetCredentials(ctx context.Context, accessToken, realm, userID string) ([]*gocloak.CredentialRepresentation, error)
+	GetUserSessions(ctx context.Context, token, realm, userID string) ([]*gocloak.UserSessionRepresentation, error)
 }

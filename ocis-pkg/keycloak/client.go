@@ -132,14 +132,14 @@ func (c *ConcreteClient) GetPIIReport(ctx context.Context, realm string, email s
 		return nil, err
 	}
 
-	creds, err := c.keycloak.GetCredentials(ctx, token.AccessToken, realm, keycloakID)
+	sessions, err := c.keycloak.GetUserSessions(ctx, token.AccessToken, realm, keycloakID)
 	if err != nil {
 		return nil, err
 	}
 
 	return &PIIReport{
-		UserData:    u,
-		Credentials: creds,
+		UserData: u,
+		Sessions: sessions,
 	}, nil
 }
 
