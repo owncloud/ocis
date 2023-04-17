@@ -90,7 +90,7 @@ func (g Graph) GatherPersonalData(usr *user.User, ref *provider.Reference, token
 
 	// Check if we have a keycloak client, and if so, get the keycloak export.
 	if ctx != nil && g.keycloakClient != nil {
-		kcd, err := g.keycloakClient.GetPIIReport(ctx, g.config.Keycloak.UserRealm, usr.GetMail())
+		kcd, err := g.keycloakClient.GetPIIReport(ctx, g.config.Keycloak.UserRealm, usr.GetUsername())
 		if err != nil {
 			g.logger.Error().Err(err).Str("userID", usr.GetId().GetOpaqueId()).Msg("cannot get keycloak personal data")
 		}
