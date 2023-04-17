@@ -64,6 +64,8 @@ import (
 
 const (
 	storageIDPrefix string = "shared::"
+
+	_resharingDefault bool = false
 )
 
 var (
@@ -84,6 +86,7 @@ type Handler struct {
 	resourceInfoCache                     cache.ResourceInfoCache
 	resourceInfoCacheTTL                  time.Duration
 	deniable                              bool
+	resharing                             bool
 
 	getClient GatewayClientGetter
 }
@@ -134,6 +137,7 @@ func (h *Handler) Init(c *config.Config) {
 	h.userIdentifierCache = ttlcache.NewCache()
 	_ = h.userIdentifierCache.SetTTL(time.Second * time.Duration(c.UserIdentifierCacheTTL))
 	h.deniable = c.EnableDenials
+	h.resharing = resharing(c)
 
 	cache, err := getCacheManager(c)
 	if err == nil {
@@ -288,7 +292,7 @@ func (h *Handler) CreateShare(w http.ResponseWriter, r *http.Request) {
 		response.WriteOCSSuccess(w, r, s)
 	case int(conversions.ShareTypePublicLink):
 		// public links default to read only
-		_, _, ocsErr := h.extractPermissions(reqRole, reqPermissions, statRes.Info, conversions.NewViewerRole())
+		_, _, ocsErr := h.extractPermissions(reqRole, reqPermissions, statRes.Info, conversions.NewViewerRole(h.resharing))
 		if ocsErr != nil && ocsErr.Error != conversions.ErrZeroPermission {
 			response.WriteOCSError(w, r, http.StatusNotFound, "No share permission", nil)
 			return
@@ -306,7 +310,7 @@ func (h *Handler) CreateShare(w http.ResponseWriter, r *http.Request) {
 		response.WriteOCSSuccess(w, r, s)
 	case int(conversions.ShareTypeFederatedCloudShare):
 		// federated shares default to read only
-		if role, val, err := h.extractPermissions(reqRole, reqPermissions, statRes.Info, conversions.NewViewerRole()); err == nil {
+		if role, val, err := h.extractPermissions(reqRole, reqPermissions, statRes.Info, conversions.NewViewerRole(h.resharing)); err == nil {
 			h.createFederatedCloudShare(w, r, statRes.Info, role, val)
 		}
 	case int(conversions.ShareTypeSpaceMembershipUser), int(conversions.ShareTypeSpaceMembershipGroup):
@@ -396,7 +400,7 @@ func (h *Handler) extractPermissions(reqRole string, reqPermissions string, ri *
 
 	// the share role overrides the requested permissions
 	if reqRole != "" {
-		role = conversions.RoleFromName(reqRole)
+		role = conversions.RoleFromName(reqRole, h.resharing)
 	}
 
 	// if the role is unknown - fall back to reqPermissions or defaultPermissions
@@ -1544,4 +1548,11 @@ func sufficientPermissions(existing, requested *provider.ResourcePermissions, is
 	ep := conversions.RoleFromResourcePermissions(existing, islink).OCSPermissions()
 	rp := conversions.RoleFromResourcePermissions(requested, islink).OCSPermissions()
 	return ep.Contain(rp)
+}
+
+func resharing(c *config.Config) bool {
+	if c != nil && c.Capabilities.Capabilities != nil && c.Capabilities.Capabilities.FilesSharing != nil {
+		return bool(c.Capabilities.Capabilities.FilesSharing.Resharing)
+	}
+	return _resharingDefault
 }

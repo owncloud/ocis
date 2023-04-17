@@ -133,16 +133,16 @@ func (r *Role) WebDAVPermissions(isDir, isShared, isMountpoint, isPublic bool) s
 }
 
 // RoleFromName creates a role from the name
-func RoleFromName(name string) *Role {
+func RoleFromName(name string, sharing bool) *Role {
 	switch name {
 	case RoleDenied:
 		return NewDeniedRole()
 	case RoleViewer:
-		return NewViewerRole()
+		return NewViewerRole(sharing)
 	case RoleSpaceViewer:
 		return NewSpaceViewerRole()
 	case RoleEditor:
-		return NewEditorRole()
+		return NewEditorRole(sharing)
 	case RoleSpaceEditor:
 		return NewSpaceEditorRole()
 	case RoleFileEditor:
@@ -174,12 +174,16 @@ func NewDeniedRole() *Role {
 	}
 }
 
-// NewViewerRole creates a viewer role
-func NewViewerRole() *Role {
+// NewViewerRole creates a viewer role. `sharing` indicates if sharing permission should be added
+func NewViewerRole(sharing bool) *Role {
+	p := PermissionRead
+	if sharing {
+		p |= PermissionShare
+	}
 	return &Role{
 		Name: RoleViewer,
 		cS3ResourcePermissions: &provider.ResourcePermissions{
-			AddGrant:             true,
+			AddGrant:             sharing,
 			GetPath:              true,
 			GetQuota:             true,
 			InitiateFileDownload: true,
@@ -187,7 +191,7 @@ func NewViewerRole() *Role {
 			ListRecycle:          true,
 			Stat:                 true,
 		},
-		ocsPermissions: PermissionRead | PermissionShare,
+		ocsPermissions: p,
 	}
 }
 
@@ -208,12 +212,16 @@ func NewSpaceViewerRole() *Role {
 	}
 }
 
-// NewEditorRole creates an editor role
-func NewEditorRole() *Role {
+// NewEditorRole creates an editor role. `sharing` indicates if sharing permission should be added
+func NewEditorRole(sharing bool) *Role {
+	p := PermissionRead | PermissionCreate | PermissionWrite | PermissionDelete
+	if sharing {
+		p |= PermissionShare
+	}
 	return &Role{
 		Name: RoleEditor,
 		cS3ResourcePermissions: &provider.ResourcePermissions{
-			AddGrant:             true,
+			AddGrant:             sharing,
 			CreateContainer:      true,
 			Delete:               true,
 			GetPath:              true,
@@ -227,7 +235,7 @@ func NewEditorRole() *Role {
 			RestoreRecycleItem:   true,
 			Stat:                 true,
 		},
-		ocsPermissions: PermissionRead | PermissionCreate | PermissionWrite | PermissionDelete | PermissionShare,
+		ocsPermissions: p,
 	}
 }
 
@@ -331,6 +339,7 @@ func NewManagerRole() *Role {
 
 // RoleFromOCSPermissions tries to map ocs permissions to a role
 // TODO: rethink using this. ocs permissions cannot be assigned 1:1 to roles
+// NOTE: If resharing=false in the system this function will return SpaceViewerRole instead ViewerRole
 func RoleFromOCSPermissions(p Permissions) *Role {
 	if p == PermissionInvalid {
 		return NewNoneRole()
@@ -339,13 +348,13 @@ func RoleFromOCSPermissions(p Permissions) *Role {
 	if p.Contain(PermissionRead) {
 		if p.Contain(PermissionWrite) && p.Contain(PermissionCreate) && p.Contain(PermissionDelete) {
 			if p.Contain(PermissionShare) {
-				return NewEditorRole()
+				return NewEditorRole(true)
 			}
 
 			return NewSpaceEditorRole()
 		}
 		if p == PermissionRead|PermissionShare {
-			return NewViewerRole()
+			return NewViewerRole(true)
 		}
 		if p == PermissionRead {
 			return NewSpaceViewerRole()

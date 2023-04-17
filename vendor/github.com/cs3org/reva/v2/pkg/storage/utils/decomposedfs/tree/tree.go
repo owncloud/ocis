@@ -32,6 +32,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bluele/gcache"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -78,6 +79,8 @@ type Tree struct {
 	blobstore Blobstore
 
 	options *options.Options
+
+	idCache gcache.Cache
 }
 
 // PermissionCheckFunc defined a function used to check resource permissions
@@ -89,6 +92,7 @@ func New(lu PathLookup, bs Blobstore, o *options.Options) *Tree {
 		lookup:    lu,
 		blobstore: bs,
 		options:   o,
+		idCache:   gcache.New(1_000_000).LRU().Build(),
 	}
 }
 
@@ -271,6 +275,7 @@ func (t *Tree) Move(ctx context.Context, oldNode *node.Node, newNode *node.Node)
 	if err != nil {
 		return errors.Wrap(err, "Decomposedfs: could not move child")
 	}
+	t.idCache.Remove(filepath.Join(oldNode.ParentPath(), oldNode.Name))
 
 	// update target parentid and name
 	attribs := node.Attributes{}
@@ -360,9 +365,19 @@ func (t *Tree) ListFolder(ctx context.Context, n *node.Node) ([]*node.Node, erro
 	for i := 0; i < numWorkers; i++ {
 		g.Go(func() error {
 			for name := range work {
-				nodeID, err := readChildNodeFromLink(filepath.Join(dir, name))
-				if err != nil {
-					return err
+				nodeID := ""
+				path := filepath.Join(dir, name)
+				if val, err := t.idCache.Get(path); err == nil {
+					nodeID = val.(string)
+				} else {
+					nodeID, err = readChildNodeFromLink(path)
+					if err != nil {
+						return err
+					}
+					err = t.idCache.Set(path, nodeID)
+					if err != nil {
+						return err
+					}
 				}
 
 				child, err := node.ReadNode(ctx, t.lookup, n.SpaceID, nodeID, false, n, true)
@@ -481,7 +496,9 @@ func (t *Tree) Delete(ctx context.Context, n *node.Node) (err error) {
 	_ = os.Remove(n.LockFilePath())
 
 	// finally remove the entry from the parent dir
-	err = os.Remove(filepath.Join(n.ParentPath(), n.Name))
+	path := filepath.Join(n.ParentPath(), n.Name)
+	err = os.Remove(path)
+	t.idCache.Remove(path)
 	if err != nil {
 		// To roll back changes
 		// TODO revert the rename
