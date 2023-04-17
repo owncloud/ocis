@@ -6,7 +6,7 @@ The notification service is responsible for sending emails to users informing th
 
 The `notifications` service has embedded email body templates.
 The email templates contain placeholders `{{ .Greeting }}`, `{{ .MessageBody }}`, `{{ .CallToAction }}` that are
-replaced with translations (See [Translations](#translations)  in this readme).
+replaced with translations, see the [Translations](#translations) section.
 These embedded templates are available for all deployment scenarios. In addition, the service supports custom
 templates.
 The custom email template takes precedence over the embedded one. If a custom email template exists, the embedded ones
