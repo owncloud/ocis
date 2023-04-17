@@ -355,9 +355,6 @@ func composeMessage(nt NotificationTemplate, locale string, path string, vars ma
 	}
 
 	message, err := executeTemplate(messageraw, vars)
-	if err != nil {
-		return "", "", "", "", err
-	}
 	return subject, subjectraw, message, messageraw, err
 }
 

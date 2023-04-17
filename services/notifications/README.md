@@ -2,14 +2,48 @@
 
 The notification service is responsible for sending emails to users informing them about events that happened. To do this it hooks into the event system and listens for certain events that the users need to be informed about.
 
+## Email notification
+
+The `notifications` service has embedded email body templates.
+The email templates contain placeholders `{{ .Greeting }}`, `{{ .MessageBody }}`, `{{ .CallToAction }}` that are
+replaced with translations (See [Translations](#translations)  in this readme).
+These embedded templates are available for all deployment scenarios. In addition, the service supports custom
+templates.
+The custom email template takes precedence over the embedded one. If a custom email template exists, the embedded ones
+are not used. To configure custom email templates,
+the `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` environment variable needs to point to a base folder that will contain the email
+templates. The source template files provided by ocis are located
+in [https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates](https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates) in the `shares`
+and `spaces` subfolders:
+[shares/shareCreated.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/shares/shareCreated.email.body.tmpl)
+[shares/shareExpired.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/shares/shareExpired.email.body.tmpl)
+[spaces/membershipExpired.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/spaces/membershipExpired.email.body.tmpl)
+[spaces/sharedSpace.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/spaces/sharedSpace.email.body.tmpl)
+[spaces/unsharedSpace.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/spaces/unsharedSpace.email.body.tmpl)
+
+Custom Email templates referenced via `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` must be located in subfolders `shares`
+and `spaces` and have the same names as the embedded templates. This naming must match the embedded ones.
+```text
+templates
+│
+└───shares
+│   │   shareCreated.email.body.tmpl
+│   │   shareExpired.email.body.tmpl
+│
+└───spaces
+    │   membershipExpired.email.body.tmpl
+    │   sharedSpace.email.body.tmpl
+    │   unsharedSpace.email.body.tmpl
+```
+
 ## Translations
 
-The `translations` service has embedded translations sourced via transifex to provide a basic set of translated languages.
+The `notifications` service has embedded translations sourced via transifex to provide a basic set of translated languages.
 These embedded translations are available for all deployment scenarios. In addition, the service supports custom
 translations, though it is currently not possible to just add custom translations to embedded ones. If custom
 translations are configured, the embedded ones are not used. To configure custom translations,
 the `NOTIFICATIONS_TRANSLATION_PATH` environment variable needs to point to a base folder that will contain the translation
-files. This path must be available from all instances of the translations service, a shared storage is recommended.
+files. This path must be available from all instances of the notifications service, a shared storage is recommended.
 Translation files must be of type  [.po](https://www.gnu.org/software/gettext/manual/html_node/PO-Files.html#PO-Files)
 or [.mo](https://www.gnu.org/software/gettext/manual/html_node/Binaries.html). For each language, the filename needs to
 be `translations.po` (or `translations.mo`) and stored in a folder structure defining the language code. In general the path/name

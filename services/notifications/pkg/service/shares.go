@@ -42,7 +42,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 	}
 
 	sharerDisplayName := owner.GetDisplayName()
-	msg, subj, err := s.render(email.ShareCreated, map[string]interface{}{
+	subj, msg, err := s.render(email.ShareCreated, map[string]interface{}{
 		"ShareGrantee": shareGrantee,
 		"ShareSharer":  sharerDisplayName,
 		"ShareFolder":  resourceInfo.Name,
@@ -85,7 +85,7 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		return
 	}
 
-	msg, subj, err := s.render(email.ShareExpired, map[string]interface{}{
+	subj, msg, err := s.render(email.ShareExpired, map[string]interface{}{
 		"ShareGrantee": shareGrantee,
 		"ShareFolder":  resourceInfo.GetName(),
 		"ExpiredAt":    e.ExpiredAt.Format("2006-01-02 15:04:05"),

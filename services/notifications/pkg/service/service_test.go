@@ -66,8 +66,19 @@ var _ = Describe("Notifications", func() {
 		Entry("Share Created", testChannel{
 			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
 			expectedSubject:     "Dr. S. Harer shared 'secrets of the board' with you",
-			expectedSender:      sharer.GetDisplayName(),
-			done:                make(chan struct{}),
+			expectedMessage: `Hello Dr. S. Harer
+
+Dr. S. Harer has shared "secrets of the board" with you.
+
+Click here to view it: files/shares/with-me
+
+
+---
+ownCloud - Store. Share. Work.
+https://owncloud.com
+`,
+			expectedSender: sharer.GetDisplayName(),
+			done:           make(chan struct{}),
 		}, events.Event{
 			Event: events.ShareCreated{
 				Sharer:        sharer.GetId(),
@@ -80,8 +91,19 @@ var _ = Describe("Notifications", func() {
 		Entry("Share Expired", testChannel{
 			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
 			expectedSubject:     "Share to 'secrets of the board' expired at 2023-04-17 16:42:00",
-			expectedSender:      sharer.GetDisplayName(),
-			done:                make(chan struct{}),
+			expectedMessage: `Hello Dr. S. Harer,
+
+Your share to secrets of the board has expired at 2023-04-17 16:42:00
+
+Even though this share has been revoked you still might have access through other shares and/or space memberships.
+
+
+---
+ownCloud - Store. Share. Work.
+https://owncloud.com
+`,
+			expectedSender: sharer.GetDisplayName(),
+			done:           make(chan struct{}),
 		}, events.Event{
 			Event: events.ShareExpired{
 				ShareOwner:    sharer.GetId(),
@@ -94,8 +116,19 @@ var _ = Describe("Notifications", func() {
 		Entry("Added to Space", testChannel{
 			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
 			expectedSubject:     "Dr. S. Harer invited you to join secret space",
-			expectedSender:      sharer.GetDisplayName(),
-			done:                make(chan struct{}),
+			expectedMessage: `Hello Dr. S. Harer,
+
+Dr. S. Harer has invited you to join "secret space".
+
+Click here to view it: f/spaceid
+
+
+---
+ownCloud - Store. Share. Work.
+https://owncloud.com
+`,
+			expectedSender: sharer.GetDisplayName(),
+			done:           make(chan struct{}),
 		}, events.Event{
 			Event: events.SpaceShared{
 				Executant:     sharer.GetId(),
@@ -108,8 +141,21 @@ var _ = Describe("Notifications", func() {
 		Entry("Removed from Space", testChannel{
 			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
 			expectedSubject:     "Dr. S. Harer removed you from secret space",
-			expectedSender:      sharer.GetDisplayName(),
-			done:                make(chan struct{}),
+			expectedMessage: `Hello Dr. S. Harer,
+
+Dr. S. Harer has removed you from "secret space".
+
+You might still have access through your other groups or direct membership.
+
+Click here to check it: f/spaceid
+
+
+---
+ownCloud - Store. Share. Work.
+https://owncloud.com
+`,
+			expectedSender: sharer.GetDisplayName(),
+			done:           make(chan struct{}),
 		}, events.Event{
 			Event: events.SpaceUnshared{
 				Executant:     sharer.GetId(),
@@ -121,8 +167,19 @@ var _ = Describe("Notifications", func() {
 		Entry("Space Expired", testChannel{
 			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
 			expectedSubject:     "Membership of 'secret space' expired at 2023-04-17 16:42:00",
-			expectedSender:      sharer.GetDisplayName(),
-			done:                make(chan struct{}),
+			expectedMessage: `Hello Dr. S. Harer,
+
+Your membership of space secret space has expired at 2023-04-17 16:42:00
+
+Even though this membership has expired you still might have access through other shares and/or space memberships
+
+
+---
+ownCloud - Store. Share. Work.
+https://owncloud.com
+`,
+			expectedSender: sharer.GetDisplayName(),
+			done:           make(chan struct{}),
 		}, events.Event{
 			Event: events.SpaceMembershipExpired{
 				SpaceOwner:    sharer.GetId(),
@@ -139,6 +196,7 @@ var _ = Describe("Notifications", func() {
 type testChannel struct {
 	expectedReceipients map[string]bool
 	expectedSubject     string
+	expectedMessage     string
 	expectedSender      string
 	done                chan struct{}
 }
@@ -150,8 +208,7 @@ func (tc testChannel) SendMessage(ctx context.Context, userIDs []string, msg, su
 		Expect(tc.expectedReceipients[u]).To(Equal(true))
 	}
 
-	// TODO: test the message?
-	//Expect(msg).To(Equal(tc.expectedMessage))
+	Expect(msg).To(Equal(tc.expectedMessage))
 	Expect(subject).To(Equal(tc.expectedSubject))
 	Expect(senderDisplayName).To(Equal(tc.expectedSender))
 	tc.done <- struct{}{}

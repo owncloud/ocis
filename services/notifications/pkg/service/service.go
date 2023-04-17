@@ -89,11 +89,7 @@ func (s eventsNotifier) Run() error {
 
 func (s eventsNotifier) render(template email.MessageTemplate, values map[string]interface{}) (string, string, error) {
 	// The locate have to come from the user setting
-	sub, msg, err := email.RenderEmailTemplate(template, "en", s.emailTemplatePath, s.translationPath, values)
-	if err != nil {
-		return "", "", err
-	}
-	return msg, sub, nil
+	return email.RenderEmailTemplate(template, "en", s.emailTemplatePath, s.translationPath, values)
 }
 
 func (s eventsNotifier) send(ctx context.Context, u *user.UserId, g *group.GroupId, msg, subj, sender string) error {
