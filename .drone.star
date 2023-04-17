@@ -33,6 +33,7 @@ PLUGINS_SLACK = "plugins/slack:1"
 REDIS = "redis:6-alpine"
 SELENIUM_STANDALONE_CHROME = "selenium/standalone-chrome:104.0-20220812"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:4.7.0"
+SAWJAN_OCISWRAPPER = "sawjan/ociswrapper:latest"
 THEGEEKLAB_DRONE_GITHUB_COMMENT = "thegeeklab/drone-github-comment:1"
 
 DEFAULT_PHP_VERSION = "7.4"
@@ -2152,14 +2153,15 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
     return [
         {
             "name": "ocis-server",
-            "image": OC_CI_ALPINE,
+            "image": SAWJAN_OCISWRAPPER,
             "detach": True,
             "environment": environment,
             "user": user,
             "commands": [
                 "ocis/bin/ocis init --insecure true",
                 "cat $OCIS_CONFIG_DIR/ocis.yaml",
-                "ocis/bin/ocis server",
+                "which ociswrapper",
+                "ociswrapper --bin-path=ocis/bin/ocis",
             ],
             "volumes": volumes,
             "depends_on": depends_on,
