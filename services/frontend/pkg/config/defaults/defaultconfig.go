@@ -89,16 +89,6 @@ func DefaultConfig() *config.Config {
 			SupportedTypes:      []string{"sha1", "md5", "adler32"},
 			PreferredUploadType: "sha1",
 		},
-		ReadyOnlyAttributes: config.ReadyOnlyAttributes{
-			AccountEnabled:           false,
-			DisplayName:              true,
-			GivenName:                true,
-			ID:                       true,
-			Mail:                     true,
-			OnPremisesSamAccountName: true,
-			Surname:                  true,
-			Quota:                    false,
-		},
 		AppHandler: config.AppHandler{
 			Prefix: "app",
 		},

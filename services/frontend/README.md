@@ -29,13 +29,5 @@ While the frontend service does not persist any data it does cache `Stat()` resp
 ## Libregraph Service Interactions
 
 A lot of user management is done via a standardized libregraph API. Depending on how the system is configured, there might be some attributes for users that an ocis instance admin user can't change because of properties
-coming from an external LDAP server, or similar. This can be the case when the ocis admin is not the LDAP admin. To make life easier for admin users, there are hints as capabilites telling the frontend which attributes are read-only or not, so they can be shown in the frontend differently. To configure these hints the following environment variables are available:
-
--   FRONTEND_READONLY_ATTRIBUTES_ACCOUNT_ENABLED: Defaults to false
--   FRONTEND_READONLY_ATTRIBUTES_DISPLAY_NAME: Defaults to true
--   FRONTEND_READONLY_ATTRIBUTES_GIVEN_NAME: Defaults to true
--   FRONTEND_READONLY_ATTRIBUTES_ID: Defaults to true
--   FRONTEND_READONLY_ATTRIBUTES_MAIL: Defaults to true
--   FRONTEND_READONLY_ATTRIBUTES_ON_PREMISES_SAM_ACCOUNT_NAME: Defaults to true
--   FRONTEND_READONLY_ATTRIBUTES_SURNAME: Defaults to true
--   FRONTEND_READONLY_ATTRIBUTES_QUOTA: Defaults to false
+coming from an external LDAP server, or similar. This can be the case when the ocis admin is not the LDAP admin. To make life easier for admin users, there are hints as capabilites telling the frontend which attributes are read-only or not, so they can be shown in the frontend differently. To configure these hints we have the environment variable FRONTEND_READONLY_USER_ATTRIBUTES,
+which takes a comma separated list of attributes.

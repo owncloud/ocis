@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"path"
 	"strconv"
+	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
@@ -63,23 +64,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 		}
 	}
 
-	read_only_attributes_map := map[string]bool{
-		"account_enabled":              cfg.ReadyOnlyAttributes.AccountEnabled,
-		"display_name":                 cfg.ReadyOnlyAttributes.DisplayName,
-		"given_name":                   cfg.ReadyOnlyAttributes.GivenName,
-		"id":                           cfg.ReadyOnlyAttributes.ID,
-		"mail":                         cfg.ReadyOnlyAttributes.Mail,
-		"on_premises_sam_account_name": cfg.ReadyOnlyAttributes.OnPremisesSamAccountName,
-		"surname":                      cfg.ReadyOnlyAttributes.Surname,
-		"quota":                        cfg.ReadyOnlyAttributes.Quota,
-	}
-
-	var read_only_attributes []string
-	for k, v := range read_only_attributes_map {
-		if v {
-			read_only_attributes = append(read_only_attributes, k)
-		}
-	}
+	ReadOnlyUserAttributes := strings.Split(cfg.ReadOnlyUserAttributes, ",")
 
 	return map[string]interface{}{
 		"core": map[string]interface{}{
@@ -216,8 +201,8 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 								"support_url_signing": true,
 							},
 							"graph": map[string]interface{}{
-								"personal_data_export": true,
-								"read_only_attributes": read_only_attributes,
+								"personal_data_export":      true,
+								"read_only_user_attributes": ReadOnlyUserAttributes,
 							},
 							"checksums": map[string]interface{}{
 								"supported_types":       cfg.Checksums.SupportedTypes,
