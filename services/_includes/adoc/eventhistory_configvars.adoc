@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-17-13-26-20]
+[#deprecation-note-2023-04-17-13-40-40]
 [caption=]
 .Deprecation notes for the eventhistory service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -180,7 +180,7 @@ The type of the eventhistory store. Supported values are: 'memory', 'ocmem', 'et
 a|`OCIS_PERSISTENT_STORE_NODES` +
 `EVENTHISTORY_STORE_NODES` +
 `EVENTHISTORY_STORE_ADDRESSES` +
-xref:deprecation-note-2023-04-17-13-26-20[Deprecation Note]
+xref:deprecation-note-2023-04-17-13-40-40[Deprecation Note]
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
