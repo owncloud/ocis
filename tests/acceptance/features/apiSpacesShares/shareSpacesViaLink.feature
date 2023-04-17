@@ -2,6 +2,7 @@
 Feature: Share spaces via link
   As the manager of a space
   I want to be able to share a space via public link
+  So that anonymous user can have access to certain resources
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -17,7 +18,7 @@ Feature: Share spaces via link
     And user "Alice" has uploaded a file inside space "share space" with content "some content" to "test.txt"
 
 
-  Scenario Outline: A manager can share a space to public via link with different permissions
+  Scenario Outline: manager can share a space to public via link with different permissions
     When user "Alice" creates a public link share of the space "share space" with settings:
       | permissions | <permissions> |
       | password    | <password>    |
@@ -46,7 +47,7 @@ Feature: Share spaces via link
       | 15          | read,update,create,delete | d*V^o*Y03R9n8Z | link     |                          |
 
 
-  Scenario: An uploader should be able to upload a file
+  Scenario: uploader should be able to upload a file
     When user "Alice" creates a public link share of the space "share space" with settings:
       | permissions | 4                        |
       | password    | 123                      |
@@ -70,7 +71,7 @@ Feature: Share spaces via link
       | lorem.txt |
 
 
-  Scenario Outline: An user without manager role cannot share a space to public via link
+  Scenario Outline: user without manager role cannot share a space to public via link
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian  |
       | role      | <role> |
@@ -86,7 +87,7 @@ Feature: Share spaces via link
       | editor |
 
 
-  Scenario: An user with manager role can share a space to public via link
+  Scenario: user with manager role can share a space to public via link
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian   |
       | role      | manager |
@@ -97,7 +98,7 @@ Feature: Share spaces via link
     And for user "Alice" the space "share space" should contain the last created public link
 
 
-  Scenario: A user cannot share a disabled space to public via link
+  Scenario: user cannot share a disabled space to public via link
     Given user "Alice" has disabled a space "share space"
     When user "Alice" creates a public link share of the space "share space" with settings:
       | permissions | 1 |

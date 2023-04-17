@@ -1,5 +1,8 @@
 @api @skipOnOcV10
-Feature:
+Feature: change shared resource
+  As a user 
+  I want to change the shared resource
+  So that I can organize them as per my necessity 
 
   Background:
     Given using spaces DAV path
@@ -9,7 +12,7 @@ Feature:
       | Brian    |
 
   @issue-4421
-  Scenario: Move files between shares by different users
+  Scenario: move files between shares by different users
     Given user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has created folder "/PARENT"

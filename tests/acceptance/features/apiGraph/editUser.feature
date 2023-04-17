@@ -1,5 +1,8 @@
 @api @skipOnOcV10
 Feature: edit user
+  As an admin
+  I want to be able to edit user information
+  So that I can manage user
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -14,7 +17,7 @@ Feature: edit user
       | password    | 1234              |
 
 
-  Scenario Outline: the admin user can edit another user's email
+  Scenario Outline: admin user can edit another user's email
     When the user "Alice" changes the email of user "Brian" to "<newEmail>" using the Graph API
     Then the HTTP status code should be "<code>"
     And the user information of "Brian" should match this JSON schema
@@ -41,7 +44,7 @@ Feature: edit user
       | change to a invalid email | invalidEmail         | 400  | brian@example.com    |
 
   @skipOnStable2.0 @issue-5763
-  Scenario Outline: the admin user can edit another user's name
+  Scenario Outline: admin user can edit another user's name
     Given user "Carol" has been created with default attributes and without skeleton files
     When the user "Alice" changes the user name of user "Carol" to "<userName>" using the Graph API
     Then the HTTP status code should be "<code>"
@@ -68,7 +71,7 @@ Feature: edit user
       | empty user name              |          | 200  | Brian       |
 
   @skipOnStable2.0
-  Scenario: the admin user changes the name of a user to the name of an existing disabled user
+  Scenario: admin user changes the name of a user to the name of an existing disabled user
     Given the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | sam             |
       | displayName | sam             |
@@ -94,7 +97,7 @@ Feature: edit user
     """
 
   @skipOnStable2.0
-  Scenario: the admin user changes the name of a user to the name of a previously deleted user
+  Scenario: admin user changes the name of a user to the name of a previously deleted user
     Given the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | sam             |
       | displayName | sam             |
@@ -120,7 +123,7 @@ Feature: edit user
     """
 
 
-  Scenario Outline: a normal user should not be able to change their email address
+  Scenario Outline: normal user should not be able to change their email address
     Given the administrator has given "Brian" the role "<role>" using the settings api
     When the user "Brian" tries to change the email of user "Brian" to "newemail@example.com" using the Graph API
     Then the HTTP status code should be "401"
@@ -146,7 +149,7 @@ Feature: edit user
       | Guest       |
 
 
-  Scenario Outline: a normal user should not be able to edit another user's email
+  Scenario Outline: normal user should not be able to edit another user's email
     Given the administrator has given "Brian" the role "<userRole>" using the settings api
     And the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | Carol             |
@@ -187,7 +190,7 @@ Feature: edit user
       | Guest       | Admin       |
 
 
-  Scenario Outline: the admin user can edit another user display name
+  Scenario Outline: admin user can edit another user display name
     When the user "Alice" changes the display name of user "Brian" to "<newDisplayName>" using the Graph API
     Then the HTTP status code should be "200"
     And the user information of "Brian" should match this JSON schema
@@ -213,7 +216,7 @@ Feature: edit user
       | displayName with characters       | *:!;_+-&#(?)   | 200  | *:!;_+-&#(?)        |
 
 
-  Scenario Outline: a normal user should not be able to change his/her own display name
+  Scenario Outline: normal user should not be able to change his/her own display name
     Given the administrator has given "Brian" the role "<role>" using the settings api
     When the user "Brian" tries to change the display name of user "Brian" to "Brian Murphy" using the Graph API
     Then the HTTP status code should be "401"
@@ -239,7 +242,7 @@ Feature: edit user
       | Guest       |
 
 
-  Scenario Outline: a normal user should not be able to edit another user's display name
+  Scenario Outline: normal user should not be able to edit another user's display name
     Given the administrator has given "Brian" the role "<userRole>" using the settings api
     And the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | Carol             |
@@ -280,14 +283,14 @@ Feature: edit user
       | Guest       | Admin       |
 
 
-  Scenario: the admin user resets password of another user
+  Scenario: admin user resets password of another user
     Given user "Brian" has uploaded file with content "test file for reset password" to "/resetpassword.txt"
     When the user "Alice" resets the password of user "Brian" to "newpassword" using the Graph API
     Then the HTTP status code should be "200"
     And the content of file "resetpassword.txt" for user "Brian" using password "newpassword" should be "test file for reset password"
 
 
-  Scenario Outline: a normal user should not be able to reset the password of another user
+  Scenario Outline: normal user should not be able to reset the password of another user
     Given the administrator has given "Brian" the role "<userRole>" using the settings api
     And the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | Carol             |
@@ -316,7 +319,7 @@ Feature: edit user
       | Guest       | Admin       |
 
   @skipOnStable2.0
-  Scenario: the admin user disables another user
+  Scenario: admin user disables another user
     When the user "Alice" disables user "Brian" using the Graph API
     Then the HTTP status code should be "200"
     When user "Alice" gets information of user "Brian" using Graph API
@@ -358,7 +361,7 @@ Feature: edit user
     """
 
   @skipOnStable2.0
-  Scenario Outline: a normal user should not be able to disable another user
+  Scenario Outline: normal user should not be able to disable another user
     Given user "Carol" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<role>" using the settings api
     When the user "Brian" tries to disable user "Carol" using the Graph API
@@ -407,7 +410,7 @@ Feature: edit user
       | Guest       |
 
   @skipOnStable2.0
-  Scenario: the admin user enables disabled user
+  Scenario: admin user enables disabled user
     Given the user "Alice" has disabled user "Brian" using the Graph API
     When the user "Alice" enables user "Brian" using the Graph API
     Then the HTTP status code should be "200"
@@ -450,7 +453,7 @@ Feature: edit user
     """
 
   @skipOnStable2.0
-  Scenario Outline: a normal user should not be able to enable another user
+  Scenario Outline: normal user should not be able to enable another user
     Given user "Carol" has been created with default attributes and without skeleton files
     And the user "Alice" has disabled user "Carol" using the Graph API
     And the administrator has given "Brian" the role "<role>" using the settings api

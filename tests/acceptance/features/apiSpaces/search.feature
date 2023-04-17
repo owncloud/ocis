@@ -1,6 +1,8 @@
 @api @skipOnOcV10
 Feature: Search
-  It is possible to search files in the Shares and the project space
+  As a user 
+  I want to search for resources in the space
+  So that I can get them quickly
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -18,7 +20,7 @@ Feature: Search
     And using new DAV path
 
 
-  Scenario: Alice can find data from the project space
+  Scenario: user can find data from the project space
     When user "Alice" searches for "fol" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "4" entries
@@ -29,7 +31,7 @@ Feature: Search
       | /folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
 
 
-  Scenario: Alice can find data from the project space
+  Scenario: user can only find data that they searched for from the project space
     When user "Alice" searches for "SUB" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "2" entries
@@ -41,7 +43,7 @@ Feature: Search
       | /folderMain/SubFolder1/subFOLDER2/insideTheFolder.txt |
 
 
-  Scenario: Brian can find data from the Shares
+  Scenario: user can find data from the shares
     Given user "Alice" has created a share inside of space "find data" with settings:
       | path      | folderMain |
       | shareWith | Brian      |
@@ -57,7 +59,7 @@ Feature: Search
     And for user "Brian" the search result should contain space "mountpoint/folderMain"
 
 
-  Scenario: User can find hidden file
+  Scenario: user can find hidden file
     Given user "Alice" has created a folder ".space" in space "find data"
     When user "Alice" searches for ".sp" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -66,7 +68,7 @@ Feature: Search
       | /.space |
 
 
-  Scenario: User cannot find pending folder
+  Scenario: user cannot find pending share
     Given user "Alice" has created a share inside of space "find data" with settings:
       | path      | folderMain |
       | shareWith | Brian      |
@@ -80,7 +82,7 @@ Feature: Search
       | /SubFolder1/subFOLDER2/insideTheFolder.txt |
 
 
-  Scenario: User cannot find declined folder
+  Scenario: user cannot find declined share
     Given user "Alice" has created a share inside of space "find data" with settings:
       | path      | folderMain |
       | shareWith | Brian      |
@@ -95,14 +97,14 @@ Feature: Search
       | /SubFolder1/subFOLDER2/insideTheFolder.txt |
 
 
-  Scenario: User cannot find deleted folder
+  Scenario: user cannot find deleted folder
     Given user "Alice" has removed the folder "folderMain" from space "find data"
     When user "Alice" searches for "folderMain" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "0" entries
 
 
-  Scenario: User can find project space by name
+  Scenario: user can find project space by name
     When user "Alice" searches for "find data" using the WebDAV API
     Then the HTTP status code should be "207"
     And the search result should contain "1" entries

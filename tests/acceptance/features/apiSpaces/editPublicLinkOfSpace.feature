@@ -25,7 +25,7 @@ Feature: A manager of the space can edit public link
     And user "Alice" has uploaded a file inside space "edit space" with content "some content" to "test.txt"
 
 
-  Scenario Outline: A manager of the space can edit public link.
+  Scenario Outline: manager of the space can edit public link.
     Given using OCS API version "2"
     When user "Alice" updates the last public link share using the sharing API with
       | permissions | <permissions> |
@@ -51,7 +51,7 @@ Feature: A manager of the space can edit public link
       | 15          | read,update,create,delete |          | newName  |
 
 
-  Scenario Outline: All members can see a created public link
+  Scenario Outline: members can see a created public link
     Given using OCS API version "2"
     When user "Alice" shares a space "edit space" with settings:
       | shareWith | Brian  |
@@ -67,7 +67,7 @@ Feature: A manager of the space can edit public link
       | viewer  |
 
 
-  Scenario Outline: Members of the space try to edit a public link
+  Scenario Outline: members of the space try to edit a public link
     Given using OCS API version "2"
     And user "Alice" has shared a space "edit space" with settings:
       | shareWith | Brian  |

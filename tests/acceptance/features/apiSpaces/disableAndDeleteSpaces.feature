@@ -223,7 +223,7 @@ Feature: Disabling and deleting space
       | Space Admin |
 
 
-  Scenario Outline: user with role user and guest cannot delete others disabled Space via the Graph API
+  Scenario Outline: user with role user and guest cannot delete others disabled space via the Graph API
     Given the administrator has given "Carol" the role "<role>" using the settings api
     And user "Alice" has disabled a space "Project Moon"
     When user "Carol" tries to delete a space "Project Moon" owned by user "Alice"

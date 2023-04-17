@@ -1,7 +1,8 @@
 @api @skipOnOcV10
 Feature: List and create spaces
   As a user
-  I want to be able to work with personal and project spaces
+  I want to be able to list project spaces
+  So that I can retrive the information about them
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -11,7 +12,7 @@ Feature: List and create spaces
     And using spaces DAV path
 
 
-  Scenario: An ordinary user can request information about their Space via the Graph API
+  Scenario: ordinary user can request information about their Space via the Graph API
     When user "Alice" lists all available spaces via the GraphApi
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Alice Hansen" and match
@@ -77,7 +78,7 @@ Feature: List and create spaces
     """
 
 
-  Scenario: An ordinary user can request information about their Space via the Graph API using a filter
+  Scenario: ordinary user can request information about their Space via the Graph API using a filter
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "folder"
     And user "Brian" has shared folder "folder" with user "Alice" with permissions "31"
@@ -173,7 +174,7 @@ Feature: List and create spaces
     And the json responded should only contain spaces of type "personal"
 
 
-  Scenario: An ordinary user will not see any space when using a filter for project
+  Scenario: ordinary user will not see any space when using a filter for project
     Given the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "my project" of type "project" with quota "20"
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'project'"
@@ -206,13 +207,13 @@ Feature: List and create spaces
     And the json responded should not contain a space with name "Alice Hansen"
 
 
-  Scenario: An ordinary user can access their Space via the webDav API
+  Scenario: ordinary user can access their space via the webDav API
     When user "Alice" lists all available spaces via the GraphApi
     And user "Alice" lists the content of the space with the name "Alice Hansen" using the WebDav Api
     Then the HTTP status code should be "207"
 
 
-  Scenario: A user can list his personal space via multiple endpoints
+  Scenario: user can list his personal space via multiple endpoints
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Alice Hansen" owned by "Alice" and match
@@ -312,7 +313,7 @@ Feature: List and create spaces
     """
 
 
-  Scenario Outline: A user can list his created spaces via multiple endpoints
+  Scenario Outline: user can list his created spaces via multiple endpoints
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the Graph API
     Then the HTTP status code should be "201"
@@ -442,7 +443,7 @@ Feature: List and create spaces
       | Space Admin |
 
 
-  Scenario Outline: A user cannot list space by id if he is not member of the space
+  Scenario Outline: user cannot list space by id if he is not member of the space
     Given the administrator has given "Alice" the role "<role>" using the settings api
     And user "Admin" has created a space "Project Venus" with the default quota using the GraphApi
     When user "Alice" tries to look up the single space "Project Venus" owned by the user "Admin" by using its id

@@ -1,6 +1,8 @@
 @api @skipOnOcV10
 Feature: Download file in project space
-  As a user with different role, I want to be able to download files
+  As a user with different role
+  I want to be able to download files
+  So that I can have it in my local storage
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -23,7 +25,7 @@ Feature: Download file in project space
       | role      | viewer |
 
 
-  Scenario Outline: A user downloads a file in the project space
+  Scenario Outline: user downloads a file in the project space
     When user "<user>" downloads the file "file.txt" of the space "download file" using the WebDAV API
     Then the HTTP status code should be "200"
     And the following headers should be set
@@ -55,7 +57,7 @@ Feature: Download file in project space
       | Brian |
 
   
-  Scenario: A user viewer cannot get the old version of the file in the project space
+  Scenario: user with role viewer cannot get the old version of the file in the project space
     Given user "Alice" has uploaded a file inside space "download file" with content "new content" to "file.txt"
     When user "Bob" tries to get version of the file "file.txt" with the index "1" of the space "download file" using the WebDAV API
     Then the HTTP status code should be "403"

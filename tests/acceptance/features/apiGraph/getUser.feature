@@ -752,7 +752,7 @@ Feature: get users
 
 
   @skipOnStable2.0
-  Scenario: admin user gets all users of certain groups
+  Scenario: admin user gets all users of two groups
     Given the administrator has given "Alice" the role "Admin" using the settings api
     And user "Carol" has been created with default attributes and without skeleton files
     And group "tea-lover" has been created
@@ -761,7 +761,7 @@ Feature: get users
     And user "Alice" has been added to group "tea-lover"
     And user "Brian" has been added to group "coffee-lover"
     And user "Carol" has been added to group "wine-lover"
-    When the user "Alice" gets all users from that are members in the group "tea-lover" or the group "coffee-lover" using the Graph API
+    When the user "Alice" gets all users that are members in the group "tea-lover" or the group "coffee-lover" using the Graph API
     Then the HTTP status code should be "200"
     And the JSON data of the response should contain the user "Alice Hansen" in the item 'value', the user-details should match
     """

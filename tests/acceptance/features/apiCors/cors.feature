@@ -2,12 +2,15 @@
 # CORS_ALLOWED_ORIGINS=https://aphno.badal
 @api @skipOnOcV10
 Feature: CORS headers
+  As a user
+  I want to send a cross-origin request
+  So that I can check if the correct headers are set
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
   @issue-5195
-  Scenario Outline: CORS headers should be returned when setting CORS domain sending Origin header
+  Scenario Outline: CORS headers should be returned when setting CORS domain sending origin header
     Given using OCS API version "<ocs_api_version>"
     When user "Alice" sends HTTP method "GET" to OCS API endpoint "<endpoint>" with headers
       | header | value               |
@@ -28,7 +31,7 @@ Feature: CORS headers
       | 2               | /apps/files_sharing/api/v1/shares | 200      | 200       |
 
 
-  Scenario Outline: CORS headers should not be returned when CORS domain does not match Origin header
+  Scenario Outline: CORS headers should not be returned when CORS domain does not match origin header
     Given using OCS API version "<ocs_api_version>"
     When user "Alice" sends HTTP method "GET" to OCS API endpoint "<endpoint>" with headers
       | header | value               |

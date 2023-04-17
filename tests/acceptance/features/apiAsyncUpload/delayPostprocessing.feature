@@ -1,5 +1,8 @@
 @api
 Feature: delay post-processing of uploaded files
+  As a user
+  I want to delay the post-processing of uploaded files
+  So that I can check the early request
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files

@@ -2,6 +2,7 @@
 Feature: Notification
   As a user
   I want to be notified of actions related to me
+  So that I can stay updated about the information
 
   Background:
     Given these users have been created with default attributes and without skeleton files:

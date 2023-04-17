@@ -1,7 +1,7 @@
 @api @skipOnReva
 Feature: attempt to PUT files with invalid password
   As an admin
-  I want to the system to be secure when passwords are stored with the full hash difficulty
+  I want the system to be secure when passwords are stored with the full hash difficulty
   So that unauthorised users do not have access to data
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production

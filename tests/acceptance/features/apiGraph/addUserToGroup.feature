@@ -120,10 +120,10 @@ Feature: add users to group
       | Alice    | var/../etc       |
 
   @issue-5938
-  Scenario Outline: user other than the admin tries to add himself to a group
+  Scenario Outline: user other than the admin tries to add herself to a group
     Given the administrator has given "Alice" the role "<role>" using the settings api
     And group "groupA" has been created
-    When user "Alice" tries to add himself to group "groupA" using the Graph API
+    When user "Alice" tries to add herself to group "groupA" using the Graph API
     Then the HTTP status code should be "403"
     And the JSON data of the response should match
     """

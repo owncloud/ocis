@@ -1,6 +1,8 @@
 @api
 Feature: REPORT request to Shares space
-  Check that the REPORT response contains all relevant details for Shares
+  As a user
+  I want to check the share REPORT response
+  So that I can make sure that the response contains all the relevant details for shares
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -13,7 +15,7 @@ Feature: REPORT request to Shares space
     And user "Alice" has shared entry "/folderMain" with user "Brian" with permissions "17"
 
 
-  Scenario Outline: Check the REPORT response of the found folder
+  Scenario Outline: check the REPORT response of the found folder
     Given using <dav_version> DAV path
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     When user "Brian" searches for "SubFolder1" using the WebDAV API
@@ -32,7 +34,7 @@ Feature: REPORT request to Shares space
       | new         |
 
 
-  Scenario Outline: Check the REPORT response of the found file
+  Scenario Outline: check the REPORT response of the found file
     Given using <dav_version> DAV path
     And user "Brian" has accepted share "/folderMain" offered by user "Alice"
     And user "Alice" has uploaded file with content "Not all those who wander are lost." to "/folderMain/SubFolder1/subFOLDER2/frodo.txt"

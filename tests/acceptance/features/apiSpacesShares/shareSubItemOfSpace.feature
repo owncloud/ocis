@@ -2,7 +2,7 @@
 Feature: Share a file or folder that is inside a space
   As an user with manager space role
   I want to be able to share the data inside the space
-
+  So that other users can have access to teh
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -21,7 +21,7 @@ Feature: Share a file or folder that is inside a space
     And using new DAV path
 
 
-  Scenario Outline: A manager of the space can share an entity inside project space to another user with role
+  Scenario Outline: manager of the space can share an entity inside project space to another user with role
     And user "Alice" creates a share inside of space "share sub-item" with settings:
       | path       | <entity>     |
       | shareWith  | Brian        |
@@ -42,7 +42,7 @@ Feature: Share a file or folder that is inside a space
       | file.txt | file   | editor | 2042-03-25T23:59:59+0100 | 2042-03-25 |
 
 
-  Scenario Outline: A user participant of the project space with manager role can share an entity to another user
+  Scenario Outline: user participant of the project space with manager role can share an entity to another user
     Given user "Alice" has shared a space "share sub-item" with settings:
       | shareWith | Brian   |
       | role      | manager |
@@ -66,7 +66,7 @@ Feature: Share a file or folder that is inside a space
       | file.txt | file   | editor |                          |            |
 
 
-  Scenario Outline: A user participant of the project space without space manager role cannot share an entity to another user
+  Scenario Outline: user participant of the project space without space manager role cannot share an entity to another user
     Given user "Alice" has shared a space "share sub-item" with settings:
       | shareWith | Brian       |
       | role      | <spaceRole> |
@@ -85,7 +85,7 @@ Feature: Share a file or folder that is inside a space
       | folder   | viewer    | 404        | No share permission |
 
 
-  Scenario Outline: A user participant of the project space can see the created resources share
+  Scenario Outline: user participant of the project space can see the created resources share
     Given user "Alice" has shared a space "share sub-item" with settings:
       | shareWith | Brian       |
       | role      | <spaceRole> |
@@ -102,7 +102,7 @@ Feature: Share a file or folder that is inside a space
       | manager   |
 
 
-  Scenario: A user shares the folder to the group
+  Scenario: user shares the folder to the group
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
     When user "Alice" creates a share inside of space "share sub-item" with settings:
@@ -120,7 +120,7 @@ Feature: Share a file or folder that is inside a space
       | expiration | 2042-01-01 |
 
   @skipOnStable2.0
-  Scenario: A user changes the expiration date
+  Scenario: user changes the expiration date
     Given user "Alice" has created a share inside of space "share sub-item" with settings:
       | path       | folder                   |
       | shareWith  | Brian                    |
@@ -134,7 +134,7 @@ Feature: Share a file or folder that is inside a space
       | expiration | 2044-01-01 |
 
 
-  Scenario: A user deletes the expiration date
+  Scenario: user deletes the expiration date
     Given user "Alice" has created a share inside of space "share sub-item" with settings:
       | path       | folder                   |
       | shareWith  | Brian                    |

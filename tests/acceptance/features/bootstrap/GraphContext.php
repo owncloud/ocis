@@ -1794,7 +1794,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When the user :user gets all users from that are members in the group :firstGroup or the group :secondGroup using the Graph API
+	 * @When the user :user gets all users that are members in the group :firstGroup or the group :secondGroup using the Graph API
 	 *
 	 * @param string $user
 	 * @param string $firstGroup

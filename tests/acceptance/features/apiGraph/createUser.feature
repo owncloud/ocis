@@ -1,6 +1,8 @@
 @api @skipOnOcV10
 Feature: create user
-  Only user with admin permissions can create new user
+  As a admin
+  I want to create a user
+  So that the user can use the application
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -9,7 +11,7 @@ Feature: create user
     Given user "Alice" has been created with default attributes and without skeleton files
 
   @issue-3516
-  Scenario Outline: the admin creates a user
+  Scenario Outline: admin creates a user
     Given the administrator has given "Alice" the role "Admin" using the settings api
     When the user "Alice" creates a new user using GraphAPI with the following settings:
       | userName       | <userName>    |
@@ -35,7 +37,7 @@ Feature: create user
       | Alice                        | same userName   | new@example.org     | 123                          | 400  | true   | should      |
 
 
-  Scenario: a user cannot be created with empty name
+  Scenario: user cannot be created with empty name
     Given the administrator has given "Alice" the role "Admin" using the settings api
     When the user "Alice" creates a new user using GraphAPI with the following settings:
       | userName       |              |
@@ -46,7 +48,7 @@ Feature: create user
     Then the HTTP status code should be "400"
 
 
-  Scenario Outline: a user without admin right cannot create a user
+  Scenario Outline: user without admin right cannot create a user
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When the user "Alice" creates a new user using GraphAPI with the following settings:
       | userName       | user         |
@@ -63,7 +65,7 @@ Feature: create user
       | Guest       |
 
   @issue-3516 @skipOnStable2.0
-  Scenario: a user cannot be created with the name of the disabled user
+  Scenario: user cannot be created with the name of the disabled user
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "Admin" using the settings api
     And the user "Alice" has disabled user "Brian" using the Graph API
@@ -76,7 +78,7 @@ Feature: create user
     Then the HTTP status code should be "400"
 
   @skipOnStable2.0
-  Scenario: a user can be created with the name of the deleted user
+  Scenario: user can be created with the name of the deleted user
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "Admin" using the settings api
     And the user "Alice" has deleted a user "Brian" using the Graph API

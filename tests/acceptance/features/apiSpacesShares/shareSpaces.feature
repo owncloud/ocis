@@ -2,6 +2,7 @@
 Feature: Share spaces
   As the owner of a space
   I want to be able to add members to a space, and to remove access for them
+  So that I can manage the access to the space
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -17,7 +18,7 @@ Feature: Share spaces
     And using spaces DAV path
 
 
-  Scenario Outline: A Space Admin can share a space to another user
+  Scenario Outline: space admin can share a space to another user
     When user "Alice" shares a space "share space" with settings:
       | shareWith | Brian  |
       | role      | <role> |
@@ -26,7 +27,7 @@ Feature: Share spaces
     And the OCS status message should be "OK"
     And for user "Brian" the JSON response should contain space called "share space" and match
     """
-     {
+    {
       "type": "object",
       "required": [
         "name",
@@ -56,14 +57,14 @@ Feature: Share spaces
       | viewer  |
 
 
-  Scenario: A user can see who has been granted access
+  Scenario: user can see who has been granted access
     When user "Alice" shares a space "share space" with settings:
       | shareWith | Brian  |
       | role      | viewer |
     Then the user "Alice" should have a space called "share space" granted to user "Brian" with role "viewer"
 
   @skipOnStable2.0
-  Scenario: A user can see that the group has been granted access
+  Scenario: user can see that the group has been granted access
     Given group "sales" has been created
     When user "Alice" shares a space "share space" with settings:
       | shareWith | sales  |
@@ -74,7 +75,7 @@ Feature: Share spaces
     And the user "Alice" should have a space called "share space" granted to group "sales" with role "viewer"
 
 
-  Scenario: A user can see a file in a received shared space
+  Scenario: user can see a file in a received shared space
     Given user "Alice" has uploaded a file inside space "share space" with content "Test" to "test.txt"
     And user "Alice" has created a folder "Folder Main" in space "share space"
     When user "Alice" shares a space "share space" with settings:
@@ -85,7 +86,7 @@ Feature: Share spaces
       | Folder Main |
 
 
-  Scenario: When a user unshares a space, the space becomes unavailable to the receiver
+  Scenario: user unshares a space
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian  |
       | role      | viewer |
@@ -119,7 +120,7 @@ Feature: Share spaces
     But the user "Brian" should not have a space called "share space"
 
 
-  Scenario Outline: Owner of a space cannot see the space after removing his access to the space
+  Scenario Outline: owner of a space cannot see the space after removing his access to the space
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian   |
       | role      | manager |
@@ -127,7 +128,7 @@ Feature: Share spaces
     Then the HTTP status code should be "200"
     And for user "Brian" the JSON response should contain space called "share space" owned by "Alice" and match
     """
-     {
+    {
       "type": "object",
       "required": [
         "name",
@@ -157,7 +158,7 @@ Feature: Share spaces
       | Brian |
 
 
-  Scenario: A user can add another user to the space managers to enable him
+  Scenario: user can add another user to the space managers to enable him
     Given user "Alice" has uploaded a file inside space "share space" with content "Test" to "test.txt"
     When user "Alice" shares a space "share space" with settings:
       | shareWith | Brian   |
@@ -171,7 +172,7 @@ Feature: Share spaces
       | test.txt |
 
 
-  Scenario Outline: A user cannot share a disabled space to another user
+  Scenario Outline: user cannot share a disabled space to another user
     Given user "Alice" has disabled a space "share space"
     When user "Alice" shares a space "share space" with settings:
       | shareWith | Brian  |
@@ -187,7 +188,7 @@ Feature: Share spaces
       | viewer  |
 
 
-  Scenario Outline: A user with manager role can share a space to another user
+  Scenario Outline: user with manager role can share a space to another user
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian   |
       | role      | manager |
@@ -199,7 +200,7 @@ Feature: Share spaces
     And the OCS status message should be "OK"
     And for user "Brian" the JSON response should contain space called "share space" and match
     """
-     {
+    {
       "type": "object",
       "required": [
         "name",
@@ -229,7 +230,7 @@ Feature: Share spaces
       | viewer  |
 
 
-  Scenario Outline: A user with editor or viewer role cannot share a space to another user
+  Scenario Outline: user with editor or viewer role cannot share a space to another user
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian  |
       | role      | <role> |
@@ -291,7 +292,7 @@ Feature: Share spaces
       | viewer | editor   |
 
   @skipOnStable2.0
-  Scenario Outline: A user shares a space with a group
+  Scenario Outline: user shares a space with a group
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using GraphApi
     And the administrator has added a user "Bob" to the group "group2" using GraphApi
@@ -302,7 +303,7 @@ Feature: Share spaces
     Then the HTTP status code should be "200"
     And for user "Brian" the JSON response should contain space called "share space" and match
     """
-     {
+    {
       "type": "object",
       "required": [
         "name",
@@ -327,7 +328,7 @@ Feature: Share spaces
     """
     And for user "Bob" the JSON response should contain space called "share space" and match
     """
-     {
+    {
       "type": "object",
       "required": [
         "name",
@@ -357,7 +358,7 @@ Feature: Share spaces
       | viewer  |
 
   @skipOnStable2.0
-  Scenario Outline: The user has no access to the space if access for the group has been removed
+  Scenario Outline: user has no access to the space if access for the group has been removed
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using GraphApi
     And user "Alice" has shared a space "share space" with settings:
@@ -374,7 +375,7 @@ Feature: Share spaces
       | viewer  |
 
   @skipOnStable2.0
-  Scenario: The user has no access to the space if he has been removed from the group
+  Scenario: user has no access to the space if he has been removed from the group
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using GraphApi
     And the administrator has added a user "Bob" to the group "group2" using GraphApi
@@ -389,7 +390,7 @@ Feature: Share spaces
     And the user "Brian" should not have a space called "share space"
     But for user "Bob" the JSON response should contain space called "share space" and match
     """
-     {
+    {
       "type": "object",
       "required": [
         "name",
@@ -414,7 +415,7 @@ Feature: Share spaces
     """
 
   @skipOnStable2.0
-  Scenario: Users don't have access to the space if the group has been deleted
+  Scenario: users don't have access to the space if the group has been deleted
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using GraphApi
     And the administrator has added a user "Bob" to the group "group2" using GraphApi
@@ -428,7 +429,7 @@ Feature: Share spaces
     And the user "Brian" should not have a space called "share space"
 
   @skipOnStable2.0
-  Scenario: User increases permissions for one member of the group or for the entire group
+  Scenario: user increases permissions for one member of the group or for the entire group
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
     And user "Alice" has shared a space "share space" with settings:
@@ -445,7 +446,7 @@ Feature: Share spaces
     Then the HTTP status code should be "201"
 
   @skipOnStable2.0
-  Scenario: User increases permissions for the group, so the user's permissions are increased
+  Scenario: user increases permissions for the group, so the user's permissions are increased
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
     And user "Alice" has shared a space "share space" with settings:
@@ -462,7 +463,7 @@ Feature: Share spaces
     Then the HTTP status code should be "201"
 
   @skipOnStable2.0
-  Scenario Outline: A Space Admin can share a space to the user with an expiration date
+  Scenario Outline: space Admin can share a space to the user with an expiration date
     When user "Alice" shares a space "share space" with settings:
       | shareWith  | Brian                    |
       | role       | <role>                   |
@@ -476,7 +477,7 @@ Feature: Share spaces
       | viewer  |
 
 
-  Scenario Outline: A Space Admin can share a space to the group with an expiration date
+  Scenario Outline: space Admin can share a space to the group with an expiration date
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
     When user "Alice" shares a space "share space" with settings:
