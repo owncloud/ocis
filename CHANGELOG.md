@@ -48,7 +48,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Web config additions: [#6032](https://github.com/owncloud/ocis/pull/6032)
 * Enhancement - Eventhistory service: [#5600](https://github.com/owncloud/ocis/pull/5600)
 * Enhancement - Expiration Notifications: [#5330](https://github.com/owncloud/ocis/pull/5330)
-* Enhancement - GDPR Export: [#5950](https://github.com/owncloud/ocis/pull/5950)
+* Enhancement - GDPR Export: [#6064](https://github.com/owncloud/ocis/pull/6064)
 * Enhancement - Make graph/education API errors more consistent: [#5682](https://github.com/owncloud/ocis/pull/5682)
 * Enhancement - Add endpoint to list permissions: [#5594](https://github.com/owncloud/ocis/pull/5594)
 * Enhancement - No Notifications for own actions: [#5871](https://github.com/owncloud/ocis/pull/5871)
