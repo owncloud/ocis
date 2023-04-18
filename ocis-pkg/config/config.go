@@ -44,10 +44,11 @@ type Mode int
 
 // Runtime configures the oCIS runtime when running in supervised mode.
 type Runtime struct {
-	Port     string `yaml:"port" env:"OCIS_RUNTIME_PORT"`
-	Host     string `yaml:"host" env:"OCIS_RUNTIME_HOST"`
-	Services string `yaml:"services" env:"OCIS_RUN_EXTENSIONS;OCIS_RUN_SERVICES" desc:"A comma-separated list of service names. Will start only the listed services."`
-	Disabled string `yaml:"disabled_services" env:"OCIS_EXCLUDE_RUN_SERVICES" desc:"A comma-separated list of service names. Will start all services except of the ones listed. Has no effect when OCIS_RUN_SERVICES is set."`
+	Port       string   `yaml:"port" env:"OCIS_RUNTIME_PORT"`
+	Host       string   `yaml:"host" env:"OCIS_RUNTIME_HOST"`
+	Services   []string `yaml:"services" env:"OCIS_RUN_EXTENSIONS;OCIS_RUN_SERVICES" desc:"A comma-separated list of service names. Will start only the listed services."`
+	Disabled   []string `yaml:"disabled_services" env:"OCIS_EXCLUDE_RUN_SERVICES" desc:"A comma-separated list of service names. Will start all services except of the ones listed. Has no effect when OCIS_RUN_SERVICES is set."`
+	Additional []string `yaml:"add_services" env:"OCIS_ADD_RUN_SERVICES" desc:"A comma-separated list of service names. Will add the listed services to the default configuration. Has no effect when OCIS_RUN_SERVICES is set."`
 }
 
 // Config combines all available configuration parts.

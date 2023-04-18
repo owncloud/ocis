@@ -18,8 +18,10 @@ import (
 	ociscfg "github.com/owncloud/ocis/v2/ocis-pkg/config"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	antivirus "github.com/owncloud/ocis/v2/services/antivirus/pkg/command"
 	appProvider "github.com/owncloud/ocis/v2/services/app-provider/pkg/command"
 	appRegistry "github.com/owncloud/ocis/v2/services/app-registry/pkg/command"
+	audit "github.com/owncloud/ocis/v2/services/audit/pkg/command"
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/command"
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/command"
 	eventhistory "github.com/owncloud/ocis/v2/services/eventhistory/pkg/command"
@@ -34,6 +36,7 @@ import (
 	notifications "github.com/owncloud/ocis/v2/services/notifications/pkg/command"
 	ocdav "github.com/owncloud/ocis/v2/services/ocdav/pkg/command"
 	ocs "github.com/owncloud/ocis/v2/services/ocs/pkg/command"
+	policies "github.com/owncloud/ocis/v2/services/policies/pkg/command"
 	postprocessing "github.com/owncloud/ocis/v2/services/postprocessing/pkg/command"
 	proxy "github.com/owncloud/ocis/v2/services/proxy/pkg/command"
 	search "github.com/owncloud/ocis/v2/services/search/pkg/command"
@@ -65,6 +68,7 @@ type Service struct {
 	Supervisor       *suture.Supervisor
 	ServicesRegistry serviceFuncMap
 	Delayed          serviceFuncMap
+	Additional       serviceFuncMap
 	Log              log.Logger
 
 	serviceToken map[string][]suture.ServiceToken
@@ -96,6 +100,7 @@ func NewService(options ...Option) (*Service, error) {
 	s := &Service{
 		ServicesRegistry: make(serviceFuncMap),
 		Delayed:          make(serviceFuncMap),
+		Additional:       make(serviceFuncMap),
 		Log:              l,
 
 		serviceToken: make(map[string][]suture.ServiceToken),
@@ -133,6 +138,11 @@ func NewService(options ...Option) (*Service, error) {
 	s.ServicesRegistry[opts.Config.Postprocessing.Service.Name] = postprocessing.NewSutureService
 	s.ServicesRegistry[opts.Config.EventHistory.Service.Name] = eventhistory.NewSutureService
 	s.ServicesRegistry[opts.Config.Userlog.Service.Name] = userlog.NewSutureService
+
+	// populate optional services
+	s.Additional[opts.Config.Antivirus.Service.Name] = antivirus.NewSutureService
+	s.Additional[opts.Config.Audit.Service.Name] = audit.NewSutureService
+	s.Additional[opts.Config.Policies.Service.Name] = policies.NewSutureService
 
 	// populate delayed services
 	s.Delayed[opts.Config.Sharing.Service.Name] = sharing.NewSutureService
@@ -212,6 +222,9 @@ func Start(o ...Option) error {
 	// schedule services that we are sure don't have interdependencies.
 	scheduleServiceTokens(s, s.ServicesRegistry)
 
+	// schedule services that are optional
+	scheduleServiceTokens(s, s.Additional)
+
 	// there are reasons not to do this, but we have race conditions ourselves. Until we resolve them, mind the following disclaimer:
 	// Calling ServeBackground will CORRECTLY start the supervisor running in a new goroutine. It is risky to directly run
 	// go supervisor.Serve()
@@ -245,9 +258,8 @@ func scheduleServiceTokens(s *Service, funcSet serviceFuncMap) {
 // the runtime.
 func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	runset = make(map[string]struct{})
-	if cfg.Runtime.Services != "" {
-		e := strings.Split(strings.ReplaceAll(cfg.Runtime.Services, " ", ""), ",")
-		for _, name := range e {
+	if cfg.Runtime.Services != nil {
+		for _, name := range cfg.Runtime.Services {
 			runset[name] = struct{}{}
 		}
 		return
@@ -261,12 +273,16 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 		runset[name] = struct{}{}
 	}
 
-	if cfg.Runtime.Disabled != "" {
-		e := strings.Split(strings.ReplaceAll(cfg.Runtime.Disabled, " ", ""), ",")
-		for _, name := range e {
-			delete(runset, name)
-		}
+	// add additional services if explicitly added by config
+	for _, name := range cfg.Runtime.Additional {
+		runset[name] = struct{}{}
 	}
+
+	// remove services if explicitly excluded by config
+	for _, name := range cfg.Runtime.Disabled {
+		delete(runset, name)
+	}
+
 }
 
 // List running processes for the Service Controller.

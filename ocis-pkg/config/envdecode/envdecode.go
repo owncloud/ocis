@@ -214,7 +214,7 @@ func decode(target interface{}, strict bool) (int, error) {
 }
 
 func decodeSlice(f *reflect.Value, env string) error {
-	parts := strings.Split(env, ";")
+	parts := strings.Split(env, ",")
 
 	values := parts[:0]
 	for _, x := range parts {
