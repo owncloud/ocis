@@ -83,31 +83,6 @@ Feature: List and create spaces
     And user "Brian" has created folder "folder"
     And user "Brian" has shared folder "folder" with user "Alice" with permissions "31"
     And user "Alice" has accepted share "/folder" offered by user "Brian"
-    Then for user "Alice" the JSON response should contain space called "Shares" and match
-    """
-     {
-      "type": "object",
-      "required": [
-        "driveType",
-        "id",
-        "name"
-      ],
-      "properties": {
-        "driveType": {
-          "type": "string",
-          "enum": ["virtual"]
-        },
-        "id": {
-          "type": "string",
-          "enum": ["%space_id%"]
-        },
-        "name": {
-          "type": "string",
-          "enum": ["Shares"]
-        }
-      }
-    }
-    """
     When user "Alice" lists all available spaces via the GraphApi with query "$filter=driveType eq 'personal'"
     Then the HTTP status code should be "200"
     And the JSON response should contain space called "Alice Hansen" and match

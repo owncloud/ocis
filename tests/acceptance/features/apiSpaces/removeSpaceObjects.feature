@@ -61,9 +61,6 @@ Feature: Remove files, folder
       | role      | <role> |
     When user "<user>" removes the file "text.txt" from space "delete objects"
     Then the HTTP status code should be "<code>"
-    And for user "<user>" the space "delete objects" <shouldOrNotBeInSpace> contain these entries:
-      | text.txt |
-    And as "<user>" file "text.txt" <shouldOrNotBeInTrash> exist in the trashbin of the space "delete objects"
     And for user "<user>" the JSON response should contain space called "delete objects" and match
     """
      {
@@ -92,6 +89,9 @@ Feature: Remove files, folder
       }
     }
     """
+    And for user "<user>" the space "delete objects" <shouldOrNotBeInSpace> contain these entries:
+      | text.txt |
+    And as "<user>" file "text.txt" <shouldOrNotBeInTrash> exist in the trashbin of the space "delete objects"
     Examples:
       | user  | role    | code | shouldOrNotBeInSpace | shouldOrNotBeInTrash | quotaValue |
       | Alice | manager | 204  | should not           | should               | 0          |

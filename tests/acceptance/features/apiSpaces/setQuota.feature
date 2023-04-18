@@ -16,7 +16,7 @@ Feature: Set quota
     And the administrator has given "Brian" the role "<userRole>" using the settings api
     When user "Alice" changes the quota of the "Brian Murphy" space to "100" owned by user "Brian"
     Then the HTTP status code should be "200"
-    And for user "Brian" the JSON response should contain space called "Brian Murphy" and match
+    And the JSON response should contain space called "Brian Murphy" and match
     """
     {
       "type": "object",
@@ -97,7 +97,7 @@ Feature: Set quota
     And user "Alice" has created a space "Project Jupiter" of type "project" with quota "20"
     When user "Brian" changes the quota of the "Project Jupiter" space to "100" owned by user "Alice"
     Then the HTTP status code should be "200"
-    And for user "Alice" the JSON response should contain space called "Project Jupiter" and match
+    And the JSON response should contain space called "Project Jupiter" and match
     """
     {
       "type": "object",
@@ -182,7 +182,7 @@ Feature: Set quota
     Given the administrator has given "Alice" the role "Admin" using the settings api
     When user "Alice" changes the quota of the "Alice Hansen" space to "100" owned by user "Alice"
     Then the HTTP status code should be "200"
-    And for user "Alice" the JSON response should contain space called "Alice Hansen" and match
+    And the JSON response should contain space called "Alice Hansen" and match
     """
     {
       "type": "object",
