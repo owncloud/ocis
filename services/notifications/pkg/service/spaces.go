@@ -4,6 +4,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
 )
 
 func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
@@ -54,7 +55,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 	}
 
 	sharerDisplayName := owner.GetDisplayName()
-	msg, subj, err := s.render("spaces/sharedSpace.email.body.tmpl", "spaces/sharedSpace.email.subject.tmpl", map[string]string{
+	subj, msg, err := s.render(email.SharedSpace, map[string]interface{}{
 		"SpaceGrantee": spaceGrantee,
 		"SpaceSharer":  sharerDisplayName,
 		"SpaceName":    resourceInfo.GetSpace().GetName(),
@@ -116,7 +117,7 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 	}
 
 	sharerDisplayName := owner.GetDisplayName()
-	msg, subj, err := s.render("spaces/unsharedSpace.email.body.tmpl", "spaces/unsharedSpace.email.subject.tmpl", map[string]string{
+	subj, msg, err := s.render(email.UnsharedSpace, map[string]interface{}{
 		"SpaceGrantee": spaceGrantee,
 		"SpaceSharer":  sharerDisplayName,
 		"SpaceName":    resourceInfo.GetSpace().Name,
@@ -151,7 +152,7 @@ func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExp
 		return
 	}
 
-	msg, subj, err := s.render("spaces/membershipExpired.email.body.tmpl", "spaces/membershipExpired.email.subject.tmpl", map[string]string{
+	subj, msg, err := s.render(email.MembershipExpired, map[string]interface{}{
 		"SpaceGrantee": shareGrantee,
 		"SpaceName":    e.SpaceName,
 		"ExpiredAt":    e.ExpiredAt.Format("2006-01-02 15:04:05"),

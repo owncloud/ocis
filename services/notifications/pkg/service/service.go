@@ -54,6 +54,7 @@ type eventsNotifier struct {
 	gwClient          gateway.GatewayAPIClient
 	machineAuthAPIKey string
 	emailTemplatePath string
+	translationPath   string
 	ocisURL           string
 }
 
@@ -86,18 +87,9 @@ func (s eventsNotifier) Run() error {
 	}
 }
 
-func (s eventsNotifier) render(bodyTemplate string, subjTemplate string, values map[string]string) (string, string, error) {
-	msg, err := email.RenderEmailTemplate(bodyTemplate, values, s.emailTemplatePath)
-	if err != nil {
-		return "", "", err
-	}
-
-	sub, err := email.RenderEmailTemplate(subjTemplate, values, s.emailTemplatePath)
-	if err != nil {
-		return "", "", err
-	}
-
-	return msg, sub, nil
+func (s eventsNotifier) render(template email.MessageTemplate, values map[string]interface{}) (string, string, error) {
+	// The locate have to come from the user setting
+	return email.RenderEmailTemplate(template, "en", s.emailTemplatePath, s.translationPath, values)
 }
 
 func (s eventsNotifier) send(ctx context.Context, u *user.UserId, g *group.GroupId, msg, subj, sender string) error {

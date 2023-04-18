@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
@@ -41,7 +42,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 	}
 
 	sharerDisplayName := owner.GetDisplayName()
-	msg, subj, err := s.render("shares/shareCreated.email.body.tmpl", "shares/shareCreated.email.subject.tmpl", map[string]string{
+	subj, msg, err := s.render(email.ShareCreated, map[string]interface{}{
 		"ShareGrantee": shareGrantee,
 		"ShareSharer":  sharerDisplayName,
 		"ShareFolder":  resourceInfo.Name,
@@ -84,7 +85,7 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		return
 	}
 
-	msg, subj, err := s.render("shares/shareExpired.email.body.tmpl", "shares/shareExpired.email.subject.tmpl", map[string]string{
+	subj, msg, err := s.render(email.ShareExpired, map[string]interface{}{
 		"ShareGrantee": shareGrantee,
 		"ShareFolder":  resourceInfo.GetName(),
 		"ExpiredAt":    e.ExpiredAt.Format("2006-01-02 15:04:05"),
