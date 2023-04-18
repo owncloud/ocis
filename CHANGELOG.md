@@ -51,6 +51,7 @@ The following sections list the changes for unreleased.
 * Enhancement - GDPR Export: [#6064](https://github.com/owncloud/ocis/pull/6064)
 * Enhancement - Make graph/education API errors more consistent: [#5682](https://github.com/owncloud/ocis/pull/5682)
 * Enhancement - Add endpoint to list permissions: [#5594](https://github.com/owncloud/ocis/pull/5594)
+* Enhancement - Notifications: [#6038](https://github.com/owncloud/ocis/pull/6038)
 * Enhancement - No Notifications for own actions: [#5871](https://github.com/owncloud/ocis/pull/5871)
 * Enhancement - Notify about policies: [#5912](https://github.com/owncloud/ocis/pull/5912)
 * Enhancement - Add a capability for the Personal Data export: [#5984](https://github.com/owncloud/ocis/pull/5984)
