@@ -809,6 +809,7 @@ def localApiTests(suite, storage, extra_environment = {}):
         "BEHAT_FILTER_TAGS": "~@skip&&~@skipOnGraph&&~@skipOnOcis-%s-Storage" % ("OC" if storage == "owncloud" else "OCIS"),
         "EXPECTED_FAILURES_FILE": "%s/tests/acceptance/expected-failures-localAPI-on-%s-storage.md" % (dirs["base"], storage.upper()),
         "UPLOAD_DELETE_WAIT_TIME": "1" if storage == "owncloud" else 0,
+        "OCIS_WRAPPER_URL": "http://ocis-server:5000",
     }
 
     for item in extra_environment:
