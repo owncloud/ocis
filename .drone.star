@@ -111,29 +111,11 @@ config = {
                 "apiGraph",
                 "apiSpaces",
                 "apiSpacesShares",
-            ],
-            "skip": False,
-            "earlyFail": True,
-        },
-        "apiCors": {
-            "suites": [
                 "apiCors",
+                "apiDelayPostProcessing",
             ],
             "skip": False,
             "earlyFail": True,
-            "extraServerEnvironment": {
-                "OCIS_CORS_ALLOW_ORIGINS": "https://aphno.badal",
-            },
-        },
-        "apiDelayPostProcessing": {
-            "suites": [
-                "apiAsyncUpload",
-            ],
-            "skip": False,
-            "earlyFail": True,
-            "extraServerEnvironment": {
-                "POSTPROCESSING_DELAY": "30s",
-            },
         },
         "apiEmailNotification": {
             "suites": [
