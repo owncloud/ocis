@@ -12,7 +12,7 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Info
 | Deprecation Version
 | Removal Version
-| Deprecation Replacment
+| Deprecation Replacement
 |===
 
 endif::[]
