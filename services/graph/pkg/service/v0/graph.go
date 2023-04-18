@@ -76,6 +76,7 @@ type Graph struct {
 
 // ServeHTTP implements the Service interface.
 func (g Graph) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	r.URL.RawPath = r.URL.EscapedPath()
 	g.mux.ServeHTTP(w, r)
 }
 
