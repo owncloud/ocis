@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-18-12-15-55]
+[#deprecation-note-2023-04-18-12-21-56]
 [caption=]
 .Deprecation notes for the postprocessing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -130,7 +130,7 @@ a| [subs=-attributes]
 A comma separated list of postprocessing steps, processed in order of their appearance. Currently supported values by the system are: 'virusscan', 'policies' and 'delay'. Custom steps are allowed. See the documentation for instructions.
 
 a|`POSTPROCESSING_VIRUSSCAN` +
-xref:deprecation-note-2023-04-18-12-15-55[Deprecation Note]
+xref:deprecation-note-2023-04-18-12-21-56[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
