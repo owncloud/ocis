@@ -4,7 +4,6 @@ import (
 	"net/url"
 	"path"
 	"strconv"
-	"strings"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
@@ -64,7 +63,10 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 		}
 	}
 
-	ReadOnlyUserAttributes := strings.Split(cfg.ReadOnlyUserAttributes, ",")
+	readOnlyUserAttributes := []string{}
+	if cfg.ReadOnlyUserAttributes != nil {
+		readOnlyUserAttributes = cfg.ReadOnlyUserAttributes
+	}
 
 	return map[string]interface{}{
 		"core": map[string]interface{}{
@@ -202,7 +204,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 							},
 							"graph": map[string]interface{}{
 								"personal_data_export":      true,
-								"read_only_user_attributes": ReadOnlyUserAttributes,
+								"read_only_user_attributes": readOnlyUserAttributes,
 							},
 							"checksums": map[string]interface{}{
 								"supported_types":       cfg.Checksums.SupportedTypes,
