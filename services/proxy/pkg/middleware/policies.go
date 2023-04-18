@@ -8,6 +8,8 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	pMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/policies/v0"
 	pService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
+	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
+	tusd "github.com/tus/tusd/pkg/handler"
 )
 
 // Policies verifies if a request is granted or not.
@@ -30,6 +32,11 @@ func Policies(logger log.Logger, qs string) func(next http.Handler) http.Handler
 					},
 					Stage: pMessage.Stage_STAGE_HTTP,
 				},
+			}
+
+			meta := tusd.ParseMetadataHeader(r.Header.Get(net.HeaderUploadMetadata))
+			req.Environment.Resource = &pMessage.Resource{
+				Name: meta["filename"],
 			}
 
 			if user, ok := revactx.ContextGetUser(r.Context()); ok {
