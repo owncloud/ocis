@@ -58,7 +58,7 @@ type testConfig struct {
 	UnmarshalerNumber unmarshalerNumber `env:"TEST_UNMARSHALER_NUMBER"`
 
 	DefaultInt      int           `env:"TEST_UNSET,asdf=asdf,default=1234"`
-	DefaultSliceInt []int         `env:"TEST_UNSET,asdf=asdf,default=1;2;3"`
+	DefaultSliceInt []int         `env:"TEST_UNSET,asdf=asdf,default=1"`
 	DefaultDuration time.Duration `env:"TEST_UNSET,asdf=asdf,default=24h"`
 	DefaultURL      *url.URL      `env:"TEST_UNSET,default=http://example.com"`
 }
@@ -137,12 +137,12 @@ func TestDecode(t *testing.T) {
 	os.Setenv("TEST_DURATION", "10m")
 	os.Setenv("TEST_URL", "https://example.com")
 	os.Setenv("TEST_INVALID_INT64", "asdf")
-	os.Setenv("TEST_STRING_SLICE", "foo;bar")
-	os.Setenv("TEST_INT64_SLICE", int64AsString+";"+int64AsString)
-	os.Setenv("TEST_UINT16_SLICE", "60000;50000")
-	os.Setenv("TEST_FLOAT64_SLICE", piAsString+";"+piAsString)
-	os.Setenv("TEST_BOOL_SLICE", "true; false; true")
-	os.Setenv("TEST_DURATION_SLICE", "10m; 20m")
+	os.Setenv("TEST_STRING_SLICE", "foo,bar")
+	os.Setenv("TEST_INT64_SLICE", int64AsString+","+int64AsString)
+	os.Setenv("TEST_UINT16_SLICE", "60000,50000")
+	os.Setenv("TEST_FLOAT64_SLICE", piAsString+","+piAsString)
+	os.Setenv("TEST_BOOL_SLICE", "true, false, true")
+	os.Setenv("TEST_DURATION_SLICE", "10m, 20m")
 	os.Setenv("TEST_URL_SLICE", "https://example.com")
 	os.Setenv("TEST_DECODER_STRUCT", "{\"string\":\"foo\"}")
 	os.Setenv("TEST_DECODER_STRUCT_PTR", "{\"string\":\"foo\"}")
@@ -274,7 +274,7 @@ func TestDecode(t *testing.T) {
 		t.Fatalf("Expected 1234, got %d", tc.DefaultInt)
 	}
 
-	expectedDefaultSlice := []int{1, 2, 3}
+	expectedDefaultSlice := []int{1}
 	if !reflect.DeepEqual(tc.DefaultSliceInt, expectedDefaultSlice) {
 		t.Fatalf("Expected %d, got %d", expectedDefaultSlice, tc.DefaultSliceInt)
 	}
@@ -603,13 +603,13 @@ func TestExport(t *testing.T) {
 	os.Setenv("TEST_BOOL", "true")
 	os.Setenv("TEST_DURATION", "10m")
 	os.Setenv("TEST_URL", "https://example.com")
-	os.Setenv("TEST_STRING_SLICE", "foo;bar")
+	os.Setenv("TEST_STRING_SLICE", "foo,bar")
 	os.Setenv("TEST_NESTED_STRING", "nest_foo")
 	os.Setenv("TEST_NESTED_STRING_POINTER", "nest_foo_ptr")
 	os.Setenv("TEST_NESTED_TWICE_STRING", "nest_twice_foo")
 	os.Setenv("TEST_REQUIRED_INT", "101")
 	os.Setenv("TEST_DEFAULT_INT_SET", "102")
-	os.Setenv("TEST_DEFAULT_INT_SLICE", "1;2;3")
+	os.Setenv("TEST_DEFAULT_INT_SLICE", "1,2,3")
 
 	var tc testConfigExport
 	tc.NestedPtr = &nestedConfigExportPointer{}
