@@ -112,7 +112,7 @@ config = {
                 "apiSpaces",
                 "apiSpacesShares",
                 "apiCors",
-                "apiDelayPostProcessing",
+                "apiAsyncUpload",
             ],
             "skip": False,
             "earlyFail": True,
@@ -2142,7 +2142,6 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "commands": [
                 "ocis/bin/ocis init --insecure true",
                 "cat $OCIS_CONFIG_DIR/ocis.yaml",
-                "which ociswrapper",
                 "ociswrapper --bin-path=ocis/bin/ocis",
             ],
             "volumes": volumes,
