@@ -152,6 +152,7 @@ default:
         - OCSContext:
         - TrashbinContext:
         - GraphContext:
+        - OcisConfigContext:
 
     apiAsyncUpload:
       paths:
@@ -167,6 +168,7 @@ default:
         - OCSContext:
         - TrashbinContext:
         - GraphContext:
+        - OcisConfigContext:
 
     apiEmailNotification:
       paths:
