@@ -89,14 +89,14 @@ use PHPUnit\Framework\Assert;
 	 */
 	public function corsAllowedOriginsHasbeenSet(string $allowedOrigins): void {
 		$envs = [
-			"CORS_ALLOWED_ORIGINS" => $allowedOrigins,
+			"OCIS_CORS_ALLOW_ORIGINS" => $allowedOrigins,
 		];
 
 		$response =  OcisConfigHelper::reConfigureOcis($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to set CORS_ALLOWED_ORIGINS"
+			"Failed to set OCIS_CORS_ALLOW_ORIGINS=". $allowedOrigins
 		);
 		// ocis config has been changed
 		// set the touched flag

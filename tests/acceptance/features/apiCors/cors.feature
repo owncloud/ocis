@@ -1,6 +1,5 @@
-# NOTE: for running this feature locally, you need to run oCIS with the following env var:
-# CORS_ALLOWED_ORIGINS=https://aphno.badal
-@api 
+# NOTE: set env OCIS_CORS_ALLOW_ORIGINS=https://aphno.badal while running ocis server
+@api
 Feature: CORS headers
   As a user
   I want to send a cross-origin request
