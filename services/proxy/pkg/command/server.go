@@ -190,7 +190,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 func (h *StaticRouteHandler) handler() http.Handler {
 	m := chi.NewMux()
-	var methods = []string{"PROPFIND", "DELETE", "PROPPATCH", "MKCOL", "COPY", "MOVE", "LOCK", "UNLOCK"}
+	var methods = []string{"PROPFIND", "DELETE", "PROPPATCH", "MKCOL", "COPY", "MOVE", "LOCK", "UNLOCK", "REPORT"}
 	for _, k := range methods {
 		chi.RegisterMethod(k)
 	}
