@@ -60,6 +60,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add config option to enforce passwords on public links: [#5848](https://github.com/owncloud/ocis/pull/5848)
 * Enhancement - Add new permission for public links: [#5690](https://github.com/owncloud/ocis/pull/5690)
 * Enhancement - Added option to configure default quota per role: [#5616](https://github.com/owncloud/ocis/pull/5616)
+* Enhancement - Add optional services to the runtime: [#6071](https://github.com/owncloud/ocis/pull/6071)
 * Enhancement - Add new SetProjectSpaceQuota permission: [#5660](https://github.com/owncloud/ocis/pull/5660)
 * Enhancement - Add expiration to user and group shares: [#5389](https://github.com/owncloud/ocis/pull/5389)
 * Enhancement - Space Management permissions: [#5441](https://github.com/owncloud/ocis/pull/5441)
