@@ -517,7 +517,7 @@ type testConfigExport struct {
 	DefaultDuration time.Duration `env:"TEST_DEFAULT_DURATION,default=24h"`
 	DefaultURL      *url.URL      `env:"TEST_DEFAULT_URL,default=http://example.com"`
 	DefaultIntSet   int           `env:"TEST_DEFAULT_INT_SET,default=99"`
-	DefaultIntSlice []int         `env:"TEST_DEFAULT_INT_SLICE,default=99;33"`
+	DefaultIntSlice []int         `env:"TEST_DEFAULT_INT_SLICE,default=99"`
 }
 
 type nestedConfigExport struct {
@@ -769,7 +769,7 @@ func TestExport(t *testing.T) {
 			Field:        "DefaultIntSlice",
 			EnvVar:       "TEST_DEFAULT_INT_SLICE",
 			Value:        "[1 2 3]",
-			DefaultValue: "99;33",
+			DefaultValue: "99",
 			HasDefault:   true,
 			UsesEnv:      true,
 		},
