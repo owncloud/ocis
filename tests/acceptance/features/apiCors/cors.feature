@@ -8,6 +8,7 @@ Feature: CORS headers
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
+    And cors allowed origins has been set to "https://aphno.badal"
 
   @issue-5195
   Scenario Outline: CORS headers should be returned when setting CORS domain sending origin header
