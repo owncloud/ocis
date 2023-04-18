@@ -42,6 +42,8 @@ If Keycloak is used for authentication, GDPR regulations require to add all pers
 *   `OCIS_KEYCLOAK_USER_REALM` - The realm the oCIS users are defined in.
 *   `OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY` - If set to true, the TLS certificate of the keycloak instance is not verified.
 
+For more details see the [User-Triggered GDPR Report](https://doc.owncloud.com/ocis/next/deployment/gdpr/gdpr.html) in the ocis admin documentation.
+
 ### Keycloak Client Configuration
 
 The client that is used to authenticate with keycloak has to be able to list users and get the credential data. To do this, the following  roles have to be assigned to the client and they have to be about the realm that contains the oCIS users:
