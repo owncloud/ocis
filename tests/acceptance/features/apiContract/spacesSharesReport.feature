@@ -54,3 +54,13 @@ Feature: Report test
       | d:getcontenttype   | text/plain                                       |
       | oc:permissions     | SD                                               |
       | d:getcontentlength | 12                                               |
+
+    
+  Scenario: search for the shared folder when the share is not accepted
+    Given user "Alice" has created a share inside of space "find data" with settings:
+      | path      | folderMain |
+      | shareWith | Brian      |
+      | role      | viewer     |
+    When user "Brian" searches for "folderMain" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result should contain "0" entries
