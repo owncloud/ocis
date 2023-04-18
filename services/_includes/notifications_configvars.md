@@ -27,4 +27,5 @@
 | OCIS_EVENTS_ENABLE_TLS<br/>NOTIFICATIONS_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
 | OCIS_MACHINE_AUTH_API_KEY<br/>NOTIFICATIONS_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary to access resources from other services.|
 | OCIS_EMAIL_TEMPLATE_PATH<br/>NOTIFICATIONS_EMAIL_TEMPLATE_PATH | string |  | Path to Email notification templates overriding embedded ones.|
+| OCIS_TRANSLATION_PATH,NOTIFICATIONS_TRANSLATION_PATH | string |  | (optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.|
 | OCIS_REVA_GATEWAY<br/>REVA_GATEWAY | string | 127.0.0.1:9142 | CS3 gateway used to look up user metadata|

@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-18-01-06-59]
+[#deprecation-note-2023-04-18-10-09-39]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -267,9 +267,18 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Path to Email notification templates overriding embedded ones.
 
+a|`OCIS_TRANSLATION_PATH,NOTIFICATIONS_TRANSLATION_PATH` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+(optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.
+
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-18-01-06-59[Deprecation Note]
+xref:deprecation-note-2023-04-18-10-09-39[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

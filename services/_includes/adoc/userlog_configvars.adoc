@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-18-01-06-59]
+[#deprecation-note-2023-04-18-10-09-39]
 [caption=]
 .Deprecation notes for the userlog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -219,7 +219,7 @@ Machine auth API key used to validate internal requests necessary to access reso
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-18-01-06-59[Deprecation Note]
+xref:deprecation-note-2023-04-18-10-09-39[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -227,14 +227,14 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 CS3 gateway used to look up user metadata
 
-a|`USERLOG_TRANSLATION_PATH` +
+a|`OCIS_TRANSLATION_PATH,USERLOG_TRANSLATION_PATH` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-(optional) Set this to a path with custom translations to overwrite the builtin translations. See the documentation for more details.
+(optional) Set this to a path with custom translations to overwrite the builtin translations. Note that file and folder naming rules apply, see the documentation for more details.
 
 a|`OCIS_EVENTS_ENDPOINT` +
 `USERLOG_EVENTS_ENDPOINT` +
@@ -299,7 +299,7 @@ The type of the userlog store. Supported values are: 'memory', 'ocmem', 'etcd', 
 a|`OCIS_PERSISTENT_STORE_NODES` +
 `USERLOG_STORE_NODES` +
 `USERLOG_STORE_ADDRESSES` +
-xref:deprecation-note-2023-04-18-01-06-59[Deprecation Note]
+xref:deprecation-note-2023-04-18-10-09-39[Deprecation Note]
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
