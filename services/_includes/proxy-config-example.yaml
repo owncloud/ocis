@@ -134,10 +134,14 @@ role_assignment:
   oidc_role_mapper:
     role_claim: roles
     role_mapping:
-      admin: ocisAdmin
-      guest: ocisGuest
-      spaceadmin: ocisSpaceAdmin
-      user: ocisUser
+    - role_name: admin
+      claim_value: ocisAdmin
+    - role_name: spaceadmin
+      claim_value: ocisSpaceAdmin
+    - role_name: user
+      claim_value: ocisUser
+    - role_name: guest
+      claim_value: ocisGuest
 policy_selector:
   static:
     policy: ocis
