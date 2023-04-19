@@ -574,42 +574,6 @@ class GraphHelper {
 	}
 
 	/**
-	 * tries to add a group to a group
-	 *
-	 * @param string $baseUrl
-	 * @param string $xRequestId
-	 * @param string $adminUser
-	 * @param string $adminPassword
-	 * @param string $groupId
-	 * @param string $groupIdToAdd
-	 *
-	 * @return ResponseInterface
-	 * @throws GuzzleException
-	 */
-	public static function addGroupToGroup(
-		string $baseUrl,
-		string $xRequestId,
-		string $adminUser,
-		string $adminPassword,
-		string $groupId,
-		string $groupIdToAdd
-	): ResponseInterface {
-		$url = self::getFullUrl($baseUrl, 'groups/' . $groupId);
-		$payload = [
-			"@odata.id" => self::getFullUrl($baseUrl, 'groups/' . $groupIdToAdd)
-		];
-		return HttpRequestHelper::sendRequest(
-			$url,
-			$xRequestId,
-			'PATCH',
-			$adminUser,
-			$adminPassword,
-			self::getRequestHeaders(),
-			\json_encode($payload)
-		);
-	}
-
-	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
 	 * @param string $adminUser

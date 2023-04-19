@@ -2072,7 +2072,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When /^the administrator "([^"]*)" tries to add a group "([^"]*)" to a group "([^"]*)" using the Graph API$/
+	 * @When /^the administrator "([^"]*)" tries to add a group "([^"]*)" to another group "([^"]*)" with PATCH request using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $groupToAdd
@@ -2082,19 +2082,56 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 * @throws Exception
 	 */
-	public function theAdministratorAddGroupToAGroupAtOnceUsingTheGraphApi(string $user, string $groupToAdd, string $group) {
+	public function theAdministratorTriesToAddGroupToAGroupAtOnceUsingTheGraphApi(string $user, string $groupToAdd, string $group) {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		$groupIdToAdd = $this->featureContext->getAttributeOfCreatedGroup($groupToAdd, "id");
 		$credentials = $this->getAdminOrUserCredentials($user);
 
+		$payload = [
+			"members@odata.bind" => [GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupIdToAdd)]
+		];
+
 		$this->featureContext->setResponse(
-			GraphHelper::addGroupToGroup(
-				$this->featureContext->getBaseUrl(),
+			HttpRequestHelper::sendRequest(
+				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupId),
+				$this->featureContext->getStepLineRef(),
+				'PATCH',
+				$credentials["username"],
+				$credentials["password"],
+				['Content-Type' => 'application/json'],
+				\json_encode($payload)
+			)
+		);
+	}
+
+	/**
+	 * @When /^the administrator "([^"]*)" tries to add a group "([^"]*)" to another group "([^"]*)" with POST request using the Graph API$/
+	 *
+	 * @param string $user
+	 * @param string $groupToAdd
+	 * @param string $group
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theAdministratorTriesToAddAGroupToAGroupThroughPostRequestUsingTheGraphApi(string $user, string $groupToAdd, string $group) {
+		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
+		$groupIdToAdd = $this->featureContext->getAttributeOfCreatedGroup($groupToAdd, "id");
+		$credentials = $this->getAdminOrUserCredentials($user);
+
+		$payload = [
+			"@odata.id" => GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupIdToAdd)
+		];
+
+		$this->featureContext->setResponse(
+			HttpRequestHelper::post(
+				GraphHelper::getFullUrl($this->featureContext->getBaseUrl(), 'groups/' . $groupId . '/members/$ref'),
 				$this->featureContext->getStepLineRef(),
 				$credentials["username"],
 				$credentials["password"],
-				$groupId,
-				$groupIdToAdd
+				['Content-Type' => 'application/json'],
+				\json_encode($payload)
 			)
 		);
 	}

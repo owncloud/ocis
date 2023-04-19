@@ -161,14 +161,14 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/addUserToGroup.feature:204](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L204)
 
 ### [Users are added in a group with wrong host in host-part of user](https://github.com/owncloud/ocis/issues/5871)
-- [apiGraph/addUserToGroup.feature:356](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L356)
 - [apiGraph/addUserToGroup.feature:370](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L370)
+- [apiGraph/addUserToGroup.feature:384](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L384)
 
 #### [Admin user can't restore other user spaces](https://github.com/owncloud/ocis/issues/5872)
 - [apiSpaces/restoreSpaces.feature:94](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/restoreSpaces.feature#L94)
 
 ### [Adding the same user as multiple members in a single request results in listing the same user twice in the group](https://github.com/owncloud/ocis/issues/5855)
-- [apiGraph/addUserToGroup.feature:407](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L407)
+- [apiGraph/addUserToGroup.feature:421](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L421)
 
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.

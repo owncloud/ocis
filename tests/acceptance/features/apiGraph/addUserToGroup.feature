@@ -305,7 +305,7 @@ Feature: add users to group
       | Carol    | grp1      |
 
   @issue-5793
-  Scenario: try to add a group to a group
+  Scenario: try to add a group to another group with PATCH request
     Given the administrator has given "Alice" the role "Admin" using the settings api
     And these users have been created with default attributes and without skeleton files:
       | username |
@@ -315,7 +315,21 @@ Feature: add users to group
       | student   |
       | music     |
     And user "Brian" has been added to group "music"
-    When the administrator "Alice" tries to add a group "music" to a group "student" using the Graph API
+    When the administrator "Alice" tries to add a group "music" to another group "student" with PATCH request using the Graph API
+    Then the HTTP status code should be "400"
+
+  @issue-5793
+  Scenario: try to add a group to another group with POST request
+    Given the administrator has given "Alice" the role "Admin" using the settings api
+    And these users have been created with default attributes and without skeleton files:
+      | username |
+      | Brian    |
+    And these groups have been created:
+      | groupname |
+      | student   |
+      | music     |
+    And user "Brian" has been added to group "music"
+    When the administrator "Alice" tries to add a group "music" to another group "student" with POST request using the Graph API
     Then the HTTP status code should be "400"
 
 
