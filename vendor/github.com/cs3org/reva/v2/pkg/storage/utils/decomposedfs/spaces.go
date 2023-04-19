@@ -246,6 +246,9 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 		case provider.ListStorageSpacesRequest_Filter_TYPE_USER:
 			// TODO: refactor this to GetUserId() in cs3
 			requestedUserID = filter[i].GetUser().GetOpaqueId()
+		case provider.ListStorageSpacesRequest_Filter_TYPE_OWNER:
+			// TODO: improve further by not evaluating shares
+			requestedUserID = filter[i].GetOwner().GetOpaqueId()
 		}
 	}
 	if len(spaceTypes) == 0 {

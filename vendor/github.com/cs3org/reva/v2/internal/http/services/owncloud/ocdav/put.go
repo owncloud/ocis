@@ -23,6 +23,7 @@ import (
 	"io"
 	"net/http"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -136,6 +137,14 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 	length, err := getContentLength(w, r)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	fn := filepath.Base(ref.Path)
+	if err := ValidateName(fn, s.nameValidators); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		b, err := errors.Marshal(http.StatusBadRequest, err.Error(), "")
+		errors.HandleWebdavError(&log, w, b, err)
 		return
 	}
 

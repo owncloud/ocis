@@ -206,6 +206,9 @@ func (h *Handler) removeUserShare(w http.ResponseWriter, r *http.Request, shareI
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "grpc delete share request failed", err)
 		return
 	}
+	if currentUser, ok := ctxpkg.ContextGetUser(ctx); ok {
+		h.resourceInfoCache.RemoveStat(currentUser.Id, getShareResp.Share.ResourceId)
+	}
 	response.WriteOCSSuccess(w, r, data)
 }
 

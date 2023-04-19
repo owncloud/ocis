@@ -32,6 +32,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx"
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/manager/registry"
+	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/metrics"
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/utils/download"
 	"github.com/cs3org/reva/v2/pkg/rhttp/router"
 	"github.com/cs3org/reva/v2/pkg/storage"
@@ -46,21 +47,14 @@ func init() {
 	registry.Register("spaces", New)
 }
 
-type config struct {
-	CacheStore    string   `mapstructure:"cache_store"`
-	CacheNodes    []string `mapstructure:"cache_nodes"`
-	CacheDatabase string   `mapstructure:"cache_database"`
-	CacheTable    string   `mapstructure:"cache_table"`
-}
-
 type manager struct {
-	conf      *config
+	conf      *cache.Config
 	publisher events.Publisher
 	statCache cache.StatCache
 }
 
-func parseConfig(m map[string]interface{}) (*config, error) {
-	c := &config{}
+func parseConfig(m map[string]interface{}) (*cache.Config, error) {
+	c := &cache.Config{}
 	if err := mapstructure.Decode(m, c); err != nil {
 		err = errors.Wrap(err, "error decoding conf")
 		return nil, err
@@ -78,7 +72,7 @@ func New(m map[string]interface{}, publisher events.Publisher) (datatx.DataTX, e
 	return &manager{
 		conf:      c,
 		publisher: publisher,
-		statCache: cache.GetStatCache(c.CacheStore, c.CacheNodes, c.CacheDatabase, c.CacheTable, 0),
+		statCache: cache.GetStatCache(c.Store, c.Nodes, c.Database, c.Table, time.Duration(c.TTL)*time.Second, c.Size),
 	}, nil
 }
 
@@ -92,8 +86,19 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 
 		switch r.Method {
 		case "GET", "HEAD":
+			if r.Method == "GET" {
+				metrics.DownloadsActive.Add(1)
+				defer func() {
+					metrics.DownloadsActive.Sub(1)
+				}()
+			}
 			download.GetOrHeadFile(w, r, fs, spaceID)
 		case "PUT":
+			metrics.UploadsActive.Add(1)
+			defer func() {
+				metrics.UploadsActive.Sub(1)
+			}()
+
 			// make a clean relative path
 			fn := path.Clean(strings.TrimLeft(r.URL.Path, "/"))
 			defer r.Body.Close()

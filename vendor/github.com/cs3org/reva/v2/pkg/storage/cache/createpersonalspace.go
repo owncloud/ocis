@@ -30,9 +30,9 @@ type createPersonalSpaceCache struct {
 }
 
 // NewCreatePersonalSpaceCache creates a new CreatePersonalSpaceCache
-func NewCreatePersonalSpaceCache(store string, nodes []string, database, table string, ttl time.Duration) CreatePersonalSpaceCache {
+func NewCreatePersonalSpaceCache(store string, nodes []string, database, table string, ttl time.Duration, size int) CreatePersonalSpaceCache {
 	c := &createPersonalSpaceCache{}
-	c.s = getStore(store, nodes, database, table, ttl)
+	c.s = getStore(store, nodes, database, table, ttl, size)
 	c.database = database
 	c.table = table
 	c.ttl = ttl

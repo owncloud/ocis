@@ -24,6 +24,7 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
+	"github.com/cs3org/reva/v2/pkg/storage/cache"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 )
@@ -63,8 +64,8 @@ type Options struct {
 
 	Tokens TokenOptions `mapstructure:"tokens"`
 
-	StatCache         CacheOptions `mapstructure:"statcache"`
-	FileMetadataCache CacheOptions `mapstructure:"filemetadatacache"`
+	StatCache         cache.Config `mapstructure:"statcache"`
+	FileMetadataCache cache.Config `mapstructure:"filemetadatacache"`
 
 	MaxAcquireLockCycles    int `mapstructure:"max_acquire_lock_cycles"`
 	LockCycleDurationFactor int `mapstructure:"lock_cycle_duration_factor"`
@@ -88,13 +89,6 @@ type TokenOptions struct {
 	DataGatewayEndpoint  string `mapstructure:"datagateway_endpoint"`
 	TransferSharedSecret string `mapstructure:"transfer_shared_secret"`
 	TransferExpires      int64  `mapstructure:"transfer_expires"`
-}
-
-// CacheOptions contains options of configuring a cache
-type CacheOptions struct {
-	CacheStore    string   `mapstructure:"cache_store"`
-	CacheNodes    []string `mapstructure:"cache_nodes"`
-	CacheDatabase string   `mapstructure:"cache_database"`
 }
 
 // New returns a new Options instance for the given configuration

@@ -52,9 +52,9 @@ import (
 	"github.com/cs3org/reva/v2/pkg/publicshare"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/share"
-	"github.com/cs3org/reva/v2/pkg/share/cache"
-	cachereg "github.com/cs3org/reva/v2/pkg/share/cache/registry"
+	sharecache "github.com/cs3org/reva/v2/pkg/share/cache"
 	warmupreg "github.com/cs3org/reva/v2/pkg/share/cache/warmup/registry"
+	"github.com/cs3org/reva/v2/pkg/storage/cache"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
@@ -83,8 +83,7 @@ type Handler struct {
 	skipUpdatingExistingSharesMountpoints bool
 	additionalInfoTemplate                *template.Template
 	userIdentifierCache                   *ttlcache.Cache
-	resourceInfoCache                     cache.ResourceInfoCache
-	resourceInfoCacheTTL                  time.Duration
+	resourceInfoCache                     cache.StatCache
 	deniable                              bool
 	resharing                             bool
 
@@ -104,7 +103,7 @@ type ocsError struct {
 	Message string
 }
 
-func getCacheWarmupManager(c *config.Config) (cache.Warmup, error) {
+func getCacheWarmupManager(c *config.Config) (sharecache.Warmup, error) {
 	if f, ok := warmupreg.NewFuncs[c.CacheWarmupDriver]; ok {
 		return f(c.CacheWarmupDrivers[c.CacheWarmupDriver])
 	}
@@ -113,13 +112,6 @@ func getCacheWarmupManager(c *config.Config) (cache.Warmup, error) {
 
 // GatewayClientGetter is the function being used to retrieve a gateway client instance
 type GatewayClientGetter func() (gateway.GatewayAPIClient, error)
-
-func getCacheManager(c *config.Config) (cache.ResourceInfoCache, error) {
-	if f, ok := cachereg.NewFuncs[c.ResourceInfoCacheDriver]; ok {
-		return f(c.ResourceInfoCacheDrivers[c.ResourceInfoCacheDriver])
-	}
-	return nil, fmt.Errorf("driver not found: %s", c.ResourceInfoCacheDriver)
-}
 
 // Init initializes this and any contained handlers
 func (h *Handler) Init(c *config.Config) {
@@ -132,19 +124,14 @@ func (h *Handler) Init(c *config.Config) {
 	h.skipUpdatingExistingSharesMountpoints = c.SkipUpdatingExistingSharesMountpoints
 
 	h.additionalInfoTemplate, _ = template.New("additionalInfo").Parse(c.AdditionalInfoAttribute)
-	h.resourceInfoCacheTTL = time.Second * time.Duration(c.ResourceInfoCacheTTL)
 
 	h.userIdentifierCache = ttlcache.NewCache()
 	_ = h.userIdentifierCache.SetTTL(time.Second * time.Duration(c.UserIdentifierCacheTTL))
 	h.deniable = c.EnableDenials
 	h.resharing = resharing(c)
 
-	cache, err := getCacheManager(c)
-	if err == nil {
-		h.resourceInfoCache = cache
-	}
-
-	if h.resourceInfoCacheTTL > 0 {
+	h.resourceInfoCache = cache.GetStatCache(c.ResourceInfoCacheStore, c.ResourceInfoCacheNodes, c.ResourceInfoCacheDatabase, "stat", time.Duration(c.ResourceInfoCacheTTL)*time.Second, c.ResourceInfoCacheSize)
+	if c.CacheWarmupDriver != "" {
 		cwm, err := getCacheWarmupManager(c)
 		if err == nil {
 			go h.startCacheWarmup(cwm)
@@ -159,15 +146,15 @@ func (h *Handler) InitWithGetter(c *config.Config, clientGetter GatewayClientGet
 	h.getClient = clientGetter
 }
 
-func (h *Handler) startCacheWarmup(c cache.Warmup) {
+func (h *Handler) startCacheWarmup(c sharecache.Warmup) {
 	time.Sleep(2 * time.Second)
 	infos, err := c.GetResourceInfos()
 	if err != nil {
 		return
 	}
 	for _, r := range infos {
-		key := storagespace.FormatResourceID(*r.Id)
-		_ = h.resourceInfoCache.SetWithExpire(key, r, h.resourceInfoCacheTTL)
+		key := h.resourceInfoCache.GetKey(r.Owner, &provider.Reference{ResourceId: r.Id}, []string{}, []string{})
+		_ = h.resourceInfoCache.PushToCache(key, r)
 	}
 }
 
@@ -781,6 +768,10 @@ func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, shareID st
 		return
 	}
 
+	if currentUser, ok := ctxpkg.ContextGetUser(ctx); ok {
+		h.resourceInfoCache.RemoveStat(currentUser.Id, shareR.Share.ResourceId)
+	}
+
 	share, err := conversions.CS3Share2ShareData(ctx, uRes.Share)
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error mapping share data", err)
@@ -1350,63 +1341,45 @@ func (h *Handler) getAdditionalInfoAttribute(ctx context.Context, u *userIdentif
 }
 
 func (h *Handler) getResourceInfoByReference(ctx context.Context, client gateway.GatewayAPIClient, ref *provider.Reference) (*provider.ResourceInfo, *rpc.Status, error) {
-	var key string
-	if ref.ResourceId == nil {
-		// This is a path based reference
-		key = ref.Path
-	} else {
-		var err error
-		key, err = storagespace.FormatReference(ref)
-		if err != nil {
-			return nil, nil, err
-		}
-	}
-	return h.getResourceInfo(ctx, client, key, ref)
+	return h.getResourceInfo(ctx, client, ref)
 }
 
 func (h *Handler) getResourceInfoByID(ctx context.Context, client gateway.GatewayAPIClient, id *provider.ResourceId) (*provider.ResourceInfo, *rpc.Status, error) {
-	return h.getResourceInfo(ctx, client, storagespace.FormatResourceID(*id), &provider.Reference{ResourceId: id})
+	return h.getResourceInfo(ctx, client, &provider.Reference{ResourceId: id})
 }
 
 // getResourceInfo retrieves the resource info to a target.
 // This method utilizes caching if it is enabled.
-func (h *Handler) getResourceInfo(ctx context.Context, client gateway.GatewayAPIClient, key string, ref *provider.Reference) (*provider.ResourceInfo, *rpc.Status, error) {
+func (h *Handler) getResourceInfo(ctx context.Context, client gateway.GatewayAPIClient, ref *provider.Reference) (*provider.ResourceInfo, *rpc.Status, error) {
 	logger := appctx.GetLogger(ctx)
-
-	var pinfo *provider.ResourceInfo
-	var status *rpc.Status
-	var err error
-	var foundInCache bool
-	if h.resourceInfoCacheTTL > 0 && h.resourceInfoCache != nil {
-		if pinfo, err = h.resourceInfoCache.Get(key); err == nil {
-			logger.Debug().Msgf("cache hit for resource %+v", key)
-			status = &rpc.Status{Code: rpc.Code_CODE_OK}
-			foundInCache = true
-		}
-	}
-	if !foundInCache {
-		logger.Debug().Msgf("cache miss for resource %+v, statting", key)
-		statReq := &provider.StatRequest{
-			Ref: ref,
-		}
-
-		statRes, err := client.Stat(ctx, statReq)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		if statRes.Status.Code != rpc.Code_CODE_OK {
-			return nil, statRes.Status, nil
-		}
-
-		pinfo = statRes.GetInfo()
-		status = statRes.Status
-		if h.resourceInfoCacheTTL > 0 {
-			_ = h.resourceInfoCache.SetWithExpire(key, pinfo, h.resourceInfoCacheTTL)
+	key := ""
+	if currentUser, ok := ctxpkg.ContextGetUser(ctx); ok {
+		key = h.resourceInfoCache.GetKey(currentUser.Id, ref, []string{}, []string{})
+		pinfo := &provider.ResourceInfo{}
+		if err := h.resourceInfoCache.PullFromCache(key, pinfo); err == nil {
+			return pinfo, &rpc.Status{Code: rpc.Code_CODE_OK}, nil
 		}
 	}
 
-	return pinfo, status, nil
+	logger.Debug().Msgf("cache miss for resource %+v, statting", ref)
+	statReq := &provider.StatRequest{
+		Ref: ref,
+	}
+
+	statRes, err := client.Stat(ctx, statReq)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if statRes.Status.Code != rpc.Code_CODE_OK {
+		return nil, statRes.Status, nil
+	}
+
+	if key != "" {
+		_ = h.resourceInfoCache.PushToCache(key, *statRes.Info)
+	}
+
+	return statRes.Info, statRes.Status, nil
 }
 
 func (h *Handler) createCs3Share(ctx context.Context, w http.ResponseWriter, r *http.Request, client gateway.GatewayAPIClient, req *collaboration.CreateShareRequest) (*collaboration.Share, *ocsError) {

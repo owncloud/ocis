@@ -55,31 +55,6 @@ import (
 // name is the Tracer name used to identify this instrumentation library.
 const tracerName = "ocdav"
 
-var (
-	nameRules = [...]nameRule{
-		nameNotEmpty{},
-		nameDoesNotContain{chars: "\f\r\n\\"},
-	}
-)
-
-type nameRule interface {
-	Test(name string) bool
-}
-
-type nameNotEmpty struct{}
-
-func (r nameNotEmpty) Test(name string) bool {
-	return len(strings.TrimSpace(name)) > 0
-}
-
-type nameDoesNotContain struct {
-	chars string
-}
-
-func (r nameDoesNotContain) Test(name string) bool {
-	return !strings.ContainsAny(name, r.chars)
-}
-
 func init() {
 	global.Register("ocdav", New)
 }
@@ -113,7 +88,15 @@ type Config struct {
 	ProductName            string                            `mapstructure:"product_name"`
 	ProductVersion         string                            `mapstructure:"product_version"`
 
+	NameValidation NameValidation `mapstructure:"validation"`
+
 	MachineAuthAPIKey string `mapstructure:"machine_auth_apikey"`
+}
+
+// NameValidation is the validation configuration for file and folder names
+type NameValidation struct {
+	InvalidChars []string `mapstructure:"invalid_chars"`
+	MaxLength    int      `mapstructure:"max_length"`
 }
 
 func (c *Config) init() {
@@ -147,6 +130,14 @@ func (c *Config) init() {
 	if c.Edition == "" {
 		c.Edition = "community"
 	}
+
+	if c.NameValidation.InvalidChars == nil {
+		c.NameValidation.InvalidChars = []string{"\f", "\r", "\n", "\\"}
+	}
+
+	if c.NameValidation.MaxLength == 0 {
+		c.NameValidation.MaxLength = 255
+	}
 }
 
 type svc struct {
@@ -160,6 +151,7 @@ type svc struct {
 	LockSystem          LockSystem
 	userIdentifierCache *ttlcache.Cache
 	tracerProvider      trace.TracerProvider
+	nameValidators      []Validator
 }
 
 func (s *svc) Config() *Config {
@@ -204,6 +196,9 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 
 // NewWith returns a new ocdav service
 func NewWith(conf *Config, fm favorite.Manager, ls LockSystem, _ *zerolog.Logger, tp trace.TracerProvider, gwc gateway.GatewayAPIClient) (global.Service, error) {
+	// be safe - init the conf again
+	conf.init()
+
 	s := &svc{
 		c:             conf,
 		webDavHandler: new(WebDavHandler),
@@ -217,6 +212,7 @@ func NewWith(conf *Config, fm favorite.Manager, ls LockSystem, _ *zerolog.Logger
 		LockSystem:          ls,
 		userIdentifierCache: ttlcache.NewCache(),
 		tracerProvider:      tp,
+		nameValidators:      ValidatorsFromConfig(conf),
 	}
 	_ = s.userIdentifierCache.SetTTL(60 * time.Second)
 

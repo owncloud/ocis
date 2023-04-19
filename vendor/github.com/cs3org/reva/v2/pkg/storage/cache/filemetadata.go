@@ -28,9 +28,9 @@ type fileMetadataCache struct {
 }
 
 // NewFileMetadataCache creates a new FileMetadataCache
-func NewFileMetadataCache(store string, nodes []string, database, table string, ttl time.Duration) FileMetadataCache {
+func NewFileMetadataCache(store string, nodes []string, database, table string, ttl time.Duration, size int) FileMetadataCache {
 	c := &fileMetadataCache{}
-	c.s = getStore(store, nodes, database, table, ttl)
+	c.s = getStore(store, nodes, database, table, ttl, size)
 	c.database = database
 	c.table = table
 	c.ttl = ttl

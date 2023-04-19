@@ -307,3 +307,17 @@ func AllowedHeaders(val []string) Option {
 		o.AllowedHeaders = val
 	}
 }
+
+// ItemNameInvalidChars provides a function to set forbidden characters in file or folder names
+func ItemNameInvalidChars(chars []string) Option {
+	return func(o *Options) {
+		o.config.NameValidation.InvalidChars = chars
+	}
+}
+
+// ItemNameMaxLength provides a function to set the maximum length of a file or folder name
+func ItemNameMaxLength(i int) Option {
+	return func(o *Options) {
+		o.config.NameValidation.MaxLength = i
+	}
+}
