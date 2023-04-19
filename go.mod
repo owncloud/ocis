@@ -65,7 +65,7 @@ require (
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/ginkgo/v2 v2.9.1
 	github.com/onsi/gomega v1.27.4
-	github.com/open-policy-agent/opa v0.50.2
+	github.com/open-policy-agent/opa v0.51.0
 	github.com/orcaman/concurrent-map v1.0.0
 	github.com/owncloud/libre-graph-api-go v1.0.2-0.20230330145712-ea267ccd404a
 	github.com/pkg/errors v0.9.1
@@ -184,7 +184,7 @@ require (
 	github.com/go-git/go-git/v5 v5.4.2 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
-	github.com/go-logr/logr v1.2.3 // indirect
+	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-resty/resty/v2 v2.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.6.0 // indirect

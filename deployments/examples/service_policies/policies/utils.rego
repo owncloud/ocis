@@ -34,9 +34,9 @@ is_request_type_put {
     input.request.method == "PUT"
 }
 
-is_request_path_file {
+is_request_type_post {
     is_stage_http
-    input.request.method == "PUT"
+    input.request.method == "POST"
 }
 
 is_request_type_mkcol {
