@@ -17,4 +17,5 @@ exclude_paths:
   - 'tests/acceptance/features/bootstrap/**'
   - 'tests/TestHelpers/**'
   - 'tests/acceptance/run.sh'
+  - 'vendor/**/*'
 ...
