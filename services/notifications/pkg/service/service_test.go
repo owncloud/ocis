@@ -15,13 +15,19 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/service"
 	"github.com/test-go/testify/mock"
+	"go-micro.dev/v4/client"
 )
 
 var _ = Describe("Notifications", func() {
 	var (
 		gwc    *cs3mocks.GatewayAPIClient
+		vs     *settingssvc.MockValueService
 		sharer = &user.User{
 			Id: &user.UserId{
 				OpaqueId: "sharer",
@@ -43,15 +49,23 @@ var _ = Describe("Notifications", func() {
 
 	BeforeEach(func() {
 		gwc = &cs3mocks.GatewayAPIClient{}
-		gwc.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharer}, nil)
+		gwc.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharer}, nil).Once()
+		gwc.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharee}, nil).Once()
 		gwc.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharer}, nil)
 		gwc.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, Info: &provider.ResourceInfo{Name: "secrets of the board", Space: &provider.StorageSpace{Name: "secret space"}}}, nil)
+		vs = &settingssvc.MockValueService{}
+		vs.GetValueByUniqueIdentifiersFunc = func(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settingssvc.GetValueResponse, error) {
+			return nil, nil
+		}
 	})
 
 	DescribeTable("Sending notifications",
 		func(tc testChannel, ev events.Event) {
+			cfg := defaults.FullDefaultConfig()
+			cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
+			_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
 			ch := make(chan events.Event)
-			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gwc, "", "", "")
+			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gwc, vs, "", "", "")
 			go evts.Run()
 
 			ch <- ev
@@ -66,7 +80,7 @@ var _ = Describe("Notifications", func() {
 		Entry("Share Created", testChannel{
 			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
 			expectedSubject:     "Dr. S. Harer shared 'secrets of the board' with you",
-			expectedMessage: `Hello Dr. S. Harer
+			expectedMessage: `Hello Eric Expireling
 
 Dr. S. Harer has shared "secrets of the board" with you.
 
@@ -91,7 +105,7 @@ https://owncloud.com
 		Entry("Share Expired", testChannel{
 			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
 			expectedSubject:     "Share to 'secrets of the board' expired at 2023-04-17 16:42:00",
-			expectedMessage: `Hello Dr. S. Harer,
+			expectedMessage: `Hello Eric Expireling,
 
 Your share to secrets of the board has expired at 2023-04-17 16:42:00
 
@@ -116,7 +130,7 @@ https://owncloud.com
 		Entry("Added to Space", testChannel{
 			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
 			expectedSubject:     "Dr. S. Harer invited you to join secret space",
-			expectedMessage: `Hello Dr. S. Harer,
+			expectedMessage: `Hello Eric Expireling,
 
 Dr. S. Harer has invited you to join "secret space".
 
@@ -141,7 +155,7 @@ https://owncloud.com
 		Entry("Removed from Space", testChannel{
 			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
 			expectedSubject:     "Dr. S. Harer removed you from secret space",
-			expectedMessage: `Hello Dr. S. Harer,
+			expectedMessage: `Hello Eric Expireling,
 
 Dr. S. Harer has removed you from "secret space".
 
@@ -167,7 +181,7 @@ https://owncloud.com
 		Entry("Space Expired", testChannel{
 			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
 			expectedSubject:     "Membership of 'secret space' expired at 2023-04-17 16:42:00",
-			expectedMessage: `Hello Dr. S. Harer,
+			expectedMessage: `Hello Eric Expireling,
 
 Your membership of space secret space has expired at 2023-04-17 16:42:00
 

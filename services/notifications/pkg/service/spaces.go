@@ -13,7 +13,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		Str("itemid", e.ID.OpaqueId).
 		Logger()
 
-	ownerCtx, owner, err := utils.Impersonate(e.Executant, s.gwClient, s.machineAuthAPIKey)
+	executantCtx, executant, err := utils.Impersonate(e.Executant, s.gwClient, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().
 			Err(err).
@@ -29,7 +29,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		return
 	}
 
-	resourceInfo, err := s.getResourceInfo(ownerCtx, &resourceID, nil)
+	resourceInfo, err := s.getResourceInfo(executantCtx, &resourceID, nil)
 	if err != nil {
 		logger.Error().
 			Err(err).
@@ -45,30 +45,28 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		return
 	}
 
-	// Note: We're using the 'ownerCtx' (authenticated as the share owner) here for requesting
+	// Note: We're using the 'executantCtx' (authenticated as the share executant) here for requesting
 	// the Grantees of the shares. Ideally the notfication service would use some kind of service
 	// user for this.
-	spaceGrantee, err := s.getGranteeName(ownerCtx, e.GranteeUserID, e.GranteeGroupID)
+	spaceGrantee, err := s.getGranteeList(executantCtx, executant.GetId(), e.GranteeUserID, e.GranteeGroupID)
 	if err != nil {
-		logger.Error().Err(err).Msg("Could not get grantee name")
+		logger.Error().Err(err).Str("event", "SpaceGrantee").Msg("Could not get grantee list")
 		return
 	}
 
-	sharerDisplayName := owner.GetDisplayName()
-	subj, msg, err := s.render(email.SharedSpace, map[string]interface{}{
-		"SpaceGrantee": spaceGrantee,
-		"SpaceSharer":  sharerDisplayName,
-		"SpaceName":    resourceInfo.GetSpace().GetName(),
-		"ShareLink":    shareLink,
-	})
+	sharerDisplayName := executant.GetDisplayName()
+	recipientList, err := s.render(executantCtx, email.SharedSpace,
+		"SpaceGrantee",
+		map[string]interface{}{
+			"SpaceSharer": sharerDisplayName,
+			"SpaceName":   resourceInfo.GetSpace().GetName(),
+			"ShareLink":   shareLink,
+		}, spaceGrantee)
 	if err != nil {
-		logger.Error().Err(err).Msg("Could not render E-Mail template for spaces")
+		s.logger.Error().Err(err).Str("event", "SharedSpace").Msg("could not get render the email")
 		return
 	}
-
-	if err := s.send(ownerCtx, e.GranteeUserID, e.GranteeGroupID, msg, subj, sharerDisplayName); err != nil {
-		logger.Error().Err(err).Msg("failed to send a message")
-	}
+	s.send(executantCtx, recipientList, sharerDisplayName)
 }
 
 func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
@@ -77,7 +75,7 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 		Str("itemid", e.ID.OpaqueId).
 		Logger()
 
-	ownerCtx, owner, err := utils.Impersonate(e.Executant, s.gwClient, s.machineAuthAPIKey)
+	executantCtx, executant, err := utils.Impersonate(e.Executant, s.gwClient, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not handle space unshared event")
 		return
@@ -91,7 +89,7 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 		return
 	}
 
-	resourceInfo, err := s.getResourceInfo(ownerCtx, &resourceID, nil)
+	resourceInfo, err := s.getResourceInfo(executantCtx, &resourceID, nil)
 	if err != nil {
 		logger.Error().
 			Err(err).
@@ -107,31 +105,28 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 		return
 	}
 
-	// Note: We're using the 'ownerCtx' (authenticated as the share owner) here for requesting
+	// Note: We're using the 'executantCtx' (authenticated as the share executant) here for requesting
 	// the Grantees of the shares. Ideally the notfication service would use some kind of service
 	// user for this.
-	spaceGrantee, err := s.getGranteeName(ownerCtx, e.GranteeUserID, e.GranteeGroupID)
+	spaceGrantee, err := s.getGranteeList(executantCtx, executant.GetId(), e.GranteeUserID, e.GranteeGroupID)
 	if err != nil {
-		logger.Error().Err(err).Msg("Could not get grantee name")
+		logger.Error().Err(err).Str("event", "SpaceGrantee").Msg("Could not get grantee list")
 		return
 	}
 
-	sharerDisplayName := owner.GetDisplayName()
-	subj, msg, err := s.render(email.UnsharedSpace, map[string]interface{}{
-		"SpaceGrantee": spaceGrantee,
-		"SpaceSharer":  sharerDisplayName,
-		"SpaceName":    resourceInfo.GetSpace().Name,
-		"ShareLink":    shareLink,
-	})
-
+	sharerDisplayName := executant.GetDisplayName()
+	recipientList, err := s.render(executantCtx, email.UnsharedSpace,
+		"SpaceGrantee",
+		map[string]interface{}{
+			"SpaceSharer": sharerDisplayName,
+			"SpaceName":   resourceInfo.GetSpace().Name,
+			"ShareLink":   shareLink,
+		}, spaceGrantee)
 	if err != nil {
-		logger.Error().Err(err).Msg("Could not render E-Mail template for spaces")
+		s.logger.Error().Err(err).Str("event", "UnsharedSpace").Msg("Could not get render the email")
 		return
 	}
-
-	if err := s.send(ownerCtx, e.GranteeUserID, e.GranteeGroupID, msg, subj, sharerDisplayName); err != nil {
-		logger.Error().Err(err).Msg("failed to send a message")
-	}
+	s.send(executantCtx, recipientList, sharerDisplayName)
 }
 
 func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExpired) {
@@ -140,30 +135,27 @@ func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExp
 		Str("itemid", e.SpaceID.GetOpaqueId()).
 		Logger()
 
-	ctx, owner, err := utils.Impersonate(e.SpaceOwner, s.gwClient, s.machineAuthAPIKey)
+	ownerCtx, owner, err := utils.Impersonate(e.SpaceOwner, s.gwClient, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not impersonate sharer")
 		return
 	}
 
-	shareGrantee, err := s.getGranteeName(ctx, e.GranteeUserID, e.GranteeGroupID)
+	granteeList, err := s.getGranteeList(ownerCtx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
 	if err != nil {
-		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("Could not get grantee name")
+		s.logger.Error().Err(err).Str("event", "SpaceUnshared").Msg("Could not get grantee list")
 		return
 	}
 
-	subj, msg, err := s.render(email.MembershipExpired, map[string]interface{}{
-		"SpaceGrantee": shareGrantee,
-		"SpaceName":    e.SpaceName,
-		"ExpiredAt":    e.ExpiredAt.Format("2006-01-02 15:04:05"),
-	})
-
+	recipientList, err := s.render(ownerCtx, email.MembershipExpired,
+		"SpaceGrantee",
+		map[string]interface{}{
+			"SpaceName": e.SpaceName,
+			"ExpiredAt": e.ExpiredAt.Format("2006-01-02 15:04:05"),
+		}, granteeList)
 	if err != nil {
-		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("Could not render E-Mail body template for shares")
+		s.logger.Error().Err(err).Str("event", "SpaceUnshared").Msg("could not get render the email")
+		return
 	}
-
-	if err := s.send(ctx, e.GranteeUserID, e.GranteeGroupID, msg, subj, owner.GetDisplayName()); err != nil {
-		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("failed to send a message")
-	}
-
+	s.send(ownerCtx, recipientList, owner.GetDisplayName())
 }

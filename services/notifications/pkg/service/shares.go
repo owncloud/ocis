@@ -35,28 +35,25 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		return
 	}
 
-	shareGrantee, err := s.getGranteeName(ownerCtx, e.GranteeUserID, e.GranteeGroupID)
+	granteeList, err := s.getGranteeList(ownerCtx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
 	if err != nil {
-		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("Could not get grantee name")
+		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("Could not get grantee list")
 		return
 	}
 
 	sharerDisplayName := owner.GetDisplayName()
-	subj, msg, err := s.render(email.ShareCreated, map[string]interface{}{
-		"ShareGrantee": shareGrantee,
-		"ShareSharer":  sharerDisplayName,
-		"ShareFolder":  resourceInfo.Name,
-		"ShareLink":    shareLink,
-	})
-
+	recipientList, err := s.render(ownerCtx, email.ShareCreated,
+		"ShareGrantee",
+		map[string]interface{}{
+			"ShareSharer": sharerDisplayName,
+			"ShareFolder": resourceInfo.Name,
+			"ShareLink":   shareLink,
+		}, granteeList)
 	if err != nil {
-		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("Could not render E-Mail body template for shares")
+		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("could not get render the email")
+		return
 	}
-
-	if err := s.send(ownerCtx, e.GranteeUserID, e.GranteeGroupID, msg, subj, sharerDisplayName); err != nil {
-		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("failed to send a message")
-	}
-
+	s.send(ownerCtx, recipientList, sharerDisplayName)
 }
 
 func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
@@ -65,13 +62,13 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		Str("itemid", e.ItemID.GetOpaqueId()).
 		Logger()
 
-	ctx, owner, err := utils.Impersonate(e.ShareOwner, s.gwClient, s.machineAuthAPIKey)
+	ownerCtx, owner, err := utils.Impersonate(e.ShareOwner, s.gwClient, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not impersonate sharer")
 		return
 	}
 
-	resourceInfo, err := s.getResourceInfo(ctx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
+	resourceInfo, err := s.getResourceInfo(ownerCtx, e.ItemID, &fieldmaskpb.FieldMask{Paths: []string{"name"}})
 	if err != nil {
 		logger.Error().
 			Err(err).
@@ -79,24 +76,21 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		return
 	}
 
-	shareGrantee, err := s.getGranteeName(ctx, e.GranteeUserID, e.GranteeGroupID)
+	granteeList, err := s.getGranteeList(ownerCtx, owner.GetId(), e.GranteeUserID, e.GranteeGroupID)
 	if err != nil {
-		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("Could not get grantee name")
+		s.logger.Error().Err(err).Str("event", "ShareExpired").Msg("Could not get grantee name")
 		return
 	}
 
-	subj, msg, err := s.render(email.ShareExpired, map[string]interface{}{
-		"ShareGrantee": shareGrantee,
-		"ShareFolder":  resourceInfo.GetName(),
-		"ExpiredAt":    e.ExpiredAt.Format("2006-01-02 15:04:05"),
-	})
-
+	recipientList, err := s.render(ownerCtx, email.ShareExpired,
+		"ShareGrantee",
+		map[string]interface{}{
+			"ShareFolder": resourceInfo.GetName(),
+			"ExpiredAt":   e.ExpiredAt.Format("2006-01-02 15:04:05"),
+		}, granteeList)
 	if err != nil {
-		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("Could not render E-Mail body template for shares")
+		s.logger.Error().Err(err).Str("event", "ShareExpired").Msg("could not get render the email")
+		return
 	}
-
-	if err := s.send(ctx, e.GranteeUserID, e.GranteeGroupID, msg, subj, owner.GetDisplayName()); err != nil {
-		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("failed to send a message")
-	}
-
+	s.send(ownerCtx, recipientList, owner.GetDisplayName())
 }

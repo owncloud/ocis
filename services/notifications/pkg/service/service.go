@@ -17,10 +17,16 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/email"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
+	"go-micro.dev/v4/metadata"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
+
+var _defaultLocale = "en"
 
 // Service should be named `Runner`
 type Service interface {
@@ -33,13 +39,16 @@ func NewEventsNotifier(
 	channel channels.Channel,
 	logger log.Logger,
 	gwClient gateway.GatewayAPIClient,
+	valueService settingssvc.ValueService,
 	machineAuthAPIKey, emailTemplatePath, ocisURL string) Service {
+
 	return eventsNotifier{
 		logger:            logger,
 		channel:           channel,
 		events:            events,
 		signals:           make(chan os.Signal, 1),
 		gwClient:          gwClient,
+		valueService:      valueService,
 		machineAuthAPIKey: machineAuthAPIKey,
 		emailTemplatePath: emailTemplatePath,
 		ocisURL:           ocisURL,
@@ -52,6 +61,7 @@ type eventsNotifier struct {
 	events            <-chan events.Event
 	signals           chan os.Signal
 	gwClient          gateway.GatewayAPIClient
+	valueService      settingssvc.ValueService
 	machineAuthAPIKey string
 	emailTemplatePath string
 	translationPath   string
@@ -87,52 +97,101 @@ func (s eventsNotifier) Run() error {
 	}
 }
 
-func (s eventsNotifier) render(template email.MessageTemplate, values map[string]interface{}) (string, string, error) {
-	// The locate have to come from the user setting
-	return email.RenderEmailTemplate(template, "en", s.emailTemplatePath, s.translationPath, values)
+// recipient represent the already rendered message including the user id opaqueID
+type recipient struct {
+	opaqueID string
+	subject  string
+	msg      string
 }
 
-func (s eventsNotifier) send(ctx context.Context, u *user.UserId, g *group.GroupId, msg, subj, sender string) error {
-	if u != nil {
-		return s.channel.SendMessage(ctx, []string{u.GetOpaqueId()}, msg, subj, sender)
+func (s eventsNotifier) render(ctx context.Context, template email.MessageTemplate,
+	granteeFieldName string, fields map[string]interface{}, granteeList []*user.UserId) ([]recipient, error) {
+	// Render the Email Template for each user
+	recipientList := make([]recipient, len(granteeList))
+	for i, userID := range granteeList {
+		locale, err := s.getUserLang(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		grantee, err := s.getUserName(ctx, userID)
+		if err != nil {
+			return nil, err
+		}
+		fields[granteeFieldName] = grantee
 
+		subj, msg, err := email.RenderEmailTemplate(template, locale, s.emailTemplatePath, s.translationPath, fields)
+		if err != nil {
+			return nil, err
+		}
+		recipientList[i] = recipient{opaqueID: userID.GetOpaqueId(), subject: subj, msg: msg}
 	}
-
-	if g != nil {
-		return s.channel.SendMessageToGroup(ctx, g, msg, subj, sender)
-	}
-
-	return nil
+	return recipientList, nil
 }
 
-func (s eventsNotifier) getGranteeName(ctx context.Context, u *user.UserId, g *group.GroupId) (string, error) {
+func (s eventsNotifier) send(ctx context.Context, recipientList []recipient, sender string) {
+	for _, r := range recipientList {
+		err := s.channel.SendMessage(ctx, []string{r.opaqueID}, r.msg, r.subject, sender)
+		if err != nil {
+			s.logger.Error().Err(err).Str("event", "SendEmail").Msg("failed to send a message")
+		}
+	}
+}
+
+func (s eventsNotifier) getGranteeList(ctx context.Context, owner, u *user.UserId, g *group.GroupId) ([]*user.UserId, error) {
 	switch {
 	case u != nil:
-		r, err := s.gwClient.GetUser(ctx, &user.GetUserRequest{UserId: u})
-		if err != nil {
-			return "", err
-		}
-
-		if r.Status.Code != rpc.Code_CODE_OK {
-			return "", fmt.Errorf("unexpected status code from gateway client: %d", r.GetStatus().GetCode())
-		}
-
-		return r.GetUser().GetDisplayName(), nil
+		return []*user.UserId{u}, nil
 	case g != nil:
-		r, err := s.gwClient.GetGroup(ctx, &group.GetGroupRequest{GroupId: g})
+		res, err := s.gwClient.GetGroup(ctx, &group.GetGroupRequest{GroupId: g})
 		if err != nil {
-			return "", err
+			return nil, err
 		}
-
-		if r.GetStatus().GetCode() != rpc.Code_CODE_OK {
-			return "", fmt.Errorf("unexpected status code from gateway client: %d", r.GetStatus().GetCode())
+		if res.Status.Code != rpc.Code_CODE_OK {
+			return nil, errors.New("could not get group")
 		}
-
-		return r.GetGroup().GetDisplayName(), nil
+		for i, userID := range res.GetGroup().GetMembers() {
+			// remove an executant from a list
+			if userID.GetOpaqueId() == owner.GetOpaqueId() {
+				res.Group.Members[i] = res.Group.Members[len(res.Group.Members)-1]
+				return res.Group.Members[:len(res.Group.Members)-1], nil
+			}
+		}
+		return res.Group.Members, nil
 	default:
-		return "", errors.New("Need at least one non-nil grantee")
+		return nil, errors.New("need at least one non-nil grantee")
 	}
+}
 
+func (s eventsNotifier) getUserName(ctx context.Context, u *user.UserId) (string, error) {
+	if u == nil {
+		return "", errors.New("need at least one non-nil grantee")
+	}
+	r, err := s.gwClient.GetUser(ctx, &user.GetUserRequest{UserId: u})
+	if err != nil {
+		return "", err
+	}
+	if r.Status.Code != rpc.Code_CODE_OK {
+		return "", fmt.Errorf("unexpected status code from gateway client: %d", r.GetStatus().GetCode())
+	}
+	return r.GetUser().GetDisplayName(), nil
+}
+
+func (s eventsNotifier) getUserLang(ctx context.Context, u *user.UserId) (string, error) {
+	granteeCtx := metadata.Set(ctx, middleware.AccountID, u.OpaqueId)
+	if resp, err := s.valueService.GetValueByUniqueIdentifiers(granteeCtx,
+		&settingssvc.GetValueByUniqueIdentifiersRequest{
+			AccountUuid: u.OpaqueId,
+			SettingId:   defaults.SettingUUIDProfileLanguage,
+		}); err == nil {
+		if resp == nil {
+			return _defaultLocale, nil
+		}
+		val := resp.Value.GetValue().GetListValue().GetValues()
+		if len(val) > 0 && val[0] != nil {
+			return val[0].GetStringValue(), nil
+		}
+	}
+	return _defaultLocale, nil
 }
 
 func (s eventsNotifier) getResourceInfo(ctx context.Context, resourceID *provider.ResourceId, fieldmask *fieldmaskpb.FieldMask) (*provider.ResourceInfo, error) {

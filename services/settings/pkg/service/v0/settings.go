@@ -43,7 +43,8 @@ const (
 	// CreateSpacePermissionName is the hardcoded setting name for the create space permission
 	CreateSpacePermissionName string = "create-space"
 
-	settingUUIDProfileLanguage = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f"
+	// SettingUUIDProfileLanguage is the hardcoded setting UUID for the user profile language
+	SettingUUIDProfileLanguage = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f"
 
 	// AccountManagementPermissionID is the hardcoded setting UUID for the account management permission
 	AccountManagementPermissionID string = "8e587774-d929-4215-910b-a317b1e80f73"
@@ -207,7 +208,7 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 		DisplayName: "Profile",
 		Settings: []*settingsmsg.Setting{
 			{
-				Id:          settingUUIDProfileLanguage,
+				Id:          SettingUUIDProfileLanguage,
 				Name:        "language",
 				DisplayName: "Language",
 				Description: "User language",
@@ -268,7 +269,7 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 				DisplayName: "Permission to read and set the language (anyone)",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SETTING,
-					Id:   settingUUIDProfileLanguage,
+					Id:   SettingUUIDProfileLanguage,
 				},
 				Value: &settingsmsg.Setting_PermissionValue{
 					PermissionValue: &settingsmsg.Permission{
@@ -286,7 +287,7 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 				DisplayName: "Permission to read and set the language (self)",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SETTING,
-					Id:   settingUUIDProfileLanguage,
+					Id:   SettingUUIDProfileLanguage,
 				},
 				Value: &settingsmsg.Setting_PermissionValue{
 					PermissionValue: &settingsmsg.Permission{
@@ -304,7 +305,7 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 				DisplayName: "Permission to read and set the language (self)",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SETTING,
-					Id:   settingUUIDProfileLanguage,
+					Id:   SettingUUIDProfileLanguage,
 				},
 				Value: &settingsmsg.Setting_PermissionValue{
 					PermissionValue: &settingsmsg.Permission{
@@ -523,7 +524,7 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 				DisplayName: "Permission to read and set the language (self)",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SETTING,
-					Id:   settingUUIDProfileLanguage,
+					Id:   SettingUUIDProfileLanguage,
 				},
 				Value: &settingsmsg.Setting_PermissionValue{
 					PermissionValue: &settingsmsg.Permission{
