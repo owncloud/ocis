@@ -106,6 +106,7 @@ checksums:
   - md5
   - adler32
   preferred_upload_type: sha1
+read_only_user_attributes: []
 middleware:
   auth:
     credentials_by_user_agent: {}

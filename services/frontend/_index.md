@@ -1,6 +1,6 @@
 ---
 title: Frontend
-date: 2023-04-19T08:09:49.778716545Z
+date: 2023-04-19T08:34:27.976113033Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/frontend
@@ -10,7 +10,7 @@ geekdocCollapseSection: true
 
 ## Abstract
 
-The frontend service translates various owncloud related HTTP APIs to CS3 requests. 
+The frontend service translates various owncloud related HTTP APIs to CS3 requests.
 
 ## Table of Contents
 
@@ -20,6 +20,7 @@ The frontend service translates various owncloud related HTTP APIs to CS3 reques
   * [datagateway](#datagateway)
   * [ocs](#ocs)
 * [Scalability](#scalability)
+* [Define Read-Only Attributes](#define-read-only-attributes)
 * [Example Yaml Config](#example-yaml-config)
 
 ## Endpoints Overview
@@ -45,6 +46,10 @@ The ocs endpoint, by default `/ocs`, implements the ownCloud 10 Open Collaborati
 ## Scalability
 
 While the frontend service does not persist any data it does cache `Stat()` responses and user information. Therefore, multiple instances of this service can be spawned in a bigger deployment like when using container orchestration with Kubernetes, when configuring `FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE=redis` and the related config options.
+
+## Define Read-Only Attributes
+
+A lot of user management is made via the standardized libregraph API. Depending on how the system is configured, there might be some user attributes that an ocis instance admin can't change because of properties coming from an external LDAP server, or similar. This can be the case when the ocis admin is not the LDAP admin. To ease life for admins, there are hints as capabilites telling the frontend which attributes are read-only to enable a different optical representation like being grayed out. To configure these hints, use the environment variable `FRONTEND_READONLY_USER_ATTRIBUTES`, which takes a comma separated list of attributes.
 
 ## Example Yaml Config
 
