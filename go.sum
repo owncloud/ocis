@@ -790,8 +790,8 @@ github.com/go-micro/plugins/v4/server/grpc v1.2.0 h1:lXfM+/0oE/u1g0hVBYsvbP4lYOY
 github.com/go-micro/plugins/v4/server/grpc v1.2.0/go.mod h1:+Ah9Pf/vMSXxBM3fup/hc3N+zN2as3nIpcRaR4sBjnY=
 github.com/go-micro/plugins/v4/server/http v1.2.1 h1:Cia924J90rgFT/4qWWvyLvN+XqEm5T9tiQyQ+GU4bOQ=
 github.com/go-micro/plugins/v4/server/http v1.2.1/go.mod h1:YuAjaSPxcn3LI8j2FUsqx0Rxunrj4YwDV41Ax76rLl0=
-github.com/go-micro/plugins/v4/store/nats-js v1.1.0 h1:6Fe1/eLtg8kRyaGvMILp4olYtTDGwYNBXyb1sYfAWGk=
-github.com/go-micro/plugins/v4/store/nats-js v1.1.0/go.mod h1:jJf7Gm39OafZlT3s3UE2/9NIYj6OlI2fmZ4czSA3gvo=
+github.com/go-micro/plugins/v4/store/nats-js v1.2.0 h1:D0LAp/QJw1nC9scNZltZRurZsman0cCmIn+A36hDR5E=
+github.com/go-micro/plugins/v4/store/nats-js v1.2.0/go.mod h1:wt51O2yNmgF/F7E00IYIH0awseRGqtnmjZGn6RjbZSk=
 github.com/go-micro/plugins/v4/store/redis v1.2.0 h1:jR7sHOD1a735cxyBNFif58tP0Ck8OUklpDN1IzzDoRg=
 github.com/go-micro/plugins/v4/store/redis v1.2.0/go.mod h1:MbCG0YiyPqETTtm7uHFmxQNCaW1o9hBoYtFwhbVjLUg=
 github.com/go-micro/plugins/v4/transport/grpc v1.1.0 h1:mXfDYfFQLnVDzjGY3o84oe4prfux9h8txsnA19dKsj8=

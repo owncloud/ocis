@@ -35,7 +35,7 @@ require (
 	github.com/go-micro/plugins/v4/registry/nats v1.2.1
 	github.com/go-micro/plugins/v4/server/grpc v1.2.0
 	github.com/go-micro/plugins/v4/server/http v1.2.1
-	github.com/go-micro/plugins/v4/store/nats-js v1.1.0
+	github.com/go-micro/plugins/v4/store/nats-js v1.2.0
 	github.com/go-micro/plugins/v4/store/redis v1.2.0
 	github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.2.0
 	github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus v1.2.0
