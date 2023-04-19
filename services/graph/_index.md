@@ -1,6 +1,6 @@
 ---
 title: Graph
-date: 2023-04-19T07:33:00.965948736Z
+date: 2023-04-19T08:01:30.520860606Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/graph
@@ -56,6 +56,7 @@ If Keycloak is used for authentication, GDPR regulations require to add all pers
 *   `OCIS_KEYCLOAK_CLIENT_REALM` - The realm the client is defined in.
 *   `OCIS_KEYCLOAK_USER_REALM` - The realm the oCIS users are defined in.
 *   `OCIS_KEYCLOAK_INSECURE_SKIP_VERIFY` - If set to true, the TLS certificate of the keycloak instance is not verified.
+For more details see the [User-Triggered GDPR Report](https://doc.owncloud.com/ocis/next/deployment/gdpr/gdpr.html) in the ocis admin documentation.
 
 ### Keycloak Client Configuration
 
