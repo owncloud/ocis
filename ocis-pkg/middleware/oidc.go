@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	gOidc "github.com/coreos/go-oidc/v3/oidc"
+	goidc "github.com/coreos/go-oidc/v3/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"golang.org/x/oauth2"
 )
@@ -24,7 +24,7 @@ func newOidcOptions(opts ...Option) Options {
 
 // OIDCProvider used to mock the oidc provider during tests
 type OIDCProvider interface {
-	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*gOidc.UserInfo, error)
+	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*goidc.UserInfo, error)
 }
 
 // OidcAuth provides a middleware to authenticate a bearer auth with an OpenID Connect identity provider
@@ -38,7 +38,7 @@ func OidcAuth(opts ...Option) func(http.Handler) http.Handler {
 		// Initialize a provider by specifying the issuer URL.
 		// it will fetch the keys from the issuer using the .well-known
 		// endpoint
-		return gOidc.NewProvider(
+		return goidc.NewProvider(
 			context.WithValue(context.Background(), oauth2.HTTPClient, http.Client{}),
 			opt.OidcIssuer,
 		)

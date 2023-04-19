@@ -54,7 +54,7 @@ type ProviderMetadata struct {
 	//claim_types_supported
 }
 
-// Logout Token
+// Logout Token defines an logout Token
 type LogoutToken struct {
 	// The URL of the server which issued this token. OpenID Connect
 	// requires this value always be identical to the URL used for
@@ -87,6 +87,7 @@ type LogoutToken struct {
 	JwtID string `json:"jti"`
 }
 
+// LogoutEvent defines a logout Event
 type LogoutEvent struct {
 	Event *struct{} `json:"http://schemas.openid.net/event/backchannel-logout"`
 }

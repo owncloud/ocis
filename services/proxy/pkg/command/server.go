@@ -41,15 +41,6 @@ import (
 	microstore "go-micro.dev/v4/store"
 )
 
-type StaticRouteHandler struct {
-	prefix        string
-	proxy         http.Handler
-	userInfoCache microstore.Store
-	logger        log.Logger
-	config        config.Config
-	oidcClient    oidc.OIDCClient
-}
-
 // Server is the entrypoint for the server command.
 func Server(cfg *config.Config) *cli.Command {
 	return &cli.Command{
@@ -186,6 +177,16 @@ func Server(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+// StaticRouteHandler defines a Route Handler for static routes
+type StaticRouteHandler struct {
+	prefix        string
+	proxy         http.Handler
+	userInfoCache microstore.Store
+	logger        log.Logger
+	config        config.Config
+	oidcClient    oidc.OIDCClient
 }
 
 func (h *StaticRouteHandler) handler() http.Handler {

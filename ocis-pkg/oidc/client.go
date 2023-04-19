@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/MicahParks/keyfunc"
-	gOidc "github.com/coreos/go-oidc/v3/oidc"
+	goidc "github.com/coreos/go-oidc/v3/oidc"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/config"
@@ -30,7 +30,7 @@ type OIDCClient interface {
 	VerifyLogoutToken(ctx context.Context, token string) (*LogoutToken, error)
 }
 
-// KeySet is a set of publc JSON Web Keys that can be used to validate the signature
+// KeySet is a set of public JSON Web Keys that can be used to validate the signature
 // of JSON web tokens. This is expected to be backed by a remote key set through
 // provider metadata discovery or an in-memory set of keys delivered out-of-band.
 type KeySet interface {
@@ -66,10 +66,10 @@ type oidcClient struct {
 	httpClient *http.Client
 }
 
-// supportedAlgorithms is a list of algorithms explicitly supported by this
+// _supportedAlgorithms is a list of algorithms explicitly supported by this
 // package. If a provider supports other algorithms, such as HS256 or none,
 // those values won't be passed to the IDTokenVerifier.
-var supportedAlgorithms = map[string]bool{
+var _supportedAlgorithms = map[string]bool{
 	RS256: true,
 	RS384: true,
 	RS512: true,
@@ -81,13 +81,13 @@ var supportedAlgorithms = map[string]bool{
 	PS512: true,
 }
 
-// NewOIDCClient returns an OIDC client for the given issuer
+// NewOIDCClient returns an OIDClient instance for the given issuer
 func NewOIDCClient(opts ...Option) OIDCClient {
 	options := newOptions(opts...)
 
 	return &oidcClient{
 		Logger:                  options.Logger,
-		issuer:                  options.OidcIssuer,
+		issuer:                  options.OIDCIssuer,
 		httpClient:              options.HTTPClient,
 		accessTokenVerifyMethod: options.AccessTokenVerifyMethod,
 		JWKSOptions:             options.JWKSOptions, // TODO I don't like that we pass down config options ...
@@ -135,13 +135,13 @@ func (c *oidcClient) lookupWellKnownOpenidConfiguration(ctx context.Context) err
 		}
 		var algs []string
 		for _, a := range p.IDTokenSigningAlgValuesSupported {
-			if supportedAlgorithms[a] {
+			if _supportedAlgorithms[a] {
 				algs = append(algs, a)
 			}
 		}
 		c.provider = &p
 		c.algorithms = algs
-		c.remoteKeySet = gOidc.NewRemoteKeySet(gOidc.ClientContext(ctx, c.httpClient), p.JwksURI)
+		c.remoteKeySet = goidc.NewRemoteKeySet(goidc.ClientContext(ctx, c.httpClient), p.JwksURI)
 	}
 	return nil
 }
@@ -174,6 +174,7 @@ func (c *oidcClient) getKeyfunc() *keyfunc.JWKS {
 
 type stringAsBool bool
 
+// Claims unmarshals the raw JSON string into a bool.
 func (sb *stringAsBool) UnmarshalJSON(b []byte) error {
 	switch string(b) {
 	case "true", `"true"`:
@@ -214,15 +215,14 @@ func (u *UserInfo) Claims(v interface{}) error {
 	return json.Unmarshal(u.claims, v)
 }
 
+// UserInfo retrieves the userinfo from a Token
 func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSource) (*UserInfo, error) {
 	if err := c.lookupWellKnownOpenidConfiguration(ctx); err != nil {
 		return nil, err
 	}
 
 	if c.provider.UserinfoEndpoint == "" {
-		if c.provider.UserinfoEndpoint == "" {
-			return nil, errors.New("oidc: user info endpoint is not supported by this provider")
-		}
+		return nil, errors.New("oidc: user info endpoint is not supported by this provider")
 	}
 
 	req, err := http.NewRequest("GET", c.provider.UserinfoEndpoint, nil)
@@ -250,9 +250,9 @@ func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSourc
 	}
 
 	ct := resp.Header.Get("Content-Type")
-	mediaType, _, parseErr := mime.ParseMediaType(ct)
-	if parseErr == nil && mediaType == "application/jwt" {
-		payload, err := c.remoteKeySet.VerifySignature(gOidc.ClientContext(ctx, c.httpClient), string(body))
+	mediaType, _, err := mime.ParseMediaType(ct)
+	if err == nil && mediaType == "application/jwt" {
+		payload, err := c.remoteKeySet.VerifySignature(goidc.ClientContext(ctx, c.httpClient), string(body))
 		if err != nil {
 			return nil, fmt.Errorf("oidc: invalid userinfo jwt signature %v", err)
 		}
@@ -348,10 +348,9 @@ func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*L
 		return nil, fmt.Errorf("oidc: logout token must contain logout event")
 	}
 	//6. Verify that the Logout Token does not contain a nonce Claim.
-	type nonce struct {
+	var n struct {
 		Nonce *string `json:"nonce"`
 	}
-	var n nonce
 	json.Unmarshal(payload, &n)
 	if n.Nonce != nil {
 		return nil, fmt.Errorf("oidc: nonce on logout token MUST NOT be present")
@@ -378,6 +377,7 @@ func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*L
 	case 0:
 		return nil, fmt.Errorf("oidc: logout token not signed")
 	case 1:
+		// do nothing
 	default:
 		return nil, fmt.Errorf("oidc: multiple signatures on logout token not supported")
 	}
@@ -392,7 +392,7 @@ func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*L
 		return nil, fmt.Errorf("oidc: logout token signed with unsupported algorithm, expected %q got %q", supportedSigAlgs, sig.Header.Algorithm)
 	}
 
-	gotPayload, err := c.remoteKeySet.VerifySignature(gOidc.ClientContext(ctx, c.httpClient), rawToken)
+	gotPayload, err := c.remoteKeySet.VerifySignature(goidc.ClientContext(ctx, c.httpClient), rawToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to verify signature: %v", err)
 	}
@@ -411,8 +411,8 @@ func unmarshalResp(r *http.Response, body []byte, v interface{}) error {
 		return nil
 	}
 	ct := r.Header.Get("Content-Type")
-	mediaType, _, parseErr := mime.ParseMediaType(ct)
-	if parseErr == nil && mediaType == "application/json" {
+	mediaType, _, err := mime.ParseMediaType(ct)
+	if err == nil && mediaType == "application/json" {
 		return fmt.Errorf("got Content-Type = application/json, but could not unmarshal as JSON: %v", err)
 	}
 	return fmt.Errorf("expected Content-Type = application/json, got %q: %v", ct, err)

@@ -112,9 +112,9 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 					Value:  []byte(encodedHash),
 					Expiry: time.Until(expiration),
 				})
-			}
-			if err != nil {
-				m.Logger.Error().Err(err).Msg("failed to write session lookup cache")
+				if err != nil {
+					m.Logger.Error().Err(err).Msg("failed to write session lookup cache")
+				}
 			}
 		}
 	}()

@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"testing"
 
-	gOidc "github.com/coreos/go-oidc/v3/oidc"
+	goidc "github.com/coreos/go-oidc/v3/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"gopkg.in/square/go-jose.v2"
 )
@@ -60,7 +60,7 @@ func TestLogoutVerify(t *testing.T) {
 								 "http://schemas.openid.net/event/backchannel-logout": {}
 								 }
 							  }`,
-			config: gOidc.Config{
+			config: goidc.Config{
 				SkipClientIDCheck: true,
 			},
 			signKey: newRSAKey(t),
@@ -69,7 +69,7 @@ func TestLogoutVerify(t *testing.T) {
 			name:        "invalid issuer",
 			issuer:      "https://bar",
 			logoutToken: `{"iss":"https://foo"}`,
-			config: gOidc.Config{
+			config: goidc.Config{
 				SkipClientIDCheck: true,
 				SkipExpiryCheck:   true,
 			},
@@ -89,7 +89,7 @@ func TestLogoutVerify(t *testing.T) {
 								 "http://schemas.openid.net/event/backchannel-logout": {}
 								 }
 							  }`,
-			config: gOidc.Config{
+			config: goidc.Config{
 				SkipClientIDCheck: true,
 				SkipExpiryCheck:   true,
 			},
@@ -108,7 +108,7 @@ func TestLogoutVerify(t *testing.T) {
 								 "http://schemas.openid.net/event/backchannel-logout": {}
 								 }
 							  }`,
-			config: gOidc.Config{
+			config: goidc.Config{
 				SkipClientIDCheck: true,
 			},
 			signKey: newRSAKey(t),
@@ -127,7 +127,7 @@ func TestLogoutVerify(t *testing.T) {
 								 "http://schemas.openid.net/event/backchannel-logout": {}
 								 }
 							  }`,
-			config: gOidc.Config{
+			config: goidc.Config{
 				SkipClientIDCheck: true,
 			},
 			signKey: newRSAKey(t),
@@ -146,7 +146,7 @@ func TestLogoutVerify(t *testing.T) {
 								 "not a logout event": {}
 								 }
 							  }`,
-			config: gOidc.Config{
+			config: goidc.Config{
 				SkipClientIDCheck: true,
 			},
 			signKey: newRSAKey(t),
@@ -162,7 +162,7 @@ func TestLogoutVerify(t *testing.T) {
 							   "jti": "bWJq",
 							   "sid": "08a5019c-17e1-4977-8f42-65a12843ea02",
 							  }`,
-			config: gOidc.Config{
+			config: goidc.Config{
 				SkipClientIDCheck: true,
 			},
 			signKey: newRSAKey(t),
@@ -182,7 +182,7 @@ func TestVerifyAudienceLogout(t *testing.T) {
 								 "http://schemas.openid.net/event/backchannel-logout": {}
 								 }
 							}`,
-			config: gOidc.Config{
+			config: goidc.Config{
 				ClientID:        "client1",
 				SkipExpiryCheck: true,
 			},
@@ -193,7 +193,7 @@ func TestVerifyAudienceLogout(t *testing.T) {
 			logoutToken: `{"iss":"https://foo","aud":"client2","sub":"subject","events": {
 								 "http://schemas.openid.net/event/backchannel-logout": {}
 								 }}`,
-			config: gOidc.Config{
+			config: goidc.Config{
 				ClientID:        "client1",
 				SkipExpiryCheck: true,
 			},
@@ -205,7 +205,7 @@ func TestVerifyAudienceLogout(t *testing.T) {
 			logoutToken: `{"iss":"https://foo","aud":["client1","client2"],"sub":"subject","events": {
 								 "http://schemas.openid.net/event/backchannel-logout": {}
 								 }}`,
-			config: gOidc.Config{
+			config: goidc.Config{
 				ClientID:        "client2",
 				SkipExpiryCheck: true,
 			},
@@ -233,7 +233,7 @@ type logoutVerificationTest struct {
 	// testing invalid signatures.
 	verificationKey *signingKey
 
-	config  gOidc.Config
+	config  goidc.Config
 	wantErr bool
 }
 
@@ -255,7 +255,7 @@ func (v logoutVerificationTest) runGetToken(t *testing.T) (*oidc.LogoutToken, er
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	issuer := "https://foo"
-	var ks gOidc.KeySet
+	var ks goidc.KeySet
 	if v.verificationKey == nil {
 		ks = &testVerifier{v.signKey.jwk()}
 	} else {
