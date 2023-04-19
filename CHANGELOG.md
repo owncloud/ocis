@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix so that PATCH requests for groups actually updates the group name: [#5949](https://github.com/owncloud/ocis/pull/5949)
 * Bugfix - Fix OIDC auth cache: [#5997](https://github.com/owncloud/ocis/pull/5997)
 * Bugfix - Fix Postprocessing events: [#5269](https://github.com/owncloud/ocis/pull/5269)
+* Bugfix - Fix Search reindexing performance regression: [#6085](https://github.com/owncloud/ocis/pull/6085)
 * Bugfix - Fix Search tag indexing: [#5405](https://github.com/owncloud/ocis/pull/5405)
 * Bugfix - Fix user type config for user provider: [#6027](https://github.com/owncloud/ocis/pull/6027)
 * Bugfix - Add missing CORS config: [#5987](https://github.com/owncloud/ocis/pull/5987)
