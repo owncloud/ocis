@@ -6,6 +6,7 @@ import (
 
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/tags"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
@@ -34,7 +35,7 @@ func (b Basic) Extract(_ context.Context, ri *storageProvider.ResourceInfo) (Doc
 	}
 
 	if ri.Mtime != nil {
-		doc.Mtime = time.Unix(int64(ri.Mtime.Seconds), int64(ri.Mtime.Nanos)).UTC().Format(time.RFC3339)
+		doc.Mtime = utils.TSToTime(ri.Mtime).Format(time.RFC3339Nano)
 	}
 
 	return doc, nil
