@@ -14,7 +14,7 @@ RESET := $(shell tput -Txterm sgr0)
 
 # add a service here when it uses transifex
 L10N_MODULES := \
-	services/notifications
+	services/notifications \
 	services/userlog
 
 # if you add a module here please also add it to the .drone.star file
