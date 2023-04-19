@@ -44,7 +44,7 @@ l10n-push:
 
 .PHONY: l10n-read
 l10n-read: $(GO_XGETTEXT)
-	go-xgettext -o $(OUTPUT_DIR)/notifications.pot --keyword=Template --add-comments -s pkg/email/l10n/templates.go
+	go-xgettext -o $(OUTPUT_DIR)/notifications.pot --keyword=Template --add-comments -s pkg/email/templates.go
 
 .PHONY: l10n-write
 l10n-write:
