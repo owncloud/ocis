@@ -35,7 +35,6 @@ type Client interface {
 	CreateUser(ctx context.Context, realm string, user *libregraph.User, userActions []UserAction) (string, error)
 	SendActionsMail(ctx context.Context, realm, userID string, userActions []UserAction) error
 	GetUserByParams(ctx context.Context, realm string, params gocloak.GetUsersParams) (*libregraph.User, error)
-	GetUserByEmail(ctx context.Context, realm, email string) (*libregraph.User, error)
 	GetUserByUsername(ctx context.Context, realm, username string) (*libregraph.User, error)
 	GetPIIReport(ctx context.Context, realm, username string) (*PIIReport, error)
 }

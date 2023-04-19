@@ -68,32 +68,6 @@ func (_m *Client) GetPIIReport(ctx context.Context, realm string, username strin
 	return r0, r1
 }
 
-// GetUserByEmail provides a mock function with given fields: ctx, realm, email
-func (_m *Client) GetUserByEmail(ctx context.Context, realm string, email string) (*libregraph.User, error) {
-	ret := _m.Called(ctx, realm, email)
-
-	var r0 *libregraph.User
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*libregraph.User, error)); ok {
-		return rf(ctx, realm, email)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) *libregraph.User); ok {
-		r0 = rf(ctx, realm, email)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*libregraph.User)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
-		r1 = rf(ctx, realm, email)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 // GetUserByParams provides a mock function with given fields: ctx, realm, params
 func (_m *Client) GetUserByParams(ctx context.Context, realm string, params gocloak.GetUsersParams) (*libregraph.User, error) {
 	ret := _m.Called(ctx, realm, params)

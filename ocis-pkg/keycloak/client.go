@@ -113,13 +113,6 @@ func (c *ConcreteClient) GetUserByParams(ctx context.Context, realm string, para
 	return c.keycloakUserToLibregraph(users[0]), nil
 }
 
-// GetUserByEmail looks up a user by email.
-func (c *ConcreteClient) GetUserByEmail(ctx context.Context, realm, mail string) (*libregraph.User, error) {
-	return c.GetUserByParams(ctx, realm, gocloak.GetUsersParams{
-		Email: &mail,
-	})
-}
-
 // GetUserByUsername looks up a user by username.
 func (c *ConcreteClient) GetUserByUsername(ctx context.Context, realm, username string) (*libregraph.User, error) {
 	return c.GetUserByParams(ctx, realm, gocloak.GetUsersParams{
