@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-19-11-11-10]
+[#deprecation-note-2023-04-19-13-00-36]
 [caption=]
 .Deprecation notes for the storage-system service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -195,7 +195,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-19-11-11-10[Deprecation Note]
+xref:deprecation-note-2023-04-19-13-00-36[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
