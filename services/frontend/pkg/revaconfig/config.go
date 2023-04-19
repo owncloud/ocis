@@ -63,6 +63,11 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 		}
 	}
 
+	readOnlyUserAttributes := []string{}
+	if cfg.ReadOnlyUserAttributes != nil {
+		readOnlyUserAttributes = cfg.ReadOnlyUserAttributes
+	}
+
 	return map[string]interface{}{
 		"core": map[string]interface{}{
 			"tracing_enabled":      cfg.Tracing.Enabled,
@@ -198,7 +203,8 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 								"support_url_signing": true,
 							},
 							"graph": map[string]interface{}{
-								"personal_data_export": true,
+								"personal_data_export":      true,
+								"read_only_user_attributes": readOnlyUserAttributes,
 							},
 							"checksums": map[string]interface{}{
 								"supported_types":       cfg.Checksums.SupportedTypes,

@@ -39,11 +39,12 @@ type Config struct {
 
 	PublicURL string `yaml:"public_url" env:"OCIS_URL;FRONTEND_PUBLIC_URL" desc:"The public facing URL of the oCIS frontend."`
 
-	AppHandler  AppHandler  `yaml:"app_handler"`
-	Archiver    Archiver    `yaml:"archiver"`
-	DataGateway DataGateway `yaml:"data_gateway"`
-	OCS         OCS         `yaml:"ocs"`
-	Checksums   Checksums   `yaml:"checksums"`
+	AppHandler             AppHandler  `yaml:"app_handler"`
+	Archiver               Archiver    `yaml:"archiver"`
+	DataGateway            DataGateway `yaml:"data_gateway"`
+	OCS                    OCS         `yaml:"ocs"`
+	Checksums              Checksums   `yaml:"checksums"`
+	ReadOnlyUserAttributes []string    `yaml:"read_only_user_attributes" env:"FRONTEND_READONLY_USER_ATTRIBUTES" desc:"Comma separated list of user attributes to indicate as read-only."`
 
 	Middleware Middleware `yaml:"middleware"`
 
