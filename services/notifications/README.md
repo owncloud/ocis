@@ -13,7 +13,7 @@ template
 final output
 ```
 
-In addition, the notifications service supports custom templates. Custom email templates take precedence over the embedded ones. If a custom email template exists, the embedded templates are not used. To configure custom email templates, the `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` environment variable needs to point to a base folder that will contain the email templates. The source templates provided by ocis you can derive from are located in the base folder [https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates](https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates) with subfolders `shares` and `spaces`.
+In addition, the notifications service supports custom templates. Custom email templates take precedence over the embedded ones. If a custom email template exists, the embedded templates are not used. To configure custom email templates, the `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` environment variable needs to point to a base folder that will contain the email templates. This path must be available from all instances of the notifications service, a shared storage is recommended. The source templates provided by ocis you can derive from are located in following base folder [https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates](https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates) with subfolders `shares` and `spaces`.
 
 -   [shares/shareCreated.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/shares/shareCreated.email.body.tmpl)
 -   [shares/shareExpired.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/shares/shareExpired.email.body.tmpl)
@@ -35,8 +35,6 @@ templates
 ```
 
 Custom email templates referenced via `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` must also be located in subfolders `shares` and `spaces` and must have the same names as the embedded templates. It is important that the names of these files and  folders match the embedded ones.
-
-Note when having multiple instances of the notfication service, the environment variable `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` must resolve to a shared storage.
 
 ## Translations
 
