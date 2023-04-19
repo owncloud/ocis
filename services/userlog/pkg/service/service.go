@@ -166,7 +166,7 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 func (ul *UserlogService) GetEvents(ctx context.Context, userid string) ([]*ehmsg.Event, error) {
 	rec, err := ul.store.Read(userid)
 	if err != nil && err != store.ErrNotFound {
-		ul.log.Fatal().Err(err).Str("userid", userid).Msg("failed to read record from database")
+		ul.log.Error().Err(err).Str("userid", userid).Msg("failed to read record from store")
 		return nil, err
 	}
 
@@ -177,7 +177,7 @@ func (ul *UserlogService) GetEvents(ctx context.Context, userid string) ([]*ehms
 
 	var eventIDs []string
 	if err := json.Unmarshal(rec[0].Value, &eventIDs); err != nil {
-		ul.log.Fatal().Err(err).Str("userid", userid).Msg("failed to umarshal record from database")
+		ul.log.Error().Err(err).Str("userid", userid).Msg("failed to umarshal record from store")
 		return nil, err
 	}
 
