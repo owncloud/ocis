@@ -44,7 +44,7 @@ type Config struct {
 	DataGateway            DataGateway `yaml:"data_gateway"`
 	OCS                    OCS         `yaml:"ocs"`
 	Checksums              Checksums   `yaml:"checksums"`
-	ReadOnlyUserAttributes []string    `yaml:"read_only_user_attributes" env:"FRONTEND_READONLY_USER_ATTRIBUTES" desc:"Comma separated list of user attributes to indicate as read-only."`
+	ReadOnlyUserAttributes []string    `yaml:"read_only_user_attributes" env:"FRONTEND_READONLY_USER_ATTRIBUTES" desc:"Comma separated list of user attributes to indicate as read-only. Supported values: 'user.onPremisesSamAccountName' (username), 'user.displayName', 'user.mail', 'user.passwordProfile' (password), 'user.appRoleAssignments' (role), 'user.accountEnabled' (login allowed), 'drive.quota' (quota)."`
 
 	Middleware Middleware `yaml:"middleware"`
 
