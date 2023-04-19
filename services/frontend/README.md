@@ -26,8 +26,6 @@ The ocs endpoint, by default `/ocs`, implements the ownCloud 10 Open Collaborati
 
 While the frontend service does not persist any data it does cache `Stat()` responses and user information. Therefore, multiple instances of this service can be spawned in a bigger deployment like when using container orchestration with Kubernetes, when configuring `FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE=redis` and the related config options.
 
-## Libregraph Service Interactions
+## Define Read-Only Attributes
 
-A lot of user management is done via a standardized libregraph API. Depending on how the system is configured, there might be some attributes for users that an ocis instance admin user can't change because of properties
-coming from an external LDAP server, or similar. This can be the case when the ocis admin is not the LDAP admin. To make life easier for admin users, there are hints as capabilites telling the frontend which attributes are read-only or not, so they can be shown in the frontend differently. To configure these hints we have the environment variable FRONTEND_READONLY_USER_ATTRIBUTES,
-which takes a comma separated list of attributes.
+A lot of user management is made via the standardized libregraph API. Depending on how the system is configured, there might be some user attributes that an ocis instance admin can't change because of properties coming from an external LDAP server, or similar. This can be the case when the ocis admin is not the LDAP admin. To ease life for admins, there are hints as capabilites telling the frontend which attributes are read-only to enable a different optical representation like being grayed out. To configure these hints, use the environment variable `FRONTEND_READONLY_USER_ATTRIBUTES`, which takes a comma separated list of attributes.
