@@ -90,8 +90,8 @@ func (c *ConcreteClient) SendActionsMail(ctx context.Context, realm, userID stri
 	return c.keycloak.ExecuteActionsEmail(ctx, token.AccessToken, realm, params)
 }
 
-// GetUserByParams looks up a user by the given parameters.
-func (c *ConcreteClient) GetUserByParams(ctx context.Context, realm string, params gocloak.GetUsersParams) (*libregraph.User, error) {
+// getUserByParams looks up a user by the given parameters.
+func (c *ConcreteClient) getUserByParams(ctx context.Context, realm string, params gocloak.GetUsersParams) (*libregraph.User, error) {
 	token, err := c.getToken(ctx)
 	if err != nil {
 		return nil, err
@@ -115,7 +115,7 @@ func (c *ConcreteClient) GetUserByParams(ctx context.Context, realm string, para
 
 // GetUserByUsername looks up a user by username.
 func (c *ConcreteClient) GetUserByUsername(ctx context.Context, realm, username string) (*libregraph.User, error) {
-	return c.GetUserByParams(ctx, realm, gocloak.GetUsersParams{
+	return c.getUserByParams(ctx, realm, gocloak.GetUsersParams{
 		Username: &username,
 	})
 }
