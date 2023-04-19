@@ -2225,6 +2225,14 @@ def build():
             "commands": [
                 "retry -t 3 'make -C ocis build'",
             ],
+            "environment": {
+                "HTTP_PROXY": {
+                    "from_secret": "drone_http_proxy",
+                },
+                "HTTPS_PROXY": {
+                    "from_secret": "drone_http_proxy",
+                },
+            },
             "volumes": [stepVolumeGo],
         },
     ]
