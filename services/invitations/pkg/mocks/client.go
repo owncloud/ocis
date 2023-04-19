@@ -40,17 +40,17 @@ func (_m *Client) CreateUser(ctx context.Context, realm string, user *libregraph
 	return r0, r1
 }
 
-// GetPIIReport provides a mock function with given fields: ctx, realm, email
-func (_m *Client) GetPIIReport(ctx context.Context, realm string, email string) (*keycloak.PIIReport, error) {
-	ret := _m.Called(ctx, realm, email)
+// GetPIIReport provides a mock function with given fields: ctx, realm, username
+func (_m *Client) GetPIIReport(ctx context.Context, realm string, username string) (*keycloak.PIIReport, error) {
+	ret := _m.Called(ctx, realm, username)
 
 	var r0 *keycloak.PIIReport
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*keycloak.PIIReport, error)); ok {
-		return rf(ctx, realm, email)
+		return rf(ctx, realm, username)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, string, string) *keycloak.PIIReport); ok {
-		r0 = rf(ctx, realm, email)
+		r0 = rf(ctx, realm, username)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*keycloak.PIIReport)
@@ -58,7 +58,7 @@ func (_m *Client) GetPIIReport(ctx context.Context, realm string, email string) 
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
-		r1 = rf(ctx, realm, email)
+		r1 = rf(ctx, realm, username)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -66,17 +66,17 @@ func (_m *Client) GetPIIReport(ctx context.Context, realm string, email string) 
 	return r0, r1
 }
 
-// GetUserByEmail provides a mock function with given fields: ctx, realm, email
-func (_m *Client) GetUserByEmail(ctx context.Context, realm string, email string) (*libregraph.User, error) {
-	ret := _m.Called(ctx, realm, email)
+// GetUserByUsername provides a mock function with given fields: ctx, realm, username
+func (_m *Client) GetUserByUsername(ctx context.Context, realm string, username string) (*libregraph.User, error) {
+	ret := _m.Called(ctx, realm, username)
 
 	var r0 *libregraph.User
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*libregraph.User, error)); ok {
-		return rf(ctx, realm, email)
+		return rf(ctx, realm, username)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, string, string) *libregraph.User); ok {
-		r0 = rf(ctx, realm, email)
+		r0 = rf(ctx, realm, username)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*libregraph.User)
@@ -84,7 +84,7 @@ func (_m *Client) GetUserByEmail(ctx context.Context, realm string, email string
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
-		r1 = rf(ctx, realm, email)
+		r1 = rf(ctx, realm, username)
 	} else {
 		r1 = ret.Error(1)
 	}

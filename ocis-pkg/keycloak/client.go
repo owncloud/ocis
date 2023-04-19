@@ -90,34 +90,39 @@ func (c *ConcreteClient) SendActionsMail(ctx context.Context, realm, userID stri
 	return c.keycloak.ExecuteActionsEmail(ctx, token.AccessToken, realm, params)
 }
 
-// GetUserByEmail looks up a user by email.
-func (c *ConcreteClient) GetUserByEmail(ctx context.Context, realm, mail string) (*libregraph.User, error) {
+// getUserByParams looks up a user by the given parameters.
+func (c *ConcreteClient) getUserByParams(ctx context.Context, realm string, params gocloak.GetUsersParams) (*libregraph.User, error) {
 	token, err := c.getToken(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	users, err := c.keycloak.GetUsers(ctx, token.AccessToken, realm, gocloak.GetUsersParams{
-		Email: &mail,
-	})
+	users, err := c.keycloak.GetUsers(ctx, token.AccessToken, realm, params)
 	if err != nil {
 		return nil, err
 	}
 
 	if len(users) == 0 {
-		return nil, fmt.Errorf("no users found with mail address %s", mail)
+		return nil, fmt.Errorf("no users found")
 	}
 
 	if len(users) > 1 {
-		return nil, fmt.Errorf("%d users found with mail address %s, expected 1", len(users), mail)
+		return nil, fmt.Errorf("%d users found", len(users))
 	}
 
 	return c.keycloakUserToLibregraph(users[0]), nil
 }
 
+// GetUserByUsername looks up a user by username.
+func (c *ConcreteClient) GetUserByUsername(ctx context.Context, realm, username string) (*libregraph.User, error) {
+	return c.getUserByParams(ctx, realm, gocloak.GetUsersParams{
+		Username: &username,
+	})
+}
+
 // GetPIIReport returns a structure with all the PII for the user.
-func (c *ConcreteClient) GetPIIReport(ctx context.Context, realm string, email string) (*PIIReport, error) {
-	u, err := c.GetUserByEmail(ctx, realm, email)
+func (c *ConcreteClient) GetPIIReport(ctx context.Context, realm, username string) (*PIIReport, error) {
+	u, err := c.GetUserByUsername(ctx, realm, username)
 	if err != nil {
 		return nil, err
 	}
