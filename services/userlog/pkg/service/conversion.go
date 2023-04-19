@@ -1,4 +1,4 @@
-:qpackage service
+package service
 
 import (
 	"bytes"
