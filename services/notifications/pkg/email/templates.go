@@ -8,23 +8,23 @@ var (
 	// Shares
 	ShareCreated = MessageTemplate{
 		bodyTemplate: "shares/shareCreated.email.body.tmpl",
-		// ShareCreated email template, Subject field
+		// ShareCreated email template, Subject field (resolves directly)
 		Subject: Template(`{ShareSharer} shared '{ShareFolder}' with you`),
-		// ShareCreated email template, Greeting field
+		// ShareCreated email template, resolves via {{ .Greeting }}
 		Greeting: Template(`Hello {ShareGrantee}`),
-		// ShareCreated email template, Message field
+		// ShareCreated email template, resolves via {{ .MessageBody }}
 		MessageBody: Template(`{ShareSharer} has shared "{ShareFolder}" with you.`),
-		// ShareCreated email template, CallToAction field
+		// ShareCreated email template, resolves via {{ .CallToAction }}
 		CallToAction: Template(`Click here to view it: {ShareLink}`),
 	}
 
 	ShareExpired = MessageTemplate{
 		bodyTemplate: "shares/shareExpired.email.body.tmpl",
-		// ShareExpired email template, Subject field
+		// ShareExpired email template, Subject field (resolves directly)
 		Subject: Template(`Share to '{ShareFolder}' expired at {ExpiredAt}`),
-		// ShareExpired email template, Greeting field
+		// ShareExpired email template, resolves via {{ .Greeting }}
 		Greeting: Template(`Hello {ShareGrantee},`),
-		// ShareExpired email template, Message field
+		// ShareExpired email template, resolves via {{ .MessageBody }}
 		MessageBody: Template(`Your share to {ShareFolder} has expired at {ExpiredAt}
 
 Even though this share has been revoked you still might have access through other shares and/or space memberships.`),
@@ -33,37 +33,37 @@ Even though this share has been revoked you still might have access through othe
 	// Spaces templates
 	SharedSpace = MessageTemplate{
 		bodyTemplate: "spaces/sharedSpace.email.body.tmpl",
-		// SharedSpace email template, Subject field
+		// SharedSpace email template, Subject field (resolves directly)
 		Subject: Template("{SpaceSharer} invited you to join {SpaceName}"),
-		// SharedSpace email template, Greeting field
+		// SharedSpace email template, resolves via {{ .Greeting }}
 		Greeting: Template(`Hello {SpaceGrantee},`),
-		// SharedSpace email template, Message field
+		// SharedSpace email template, resolves via {{ .MessageBody }}
 		MessageBody: Template(`{SpaceSharer} has invited you to join "{SpaceName}".`),
-		// SharedSpace email template, CallToAction field
+		// SharedSpace email template, resolves via {{ .CallToAction }}
 		CallToAction: Template(`Click here to view it: {ShareLink}`),
 	}
 
 	UnsharedSpace = MessageTemplate{
 		bodyTemplate: "spaces/unsharedSpace.email.body.tmpl",
-		// UnsharedSpace email template, Subject field
+		// UnsharedSpace email template, Subject field (resolves directly)
 		Subject: Template(`{SpaceSharer} removed you from {SpaceName}`),
-		// UnsharedSpace email template, Greeting field
+		// UnsharedSpace email template, resolves via {{ .Greeting }}
 		Greeting: Template(`Hello {SpaceGrantee},`),
-		// UnsharedSpace email template, Message field
+		// UnsharedSpace email template, resolves via {{ .MessageBody }}
 		MessageBody: Template(`{SpaceSharer} has removed you from "{SpaceName}".
 
 You might still have access through your other groups or direct membership.`),
-		// UnsharedSpace email template, CallToAction field
+		// UnsharedSpace email template, resolves via {{ .CallToAction }}
 		CallToAction: Template(`Click here to check it: {ShareLink}`),
 	}
 
 	MembershipExpired = MessageTemplate{
 		bodyTemplate: "spaces/membershipExpired.email.body.tmpl",
-		// MembershipExpired email template, Subject field
+		// MembershipExpired email template, Subject field (resolves directly)
 		Subject: Template(`Membership of '{SpaceName}' expired at {ExpiredAt}`),
-		// MembershipExpired email template, Greeting field
+		// MembershipExpired email template, resolves via {{ .Greeting }}
 		Greeting: Template(`Hello {SpaceGrantee},`),
-		// MembershipExpired email template, Message field
+		// MembershipExpired email template, resolves via {{ .MessageBody }}
 		MessageBody: Template(`Your membership of space {SpaceName} has expired at {ExpiredAt}
 
 Even though this membership has expired you still might have access through other shares and/or space memberships`),
