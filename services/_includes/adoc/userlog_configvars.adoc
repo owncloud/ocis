@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-19-13-00-36]
+[#deprecation-note-2023-04-19-13-21-50]
 [caption=]
 .Deprecation notes for the userlog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -16,12 +16,12 @@ ifeval::[{show-deprecation} == true]
 
 | REVA_GATEWAY changing name for consistency
 | 3.0
-| 3.1
+| 4.0.0
 | OCIS_REVA_GATEWAY
 
 | USERLOG_STORE_ADDRESSES name needs to be harmonized
 | 3.0
-| 3.1
+| 4.0.0
 | USERLOG_STORE_NODES
 |===
 
@@ -219,7 +219,7 @@ Machine auth API key used to validate internal requests necessary to access reso
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-19-13-00-36[Deprecation Note]
+xref:deprecation-note-2023-04-19-13-21-50[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -299,7 +299,7 @@ The type of the userlog store. Supported values are: 'memory', 'ocmem', 'etcd', 
 a|`OCIS_PERSISTENT_STORE_NODES` +
 `USERLOG_STORE_NODES` +
 `USERLOG_STORE_ADDRESSES` +
-xref:deprecation-note-2023-04-19-13-00-36[Deprecation Note]
+xref:deprecation-note-2023-04-19-13-21-50[Deprecation Note]
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
