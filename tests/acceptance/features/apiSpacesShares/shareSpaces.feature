@@ -552,7 +552,7 @@ Feature: Share spaces
       | viewer  |
 
   @skipOnStable2.0
-  Scenario Outline: update the expiration date of a space in group share
+  Scenario Outline: delete the expiration date of a space in group share
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
     And user "Alice" has shared a space "share space" with settings:
