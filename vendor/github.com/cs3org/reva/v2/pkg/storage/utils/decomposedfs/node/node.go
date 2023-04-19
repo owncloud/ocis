@@ -1,0 +1,1290 @@
+// Copyright 2018-2021 CERN
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+// In applying this license, CERN does not waive the privileges and immunities
+// granted to it by virtue of its status as an Intergovernmental Organization
+// or submit itself to any jurisdiction.
+
+package node
+
+import (
+	"context"
+	"crypto/md5"
+	"encoding/hex"
+	"fmt"
+	"hash"
+	"io"
+	"io/fs"
+	"os"
+	"path/filepath"
+	"strconv"
+	"strings"
+	"syscall"
+	"time"
+
+	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/internal/grpc/services/storageprovider"
+	"github.com/cs3org/reva/v2/pkg/appctx"
+	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/mime"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/ace"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/grants"
+	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/google/uuid"
+	"github.com/pkg/errors"
+)
+
+// Define keys and values used in the node metadata
+const (
+	LockdiscoveryKey = "DAV:lockdiscovery"
+	FavoriteKey      = "http://owncloud.org/ns/favorite"
+	ShareTypesKey    = "http://owncloud.org/ns/share-types"
+	ChecksumsKey     = "http://owncloud.org/ns/checksums"
+	UserShareType    = "0"
+	QuotaKey         = "quota"
+
+	QuotaUnlimited    = "0"
+	QuotaUncalculated = "-1"
+	QuotaUnknown      = "-2"
+
+	// TrashIDDelimiter represents the characters used to separate the nodeid and the deletion time.
+	TrashIDDelimiter    = ".T."
+	RevisionIDDelimiter = ".REV."
+
+	// RootID defines the root node's ID
+	RootID = "root"
+
+	// ProcessingStatus is the name of the status when processing a file
+	ProcessingStatus = "processing:"
+)
+
+// Node represents a node in the tree and provides methods to get a Parent or Child instance
+type Node struct {
+	SpaceID   string
+	ParentID  string
+	ID        string
+	Name      string
+	Blobsize  int64
+	BlobID    string
+	owner     *userpb.UserId
+	Exists    bool
+	SpaceRoot *Node
+
+	lu          PathLookup
+	xattrsCache map[string][]byte
+	nodeType    *provider.ResourceType
+}
+
+// PathLookup defines the interface for the lookup component
+type PathLookup interface {
+	InternalRoot() string
+	InternalPath(spaceID, nodeID string) string
+	Path(ctx context.Context, n *Node, hasPermission PermissionFunc) (path string, err error)
+	MetadataBackend() metadata.Backend
+	ReadBlobSizeAttr(path string) (int64, error)
+	ReadBlobIDAttr(path string) (string, error)
+}
+
+// New returns a new instance of Node
+func New(spaceID, id, parentID, name string, blobsize int64, blobID string, t provider.ResourceType, owner *userpb.UserId, lu PathLookup) *Node {
+	if blobID == "" {
+		blobID = uuid.New().String()
+	}
+	return &Node{
+		SpaceID:  spaceID,
+		ID:       id,
+		ParentID: parentID,
+		Name:     name,
+		Blobsize: blobsize,
+		owner:    owner,
+		lu:       lu,
+		BlobID:   blobID,
+		nodeType: &t,
+	}
+}
+
+// Type returns the node's resource type
+func (n *Node) Type() provider.ResourceType {
+	if n.nodeType != nil {
+		return *n.nodeType
+	}
+
+	t := provider.ResourceType_RESOURCE_TYPE_INVALID
+
+	// Try to read from xattrs
+	typeAttr, err := n.XattrInt32(prefixes.TypeAttr)
+	if err == nil {
+		t = provider.ResourceType(typeAttr)
+		n.nodeType = &t
+		return t
+	}
+
+	// Fall back to checking on disk
+	fi, err := os.Lstat(n.InternalPath())
+	if err != nil {
+		return t
+	}
+
+	switch {
+	case fi.IsDir():
+		if _, err = n.Xattr(prefixes.ReferenceAttr); err == nil {
+			t = provider.ResourceType_RESOURCE_TYPE_REFERENCE
+		} else {
+			t = provider.ResourceType_RESOURCE_TYPE_CONTAINER
+		}
+	case fi.Mode().IsRegular():
+		t = provider.ResourceType_RESOURCE_TYPE_FILE
+	case fi.Mode()&os.ModeSymlink != 0:
+		t = provider.ResourceType_RESOURCE_TYPE_SYMLINK
+		// TODO reference using ext attr on a symlink
+		// nodeType = provider.ResourceType_RESOURCE_TYPE_REFERENCE
+	}
+	n.nodeType = &t
+	return t
+}
+
+// SetType sets the type of the node.
+func (n *Node) SetType(t provider.ResourceType) {
+	n.nodeType = &t
+}
+
+// ChangeOwner sets the owner of n to newOwner
+func (n *Node) ChangeOwner(new *userpb.UserId) (err error) {
+	n.SpaceRoot.owner = new
+
+	attribs := Attributes{}
+	attribs.SetString(prefixes.OwnerIDAttr, new.OpaqueId)
+	attribs.SetString(prefixes.OwnerIDPAttr, new.Idp)
+	attribs.SetString(prefixes.OwnerTypeAttr, utils.UserTypeToString(new.Type))
+
+	if err := n.SpaceRoot.SetXattrs(attribs, true); err != nil {
+		return err
+	}
+
+	return
+}
+
+// WriteAllNodeMetadata writes the Node metadata to disk
+func (n *Node) WriteAllNodeMetadata(ctx context.Context) (err error) {
+	attribs := Attributes{}
+	attribs.SetInt64(prefixes.TypeAttr, int64(n.Type()))
+	attribs.SetString(prefixes.ParentidAttr, n.ParentID)
+	attribs.SetString(prefixes.NameAttr, n.Name)
+	attribs.SetString(prefixes.BlobIDAttr, n.BlobID)
+	attribs.SetInt64(prefixes.BlobsizeAttr, n.Blobsize)
+
+	return n.SetXattrs(attribs, true)
+}
+
+// WriteOwner writes the space owner
+func (n *Node) WriteOwner(owner *userpb.UserId) error {
+	n.SpaceRoot.owner = owner
+
+	attribs := Attributes{}
+	attribs.SetString(prefixes.OwnerIDAttr, owner.OpaqueId)
+	attribs.SetString(prefixes.OwnerIDPAttr, owner.Idp)
+	attribs.SetString(prefixes.OwnerTypeAttr, utils.UserTypeToString(owner.Type))
+
+	if err := n.SpaceRoot.SetXattrs(attribs, true); err != nil {
+		return err
+	}
+	n.SpaceRoot.owner = owner
+	return nil
+}
+
+// SpaceOwnerOrManager returns the space owner of the space. If no owner is set
+// one of the space managers is returned instead.
+func (n *Node) SpaceOwnerOrManager(ctx context.Context) *userpb.UserId {
+	owner := n.Owner()
+	if owner != nil && owner.Type != userpb.UserType_USER_TYPE_SPACE_OWNER {
+		return owner
+	}
+
+	// We don't have an owner set. Find a manager instead.
+	grants, err := n.SpaceRoot.ListGrants(ctx)
+	if err != nil {
+		return nil
+	}
+	for _, grant := range grants {
+		if grant.Permissions.Stat && grant.Permissions.ListContainer && grant.Permissions.InitiateFileDownload {
+			return grant.GetGrantee().GetUserId()
+		}
+	}
+
+	return nil
+}
+
+// ReadNode creates a new instance from an id and checks if it exists
+func ReadNode(ctx context.Context, lu PathLookup, spaceID, nodeID string, canListDisabledSpace bool, spaceRoot *Node, skipParentCheck bool) (*Node, error) {
+	var err error
+
+	if spaceRoot == nil {
+		// read space root
+		spaceRoot = &Node{
+			SpaceID: spaceID,
+			lu:      lu,
+			ID:      spaceID,
+		}
+		spaceRoot.SpaceRoot = spaceRoot
+		spaceRoot.owner, err = spaceRoot.readOwner()
+		switch {
+		case metadata.IsNotExist(err):
+			return spaceRoot, nil // swallow not found, the node defaults to exists = false
+		case err != nil:
+			return nil, err
+		}
+		spaceRoot.Exists = true
+
+		// lookup name in extended attributes
+		spaceRoot.Name, err = spaceRoot.XattrString(prefixes.NameAttr)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// TODO ReadNode should not check permissions
+	if !canListDisabledSpace && spaceRoot.IsDisabled() {
+		// no permission = not found
+		return nil, errtypes.NotFound(spaceID)
+	}
+
+	// if current user cannot stat the root return not found?
+	// no for shares the root might be a different resource
+
+	// check if this is a space root
+	if spaceID == nodeID {
+		return spaceRoot, nil
+	}
+
+	// are we reading a revision?
+	revisionSuffix := ""
+	if strings.Contains(nodeID, RevisionIDDelimiter) {
+		// verify revision key format
+		kp := strings.SplitN(nodeID, RevisionIDDelimiter, 2)
+		if len(kp) == 2 {
+			// use the actual node for the metadata lookup
+			nodeID = kp[0]
+			// remember revision for blob metadata
+			revisionSuffix = RevisionIDDelimiter + kp[1]
+		}
+	}
+
+	// read node
+	n := &Node{
+		SpaceID:   spaceID,
+		lu:        lu,
+		ID:        nodeID,
+		SpaceRoot: spaceRoot,
+	}
+	nodePath := n.InternalPath()
+
+	// append back revision to nodeid, even when returning a not existing node
+	defer func() {
+		// when returning errors n is nil
+		if n != nil {
+			n.ID += revisionSuffix
+		}
+	}()
+
+	attrs, err := n.Xattrs()
+	switch {
+	case metadata.IsNotExist(err):
+		return n, nil // swallow not found, the node defaults to exists = false
+	case err != nil:
+		return nil, err
+	}
+	n.Exists = true
+
+	n.Name = attrs.String(prefixes.NameAttr)
+	n.ParentID = attrs.String(prefixes.ParentidAttr)
+	if n.ParentID == "" {
+		d, _ := os.ReadFile(lu.MetadataBackend().MetadataPath(n.InternalPath()))
+		if _, ok := lu.MetadataBackend().(metadata.MessagePackBackend); ok {
+			appctx.GetLogger(ctx).Error().Str("path", n.InternalPath()).Str("nodeid", n.ID).Interface("attrs", attrs).Bytes("messagepack", d).Msg("missing parent id")
+		}
+		return nil, errtypes.InternalError("Missing parent ID on node")
+	}
+	// TODO why do we stat the parent? to determine if the current node is in the trash we would need to traverse all parents...
+	// we need to traverse all parents for permissions anyway ...
+	// - we can compare to space root owner with the current user
+	// - we can compare the share permissions on the root for spaces, which would work for managers
+	// - for non managers / owners we need to traverse all path segments because an intermediate node might have been shared
+	// - if we want to support negative acls we need to traverse the path for all users (but the owner)
+	// for trashed items we need to check all parents
+	// - one of them might have the trash suffix ...
+	// - options:
+	//   - move deleted nodes in a trash folder that is still part of the tree (aka freedesktop org trash spec)
+	//     - shares should still be removed, which requires traversing all trashed children ... and it should be undoable ...
+	//     - what if a trashed file is restored? will child items be accessible by a share?
+	//   - compare paths of trash root items and the trashed file?
+	//     - to determine the relative path of a file we would need to traverse all intermediate nodes anyway
+	//   - recursively mark all children as trashed ... async ... it is ok when that is not synchronous
+	//     - how do we pick up if an error occurs? write a journal somewhere? activity log / delta?
+	//     - stat requests will not pick up trashed items at all
+	//   - recursively move all children into the trash folder?
+	//     - no need to write an additional trash entry
+	//     - can be made more robust with a journal
+	//     - same recursion mechanism can be used to purge items? sth we still need to do
+	//   - flag the two above options with dtime
+	if !skipParentCheck {
+		_, err = os.Stat(n.ParentPath())
+		if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				return nil, errtypes.NotFound(err.Error())
+			}
+			return nil, err
+		}
+	}
+
+	if revisionSuffix == "" {
+		n.BlobID = attrs.String(prefixes.BlobIDAttr)
+		blobSize, err := attrs.Int64(prefixes.BlobsizeAttr)
+		if err != nil {
+			return nil, err
+		}
+		n.Blobsize = blobSize
+	} else {
+		n.BlobID, err = lu.ReadBlobIDAttr(nodePath + revisionSuffix)
+		if err != nil {
+			return nil, err
+		}
+
+		// Lookup blobsize
+		n.Blobsize, err = lu.ReadBlobSizeAttr(nodePath + revisionSuffix)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return n, nil
+}
+
+// The os error is buried inside the fs.PathError error
+func isNotDir(err error) bool {
+	if perr, ok := err.(*fs.PathError); ok {
+		if serr, ok2 := perr.Err.(syscall.Errno); ok2 {
+			return serr == syscall.ENOTDIR
+		}
+	}
+	return false
+}
+
+func readChildNodeFromLink(path string) (string, error) {
+	link, err := os.Readlink(path)
+	if err != nil {
+		return "", err
+	}
+	nodeID := strings.TrimLeft(link, "/.")
+	nodeID = strings.ReplaceAll(nodeID, "/", "")
+	return nodeID, nil
+}
+
+// Child returns the child node with the given name
+func (n *Node) Child(ctx context.Context, name string) (*Node, error) {
+	spaceID := n.SpaceID
+	if spaceID == "" && n.ParentID == "root" {
+		spaceID = n.ID
+	} else if n.SpaceRoot != nil {
+		spaceID = n.SpaceRoot.ID
+	}
+	nodeID, err := readChildNodeFromLink(filepath.Join(n.InternalPath(), name))
+	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) || isNotDir(err) {
+
+			c := &Node{
+				SpaceID:   spaceID,
+				lu:        n.lu,
+				ParentID:  n.ID,
+				Name:      name,
+				SpaceRoot: n.SpaceRoot,
+			}
+			return c, nil // if the file does not exist we return a node that has Exists = false
+		}
+
+		return nil, errors.Wrap(err, "decomposedfs: Wrap: readlink error")
+	}
+
+	var c *Node
+	c, err = ReadNode(ctx, n.lu, spaceID, nodeID, false, n.SpaceRoot, true)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not read child node")
+	}
+
+	return c, nil
+}
+
+// Parent returns the parent node
+func (n *Node) Parent() (p *Node, err error) {
+	if n.ParentID == "" {
+		return nil, fmt.Errorf("decomposedfs: root has no parent")
+	}
+	p = &Node{
+		SpaceID:   n.SpaceID,
+		lu:        n.lu,
+		ID:        n.ParentID,
+		SpaceRoot: n.SpaceRoot,
+	}
+
+	// lookup name and parent id in extended attributes
+	p.ParentID, _ = p.XattrString(prefixes.ParentidAttr)
+	p.Name, _ = p.XattrString(prefixes.NameAttr)
+
+	// check node exists
+	if _, err := os.Stat(p.InternalPath()); err == nil {
+		p.Exists = true
+	}
+	return
+}
+
+// Owner returns the space owner
+func (n *Node) Owner() *userpb.UserId {
+	return n.SpaceRoot.owner
+}
+
+// readOwner reads the owner from the extended attributes of the space root
+// in case either owner id or owner idp are unset we return an error and an empty owner object
+func (n *Node) readOwner() (*userpb.UserId, error) {
+	owner := &userpb.UserId{}
+
+	// lookup parent id in extended attributes
+	var attr string
+	var err error
+	// lookup ID in extended attributes
+	attr, err = n.SpaceRoot.XattrString(prefixes.OwnerIDAttr)
+	switch {
+	case err == nil:
+		owner.OpaqueId = attr
+	case metadata.IsAttrUnset(err):
+		// ignore
+	default:
+		return nil, err
+	}
+
+	// lookup IDP in extended attributes
+	attr, err = n.SpaceRoot.XattrString(prefixes.OwnerIDPAttr)
+	switch {
+	case err == nil:
+		owner.Idp = attr
+	case metadata.IsAttrUnset(err):
+		// ignore
+	default:
+		return nil, err
+	}
+
+	// lookup type in extended attributes
+	attr, err = n.SpaceRoot.XattrString(prefixes.OwnerTypeAttr)
+	switch {
+	case err == nil:
+		owner.Type = utils.UserTypeMap(attr)
+	case metadata.IsAttrUnset(err):
+		// ignore
+	default:
+		return nil, err
+	}
+
+	// owner is an optional property
+	if owner.Idp == "" && owner.OpaqueId == "" {
+		return nil, nil
+	}
+	return owner, nil
+}
+
+// PermissionSet returns the permission set and an accessDenied flag
+// for the current user
+// the parent nodes are not taken into account
+// accessDenied is separate from the resource permissions
+// because we only support full denials
+func (n *Node) PermissionSet(ctx context.Context) (provider.ResourcePermissions, bool) {
+	u, ok := ctxpkg.ContextGetUser(ctx)
+	if !ok {
+		appctx.GetLogger(ctx).Debug().Interface("node", n).Msg("no user in context, returning default permissions")
+		return NoPermissions(), false
+	}
+	if utils.UserEqual(u.Id, n.SpaceRoot.Owner()) {
+		return OwnerPermissions(), false
+	}
+	// read the permissions for the current user from the acls of the current node
+	if np, accessDenied, err := n.ReadUserPermissions(ctx, u); err == nil {
+		return np, accessDenied
+	}
+	// be defensive, we could have access via another grant
+	return NoPermissions(), true
+}
+
+// InternalPath returns the internal path of the Node
+func (n *Node) InternalPath() string {
+	return n.lu.InternalPath(n.SpaceID, n.ID)
+}
+
+// ParentPath returns the internal path of the parent of the current node
+func (n *Node) ParentPath() string {
+	return n.lu.InternalPath(n.SpaceID, n.ParentID)
+}
+
+// LockFilePath returns the internal path of the lock file of the node
+func (n *Node) LockFilePath() string {
+	return n.InternalPath() + ".lock"
+}
+
+// CalculateEtag returns a hash of fileid + tmtime (or mtime)
+func CalculateEtag(nodeID string, tmTime time.Time) (string, error) {
+	return calculateEtag(nodeID, tmTime)
+}
+
+// calculateEtag returns a hash of fileid + tmtime (or mtime)
+func calculateEtag(nodeID string, tmTime time.Time) (string, error) {
+	h := md5.New()
+	if _, err := io.WriteString(h, nodeID); err != nil {
+		return "", err
+	}
+	if tb, err := tmTime.UTC().MarshalBinary(); err == nil {
+		if _, err := h.Write(tb); err != nil {
+			return "", err
+		}
+	} else {
+		return "", err
+	}
+	return fmt.Sprintf(`"%x"`, h.Sum(nil)), nil
+}
+
+// SetMtimeString sets the mtime and atime of a node to the unixtime parsed from the given string
+func (n *Node) SetMtimeString(mtime string) error {
+	mt, err := parseMTime(mtime)
+	if err != nil {
+		return err
+	}
+	return n.SetMtime(mt)
+}
+
+// SetMtime sets the mtime and atime of a node
+func (n *Node) SetMtime(mtime time.Time) error {
+	nodePath := n.InternalPath()
+	// updating mtime also updates atime
+	return os.Chtimes(nodePath, mtime, mtime)
+}
+
+// SetEtag sets the temporary etag of a node if it differs from the current etag
+func (n *Node) SetEtag(ctx context.Context, val string) (err error) {
+	sublog := appctx.GetLogger(ctx).With().Interface("node", n).Logger()
+	var tmTime time.Time
+	if tmTime, err = n.GetTMTime(); err != nil {
+		return
+	}
+	var etag string
+	if etag, err = calculateEtag(n.ID, tmTime); err != nil {
+		return
+	}
+
+	// sanitize etag
+	val = fmt.Sprintf("\"%s\"", strings.Trim(val, "\""))
+	if etag == val {
+		sublog.Debug().
+			Str("etag", val).
+			Msg("ignoring request to update identical etag")
+		return nil
+	}
+	// etag is only valid until the calculated etag changes, is part of propagation
+	return n.SetXattrString(prefixes.TmpEtagAttr, val)
+}
+
+// SetFavorite sets the favorite for the current user
+// TODO we should not mess with the user here ... the favorites is now a user specific property for a file
+// that cannot be mapped to extended attributes without leaking who has marked a file as a favorite
+// it is a specific case of a tag, which is user individual as well
+// TODO there are different types of tags
+// 1. public that are managed by everyone
+// 2. private tags that are only visible to the user
+// 3. system tags that are only visible to the system
+// 4. group tags that are only visible to a group ...
+// urgh ... well this can be solved using different namespaces
+// 1. public = p:
+// 2. private = u:<uid>: for user specific
+// 3. system = s: for system
+// 4. group = g:<gid>:
+// 5. app? = a:<aid>: for apps?
+// obviously this only is secure when the u/s/g/a namespaces are not accessible by users in the filesystem
+// public tags can be mapped to extended attributes
+func (n *Node) SetFavorite(uid *userpb.UserId, val string) error {
+	// the favorite flag is specific to the user, so we need to incorporate the userid
+	fa := fmt.Sprintf("%s:%s:%s@%s", prefixes.FavPrefix, utils.UserTypeToString(uid.GetType()), uid.GetOpaqueId(), uid.GetIdp())
+	return n.SetXattrString(fa, val)
+}
+
+// IsDir returns true if the node is a directory
+func (n *Node) IsDir() bool {
+	attr, _ := n.XattrInt32(prefixes.TypeAttr)
+	return attr == int32(provider.ResourceType_RESOURCE_TYPE_CONTAINER)
+}
+
+// AsResourceInfo return the node as CS3 ResourceInfo
+func (n *Node) AsResourceInfo(ctx context.Context, rp *provider.ResourcePermissions, mdKeys, fieldMask []string, returnBasename bool) (ri *provider.ResourceInfo, err error) {
+	sublog := appctx.GetLogger(ctx).With().Interface("node", n.ID).Logger()
+
+	var fn string
+	nodeType := n.Type()
+
+	var target string
+	if nodeType == provider.ResourceType_RESOURCE_TYPE_REFERENCE {
+		target, _ = n.XattrString(prefixes.ReferenceAttr)
+	}
+
+	id := &provider.ResourceId{SpaceId: n.SpaceID, OpaqueId: n.ID}
+
+	switch {
+	case n.IsSpaceRoot():
+		fn = "." // space roots do not have a path as they are referencing themselves
+	case returnBasename:
+		fn = n.Name
+	default:
+		fn, err = n.lu.Path(ctx, n, NoCheck)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	ri = &provider.ResourceInfo{
+		Id:            id,
+		Path:          fn,
+		Type:          nodeType,
+		MimeType:      mime.Detect(nodeType == provider.ResourceType_RESOURCE_TYPE_CONTAINER, fn),
+		Size:          uint64(n.Blobsize),
+		Target:        target,
+		PermissionSet: rp,
+		Owner:         n.Owner(),
+		ParentId: &provider.ResourceId{
+			SpaceId:  n.SpaceID,
+			OpaqueId: n.ParentID,
+		},
+		Name: n.Name,
+	}
+
+	if n.IsProcessing() {
+		ri.Opaque = utils.AppendPlainToOpaque(ri.Opaque, "status", "processing")
+	}
+
+	if nodeType == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
+		ts, err := n.GetTreeSize()
+		if err == nil {
+			ri.Size = ts
+		} else {
+			ri.Size = 0 // make dirs always return 0 if it is unknown
+			sublog.Debug().Err(err).Msg("could not read treesize")
+		}
+	}
+
+	// TODO make etag of files use fileid and checksum
+
+	var tmTime time.Time
+	if tmTime, err = n.GetTMTime(); err != nil {
+		sublog.Debug().Err(err).Msg("could not get tmtime")
+	}
+
+	// use temporary etag if it is set
+	if b, err := n.XattrString(prefixes.TmpEtagAttr); err == nil && b != "" {
+		ri.Etag = fmt.Sprintf(`"%x"`, b)
+	} else if ri.Etag, err = calculateEtag(n.ID, tmTime); err != nil {
+		sublog.Debug().Err(err).Msg("could not calculate etag")
+	}
+
+	// mtime uses tmtime if present
+	// TODO expose mtime and tmtime separately?
+	un := tmTime.UnixNano()
+	ri.Mtime = &types.Timestamp{
+		Seconds: uint64(un / 1000000000),
+		Nanos:   uint32(un % 1000000000),
+	}
+
+	mdKeysMap := make(map[string]struct{})
+	for _, k := range mdKeys {
+		mdKeysMap[k] = struct{}{}
+	}
+
+	var returnAllMetadata bool
+	if _, ok := mdKeysMap["*"]; len(mdKeys) == 0 || ok {
+		returnAllMetadata = true
+	}
+
+	metadata := map[string]string{}
+
+	fieldMaskKeysMap := make(map[string]struct{})
+	for _, k := range fieldMask {
+		fieldMaskKeysMap[k] = struct{}{}
+	}
+
+	var returnAllFields bool
+	if _, ok := fieldMaskKeysMap["*"]; len(fieldMask) == 0 || ok {
+		returnAllFields = true
+	}
+
+	// read favorite flag for the current user
+	if _, ok := mdKeysMap[FavoriteKey]; returnAllMetadata || ok {
+		favorite := ""
+		if u, ok := ctxpkg.ContextGetUser(ctx); ok {
+			// the favorite flag is specific to the user, so we need to incorporate the userid
+			if uid := u.GetId(); uid != nil {
+				fa := fmt.Sprintf("%s:%s:%s@%s", prefixes.FavPrefix, utils.UserTypeToString(uid.GetType()), uid.GetOpaqueId(), uid.GetIdp())
+				if val, err := n.XattrString(fa); err == nil {
+					sublog.Debug().
+						Str("favorite", fa).
+						Msg("found favorite flag")
+					favorite = val
+				}
+			} else {
+				sublog.Error().Err(errtypes.UserRequired("userrequired")).Msg("user has no id")
+			}
+		} else {
+			sublog.Error().Err(errtypes.UserRequired("userrequired")).Msg("error getting user from ctx")
+		}
+		metadata[FavoriteKey] = favorite
+	}
+	// read locks
+	// FIXME move to fieldmask
+	if _, ok := mdKeysMap[LockdiscoveryKey]; returnAllMetadata || ok {
+		if n.hasLocks(ctx) {
+			err = readLocksIntoOpaque(ctx, n, ri)
+			if err != nil {
+				sublog.Debug().Err(errtypes.InternalError("lockfail"))
+			}
+		}
+	}
+
+	// share indicator
+	if _, ok := fieldMaskKeysMap["share-types"]; returnAllFields || ok {
+		granteeTypes := n.getGranteeTypes(ctx)
+		if len(granteeTypes) > 0 {
+			// TODO add optional property to CS3 ResourceInfo to transport grants?
+			var s strings.Builder
+			first := true
+			for _, t := range granteeTypes {
+				if !first {
+					s.WriteString(",")
+				} else {
+					first = false
+				}
+				s.WriteString(strconv.Itoa(int(t)))
+			}
+			ri.Opaque = utils.AppendPlainToOpaque(ri.Opaque, "share-types", s.String())
+		}
+	}
+
+	// checksums
+	// FIXME move to fieldmask
+	if _, ok := mdKeysMap[ChecksumsKey]; (nodeType == provider.ResourceType_RESOURCE_TYPE_FILE) && (returnAllMetadata || ok) {
+		// TODO which checksum was requested? sha1 adler32 or md5? for now hardcode sha1?
+		// TODO make ResourceInfo carry multiple checksums
+		n.readChecksumIntoResourceChecksum(ctx, storageprovider.XSSHA1, ri)
+		n.readChecksumIntoOpaque(ctx, storageprovider.XSMD5, ri)
+		n.readChecksumIntoOpaque(ctx, storageprovider.XSAdler32, ri)
+	}
+	// quota
+	// FIXME move to fieldmask
+	if _, ok := mdKeysMap[QuotaKey]; (nodeType == provider.ResourceType_RESOURCE_TYPE_CONTAINER) && returnAllMetadata || ok {
+		if n.SpaceRoot != nil && n.SpaceRoot.InternalPath() != "" {
+			n.SpaceRoot.readQuotaIntoOpaque(ctx, ri)
+		}
+	}
+
+	// only read the requested metadata attributes
+	attrs, err := n.Xattrs()
+	if err != nil {
+		sublog.Error().Err(err).Msg("error getting list of extended attributes")
+	} else {
+		for key, value := range attrs {
+			// filter out non-custom properties
+			if !strings.HasPrefix(key, prefixes.MetadataPrefix) {
+				continue
+			}
+			// only read when key was requested
+			k := key[len(prefixes.MetadataPrefix):]
+			if _, ok := mdKeysMap[k]; returnAllMetadata || ok {
+				metadata[k] = string(value)
+			}
+
+		}
+	}
+	ri.ArbitraryMetadata = &provider.ArbitraryMetadata{
+		Metadata: metadata,
+	}
+
+	// add virusscan information
+	if scanned, _, date := n.ScanData(); scanned {
+		ri.Opaque = utils.AppendPlainToOpaque(ri.Opaque, "scantime", date.Format(time.RFC3339Nano))
+	}
+
+	sublog.Debug().
+		Interface("ri", ri).
+		Msg("AsResourceInfo")
+
+	return ri, nil
+}
+
+func (n *Node) readChecksumIntoResourceChecksum(ctx context.Context, algo string, ri *provider.ResourceInfo) {
+	v, err := n.Xattr(prefixes.ChecksumPrefix + algo)
+	switch {
+	case err == nil:
+		ri.Checksum = &provider.ResourceChecksum{
+			Type: storageprovider.PKG2GRPCXS(algo),
+			Sum:  hex.EncodeToString(v),
+		}
+	case metadata.IsAttrUnset(err):
+		appctx.GetLogger(ctx).Debug().Err(err).Str("nodepath", n.InternalPath()).Str("algorithm", algo).Msg("checksum not set")
+	default:
+		appctx.GetLogger(ctx).Error().Err(err).Str("nodepath", n.InternalPath()).Str("algorithm", algo).Msg("could not read checksum")
+	}
+}
+
+func (n *Node) readChecksumIntoOpaque(ctx context.Context, algo string, ri *provider.ResourceInfo) {
+	v, err := n.Xattr(prefixes.ChecksumPrefix + algo)
+	switch {
+	case err == nil:
+		if ri.Opaque == nil {
+			ri.Opaque = &types.Opaque{
+				Map: map[string]*types.OpaqueEntry{},
+			}
+		}
+		ri.Opaque.Map[algo] = &types.OpaqueEntry{
+			Decoder: "plain",
+			Value:   []byte(hex.EncodeToString(v)),
+		}
+	case metadata.IsAttrUnset(err):
+		appctx.GetLogger(ctx).Debug().Err(err).Str("nodepath", n.InternalPath()).Str("algorithm", algo).Msg("checksum not set")
+	default:
+		appctx.GetLogger(ctx).Error().Err(err).Str("nodepath", n.InternalPath()).Str("algorithm", algo).Msg("could not read checksum")
+	}
+}
+
+// quota is always stored on the root node
+func (n *Node) readQuotaIntoOpaque(ctx context.Context, ri *provider.ResourceInfo) {
+	v, err := n.XattrString(prefixes.QuotaAttr)
+	switch {
+	case err == nil:
+		// make sure we have a proper signed int
+		// we use the same magic numbers to indicate:
+		// -1 = uncalculated
+		// -2 = unknown
+		// -3 = unlimited
+		if _, err := strconv.ParseInt(v, 10, 64); err == nil {
+			if ri.Opaque == nil {
+				ri.Opaque = &types.Opaque{
+					Map: map[string]*types.OpaqueEntry{},
+				}
+			}
+			ri.Opaque.Map[QuotaKey] = &types.OpaqueEntry{
+				Decoder: "plain",
+				Value:   []byte(v),
+			}
+		} else {
+			appctx.GetLogger(ctx).Error().Err(err).Str("nodepath", n.InternalPath()).Str("quota", v).Msg("malformed quota")
+		}
+	case metadata.IsAttrUnset(err):
+		appctx.GetLogger(ctx).Debug().Err(err).Str("nodepath", n.InternalPath()).Msg("quota not set")
+	default:
+		appctx.GetLogger(ctx).Error().Err(err).Str("nodepath", n.InternalPath()).Msg("could not read quota")
+	}
+}
+
+// HasPropagation checks if the propagation attribute exists and is set to "1"
+func (n *Node) HasPropagation() (propagation bool) {
+	if b, err := n.XattrString(prefixes.PropagationAttr); err == nil {
+		return b == "1"
+	}
+	return false
+}
+
+// GetTMTime reads the tmtime from the extended attributes, falling back to GetMTime()
+func (n *Node) GetTMTime() (time.Time, error) {
+	b, err := n.XattrString(prefixes.TreeMTimeAttr)
+	if err == nil {
+		return time.Parse(time.RFC3339Nano, b)
+	}
+
+	// no tmtime, use mtime
+	return n.GetMTime()
+}
+
+// GetMTime reads the mtime from disk
+func (n *Node) GetMTime() (time.Time, error) {
+	fi, err := os.Lstat(n.InternalPath())
+	if err != nil {
+		return time.Time{}, err
+	}
+	return fi.ModTime(), nil
+}
+
+// SetTMTime writes the UTC tmtime to the extended attributes or removes the attribute if nil is passed
+func (n *Node) SetTMTime(t *time.Time) (err error) {
+	if t == nil {
+		return n.RemoveXattr(prefixes.TreeMTimeAttr)
+	}
+	return n.SetXattrString(prefixes.TreeMTimeAttr, t.UTC().Format(time.RFC3339Nano))
+}
+
+// GetDTime reads the dtime from the extended attributes
+func (n *Node) GetDTime() (tmTime time.Time, err error) {
+	b, err := n.XattrString(prefixes.DTimeAttr)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return time.Parse(time.RFC3339Nano, b)
+}
+
+// SetDTime writes the UTC dtime to the extended attributes or removes the attribute if nil is passed
+func (n *Node) SetDTime(t *time.Time) (err error) {
+	if t == nil {
+		return n.RemoveXattr(prefixes.DTimeAttr)
+	}
+	return n.SetXattrString(prefixes.DTimeAttr, t.UTC().Format(time.RFC3339Nano))
+}
+
+// IsDisabled returns true when the node has a dmtime attribute set
+// only used to check if a space is disabled
+// FIXME confusing with the trash logic
+func (n *Node) IsDisabled() bool {
+	if _, err := n.GetDTime(); err == nil {
+		return true
+	}
+	return false
+}
+
+// GetTreeSize reads the treesize from the extended attributes
+func (n *Node) GetTreeSize() (treesize uint64, err error) {
+	s, err := n.XattrInt64(prefixes.TreesizeAttr)
+	if err != nil {
+		return 0, err
+	}
+	return uint64(s), nil
+}
+
+// SetTreeSize writes the treesize to the extended attributes
+func (n *Node) SetTreeSize(ts uint64) (err error) {
+	return n.SetXattrString(prefixes.TreesizeAttr, strconv.FormatUint(ts, 10))
+}
+
+// GetBlobSize reads the blobsize from the extended attributes
+func (n *Node) GetBlobSize() (treesize uint64, err error) {
+	s, err := n.XattrInt64(prefixes.BlobsizeAttr)
+	if err != nil {
+		return 0, err
+	}
+	return uint64(s), nil
+}
+
+// SetChecksum writes the checksum with the given checksum type to the extended attributes
+func (n *Node) SetChecksum(csType string, h hash.Hash) (err error) {
+	return n.SetXattr(prefixes.ChecksumPrefix+csType, h.Sum(nil))
+}
+
+// UnsetTempEtag removes the temporary etag attribute
+func (n *Node) UnsetTempEtag() (err error) {
+	return n.RemoveXattr(prefixes.TmpEtagAttr)
+}
+
+// ReadUserPermissions will assemble the permissions for the current user on the given node without parent nodes
+// we indicate if the access was denied by setting a grant with no permissions
+func (n *Node) ReadUserPermissions(ctx context.Context, u *userpb.User) (ap provider.ResourcePermissions, accessDenied bool, err error) {
+	// check if the current user is the owner
+	if utils.UserEqual(u.Id, n.Owner()) {
+		appctx.GetLogger(ctx).Debug().Str("node", n.ID).Msg("user is owner, returning owner permissions")
+		return OwnerPermissions(), false, nil
+	}
+
+	ap = provider.ResourcePermissions{}
+
+	// for an efficient group lookup convert the list of groups to a map
+	// groups are just strings ... groupnames ... or group ids ??? AAARGH !!!
+	groupsMap := make(map[string]bool, len(u.Groups))
+	for i := range u.Groups {
+		groupsMap[u.Groups[i]] = true
+	}
+
+	var g *provider.Grant
+
+	// we read all grantees from the node
+	var grantees []string
+	if grantees, err = n.ListGrantees(ctx); err != nil {
+		appctx.GetLogger(ctx).Error().Err(err).Interface("node", n).Msg("error listing grantees")
+		return NoPermissions(), true, err
+	}
+
+	// instead of making n getxattr syscalls we are going to list the acls and filter them here
+	// we have two options here:
+	// 1. we can start iterating over the acls / grants on the node or
+	// 2. we can iterate over the number of groups
+	// The current implementation tries to be defensive for cases where users have hundreds or thousands of groups, so we iterate over the existing acls.
+	userace := prefixes.GrantUserAcePrefix + u.Id.OpaqueId
+	userFound := false
+	for i := range grantees {
+		switch {
+		// we only need to find the user once
+		case !userFound && grantees[i] == userace:
+			g, err = n.ReadGrant(ctx, grantees[i])
+		case strings.HasPrefix(grantees[i], prefixes.GrantGroupAcePrefix): // only check group grantees
+			gr := strings.TrimPrefix(grantees[i], prefixes.GrantGroupAcePrefix)
+			if groupsMap[gr] {
+				g, err = n.ReadGrant(ctx, grantees[i])
+			} else {
+				// no need to check attribute
+				continue
+			}
+		default:
+			// no need to check attribute
+			continue
+		}
+
+		switch {
+		case err == nil:
+			// If all permissions are set to false we have a deny grant
+			if grants.PermissionsEqual(g.Permissions, &provider.ResourcePermissions{}) {
+				return NoPermissions(), true, nil
+			}
+			AddPermissions(&ap, g.GetPermissions())
+		case metadata.IsAttrUnset(err):
+			err = nil
+			appctx.GetLogger(ctx).Error().Interface("node", n).Str("grant", grantees[i]).Interface("grantees", grantees).Msg("grant vanished from node after listing")
+			// continue with next segment
+		default:
+			appctx.GetLogger(ctx).Error().Err(err).Interface("node", n).Str("grant", grantees[i]).Msg("error reading permissions")
+			// continue with next segment
+		}
+	}
+
+	appctx.GetLogger(ctx).Debug().Interface("permissions", ap).Interface("node", n).Interface("user", u).Msg("returning aggregated permissions")
+	return ap, false, nil
+}
+
+// IsDenied checks if the node was denied to that user
+func (n *Node) IsDenied(ctx context.Context) bool {
+	u := ctxpkg.ContextMustGetUser(ctx)
+	userace := prefixes.GrantUserAcePrefix + u.Id.OpaqueId
+	g, err := n.ReadGrant(ctx, userace)
+	switch {
+	case err == nil:
+		// If all permissions are set to false we have a deny grant
+		return grants.PermissionsEqual(g.Permissions, &provider.ResourcePermissions{})
+	case metadata.IsAttrUnset(err):
+		return false
+	default:
+		// be paranoid, resource is denied
+		return true
+	}
+}
+
+// ListGrantees lists the grantees of the current node
+// We don't want to wast time and memory by creating grantee objects.
+// The function will return a list of opaque strings that can be used to make a ReadGrant call
+func (n *Node) ListGrantees(ctx context.Context) (grantees []string, err error) {
+	attrs, err := n.Xattrs()
+	if err != nil {
+		appctx.GetLogger(ctx).Error().Err(err).Str("node", n.ID).Msg("error listing attributes")
+		return nil, err
+	}
+	for name := range attrs {
+		if strings.HasPrefix(name, prefixes.GrantPrefix) {
+			grantees = append(grantees, name)
+		}
+	}
+	return
+}
+
+// ReadGrant reads a CS3 grant
+func (n *Node) ReadGrant(ctx context.Context, grantee string) (g *provider.Grant, err error) {
+	xattr, err := n.Xattr(grantee)
+	if err != nil {
+		return nil, err
+	}
+	var e *ace.ACE
+	if e, err = ace.Unmarshal(strings.TrimPrefix(grantee, prefixes.GrantPrefix), xattr); err != nil {
+		return nil, err
+	}
+	return e.Grant(), nil
+}
+
+// ListGrants lists all grants of the current node.
+func (n *Node) ListGrants(ctx context.Context) ([]*provider.Grant, error) {
+	grantees, err := n.ListGrantees(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	grants := make([]*provider.Grant, 0, len(grantees))
+	for _, g := range grantees {
+		grant, err := n.ReadGrant(ctx, g)
+		if err != nil {
+			appctx.GetLogger(ctx).
+				Error().
+				Err(err).
+				Str("node", n.ID).
+				Str("grantee", g).
+				Msg("error reading grant")
+			continue
+		}
+		grants = append(grants, grant)
+	}
+	return grants, nil
+}
+
+func (n *Node) getGranteeTypes(ctx context.Context) []provider.GranteeType {
+	types := []provider.GranteeType{}
+	if g, err := n.ListGrantees(ctx); err == nil {
+		hasUserShares, hasGroupShares := false, false
+		for i := range g {
+			switch {
+			case !hasUserShares && strings.HasPrefix(g[i], prefixes.GrantUserAcePrefix):
+				hasUserShares = true
+			case !hasGroupShares && strings.HasPrefix(g[i], prefixes.GrantGroupAcePrefix):
+				hasGroupShares = true
+			case hasUserShares && hasGroupShares:
+				break
+			}
+		}
+		if hasUserShares {
+			types = append(types, provider.GranteeType_GRANTEE_TYPE_USER)
+		}
+		if hasGroupShares {
+			types = append(types, provider.GranteeType_GRANTEE_TYPE_GROUP)
+		}
+	}
+	return types
+}
+
+func parseMTime(v string) (t time.Time, err error) {
+	p := strings.SplitN(v, ".", 2)
+	var sec, nsec int64
+	if sec, err = strconv.ParseInt(p[0], 10, 64); err == nil {
+		if len(p) > 1 {
+			nsec, err = strconv.ParseInt(p[1], 10, 64)
+		}
+	}
+	return time.Unix(sec, nsec), err
+}
+
+// FindStorageSpaceRoot calls n.Parent() and climbs the tree
+// until it finds the space root node and adds it to the node
+func (n *Node) FindStorageSpaceRoot() error {
+	if n.SpaceRoot != nil {
+		return nil
+	}
+	var err error
+	// remember the node we ask for and use parent to climb the tree
+	parent := n
+	for {
+		if parent.IsSpaceRoot() {
+			n.SpaceRoot = parent
+			break
+		}
+		if parent, err = parent.Parent(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// UnmarkProcessing removes the processing flag from the node
+func (n *Node) UnmarkProcessing(uploadID string) error {
+	v, _ := n.XattrString(prefixes.StatusPrefix)
+	if v != ProcessingStatus+uploadID {
+		// file started another postprocessing later - do not remove
+		return nil
+	}
+	return n.RemoveXattr(prefixes.StatusPrefix)
+}
+
+// IsProcessing returns true if the node is currently being processed
+func (n *Node) IsProcessing() bool {
+	v, err := n.XattrString(prefixes.StatusPrefix)
+	return err == nil && strings.HasPrefix(v, ProcessingStatus)
+}
+
+// IsSpaceRoot checks if the node is a space root
+func (n *Node) IsSpaceRoot() bool {
+	_, err := n.Xattr(prefixes.SpaceNameAttr)
+	return err == nil
+}
+
+// SetScanData sets the virus scan info to the node
+func (n *Node) SetScanData(info string, date time.Time) error {
+	attribs := Attributes{}
+	attribs.SetString(prefixes.ScanStatusPrefix, info)
+	attribs.SetString(prefixes.ScanDatePrefix, date.Format(time.RFC3339Nano))
+	return n.SetXattrs(attribs, true)
+}
+
+// ScanData returns scanning information of the node
+func (n *Node) ScanData() (scanned bool, virus string, scantime time.Time) {
+	ti, _ := n.XattrString(prefixes.ScanDatePrefix)
+	if ti == "" {
+		return // not scanned yet
+	}
+
+	t, err := time.Parse(time.RFC3339Nano, ti)
+	if err != nil {
+		return
+	}
+
+	i, err := n.XattrString(prefixes.ScanStatusPrefix)
+	if err != nil {
+		return
+	}
+
+	return true, i, t
+}
+
+// CheckQuota checks if both disk space and available quota are sufficient
+// Overwrite must be set to true if the new file replaces the old file e.g.
+// when creating a new file version. In such a case the function will
+// reduce the used bytes by the old file size and then add the new size.
+// If overwrite is false oldSize will be ignored.
+var CheckQuota = func(spaceRoot *Node, overwrite bool, oldSize, newSize uint64) (quotaSufficient bool, err error) {
+	used, _ := spaceRoot.GetTreeSize()
+	if !enoughDiskSpace(spaceRoot.InternalPath(), newSize) {
+		return false, errtypes.InsufficientStorage("disk full")
+	}
+	quotaByteStr, _ := spaceRoot.XattrString(prefixes.QuotaAttr)
+	switch quotaByteStr {
+	case "":
+		// if quota is not set, it means unlimited
+		return true, nil
+	case QuotaUnlimited:
+		return true, nil
+	case QuotaUncalculated:
+		// treat it as unlimited
+		return true, nil
+	case QuotaUnknown:
+		// treat it as unlimited
+		return true, nil
+	}
+	quotaByte, _ := strconv.ParseUint(quotaByteStr, 10, 64)
+	if overwrite {
+		if quotaByte < used-oldSize+newSize {
+			return false, errtypes.InsufficientStorage("quota exceeded")
+		}
+		// if total is smaller than used, total-used could overflow and be bigger than fileSize
+	} else if newSize > quotaByte-used || quotaByte < used {
+		return false, errtypes.InsufficientStorage("quota exceeded")
+	}
+	return true, nil
+}
+
+func enoughDiskSpace(path string, fileSize uint64) bool {
+	avalB, err := GetAvailableSize(path)
+	if err != nil {
+		return false
+	}
+	return avalB > fileSize
+}

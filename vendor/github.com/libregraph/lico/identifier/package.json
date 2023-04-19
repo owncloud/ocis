@@ -1,0 +1,108 @@
+{
+  "name": "identifier",
+  "version": "1.0.0",
+  "private": true,
+  "homepage": ".",
+  "dependencies": {
+    "@fontsource/roboto": "^4.5.8",
+    "@material-ui/core": "^4.12.4",
+    "@material-ui/icons": "^4.11.3",
+    "@testing-library/dom": "^8.19.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/user-event": "^12.8.3",
+    "@types/jest": "^26.0.24",
+    "@types/node": "^12.20.55",
+    "@types/react": "^17.0.50",
+    "@types/react-dom": "^17.0.17",
+    "@types/react-redux": "^7.1.24",
+    "@types/redux-logger": "^3.0.9",
+    "axios": "^0.22.0",
+    "classnames": "^2.3.2",
+    "eslint": "^8.25.0",
+    "glob": "^8.0.3",
+    "i18next": "^21.9.1",
+    "i18next-browser-languagedetector": "^6.1.8",
+    "i18next-http-backend": "^1.4.4",
+    "i18next-resources-to-backend": "^1.0.0",
+    "query-string": "^7.1.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-i18next": "^11.18.4",
+    "react-redux": "^7.2.9",
+    "react-router": "^5.3.4",
+    "react-router-dom": "5.3.4",
+    "react-scripts": "5.0.1",
+    "redux": "^4.2.0",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.4.1",
+    "render-if": "^0.1.1",
+    "typescript": "^4.8.4",
+    "web-vitals": "^1.1.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "lint": "eslint ./src/**/*.{tsx,ts,jsx,js}",
+    "licenses": "NODE_PATH=./node_modules node ../scripts/js-license-ranger.js",
+    "analyze": "source-map-explorer 'build/static/js/*.js'"
+  },
+  "devDependencies": {
+    "cldr": "^7.2.0",
+    "eslint-plugin-i18next": "^5.2.1",
+    "i18next-conv": "^12.1.1",
+    "i18next-parser": "^5.4.0",
+    "source-map-explorer": "^1.8.0"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}"
+    ]
+  },
+  "eslintConfig": {
+    "plugins": [
+      "i18next"
+    ],
+    "extends": [
+      "react-app",
+      "react-app/jest",
+      "plugin:react/recommended",
+      "plugin:@typescript-eslint/recommended",
+      "plugin:i18next/recommended"
+    ],
+    "rules": {
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error"
+      ],
+      "no-use-before-define": "off",
+      "@typescript-eslint/no-use-before-define": [
+        "error"
+      ],
+      "i18next/no-literal-string": [
+        "off",
+        {
+          "markupOnly": true
+        }
+      ],
+      "react/prop-types": [
+        "warn"
+      ]
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "packageManager": "yarn@3.2.2"
+}

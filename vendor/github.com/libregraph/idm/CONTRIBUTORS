@@ -1,0 +1,18 @@
+# This is the official list of people who can contribute
+# (and typically have contributed) code to the LibreGraph repository.
+# The AUTHORS file lists the copyright holders; this file
+# lists people.  For example, Kopano employees are listed here
+# but not in AUTHORS, because Kopano holds the copyright.
+#
+# Names should be added to this file like so:
+#     Individual's name <submission email address>
+#     Individual's name <submission email address> <email2> <emailN>
+#
+# An entry with multiple email addresses specifies that the
+# first address should be used in the submit logs.
+
+# Please keep the list sorted.
+
+Felix Bartels <f.bartels@kopano.com>
+Ralf Haferkamp <rhaferkamp@owncloud.com>
+Simon Eisenmann <s.eisenmann@kopano.com> <simon@longsleep.org>

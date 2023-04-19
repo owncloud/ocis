@@ -1,0 +1,5 @@
+LibreGraph Connect
+Copyright 2017-2021 Kopano and its licensors
+
+This product includes software developed at
+Kopano (https://kopano.com/).

@@ -1,0 +1,9 @@
+/vendor
+/bin
+/.gopath
+/golint.txt
+/govet.txt
+/test/tests.*
+/tests.output
+/tests.xml
+/coverage.out
