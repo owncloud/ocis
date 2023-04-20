@@ -131,7 +131,7 @@ Feature: move (rename) folder
       | spaces      | /...          |
       | spaces      | /..upload     |
 
-  @issue-3023
+  @skipOnReva @issue-3023
   Scenario Outline: Moving a folder into a sub-folder of itself
     Given using <dav_version> DAV path
     And user "Alice" has created folder "PARENT"
