@@ -76,6 +76,13 @@ type Graph struct {
 
 // ServeHTTP implements the Service interface.
 func (g Graph) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// There was a number of issues with the chi router and parameters with
+	// slashes/percentage/other characters that didn't get properly escaped.
+	// This is a workaround to fix this. Also, we're not the only ones who have
+	// tried to fix this, as seen in this issue:
+	// https://github.com/go-chi/chi/issues/641#issuecomment-883156692
+	r.URL.RawPath = r.URL.EscapedPath()
+
 	g.mux.ServeHTTP(w, r)
 }
 
