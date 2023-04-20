@@ -191,11 +191,6 @@ type StaticRouteHandler struct {
 
 func (h *StaticRouteHandler) handler() http.Handler {
 	m := chi.NewMux()
-	var methods = []string{"PROPFIND", "DELETE", "PROPPATCH", "MKCOL", "COPY", "MOVE", "LOCK", "UNLOCK", "REPORT"}
-	for _, k := range methods {
-		chi.RegisterMethod(k)
-	}
-
 	m.Route(h.prefix, func(r chi.Router) {
 		// Wrapper for backchannel logout
 		r.Post("/backchannel_logout", h.backchannelLogout)
@@ -204,6 +199,16 @@ func (h *StaticRouteHandler) handler() http.Handler {
 		r.HandleFunc("/*", h.proxy.ServeHTTP)
 
 	})
+	// This is commented out due to a race issue in chi
+	//var methods = []string{"PROPFIND", "DELETE", "PROPPATCH", "MKCOL", "COPY", "MOVE", "LOCK", "UNLOCK", "REPORT"}
+	//for _, k := range methods {
+	//	chi.RegisterMethod(k)
+	//}
+
+	// To avoid using the chi.RegisterMethod() this is basically a catchAll for all HTTP Methods that are not
+	// covered in chi by default
+	m.MethodNotAllowed(h.proxy.ServeHTTP)
+
 	return m
 }
 
