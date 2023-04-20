@@ -1008,8 +1008,8 @@ Feature: get users
 
   @issue-6017
   Scenario Outline: admin user gets the drive information of a user with different user role
-    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
-    And the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
+    Given the administrator has assigned the role "<user-role-1>" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<user-role-2>" to user "Brian" using the Graph API
     And user "Brian" has created folder "my_data"
     When user "Alice" gets the personal drive information of user "Brian" using Graph API
     Then the HTTP status code should be "200"
@@ -1101,11 +1101,15 @@ Feature: get users
     }
     """
     Examples:
-      | userRole    |
-      | Admin       |
-      | Space Admin |
-      | User        |
-      | Guest       |
+      | user-role-1 | user-role-2 |
+      | Admin       | Admin       |
+      | Admin       | Space Admin |
+      | Admin       | User        |
+      | Admin       | Guest       |
+      | Space Admin | Admin       |
+      | Space Admin | Space Admin |
+      | Space Admin | User        |
+      | Space Admin | Guest       |
 
 
   Scenario Outline: non-admin user tries to get drive information of other user with different user role
@@ -1113,12 +1117,36 @@ Feature: get users
     And the administrator has assigned the role "<user-role-2>" to user "Brian" using the Graph API
     When user "Alice" gets the personal drive information of user "Brian" using Graph API
     Then the HTTP status code should be "404"
+    And the JSON data of the response should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "error"
+      ],
+      "properties": {
+        "error": {
+          "type": "object",
+          "required": [
+            "code",
+            "message"
+          ],
+          "properties": {
+            "code": {
+              "type": "string",
+              "enum": ["itemNotFound"]
+            },
+            "message": {
+              "type": "string",
+              "enum": ["no drive returned from storage"]
+            }
+          }
+        }
+      }
+    }
+    """
     Examples:
       | user-role-1 | user-role-2 |
-      | Space Admin | Admin       |
-      | Space Admin | Space Admin |
-      | Space Admin | User        |
-      | Space Admin | Guest       |
       | User        | Admin       |
       | User        | Space Admin |
       | User        | User        |
