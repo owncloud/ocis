@@ -1,5 +1,8 @@
 @api
 Feature: check etag propagation after different file alterations
+  As a user
+  I want to check the etag
+  So that I can make sure that they are correct after different file alterations
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -25,17 +28,17 @@ Feature: check etag propagation after different file alterations
     When user "Brian" copies file "/upload/file.txt" to "/upload/renamed.txt" inside space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed
-      | user  | path                | space       |
-      | Alice | /                   | Personal    |
-      | Alice | /upload             | Personal    |
-      | Alice | /upload/renamed.txt | Personal    |
-      | Brian | /                   | Shares |
-      | Brian | /upload             | Shares |
-      | Brian | /upload/renamed.txt | Shares |
+      | user  | path                | space    |
+      | Alice | /                   | Personal |
+      | Alice | /upload             | Personal |
+      | Alice | /upload/renamed.txt | Personal |
+      | Brian | /                   | Shares   |
+      | Brian | /upload             | Shares   |
+      | Brian | /upload/renamed.txt | Shares   |
     And these etags should not have changed
-      | user  | path             | space       |
-      | Alice | /upload/file.txt | Personal    |
-      | Brian | /upload/file.txt | Shares |
+      | user  | path             | space    |
+      | Alice | /upload/file.txt | Personal |
+      | Brian | /upload/file.txt | Shares   |
 
 
   Scenario: copying a file inside a folder as a sharer changes its etag for all collaborators
@@ -53,20 +56,20 @@ Feature: check etag propagation after different file alterations
     When user "Alice" copies file "/upload/file.txt" to "/upload/renamed.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed
-      | user  | path                | space       |
-      | Alice | /                   | Personal    |
-      | Alice | /upload             | Personal    |
-      | Alice | /upload/renamed.txt | Personal    |
-      | Brian | /                   | Shares |
-      | Brian | /upload             | Shares |
-      | Brian | /upload/renamed.txt | Shares |
+      | user  | path                | space    |
+      | Alice | /                   | Personal |
+      | Alice | /upload             | Personal |
+      | Alice | /upload/renamed.txt | Personal |
+      | Brian | /                   | Shares   |
+      | Brian | /upload             | Shares   |
+      | Brian | /upload/renamed.txt | Shares   |
     And these etags should not have changed
-      | user  | path             | space       |
-      | Alice | /upload/file.txt | Personal    |
-      | Brian | /upload/file.txt | Shares |
+      | user  | path             | space    |
+      | Alice | /upload/file.txt | Personal |
+      | Brian | /upload/file.txt | Shares   |
 
 
-  Scenario: as share receiver renaming a file inside a folder changes its etag for all collaborators
+  Scenario: share receiver renaming a file inside a folder changes its etag for all collaborators
     Given user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
     And user "Brian" has accepted share "/upload" offered by user "Alice"
@@ -79,18 +82,18 @@ Feature: check etag propagation after different file alterations
     When user "Brian" moves file "/upload/file.txt" to "/upload/renamed.txt" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed
-      | user  | path                | space       |
-      | Alice | /                   | Personal    |
-      | Alice | /upload             | Personal    |
-      | Brian | /                   | Shares |
-      | Brian | /upload             | Shares |
+      | user  | path    | space    |
+      | Alice | /       | Personal |
+      | Alice | /upload | Personal |
+      | Brian | /       | Shares   |
+      | Brian | /upload | Shares   |
     And these etags should not have changed
-      | user  | path                | space       |
-      | Alice | /upload/renamed.txt | Personal    |
-      | Brian | /upload/renamed.txt | Shares |
+      | user  | path                | space    |
+      | Alice | /upload/renamed.txt | Personal |
+      | Brian | /upload/renamed.txt | Shares   |
 
 
-  Scenario: as sharer renaming a file inside a folder changes its etag for all collaborators
+  Scenario: sharer renaming a file inside a folder changes its etag for all collaborators
     Given user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
     And user "Brian" has accepted share "/upload" offered by user "Alice"
@@ -103,18 +106,18 @@ Feature: check etag propagation after different file alterations
     When user "Alice" moves file "/upload/file.txt" to "/upload/renamed.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed
-      | user  | path                | space       |
-      | Alice | /                   | Personal    |
-      | Alice | /upload             | Personal    |
-      | Brian | /                   | Shares |
-      | Brian | /upload             | Shares |
+      | user  | path    | space    |
+      | Alice | /       | Personal |
+      | Alice | /upload | Personal |
+      | Brian | /       | Shares   |
+      | Brian | /upload | Shares   |
     And these etags should not have changed
-      | user  | path                | space       |
-      | Alice | /upload/renamed.txt | Personal    |
-      | Brian | /upload/renamed.txt | Shares |
+      | user  | path                | space    |
+      | Alice | /upload/renamed.txt | Personal |
+      | Brian | /upload/renamed.txt | Shares   |
 
 
-  Scenario: as sharer moving a file from one folder to an other changes the etags of both folders for all collaborators
+  Scenario: sharer moving a file from one folder to an other changes the etags of both folders for all collaborators
     Given user "Alice" has created folder "/dst"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -131,16 +134,16 @@ Feature: check etag propagation after different file alterations
     When user "Alice" moves file "/upload/file.txt" to "/dst/file.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed
-      | user  | path        | space       |
-      | Alice | /           | Personal    |
-      | Alice | /upload     | Personal    |
-      | Alice | /dst        | Personal    |
-      | Brian | /           | Shares |
-      | Brian | /upload     | Shares |
-      | Brian | /dst        | Shares |
+      | user  | path    | space    |
+      | Alice | /       | Personal |
+      | Alice | /upload | Personal |
+      | Alice | /dst    | Personal |
+      | Brian | /       | Shares   |
+      | Brian | /upload | Shares   |
+      | Brian | /dst    | Shares   |
 
 
-  Scenario: as share receiver moving a file from one folder to an other changes the etags of both folders for all collaborators
+  Scenario: share receiver moving a file from one folder to an other changes the etags of both folders for all collaborators
     Given user "Alice" has created folder "/dst"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -156,16 +159,16 @@ Feature: check etag propagation after different file alterations
     When user "Brian" moves file "/upload/file.txt" to "/dst/file.txt" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed
-      | user  | path        | space       |
-      | Alice | /           | Personal    |
-      | Alice | /upload     | Personal    |
-      | Alice | /dst        | Personal    |
-      | Brian | /           | Shares |
-      | Brian | /upload     | Shares |
-      | Brian | /dst        | Shares |
+      | user  | path    | space    |
+      | Alice | /       | Personal |
+      | Alice | /upload | Personal |
+      | Alice | /dst    | Personal |
+      | Brian | /       | Shares   |
+      | Brian | /upload | Shares   |
+      | Brian | /dst    | Shares   |
 
 
-  Scenario: as sharer moving a folder from one folder to an other changes the etags of both folders for all collaborators
+  Scenario: sharer moving a folder from one folder to an other changes the etags of both folders for all collaborators
     Given user "Alice" has created folder "/dst"
     And user "Alice" has created folder "/upload/toMove"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -181,16 +184,16 @@ Feature: check etag propagation after different file alterations
     When user "Alice" moves file "/upload/toMove" to "/dst/toMove" using the WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed
-      | user  | path        | space       |
-      | Alice | /           | Personal    |
-      | Alice | /upload     | Personal    |
-      | Alice | /dst        | Personal    |
-      | Brian | /           | Shares |
-      | Brian | /upload     | Shares |
-      | Brian | /dst        | Shares |
+      | user  | path    | space    |
+      | Alice | /       | Personal |
+      | Alice | /upload | Personal |
+      | Alice | /dst    | Personal |
+      | Brian | /       | Shares   |
+      | Brian | /upload | Shares   |
+      | Brian | /dst    | Shares   |
 
 
-  Scenario: as share reciever moving a folder from one folder to an other changes the etags of both folders for all collaborators
+  Scenario: share reciever moving a folder from one folder to an other changes the etags of both folders for all collaborators
     Given user "Alice" has created folder "/dst"
     And user "Alice" has created folder "/upload/toMove"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -206,16 +209,16 @@ Feature: check etag propagation after different file alterations
     When user "Brian" moves file "/upload/toMove" to "/dst/toMove" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed
-      | user  | path        | space       |
-      | Alice | /           | Personal    |
-      | Alice | /upload     | Personal    |
-      | Alice | /dst        | Personal    |
-      | Brian | /           | Shares |
-      | Brian | /upload     | Shares |
-      | Brian | /dst        | Shares |
+      | user  | path    | space    |
+      | Alice | /       | Personal |
+      | Alice | /upload | Personal |
+      | Alice | /dst    | Personal |
+      | Brian | /       | Shares   |
+      | Brian | /upload | Shares   |
+      | Brian | /dst    | Shares   |
 
 
-  Scenario: as share receiver creating a folder inside a folder received as a share changes its etag for all collaborators
+  Scenario: share receiver creating a folder inside a folder received as a share changes its etag for all collaborators
     Given user "Alice" has shared folder "/upload" with user "Brian"
     And user "Brian" has accepted share "/upload" offered by user "Alice"
     And user "Alice" has stored etag of element "/" inside space "Personal"
@@ -225,14 +228,14 @@ Feature: check etag propagation after different file alterations
     When user "Brian" creates a subfolder "/upload/new" in space "Shares" using the WebDav Api
     Then the HTTP status code should be "201"
     And these etags should have changed
-      | user  | path           | space       |
-      | Alice | /              | Personal    |
-      | Alice | /upload        | Personal    |
-      | Brian | /              | Shares |
-      | Brian | /upload        | Shares |
+      | user  | path    | space    |
+      | Alice | /       | Personal |
+      | Alice | /upload | Personal |
+      | Brian | /       | Shares   |
+      | Brian | /upload | Shares   |
 
 
-  Scenario: as sharer creating a folder inside a shared folder changes etag for all collaborators
+  Scenario: sharer creating a folder inside a shared folder changes etag for all collaborators
     Given user "Alice" has shared folder "/upload" with user "Brian"
     And user "Brian" has accepted share "/upload" offered by user "Alice"
     And user "Alice" has stored etag of element "/" inside space "Personal"
@@ -242,14 +245,14 @@ Feature: check etag propagation after different file alterations
     When user "Alice" creates folder "/upload/new" using the WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed
-      | user  | path           | space       |
-      | Alice | /              | Personal    |
-      | Alice | /upload        | Personal    |
-      | Brian | /              | Shares |
-      | Brian | /upload        | Shares |
+      | user  | path    | space    |
+      | Alice | /       | Personal |
+      | Alice | /upload | Personal |
+      | Brian | /       | Shares   |
+      | Brian | /upload | Shares   |
 
 
-  Scenario: as share receiver uploading a file inside a folder received as a share changes its etag for all collaborators
+  Scenario: share receiver uploading a file inside a folder received as a share changes its etag for all collaborators
     Given user "Alice" has shared folder "/upload" with user "Brian"
     And user "Brian" has accepted share "/upload" offered by user "Alice"
     And user "Alice" has stored etag of element "/" inside space "Personal"
@@ -259,14 +262,14 @@ Feature: check etag propagation after different file alterations
     When user "Brian" uploads a file inside space "Shares" with content "uploaded content" to "/upload/file.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed
-      | user  | path           | space       |
-      | Alice | /              | Personal    |
-      | Alice | /upload        | Personal    |
-      | Brian | /              | Shares |
-      | Brian | /upload        | Shares |
+      | user  | path    | space    |
+      | Alice | /       | Personal |
+      | Alice | /upload | Personal |
+      | Brian | /       | Shares   |
+      | Brian | /upload | Shares   |
 
 
-  Scenario: as sharer uploading a file inside a shared folder should update etags for all collaborators
+  Scenario: sharer uploading a file inside a shared folder should update etags for all collaborators
     Given user "Alice" has shared folder "/upload" with user "Brian"
     And user "Brian" has accepted share "/upload" offered by user "Alice"
     And user "Alice" has stored etag of element "/" inside space "Personal"
@@ -276,14 +279,14 @@ Feature: check etag propagation after different file alterations
     When user "Alice" uploads file with content "uploaded content" to "/upload/file.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And these etags should have changed
-      | user  | path           | space       |
-      | Alice | /              | Personal    |
-      | Alice | /upload        | Personal    |
-      | Brian | /              | Shares |
-      | Brian | /upload        | Shares |
+      | user  | path    | space    |
+      | Alice | /       | Personal |
+      | Alice | /upload | Personal |
+      | Brian | /       | Shares   |
+      | Brian | /upload | Shares   |
 
 
-  Scenario: as share receiver overwriting a file inside a received shared folder should update etags for all collaborators
+  Scenario: share receiver overwriting a file inside a received shared folder should update etags for all collaborators
     Given user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
     And user "Brian" has accepted share "/upload" offered by user "Alice"
@@ -294,14 +297,14 @@ Feature: check etag propagation after different file alterations
     When user "Brian" uploads a file inside space "Shares" with content "new content" to "/upload/file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And these etags should have changed
-      | user  | path           | space       |
-      | Alice | /              | Personal    |
-      | Alice | /upload        | Personal    |
-      | Brian | /              | Shares |
-      | Brian | /upload        | Shares |
+      | user  | path    | space    |
+      | Alice | /       | Personal |
+      | Alice | /upload | Personal |
+      | Brian | /       | Shares   |
+      | Brian | /upload | Shares   |
 
 
-  Scenario: as sharer overwriting a file inside a shared folder should update etags for all collaborators
+  Scenario: sharer overwriting a file inside a shared folder should update etags for all collaborators
     Given user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
     And user "Brian" has accepted share "/upload" offered by user "Alice"
@@ -312,14 +315,14 @@ Feature: check etag propagation after different file alterations
     When user "Alice" uploads file with content "new content" to "/upload/file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
     And these etags should have changed
-      | user  | path           | space       |
-      | Alice | /              | Personal    |
-      | Alice | /upload        | Personal    |
-      | Brian | /              | Shares |
-      | Brian | /upload        | Shares |
+      | user  | path    | space    |
+      | Alice | /       | Personal |
+      | Alice | /upload | Personal |
+      | Brian | /       | Shares   |
+      | Brian | /upload | Shares   |
 
 
-  Scenario: As share receiver deleting (removing) a file changes the etags of all parents for all collaborators
+  Scenario: share receiver deleting (removing) a file changes the etags of all parents for all collaborators
     Given user "Alice" has created folder "/upload/sub"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -334,19 +337,19 @@ Feature: check etag propagation after different file alterations
     When user "Brian" removes the file "upload/sub/file.txt" from space "Shares"
     Then the HTTP status code should be "204"
     And these etags should have changed
-      | user  | path        | space       |
-      | Alice | /           | Personal    |
-      | Alice | /upload     | Personal    |
-      | Alice | /upload/sub | Personal    |
-      | Brian | /           | Shares |
-      | Brian | /upload     | Shares |
-      | Brian | /upload/sub | Shares |
+      | user  | path        | space    |
+      | Alice | /           | Personal |
+      | Alice | /upload     | Personal |
+      | Alice | /upload/sub | Personal |
+      | Brian | /           | Shares   |
+      | Brian | /upload     | Shares   |
+      | Brian | /upload/sub | Shares   |
     And these etags should not have changed
       | user  | path | space    |
       | Brian | /    | Personal |
 
 
-  Scenario: As sharer deleting (removing) a file changes the etags of all parents for all collaborators
+  Scenario: sharer deleting (removing) a file changes the etags of all parents for all collaborators
     Given user "Alice" has created folder "/upload/sub"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/sub/file.txt"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -361,19 +364,19 @@ Feature: check etag propagation after different file alterations
     When user "Alice" removes the file "upload/sub/file.txt" from space "Personal"
     Then the HTTP status code should be "204"
     And these etags should have changed
-      | user  | path        | space       |
-      | Alice | /           | Personal    |
-      | Alice | /upload     | Personal    |
-      | Alice | /upload/sub | Personal    |
-      | Brian | /           | Shares |
-      | Brian | /upload     | Shares |
-      | Brian | /upload/sub | Shares |
+      | user  | path        | space    |
+      | Alice | /           | Personal |
+      | Alice | /upload     | Personal |
+      | Alice | /upload/sub | Personal |
+      | Brian | /           | Shares   |
+      | Brian | /upload     | Shares   |
+      | Brian | /upload/sub | Shares   |
     And these etags should not have changed
       | user  | path | space    |
       | Brian | /    | Personal |
 
 
-  Scenario: As share receiver deleting (removing) a folder changes the etags of all parents for all collaborators
+  Scenario: share receiver deleting (removing) a folder changes the etags of all parents for all collaborators
     Given user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -388,19 +391,19 @@ Feature: check etag propagation after different file alterations
     When user "Brian" removes the file "upload/sub/toDelete" from space "Shares"
     Then the HTTP status code should be "204"
     And these etags should have changed
-      | user  | path        | space       |
-      | Alice | /           | Personal    |
-      | Alice | /upload     | Personal    |
-      | Alice | /upload/sub | Personal    |
-      | Brian | /           | Shares |
-      | Brian | /upload     | Shares |
-      | Brian | /upload/sub | Shares |
+      | user  | path        | space    |
+      | Alice | /           | Personal |
+      | Alice | /upload     | Personal |
+      | Alice | /upload/sub | Personal |
+      | Brian | /           | Shares   |
+      | Brian | /upload     | Shares   |
+      | Brian | /upload/sub | Shares   |
     And these etags should not have changed
       | user  | path | space    |
       | Brian | /    | Personal |
 
 
-  Scenario: As sharer deleting (removing) a folder changes the etags of all parents for all collaborators
+  Scenario: sharer deleting (removing) a folder changes the etags of all parents for all collaborators
     Given user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
     And user "Alice" has shared folder "/upload" with user "Brian"
@@ -415,13 +418,13 @@ Feature: check etag propagation after different file alterations
     When user "Alice" removes the file "upload/sub/toDelete" from space "Personal"
     Then the HTTP status code should be "204"
     And these etags should have changed
-      | user  | path        | space       |
-      | Alice | /           | Personal    |
-      | Alice | /upload     | Personal    |
-      | Alice | /upload/sub | Personal    |
-      | Brian | /           | Shares |
-      | Brian | /upload     | Shares |
-      | Brian | /upload/sub | Shares |
+      | user  | path        | space    |
+      | Alice | /           | Personal |
+      | Alice | /upload     | Personal |
+      | Alice | /upload/sub | Personal |
+      | Brian | /           | Shares   |
+      | Brian | /upload     | Shares   |
+      | Brian | /upload/sub | Shares   |
     And these etags should not have changed
       | user  | path | space    |
       | Brian | /    | Personal |

@@ -1,9 +1,10 @@
 @api
 Feature: assign role
-  As an admin, I want to assign roles to users.
-  I cannot change my own role.
-  Users without an admin role cannot get the list of roles, assignments list and assign roles to users
+  As an admin,
+  I want to assign roles to users
+  So that I can provide them different authority 
 
+  
   Scenario Outline: only admin user can see all existing roles
     Given user "Alice" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "<userRole>" using the settings api

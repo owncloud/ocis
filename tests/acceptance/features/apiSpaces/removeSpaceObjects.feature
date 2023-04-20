@@ -2,8 +2,7 @@
 Feature: Remove files, folder
   As a user
   I want to be able to remove files, folders
-  Users with the editor role can also remove objects
-  Users with the viewer role cannot remove objects
+  So that I can remove unnecessary objects
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -20,7 +19,7 @@ Feature: Remove files, folder
     And user "Alice" has uploaded a file inside space "delete objects" with content "some content" to "text.txt"
 
 
-  Scenario Outline: An user deletes a folder with some subfolders in a Space via the webDav API
+  Scenario Outline: user deletes a folder with some subfolders in a space via the webDav API
     Given user "Alice" has shared a space "delete objects" with settings:
       | shareWith | Brian  |
       | role      | <role> |
@@ -37,7 +36,7 @@ Feature: Remove files, folder
       | Brian | viewer  | 403  | should               | should not           |
 
 
-  Scenario Outline: An user deletes a subfolder in a Space via the webDav API
+  Scenario Outline: user deletes a subfolder in a space via the webDav API
     Given user "Alice" has shared a space "delete objects" with settings:
       | shareWith | Brian  |
       | role      | <role> |
@@ -56,7 +55,7 @@ Feature: Remove files, folder
       | Brian | viewer  | 403  | should               | should not           |
 
 
-  Scenario Outline: An user deletes a file in a Space via the webDav API
+  Scenario Outline: user deletes a file in a space via the webDav API
     Given user "Alice" has shared a space "delete objects" with settings:
       | shareWith | Brian  |
       | role      | <role> |
@@ -101,7 +100,7 @@ Feature: Remove files, folder
       | Brian | viewer  | 403  | should               | should not           | 12         |
 
 
-  Scenario: An user is unable to delete a Space via the webDav API
+  Scenario: user is unable to delete a space via the webDav API
     When user "Alice" removes the folder "" from space "delete objects"
     Then the HTTP status code should be "405"
     And for user "Alice" the JSON response should contain space called "delete objects" and match

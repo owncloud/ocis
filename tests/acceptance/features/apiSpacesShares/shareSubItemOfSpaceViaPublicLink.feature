@@ -1,21 +1,22 @@
 @api @skipOnOcV10
 Feature: Share a file or folder that is inside a space via public link
-      As an user with manager space role
-      I want to be able to share the data inside the space via public link
+  As a user with manager space role
+  I want to be able to share the data inside the space via public link
+  So that an anonymous user can have access to certain resources
 
-      folder permissions:
-      | role        | permissions |
-      | internal    | 0           |
-      | viewer      | 1           |
-      | uploader    | 4           |
-      | contributor | 5           |
-      | editor      | 15          |
+  folder permissions:
+    | role        | permissions |
+    | internal    | 0           |
+    | viewer      | 1           |
+    | uploader    | 4           |
+    | contributor | 5           |
+    | editor      | 15          |
 
-      file permissions:
-      | role     | permissions |
-      | internal | 0           |
-      | viewer   | 1           |
-      | editor   | 3           |
+  file permissions:
+    | role     | permissions |
+    | internal | 0           |
+    | viewer   | 1           |
+    | editor   | 3           |
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -32,7 +33,7 @@ Feature: Share a file or folder that is inside a space via public link
     And user "Alice" has uploaded a file inside space "share sub-item" with content "some content" to "folder/file.txt"
 
   @issue-5139
-  Scenario Outline: A manager of the space can share an entity inside project space via public link
+  Scenario Outline: manager of the space can share an entity inside project space via public link
     When user "Alice" creates a public link share inside of space "share sub-item" with settings:
       | path        | <entity>      |
       | shareType   | 3             |
@@ -64,7 +65,7 @@ Feature: Share a file or folder that is inside a space via public link
       | folder/file.txt | /file.txt   | 3           | 123      | link | 2042-03-25T23:59:59+0100 | file      | text/plain           |
 
   @issue-5139
-  Scenario Outline: An user participant of the project space with space manager role can share an entity inside project space via public link
+  Scenario Outline: user participant of the project space with space manager role can share an entity inside project space via public link
     Given user "Alice" has shared a space "share sub-item" with settings:
       | shareWith | Brian   |
       | role      | manager |
@@ -92,7 +93,7 @@ Feature: Share a file or folder that is inside a space via public link
       | folder/file.txt | /file.txt   | file      | text/plain           |
 
 
-  Scenario Outline: An user participant of the project space without space manager role cannot share an entity inside project space via public link
+  Scenario Outline: user participant of the project space without space manager role cannot share an entity inside project space via public link
     Given user "Alice" has shared a space "share sub-item" with settings:
       | shareWith | Brian       |
       | role      | <spaceRole> |
@@ -114,7 +115,7 @@ Feature: Share a file or folder that is inside a space via public link
       | folder/file.txt | viewer    |
 
 
-  Scenario Outline: User creates a new public link share of a file with edit permissions
+  Scenario Outline: user creates a new public link share of a file with edit permissions
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "Random data" to "/file.txt"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -141,7 +142,7 @@ Feature: Share a file or folder that is inside a space via public link
       | 2               | 200             |
 
   @issue-5139
-  Scenario Outline: An user participant of the project space can see the created public resources link
+  Scenario Outline: user participant of the project space can see the created public resources link
     Given user "Alice" has shared a space "share sub-item" with settings:
       | shareWith | Brian       |
       | role      | <spaceRole> |

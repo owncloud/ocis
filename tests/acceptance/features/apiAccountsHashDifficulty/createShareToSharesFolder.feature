@@ -8,7 +8,7 @@ Feature: sharing
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
 
 
-  Scenario Outline: Creating a share of a file with a user
+  Scenario Outline: creating a share of a file with a user
     Given auto-accept shares has been disabled
     And using OCS API version "<ocs_api_version>"
     And user "Alice" has been created with default attributes and without skeleton files

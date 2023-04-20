@@ -8,7 +8,7 @@ Feature: create space
     Given user "Alice" has been created with default attributes and without skeleton files
 
   @issue-5938
-  Scenario Outline: user with role user and guest can't create Space via Graph API
+  Scenario Outline: user with role user and guest can't create space via Graph API
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" tries to create a space "Project Mars" of type "project" with the default quota using the Graph API
     Then the HTTP status code should be "403"
@@ -19,7 +19,7 @@ Feature: create space
       | Guest |
 
 
-  Scenario Outline: an admin or space admin user can create a Space via the Graph API with a default quota
+  Scenario Outline: admin or space admin user can create a space via the Graph API with a default quota
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" creates a space "Project Mars" of type "project" with the default quota using the Graph API
     Then the HTTP status code should be "201"
@@ -90,7 +90,7 @@ Feature: create space
       | Space Admin |
 
 
-  Scenario Outline: an admin or space admin user can create a Space via the Graph API with certain quota
+  Scenario Outline: admin or space admin user can create a space via the Graph API with certain quota
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the Graph API
     Then the HTTP status code should be "201"

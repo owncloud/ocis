@@ -1,6 +1,8 @@
 @api @skipOnOcV10
 Feature: create group
-  Only user with admin permissions can create new groups
+  As an admin
+  I want to create a group
+  So that I can add users to the group
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files

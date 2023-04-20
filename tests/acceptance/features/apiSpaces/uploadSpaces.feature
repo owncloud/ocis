@@ -1,7 +1,8 @@
 @api @skipOnOcV10
 Feature: Upload files into a space
-  As an user
+  As a user
   I want to be able to create folders and files in the space
+  So that I can store various information in them
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -17,7 +18,7 @@ Feature: Upload files into a space
     And using spaces DAV path
 
 
-  Scenario Outline: An user creates a folder in the Space via the Graph API
+  Scenario Outline: user creates a folder in the space via the Graph API
     Given user "Alice" has shared a space "Project Ceres" with settings:
       | shareWith | Brian  |
       | role      | <role> |
@@ -32,7 +33,7 @@ Feature: Upload files into a space
       | viewer  | 403  | should not  |
 
 
-  Scenario Outline: An user uploads a file in shared Space via the Graph API
+  Scenario Outline: user uploads a file in shared space via the Graph API
     Given user "Alice" has shared a space "Project Ceres" with settings:
       | shareWith | Brian  |
       | role      | <role> |
@@ -75,7 +76,7 @@ Feature: Upload files into a space
       | viewer  | 403  | should not  | 0         |
 
 
-  Scenario: An user can create subfolders in a Space via the Graph API
+  Scenario: user can create subfolders in a space via the Graph API
     When user "Alice" creates a subfolder "mainFolder/subFolder1/subFolder2" in space "Project Ceres" using the WebDav Api
     Then the HTTP status code should be "201"
     And for user "Alice" the space "Project Ceres" should contain these entries:
@@ -84,7 +85,7 @@ Feature: Upload files into a space
       | subFolder2 |
 
 
-  Scenario: An user can create a folder and upload a file to a Space
+  Scenario: user can create a folder and upload a file to a space
     When user "Alice" creates a folder "NewFolder" in space "Project Ceres" using the WebDav Api
     Then the HTTP status code should be "201"
     And user "Alice" uploads a file inside space "Project Ceres" with content "Test" to "test.txt" using the WebDAV API
@@ -94,7 +95,7 @@ Feature: Upload files into a space
       | test.txt  |
 
 
-  Scenario: An user cannot create a folder or a file in a Space if they do not have permission
+  Scenario: user cannot create a folder or a file in a space if they do not have permission
     When user "Bob" creates a folder "forAlice" in space "Project Ceres" owned by the user "Alice" using the WebDav Api
     Then the HTTP status code should be "404"
     When user "Bob" uploads a file inside space "Project Ceres" owned by the user "Alice" with content "Test" to "test.txt" using the WebDAV API

@@ -384,7 +384,7 @@ Feature: get groups and their members
       | Guest       |
 
 
-  Scenario: Get details of a group
+  Scenario: get details of a group
     Given group "tea-lover" has been created
     When user "Alice" gets details of the group "tea-lover" using the Graph API
     Then the HTTP status code should be "200"
@@ -410,7 +410,7 @@ Feature: get groups and their members
     """
 
 
-  Scenario Outline: Get details of group with UTF-8 characters name
+  Scenario Outline: get details of group with UTF-8 characters name
     Given group "<group>" has been created
     When user "Alice" gets details of the group "<group>" using the Graph API
     Then the HTTP status code should be "200"

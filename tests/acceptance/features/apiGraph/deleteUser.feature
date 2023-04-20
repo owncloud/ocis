@@ -1,6 +1,8 @@
 @api @skipOnOcV10
 Feature: delete user
-  Only user with admin permission can delete user
+  As an admin
+  I want to be able to delete users
+  So that I can remove unnecessary users
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -9,7 +11,7 @@ Feature: delete user
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: the admin user deletes a user
+  Scenario Outline: admin user deletes a user
     Given the administrator has given "Alice" the role "Admin" using the settings api
     And the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | <userName>    |
@@ -26,7 +28,7 @@ Feature: delete user
       | name                 | pass with space | example@example.org | my pass                      |
 
 
-  Scenario: Delete a user and specify the user name in different case
+  Scenario: delete a user and specify the user name in different case
     Given user "brand-new-user" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "Admin" using the settings api
     When the user "Alice" deletes a user "Brand-New-User" using the Graph API
@@ -34,7 +36,7 @@ Feature: delete user
     And user "brand-new-user" should not exist
 
 
-  Scenario Outline: the admin user deletes another user with different role
+  Scenario Outline: admin user deletes another user with different role
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "Admin" using the settings api
     And the administrator has given "Brian" the role "<role>" using the settings api
@@ -49,14 +51,14 @@ Feature: delete user
       | Guest       |
 
 
-  Scenario: the admin user tries to delete his/her own account
+  Scenario: admin user tries to delete his/her own account
     Given the administrator has given "Alice" the role "Admin" using the settings api
     When the user "Alice" deletes a user "Alice" using the Graph API
     Then the HTTP status code should be "403"
     And user "Alice" should exist
 
 
-  Scenario Outline: Non-admin user tries to delete his/her own account
+  Scenario Outline: non-admin user tries to delete his/her own account
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When the user "Alice" deletes a user "Alice" using the Graph API
     Then the HTTP status code should be "401"
@@ -68,13 +70,13 @@ Feature: delete user
       | Guest       |
 
 
-  Scenario: the admin user tries to delete a nonexistent user
+  Scenario: admin user tries to delete a nonexistent user
     Given the administrator has given "Alice" the role "Admin" using the settings api
     When the user "Alice" tries to delete a nonexistent user using the Graph API
     Then the HTTP status code should be "404"
 
   
-  Scenario Outline: Non-admin user tries to delete a nonexistent user
+  Scenario Outline: non-admin user tries to delete a nonexistent user
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When the user "Alice" tries to delete a nonexistent user using the Graph API
     Then the HTTP status code should be "401"
@@ -85,7 +87,7 @@ Feature: delete user
       | Guest       |
 
 
-  Scenario Outline: Non-admin user tries to delete another user with different role
+  Scenario Outline: non-admin user tries to delete another user with different role
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "<role>" using the settings api
     And the administrator has given "Alice" the role "<userRole>" using the settings api
@@ -108,7 +110,7 @@ Feature: delete user
       | Guest       | Admin       |
 
 
-  Scenario: the admin user deletes a disabled user
+  Scenario: admin user deletes a disabled user
     Given the administrator has given "Alice" the role "Admin" using the settings api
     And user "Brian" has been created with default attributes and without skeleton files
     And the user "Alice" has disabled user "Brian" using the Graph API

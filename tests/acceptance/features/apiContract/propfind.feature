@@ -1,6 +1,8 @@
 @api @skipOnOcV10
 Feature: Propfind test
-  check that the PROPFIND response contains all the relevant values
+  As a user
+  I want to check the PROPFIND response
+  So that I can make sure that the response contains all the relevant values
 
   Background:
     Given these users have been created with default attributes and without skeleton files:

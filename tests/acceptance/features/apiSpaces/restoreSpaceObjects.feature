@@ -2,7 +2,7 @@
 Feature: Restore files, folder
   As a user with manager and editor role
   I want to be able to restore files, folders
-  Users with the viewer role cannot restore objects
+  So that I can get the resources that were accidentally deleted
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839
@@ -21,7 +21,7 @@ Feature: Restore files, folder
     And user "Alice" has uploaded a file inside space "restore objects" with content "test" to "newFolder/file.txt"
 
 
-  Scenario Outline: The user with different role can see deleted objects in trash bin of the space via the webDav API
+  Scenario Outline: user with different role can see deleted objects in trash bin of the space via the webDav API
     Given user "Alice" has shared a space "restore objects" with settings:
       | shareWith | Brian  |
       | role      | <role> |
@@ -38,7 +38,7 @@ Feature: Restore files, folder
       | Brian | viewer  |
 
 
-  Scenario Outline: The user can restore a folder with some objects from the trash via the webDav API
+  Scenario Outline: user can restore a folder with some objects from the trash via the webDav API
     Given user "Alice" has shared a space "restore objects" with settings:
       | shareWith | Brian  |
       | role      | <role> |
@@ -56,7 +56,7 @@ Feature: Restore files, folder
       | Brian | viewer  | 403  | should not           | should               |
 
 
-  Scenario Outline: The user can restore a file from the trash via the webDav API
+  Scenario Outline: user can restore a file from the trash via the webDav API
     Given user "Alice" has shared a space "restore objects" with settings:
       | shareWith | Brian  |
       | role      | <role> |
@@ -74,7 +74,7 @@ Feature: Restore files, folder
       | Brian | viewer  | 403  | should not           | should               |
 
 
-  Scenario: The user can restore a file even if there is not enough quota to do so
+  Scenario: user can restore a file even if there is not enough quota to do so
     Given user "Admin" has changed the quota of the "Brian Murphy" space to "30"
     And user "Brian" has uploaded file with content "file is less than 30 bytes" to "/file.txt"
     And user "Brian" has uploaded file with content "reduceContent" to "/file.txt"
