@@ -3,19 +3,22 @@ package command
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
+	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/render"
 	"github.com/justinas/alice"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -36,7 +39,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 	"github.com/urfave/cli/v2"
 	microstore "go-micro.dev/v4/store"
-	"golang.org/x/oauth2"
 )
 
 // Server is the entrypoint for the server command.
@@ -49,6 +51,15 @@ func Server(cfg *config.Config) *cli.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
+			userInfoCache := store.Create(
+				store.Store(cfg.OIDC.UserinfoCache.Store),
+				store.TTL(cfg.OIDC.UserinfoCache.TTL),
+				store.Size(cfg.OIDC.UserinfoCache.Size),
+				microstore.Nodes(cfg.OIDC.UserinfoCache.Nodes...),
+				microstore.Database(cfg.OIDC.UserinfoCache.Database),
+				microstore.Table(cfg.OIDC.UserinfoCache.Table),
+			)
+
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 			err := tracing.Configure(cfg)
 			if err != nil {
@@ -58,6 +69,27 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
+
+			var oidcHTTPClient = &http.Client{
+				Transport: &http.Transport{
+					TLSClientConfig: &tls.Config{
+						MinVersion:         tls.VersionTLS12,
+						InsecureSkipVerify: cfg.OIDC.Insecure, //nolint:gosec
+					},
+					DisableKeepAlives: true,
+				},
+				Timeout: time.Second * 10,
+			}
+
+			oidcClient := oidc.NewOIDCClient(
+				oidc.WithAccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
+				oidc.WithLogger(logger),
+				oidc.WithHTTPClient(oidcHTTPClient),
+				oidc.WithOidcIssuer(cfg.OIDC.Issuer),
+				oidc.WithJWKSOptions(cfg.OIDC.JWKS),
+				oidc.WithClientID(cfg.OIDC.ClientID),
+				oidc.WithSkipClientIDCheck(cfg.OIDC.SkipClientIDCheck),
+			)
 
 			var (
 				m = metrics.New()
@@ -79,18 +111,28 @@ func Server(cfg *config.Config) *cli.Command {
 				proxy.Logger(logger),
 				proxy.Config(cfg),
 			)
+
+			lh := StaticRouteHandler{
+				prefix:        cfg.HTTP.Root,
+				userInfoCache: userInfoCache,
+				logger:        logger,
+				config:        *cfg,
+				oidcClient:    oidcClient,
+				proxy:         rp,
+			}
 			if err != nil {
-				return fmt.Errorf("Failed to initialize reverse proxy: %w", err)
+				return fmt.Errorf("failed to initialize reverse proxy: %w", err)
 			}
 
 			{
+				middlewares := loadMiddlewares(ctx, logger, cfg, userInfoCache)
 				server, err := proxyHTTP.Server(
-					proxyHTTP.Handler(rp),
+					proxyHTTP.Handler(lh.handler()),
 					proxyHTTP.Logger(logger),
 					proxyHTTP.Context(ctx),
 					proxyHTTP.Config(cfg),
 					proxyHTTP.Metrics(metrics.New()),
-					proxyHTTP.Middlewares(loadMiddlewares(ctx, logger, cfg)),
+					proxyHTTP.Middlewares(middlewares),
 				)
 
 				if err != nil {
@@ -137,7 +179,86 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config) alice.Chain {
+// StaticRouteHandler defines a Route Handler for static routes
+type StaticRouteHandler struct {
+	prefix        string
+	proxy         http.Handler
+	userInfoCache microstore.Store
+	logger        log.Logger
+	config        config.Config
+	oidcClient    oidc.OIDCClient
+}
+
+func (h *StaticRouteHandler) handler() http.Handler {
+	m := chi.NewMux()
+	m.Route(h.prefix, func(r chi.Router) {
+		// Wrapper for backchannel logout
+		r.Post("/backchannel_logout", h.backchannelLogout)
+
+		// TODO: migrate oidc well knowns here in a second wrapper
+		r.HandleFunc("/*", h.proxy.ServeHTTP)
+
+	})
+	// This is commented out due to a race issue in chi
+	//var methods = []string{"PROPFIND", "DELETE", "PROPPATCH", "MKCOL", "COPY", "MOVE", "LOCK", "UNLOCK", "REPORT"}
+	//for _, k := range methods {
+	//	chi.RegisterMethod(k)
+	//}
+
+	// To avoid using the chi.RegisterMethod() this is basically a catchAll for all HTTP Methods that are not
+	// covered in chi by default
+	m.MethodNotAllowed(h.proxy.ServeHTTP)
+
+	return m
+}
+
+type jse struct {
+	Error            string `json:"error"`
+	ErrorDescription string `json:"error_description"`
+}
+
+// handle backchannel logout requests as per https://openid.net/specs/openid-connect-backchannel-1_0.html#BCRequest
+func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Request) {
+	// parse the application/x-www-form-urlencoded POST request
+	if err := r.ParseForm(); err != nil {
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, jse{Error: "invalid_request", ErrorDescription: err.Error()})
+		return
+	}
+
+	logoutToken, err := h.oidcClient.VerifyLogoutToken(r.Context(), r.PostFormValue("logout_token"))
+	if err != nil {
+		render.Status(r, http.StatusBadRequest)
+		render.JSON(w, r, jse{Error: "invalid_request", ErrorDescription: err.Error()})
+		return
+	}
+
+	records, err := h.userInfoCache.Read(logoutToken.SessionId)
+	if errors.Is(err, microstore.ErrNotFound) || len(records) == 0 {
+		render.Status(r, http.StatusOK)
+		render.JSON(w, r, nil)
+		return
+	}
+
+	for _, record := range records {
+		err = h.userInfoCache.Delete(string(record.Value))
+		if !errors.Is(err, microstore.ErrNotFound) {
+			// Spec requires us to return a 400 BadRequest when the session could not be destroyed
+			h.logger.Err(err).Msg("could not delete user info from cache")
+			render.Status(r, http.StatusBadRequest)
+			render.JSON(w, r, jse{Error: "invalid_request", ErrorDescription: err.Error()})
+			return
+		}
+	}
+
+	// we can ignore errors when cleaning up the lookup table
+	_ = h.userInfoCache.Delete(logoutToken.SessionId)
+
+	render.Status(r, http.StatusOK)
+	render.JSON(w, r, nil)
+}
+
+func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache microstore.Store) alice.Chain {
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
 	revaClient, err := pool.GetGatewayServiceClient(cfg.Reva.Address, cfg.Reva.GetRevaOptions()...)
 	if err != nil {
@@ -212,32 +333,19 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config)
 		})
 	}
 
-	cache := store.Create(
-		store.Store(cfg.OIDC.UserinfoCache.Store),
-		store.TTL(cfg.OIDC.UserinfoCache.TTL),
-		store.Size(cfg.OIDC.UserinfoCache.Size),
-		microstore.Nodes(cfg.OIDC.UserinfoCache.Nodes...),
-		microstore.Database(cfg.OIDC.UserinfoCache.Database),
-		microstore.Table(cfg.OIDC.UserinfoCache.Table),
-	)
-
 	authenticators = append(authenticators, middleware.NewOIDCAuthenticator(
 		middleware.Logger(logger),
-		middleware.Cache(cache),
+		middleware.UserInfoCache(userInfoCache),
 		middleware.DefaultAccessTokenTTL(cfg.OIDC.UserinfoCache.TTL),
 		middleware.HTTPClient(oidcHTTPClient),
 		middleware.OIDCIss(cfg.OIDC.Issuer),
-		middleware.JWKSOptions(cfg.OIDC.JWKS),
-		middleware.AccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
-		middleware.OIDCProviderFunc(func() (middleware.OIDCProvider, error) {
-			// Initialize a provider by specifying the issuer URL.
-			// it will fetch the keys from the issuer using the .well-known
-			// endpoint
-			return oidc.NewProvider(
-				context.WithValue(ctx, oauth2.HTTPClient, oidcHTTPClient),
-				cfg.OIDC.Issuer,
-			)
-		}),
+		middleware.OIDCClient(oidc.NewOIDCClient(
+			oidc.WithAccessTokenVerifyMethod(cfg.OIDC.AccessTokenVerifyMethod),
+			oidc.WithLogger(logger),
+			oidc.WithHTTPClient(oidcHTTPClient),
+			oidc.WithOidcIssuer(cfg.OIDC.Issuer),
+			oidc.WithJWKSOptions(cfg.OIDC.JWKS),
+		)),
 	))
 	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
 		Logger:            logger,

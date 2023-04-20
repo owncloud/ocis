@@ -108,6 +108,8 @@ type OIDC struct {
 	UserinfoCache           *Cache `yaml:"user_info_cache"`
 	JWKS                    JWKS   `yaml:"jwks"`
 	RewriteWellKnown        bool   `yaml:"rewrite_well_known" env:"PROXY_OIDC_REWRITE_WELLKNOWN" desc:"Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider."`
+	ClientID                string `yaml:"client_id" env:"OCIS_OIDC_CLIENT_ID;PROXY_OIDC_CLIENT_ID" desc:"OIDC client ID, which ownCloud Web uses. This client needs to be set up in your external IDP (has no effect when using the builtin IDP)."`
+	SkipClientIDCheck       bool   `yaml:"skip_client_id_check" env:"PROXY_OIDC_SKIP_CLIENT_ID_CHECK" desc:"If true will skip checking the configured client ID is present in audience claims. See following chapter for more details: https://openid.net/specs/openid-connect-core-1_0.html#IDToken"`
 }
 
 type JWKS struct {

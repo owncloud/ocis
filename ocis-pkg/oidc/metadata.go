@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
@@ -51,6 +52,44 @@ type ProviderMetadata struct {
 	CheckSessionIframe string `json:"check_session_iframe,omitempty"`
 	EndSessionEndpoint string `json:"end_session_endpoint,omitempty"`
 	//claim_types_supported
+}
+
+// Logout Token defines an logout Token
+type LogoutToken struct {
+	// The URL of the server which issued this token. OpenID Connect
+	// requires this value always be identical to the URL used for
+	// initial discovery.
+	//
+	// Note: Because of a known issue with Google Accounts' implementation
+	// this value may differ when using Google.
+	//
+	// See: https://developers.google.com/identity/protocols/OpenIDConnect#obtainuserinfo
+	Issuer string `json:"iss"` // example "https://server.example.com"
+
+	// A unique string which identifies the end user.
+	Subject string `json:"sub"` //"248289761001"
+
+	// The client ID, or set of client IDs, that this token is issued for. For
+	// common uses, this is the client that initialized the auth flow.
+	//
+	// This package ensures the audience contains an expected value.
+	Audience jwt.ClaimStrings `json:"aud"` // "s6BhdRkqt3"
+
+	// When the token was issued by the provider.
+	IssuedAt *jwt.NumericDate `json:"iat"`
+
+	// The Session Id
+	SessionId string `json:"sid"`
+
+	Events LogoutEvent `json:"events"`
+
+	// Jwt Id
+	JwtID string `json:"jti"`
+}
+
+// LogoutEvent defines a logout Event
+type LogoutEvent struct {
+	Event *struct{} `json:"http://schemas.openid.net/event/backchannel-logout"`
 }
 
 func GetIDPMetadata(logger log.Logger, client *http.Client, idpURI string) (ProviderMetadata, error) {
