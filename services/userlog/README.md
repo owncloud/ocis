@@ -44,9 +44,12 @@ The `userlog` service has embedded translations sourced via transifex to provide
 
 The language code pattern is composed of `language[_territory]` where  `language` is the base language and `_territory` is optional and defines a country.
 
-For example, for the language `de_DE`, one needs to place the corresponding translation files to `{USERLOG_TRANSLATION_PATH}/de_DE/LC_MESSAGES/userlog.po`.
+For example, for the language `de`, one needs to place the corresponding translation files to `{USERLOG_TRANSLATION_PATH}/de_DE/LC_MESSAGES/userlog.po`.
+
+Important: For the time being, the embedded ownCloud Web frontent only supports the main language-code but does not handle any territory. When strings are available in the language-code `language_territory`, the web frontend does not see it as it only requests `language`. As impact, any translations made must exist in the requested `language` to avoid a fallback to the default.
 
 ### Translation Rules
 
-*   If a requested language code is not available, the service tries to fall back to the base language if available. For example, if `de_DE` is not available, the service tries to fall back to translations in the `de` folder.
-*   If the base language `de` is also not available, the service falls back to the system's default English (`en`), which is the source of the texts provided by the code.
+*   If a requested language code is not available, the service tries to fall back to the base language if available. For example, if the requested language-code `de_DE` is not available, the service tries to fall back to translations in the `de` folder.
+*   If the base language `de` is also not available, the service falls back to the system's default English (`en`),
+which is the source of the texts provided by the code.
