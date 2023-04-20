@@ -28,7 +28,7 @@
 | OCIS_URL<br/>WEB_UI_CONFIG_SERVER | string | https://localhost:9200 | URL, where the oCIS APIs are reachable for ownCloud Web.|
 | WEB_OIDC_METADATA_URL | string | https://localhost:9200/.well-known/openid-configuration | URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + "/.well-known/openid-configuration".|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>WEB_OIDC_AUTHORITY | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
-| WEB_OIDC_CLIENT_ID | string | web | OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP.|
+| OCIS_OIDC_CLIENT_ID<br/>WEB_OIDC_CLIENT_ID | string | web | OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP (has no effect when using the builtin IDP).|
 | WEB_OIDC_RESPONSE_TYPE | string | code | OIDC response type to use for authentication.|
 | WEB_OIDC_SCOPE | string | openid profile email | OIDC scopes to request during authentication to authorize access to user details. Defaults to 'openid profile email'. Values are separated by blank. More example values but not limited to are 'address' or 'phone' etc.|
 | OCIS_JWT_SECRET<br/>WEB_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|

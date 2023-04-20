@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-20-10-58-21]
+[#deprecation-note-2023-04-20-11-24-12]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -194,7 +194,7 @@ Enable/Disable HTTPS for the external HTTP services.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-20-10-58-21[Deprecation Note]
+xref:deprecation-note-2023-04-20-11-24-12[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -356,6 +356,25 @@ a| [subs=-attributes]
 ++false ++
 a| [subs=-attributes]
 Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider.
+
+a|`OCIS_OIDC_CLIENT_ID` +
+`PROXY_OIDC_CLIENT_ID` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++web ++
+a| [subs=-attributes]
+OIDC client ID, which ownCloud Web uses. This client needs to be set up in your external IDP (has no effect when using the builtin IDP).
+
+a|`PROXY_OIDC_SKIP_CLIENT_ID_CHECK` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+If true will skip checking the configured client ID is present in audience claims. See following chapter for more details: \https://openid.net/specs/openid-connect-core-1_0.html#IDToken
 
 a|`OCIS_JWT_SECRET` +
 `PROXY_JWT_SECRET` +

@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-20-10-58-21]
+[#deprecation-note-2023-04-20-11-24-12]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -272,14 +272,15 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 URL of the OIDC issuer. It defaults to URL of the builtin IDP.
 
-a|`WEB_OIDC_CLIENT_ID` +
+a|`OCIS_OIDC_CLIENT_ID` +
+`WEB_OIDC_CLIENT_ID` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++web ++
 a| [subs=-attributes]
-OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP.
+OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP (has no effect when using the builtin IDP).
 
 a|`WEB_OIDC_RESPONSE_TYPE` +
 
