@@ -11,7 +11,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/pkg/errors"
 	"github.com/shamaton/msgpack/v2"
 	store "go-micro.dev/v4/store"
@@ -104,7 +103,7 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 				m.Logger.Error().Err(err).Msg("failed to write to userinfo cache")
 			}
 
-			if sid, ok := claims["sid"]; ok {
+			if sid := aClaims.SessionID; sid != "" {
 				// reuse user cache for session id lookup
 				err = m.userInfoCache.Write(&store.Record{
 					Key:    fmt.Sprintf("%s", sid),
@@ -125,7 +124,7 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 // extractExpiration tries to extract the expriration time from the access token
 // If the access token does not have an exp claim it will fallback to the configured
 // default expiration
-func (m OIDCAuthenticator) extractExpiration(aClaims jwt.RegisteredClaims) time.Time {
+func (m OIDCAuthenticator) extractExpiration(aClaims oidc.RegClaimsWithSID) time.Time {
 	defaultExpiration := time.Now().Add(m.DefaultTokenCacheTTL)
 	if aClaims.ExpiresAt != nil {
 		m.Logger.Debug().Str("exp", aClaims.ExpiresAt.String()).Msg("Expiration Time from access_token")

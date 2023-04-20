@@ -27,7 +27,7 @@ import (
 // OIDCClient used to mock the oidc client during tests
 type OIDCClient interface {
 	UserInfo(ctx context.Context, ts oauth2.TokenSource) (*UserInfo, error)
-	VerifyAccessToken(ctx context.Context, token string) (jwt.RegisteredClaims, []string, error)
+	VerifyAccessToken(ctx context.Context, token string) (RegClaimsWithSID, []string, error)
 	VerifyLogoutToken(ctx context.Context, token string) (*LogoutToken, error)
 }
 
@@ -44,6 +44,11 @@ type KeySet interface {
 	// If VerifySignature makes HTTP requests to verify the token, it's expected to
 	// use any HTTP client associated with the context through ClientContext.
 	VerifySignature(ctx context.Context, jwt string) (payload []byte, err error)
+}
+
+type RegClaimsWithSID struct {
+	SessionID string `json:"sid"`
+	jwt.RegisteredClaims
 }
 
 type oidcClient struct {
@@ -270,26 +275,26 @@ func (c *oidcClient) UserInfo(ctx context.Context, tokenSource oauth2.TokenSourc
 	}, nil
 }
 
-func (c *oidcClient) VerifyAccessToken(ctx context.Context, token string) (jwt.RegisteredClaims, []string, error) {
+func (c *oidcClient) VerifyAccessToken(ctx context.Context, token string) (RegClaimsWithSID, []string, error) {
 	var mapClaims []string
 	if err := c.lookupWellKnownOpenidConfiguration(ctx); err != nil {
-		return jwt.RegisteredClaims{}, mapClaims, err
+		return RegClaimsWithSID{}, mapClaims, err
 	}
 	switch c.accessTokenVerifyMethod {
 	case config.AccessTokenVerificationJWT:
 		return c.verifyAccessTokenJWT(token)
 	case config.AccessTokenVerificationNone:
 		c.Logger.Debug().Msg("Access Token verification disabled")
-		return jwt.RegisteredClaims{}, mapClaims, nil
+		return RegClaimsWithSID{}, mapClaims, nil
 	default:
 		c.Logger.Error().Str("access_token_verify_method", c.accessTokenVerifyMethod).Msg("Unknown Access Token verification setting")
-		return jwt.RegisteredClaims{}, mapClaims, errors.New("unknown Access Token Verification method")
+		return RegClaimsWithSID{}, mapClaims, errors.New("unknown Access Token Verification method")
 	}
 }
 
 // verifyAccessTokenJWT tries to parse and verify the access token as a JWT.
-func (c *oidcClient) verifyAccessTokenJWT(token string) (jwt.RegisteredClaims, []string, error) {
-	var claims jwt.RegisteredClaims
+func (c *oidcClient) verifyAccessTokenJWT(token string) (RegClaimsWithSID, []string, error) {
+	var claims RegClaimsWithSID
 	var mapClaims []string
 	jwks := c.getKeyfunc()
 	if jwks == nil {
