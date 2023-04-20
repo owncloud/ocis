@@ -2,7 +2,7 @@
 Feature: create groups, group names are case insensitive
   As an admin
   I want to create groups with similar cases
-  SO that I can check if the group names are case sensitive
+  So that I can check if the group names are case sensitive
 
   @issue-3516
   Scenario Outline: group names are case insensitive, creating groups with different upper and lower case names
