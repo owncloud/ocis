@@ -91,6 +91,20 @@ func (g Graph) getDrives(w http.ResponseWriter, r *http.Request, unrestricted bo
 		errorcode.NotSupported.Render(w, r, http.StatusNotImplemented, err.Error())
 		return
 	}
+	if !unrestricted {
+		user, ok := revactx.ContextGetUser(r.Context())
+		if !ok {
+			logger.Debug().Msg("could not create drive: invalid user")
+			errorcode.NotAllowed.Render(w, r, http.StatusUnauthorized, "invalid user")
+			return
+		}
+		filters = append(filters, &storageprovider.ListStorageSpacesRequest_Filter{
+			Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_USER,
+			Term: &storageprovider.ListStorageSpacesRequest_Filter_User{
+				User: user.GetId(),
+			},
+		})
+	}
 
 	logger.Debug().
 		Interface("filters", filters).
