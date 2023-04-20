@@ -58,22 +58,6 @@ class AppConfigurationContext implements Context {
 	}
 
 	/**
-	 * @Given /^parameter "([^"]*)" of app "([^"]*)" has been set to ((?:'[^']*')|(?:"[^"]*"))$/
-	 *
-	 * @param string $parameter
-	 * @param string $app
-	 * @param string $value
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function serverParameterHasBeenSetTo(string $parameter, string $app, string $value):void {
-		// The capturing group of the regex always includes the quotes at each
-		// end of the captured string, so trim them.
-		return;
-	}
-
-	/**
 	 * @Then the capabilities setting of :capabilitiesApp path :capabilitiesPath should be :expectedValue
 	 * @Given the capabilities setting of :capabilitiesApp path :capabilitiesPath has been confirmed to be :expectedValue
 	 *

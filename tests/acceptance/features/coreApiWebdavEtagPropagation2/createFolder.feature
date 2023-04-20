@@ -3,7 +3,6 @@ Feature: propagation of etags when creating folders
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
-    And parameter "shareapi_auto_accept_share" of app "core" has been set to "no"
 
   @issue-product-280
   Scenario Outline: creating a folder inside a folder changes its etag

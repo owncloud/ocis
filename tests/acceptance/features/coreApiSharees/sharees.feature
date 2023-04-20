@@ -60,7 +60,6 @@ Feature: search sharees
 
   Scenario Outline: search only with group members - allowed
     Given using OCS API version "<ocs-api-version>"
-    And parameter "shareapi_only_share_with_group_members" of app "core" has been set to "yes"
     And user "Sharee1" has been added to group "ShareeGroup2"
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | sharee |
@@ -207,7 +206,6 @@ Feature: search sharees
       | username | displayname |
       | another  | Another     |
     And user "Another" has been added to group "ShareeGroup2"
-    And parameter "shareapi_share_dialog_user_enumeration_group_members" of app "core" has been set to "yes"
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | anot |
       | itemType | file |

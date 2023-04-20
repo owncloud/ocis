@@ -75,7 +75,6 @@ Feature: share access by ID
 
 
   Scenario Outline: accept a share using the invalid share Id
-    Given parameter "shareapi_auto_accept_share" of app "core" has been set to "yes"
     And using OCS API version "<ocs_api_version>"
     When user "Brian" accepts share with ID "<share_id>" using the sharing API
     Then the OCS status code should be "404"
@@ -94,7 +93,6 @@ Feature: share access by ID
 
 
   Scenario Outline: accept a share using empty share Id
-    Given parameter "shareapi_auto_accept_share" of app "core" has been set to "yes"
     And using OCS API version "<ocs_api_version>"
     When user "Brian" accepts share with ID "" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
@@ -126,7 +124,6 @@ Feature: share access by ID
 
 
   Scenario Outline: decline a share using a invalid share Id
-    Given parameter "shareapi_auto_accept_share" of app "core" has been set to "yes"
     And using OCS API version "<ocs_api_version>"
     When user "Brian" declines share with ID "<share_id>" using the sharing API
     Then the OCS status code should be "404"
@@ -145,7 +142,6 @@ Feature: share access by ID
 
 
   Scenario Outline: decline a share using empty share Id
-    Given parameter "shareapi_auto_accept_share" of app "core" has been set to "yes"
     And using OCS API version "<ocs_api_version>"
     When user "Brian" declines share with ID "" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"

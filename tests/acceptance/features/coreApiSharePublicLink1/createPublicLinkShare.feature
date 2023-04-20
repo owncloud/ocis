@@ -219,7 +219,6 @@ Feature: create a public link share
 
   Scenario Outline: creating a link share with no specified permissions defaults to read permissions when public upload is disabled globally and accessing using the public WebDAV API
     Given using OCS API version "<ocs_api_version>"
-    And parameter "shareapi_allow_public_upload" of app "core" has been set to "no"
     And user "Alice" has created folder "/afolder"
     When user "Alice" creates a public link share using the sharing API with settings
       | path | /afolder |
