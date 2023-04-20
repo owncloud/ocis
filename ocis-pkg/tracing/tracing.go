@@ -5,17 +5,19 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	rtrace "github.com/cs3org/reva/v2/pkg/trace"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // Propagator ensures the importer module uses the same trace propagation strategy.
@@ -79,14 +81,26 @@ func GetTraceProvider(endpoint, collector, serviceName, traceType string) (*sdkt
 
 		//secureOption := otlptracegrpc.WithTLSCredentials(credentials.NewClientTLSFromCert(nil, ""))
 		// TODO make configurable
-		secureOption := otlptracegrpc.WithInsecure()
+		//secureOption := otlptracegrpc.WithInsecure()
 
-		exporter, err := otlptrace.New(
+		// If the OpenTelemetry Collector is running on a local cluster (minikube or
+		// microk8s), it should be accessible through the NodePort service at the
+		// `localhost:30080` endpoint. Otherwise, replace `localhost` with the
+		// endpoint of your cluster. If you run the app inside k8s, then you can
+		// probably connect directly to the service through dns.
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+		conn, err := grpc.DialContext(ctx, endpoint,
+			// Note the use of insecure transport here. TLS is recommended in production.
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+			grpc.WithBlock(),
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
+		}
+		exporter, err := otlptracegrpc.New(
 			context.Background(),
-			otlptracegrpc.NewClient(
-				secureOption,
-				otlptracegrpc.WithEndpoint(endpoint),
-			),
+			otlptracegrpc.WithGRPCConn(conn),
 		)
 
 		if err != nil {
