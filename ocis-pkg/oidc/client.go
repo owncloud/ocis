@@ -10,6 +10,7 @@ import (
 	"io"
 	"mime"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -176,14 +177,11 @@ type stringAsBool bool
 
 // Claims unmarshals the raw JSON string into a bool.
 func (sb *stringAsBool) UnmarshalJSON(b []byte) error {
-	switch string(b) {
-	case "true", `"true"`:
-		*sb = true
-	case "false", `"false"`:
-		*sb = false
-	default:
-		return errors.New("invalid value for boolean")
+	v, err := strconv.ParseBool(string(b))
+	if err != nil {
+		return err
 	}
+	*sb = stringAsBool(v)
 	return nil
 }
 

@@ -70,7 +70,6 @@ func (m *OIDCAuthenticator) getClaims(token string, req *http.Request) (map[stri
 		m.Logger.Error().Err(err).Msg("could not unmarshal userinfo")
 	}
 
-	// TODO: use mClaims
 	aClaims, _, err := m.oidcClient.VerifyAccessToken(req.Context(), token)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to verify access token")
