@@ -395,7 +395,7 @@ func (i *LDAP) AddUsersToEducationSchool(ctx context.Context, schoolNumberOrID s
 		user, err := i.getEducationUserByNameOrID(memberID)
 		if err != nil {
 			i.logger.Warn().Str("userid", memberID).Msg("User does not exist")
-			return err
+			return errorcode.New(errorcode.ItemNotFound, fmt.Sprintf("user '%s' not found", memberID))
 		}
 		userEntries = append(userEntries, user)
 	}
