@@ -1,6 +1,6 @@
 ---
 title: Notification
-date: 2023-04-20T13:06:06.881647355Z
+date: 2023-04-20T14:11:17.460583801Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/notifications
@@ -57,12 +57,13 @@ the `NOTIFICATIONS_TRANSLATION_PATH` environment variable needs to point to a ba
 {NOTIFICATIONS_TRANSLATION_PATH}/{language-code}/LC_MESSAGES/translations.po
 ```
 The language code pattern is composed of `language[_territory]` where  `language` is the base language and `_territory` is optional and defines a country.
-For example, for the language `de_DE`, one needs to place the corresponding translation files to `{NOTIFICATIONS_TRANSLATION_PATH}/de_DE/LC_MESSAGES/translations.po`.
+For example, for the language `de`, one needs to place the corresponding translation files to `{NOTIFICATIONS_TRANSLATION_PATH}/de/LC_MESSAGES/translations.po`.
+<!-- also see the userlog readme -->
+Important: For the time being, the embedded ownCloud Web frontend only supports the main language code but does not handle any territory. When strings are available in the language code `language_territory`, the web frontend does not see it as it only requests `language`. In consequence, any translations made must exist in the requested `language` to avoid a fallback to the default.
 
 ### Translation Rules
 
-*   If a requested language code is not available, the service tries to fall back to the base language if available.
-For example, if `de_DE` is not available, the service tries to fall back to translations in the `de` folder.
+*   If a requested language code is not available, the service tries to fall back to the base language if available. For example, if the requested language-code `de_DE` is not available, the service tries to fall back to translations in the `de` folder.
 *   If the base language `de` is also not available, the service falls back to the system's default English (`en`),
 which is the source of the texts provided by the code.
 
