@@ -1,0 +1,5 @@
+Kopano oidc-go
+Copyright 2017-2019 Kopano and its licensors
+
+This product includes software developed at
+Kopano (https://kopano.com/).

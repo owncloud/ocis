@@ -1,0 +1,3 @@
+.vscode
+/fuzz/workdir
+/fuzz/*.zip

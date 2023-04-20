@@ -1,0 +1,19 @@
+language: go
+
+go:
+  - 1.x
+  - 1.4
+  - 1.5
+  - 1.6
+  - 1.7
+  - 1.8
+  - 1.9
+  - '1.10'
+  - tip
+  - master
+
+go_import_path: stash.kopano.io/kgol/rndm
+
+matrix:
+  allow_failures:
+    - go: tip master

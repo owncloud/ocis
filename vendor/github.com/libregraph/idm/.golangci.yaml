@@ -1,0 +1,77 @@
+run:
+  modules-download-mode: vendor
+  issues-exit-code: 0
+
+linters-settings:
+  govet:
+    check-shadowing: true
+    settings:
+      printf:
+        funcs:
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Infof
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Warnf
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Errorf
+          - (github.com/golangci/golangci-lint/pkg/logutils.Log).Fatalf
+  gocyclo:
+    min-complexity: 10
+  maligned:
+    suggest-new: true
+  dupl:
+    threshold: 100
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+  misspell:
+    locale: US
+  lll:
+    line-length: 140
+  goimports:
+    local-prefixes: github.com/libregraph/idm
+  gocritic:
+    enabled-tags:
+      - performance
+      - style
+      - experimental
+  revive:
+    min-confidence: 0
+
+linters:
+  # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
+  disable-all: true
+  enable:
+    - bodyclose
+    - deadcode
+    - dupl
+    - errcheck
+    - exportloopref
+    - funlen
+    - gochecknoinits
+    - goconst
+    - gocritic
+    - gocyclo
+    - gofmt
+    - goimports
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - lll
+    - misspell
+    - nakedret
+    - revive
+    - staticcheck
+    - structcheck
+    - stylecheck
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - varcheck
+
+  # don't enable:
+  # - depguard - until https://github.com/OpenPeeDeeP/depguard/issues/7 gets fixed
+  # - maligned,prealloc
+  # - gochecknoglobals
+
+severity:
+  default-severity: warning
