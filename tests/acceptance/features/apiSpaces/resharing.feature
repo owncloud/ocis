@@ -2,7 +2,7 @@
 Feature: Resharing
   As a user 
   I want to reshare resources
-  So that other users can have access to it
+  So that other users can have access to them
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839

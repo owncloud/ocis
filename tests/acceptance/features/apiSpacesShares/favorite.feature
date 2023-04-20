@@ -2,7 +2,7 @@
 Feature: favorite
   As a user
   I want to favouite resources
-  So that I can acesses them quickly
+  So that I can access them quickly
 
   Background:
     Given these users have been created with default attributes and without skeleton files:

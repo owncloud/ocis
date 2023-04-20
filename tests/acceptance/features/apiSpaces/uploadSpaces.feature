@@ -1,6 +1,6 @@
 @api @skipOnOcV10
 Feature: Upload files into a space
-  As an user
+  As a user
   I want to be able to create folders and files in the space
   So that I can store various information in them
 

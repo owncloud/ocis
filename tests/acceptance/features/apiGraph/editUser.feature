@@ -2,7 +2,7 @@
 Feature: edit user
   As an admin
   I want to be able to edit user information
-  So that I can manage user
+  So that I can manage users
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839

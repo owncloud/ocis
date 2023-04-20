@@ -1,7 +1,7 @@
 @api @skipOnOcV10
 Feature: Space management
   As a user with space admin permission
-  I want to be able to manage all existing project space
+  I want to be able to manage all existing project spaces
   So that
     - I can get all project space where I am not member using "graph/v1.0/drives" endpoint
     - I can edit space: change quota, name, description

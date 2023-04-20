@@ -1,8 +1,8 @@
 @api @skipOnOcV10
 Feature: Share a file or folder that is inside a space
-  As an user with manager space role
+  As a user with manager space role
   I want to be able to share the data inside the space
-  So that other users can have access to teh
+  So that other users can have access to it
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839

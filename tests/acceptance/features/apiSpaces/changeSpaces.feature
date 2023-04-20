@@ -1,8 +1,8 @@
 @api @skipOnOcV10
 Feature: Change data of space
   As a user with space admin rights
-  I want to be able to change the data of a created space (increase the quota, change name, etc.)
-  So that I can manage them
+  I want to be able to change the meta-data of a created space (increase the quota, change name, etc.)
+  So that I can manage the spaces
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839

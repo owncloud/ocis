@@ -2,7 +2,7 @@
 Feature: List and create spaces
   As a user
   I want to be able to list project spaces
-  So that I can retrive the information about them
+  So that I can retrieve the information about them
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
   See https://github.com/owncloud/ocis/issues/1542 and https://github.com/owncloud/ocis/pull/839

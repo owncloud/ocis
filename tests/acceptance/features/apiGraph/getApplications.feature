@@ -1,8 +1,8 @@
 @api @skipOnOcV10 @skipOnStable2.0
 Feature: get applications
-  As an user
-  I want to be able to get applications information with existings roles
-  So that I can see which role blongs to what user
+  As a user
+  I want to be able to get application information with existing roles
+  So that I can see which role belongs to what user
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files

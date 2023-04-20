@@ -1,8 +1,8 @@
 @api @skipOnOcV10
 Feature: Share a file or folder that is inside a space via public link
-  As an user with manager space role
+  As a user with manager space role
   I want to be able to share the data inside the space via public link
-  So that anonymous user can have access to certain resources
+  So that an anonymous user can have access to certain resources
 
   folder permissions:
     | role        | permissions |
