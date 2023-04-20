@@ -53,7 +53,7 @@ For example, for the language `de`, one needs to place the corresponding transla
 
 <!-- also see the userlog readme -->
 
-Important: For the time being, the embedded ownCloud Web frontent only supports the main language-code but does not handle any territory. When strings are available in the language-code `language_territory`, the web frontend does not see it as it only requests `language`. As impact, any translations made must exist in the requested `language` to avoid a fallback to the default.
+Important: For the time being, the embedded ownCloud Web frontend only supports the main language code but does not handle any territory. When strings are available in the language code `language_territory`, the web frontend does not see it as it only requests `language`. In consequence, any translations made must exist in the requested `language` to avoid a fallback to the default.
 
 ### Translation Rules
 
