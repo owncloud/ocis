@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"net/http"
+
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
@@ -16,6 +18,8 @@ type Options struct {
 	OidcIssuer string
 	// GatewayAPIClient is a reva gateway client
 	GatewayAPIClient gatewayv1beta1.GatewayAPIClient
+	// HttpClient is a http client
+	HttpClient http.Client
 }
 
 // WithLogger provides a function to set the openid connect issuer option.
@@ -36,5 +40,12 @@ func WithLogger(val log.Logger) Option {
 func WithGatewayAPIClient(val gatewayv1beta1.GatewayAPIClient) Option {
 	return func(o *Options) {
 		o.GatewayAPIClient = val
+	}
+}
+
+// HttpClient provides a function to set the http client option.
+func WithHttpClient(val http.Client) Option {
+	return func(o *Options) {
+		o.HttpClient = val
 	}
 }

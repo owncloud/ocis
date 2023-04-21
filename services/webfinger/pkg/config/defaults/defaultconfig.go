@@ -48,6 +48,8 @@ func DefaultConfig() *config.Config {
 				},
 			},
 		},
+		IDP:      "https://localhost:9200",
+		Insecure: false,
 	}
 }
 
