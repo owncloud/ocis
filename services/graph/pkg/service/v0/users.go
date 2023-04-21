@@ -138,7 +138,7 @@ func (g Graph) GetUserDrive(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	filters := []*storageprovider.ListStorageSpacesRequest_Filter{listStorageSpacesTypeFilter("personal"), listStorageSpacesUserFilter(userID)}
-	res, err := g.ListStorageSpacesWithFilters(ctx, filters, false)
+	res, err := g.ListStorageSpacesWithFilters(ctx, filters, true)
 	switch {
 	case err != nil:
 		logger.Error().Err(err).Msg("could not get drive: transport error")

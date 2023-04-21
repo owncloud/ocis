@@ -345,6 +345,32 @@ class GraphHelper {
 		);
 	}
 
+	/***
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $byUser
+	 * @param string $userPassword
+	 * @param string $userId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function getPersonalDriveInformationByUserId(
+		string $baseUrl,
+		string $xRequestId,
+		string $byUser,
+		string $userPassword,
+		string $userId
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users/' . $userId . '/drive');
+		return HttpRequestHelper::get(
+			$url,
+			$xRequestId,
+			$byUser,
+			$userPassword
+		);
+	}
+
 	/**
 	 * @param string $baseUrl
 	 * @param string $xRequestId
