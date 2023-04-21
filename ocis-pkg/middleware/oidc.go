@@ -39,7 +39,7 @@ func OidcAuth(opts ...Option) func(http.Handler) http.Handler {
 		// it will fetch the keys from the issuer using the .well-known
 		// endpoint
 		return goidc.NewProvider(
-			context.WithValue(context.Background(), oauth2.HTTPClient, http.Client{}),
+			context.WithValue(context.Background(), oauth2.HTTPClient, &opt.HttpClient),
 			opt.OidcIssuer,
 		)
 	}
@@ -65,7 +65,7 @@ func OidcAuth(opts ...Option) func(http.Handler) http.Handler {
 				}
 
 				userInfo, err := provider.UserInfo(
-					context.WithValue(ctx, oauth2.HTTPClient, http.Client{}),
+					context.WithValue(ctx, oauth2.HTTPClient, &opt.HttpClient),
 					oauth2.StaticTokenSource(oauth2Token),
 				)
 				if err != nil {

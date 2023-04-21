@@ -1,8 +1,10 @@
 package http
 
 import (
+	"crypto/tls"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
@@ -60,9 +62,21 @@ func Server(opts ...Option) (ohttp.Service, error) {
 		version.String,
 	))
 
+	var oidcHTTPClient = &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				MinVersion:         tls.VersionTLS12,
+				InsecureSkipVerify: options.Config.Insecure, //nolint:gosec
+			},
+			DisableKeepAlives: true,
+		},
+		Timeout: time.Second * 10,
+	}
+
 	mux.Use(middleware.OidcAuth(
 		middleware.WithLogger(options.Logger),
 		middleware.WithOidcIssuer(options.Config.IDP),
+		middleware.WithHttpClient(*oidcHTTPClient),
 	))
 
 	// this logs http request related data
