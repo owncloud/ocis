@@ -84,6 +84,8 @@ const LockTypeKey = "reva.lock.type"
 
 var hiddenReg = regexp.MustCompile(`\.sys\..#.`)
 
+var _resharing = false
+
 func (c *Config) init() {
 	c.Namespace = path.Clean(c.Namespace)
 	if !strings.HasPrefix(c.Namespace, "/") {
@@ -2121,15 +2123,19 @@ func (fs *eosfs) permissionSet(ctx context.Context, eosFileInfo *eosclient.FileI
 		// The logged-in user is the owner but we may be impersonating them
 		// on behalf of a public share accessor.
 
+		// NOTE: This will grant the user full access when the opaque is nil
+		// it is likely that this can be used for attacks
 		if u.Opaque != nil {
+			// FIXME: "editor" and "viewer" are not sufficient anymore, they could have different permissions
+			// The role names should not be hardcoded any more as they will come from config in the future
 			if publicShare, ok := u.Opaque.Map["public-share-role"]; ok {
 				if string(publicShare.Value) == "editor" {
-					return conversions.NewEditorRole().CS3ResourcePermissions()
+					return conversions.NewEditorRole(_resharing).CS3ResourcePermissions()
 				} else if string(publicShare.Value) == "uploader" {
 					return conversions.NewUploaderRole().CS3ResourcePermissions()
 				}
 				// Default to viewer role
-				return conversions.NewViewerRole().CS3ResourcePermissions()
+				return conversions.NewViewerRole(_resharing).CS3ResourcePermissions()
 			}
 		}
 

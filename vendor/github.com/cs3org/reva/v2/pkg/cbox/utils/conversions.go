@@ -128,20 +128,8 @@ func SharePermToInt(p *provider.ResourcePermissions) int {
 
 // IntTosharePerm retrieves read/write permissions from an integer
 func IntTosharePerm(p int, itemType string) *provider.ResourcePermissions {
-	switch p {
-	case 1:
-		return conversions.NewViewerRole().CS3ResourcePermissions()
-	case 15:
-		if itemType == "folder" {
-			return conversions.NewEditorRole().CS3ResourcePermissions()
-		}
-		return conversions.NewFileEditorRole().CS3ResourcePermissions()
-	case 4:
-		return conversions.NewUploaderRole().CS3ResourcePermissions()
-	default:
-		// TODO we may have other options, for now this is a denial
-		return &provider.ResourcePermissions{}
-	}
+	perms, _ := conversions.NewPermissions(p)
+	return conversions.RoleFromOCSPermissions(perms).CS3ResourcePermissions()
 }
 
 // IntToShareState retrieves the received share state from an integer

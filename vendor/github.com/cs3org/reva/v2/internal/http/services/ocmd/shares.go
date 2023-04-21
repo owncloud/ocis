@@ -173,15 +173,16 @@ func (h *sharesHandler) createShare(w http.ResponseWriter, r *http.Request) {
 	var role *conversions.Role
 	pval, ok := options["permissions"].(int)
 	if !ok {
-		role = conversions.NewViewerRole()
-	} else {
-		permissions, err = conversions.NewPermissions(pval)
-		if err != nil {
-			WriteError(w, r, APIErrorInvalidParameter, err.Error(), nil)
-			return
-		}
-		role = conversions.RoleFromOCSPermissions(permissions)
+		WriteError(w, r, APIErrorInvalidParameter, "permissions not provided", nil)
+		return
 	}
+
+	permissions, err = conversions.NewPermissions(pval)
+	if err != nil {
+		WriteError(w, r, APIErrorInvalidParameter, err.Error(), nil)
+		return
+	}
+	role = conversions.RoleFromOCSPermissions(permissions)
 
 	val, err := json.Marshal(role.CS3ResourcePermissions())
 	if err != nil {
