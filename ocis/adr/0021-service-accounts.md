@@ -22,7 +22,7 @@ This ADR deals with a prerequisite for service authorization: service accounts.
 
 Some services need access to file content without a user being logged in. We currently pass the owner or manager
 of a space in events which allows the search service to impersonate that user to extract metadata from the changed resource.
-There are two problems with this: 
+There are two problems with this:
 1. The service could get all permissions of the user and gain write permission
 2. There is a race condition where the user in the event might no longer have read permission, causing the index to go stale
 
@@ -71,14 +71,14 @@ To authenticate service accounts the static reva auth registry needs to be confi
 * Bad, because we have to write code to manage service accounts or at least filter them out in the admin ui
 
 
-### Impersonate Space-Owners 
+### Impersonate Space-Owners
 
 We could implement a new auth manager that can authenticate space owners, a CS3 user type we introduced for project spaces which 'have no owner', only one or more managers.
 
 * Good, because it reuses the space owner user type
-* Bad, because the space owner always has write permisson
+* Bad, because the space owner always has write permission
 * Bad, because we don't know if a there are places in the code that try to look up a user with USER_TYPE_SPACE_OWNER at the cs3 users service ... they might not exist there ... or do we have to implement a userregistry, similar to the authregistry?
-* Bad, because it feels like another hack and does not protect against compromized services that try to execute operations that the user did not consent to.
+* Bad, because it feels like another hack and does not protect against compromised services that try to execute operations that the user did not consent to.
 
 ## Links
 
@@ -92,4 +92,4 @@ Another example would be a `Resource.Read` check for a specific resource. Normal
 
 In the storage drive implementation we can check the ACLs first (which would allow service accounts that are known to the underlying storage system, e.g. EOS to access the resource) and then make a call to the permissions service. At least for the Read Resource permission. Other permission checks can be introduced as needed.
 
-The permission names and constraints are different from the MS Graph API. Giving permission like [`Files.ReadWrite.All`](https://learn.microsoft.com/en-us/graph/permissions-reference#user-permissions) a different meaning, depending on the type of user (for normal users it means all files they have access to, for service accounts it means all files in the organization) is a source of confusion which only gets worse when there are two different UUIDs for this. 
+The permission names and constraints are different from the MS Graph API. Giving permission like [`Files.ReadWrite.All`](https://learn.microsoft.com/en-us/graph/permissions-reference#user-permissions) a different meaning, depending on the type of user (for normal users it means all files they have access to, for service accounts it means all files in the organization) is a source of confusion which only gets worse when there are two different UUIDs for this.

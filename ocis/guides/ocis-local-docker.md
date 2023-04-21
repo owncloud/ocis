@@ -189,7 +189,7 @@ This command is handy to run specific commands inside your service. Try `docker 
 
 ### Persist data, restart and logging
 
-The key to a successful container setup is the persistance of the application data to make the data survive a re-boot. Docker normally uses [volumes](https://docs.docker.com/storage/volumes/) for this purpose. A volume can either be a "named volume" which are completely managed by docker and have many advantages (see the linked docker documentation), or "bind mounts" which are uing the directory structure and OS of the host system. In our example we already use a bind mount for the config file. We will now add a named volume for the oCIS data directory.
+The key to a successful container setup is the persistence of the application data to make the data survive a re-boot. Docker normally uses [volumes](https://docs.docker.com/storage/volumes/) for this purpose. A volume can either be a "named volume" which are completely managed by docker and have many advantages (see the linked docker documentation), or "bind mounts" which are using the directory structure and OS of the host system. In our example we already use a bind mount for the config file. We will now add a named volume for the oCIS data directory.
 
 This is the way we should configure the ocis service:
 
@@ -229,7 +229,7 @@ Now let us configure the restart policy and the logging settings for the ocis se
     # you can switch to the "local" log driver which does rotation by default
     logging:
       driver: local
-    # otherwise you could specify log rotation exlicitely
+    # otherwise you could specify log rotation explicitly
     #  driver: "json-file" # this is the default driver
     #  options:
     #    max-size: "200k" # limit the size of the log file
@@ -304,7 +304,7 @@ services:
     # you can switch to the "local" log driver which does rotation by default
     logging:
       driver: local
-    # otherwise you could specify log rotation exlicitely
+    # otherwise you could specify log rotation explicitly
     #  driver: "json-file" # this is the default driver
     #  options:
     #    max-size: "200k" # limit the size of the log file

@@ -35,7 +35,7 @@ oidc-gen \
 
 If you have dynamic client registration enabled on your OpenID Connect identity provider, you can skip the `--client-id`,  `--client-secret` and `--pub` options.
 
-If you're using a dedicated OpenID Connect client for the OIDC-agent, we recommend a public one with the following two redirect URIs: `http://127.0.0.1:*` and `http://localhost:*`. Alternatively you also may use the already existing OIDC client of the ownCloud Desktop Client (`--client-id=xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69` and `--client-secret=UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh`, no `--pub` set, request specific scope for oofline access), e.g.:
+If you're using a dedicated OpenID Connect client for the OIDC-agent, we recommend a public one with the following two redirect URIs: `http://127.0.0.1:*` and `http://localhost:*`. Alternatively you also may use the already existing OIDC client of the ownCloud Desktop Client (`--client-id=xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69` and `--client-secret=UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh`, no `--pub` set, request specific scope for offline access), e.g.:
 ``` bash
 oidc-gen /
  --client-id=xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69 \
