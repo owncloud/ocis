@@ -71,7 +71,7 @@ require (
 	github.com/owncloud/libre-graph-api-go v1.0.2-0.20230330145712-ea267ccd404a
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/xattr v0.4.9
-	github.com/prometheus/client_golang v1.14.0
+	github.com/prometheus/client_golang v1.15.0
 	github.com/rogpeppe/go-internal v1.9.0
 	github.com/rs/zerolog v1.29.0
 	github.com/shamaton/msgpack/v2 v2.1.1
@@ -100,7 +100,7 @@ require (
 	golang.org/x/text v0.9.0
 	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f
 	google.golang.org/grpc v1.54.0
-	google.golang.org/protobuf v1.28.1
+	google.golang.org/protobuf v1.30.0
 	gopkg.in/square/go-jose.v2 v2.6.0
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools/v3 v3.4.0
@@ -271,8 +271,8 @@ require (
 	github.com/pquerna/cachecontrol v0.1.0 // indirect
 	github.com/prometheus/alertmanager v0.24.0 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
-	github.com/prometheus/common v0.37.0 // indirect
-	github.com/prometheus/procfs v0.8.0 // indirect
+	github.com/prometheus/common v0.42.0 // indirect
+	github.com/prometheus/procfs v0.9.0 // indirect
 	github.com/prometheus/statsd_exporter v0.22.8 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/rivo/uniseg v0.4.2 // indirect
