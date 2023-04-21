@@ -74,7 +74,7 @@ We updated reva to the version 2.0.0.
 * Enh [cs3org/reva#2397](https://github.com/cs3org/reva/pull/2397) :  Product field in OCS version
 * Enh [cs3org/reva#2393](https://github.com/cs3org/reva/pull/2393) :  Update tus/tusd to version 1.8.0
 * Enh [cs3org/reva#2522](https://github.com/cs3org/reva/pull/2522) :  Introduce events
-* Enh [cs3org/reva#2528](https://github.com/cs3org/reva/pull/2528) :  Use an exclcusive write lock when writing multiple attributes
+* Enh [cs3org/reva#2528](https://github.com/cs3org/reva/pull/2528) :  Use an exclusive write lock when writing multiple attributes
 * Enh [cs3org/reva#2595](https://github.com/cs3org/reva/pull/2595) :  Add integration test for the groupprovider
 * Enh [cs3org/reva#2439](https://github.com/cs3org/reva/pull/2439) :  Ignore handled errors when creating spaces
 * Enh [cs3org/reva#2500](https://github.com/cs3org/reva/pull/2500) :  Invalidate listproviders cache

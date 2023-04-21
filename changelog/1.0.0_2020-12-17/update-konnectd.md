@@ -12,7 +12,7 @@ Other changes from upstream:
 - Update Jenkins reporting plugin from checkstyle to recordIssues
 - Remove extra kty key from JWKS top level document
 - Fix regression which encodes URL fragments twice
-- Avoid generating fragmet/query URLs with wrong order
+- Avoid generating fragment/query URLs with wrong order
 - Return state for oidc endsession response redirects
 - Use server provided username to avoid case mismatch
 - Use signed-out-uri if set as fallback for goodbye redirect on saml slo

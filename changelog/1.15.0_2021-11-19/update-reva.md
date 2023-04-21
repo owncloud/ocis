@@ -25,7 +25,7 @@ This update includes:
  * Enh [cs3org/reva#2212](https://github.com/cs3org/reva/pull/2212): Filter root path according to the agent that makes the request
  * Enh [cs3org/reva#2237](https://github.com/cs3org/reva/pull/2237): Skip get user call in eosfs in case previous ones also failed
  * Enh [cs3org/reva#2266](https://github.com/cs3org/reva/pull/2266): Callback for the EOS UID cache to retry fetch for failed keys
- * Enh [cs3org/reva#2215](https://github.com/cs3org/reva/pull/2215): Aggregrate resource info properties for virtual views
+ * Enh [cs3org/reva#2215](https://github.com/cs3org/reva/pull/2215): Aggregate resource info properties for virtual views
  * Enh [cs3org/reva#2271](https://github.com/cs3org/reva/pull/2271): Revamp the favorite manager and add the cbox sql driver
  * Enh [cs3org/reva#2248](https://github.com/cs3org/reva/pull/2248): Cache whether a user home was created or not
  * Enh [cs3org/reva#2282](https://github.com/cs3org/reva/pull/2282): Return a proper NOT_FOUND error when a user or group is not found

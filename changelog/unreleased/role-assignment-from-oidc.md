@@ -1,4 +1,4 @@
-Enhancement: Added possiblity to assign roles based on OIDC claims
+Enhancement: Added possibility to assign roles based on OIDC claims
 
 oCIS can now be configured to update a user's role assignment from the values of a claim provided
 via the IDPs userinfo endpoint. The claim name and the mapping between claim values and ocis role

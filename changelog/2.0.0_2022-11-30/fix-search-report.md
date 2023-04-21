@@ -1,7 +1,7 @@
 Bugfix: Fix search report
 
 There were multiple issues with REPORT search responses from webdav. Also we want it to be consistent with PROPFIND responses.
-*   the `remote.php` prefix was missing from the href (added even though not neccessary)
+*   the `remote.php` prefix was missing from the href (added even though not necessary)
 *   the ids were formatted wrong, they should look different for shares and spaces.
 *   the name of the resource was missing
 *   the shareid was missing (for shares)

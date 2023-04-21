@@ -7,7 +7,7 @@ Tags: ocis-pkg
 * Change - Roles manager: [#60](https://github.com/owncloud/ocis-pkg/pull/60)
 * Change - Use go-micro's metadata context for account id: [#56](https://github.com/owncloud/ocis-pkg/pull/56)
 * Bugfix - Remove redigo 2.0.0+incompatible dependency: [#33](https://github.com/owncloud/ocis-graph/pull/33)
-* Change - Add middleware for x-access-token distmantling: [#46](https://github.com/owncloud/ocis-pkg/pull/46)
+* Change - Add middleware for x-access-token dismantling: [#46](https://github.com/owncloud/ocis-pkg/pull/46)
 * Enhancement - Add `ocis.id` and numeric id claims: [#50](https://github.com/owncloud/ocis-pkg/pull/50)
 * Bugfix - Pass flags to micro service: [#44](https://github.com/owncloud/ocis-pkg/pull/44)
 * Change - Add header to cors handler: [#41](https://github.com/owncloud/ocis-pkg/issues/41)

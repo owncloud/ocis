@@ -43,7 +43,7 @@ Changelog for reva 2.11.0 (2022-11-03)
 *   Enhancement  [cs3org/reva#3376](https://github.com/cs3org/reva/pull/3376):  Improve logging
 *   Enhancement  [cs3org/reva#3250](https://github.com/cs3org/reva/pull/3250):  Allow sharing the gateway caches
 *   Enhancement  [cs3org/reva#3240](https://github.com/cs3org/reva/pull/3240):  We now only encode &, < and > in PROPFIND PCDATA
-*   Enhancement  [cs3org/reva#3334](https://github.com/cs3org/reva/pull/3334):  Secure the nats connectin with TLS
+*   Enhancement  [cs3org/reva#3334](https://github.com/cs3org/reva/pull/3334):  Secure the nats connection with TLS
 *   Enhancement  [cs3org/reva#3300](https://github.com/cs3org/reva/pull/3300):  Do not leak existence of resources
 *   Enhancement  [cs3org/reva#3233](https://github.com/cs3org/reva/pull/3233):  Allow to override default broker for go-micro base ocdav service
 *   Enhancement  [cs3org/reva#3258](https://github.com/cs3org/reva/pull/3258):  Allow ocdav to share the registry instance with other services

@@ -1,5 +1,5 @@
-Change: Enable privatelinks by default
+Change: Enable private links by default
 
-Enable privatelinks by default in the capabilities.
+Enable private links by default in the capabilities.
 
 https://github.com/owncloud/ocis/pull/4599/
