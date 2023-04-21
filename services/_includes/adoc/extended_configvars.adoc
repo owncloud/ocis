@@ -1050,6 +1050,7 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 ++ ++
+    
 
 a| `MICRO_LOG_LEVEL` +
 a| [subs=-attributes]
@@ -1058,7 +1059,6 @@ a| [subs=-attributes]
 ++Error ++
 a| [subs=-attributes]
 ++Set the log level for the internal go micro framework. Only change on supervision of ownCloud Support. ++
-    
 
 a| `MICRO_LOG_LEVEL` +
 a| [subs=-attributes]
@@ -1102,19 +1102,19 @@ a| [subs=-attributes]
 
 a| `MICRO_REGISTRY_ADDRESS` +
 a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-++ ++
-
-a| `MICRO_REGISTRY_ADDRESS` +
-a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 ++The bind address of the internal go micro framework. Only change on supervision of ownCloud Support. ++
+
+a| `MICRO_REGISTRY_ADDRESS` +
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+++ ++
 
 a| `MINIO_ACCESS_KEY` +
 a| [subs=-attributes]
