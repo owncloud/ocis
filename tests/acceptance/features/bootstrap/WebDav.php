@@ -24,6 +24,7 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Ring\Exception\ConnectException;
+use Helmich\JsonAssert\JsonAssertions;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Stream\StreamInterface;
@@ -5383,5 +5384,21 @@ trait WebDav {
 			$actualUserDisplayName,
 			"Expected display name of version with index $index in response to user '$this->responseUser' was '$expectedUserDisplayName', but got '$actualUserDisplayName'"
 		);
+	}
+
+	/**
+	 * @When user :user downloads the content of generated GDPR report of file :pathToFile using password :password
+	 *
+	 * @param string $user
+	 * @param string $pathToFile
+	 * @param string $password
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userGetsTheContentOfGeneratedJsonReport(string $user, string $pathToFile, string $password): void {
+		$password = $this->getActualPassword($password);
+		$this->downloadFileAsUserUsingPassword($user, $pathToFile, $password);
+		$this->pushToLastStatusCodesArrays();
 	}
 }
