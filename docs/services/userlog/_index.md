@@ -27,10 +27,10 @@ The `userlog` service persists information via the configured store in `USERLOG_
   -   `redis`: Stores data in a configured redis cluster.
   -   `etcd`: Stores data in a configured etcd cluster.
   -   `nats-js`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
-  -   `noop`: Stores nothing. Useful for testing. Not recommended in productive enviroments.
+  -   `noop`: Stores nothing. Useful for testing. Not recommended in production environments.
 
 1.  Note that in-memory stores are by nature not reboot persistent.
-2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicapable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store applies.
+2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store applies.
 3.  The userlog service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
 
 ## Configuring

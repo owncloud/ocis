@@ -40,7 +40,7 @@ The following is valid for envvars and yaml files related to the doc process:
 * When filing a pull request in the ocis master branch relating to docs, CI runs `make docs-generate` and copies the result into the `docs` branch of ocis. This branch is then taken as base for owncloud.dev and as reference for the [admin docs](https://doc.owncloud.com/ocis/next/).
 * When running `make docs-generate` locally, the same output is created as above but it stays in the same branch where the make command was issued.
 
-In both cases, `make docs-generate` removes files in the target folder `_includes` to avoid remnants. All content is recreated. 
+In both cases, `make docs-generate` removes files in the target folder `_includes` to avoid remnants. All content is recreated.
 
 On a side note (unrelated to the `docs` branch), [deployment examples](https://github.com/owncloud/ocis/tree/master/deployments/examples) have their own branch related to an ocis stable version to keep the state consistent, which is necessary for the admin documentation.
 
@@ -71,7 +71,7 @@ Global envvars are gathered by checking if the envvar is available in more than 
 
 ### General Extended Envvars Info
 
-"Extended" envvars are variables that need to be present *before* the core or services are starting up as they depend on the info provided like path for config files etc. Therefore they are _not_ bound to services like other envvars. 
+"Extended" envvars are variables that need to be present *before* the core or services are starting up as they depend on the info provided like path for config files etc. Therefore they are _not_ bound to services like other envvars.
 
 It can happen that extended envvars are found but do not need to be published as they are for internal use only. Those envvars can be defined to be ignored for further processing.
 
@@ -81,7 +81,7 @@ IMPORTANT:
 
 - Because extended envvars do not have the same structural setup as "normal" envvars (like type, description or defaults), this info needs to be provided manually once - even if found multiple times. Any change of this info will be noticed during the next CI run, the corresponding adoc file generated, changes transported to the docs branch and published in the next admin docs build.
 
-- The identification if an envvar is in the yaml file already present is made via the `rawname` and the `path` identifyer which includes the line number. If there is a change in the source file shifting line numbers, new items will get added and the old ones not touched. Though technically ok, this can cause confusion to identify which items have a correct path reference. To get rid of items with wrong line numbers, correct the existing ones, especially the one containing the description and which is marked to be shown. Only items that have a real line number match need to be present, orphanded items can safely be deleted. You can double check valid items by creating a dummy branch, delete the `extended_vars.yaml` and run `make docs-generate` to regenerate the file having only items with valid path references.
+- The identification if an envvar is in the yaml file already present is made via the `rawname` and the `path` identifier which includes the line number. If there is a change in the source file shifting line numbers, new items will get added and the old ones not touched. Though technically ok, this can cause confusion to identify which items have a correct path reference. To get rid of items with wrong line numbers, correct the existing ones, especially the one containing the description and which is marked to be shown. Only items that have a real line number match need to be present, orphaned items can safely be deleted. You can double-check valid items by creating a dummy branch, delete the `extended_vars.yaml` and run `make docs-generate` to regenerate the file having only items with valid path references.
 
 - Do not change the sort order of extended envvar blocks as they are automatically reordered alphabetically.
 

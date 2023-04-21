@@ -540,7 +540,7 @@ curl -L -X PATCH 'https://localhost:9200/graph/v1.0/drives/storage-users-1$535aa
 
 {{< hint type=info title="Body value" >}}
 
-This request needs an empty body (--data-raw '{}') to fulfil the standard libregraph specificiation even when the body is not needed.
+This request needs an empty body (--data-raw '{}') to fulfil the standard libregraph specification even when the body is not needed.
 
 {{< /hint >}}
 {{< /tab >}}
