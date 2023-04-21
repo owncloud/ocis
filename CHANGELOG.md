@@ -26,6 +26,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add 'ocis decomposedfs metadata' command: [#5858](https://github.com/owncloud/ocis/pull/5858)
 * Enhancement - Add global env variable extractor: [#5164](https://github.com/owncloud/ocis/pull/5164)
 * Enhancement - Add MessageRichParameters: [#5927](https://github.com/owncloud/ocis/pull/5927)
+* Enhancement - Add webfinger service: [#5373](https://github.com/owncloud/ocis/pull/5373)
 * Enhancement - Async Postprocessing: [#5207](https://github.com/owncloud/ocis/pull/5207)
 * Enhancement - Automate md creation: [#5901](https://github.com/owncloud/ocis/pull/5901)
 * Enhancement - Add more logging to av service: [#5973](https://github.com/owncloud/ocis/pull/5973)
