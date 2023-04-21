@@ -1373,7 +1373,7 @@ class GraphContext implements Context {
 	 * @return void
 	 * @throws JsonException
 	 */
-	public function userRetrievesHisorHerInformationOfUserUsingGraphApi(
+	public function userRetrievesHisOrHerInformationOfUserUsingGraphApi(
 		string $user
 	):void {
 		$response = $this->retrieveUserInformationUsingGraphApi($user);

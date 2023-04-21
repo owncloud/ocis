@@ -331,7 +331,7 @@ trait Sharing {
 	/**
 	 * @param string $user
 	 * @param TableNode|null $body
-	 *    TableNode $body should not have any heading and can have following rows    |
+	 *    TableNode $body should not have any heading and can have the following rows   |
 	 *       | path               | The folder or file path to be shared                |
 	 *       | name               | A (human-readable) name for the share,              |
 	 *       |                    | which can be up to 64 characters in length.         |
@@ -355,7 +355,7 @@ trait Sharing {
 	 *       |                    |     (default: 31, for public shares: 1)             |
 	 *       |                    |     Pass either the (total) number,                 |
 	 *       |                    |     or the keyword,                                 |
-	 *       |                    |     or an comma separated list of keywords          |
+	 *       |                    |     or a comma separated list of keywords           |
 	 *       | shareWith          | The user or group id with which the file should     |
 	 *       |                    | be shared.                                          |
 	 *       | shareType          | The type of the share. This can be one of:          |
@@ -3133,7 +3133,7 @@ trait Sharing {
 	 * Returns shares of a file or folder as a SimpleXMLElement
 	 *
 	 * Note: the "single" SimpleXMLElement may contain one or more actual
-	 * shares (to users, groups or public links etc). If you access an item directly,
+	 * shares (to users, groups or public links etc.). If you access an item directly,
 	 * for example, getShares()->id, then the value of "id" for the first element
 	 * will be returned. To access all the elements, you can loop through the
 	 * returned SimpleXMLElement with "foreach" - it will act like a PHP array

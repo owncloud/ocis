@@ -29,7 +29,7 @@ use Psr\Http\Message\ResponseInterface;
 use SimpleXMLElement;
 
 /**
- * Helper to setup UI / Integration tests
+ * Helper to set up UI / Integration tests
  *
  * @author Artur Neumann <artur@jankaritech.com>
  *

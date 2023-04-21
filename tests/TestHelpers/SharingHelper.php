@@ -169,8 +169,8 @@ class SharingHelper {
 	}
 
 	/**
-	 * calculates the permission sum (int) from given permissions
-	 * permissions can be passed in as int, string or array of int or string
+	 * Calculates the permission sum (int) from given permissions.
+	 * Permissions can be passed in as int, string or array of int or string
 	 * 'read' => 1
 	 * 'update' => 2
 	 * 'create' => 4

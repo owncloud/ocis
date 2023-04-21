@@ -385,7 +385,7 @@ class FilesVersionsContext implements Context {
 
 	/**
 	 * returns the result parsed into an SimpleXMLElement
-	 * with an registered namespace with 'd' as prefix and 'DAV:' as namespace
+	 * with a registered namespace with 'd' as prefix and 'DAV:' as namespace
 	 *
 	 * @param string $user
 	 * @param string $fileId

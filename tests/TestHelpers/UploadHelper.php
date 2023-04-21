@@ -164,7 +164,7 @@ class UploadHelper extends \PHPUnit\Framework\Assert {
 	 * @param string|null $source source file path
 	 * @param string|null $destination destination path on the server
 	 * @param string|null $xRequestId
-	 * @param bool $overwriteMode when false creates separate files to test uploading brand new files,
+	 * @param bool $overwriteMode when false creates separate files to test uploading brand-new files,
 	 *                            when true it just overwrites the same file over and over again with the same name
 	 * @param string|null $exceptChunkingType empty string or "old" or "new"
 	 *

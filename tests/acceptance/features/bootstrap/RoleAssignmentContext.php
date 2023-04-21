@@ -38,7 +38,7 @@ class RoleAssignmentContext implements Context {
 	/**
 	 * @var string
 	 */
-	private string $setttingsUrl = '/api/v0/settings/';
+	private string $settingsUrl = '/api/v0/settings/';
 
 	/**
 	 * This will run before EVERY scenario.
@@ -70,7 +70,7 @@ class RoleAssignmentContext implements Context {
 	 * @throws Exception
 	 */
 	public function getAllExistingRoles(string $user): void {
-		$fullUrl = $this->baseUrl . $this->setttingsUrl . "roles-list";
+		$fullUrl = $this->baseUrl . $this->settingsUrl . "roles-list";
 		$this->featureContext->setResponse(
 			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), "{}")
 		);
@@ -87,7 +87,7 @@ class RoleAssignmentContext implements Context {
 	 * @throws Exception
 	 */
 	public function sendRequestToAssignRoleToUser(string $user, string $userId, string $roleId): void {
-		$fullUrl = $this->baseUrl . $this->setttingsUrl . "assignments-add";
+		$fullUrl = $this->baseUrl . $this->settingsUrl . "assignments-add";
 		$body = json_encode(["account_uuid" => $userId, "role_id" => $roleId], JSON_THROW_ON_ERROR);
 
 		$this->featureContext->setResponse(
@@ -105,7 +105,7 @@ class RoleAssignmentContext implements Context {
 	 * @throws Exception
 	 */
 	public function sendRequestAssignmentsList(string $user, string $userId): void {
-		$fullUrl = $this->baseUrl . $this->setttingsUrl . "assignments-list";
+		$fullUrl = $this->baseUrl . $this->settingsUrl . "assignments-list";
 		$body = json_encode(["account_uuid" => $userId], JSON_THROW_ON_ERROR);
 
 		$this->featureContext->setResponse(

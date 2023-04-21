@@ -1,7 +1,7 @@
 @api @skipOnOcV10
 Feature: favorite
   As a user
-  I want to favouite resources
+  I want to favorite resources
   So that I can access them quickly
 
   Background:

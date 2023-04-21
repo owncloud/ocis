@@ -288,7 +288,7 @@ class TUSContext implements Context {
 	 * @param string $user
 	 * @param string $source
 	 * @param string $destination
-	 * @param string $mtime Time in human readable format is taken as input which is converted into milliseconds that is used by API
+	 * @param string $mtime Time in human-readable format is taken as input which is converted into milliseconds that is used by API
 	 *
 	 * @return void
 	 * @throws Exception

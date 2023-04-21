@@ -14,8 +14,8 @@ Feature: Notification
 
 
   Scenario: user gets a notification of space sharing
-    Given user "Alice" has created a space "notificaton checking" with the default quota using the GraphApi
-    And user "Alice" has shared a space "notificaton checking" with settings:
+    Given user "Alice" has created a space "notification checking" with the default quota using the GraphApi
+    And user "Alice" has shared a space "notification checking" with settings:
       | shareWith | Brian  |
       | role      | editor |
     When user "Brian" lists all notifications
@@ -44,7 +44,7 @@ Feature: Notification
         },
         "message": {
           "type": "string",
-          "enum": ["Alice Hansen added you to Space notificaton checking"]
+          "enum": ["Alice Hansen added you to Space notification checking"]
         },
         "messageRich": {
           "type": "string",
@@ -70,7 +70,7 @@ Feature: Notification
                 },
                 "name": {
                   "type": "string",
-                  "enum": ["notificaton checking"]
+                  "enum": ["notification checking"]
                 }
               }
             },
@@ -104,7 +104,7 @@ Feature: Notification
         },
         "object_id": {
           "type": "string"
-          
+
         },
         "object_type": {
           "type": "string",

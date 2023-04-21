@@ -1,6 +1,6 @@
 @api @skipOnOcV10
 Feature: Resharing
-  As a user 
+  As a user
   I want to reshare resources
   So that other users can have access to them
 
@@ -101,7 +101,7 @@ Feature: Resharing
       | Damian | 31          | 404  |
 
 
-  Scenario Outline: Rrsharing files with different permissions
+  Scenario Outline: Resharing files with different permissions
     Given user "Alice" has uploaded file with content "Random data" to "/file.txt"
     And user "Alice" has shared file "/file.txt" with user "Brian" with permissions "<shareepermissions>"
     And user "Brian" has accepted share "/file.txt" offered by user "Alice"

@@ -1066,7 +1066,7 @@ class SpacesContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function usershouldNotHaveSpace(
+	public function userShouldNotHaveSpace(
 		string $user,
 		string $spaceName
 	): void {
@@ -1803,7 +1803,7 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * returns a url for destination with spacename
+	 * returns a URL for destination with spacename
 	 *
 	 * @param string $user
 	 * @param string $fileDestination

@@ -686,7 +686,7 @@ trait Provisioning {
 		$userId = \str_replace('+', '\+', $setting["userid"]);
 		$newDN = 'uid=' . $userId . ',ou=' . $ou . ',' . $this->ldapBaseDN;
 
-		//pick a high number as uidnumber to make sure there are no conflicts with existing uidnumbers
+		//pick a high uidnumber to make sure there are no conflicts with existing uidnumbers
 		$uidNumber = \count($this->ldapCreatedUsers) + 30000;
 		$entry = [];
 		$entry['cn'] = $userId;
@@ -936,7 +936,7 @@ trait Provisioning {
 						$body,
 					);
 				} else {
-					// Create a OCS request for creating the user. The request is not sent to the server yet.
+					// Create an OCS request for creating the user. The request is not sent to the server yet.
 					$request = OcsApiHelper::createOcsRequest(
 						$this->getBaseUrl(),
 						'POST',

@@ -836,7 +836,7 @@ class WebDavPropertiesContext implements Context {
 			// expected href should be like: "remote.php/webdav/strängé folder/file.txt"
 			$explodeDecoded = \explode('/', $decodedValue);
 			// get the first item of the expected href.
-			// i.e remote.php from "remote.php/webdav/strängé folder/file.txt"
+			// i.e. remote.php from "remote.php/webdav/strängé folder/file.txt"
 			// or dav from "dav/spaces/%spaceid%/C++ file.cpp"
 			$explodeExpected = \explode('/', $expectedHref);
 			$remotePhpIndex = \array_search($explodeExpected[0], $explodeDecoded);
