@@ -1,6 +1,6 @@
 Enhancement: Secure the nats connection with TLS
 
-Encyrpted the connection to the event broker using TLS.
+Encrypted the connection to the event broker using TLS.
 Per default TLS is not enabled but can be enabled by setting either `OCIS_EVENTS_ENABLE_TLS=true` or the respective service configs:
 
 - `AUDIT_EVENTS_ENABLE_TLS=true`

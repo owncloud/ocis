@@ -43,7 +43,7 @@ Updated reva to version 2.3.0. This update includes:
 * Enhancement [cs3org/reva#2790](https://github.com/cs3org/reva/pull/2790): Fake providerids so API stays stable after beta
 * Enhancement [cs3org/reva#2685](https://github.com/cs3org/reva/pull/2685): Enable federated account access
 * Enhancement [cs3org/reva#1787](https://github.com/cs3org/reva/pull/1787): Add support for HTTP TPC
-* Enhancement [cs3org/reva#2799](https://github.com/cs3org/reva/pull/2799): Add flag to enable unrestriced listing of spaces
+* Enhancement [cs3org/reva#2799](https://github.com/cs3org/reva/pull/2799): Add flag to enable unrestricted listing of spaces
 * Enhancement [cs3org/reva#2560](https://github.com/cs3org/reva/pull/2560): Mentix PromSD extensions
 * Enhancement [cs3org/reva#2741](https://github.com/cs3org/reva/pull/2741): Meta path for user
 * Enhancement [cs3org/reva#2613](https://github.com/cs3org/reva/pull/2613): Externalize custom mime types configuration for storage providers

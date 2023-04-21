@@ -630,7 +630,7 @@ Tags: storage, reva
 
    Currently, cross storage etag propagation is not yet implemented, which prevents the desktop
    client from detecting changes via the PROPFIND to /. / is managed by the root storage provider
-   which is independend of the home and oc storage providers. If a file changes in /home/foo, the
+   which is independent of the home and oc storage providers. If a file changes in /home/foo, the
    etag change will only be propagated to the root of the home storage provider.
 
    This change jails users into the `/home` namespace, and allows configuring the namespace to
@@ -701,7 +701,7 @@ Tags: storage, reva
 * Enhancement - Update reva to v0.0.2-0.20200212114015-0dbce24f7e8b: [#91](https://github.com/owncloud/ocis-reva/pull/91)
 
    Reva has seen a lot of changes that allow us to - reduce the configuration overhead - use the
-   autocreato home folder option - use the home folder path layout option - no longer start the root
+   autocreate home folder option - use the home folder path layout option - no longer start the root
    storage
 
    https://github.com/owncloud/ocis-reva/pull/91

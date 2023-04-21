@@ -4,7 +4,7 @@ Updated reva to version 2.1.0. This update includes:
 
   * Fix [cs3org/reva#2636](https://github.com/cs3org/reva/pull/2636): Delay reconnect log for events
   * Fix [cs3org/reva#2645](https://github.com/cs3org/reva/pull/2645): Avoid warning about missing .flock files
-  * Fix [cs3org/reva#2625](https://github.com/cs3org/reva/pull/2625): Fix locking on publik links and the decomposed filesystem
+  * Fix [cs3org/reva#2625](https://github.com/cs3org/reva/pull/2625): Fix locking on public links and the decomposed filesystem
   * Fix [cs3org/reva#2643](https://github.com/cs3org/reva/pull/2643): Emit linkaccessfailed event when share is nil
   * Fix [cs3org/reva#2646](https://github.com/cs3org/reva/pull/2646): Replace public mountpoint fileid with grant fileid in ocdav
   * Fix [cs3org/reva#2612](https://github.com/cs3org/reva/pull/2612): Adjust the scope handling to support the spaces architecture

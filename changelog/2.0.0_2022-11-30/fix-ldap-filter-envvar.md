@@ -1,6 +1,6 @@
 Bugfix: Inconsistency env var naming for LDAP filter configuration
 
-There was a naming inconsitency for the enviroment variables used to define
+There was a naming inconsistency for the environment variables used to define
 LDAP filters for user and groups queries. Some services used `LDAP_USER_FILTER`
 while others used `LDAP_USERFILTER`. This is now changed to use `LDAP_USER_FILTER`
 and `LDAP_GROUP_FILTER`.

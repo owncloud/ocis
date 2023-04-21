@@ -1,8 +1,8 @@
-Enhancement: Unify LDAP config settings accross services
+Enhancement: Unify LDAP config settings across services
 
 The storage services where updated to adapt for the recent changes of the LDAP
 settings in reva.
-    
+
 Also we allow now to use a new set of top-level LDAP environment variables that
 are shared between all LDAP-using services in ocis (graph, idp,
 storage-auth-basic, storage-userprovider, storage-groupprovider, idm). This
@@ -33,7 +33,7 @@ LDAP_GROUP_SCHEMA_ID
 LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING
 
 Where need these can be overwritten by service specific variables. E.g. it is possible
-to use STORAGE_LDAP_URI to overide the top-level LDAP_URI variable.
+to use STORAGE_LDAP_URI to override the top-level LDAP_URI variable.
 
 https://github.com/owncloud/ocis/pull/3476
 https://github.com/owncloud/ocis/issues/3150

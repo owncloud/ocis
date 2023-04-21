@@ -1,4 +1,4 @@
-Bugfix: Initial role assingment with external IDM
+Bugfix: Initial role assignment with external IDM
 
 We've the initial user role assignment when using an external LDAP server.
 

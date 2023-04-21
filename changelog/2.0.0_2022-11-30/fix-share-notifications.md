@@ -1,6 +1,6 @@
 Bugfix: Mail notifications for group shares
 
-We fixed multiple issues in the notifications service, which broke notifcation
+We fixed multiple issues in the notifications service, which broke notification
 mails new shares with groups.
 
 https://github.com/owncloud/ocis/pull/4714
