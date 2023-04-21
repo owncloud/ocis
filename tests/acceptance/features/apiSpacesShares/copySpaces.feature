@@ -418,7 +418,7 @@ Feature: copy file
       | viewer  | should not  | 403         |
 
 
-  Scenario Outline: user copies a folder from personal space to share space with different permmissions
+  Scenario Outline: user copies a folder from personal space to share space with different permissions
     Given user "Brian" has created folder "/testshare"
     And user "Brian" has shared folder "/testshare" with user "Alice" with permissions "<permissions>"
     And user "Alice" has accepted share "/testshare" offered by user "Brian"

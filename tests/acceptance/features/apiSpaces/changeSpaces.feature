@@ -118,7 +118,7 @@ Feature: Change data of space
           "properties": {
             "total" : {
               "type": "number",
-              "enum": [<expectedQuataValue>]
+              "enum": [<expectedQuotaValue>]
             }
           }
         }
@@ -126,7 +126,7 @@ Feature: Change data of space
     }
     """
     Examples:
-      | user  | code | expectedQuataValue |
+      | user  | code | expectedQuotaValue |
       | Alice | 200  | 100                |
       | Brian | 403  | 20                 |
       | Bob   | 403  | 20                 |

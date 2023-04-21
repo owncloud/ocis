@@ -156,7 +156,7 @@ Feature: Search
       | spaces      |
 
 
-  Scenario Outline: limit returned search entries to more entires than there are
+  Scenario Outline: limit returned search entries to more entries than there are
     Given using <dav_version> DAV path
     When user "Alice" searches for "upload" and limits the results to "100" items using the WebDAV API
     Then the HTTP status code should be "207"

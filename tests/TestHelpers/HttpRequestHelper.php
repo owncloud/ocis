@@ -369,7 +369,7 @@ class HttpRequestHelper {
 	}
 
 	/**
-	 * Create an http request based on given parameters.
+	 * Create an HTTP request based on given parameters.
 	 * This creates a RequestInterface object that can be used with a client to send a request.
 	 * This enables us to create multiple requests in advance so that we can send them to the server at once in parallel.
 	 *
@@ -612,7 +612,7 @@ class HttpRequestHelper {
 	 * @throws Exception
 	 */
 	public static function getResponseXml(ResponseInterface $response, ?string $exceptionText = ''):SimpleXMLElement {
-		// rewind just to make sure we can re-parse it in case it was parsed already...
+		// rewind just to make sure we can reparse it in case it was parsed already...
 		$response->getBody()->rewind();
 		$contents = $response->getBody()->getContents();
 		try {

@@ -193,7 +193,7 @@ Feature: check etag propagation after different file alterations
       | Brian | /dst    | Shares   |
 
 
-  Scenario: share reciever moving a folder from one folder to an other changes the etags of both folders for all collaborators
+  Scenario: share receiver moving a folder from one folder to an other changes the etags of both folders for all collaborators
     Given user "Alice" has created folder "/dst"
     And user "Alice" has created folder "/upload/toMove"
     And user "Alice" has shared folder "/upload" with user "Brian"

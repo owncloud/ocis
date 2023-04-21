@@ -2315,7 +2315,7 @@ trait WebDav {
 	}
 
 	/**
-	 * sets the chunking version from human readable format
+	 * sets the chunking version from human-readable format
 	 *
 	 * @param string $version (no|v1|v2|new|old)
 	 *
@@ -3044,7 +3044,7 @@ trait WebDav {
 	 * @param string $user
 	 * @param string $source
 	 * @param string $destination
-	 * @param string $mtime Time in human readable format is taken as input which is converted into milliseconds that is used by API
+	 * @param string $mtime Time in human-readable format is taken as input which is converted into milliseconds that is used by API
 	 *
 	 * @return void
 	 * @throws Exception

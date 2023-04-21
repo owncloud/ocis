@@ -2,7 +2,7 @@
 Feature: set file properties
   As a user
   I want to be able to set meta-information about files
-  So that I can reccord file meta-information (detailed requirement TBD)
+  So that I can record file meta-information (detailed requirement TBD)
 
   Background:
     Given using OCS API version "1"

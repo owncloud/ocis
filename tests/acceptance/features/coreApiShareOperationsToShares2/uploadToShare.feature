@@ -168,7 +168,7 @@ Feature: sharing
       | new      |
 
   @skipOnGraph
-  Scenario Outline: Uploading to a user shared folder with read/write permission when the sharer has unsufficient quota does not work
+  Scenario Outline: Uploading to a user shared folder with read/write permission when the sharer has insufficient quota does not work
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and small skeleton files
     And user "Alice" has created folder "FOLDER"
@@ -188,7 +188,7 @@ Feature: sharing
       | new      |
 
 
-  Scenario Outline: Uploading to a group shared folder with read/write permission when the sharer has unsufficient quota does not work
+  Scenario Outline: Uploading to a group shared folder with read/write permission when the sharer has insufficient quota does not work
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created

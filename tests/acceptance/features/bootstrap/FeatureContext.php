@@ -2941,7 +2941,7 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * returns a string that can be used to check a url of comments with
+	 * returns a string that can be used to check a URL of comments with
 	 * regular expression (without delimiter)
 	 *
 	 * @return string
