@@ -7,7 +7,7 @@ geekdocEditPath: edit/master/docs/architecture
 geekdocFilePath: upload-processing.md
 ---
 
-Uploads are handled by a dedicated service that uses TUS.io for rusumable uploads. When all bytes have been transferred the upload is finalized by making the file available in file listings and for download.
+Uploads are handled by a dedicated service that uses TUS.io for resumable uploads. When all bytes have been transferred the upload is finalized by making the file available in file listings and for download.
 
 The finalization may be asynchronous when mandatory workflow steps are involved.
 
@@ -29,7 +29,7 @@ sequenceDiagram
     storageprovider-->>-ocdav: OK, Protocol simple, UploadEndpoint: /data, Token: {jwt}
     Note right of ocdav: The {jwt} contains the internal actual target, eg.:<br>http://localhost:9158/data/simple/91cc9882-db71-4b37-b694-a522850fcee1
     ocdav->>+dataprovider: PUT /data<br>X-Reva-Transfer: {jwt}
-    dataprovider-->>-ocdav: 201 Created 
+    dataprovider-->>-ocdav: 201 Created
     ocdav-->>-Client: 201 Created
 
 {{</mermaid>}}
@@ -97,7 +97,7 @@ sequenceDiagram
     dataprovider-)nats: emit all-bytes-received event
     nats-)processing: all-bytes-received({uploadid}) event
     Note over dataprovider: TODO: A lot of time may pass here, we could use<br> the `Prefer: respond-async` header to return early<br>with a 202 Accepted status and a Location header<br>to a websocket endpoint
-    alt success 
+    alt success
     processing-)nats: emit processing-finished({uploadid}) event
         nats-)dataprovider: processing-finished({uploadid}) event
         dataprovider-->>-datagateway: 204 No Content<br>TUS-Resumable: 1.0.0<br>Upload-Offset: 363976

@@ -4,7 +4,7 @@ date: 2022-06-14T16:00:00+02:00
 weight: 5
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/ocis/guides
-geekdocFilePath: ocis-and-conatiners.md
+geekdocFilePath: ocis-and-containers.md
 geekdocCollapseSection: true
 ---
 
