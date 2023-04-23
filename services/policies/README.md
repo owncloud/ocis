@@ -63,7 +63,7 @@ policies:
       - your_path_to_policies/util.rego
 ```
 
-Once the references to policy files are configured correctly, the _QUERY configuration needs to be defined for the proxy middleware and for the events service.
+Once the references to policy files are configured correctly, the `_QUERY`  configuration needs to be defined for the proxy middleware and for the events service.
 
 ## Setting the Query Configuration
 
