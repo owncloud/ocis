@@ -1,6 +1,6 @@
 ---
 title: Antivirus
-date: 2023-04-23T01:11:26.926172106Z
+date: 2023-04-23T09:21:47.678374302Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/antivirus
@@ -16,7 +16,7 @@ The `antivirus` service is responsible for scanning files for viruses.
 
 * [Configuration](#configuration)
   * [Antivirus Scanner Type](#antivirus-scanner-type)
-  * [Maximum Scan size](#maximum-scan-size)
+  * [Maximum Scan Size](#maximum-scan-size)
   * [Infected File Handling](#infected-file-handling)
   * [Scanner Inaccessibility](#scanner-inaccessibility)
 * [Operation Modes](#operation-modes)
@@ -31,9 +31,9 @@ The antivirus service currently supports [ICAP](https://tools.ietf.org/html/rfc3
   -   For `icap`, only scanners using the `X-Infection-Found` header are currently supported.
   -   For `clamav` only local sockets can currently be configured.
 
-### Maximum Scan size
+### Maximum Scan Size
 
-Several factors can make it necessary to limit the maximum filesize the antivirus service will use for scanning. Use the `ANTIVIRUS_MAX_SCAN_SIZE` environment variable to scan only a given amount of bytes. Obviously, it is recommended to scan the whole file, but several factors like scanner type and version, bandwith, performance issues, etc. might make a limit necessary.
+Several factors can make it necessary to limit the maximum filesize the antivirus service will use for scanning. Use the `ANTIVIRUS_MAX_SCAN_SIZE` environment variable to scan only a given amount of bytes. Obviously, it is recommended to scan the whole file, but several factors like scanner type and version, bandwidth, performance issues, etc. might make a limit necessary.
 
 ### Infected File Handling
 

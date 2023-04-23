@@ -1,6 +1,6 @@
 ---
 title: Frontend
-date: 2023-04-23T01:11:26.927026472Z
+date: 2023-04-23T09:21:47.679199644Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/docs/services/frontend
@@ -19,6 +19,7 @@ The frontend service translates various owncloud related HTTP APIs to CS3 reques
   * [archiver](#archiver)
   * [datagateway](#datagateway)
   * [ocs](#ocs)
+  * [Sharing](#sharing)
 * [Scalability](#scalability)
 * [Define Read-Only Attributes](#define-read-only-attributes)
 * [Example Yaml Config](#example-yaml-config)
@@ -42,6 +43,12 @@ The datagateway endpoint, by default `/data`, forwards file up- and download req
 ### ocs
 
 The ocs endpoint, by default `/ocs`, implements the ownCloud 10 Open Collaboration Services API by translating it into CS3 API requests. It can handle users, groups, capabilities and also implements the files sharing functionality on top of CS3. The `/ocs/v[12].php/cloud/user/signing-key` is currently handled by the dedicated [ocs](https://github.com/owncloud/ocis/tree/master/services/ocs) service.
+
+### Sharing
+
+Aggregating share information is one of the most time consuming operations in OCIS. The service fetches a list of either received or created shares and has to stat every resource individually. While stats are fast, the default behavior scales linearly with the number of shares.
+To save network trips the sharing implementation can cache the stat requests with an in memory cache or in redis. It will shorten the response time by the network round-trip overhead at the cost of the API only eventually being updated.
+Setting `FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL=60` would cache the stat info for 60 seconds. Increasing this value makes sense for large deployments with thousands of active users that keep the cache up to date. Low frequency usage scenarios should not expect a noticeable improvement.
 
 ## Scalability
 
