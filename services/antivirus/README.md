@@ -11,9 +11,9 @@ The antivirus service currently supports [ICAP](https://tools.ietf.org/html/rfc3
   -   For `icap`, only scanners using the `X-Infection-Found` header are currently supported.
   -   For `clamav` only local sockets can currently be configured.
 
-### Maximum Scan size
+### Maximum Scan Size
 
-Several factors can make it necessary to limit the maximum filesize the antivirus service will use for scanning. Use the `ANTIVIRUS_MAX_SCAN_SIZE` environment variable to scan only a given amount of bytes. Obviously, it is recommended to scan the whole file, but several factors like scanner type and version, bandwith, performance issues, etc. might make a limit necessary.
+Several factors can make it necessary to limit the maximum filesize the antivirus service will use for scanning. Use the `ANTIVIRUS_MAX_SCAN_SIZE` environment variable to scan only a given amount of bytes. Obviously, it is recommended to scan the whole file, but several factors like scanner type and version, bandwidth, performance issues, etc. might make a limit necessary.
 
 ### Infected File Handling
 

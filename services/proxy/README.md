@@ -1,6 +1,6 @@
 # Proxy
 
-The proxy service is an API-Gateway for the ownCloud Infinite Scale microservices. Every HTTP request goes through this service. Authentication, logging and other preprocessing of requests also happens here. Mechanisms like request rate limitting or intrusion prevention are **not** included in the proxy service and must be setup in front like with an external reverse proxy.
+The proxy service is an API-Gateway for the ownCloud Infinite Scale microservices. Every HTTP request goes through this service. Authentication, logging and other preprocessing of requests also happens here. Mechanisms like request rate limiting or intrusion prevention are **not** included in the proxy service and must be setup in front like with an external reverse proxy.
 
 The proxy service is the only service communicating to the outside and needs therefore usual protections against DDOS, Slow Loris or other attack vectors. All other services are not exposed to the outside, but also need protective measures when it comes to distributed setups like when using container orchestration over various physical servers.
 
@@ -102,9 +102,9 @@ The `proxy` service can use a configured store via `PROXY_STORE_TYPE`. Possible 
   -   `redis-sentinel`: Stores data in a configured redis sentinel cluster.
   -   `etcd`: Stores data in a configured etcd cluster.
   -   `nats-js`: Stores data using key-value-store feature of [nats jetstream](https://docs.nats.io/nats-concepts/jetstream/key-value-store)
-  -   `noop`: Stores nothing. Useful for testing. Not recommended in productive enviroments.
+  -   `noop`: Stores nothing. Useful for testing. Not recommended in production environments.
 
 1.  Note that in-memory stores are by nature not reboot persistent.
-2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicapable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store applies.
+2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store applies.
 3.  The proxy service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
 4.  When using `redis-sentinel`, the Redis master to use is configured via `PROXY_OIDC_USERINFO_CACHE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
