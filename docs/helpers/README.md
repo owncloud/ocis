@@ -16,11 +16,12 @@
 
 ## Introduction
 
-`docs/helpers` contains small go programs creating docs by extracting information from the code. The `main.go` program is manually started with `make docs-generate` or via the CI. It calls the other required programs and has three main responsibilities:
+`docs/helpers` contains small go programs creating docs by extracting information from the code. The `main.go` program is manually started with `make docs-generate` or via the CI. It calls the other required programs and has these main responsibilities:
 
 - Generate docs for envvars in config structs including deprecations if there are any.
 - Extract and generate docs for `extended` envvars that are not mentioned in config structs (aka "rogue" envvars).
 - Extract and generate docs for `global` envvars which occur in multiple services.
+- Create `docs/service/<service-name>/_index.md` from `service/<service-name>/README.md` files while keeping the existing `_index.md` if the README.md has not been created so far.
 
 ## Output Generated
 

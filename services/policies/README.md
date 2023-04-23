@@ -86,7 +86,7 @@ proxy:
     query: data.proxy.granted
 ```
 
-The same can be achieved by setting the following evironment variable:
+The same can be achieved by setting the following environment variable:
 
 ```yaml
 PROXY_POLICIES_QUERY=data.proxy.granted
@@ -100,13 +100,13 @@ policies:
     query: data.postprocessing.granted
 ```
 
-The same can be achieved by setting the following evironment variable:
+The same can be achieved by setting the following environment variable:
 
 ```yaml
 POLICIES_POSTPROCESSING_QUERY=data.postprocessing.granted
 ```
 
-As soon as that query is configured, the postprocessing service must be informed to use the policies step by setting the environment variable: 
+As soon as that query is configured, the postprocessing service must be informed to use the policies step by setting the environment variable:
 
 ```yaml
 POSTPROCESSING_STEPS=policies
@@ -116,7 +116,7 @@ Note that additional steps can be configured and their position in the list defi
 
 ## Rego Key Match
 
-To identify available keys for OPA, you need to look at [engine.go](https://github.com/owncloud/ocis/blob/master/services/policies/pkg/engine/engine.go) and the [policies.swagger.json](https://github.com/owncloud/ocis/blob/master/protogen/gen/ocis/services/policies/v0/policies.swagger.json) file. Note that which keys are avaialble depends from which module it is used.
+To identify available keys for OPA, you need to look at [engine.go](https://github.com/owncloud/ocis/blob/master/services/policies/pkg/engine/engine.go) and the [policies.swagger.json](https://github.com/owncloud/ocis/blob/master/protogen/gen/ocis/services/policies/v0/policies.swagger.json) file. Note that which keys are available depends on from which module it is used.
 
 ## Example Policies
 
