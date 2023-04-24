@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix Search reindexing performance regression: [#6085](https://github.com/owncloud/ocis/pull/6085)
 * Bugfix - Fix Search tag indexing: [#5405](https://github.com/owncloud/ocis/pull/5405)
 * Bugfix - Fix user type config for user provider: [#6027](https://github.com/owncloud/ocis/pull/6027)
+* Bugfix - Fix userlog panic: [#6114](https://github.com/owncloud/ocis/pull/6114)
 * Bugfix - Add missing CORS config: [#5987](https://github.com/owncloud/ocis/pull/5987)
 * Bugfix - Populate expanded properties: [#5421](https://github.com/owncloud/ocis/pull/5421)
 * Bugfix - Add portrait thumbnail resolutions: [#5656](https://github.com/owncloud/ocis/pull/5656)
