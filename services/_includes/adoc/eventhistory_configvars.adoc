@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: true
+:show-deprecation: false
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-24-12-23-05]
+[#deprecation-note-2023-04-24-13-14-15]
 [caption=]
 .Deprecation notes for the eventhistory service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -13,11 +13,6 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
-
-| EVENTHISTORY_STORE_ADDRESSES name needs to be harmonized
-| 3.0
-| 4.0.0
-| EVENTHISTORY_STORE_NODES
 |===
 
 endif::[]
@@ -167,26 +162,23 @@ Enable TLS for the connection to the events broker. The events broker is the oci
 
 a|`OCIS_PERSISTENT_STORE` +
 `EVENTHISTORY_STORE` +
-`OCIS_PERSISTENT_STORE_TYPE` +
-`EVENTHISTORY_STORE_TYPE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++memory ++
 a| [subs=-attributes]
-The type of the eventhistory store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
 a|`OCIS_PERSISTENT_STORE_NODES` +
 `EVENTHISTORY_STORE_NODES` +
-`EVENTHISTORY_STORE_ADDRESSES` +
-xref:deprecation-note-2023-04-24-12-23-05[Deprecation Note]
+
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[] ++
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
 
 a|`EVENTHISTORY_STORE_DATABASE` +
 
@@ -206,7 +198,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The database table the store should use.
 
-a|`EVENTHISTORY_RECORD_EXPIRY` +
+a|`OCIS_PERSISTENT_STORE_TTL` +
+`EVENTHISTORY_STORE_TTL` +
 
 a| [subs=-attributes]
 ++Duration ++
@@ -215,7 +208,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
 
-a|`EVENTHISTORY_STORE_SIZE` +
+a|`OCIS_PERSISTENT_STORE_SIZE` +
+`EVENTHISTORY_STORE_SIZE` +
 
 a| [subs=-attributes]
 ++int ++

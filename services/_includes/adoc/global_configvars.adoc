@@ -109,10 +109,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++attribute ++
+++none ++
 
 a| [subs=-attributes]
-An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'.
+An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.
 
 a| `LDAP_GROUP_BASE_DN`
 
@@ -210,7 +210,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++owncloudUUID ++
+++ownclouduuid ++
 
 a| [subs=-attributes]
 LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
@@ -435,7 +435,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.
+Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user id's.
 
 a| `LDAP_USER_SCHEMA_MAIL`
 
@@ -520,7 +520,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
+ID of the user who collects all necessary information for deletion.
 
 a| `OCIS_ASYNC_UPLOADS`
 
@@ -537,82 +537,38 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enable asynchronous file uploads.
 
-a| `OCIS_CACHE_STORE`
+a| `OCIS_CACHE_DATABASE`
 
 a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ ++
+++ocis ++
 
 a| [subs=-attributes]
-The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+The database name the configured store should use.
 
-a| `OCIS_CACHE_STORE_ADDRESS`
+a| `OCIS_CACHE_SIZE`
 
 a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/storage-system.adoc[storage-system] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
-
-a| [subs=-attributes]
-++[]string ++
-
-a| [subs=-attributes]
-++[] ++
-
-a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
-
-a| `OCIS_CACHE_STORE_ADDRESSES`
-
-a| [subs=attributes+]
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/ocs.adoc[ocs] +
-* xref:{s-path}/proxy.adoc[proxy] +
-
-a| [subs=-attributes]
-++[]string ++
-
-a| [subs=-attributes]
-++[] ++
-
-a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
-
-a| `OCIS_CACHE_STORE_NODES`
-
-a| [subs=attributes+]
+* xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
-
-a| [subs=-attributes]
-++[]string ++
-
-a| [subs=-attributes]
-++[] ++
-
-a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
-
-a| `OCIS_CACHE_STORE_SIZE`
-
-a| [subs=attributes+]
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/ocs.adoc[ocs] +
-* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
 ++int ++
@@ -623,33 +579,17 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
-a| `OCIS_CACHE_STORE_TTL`
+a| `OCIS_CACHE_STORE`
 
 a| [subs=attributes+]
-* xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/ocs.adoc[ocs] +
-* xref:{s-path}/proxy.adoc[proxy] +
-
-a| [subs=-attributes]
-++Duration ++
-
-a| [subs=-attributes]
-++0s ++
-
-a| [subs=-attributes]
-Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
-
-a| `OCIS_CACHE_STORE_TYPE`
-
-a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
 ++string ++
@@ -659,6 +599,50 @@ a| [subs=-attributes]
 
 a| [subs=-attributes]
 The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+
+a| `OCIS_CACHE_STORE_NODES`
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++[]string ++
+
+a| [subs=-attributes]
+++[] ++
+
+a| [subs=-attributes]
+A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+
+a| `OCIS_CACHE_TTL`
+
+a| [subs=attributes+]
+* xref:{s-path}/frontend.adoc[frontend] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++Duration ++
+
+a| [subs=-attributes]
+++0s ++
+
+a| [subs=-attributes]
+Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -721,7 +705,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET POST PUT PATCH DELETE OPTIONS] ++
+++[GET] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
@@ -1191,10 +1175,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++attribute ++
+++none ++
 
 a| [subs=-attributes]
-An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'.
+An option to control the behavior for disabling users. Valid options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed.
 
 a| `OCIS_LDAP_GROUP_BASE_DN`
 
@@ -1292,7 +1276,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++owncloudUUID ++
+++ownclouduuid ++
 
 a| [subs=-attributes]
 LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.
@@ -1517,7 +1501,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.
+Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user id's.
 
 a| `OCIS_LDAP_USER_SCHEMA_MAIL`
 
@@ -1805,7 +1789,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+Machine auth API key used to validate internal requests necessary to access resources from other services.
 
 a| `OCIS_OIDC_CLIENT_ID`
 
@@ -1820,7 +1804,7 @@ a| [subs=-attributes]
 ++web ++
 
 a| [subs=-attributes]
-OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP (has no effect when using the builtin IDP).
+OIDC client ID, which ownCloud Web uses. This client needs to be set up in your external IDP (has no effect when using the builtin IDP).
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1856,7 +1840,7 @@ a| [subs=-attributes]
 ++memory ++
 
 a| [subs=-attributes]
-The type of the eventhistory store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
 a| `OCIS_PERSISTENT_STORE_NODES`
 
@@ -1871,7 +1855,37 @@ a| [subs=-attributes]
 ++[] ++
 
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+
+a| `OCIS_PERSISTENT_STORE_SIZE`
+
+a| [subs=attributes+]
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++int ++
+
+a| [subs=-attributes]
+++0 ++
+
+a| [subs=-attributes]
+The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.
+
+a| `OCIS_PERSISTENT_STORE_TTL`
+
+a| [subs=attributes+]
+* xref:{s-path}/eventhistory.adoc[eventhistory] +
+* xref:{s-path}/userlog.adoc[userlog] +
+
+a| [subs=-attributes]
+++Duration ++
+
+a| [subs=-attributes]
+++336h0m0s ++
+
+a| [subs=-attributes]
+Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
 
 a| `OCIS_REVA_GATEWAY`
 

@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-24-12-23-05]
+[#deprecation-note-2023-04-24-13-14-15]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -194,7 +194,7 @@ Enable/Disable HTTPS for the external HTTP services.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-24-12-23-05[Deprecation Note]
+xref:deprecation-note-2023-04-24-13-14-15[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -252,29 +252,25 @@ Sets how OIDC access tokens should be verified. Possible values are 'none' and '
 
 a|`OCIS_CACHE_STORE` +
 `PROXY_OIDC_USERINFO_CACHE_STORE` +
-`OCIS_CACHE_STORE_TYPE` +
-`PROXY_OIDC_USERINFO_CACHE_TYPE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++memory ++
 a| [subs=-attributes]
-The type of the userinfo cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
 a|`OCIS_CACHE_STORE_NODES` +
 `PROXY_OIDC_USERINFO_CACHE_NODES` +
-`OCIS_CACHE_STORE_ADDRESSES` +
-`PROXY_OIDC_USERINFO_CACHE_ADDRESSES` +
 
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[] ++
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
 
-a|`PROXY_OIDC_USERINFO_CACHE_DATABASE` +
+a|`OCIS_CACHE_DATABASE` +
 
 a| [subs=-attributes]
 ++string ++
@@ -292,7 +288,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The database table the store should use.
 
-a|`OCIS_CACHE_STORE_TTL` +
+a|`OCIS_CACHE_TTL` +
 `PROXY_OIDC_USERINFO_CACHE_TTL` +
 
 a| [subs=-attributes]
@@ -302,7 +298,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
 
-a|`OCIS_CACHE_STORE_SIZE` +
+a|`OCIS_CACHE_SIZE` +
 `PROXY_OIDC_USERINFO_CACHE_SIZE` +
 
 a| [subs=-attributes]
