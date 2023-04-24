@@ -19,6 +19,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/go-chi/chi/v5"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
 )
@@ -42,6 +43,12 @@ type ExportPersonalDataRequest struct {
 func (g Graph) ExportPersonalData(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	u := revactx.ContextMustGetUser(ctx)
+	if reqUserID := chi.URLParam(r, "userID"); reqUserID != u.GetId().GetOpaqueId() {
+		g.logger.Info().Msg("uid mismatch")
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = w.Write([]byte("personal data export for other users are not permitted"))
+		return
+	}
 	// Get location from request
 	loc := getLocation(r)
 
