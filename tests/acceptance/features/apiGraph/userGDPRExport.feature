@@ -8,12 +8,11 @@ Feature: user GDPR (General Data Protection Regulation) report
     Given user "Alice" has been created with default attributes and without skeleton files
     And using spaces DAV path
 
-  Scenario: request and check a GDPR report when user upload a file
-    Given user "Alice" has uploaded file with content "sample text" to "lorem.txt"
+  Scenario: generate a GDPR report and check when a user is created
     When user "Alice" generates GDPR reports of his own data to "/.personal_data_export.json"
-    And user "Alice" downloads the content of generated GDPR report of file "personal_data_export.json" using password "123456"
+    And user "Alice" downloads the content of generated GDPR report of file ".personal_data_export.json" using password "123456"
     Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
-    And the downloaded JSON content should contain event type "events.FileUploaded" in item 'events' and should match
+    And the downloaded JSON content should contain event type "events.UserCreated" in item 'events' and should match
     """
     {
       "type": "object",
@@ -25,22 +24,85 @@ Feature: user GDPR (General Data Protection Regulation) report
           "type": "object",
           "required": [
             "Executant",
-            "Owner",
-            "Ref",
-            "SpaceOwner"
+            "UserID"
           ],
           "properties": {
-            "Ref": {
+            "Executant": {
               "type": "object",
               "required": [
-                "path"
+                "idp",
+                "opaque_id",
+                "type"
               ],
               "properties": {
-                "path" : {
+                "idp": {
                   "type": "string",
-                  "enum": ["./lorem.txt"]
+                  "pattern": "^%base_url%$"
+                },
+                "opaque_id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "type": {
+                  "type": "number",
+                  "enum": [1]
                 }
               }
+            },
+            "UserID": {
+              "type": "string",
+              "pattern": "^%user_id_pattern%$"
+            }
+          }
+        }
+      }
+    }
+    """
+    And the downloaded JSON content should contain event type "events.SpaceCreated" in item 'events' and should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "event"
+      ],
+      "properties": {
+        "event" : {
+          "type": "object",
+          "required": [
+            "Executant",
+            "Name",
+            "Type"
+          ],
+          "properties": {
+            "Executant": {
+              "type": "object",
+              "required": [
+                "idp",
+                "opaque_id",
+                "type"
+              ],
+              "properties": {
+                "idp": {
+                  "type": "string",
+                  "pattern": "^%base_url%$"
+                },
+                "opaque_id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "type": {
+                  "type": "number",
+                  "enum": [1]
+                }
+              }
+            },
+            "Name": {
+              "type": "string",
+              "enum": ["Alice Hansen"]
+            },
+            "Type": {
+              "type": "string",
+              "enum": ["personal"]
             }
           }
         }
