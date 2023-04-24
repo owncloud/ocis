@@ -213,7 +213,6 @@ func GetOrHeadFile(w http.ResponseWriter, r *http.Request, fs storage.FS, spaceI
 			sublog.Error().Int64("copied", c).Int64("size", sendSize).Msg("copied vs size mismatch")
 		}
 	}
-
 }
 
 func handleError(w http.ResponseWriter, log *zerolog.Logger, err error, action string) {

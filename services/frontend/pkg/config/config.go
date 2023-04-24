@@ -123,25 +123,16 @@ type OCS struct {
 	SharePrefix                          string             `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX" desc:"Path prefix for shares as part of an ocis resource. Note that the path must start with '/'."`
 	HomeNamespace                        string             `yaml:"home_namespace" env:"FRONTEND_OCS_PERSONAL_NAMESPACE;FRONTEND_OCS_HOME_NAMESPACE" desc:"Homespace namespace identifier." deprecationVersion:"3.0" removalVersion:"4.0.0" deprecationInfo:"FRONTEND_OCS_HOME_NAMESPACE changing name for consistency" deprecationReplacement:"FRONTEND_OCS_PERSONAL_NAMESPACE"`
 	AdditionalInfoAttribute              string             `yaml:"additional_info_attribute" env:"FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE" desc:"Additional information attribute for the user like {{.Mail}}."`
-	ResourceInfoCacheTTL                 int                `yaml:"resource_info_cache_ttl" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL" desc:"Max TTL in seconds for the resource info cache. 0 disables the cache."`
-	ResourceInfoCacheType                string             `yaml:"resource_info_cache_type" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE" desc:"The type of the resource info cache. Supported values are 'memory' and 'redis'."`
-	ResourceInfoCaches                   ResourceInfoCaches `yaml:"resource_info_caches,omitempty"` // only used for redis
+	ResourceInfoCacheType                string             `yaml:"resource_info_cache_type" env:"OCIS_CACHE_STORE;FRONTEND_OCS_RESOURCE_INFO_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	ResourceInfoCacheNodes               []string           `yaml:"resource_info_cache_nodes" env:"OCIS_CACHE_STORE_NODES;FRONTEND_OCS_RESOURCE_INFO_CACHE_STORE_NODES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`
+	ResourceInfoCacheDatabase            string             `yaml:"resource_info_cache_database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use."`
+	ResourceInfoCacheTable               string             `yaml:"resource_info_cache_table" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TABLE" desc:"The database table the store should use."`
+	ResourceInfoCacheTTL                 int                `yaml:"resource_info_cache_ttl" env:"OCIS_CACHE_TTL;FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL" desc:"Max TTL in seconds for the resource info cache."`
+	ResourceInfoCacheSize                int                `yaml:"resource_info_cache_size" env:"OCIS_CACHE_SIZE;FRONTEND_OCS_RESOURCE_INFO_CACHE_SIZE" desc:"Max number of entries to hold in the cache."`
 	CacheWarmupDriver                    string             `yaml:"cache_warmup_driver,omitempty"`  // not supported by the oCIS product, therefore not part of docs
 	CacheWarmupDrivers                   CacheWarmupDrivers `yaml:"cache_warmup_drivers,omitempty"` // not supported by the oCIS product, therefore not part of docs
 	EnableDenials                        bool               `yaml:"enable_denials" env:"FRONTEND_OCS_ENABLE_DENIALS" desc:"EXPERIMENTAL: enable the feature to deny access on folders."`
 	WriteablePublicShareMustHavePassword bool               `yaml:"public_sharing_writeableshare_must_have_password" env:"OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD;FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD" desc:"Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares."`
-}
-
-// ResourceInfoCaches holds resource info cache configurations
-type ResourceInfoCaches struct {
-	Redis RedisDriver `yaml:"redis,omitempty"`
-}
-
-// RedisDriver holds redis configuration
-type RedisDriver struct {
-	Address  string `yaml:"address" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_ADDR" desc:"A comma separated list of addresses to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how addresses are used is dependent on the library of the configured store."`
-	Username string `yaml:"username" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_USERNAME" desc:"The username to access the redis cache."`
-	Password string `yaml:"password" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_PASSWORD" desc:"The password to access the redis cache."`
 }
 
 type CacheWarmupDrivers struct {

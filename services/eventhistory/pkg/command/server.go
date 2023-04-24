@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/cs3org/reva/v2/pkg/events/stream"
+	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
-	"github.com/owncloud/ocis/v2/ocis-pkg/store"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config"
 	"github.com/owncloud/ocis/v2/services/eventhistory/pkg/config/parser"
@@ -57,7 +57,7 @@ func Server(cfg *config.Config) *cli.Command {
 
 			st := store.Create(
 				store.Store(cfg.Store.Store),
-				store.TTL(cfg.Store.RecordExpiry),
+				store.TTL(cfg.Store.TTL),
 				store.Size(cfg.Store.Size),
 				microstore.Nodes(cfg.Store.Nodes...),
 				microstore.Database(cfg.Store.Database),

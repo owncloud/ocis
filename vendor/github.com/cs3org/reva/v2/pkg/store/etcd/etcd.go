@@ -16,19 +16,20 @@ const (
 	suffixNS = ".suffix"
 )
 
-type EtcdStore struct {
+// Store is a store implementation which uses etcd to store the data
+type Store struct {
 	options store.Options
 	client  *clientv3.Client
 }
 
-// Create a new go-micro store backed by etcd
-func NewEtcdStore(opts ...store.Option) store.Store {
-	es := &EtcdStore{}
+// NewStore creates a new go-micro store backed by etcd
+func NewStore(opts ...store.Option) store.Store {
+	es := &Store{}
 	_ = es.Init(opts...)
 	return es
 }
 
-func (es *EtcdStore) getCtx() (context.Context, context.CancelFunc) {
+func (es *Store) getCtx() (context.Context, context.CancelFunc) {
 	currentCtx := es.options.Context
 	if currentCtx == nil {
 		currentCtx = context.TODO()
@@ -42,7 +43,7 @@ func (es *EtcdStore) getCtx() (context.Context, context.CancelFunc) {
 // Currently, only the etcd nodes are configurable. If no node is provided,
 // it will use the "127.0.0.1:2379" node.
 // Context timeout is setup to 10 seconds, and dial timeout to 2 seconds
-func (es *EtcdStore) setupClient() {
+func (es *Store) setupClient() {
 	if es.client != nil {
 		es.client.Close()
 	}
@@ -60,10 +61,10 @@ func (es *EtcdStore) setupClient() {
 	es.client = cli
 }
 
-// Initialize the go-micro store implementation.
+// Init initializes the go-micro store implementation.
 // Currently, only the nodes are configurable, the rest of the options
 // will be ignored.
-func (es *EtcdStore) Init(opts ...store.Option) error {
+func (es *Store) Init(opts ...store.Option) error {
 	optList := store.Options{}
 	for _, opt := range opts {
 		opt(&optList)
@@ -74,8 +75,8 @@ func (es *EtcdStore) Init(opts ...store.Option) error {
 	return nil
 }
 
-// Get the store options
-func (es *EtcdStore) Options() store.Options {
+// Options returns the store options
+func (es *Store) Options() store.Options {
 	return es.options
 }
 
@@ -124,7 +125,7 @@ func getEffectiveTTL(r *store.Record, opts store.WriteOptions) int64 {
 //
 // It's recommended to use a minimum TTL of 10 secs or higher (or not to use
 // TTL) in order to prevent problematic scenarios.
-func (es *EtcdStore) Write(r *store.Record, opts ...store.WriteOption) error {
+func (es *Store) Write(r *store.Record, opts ...store.WriteOption) error {
 	wopts := store.WriteOptions{}
 	for _, opt := range opts {
 		opt(&wopts)
@@ -208,7 +209,7 @@ func processListResponse(resp *clientv3.GetResponse, offset int64, reverse bool)
 }
 
 // Perform an exact key read and return the result
-func (es *EtcdStore) directRead(kv clientv3.KV, key string) ([]*store.Record, error) {
+func (es *Store) directRead(kv clientv3.KV, key string) ([]*store.Record, error) {
 	ctx, cancel := es.getCtx()
 	resp, err := kv.Get(ctx, key)
 	cancel()
@@ -226,7 +227,7 @@ func (es *EtcdStore) directRead(kv clientv3.KV, key string) ([]*store.Record, er
 // Perform a prefix read with limit and offset. A limit of 0 will return all
 // results. Usage of offset isn't recommended because those results must still
 // be fethed from the server in order to be discarded.
-func (es *EtcdStore) prefixRead(kv clientv3.KV, key string, limit, offset int64) ([]*store.Record, error) {
+func (es *Store) prefixRead(kv clientv3.KV, key string, limit, offset int64) ([]*store.Record, error) {
 	getOptions := []clientv3.OpOption{
 		clientv3.WithPrefix(),
 	}
@@ -250,7 +251,7 @@ func (es *EtcdStore) prefixRead(kv clientv3.KV, key string, limit, offset int64)
 // we'll find all the results we need within that range, and we'll likely
 // need to request more data from the server. The number of requests we need
 // to perform is unknown and might cause load.
-func (es *EtcdStore) prefixSuffixRead(kv clientv3.KV, prefix, suffix string, limit, offset int64) ([]*store.Record, error) {
+func (es *Store) prefixSuffixRead(kv clientv3.KV, prefix, suffix string, limit, offset int64) ([]*store.Record, error) {
 	firstKeyOut := firstKeyOutOfPrefixString(prefix)
 	getOptions := []clientv3.OpOption{
 		clientv3.WithRange(firstKeyOut),
@@ -327,7 +328,7 @@ func (es *EtcdStore) prefixSuffixRead(kv clientv3.KV, prefix, suffix string, lim
 // Don't rely on any particular order of the keys. The records are expected to
 // be sorted by key except if the suffix option (suffix without prefix) is
 // used. In this case, the keys will be sorted based on the reversed key
-func (es *EtcdStore) Read(key string, opts ...store.ReadOption) ([]*store.Record, error) {
+func (es *Store) Read(key string, opts ...store.ReadOption) ([]*store.Record, error) {
 	ropts := store.ReadOptions{}
 	for _, opt := range opts {
 		opt(&ropts)
@@ -362,7 +363,7 @@ func (es *EtcdStore) Read(key string, opts ...store.ReadOption) ([]*store.Record
 // Since the Write method inserts 2 entries for a given key, those both
 // entries will also be removed using the same key. This is handled
 // transparently.
-func (es *EtcdStore) Delete(key string, opts ...store.DeleteOption) error {
+func (es *Store) Delete(key string, opts ...store.DeleteOption) error {
 	dopts := store.DeleteOptions{}
 	for _, opt := range opts {
 		opt(&dopts)
@@ -391,7 +392,7 @@ func (es *EtcdStore) Delete(key string, opts ...store.DeleteOption) error {
 //
 // Note that values for the keys won't be requested to the etcd server, that's
 // why the reverse option is important
-func (es *EtcdStore) listKeys(kv clientv3.KV, prefixKey string, limit, offset int64, reverse bool) ([]string, error) {
+func (es *Store) listKeys(kv clientv3.KV, prefixKey string, limit, offset int64, reverse bool) ([]string, error) {
 	getOptions := []clientv3.OpOption{
 		clientv3.WithKeysOnly(),
 		clientv3.WithPrefix(),
@@ -415,7 +416,7 @@ func (es *EtcdStore) listKeys(kv clientv3.KV, prefixKey string, limit, offset in
 // the suffix manually on our side, which means we'll likely need to perform
 // additional requests to the etcd server to get more results matching all the
 // requirements.
-func (es *EtcdStore) prefixSuffixList(kv clientv3.KV, prefix, suffix string, limit, offset int64) ([]string, error) {
+func (es *Store) prefixSuffixList(kv clientv3.KV, prefix, suffix string, limit, offset int64) ([]string, error) {
 	firstKeyOut := firstKeyOutOfPrefixString(prefix)
 	getOptions := []clientv3.OpOption{
 		clientv3.WithKeysOnly(),
@@ -492,7 +493,7 @@ func (es *EtcdStore) prefixSuffixList(kv clientv3.KV, prefix, suffix string, lim
 // just the suffix option is fine.
 // In addition, using the offset option is also discouraged because we'll
 // need to request additional keys that will be skipped on our side.
-func (es *EtcdStore) List(opts ...store.ListOption) ([]string, error) {
+func (es *Store) List(opts ...store.ListOption) ([]string, error) {
 	lopts := store.ListOptions{}
 	for _, opt := range opts {
 		opt(&lopts)
@@ -521,11 +522,11 @@ func (es *EtcdStore) List(opts ...store.ListOption) ([]string, error) {
 }
 
 // Close the client
-func (es *EtcdStore) Close() error {
+func (es *Store) Close() error {
 	return es.client.Close()
 }
 
 // Return the service name
-func (es *EtcdStore) String() string {
+func (es *Store) String() string {
 	return "Etcd"
 }

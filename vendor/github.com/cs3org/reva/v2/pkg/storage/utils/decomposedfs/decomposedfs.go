@@ -160,7 +160,7 @@ func New(o *options.Options, lu *lookup.Lookup, p Permissions, tp Tree, es event
 		p:            p,
 		chunkHandler: chunking.NewChunkHandler(filepath.Join(o.Root, "uploads")),
 		stream:       es,
-		cache:        cache.GetStatCache(o.StatCache.CacheStore, o.StatCache.CacheNodes, o.StatCache.CacheDatabase, "stat", 0),
+		cache:        cache.GetStatCache(o.StatCache.Store, o.StatCache.Nodes, o.StatCache.Database, "stat", time.Duration(o.StatCache.TTL)*time.Second, o.StatCache.Size),
 	}
 
 	if o.AsyncFileUploads {

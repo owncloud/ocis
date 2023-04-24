@@ -19,20 +19,10 @@
 package cache
 
 import (
-	"time"
-
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 )
 
 // Warmup is the interface to implement cache warmup strategies.
 type Warmup interface {
 	GetResourceInfos() ([]*provider.ResourceInfo, error)
-}
-
-// ResourceInfoCache is the interface to implement caches for resource infos
-type ResourceInfoCache interface {
-	Get(key string) (*provider.ResourceInfo, error)
-	GetKeys(keys []string) ([]*provider.ResourceInfo, error)
-	Set(key string, info *provider.ResourceInfo) error
-	SetWithExpire(key string, info *provider.ResourceInfo, expiration time.Duration) error
 }

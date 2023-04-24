@@ -146,24 +146,20 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 					"insecure":               true,
 				},
 				"ocs": map[string]interface{}{
-					"storage_registry_svc":     cfg.Reva.Address,
-					"share_prefix":             cfg.OCS.SharePrefix,
-					"home_namespace":           cfg.OCS.HomeNamespace,
-					"resource_info_cache_ttl":  cfg.OCS.ResourceInfoCacheTTL,
-					"resource_info_cache_type": cfg.OCS.ResourceInfoCacheType,
-					"resource_info_caches": map[string]interface{}{
-						// memory has no additional config
-						"redis": map[string]interface{}{
-							"redis_address":  cfg.OCS.ResourceInfoCaches.Redis.Address,
-							"redis_username": cfg.OCS.ResourceInfoCaches.Redis.Username,
-							"redis_password": cfg.OCS.ResourceInfoCaches.Redis.Password,
-						},
-					},
-					"prefix":                    cfg.OCS.Prefix,
-					"additional_info_attribute": cfg.OCS.AdditionalInfoAttribute,
-					"machine_auth_apikey":       cfg.MachineAuthAPIKey,
-					"enable_denials":            cfg.OCS.EnableDenials,
-					"cache_warmup_driver":       cfg.OCS.CacheWarmupDriver,
+					"storage_registry_svc":         cfg.Reva.Address,
+					"share_prefix":                 cfg.OCS.SharePrefix,
+					"home_namespace":               cfg.OCS.HomeNamespace,
+					"resource_info_cache_ttl":      cfg.OCS.ResourceInfoCacheTTL,
+					"resource_info_cache_size":     cfg.OCS.ResourceInfoCacheSize,
+					"resource_info_cache_store":    cfg.OCS.ResourceInfoCacheType,
+					"resource_info_cache_nodes":    cfg.OCS.ResourceInfoCacheNodes,
+					"resource_info_cache_database": cfg.OCS.ResourceInfoCacheDatabase,
+					"resource_info_cache_table":    cfg.OCS.ResourceInfoCacheTable,
+					"prefix":                       cfg.OCS.Prefix,
+					"additional_info_attribute":    cfg.OCS.AdditionalInfoAttribute,
+					"machine_auth_apikey":          cfg.MachineAuthAPIKey,
+					"enable_denials":               cfg.OCS.EnableDenials,
+					"cache_warmup_driver":          cfg.OCS.CacheWarmupDriver,
 					"cache_warmup_drivers": map[string]interface{}{
 						"cbox": map[string]interface{}{
 							"db_username": cfg.OCS.CacheWarmupDrivers.CBOX.DBUsername,

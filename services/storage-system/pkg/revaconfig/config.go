@@ -161,10 +161,16 @@ func metadataDrivers(cfg *config.Config) map[string]interface{} {
 			"permissionssvc":             cfg.GRPC.Addr,
 			"max_acquire_lock_cycles":    cfg.Drivers.OCIS.MaxAcquireLockCycles,
 			"lock_cycle_duration_factor": cfg.Drivers.OCIS.LockCycleDurationFactor,
+			"statcache": map[string]interface{}{
+				"cache_store":    "noop",
+				"cache_database": "system",
+			},
 			"filemetadatacache": map[string]interface{}{
 				"cache_store":    cfg.Cache.Store,
 				"cache_nodes":    cfg.Cache.Nodes,
 				"cache_database": cfg.Cache.Database,
+				"cache_ttl":      cfg.Cache.TTL,
+				"cache_size":     cfg.Cache.Size,
 			},
 		},
 	}

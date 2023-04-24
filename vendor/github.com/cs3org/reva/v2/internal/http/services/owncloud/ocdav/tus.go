@@ -50,11 +50,9 @@ func (s *svc) handlePathTusPost(w http.ResponseWriter, r *http.Request, ns strin
 
 	// read filename from metadata
 	meta := tusd.ParseMetadataHeader(r.Header.Get(net.HeaderUploadMetadata))
-	for _, r := range nameRules {
-		if !r.Test(meta["filename"]) {
-			w.WriteHeader(http.StatusPreconditionFailed)
-			return
-		}
+	if err := ValidateName(meta["filename"], s.nameValidators); err != nil {
+		w.WriteHeader(http.StatusPreconditionFailed)
+		return
 	}
 
 	// append filename to current dir
@@ -76,11 +74,9 @@ func (s *svc) handleSpacesTusPost(w http.ResponseWriter, r *http.Request, spaceI
 
 	// read filename from metadata
 	meta := tusd.ParseMetadataHeader(r.Header.Get(net.HeaderUploadMetadata))
-	for _, r := range nameRules {
-		if !r.Test(meta["filename"]) {
-			w.WriteHeader(http.StatusPreconditionFailed)
-			return
-		}
+	if err := ValidateName(meta["filename"], s.nameValidators); err != nil {
+		w.WriteHeader(http.StatusPreconditionFailed)
+		return
 	}
 
 	sublog := appctx.GetLogger(ctx).With().Str("spaceid", spaceID).Str("path", r.URL.Path).Logger()

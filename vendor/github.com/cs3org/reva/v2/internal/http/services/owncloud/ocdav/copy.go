@@ -87,19 +87,18 @@ func (s *svc) handlePathCopy(w http.ResponseWriter, r *http.Request, ns string) 
 		return
 	}
 
-	for _, r := range nameRules {
-		if !r.Test(src) {
-			w.WriteHeader(http.StatusBadRequest)
-			b, err := errors.Marshal(http.StatusBadRequest, "source failed naming rules", "")
-			errors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
-			return
-		}
-		if !r.Test(dst) {
-			w.WriteHeader(http.StatusBadRequest)
-			b, err := errors.Marshal(http.StatusBadRequest, "destination failed naming rules", "")
-			errors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
-			return
-		}
+	if err := ValidateName(src, s.nameValidators); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		b, err := errors.Marshal(http.StatusBadRequest, "source failed naming rules", "")
+		errors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
+		return
+	}
+
+	if err := ValidateName(dst, s.nameValidators); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		b, err := errors.Marshal(http.StatusBadRequest, "destination failed naming rules", "")
+		errors.HandleWebdavError(appctx.GetLogger(ctx), w, b, err)
+		return
 	}
 
 	dst = path.Join(ns, dst)

@@ -89,9 +89,13 @@ func DefaultConfig() *config.Config {
 			ClusterID: "ocis-cluster",
 			EnableTLS: false,
 		},
-		Cache: config.Cache{
+		StatCache: config.StatCache{
 			Store:    "memory",
-			Database: "users",
+			Database: "ocis",
+		},
+		FilemetadataCache: config.FilemetadataCache{
+			Store:    "memory",
+			Database: "ocis",
 		},
 		Tasks: config.Tasks{
 			PurgeTrashBin: config.PurgeTrashBin{

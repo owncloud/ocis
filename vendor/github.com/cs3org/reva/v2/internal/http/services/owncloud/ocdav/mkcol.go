@@ -40,10 +40,8 @@ func (s *svc) handlePathMkcol(w http.ResponseWriter, r *http.Request, ns string)
 	defer span.End()
 
 	fn := path.Join(ns, r.URL.Path)
-	for _, r := range nameRules {
-		if !r.Test(fn) {
-			return http.StatusBadRequest, fmt.Errorf("invalid name rule")
-		}
+	if err := ValidateName(fn, s.nameValidators); err != nil {
+		return http.StatusBadRequest, err
 	}
 	sublog := appctx.GetLogger(ctx).With().Str("path", fn).Logger()
 

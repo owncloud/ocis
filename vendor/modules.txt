@@ -349,7 +349,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.12.1-0.20230420073005-11edad1f09fe
+# github.com/cs3org/reva/v2 v2.12.1-0.20230424091007-8d8b567179b1
 ## explicit; go 1.19
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -576,16 +576,13 @@ github.com/cs3org/reva/v2/pkg/rhttp/datatx/manager/registry
 github.com/cs3org/reva/v2/pkg/rhttp/datatx/manager/simple
 github.com/cs3org/reva/v2/pkg/rhttp/datatx/manager/spaces
 github.com/cs3org/reva/v2/pkg/rhttp/datatx/manager/tus
+github.com/cs3org/reva/v2/pkg/rhttp/datatx/metrics
 github.com/cs3org/reva/v2/pkg/rhttp/datatx/utils/download
 github.com/cs3org/reva/v2/pkg/rhttp/global
 github.com/cs3org/reva/v2/pkg/rhttp/router
 github.com/cs3org/reva/v2/pkg/sdk/common
 github.com/cs3org/reva/v2/pkg/share
 github.com/cs3org/reva/v2/pkg/share/cache
-github.com/cs3org/reva/v2/pkg/share/cache/loader
-github.com/cs3org/reva/v2/pkg/share/cache/memory
-github.com/cs3org/reva/v2/pkg/share/cache/redis
-github.com/cs3org/reva/v2/pkg/share/cache/registry
 github.com/cs3org/reva/v2/pkg/share/cache/warmup/cbox
 github.com/cs3org/reva/v2/pkg/share/cache/warmup/loader
 github.com/cs3org/reva/v2/pkg/share/cache/warmup/registry
@@ -674,6 +671,9 @@ github.com/cs3org/reva/v2/pkg/storage/utils/sync
 github.com/cs3org/reva/v2/pkg/storage/utils/templates
 github.com/cs3org/reva/v2/pkg/storage/utils/walker
 github.com/cs3org/reva/v2/pkg/storagespace
+github.com/cs3org/reva/v2/pkg/store
+github.com/cs3org/reva/v2/pkg/store/etcd
+github.com/cs3org/reva/v2/pkg/store/memory
 github.com/cs3org/reva/v2/pkg/sysinfo
 github.com/cs3org/reva/v2/pkg/tags
 github.com/cs3org/reva/v2/pkg/token
@@ -906,7 +906,7 @@ github.com/go-micro/plugins/v4/server/grpc
 # github.com/go-micro/plugins/v4/server/http v1.2.1
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/server/http
-# github.com/go-micro/plugins/v4/store/nats-js v1.2.0
+# github.com/go-micro/plugins/v4/store/nats-js v1.1.0
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/store/nats-js
 # github.com/go-micro/plugins/v4/store/redis v1.2.0

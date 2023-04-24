@@ -43,7 +43,6 @@ import (
 	_ "github.com/cs3org/reva/v2/pkg/preferences/loader"
 	_ "github.com/cs3org/reva/v2/pkg/publicshare/manager/loader"
 	_ "github.com/cs3org/reva/v2/pkg/rhttp/datatx/manager/loader"
-	_ "github.com/cs3org/reva/v2/pkg/share/cache/loader"
 	_ "github.com/cs3org/reva/v2/pkg/share/cache/warmup/loader"
 	_ "github.com/cs3org/reva/v2/pkg/share/manager/loader"
 	_ "github.com/cs3org/reva/v2/pkg/storage/favorite/loader"

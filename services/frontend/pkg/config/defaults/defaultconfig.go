@@ -102,12 +102,13 @@ func DefaultConfig() *config.Config {
 			Prefix: "data",
 		},
 		OCS: config.OCS{
-			Prefix:                  "ocs",
-			SharePrefix:             "/Shares",
-			HomeNamespace:           "/users/{{.Id.OpaqueId}}",
-			AdditionalInfoAttribute: "{{.Mail}}",
-			ResourceInfoCacheType:   "memory",
-			ResourceInfoCacheTTL:    0,
+			Prefix:                    "ocs",
+			SharePrefix:               "/Shares",
+			HomeNamespace:             "/users/{{.Id.OpaqueId}}",
+			AdditionalInfoAttribute:   "{{.Mail}}",
+			ResourceInfoCacheType:     "memory",
+			ResourceInfoCacheDatabase: "frontend",
+			ResourceInfoCacheTTL:      0,
 		},
 		Middleware: config.Middleware{
 			Auth: config.Auth{

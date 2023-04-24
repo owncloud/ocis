@@ -6,8 +6,8 @@ import (
 	"go-micro.dev/v4/store"
 )
 
-// In-memory store implementation using multiple MemStore to provide support
-// for multiple databases and tables.
+// MultiMemStore is a in-memory store implementation using multiple MemStore
+// to provide support for multiple databases and tables.
 // Each table will be mapped to its own MemStore, which will be completely
 // isolated from the rest. In particular, each MemStore will have its own
 // capacity, so it's possible to have 10 MemStores with full capacity (512
@@ -24,7 +24,7 @@ type MultiMemStore struct {
 	genOpts      []store.Option
 }
 
-// Create a new MultiMemStore. A new MemStore will be mapped based on the options.
+// NewMultiMemStore creates a new MultiMemStore. A new MemStore will be mapped based on the options.
 // A default MemStore will be mapped if no Database and Table aren't used.
 func NewMultiMemStore(opts ...store.Option) store.Store {
 	m := &MultiMemStore{
@@ -55,7 +55,7 @@ func (m *MultiMemStore) getMemStore(prefix string) *MemStore {
 	return newStore
 }
 
-// Initialize the mapped MemStore based on the Database and Table values
+// Init initializes the mapped MemStore based on the Database and Table values
 // from the options with the same options. The target MemStore will be
 // reinitialized if needed.
 func (m *MultiMemStore) Init(opts ...store.Option) error {
@@ -70,7 +70,7 @@ func (m *MultiMemStore) Init(opts ...store.Option) error {
 	return mStore.Init(opts...)
 }
 
-// Get the options used to create the MultiMemStore.
+// Options returns the options used to create the MultiMemStore.
 // Specific options for each MemStore aren't available
 func (m *MultiMemStore) Options() store.Options {
 	optList := store.Options{}
@@ -149,10 +149,12 @@ func (m *MultiMemStore) List(opts ...store.ListOption) ([]string, error) {
 	return mStore.List(opts...)
 }
 
+// Close closes the store
 func (m *MultiMemStore) Close() error {
 	return nil
 }
 
+// String returns the name of the store implementation
 func (m *MultiMemStore) String() string {
 	return "MultiRadixMemStore"
 }

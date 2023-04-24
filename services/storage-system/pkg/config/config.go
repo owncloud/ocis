@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -84,7 +85,9 @@ type OCISDriver struct {
 
 // Cache holds cache config
 type Cache struct {
-	Store    string   `yaml:"store" env:"OCIS_CACHE_STORE;STORAGE_SYSTEM_CACHE_STORE;OCIS_CACHE_STORE_TYPE" desc:"Store implementation for the cache. Supported values are 'memory' (default), 'redis', 'redis-sentinel', 'nats-js', 'etcd' and 'noop'. See the text description for details."`
-	Nodes    []string `yaml:"nodes" env:"OCIS_CACHE_STORE_NODES;STORAGE_SYSTEM_CACHE_NODES;OCIS_CACHE_STORE_ADDRESS" desc:"A comma separated list of nodes to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`
-	Database string   `yaml:"database" env:"STORAGE_SYSTEM_CACHE_DATABASE" desc:"The database name the configured store should use."`
+	Store    string        `yaml:"store" env:"OCIS_CACHE_STORE;STORAGE_SYSTEM_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	Nodes    []string      `yaml:"nodes" env:"OCIS_CACHE_STORE_NODES;STORAGE_SYSTEM_CACHE_NODES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`
+	Database string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use."`
+	TTL      time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;STORAGE_SYSTEM_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds)."`
+	Size     int           `yaml:"size" env:"OCIS_CACHE_SIZE;STORAGE_SYSTEM_CACHE_SIZE" desc:"The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512."`
 }

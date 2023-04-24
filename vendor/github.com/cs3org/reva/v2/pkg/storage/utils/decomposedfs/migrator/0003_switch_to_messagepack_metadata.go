@@ -25,9 +25,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/cs3org/reva/v2/pkg/storage/cache"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
 )
 
 // Migration0003 migrates the file metadata to the current backend.
@@ -44,7 +44,7 @@ func (m *Migrator) Migration0003() (Result, error) {
 
 	m.log.Info().Str("root", m.lu.InternalRoot()).Msg("Migrating to messagepack metadata backend...")
 	xattrs := metadata.XattrsBackend{}
-	mpk := metadata.NewMessagePackBackend(m.lu.InternalRoot(), options.CacheOptions{})
+	mpk := metadata.NewMessagePackBackend(m.lu.InternalRoot(), cache.Config{})
 
 	spaces, _ := filepath.Glob(filepath.Join(m.lu.InternalRoot(), "spaces", "*", "*"))
 	for _, space := range spaces {

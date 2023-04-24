@@ -27,9 +27,9 @@ import (
 )
 
 // NewStatCache creates a new StatCache
-func NewStatCache(store string, nodes []string, database, table string, ttl time.Duration) StatCache {
+func NewStatCache(store string, nodes []string, database, table string, ttl time.Duration, size int) StatCache {
 	c := statCache{}
-	c.s = getStore(store, nodes, database, table, ttl)
+	c.s = getStore(store, nodes, database, table, ttl, size)
 	c.database = database
 	c.table = table
 	c.ttl = ttl

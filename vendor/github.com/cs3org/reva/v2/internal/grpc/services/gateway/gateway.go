@@ -72,8 +72,11 @@ type config struct {
 	CacheNodes                   []string                          `mapstructure:"cache_nodes"`
 	CacheDatabase                string                            `mapstructure:"cache_database"`
 	CreateHomeCacheTTL           int                               `mapstructure:"create_home_cache_ttl"`
+	CreateHomeCacheSize          int                               `mapstructure:"create_home_cache_size"`
 	ProviderCacheTTL             int                               `mapstructure:"provider_cache_ttl"`
+	ProviderCacheSize            int                               `mapstructure:"provider_cache_size"`
 	StatCacheTTL                 int                               `mapstructure:"stat_cache_ttl"`
+	StatCacheSize                int                               `mapstructure:"stat_cache_size"`
 	UseCommonSpaceRootShareLogic bool                              `mapstructure:"use_common_space_root_share_logic"`
 }
 
@@ -166,10 +169,10 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 		c:                        c,
 		dataGatewayURL:           *u,
 		tokenmgr:                 tokenManager,
-		statCache:                cache.GetStatCache(c.CacheStore, c.CacheNodes, c.CacheDatabase, "stat", time.Duration(c.StatCacheTTL)*time.Second),
-		providerCache:            cache.GetProviderCache(c.CacheStore, c.CacheNodes, c.CacheDatabase, "provider", time.Duration(c.ProviderCacheTTL)*time.Second),
-		createHomeCache:          cache.GetCreateHomeCache(c.CacheStore, c.CacheNodes, c.CacheDatabase, "createHome", time.Duration(c.CreateHomeCacheTTL)*time.Second),
-		createPersonalSpaceCache: cache.GetCreatePersonalSpaceCache(c.CacheStore, c.CacheNodes, c.CacheDatabase, "createPersonalSpace", time.Duration(c.CreateHomeCacheTTL)*time.Second),
+		statCache:                cache.GetStatCache(c.CacheStore, c.CacheNodes, c.CacheDatabase, "stat", time.Duration(c.StatCacheTTL)*time.Second, c.StatCacheSize),
+		providerCache:            cache.GetProviderCache(c.CacheStore, c.CacheNodes, c.CacheDatabase, "provider", time.Duration(c.ProviderCacheTTL)*time.Second, c.ProviderCacheSize),
+		createHomeCache:          cache.GetCreateHomeCache(c.CacheStore, c.CacheNodes, c.CacheDatabase, "createHome", time.Duration(c.CreateHomeCacheTTL)*time.Second, c.CreateHomeCacheSize),
+		createPersonalSpaceCache: cache.GetCreatePersonalSpaceCache(c.CacheStore, c.CacheNodes, c.CacheDatabase, "createPersonalSpace", time.Duration(c.CreateHomeCacheTTL)*time.Second, c.CreateHomeCacheSize),
 	}
 
 	return s, nil

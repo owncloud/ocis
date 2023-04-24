@@ -27,7 +27,6 @@ import (
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
 	"github.com/pkg/xattr"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"github.com/shamaton/msgpack/v2"
@@ -46,10 +45,10 @@ type readWriteCloseSeekTruncater interface {
 }
 
 // NewMessagePackBackend returns a new MessagePackBackend instance
-func NewMessagePackBackend(rootPath string, o options.CacheOptions) MessagePackBackend {
+func NewMessagePackBackend(rootPath string, o cache.Config) MessagePackBackend {
 	return MessagePackBackend{
 		rootPath:  filepath.Clean(rootPath),
-		metaCache: cache.GetFileMetadataCache(o.CacheStore, o.CacheNodes, o.CacheDatabase, "filemetadata", 24*time.Hour),
+		metaCache: cache.GetFileMetadataCache(o.Store, o.Nodes, o.Database, "filemetadata", time.Duration(o.TTL)*time.Second, o.Size),
 	}
 }
 
