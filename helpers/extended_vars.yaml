@@ -1,6 +1,6 @@
 variables:
 - rawname: ACK_GINKGO_DEPRECATIONS
-  path: vendor/github.com/onsi/ginkgo/types/deprecation_support.go:89
+  path: vendor/github.com/onsi/ginkgo/v2/types/deprecation_support.go:106
   foundincode: true
   name: ACK_GINKGO_DEPRECATIONS
   type: ""
@@ -8,7 +8,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: ACK_GINKGO_DEPRECATIONS
-  path: vendor/github.com/onsi/ginkgo/v2/types/deprecation_support.go:106
+  path: vendor/github.com/onsi/ginkgo/types/deprecation_support.go:89
   foundincode: true
   name: ACK_GINKGO_DEPRECATIONS
   type: ""
@@ -24,7 +24,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: ANSICON
-  path: vendor/github.com/gookit/color/detect_windows.go:136
+  path: vendor/github.com/gookit/goutil/envutil/info.go:139
   foundincode: true
   name: ANSICON
   type: ""
@@ -32,7 +32,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: ANSICON
-  path: vendor/github.com/gookit/goutil/envutil/info.go:139
+  path: vendor/github.com/gookit/color/detect_windows.go:136
   foundincode: true
   name: ANSICON
   type: ""
@@ -64,14 +64,6 @@ variables:
   description: ""
   do_ignore: false
 - rawname: AWS_ACCESS_KEY
-  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/env_aws.go:46
-  foundincode: true
-  name: AWS_ACCESS_KEY
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: AWS_ACCESS_KEY
   path: vendor/github.com/aws/aws-sdk-go/aws/credentials/env_provider.go:46
   foundincode: true
   name: AWS_ACCESS_KEY
@@ -79,8 +71,16 @@ variables:
   default_value: ""
   description: ""
   do_ignore: false
+- rawname: AWS_ACCESS_KEY
+  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/env_aws.go:46
+  foundincode: true
+  name: AWS_ACCESS_KEY
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: AWS_ACCESS_KEY_ID
-  path: vendor/github.com/aws/aws-sdk-go/aws/credentials/env_provider.go:44
+  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/env_aws.go:44
   foundincode: true
   name: AWS_ACCESS_KEY_ID
   type: ""
@@ -88,7 +88,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: AWS_ACCESS_KEY_ID
-  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/env_aws.go:44
+  path: vendor/github.com/aws/aws-sdk-go/aws/credentials/env_provider.go:44
   foundincode: true
   name: AWS_ACCESS_KEY_ID
   type: ""
@@ -120,14 +120,6 @@ variables:
   description: ""
   do_ignore: false
 - rawname: AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
-  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/iam_aws.go:126
-  foundincode: true
-  name: AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
   path: vendor/github.com/minio/minio-go/v7/pkg/credentials/iam_aws.go:129
   foundincode: true
   name: AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
@@ -135,10 +127,10 @@ variables:
   default_value: ""
   description: ""
   do_ignore: false
-- rawname: AWS_PROFILE
-  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/file_aws_credentials.go:72
+- rawname: AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
+  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/iam_aws.go:126
   foundincode: true
-  name: AWS_PROFILE
+  name: AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
   type: ""
   default_value: ""
   description: ""
@@ -151,8 +143,16 @@ variables:
   default_value: ""
   description: ""
   do_ignore: false
+- rawname: AWS_PROFILE
+  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/file_aws_credentials.go:72
+  foundincode: true
+  name: AWS_PROFILE
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: AWS_REGION
-  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/iam_aws.go:95
+  path: vendor/github.com/aws/aws-sdk-go/aws/defaults/defaults.go:58
   foundincode: true
   name: AWS_REGION
   type: ""
@@ -160,7 +160,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: AWS_REGION
-  path: vendor/github.com/aws/aws-sdk-go/aws/defaults/defaults.go:58
+  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/iam_aws.go:94
   foundincode: true
   name: AWS_REGION
   type: ""
@@ -176,7 +176,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: AWS_REGION
-  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/iam_aws.go:96
+  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/iam_aws.go:95
   foundincode: true
   name: AWS_REGION
   type: ""
@@ -184,7 +184,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: AWS_REGION
-  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/iam_aws.go:94
+  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/iam_aws.go:96
   foundincode: true
   name: AWS_REGION
   type: ""
@@ -248,7 +248,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: AWS_SESSION_TOKEN
-  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/env_aws.go:63
+  path: vendor/github.com/aws/aws-sdk-go/aws/credentials/env_provider.go:66
   foundincode: true
   name: AWS_SESSION_TOKEN
   type: ""
@@ -256,7 +256,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: AWS_SESSION_TOKEN
-  path: vendor/github.com/aws/aws-sdk-go/aws/credentials/env_provider.go:66
+  path: vendor/github.com/minio/minio-go/v7/pkg/credentials/env_aws.go:63
   foundincode: true
   name: AWS_SESSION_TOKEN
   type: ""
@@ -352,7 +352,7 @@ variables:
   description: ""
   do_ignore: true
 - rawname: ConEmuANSI
-  path: vendor/github.com/gookit/goutil/envutil/info.go:134
+  path: vendor/github.com/gookit/color/detect_windows.go:123
   foundincode: true
   name: ConEmuANSI
   type: ""
@@ -360,7 +360,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: ConEmuANSI
-  path: vendor/github.com/gookit/color/detect_windows.go:123
+  path: vendor/github.com/gookit/goutil/envutil/info.go:134
   foundincode: true
   name: ConEmuANSI
   type: ""
@@ -384,7 +384,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: DBUS_SYSTEM_BUS_ADDRESS
-  path: vendor/github.com/godbus/dbus/v5/conn_unix.go:12
+  path: vendor/github.com/godbus/dbus/v5/conn_windows.go:10
   foundincode: true
   name: DBUS_SYSTEM_BUS_ADDRESS
   type: ""
@@ -392,7 +392,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: DBUS_SYSTEM_BUS_ADDRESS
-  path: vendor/github.com/godbus/dbus/v5/conn_windows.go:10
+  path: vendor/github.com/godbus/dbus/v5/conn_unix.go:12
   foundincode: true
   name: DBUS_SYSTEM_BUS_ADDRESS
   type: ""
@@ -520,14 +520,6 @@ variables:
   description: ""
   do_ignore: false
 - rawname: GINKGO_EDITOR_INTEGRATION
-  path: vendor/github.com/onsi/ginkgo/v2/ginkgo/run/run_command.go:184
-  foundincode: true
-  name: GINKGO_EDITOR_INTEGRATION
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: GINKGO_EDITOR_INTEGRATION
   path: vendor/github.com/onsi/ginkgo/ginkgo/run_command.go:154
   foundincode: true
   name: GINKGO_EDITOR_INTEGRATION
@@ -537,6 +529,14 @@ variables:
   do_ignore: false
 - rawname: GINKGO_EDITOR_INTEGRATION
   path: vendor/github.com/onsi/ginkgo/v2/core_dsl.go:331
+  foundincode: true
+  name: GINKGO_EDITOR_INTEGRATION
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: GINKGO_EDITOR_INTEGRATION
+  path: vendor/github.com/onsi/ginkgo/v2/ginkgo/run/run_command.go:184
   foundincode: true
   name: GINKGO_EDITOR_INTEGRATION
   type: ""
@@ -576,14 +576,6 @@ variables:
   description: ""
   do_ignore: false
 - rawname: GO15VENDOREXPERIMENT
-  path: vendor/github.com/onsi/ginkgo/ginkgo/testsuite/vendor_check_go16.go:13
-  foundincode: true
-  name: GO15VENDOREXPERIMENT
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: GO15VENDOREXPERIMENT
   path: vendor/github.com/onsi/ginkgo/ginkgo/testsuite/vendor_check_go15.go:14
   foundincode: true
   name: GO15VENDOREXPERIMENT
@@ -591,8 +583,16 @@ variables:
   default_value: ""
   description: ""
   do_ignore: false
+- rawname: GO15VENDOREXPERIMENT
+  path: vendor/github.com/onsi/ginkgo/ginkgo/testsuite/vendor_check_go16.go:13
+  foundincode: true
+  name: GO15VENDOREXPERIMENT
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
 - rawname: GODEBUG
-  path: vendor/golang.org/x/sys/cpu/cpu.go:220
+  path: vendor/golang.org/x/net/http2/h2c/h2c.go:34
   foundincode: true
   name: GODEBUG
   type: ""
@@ -608,7 +608,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: GODEBUG
-  path: vendor/golang.org/x/net/http2/h2c/h2c.go:34
+  path: vendor/golang.org/x/sys/cpu/cpu.go:220
   foundincode: true
   name: GODEBUG
   type: ""
@@ -672,7 +672,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: HOME
-  path: vendor/github.com/aws/aws-sdk-go/aws/credentials/ssocreds/os.go:9
+  path: vendor/github.com/kevinburke/ssh_config/config.go:69
   foundincode: true
   name: HOME
   type: ""
@@ -696,23 +696,23 @@ variables:
   description: ""
   do_ignore: false
 - rawname: HOME
-  path: vendor/github.com/nats-io/nats.go/nats.go:5367
-  foundincode: true
-  name: HOME
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: HOME
-  path: vendor/github.com/kevinburke/ssh_config/config.go:69
-  foundincode: true
-  name: HOME
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: HOME
   path: vendor/github.com/godbus/dbus/v5/homedir.go:21
+  foundincode: true
+  name: HOME
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: HOME
+  path: vendor/github.com/aws/aws-sdk-go/aws/credentials/ssocreds/os.go:9
+  foundincode: true
+  name: HOME
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: HOME
+  path: vendor/github.com/nats-io/nats.go/nats.go:5367
   foundincode: true
   name: HOME
   type: ""
@@ -1048,16 +1048,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: MICRO_LOG_LEVEL
-  path: ocis-pkg/log/log.go:31
-  foundincode: true
-  name: MICRO_LOG_LEVEL
-  type: string
-  default_value: Error
-  description: Set the log level for the internal go micro framework. Only change
-    on supervision of ownCloud Support.
-  do_ignore: false
-- rawname: MICRO_LOG_LEVEL
-  path: vendor/go-micro.dev/v4/logger/default.go:17
+  path: vendor/go-micro.dev/v4/util/log/log.go:60
   foundincode: true
   name: MICRO_LOG_LEVEL
   type: ""
@@ -1073,7 +1064,16 @@ variables:
   description: ""
   do_ignore: true
 - rawname: MICRO_LOG_LEVEL
-  path: vendor/go-micro.dev/v4/util/log/log.go:60
+  path: ocis-pkg/log/log.go:31
+  foundincode: true
+  name: MICRO_LOG_LEVEL
+  type: string
+  default_value: Error
+  description: Set the log level for the internal go micro framework. Only change
+    on supervision of ownCloud Support.
+  do_ignore: false
+- rawname: MICRO_LOG_LEVEL
+  path: vendor/go-micro.dev/v4/logger/default.go:17
   foundincode: true
   name: MICRO_LOG_LEVEL
   type: ""
@@ -1180,7 +1180,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: MSYSTEM
-  path: vendor/github.com/gookit/color/detect_env.go:243
+  path: vendor/github.com/gookit/goutil/sysutil/sysenv.go:18
   foundincode: true
   name: MSYSTEM
   type: ""
@@ -1188,7 +1188,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: MSYSTEM
-  path: vendor/github.com/gookit/goutil/sysutil/sysenv.go:18
+  path: vendor/github.com/gookit/color/detect_env.go:243
   foundincode: true
   name: MSYSTEM
   type: ""
@@ -1417,7 +1417,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: SSH_AUTH_SOCK
-  path: vendor/github.com/xanzy/ssh-agent/sshagent.go:49
+  path: vendor/github.com/xanzy/ssh-agent/sshagent.go:37
   foundincode: true
   name: SSH_AUTH_SOCK
   type: ""
@@ -1425,7 +1425,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: SSH_AUTH_SOCK
-  path: vendor/github.com/xanzy/ssh-agent/sshagent.go:37
+  path: vendor/github.com/xanzy/ssh-agent/sshagent.go:49
   foundincode: true
   name: SSH_AUTH_SOCK
   type: ""
@@ -1449,23 +1449,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: TERM
-  path: vendor/github.com/fatih/color/color.go:22
-  foundincode: true
-  name: TERM
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: TERM
-  path: vendor/github.com/gookit/color/detect_env.go:56
-  foundincode: true
-  name: TERM
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: TERM
-  path: vendor/github.com/gookit/goutil/envutil/info.go:123
+  path: vendor/github.com/xo/terminfo/load.go:71
   foundincode: true
   name: TERM
   type: ""
@@ -1481,7 +1465,15 @@ variables:
   description: ""
   do_ignore: false
 - rawname: TERM
-  path: vendor/github.com/xo/terminfo/load.go:71
+  path: vendor/github.com/gookit/color/detect_env.go:56
+  foundincode: true
+  name: TERM
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: TERM
+  path: vendor/github.com/fatih/color/color.go:22
   foundincode: true
   name: TERM
   type: ""
@@ -1490,6 +1482,14 @@ variables:
   do_ignore: false
 - rawname: TERM
   path: vendor/github.com/xo/terminfo/color.go:75
+  foundincode: true
+  name: TERM
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: TERM
+  path: vendor/github.com/gookit/goutil/envutil/info.go:123
   foundincode: true
   name: TERM
   type: ""
@@ -1553,7 +1553,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: USERPROFILE
-  path: vendor/github.com/nats-io/nats.go/nats.go:5352
+  path: vendor/github.com/aws/aws-sdk-go/aws/credentials/ssocreds/os_windows.go:6
   foundincode: true
   name: USERPROFILE
   type: ""
@@ -1569,6 +1569,14 @@ variables:
   description: ""
   do_ignore: false
 - rawname: USERPROFILE
+  path: vendor/github.com/nats-io/nats-server/v2/server/opts.go:5004
+  foundincode: true
+  name: USERPROFILE
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: USERPROFILE
   path: vendor/github.com/mitchellh/go-homedir/homedir.go:155
   foundincode: true
   name: USERPROFILE
@@ -1577,15 +1585,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: USERPROFILE
-  path: vendor/github.com/aws/aws-sdk-go/aws/credentials/ssocreds/os_windows.go:6
-  foundincode: true
-  name: USERPROFILE
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: USERPROFILE
-  path: vendor/github.com/nats-io/nats-server/v2/server/opts.go:5004
+  path: vendor/github.com/nats-io/nats.go/nats.go:5352
   foundincode: true
   name: USERPROFILE
   type: ""
@@ -1665,6 +1665,14 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8030
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
   path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8136
   foundincode: true
   name: enableHTTPS
@@ -1673,7 +1681,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1091
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10645
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -1681,151 +1689,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4328
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8163
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4921
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10114
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8271
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9595
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:618
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7749
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2820
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6201
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3329
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2022
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9423
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5519
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8356
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9770
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2358
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8724
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10735
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6751
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -1841,126 +1705,6 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9253
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8056
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1375
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4150
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6900
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3430
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7122
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9079
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4559
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7770
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10290
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11303
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7437
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9941
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11777
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
   path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8547
   foundincode: true
   name: enableHTTPS
@@ -1969,7 +1713,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4365
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10843
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -1977,7 +1721,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5753
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4328
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -1985,103 +1729,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:483
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8030
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6810
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10441
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10796
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8244
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4741
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:12275
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6534
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5288
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8297
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8900
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1535
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5397
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2097,7 +1745,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7652
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8724
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2105,7 +1753,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10570
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4031
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2113,7 +1761,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2737
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6534
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2121,7 +1769,47 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1238
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8900
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2022
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6201
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5104
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8271
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11777
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2145,7 +1833,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3060
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3685
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2153,7 +1841,47 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:952
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11493
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:835
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6810
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4921
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7770
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7749
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2169,6 +1897,14 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9770
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
   path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6629
   foundincode: true
   name: enableHTTPS
@@ -2177,7 +1913,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11951
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4559
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2185,7 +1921,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3685
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10441
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2193,7 +1929,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11090
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11405
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2201,7 +1937,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2955
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6900
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2209,63 +1945,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2551
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5626
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1855
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4031
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7060
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8217
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2289
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3854
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2183
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2281,7 +1961,151 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5847
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3060
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2955
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:618
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3229
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:483
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4150
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5288
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1238
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:12139
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7122
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10114
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2820
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4741
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10290
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1375
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8244
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5626
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4365
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10570
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2305,7 +2129,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5397
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7437
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2313,7 +2137,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10645
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2358
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2321,7 +2145,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5104
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2737
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2329,7 +2153,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:12139
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:12275
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2337,7 +2161,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:835
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10735
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2353,7 +2177,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10312
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3430
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2361,23 +2185,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10843
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:430
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11493
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8217
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2393,7 +2201,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2183
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8056
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2401,7 +2209,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8190
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2289
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2409,7 +2217,63 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11405
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9253
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7060
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1535
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10796
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:12039
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1091
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7652
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5519
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2425,7 +2289,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3229
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1675
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2433,7 +2297,87 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:552
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11951
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2551
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3854
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9079
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11303
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9595
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9941
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8297
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10312
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:430
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:952
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2449,31 +2393,87 @@ variables:
   description: ""
   do_ignore: false
 - rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3329
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:552
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9423
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1855
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5753
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8163
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11090
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8190
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5847
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8356
+  foundincode: true
+  name: enableHTTPS
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: enableHTTPS
   path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10399
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6751
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1675
-  foundincode: true
-  name: enableHTTPS
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: enableHTTPS
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:12039
   foundincode: true
   name: enableHTTPS
   type: ""
@@ -2497,7 +2497,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: env
-  path: vendor/google.golang.org/protobuf/reflect/protoregistry/registry.go:63
+  path: vendor/google.golang.org/protobuf/reflect/protoregistry/registry.go:51
   foundincode: true
   name: env
   type: ""
@@ -2505,7 +2505,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: env
-  path: vendor/google.golang.org/protobuf/reflect/protoregistry/registry.go:51
+  path: vendor/google.golang.org/protobuf/reflect/protoregistry/registry.go:63
   foundincode: true
   name: env
   type: ""
@@ -2561,7 +2561,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: envVar
-  path: vendor/google.golang.org/grpc/internal/envconfig/envconfig.go:51
+  path: vendor/google.golang.org/grpc/internal/envconfig/envconfig.go:44
   foundincode: true
   name: envVar
   type: ""
@@ -2569,7 +2569,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: envVar
-  path: vendor/google.golang.org/grpc/internal/envconfig/envconfig.go:44
+  path: vendor/google.golang.org/grpc/internal/envconfig/envconfig.go:51
   foundincode: true
   name: envVar
   type: ""
@@ -2617,7 +2617,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: k
-  path: vendor/github.com/aws/aws-sdk-go/aws/session/env_config.go:454
+  path: vendor/github.com/aws/aws-sdk-go/aws/session/env_config.go:419
   foundincode: true
   name: k
   type: ""
@@ -2633,7 +2633,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: k
-  path: vendor/github.com/aws/aws-sdk-go/aws/session/env_config.go:369
+  path: vendor/github.com/aws/aws-sdk-go/aws/session/env_config.go:359
   foundincode: true
   name: k
   type: ""
@@ -2641,7 +2641,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: k
-  path: vendor/github.com/aws/aws-sdk-go/aws/session/env_config.go:419
+  path: vendor/github.com/aws/aws-sdk-go/aws/session/env_config.go:369
   foundincode: true
   name: k
   type: ""
@@ -2657,7 +2657,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: k
-  path: vendor/github.com/aws/aws-sdk-go/aws/session/env_config.go:359
+  path: vendor/github.com/aws/aws-sdk-go/aws/session/env_config.go:454
   foundincode: true
   name: k
   type: ""
@@ -2697,6 +2697,14 @@ variables:
   description: ""
   do_ignore: false
 - rawname: name
+  path: vendor/github.com/gookit/config/v2/load.go:113
+  foundincode: true
+  name: name
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: name
   path: vendor/github.com/gookit/config/v2/util.go:114
   foundincode: true
   name: name
@@ -2714,14 +2722,6 @@ variables:
   do_ignore: false
 - rawname: name
   path: vendor/github.com/gookit/goutil/envutil/get.go:12
-  foundincode: true
-  name: name
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: name
-  path: vendor/github.com/gookit/config/v2/load.go:113
   foundincode: true
   name: name
   type: ""
@@ -2761,127 +2761,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10642
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:832
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9767
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8241
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8027
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1235
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:549
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3851
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11675
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10793
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11774
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4738
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2426
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2817
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1852
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10309
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11300
   foundincode: true
   name: serverEndpoint
   type: ""
@@ -2897,246 +2777,6 @@ variables:
   description: ""
   do_ignore: false
 - rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8214
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7119
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10840
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8106
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10567
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11848
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7434
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9592
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8160
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7767
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:713
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10815
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:615
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5285
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8897
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5844
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1672
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9420
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1532
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:949
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10396
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7057
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7746
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3057
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1372
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2286
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4362
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9938
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5623
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8187
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
   path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5750
   foundincode: true
   name: serverEndpoint
@@ -3145,7 +2785,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8133
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4334
   foundincode: true
   name: serverEndpoint
   type: ""
@@ -3153,127 +2793,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5101
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6626
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9076
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10287
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4335
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11402
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:427
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:285
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8053
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8721
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2638
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:12136
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7273
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:480
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9250
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4147
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11774
   foundincode: true
   name: serverEndpoint
   type: ""
@@ -3289,231 +2809,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10732
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11599
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8544
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4556
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3226
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2355
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11300
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10438
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7649
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8268
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4028
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8294
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:12036
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2180
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6807
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10111
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3682
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1757
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11948
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8353
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5516
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1088
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8080
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4918
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2734
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6531
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6748
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2952
-  foundincode: true
-  name: serverEndpoint
-  type: ""
-  default_value: ""
-  description: ""
-  do_ignore: false
-- rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2548
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4147
   foundincode: true
   name: serverEndpoint
   type: ""
@@ -3529,7 +2825,15 @@ variables:
   description: ""
   do_ignore: false
 - rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2019
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8187
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9250
   foundincode: true
   name: serverEndpoint
   type: ""
@@ -3545,7 +2849,495 @@ variables:
   description: ""
   do_ignore: false
 - rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5394
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4556
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2286
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11599
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7767
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10287
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:713
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2638
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1672
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1235
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5516
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3851
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10309
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4738
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8133
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5623
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1532
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10438
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8294
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10793
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6626
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2355
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7057
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8721
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7434
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5101
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9938
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:12136
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2180
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11675
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6748
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8027
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8214
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8053
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9592
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6807
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7649
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1372
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1852
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2817
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1757
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8897
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8080
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9076
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:949
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2548
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10815
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7273
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10642
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10396
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10111
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:285
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8353
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4918
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11402
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11948
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:480
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4362
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9767
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5285
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3682
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2734
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3057
   foundincode: true
   name: serverEndpoint
   type: ""
@@ -3561,7 +3353,215 @@ variables:
   description: ""
   do_ignore: false
 - rawname: serverEndpoint
-  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4334
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:549
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:11848
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4335
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8106
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8268
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:615
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2019
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8241
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8544
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10732
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2952
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:2426
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:3226
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:6531
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:1088
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:427
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:8160
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:9420
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10840
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5394
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7746
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:10567
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:5844
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:832
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:7119
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:12036
+  foundincode: true
+  name: serverEndpoint
+  type: ""
+  default_value: ""
+  description: ""
+  do_ignore: false
+- rawname: serverEndpoint
+  path: vendor/github.com/minio/minio-go/v7/functional_tests.go:4028
   foundincode: true
   name: serverEndpoint
   type: ""
@@ -3569,7 +3569,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: shareddefaults.ECSCredsProviderEnvVar
-  path: vendor/github.com/aws/aws-sdk-go/aws/session/credentials.go:212
+  path: vendor/github.com/aws/aws-sdk-go/aws/defaults/defaults.go:127
   foundincode: true
   name: shareddefaults.ECSCredsProviderEnvVar
   type: ""
@@ -3577,7 +3577,7 @@ variables:
   description: ""
   do_ignore: false
 - rawname: shareddefaults.ECSCredsProviderEnvVar
-  path: vendor/github.com/aws/aws-sdk-go/aws/defaults/defaults.go:127
+  path: vendor/github.com/aws/aws-sdk-go/aws/session/credentials.go:212
   foundincode: true
   name: shareddefaults.ECSCredsProviderEnvVar
   type: ""
