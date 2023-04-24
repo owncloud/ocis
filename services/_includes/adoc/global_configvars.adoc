@@ -26,7 +26,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-The default role assignments the demo users should be setup.
+Flag to enable or disable the creation of the demo users.
 
 a| `LDAP_BIND_DN`
 
@@ -41,7 +41,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=reva,ou=sysusers,o=libregraph-idm ++
+++uid=idp,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -80,7 +80,7 @@ a| [subs=-attributes]
 ++~/.ocis/idm/ldap.crt ++
 
 a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp.
 
 a| `LDAP_DISABLED_USERS_GROUP_DN`
 
@@ -314,7 +314,7 @@ a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
 
 a| [subs=-attributes]
-URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
+Url of the LDAP service to use as IDP.
 
 a| `LDAP_USER_BASE_DN`
 
@@ -349,7 +349,7 @@ a| [subs=-attributes]
 ++ownCloudUserEnabled ++
 
 a| [subs=-attributes]
-LDAP attribute to use as a flag telling if the user is enabled or disabled.
+LDAP Attribute to use as a flag telling if the user is enabled or disabled.
 
 a| `LDAP_USER_FILTER`
 
@@ -385,7 +385,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-The object class to use for users in the default user search filter like 'inetOrgPerson'.
+LDAP User ObjectClass like 'inetOrgPerson'.
 
 a| `LDAP_USER_SCHEMA_DISPLAYNAME`
 
@@ -416,10 +416,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ownclouduuid ++
+++uid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
+LDAP User uuid attribute like 'uid'.
 
 a| `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -453,7 +453,7 @@ a| [subs=-attributes]
 ++mail ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for the email address of users.
+LDAP User email attribute like 'mail'.
 
 a| `LDAP_USER_SCHEMA_USERNAME`
 
@@ -468,10 +468,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid ++
+++displayName ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for username of users.
+LDAP User name attribute like 'displayName'.
 
 a| `LDAP_USER_SCHEMA_USER_TYPE`
 
@@ -504,7 +504,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
 
 a| `OCIS_ADMIN_USER_ID`
 
@@ -537,58 +537,14 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Enable asynchronous file uploads.
 
-a| `OCIS_CACHE_DATABASE`
-
-a| [subs=attributes+]
-* xref:{s-path}/frontend.adoc[frontend] +
-* xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/proxy.adoc[proxy] +
-* xref:{s-path}/storage-system.adoc[storage-system] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
-
-a| [subs=-attributes]
-++string ++
-
-a| [subs=-attributes]
-++proxy ++
-
-a| [subs=-attributes]
-The database name the configured store should use.
-
-a| `OCIS_CACHE_SIZE`
-
-a| [subs=attributes+]
-* xref:{s-path}/frontend.adoc[frontend] +
-* xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/ocs.adoc[ocs] +
-* xref:{s-path}/proxy.adoc[proxy] +
-* xref:{s-path}/storage-system.adoc[storage-system] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
-
-a| [subs=-attributes]
-++int ++
-
-a| [subs=-attributes]
-++0 ++
-
-a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.
-
 a| `OCIS_CACHE_STORE`
 
 a| [subs=attributes+]
-* xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
@@ -600,16 +556,11 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
-a| `OCIS_CACHE_STORE_NODES`
+a| `OCIS_CACHE_STORE_ADDRESS`
 
 a| [subs=attributes+]
-* xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/graph.adoc[graph] +
-* xref:{s-path}/ocs.adoc[ocs] +
-* xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
@@ -619,21 +570,68 @@ a| [subs=-attributes]
 ++[] ++
 
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+A comma separated list of nodes to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
 
-a| `OCIS_CACHE_TTL`
+a| `OCIS_CACHE_STORE_ADDRESSES`
 
 a| [subs=attributes+]
-* xref:{s-path}/frontend.adoc[frontend] +
-* xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+
+a| [subs=-attributes]
+++[]string ++
+
+a| [subs=-attributes]
+++[] ++
+
+a| [subs=-attributes]
+A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+
+a| `OCIS_CACHE_STORE_NODES`
+
+a| [subs=attributes+]
 * xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
+
+a| [subs=-attributes]
+++[]string ++
+
+a| [subs=-attributes]
+++[] ++
+
+a| [subs=-attributes]
+A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+
+a| `OCIS_CACHE_STORE_SIZE`
+
+a| [subs=attributes+]
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+
+a| [subs=-attributes]
+++int ++
+
+a| [subs=-attributes]
+++0 ++
+
+a| [subs=-attributes]
+The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.
+
+a| `OCIS_CACHE_STORE_TTL`
+
+a| [subs=attributes+]
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
 
 a| [subs=-attributes]
 ++Duration ++
@@ -643,6 +641,24 @@ a| [subs=-attributes]
 
 a| [subs=-attributes]
 Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
+
+a| `OCIS_CACHE_STORE_TYPE`
+
+a| [subs=attributes+]
+* xref:{s-path}/gateway.adoc[gateway] +
+* xref:{s-path}/graph.adoc[graph] +
+* xref:{s-path}/ocs.adoc[ocs] +
+* xref:{s-path}/proxy.adoc[proxy] +
+* xref:{s-path}/storage-system.adoc[storage-system] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -661,7 +677,7 @@ a| [subs=-attributes]
 ++bool ++
 
 a| [subs=-attributes]
-++true ++
+++false ++
 
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
@@ -683,7 +699,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With] ++
+++[] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -705,7 +721,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET POST PUT PATCH DELETE OPTIONS] ++
+++[] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
@@ -984,7 +1000,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether to verify the server TLS certificates.
+Whether the ocis server should skip the client certificate verification during the TLS handshake.
 
 a| `OCIS_JWT_SECRET`
 
@@ -1125,7 +1141,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid=reva,ou=sysusers,o=libregraph-idm ++
+++uid=idp,ou=sysusers,o=libregraph-idm ++
 
 a| [subs=-attributes]
 LDAP DN to use for simple bind authentication with the target LDAP server.
@@ -1146,7 +1162,7 @@ a| [subs=-attributes]
 ++~/.ocis/idm/ldap.crt ++
 
 a| [subs=-attributes]
-Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idm.
+Path/File name for the root CA certificate (in PEM format) used to validate TLS server certificates of the LDAP service. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp.
 
 a| `OCIS_LDAP_DISABLED_USERS_GROUP_DN`
 
@@ -1380,7 +1396,7 @@ a| [subs=-attributes]
 ++ldaps://localhost:9235 ++
 
 a| [subs=-attributes]
-URI of the LDAP Server to connect to. Supported URI schemes are 'ldaps://' and 'ldap://'
+Url of the LDAP service to use as IDP.
 
 a| `OCIS_LDAP_USER_BASE_DN`
 
@@ -1415,7 +1431,7 @@ a| [subs=-attributes]
 ++ownCloudUserEnabled ++
 
 a| [subs=-attributes]
-LDAP attribute to use as a flag telling if the user is enabled or disabled.
+LDAP Attribute to use as a flag telling if the user is enabled or disabled.
 
 a| `OCIS_LDAP_USER_FILTER`
 
@@ -1451,7 +1467,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-The object class to use for users in the default user search filter like 'inetOrgPerson'.
+LDAP User ObjectClass like 'inetOrgPerson'.
 
 a| `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME`
 
@@ -1482,10 +1498,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++ownclouduuid ++
+++uid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
+LDAP User uuid attribute like 'uid'.
 
 a| `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -1519,7 +1535,7 @@ a| [subs=-attributes]
 ++mail ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for the email address of users.
+LDAP User email attribute like 'mail'.
 
 a| `OCIS_LDAP_USER_SCHEMA_USERNAME`
 
@@ -1534,10 +1550,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++uid ++
+++displayName ++
 
 a| [subs=-attributes]
-LDAP Attribute to use for username of users.
+LDAP User name attribute like 'displayName'.
 
 a| `OCIS_LDAP_USER_SCHEMA_USER_TYPE`
 
@@ -1570,7 +1586,7 @@ a| [subs=-attributes]
 ++sub ++
 
 a| [subs=-attributes]
-LDAP search scope to use when looking up users. Supported values are 'base', 'one' and 'sub'.
+LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.
 
 a| `OCIS_LOG_COLOR`
 
@@ -1804,7 +1820,7 @@ a| [subs=-attributes]
 ++web ++
 
 a| [subs=-attributes]
-OIDC client ID, which ownCloud Web uses. This client needs to be set up in your external IDP (has no effect when using the builtin IDP).
+OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP (has no effect when using the builtin IDP).
 
 a| `OCIS_OIDC_ISSUER`
 
@@ -1825,7 +1841,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+The OIDC issuer URL to use.
 
 a| `OCIS_PERSISTENT_STORE`
 
@@ -1840,7 +1856,7 @@ a| [subs=-attributes]
 ++memory ++
 
 a| [subs=-attributes]
-The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+The type of the userlog store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
 a| `OCIS_PERSISTENT_STORE_NODES`
 
@@ -1855,37 +1871,7 @@ a| [subs=-attributes]
 ++[] ++
 
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
-
-a| `OCIS_PERSISTENT_STORE_SIZE`
-
-a| [subs=attributes+]
-* xref:{s-path}/eventhistory.adoc[eventhistory] +
-* xref:{s-path}/userlog.adoc[userlog] +
-
-a| [subs=-attributes]
-++int ++
-
-a| [subs=-attributes]
-++0 ++
-
-a| [subs=-attributes]
-The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.
-
-a| `OCIS_PERSISTENT_STORE_TTL`
-
-a| [subs=attributes+]
-* xref:{s-path}/eventhistory.adoc[eventhistory] +
-* xref:{s-path}/userlog.adoc[userlog] +
-
-a| [subs=-attributes]
-++Duration ++
-
-a| [subs=-attributes]
-++336h0m0s ++
-
-a| [subs=-attributes]
-Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
+A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
 
 a| `OCIS_REVA_GATEWAY`
 
@@ -1937,7 +1923,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.
+Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.
 
 a| `OCIS_SPACES_MAX_QUOTA`
 
@@ -1952,7 +1938,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
+Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
 
 a| `OCIS_SYSTEM_USER_API_KEY`
 
@@ -2187,7 +2173,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 
 a| `OCIS_URL`
 
@@ -2218,7 +2204,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+The OIDC issuer URL to use.
 
 a| `REVA_GATEWAY`
 
@@ -2270,7 +2256,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-The storage transfer secret.
+Transfer secret for signing file up- and download requests.
 
 a| `STORAGE_USERS_OCIS_ASYNC_UPLOADS`
 

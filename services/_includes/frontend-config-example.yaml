@@ -96,12 +96,8 @@ ocs:
   share_prefix: /Shares
   home_namespace: /users/{{.Id.OpaqueId}}
   additional_info_attribute: '{{.Mail}}'
-  resource_info_cache_type: memory
-  resource_info_cache_nodes: []
-  resource_info_cache_database: frontend
-  resource_info_cache_table: ""
   resource_info_cache_ttl: 0
-  resource_info_cache_size: 0
+  resource_info_cache_type: memory
   enable_denials: false
   public_sharing_writeableshare_must_have_password: false
 checksums:

@@ -84,18 +84,10 @@ events:
   tls_root_ca_cert_path: ""
   enable_tls: false
   num_consumers: 0
-stat_cache:
+cache:
   store: memory
   nodes: []
-  database: ocis
-  ttl: 0s
-  size: 0
-filemetadata_cache:
-  store: memory
-  nodes: []
-  database: ocis
-  ttl: 0s
-  size: 0
+  database: users
 mount_id: ""
 expose_data_server: false
 readonly: false

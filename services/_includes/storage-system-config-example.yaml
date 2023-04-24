@@ -37,8 +37,6 @@ cache:
   store: memory
   nodes: []
   database: system
-  ttl: 0s
-  size: 0
 driver: ocis
 drivers:
   ocis:

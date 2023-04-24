@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-24-13-14-35]
+[#deprecation-note-2023-04-24-14-13-18]
 [caption=]
 .Deprecation notes for the ocs service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -108,6 +108,8 @@ The path to the log file. Activates logging to this file if set.
 
 a|`OCIS_CACHE_STORE` +
 `OCS_CACHE_STORE` +
+`OCIS_CACHE_STORE_TYPE` +
+`OCS_CACHE_STORE_TYPE` +
 
 a| [subs=-attributes]
 ++string ++
@@ -118,13 +120,15 @@ The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'r
 
 a|`OCIS_CACHE_STORE_NODES` +
 `OCS_CACHE_STORE_NODES` +
+`OCIS_CACHE_STORE_ADDRESSES` +
+`OCS_CACHE_STORE_ADDRESSES` +
 
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[] ++
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
 
 a|`OCS_CACHE_STORE_DATABASE` +
 
@@ -144,8 +148,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The database table the store should use.
 
-a|`OCIS_CACHE_TTL` +
-`OCS_CACHE_TTL` +
+a|`OCIS_CACHE_STORE_TTL` +
+`OCS_CACHE_STORE_TTL` +
 
 a| [subs=-attributes]
 ++Duration ++
@@ -154,8 +158,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
 
-a|`OCIS_CACHE_SIZE` +
-`OCS_CACHE_SIZE` +
+a|`OCIS_CACHE_STORE_SIZE` +
+`OCS_CACHE_STORE_SIZE` +
 
 a| [subs=-attributes]
 ++int ++
