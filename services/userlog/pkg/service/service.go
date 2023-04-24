@@ -352,6 +352,10 @@ func (ul *UserlogService) resolveID(ctx context.Context, userid *user.UserId, gr
 		return []string{userid.GetOpaqueId()}, nil
 	}
 
+	if ctx == nil {
+		return nil, errors.New("need ctx to resolve group id")
+	}
+
 	return ul.resolveGroup(ctx, groupid.GetOpaqueId())
 }
 
