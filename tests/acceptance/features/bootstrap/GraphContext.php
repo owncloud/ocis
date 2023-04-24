@@ -1706,13 +1706,13 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then the user retrieve API response should contain the following applications information:
+	 * @Then the user API response should contain the following application information:
 	 *
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 */
-	public function theResponseShouldContainTheFollowingApplicationsInformation(TableNode $table): void {
+	public function theResponseShouldContainTheFollowingApplicationInformation(TableNode $table): void {
 		Assert::assertIsArray($responseArray = ($this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse()))['value'][0]);
 		foreach ($table->getHash() as $row) {
 			$key = $row["key"];
@@ -1728,7 +1728,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then the user retrieve API response should contain the following app roles:
+	 * @Then the user API response should contain the following app roles:
 	 *
 	 * @param TableNode $table
 	 *

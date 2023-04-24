@@ -12,11 +12,11 @@ Feature: get applications
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" gets all applications using the Graph API
     Then the HTTP status code should be "200"
-    And the user retrieve API response should contain the following applications information:
+    And the user API response should contain the following application information:
       | key                        | value                   |
       | displayName                | ownCloud Infinite Scale |
       | id                         | %uuid_v4%               |
-    And the user retrieve API response should contain the following app roles:
+    And the user API response should contain the following app roles:
       | Admin       |
       | Space Admin |
       | User        |
