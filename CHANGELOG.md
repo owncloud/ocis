@@ -73,6 +73,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Use gotext master: [#5867](https://github.com/owncloud/ocis/pull/5867)
 * Enhancement - Userlog: [#5699](https://github.com/owncloud/ocis/pull/5699)
 * Enhancement - Userlog Service: [#5610](https://github.com/owncloud/ocis/pull/5610)
+* Enhancement - Determine the users language to translate via Transifex: [#6089](https://github.com/owncloud/ocis/pull/6089)
 
 # Changelog for [2.0.0] (2022-11-30)
 
