@@ -464,8 +464,9 @@
   "otpPolicyPeriod": 30,
   "otpPolicyCodeReusable": false,
   "otpSupportedApplications": [
-    "totpAppFreeOTPName",
-    "totpAppGoogleName"
+    "totpAppMicrosoftAuthenticatorName",
+    "totpAppGoogleName",
+    "totpAppFreeOTPName"
   ],
   "webAuthnPolicyRpEntityName": "keycloak",
   "webAuthnPolicySignatureAlgorithms": [
@@ -1113,6 +1114,8 @@
     {
       "id": "54b18eca-cf79-4263-9db9-2d79f8a1c831",
       "clientId": "web",
+      "name": "",
+      "description": "",
       "rootUrl": "https://ocis.owncloud.test",
       "adminUrl": "https://ocis.owncloud.test",
       "baseUrl": "",
@@ -1142,10 +1145,13 @@
         "saml.multivalued.roles": "false",
         "saml.encrypt": "false",
         "post.logout.redirect.uris": "+",
+        "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false",
         "saml.server.signature": "false",
         "saml.server.signature.keyinfo.ext": "false",
         "exclude.session.state.from.auth.response": "false",
+        "oidc.ciba.grant.enabled": "false",
+        "backchannel.logout.url": "https://ocis.owncloud.test/backchannel_logout",
         "backchannel.logout.session.required": "true",
         "client_credentials.use_refresh_token": "false",
         "saml_force_name_id_format": "false",
@@ -1692,7 +1698,8 @@
           "consentRequired": false,
           "config": {
             "id.token.claim": "true",
-            "access.token.claim": "true"
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
           }
         }
       ]
@@ -2590,7 +2597,7 @@
     "cibaInterval": "5",
     "realmReusableOtpCode": "false"
   },
-  "keycloakVersion": "20.0.5",
+  "keycloakVersion": "21.1.0",
   "userManagedAccessAllowed": false,
   "clientProfiles": {
     "profiles": []

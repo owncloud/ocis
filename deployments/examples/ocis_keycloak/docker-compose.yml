@@ -102,10 +102,10 @@ services:
     restart: always
 
   keycloak:
-    image: quay.io/keycloak/keycloak:20.0
+    image: quay.io/keycloak/keycloak:21.1
     networks:
       ocis-net:
-    command: ["start", "--proxy edge", "--import-realm"]
+    command: ["start", "--proxy edge", "--spi-connections-http-client-default-disable-trust-manager=${INSECURE:-false}", "--import-realm"]
     entrypoint: ["/bin/sh", "/opt/keycloak/bin/docker-entrypoint-override.sh"]
     volumes:
       - "./config/keycloak/docker-entrypoint-override.sh:/opt/keycloak/bin/docker-entrypoint-override.sh"
