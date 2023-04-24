@@ -31,6 +31,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Async Postprocessing: [#5207](https://github.com/owncloud/ocis/pull/5207)
 * Enhancement - Automate md creation: [#5901](https://github.com/owncloud/ocis/pull/5901)
 * Enhancement - Add more logging to av service: [#5973](https://github.com/owncloud/ocis/pull/5973)
+* Enhancement - Return Bad Request when requesting GDPR export for another user: [#6123](https://github.com/owncloud/ocis/pull/6123)
 * Enhancement - Add endpoints to upload a custom logo: [#5735](https://github.com/owncloud/ocis/pull/5735)
 * Enhancement - Bump go-ldap version: [#6004](https://github.com/owncloud/ocis/pull/6004)
 * Enhancement - Bump libre-graph-api-go: [#5309](https://github.com/owncloud/ocis/pull/5309)
