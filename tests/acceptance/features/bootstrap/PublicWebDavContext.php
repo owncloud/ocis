@@ -529,7 +529,7 @@ class PublicWebDavContext implements Context {
 	}
 
 	/**
-	 * @Given the public has uploaded file :filename" with password :password and content :body
+	 * @Given the public has uploaded file :filename with password :password and content :body
 	 *
 	 * @param string $filename target file name
 	 * @param string|null $password
