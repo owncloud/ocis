@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-24-14-13-18]
+[#deprecation-note-2023-04-24-15-07-02]
 [caption=]
 .Deprecation notes for the userlog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -18,11 +18,6 @@ ifeval::[{show-deprecation} == true]
 | 3.0
 | 4.0.0
 | OCIS_REVA_GATEWAY
-
-| USERLOG_STORE_ADDRESSES name needs to be harmonized
-| 3.0
-| 4.0.0
-| USERLOG_STORE_NODES
 |===
 
 endif::[]
@@ -219,7 +214,7 @@ Machine auth API key used to validate internal requests necessary to access reso
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-24-14-13-18[Deprecation Note]
+xref:deprecation-note-2023-04-24-15-07-02[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -287,25 +282,23 @@ Enable TLS for the connection to the events broker. The events broker is the oci
 
 a|`OCIS_PERSISTENT_STORE` +
 `USERLOG_STORE` +
-`USERLOG_STORE_TYPE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++memory ++
 a| [subs=-attributes]
-The type of the userlog store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
 a|`OCIS_PERSISTENT_STORE_NODES` +
 `USERLOG_STORE_NODES` +
-`USERLOG_STORE_ADDRESSES` +
-xref:deprecation-note-2023-04-24-14-13-18[Deprecation Note]
+
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[] ++
 a| [subs=-attributes]
-A comma separated list of nodes to access the configured store. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
 
 a|`USERLOG_STORE_DATABASE` +
 

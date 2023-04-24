@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-24-14-13-18]
+[#deprecation-note-2023-04-24-15-07-02]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -182,7 +182,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-24-14-13-18[Deprecation Note]
+xref:deprecation-note-2023-04-24-15-07-02[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -246,7 +246,7 @@ Disable creation of the home space on login.
 
 a|`OCIS_TRANSFER_SECRET` +
 `STORAGE_TRANSFER_SECRET` +
-xref:deprecation-note-2023-04-24-14-13-18[Deprecation Note]
+xref:deprecation-note-2023-04-24-15-07-02[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -265,67 +265,92 @@ Expiry for the gateway tokens.
 
 a|`OCIS_CACHE_STORE` +
 `GATEWAY_CACHE_STORE` +
-`OCIS_CACHE_STORE_TYPE` +
-`GATEWAY_CACHE_STORE_TYPE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++memory ++
 a| [subs=-attributes]
-Store implementation for the cache. Supported values are 'memory' (default), 'redis', and 'etcd'.
+The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
 a|`OCIS_CACHE_STORE_NODES` +
 `GATEWAY_CACHE_STORE_NODES` +
-`OCIS_CACHE_STORE_ADDRESS` +
-`GATEWAY_CACHE_STORE_ADDRESS` +
-`GATEWAY_CACHE_NODES` +
 
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
 ++[] ++
 a| [subs=-attributes]
-Nodes to use for the cache store.
+A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
 
-a|`GATEWAY_CACHE_DATABASE` +
+a|`OCIS_CACHE_DATABASE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++users ++
 a| [subs=-attributes]
-Database name of the cache.
+The database name the configured store should use.
 
-a|`OCIS_CACHE_STORE_TTL` +
+a|`OCIS_CACHE_TTL` +
 `GATEWAY_STAT_CACHE_TTL` +
 
 a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++300ns ++
+a| [subs=-attributes]
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
+
+a|`OCIS_CACHE_SIZE` +
+`GATEWAY_STAT_CACHE_SIZE` +
+
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++300 ++
+++0 ++
 a| [subs=-attributes]
-Max TTL in seconds for the gateway's stat cache.
+The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
-a|`OCIS_CACHE_STORE_TTL` +
+a|`OCIS_CACHE_TTL` +
 `GATEWAY_PROVIDER_CACHE_TTL` +
 
 a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++300ns ++
+a| [subs=-attributes]
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
+
+a|`OCIS_CACHE_SIZE` +
+`GATEWAY_PROVIDER_CACHE_SIZE` +
+
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++300 ++
+++0 ++
 a| [subs=-attributes]
-Max TTL in seconds for the gateway's provider cache.
+The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
-a|`OCIS_CACHE_STORE_TTL` +
+a|`OCIS_CACHE_TTL` +
 `GATEWAY_CREATE_HOME_CACHE_TTL` +
 
 a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++300ns ++
+a| [subs=-attributes]
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
+
+a|`OCIS_CACHE_SIZE` +
+`GATEWAY_CREATE_HOME_CACHE_SIZE` +
+
+a| [subs=-attributes]
 ++int ++
 a| [subs=-attributes]
-++300 ++
+++0 ++
 a| [subs=-attributes]
-Max TTL in seconds for the gateway's create home cache.
+The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
 a|`OCIS_URL` +
 `GATEWAY_FRONTEND_PUBLIC_URL` +

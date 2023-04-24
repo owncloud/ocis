@@ -10,12 +10,12 @@
 | OCIS_LOG_PRETTY<br/>GRAPH_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>GRAPH_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>GRAPH_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
-| OCIS_CACHE_STORE<br/>GRAPH_CACHE_STORE<br/>OCIS_CACHE_STORE_TYPE<br/>GRAPH_CACHE_STORE_TYPE | string | memory | The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
-| OCIS_CACHE_STORE_NODES<br/>GRAPH_CACHE_STORE_NODES<br/>OCIS_CACHE_STORE_ADDRESSES<br/>GRAPH_CACHE_STORE_ADDRESSES | []string | [] | A comma-separated list of nodes to connect to. This has no effect when 'in-memory' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.|
+| OCIS_CACHE_STORE<br/>GRAPH_CACHE_STORE | string | memory | The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
+| OCIS_CACHE_STORE_NODES<br/>GRAPH_CACHE_STORE_NODES | []string | [] | A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.|
 | GRAPH_CACHE_STORE_DATABASE | string | graph | The database name the configured store should use.|
 | GRAPH_CACHE_STORE_TABLE | string | roles | The database table the store should use.|
-| OCIS_CACHE_STORE_TTL<br/>GRAPH_CACHE_STORE_TTL | Duration | 336h0m0s | Time to live for cache records in the graph. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).|
-| OCIS_CACHE_STORE_SIZE<br/>GRAPH_CACHE_STORE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.|
+| OCIS_CACHE_TTL<br/>GRAPH_CACHE_TTL | Duration | 336h0m0s | Time to live for cache records in the graph. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).|
+| OCIS_CACHE_SIZE<br/>GRAPH_CACHE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.|
 | GRAPH_DEBUG_ADDR | string | 127.0.0.1:9124 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | GRAPH_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | GRAPH_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|

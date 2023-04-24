@@ -26,5 +26,5 @@ store:
   nodes: []
   database: eventhistory
   table: events
-  record_expiry: 336h0m0s
+  ttl: 336h0m0s
   size: 0

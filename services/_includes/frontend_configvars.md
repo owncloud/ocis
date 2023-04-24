@@ -49,11 +49,12 @@
 | FRONTEND_OCS_SHARE_PREFIX | string | /Shares | Path prefix for shares as part of an ocis resource. Note that the path must start with '/'.|
 | FRONTEND_OCS_PERSONAL_NAMESPACE<br/>FRONTEND_OCS_HOME_NAMESPACE | string | /users/{{.Id.OpaqueId}} | Homespace namespace identifier.|
 | FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE | string | {{.Mail}} | Additional information attribute for the user like {{.Mail}}.|
-| FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL | int | 0 | Max TTL in seconds for the resource info cache. 0 disables the cache.|
-| FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE | string | memory | The type of the resource info cache. Supported values are 'memory' and 'redis'.|
-| FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_ADDR | string |  | A comma separated list of addresses to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how addresses are used is dependent on the library of the configured store.|
-| FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_USERNAME | string |  | The username to access the redis cache.|
-| FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_PASSWORD | string |  | The password to access the redis cache.|
+| OCIS_CACHE_STORE<br/>FRONTEND_OCS_RESOURCE_INFO_CACHE_STORE | string | memory | The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
+| OCIS_CACHE_STORE_NODES<br/>FRONTEND_OCS_RESOURCE_INFO_CACHE_STORE_NODES | []string | [] | A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.|
+| OCIS_CACHE_DATABASE | string | frontend | The database name the configured store should use.|
+| FRONTEND_OCS_RESOURCE_INFO_CACHE_TABLE | string |  | The database table the store should use.|
+| OCIS_CACHE_TTL<br/>FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL | int | 0 | Max TTL in seconds for the resource info cache.|
+| OCIS_CACHE_SIZE<br/>FRONTEND_OCS_RESOURCE_INFO_CACHE_SIZE | int | 0 | Max number of entries to hold in the cache.|
 | FRONTEND_OCS_ENABLE_DENIALS | bool | false | EXPERIMENTAL: enable the feature to deny access on folders.|
 | OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD<br/>FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD | bool | false | Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.|
 | FRONTEND_CHECKSUMS_SUPPORTED_TYPES | []string | [sha1 md5 adler32] | Define the checksum types that indicate to clients which hashes the server can use to verify upload integrity. You can provide multiple types separated by blank or comma. Supported types are 'sha1', 'md5' and 'adler32'.|

@@ -26,12 +26,15 @@
 | GATEWAY_DISABLE_HOME_CREATION_ON_LOGIN | bool | true | Disable creation of the home space on login.|
 | OCIS_TRANSFER_SECRET<br/>STORAGE_TRANSFER_SECRET | string |  | The storage transfer secret.|
 | GATEWAY_TRANSFER_EXPIRES | int | 86400 | Expiry for the gateway tokens.|
-| OCIS_CACHE_STORE<br/>GATEWAY_CACHE_STORE<br/>OCIS_CACHE_STORE_TYPE<br/>GATEWAY_CACHE_STORE_TYPE | string | memory | Store implementation for the cache. Supported values are 'memory' (default), 'redis', and 'etcd'.|
-| OCIS_CACHE_STORE_NODES<br/>GATEWAY_CACHE_STORE_NODES<br/>OCIS_CACHE_STORE_ADDRESS<br/>GATEWAY_CACHE_STORE_ADDRESS<br/>GATEWAY_CACHE_NODES | []string | [] | Nodes to use for the cache store.|
-| GATEWAY_CACHE_DATABASE | string | users | Database name of the cache.|
-| OCIS_CACHE_STORE_TTL<br/>GATEWAY_STAT_CACHE_TTL | int | 300 | Max TTL in seconds for the gateway's stat cache.|
-| OCIS_CACHE_STORE_TTL<br/>GATEWAY_PROVIDER_CACHE_TTL | int | 300 | Max TTL in seconds for the gateway's provider cache.|
-| OCIS_CACHE_STORE_TTL<br/>GATEWAY_CREATE_HOME_CACHE_TTL | int | 300 | Max TTL in seconds for the gateway's create home cache.|
+| OCIS_CACHE_STORE<br/>GATEWAY_CACHE_STORE | string | memory | The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
+| OCIS_CACHE_STORE_NODES<br/>GATEWAY_CACHE_STORE_NODES | []string | [] | A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.|
+| OCIS_CACHE_DATABASE | string | users | The database name the configured store should use.|
+| OCIS_CACHE_TTL<br/>GATEWAY_STAT_CACHE_TTL | Duration | 300ns | Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).|
+| OCIS_CACHE_SIZE<br/>GATEWAY_STAT_CACHE_SIZE | int | 0 | The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.|
+| OCIS_CACHE_TTL<br/>GATEWAY_PROVIDER_CACHE_TTL | Duration | 300ns | Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).|
+| OCIS_CACHE_SIZE<br/>GATEWAY_PROVIDER_CACHE_SIZE | int | 0 | The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.|
+| OCIS_CACHE_TTL<br/>GATEWAY_CREATE_HOME_CACHE_TTL | Duration | 300ns | Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).|
+| OCIS_CACHE_SIZE<br/>GATEWAY_CREATE_HOME_CACHE_SIZE | int | 0 | The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.|
 | OCIS_URL<br/>GATEWAY_FRONTEND_PUBLIC_URL | string | https://localhost:9200 | The public facing URL of the oCIS frontend.|
 | GATEWAY_USERS_ENDPOINT | string | localhost:9144 | The USERS API endpoint.|
 | GATEWAY_GROUPS_ENDPOINT | string | localhost:9160 | The GROUPS API endpoint.|

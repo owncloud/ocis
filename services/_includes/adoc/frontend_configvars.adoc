@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-24-14-13-18]
+[#deprecation-note-2023-04-24-15-07-02]
 [caption=]
 .Deprecation notes for the frontend service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -226,7 +226,7 @@ Allow credentials for CORS.See following chapter for more details: *Access-Contr
 
 a|`OCIS_TRANSFER_SECRET` +
 `STORAGE_TRANSFER_SECRET` +
-xref:deprecation-note-2023-04-24-14-13-18[Deprecation Note]
+xref:deprecation-note-2023-04-24-15-07-02[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -246,7 +246,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-24-14-13-18[Deprecation Note]
+xref:deprecation-note-2023-04-24-15-07-02[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -468,7 +468,7 @@ Path prefix for shares as part of an ocis resource. Note that the path must star
 
 a|`FRONTEND_OCS_PERSONAL_NAMESPACE` +
 `FRONTEND_OCS_HOME_NAMESPACE` +
-xref:deprecation-note-2023-04-24-14-13-18[Deprecation Note]
+xref:deprecation-note-2023-04-24-15-07-02[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -485,50 +485,63 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Additional information attribute for the user like {{.Mail}}.
 
-a|`FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL` +
-
-a| [subs=-attributes]
-++int ++
-a| [subs=-attributes]
-++0 ++
-a| [subs=-attributes]
-Max TTL in seconds for the resource info cache. 0 disables the cache.
-
-a|`FRONTEND_OCS_RESOURCE_INFO_CACHE_TYPE` +
+a|`OCIS_CACHE_STORE` +
+`FRONTEND_OCS_RESOURCE_INFO_CACHE_STORE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++memory ++
 a| [subs=-attributes]
-The type of the resource info cache. Supported values are 'memory' and 'redis'.
+The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
-a|`FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_ADDR` +
+a|`OCIS_CACHE_STORE_NODES` +
+`FRONTEND_OCS_RESOURCE_INFO_CACHE_STORE_NODES` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+
+a|`OCIS_CACHE_DATABASE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++frontend ++
+a| [subs=-attributes]
+The database name the configured store should use.
+
+a|`FRONTEND_OCS_RESOURCE_INFO_CACHE_TABLE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-A comma separated list of addresses to access the configured store. This has no effect when the 'memory' store is configured. Note that the behaviour how addresses are used is dependent on the library of the configured store.
+The database table the store should use.
 
-a|`FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_USERNAME` +
-
-a| [subs=-attributes]
-++string ++
-a| [subs=-attributes]
-++ ++
-a| [subs=-attributes]
-The username to access the redis cache.
-
-a|`FRONTEND_OCS_RESOURCE_INFO_CACHE_REDIS_PASSWORD` +
+a|`OCIS_CACHE_TTL` +
+`FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL` +
 
 a| [subs=-attributes]
-++string ++
+++int ++
 a| [subs=-attributes]
-++ ++
+++0 ++
 a| [subs=-attributes]
-The password to access the redis cache.
+Max TTL in seconds for the resource info cache.
+
+a|`OCIS_CACHE_SIZE` +
+`FRONTEND_OCS_RESOURCE_INFO_CACHE_SIZE` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+Max number of entries to hold in the cache.
 
 a|`FRONTEND_OCS_ENABLE_DENIALS` +
 

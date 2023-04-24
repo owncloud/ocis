@@ -37,9 +37,12 @@ cache:
   store: memory
   nodes: []
   database: users
-  stat_cache_ttl: 300
-  provider_cache_ttl: 300
-  create_home_cache_ttl: 300
+  stat_cache_ttl: 300ns
+  stat_cache_size: 0
+  provider_cache_ttl: 300ns
+  provider_cache_size: 0
+  create_home_cache_ttl: 300ns
+  create_home_cache_size: 0
 frontend_public_url: https://localhost:9200
 users_endpoint: localhost:9144
 groups_endpoint: localhost:9160
