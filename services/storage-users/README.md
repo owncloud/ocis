@@ -83,7 +83,7 @@ The configuration for the `purge-expired` command is done by using the following
 
 ## Caching
 
-The `storage-users` service caches file metadata via the configured store in `STORAGE_USERS_CACHE_STORE`. Possible stores are:
+The `storage-users` service caches stat and metadata via the configured store in `STORAGE_USERS_STAT_CACHE_STORE` and `STORAGE_USERS_FILEMETADATA_CACHE_STORE`. Possible stores are:
   -   `memory`: Basic in-memory store and the default.
   -   `redis`: Stores metadata in a configured Redis cluster.
   -   `redis-sentinel`: Stores metadata in a configured Redis Sentinel cluster.
@@ -94,4 +94,4 @@ The `storage-users` service caches file metadata via the configured store in `ST
 1.  Note that in-memory stores are by nature not reboot persistent.
 2.  Though usually not necessary, a database name can be configured for event stores if the event store supports this. Generally not applicable for stores of type `in-memory`, `redis` and `redis-sentinel`. These settings are blank by default which means that the standard settings of the configured store applies.
 3.  The `storage-users` service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
-4.  When using `redis-sentinel`, the Redis master to use is configured via `STORAGE_SYSTEM_CACHE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+4.  When using `redis-sentinel`, the Redis master to use is configured via `STORAGE_USERS_STAT_CACHE_STORE_NODES` and `STORAGE_USERS_FILEMETADATA_CACHE_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
