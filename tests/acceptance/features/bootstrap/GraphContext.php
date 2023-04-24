@@ -2344,28 +2344,34 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then the downloaded JSON content should contain event type :arg1 in item 'events' and should match
+	 * @Then the downloaded JSON content should contain event type :key in item 'events' and should match
+	 * @Then the downloaded JSON should contain key :key and match
 	 *
-	 * @param string $eventType
+	 * @param string $key
 	 * @param PyStringNode $schemaString
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 *
 	 */
-	public function downloadedJsonContentShouldContainEventTypeInItemAndShouldMatch(string $eventType, PyStringNode $schemaString): void {
-		$events = $this->featureContext->getJsonDecodedResponseBodyContent()->events;
-		// search for the event type and assert
+	public function downloadedJsonContentShouldContainEventTypeInItemAndShouldMatch(string $key, PyStringNode $schemaString): void {
 		$actualResponseToAssert = null;
-		foreach ($events as $event) {
-			if ($event->type === $eventType) {
-				$actualResponseToAssert = $event;
-				break;
+		// the response contains only 2 key either events or user
+		if ($key === "user") {
+			$actualResponseToAssert = $this->featureContext->getJsonDecodedResponseBodyContent()->user;
+		} else {
+			$events = $this->featureContext->getJsonDecodedResponseBodyContent()->events;
+			foreach ($events as $event) {
+				if ($event->type === $key) {
+					$actualResponseToAssert = $event;
+					break;
+				}
 			}
 		}
+		// search for the event type and assert
 		if ($actualResponseToAssert === null) {
 			throw new Error(
-				"Response does not contain event type '" . $eventType . "'."
+				"Response does not contain key '" . $key . "'."
 			);
 		}
 		JsonAssertions::assertJsonDocumentMatchesSchema(
