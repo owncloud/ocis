@@ -12,6 +12,8 @@ import (
 	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/crypto"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/config/parser"
@@ -93,8 +95,8 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				logger.Fatal().Err(err).Str("addr", cfg.Notifications.RevaGateway).Msg("could not get reva client")
 			}
-
-			svc := service.NewEventsNotifier(evts, channel, logger, gwclient, cfg.Notifications.MachineAuthAPIKey, cfg.Notifications.EmailTemplatePath, cfg.WebUIURL)
+			valueService := settingssvc.NewValueService("com.owncloud.api.settings", grpc.DefaultClient())
+			svc := service.NewEventsNotifier(evts, channel, logger, gwclient, valueService, cfg.Notifications.MachineAuthAPIKey, cfg.Notifications.EmailTemplatePath, cfg.WebUIURL)
 			return svc.Run()
 		},
 	}

@@ -4,7 +4,6 @@ package store
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -87,8 +86,39 @@ func (s *Store) ReadValue(valueID string) (*settingsmsg.Value, error) {
 
 // ReadValueByUniqueIdentifiers tries to find a value given a set of unique identifiers
 func (s *Store) ReadValueByUniqueIdentifiers(accountUUID, settingID string) (*settingsmsg.Value, error) {
-	fmt.Println("ReadValueByUniqueIdentifiers not implemented")
-	return nil, errors.New("not implemented")
+	if settingID == "" {
+		return nil, fmt.Errorf("settingID can not be empty %w", settings.ErrNotFound)
+	}
+	s.Init()
+	ctx := context.TODO()
+
+	vIDs, err := s.mdc.ReadDir(ctx, valuesFolderLocation)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, vid := range vIDs {
+		b, err := s.mdc.SimpleDownload(ctx, valuePath(vid))
+		switch err.(type) {
+		case nil:
+			// continue
+		case errtypes.NotFound:
+			continue
+		default:
+			return nil, err
+		}
+
+		v := &settingsmsg.Value{}
+		err = json.Unmarshal(b, v)
+		if err != nil {
+			return nil, err
+		}
+
+		if v.AccountUuid == accountUUID && v.SettingId == settingID {
+			return v, nil
+		}
+	}
+	return nil, settings.ErrNotFound
 }
 
 // WriteValue writes the given value into a file within the dataPath
