@@ -43,7 +43,7 @@ func DefaultConfig() *config.Config {
 			AccessTokenVerifyMethod: config.AccessTokenVerificationJWT,
 			UserinfoCache: &config.Cache{
 				Store:    "memory",
-				Database: "proxy",
+				Database: "ocis",
 				Table:    "userinfo",
 				TTL:      time.Second * 10,
 			},

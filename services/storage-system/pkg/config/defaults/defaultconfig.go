@@ -52,7 +52,7 @@ func DefaultConfig() *config.Config {
 		},
 		Cache: config.Cache{
 			Store:    "memory",
-			Database: "system",
+			Database: "ocis",
 		},
 	}
 }

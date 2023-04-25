@@ -38,7 +38,7 @@ func DefaultConfig() *config.Config {
 		TransferExpires:            24 * 60 * 60,
 		Cache: config.Cache{
 			Store:              "memory",
-			Database:           "users",
+			Database:           "ocis",
 			StatCacheTTL:       300,
 			ProviderCacheTTL:   300,
 			CreateHomeCacheTTL: 300,

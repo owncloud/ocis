@@ -107,7 +107,7 @@ func DefaultConfig() *config.Config {
 			HomeNamespace:             "/users/{{.Id.OpaqueId}}",
 			AdditionalInfoAttribute:   "{{.Mail}}",
 			ResourceInfoCacheType:     "memory",
-			ResourceInfoCacheDatabase: "frontend",
+			ResourceInfoCacheDatabase: "ocis",
 			ResourceInfoCacheTTL:      0,
 		},
 		Middleware: config.Middleware{
