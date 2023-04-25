@@ -83,7 +83,7 @@ type Handler struct {
 	skipUpdatingExistingSharesMountpoints bool
 	additionalInfoTemplate                *template.Template
 	userIdentifierCache                   *ttlcache.Cache
-	resourceInfoCache                     cache.StatCache
+	statCache                             cache.StatCache
 	deniable                              bool
 	resharing                             bool
 
@@ -130,7 +130,7 @@ func (h *Handler) Init(c *config.Config) {
 	h.deniable = c.EnableDenials
 	h.resharing = resharing(c)
 
-	h.resourceInfoCache = cache.GetStatCache(c.ResourceInfoCacheStore, c.ResourceInfoCacheNodes, c.ResourceInfoCacheDatabase, "stat", time.Duration(c.ResourceInfoCacheTTL)*time.Second, c.ResourceInfoCacheSize)
+	h.statCache = cache.GetStatCache(c.ResourceInfoCacheStore, c.ResourceInfoCacheNodes, c.ResourceInfoCacheDatabase, "stat", time.Duration(c.ResourceInfoCacheTTL)*time.Second, c.ResourceInfoCacheSize)
 	if c.CacheWarmupDriver != "" {
 		cwm, err := getCacheWarmupManager(c)
 		if err == nil {
@@ -153,8 +153,8 @@ func (h *Handler) startCacheWarmup(c sharecache.Warmup) {
 		return
 	}
 	for _, r := range infos {
-		key := h.resourceInfoCache.GetKey(r.Owner, &provider.Reference{ResourceId: r.Id}, []string{}, []string{})
-		_ = h.resourceInfoCache.PushToCache(key, r)
+		key := h.statCache.GetKey(r.Owner, &provider.Reference{ResourceId: r.Id}, []string{}, []string{})
+		_ = h.statCache.PushToCache(key, r)
 	}
 }
 
@@ -769,7 +769,7 @@ func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, shareID st
 	}
 
 	if currentUser, ok := ctxpkg.ContextGetUser(ctx); ok {
-		h.resourceInfoCache.RemoveStat(currentUser.Id, shareR.Share.ResourceId)
+		h.statCache.RemoveStat(currentUser.Id, shareR.Share.ResourceId)
 	}
 
 	share, err := conversions.CS3Share2ShareData(ctx, uRes.Share)
@@ -1354,10 +1354,10 @@ func (h *Handler) getResourceInfo(ctx context.Context, client gateway.GatewayAPI
 	logger := appctx.GetLogger(ctx)
 	key := ""
 	if currentUser, ok := ctxpkg.ContextGetUser(ctx); ok {
-		key = h.resourceInfoCache.GetKey(currentUser.Id, ref, []string{}, []string{})
-		pinfo := &provider.ResourceInfo{}
-		if err := h.resourceInfoCache.PullFromCache(key, pinfo); err == nil {
-			return pinfo, &rpc.Status{Code: rpc.Code_CODE_OK}, nil
+		key = h.statCache.GetKey(currentUser.Id, ref, []string{}, []string{})
+		s := &provider.StatResponse{}
+		if err := h.statCache.PullFromCache(key, s); err == nil {
+			return s.Info, &rpc.Status{Code: rpc.Code_CODE_OK}, nil
 		}
 	}
 
@@ -1376,7 +1376,7 @@ func (h *Handler) getResourceInfo(ctx context.Context, client gateway.GatewayAPI
 	}
 
 	if key != "" {
-		_ = h.resourceInfoCache.PushToCache(key, *statRes.Info)
+		_ = h.statCache.PushToCache(key, statRes)
 	}
 
 	return statRes.Info, statRes.Status, nil

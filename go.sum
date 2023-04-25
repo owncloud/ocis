@@ -627,8 +627,8 @@ github.com/crewjam/httperr v0.2.0 h1:b2BfXR8U3AlIHwNeFFvZ+BV1LFvKLlzMjzaTnZMybNo
 github.com/crewjam/httperr v0.2.0/go.mod h1:Jlz+Sg/XqBQhyMjdDiC+GNNRzZTD7x39Gu3pglZ5oH4=
 github.com/crewjam/saml v0.4.13 h1:TYHggH/hwP7eArqiXSJUvtOPNzQDyQ7vwmwEqlFWhMc=
 github.com/crewjam/saml v0.4.13/go.mod h1:igEejV+fihTIlHXYP8zOec3V5A8y3lws5bQBFsTm4gA=
-github.com/cs3org/reva/v2 v2.12.1-0.20230424091007-8d8b567179b1 h1:ds7JOiVqRoMR1EAkoxHJEEA8iX8JirO3bPxXACGE8iA=
-github.com/cs3org/reva/v2 v2.12.1-0.20230424091007-8d8b567179b1/go.mod h1:2SKiycp0NwrLm/c1YeKUHwLSwPqV7hKfFEMdYgEaDxo=
+github.com/cs3org/reva/v2 v2.12.1-0.20230425110812-8a3352fb1960 h1:QEQ9tu4S835dmRUryRj0JTQJPBg1AgPxXyVHrPtOY4U=
+github.com/cs3org/reva/v2 v2.12.1-0.20230425110812-8a3352fb1960/go.mod h1:VxBmpOvIKlgKLPOsHun+fABopzX+3ZELPAp3N5bQMsM=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
@@ -792,8 +792,8 @@ github.com/go-micro/plugins/v4/server/http v1.2.1 h1:Cia924J90rgFT/4qWWvyLvN+XqE
 github.com/go-micro/plugins/v4/server/http v1.2.1/go.mod h1:YuAjaSPxcn3LI8j2FUsqx0Rxunrj4YwDV41Ax76rLl0=
 github.com/go-micro/plugins/v4/store/nats-js v1.1.0 h1:6Fe1/eLtg8kRyaGvMILp4olYtTDGwYNBXyb1sYfAWGk=
 github.com/go-micro/plugins/v4/store/nats-js v1.1.0/go.mod h1:jJf7Gm39OafZlT3s3UE2/9NIYj6OlI2fmZ4czSA3gvo=
-github.com/go-micro/plugins/v4/store/redis v1.2.0 h1:jR7sHOD1a735cxyBNFif58tP0Ck8OUklpDN1IzzDoRg=
-github.com/go-micro/plugins/v4/store/redis v1.2.0/go.mod h1:MbCG0YiyPqETTtm7uHFmxQNCaW1o9hBoYtFwhbVjLUg=
+github.com/go-micro/plugins/v4/store/redis v1.2.1-0.20230405210006-efd9191305c5 h1:W5HQDVr+6u9yQpnFZxMBRQd2rQCjOw/17Yb3dp6SQhE=
+github.com/go-micro/plugins/v4/store/redis v1.2.1-0.20230405210006-efd9191305c5/go.mod h1:MbCG0YiyPqETTtm7uHFmxQNCaW1o9hBoYtFwhbVjLUg=
 github.com/go-micro/plugins/v4/transport/grpc v1.1.0 h1:mXfDYfFQLnVDzjGY3o84oe4prfux9h8txsnA19dKsj8=
 github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.2.0 h1:EQj4l7fuOSz8ueUYhFlpZPp9+tN4JeONL32ARRKXW/U=
 github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.2.0/go.mod h1:JR9Ox/iJIrcXm8nCWdAEBsyG7Q7lyMLzsTZPfXrqvwo=
