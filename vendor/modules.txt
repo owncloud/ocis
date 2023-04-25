@@ -349,7 +349,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.12.1-0.20230424091007-8d8b567179b1
+# github.com/cs3org/reva/v2 v2.12.1-0.20230425110812-8a3352fb1960
 ## explicit; go 1.19
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -909,7 +909,7 @@ github.com/go-micro/plugins/v4/server/http
 # github.com/go-micro/plugins/v4/store/nats-js v1.1.0
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/store/nats-js
-# github.com/go-micro/plugins/v4/store/redis v1.2.0
+# github.com/go-micro/plugins/v4/store/redis v1.2.1-0.20230405210006-efd9191305c5
 ## explicit; go 1.17
 github.com/go-micro/plugins/v4/store/redis
 # github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.2.0

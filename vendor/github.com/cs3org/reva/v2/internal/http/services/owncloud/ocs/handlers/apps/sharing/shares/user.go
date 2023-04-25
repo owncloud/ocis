@@ -207,7 +207,7 @@ func (h *Handler) removeUserShare(w http.ResponseWriter, r *http.Request, shareI
 		return
 	}
 	if currentUser, ok := ctxpkg.ContextGetUser(ctx); ok {
-		h.resourceInfoCache.RemoveStat(currentUser.Id, getShareResp.Share.ResourceId)
+		h.statCache.RemoveStat(currentUser.Id, getShareResp.Share.ResourceId)
 	}
 	response.WriteOCSSuccess(w, r, data)
 }
