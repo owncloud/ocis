@@ -1162,7 +1162,7 @@ def e2eTests(ctx):
         },
         "commands": [
             "cd %s" % dirs["web"],
-            "sleep 10 && pnpm test:e2e:cucumber tests/e2e/cucumber/**/*[!.oc10].feature",
+            "sleep 10 && pnpm test:e2e:cucumber tests/e2e/cucumber/**/*[!.oc10].feature --tags ~@skip",
         ],
     }]
 
