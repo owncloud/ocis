@@ -14,7 +14,6 @@ type Config struct {
 
 	Tracing *Tracing `yaml:"tracing"`
 	Log     *Log     `yaml:"log"`
-	Cache   *Cache   `yaml:"cache"`
 	Debug   Debug    `yaml:"debug"`
 
 	HTTP HTTP `yaml:"http"`
