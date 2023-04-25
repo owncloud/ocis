@@ -13,7 +13,7 @@ import (
 
 var _ = Describe("opa ocis resource functions", func() {
 	Describe("ocis.resource.download", func() {
-		It("loads reva resources", func() {
+		It("downloads reva resources", func() {
 			ts := []byte("Lorem Ipsum is simply dummy text of the printing and typesetting")
 			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				w.Write(ts)

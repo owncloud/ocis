@@ -51,11 +51,11 @@ func Server(cfg *config.Config) *cli.Command {
 					log.Pretty(cfg.Log.Pretty),
 					log.Color(cfg.Log.Color),
 					log.File(cfg.Log.File),
-				)
+				).SubloggerWithRequestID(ctx)
 			)
 			defer cancel()
 
-			e, err := opa.NewOPA(cfg.Engine.Timeout, cfg.Engine)
+			e, err := opa.NewOPA(cfg.Engine.Timeout, logger, cfg.Engine)
 			if err != nil {
 				return err
 			}

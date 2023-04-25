@@ -9,9 +9,9 @@ import (
 	"strings"
 )
 
-var RFMimetypeExtension = rego.Function1(
+var RFMimetypeExtensions = rego.Function1(
 	&rego.Function{
-		Name:             "ocis.mimetype.extension_for_mimetype",
+		Name:             "ocis.mimetype.extensions",
 		Decl:             types.NewFunction(types.Args(types.S), types.A),
 		Memoize:          true,
 		Nondeterministic: true,
@@ -28,12 +28,12 @@ var RFMimetypeExtension = rego.Function1(
 			return nil, err
 		}
 
-		v, err := ast.InterfaceToValue(detectedExtensions)
-		if err != nil {
-			return nil, err
+		var mimeTerms []*ast.Term
+		for _, extension := range detectedExtensions {
+			mimeTerms = append(mimeTerms, ast.NewTerm(ast.String(extension)))
 		}
 
-		return ast.NewTerm(v), nil
+		return ast.ArrayTerm(mimeTerms...), nil
 	},
 )
 
@@ -51,13 +51,8 @@ var RFMimetypeDetect = rego.Function1(
 			return nil, err
 		}
 
-		mimeInfo := mimetype.Detect(body).String()
-		detectedMimetype := strings.Split(mimeInfo, ";")[0]
-		v, err := ast.InterfaceToValue(detectedMimetype)
-		if err != nil {
-			return nil, err
-		}
+		mimetype := mimetype.Detect(body).String()
 
-		return ast.NewTerm(v), nil
+		return ast.StringTerm(strings.Split(mimetype, ";")[0]), nil
 	},
 )
