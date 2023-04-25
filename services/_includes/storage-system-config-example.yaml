@@ -36,7 +36,7 @@ skip_user_groups_in_token: false
 cache:
   store: memory
   nodes: []
-  database: system
+  database: ocis
   ttl: 0s
   size: 0
 driver: ocis

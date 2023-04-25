@@ -28,7 +28,7 @@
 | GATEWAY_TRANSFER_EXPIRES | int | 86400 | Expiry for the gateway tokens.|
 | OCIS_CACHE_STORE<br/>GATEWAY_CACHE_STORE | string | memory | The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
 | OCIS_CACHE_STORE_NODES<br/>GATEWAY_CACHE_STORE_NODES | []string | [] | A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.|
-| OCIS_CACHE_DATABASE | string | users | The database name the configured store should use.|
+| OCIS_CACHE_DATABASE | string | ocis | The database name the configured store should use.|
 | OCIS_CACHE_TTL<br/>GATEWAY_STAT_CACHE_TTL | Duration | 300ns | Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).|
 | OCIS_CACHE_SIZE<br/>GATEWAY_STAT_CACHE_SIZE | int | 0 | The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.|
 | OCIS_CACHE_TTL<br/>GATEWAY_PROVIDER_CACHE_TTL | Duration | 300ns | Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).|

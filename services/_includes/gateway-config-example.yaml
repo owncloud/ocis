@@ -36,7 +36,7 @@ transfer_expires: 86400
 cache:
   store: memory
   nodes: []
-  database: users
+  database: ocis
   stat_cache_ttl: 300ns
   stat_cache_size: 0
   provider_cache_ttl: 300ns

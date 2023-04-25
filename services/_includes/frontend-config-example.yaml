@@ -98,7 +98,7 @@ ocs:
   additional_info_attribute: '{{.Mail}}'
   resource_info_cache_type: memory
   resource_info_cache_nodes: []
-  resource_info_cache_database: frontend
+  resource_info_cache_database: ocis
   resource_info_cache_table: ""
   resource_info_cache_ttl: 0
   resource_info_cache_size: 0

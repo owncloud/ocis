@@ -11,13 +11,6 @@ log:
   pretty: false
   color: false
   file: ""
-cache:
-  store: ""
-  nodes: []
-  database: ""
-  table: ""
-  ttl: 0s
-  size: 0
 debug:
   addr: 127.0.0.1:9114
   token: ""

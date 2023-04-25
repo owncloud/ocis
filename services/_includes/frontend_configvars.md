@@ -51,7 +51,7 @@
 | FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE | string | {{.Mail}} | Additional information attribute for the user like {{.Mail}}.|
 | OCIS_CACHE_STORE<br/>FRONTEND_OCS_RESOURCE_INFO_CACHE_STORE | string | memory | The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
 | OCIS_CACHE_STORE_NODES<br/>FRONTEND_OCS_RESOURCE_INFO_CACHE_STORE_NODES | []string | [] | A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.|
-| OCIS_CACHE_DATABASE | string | frontend | The database name the configured store should use.|
+| OCIS_CACHE_DATABASE | string | ocis | The database name the configured store should use.|
 | FRONTEND_OCS_RESOURCE_INFO_CACHE_TABLE | string |  | The database table the store should use.|
 | OCIS_CACHE_TTL<br/>FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL | int | 0 | Max TTL in seconds for the resource info cache.|
 | OCIS_CACHE_SIZE<br/>FRONTEND_OCS_RESOURCE_INFO_CACHE_SIZE | int | 0 | Max number of entries to hold in the cache.|

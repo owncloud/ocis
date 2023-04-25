@@ -117,7 +117,7 @@ oidc:
   user_info_cache:
     store: memory
     addresses: []
-    database: proxy
+    database: ocis
     table: userinfo
     ttl: 10s
     size: 0
