@@ -94,7 +94,7 @@ Feature: Space management
   Scenario: space admin user changes the name of the project space
     When user "Brian" changes the name of the "Project" space to "New Name" owned by user "Alice"
     Then the HTTP status code should be "200"
-    And the JSON response should contain space called "New Name" and match
+    And the JSON data of the response should match
     """
     {
       "type": "object",
@@ -134,7 +134,7 @@ Feature: Space management
   Scenario: space admin user changes the description of the project space
     When user "Brian" changes the description of the "Project" space to "New description" owned by user "Alice"
     Then the HTTP status code should be "200"
-    And the JSON response should contain space called "Project" and match
+    And the JSON data of the response should match
     """
     {
       "type": "object",

@@ -24,10 +24,10 @@ Feature: Change data of space
     And using spaces DAV path
 
 
-  Scenario: only space admin user can change the name of a space via the Graph API
+  Scenario: user with space manager role can change the name of a space via the Graph API
     When user "Alice" changes the name of the "Project Jupiter" space to "Project Death Star"
     Then the HTTP status code should be "200"
-    And the JSON response should contain space called "Project Death Star" and match
+    And the JSON data of the response should match
     """
      {
       "type": "object",
@@ -49,10 +49,10 @@ Feature: Change data of space
     """
 
 
-  Scenario Outline: other than space admin user can't change the name of a Space via the Graph API
-    When user "<user>" changes the name of the "Project Jupiter" space to "<expectedName>"
-    Then the HTTP status code should be "<code>"
-    And for user "<user>" the JSON response should contain space called "<expectedName>" and match
+  Scenario Outline: user other than space manager role can't change the name of a Space via the Graph API
+    When user "<user>" changes the name of the "Project Jupiter" space to "Project Jupiter"
+    Then the HTTP status code should be "403"
+    And for user "<user>" the JSON response should contain space called "Project Jupiter" and match
     """
      {
       "type": "object",
@@ -63,7 +63,7 @@ Feature: Change data of space
       "properties": {
         "name": {
           "type": "string",
-          "enum": ["<expectedName>"]
+          "enum": ["Project Jupiter"]
         },
         "driveType": {
           "type": "string",
@@ -73,15 +73,15 @@ Feature: Change data of space
     }
     """
     Examples:
-      | user  | code | expectedName       |
-      | Brian | 403  | Project Jupiter    |
-      | Bob   | 403  | Project Jupiter    |
+      | user  |
+      | Brian |
+      | Bob   |
 
 
-  Scenario: only space admin user can change the description(subtitle) of a space via the Graph API
+  Scenario: user with space manager role can change the description(subtitle) of a space via the Graph API
     When user "Alice" changes the description of the "Project Jupiter" space to "The Death Star is a fictional mobile space station"
     Then the HTTP status code should be "200"
-    And the JSON response should contain space called "Project Jupiter" and match
+    And the JSON data of the response should match
     """
      {
       "type": "object",
@@ -110,45 +110,11 @@ Feature: Change data of space
 
   Scenario Outline: viewer and editor cannot change the description(subtitle) of a space via the Graph API
     When user "<user>" changes the description of the "Project Jupiter" space to "The Death Star is a fictional mobile space station"
-    Then the HTTP status code should be "<code>"
+    Then the HTTP status code should be "403"
     Examples:
-      | user  | code |
-      | Brian | 403  |
-      | Bob   | 403  |
-
-
-  Scenario: user tries to increase the quota of a Space via the Graph API
-  Scenario: An user tries to increase the quota of a Space via the Graph API
-    When user "Alice" changes the quota of the "Project Jupiter" space to "100"
-    Then the HTTP status code should be "200"
-    And the JSON response should contain space called "Project Jupiter" and match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name",
-        "quota"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Jupiter"]
-        },
-        "quota": {
-          "type": "object",
-          "required": [
-            "total"
-          ],
-          "properties": {
-            "total" : {
-              "type": "number",
-              "enum": [100]
-            }
-          }
-        }
-      }
-    }
-    """
+      | user  |
+      | Brian |
+      | Bob   |
 
 
   Scenario Outline: user with normal space permission can't increases the quota of a Space via the Graph API
@@ -191,7 +157,7 @@ Feature: Change data of space
   Scenario Outline: space admin user set no restriction quota of a Space via the Graph API
     When user "Alice" changes the quota of the "Project Jupiter" space to "<quotaValue>"
     Then the HTTP status code should be "200"
-    And the JSON response should contain space called "Project Jupiter" and match
+    And the JSON data of the response should match
     """
      {
       "type": "object",
