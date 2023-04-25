@@ -9,11 +9,10 @@ import (
 // Config combines all available configuration parts.
 type Config struct {
 	Commons *shared.Commons `yaml:"-"` // don't use this directly as configuration for a service
-
-	Service Service `yaml:"-"`
-
-	Log   *Log  `yaml:"log"`
-	Debug Debug `yaml:"debug"`
+	Service Service         `yaml:"-"`
+	Tracing *Tracing        `yaml:"tracing"`
+	Log     *Log            `yaml:"log"`
+	Debug   Debug           `yaml:"debug"`
 
 	Nats Nats `ociConfig:"nats"`
 
@@ -30,4 +29,11 @@ type Nats struct {
 	TLSKey                  string `yaml:"tls_key" env:"NATS_TLS_KEY" desc:"Path/File name for the TLS certificate key (in PEM format) for the NATS listener. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/nats."`
 	TLSSkipVerifyClientCert bool   `yaml:"tls_skip_verify_client_cert" env:"OCIS_INSECURE;NATS_TLS_SKIP_VERIFY_CLIENT_CERT" desc:"Whether the NATS server should skip the client certificate verification during the TLS handshake."`
 	EnableTLS               bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;NATS_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.."`
+}
+
+type Tracing struct {
+	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;NATS_TRACING_ENABLED" desc:"Activates tracing."`
+	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;NATS_TRACING_TYPE" desc:"The type of tracing. Defaults to \"\", which is the same as \"jaeger\". Allowed tracing types are \"jaeger\" and \"\" as of now."`
+	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;NATS_TRACING_ENDPOINT" desc:"The endpoint of the tracing agent."`
+	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;NATS_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset."`
 }

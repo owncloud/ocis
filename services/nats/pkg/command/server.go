@@ -9,6 +9,9 @@ import (
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	pkgcrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
+	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/nats/pkg/config"
 	"github.com/owncloud/ocis/v2/services/nats/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/nats/pkg/logging"
@@ -37,6 +40,25 @@ func Server(cfg *config.Config) *cli.Command {
 			}()
 
 			defer cancel()
+
+			{
+				server := debug.NewService(
+					debug.Logger(logger),
+					debug.Name(cfg.Service.Name),
+					debug.Version(version.GetString()),
+					debug.Address(cfg.Debug.Addr),
+					debug.Token(cfg.Debug.Token),
+					debug.Pprof(cfg.Debug.Pprof),
+					debug.Zpages(cfg.Debug.Zpages),
+					debug.Health(handlers.Health),
+					debug.Ready(handlers.Ready),
+				)
+
+				gr.Add(server.ListenAndServe, func(_ error) {
+					_ = server.Shutdown(ctx)
+					cancel()
+				})
+			}
 
 			var tlsConf *tls.Config
 			if cfg.Nats.EnableTLS {
