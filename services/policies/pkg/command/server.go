@@ -21,7 +21,7 @@ import (
 	svcProtogen "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/policies/v0"
 	"github.com/owncloud/ocis/v2/services/policies/pkg/config"
 	"github.com/owncloud/ocis/v2/services/policies/pkg/config/parser"
-	"github.com/owncloud/ocis/v2/services/policies/pkg/engine"
+	"github.com/owncloud/ocis/v2/services/policies/pkg/engine/opa"
 	svcEvent "github.com/owncloud/ocis/v2/services/policies/pkg/service/event"
 	svcGRPC "github.com/owncloud/ocis/v2/services/policies/pkg/service/grpc"
 	"github.com/urfave/cli/v2"
@@ -55,7 +55,7 @@ func Server(cfg *config.Config) *cli.Command {
 			)
 			defer cancel()
 
-			e, err := engine.NewOPA(cfg.Engine.Timeout, cfg.Engine)
+			e, err := opa.NewOPA(cfg.Engine.Timeout, cfg.Engine)
 			if err != nil {
 				return err
 			}
