@@ -1,5 +1,8 @@
 @api
 Feature: MOVE file/folder
+  As a user 
+  I want to move resources
+  So that I can organise resources according to my preference 
 
   Background:
     Given these users have been created with default attributes and without skeleton files:

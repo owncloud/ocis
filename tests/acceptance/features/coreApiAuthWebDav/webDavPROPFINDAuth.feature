@@ -1,5 +1,8 @@
 @api
-Feature: get file info using PROPFIND
+Feature: PROPFIND file/folder
+  As a user
+  I want to send PROPFIND request to various endpoints
+  So that I can ensure the endpoints are well authenticated
 
   Background:
     Given these users have been created with default attributes and without skeleton files:

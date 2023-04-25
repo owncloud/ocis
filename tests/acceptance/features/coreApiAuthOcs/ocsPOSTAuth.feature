@@ -1,5 +1,8 @@
 @api @files_sharing-app-required
 Feature: auth
+  As a user
+  I want to send POST request to various endpoints
+  So that I can make sure the endpoints need proper authentication
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files

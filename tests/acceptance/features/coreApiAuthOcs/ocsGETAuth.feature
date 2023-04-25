@@ -1,5 +1,8 @@
 @api @files_sharing-app-required
 Feature: auth
+  As a user
+  I want to send GET request to various endpoints
+  So that I can make sure the endpoints need proper authentication
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
@@ -101,7 +104,7 @@ Feature: auth
     And the OCS status code of responses on all endpoints should be "200"
 
   @issue-1319
-  Scenario:using OCS with admin basic auth
+  Scenario: using OCS with admin basic auth
     When the administrator requests these endpoint with "GET"
       | endpoint                 |
       | /ocs/v1.php/cloud/apps   |
