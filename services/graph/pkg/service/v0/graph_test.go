@@ -479,7 +479,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.CreateDrive(rr, r)
-				Expect(rr.Code).To(Equal(http.StatusUnauthorized))
+				Expect(rr.Code).To(Equal(http.StatusForbidden))
 
 				body, _ := io.ReadAll(rr.Body)
 				var libreError libregraph.OdataError
