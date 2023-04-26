@@ -164,48 +164,22 @@ func (n *Node) SetType(t provider.ResourceType) {
 	n.nodeType = &t
 }
 
-// ChangeOwner sets the owner of n to newOwner
-func (n *Node) ChangeOwner(new *userpb.UserId) (err error) {
-	n.SpaceRoot.owner = new
-
-	attribs := Attributes{}
-	attribs.SetString(prefixes.OwnerIDAttr, new.OpaqueId)
-	attribs.SetString(prefixes.OwnerIDPAttr, new.Idp)
-	attribs.SetString(prefixes.OwnerTypeAttr, utils.UserTypeToString(new.Type))
-
-	if err := n.SpaceRoot.SetXattrs(attribs, true); err != nil {
-		return err
-	}
-
-	return
-}
-
-// WriteAllNodeMetadata writes the Node metadata to disk
-func (n *Node) WriteAllNodeMetadata(ctx context.Context) (err error) {
+// NodeMetadata writes the Node metadata to disk and allows passing additional attributes
+func (n *Node) NodeMetadata() Attributes {
 	attribs := Attributes{}
 	attribs.SetInt64(prefixes.TypeAttr, int64(n.Type()))
 	attribs.SetString(prefixes.ParentidAttr, n.ParentID)
 	attribs.SetString(prefixes.NameAttr, n.Name)
-	attribs.SetString(prefixes.BlobIDAttr, n.BlobID)
-	attribs.SetInt64(prefixes.BlobsizeAttr, n.Blobsize)
-
-	return n.SetXattrs(attribs, true)
+	if n.Type() == provider.ResourceType_RESOURCE_TYPE_FILE {
+		attribs.SetString(prefixes.BlobIDAttr, n.BlobID)
+		attribs.SetInt64(prefixes.BlobsizeAttr, n.Blobsize)
+	}
+	return attribs
 }
 
-// WriteOwner writes the space owner
-func (n *Node) WriteOwner(owner *userpb.UserId) error {
+// SetOwner sets the space owner on the node
+func (n *Node) SetOwner(owner *userpb.UserId) {
 	n.SpaceRoot.owner = owner
-
-	attribs := Attributes{}
-	attribs.SetString(prefixes.OwnerIDAttr, owner.OpaqueId)
-	attribs.SetString(prefixes.OwnerIDPAttr, owner.Idp)
-	attribs.SetString(prefixes.OwnerTypeAttr, utils.UserTypeToString(owner.Type))
-
-	if err := n.SpaceRoot.SetXattrs(attribs, true); err != nil {
-		return err
-	}
-	n.SpaceRoot.owner = owner
-	return nil
 }
 
 // SpaceOwnerOrManager returns the space owner of the space. If no owner is set
@@ -354,11 +328,13 @@ func ReadNode(ctx context.Context, lu PathLookup, spaceID, nodeID string, canLis
 
 	if revisionSuffix == "" {
 		n.BlobID = attrs.String(prefixes.BlobIDAttr)
-		blobSize, err := attrs.Int64(prefixes.BlobsizeAttr)
-		if err != nil {
-			return nil, err
+		if n.BlobID != "" {
+			blobSize, err := attrs.Int64(prefixes.BlobsizeAttr)
+			if err != nil {
+				return nil, err
+			}
+			n.Blobsize = blobSize
 		}
-		n.Blobsize = blobSize
 	} else {
 		n.BlobID, err = lu.ReadBlobIDAttr(nodePath + revisionSuffix)
 		if err != nil {

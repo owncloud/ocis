@@ -67,9 +67,9 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 		return nil, err
 	}
 
-	if conf.CacheWarmupDriver == "first-request" && conf.ResourceInfoCacheTTL > 0 {
+	if conf.CacheWarmupDriver == "first-request" && conf.StatCacheStore != "noop" {
 		s.warmupCacheTracker = ttlcache.NewCache()
-		_ = s.warmupCacheTracker.SetTTL(time.Second * time.Duration(conf.ResourceInfoCacheTTL))
+		_ = s.warmupCacheTracker.SetTTL(time.Second * time.Duration(conf.StatCacheTTL))
 	}
 
 	return s, nil

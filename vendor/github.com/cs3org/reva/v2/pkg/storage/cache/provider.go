@@ -19,11 +19,12 @@
 package cache
 
 import (
-	"strings"
+	"sync"
 	"time"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"go-micro.dev/v4/store"
 )
 
 // ProviderCache can invalidate all provider related cache entries
@@ -47,20 +48,22 @@ func (c providerCache) RemoveListStorageProviders(res *provider.ResourceId) {
 	if res == nil {
 		return
 	}
-	sid := res.SpaceId
 
-	keys, err := c.List()
+	keys, err := c.List(store.ListSuffix(res.SpaceId), store.ListLimit(100))
 	if err != nil {
 		// FIXME log error
 		return
 	}
-	// FIXME add context option to List, Read and Write to upstream
+
+	wg := sync.WaitGroup{}
 	for _, key := range keys {
-		if strings.Contains(key, sid) {
-			_ = c.Delete(key)
-			continue
-		}
+		wg.Add(1)
+		go func(k string) {
+			defer wg.Done()
+			_ = c.Delete(k)
+		}(key)
 	}
+	wg.Wait()
 }
 
 func (c providerCache) GetKey(userID *userpb.UserId, spaceID string) string {

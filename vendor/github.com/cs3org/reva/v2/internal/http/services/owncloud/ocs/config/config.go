@@ -37,12 +37,12 @@ type Config struct {
 	AdditionalInfoAttribute               string                            `mapstructure:"additional_info_attribute"`
 	CacheWarmupDriver                     string                            `mapstructure:"cache_warmup_driver"`
 	CacheWarmupDrivers                    map[string]map[string]interface{} `mapstructure:"cache_warmup_drivers"`
-	ResourceInfoCacheStore                string                            `mapstructure:"resource_info_cache_store"`
-	ResourceInfoCacheNodes                []string                          `mapstructure:"resource_info_cache_nodes"`
-	ResourceInfoCacheDatabase             string                            `mapstructure:"resource_info_cache_database"`
-	ResourceInfoCacheTable                string                            `mapstructure:"resource_info_cache_table"`
-	ResourceInfoCacheTTL                  int                               `mapstructure:"resource_info_cache_ttl"`
-	ResourceInfoCacheSize                 int                               `mapstructure:"resource_info_cache_size"`
+	StatCacheStore                        string                            `mapstructure:"stat_cache_store"`
+	StatCacheNodes                        []string                          `mapstructure:"stat_cache_nodes"`
+	StatCacheDatabase                     string                            `mapstructure:"stat_cache_database"`
+	StatCacheTable                        string                            `mapstructure:"stat_cache_table"`
+	StatCacheTTL                          int                               `mapstructure:"stat_cache_ttl"`
+	StatCacheSize                         int                               `mapstructure:"stat_cache_size"`
 	UserIdentifierCacheTTL                int                               `mapstructure:"user_identifier_cache_ttl"`
 	MachineAuthAPIKey                     string                            `mapstructure:"machine_auth_apikey"`
 	SkipUpdatingExistingSharesMountpoints bool                              `mapstructure:"skip_updating_existing_shares_mountpoint"`

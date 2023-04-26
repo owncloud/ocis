@@ -20,10 +20,12 @@ package cache
 
 import (
 	"strings"
+	"sync"
 	"time"
 
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"go-micro.dev/v4/store"
 )
 
 // NewStatCache creates a new StatCache
@@ -50,27 +52,27 @@ func (c statCache) RemoveStat(userID *userpb.UserId, res *provider.ResourceId) {
 		oid = "oid:" + res.OpaqueId
 	}
 
-	keys, err := c.List()
-	if err != nil {
-		// FIXME handle error
-		return
-	}
-	for _, key := range keys {
-		if strings.Contains(key, uid) {
-			_ = c.Delete(key)
-			continue
-		}
+	// TODO currently, invalidating the stat cache is inefficient and should be disabled. Storage providers / drivers can more selectively invalidate stat cache entries.
+	// This shotgun invalidation wipes all cache entries for the user, space, and nodeid of a changed resource, which means the stat cache is mostly empty, anyway.
+	prefixes := []string{uid, "*" + sid, "*" + oid}
 
-		if sid != "" && strings.Contains(key, sid) {
-			_ = c.Delete(key)
-			continue
-		}
-
-		if oid != "" && strings.Contains(key, oid) {
-			_ = c.Delete(key)
-			continue
-		}
+	wg := sync.WaitGroup{}
+	for _, prefix := range prefixes {
+		wg.Add(1)
+		go func(p string) {
+			defer wg.Done()
+			keys, _ := c.List(store.ListPrefix(p), store.ListLimit(100))
+			for _, key := range keys {
+				wg.Add(1)
+				go func(k string) {
+					defer wg.Done()
+					_ = c.Delete(k)
+				}(key)
+			}
+		}(prefix)
 	}
+
+	wg.Wait()
 }
 
 // generates a user specific key pointing to ref - used for statcache

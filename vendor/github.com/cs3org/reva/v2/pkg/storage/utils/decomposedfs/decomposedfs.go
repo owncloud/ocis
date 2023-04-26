@@ -48,7 +48,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/chunking"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
-	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/migrator"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
@@ -589,16 +588,6 @@ func (fs *Decomposedfs) CreateDir(ctx context.Context, ref *provider.Reference) 
 		return
 	}
 
-	if fs.o.TreeTimeAccounting || fs.o.TreeSizeAccounting {
-		// mark the home node as the end of propagation
-		if err = n.SetXattrString(prefixes.PropagationAttr, "1"); err != nil {
-			appctx.GetLogger(ctx).Error().Err(err).Interface("node", n).Msg("could not mark node to propagate")
-
-			// FIXME: This does not return an error at all, but results in a severe situation that the
-			// part tree is not marked for propagation
-			return
-		}
-	}
 	return
 }
 
