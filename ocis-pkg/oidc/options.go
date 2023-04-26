@@ -27,11 +27,6 @@ type Options struct {
 	// AccessTokenVerifyMethod to use when verifying access tokens
 	// TODO pass a function or interface to verify? an AccessTokenVerifier?
 	AccessTokenVerifyMethod string
-	// ClientID the client id to expect in tokens. If not set SkipClientIDCheck must be true
-	// TODO also check in access token
-	ClientID string
-	// SkipClientIDCheck must be true if ClientID is empty
-	SkipClientIDCheck bool
 	// Config to use
 	Config *goidc.Config
 
@@ -89,20 +84,6 @@ func WithJWKSOptions(val config.JWKS) Option {
 func WithKeySet(val KeySet) Option {
 	return func(o *Options) {
 		o.KeySet = val
-	}
-}
-
-// WithClientID provides a function to set the clientID option.
-func WithClientID(val string) Option {
-	return func(o *Options) {
-		o.ClientID = val
-	}
-}
-
-// WithSkipClientIDCheck provides a function to set the skipClientIDCheck option.
-func WithSkipClientIDCheck(val bool) Option {
-	return func(o *Options) {
-		o.SkipClientIDCheck = val
 	}
 }
 

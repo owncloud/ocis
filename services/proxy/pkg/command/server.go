@@ -87,8 +87,6 @@ func Server(cfg *config.Config) *cli.Command {
 				oidc.WithHTTPClient(oidcHTTPClient),
 				oidc.WithOidcIssuer(cfg.OIDC.Issuer),
 				oidc.WithJWKSOptions(cfg.OIDC.JWKS),
-				oidc.WithClientID(cfg.OIDC.ClientID),
-				oidc.WithSkipClientIDCheck(cfg.OIDC.SkipClientIDCheck),
 			)
 
 			var (

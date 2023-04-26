@@ -55,8 +55,6 @@ type oidcClient struct {
 	// Logger to use for logging, must be set
 	Logger log.Logger
 
-	clientID                string
-	skipClientIDCheck       bool
 	issuer                  string
 	provider                *ProviderMetadata
 	providerLock            *sync.Mutex
@@ -99,8 +97,6 @@ func NewOIDCClient(opts ...Option) OIDCClient {
 		JWKSOptions:             options.JWKSOptions, // TODO I don't like that we pass down config options ...
 		providerLock:            &sync.Mutex{},
 		jwksLock:                &sync.Mutex{},
-		clientID:                options.ClientID,
-		skipClientIDCheck:       options.SkipClientIDCheck,
 		remoteKeySet:            options.KeySet,
 		provider:                options.ProviderMetadata,
 	}
@@ -361,19 +357,6 @@ func (c *oidcClient) VerifyLogoutToken(ctx context.Context, rawToken string) (*L
 	// Check issuer.
 	if !c.skipIssuerValidation && token.Issuer != c.issuer {
 		return nil, fmt.Errorf("oidc: logout token issued by a different provider, expected %q got %q", c.issuer, token.Issuer)
-	}
-
-	// If a client ID has been provided, make sure it's part of the audience. SkipClientIDCheck must be true if ClientID is empty.
-	//
-	// This check DOES NOT ensure that the ClientID is the party to which the ID Token was issued (i.e. Authorized party).
-	if !c.skipClientIDCheck {
-		if c.clientID != "" {
-			if !contains(token.Audience, c.clientID) {
-				return nil, fmt.Errorf("oidc: expected audience %q got %q", c.clientID, token.Audience)
-			}
-		} else {
-			return nil, fmt.Errorf("oidc: invalid configuration, clientID must be provided or SkipClientIDCheck must be set")
-		}
 	}
 
 	switch len(jws.Signatures) {
