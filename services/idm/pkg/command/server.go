@@ -13,9 +13,13 @@ import (
 	"github.com/libregraph/idm/pkg/ldappassword"
 	"github.com/libregraph/idm/pkg/ldbbolt"
 	"github.com/libregraph/idm/server"
+	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	pkgcrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
+	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/idm"
 	"github.com/owncloud/ocis/v2/services/idm/pkg/config"
 	"github.com/owncloud/ocis/v2/services/idm/pkg/config/parser"
@@ -33,16 +37,88 @@ func Server(cfg *config.Config) *cli.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
-			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			ctx, cancel := func() (context.Context, context.CancelFunc) {
-				if cfg.Context == nil {
-					return context.WithCancel(context.Background())
-				}
-				return context.WithCancel(cfg.Context)
-			}()
+			var (
+				gr          = run.Group{}
+				logger      = logging.Configure(cfg.Service.Name, cfg.Log)
+				ctx, cancel = func() (context.Context, context.CancelFunc) {
+					if cfg.Context == nil {
+						return context.WithCancel(context.Background())
+					}
+					return context.WithCancel(cfg.Context)
+				}()
+			)
 
 			defer cancel()
-			return start(ctx, logger, cfg)
+
+			{
+				servercfg := server.Config{
+					Logger:          log.LogrusWrap(logger.Logger),
+					LDAPHandler:     "boltdb",
+					LDAPSListenAddr: cfg.IDM.LDAPSAddr,
+					TLSCertFile:     cfg.IDM.Cert,
+					TLSKeyFile:      cfg.IDM.Key,
+					LDAPBaseDN:      "o=libregraph-idm",
+					LDAPAdminDN:     "uid=libregraph,ou=sysusers,o=libregraph-idm",
+
+					BoltDBFile: cfg.IDM.DatabasePath,
+				}
+
+				if cfg.IDM.LDAPSAddr != "" {
+					// Generate a self-signing cert if no certificate is present
+					if err := pkgcrypto.GenCert(cfg.IDM.Cert, cfg.IDM.Key, logger); err != nil {
+						logger.Fatal().Err(err).Msgf("Could not generate test-certificate")
+					}
+				}
+				if _, err := os.Stat(servercfg.BoltDBFile); errors.Is(err, os.ErrNotExist) {
+					logger.Debug().Msg("Bootstrapping IDM database")
+					if err = bootstrap(logger, cfg, servercfg); err != nil {
+						logger.Error().Err(err).Msg("failed to bootstrap idm database")
+					}
+				}
+
+				svc, err := server.NewServer(&servercfg)
+				if err != nil {
+					return err
+				}
+
+				gr.Add(func() error {
+					err := make(chan error)
+					select {
+					case <-ctx.Done():
+						return nil
+
+					case err <- svc.Serve(ctx):
+						return <-err
+					}
+				}, func(err error) {
+					logger.Error().
+						Err(err).
+						Msg("Shutting down server")
+					cancel()
+				})
+			}
+
+			{
+				server := debug.NewService(
+					debug.Logger(logger),
+					debug.Name(cfg.Service.Name),
+					debug.Version(version.GetString()),
+					debug.Address(cfg.Debug.Addr),
+					debug.Token(cfg.Debug.Token),
+					debug.Pprof(cfg.Debug.Pprof),
+					debug.Zpages(cfg.Debug.Zpages),
+					debug.Health(handlers.Health),
+					debug.Ready(handlers.Ready),
+				)
+
+				gr.Add(server.ListenAndServe, func(_ error) {
+					_ = server.Shutdown(ctx)
+					cancel()
+				})
+			}
+
+			return gr.Run()
+			//return start(ctx, logger, cfg)
 		},
 	}
 }
