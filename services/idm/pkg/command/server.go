@@ -123,39 +123,6 @@ func Server(cfg *config.Config) *cli.Command {
 	}
 }
 
-func start(ctx context.Context, logger log.Logger, cfg *config.Config) error {
-	servercfg := server.Config{
-		Logger:          log.LogrusWrap(logger.Logger),
-		LDAPHandler:     "boltdb",
-		LDAPSListenAddr: cfg.IDM.LDAPSAddr,
-		TLSCertFile:     cfg.IDM.Cert,
-		TLSKeyFile:      cfg.IDM.Key,
-		LDAPBaseDN:      "o=libregraph-idm",
-		LDAPAdminDN:     "uid=libregraph,ou=sysusers,o=libregraph-idm",
-
-		BoltDBFile: cfg.IDM.DatabasePath,
-	}
-
-	if cfg.IDM.LDAPSAddr != "" {
-		// Generate a self-signing cert if no certificate is present
-		if err := pkgcrypto.GenCert(cfg.IDM.Cert, cfg.IDM.Key, logger); err != nil {
-			logger.Fatal().Err(err).Msgf("Could not generate test-certificate")
-		}
-	}
-	if _, err := os.Stat(servercfg.BoltDBFile); errors.Is(err, os.ErrNotExist) {
-		logger.Debug().Msg("Bootstrapping IDM database")
-		if err = bootstrap(logger, cfg, servercfg); err != nil {
-			logger.Error().Err(err).Msg("failed to bootstrap idm database")
-		}
-	}
-
-	svc, err := server.NewServer(&servercfg)
-	if err != nil {
-		return err
-	}
-	return svc.Serve(ctx)
-}
-
 func bootstrap(logger log.Logger, cfg *config.Config, srvcfg server.Config) error {
 	// Hash password if the config does not supply a hash already
 	var err error
