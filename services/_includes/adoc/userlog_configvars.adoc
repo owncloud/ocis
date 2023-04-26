@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-26-05-51-23]
+[#deprecation-note-2023-04-26-08-49-43]
 [caption=]
 .Deprecation notes for the userlog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -214,7 +214,7 @@ Machine auth API key used to validate internal requests necessary to access reso
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-26-05-51-23[Deprecation Note]
+xref:deprecation-note-2023-04-26-08-49-43[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -222,7 +222,8 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 CS3 gateway used to look up user metadata
 
-a|`OCIS_TRANSLATION_PATH,USERLOG_TRANSLATION_PATH` +
+a|`OCIS_TRANSLATION_PATH` +
+`USERLOG_TRANSLATION_PATH` +
 
 a| [subs=-attributes]
 ++string ++
