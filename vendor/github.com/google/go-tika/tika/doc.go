@@ -21,11 +21,15 @@ Start with basic imports:
 	import "github.com/google/go-tika/tika"
 
 You will need a running Server to make API calls to. So, if you don't
-have a server that is already running and you don't have the Server
+have a server that is already running, and you don't have the Server
 JAR already downloaded, you can download one. The caller is responsible
 for removing the file when no longer needed.
 
-	err := tika.DownloadServer(context.Background(), "1.16", "tika-server-1.16.jar")
+Version is a custom type, and should be passed as such. There are constants in the code for these.
+The following example downloads version 1.21 to the named JAR in the
+current working directory.
+
+	err := tika.DownloadServer(context.Background(), tika.Version121, "tika-server-1.21.jar")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,7 +37,7 @@ for removing the file when no longer needed.
 If you don't have a running Tika Server, you can start one.
 
 	// Optionally pass a port as the second argument.
-	s, err := tika.NewServer("tika-server-1.16.jar", "")
+	s, err := tika.NewServer("tika-server-1.21.jar", "")
 	if err != nil {
 		log.Fatal(err)
 	}
