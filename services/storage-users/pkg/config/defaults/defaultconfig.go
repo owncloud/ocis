@@ -90,7 +90,7 @@ func DefaultConfig() *config.Config {
 			EnableTLS: false,
 		},
 		StatCache: config.StatCache{
-			Store:    "memory",
+			Store:    "noop",
 			Database: "ocis",
 			TTL:      300 * time.Second,
 		},

@@ -108,7 +108,7 @@ func DefaultConfig() *config.Config {
 			SharePrefix:             "/Shares",
 			HomeNamespace:           "/users/{{.Id.OpaqueId}}",
 			AdditionalInfoAttribute: "{{.Mail}}",
-			StatCacheType:           "memory",
+			StatCacheType:           "noop",
 			StatCacheDatabase:       "ocis",
 			StatCacheTTL:            300 * time.Second,
 		},
