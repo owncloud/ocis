@@ -1,8 +1,8 @@
-@api @skipOnOcV10
+@api
 Feature: user GDPR (General Data Protection Regulation) report
   As a user
-  I want to get or generate GDPR report of my own data
-  So that i can see the report of my own data at any time
+  I want to generate my GDPR report
+  So that I can review what events are stored by the server
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
@@ -10,10 +10,10 @@ Feature: user GDPR (General Data Protection Regulation) report
 
 
   Scenario: generate a GDPR report and check user data in the downloaded report
-    When user "Alice" generates GDPR reports of his own data to "/.personal_data_export.json"
-    And user "Alice" downloads the content of generated GDPR report of file ".personal_data_export.json" using password "123456"
+    When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
+    And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
     Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
-    And the downloaded JSON should contain key "user" and match
+    And the downloaded JSON content should contain key 'user' and match
     """
     {
       "type": "object",
@@ -73,8 +73,8 @@ Feature: user GDPR (General Data Protection Regulation) report
     """
 
   Scenario: generate a GDPR report and check events when a user is created
-    When user "Alice" generates GDPR reports of his own data to "/.personal_data_export.json"
-    And user "Alice" downloads the content of generated GDPR report of file ".personal_data_export.json" using password "123456"
+    When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
+    And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
     Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
     And the downloaded JSON content should contain event type "events.UserCreated" in item 'events' and should match
     """
@@ -135,7 +135,8 @@ Feature: user GDPR (General Data Protection Regulation) report
           "required": [
             "Executant",
             "Name",
-            "Type"
+            "Type",
+            "Quota"
           ],
           "properties": {
             "Executant": {
@@ -167,6 +168,10 @@ Feature: user GDPR (General Data Protection Regulation) report
             "Type": {
               "type": "string",
               "enum": ["personal"]
+            },
+            "Quota": {
+              "type": ["number", "null"],
+              "enum": [null]
             }
           }
         }

@@ -2319,7 +2319,7 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @When user :user generates GDPR reports of his own data to :path
+	 * @When /^user "([^"]*)" exports (?:her|his) GDPR report to "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $path
@@ -2344,38 +2344,53 @@ class GraphContext implements Context {
 	}
 
 	/**
-	 * @Then the downloaded JSON content should contain event type :key in item 'events' and should match
-	 * @Then the downloaded JSON should contain key :key and match
+	 * @Then the downloaded JSON content should contain event type :eventType in item 'events' and should match
 	 *
-	 * @param string $key
+	 * @param string $eventType
 	 * @param PyStringNode $schemaString
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 *
 	 */
-	public function downloadedJsonContentShouldContainEventTypeInItemAndShouldMatch(string $key, PyStringNode $schemaString): void {
+	public function downloadedJsonContentShouldContainEventTypeInItemAndShouldMatch(string $eventType, PyStringNode $schemaString): void {
 		$actualResponseToAssert = null;
-		// the response contains only 2 key either events or user
-		if ($key === "user") {
-			$actualResponseToAssert = $this->featureContext->getJsonDecodedResponseBodyContent()->user;
-		} else {
-			$events = $this->featureContext->getJsonDecodedResponseBodyContent()->events;
-			foreach ($events as $event) {
-				if ($event->type === $key) {
-					$actualResponseToAssert = $event;
-					break;
-				}
+		$events = $this->featureContext->getJsonDecodedResponseBodyContent()->events;
+		foreach ($events as $event) {
+			if ($event->type === $eventType) {
+				$actualResponseToAssert = $event;
+				break;
 			}
 		}
-		// search for the event type and assert
 		if ($actualResponseToAssert === null) {
 			throw new Error(
-				"Response does not contain key '" . $key . "'."
+				"Response does not contain event type '" . $eventType . "'."
 			);
 		}
 		JsonAssertions::assertJsonDocumentMatchesSchema(
 			$actualResponseToAssert,
+			$this->featureContext->getJSONSchema($schemaString)
+		);
+	}
+
+	/**
+	 * @Then the downloaded JSON content should contain key 'user' and match
+	 *
+	 * @param PyStringNode $schemaString
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 *
+	 */
+	public function downloadedJsonContentShouldContainKeyUserAndMatch(PyStringNode $schemaString): void {
+		$actualResponseToAssert = $this->featureContext->getJsonDecodedResponseBodyContent();
+		if (!isset($actualResponseToAssert->user)) {
+			throw new Error(
+				"Response does not contain key 'user'"
+			);
+		}
+		JsonAssertions::assertJsonDocumentMatchesSchema(
+			$actualResponseToAssert->user,
 			$this->featureContext->getJSONSchema($schemaString)
 		);
 	}

@@ -5387,17 +5387,16 @@ trait WebDav {
 	}
 
 	/**
-	 * @When user :user downloads the content of generated GDPR report of file :pathToFile using password :password
+	 * @When user :user downloads the content of GDPR report :pathToFile
 	 *
 	 * @param string $user
 	 * @param string $pathToFile
-	 * @param string $password
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userGetsTheContentOfGeneratedJsonReport(string $user, string $pathToFile, string $password): void {
-		$password = $this->getActualPassword($password);
+	public function userGetsTheContentOfGeneratedJsonReport(string $user, string $pathToFile): void {
+		$password = $this->getPasswordForUser($user);
 		$this->downloadFileAsUserUsingPassword($user, $pathToFile, $password);
 		$this->pushToLastStatusCodesArrays();
 	}
