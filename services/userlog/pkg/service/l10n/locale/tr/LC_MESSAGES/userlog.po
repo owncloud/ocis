@@ -1,0 +1,103 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# 
+# Translators:
+# Begüm Topyıldız <bgmtpyldz@gmail.com>, 2023
+# 
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: EMAIL\n"
+"POT-Creation-Date: 2023-04-26 00:17+0000\n"
+"PO-Revision-Date: 2023-03-15 08:28+0000\n"
+"Last-Translator: Begüm Topyıldız <bgmtpyldz@gmail.com>, 2023\n"
+"Language-Team: Turkish (https://app.transifex.com/owncloud-org/teams/6149/tr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: tr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: pkg/service/templates.go:40
+msgid "Access to Space {space} lost"
+msgstr "{space} Alanına erişim kayboldu"
+
+#: pkg/service/templates.go:55
+msgid "Access to {resource} expired"
+msgstr "{resource} erişiminin süresi doldu"
+
+#: pkg/service/templates.go:15
+msgid "File {resource} was deleted because it violates the policies"
+msgstr "{resource} dosyası, politikaları ihlal ettiği için silindi"
+
+#: pkg/service/templates.go:39
+msgid "Membership expired"
+msgstr "Üyelik sona erdi"
+
+#: pkg/service/templates.go:14
+msgid "Policies enforced"
+msgstr "Politikalar uygulandı"
+
+#: pkg/service/templates.go:24
+msgid "Removed from Space"
+msgstr "Alandan kaldırıldı"
+
+#: pkg/service/templates.go:44
+msgid "Resource shared"
+msgstr "Kaynak paylaşıldı"
+
+#: pkg/service/templates.go:49
+msgid "Resource unshared"
+msgstr "Kaynak paylaşılmadı"
+
+#: pkg/service/templates.go:54
+msgid "Share expired"
+msgstr "Paylaşım sona erdi"
+
+#: pkg/service/templates.go:34
+msgid "Space deleted"
+msgstr "Alan silindi"
+
+#: pkg/service/templates.go:29
+msgid "Space disabled"
+msgstr "Alan devre dışı"
+
+#: pkg/service/templates.go:19
+msgid "Space shared"
+msgstr "Alan paylaşıldı"
+
+#: pkg/service/templates.go:9
+msgid "Virus found"
+msgstr "Virüs bulundu"
+
+#: pkg/service/templates.go:10
+msgid "Virus found in {resource}. Upload not possible. Virus: {virus}"
+msgstr ""
+"{resource} kaynağında virüs bulundu. Yükleme mümkün değil. Virüs: {virus}"
+
+#: pkg/service/templates.go:20
+msgid "{user} added you to Space {space}"
+msgstr "{user} sizi {space} Alanına ekledi"
+
+#: pkg/service/templates.go:35
+msgid "{user} deleted Space {space}"
+msgstr "{user} {space} Alanını sildi"
+
+#: pkg/service/templates.go:30
+msgid "{user} disabled Space {space}"
+msgstr "{user} {space} Alanını devre dışı bıraktı"
+
+#: pkg/service/templates.go:25
+msgid "{user} removed you from Space {space}"
+msgstr "{user} sizi {space} Alanından kaldırdı"
+
+#: pkg/service/templates.go:45
+msgid "{user} shared {resource} with you"
+msgstr "{user} sizinle {resource} paylaştı"
+
+#: pkg/service/templates.go:50
+msgid "{user} unshared {resource} with you"
+msgstr "{user} sizinle {resource} paylaşımını kaldırdı"
