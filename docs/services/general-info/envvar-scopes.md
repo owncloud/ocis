@@ -40,4 +40,4 @@ All environment variable types that are used in a service follow the same [depre
 
 ## Separating Envvars
 
-When multiple envvars are defined for one purpose like a global and local one, use `;` (semicolons) to properly separate the envvars in go code. Though it is possible to separate with `,` (comma) according go rules, the current implementation of the docs generation process only recognizes semicolons as separator.
+When multiple envvars are defined for one purpose like a global and local one, use `;` (semicolon) to properly separate the envvars in go code. Though it is possible to separate with `,` (comma) according go rules, the current implementation of the docs generation process only recognizes semicolons as separator.
