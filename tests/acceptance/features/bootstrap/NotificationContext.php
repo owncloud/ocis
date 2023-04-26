@@ -11,6 +11,9 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use TestHelpers\OcsApiHelper;
 use Behat\Gherkin\Node\PyStringNode;
 use Helmich\JsonAssert\JsonAssertions;
+use TestHelpers\EmailHelper;
+use PHPUnit\Framework\Assert;
+use TestHelpers\GraphHelper;
 
 require_once 'bootstrap.php';
 
@@ -19,7 +22,11 @@ require_once 'bootstrap.php';
  */
 class NotificationContext implements Context {
 	private FeatureContext $featureContext;
+
+	private SpacesContext $spacesContext;
+
 	private string $notificationEndpointPath = '/apps/notifications/api/v1/notifications?format=json';
+
 	private array $notificationIds;
 
 	/**
@@ -70,6 +77,7 @@ class NotificationContext implements Context {
 		$environment = $scope->getEnvironment();
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
+		$this->spacesContext = $environment->getContext('SpacesContext');
 	}
 
 	/**
@@ -133,5 +141,106 @@ class NotificationContext implements Context {
 			$responseBody,
 			$this->featureContext->getJSONSchema($schemaString)
 		);
+	}
+
+	/**
+	 * @Then user :user should have received the following email from user :sender about the share of project space :spaceName
+	 *
+	 * @param string $user
+	 * @param string $sender
+	 * @param string $spaceName
+	 * @param PyStringNode $content
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userShouldHaveReceivedTheFollowingEmailFromUserAboutTheShareOfProjectSpace(string $user, string $sender, string $spaceName, PyStringNode $content):void {
+		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
+		$this->featureContext->setResponse(
+			GraphHelper::getMySpaces(
+				$this->featureContext->getBaseUrl(),
+				$user,
+				$this->featureContext->getPasswordForUser($user)
+			)
+		);
+		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
+			$rawExpectedEmailBodyContent,
+			$sender,
+			[],
+			[
+				[
+					"code" => "%space_id%",
+					"function" =>
+						[$this->spacesContext, "getSpaceIdByNameFromResponse"],
+					"parameter" => [$spaceName]
+				],
+			],
+			null,
+			null
+		);
+		$this->assertEmailContains($user, $expectedEmailBodyContent);
+	}
+
+	/**
+	 * @Then user :user should have reveived the following email from user :sender
+	 *
+	 * @param string $user
+	 * @param string $sender
+	 * @param PyStringNode $content
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userShouldHaveReveivedTheFollowingEmailFromUser(string $user, string $sender, PyStringNode $content):void {
+		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
+		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
+			$rawExpectedEmailBodyContent,
+			$sender
+		);
+		$this->assertEmailContains($user, $expectedEmailBodyContent);
+	}
+
+	/***
+	 * @param string $user
+	 * @param string $expectedEmailBodyContent
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function assertEmailContains(string $user, string $expectedEmailBodyContent):void {
+		$address = $this->featureContext->getEmailAddressForUser($user);
+		$this->featureContext->pushEmailRecipientAsMailBox($address);
+		$actualEmailBodyContent = EmailHelper::getBodyOfLastEmail($address, $this->featureContext->getStepLineRef());
+		Assert::assertStringContainsString(
+			$expectedEmailBodyContent,
+			$actualEmailBodyContent,
+			"The email address '$address' should have received an email with the body containing $expectedEmailBodyContent
+			but the received email is $actualEmailBodyContent"
+		);
+	}
+
+	/**
+	 * Delete all the inbucket emails
+	 *
+	 * @AfterScenario @email
+	 *
+	 * @return void
+	 */
+	public function clearInbucketMessages():void {
+		try {
+			if (!empty($this->featureContext->emailRecipients)) {
+				foreach ($this->featureContext->emailRecipients as $emailRecipent) {
+					EmailHelper::deleteAllEmailsForAMailbox(
+						EmailHelper::getLocalEmailUrl(),
+						$this->featureContext->getStepLineRef(),
+						$emailRecipent
+					);
+				}
+			}
+		} catch (Exception $e) {
+			echo __METHOD__ .
+				" could not delete inbucket messages, is inbucket set up?\n" .
+				$e->getMessage();
+		}
 	}
 }

@@ -168,6 +168,22 @@ default:
         - TrashbinContext:
         - GraphContext:
 
+    apiEmailNotification:
+      paths:
+        - '%paths.base%/../features/apiEmailNotification'
+      context: *common_ldap_suite_context
+      contexts:
+        - NotificationContext:
+        - SpacesContext:
+        - FeatureContext: *common_feature_context_params
+        - WebDavPropertiesContext:
+        - OCSContext:
+        - GraphContext:
+        - TrashbinContext:
+        - FavoritesContext:
+        - ChecksumContext:
+        - FilesVersionsContext:
+        - RoleAssignmentContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~

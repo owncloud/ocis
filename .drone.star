@@ -5,6 +5,7 @@
 ALPINE_GIT = "alpine/git:latest"
 CHKO_DOCKER_PUSHRM = "chko/docker-pushrm:1"
 DRONE_CLI = "drone/cli:alpine"
+INBUCKET_INBUCKET = "inbucket/inbucket"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 OC_CI_ALPINE = "owncloudci/alpine:latest"
 OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier:latest"
@@ -131,6 +132,25 @@ config = {
             "earlyFail": True,
             "extraServerEnvironment": {
                 "POSTPROCESSING_DELAY": "30s",
+            },
+        },
+        "apiEmailNotification": {
+            "suites": [
+                "apiEmailNotification",
+            ],
+            "skip": False,
+            "earlyFail": True,
+            "emailNeeded": True,
+            "extraEnvironment": {
+                "EMAIL_HOST": "email",
+                "EMAIL_PORT": "9000",
+            },
+            "extraServerEnvironment": {
+                "NOTIFICATIONS_SMTP_HOST": "email",
+                "NOTIFICATIONS_SMTP_PORT": "2500",
+                "NOTIFICATIONS_SMTP_SENDER": "ownCloud <notifications@${OCIS_DOMAIN:-ocis.owncloud.test}>",
+                "NOTIFICATIONS_SMTP_USERNAME": "notifications@${OCIS_DOMAIN:-ocis.owncloud.test}",
+                "NOTIFICATIONS_SMTP_INSECURE": "true",
             },
         },
     },
@@ -759,6 +779,7 @@ def localApiTestPipeline(ctx):
         "extraServerEnvironment": {},
         "storages": ["ocis"],
         "accounts_hash_difficulty": 4,
+        "emailNeeded": False,
     }
 
     if "localApiTests" in config:
@@ -781,9 +802,10 @@ def localApiTestPipeline(ctx):
                             "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                                      restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
                                      ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"]) +
+                                     (waitForEmailService() if params["emailNeeded"] else []) +
                                      localApiTests(suite, storage, params["extraEnvironment"]) +
                                      failEarly(ctx, early_fail),
-                            "services": redisForOCStorage(storage),
+                            "services": emailService() if params["emailNeeded"] else [],
                             "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
                             "trigger": {
                                 "ref": [
@@ -2890,5 +2912,20 @@ def restoreWebPnpmCache():
             "tar -xvf %s" % dirs["webPnpmZip"],
             "pnpm config set store-dir ./.pnpm-store",
             "retry -t 3 'pnpm install'",
+        ],
+    }]
+
+def emailService():
+    return [{
+        "name": "email",
+        "image": INBUCKET_INBUCKET,
+    }]
+
+def waitForEmailService():
+    return [{
+        "name": "wait-for-email",
+        "image": OC_CI_WAIT_FOR,
+        "commands": [
+            "wait-for -it email:9000 -t 600",
         ],
     }]
