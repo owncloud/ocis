@@ -7,7 +7,8 @@ func Template(s string) string { return s }
 var (
 	// Shares
 	ShareCreated = MessageTemplate{
-		bodyTemplate: "shares/shareCreated.email.body.tmpl",
+		textTemplate: "shares/shareCreated.email.body.tmpl",
+		htmlTemplate: "html/email.html.tmpl",
 		// ShareCreated email template, Subject field (resolves directly)
 		Subject: Template(`{ShareSharer} shared '{ShareFolder}' with you`),
 		// ShareCreated email template, resolves via {{ .Greeting }}
@@ -19,7 +20,8 @@ var (
 	}
 
 	ShareExpired = MessageTemplate{
-		bodyTemplate: "shares/shareExpired.email.body.tmpl",
+		textTemplate: "shares/shareExpired.email.body.tmpl",
+		htmlTemplate: "html/email.html.tmpl",
 		// ShareExpired email template, Subject field (resolves directly)
 		Subject: Template(`Share to '{ShareFolder}' expired at {ExpiredAt}`),
 		// ShareExpired email template, resolves via {{ .Greeting }}
@@ -32,7 +34,8 @@ Even though this share has been revoked you still might have access through othe
 
 	// Spaces templates
 	SharedSpace = MessageTemplate{
-		bodyTemplate: "spaces/sharedSpace.email.body.tmpl",
+		textTemplate: "spaces/sharedSpace.email.body.tmpl",
+		htmlTemplate: "html/email.html.tmpl",
 		// SharedSpace email template, Subject field (resolves directly)
 		Subject: Template("{SpaceSharer} invited you to join {SpaceName}"),
 		// SharedSpace email template, resolves via {{ .Greeting }}
@@ -44,7 +47,8 @@ Even though this share has been revoked you still might have access through othe
 	}
 
 	UnsharedSpace = MessageTemplate{
-		bodyTemplate: "spaces/unsharedSpace.email.body.tmpl",
+		textTemplate: "spaces/unsharedSpace.email.body.tmpl",
+		htmlTemplate: "html/email.html.tmpl",
 		// UnsharedSpace email template, Subject field (resolves directly)
 		Subject: Template(`{SpaceSharer} removed you from {SpaceName}`),
 		// UnsharedSpace email template, resolves via {{ .Greeting }}
@@ -58,7 +62,8 @@ You might still have access through your other groups or direct membership.`),
 	}
 
 	MembershipExpired = MessageTemplate{
-		bodyTemplate: "spaces/membershipExpired.email.body.tmpl",
+		textTemplate: "spaces/membershipExpired.email.body.tmpl",
+		htmlTemplate: "html/email.html.tmpl",
 		// MembershipExpired email template, Subject field (resolves directly)
 		Subject: Template(`Membership of '{SpaceName}' expired at {ExpiredAt}`),
 		// MembershipExpired email template, resolves via {{ .Greeting }}
@@ -84,8 +89,11 @@ var _placeholders = map[string]string{
 
 // MessageTemplate is the data structure for the email
 type MessageTemplate struct {
-	// bodyTemplate represent the path to .tmpl file
-	bodyTemplate string
+	// textTemplate represent the path to text plain .tmpl file
+	textTemplate string
+	// htmlTemplate represent the path to html .tmpl file
+	htmlTemplate string
+	// The fields below represent the placeholders for the translatable templates
 	Subject      string
 	Greeting     string
 	MessageBody  string

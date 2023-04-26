@@ -4,16 +4,16 @@ The notification service is responsible for sending emails to users informing th
 
 ## Email Notification Templates
 
-The `notifications` service has embedded email body templates. Email templates can use the placeholders `{{ .Greeting }}`, `{{ .MessageBody }}` and `{{ .CallToAction }}` which are replaced with translations when sent, see the [Translations](#translations) section for more details. Depending on the email purpose, placeholders will contain different strings. An individual translatable string is available for each purpose, finally resolved by the placeholder. Though the email subject is also part of translations, it has no placeholder as it is a mandatory email component. The embedded templates are available for all deployment scenarios.
+The `notifications` service has embedded email text and html body templates. Email templates can use the placeholders `{{ .Greeting }}`, `{{ .MessageBody }}` and `{{ .CallToAction }}` which are replaced with translations when sent, see the [Translations](#translations) section for more details. Depending on the email purpose, placeholders will contain different strings. An individual translatable string is available for each purpose, finally resolved by the placeholder. Though the email subject is also part of translations, it has no placeholder as it is a mandatory email component. The embedded templates are available for all deployment scenarios.
 
 ```text
-template 
+template
   placeholders
     translated strings <-- source strings <-- purpose
 final output
 ```
 
-In addition, the notifications service supports custom templates. Custom email templates take precedence over the embedded ones. If a custom email template exists, the embedded templates are not used. To configure custom email templates, the `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` environment variable needs to point to a base folder that will contain the email templates. This path must be available from all instances of the notifications service, a shared storage is recommended. The source templates provided by ocis you can derive from are located in following base folder [https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates](https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates) with subfolders `shares` and `spaces`.
+In addition, the notifications service supports custom templates. Custom email templates take precedence over the embedded ones. If a custom email template exists, the embedded templates are not used. To configure custom email templates, the `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` environment variable needs to point to a base folder that will contain the email templates. This path must be available from all instances of the notifications service, a shared storage is recommended. The source templates provided by ocis you can derive from are located in following base folder [https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates](https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates) with subfolders `shares` `spaces` and `html`.
 
 -   [shares/shareCreated.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/shares/shareCreated.email.body.tmpl)
 -   [shares/shareExpired.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/shares/shareExpired.email.body.tmpl)
@@ -21,8 +21,16 @@ In addition, the notifications service supports custom templates. Custom email t
 -   [spaces/sharedSpace.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/spaces/sharedSpace.email.body.tmpl)
 -   [spaces/unsharedSpace.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/spaces/unsharedSpace.email.body.tmpl)
 
+-   [html/email.html.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/html/email.html.tmpl)
+
 ```text
 templates
+│
+└───html
+│   │   email.html.tmpl
+│   │
+│   └───img
+│       │   logo-mail.gif
 │
 └───shares
 │   │   shareCreated.email.body.tmpl
@@ -35,6 +43,7 @@ templates
 ```
 
 Custom email templates referenced via `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` must also be located in subfolders `shares` and `spaces` and must have the same names as the embedded templates. It is important that the names of these files and  folders match the embedded ones.
+In the subfolder `html` contains a default HTML template provided by ocis. The images can be embedded in a custom HTML template as a CID source ```<img src="cid:logo-mail.gif" alt="logo-mail"/>``` The image files should be located in `html/img` subfolder. Supported image types are png, jpeg, and gif.
 
 ## Translations
 

@@ -5,7 +5,6 @@ import (
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
-	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
@@ -19,6 +18,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
+	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/service"
 	"github.com/test-go/testify/mock"
 	"go-micro.dev/v4/client"
@@ -32,12 +32,14 @@ var _ = Describe("Notifications", func() {
 			Id: &user.UserId{
 				OpaqueId: "sharer",
 			},
+			Mail:        "sharer@owncloud.com",
 			DisplayName: "Dr. S. Harer",
 		}
 		sharee = &user.User{
 			Id: &user.UserId{
 				OpaqueId: "sharee",
 			},
+			Mail:        "sharee@owncloud.com",
 			DisplayName: "Eric Expireling",
 		}
 		resourceid = &provider.ResourceId{
@@ -78,7 +80,7 @@ var _ = Describe("Notifications", func() {
 		},
 
 		Entry("Share Created", testChannel{
-			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
+			expectedReceipients: []string{sharee.GetMail()},
 			expectedSubject:     "Dr. S. Harer shared 'secrets of the board' with you",
 			expectedMessage: `Hello Eric Expireling
 
@@ -103,7 +105,7 @@ https://owncloud.com
 		}),
 
 		Entry("Share Expired", testChannel{
-			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
+			expectedReceipients: []string{sharee.GetMail()},
 			expectedSubject:     "Share to 'secrets of the board' expired at 2023-04-17 16:42:00",
 			expectedMessage: `Hello Eric Expireling,
 
@@ -128,7 +130,7 @@ https://owncloud.com
 		}),
 
 		Entry("Added to Space", testChannel{
-			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
+			expectedReceipients: []string{sharee.GetMail()},
 			expectedSubject:     "Dr. S. Harer invited you to join secret space",
 			expectedMessage: `Hello Eric Expireling,
 
@@ -153,7 +155,7 @@ https://owncloud.com
 		}),
 
 		Entry("Removed from Space", testChannel{
-			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
+			expectedReceipients: []string{sharee.GetMail()},
 			expectedSubject:     "Dr. S. Harer removed you from secret space",
 			expectedMessage: `Hello Eric Expireling,
 
@@ -179,7 +181,7 @@ https://owncloud.com
 		}),
 
 		Entry("Space Expired", testChannel{
-			expectedReceipients: map[string]bool{sharee.GetId().GetOpaqueId(): true},
+			expectedReceipients: []string{sharee.GetMail()},
 			expectedSubject:     "Membership of 'secret space' expired at 2023-04-17 16:42:00",
 			expectedMessage: `Hello Eric Expireling,
 
@@ -208,27 +210,20 @@ https://owncloud.com
 
 // NOTE: This is explictitly not testing the message itself. Should we?
 type testChannel struct {
-	expectedReceipients map[string]bool
+	expectedReceipients []string
 	expectedSubject     string
 	expectedMessage     string
 	expectedSender      string
 	done                chan struct{}
 }
 
-func (tc testChannel) SendMessage(ctx context.Context, userIDs []string, msg, subject, senderDisplayName string) error {
+func (tc testChannel) SendMessage(ctx context.Context, m *channels.Message) error {
 	defer GinkgoRecover()
 
-	for _, u := range userIDs {
-		Expect(tc.expectedReceipients[u]).To(Equal(true))
-	}
-
-	Expect(msg).To(Equal(tc.expectedMessage))
-	Expect(subject).To(Equal(tc.expectedSubject))
-	Expect(senderDisplayName).To(Equal(tc.expectedSender))
+	Expect(m.Recipient).To(Equal(tc.expectedReceipients))
+	Expect(m.Subject).To(Equal(tc.expectedSubject))
+	Expect(m.TextBody).To(Equal(tc.expectedMessage))
+	Expect(m.Sender).To(Equal(tc.expectedSender))
 	tc.done <- struct{}{}
 	return nil
-}
-
-func (tc testChannel) SendMessageToGroup(ctx context.Context, groupID *group.GroupId, msg, subject, senderDisplayName string) error {
-	return tc.SendMessage(ctx, []string{groupID.GetOpaqueId()}, msg, subject, senderDisplayName)
 }

@@ -48,12 +48,12 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 			"ShareSharer": sharerDisplayName,
 			"ShareFolder": resourceInfo.Name,
 			"ShareLink":   shareLink,
-		}, granteeList)
+		}, granteeList, sharerDisplayName)
 	if err != nil {
 		s.logger.Error().Err(err).Str("event", "ShareCreated").Msg("could not get render the email")
 		return
 	}
-	s.send(ownerCtx, recipientList, sharerDisplayName)
+	s.send(ownerCtx, recipientList)
 }
 
 func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
@@ -87,10 +87,10 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		map[string]interface{}{
 			"ShareFolder": resourceInfo.GetName(),
 			"ExpiredAt":   e.ExpiredAt.Format("2006-01-02 15:04:05"),
-		}, granteeList)
+		}, granteeList, owner.GetDisplayName())
 	if err != nil {
 		s.logger.Error().Err(err).Str("event", "ShareExpired").Msg("could not get render the email")
 		return
 	}
-	s.send(ownerCtx, recipientList, owner.GetDisplayName())
+	s.send(ownerCtx, recipientList)
 }

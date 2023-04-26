@@ -61,12 +61,12 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 			"SpaceSharer": sharerDisplayName,
 			"SpaceName":   resourceInfo.GetSpace().GetName(),
 			"ShareLink":   shareLink,
-		}, spaceGrantee)
+		}, spaceGrantee, sharerDisplayName)
 	if err != nil {
 		s.logger.Error().Err(err).Str("event", "SharedSpace").Msg("could not get render the email")
 		return
 	}
-	s.send(executantCtx, recipientList, sharerDisplayName)
+	s.send(executantCtx, recipientList)
 }
 
 func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
@@ -121,12 +121,12 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 			"SpaceSharer": sharerDisplayName,
 			"SpaceName":   resourceInfo.GetSpace().Name,
 			"ShareLink":   shareLink,
-		}, spaceGrantee)
+		}, spaceGrantee, sharerDisplayName)
 	if err != nil {
 		s.logger.Error().Err(err).Str("event", "UnsharedSpace").Msg("Could not get render the email")
 		return
 	}
-	s.send(executantCtx, recipientList, sharerDisplayName)
+	s.send(executantCtx, recipientList)
 }
 
 func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExpired) {
@@ -152,10 +152,10 @@ func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExp
 		map[string]interface{}{
 			"SpaceName": e.SpaceName,
 			"ExpiredAt": e.ExpiredAt.Format("2006-01-02 15:04:05"),
-		}, granteeList)
+		}, granteeList, owner.GetDisplayName())
 	if err != nil {
 		s.logger.Error().Err(err).Str("event", "SpaceUnshared").Msg("could not get render the email")
 		return
 	}
-	s.send(ownerCtx, recipientList, owner.GetDisplayName())
+	s.send(ownerCtx, recipientList)
 }
