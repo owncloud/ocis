@@ -1,5 +1,8 @@
 @api
 Feature: PROPPATCH file/folder
+  As a user
+  I want to send PROPPATCH request to various endpoints
+  So that I can ensure the endpoints are well authenticated
 
   Background:
     Given these users have been created with default attributes and without skeleton files:

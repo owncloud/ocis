@@ -392,67 +392,67 @@ API, search, favorites, config, capabilities, not existing endpoints, CORS and o
 
 #### [Ability to return error messages in Webdav response bodies](https://github.com/owncloud/ocis/issues/1293)
 
-- [coreApiAuthOcs/ocsDELETEAuth.feature:8](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsDELETEAuth.feature#L8)
-- [coreApiAuthOcs/ocsGETAuth.feature:8](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsGETAuth.feature#L8)
-- [coreApiAuthOcs/ocsGETAuth.feature:42](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsGETAuth.feature#L42)
-- [coreApiAuthOcs/ocsGETAuth.feature:73](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsGETAuth.feature#L73)
-- [coreApiAuthOcs/ocsGETAuth.feature:104](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsGETAuth.feature#L104)
-- [coreApiAuthOcs/ocsGETAuth.feature:121](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsGETAuth.feature#L121)
-- [coreApiAuthOcs/ocsPOSTAuth.feature:8](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsPOSTAuth.feature#L8)
-- [coreApiAuthOcs/ocsPUTAuth.feature:8](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsPUTAuth.feature#L8)
+- [coreApiAuthOcs/ocsDELETEAuth.feature:11](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsDELETEAuth.feature#L11)
+- [coreApiAuthOcs/ocsGETAuth.feature:11](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsGETAuth.feature#L11)
+- [coreApiAuthOcs/ocsGETAuth.feature:45](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsGETAuth.feature#L45)
+- [coreApiAuthOcs/ocsGETAuth.feature:76](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsGETAuth.feature#L76)
+- [coreApiAuthOcs/ocsGETAuth.feature:107](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsGETAuth.feature#L107)
+- [coreApiAuthOcs/ocsGETAuth.feature:124](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsGETAuth.feature#L124)
+- [coreApiAuthOcs/ocsPOSTAuth.feature:11](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsPOSTAuth.feature#L11)
+- [coreApiAuthOcs/ocsPUTAuth.feature:11](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsPUTAuth.feature#L11)
 - [coreApiSharePublicLink1/createPublicLinkShare.feature:343](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharePublicLink1/createPublicLinkShare.feature#L343)
 
 #### [sending MKCOL requests to another user's webDav endpoints as normal user gives 404 instead of 403 ](https://github.com/owncloud/ocis/issues/3872)
 
 _ocdav: api compatibility, return correct status code_
 
-- [coreApiAuthWebDav/webDavMKCOLAuth.feature:52](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavMKCOLAuth.feature#L52)
-- [coreApiAuthWebDav/webDavMKCOLAuth.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavMKCOLAuth.feature#L63)
+- [coreApiAuthWebDav/webDavMKCOLAuth.feature:55](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavMKCOLAuth.feature#L55)
+- [coreApiAuthWebDav/webDavMKCOLAuth.feature:66](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavMKCOLAuth.feature#L66)
 
 #### [trying to lock file of another user gives http 200](https://github.com/owncloud/ocis/issues/2176)
 
-- [coreApiAuthWebDav/webDavLOCKAuth.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavLOCKAuth.feature#L56)
-- [coreApiAuthWebDav/webDavLOCKAuth.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavLOCKAuth.feature#L68)
+- [coreApiAuthWebDav/webDavLOCKAuth.feature:59](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavLOCKAuth.feature#L59)
+- [coreApiAuthWebDav/webDavLOCKAuth.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavLOCKAuth.feature#L71)
 
 #### [send (MOVE,COPY) requests to another user's webDav endpoints as normal user gives 400 instead of 403](https://github.com/owncloud/ocis/issues/3882)
 
 _ocdav: api compatibility, return correct status code_
 
-- [coreApiAuthWebDav/webDavMOVEAuth.feature:55](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavMOVEAuth.feature#L55)
-- [coreApiAuthWebDav/webDavMOVEAuth.feature:64](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavMOVEAuth.feature#L64)
-- [coreApiAuthWebDav/webDavCOPYAuth.feature:59](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavCOPYAuth.feature#L59)
-- [coreApiAuthWebDav/webDavCOPYAuth.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavCOPYAuth.feature#L68)
+- [coreApiAuthWebDav/webDavMOVEAuth.feature:58](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavMOVEAuth.feature#L58)
+- [coreApiAuthWebDav/webDavMOVEAuth.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavMOVEAuth.feature#L67)
+- [coreApiAuthWebDav/webDavCOPYAuth.feature:58](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavCOPYAuth.feature#L58)
+- [coreApiAuthWebDav/webDavCOPYAuth.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavCOPYAuth.feature#L67)
 
 #### [send POST requests to another user's webDav endpoints as normal user](https://github.com/owncloud/ocis/issues/1287)
 
 _ocdav: api compatibility, return correct status code_
 
-- [coreApiAuthWebDav/webDavPOSTAuth.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavPOSTAuth.feature#L56)
-- [coreApiAuthWebDav/webDavPOSTAuth.feature:65](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavPOSTAuth.feature#L65)
+- [coreApiAuthWebDav/webDavPOSTAuth.feature:59](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavPOSTAuth.feature#L59)
+- [coreApiAuthWebDav/webDavPOSTAuth.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavPOSTAuth.feature#L68)
 
 #### Another users space literally does not exist because it is not listed as a space for him, 404 seems correct, expects 403
 
-- [coreApiAuthWebDav/webDavPUTAuth.feature:56](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavPUTAuth.feature#L56)
-- [coreApiAuthWebDav/webDavPUTAuth.feature:68](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavPUTAuth.feature#L68)
+- [coreApiAuthWebDav/webDavPUTAuth.feature:59](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavPUTAuth.feature#L59)
+- [coreApiAuthWebDav/webDavPUTAuth.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavPUTAuth.feature#L71)
 
 #### [Using double slash in URL to access a folder gives 501 and other status codes](https://github.com/owncloud/ocis/issues/1667)
 
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:13](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L13)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:24](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L24)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:55](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L55)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:66](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L66)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:76](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L76)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:88](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L88)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:100](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L100)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:111](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L111)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:121](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L121)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:132](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L132)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:142](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L142)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:153](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L153)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:163](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L163)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:174](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L174)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:184](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L184)
-- [coreApiAuthWebDav/webDavSpecialURLs.feature:195](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L195)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:16](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L16)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:27](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L27)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:58](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L58)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:69](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L69)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:79](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L79)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:91](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L91)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:103](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L103)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:114](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L114)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:124](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L124)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:135](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L135)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:145](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L145)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:156](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L156)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:166](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L166)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:177](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L177)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:187](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L187)
+- [coreApiAuthWebDav/webDavSpecialURLs.feature:198](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthWebDav/webDavSpecialURLs.feature#L198)
 
 #### [Difference in response content of status.php and default capabilities](https://github.com/owncloud/ocis/issues/1286)
 
@@ -495,7 +495,7 @@ And other missing implementation of favorites
 
 #### [Request to edit non-existing user by authorized admin gets unauthorized in http response](https://github.com/owncloud/core/issues/38423)
 
-- [coreApiAuthOcs/ocsPUTAuth.feature:24](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsPUTAuth.feature#L24)
+- [coreApiAuthOcs/ocsPUTAuth.feature:27](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiAuthOcs/ocsPUTAuth.feature#L27)
 
 #### [Sharing a same file twice to the same group](https://github.com/owncloud/ocis/issues/1710)
 

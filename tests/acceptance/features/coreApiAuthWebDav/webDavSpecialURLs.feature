@@ -1,5 +1,8 @@
 @api @skipOnOcV10.10.0
 Feature: make webdav request with special urls
+  As a user
+  I want to make webdav request with special urls
+  So that I can make sure that they work
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files

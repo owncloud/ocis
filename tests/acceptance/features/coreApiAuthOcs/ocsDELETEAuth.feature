@@ -1,5 +1,8 @@
 @api @files_sharing-app-required
 Feature: auth
+  As a user
+  I want to send delete request with wrong password
+  So that I can make sure it doesn't work
 
   Background:
     Given user "another-admin" has been created with default attributes and without skeleton files

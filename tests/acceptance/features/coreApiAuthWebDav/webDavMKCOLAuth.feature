@@ -1,5 +1,8 @@
 @api
 Feature: create folder using MKCOL
+  As a user 
+  I want to create folders
+  So that I can organise resources in folders
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files

@@ -1,5 +1,8 @@
 @api
 Feature: delete file/folder
+  As a user
+  I want to delete a file or folder
+  So that I can remove redundant resources
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -32,6 +35,7 @@ Feature: delete file/folder
       | /remote.php/dav/spaces/%spaceid%/PARENT            |
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
+
 
   Scenario: send DELETE requests to webDav endpoints as normal user with no password
     When user "Alice" requests these endpoints with "DELETE" using password "" about user "Alice"

@@ -1,5 +1,8 @@
 @api
 Feature: auth
+  As a user
+  I want to check the authentication of the application
+  So that I can make sure it's secure
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files

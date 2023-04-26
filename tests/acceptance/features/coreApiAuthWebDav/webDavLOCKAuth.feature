@@ -1,5 +1,8 @@
 @api
 Feature: LOCK file/folder
+  As a user
+  I want to lock a file or folder
+  So that I can ensure that the resources won't be changed unexpectedly
 
   Background:
     Given these users have been created with default attributes and without skeleton files:

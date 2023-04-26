@@ -1,5 +1,8 @@
 @api @files_sharing-app-required
 Feature: auth
+  As a user
+  I want to send PUT request to various endpoints
+  So that I can make sure the endpoints need proper authentication
 
   Background:
     Given user "another-admin" has been created with default attributes and without skeleton files
@@ -21,7 +24,7 @@ Feature: auth
     And the OCS status code of responses on all endpoints should be "997"
 
 
-  Scenario: Request to edit nonexistent user by authorized admin gets unauthorized in http response
+  Scenario: request to edit nonexistent user by authorized admin gets unauthorized in http response
     Given user "another-admin" has been added to group "admin"
     When user "another-admin" requests these endpoints with "PUT" including body "doesnotmatter" about user "nonexistent"
       | endpoint                                         |
