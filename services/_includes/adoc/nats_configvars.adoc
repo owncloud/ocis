@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-26-16-15-05]
+[#deprecation-note-2023-04-26-19-04-45]
 [caption=]
 .Deprecation notes for the nats service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -25,6 +25,46 @@ endif::[]
 | Type
 | Default Value
 | Description
+
+a|`OCIS_TRACING_ENABLED` +
+`NATS_TRACING_ENABLED` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates tracing.
+
+a|`OCIS_TRACING_TYPE` +
+`NATS_TRACING_TYPE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+
+a|`OCIS_TRACING_ENDPOINT` +
+`NATS_TRACING_ENDPOINT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The endpoint of the tracing agent.
+
+a|`OCIS_TRACING_COLLECTOR` +
+`NATS_TRACING_COLLECTOR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 a|`OCIS_LOG_LEVEL` +
 `NATS_LOG_LEVEL` +
