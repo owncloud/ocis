@@ -1,3 +1,13 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v3.0.0...master
+
+## Summary
+
+* Enhancement - Open Debug endpoint for Nats: [#5002](https://github.com/owncloud/ocis/issues/5002)
+
 # Changelog for [3.0.0] (2023-04-24)
 
 The following sections list the changes for 3.0.0.
