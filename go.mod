@@ -42,7 +42,7 @@ require (
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang/protobuf v1.5.3
-	github.com/google/go-tika v0.2.0
+	github.com/google/go-tika v0.3.0
 	github.com/google/uuid v1.3.0
 	github.com/gookit/config/v2 v2.1.8
 	github.com/gorilla/mux v1.8.0
