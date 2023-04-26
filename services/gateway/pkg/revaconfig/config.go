@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 
@@ -58,15 +59,21 @@ func GatewayConfigFromStruct(cfg *config.Config, logger log.Logger) map[string]i
 					"transfer_shared_secret":         cfg.TransferSecret,
 					"transfer_expires":               cfg.TransferExpires,
 					// cache and TTLs
-					"cache_store":            cfg.Cache.Store,
-					"cache_nodes":            cfg.Cache.Nodes,
-					"cache_database":         cfg.Cache.Database,
-					"stat_cache_ttl":         cfg.Cache.StatCacheTTL,
-					"stat_cache_size":        cfg.Cache.StatCacheSize,
-					"provider_cache_ttl":     cfg.Cache.ProviderCacheTTL,
-					"provider_cache_size":    cfg.Cache.ProviderCacheSize,
-					"create_home_cache_ttl":  cfg.Cache.CreateHomeCacheTTL,
-					"create_home_cache_size": cfg.Cache.CreateHomeCacheSize,
+					"stat_cache_store":           cfg.Cache.StatCacheStore,
+					"stat_cache_nodes":           cfg.Cache.StatCacheNodes,
+					"stat_cache_database":        cfg.Cache.StatCacheDatabase,
+					"stat_cache_ttl":             cfg.Cache.StatCacheTTL / time.Second,
+					"stat_cache_size":            cfg.Cache.StatCacheSize,
+					"provider_cache_store":       cfg.Cache.ProviderCacheStore,
+					"provider_cache_nodes":       cfg.Cache.ProviderCacheNodes,
+					"provider_cache_database":    cfg.Cache.ProviderCacheDatabase,
+					"provider_cache_ttl":         cfg.Cache.ProviderCacheTTL / time.Second,
+					"provider_cache_size":        cfg.Cache.ProviderCacheSize,
+					"create_home_cache_store":    cfg.Cache.CreateHomeCacheStore,
+					"create_home_cache_nodes":    cfg.Cache.CreateHomeCacheNodes,
+					"create_home_cache_database": cfg.Cache.CreateHomeCacheDatabase,
+					"create_home_cache_ttl":      cfg.Cache.CreateHomeCacheTTL / time.Second,
+					"create_home_cache_size":     cfg.Cache.CreateHomeCacheSize,
 				},
 				"authregistry": map[string]interface{}{
 					"driver": "static",

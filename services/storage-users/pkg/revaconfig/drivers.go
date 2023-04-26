@@ -1,6 +1,10 @@
 package revaconfig
 
-import "github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
+import (
+	"time"
+
+	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
+)
 
 // EOS is the config mapping for the EOS storage driver
 func EOS(cfg *config.Config) map[string]interface{} {
@@ -130,14 +134,14 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 			"cache_store":    cfg.StatCache.Store,
 			"cache_nodes":    cfg.StatCache.Nodes,
 			"cache_database": cfg.StatCache.Database,
-			"cache_ttl":      cfg.StatCache.TTL,
+			"cache_ttl":      cfg.StatCache.TTL / time.Second,
 			"cache_size":     cfg.StatCache.Size,
 		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":    cfg.FilemetadataCache.Store,
 			"cache_nodes":    cfg.FilemetadataCache.Nodes,
 			"cache_database": cfg.FilemetadataCache.Database,
-			"cache_ttl":      cfg.FilemetadataCache.TTL,
+			"cache_ttl":      cfg.FilemetadataCache.TTL / time.Second,
 			"cache_size":     cfg.FilemetadataCache.Size,
 		},
 		"events": map[string]interface{}{
@@ -177,14 +181,14 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_store":    cfg.StatCache.Store,
 			"cache_nodes":    cfg.StatCache.Nodes,
 			"cache_database": cfg.StatCache.Database,
-			"cache_ttl":      cfg.StatCache.TTL,
+			"cache_ttl":      cfg.StatCache.TTL / time.Second,
 			"cache_size":     cfg.StatCache.Size,
 		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":    cfg.FilemetadataCache.Store,
 			"cache_nodes":    cfg.FilemetadataCache.Nodes,
 			"cache_database": cfg.FilemetadataCache.Database,
-			"cache_ttl":      cfg.FilemetadataCache.TTL,
+			"cache_ttl":      cfg.FilemetadataCache.TTL / time.Second,
 			"cache_size":     cfg.FilemetadataCache.Size,
 		},
 	}
@@ -229,14 +233,14 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 			"cache_store":    cfg.StatCache.Store,
 			"cache_nodes":    cfg.StatCache.Nodes,
 			"cache_database": cfg.StatCache.Database,
-			"cache_ttl":      cfg.StatCache.TTL,
+			"cache_ttl":      cfg.StatCache.TTL / time.Second,
 			"cache_size":     cfg.StatCache.Size,
 		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":    cfg.FilemetadataCache.Store,
 			"cache_nodes":    cfg.FilemetadataCache.Nodes,
 			"cache_database": cfg.FilemetadataCache.Database,
-			"cache_ttl":      cfg.FilemetadataCache.TTL,
+			"cache_ttl":      cfg.FilemetadataCache.TTL / time.Second,
 			"cache_size":     cfg.FilemetadataCache.Size,
 		},
 		"events": map[string]interface{}{
@@ -280,14 +284,14 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_store":    cfg.StatCache.Store,
 			"cache_nodes":    cfg.StatCache.Nodes,
 			"cache_database": cfg.StatCache.Database,
-			"cache_ttl":      cfg.StatCache.TTL,
+			"cache_ttl":      cfg.StatCache.TTL / time.Second,
 			"cache_size":     cfg.StatCache.Size,
 		},
 		"filemetadatacache": map[string]interface{}{
 			"cache_store":    cfg.FilemetadataCache.Store,
 			"cache_nodes":    cfg.FilemetadataCache.Nodes,
 			"cache_database": cfg.FilemetadataCache.Database,
-			"cache_ttl":      cfg.FilemetadataCache.TTL,
+			"cache_ttl":      cfg.FilemetadataCache.TTL / time.Second,
 			"cache_size":     cfg.FilemetadataCache.Size,
 		},
 	}

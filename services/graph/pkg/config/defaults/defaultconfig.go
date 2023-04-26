@@ -93,7 +93,7 @@ func DefaultConfig() *config.Config {
 		},
 		Cache: &config.Cache{
 			Store:    "memory",
-			Database: "graph",
+			Database: "ocis",
 			Table:    "roles",
 			TTL:      time.Hour * 336,
 		},
