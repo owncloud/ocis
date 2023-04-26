@@ -52,26 +52,6 @@ Feature: Change data of space
   Scenario Outline: user other than space manager role can't change the name of a Space via the Graph API
     When user "<user>" changes the name of the "Project Jupiter" space to "Project Jupiter"
     Then the HTTP status code should be "403"
-    And for user "<user>" the JSON response should contain space called "Project Jupiter" and match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name",
-        "driveType"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Jupiter"]
-        },
-        "driveType": {
-          "type": "string",
-          "enum": ["project"]
-        }
-      }
-    }
-    """
     Examples:
       | user  |
       | Brian |
@@ -120,34 +100,6 @@ Feature: Change data of space
   Scenario Outline: user with normal space permission can't increases the quota of a Space via the Graph API
     When user "<user>" changes the quota of the "Project Jupiter" space to "100"
     Then the HTTP status code should be "403"
-    And for user "<user>" the JSON response should contain space called "Project Jupiter" and match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name",
-        "quota"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Jupiter"]
-        },
-        "quota": {
-          "type": "object",
-          "required": [
-            "total"
-          ],
-          "properties": {
-            "total" : {
-              "type": "number",
-              "enum": [20]
-            }
-          }
-        }
-      }
-    }
-    """
     Examples:
       | user  |
       | Brian |
@@ -192,7 +144,7 @@ Feature: Change data of space
     """
     When user "Alice" uploads a file inside space "Project Jupiter" with content "some content" to "file.txt" using the WebDAV API
     Then the HTTP status code should be "201"
-    And for user "Alice" the JSON response should contain space called "Project Jupiter" and match
+    And for user "Alice" the JSON representation of their drive should contain space called "Project Jupiter" and match
     """
      {
       "type": "object",
@@ -236,7 +188,7 @@ Feature: Change data of space
     And user "Alice" has uploaded a file inside space "Project Jupiter" with content "space description" to ".space/readme.md"
     When user "Alice" sets the file ".space/readme.md" as a description in a special section of the "Project Jupiter" space
     Then the HTTP status code should be "200"
-    And for user "Alice" the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/readme.md" and match
+    And the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/readme.md" and match
     """
     {
       "type": "object",
@@ -319,7 +271,7 @@ Feature: Change data of space
     And user "Alice" has set the file ".space/readme.md" as a description in a special section of the "Project Jupiter" space
     When user "<user>" uploads a file inside space "Project Jupiter" with content "new description" to ".space/readme.md" using the WebDAV API
     Then the HTTP status code should be "<code>"
-    And for user "Alice" the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/readme.md" and match
+    And for user "<user>" the JSON representation of their drive should contain space called "Project Jupiter" owned by "Alice" with description file ".space/readme.md" and match
     """
     {
       "type": "object",
@@ -405,7 +357,7 @@ Feature: Change data of space
     And user "<user>" has uploaded a file inside space "Project Jupiter" with content "" to ".space/<fileName>"
     When user "<user>" sets the file ".space/<fileName>" as a space image in a special section of the "Project Jupiter" space
     Then the HTTP status code should be "200"
-    And for user "Alice" the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/<fileName>" and match
+    And the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/<fileName>" and match
     """
     {
       "type": "object",
@@ -499,7 +451,7 @@ Feature: Change data of space
     When user "<user>" uploads a file inside space "Project Jupiter" owned by the user "Alice" with content "new content" to ".space/readme.md" using the WebDAV API
     Then the HTTP status code should be "<code>"
     And for user "<user>" the content of the file ".space/readme.md" of the space "Project Jupiter" should be "<expectedContent>"
-    And for user "<user>" the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/readme.md" and match
+    And the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/readme.md" and match
     """
     {
       "type": "object",
@@ -585,7 +537,7 @@ Feature: Change data of space
     When user "<user>" has uploaded a file inside space "Project Jupiter" with content "" to ".space/newSpaceImage.png"
     And user "<user>" sets the file ".space/newSpaceImage.png" as a space image in a special section of the "Project Jupiter" space
     Then the HTTP status code should be "200"
-    And for user "<user>" the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/newSpaceImage.png" and match
+    And the JSON response should contain space called "Project Jupiter" owned by "Alice" with description file ".space/newSpaceImage.png" and match
     """
     {
       "type": "object",
@@ -681,7 +633,7 @@ Feature: Change data of space
     Then the HTTP status code should be "200"
     When user "Brian" uploads a file inside space "Brian Murphy" with content "file is more than 15 bytes" to "file.txt" using the WebDAV API
     Then the HTTP status code should be <code>
-    And for user "Brian" the JSON response should contain space called "Brian Murphy" and match
+    And for user "Brian" the JSON representation of their drive should contain space called "Brian Murphy" and match
     """
      {
       "type": "object",

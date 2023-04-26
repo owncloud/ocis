@@ -25,7 +25,7 @@ Feature: Share spaces
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    And for user "Brian" the JSON response should contain space called "share space" and match
+    And for user "Brian" the JSON representation of their drive should contain space called "share space" and match
     """
     {
       "type": "object",
@@ -90,7 +90,7 @@ Feature: Share spaces
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith | Brian  |
       | role      | viewer |
-    And for user "Brian" the JSON response should contain space called "share space" and match
+    And for user "Brian" the JSON representation of their drive should contain space called "share space" and match
     """
      {
       "type": "object",
@@ -126,7 +126,7 @@ Feature: Share spaces
       | role      | manager |
     When user "<user>" unshares a space "share space" to user "Alice"
     Then the HTTP status code should be "200"
-    And for user "Brian" the JSON response should contain space called "share space" owned by "Alice" and match
+    And for user "Brian" the JSON representation of their drive should contain space called "share space" owned by "Alice" and match
     """
     {
       "type": "object",
@@ -198,7 +198,7 @@ Feature: Share spaces
     Then the HTTP status code should be "200"
     And the OCS status code should be "200"
     And the OCS status message should be "OK"
-    And for user "Brian" the JSON response should contain space called "share space" and match
+    And for user "Brian" the JSON representation of their drive should contain space called "share space" and match
     """
     {
       "type": "object",
@@ -301,7 +301,7 @@ Feature: Share spaces
       | shareType | 8      |
       | role      | <role> |
     Then the HTTP status code should be "200"
-    And for user "Brian" the JSON response should contain space called "share space" and match
+    And for user "Brian" the JSON representation of their drive should contain space called "share space" and match
     """
     {
       "type": "object",
@@ -326,7 +326,7 @@ Feature: Share spaces
       }
     }
     """
-    And for user "Bob" the JSON response should contain space called "share space" and match
+    And for user "Bob" the JSON representation of their drive should contain space called "share space" and match
     """
     {
       "type": "object",
@@ -388,7 +388,7 @@ Feature: Share spaces
       | Brian    | group2    |
     Then the HTTP status code of responses on all endpoints should be "204"
     And the user "Brian" should not have a space called "share space"
-    But for user "Bob" the JSON response should contain space called "share space" and match
+    But for user "Bob" the JSON representation of their drive should contain space called "share space" and match
     """
     {
       "type": "object",

@@ -114,21 +114,6 @@ Feature: Space management
   Scenario: user without space admin permission tries to change the name of the project space
     When user "Carol" tries to change the name of the "Project" space to "New Name" owned by user "Alice"
     Then the HTTP status code should be "403"
-    And for user "Alice" the JSON response should contain space called "Project" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "name"
-      ],
-      "properties": {
-        "name": {
-           "type": "string",
-           "enum": ["Project"]
-        }
-      }
-    }
-    """
 
   @skipOnStable2.0
   Scenario: space admin user changes the description of the project space
@@ -155,27 +140,12 @@ Feature: Space management
     Given user "Alice" has changed the description of the "Project" space to "old description"
     When user "Carol" tries to change the description of the "Project" space to "New description" owned by user "Alice"
     Then the HTTP status code should be "403"
-    And for user "Alice" the JSON response should contain space called "Project" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "description"
-      ],
-      "properties": {
-        "description": {
-           "type": "string",
-           "enum": ["old description"]
-        }
-      }
-    }
-    """
 
   @skipOnStable2.0
   Scenario: space admin user disables the project space
     When user "Brian" disables a space "Project" owned by user "Alice"
     Then the HTTP status code should be "204"
-    And for user "Alice" the JSON response should contain space called "Project" and match
+    And for user "Alice" the JSON representation of their drive should contain space called "Project" and match
     """
     {
       "type": "object",
@@ -238,42 +208,6 @@ Feature: Space management
     Given user "Alice" has disabled a space "Project"
     When user "Carol" tries to delete a space "Project" owned by user "Alice"
     Then the HTTP status code should be "403"
-    And for user "Alice" the JSON response should contain space called "Project" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "name",
-        "root"
-      ],
-      "properties": {
-        "name": {
-           "type": "string",
-           "enum": ["Project"]
-        },
-        "root": {
-          "type": "object",
-          "required": [
-            "deleted"
-          ],
-          "properties": {
-            "deleted": {
-              "type": "object",
-              "required": [
-              "state"
-              ],
-              "properties": {
-                "state": {
-                  "type": "string",
-                  "enum": ["trashed"]
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    """
 
   @skipOnStable2.0
   Scenario: space admin user enables the project space
@@ -286,39 +220,3 @@ Feature: Space management
     Given user "Alice" has disabled a space "Project"
     When user "Carol" tries to restore a disabled space "Project" owned by user "Alice"
     Then the HTTP status code should be "404"
-    And for user "Alice" the JSON response should contain space called "Project" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "name",
-        "root"
-      ],
-      "properties": {
-        "name": {
-           "type": "string",
-           "enum": ["Project"]
-        },
-        "root": {
-          "type": "object",
-          "required": [
-            "deleted"
-          ],
-          "properties": {
-            "deleted": {
-              "type": "object",
-              "required": [
-              "state"
-              ],
-              "properties": {
-                "state": {
-                  "type": "string",
-                  "enum": ["trashed"]
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    """

@@ -41,7 +41,7 @@ Feature: Upload files into a space
     Then the HTTP status code should be "<code>"
     And for user "Brian" the space "Project Ceres" <shouldOrNot> contain these entries:
       | test.txt |
-    And for user "Brian" the JSON response should contain space called "Project Ceres" and match
+    And for user "Brian" the JSON representation of their drive should contain space called "Project Ceres" and match
     """
      {
       "type": "object",

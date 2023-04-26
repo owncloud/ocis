@@ -876,6 +876,7 @@ class SpacesContext implements Context {
 		?PyStringNode $schemaString = null
 	): void {
 		Assert::assertNotNull($schemaString, 'schema is not valid JSON');
+
 		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->value)) {
 			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
 			foreach ($responseBody as $value) {
@@ -919,6 +920,7 @@ class SpacesContext implements Context {
 			null,
 			$userName,
 		);
+
 		JsonAssertions::assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->featureContext->getJSONSchema($schemaString)
@@ -926,9 +928,9 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^for user "([^"]*)" the JSON response should contain space called "([^"]*)" and match$/
-	 * @Then /^for user "([^"]*)" the JSON response should contain space called "([^"]*)" (?:owned by|granted to) "([^"]*)" and match$/
-	 * @Then /^for user "([^"]*)" the JSON response should contain space called "([^"]*)" (?:owned by|granted to) "([^"]*)" (?:with description file|with space image) "([^"]*)" and match$/
+	 * @Then /^for user "([^"]*)" the JSON representation of their drive should contain space called "([^"]*)" and match$/
+	 * @Then /^for user "([^"]*)" the JSON representation of their drive should contain space called "([^"]*)" (?:owned by|granted to) "([^"]*)" and match$/
+	 * @Then /^for user "([^"]*)" the JSON representation of their drive should contain space called "([^"]*)" (?:owned by|granted to) "([^"]*)" (?:with description file|with space image) "([^"]*)" and match$/
 	 *
 	 * @param string $user
 	 * @param string|null $spaceName

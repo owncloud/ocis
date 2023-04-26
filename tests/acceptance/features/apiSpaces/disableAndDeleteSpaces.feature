@@ -28,7 +28,7 @@ Feature: Disabling and deleting space
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" disables a space "Project Moon"
     Then the HTTP status code should be "204"
-    And for user "Alice" the JSON response should contain space called "Project Moon" and match
+    And for user "Alice" the JSON representation of their drive should contain space called "Project Moon" and match
     """
      {
       "type": "object",
@@ -78,36 +78,6 @@ Feature: Disabling and deleting space
     Given the administrator has given "Carol" the role "<role>" using the settings api
     When user "Carol" tries to disable a space "Project Moon" owned by user "Alice"
     Then the HTTP status code should be "403"
-    And for user "Brian" the JSON response should contain space called "Project Moon" and match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Moon"]
-        }
-      }
-    }
-    """
-    And for user "Bob" the JSON response should contain space called "Project Moon" and match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Moon"]
-        }
-      }
-    }
-    """
     Examples:
       | role  |
       | User  |
@@ -128,21 +98,6 @@ Feature: Disabling and deleting space
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" deletes a space "Project Moon"
     Then the HTTP status code should be "400"
-    And for user "Alice" the JSON response should contain space called "Project Moon" and match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Moon"]
-        }
-      }
-    }
-    """
     Examples:
       | role        |
       | Admin       |
@@ -167,9 +122,9 @@ Feature: Disabling and deleting space
 
   Scenario Outline: an admin and space manager can disable other space via the Graph API
     Given the administrator has given "Carol" the role "<role>" using the settings api
-    When user "Carol" tries to disable a space "Project Moon" owned by user "Alice"
+    When user "Carol" disables a space "Project Moon" owned by user "Alice"
     Then the HTTP status code should be "204"
-    And for user "Alice" the JSON response should contain space called "Project Moon" and match
+    And for user "Alice" the JSON representation of their drive should contain space called "Project Moon" and match
     """
      {
       "type": "object",

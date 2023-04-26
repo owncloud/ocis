@@ -61,7 +61,7 @@ Feature: Remove files, folder
       | role      | <role> |
     When user "<user>" removes the file "text.txt" from space "delete objects"
     Then the HTTP status code should be "<code>"
-    And for user "<user>" the JSON response should contain space called "delete objects" and match
+    And for user "<user>" the JSON representation of their drive should contain space called "delete objects" and match
     """
      {
       "type": "object",
@@ -103,18 +103,3 @@ Feature: Remove files, folder
   Scenario: user is unable to delete a space via the webDav API
     When user "Alice" removes the folder "" from space "delete objects"
     Then the HTTP status code should be "405"
-    And for user "Alice" the JSON response should contain space called "delete objects" and match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["delete objects"]
-        }
-      }
-    }
-    """

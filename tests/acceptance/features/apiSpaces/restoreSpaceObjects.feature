@@ -81,7 +81,7 @@ Feature: Restore files, folder
     And user "Brian" has uploaded file with content "some content" to "newFile.txt"
     When user "Brian" restores version index "1" of file "/file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
-    And for user "Brian" the JSON response should contain space called "Brian Murphy" and match
+    And for user "Brian" the JSON representation of their drive should contain space called "Brian Murphy" and match
     """
      {
       "type": "object",
