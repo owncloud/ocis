@@ -1,12 +1,15 @@
 @api @files_sharing-app-required
 Feature: sharing
+  As a user
+  I want to share resources to others
+  So that they can have access on them
 
   Background:
     Given auto-accept shares has been disabled
     And user "Alice" has been created with default attributes and without skeleton files
 
   @smokeTest @skipOnEncryptionType:user-keys
-  Scenario Outline: Creating a share of a file with a user, the default permissions are read(1)+update(2)+can-share(16)
+  Scenario Outline: creating a share of a file with a user, the default permissions are read(1)+update(2)+can-share(16)
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
@@ -36,7 +39,7 @@ Feature: sharing
       | 2               | 200             |
 
   @smokeTest @skipOnEncryptionType:user-keys @issue-2133
-  Scenario Outline: Creating a share of a file containing commas in the filename, with a user, the default permissions are read(1)+update(2)+can-share(16)
+  Scenario Outline: creating a share of a file containing commas in the filename, with a user, the default permissions are read(1)+update(2)+can-share(16)
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "file with comma in filename" to "/sample,1.txt"
@@ -65,7 +68,7 @@ Feature: sharing
       | 2               | 200             |
 
   @issue-2133 @issue-1270 @issue-1271
-  Scenario Outline: Creating a share of a file with a user and asking for various permission combinations
+  Scenario Outline: creating a share of a file with a user and asking for various permission combinations
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
@@ -100,7 +103,7 @@ Feature: sharing
       | 2               | 2                     | 2                   | 200             |
 
 
-  Scenario Outline: Creating a share of a file with no permissions should fail
+  Scenario Outline: creating a share of a file with no permissions should fail
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "Random data" to "randomfile.txt"
@@ -116,7 +119,7 @@ Feature: sharing
       | 2               | 400              |
 
 
-  Scenario Outline: Creating a share of a folder with no permissions should fail
+  Scenario Outline: creating a share of a folder with no permissions should fail
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/afolder"
@@ -132,7 +135,7 @@ Feature: sharing
       | 2               | 400              |
 
   @issue-2133
-  Scenario Outline: Creating a share of a folder with a user, the default permissions are all permissions(31)
+  Scenario Outline: creating a share of a folder with a user, the default permissions are all permissions(31)
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/FOLDER"
@@ -157,7 +160,7 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario Outline: Creating a share of a file with a group, the default permissions are read(1)+update(2)+can-share(16)
+  Scenario Outline: creating a share of a file with a group, the default permissions are read(1)+update(2)+can-share(16)
     Given using OCS API version "<ocs_api_version>"
     And group "grp1" has been created
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
@@ -182,7 +185,7 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario Outline: Creating a share of a folder with a group, the default permissions are all permissions(31)
+  Scenario Outline: creating a share of a folder with a group, the default permissions are all permissions(31)
     Given using OCS API version "<ocs_api_version>"
     And group "grp1" has been created
     And user "Alice" has created folder "/FOLDER"
@@ -207,7 +210,7 @@ Feature: sharing
       | 2               | 200             |
 
   @smokeTest
-  Scenario Outline: Share of folder to a group
+  Scenario Outline: share of folder to a group
     Given using OCS API version "<ocs_api_version>"
     And these users have been created with default attributes and without skeleton files:
       | username |
@@ -235,7 +238,7 @@ Feature: sharing
       | 2               | 200             |
 
   @smokeTest @skipOnReva # reva doesn't have a pre-created admin user
-  Scenario Outline: User included in multiple groups receives a share from the admin
+  Scenario Outline: user included in multiple groups receives a share from the admin
     Given using OCS API version "<ocs_api_version>"
     And group "grp1" has been created
     And group "grp2" has been created
@@ -434,7 +437,7 @@ Feature: sharing
     And the content of file "/Shares/randomfile.txt" for user "Brian" should be "Random data"
 
 
-  Scenario Outline: Share of folder to a group with emoji in the name
+  Scenario Outline: share of folder to a group with emoji in the name
     Given using OCS API version "<ocs_api_version>"
     And these users have been created with default attributes and without skeleton files:
       | username |
@@ -529,7 +532,7 @@ Feature: sharing
       | 2               | 200             | /textfile0.txt |
 
   @skipOnFilesClassifier @issue-files-classifier-291 @issue-2146
-  Scenario: Share a file by multiple channels and download from sub-folder and direct file share
+  Scenario: share a file by multiple channels and download from sub-folder and direct file share
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -624,7 +627,7 @@ Feature: sharing
       | /userOneFolder     |
 
   @smokeTest
-  Scenario Outline: Creating a share of a renamed file
+  Scenario Outline: creating a share of a renamed file
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
@@ -677,7 +680,7 @@ Feature: sharing
       | 2               | 200             |
 
   @issue-719
-  Scenario Outline: Creating a share of a renamed file when another share exists
+  Scenario Outline: creating a share of a renamed file when another share exists
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/Folder1"
@@ -710,7 +713,7 @@ Feature: sharing
       | 2               | 200             |
 
   @issue-1710
-  Scenario Outline: Sharing a same file twice to the same group is not possible
+  Scenario Outline: sharing a same file twice to the same group is not possible
     Given using OCS API version "<ocs-api-version>"
     And group "grp1" has been created
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
@@ -725,7 +728,7 @@ Feature: sharing
       | 2               | 403         |
 
   @issue-2215
-  Scenario Outline: Sharing the shares folder to users is not possible
+  Scenario Outline: sharing the shares folder to users is not possible
     Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
@@ -742,7 +745,7 @@ Feature: sharing
       | 2               | 403         |
 
   @issue-2215
-  Scenario Outline: Sharing the shares folder to groups is not possible
+  Scenario Outline: sharing the shares folder to groups is not possible
     Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
@@ -761,7 +764,7 @@ Feature: sharing
       | 2               | 403         |
 
   @issue-2215
-  Scenario Outline: Sharing the shares folder as public link is not possible
+  Scenario Outline: sharing the shares folder as public link is not possible
     Given using OCS API version "<ocs-api-version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"

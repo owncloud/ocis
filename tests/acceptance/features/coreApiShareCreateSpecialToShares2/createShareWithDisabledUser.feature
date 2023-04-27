@@ -1,5 +1,8 @@
 @api @files_sharing-app-required @issue-1328
 Feature: share resources with a disabled user
+  As a user
+  I want to share resources to disabled user
+  So that I can make sure it doesn't work
 
   Background:
     Given auto-accept shares has been disabled
@@ -7,7 +10,7 @@ Feature: share resources with a disabled user
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
 
   @issue-2212
-  Scenario Outline: Creating a new share with a disabled user
+  Scenario Outline: creating a new share with a disabled user
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has been disabled
@@ -19,7 +22,7 @@ Feature: share resources with a disabled user
       | 1               | 997             |
 
 
-  Scenario: Creating a new share with a disabled user
+  Scenario: creating a new share with a disabled user
     Given using OCS API version "2"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has been disabled

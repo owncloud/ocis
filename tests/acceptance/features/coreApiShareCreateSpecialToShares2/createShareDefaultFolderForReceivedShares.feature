@@ -1,12 +1,15 @@
 @api @files_sharing-app-required @issue-1327
 Feature: shares are received in the default folder for received shares
+  As a user
+  I want to share the default Shares folder
+  So that I can make sure it does not work
 
   Background:
     Given auto-accept shares has been disabled
     And user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: Do not allow sharing of the entire share_folder
+  Scenario Outline: do not allow sharing of the entire share folder
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
