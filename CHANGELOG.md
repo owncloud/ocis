@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Add debug server to idm: [#6153](https://github.com/owncloud/ocis/pull/6153)
+* Enhancement - Open Debug endpoint for Notifications: [#5002](https://github.com/owncloud/ocis/issues/5002)
 * Enhancement - Open Debug endpoint for Nats: [#5002](https://github.com/owncloud/ocis/issues/5002)
 
 # Changelog for [3.0.0] (2023-04-24)
