@@ -1,6 +1,6 @@
 ---
 title: IDP
-date: 2023-04-27T13:16:50.049486505Z
+date: 2023-04-27T13:56:01.132295278Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/idp
@@ -20,6 +20,7 @@ By default, it is configured to use the ocis IDM service as its LDAP backend for
 looking up and authenticating users. Other backends like an external LDAP
 server can be configured via a set of
 [enviroment variables](https://owncloud.dev/services/idp/configuration/#environment-variables).
+Note that translations provided by the IDP service are not maintained via ownCloud but part of the embedded vendor package: LibreGraph Connect Identifier.
 
 ## Table of Contents
 
