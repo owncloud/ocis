@@ -24,6 +24,10 @@ olcAttributeTypes: ( ownCloudOid:1.1.4 NAME 'ownCloudUserEnabled'
   DESC 'A boolean value indicating if ownCloudUser is enabled'
   EQUALITY booleanMatch
   SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 SINGLE-VALUE)
+olcAttributeTypes: ( ownCloudOid:1.1.5 NAME 'ownCloudUserType'
+  DESC 'User type (e.g. Member or Guest)'
+  EQUALITY caseIgnoreMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
 olcObjectClasses: ( ownCloudOid:1.2.1 NAME 'ownCloud'
   DESC 'ownCloud LDAP Schema'
   AUXILIARY
@@ -32,4 +36,4 @@ olcObjectClasses: ( ownCloudOid:1.2.2 NAME 'ownCloudUser'
   DESC 'ownCloud User LDAP Schema'
   SUP ownCloud
   AUXILIARY
-  MAY ( ocExternalIdentity $ ownCloudUserEnabled ) )
+  MAY ( ocExternalIdentity $ ownCloudUserEnabled $ ownCloudUserType ) )
