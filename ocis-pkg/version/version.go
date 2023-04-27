@@ -19,7 +19,9 @@ var (
 	LatestTag = "3.0.0-rc.1+dev"
 
 	// Date indicates the build date.
-	Date = time.Now().Format("20060102")
+	// This has been removed, it looks like you can only replace static strings with recent go versions
+	//Date = time.Now().Format("20060102")
+	Date = "dev"
 
 	// Legacy defines the old long 4 number ownCloud version needed for some clients
 	Legacy = "10.11.0.0"
@@ -30,6 +32,9 @@ var (
 
 // Compiled returns the compile time of this service.
 func Compiled() time.Time {
+	if Date == "dev" {
+		return time.Now()
+	}
 	t, _ := time.Parse("20060102", Date)
 	return t
 }
