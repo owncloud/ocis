@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-27-10-28-48]
+[#deprecation-note-2023-04-27-10-36-06]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -182,7 +182,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-27-10-28-48[Deprecation Note]
+xref:deprecation-note-2023-04-27-10-36-06[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -246,7 +246,7 @@ Disable creation of the home space on login.
 
 a|`OCIS_TRANSFER_SECRET` +
 `STORAGE_TRANSFER_SECRET` +
-xref:deprecation-note-2023-04-27-10-28-48[Deprecation Note]
+xref:deprecation-note-2023-04-27-10-36-06[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -264,17 +264,17 @@ a| [subs=-attributes]
 Expiry for the gateway tokens.
 
 a|`OCIS_CACHE_STORE` +
-`GATEWAY_CACHE_STORE` +
+`GATEWAY_STAT_CACHE_STORE` +
 
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++memory ++
+++noop ++
 a| [subs=-attributes]
 The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
 a|`OCIS_CACHE_STORE_NODES` +
-`GATEWAY_CACHE_STORE_NODES` +
+`GATEWAY_STAT_CACHE_STORE_NODES` +
 
 a| [subs=-attributes]
 ++[]string ++
@@ -298,9 +298,9 @@ a|`OCIS_CACHE_TTL` +
 a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
-++300ns ++
+++5m0s ++
 a| [subs=-attributes]
-Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).
 
 a|`OCIS_CACHE_SIZE` +
 `GATEWAY_STAT_CACHE_SIZE` +
@@ -312,15 +312,44 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
+a|`OCIS_CACHE_STORE` +
+`GATEWAY_PROVIDER_CACHE_STORE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++noop ++
+a| [subs=-attributes]
+The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+
+a|`OCIS_CACHE_STORE_NODES` +
+`GATEWAY_PROVIDER_CACHE_STORE_NODES` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+
+a|`OCIS_CACHE_DATABASE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ocis ++
+a| [subs=-attributes]
+The database name the configured store should use.
+
 a|`OCIS_CACHE_TTL` +
 `GATEWAY_PROVIDER_CACHE_TTL` +
 
 a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
-++300ns ++
+++5m0s ++
 a| [subs=-attributes]
-Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).
 
 a|`OCIS_CACHE_SIZE` +
 `GATEWAY_PROVIDER_CACHE_SIZE` +
@@ -332,15 +361,44 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
+a|`OCIS_CACHE_STORE` +
+`GATEWAY_CREATE_HOME_CACHE_STORE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++noop ++
+a| [subs=-attributes]
+The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+
+a|`OCIS_CACHE_STORE_NODES` +
+`GATEWAY_CREATE_HOME_CACHE_STORE_NODES` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+
+a|`OCIS_CACHE_DATABASE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ocis ++
+a| [subs=-attributes]
+The database name the configured store should use.
+
 a|`OCIS_CACHE_TTL` +
 `GATEWAY_CREATE_HOME_CACHE_TTL` +
 
 a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
-++300ns ++
+++5m0s ++
 a| [subs=-attributes]
-Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).
 
 a|`OCIS_CACHE_SIZE` +
 `GATEWAY_CREATE_HOME_CACHE_SIZE` +

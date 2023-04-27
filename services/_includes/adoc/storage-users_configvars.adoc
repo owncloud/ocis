@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-04-27-10-28-49]
+[#deprecation-note-2023-04-27-10-36-06]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -205,7 +205,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-04-27-10-28-49[Deprecation Note]
+xref:deprecation-note-2023-04-27-10-36-06[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -342,7 +342,7 @@ Maximum number of concurrent go-routines. Higher values can potentially get work
 
 a|`OCIS_ASYNC_UPLOADS` +
 `STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
-xref:deprecation-note-2023-04-27-10-28-49[Deprecation Note]
+xref:deprecation-note-2023-04-27-10-36-06[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -645,7 +645,7 @@ Whether to verify the server TLS certificates.
 
 a|`STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT` +
-xref:deprecation-note-2023-04-27-10-28-49[Deprecation Note]
+xref:deprecation-note-2023-04-27-10-36-06[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -678,7 +678,7 @@ a|`OCIS_CACHE_STORE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++memory ++
+++noop ++
 a| [subs=-attributes]
 The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
@@ -707,9 +707,9 @@ a|`OCIS_CACHE_TTL` +
 a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
-++0s ++
+++5m0s ++
 a| [subs=-attributes]
-Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).
 
 a|`OCIS_CACHE_SIZE` +
 `STORAGE_USERS_STAT_CACHE_SIZE` +
@@ -756,9 +756,9 @@ a|`OCIS_CACHE_TTL` +
 a| [subs=-attributes]
 ++Duration ++
 a| [subs=-attributes]
-++0s ++
+++24m0s ++
 a| [subs=-attributes]
-Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '24h' (24 hours).
 
 a|`OCIS_CACHE_SIZE` +
 `STORAGE_USERS_FILEMETADATA_CACHE_SIZE` +

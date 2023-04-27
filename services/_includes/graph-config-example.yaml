@@ -14,7 +14,7 @@ log:
 cache:
   store: memory
   nodes: []
-  database: graph
+  database: ocis
   table: roles
   ttl: 336h0m0s
   size: 0
