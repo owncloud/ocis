@@ -33,11 +33,11 @@ const (
 	// LanguageReadWriteName is the hardcoded setting name for the language read write permission
 	LanguageReadWriteName string = "language-readwrite"
 
-	// DisableEmailNotificationsPermissionID is the hardcoded setting UUID for the language read write permission
+	// DisableEmailNotificationsPermissionID is the hardcoded setting UUID for the disable email notifications permission
 	DisableEmailNotificationsPermissionID string = "ad5bb5e5-dc13-4cd3-9304-09a424564ea8"
-	// DisableEmailNotificationsPermissionName is the hardcoded setting name for the language read write permission
-	DisableEmailNotificationsPermissionName string = "disable-email-notifications"
-	// DisableEmailNotificationsPermissionDisplayName is the hardcoded setting name for the language read write permission
+	// DisableEmailNotificationsPermissionName is the hardcoded setting name for the disable email notifications permission
+	DisableEmailNotificationsPermissionName string = "EmailNotifications.ReadWriteDisabled"
+	// DisableEmailNotificationsPermissionDisplayName is the hardcoded setting name for the disable email notifications permission
 	DisableEmailNotificationsPermissionDisplayName string = "Disable Email Notifications"
 
 	// SetPersonalSpaceQuotaPermissionID is the hardcoded setting UUID for the set personal space quota permission
@@ -674,7 +674,7 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 			},
 			{
 				Id:          SettingUUIDProfileDisableNotifications,
-				Name:        "disable email notifications",
+				Name:        "disable-email-notifications",
 				DisplayName: "Disable Email Notifications",
 				Description: "Disable email notifications",
 				Resource: &settingsmsg.Resource{
