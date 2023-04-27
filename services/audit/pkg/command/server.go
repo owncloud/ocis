@@ -10,8 +10,12 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/go-micro/plugins/v4/events/natsjs"
+	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
+	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/audit/pkg/config"
 	"github.com/owncloud/ocis/v2/services/audit/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/audit/pkg/logging"
@@ -30,13 +34,17 @@ func Server(cfg *config.Config) *cli.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(c *cli.Context) error {
-			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			var (
+				gr     = run.Group{}
+				logger = logging.Configure(cfg.Service.Name, cfg.Log)
 
-			ctx := cfg.Context
-			if ctx == nil {
-				ctx = context.Background()
-			}
-			ctx, cancel := context.WithCancel(ctx)
+				ctx, cancel = func() (context.Context, context.CancelFunc) {
+					if cfg.Context == nil {
+						return context.WithCancel(context.Background())
+					}
+					return context.WithCancel(cfg.Context)
+				}()
+			)
 			defer cancel()
 
 			evtsCfg := cfg.Events
@@ -76,8 +84,35 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			svc.AuditLoggerFromConfig(ctx, cfg.Auditlog, evts, logger)
-			return nil
+			gr.Add(func() error {
+				svc.AuditLoggerFromConfig(ctx, cfg.Auditlog, evts, logger)
+				return nil
+			}, func(err error) {
+				logger.Error().
+					Err(err).
+					Msg("Shutting down server")
+				cancel()
+			})
+
+			{
+				server := debug.NewService(
+					debug.Logger(logger),
+					debug.Name(cfg.Service.Name),
+					debug.Version(version.GetString()),
+					debug.Address(cfg.Debug.Addr),
+					debug.Token(cfg.Debug.Token),
+					debug.Pprof(cfg.Debug.Pprof),
+					debug.Zpages(cfg.Debug.Zpages),
+					debug.Health(handlers.Health),
+					debug.Ready(handlers.Ready),
+				)
+
+				gr.Add(server.ListenAndServe, func(_ error) {
+					_ = server.Shutdown(ctx)
+					cancel()
+				})
+			}
+			return gr.Run()
 		},
 	}
 }
