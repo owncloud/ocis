@@ -178,3 +178,174 @@ Feature: user GDPR (General Data Protection Regulation) report
       }
     }
     """
+
+
+  Scenario: generate a GDPR report and check events when user uploads a file
+    Given user "Alice" has uploaded file with content "sample text" to "lorem.txt"
+    When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
+    And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
+    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    And the downloaded JSON content should contain event type "events.BytesReceived" in item 'events' and should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "event"
+      ],
+      "properties": {
+        "event" : {
+          "type": "object",
+          "required": [
+            "ExecutingUser",
+            "Filename",
+            "ResourceID",
+            "Filesize",
+            "UploadID",
+            "SpaceOwner"
+          ],
+          "properties": {
+            "ExecutingUser": {
+              "type": "object",
+              "required": [
+                "username"
+              ],
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "enum": ["Alice"]
+                }
+              }
+            },
+            "Filename": {
+              "type": "string",
+              "enum": ["lorem.txt"]
+            },
+            "Filesize": {
+              "type": "number",
+              "enum": [11]
+            },
+            "Quota": {
+              "type": ["number", "null"],
+              "enum": [null]
+            }
+          }
+        }
+      }
+    }
+    """
+    And the downloaded JSON content should contain event type "events.FileUploaded" in item 'events' and should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "event"
+      ],
+      "properties": {
+        "event" : {
+          "type": "object",
+          "required": [
+            "Executant",
+            "Owner",
+            "Ref",
+            "SpaceOwner"
+          ],
+          "properties": {
+            "Ref": {
+              "type": "object",
+              "required": [
+                "path"
+              ],
+              "properties": {
+                "path" : {
+                  "type": "string",
+                  "enum": ["./lorem.txt"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+    And the downloaded JSON content should contain event type "events.PostprocessingFinished" in item 'events' and should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "event"
+      ],
+      "properties": {
+        "event" : {
+          "type": "object",
+          "required": [
+            "ExecutingUser",
+            "Filename",
+            "Result"
+          ],
+          "properties": {
+            "ExecutingUser": {
+              "type": "object",
+              "required": [
+                "username"
+              ],
+              "properties": {
+                "username": {
+                  "type": "string",
+                  "enum": ["Alice"]
+                }
+              }
+            },
+            "Filename": {
+              "type": "string",
+              "enum": ["lorem.txt"]
+            },
+            "Result": {
+              "type": "object",
+              "required": [
+                "init"
+              ],
+              "properties": {
+                "init": {
+                  "type": "object",
+                  "required": [
+                    "ExecutingUser",
+                    "Filename",
+                    "ResourceID",
+                    "Filesize",
+                    "UploadID",
+                    "SpaceOwner"
+                  ],
+                  "properties": {
+                    "ExecutingUser": {
+                      "type": "object",
+                      "required": [
+                        "username"
+                      ],
+                      "properties": {
+                        "username": {
+                          "type": "string",
+                          "enum": ["Alice"]
+                        }
+                      }
+                    },
+                    "Filename": {
+                      "type": "string",
+                      "enum": ["lorem.txt"]
+                    },
+                    "Filesize": {
+                      "type": "number",
+                      "enum": [11]
+                    },
+                    "Quota": {
+                      "type": ["number", "null"],
+                      "enum": [null]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
