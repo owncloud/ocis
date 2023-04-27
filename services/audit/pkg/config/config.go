@@ -12,8 +12,9 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Log   *Log  `yaml:"log"`
-	Debug Debug `yaml:"debug"`
+	Tracing *Tracing `yaml:"tracing"`
+	Log     *Log     `yaml:"log"`
+	Debug   Debug    `yaml:"debug"`
 
 	Events   Events   `yaml:"events"`
 	Auditlog Auditlog `yaml:"auditlog"`
@@ -37,4 +38,12 @@ type Auditlog struct {
 	LogToFile    bool   `yaml:"log_to_file" env:"AUDIT_LOG_TO_FILE" desc:"Logs to file if true. Independent of the log to Stdout file option."`
 	FilePath     string `yaml:"filepath" env:"AUDIT_FILEPATH" desc:"Filepath to the logfile. Mandatory if LogToFile is true."`
 	Format       string `yaml:"format" env:"AUDIT_FORMAT" desc:"Log format. Using json is advised."`
+}
+
+// Tracing defines the available tracing configuration.
+type Tracing struct {
+	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;AUDIT_TRACING_ENABLED" desc:"Activates tracing."`
+	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;AUDIT_TRACING_TYPE" desc:"The type of tracing. Defaults to \"\", which is the same as \"jaeger\". Allowed tracing types are \"jaeger\" and \"\" as of now."`
+	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;AUDIT_TRACING_ENDPOINT" desc:"The endpoint of the tracing agent."`
+	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;AUDIT_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset."`
 }
