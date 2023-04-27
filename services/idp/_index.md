@@ -1,6 +1,6 @@
 ---
 title: IDP
-date: 2023-04-27T15:02:06.358729509Z
+date: 2023-04-27T15:23:14.323955482Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/idp
@@ -12,15 +12,10 @@ geekdocCollapseSection: true
 
 ## Abstract
 
-This service provides a builtin minimal OpenID Connect provider based on
-[LibreGraph Connect (lico)](https://github.com/libregraph/lico) for oCIS.
-It is mainly targeted at smaller installations. For larger setups it is
-recommended to replace IDP with and external OpenID Connect Provider.
-By default, it is configured to use the ocis IDM service as its LDAP backend for
-looking up and authenticating users. Other backends like an external LDAP
-server can be configured via a set of
-[enviroment variables](https://owncloud.dev/services/idp/configuration/#environment-variables).
-Note that translations provided by the IDP service are not maintained via ownCloud but part of the embedded vendor package: LibreGraph Connect Identifier.
+This service provides a builtin minimal OpenID Connect provider based on [LibreGraph Connect (lico)](https://github.com/libregraph/lico) for ocis.
+It is mainly targeted at smaller installations. For larger setups it is recommended to replace IDP with an external OpenID Connect Provider.
+By default, it is configured to use the ocis IDM service as its LDAP backend for looking up and authenticating users. Other backends like an external LDAP server can be configured via a set of [enviroment variables](https://owncloud.dev/services/idp/configuration/#environment-variables).
+Note that translations provided by the IDP service are not maintained via ownCloud but part of the embedded  [LibreGraph Connect Identifier](https://github.com/libregraph/lico/tree/master/identifier) package.
 
 ## Table of Contents
 
