@@ -629,13 +629,13 @@ func (fs *Decomposedfs) DeleteStorageSpace(ctx context.Context, req *provider.De
 			return err
 		}
 
-		// remove space metadata
-		if err := os.RemoveAll(fs.getSpaceRoot(spaceID)); err != nil {
+		// invalidate cache
+		if err := fs.lu.MetadataBackend().Purge(n.InternalPath()); err != nil {
 			return err
 		}
 
-		// invalidate cache
-		if err := fs.lu.MetadataBackend().Purge(n.InternalPath()); err != nil {
+		// remove space metadata
+		if err := os.RemoveAll(fs.getSpaceRoot(spaceID)); err != nil {
 			return err
 		}
 
