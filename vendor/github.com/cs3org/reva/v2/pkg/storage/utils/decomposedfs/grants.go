@@ -201,8 +201,6 @@ func (fs *Decomposedfs) RemoveGrant(ctx context.Context, ref *provider.Reference
 		return err
 	}
 
-	spaceGrant := ctx.Value(utils.SpaceGrant)
-
 	var attr string
 	if g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_GROUP {
 		attr = prefixes.GrantGroupAcePrefix + g.Grantee.GetGroupId().OpaqueId
@@ -214,16 +212,32 @@ func (fs *Decomposedfs) RemoveGrant(ctx context.Context, ref *provider.Reference
 		return err
 	}
 
-	// TODO we need an index for groups
-	if spaceGrant != nil && g.Grantee.Type != provider.GranteeType_GRANTEE_TYPE_GROUP {
-		// remove from user index
-		userIDPath := filepath.Join(fs.o.Root, "indexes", "by-user-id", g.Grantee.GetUserId().OpaqueId, grantNode.SpaceID)
-		if err := os.Remove(userIDPath); err != nil {
-			return err
+	if isShareGrant(ctx) {
+		// do not invalidate by user or group indexes
+		// FIXME we should invalidate the by-type index, but that requires reference counting
+	} else {
+		// invalidate space grant
+		switch {
+		case g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_USER:
+			// remove from user index
+			userIDPath := filepath.Join(fs.o.Root, "indexes", "by-user-id", g.Grantee.GetUserId().GetOpaqueId(), grantNode.SpaceID)
+			if err := os.Remove(userIDPath); err != nil {
+				return err
+			}
+		case g.Grantee.Type == provider.GranteeType_GRANTEE_TYPE_GROUP:
+			// remove from group index
+			userIDPath := filepath.Join(fs.o.Root, "indexes", "by-group-id", g.Grantee.GetGroupId().GetOpaqueId(), grantNode.SpaceID)
+			if err := os.Remove(userIDPath); err != nil {
+				return err
+			}
 		}
 	}
 
 	return fs.tp.Propagate(ctx, grantNode, 0)
+}
+
+func isShareGrant(ctx context.Context) bool {
+	return ctx.Value(utils.SpaceGrant) == nil
 }
 
 // UpdateGrant updates a grant on a resource
@@ -319,7 +333,7 @@ func (fs *Decomposedfs) storeGrant(ctx context.Context, n *node.Node, g *provide
 	}
 
 	// update the indexes only after successfully setting the grant
-	err := fs.updateIndexes(ctx, g.GetGrantee().GetUserId().GetOpaqueId(), spaceType, n.ID)
+	err := fs.updateIndexes(ctx, g.GetGrantee(), spaceType, n.ID)
 	if err != nil {
 		return err
 	}
