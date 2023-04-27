@@ -109,10 +109,7 @@ func (s eventsNotifier) render(ctx context.Context, template email.MessageTempla
 	// Render the Email Template for each user
 	recipientList := make([]recipient, len(granteeList))
 	for i, userID := range granteeList {
-		locale, err := s.getUserLang(ctx, userID)
-		if err != nil {
-			return nil, err
-		}
+		locale := s.getUserLang(ctx, userID)
 		grantee, err := s.getUserName(ctx, userID)
 		if err != nil {
 			return nil, err
@@ -137,9 +134,12 @@ func (s eventsNotifier) send(ctx context.Context, recipientList []recipient, sen
 	}
 }
 
-func (s eventsNotifier) getGranteeList(ctx context.Context, owner, u *user.UserId, g *group.GroupId) ([]*user.UserId, error) {
+func (s eventsNotifier) getGranteeList(ctx context.Context, executant, u *user.UserId, g *group.GroupId) ([]*user.UserId, error) {
 	switch {
 	case u != nil:
+		if s.disableEmails(ctx, u) {
+			return []*user.UserId{}, nil
+		}
 		return []*user.UserId{u}, nil
 	case g != nil:
 		res, err := s.gwClient.GetGroup(ctx, &group.GetGroupRequest{GroupId: g})
@@ -149,14 +149,22 @@ func (s eventsNotifier) getGranteeList(ctx context.Context, owner, u *user.UserI
 		if res.Status.Code != rpc.Code_CODE_OK {
 			return nil, errors.New("could not get group")
 		}
-		for i, userID := range res.GetGroup().GetMembers() {
-			// remove an executant from a list
-			if userID.GetOpaqueId() == owner.GetOpaqueId() {
-				res.Group.Members[i] = res.Group.Members[len(res.Group.Members)-1]
-				return res.Group.Members[:len(res.Group.Members)-1], nil
+
+		var grantees []*user.UserId
+		for _, userID := range res.GetGroup().GetMembers() {
+			// don't add the executant
+			if userID.GetOpaqueId() == executant.GetOpaqueId() {
+				continue
 			}
+
+			// don't add users who opted out
+			if s.disableEmails(ctx, userID) {
+				continue
+			}
+
+			grantees = append(grantees, userID)
 		}
-		return res.Group.Members, nil
+		return grantees, nil
 	default:
 		return nil, errors.New("need at least one non-nil grantee")
 	}
@@ -176,22 +184,34 @@ func (s eventsNotifier) getUserName(ctx context.Context, u *user.UserId) (string
 	return r.GetUser().GetDisplayName(), nil
 }
 
-func (s eventsNotifier) getUserLang(ctx context.Context, u *user.UserId) (string, error) {
+func (s eventsNotifier) getUserLang(ctx context.Context, u *user.UserId) string {
 	granteeCtx := metadata.Set(ctx, middleware.AccountID, u.OpaqueId)
 	if resp, err := s.valueService.GetValueByUniqueIdentifiers(granteeCtx,
 		&settingssvc.GetValueByUniqueIdentifiersRequest{
 			AccountUuid: u.OpaqueId,
 			SettingId:   defaults.SettingUUIDProfileLanguage,
-		}); err == nil {
-		if resp == nil {
-			return _defaultLocale, nil
-		}
-		val := resp.Value.GetValue().GetListValue().GetValues()
+		},
+	); err == nil {
+		val := resp.GetValue().GetValue().GetListValue().GetValues()
 		if len(val) > 0 && val[0] != nil {
-			return val[0].GetStringValue(), nil
+			return val[0].GetStringValue()
 		}
 	}
-	return _defaultLocale, nil
+	return _defaultLocale
+}
+
+func (s eventsNotifier) disableEmails(ctx context.Context, u *user.UserId) bool {
+	granteeCtx := metadata.Set(ctx, middleware.AccountID, u.OpaqueId)
+	if resp, err := s.valueService.GetValueByUniqueIdentifiers(granteeCtx,
+		&settingssvc.GetValueByUniqueIdentifiersRequest{
+			AccountUuid: u.OpaqueId,
+			SettingId:   defaults.SettingUUIDProfileDisableNotifications,
+		},
+	); err == nil {
+		return resp.GetValue().GetValue().GetBoolValue()
+
+	}
+	return false
 }
 
 func (s eventsNotifier) getResourceInfo(ctx context.Context, resourceID *provider.ResourceId, fieldmask *fieldmaskpb.FieldMask) (*provider.ResourceInfo, error) {

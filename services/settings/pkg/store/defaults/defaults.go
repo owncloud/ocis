@@ -33,6 +33,13 @@ const (
 	// LanguageReadWriteName is the hardcoded setting name for the language read write permission
 	LanguageReadWriteName string = "language-readwrite"
 
+	// DisableEmailNotificationsPermissionID is the hardcoded setting UUID for the disable email notifications permission
+	DisableEmailNotificationsPermissionID string = "ad5bb5e5-dc13-4cd3-9304-09a424564ea8"
+	// DisableEmailNotificationsPermissionName is the hardcoded setting name for the disable email notifications permission
+	DisableEmailNotificationsPermissionName string = "EmailNotifications.ReadWriteDisabled"
+	// DisableEmailNotificationsPermissionDisplayName is the hardcoded setting name for the disable email notifications permission
+	DisableEmailNotificationsPermissionDisplayName string = "Disable Email Notifications"
+
 	// SetPersonalSpaceQuotaPermissionID is the hardcoded setting UUID for the set personal space quota permission
 	SetPersonalSpaceQuotaPermissionID string = "4e6f9709-f9e7-44f1-95d4-b762d27b7896"
 	// SetPersonalSpaceQuotaPermissionName is the hardcoded setting name for the set personal space quota permission
@@ -75,6 +82,8 @@ const (
 
 	// SettingUUIDProfileLanguage is the hardcoded setting UUID for the user profile language
 	SettingUUIDProfileLanguage = "aa8cfbe5-95d4-4f7e-a032-c3c01f5f062f"
+	// SettingUUIDProfileDisableNotifications is the hardcoded setting UUID for the disable notifications setting
+	SettingUUIDProfileDisableNotifications = "33ffb5d6-cd07-4dc0-afb0-84f7559ae438"
 
 	// AccountManagementPermissionID is the hardcoded setting UUID for the account management permission
 	AccountManagementPermissionID string = "8e587774-d929-4215-910b-a317b1e80f73"
@@ -166,6 +175,21 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 					PermissionValue: &settingsmsg.Permission{
 						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
 						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+			{
+				Id:          DisableEmailNotificationsPermissionID,
+				Name:        DisableEmailNotificationsPermissionName,
+				DisplayName: DisableEmailNotificationsPermissionDisplayName,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SETTING,
+					Id:   SettingUUIDProfileDisableNotifications,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
 					},
 				},
 			},
@@ -427,6 +451,21 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 				},
 			},
 			{
+				Id:          DisableEmailNotificationsPermissionID,
+				Name:        DisableEmailNotificationsPermissionName,
+				DisplayName: DisableEmailNotificationsPermissionDisplayName,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SETTING,
+					Id:   SettingUUIDProfileDisableNotifications,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
+					},
+				},
+			},
+			{
 				Id:          SelfManagementPermissionID,
 				Name:        SelfManagementPermissionName,
 				DisplayName: "Self Management",
@@ -494,6 +533,21 @@ func generateBundleUserRole() *settingsmsg.Bundle {
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SETTING,
 					Id:   SettingUUIDProfileLanguage,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
+					},
+				},
+			},
+			{
+				Id:          DisableEmailNotificationsPermissionID,
+				Name:        DisableEmailNotificationsPermissionName,
+				DisplayName: DisableEmailNotificationsPermissionDisplayName,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SETTING,
+					Id:   SettingUUIDProfileDisableNotifications,
 				},
 				Value: &settingsmsg.Setting_PermissionValue{
 					PermissionValue: &settingsmsg.Permission{
@@ -578,6 +632,21 @@ func generateBundleGuestRole() *settingsmsg.Bundle {
 					},
 				},
 			},
+			{
+				Id:          DisableEmailNotificationsPermissionID,
+				Name:        DisableEmailNotificationsPermissionName,
+				DisplayName: DisableEmailNotificationsPermissionDisplayName,
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SETTING,
+					Id:   SettingUUIDProfileDisableNotifications,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_OWN,
+					},
+				},
+			},
 		},
 	}
 }
@@ -602,6 +671,16 @@ func generateBundleProfileRequest() *settingsmsg.Bundle {
 					Type: settingsmsg.Resource_TYPE_USER,
 				},
 				Value: &languageSetting,
+			},
+			{
+				Id:          SettingUUIDProfileDisableNotifications,
+				Name:        "disable-email-notifications",
+				DisplayName: "Disable Email Notifications",
+				Description: "Disable email notifications",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_USER,
+				},
+				Value: &settingsmsg.Setting_BoolValue{BoolValue: &settingsmsg.Bool{Default: false, Label: "disable notifications"}},
 			},
 		},
 	}
