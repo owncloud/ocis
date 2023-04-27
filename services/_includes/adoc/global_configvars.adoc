@@ -26,7 +26,67 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-The default role assignments the demo users should be setup.
+Flag to enable or disable the creation of the demo users.
+
+a| `IDM_TRACING_COLLECTOR`
+
+a| [subs=attributes+]
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/notifications.adoc[notifications] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
+
+a| `IDM_TRACING_ENABLED`
+
+a| [subs=attributes+]
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/notifications.adoc[notifications] +
+
+a| [subs=-attributes]
+++bool ++
+
+a| [subs=-attributes]
+++false ++
+
+a| [subs=-attributes]
+Activates tracing.
+
+a| `IDM_TRACING_ENDPOINT`
+
+a| [subs=attributes+]
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/notifications.adoc[notifications] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The endpoint of the tracing agent.
+
+a| `IDM_TRACING_TYPE`
+
+a| [subs=attributes+]
+* xref:{s-path}/idm.adoc[idm] +
+* xref:{s-path}/notifications.adoc[notifications] +
+
+a| [subs=-attributes]
+++string ++
+
+a| [subs=-attributes]
+++ ++
+
+a| [subs=-attributes]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
 
 a| `LDAP_BIND_DN`
 
@@ -163,7 +223,7 @@ a| [subs=-attributes]
 ++groupOfNames ++
 
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter like 'groupOfNames'.
+The object class to use for groups in the default group search filter ('groupOfNames').
 
 a| `LDAP_GROUP_SCHEMA_DISPLAYNAME`
 
@@ -213,7 +273,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique ID for groups. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
 
 a| `LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -229,7 +289,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs.
 
 a| `LDAP_GROUP_SCHEMA_MAIL`
 
@@ -385,7 +445,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-The object class to use for users in the default user search filter like 'inetOrgPerson'.
+The object class to use for users in the default user search filter ('inetOrgPerson').
 
 a| `LDAP_USER_SCHEMA_DISPLAYNAME`
 
@@ -419,7 +479,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
+LDAP Attribute to use as the unique id for users. This should be a stable globally unique ID like a UUID.
 
 a| `LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -435,7 +495,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.
+Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.
 
 a| `LDAP_USER_SCHEMA_MAIL`
 
@@ -576,7 +636,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Max number of entries to hold in the cache.
+The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
 a| `OCIS_CACHE_STORE`
 
@@ -632,13 +692,13 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
-++int ++
+++Duration ++
 
 a| [subs=-attributes]
-++0 ++
+++300ns ++
 
 a| [subs=-attributes]
-Max TTL in seconds for the resource info cache.
+Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -980,7 +1040,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether to verify the server TLS certificates.
+Allow insecure connections to the OIDC issuer.
 
 a| `OCIS_JWT_SECRET`
 
@@ -1225,7 +1285,7 @@ a| [subs=-attributes]
 ++groupOfNames ++
 
 a| [subs=-attributes]
-The object class to use for groups in the default group search filter like 'groupOfNames'.
+The object class to use for groups in the default group search filter ('groupOfNames').
 
 a| `OCIS_LDAP_GROUP_SCHEMA_DISPLAYNAME`
 
@@ -1275,7 +1335,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique ID for groups. This should be a stable globally unique ID like a UUID.
+LDAP Attribute to use as the unique id for groups. This should be a stable globally unique id (e.g. a UUID).
 
 a| `OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -1291,7 +1351,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs.
 
 a| `OCIS_LDAP_GROUP_SCHEMA_MAIL`
 
@@ -1447,7 +1507,7 @@ a| [subs=-attributes]
 ++inetOrgPerson ++
 
 a| [subs=-attributes]
-The object class to use for users in the default user search filter like 'inetOrgPerson'.
+The object class to use for users in the default user search filter ('inetOrgPerson').
 
 a| `OCIS_LDAP_USER_SCHEMA_DISPLAYNAME`
 
@@ -1481,7 +1541,7 @@ a| [subs=-attributes]
 ++ownclouduuid ++
 
 a| [subs=-attributes]
-LDAP Attribute to use as the unique id for users. This should be a stable globally unique id like a UUID.
+LDAP Attribute to use as the unique id for users. This should be a stable globally unique ID like a UUID.
 
 a| `OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING`
 
@@ -1497,7 +1557,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.
+Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.
 
 a| `OCIS_LDAP_USER_SCHEMA_MAIL`
 
@@ -1821,7 +1881,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider href for the openid-discovery relation.
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
 a| `OCIS_PERSISTENT_STORE`
 
@@ -1933,7 +1993,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.
+Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.
 
 a| `OCIS_SPACES_MAX_QUOTA`
 
@@ -1948,7 +2008,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-Set the global max quota value in bytes. A value of 0 equals unlimited. The value is provided via capabilities.
+Set a global max quota for spaces in bytes. A value of 0 equals unlimited. If not using the global OCIS_SPACES_MAX_QUOTA, you must define the FRONTEND_MAX_QUOTA in the frontend service.
 
 a| `OCIS_SYSTEM_USER_API_KEY`
 
@@ -2022,6 +2082,7 @@ a| [subs=attributes+]
 * xref:{s-path}/idp.adoc[idp] +
 * xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
@@ -2064,6 +2125,7 @@ a| [subs=attributes+]
 * xref:{s-path}/idp.adoc[idp] +
 * xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
@@ -2106,6 +2168,7 @@ a| [subs=attributes+]
 * xref:{s-path}/idp.adoc[idp] +
 * xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
@@ -2148,6 +2211,7 @@ a| [subs=attributes+]
 * xref:{s-path}/idp.adoc[idp] +
 * xref:{s-path}/invitations.adoc[invitations] +
 * xref:{s-path}/nats.adoc[nats] +
+* xref:{s-path}/notifications.adoc[notifications] +
 * xref:{s-path}/ocdav.adoc[ocdav] +
 * xref:{s-path}/ocs.adoc[ocs] +
 * xref:{s-path}/proxy.adoc[proxy] +
@@ -2187,7 +2251,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Transfer secret for signing file up- and download requests.
+The storage transfer secret.
 
 a| `OCIS_URL`
 
@@ -2218,7 +2282,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-The identity provider href for the openid-discovery relation.
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
 a| `REVA_GATEWAY`
 
@@ -2270,7 +2334,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Transfer secret for signing file up- and download requests.
+The storage transfer secret.
 
 a| `STORAGE_USERS_OCIS_ASYNC_UPLOADS`
 
