@@ -151,13 +151,13 @@ func (t *Tree) TouchFile(ctx context.Context, n *node.Node, markprocessing bool)
 		return errors.Wrap(err, "Decomposedfs: error creating node")
 	}
 
-	err = n.WriteAllNodeMetadata(ctx)
+	attributes := n.NodeMetadata()
+	if markprocessing {
+		attributes[prefixes.StatusPrefix] = []byte(node.ProcessingStatus)
+	}
+	err = n.SetXattrs(attributes, true)
 	if err != nil {
 		return err
-	}
-
-	if markprocessing {
-		_ = n.SetXattr(prefixes.StatusPrefix, []byte(node.ProcessingStatus))
 	}
 
 	// link child name to parent if it is new
@@ -194,10 +194,6 @@ func (t *Tree) CreateDir(ctx context.Context, n *node.Node) (err error) {
 	err = t.createDirNode(ctx, n)
 	if err != nil {
 		return
-	}
-
-	if err := n.SetTreeSize(0); err != nil {
-		return err
 	}
 
 	// make child appear in listings
@@ -907,7 +903,12 @@ func (t *Tree) createDirNode(ctx context.Context, n *node.Node) (err error) {
 		return errors.Wrap(err, "Decomposedfs: error creating node")
 	}
 
-	return n.WriteAllNodeMetadata(ctx)
+	attributes := n.NodeMetadata()
+	attributes[prefixes.TreesizeAttr] = []byte("0") // initialize as empty, TODO why bother? if it is not set we could treat it as 0?
+	if t.options.TreeTimeAccounting || t.options.TreeSizeAccounting {
+		attributes[prefixes.PropagationAttr] = []byte("1") // mark the node for propagation
+	}
+	return n.SetXattrs(attributes, true)
 }
 
 var nodeIDRegep = regexp.MustCompile(`.*/nodes/([^.]*).*`)
@@ -938,19 +939,21 @@ func (t *Tree) readRecycleItem(ctx context.Context, spaceID, key, path string) (
 	if err != nil {
 		return
 	}
-	recycleNode.SetType(t.lookup.TypeFromPath(recycleNode.InternalPath()))
+	recycleNode.SetType(t.lookup.TypeFromPath(deletedNodePath))
 
 	var attrBytes []byte
-	// lookup blobID in extended attributes
-	if attrBytes, err = backend.Get(deletedNodePath, prefixes.BlobIDAttr); err == nil {
-		recycleNode.BlobID = string(attrBytes)
-	} else {
-		return
-	}
+	if recycleNode.Type() == provider.ResourceType_RESOURCE_TYPE_FILE {
+		// lookup blobID in extended attributes
+		if attrBytes, err = backend.Get(deletedNodePath, prefixes.BlobIDAttr); err == nil {
+			recycleNode.BlobID = string(attrBytes)
+		} else {
+			return
+		}
 
-	// lookup blobSize in extended attributes
-	if recycleNode.Blobsize, err = backend.GetInt64(deletedNodePath, prefixes.BlobsizeAttr); err != nil {
-		return
+		// lookup blobSize in extended attributes
+		if recycleNode.Blobsize, err = backend.GetInt64(deletedNodePath, prefixes.BlobsizeAttr); err != nil {
+			return
+		}
 	}
 
 	// lookup parent id in extended attributes

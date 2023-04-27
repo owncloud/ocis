@@ -19,7 +19,6 @@
 package cache
 
 import (
-	"strings"
 	"time"
 )
 
@@ -40,15 +39,5 @@ func NewFileMetadataCache(store string, nodes []string, database, table string, 
 
 // RemoveMetadata removes a reference from the metadata cache
 func (c *fileMetadataCache) RemoveMetadata(path string) error {
-	keys, err := c.List()
-	if err != nil {
-		return err
-	}
-
-	for _, key := range keys {
-		if strings.HasPrefix(key, path) {
-			_ = c.Delete(key)
-		}
-	}
-	return nil
+	return c.s.Delete(path)
 }

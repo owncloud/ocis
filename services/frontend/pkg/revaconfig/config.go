@@ -4,6 +4,7 @@ import (
 	"net/url"
 	"path"
 	"strconv"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
@@ -146,20 +147,20 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 					"insecure":               true,
 				},
 				"ocs": map[string]interface{}{
-					"storage_registry_svc":         cfg.Reva.Address,
-					"share_prefix":                 cfg.OCS.SharePrefix,
-					"home_namespace":               cfg.OCS.HomeNamespace,
-					"resource_info_cache_ttl":      cfg.OCS.ResourceInfoCacheTTL,
-					"resource_info_cache_size":     cfg.OCS.ResourceInfoCacheSize,
-					"resource_info_cache_store":    cfg.OCS.ResourceInfoCacheType,
-					"resource_info_cache_nodes":    cfg.OCS.ResourceInfoCacheNodes,
-					"resource_info_cache_database": cfg.OCS.ResourceInfoCacheDatabase,
-					"resource_info_cache_table":    cfg.OCS.ResourceInfoCacheTable,
-					"prefix":                       cfg.OCS.Prefix,
-					"additional_info_attribute":    cfg.OCS.AdditionalInfoAttribute,
-					"machine_auth_apikey":          cfg.MachineAuthAPIKey,
-					"enable_denials":               cfg.OCS.EnableDenials,
-					"cache_warmup_driver":          cfg.OCS.CacheWarmupDriver,
+					"storage_registry_svc":      cfg.Reva.Address,
+					"share_prefix":              cfg.OCS.SharePrefix,
+					"home_namespace":            cfg.OCS.HomeNamespace,
+					"stat_cache_ttl":            cfg.OCS.StatCacheTTL / time.Second,
+					"stat_cache_size":           cfg.OCS.StatCacheSize,
+					"stat_cache_store":          cfg.OCS.StatCacheType,
+					"stat_cache_nodes":          cfg.OCS.StatCacheNodes,
+					"stat_cache_database":       cfg.OCS.StatCacheDatabase,
+					"stat_cache_table":          cfg.OCS.StatCacheTable,
+					"prefix":                    cfg.OCS.Prefix,
+					"additional_info_attribute": cfg.OCS.AdditionalInfoAttribute,
+					"machine_auth_apikey":       cfg.MachineAuthAPIKey,
+					"enable_denials":            cfg.OCS.EnableDenials,
+					"cache_warmup_driver":       cfg.OCS.CacheWarmupDriver,
 					"cache_warmup_drivers": map[string]interface{}{
 						"cbox": map[string]interface{}{
 							"db_username": cfg.OCS.CacheWarmupDrivers.CBOX.DBUsername,

@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -123,12 +124,12 @@ type OCS struct {
 	SharePrefix                          string             `yaml:"share_prefix" env:"FRONTEND_OCS_SHARE_PREFIX" desc:"Path prefix for shares as part of an ocis resource. Note that the path must start with '/'."`
 	HomeNamespace                        string             `yaml:"home_namespace" env:"FRONTEND_OCS_PERSONAL_NAMESPACE;FRONTEND_OCS_HOME_NAMESPACE" desc:"Homespace namespace identifier." deprecationVersion:"3.0" removalVersion:"4.0.0" deprecationInfo:"FRONTEND_OCS_HOME_NAMESPACE changing name for consistency" deprecationReplacement:"FRONTEND_OCS_PERSONAL_NAMESPACE"`
 	AdditionalInfoAttribute              string             `yaml:"additional_info_attribute" env:"FRONTEND_OCS_ADDITIONAL_INFO_ATTRIBUTE" desc:"Additional information attribute for the user like {{.Mail}}."`
-	ResourceInfoCacheType                string             `yaml:"resource_info_cache_type" env:"OCIS_CACHE_STORE;FRONTEND_OCS_RESOURCE_INFO_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
-	ResourceInfoCacheNodes               []string           `yaml:"resource_info_cache_nodes" env:"OCIS_CACHE_STORE_NODES;FRONTEND_OCS_RESOURCE_INFO_CACHE_STORE_NODES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`
-	ResourceInfoCacheDatabase            string             `yaml:"resource_info_cache_database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use."`
-	ResourceInfoCacheTable               string             `yaml:"resource_info_cache_table" env:"FRONTEND_OCS_RESOURCE_INFO_CACHE_TABLE" desc:"The database table the store should use."`
-	ResourceInfoCacheTTL                 int                `yaml:"resource_info_cache_ttl" env:"OCIS_CACHE_TTL;FRONTEND_OCS_RESOURCE_INFO_CACHE_TTL" desc:"Max TTL in seconds for the resource info cache."`
-	ResourceInfoCacheSize                int                `yaml:"resource_info_cache_size" env:"OCIS_CACHE_SIZE;FRONTEND_OCS_RESOURCE_INFO_CACHE_SIZE" desc:"Max number of entries to hold in the cache."`
+	StatCacheType                        string             `yaml:"stat_cache_type" env:"OCIS_CACHE_STORE;FRONTEND_OCS_STAT_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	StatCacheNodes                       []string           `yaml:"stat_cache_nodes" env:"OCIS_CACHE_STORE_NODES;FRONTEND_OCS_STAT_CACHE_STORE_NODES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`
+	StatCacheDatabase                    string             `yaml:"stat_cache_database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use."`
+	StatCacheTable                       string             `yaml:"stat_cache_table" env:"FRONTEND_OCS_STAT_CACHE_TABLE" desc:"The database table the store should use."`
+	StatCacheTTL                         time.Duration      `yaml:"stat_cache_ttl" env:"OCIS_CACHE_TTL;FRONTEND_OCS_STAT_CACHE_TTL" desc:"Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds)."`
+	StatCacheSize                        int                `yaml:"stat_cache_size" env:"OCIS_CACHE_SIZE;FRONTEND_OCS_STAT_CACHE_SIZE" desc:"Max number of entries to hold in the cache."`
 	CacheWarmupDriver                    string             `yaml:"cache_warmup_driver,omitempty"`  // not supported by the oCIS product, therefore not part of docs
 	CacheWarmupDrivers                   CacheWarmupDrivers `yaml:"cache_warmup_drivers,omitempty"` // not supported by the oCIS product, therefore not part of docs
 	EnableDenials                        bool               `yaml:"enable_denials" env:"FRONTEND_OCS_ENABLE_DENIALS" desc:"EXPERIMENTAL: enable the feature to deny access on folders."`

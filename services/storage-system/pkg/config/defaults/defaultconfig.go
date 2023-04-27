@@ -2,6 +2,7 @@ package defaults
 
 import (
 	"path/filepath"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -50,9 +51,10 @@ func DefaultConfig() *config.Config {
 				LockCycleDurationFactor: 30,
 			},
 		},
-		Cache: config.Cache{
+		FileMetadataCache: config.Cache{
 			Store:    "memory",
 			Database: "ocis",
+			TTL:      24 * 60 * time.Second,
 		},
 	}
 }

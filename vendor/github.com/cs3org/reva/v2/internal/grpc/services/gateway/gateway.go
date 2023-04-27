@@ -68,15 +68,21 @@ type config struct {
 	DataTransfersFolder          string                            `mapstructure:"data_transfers_folder"`
 	TokenManagers                map[string]map[string]interface{} `mapstructure:"token_managers"`
 	AllowedUserAgents            map[string][]string               `mapstructure:"allowed_user_agents"` // map[path][]user-agent
-	CacheStore                   string                            `mapstructure:"cache_store"`
-	CacheNodes                   []string                          `mapstructure:"cache_nodes"`
-	CacheDatabase                string                            `mapstructure:"cache_database"`
-	CreateHomeCacheTTL           int                               `mapstructure:"create_home_cache_ttl"`
-	CreateHomeCacheSize          int                               `mapstructure:"create_home_cache_size"`
-	ProviderCacheTTL             int                               `mapstructure:"provider_cache_ttl"`
-	ProviderCacheSize            int                               `mapstructure:"provider_cache_size"`
+	StatCacheStore               string                            `mapstructure:"stat_cache_store"`
+	StatCacheNodes               []string                          `mapstructure:"stat_cache_nodes"`
+	StatCacheDatabase            string                            `mapstructure:"stat_cache_database"`
 	StatCacheTTL                 int                               `mapstructure:"stat_cache_ttl"`
 	StatCacheSize                int                               `mapstructure:"stat_cache_size"`
+	CreateHomeCacheStore         string                            `mapstructure:"create_home_cache_store"`
+	CreateHomeCacheNodes         []string                          `mapstructure:"create_home_cache_nodes"`
+	CreateHomeCacheDatabase      string                            `mapstructure:"create_home_cache_database"`
+	CreateHomeCacheTTL           int                               `mapstructure:"create_home_cache_ttl"`
+	CreateHomeCacheSize          int                               `mapstructure:"create_home_cache_size"`
+	ProviderCacheStore           string                            `mapstructure:"provider_cache_store"`
+	ProviderCacheNodes           []string                          `mapstructure:"provider_cache_nodes"`
+	ProviderCacheDatabase        string                            `mapstructure:"provider_cache_database"`
+	ProviderCacheTTL             int                               `mapstructure:"provider_cache_ttl"`
+	ProviderCacheSize            int                               `mapstructure:"provider_cache_size"`
 	UseCommonSpaceRootShareLogic bool                              `mapstructure:"use_common_space_root_share_logic"`
 }
 
@@ -124,12 +130,28 @@ func (c *config) init() {
 	}
 
 	// caching needs to be explicitly enabled
-	if c.CacheStore == "" {
-		c.CacheStore = "noop"
+	if c.StatCacheStore == "" {
+		c.StatCacheStore = "noop"
 	}
 
-	if c.CacheDatabase == "" {
-		c.CacheDatabase = "reva"
+	if c.StatCacheDatabase == "" {
+		c.StatCacheDatabase = "reva"
+	}
+
+	if c.ProviderCacheStore == "" {
+		c.ProviderCacheStore = "noop"
+	}
+
+	if c.ProviderCacheDatabase == "" {
+		c.ProviderCacheDatabase = "reva"
+	}
+
+	if c.CreateHomeCacheStore == "" {
+		c.CreateHomeCacheStore = "noop"
+	}
+
+	if c.CreateHomeCacheDatabase == "" {
+		c.CreateHomeCacheDatabase = "reva"
 	}
 }
 
@@ -169,10 +191,10 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 		c:                        c,
 		dataGatewayURL:           *u,
 		tokenmgr:                 tokenManager,
-		statCache:                cache.GetStatCache(c.CacheStore, c.CacheNodes, c.CacheDatabase, "stat", time.Duration(c.StatCacheTTL)*time.Second, c.StatCacheSize),
-		providerCache:            cache.GetProviderCache(c.CacheStore, c.CacheNodes, c.CacheDatabase, "provider", time.Duration(c.ProviderCacheTTL)*time.Second, c.ProviderCacheSize),
-		createHomeCache:          cache.GetCreateHomeCache(c.CacheStore, c.CacheNodes, c.CacheDatabase, "createHome", time.Duration(c.CreateHomeCacheTTL)*time.Second, c.CreateHomeCacheSize),
-		createPersonalSpaceCache: cache.GetCreatePersonalSpaceCache(c.CacheStore, c.CacheNodes, c.CacheDatabase, "createPersonalSpace", time.Duration(c.CreateHomeCacheTTL)*time.Second, c.CreateHomeCacheSize),
+		statCache:                cache.GetStatCache(c.StatCacheStore, c.StatCacheNodes, c.StatCacheDatabase, "stat", time.Duration(c.StatCacheTTL)*time.Second, c.StatCacheSize),
+		providerCache:            cache.GetProviderCache(c.ProviderCacheStore, c.ProviderCacheNodes, c.ProviderCacheDatabase, "provider", time.Duration(c.ProviderCacheTTL)*time.Second, c.ProviderCacheSize),
+		createHomeCache:          cache.GetCreateHomeCache(c.CreateHomeCacheStore, c.CreateHomeCacheNodes, c.CreateHomeCacheDatabase, "createHome", time.Duration(c.CreateHomeCacheTTL)*time.Second, c.CreateHomeCacheSize),
+		createPersonalSpaceCache: cache.GetCreatePersonalSpaceCache(c.CreateHomeCacheStore, c.CreateHomeCacheNodes, c.CreateHomeCacheDatabase, "createPersonalSpace", time.Duration(c.CreateHomeCacheTTL)*time.Second, c.CreateHomeCacheSize),
 	}
 
 	return s, nil

@@ -1,6 +1,8 @@
 package defaults
 
 import (
+	"time"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
@@ -102,13 +104,13 @@ func DefaultConfig() *config.Config {
 			Prefix: "data",
 		},
 		OCS: config.OCS{
-			Prefix:                    "ocs",
-			SharePrefix:               "/Shares",
-			HomeNamespace:             "/users/{{.Id.OpaqueId}}",
-			AdditionalInfoAttribute:   "{{.Mail}}",
-			ResourceInfoCacheType:     "memory",
-			ResourceInfoCacheDatabase: "ocis",
-			ResourceInfoCacheTTL:      0,
+			Prefix:                  "ocs",
+			SharePrefix:             "/Shares",
+			HomeNamespace:           "/users/{{.Id.OpaqueId}}",
+			AdditionalInfoAttribute: "{{.Mail}}",
+			StatCacheType:           "noop",
+			StatCacheDatabase:       "ocis",
+			StatCacheTTL:            300 * time.Second,
 		},
 		Middleware: config.Middleware{
 			Auth: config.Auth{

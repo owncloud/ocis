@@ -101,28 +101,18 @@ func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.Cr
 		return nil, errors.Wrap(err, "Decomposedfs: error creating node")
 	}
 
-	if err := root.WriteAllNodeMetadata(ctx); err != nil {
-		return nil, err
-	}
-	var owner *userv1beta1.UserId
 	if req.GetOwner() != nil && req.GetOwner().GetId() != nil {
-		owner = req.GetOwner().GetId()
+		root.SetOwner(req.GetOwner().GetId())
 	} else {
-		owner = &userv1beta1.UserId{OpaqueId: spaceID, Type: userv1beta1.UserType_USER_TYPE_SPACE_OWNER}
-	}
-	if err := root.WriteOwner(owner); err != nil {
-		return nil, err
+		root.SetOwner(&userv1beta1.UserId{OpaqueId: spaceID, Type: userv1beta1.UserType_USER_TYPE_SPACE_OWNER})
 	}
 
-	err = fs.updateIndexes(ctx, req.GetOwner().GetId().GetOpaqueId(), req.Type, root.ID)
-	if err != nil {
-		return nil, err
-	}
+	metadata := node.Attributes{}
+	metadata.SetString(prefixes.OwnerIDAttr, root.Owner().GetOpaqueId())
+	metadata.SetString(prefixes.OwnerIDPAttr, root.Owner().GetIdp())
+	metadata.SetString(prefixes.OwnerTypeAttr, utils.UserTypeToString(root.Owner().GetType()))
 
-	metadata := make(node.Attributes, 6)
-
-	// always enable propagation on the storage space root
-	// mark the space root node as the end of propagation
+	// always mark the space root node as the end of propagation
 	metadata.SetString(prefixes.PropagationAttr, "1")
 	metadata.SetString(prefixes.NameAttr, req.Name)
 	metadata.SetString(prefixes.SpaceNameAttr, req.Name)
@@ -151,14 +141,20 @@ func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.Cr
 		metadata.SetString(prefixes.SpaceAliasAttr, alias)
 	}
 
+	// Write node
 	if err := root.SetXattrs(metadata, true); err != nil {
+		return nil, err
+	}
+
+	// Write index
+	err = fs.updateIndexes(ctx, req.GetOwner().GetId().GetOpaqueId(), req.Type, root.ID)
+	if err != nil {
 		return nil, err
 	}
 
 	ctx = context.WithValue(ctx, utils.SpaceGrant, struct{ SpaceType string }{SpaceType: req.Type})
 
 	if req.Type != _spaceTypePersonal {
-		u := ctxpkg.ContextMustGetUser(ctx)
 		if err := fs.AddGrant(ctx, &provider.Reference{
 			ResourceId: &provider.ResourceId{
 				SpaceId:  spaceID,
@@ -633,12 +629,17 @@ func (fs *Decomposedfs) DeleteStorageSpace(ctx context.Context, req *provider.De
 			return err
 		}
 
+		// invalidate cache
+		if err := fs.lu.MetadataBackend().Purge(n.InternalPath()); err != nil {
+			return err
+		}
+
 		// remove space metadata
 		if err := os.RemoveAll(fs.getSpaceRoot(spaceID)); err != nil {
 			return err
 		}
 
-		// FIXME remove space blobs
+		// TODO remove space blobs with s3 backend by adding a purge method to the Blobstore interface
 
 		return nil
 	}

@@ -1,6 +1,8 @@
 package defaults
 
 import (
+	"time"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/gateway/pkg/config"
@@ -37,11 +39,15 @@ func DefaultConfig() *config.Config {
 		DisableHomeCreationOnLogin: true,
 		TransferExpires:            24 * 60 * 60,
 		Cache: config.Cache{
-			Store:              "memory",
-			Database:           "ocis",
-			StatCacheTTL:       300,
-			ProviderCacheTTL:   300,
-			CreateHomeCacheTTL: 300,
+			StatCacheStore:          "noop",
+			StatCacheDatabase:       "ocis",
+			StatCacheTTL:            300 * time.Second,
+			ProviderCacheStore:      "noop",
+			ProviderCacheDatabase:   "ocis",
+			ProviderCacheTTL:        300 * time.Second,
+			CreateHomeCacheStore:    "noop",
+			CreateHomeCacheDatabase: "ocis",
+			CreateHomeCacheTTL:      300 * time.Second,
 		},
 
 		FrontendPublicURL: "https://localhost:9200",

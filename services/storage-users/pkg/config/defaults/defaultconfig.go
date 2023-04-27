@@ -90,12 +90,14 @@ func DefaultConfig() *config.Config {
 			EnableTLS: false,
 		},
 		StatCache: config.StatCache{
-			Store:    "memory",
+			Store:    "noop",
 			Database: "ocis",
+			TTL:      300 * time.Second,
 		},
 		FilemetadataCache: config.FilemetadataCache{
 			Store:    "memory",
 			Database: "ocis",
+			TTL:      24 * 60 * time.Second,
 		},
 		Tasks: config.Tasks{
 			PurgeTrashBin: config.PurgeTrashBin{
