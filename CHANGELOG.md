@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Enhancement - Add debug server to audit: [#6178](https://github.com/owncloud/ocis/pull/6178)
 * Enhancement - Add debug server to idm: [#6153](https://github.com/owncloud/ocis/pull/6153)
 * Enhancement - Open Debug endpoint for Notifications: [#5002](https://github.com/owncloud/ocis/issues/5002)
 * Enhancement - Disable Notifications: [#6137](https://github.com/owncloud/ocis/pull/6137)
