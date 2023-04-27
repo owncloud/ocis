@@ -36,6 +36,8 @@
 | PROXY_OIDC_JWKS_REFRESH_RATE_LIMIT | uint64 | 60 | Limits the rate in seconds at which refresh requests are performed for unknown keys. This is used to prevent malicious clients from imposing high network load on the IDP via ocis.|
 | PROXY_OIDC_JWKS_REFRESH_UNKNOWN_KID | bool | true | If set to 'true', the JWKS refresh request will occur every time an unknown KEY ID (KID) is seen. Always set a 'refresh_limit' when enabling this.|
 | PROXY_OIDC_REWRITE_WELLKNOWN | bool | false | Enables rewriting the /.well-known/openid-configuration to the configured OIDC issuer. Needed by the Desktop Client, Android Client and iOS Client to discover the OIDC provider.|
+| OCIS_OIDC_CLIENT_ID<br/>PROXY_OIDC_CLIENT_ID | string | web | OIDC client ID, which ownCloud Web uses. This client needs to be set up in your external IDP (has no effect when using the builtin IDP).|
+| PROXY_OIDC_SKIP_CLIENT_ID_CHECK | bool | false | If true will skip checking the configured client ID is present in audience claims. See following chapter for more details: https://openid.net/specs/openid-connect-core-1_0.html#IDToken|
 | OCIS_JWT_SECRET<br/>PROXY_JWT_SECRET | string |  | The secret to mint and validate JWT tokens.|
 | PROXY_ROLE_ASSIGNMENT_DRIVER | string | default | The mechanism that should be used to assign roles to user upon login. Supported values: 'default' or 'oidc'. 'default' will assign the role 'user' to users which don't have a role assigned at the time they login. 'oidc' will assign the role based on the value of a claim (configured via PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM) from the users OIDC claims.|
 | PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM | string | roles | The OIDC claim used to create the users role assignment.|

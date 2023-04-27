@@ -127,6 +127,8 @@ oidc:
     refresh_limit: 60
     refresh_unknown_kid: true
   rewrite_well_known: false
+  client_id: web
+  skip_client_id_check: false
 token_manager:
   jwt_secret: ""
 role_assignment:
