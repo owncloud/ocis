@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: Restoring space
   As a manager of space
   I want to be able to restore a disabled space

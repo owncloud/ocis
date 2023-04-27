@@ -10,7 +10,7 @@ Feature: resharing can be done on a reshared resource
       | Carol    |
       | David    |
 
-  @skipOnOcV10
+  
   Scenario: Reshared files can be still accessed if a user in the middle removes it.
     Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"

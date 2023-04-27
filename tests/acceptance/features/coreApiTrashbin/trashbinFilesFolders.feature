@@ -19,7 +19,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -35,7 +35,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -54,7 +54,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -75,7 +75,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -94,7 +94,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -130,7 +130,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -153,7 +153,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -170,7 +170,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -262,7 +262,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -281,7 +281,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -300,7 +300,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -323,7 +323,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | new      | -123     |
       | new      | 0.0      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path | username |
       | spaces   | dash-123 |
@@ -345,7 +345,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -365,7 +365,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -382,7 +382,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -419,7 +419,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -456,7 +456,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |

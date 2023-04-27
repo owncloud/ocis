@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: move folders
   As a user
   I want to be able to move and upload files/folders

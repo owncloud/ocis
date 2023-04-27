@@ -21,7 +21,7 @@ Feature: there can be only one exclusive lock on a resource
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |
@@ -48,7 +48,7 @@ Feature: there can be only one exclusive lock on a resource
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |
@@ -75,7 +75,7 @@ Feature: there can be only one exclusive lock on a resource
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |
@@ -102,7 +102,7 @@ Feature: there can be only one exclusive lock on a resource
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |

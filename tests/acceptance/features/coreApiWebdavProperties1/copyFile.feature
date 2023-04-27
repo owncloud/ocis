@@ -23,7 +23,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -39,7 +39,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -57,7 +57,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -119,7 +119,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -138,7 +138,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -156,7 +156,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -178,7 +178,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -202,7 +202,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -225,7 +225,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -249,7 +249,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -409,7 +409,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -435,7 +435,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -562,7 +562,7 @@ Feature: copy file
       | old         |
       | new         |
 
-  @skipOnOcV10 @personalSpace
+  @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -579,7 +579,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -595,7 +595,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -613,7 +613,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -725,7 +725,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -838,7 +838,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -859,7 +859,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -880,7 +880,7 @@ Feature: copy file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |

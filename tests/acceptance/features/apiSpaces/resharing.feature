@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: Resharing
   As a user
   I want to reshare resources

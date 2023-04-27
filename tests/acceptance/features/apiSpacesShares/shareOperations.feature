@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: sharing
   As a user
   I want to share resources with different permissions

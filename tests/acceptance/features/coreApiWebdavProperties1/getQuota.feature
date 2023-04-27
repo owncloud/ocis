@@ -19,7 +19,7 @@ Feature: get quota
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -35,7 +35,7 @@ Feature: get quota
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -62,7 +62,7 @@ Feature: get quota
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -82,7 +82,7 @@ Feature: get quota
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -104,7 +104,7 @@ Feature: get quota
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |

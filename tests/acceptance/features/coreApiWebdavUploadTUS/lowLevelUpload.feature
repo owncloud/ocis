@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: low level tests for upload of chunks
 
   Background:

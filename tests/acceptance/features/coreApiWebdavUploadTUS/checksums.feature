@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: checksums
 
   Background:

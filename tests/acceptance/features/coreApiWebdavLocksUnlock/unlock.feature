@@ -20,7 +20,7 @@ Feature: UNLOCK locked items
       | old      |
       | new      |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path |
       | spaces   |
@@ -65,7 +65,7 @@ Feature: UNLOCK locked items
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |

@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: Public can download folders from project space public link
   As a public
   I want to be able to download folder from public link

@@ -26,7 +26,7 @@ Feature: propagation of etags when deleting a file or folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -51,7 +51,7 @@ Feature: propagation of etags when deleting a file or folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -77,7 +77,7 @@ Feature: propagation of etags when deleting a file or folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -228,7 +228,7 @@ Feature: propagation of etags when deleting a file or folder
       | old         |
       | new         |
 
-  @skipOnOcV10 @personalSpace
+  @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -253,7 +253,7 @@ Feature: propagation of etags when deleting a file or folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |

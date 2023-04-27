@@ -25,7 +25,7 @@ Feature: PROPFIND file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
 
-  @smokeTest @skipOnBruteForceProtection @issue-brute_force_protection-112 @skipOnOcV10 @personalSpace
+  @smokeTest @skipOnBruteForceProtection @issue-brute_force_protection-112 @personalSpace
   Scenario: send PROPFIND requests to webDav endpoints as normal user with wrong password using the spaces WebDAV API
     When user "Alice" requests these endpoints with "PROPFIND" including body "doesnotmatter" using password "invalid" about user "Alice"
       | endpoint                                           |
@@ -45,7 +45,7 @@ Feature: PROPFIND file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
 
-  @smokeTest @skipOnBruteForceProtection @issue-brute_force_protection-112 @skipOnOcV10 @personalSpace
+  @smokeTest @skipOnBruteForceProtection @issue-brute_force_protection-112 @personalSpace
   Scenario: send PROPFIND requests to webDav endpoints as normal user with no password using the spaces WebDAV API
     When user "Alice" requests these endpoints with "PROPFIND" including body "doesnotmatter" using password "" about user "Alice"
       | endpoint                                           |
@@ -63,7 +63,7 @@ Feature: PROPFIND file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "404"
 
-  @skipOnOcV10 @personalSpace @issue-1347
+  @personalSpace @issue-1347
   Scenario: send PROPFIND requests to another user's webDav endpoints as normal user using the spaces WebDAV API
     When user "Brian" requests these endpoints with "PROPFIND" to get property "d:getetag" about user "Alice"
       | endpoint                                           |
@@ -83,7 +83,7 @@ Feature: PROPFIND file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
 
-  @skipOnOcV10 @personalSpace
+  @personalSpace
   Scenario: send PROPFIND requests to webDav endpoints using invalid username but correct password using the spaces WebDAV API
     When user "usero" requests these endpoints with "PROPFIND" including body "doesnotmatter" using the password of user "Alice"
       | endpoint                                           |
@@ -103,7 +103,7 @@ Feature: PROPFIND file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
 
-  @skipOnOcV10 @personalSpace
+  @personalSpace
   Scenario: send PROPFIND requests to webDav endpoints using valid password and username of different user using the spaces WebDAV API
     When user "Brian" requests these endpoints with "PROPFIND" including body "doesnotmatter" using the password of user "Alice"
       | endpoint                                           |
@@ -123,7 +123,7 @@ Feature: PROPFIND file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
 
-  @smokeTest @skipOnBruteForceProtection @issue-brute_force_protection-112 @skipOnOcV10 @personalSpace
+  @smokeTest @skipOnBruteForceProtection @issue-brute_force_protection-112 @personalSpace
   Scenario: send PROPFIND requests to webDav endpoints without any authentication using the spaces WebDAV API
     When a user requests these endpoints with "PROPFIND" with body "doesnotmatter" and no authentication about user "Alice"
       | endpoint                                           |

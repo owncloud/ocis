@@ -27,7 +27,7 @@ Feature: upload file
       | new         | /strängé file.txt |
       | new         | /s,a,m,p,l,e.txt  |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | file_name         |
       | spaces      | /upload.txt       |
@@ -48,7 +48,7 @@ Feature: upload file
       | new         | "C++ file.cpp" |
       | new         | "file #2.txt"  |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | file_name      |
       | spaces      | "C++ file.cpp" |
@@ -70,7 +70,7 @@ Feature: upload file
       | new         | " ?fi=le&%#2 . txt" |
       | new         | " # %ab ab?=ed "    |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | file_name           |
       | spaces      | "file ?2.txt"       |
@@ -92,7 +92,7 @@ Feature: upload file
       | new         | ",,,.txt"      |
       | new         | ",,,.,"        |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | file_name      |
       | spaces      | "sample,1.txt" |
@@ -119,7 +119,7 @@ Feature: upload file
       | new         | /नेपाली                          | नेपाली                        |
       | new         | /folder #2.txt                   | file #2.txt                   |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | folder_name     | file_name        |
       | spaces      | /strängé folder | strängé file.txt |
@@ -143,7 +143,7 @@ Feature: upload file
       | new         | /folder ?2.txt    | file ?2.txt  |
       | new         | /?fi=le&%#2 . txt | # %ab ab?=ed |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | folder_name       | file_name    |
       | spaces      | /folder ?2.txt    | file ?2.txt  |
@@ -161,7 +161,7 @@ Feature: upload file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -181,7 +181,7 @@ Feature: upload file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -208,7 +208,7 @@ Feature: upload file
       | new         | /upload...1.. | abc...txt.. |
       | new         | /...          | ...         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | folder_name   | file_name   |
       | spaces      | /upload.      | abc.        |
@@ -229,7 +229,7 @@ Feature: upload file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -247,7 +247,7 @@ Feature: upload file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -266,7 +266,7 @@ Feature: upload file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -285,7 +285,7 @@ Feature: upload file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -312,7 +312,7 @@ Feature: upload file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -328,7 +328,7 @@ Feature: upload file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |

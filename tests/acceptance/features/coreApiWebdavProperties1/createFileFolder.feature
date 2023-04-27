@@ -33,7 +33,7 @@ Feature: create files and folder
       | new         | /😀 🤖          |
       | new         | /new&folder     |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | folder_name |
       | spaces      | /upload         |
@@ -59,7 +59,7 @@ Feature: create files and folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -78,7 +78,7 @@ Feature: create files and folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -98,7 +98,7 @@ Feature: create files and folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -117,7 +117,7 @@ Feature: create files and folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -136,7 +136,7 @@ Feature: create files and folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -167,7 +167,7 @@ Feature: create files and folder
       | new         | /😀 🤖.txt       |
       | new         | /new&file.txt    |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | file_name        |
       | spaces      | /upload.txt      |

@@ -22,7 +22,7 @@ Feature: propagation of etags when creating folders
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -47,7 +47,7 @@ Feature: propagation of etags when creating folders
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -124,7 +124,7 @@ Feature: propagation of etags when creating folders
       | old         |
       | new         |
 
-  @skipOnOcV10 @personalSpace
+  @personalSpace
     Examples:
       | dav_version |
       | spaces      |

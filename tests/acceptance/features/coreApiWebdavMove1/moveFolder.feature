@@ -21,7 +21,7 @@ Feature: move (rename) folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -39,7 +39,7 @@ Feature: move (rename) folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -57,7 +57,7 @@ Feature: move (rename) folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -78,7 +78,7 @@ Feature: move (rename) folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -96,7 +96,7 @@ Feature: move (rename) folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -122,7 +122,7 @@ Feature: move (rename) folder
       | new         | /...          |
       | new         | /..upload     |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | folder_name   |
       | spaces      | /upload.      |
@@ -147,7 +147,7 @@ Feature: move (rename) folder
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |

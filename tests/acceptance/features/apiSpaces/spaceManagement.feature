@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: Space management
   As a user with space admin permission
   I want to be able to manage all existing project spaces

@@ -23,7 +23,7 @@ Feature: sharing
       | old      |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -154,7 +154,7 @@ Feature: sharing
       | old      |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |

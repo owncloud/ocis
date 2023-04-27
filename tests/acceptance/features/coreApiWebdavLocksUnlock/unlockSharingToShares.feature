@@ -28,7 +28,7 @@ Feature: UNLOCK locked items (sharing)
       | new      | shared     | /parent.txt        |
       | new      | exclusive  | /parent.txt        |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope | pending_share_path |
       | spaces   | shared     | /parent.txt        |
@@ -52,7 +52,7 @@ Feature: UNLOCK locked items (sharing)
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |
@@ -76,7 +76,7 @@ Feature: UNLOCK locked items (sharing)
       | new      | shared     | /parent.txt        |
       | new      | exclusive  | /parent.txt        |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope | pending_share_path |
       | spaces   | shared     | /parent.txt        |
@@ -100,7 +100,7 @@ Feature: UNLOCK locked items (sharing)
       | new      | shared     | /parent.txt        |
       | new      | exclusive  | /parent.txt        |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope | pending_share_path |
       | spaces   | shared     | /parent.txt        |
@@ -124,7 +124,7 @@ Feature: UNLOCK locked items (sharing)
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |

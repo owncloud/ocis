@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: download multiple resources bundled into an archive
   As a user
   I want to be able to download multiple items at once

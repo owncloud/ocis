@@ -10,7 +10,7 @@ Feature: PROPFIND
       | dav_path                      |
       | /remote.php/dav/files         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_path                      |
       | /remote.php/dav/spaces        |

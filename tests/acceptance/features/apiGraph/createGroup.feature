@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: create group
   As an admin
   I want to create a group

@@ -130,41 +130,6 @@ Feature: Restore deleted files/folders
       | old      |
       | new      |
 
-  @files_external-app-required @skipOnEncryptionType:user-keys @encryption-issue-42 @skip_on_objectstore
-  Scenario Outline: Deleting a file into external storage moves it to the trashbin and can be restored
-    Given using <dav-path> DAV path
-    And user "Alice" has created folder "/local_storage/tmp"
-    And user "Alice" has moved file "/textfile0.txt" to "/local_storage/tmp/textfile0.txt"
-    And user "Alice" has deleted file "/local_storage/tmp/textfile0.txt"
-    And as "Alice" the folder with original path "/local_storage/tmp/textfile0.txt" should exist in the trashbin
-    When user "Alice" restores the folder with original path "/local_storage/tmp/textfile0.txt" using the trashbin API
-    Then the HTTP status code should be "201"
-    And the following headers should match these regular expressions for user "Alice"
-      | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
-    And as "Alice" the folder with original path "/local_storage/tmp/textfile0.txt" should not exist in the trashbin
-    And the content of file "/local_storage/tmp/textfile0.txt" for user "Alice" should be "file to delete"
-    And user "Alice" should see the following elements
-      | /local_storage/                  |
-      | /local_storage/tmp/              |
-      | /local_storage/tmp/textfile0.txt |
-    Examples:
-      | dav-path |
-      | old      |
-      | new      |
-
-  @files_external-app-required @skipOnEncryptionType:user-keys @encryption-issue-42 @skip_on_objectstore
-  Scenario: Deleting an updated file into external storage moves it to the trashbin and can be restored
-    Given using old DAV path
-    And user "Alice" has created folder "/local_storage/tmp"
-    And user "Alice" has moved file "/textfile0.txt" to "/local_storage/tmp/textfile0.txt"
-    And user "Alice" has uploaded chunk file "1" of "1" with "AA" to "/local_storage/tmp/textfile0.txt"
-    And user "Alice" has deleted file "/local_storage/tmp/textfile0.txt"
-    And as "Alice" the folder with original path "/local_storage/tmp/textfile0.txt" should exist in the trashbin
-    When user "Alice" restores the folder with original path "/local_storage/tmp/textfile0.txt" using the trashbin API
-    Then the HTTP status code should be "201"
-    And as "Alice" the folder with original path "/local_storage/tmp/textfile0.txt" should not exist in the trashbin
-    And the content of file "/local_storage/tmp/textfile0.txt" for user "Alice" should be "AA"
-
   @smokeTest
   Scenario Outline: A deleted file cannot be restored by a different user
     Given using <dav-path> DAV path
