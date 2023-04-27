@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"reflect"
 	"sort"
 	"strings"
 
@@ -127,6 +128,13 @@ func (g Graph) PatchGroup(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not change group: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %s", err.Error()))
+		return
+	}
+
+	if reflect.ValueOf(*changes).IsZero() {
+		logger.Debug().Interface("body", r.Body).Msg("ignoring empyt request body")
+		render.Status(r, http.StatusNoContent)
+		render.NoContent(w, r)
 		return
 	}
 
