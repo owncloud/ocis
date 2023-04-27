@@ -2,7 +2,7 @@
 dn: uid=einstein,ou=users,dc=owncloud,dc=com
 objectClass: inetOrgPerson
 objectClass: organizationalPerson
-objectClass: ownCloud
+objectClass: ownCloudUser
 objectClass: person
 objectClass: posixAccount
 objectClass: top
@@ -22,7 +22,7 @@ userPassword:: e1NTSEF9TXJEcXpFNGdKbXZxbVRVTGhvWEZ1VzJBbkV3NWFLK3J3WTIvbHc9PQ==
 dn: uid=marie,ou=users,dc=owncloud,dc=com
 objectClass: inetOrgPerson
 objectClass: organizationalPerson
-objectClass: ownCloud
+objectClass: ownCloudUser
 objectClass: person
 objectClass: posixAccount
 objectClass: top
@@ -42,7 +42,7 @@ userPassword:: e1NTSEF9UmFvQWs3TU9jRHBIUWY3bXN3MGhHNnVraFZQWnRIRlhOSUNNZEE9PQ==
 dn: uid=richard,ou=users,dc=owncloud,dc=com
 objectClass: inetOrgPerson
 objectClass: organizationalPerson
-objectClass: ownCloud
+objectClass: ownCloudUser
 objectClass: person
 objectClass: posixAccount
 objectClass: top
@@ -62,7 +62,7 @@ userPassword:: e1NTSEF9Z05LZTRreHdmOGRUREY5eHlhSmpySTZ3MGxSVUM1d1RGcWROTVE9PQ==
 dn: uid=moss,ou=users,dc=owncloud,dc=com
 objectClass: inetOrgPerson
 objectClass: organizationalPerson
-objectClass: ownCloud
+objectClass: ownCloudUser
 objectClass: person
 objectClass: posixAccount
 objectClass: top
@@ -82,7 +82,7 @@ userPassword:: e1NTSEF9N0hEdTRoMkFDVExFWWt4U0RtSDZVQjhmUlpKRExDZDc=
 dn: uid=admin,ou=users,dc=owncloud,dc=com
 objectClass: inetOrgPerson
 objectClass: organizationalPerson
-objectClass: ownCloud
+objectClass: ownCloudUser
 objectClass: person
 objectClass: posixAccount
 objectClass: top
