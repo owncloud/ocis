@@ -1360,4 +1360,37 @@ class GraphHelper {
 			self::getRequestHeaders()
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $userId
+	 * @param string $path
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function generateGDPRReport(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $userId,
+		string $path
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users/' . $userId . '/exportPersonalData');
+		// this payload is the storage location of the report generated
+		$payload['storageLocation'] = $path;
+		return HttpRequestHelper::sendRequest(
+			$url,
+			$xRequestId,
+			"POST",
+			$user,
+			$password,
+			self::getRequestHeaders(),
+			\json_encode($payload)
+		);
+	}
 }
