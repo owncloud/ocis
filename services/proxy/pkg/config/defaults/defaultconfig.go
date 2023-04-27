@@ -53,7 +53,6 @@ func DefaultConfig() *config.Config {
 				RefreshTimeout:    10, // seconds
 				RefreshUnknownKID: true,
 			},
-			ClientID: "web",
 		},
 		PolicySelector: nil,
 		RoleAssignment: config.RoleAssignment{
