@@ -98,22 +98,6 @@ Feature: upload to a public link share
     When the public uploads file "test.txt" with content "test-file" using the new public WebDAV API
     Then the HTTP status code should be "507"
 
-  @issue-1328
-  Scenario: Uploading file to a public shared folder does not work when allow public uploads has been disabled before sharing and again enabled after sharing the folder with public API
-    And user "Alice" has created a public link share with settings
-      | path | FOLDER |
-    When the public uploads file "test.txt" with content "test-file" using the new public WebDAV API
-    And the HTTP status code should be "403"
-
-  @issue-1328
-  Scenario: Uploading file to a public shared folder works when allow public uploads has been disabled and again enabled after sharing the folder with public API
-    Given user "Alice" has created a public link share with settings
-      | path        | FOLDER |
-      | permissions | create |
-    When the public uploads file "test.txt" with content "test-file" using the new public WebDAV API
-    Then the HTTP status code should be "201"
-    And the content of file "/FOLDER/test.txt" for user "Alice" should be "test-file"
-
   @smokeTest
   Scenario: Uploading to a public upload-write and no edit and no overwrite share with public API
     Given user "Alice" has created a public link share with settings

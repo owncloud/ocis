@@ -65,7 +65,7 @@ Feature: search sharees
       | search   | sharee |
       | itemType | file   |
     Then the OCS status code should be "<ocs-status>"
-    And the HTTP status code should be "<http-status>"
+    And the HTTP status code should be "200"
     And the "exact users" sharees returned should be empty
     And the "users" sharees returned should be
       | Sharee One | 0 | sharee1 |
@@ -76,9 +76,9 @@ Feature: search sharees
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
     Examples:
-      | ocs-api-version | ocs-status | http-status |
-      | 1               | 100        | 200         |
-      | 2               | 200        | 200         |
+      | ocs-api-version | ocs-status |
+      | 1               | 100        |
+      | 2               | 200        |
 
 
   Scenario Outline: search with exact match
