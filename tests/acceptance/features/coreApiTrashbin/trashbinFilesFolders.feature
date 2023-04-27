@@ -158,7 +158,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | spaces   |
 
-  @local_storage @files_external-app-required @skipOnEncryptionType:user-keys @encryption-issue-42 @skip_on_objectstore
+  @files_external-app-required @skipOnEncryptionType:user-keys @encryption-issue-42 @skip_on_objectstore
   Scenario Outline: Deleting a folder into external storage moves it to the trashbin
     Given using <dav-path> DAV path
     And user "Alice" has created folder "/local_storage/tmp"

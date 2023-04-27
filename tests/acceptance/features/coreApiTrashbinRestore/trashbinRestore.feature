@@ -130,7 +130,7 @@ Feature: Restore deleted files/folders
       | old      |
       | new      |
 
-  @local_storage @files_external-app-required @skipOnEncryptionType:user-keys @encryption-issue-42 @skip_on_objectstore
+  @files_external-app-required @skipOnEncryptionType:user-keys @encryption-issue-42 @skip_on_objectstore
   Scenario Outline: Deleting a file into external storage moves it to the trashbin and can be restored
     Given using <dav-path> DAV path
     And user "Alice" has created folder "/local_storage/tmp"
@@ -152,7 +152,7 @@ Feature: Restore deleted files/folders
       | old      |
       | new      |
 
-  @local_storage @files_external-app-required @skipOnEncryptionType:user-keys @encryption-issue-42 @skip_on_objectstore
+  @files_external-app-required @skipOnEncryptionType:user-keys @encryption-issue-42 @skip_on_objectstore
   Scenario: Deleting an updated file into external storage moves it to the trashbin and can be restored
     Given using old DAV path
     And user "Alice" has created folder "/local_storage/tmp"

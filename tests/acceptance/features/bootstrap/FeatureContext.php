@@ -3669,20 +3669,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * After Scenario. restore trusted servers
-	 *
-	 * @AfterScenario @federation-app-required
-	 *
-	 * @return void
-	 */
-	public function restoreTrustedServersAfterScenario(): void {
-		$this->restoreTrustedServers('LOCAL');
-		if ($this->federatedServerExists()) {
-			$this->restoreTrustedServers('REMOTE');
-		}
-	}
-
-	/**
 	 * @param string $sourceUser
 	 * @param string $targetUser
 	 *
@@ -3815,21 +3801,6 @@ class FeatureContext extends BehatVariablesContext {
 			$body = '';
 		}
 		return $body;
-	}
-
-	/**
-	 * Before Scenario to Save trusted Servers
-	 *
-	 * @BeforeScenario @federation-app-required
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function setInitialTrustedServersBeforeScenario(): void {
-		$this->initialTrustedServer = [
-			'LOCAL' => $this->getTrustedServers(),
-			'REMOTE' => $this->getTrustedServers('REMOTE')
-		];
 	}
 
 	/**
