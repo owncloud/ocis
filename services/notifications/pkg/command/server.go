@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -10,9 +11,13 @@ import (
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-micro/plugins/v4/events/natsjs"
+	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/crypto"
+	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/config"
@@ -33,6 +38,36 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+
+			gr := run.Group{}
+
+			ctx, cancel := func() (context.Context, context.CancelFunc) {
+				if cfg.Context == nil {
+					return context.WithCancel(context.Background())
+				}
+				return context.WithCancel(cfg.Context)
+			}()
+
+			defer cancel()
+
+			{
+				server := debug.NewService(
+					debug.Logger(logger),
+					debug.Name(cfg.Service.Name),
+					debug.Version(version.GetString()),
+					debug.Address(cfg.Debug.Addr),
+					debug.Token(cfg.Debug.Token),
+					debug.Pprof(cfg.Debug.Pprof),
+					debug.Zpages(cfg.Debug.Zpages),
+					debug.Health(handlers.Health),
+					debug.Ready(handlers.Ready),
+				)
+
+				gr.Add(server.ListenAndServe, func(_ error) {
+					_ = server.Shutdown(ctx)
+					cancel()
+				})
+			}
 
 			// evs defines a list of events to subscribe to
 			evs := []events.Unmarshaller{
@@ -97,7 +132,12 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 			valueService := settingssvc.NewValueService("com.owncloud.api.settings", grpc.DefaultClient())
 			svc := service.NewEventsNotifier(evts, channel, logger, gwclient, valueService, cfg.Notifications.MachineAuthAPIKey, cfg.Notifications.EmailTemplatePath, cfg.WebUIURL)
-			return svc.Run()
+
+			gr.Add(svc.Run, func(error) {
+				cancel()
+			})
+
+			return gr.Run()
 		},
 	}
 }

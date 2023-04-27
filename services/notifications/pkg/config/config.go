@@ -12,8 +12,9 @@ type Config struct {
 
 	Service Service `yaml:"-"`
 
-	Log   *Log  `yaml:"log"`
-	Debug Debug `yaml:"debug"`
+	Tracing *Tracing `yaml:"tracing"`
+	Log     *Log     `yaml:"log"`
+	Debug   Debug    `yaml:"debug"`
 
 	WebUIURL string `yaml:"ocis_url" env:"OCIS_URL;NOTIFICATIONS_WEB_UI_URL" desc:"The public facing URL of the oCIS Web UI, used e.g. when sending notification eMails"`
 
@@ -53,4 +54,12 @@ type Events struct {
 	TLSInsecure          bool   `yaml:"tls_insecure" env:"OCIS_INSECURE;NOTIFICATIONS_EVENTS_TLS_INSECURE" desc:"Whether to verify the server TLS certificates."`
 	TLSRootCACertificate string `yaml:"tls_root_ca_certificate" env:"NOTIFICATIONS_EVENTS_TLS_ROOT_CA_CERTIFICATE" desc:"The root CA certificate used to validate the server's TLS certificate. If provided NOTIFICATIONS_EVENTS_TLS_INSECURE will be seen as false."`
 	EnableTLS            bool   `yaml:"enable_tls" env:"OCIS_EVENTS_ENABLE_TLS;NOTIFICATIONS_EVENTS_ENABLE_TLS" desc:"Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services.."`
+}
+
+// Tracing defines the available tracing configuration.
+type Tracing struct {
+	Enabled   bool   `yaml:"enabled" env:"OCIS_TRACING_ENABLED;IDM_TRACING_ENABLED" desc:"Activates tracing."`
+	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;IDM_TRACING_TYPE" desc:"The type of tracing. Defaults to \"\", which is the same as \"jaeger\". Allowed tracing types are \"jaeger\" and \"\" as of now."`
+	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;IDM_TRACING_ENDPOINT" desc:"The endpoint of the tracing agent."`
+	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;IDM_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset."`
 }
