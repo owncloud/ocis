@@ -54,6 +54,8 @@ func DefaultConfig() *config.Config {
 			WebDavPath:   "/dav/spaces/",
 			DefaultQuota: "1000000000",
 			// 30 minutes
+			ExtendedSpacePropertiesCacheTTL: 1800,
+			// 30 minutes
 			GroupsCacheTTL: 1800,
 			// 30 minutes
 			UsersCacheTTL: 1800,

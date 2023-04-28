@@ -215,8 +215,20 @@ func (g Graph) getPathForResource(ctx context.Context, id storageprovider.Resour
 	return res.Path, err
 }
 
-// getExtendedSpaceProperties reads properties from the opaque and transforms them into driveItems
-func (g Graph) getExtendedSpaceProperties(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace) []libregraph.DriveItem {
+// getSpecialDriveItems reads properties from the opaque and transforms them into driveItems
+func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace) []libregraph.DriveItem {
+
+	// if the root is older or equal to our cache we can reuse the cached extended spaces properties
+	if entry := g.specialDriveItemsCache.Get(spaceRootStatKey(space.Root)); entry != nil {
+		if spe, ok := entry.Value().(specialDriveItemEntry); ok {
+			if spe.rootMtime != nil && space.Mtime != nil {
+				if spe.rootMtime.Seconds >= space.Mtime.Seconds { // second precision is good enough
+					return spe.specialDriveItems
+				}
+			}
+		}
+	}
+
 	var spaceItems []libregraph.DriveItem
 	if space.Opaque == nil {
 		return nil
@@ -235,7 +247,28 @@ func (g Graph) getExtendedSpaceProperties(ctx context.Context, baseURL *url.URL,
 			}
 		}
 	}
+
+	// cache properties
+	spacePropertiesEntry := specialDriveItemEntry{
+		specialDriveItems: spaceItems,
+		rootMtime:         space.Mtime,
+	}
+	g.specialDriveItemsCache.Set(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL))
+
 	return spaceItems
+}
+
+// generates a space root stat cache key used to detect changes in a space
+func spaceRootStatKey(id *storageprovider.ResourceId) string {
+	if id == nil {
+		return ""
+	}
+	return id.StorageId + "$" + id.SpaceId + "!" + id.OpaqueId
+}
+
+type specialDriveItemEntry struct {
+	specialDriveItems []libregraph.DriveItem
+	rootMtime         *types.Timestamp
 }
 
 func (g Graph) getSpecialDriveItem(ctx context.Context, id storageprovider.ResourceId, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
