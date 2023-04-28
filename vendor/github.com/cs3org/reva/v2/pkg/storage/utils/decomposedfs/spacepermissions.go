@@ -3,11 +3,13 @@ package decomposedfs
 import (
 	"context"
 
+	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3permissions "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"google.golang.org/grpc"
 )
 
@@ -70,12 +72,12 @@ func (p Permissions) ListAllSpaces(ctx context.Context) bool {
 }
 
 // ListSpacesOfUser returns true when the user is allowed to list the spaces of the given user
-func (p Permissions) ListSpacesOfUser(ctx context.Context, userid string) bool {
-	switch userid {
-	case userIDAny:
+func (p Permissions) ListSpacesOfUser(ctx context.Context, userid *userv1beta1.UserId) bool {
+	switch {
+	case userid == nil:
 		// there is no filter
 		return true // TODO: is `true` actually correct here? Shouldn't we check for ListAllSpaces too?
-	case ctxpkg.ContextMustGetUser(ctx).GetId().GetOpaqueId():
+	case utils.UserIDEqual(ctxpkg.ContextMustGetUser(ctx).GetId(), userid):
 		return true
 	default:
 		return p.ListAllSpaces(ctx)

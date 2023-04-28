@@ -1046,19 +1046,46 @@ func (n *Node) ReadUserPermissions(ctx context.Context, u *userpb.User) (ap prov
 
 // IsDenied checks if the node was denied to that user
 func (n *Node) IsDenied(ctx context.Context) bool {
-	u := ctxpkg.ContextMustGetUser(ctx)
-	userace := prefixes.GrantUserAcePrefix + u.Id.OpaqueId
-	g, err := n.ReadGrant(ctx, userace)
-	switch {
-	case err == nil:
-		// If all permissions are set to false we have a deny grant
-		return grants.PermissionsEqual(g.Permissions, &provider.ResourcePermissions{})
-	case metadata.IsAttrUnset(err):
-		return false
-	default:
+	gs, err := n.ListGrants(ctx)
+	if err != nil {
 		// be paranoid, resource is denied
 		return true
 	}
+
+	u := ctxpkg.ContextMustGetUser(ctx)
+	isExecutant := func(g *provider.Grantee) bool {
+		switch g.GetType() {
+		case provider.GranteeType_GRANTEE_TYPE_USER:
+			return g.GetUserId().GetOpaqueId() == u.GetId().GetOpaqueId()
+		case provider.GranteeType_GRANTEE_TYPE_GROUP:
+			// check gid
+			gid := g.GetGroupId().GetOpaqueId()
+			for _, group := range u.Groups {
+				if gid == group {
+					return true
+				}
+
+			}
+			return false
+		default:
+			return false
+		}
+
+	}
+
+	for _, g := range gs {
+		if !isExecutant(g.Grantee) {
+			continue
+		}
+
+		if grants.PermissionsEqual(g.Permissions, &provider.ResourcePermissions{}) {
+			// resource is denied
+			return true
+		}
+	}
+
+	// no deny grants
+	return false
 }
 
 // ListGrantees lists the grantees of the current node

@@ -90,6 +90,7 @@ var _ = Describe("Graph", func() {
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.GetDrives(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
@@ -102,6 +103,7 @@ var _ = Describe("Graph", func() {
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/drives", nil)
+				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.GetAllDrives(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
@@ -131,6 +133,7 @@ var _ = Describe("Graph", func() {
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.GetDrives(rr, r)
 
@@ -201,6 +204,7 @@ var _ = Describe("Graph", func() {
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?$orderby=name%20asc", nil)
+				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.GetDrives(rr, r)
 
@@ -281,6 +285,7 @@ var _ = Describe("Graph", func() {
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.GetDrives(rr, r)
 
@@ -320,6 +325,7 @@ var _ = Describe("Graph", func() {
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?$orderby=owner%20asc", nil)
+				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.GetDrives(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusBadRequest))
@@ -361,6 +367,7 @@ var _ = Describe("Graph", func() {
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(nil, errors.New("transport error"))
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives)", nil)
+				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.GetDrives(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusInternalServerError))
@@ -378,6 +385,7 @@ var _ = Describe("Graph", func() {
 					StorageSpaces: []*provider.StorageSpace{}}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives)", nil)
+				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.GetDrives(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusInternalServerError))
@@ -395,6 +403,7 @@ var _ = Describe("Graph", func() {
 					StorageSpaces: []*provider.StorageSpace{}}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives)", nil)
+				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.GetDrives(rr, r)
 				Expect(rr.Code).To(Equal(http.StatusOK))
@@ -430,6 +439,7 @@ var _ = Describe("Graph", func() {
 				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives", nil)
+				r = r.WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.GetDrives(rr, r)
 
@@ -469,7 +479,7 @@ var _ = Describe("Graph", func() {
 				r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/drives", bytes.NewBuffer(jsonBody)).WithContext(ctx)
 				rr := httptest.NewRecorder()
 				svc.CreateDrive(rr, r)
-				Expect(rr.Code).To(Equal(http.StatusUnauthorized))
+				Expect(rr.Code).To(Equal(http.StatusForbidden))
 
 				body, _ := io.ReadAll(rr.Body)
 				var libreError libregraph.OdataError

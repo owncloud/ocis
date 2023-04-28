@@ -91,6 +91,20 @@ func (g Graph) getDrives(w http.ResponseWriter, r *http.Request, unrestricted bo
 		errorcode.NotSupported.Render(w, r, http.StatusNotImplemented, err.Error())
 		return
 	}
+	if !unrestricted {
+		user, ok := revactx.ContextGetUser(r.Context())
+		if !ok {
+			logger.Debug().Msg("could not create drive: invalid user")
+			errorcode.NotAllowed.Render(w, r, http.StatusUnauthorized, "invalid user")
+			return
+		}
+		filters = append(filters, &storageprovider.ListStorageSpacesRequest_Filter{
+			Type: storageprovider.ListStorageSpacesRequest_Filter_TYPE_USER,
+			Term: &storageprovider.ListStorageSpacesRequest_Filter_User{
+				User: user.GetId(),
+			},
+		})
+	}
 
 	logger.Debug().
 		Interface("filters", filters).
@@ -240,7 +254,7 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 	if !canCreateSpace {
 		logger.Debug().Bool("cancreatespace", canCreateSpace).Msg("could not create drive: insufficient permissions")
 		// if the permission is not existing for the user in context we can assume we don't have it. Return 401.
-		errorcode.NotAllowed.Render(w, r, http.StatusUnauthorized, "insufficient permissions to create a space.")
+		errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "insufficient permissions to create a space.")
 		return
 	}
 

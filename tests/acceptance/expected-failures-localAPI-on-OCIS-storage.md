@@ -146,8 +146,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/removeUserFromGroup.feature:192](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/removeUserFromGroup.feature#L192)
 - [apiGraph/removeUserFromGroup.feature:193](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/removeUserFromGroup.feature#L193)
 - [apiGraph/removeUserFromGroup.feature:194](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/removeUserFromGroup.feature#L194)
-- [apiSpaces/createSpace.feature:18](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/createSpace.feature#L18)
-- [apiSpaces/createSpace.feature:19](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/createSpace.feature#L19)
 
 #### [API requests for a non-existent resources should return 404](https://github.com/owncloud/ocis/issues/5939)
 - [apiGraph/addUserToGroup.feature:202](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L202)

@@ -57,6 +57,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"github.com/jellydator/ttlcache/v2"
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
@@ -95,6 +96,8 @@ type Decomposedfs struct {
 	chunkHandler *chunking.ChunkHandler
 	stream       events.Stream
 	cache        cache.StatCache
+
+	UserCache *ttlcache.Cache
 }
 
 // NewDefault returns an instance with default components
@@ -160,6 +163,7 @@ func New(o *options.Options, lu *lookup.Lookup, p Permissions, tp Tree, es event
 		chunkHandler: chunking.NewChunkHandler(filepath.Join(o.Root, "uploads")),
 		stream:       es,
 		cache:        cache.GetStatCache(o.StatCache.Store, o.StatCache.Nodes, o.StatCache.Database, "stat", time.Duration(o.StatCache.TTL)*time.Second, o.StatCache.Size),
+		UserCache:    ttlcache.NewCache(),
 	}
 
 	if o.AsyncFileUploads {

@@ -37,6 +37,7 @@ import (
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
@@ -54,13 +55,13 @@ const (
 	spaceTypeShare     = "share"
 	spaceTypeAny       = "*"
 	spaceIDAny         = "*"
-	userIDAny          = "*"
 
 	quotaUnrestricted = 0
 )
 
 // CreateStorageSpace creates a storage space
 func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.CreateStorageSpaceRequest) (*provider.CreateStorageSpaceResponse, error) {
+	ctx = context.WithValue(ctx, utils.SpaceGrant, struct{}{})
 
 	// "everything is a resource" this is the unique ID for the Space resource.
 	spaceID := uuid.New().String()
@@ -147,7 +148,10 @@ func (fs *Decomposedfs) CreateStorageSpace(ctx context.Context, req *provider.Cr
 	}
 
 	// Write index
-	err = fs.updateIndexes(ctx, req.GetOwner().GetId().GetOpaqueId(), req.Type, root.ID)
+	err = fs.updateIndexes(ctx, &provider.Grantee{
+		Type: provider.GranteeType_GRANTEE_TYPE_USER,
+		Id:   &provider.Grantee_UserId{UserId: req.GetOwner().GetId()},
+	}, req.Type, root.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +222,7 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 	var (
 		spaceID         = spaceIDAny
 		nodeID          = spaceIDAny
-		requestedUserID = userIDAny
+		requestedUserID *userv1beta1.UserId
 	)
 
 	spaceTypes := map[string]struct{}{}
@@ -241,10 +245,10 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 			}
 		case provider.ListStorageSpacesRequest_Filter_TYPE_USER:
 			// TODO: refactor this to GetUserId() in cs3
-			requestedUserID = filter[i].GetUser().GetOpaqueId()
+			requestedUserID = filter[i].GetUser()
 		case provider.ListStorageSpacesRequest_Filter_TYPE_OWNER:
 			// TODO: improve further by not evaluating shares
-			requestedUserID = filter[i].GetOwner().GetOpaqueId()
+			requestedUserID = filter[i].GetOwner()
 		}
 	}
 	if len(spaceTypes) == 0 {
@@ -292,8 +296,8 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 
 	matches := map[string]struct{}{}
 
-	if requestedUserID != userIDAny {
-		path := filepath.Join(fs.o.Root, "indexes", "by-user-id", requestedUserID, nodeID)
+	if requestedUserID != nil {
+		path := filepath.Join(fs.o.Root, "indexes", "by-user-id", requestedUserID.GetOpaqueId(), nodeID)
 		m, err := filepath.Glob(path)
 		if err != nil {
 			return nil, err
@@ -305,9 +309,35 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 			}
 			matches[link] = struct{}{}
 		}
+
+		// get Groups for userid
+		user := ctxpkg.ContextMustGetUser(ctx)
+		// TODO the user from context may not have groups populated
+		if !utils.UserIDEqual(user.GetId(), requestedUserID) {
+			user, err = fs.UserIDToUserAndGroups(ctx, requestedUserID)
+			if err != nil {
+				return nil, err // TODO log and continue?
+			}
+		}
+
+		for _, group := range user.Groups {
+			path := filepath.Join(fs.o.Root, "indexes", "by-group-id", group, nodeID)
+			m, err := filepath.Glob(path)
+			if err != nil {
+				return nil, err
+			}
+			for _, match := range m {
+				link, err := os.Readlink(match)
+				if err != nil {
+					continue
+				}
+				matches[link] = struct{}{}
+			}
+		}
+
 	}
 
-	if requestedUserID == userIDAny {
+	if requestedUserID == nil {
 		for spaceType := range spaceTypes {
 			path := filepath.Join(fs.o.Root, "indexes", "by-type", spaceType, nodeID)
 			m, err := filepath.Glob(path)
@@ -410,6 +440,31 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 
 	return spaces, nil
 
+}
+
+// UserIDToUserAndGroups converts a user ID to a user with groups
+func (fs *Decomposedfs) UserIDToUserAndGroups(ctx context.Context, userid *userv1beta1.UserId) (*userv1beta1.User, error) {
+	user, err := fs.UserCache.Get(userid.GetOpaqueId())
+	if err == nil {
+		return user.(*userv1beta1.User), nil
+	}
+
+	gwConn, err := pool.GetGatewayServiceClient(fs.o.GatewayAddr)
+	if err != nil {
+		return nil, err
+	}
+	getUserResponse, err := gwConn.GetUser(ctx, &userv1beta1.GetUserRequest{
+		UserId:                 userid,
+		SkipFetchingUserGroups: false,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if getUserResponse.Status.Code != v1beta11.Code_CODE_OK {
+		return nil, status.NewErrorFromCode(getUserResponse.Status.Code, "gateway")
+	}
+	_ = fs.UserCache.Set(userid.GetOpaqueId(), getUserResponse.GetUser())
+	return getUserResponse.GetUser(), nil
 }
 
 // MustCheckNodePermissions checks if permission checks are needed to be performed when user requests spaces
@@ -649,12 +704,26 @@ func (fs *Decomposedfs) DeleteStorageSpace(ctx context.Context, req *provider.De
 	return n.SetDTime(&dtime)
 }
 
-func (fs *Decomposedfs) updateIndexes(ctx context.Context, userID, spaceType, spaceID string) error {
+func (fs *Decomposedfs) updateIndexes(ctx context.Context, grantee *provider.Grantee, spaceType, spaceID string) error {
 	err := fs.linkStorageSpaceType(ctx, spaceType, spaceID)
 	if err != nil {
 		return err
 	}
-	return fs.linkSpaceByUser(ctx, userID, spaceID)
+	if isShareGrant(ctx) {
+		// FIXME we should count the references for the by-type index currently removing the second share from the same
+		// space cannot determine if the by-type should be deletet, which is why we never delete them ...
+		return nil
+	}
+
+	// create space grant index
+	switch {
+	case grantee.Type == provider.GranteeType_GRANTEE_TYPE_USER:
+		return fs.linkSpaceByUser(ctx, grantee.GetUserId().GetOpaqueId(), spaceID)
+	case grantee.Type == provider.GranteeType_GRANTEE_TYPE_GROUP:
+		return fs.linkSpaceByGroup(ctx, grantee.GetGroupId().GetOpaqueId(), spaceID)
+	default:
+		return errtypes.BadRequest("invalid grantee type: " + grantee.GetType().String())
+	}
 }
 
 func (fs *Decomposedfs) linkSpaceByUser(ctx context.Context, userID, spaceID string) error {
@@ -676,6 +745,30 @@ func (fs *Decomposedfs) linkSpaceByUser(ctx context.Context, userID, spaceID str
 		} else {
 			// TODO how should we handle error cases here?
 			appctx.GetLogger(ctx).Error().Err(err).Str("space", spaceID).Str("user-id", userID).Msg("could not create symlink")
+		}
+	}
+	return nil
+}
+
+func (fs *Decomposedfs) linkSpaceByGroup(ctx context.Context, groupID, spaceID string) error {
+	if groupID == "" {
+		return nil
+	}
+	// create group index dir
+	// TODO: pathify groupid
+	if err := os.MkdirAll(filepath.Join(fs.o.Root, "indexes", "by-group-id", groupID), 0700); err != nil {
+		return err
+	}
+
+	err := os.Symlink("../../../spaces/"+lookup.Pathify(spaceID, 1, 2)+"/nodes/"+lookup.Pathify(spaceID, 4, 2), filepath.Join(fs.o.Root, "indexes/by-group-id", groupID, spaceID))
+	if err != nil {
+		if isAlreadyExists(err) {
+			appctx.GetLogger(ctx).Debug().Err(err).Str("space", spaceID).Str("group-id", groupID).Msg("symlink already exists")
+			// FIXME: is it ok to wipe this err if the symlink already exists?
+			err = nil //nolint
+		} else {
+			// TODO how should we handle error cases here?
+			appctx.GetLogger(ctx).Error().Err(err).Str("space", spaceID).Str("group-id", groupID).Msg("could not create symlink")
 		}
 	}
 	return nil

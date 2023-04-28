@@ -35,6 +35,9 @@ type Option func(o *Options)
 // Options defines the available options for this package.
 type Options struct {
 
+	// the gateway address
+	GatewayAddr string `mapstructure:"gateway_addr"`
+
 	// the metadata backend to use, currently supports `xattr` or `ini`
 	MetadataBackend string `mapstructure:"metadata_backend"`
 
@@ -98,6 +101,8 @@ func New(m map[string]interface{}) (*Options, error) {
 		err = errors.Wrap(err, "error decoding conf")
 		return nil, err
 	}
+
+	o.GatewayAddr = sharedconf.GetGatewaySVC(o.GatewayAddr)
 
 	if o.MetadataBackend == "" {
 		o.MetadataBackend = "xattrs"
