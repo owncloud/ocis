@@ -825,37 +825,61 @@ func (g Graph) cs3PermissionsToLibreGraph(ctx context.Context, space *storagepro
 
 func (g Graph) getDriveQuota(ctx context.Context, space *storageprovider.StorageSpace) (libregraph.Quota, error) {
 	logger := g.logger.SubloggerWithRequestID(ctx)
-	client := g.GetGatewayClient()
 
-	req := &gateway.GetQuotaRequest{
-		Ref: &storageprovider.Reference{
-			ResourceId: space.Root,
-			Path:       ".",
-		},
-	}
-	res, err := client.GetQuota(ctx, req)
-	switch {
-	case err != nil:
-		logger.Error().Err(err).Interface("ref", req.Ref).Msg("could not call GetQuota: transport error")
-		return libregraph.Quota{}, nil
-	case res.GetStatus().GetCode() == cs3rpc.Code_CODE_UNIMPLEMENTED:
-		logger.Debug().Msg("get quota is not implemented on the storage driver")
-		return libregraph.Quota{}, nil
-	case res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
-		logger.Debug().Str("grpc", res.GetStatus().GetMessage()).Msg("error sending get quota grpc request")
-		return libregraph.Quota{}, errors.New(res.GetStatus().GetMessage())
-	}
-
-	var remaining int64
-	if res.Opaque != nil {
-		m := res.Opaque.Map
-		if e, ok := m["remaining"]; ok {
+	noQuotaInOpaque := true
+	var remaining, used, total int64
+	if space.Opaque != nil {
+		m := space.Opaque.Map
+		if e, ok := m["quota.remaining"]; ok {
+			noQuotaInOpaque = false
 			remaining, _ = strconv.ParseInt(string(e.Value), 10, 64)
 		}
+		if e, ok := m["quota.used"]; ok {
+			noQuotaInOpaque = false
+			used, _ = strconv.ParseInt(string(e.Value), 10, 64)
+		}
+		if e, ok := m["quota.total"]; ok {
+			noQuotaInOpaque = false
+			total, _ = strconv.ParseInt(string(e.Value), 10, 64)
+		}
+
 	}
 
-	used := int64(res.UsedBytes)
-	total := int64(res.TotalBytes)
+	if noQuotaInOpaque {
+		// we have to make a trip to the storage
+		// TODO only if quota property was requested
+		client := g.GetGatewayClient()
+
+		req := &gateway.GetQuotaRequest{
+			Ref: &storageprovider.Reference{
+				ResourceId: space.Root,
+				Path:       ".",
+			},
+		}
+		res, err := client.GetQuota(ctx, req)
+		switch {
+		case err != nil:
+			logger.Error().Err(err).Interface("ref", req.Ref).Msg("could not call GetQuota: transport error")
+			return libregraph.Quota{}, nil
+		case res.GetStatus().GetCode() == cs3rpc.Code_CODE_UNIMPLEMENTED:
+			logger.Debug().Msg("get quota is not implemented on the storage driver")
+			return libregraph.Quota{}, nil
+		case res.GetStatus().GetCode() != cs3rpc.Code_CODE_OK:
+			logger.Debug().Str("grpc", res.GetStatus().GetMessage()).Msg("error sending get quota grpc request")
+			return libregraph.Quota{}, errors.New(res.GetStatus().GetMessage())
+		}
+
+		if res.Opaque != nil {
+			m := res.Opaque.Map
+			if e, ok := m["remaining"]; ok {
+				remaining, _ = strconv.ParseInt(string(e.Value), 10, 64)
+			}
+		}
+
+		used = int64(res.UsedBytes)
+		total = int64(res.TotalBytes)
+	}
+
 	qta := libregraph.Quota{
 		Remaining: &remaining,
 		Used:      &used,
