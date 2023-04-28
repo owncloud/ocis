@@ -138,7 +138,7 @@ func Sanitize(cfg *config.Config) {
 		cfg.Web.Config.Options.AccountEditLink = nil
 	}
 	// remove Editor parent if no value is set
-	if cfg.Web.Config.Options.Editor.AutosaveEnabled == false {
+	if !cfg.Web.Config.Options.Editor.AutosaveEnabled {
 		cfg.Web.Config.Options.Editor = nil
 	}
 	// remove FeedbackLink parent if no value is set
