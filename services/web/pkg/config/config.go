@@ -51,16 +51,16 @@ type CustomTranslation struct {
 
 // WebConfig defines the available web configuration for a dynamically rendered config.json.
 type WebConfig struct {
-	Server        string                 `json:"server,omitempty" yaml:"server" env:"OCIS_URL;WEB_UI_CONFIG_SERVER" desc:"URL, where the oCIS APIs are reachable for ownCloud Web."`
-	Theme         string                 `json:"theme,omitempty" yaml:"-"`
-	OpenIDConnect OIDC                   `json:"openIdConnect,omitempty" yaml:"oidc"`
-	Apps          []string               `json:"apps" yaml:"apps"`
-	Applications  []Application          `json:"applications,omitempty" yaml:"applications"`
-	ExternalApps  []ExternalApp          `json:"external_apps,omitempty" yaml:"external_apps"`
-	Options       map[string]interface{} `json:"options,omitempty" yaml:"options"`
-	Styles        []CustomStyle          `json:"styles,omitempty" yaml:"styles"`
-	Scripts       []CustomScript         `json:"scripts,omitempty" yaml:"scripts"`
-	Translations  []CustomTranslation    `json:"customTranslations,omitempty" yaml:"custom_translations"`
+	Server        string              `json:"server,omitempty" yaml:"server" env:"OCIS_URL;WEB_UI_CONFIG_SERVER" desc:"URL, where the oCIS APIs are reachable for ownCloud Web."`
+	Theme         string              `json:"theme,omitempty" yaml:"-"`
+	OpenIDConnect OIDC                `json:"openIdConnect,omitempty" yaml:"oidc"`
+	Apps          []string            `json:"apps" yaml:"apps"`
+	Applications  []Application       `json:"applications,omitempty" yaml:"applications"`
+	ExternalApps  []ExternalApp       `json:"external_apps,omitempty" yaml:"external_apps"`
+	Options       Options             `json:"options,omitempty" yaml:"options"`
+	Styles        []CustomStyle       `json:"styles,omitempty" yaml:"styles"`
+	Scripts       []CustomScript      `json:"scripts,omitempty" yaml:"scripts"`
+	Translations  []CustomTranslation `json:"customTranslations,omitempty" yaml:"custom_translations"`
 }
 
 // OIDC defines the available oidc configuration

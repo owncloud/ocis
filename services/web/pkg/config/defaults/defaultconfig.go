@@ -66,8 +66,8 @@ func DefaultConfig() *config.Config {
 						},
 					},
 				},
-				Options: map[string]interface{}{
-					"previewFileMimeTypes": []string{"image/gif", "image/png", "image/jpeg", "text/plain", "image/tiff", "image/bmp", "image/x-ms-bmp"},
+				Options: config.Options{
+					PreviewFileMimeTypes: []string{"image/gif", "image/png", "image/jpeg", "text/plain", "image/tiff", "image/bmp", "image/x-ms-bmp"},
 				},
 			},
 		},
