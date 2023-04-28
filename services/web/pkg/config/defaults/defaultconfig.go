@@ -67,7 +67,19 @@ func DefaultConfig() *config.Config {
 					},
 				},
 				Options: config.Options{
-					PreviewFileMimeTypes: []string{"image/gif", "image/png", "image/jpeg", "text/plain", "image/tiff", "image/bmp", "image/x-ms-bmp"},
+					ContextHelpersReadMore:   true,
+					PreviewFileMimeTypes:     []string{"image/gif", "image/png", "image/jpeg", "text/plain", "image/tiff", "image/bmp", "image/x-ms-bmp"},
+					SharingRecipientsPerPage: 200,
+					AccountEditLink:          &config.AccountEditLink{},
+					Editor:                   &config.Editor{},
+					FeedbackLink:             &config.FeedbackLink{},
+					Routing: config.Routing{
+						IDBased: true,
+					},
+					Sidebar: config.Sidebar{
+						Shares: config.SidebarShares{},
+					},
+					Upload: &config.Upload{},
 				},
 			},
 		},
@@ -120,5 +132,23 @@ func Sanitize(cfg *config.Config) {
 	// build well known openid-configuration endpoint if it is not set
 	if cfg.Web.Config.OpenIDConnect.MetadataURL == "" {
 		cfg.Web.Config.OpenIDConnect.MetadataURL = strings.TrimRight(cfg.Web.Config.OpenIDConnect.Authority, "/") + "/.well-known/openid-configuration"
+	}
+	// remove AccountEdit parent if no value is set
+	if cfg.Web.Config.Options.AccountEditLink.Href == "" {
+		cfg.Web.Config.Options.AccountEditLink = nil
+	}
+	// remove Editor parent if no value is set
+	if cfg.Web.Config.Options.Editor.AutosaveEnabled == false {
+		cfg.Web.Config.Options.Editor = nil
+	}
+	// remove FeedbackLink parent if no value is set
+	if cfg.Web.Config.Options.FeedbackLink.Href == "" &&
+		cfg.Web.Config.Options.FeedbackLink.AriaLabel == "" &&
+		cfg.Web.Config.Options.FeedbackLink.Description == "" {
+		cfg.Web.Config.Options.FeedbackLink = nil
+	}
+	// remove Upload parent if no value is set
+	if cfg.Web.Config.Options.Upload.XHR.Timeout == 0 {
+		cfg.Web.Config.Options.Upload = nil
 	}
 }
