@@ -40,6 +40,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+var _defaultPublicLinkPermission = 1
+
 func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, statInfo *provider.ResourceInfo) (*link.PublicShare, *ocsError) {
 	ctx := r.Context()
 	log := appctx.GetLogger(ctx)
@@ -53,27 +55,39 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 		}
 	}
 
-	user := ctxpkg.ContextMustGetUser(ctx)
-	resp, err := c.CheckPermission(ctx, &permissionsv1beta1.CheckPermissionRequest{
-		SubjectRef: &permissionsv1beta1.SubjectReference{
-			Spec: &permissionsv1beta1.SubjectReference_UserId{
-				UserId: user.Id,
-			},
-		},
-		Permission: "PublicLink.Write",
-	})
+	permKey, err := permKeyFromRequest(r, h)
 	if err != nil {
 		return nil, &ocsError{
-			Code:    response.MetaServerError.StatusCode,
-			Message: "failed to check user permission",
+			Code:    response.MetaBadRequest.StatusCode,
+			Message: "Could not read permission from request",
 			Error:   err,
 		}
 	}
 
-	if resp.Status.Code != rpc.Code_CODE_OK {
-		return nil, &ocsError{
-			Code:    response.MetaForbidden.StatusCode,
-			Message: "user is not allowed to create a public link",
+	// NOTE: one is allowed to create an internal link without the `Publink.Write` permission
+	if permKey != nil && *permKey != 0 {
+		user := ctxpkg.ContextMustGetUser(ctx)
+		resp, err := c.CheckPermission(ctx, &permissionsv1beta1.CheckPermissionRequest{
+			SubjectRef: &permissionsv1beta1.SubjectReference{
+				Spec: &permissionsv1beta1.SubjectReference_UserId{
+					UserId: user.Id,
+				},
+			},
+			Permission: "PublicLink.Write",
+		})
+		if err != nil {
+			return nil, &ocsError{
+				Code:    response.MetaServerError.StatusCode,
+				Message: "failed to check user permission",
+				Error:   err,
+			}
+		}
+
+		if resp.Status.Code != rpc.Code_CODE_OK {
+			return nil, &ocsError{
+				Code:    response.MetaForbidden.StatusCode,
+				Message: "user is not allowed to create a public link",
+			}
 		}
 	}
 
@@ -113,19 +127,18 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 		}
 	}
 
-	newPermissions, err := permissionFromRequest(r, h)
+	permissions, err := ocPublicPermToCs3(permKey, h)
 	if err != nil {
 		return nil, &ocsError{
 			Code:    response.MetaBadRequest.StatusCode,
-			Message: "Could not read permission from request",
+			Message: "Could not create permission from permission key",
 			Error:   err,
 		}
 	}
-
-	if newPermissions == nil {
+	if permissions == nil {
 		// default perms: read-only
 		// TODO: the default might change depending on allowed permissions and configs
-		newPermissions, err = ocPublicPermToCs3(1, h)
+		permissions, err = ocPublicPermToCs3(&_defaultPublicLinkPermission, h)
 		if err != nil {
 			return nil, &ocsError{
 				Code:    response.MetaServerError.StatusCode,
@@ -137,14 +150,14 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 
 	if statInfo != nil && statInfo.Type == provider.ResourceType_RESOURCE_TYPE_FILE {
 		// Single file shares should never have delete or create permissions
-		role := conversions.RoleFromResourcePermissions(newPermissions, true)
-		permissions := role.OCSPermissions()
-		permissions &^= conversions.PermissionCreate
-		permissions &^= conversions.PermissionDelete
-		newPermissions = conversions.RoleFromOCSPermissions(permissions).CS3ResourcePermissions()
+		role := conversions.RoleFromResourcePermissions(permissions, true)
+		p := role.OCSPermissions()
+		p &^= conversions.PermissionCreate
+		p &^= conversions.PermissionDelete
+		permissions = conversions.RoleFromOCSPermissions(p).CS3ResourcePermissions()
 	}
 
-	if !sufficientPermissions(statInfo.PermissionSet, newPermissions, true) {
+	if !sufficientPermissions(statInfo.PermissionSet, permissions, true) {
 		response.WriteOCSError(w, r, http.StatusNotFound, "no share permission", nil)
 		return nil, &ocsError{
 			Code:    http.StatusNotFound,
@@ -157,7 +170,7 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 		ResourceInfo: statInfo,
 		Grant: &link.Grant{
 			Permissions: &link.PublicSharePermissions{
-				Permissions: newPermissions,
+				Permissions: permissions,
 			},
 			Password: r.FormValue("password"),
 		},
@@ -296,23 +309,11 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 	}
 
 	ctx := r.Context()
-
 	user := ctxpkg.ContextMustGetUser(ctx)
-	resp, err := gwC.CheckPermission(ctx, &permissionsv1beta1.CheckPermissionRequest{
-		SubjectRef: &permissionsv1beta1.SubjectReference{
-			Spec: &permissionsv1beta1.SubjectReference_UserId{
-				UserId: user.Id,
-			},
-		},
-		Permission: "PublicLink.Write",
-	})
-	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "failed to check user permission", err)
-		return
-	}
 
-	if resp.Status.Code != rpc.Code_CODE_OK {
-		response.WriteOCSError(w, r, response.MetaForbidden.StatusCode, "user is not allowed to create a public link", nil)
+	permKey, err := permKeyFromRequest(r, h)
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "invalid permissions", err)
 		return
 	}
 
@@ -330,8 +331,30 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 		return
 	}
 
-	u := ctxpkg.ContextMustGetUser(r.Context())
-	if !publicshare.IsCreatedByUser(*before.Share, u) {
+	createdByUser := publicshare.IsCreatedByUser(*before.Share, user)
+
+	// NOTE: you are allowed to update a link TO a public link without the `PublicLink.Write` permission if you created it yourself
+	if (permKey != nil && *permKey != 0) || !createdByUser {
+		resp, err := gwC.CheckPermission(ctx, &permissionsv1beta1.CheckPermissionRequest{
+			SubjectRef: &permissionsv1beta1.SubjectReference{
+				Spec: &permissionsv1beta1.SubjectReference_UserId{
+					UserId: user.Id,
+				},
+			},
+			Permission: "PublicLink.Write",
+		})
+		if err != nil {
+			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "failed to check user permission", err)
+			return
+		}
+
+		if resp.Status.Code != rpc.Code_CODE_OK {
+			response.WriteOCSError(w, r, response.MetaForbidden.StatusCode, "user is not allowed to update the public link", nil)
+			return
+		}
+	}
+
+	if !createdByUser {
 		sRes, err := gwC.Stat(r.Context(), &provider.StatRequest{Ref: &provider.Reference{ResourceId: before.Share.ResourceId}})
 		if err != nil {
 			log.Err(err).Interface("resource_id", before.Share.ResourceId).Msg("failed to stat shared resource")
@@ -368,7 +391,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 	}
 
 	// Permissions
-	newPermissions, err := permissionFromRequest(r, h)
+	newPermissions, err := ocPublicPermToCs3(permKey, h)
 	logger.Debug().Interface("newPermissions", newPermissions).Msg("Parsed permissions")
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "invalid permissions", err)
@@ -563,9 +586,12 @@ func decreasePermissionsIfNecessary(perm int) int {
 	return perm
 }
 
-func ocPublicPermToCs3(permKey int, h *Handler) (*provider.ResourcePermissions, error) {
+func ocPublicPermToCs3(pk *int, h *Handler) (*provider.ResourcePermissions, error) {
+	if pk == nil {
+		return nil, nil
+	}
 
-	permKey = decreasePermissionsIfNecessary(permKey)
+	permKey := decreasePermissionsIfNecessary(*pk)
 
 	// TODO refactor this ocPublicPermToRole[permKey] check into a conversions.NewPublicSharePermissions?
 	// not all permissions are possible for public shares
@@ -583,7 +609,8 @@ func ocPublicPermToCs3(permKey int, h *Handler) (*provider.ResourcePermissions, 
 	return conversions.RoleFromOCSPermissions(perm).CS3ResourcePermissions(), nil
 }
 
-func permissionFromRequest(r *http.Request, h *Handler) (*provider.ResourcePermissions, error) {
+// pointer will be nil if no permission is set
+func permKeyFromRequest(r *http.Request, h *Handler) (*int, error) {
 	var err error
 	// phoenix sends: {"permissions": 15}. See ocPublicPermToRole struct for mapping
 
@@ -593,11 +620,11 @@ func permissionFromRequest(r *http.Request, h *Handler) (*provider.ResourcePermi
 
 	// handle legacy "publicUpload" arg that overrides permissions differently depending on the scenario
 	// https://github.com/owncloud/core/blob/v10.4.0/apps/files_sharing/lib/Controller/Share20OcsController.php#L447
-	publicUploadString, ok := r.Form["publicUpload"]
-	if ok {
-		publicUploadFlag, err := strconv.ParseBool(publicUploadString[0])
+	publicUploadString := r.FormValue("publicUpload")
+	if publicUploadString != "" {
+		publicUploadFlag, err := strconv.ParseBool(publicUploadString)
 		if err != nil {
-			log.Error().Err(err).Str("publicUpload", publicUploadString[0]).Msg("could not parse publicUpload argument")
+			log.Error().Err(err).Str("publicUpload", publicUploadString).Msg("could not parse publicUpload argument")
 			return nil, err
 		}
 
@@ -606,24 +633,20 @@ func permissionFromRequest(r *http.Request, h *Handler) (*provider.ResourcePermi
 			permKey = 15
 		}
 	} else {
-		permissionsString, ok := r.Form["permissions"]
-		if !ok {
+		permissionsString := r.FormValue("permissions")
+		if permissionsString == "" {
 			// no permission values given
 			return nil, nil
 		}
 
-		permKey, err = strconv.Atoi(permissionsString[0])
+		permKey, err = strconv.Atoi(permissionsString)
 		if err != nil {
 			log.Error().Str("permissionFromRequest", "shares").Msgf("invalid type: %T", permKey)
 			return nil, fmt.Errorf("invalid type: %T", permKey)
 		}
 	}
 
-	p, err := ocPublicPermToCs3(permKey, h)
-	if err != nil {
-		return nil, err
-	}
-	return p, err
+	return &permKey, nil
 }
 
 // TODO: add mapping for user share permissions to role
