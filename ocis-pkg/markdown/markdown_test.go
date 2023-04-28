@@ -15,19 +15,19 @@ some abstract description
 subtitle one description
 
 ## SubTitle 2
-
 subtitle two description
-
 ### Subpoint to SubTitle 2
 
 description to subpoint
+
+more text
 `
 	SmallMD = MD{
 		Headings: []Heading{
-			{Level: 1, Header: "Title", Content: "some abstract description\n"},
-			{Level: 2, Header: "SubTitle 1", Content: "subtitle one description\n"},
+			{Level: 1, Header: "Title", Content: "\nsome abstract description\n\n"},
+			{Level: 2, Header: "SubTitle 1", Content: "\nsubtitle one description\n\n"},
 			{Level: 2, Header: "SubTitle 2", Content: "subtitle two description\n"},
-			{Level: 3, Header: "Subpoint to SubTitle 2", Content: "description to subpoint\n"},
+			{Level: 3, Header: "Subpoint to SubTitle 2", Content: "\ndescription to subpoint\n\nmore text\n"},
 		},
 	}
 )
