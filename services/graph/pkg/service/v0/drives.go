@@ -34,6 +34,7 @@ import (
 	settingsServiceExt "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/pkg/errors"
 	merrors "go-micro.dev/v4/errors"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -503,24 +504,70 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces []*storageprovider.StorageSpace) ([]*libregraph.Drive, error) {
-	responses := make([]*libregraph.Drive, 0, len(storageSpaces))
-	for _, storageSpace := range storageSpaces {
-		res, err := g.cs3StorageSpaceToDrive(ctx, baseURL, storageSpace)
-		if err != nil {
-			return nil, err
-		}
+	errg, ctx := errgroup.WithContext(ctx)
+	work := make(chan *storageprovider.StorageSpace, len(storageSpaces))
+	results := make(chan *libregraph.Drive, len(storageSpaces))
 
-		// can't access disabled space
-		if utils.ReadPlainFromOpaque(storageSpace.Opaque, "trashed") != "trashed" {
-			res.Special = g.getExtendedSpaceProperties(ctx, baseURL, storageSpace)
-			quota, err := g.getDriveQuota(ctx, storageSpace)
-			res.Quota = &quota
-			if err != nil {
-				//logger.Debug().Err(err).Interface("id", sp.Id).Msg("error calling get quota on drive")
-				return nil, err
+	// Distribute work
+	errg.Go(func() error {
+		defer close(work)
+		for _, space := range storageSpaces {
+			select {
+			case work <- space:
+			case <-ctx.Done():
+				return ctx.Err()
 			}
 		}
-		responses = append(responses, res)
+		return nil
+	})
+
+	// Spawn workers that'll concurrently work the queue
+	numWorkers := 20
+	if len(storageSpaces) < numWorkers {
+		numWorkers = len(storageSpaces)
+	}
+	for i := 0; i < numWorkers; i++ {
+		errg.Go(func() error {
+			for storageSpace := range work {
+				res, err := g.cs3StorageSpaceToDrive(ctx, baseURL, storageSpace)
+				if err != nil {
+					return err
+				}
+
+				// can't access disabled space
+				if utils.ReadPlainFromOpaque(storageSpace.Opaque, "trashed") != "trashed" {
+					res.Special = g.getExtendedSpaceProperties(ctx, baseURL, storageSpace)
+					quota, err := g.getDriveQuota(ctx, storageSpace)
+					res.Quota = &quota
+					if err != nil {
+						return err
+					}
+				}
+				select {
+				case results <- res:
+				case <-ctx.Done():
+					return ctx.Err()
+				}
+			}
+			return nil
+		})
+	}
+
+	// Wait for things to settle down, then close results chan
+	go func() {
+		_ = errg.Wait() // error is checked later
+		close(results)
+	}()
+
+	responses := make([]*libregraph.Drive, len(storageSpaces))
+	i := 0
+	for r := range results {
+		responses[i] = r
+		i++
+	}
+
+	if err := errg.Wait(); err != nil {
+		return nil, err
 	}
 
 	return responses, nil
