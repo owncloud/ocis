@@ -50,27 +50,19 @@ func (md MD) TocString() string {
 
 // WriteContent writes the MDs content to the given writer
 func (md MD) WriteContent(w io.Writer) (int64, error) {
-	max, written := len(md.Headings), int64(0)
+	written := int64(0)
 	write := func(s string) error {
 		n, err := w.Write([]byte(s))
 		written += int64(n)
 		return err
 	}
-	for i, h := range md.Headings {
+	for _, h := range md.Headings {
 		if err := write(strings.Repeat("#", h.Level) + " " + h.Header + "\n"); err != nil {
-			return written, err
-		}
-		if err := write("\n"); err != nil {
 			return written, err
 		}
 		if len(h.Content) > 0 {
 			if err := write(h.Content); err != nil {
 				return written, err
-			}
-			if i < max-1 {
-				if err := write("\n"); err != nil {
-					return written, err
-				}
 			}
 		}
 	}
@@ -110,20 +102,30 @@ func NewMD(b []byte) MD {
 			content = strings.Builder{}
 		}
 	}
-	parts := strings.Split(string(b), "\n")
-	for _, p := range parts {
-		if p == "" {
+	parts := strings.Split("\n"+string(b), "\n#")
+	numparts := len(parts) - 1
+	for i, p := range parts {
+		if i == 0 {
+			// omit part before first heading
 			continue
 		}
-		if p[:1] == "#" { // this is a header
-			sendHeading()
-			heading = headingFromString(p)
-		} else {
-			// readd lost "\n"
-			_, _ = content.WriteString(p + "\n")
+
+		all := strings.SplitN(p, "\n", 2)
+		if len(all) != 2 {
+			continue
 		}
+
+		head, con := all[0], all[1]
+		// readd lost "#"
+		heading = headingFromString("#" + head)
+		_, _ = content.WriteString(con)
+		// readd lost "\n" - omit for last part
+		if i < numparts {
+			_, _ = content.WriteString("\n")
+		}
+		// add heading
+		sendHeading()
 	}
-	sendHeading()
 	return md
 }
 
