@@ -1,6 +1,6 @@
 ---
 title: Audit
-date: 2023-04-30T00:17:27.807676851Z
+date: 2023-04-30T09:37:28.236449049Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/audit
@@ -12,8 +12,11 @@ geekdocCollapseSection: true
 
 ## Abstract
 
+
 The audit service logs all events of the system as an audit log. Per default, it will be logged to standard out, but can also be configured to a file output. Supported log formats are json or a minimal human-readable format.
+
 With audit logs, you are able to prove compliance with corporate guidelines as well as to enable reporting and auditing of operations. The audit service takes note of actions conducted by users and administrators.
+
 Example minimal format:
 ```
 file_delete)
@@ -21,13 +24,17 @@ file_delete)
 file_trash_delete)
    user 'user_id' removed file 'item_id' from trashbin
 ```
+
 Example json:
 ```
 {"RemoteAddr":"","User":"user_id","URL":"","Method":"","UserAgent":"","Time":"","App":"admin_audit","Message":"user 'user_id' trashed file 'item_id'","Action":"file_delete","CLI":false,"Level":1,"Path":"path","Owner":"user_id","FileID":"item_id"}
 {"RemoteAddr":"","User":"user_id","URL":"","Method":"","UserAgent":"","Time":"","App":"admin_audit","Message":"user 'user_id' removed file 'item_id' from trashbin","Action":"file_trash_delete","CLI":false,"Level":1,"Path":"path","Owner":"user_id","FileID":"item_id"}
 ```
+
 The audit service is not started automatically when running as single binary started via `ocis server` or when running as docker container and must be started and stopped manually on demand.
+
 The audit service logs:
+
 -   File system operations  
 (create/delete/move; including actions on the trash bin and versioning)
 -   User management operations  
@@ -40,7 +47,6 @@ The audit service logs:
 * [Example Yaml Config](#example-yaml-config)
 
 ## Example Yaml Config
-
 {{< include file="services/_includes/audit-config-example.yaml"  language="yaml" >}}
 
 {{< include file="services/_includes/audit_configvars.md" >}}

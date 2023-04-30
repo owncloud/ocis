@@ -1,6 +1,6 @@
 ---
 title: Nats
-date: 2023-04-30T00:17:27.809690224Z
+date: 2023-04-30T09:37:28.2376888Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/nats
@@ -12,8 +12,11 @@ geekdocCollapseSection: true
 
 ## Abstract
 
+
 The nats service is the event broker of the system. It distributes events among all other services and enables other services to communicate asynchronous.
+
 Services can `Publish` events to the nats service and nats will store these events on disk and distribute these events to other services eventually. Services can `Consume` events from the nats service by registering to a `ConsumerGroup`. Each `ConsumerGroup` is guaranteed to get each event exactly once. In most cases, each service will register its own `ConsumerGroup`. When there are multiple instances of a service, those instances will usually use that `ConsumerGroup` as common resource.
+
 
 ## Table of Contents
 
@@ -33,11 +36,11 @@ To be able to deliver events even after a system or service restart, nats will s
 ## TLS Encryption
 
 Connections to the nats service (`Publisher`/`Consumer` see above) can be TLS encrypted by setting the corresponding env vars `NATS_TLS_CERT`, `NATS_TLS_KEY` to the cert and key files and `ENABLE_TLS` to true. Checking the certificate of incoming request can be disabled with the `NATS_EVENTS_ENABLE_TLS` environment variable.
+
 Certificate files can also be set via global variables starting with `OCIS_`, for details see the environment variable list.
+
 Note that using TLS is highly recommended for productive environments, especially when using container orchestration with Kubernetes.
-
 ## Example Yaml Config
-
 {{< include file="services/_includes/nats-config-example.yaml"  language="yaml" >}}
 
 {{< include file="services/_includes/nats_configvars.md" >}}

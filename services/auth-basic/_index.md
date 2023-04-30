@@ -1,6 +1,6 @@
 ---
 title: Auth-Basic
-date: 2023-04-30T00:17:27.80787381Z
+date: 2023-04-30T09:37:28.236564407Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/auth-basic
@@ -12,9 +12,13 @@ geekdocCollapseSection: true
 
 ## Abstract
 
+
 The oCIS Auth Basic service provides basic authentication for those clients who cannot handle OpenID Connect. This should only be enabled for tests and development.
+
 The `auth-basic` service is responsible for validating authentication of incoming requests. To do so, it will use the configured `auth manager`, see the `Auth Managers` section. Only HTTP basic auth requests to ocis will involve the `auth-basic` service.
+
 To enable `auth-basic`, you first must set `PROXY_ENABLE_BASIC_AUTH` to `true`.
+
 
 ## Table of Contents
 
@@ -41,7 +45,6 @@ oCIS currently supports no other auth manager
 When using `"ldap"` as auth manager, there is no persistance as requests will just be forwarded to the LDAP server. Therefore, multiple instances of the `auth-basic` service can be started without further configuration. Be aware, that other auth managers might not allow that.
 
 ## Example Yaml Config
-
 {{< include file="services/_includes/auth-basic-config-example.yaml"  language="yaml" >}}
 
 {{< include file="services/_includes/auth-basic_configvars.md" >}}

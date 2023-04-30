@@ -1,6 +1,6 @@
 ---
 title: Search
-date: 2023-04-30T00:17:27.811354392Z
+date: 2023-04-30T09:37:28.238829713Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/search
@@ -12,9 +12,12 @@ geekdocCollapseSection: true
 
 ## Abstract
 
+
 The search service is responsible for metadata and content extraction, stores that data as index and makes it searchable. The following clarifies the extraction terms _metadata_ and _content_:
+
 *   Metadata: all data that _describes_ the file like `Name`, `Size`, `MimeType`, `Tags` and `Mtime`.
 *   Content: all data that _relates to content_ of the file like `words`, `geo data`, `exif data` etc.
+
 
 ## Table of Contents
 
@@ -48,10 +51,15 @@ The search service is responsible for metadata and content extraction, stores th
 *   To use the search service, an event system needs to be configured for all services like NATS, which is shipped and preconfigured.
 *   The search service consumes events and does not block other tasks. 
 *   When looking for content extraction, [Apache Tika - a content analysis toolkit](https://tika.apache.org) can be used but needs to be installed separately.
+
 Extractions are stored as index via the search service. Consider that indexing requires adequate storage capacity - and the space requirement will grow. To avoid filling up the filesystem with the index and rendering Infinite Scale unusable, the index should reside on its own filesystem.
+
 You can change the path to where search maintains its data in case the filesystem gets close to full and you need to relocate the data. Stop the service, move the data, reconfigure the path in the environment variable and restart the service.
+
 When using content extraction, more resources and time are needed, because the content of the file needs to be analyzed. This is especially true for big and multiple concurrent files.
+
 The search service runs out of the box with the shipped default `basic` configuration. No further configuration is needed, except when using content extraction.
+
 Note that as of now, the search service can not be scaled. Consider using a dedicated hardware for this service in case more resources are needed.
 
 ## Search engines
@@ -61,6 +69,7 @@ By default, the search service is shipped with [bleve](https://github.com/bleves
 ## Extraction Engines
 
 The search service provides the following extraction engines and their results are used as index for searching:
+
 *   The embedded `basic` configuration provides metadata extraction which is always on.
 *   The `tika` configuration, which _additionally_ provides content extraction, if installed and configured.
 
@@ -76,11 +85,16 @@ This extractor is the most simple one and just uses the resource information pro
 
 This extractor is more advanced compared to the [Basic extractor](#basic-extractor). The main difference is that this extractor is able to search file contents.
 However, [Apache Tika](https://tika.apache.org/) is required for this task. Read the [Getting Started with Apache Tika](https://tika.apache.org/2.6.0/gettingstarted.html) guide on how to install and run Tika or use a ready to run [Tika container](https://hub.docker.com/r/apache/tika).
+
 As soon as Tika is installed and accessible, the search service must be configured for the use with Tika. The following settings must be set:
+
 *   `SEARCH_EXTRACTOR_TYPE=tika`
 *   `SEARCH_EXTRACTOR_TIKA_TIKA_URL=http://YOUR-TIKA.URL`
+
 When the search service can reach Tika, it begins to read out the content on demand. Note that files must be downloaded during the process, which can lead to delays with larger documents.
+
 When using the Tika container and docker-compose, consider the following:
+
 *   See the [ocis_wopi](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_wopi) example.
 *   Containers for the linked service are reachable at a hostname identical to the alias or the service name if no alias was specified.
 
@@ -147,20 +161,21 @@ This is exactly the same as [File uploaded - synchronous](#file-uploaded---synch
 ## Manually Trigger Re-Indexing a Space
 
 The service includes a command-line interface to trigger re-indexing a space:
+
 ```shell
 ocis search index --space $SPACE_ID --user $USER_ID
 ```
+
 Note that not names but IDs are necessary and that the specified user ID needs access to the space to be indexed.
 
 ## Notes
 
 The indexing process tries to be self-healing in some situations.
+
 In the following example, let's assume a file tree `foo/bar/baz` exists.  
 If the folder `bar` gets renamed to `new-bar`, the path to `baz` is no longer `foo/bar/baz` but `foo/new-bar/baz`.  
 The search service checks the change and either just updates the path in the index or creates a new index for all items affected if none was present.
-
 ## Example Yaml Config
-
 {{< include file="services/_includes/search-config-example.yaml"  language="yaml" >}}
 
 {{< include file="services/_includes/search_configvars.md" >}}
