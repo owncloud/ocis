@@ -24,7 +24,6 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\TableNode;
 use PHPUnit\Framework\Assert;
-use TestHelpers\OcisHelper;
 use TestHelpers\WebDavHelper;
 
 require_once 'bootstrap.php';
@@ -33,11 +32,7 @@ require_once 'bootstrap.php';
  * context containing search related API steps
  */
 class SearchContext implements Context {
-	/**
-	 *
-	 * @var FeatureContext
-	 */
-	private $featureContext;
+	private FeatureContext $featureContext;
 
 	/**
 	 * @When user :user searches for :pattern using the WebDAV API
@@ -183,7 +178,7 @@ class SearchContext implements Context {
 		$expectedEntriesArray = [];
 		$responseResourcesArray = $this->featureContext->findEntryFromReportResponse($user);
 		foreach ($expectedEntries as $item) {
-			\array_push($expectedEntriesArray, $item[0]);
+			$expectedEntriesArray[] = $item[0];
 		}
 		Assert::assertEqualsCanonicalizing($expectedEntriesArray, $responseResourcesArray);
 	}

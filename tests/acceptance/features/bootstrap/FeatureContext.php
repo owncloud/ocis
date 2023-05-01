@@ -54,34 +54,14 @@ class FeatureContext extends BehatVariablesContext {
 	use WebDav;
 
 	/**
-	 * @var int Unix timestamp seconds
+	 * Unix timestamp seconds
 	 */
-	private $scenarioStartTime;
-
-	/**
-	 * @var string
-	 */
-	private $adminUsername = '';
-
-	/**
-	 * @var string
-	 */
-	private $adminPassword = '';
-
-	/**
-	 * @var string
-	 */
-	private $adminDisplayName = '';
-
-	/**
-	 * @var string
-	 */
-	private $adminEmailAddress = '';
-
-	/**
-	 * @var string
-	 */
-	private $originalAdminPassword = '';
+	private int $scenarioStartTime;
+	private string $adminUsername = '';
+	private string $adminPassword = '';
+	private string $adminDisplayName = '';
+	private string $adminEmailAddress = '';
+	private string $originalAdminPassword = '';
 
 	/**
 	 * An array of values of replacement values of user attributes.
@@ -89,240 +69,111 @@ class FeatureContext extends BehatVariablesContext {
 	 * run-time values are maintained and referenced in the $createdUsers array.
 	 *
 	 * Key is the username, value is an array of user attributes
-	 *
-	 * @var array|null
 	 */
-	private $userReplacements = null;
-
-	/**
-	 * @var string
-	 */
-	private $regularUserPassword = '';
-
-	/**
-	 * @var string
-	 */
-	private $alt1UserPassword = '';
-
-	/**
-	 * @var string
-	 */
-	private $alt2UserPassword = '';
-
-	/**
-	 * @var string
-	 */
-	private $alt3UserPassword = '';
-
-	/**
-	 * @var string
-	 */
-	private $alt4UserPassword = '';
+	private ?array $userReplacements = null;
+	private string $regularUserPassword = '';
+	private string $alt1UserPassword = '';
+	private string $alt2UserPassword = '';
+	private string $alt3UserPassword = '';
+	private string $alt4UserPassword = '';
 
 	/**
 	 * The password to use in tests that create a sub-admin user
-	 *
-	 * @var string
 	 */
-	private $subAdminPassword = '';
+	private string $subAdminPassword = '';
 
 	/**
 	 * The password to use in tests that create another admin user
-	 *
-	 * @var string
 	 */
-	private $alternateAdminPassword = '';
+	private string $alternateAdminPassword = '';
 
 	/**
 	 * The password to use in tests that create public link shares
-	 *
-	 * @var string
 	 */
-	private $publicLinkSharePassword = '';
+	private string $publicLinkSharePassword = '';
+	private string $ocPath = '';
 
 	/**
-	 * @var string
+	 * Location of the root folder of ownCloud on the local server under test
 	 */
-	private $ocPath = '';
-
-	/**
-	 * @var string location of the root folder of ownCloud on the local server under test
-	 */
-	private $localServerRoot = null;
-
-	/**
-	 * @var string
-	 */
-	private $currentUser = '';
-
-	/**
-	 * @var string
-	 */
-	private $currentServer = '';
+	private ?string $localServerRoot = null;
+	private string $currentUser = '';
+	private string $currentServer = '';
 
 	/**
 	 * The base URL of the current server under test,
 	 * without any terminating slash
 	 * e.g. http://localhost:8080
-	 *
-	 * @var string
 	 */
-	private $baseUrl = '';
+	private string $baseUrl = '';
 
 	/**
 	 * The base URL of the local server under test,
 	 * without any terminating slash
 	 * e.g. http://localhost:8080
-	 *
-	 * @var string
 	 */
-	private $localBaseUrl = '';
+	private string $localBaseUrl = '';
 
 	/**
 	 * The base URL of the remote (federated) server under test,
 	 * without any terminating slash
 	 * e.g. http://localhost:8180
-	 *
-	 * @var string
 	 */
-	private $remoteBaseUrl = '';
+	private string $remoteBaseUrl = '';
 
 	/**
 	 * The suite name, feature name and scenario line number.
 	 * Example: apiComments/createComments.feature:24
-	 *
-	 * @var string
 	 */
-	private $scenarioString = '';
+	private string $scenarioString = '';
 
 	/**
 	 * A full unique reference to the step that is currently executing.
 	 * Example: apiComments/createComments.feature:24-28
 	 * That is line 28, in the scenario at line 24, in the createComments feature
 	 * in the apiComments suite.
-	 *
-	 * @var string
 	 */
-	private $stepLineRef = '';
+	private string $stepLineRef = '';
+	private bool $sendStepLineRef = false;
+	private bool $sendStepLineRefHasBeenChecked = false;
 
 	/**
-	 * @var bool|null
-	 */
-	private $sendStepLineRef = null;
-
-	/**
-	 *
-	 *
 	 * @var boolean true if TEST_SERVER_FED_URL is defined
 	 */
-	private $federatedServerExists = false;
-
-	/**
-	 * @var int
-	 */
-	private $ocsApiVersion = 1;
-
-	/**
-	 * @var ResponseInterface
-	 */
-	private $response = null;
-
-	/**
-	 * @var string
-	 */
-	private $responseUser = "";
-
-	/**
-	 * @var string
-	 */
-	private $responseBodyContent = null;
-
-	/**
-	 * @var array
-	 */
-	private $userResponseBodyContents = [];
-
-	/**
-	 * @var array
-	 */
-	public $emailRecipients = [];
-
-	/**
-	 * @var CookieJar
-	 */
-	private $cookieJar;
-
-	/**
-	 * @var string
-	 */
-	private $requestToken;
-
-	/**
-	 * @var array
-	 */
-	private $storageIds = [];
-
-	/**
-	 * @var array
-	 */
-	private $createdFiles = [];
+	private bool $federatedServerExists = false;
+	private int $ocsApiVersion = 1;
+	private ?ResponseInterface $response = null;
+	private string $responseUser = '';
+	private ?string $responseBodyContent = null;
+	private array $userResponseBodyContents = [];
+	public array $emailRecipients = [];
+	private CookieJar $cookieJar;
+	private string $requestToken;
+	private array $storageIds = [];
+	private array $createdFiles = [];
 
 	/**
 	 * The local source IP address from which to initiate API actions.
 	 * Defaults to system-selected address matching IP address family and scope.
-	 *
-	 * @var string|null
 	 */
-	private $sourceIpAddress = null;
-
-	private $guzzleClientHeaders = [];
-
-	/**
-	 *
-	 * @var OCSContext
-	 */
-	public $ocsContext;
-
-	/**
-	 *
-	 * @var AuthContext
-	 */
-	public $authContext;
-
-	/**
-	 *
-	 * @var GraphContext
-	 */
-	public $graphContext;
-
-	/**
-	 *
-	 * @var AppConfigurationContext
-	 */
-	public $appConfigurationContext;
-
-	/**
-	 * @var array
-	 */
-	private $initialTrustedServer;
+	private ?string $sourceIpAddress = null;
+	private array $guzzleClientHeaders = [];
+	public OCSContext $ocsContext;
+	public AuthContext $authContext;
+	public GraphContext $graphContext;
+	public AppConfigurationContext $appConfigurationContext;
+	private array $initialTrustedServer;
 
 	/**
 	 * The codes are stored as strings, even though they are numbers
-	 *
-	 * @var array last http status codes
 	 */
-	private $lastHttpStatusCodesArray = [];
-	/**
-	 * @var array last ocs status codes
-	 */
-	private $lastOCSStatusCodesArray = [];
+	private array $lastHttpStatusCodesArray = [];
+	private array $lastOCSStatusCodesArray = [];
 
 	/**
-	 * @var bool
-	 *
 	 * this is set true for db conversion tests
 	 */
-	private $dbConversion = false;
+	private bool $dbConversion = false;
 
 	/**
 	 * @param bool $value
@@ -340,10 +191,7 @@ class FeatureContext extends BehatVariablesContext {
 		return $this->dbConversion;
 	}
 
-	/**
-	 * @var string
-	 */
-	private $oCSelector;
+	private string $oCSelector;
 
 	/**
 	 * @param string $selector
@@ -402,7 +250,7 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return void
 	 */
 	public function pushToLastOcsCodesArray(string $ocsStatusCode): void {
-		array_push($this->lastOCSStatusCodesArray, $ocsStatusCode);
+		$this->lastOCSStatusCodesArray[] = $ocsStatusCode;
 	}
 
 	/**
@@ -438,54 +286,21 @@ class FeatureContext extends BehatVariablesContext {
 		}
 	}
 
-	/*
-	 * @var Ldap
-	 */
-	private $ldap;
-	/**
-	 * @var string
-	 */
-	private $ldapBaseDN;
-	/**
-	 * @var string
-	 */
-	private $ldapHost;
-	/**
-	 * @var int
-	 */
-	private $ldapPort;
-	/**
-	 * @var string
-	 */
-	private $ldapAdminUser;
-	/**
-	 * @var string
-	 */
-	private $ldapAdminPassword = "";
-	/**
-	 * @var string
-	 */
-	private $ldapUsersOU;
-	/**
-	 * @var string
-	 */
-	private $ldapGroupsOU;
-	/**
-	 * @var string
-	 */
-	private $ldapGroupSchema;
-	/**
-	 * @var bool
-	 */
-	private $skipImportLdif;
-	/**
-	 * @var array
-	 */
-	private $toDeleteDNs = [];
-	private $ldapCreatedUsers = [];
-	private $ldapCreatedGroups = [];
-	private $toDeleteLdapConfigs = [];
-	private $oldLdapConfig = [];
+	private Ldap $ldap;
+	private string $ldapBaseDN;
+	private string $ldapHost;
+	private int $ldapPort;
+	private string $ldapAdminUser;
+	private string $ldapAdminPassword = "";
+	private string $ldapUsersOU;
+	private string $ldapGroupsOU;
+	private string $ldapGroupSchema;
+	private bool $skipImportLdif;
+	private array $toDeleteDNs = [];
+	private array $ldapCreatedUsers = [];
+	private array $ldapCreatedGroups = [];
+	private array $toDeleteLdapConfigs = [];
+	private array $oldLdapConfig = [];
 
 	/**
 	 * @return Ldap
@@ -590,8 +405,9 @@ class FeatureContext extends BehatVariablesContext {
 	 * @return bool
 	 */
 	public function sendScenarioLineReferencesInXRequestId(): ?bool {
-		if ($this->sendStepLineRef === null) {
+		if ($this->sendStepLineRefHasBeenChecked === false) {
 			$this->sendStepLineRef = (\getenv("SEND_SCENARIO_LINE_REFERENCES") === "true");
+			$this->sendStepLineRefHasBeenChecked = true;
 		}
 		return $this->sendStepLineRef;
 	}
@@ -4032,15 +3848,12 @@ class FeatureContext extends BehatVariablesContext {
 			$this->getAdminPassword(),
 			$userName
 		);
-		if ($response) {
-			$data = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
-			if (isset($data["id"])) {
-				return $data["id"];
-			} else {
-				throw new Exception(__METHOD__ . " accounts-list is empty");
-			}
+		$data = \json_decode($response->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
+		if (isset($data["id"])) {
+			return $data["id"];
+		} else {
+			throw new Exception(__METHOD__ . " accounts-list is empty");
 		}
-		throw new Exception(__METHOD__ . " user with name $userName not found");
 	}
 
 	/**
@@ -4059,14 +3872,11 @@ class FeatureContext extends BehatVariablesContext {
 			$this->getAdminPassword(),
 			$groupName
 		);
-		if ($response) {
-			$data = $this->getJsonDecodedResponse($response);
-			if (isset($data["id"])) {
-				return $data["id"];
-			} else {
-				throw new Exception(__METHOD__ . " accounts-list is empty");
-			}
+		$data = $this->getJsonDecodedResponse($response);
+		if (isset($data["id"])) {
+			return $data["id"];
+		} else {
+			throw new Exception(__METHOD__ . " accounts-list is empty");
 		}
-		throw new Exception(__METHOD__ . " Group with name $groupName not found");
 	}
 }

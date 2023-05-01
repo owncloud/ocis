@@ -19,25 +19,9 @@ require_once 'bootstrap.php';
  * Context for the TUS-specific steps using the Graph API
  */
 class RoleAssignmentContext implements Context {
-
-	/**
-	 * @var FeatureContext
-	 */
 	private FeatureContext $featureContext;
-
-	/**
-	 * @var SpacesContext
-	 */
 	private SpacesContext $spacesContext;
-
-	/**
-	 * @var string
-	 */
 	private string $baseUrl;
-
-	/**
-	 * @var string
-	 */
 	private string $settingsUrl = '/api/v0/settings/';
 
 	/**
@@ -121,7 +105,6 @@ class RoleAssignmentContext implements Context {
 	 *
 	 * @return void
 	 *
-	 * @throws GuzzleException
 	 * @throws Exception
 	 */
 	public function theAdministratorHasGivenUserTheRole(string $user, string $role): void {
@@ -137,7 +120,7 @@ class RoleAssignmentContext implements Context {
 	 *
 	 * @return string
 	 */
-	public function userGetRoleIdByRoleName($user, $role): string {
+	public function userGetRoleIdByRoleName(string $user, string $role): string {
 		$this->getAllExistingRoles($user);
 
 		if ($this->featureContext->getResponse()) {
@@ -149,6 +132,8 @@ class RoleAssignmentContext implements Context {
 				__METHOD__ . " could not find bundles in body"
 			);
 			$bundles = $decodedBody["bundles"];
+		} else {
+			$bundles = [];
 		}
 
 		$roleToAssign = "";
@@ -171,7 +156,7 @@ class RoleAssignmentContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function setRoleToUser($user, $userId, $roleId): void {
+	public function setRoleToUser(string $user, string $userId, string $roleId): void {
 		$this->sendRequestToAssignRoleToUser($user, $userId, $roleId);
 
 		if ($this->featureContext->getResponse()) {
@@ -183,6 +168,8 @@ class RoleAssignmentContext implements Context {
 				__METHOD__ . " could not find assignment in body"
 			);
 			$assignment = $decodedBody["assignment"];
+		} else {
+			$assignment = [];
 		}
 
 		Assert::assertEquals($userId, $assignment["accountUuid"]);

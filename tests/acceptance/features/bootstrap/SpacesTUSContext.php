@@ -12,9 +12,7 @@ declare(strict_types=1);
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use GuzzleHttp\Exception\GuzzleException;
-use TestHelpers\HttpRequestHelper;
 use Behat\Gherkin\Node\TableNode;
-use TestHelpers\WebDavHelper;
 
 require_once 'bootstrap.php';
 
@@ -22,26 +20,9 @@ require_once 'bootstrap.php';
  * Context for the TUS-specific steps using the Graph API
  */
 class SpacesTUSContext implements Context {
-
-	/**
-	 * @var FeatureContext
-	 */
 	private FeatureContext $featureContext;
-
-	/**
-	 * @var TUSContext
-	 */
 	private TUSContext $tusContext;
-
-	/**
-	 * @var SpacesContext
-	 */
 	private SpacesContext $spacesContext;
-
-	/**
-	 * @var string
-	 */
-	private string $baseUrl;
 
 	/**
 	 * This will run before EVERY scenario.
@@ -60,7 +41,6 @@ class SpacesTUSContext implements Context {
 		$this->featureContext = $environment->getContext('FeatureContext');
 		$this->spacesContext = $environment->getContext('SpacesContext');
 		$this->tusContext = $environment->getContext('TUSContext');
-		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
 	}
 
 	/**
@@ -88,7 +68,6 @@ class SpacesTUSContext implements Context {
 	 * @param string $source
 	 * @param string $destination
 	 * @param string $spaceName
-	 * @param array|null $uploadMetadata
 	 *
 	 * @return void
 	 * @throws Exception
@@ -98,8 +77,7 @@ class SpacesTUSContext implements Context {
 		string $user,
 		string $source,
 		string $destination,
-		string $spaceName,
-		?array $uploadMetadata = null
+		string $spaceName
 	): void {
 		$this->spacesContext->setSpaceIDByName($user, $spaceName);
 		$this->tusContext->userUploadsUsingTusAFileTo($user, $source, $destination);

@@ -41,65 +41,20 @@ require_once 'bootstrap.php';
  * Context for ocis spaces specific steps
  */
 class SpacesContext implements Context {
-
-	/**
-	 * @var FeatureContext
-	 */
 	private FeatureContext $featureContext;
-
-	/**
-	 * @var OCSContext
-	 */
 	private OCSContext $ocsContext;
-
-	/**
-	 * @var TrashbinContext
-	 */
 	private TrashbinContext $trashbinContext;
-
-	/**
-	 * @var WebDavPropertiesContext
-	 */
 	private WebDavPropertiesContext $webDavPropertiesContext;
-
-	/**
-	 * @var FavoritesContext
-	 */
 	private FavoritesContext $favoritesContext;
-
-	/**
-	 * @var ChecksumContext
-	 */
 	private ChecksumContext $checksumContext;
-
-	/**
-	 * @var FilesVersionsContext
-	 */
 	private FilesVersionsContext $filesVersionsContext;
-
-	/**
-	 * @var GraphContext
-	 */
-	private GraphContext $graphContext;
-
-	/**
-	 * @var string
-	 */
 	private string $baseUrl;
 
 	/**
-	 * @var array key is space name and value is the username that created the space
+	 * key is space name and value is the username that created the space
 	 */
 	private array $createdSpaces;
-
-	/**
-	 * @var string
-	 */
 	private string $ocsApiUrl = '/ocs/v2.php/apps/files_sharing/api/v1/shares';
-
-	/**
-	 * @var string
-	 */
 	private string $davSpacesUrl = '/remote.php/dav/spaces/';
 
 	/**
@@ -117,7 +72,7 @@ class SpacesContext implements Context {
 	 *   ]
 	 * ]
 	 */
-	private $storedEtags = [];
+	private array $storedEtags = [];
 
 	/**
 	 * @param string $spaceName
@@ -143,8 +98,6 @@ class SpacesContext implements Context {
 	}
 
 	private array $availableSpaces = [];
-
-	private array $lastPublicLinkData = [];
 
 	/**
 	 * @return array
@@ -184,13 +137,6 @@ class SpacesContext implements Context {
 	public function setResponseXml(array $responseXml): void {
 		$this->responseXml = $responseXml;
 	}
-
-	/**
-	 * space id from last propfind request
-	 *
-	 * @var string
-	 */
-	private string $responseSpaceId;
 
 	/**
 	 * Get SpaceId by Name
@@ -441,7 +387,6 @@ class SpacesContext implements Context {
 		$this->favoritesContext = $environment->getContext('FavoritesContext');
 		$this->checksumContext = $environment->getContext('ChecksumContext');
 		$this->filesVersionsContext = $environment->getContext('FilesVersionsContext');
-		$this->graphContext = $environment->getContext('GraphContext');
 		// Run the BeforeScenario function in OCSContext to set it up correctly
 		$this->ocsContext->before($scope);
 		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
@@ -614,7 +559,7 @@ class SpacesContext implements Context {
 	public function theUserLooksUpTheSingleSpaceUsingTheGraphApiByUsingItsId(string $user, string $spaceName, string $ownerUser = ''): void {
 		$space = $this->getSpaceByName(($ownerUser !== "") ? $ownerUser : $user, $spaceName);
 		Assert::assertIsArray($space);
-		Assert::assertNotEmpty($spaceId = $space["id"]);
+		Assert::assertNotEmpty($space["id"]);
 		Assert::assertNotEmpty($space["root"]["webDavUrl"]);
 		$this->featureContext->setResponse(
 			GraphHelper::getSingleSpace(
@@ -2284,7 +2229,7 @@ class SpacesContext implements Context {
 	 *
 	 * @param  string $user
 	 * @param  string $spaceName
-	 * @param  string $owner
+	 * @param string $owner
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -2292,7 +2237,7 @@ class SpacesContext implements Context {
 	public function sendDeleteSpaceRequest(
 		string $user,
 		string $spaceName,
-		$owner = ''
+		string $owner = ''
 	): void {
 		$space = $this->getSpaceByName(($owner !== "") ? $owner : $user, $spaceName);
 
@@ -3242,12 +3187,11 @@ class SpacesContext implements Context {
 	 * @param string $recipientType
 	 * @param string $recipient
 	 * @param string $role
-	 * @param string $expirationDate
+	 * @param string|null $expirationDate
 	 *
 	 * @return void
 	 *
 	 * @throws GuzzleException
-	 * @throws Exception
 	 */
 	public function theUserShouldHaveSpaceWithRecipient(
 		string $user,

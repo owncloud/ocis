@@ -34,10 +34,7 @@ use Behat\Behat\Context\Context;
  * AppConfiguration trait
  */
 class AppConfigurationContext implements Context {
-	/**
-	 * @var FeatureContext
-	 */
-	private $featureContext;
+	private FeatureContext $featureContext;
 
 	/**
 	 * @When /^the administrator sets parameter "([^"]*)" of app "([^"]*)" to ((?:'[^']*')|(?:"[^"]*"))$/

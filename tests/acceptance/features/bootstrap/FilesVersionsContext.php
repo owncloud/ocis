@@ -33,11 +33,7 @@ require_once 'bootstrap.php';
  * Steps that relate to files_versions app
  */
 class FilesVersionsContext implements Context {
-	/**
-	 *
-	 * @var FeatureContext
-	 */
-	private $featureContext;
+	private FeatureContext $featureContext;
 
 	/**
 	 * @param string $fileId
@@ -240,8 +236,8 @@ class FilesVersionsContext implements Context {
 		Assert::assertEquals(
 			$length,
 			(int) $xmlPart[$index],
-			"The content length of file {$path} with version {$index} for user {$user} was
-			expected to be {$length} but the actual content length is {$xmlPart[$index]}"
+			"The content length of file $path with version $index for user $user was
+			expected to be $length but the actual content length is $xmlPart[$index]"
 		);
 	}
 

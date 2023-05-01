@@ -31,15 +31,7 @@ require_once 'bootstrap.php';
  * Acceptance test steps related to testing tags features
  */
 class TagContext implements Context {
-	/**
-	 *
-	 * @var FeatureContext
-	 */
-	private $featureContext;
-
-	/**
-	 * @var SpacesContext
-	 */
+	private FeatureContext $featureContext;
 	private SpacesContext $spacesContext;
 
 	/**
@@ -61,11 +53,6 @@ class TagContext implements Context {
 	}
 
 	/**
-	 * @var array
-	 */
-	private $createdTags = [];
-
-	/**
 	 * @When /^user "([^"]*)" creates the following tags for (folder|file)\s?"([^"]*)" of space "([^"]*)":$/
 	 *
 	 * @param string $user
@@ -80,7 +67,7 @@ class TagContext implements Context {
 	public function theUserCreatesFollowingTags(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):void {
 		$tagNameArray = [];
 		foreach ($table->getRows() as $value) {
-			array_push($tagNameArray, $value[0]);
+			$tagNameArray[] = $value[0];
 		}
 
 		if ($fileOrFolder === 'folder') {
@@ -173,7 +160,7 @@ class TagContext implements Context {
 	public function userRemovesTagsFromResourceOfTheSpace(string $user, string $fileOrFolder, string $resource, string $space, TableNode $table):void {
 		$tagNameArray = [];
 		foreach ($table->getRows() as $value) {
-			array_push($tagNameArray, $value[0]);
+			$tagNameArray[] = $value[0];
 		}
 
 		if ($fileOrFolder === 'folder') {
