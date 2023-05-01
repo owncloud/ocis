@@ -167,7 +167,6 @@ func (s eventsNotifier) getGranteeList(ctx context.Context, executant, u *user.U
 	}
 }
 
-// func (s eventsNotifier) getUserName(ctx context.Context, u *user.UserId) (string, error) {
 func (s eventsNotifier) getUser(ctx context.Context, u *user.UserId) (*user.User, error) {
 	if u == nil {
 		return nil, errors.New("need at least one non-nil grantee")

@@ -101,6 +101,7 @@ func (m Mail) getMailClient() (*mail.SMTPClient, error) {
 // SendMessage sends a message to all given users.
 func (m Mail) SendMessage(ctx context.Context, message *Message) error {
 	if m.conf.Notifications.SMTP.Host == "" {
+		m.logger.Info().Str("mail", "SendMessage").Msg("failed to send a message. SMTP host is  not set")
 		return nil
 	}
 

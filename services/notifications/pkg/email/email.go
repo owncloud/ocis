@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"embed"
 	"html/template"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -17,6 +18,8 @@ import (
 var (
 	//go:embed templates
 	templatesFS embed.FS
+
+	imgDir = filepath.Join("templates", "html", "img")
 )
 
 // RenderEmailTemplate renders the email template for a new share
@@ -38,7 +41,7 @@ func RenderEmailTemplate(mt MessageTemplate, locale string, emailTemplatePath st
 	if err != nil {
 		return nil, err
 	}
-	htmlTpl, err := parseTemplate(emailTemplatePath, filepath.Join("html", "email.html.tmpl"))
+	htmlTpl, err := parseTemplate(emailTemplatePath, mt.htmlTemplate)
 	if err != nil {
 		return nil, err
 	}
@@ -46,15 +49,19 @@ func RenderEmailTemplate(mt MessageTemplate, locale string, emailTemplatePath st
 	if err != nil {
 		return nil, err
 	}
-
 	var data map[string][]byte
-	data, err = readImages(emailTemplatePath)
-	if err != nil {
-		data, err = readFs()
+	if emailTemplatePath != "" {
+		data, err = readImages(emailTemplatePath)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		data, err = readImagesFs()
 		if err != nil {
 			return nil, err
 		}
 	}
+
 	return &channels.Message{
 		Subject:      textMt.Subject,
 		TextBody:     textBody,
@@ -76,26 +83,10 @@ func emailTemplate(tpl *template.Template, mt MessageTemplate) (string, error) {
 }
 
 func parseTemplate(emailTemplatePath string, file string) (*template.Template, error) {
-	var err error
-	var tpl *template.Template
-	// try to lookup the files in the filesystem
-	tpl, err = template.ParseFiles(filepath.Join(emailTemplatePath, file))
-	if err != nil {
-		// template has not been found in the fs, or path has not been specified => use embed templates
-		tpl, err = template.ParseFS(templatesFS, filepath.Join("templates", file))
-		if err != nil {
-			return nil, err
-		}
+	if emailTemplatePath != "" {
+		return template.ParseFiles(filepath.Join(emailTemplatePath, file))
 	}
-	return tpl, err
-}
-
-func executeRaw(raw string, vars map[string]interface{}) (string, error) {
-	tpl, err := template.New("").Parse(raw)
-	if err != nil {
-		return "", err
-	}
-	return executeTemplate(tpl, vars)
+	return template.ParseFS(templatesFS, filepath.Join(file))
 }
 
 func executeTemplate(tpl *template.Template, vars any) (string, error) {
@@ -106,39 +97,29 @@ func executeTemplate(tpl *template.Template, vars any) (string, error) {
 	return writer.String(), nil
 }
 
-func readFs() (map[string][]byte, error) {
-	dir := filepath.Join("templates", "html", "img")
+func readImagesFs() (map[string][]byte, error) {
+	dir := filepath.Join(imgDir)
 	entries, err := templatesFS.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
-
-	list := make(map[string][]byte)
-	for _, e := range entries {
-		if !e.IsDir() {
-			file, err := templatesFS.ReadFile(filepath.Join(dir, e.Name()))
-			if err != nil {
-				return nil, err
-			}
-			if !validateMime(file) {
-				continue
-			}
-			list[e.Name()] = file
-		}
-	}
-	return list, nil
+	return read(entries, templatesFS)
 }
 
 func readImages(emailTemplatePath string) (map[string][]byte, error) {
-	dir := filepath.Join(emailTemplatePath, "html", "img")
+	dir := filepath.Join(emailTemplatePath, imgDir)
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, err
 	}
+	return read(entries, os.DirFS(emailTemplatePath))
+}
+
+func read(entries []fs.DirEntry, fsys fs.FS) (map[string][]byte, error) {
 	list := make(map[string][]byte)
 	for _, e := range entries {
 		if !e.IsDir() {
-			file, err := os.ReadFile(filepath.Join(dir, e.Name()))
+			file, err := fs.ReadFile(fsys, filepath.Join(imgDir, e.Name()))
 			if err != nil {
 				return nil, err
 			}

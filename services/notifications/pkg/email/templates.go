@@ -7,8 +7,8 @@ func Template(s string) string { return s }
 var (
 	// Shares
 	ShareCreated = MessageTemplate{
-		textTemplate: "shares/shareCreated.email.body.tmpl",
-		htmlTemplate: "html/email.html.tmpl",
+		textTemplate: "templates/text/email.text.tmpl",
+		htmlTemplate: "templates/html/email.html.tmpl",
 		// ShareCreated email template, Subject field (resolves directly)
 		Subject: Template(`{ShareSharer} shared '{ShareFolder}' with you`),
 		// ShareCreated email template, resolves via {{ .Greeting }}
@@ -20,8 +20,8 @@ var (
 	}
 
 	ShareExpired = MessageTemplate{
-		textTemplate: "shares/shareExpired.email.body.tmpl",
-		htmlTemplate: "html/email.html.tmpl",
+		textTemplate: "templates/text/email.text.tmpl",
+		htmlTemplate: "templates/html/email.html.tmpl",
 		// ShareExpired email template, Subject field (resolves directly)
 		Subject: Template(`Share to '{ShareFolder}' expired at {ExpiredAt}`),
 		// ShareExpired email template, resolves via {{ .Greeting }}
@@ -34,8 +34,8 @@ Even though this share has been revoked you still might have access through othe
 
 	// Spaces templates
 	SharedSpace = MessageTemplate{
-		textTemplate: "spaces/sharedSpace.email.body.tmpl",
-		htmlTemplate: "html/email.html.tmpl",
+		textTemplate: "templates/text/email.text.tmpl",
+		htmlTemplate: "templates/html/email.html.tmpl",
 		// SharedSpace email template, Subject field (resolves directly)
 		Subject: Template("{SpaceSharer} invited you to join {SpaceName}"),
 		// SharedSpace email template, resolves via {{ .Greeting }}
@@ -47,8 +47,8 @@ Even though this share has been revoked you still might have access through othe
 	}
 
 	UnsharedSpace = MessageTemplate{
-		textTemplate: "spaces/unsharedSpace.email.body.tmpl",
-		htmlTemplate: "html/email.html.tmpl",
+		textTemplate: "templates/text/email.text.tmpl",
+		htmlTemplate: "templates/html/email.html.tmpl",
 		// UnsharedSpace email template, Subject field (resolves directly)
 		Subject: Template(`{SpaceSharer} removed you from {SpaceName}`),
 		// UnsharedSpace email template, resolves via {{ .Greeting }}
@@ -62,8 +62,8 @@ You might still have access through your other groups or direct membership.`),
 	}
 
 	MembershipExpired = MessageTemplate{
-		textTemplate: "spaces/membershipExpired.email.body.tmpl",
-		htmlTemplate: "html/email.html.tmpl",
+		textTemplate: "templates/text/email.text.tmpl",
+		htmlTemplate: "templates/html/email.html.tmpl",
 		// MembershipExpired email template, Subject field (resolves directly)
 		Subject: Template(`Membership of '{SpaceName}' expired at {ExpiredAt}`),
 		// MembershipExpired email template, resolves via {{ .Greeting }}

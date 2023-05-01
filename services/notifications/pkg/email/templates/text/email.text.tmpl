@@ -1,7 +1,9 @@
 {{ .Greeting }}
 
 {{ .MessageBody }}
-
+{{if ne .CallToAction "" }}
+{{ .CallToAction }}
+{{end}}
 
 ---
 ownCloud - Store. Share. Work.
