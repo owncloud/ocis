@@ -175,7 +175,7 @@ Feature: checksums
       | dav_version |
       | spaces      |
 
-  @files_sharing-app-required @issue-1291
+  @issue-1291
   Scenario Outline: sharing a file with checksum should return the checksum in the propfind using new DAV path
     Given auto-accept shares has been disabled
     And using <dav_version> DAV path
@@ -190,7 +190,7 @@ Feature: checksums
       | dav_version |
       | new         |
 
-  @files_sharing-app-required @issue-1291
+  @issue-1291
   Scenario Outline: modifying a shared file should return correct checksum in the propfind using new DAV path
     Given auto-accept shares has been disabled
     And using <dav_version> DAV path

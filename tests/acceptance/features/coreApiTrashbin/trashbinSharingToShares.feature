@@ -1,4 +1,4 @@
-@api @files_trashbin-app-required @files_sharing-app-required
+@api @files_trashbin-app-required
 Feature: using trashbin together with sharing
 
   Background:

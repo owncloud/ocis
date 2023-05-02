@@ -272,7 +272,7 @@ Feature: dav-versions
     Then the HTTP status code should be "204"
     And the version folder of file "/file.txt" for user "Alice" should contain "0" element
 
-  @files_sharing-app-required
+ 
   Scenario: sharer of a file can see the old version information when the sharee changes the content of the file
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "First content" to "sharefile.txt"
@@ -284,7 +284,7 @@ Feature: dav-versions
     When user "Brian" gets the number of versions of file "/Shares/sharefile.txt"
     Then the HTTP status code should be "403"
 
-  @files_sharing-app-required
+ 
   Scenario: sharer of a file can restore the original content of a shared file after the file has been modified by the sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "First content" to "sharefile.txt"
@@ -296,7 +296,7 @@ Feature: dav-versions
     And the content of file "/sharefile.txt" for user "Alice" should be "First content"
     And the content of file "/Shares/sharefile.txt" for user "Brian" should be "First content"
 
-  @files_sharing-app-required
+ 
   Scenario: sharer can restore a file inside a shared folder modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
@@ -309,7 +309,7 @@ Feature: dav-versions
     And the content of file "/sharingfolder/sharefile.txt" for user "Alice" should be "First content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "First content"
 
-  @files_sharing-app-required
+ 
   Scenario: sharee cannot see a version of a file inside a shared folder when modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
@@ -322,7 +322,7 @@ Feature: dav-versions
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "Second content"
     And the content of file "/sharingfolder/sharefile.txt" for user "Alice" should be "Second content"
 
-  @files_sharing-app-required
+ 
   Scenario: sharer can restore a file inside a shared folder created by sharee and modified by sharer
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
@@ -335,7 +335,7 @@ Feature: dav-versions
     And the content of file "/sharingfolder/sharefile.txt" for user "Alice" should be "First content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "First content"
 
-  @files_sharing-app-required
+ 
   Scenario: sharer can restore a file inside a shared folder created by sharee and modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
@@ -348,7 +348,7 @@ Feature: dav-versions
     And the content of file "/sharingfolder/sharefile.txt" for user "Alice" should be "old content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "old content"
 
-  @files_sharing-app-required
+ 
   Scenario: sharer can restore a file inside a group shared folder modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
@@ -368,7 +368,7 @@ Feature: dav-versions
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "First content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Carol" should be "First content"
 
-  @files_sharing-app-required
+ 
   Scenario Outline: Moving a file (with versions) into a shared folder as the sharee and as the sharer
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -393,7 +393,7 @@ Feature: dav-versions
       | old         | Brian | /testshare        |
       | new         | Brian | /testshare        |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: Moving a file (with versions) out of a shared folder as the sharee and as the sharer
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -418,7 +418,7 @@ Feature: dav-versions
       | old         | Brian | /testshare |
       | new         | Brian | /testshare |
 
-  @files_sharing-app-required
+ 
   Scenario: Receiver tries to get file versions of unshared file from the sharer
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
@@ -429,7 +429,7 @@ Feature: dav-versions
     Then the HTTP status code should be "404"
     And the value of the item "//s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
 
-  @skipOnStorage:ceph @files_primary_s3-issue-161 @files_sharing-app-required
+  @skipOnStorage:ceph @files_primary_s3-issue-161
   Scenario: Receiver tries get file versions of shared file from the sharer
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"

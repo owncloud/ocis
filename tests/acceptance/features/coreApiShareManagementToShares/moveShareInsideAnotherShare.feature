@@ -1,4 +1,4 @@
-@api @files_sharing-app-required
+@api
 Feature: moving a share inside another share
   As a user
   I want to move a shared resource inside another shared resource

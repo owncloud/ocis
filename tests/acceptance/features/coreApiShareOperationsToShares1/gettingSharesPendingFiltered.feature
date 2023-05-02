@@ -1,4 +1,4 @@
-@api @files_sharing-app-required
+@api
 Feature: get the pending shares filtered by type (user, group etc)
   As a user
   I want to be able to know the pending shares that I have received of a particular type (user, group etc)

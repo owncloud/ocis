@@ -25,7 +25,7 @@ Feature: UNLOCK locked items
       | dav-path |
       | spaces   |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: as public unlocking a file in a share that was locked by the file owner is not possible. To unlock use the owners locktoken
     Given user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"

@@ -4,7 +4,7 @@ Feature: actions on a locked item are possible if the token is sent with the req
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
-  @files_sharing-app-required
+ 
   Scenario Outline: two users having both a shared lock can use the resource
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files

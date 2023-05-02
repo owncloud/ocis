@@ -1,4 +1,4 @@
-@api @files_sharing-app-required
+@api
 Feature: favorite
   As a user
   I want to favorite the shared resources

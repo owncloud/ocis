@@ -62,7 +62,7 @@ Feature: copy file
       | dav_version |
       | spaces      |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: Copying a file to a folder with no permissions
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -81,7 +81,7 @@ Feature: copy file
       | old         |
       | new         |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: Copying a file to overwrite a file into a folder with no permissions
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -618,7 +618,7 @@ Feature: copy file
       | dav_version |
       | spaces      |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: Copying a file into a shared folder as the sharee
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -638,7 +638,7 @@ Feature: copy file
       | old         |
       | new         |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: Copying a file into a shared folder as the sharer
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -659,7 +659,7 @@ Feature: copy file
       | old         |
       | new         |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: Copying a file out of a shared folder as the sharee
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -681,7 +681,7 @@ Feature: copy file
       | old         |
       | new         |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: Copying a file out of a shared folder as the sharer
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -730,7 +730,7 @@ Feature: copy file
       | dav_version |
       | spaces      |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: Copying a file between shares received from different users
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -761,7 +761,7 @@ Feature: copy file
       | old         |
       | new         |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: Copying a folder between shares received from different users
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -793,7 +793,7 @@ Feature: copy file
       | old         |
       | new         |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: Copying a file to a folder that is shared with multiple users
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files

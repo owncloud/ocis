@@ -1868,40 +1868,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @Given file :filename with text :text has been created in local storage on the server
-	 *
-	 * @param string $filename
-	 * @param string $text
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function fileHasBeenCreatedInLocalStorageWithText(string $filename, string $text): void {
-		$this->createFileOnServerWithContent(
-			LOCAL_STORAGE_DIR_ON_REMOTE_SERVER . "/$filename",
-			$text
-		);
-	}
-
-	/**
-	 * @Given file :filename has been deleted from local storage on the server
-	 *
-	 * @param string $filename
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function fileHasBeenDeletedInLocalStorage(string $filename): void {
-		SetupHelper::deleteFileOnServer(
-			LOCAL_STORAGE_DIR_ON_REMOTE_SERVER . "/$filename",
-			$this->getStepLineRef(),
-			$this->getBaseUrl(),
-			$this->getAdminUsername(),
-			$this->getAdminPassword()
-		);
-	}
-
-	/**
 	 * @param string $user
 	 *
 	 * @return boolean
@@ -2186,83 +2152,6 @@ class FeatureContext extends BehatVariablesContext {
 	}
 
 	/**
-	 * @When the administrator creates file :path with content :content in local storage using the testing API
-	 *
-	 * @param string $path
-	 * @param string $content
-	 *
-	 * @return void
-	 */
-	public function theAdministratorCreatesFileUsingTheTestingApi(string $path, string $content): void {
-		$this->theAdministratorCreatesFileWithContentInLocalStorageUsingTheTestingApi(
-			$path,
-			$content,
-			'local_storage'
-		);
-	}
-
-	/**
-	 * @Given the administrator has created file :path with content :content in local storage using the testing API
-	 *
-	 * @param string $path
-	 * @param string $content
-	 *
-	 * @return void
-	 */
-	public function theAdministratorHasCreatedFileUsingTheTestingApi(string $path, string $content): void {
-		$this->theAdministratorHasCreatedFileWithContentInLocalStorageUsingTheTestingApi(
-			$path,
-			$content,
-			'local_storage'
-		);
-	}
-
-	/**
-	 * @When the administrator creates file :path with content :content in local storage :mountPoint using the testing API
-	 *
-	 * @param string $path
-	 * @param string $content
-	 * @param string $mountPoint
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorCreatesFileWithContentInLocalStorageUsingTheTestingApi(
-		string $path,
-		string $content,
-		string $mountPoint
-	): void {
-		$response = $this->copyContentToFileInTemporaryStorageOnSystemUnderTest(
-			"$mountPoint/$path",
-			$content
-		);
-		$this->setResponse($response);
-	}
-
-	/**
-	 * @Given the administrator has created file :path with content :content in local storage :mountPoint
-	 *
-	 * @param string $path
-	 * @param string $content
-	 * @param string $mountPoint
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theAdministratorHasCreatedFileWithContentInLocalStorageUsingTheTestingApi(
-		string $path,
-		string $content,
-		string $mountPoint
-	): void {
-		$this->theAdministratorCreatesFileWithContentInLocalStorageUsingTheTestingApi(
-			$path,
-			$content,
-			$mountPoint
-		);
-		$this->theHTTPStatusCodeShouldBeSuccess();
-	}
-
-	/**
 	 * Copy a file from the test-runner to the temporary storage directory on
 	 * the system-under-test. This uses the testing app to push the file into
 	 * the backend of the server, where it can be seen by occ commands done in
@@ -2319,28 +2208,6 @@ class FeatureContext extends BehatVariablesContext {
 			],
 			$this->getOcsApiVersion()
 		);
-	}
-
-	/**
-	 * @When the administrator deletes file :path in local storage using the testing API
-	 *
-	 * @param string $path
-	 *
-	 * @return void
-	 */
-	public function theAdministratorDeletesFileInLocalStorageUsingTheTestingApi(string $path): void {
-		$user = $this->getAdminUsername();
-		$response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$user,
-			$this->getAdminPassword(),
-			'DELETE',
-			"/apps/testing/api/v1/file",
-			$this->getStepLineRef(),
-			['file' => LOCAL_STORAGE_DIR_ON_REMOTE_SERVER . "/$path"],
-			$this->getOcsApiVersion()
-		);
-		$this->setResponse($response);
 	}
 
 	/**
@@ -2610,21 +2477,6 @@ class FeatureContext extends BehatVariablesContext {
 		);
 
 		$this->setResponse($response);
-	}
-
-	/**
-	 * @When the local storage mount for :mount is renamed to :target
-	 *
-	 * @param string $mount
-	 * @param string $target
-	 *
-	 * @return void
-	 */
-	public function theLocalStorageMountForIsRenamedTo(string $mount, string $target): void {
-		$mountPath = TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER . "/" . ltrim($mount, '/');
-		$targetPath = TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER . "/" . ltrim($target, '/');
-
-		$this->moveFileInServerRoot($mountPath, $targetPath);
 	}
 
 	/**

@@ -1,4 +1,4 @@
-@api @files_sharing-app-required @public_link_share-feature-required
+@api @public_link_share-feature-required
 Feature: create a public link share when share_folder is set to Shares
 
   Background:

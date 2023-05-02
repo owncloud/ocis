@@ -1,4 +1,4 @@
-@api @issue-1284 @files_sharing-app-required
+@api @issue-1284
 Feature: UNLOCK locked items (sharing)
 
   Background:
