@@ -15,7 +15,7 @@ Feature: delete file/folder
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
 
-  @smokeTest @skipOnBruteForceProtection @issue-brute_force_protection-112
+  @smokeTest
   Scenario: send DELETE requests to webDav endpoints as normal user with wrong password
     When user "Alice" requests these endpoints with "DELETE" using password "invalid" about user "Alice"
       | endpoint                                           |
@@ -27,7 +27,7 @@ Feature: delete file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
 
-  @smokeTest @skipOnBruteForceProtection @issue-brute_force_protection-112 @personalSpace
+  @smokeTest @personalSpace
   Scenario: send DELETE requests to webDav endpoints as normal user with wrong password using the spaces WebDAV API
     When user "Alice" requests these endpoints with "DELETE" using password "invalid" about user "Alice"
       | endpoint                                           |
@@ -115,7 +115,7 @@ Feature: delete file/folder
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
 
-  @smokeTest @skipOnBruteForceProtection @issue-brute_force_protection-112
+  @smokeTest
   Scenario: send DELETE requests to webDav endpoints without any authentication
     When a user requests these endpoints with "DELETE" with no authentication about user "Alice"
       | endpoint                                           |
@@ -126,7 +126,7 @@ Feature: delete file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "401"
 
-  @smokeTest @skipOnBruteForceProtection @issue-brute_force_protection-112 @personalSpace
+  @smokeTest @personalSpace
   Scenario: send DELETE requests to webDav endpoints without any authentication using the spaces WebDAV API
     When a user requests these endpoints with "DELETE" with no authentication about user "Alice"
       | endpoint                                           |

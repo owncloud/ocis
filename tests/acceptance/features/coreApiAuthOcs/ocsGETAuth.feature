@@ -72,7 +72,7 @@ Feature: auth
     Then the HTTP status code of responses on all endpoints should be "401"
     And the OCS status code of responses on all endpoints should be "401"
 
-  @issue-1338 @issue-1337 @smokeTest @skipOnBruteForceProtection @issue-brute_force_protection-112
+  @issue-1338 @issue-1337 @smokeTest
   Scenario: using OCS as normal user with wrong password
     When user "Alice" requests these endpoints with "GET" using password "invalid"
       | endpoint                                                    |
@@ -120,7 +120,7 @@ Feature: auth
     Then the HTTP status code of responses on all endpoints should be "200"
     And the OCS status code of responses on all endpoints should be "200"
 
-  @issue-1337 @issue-1319 @skipOnBruteForceProtection @issue-brute_force_protection-112
+  @issue-1337 @issue-1319
   Scenario: using OCS as admin user with wrong password
     Given user "another-admin" has been created with default attributes and without skeleton files
     And user "another-admin" has been added to group "admin"
