@@ -77,18 +77,16 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &ListResponse{Value: files})
 }
 
-func (g Graph) getDriveItem(ctx context.Context, root storageprovider.ResourceId) (*libregraph.DriveItem, error) {
+func (g Graph) getDriveItem(ctx context.Context, ref storageprovider.Reference) (*libregraph.DriveItem, error) {
 	client := g.GetGatewayClient()
 
-	ref := &storageprovider.Reference{
-		ResourceId: &root,
-	}
-	res, err := client.Stat(ctx, &storageprovider.StatRequest{Ref: ref})
+	res, err := client.Stat(ctx, &storageprovider.StatRequest{Ref: &ref})
 	if err != nil {
 		return nil, err
 	}
 	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("could not stat %s: %s", ref, res.Status.Message)
+		refStr, _ := storagespace.FormatReference(&ref)
+		return nil, fmt.Errorf("could not stat %s: %s", refStr, res.Status.Message)
 	}
 	return cs3ResourceToDriveItem(res.Info)
 }
@@ -234,17 +232,30 @@ func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space
 		return nil
 	}
 	metadata := space.Opaque.Map
-	names := [2]string{SpaceImageSpecialFolderName, ReadmeSpecialFolderName}
+	names := map[string]string{
+		SpaceImageSpecialFolderName: "/.space/logo.png",
+		ReadmeSpecialFolderName:     "/.space/readme.md",
+	}
 
-	for _, itemName := range names {
+	for itemName, itemPath := range names {
+		// The default is a path relative to the space root
+		var ref storageprovider.Reference
 		if itemID, ok := metadata[itemName]; ok {
 			rid, _ := storagespace.ParseID(string(itemID.Value))
 			// add the storageID of the space, all drive items of this space belong to the same storageID
 			rid.StorageId = space.GetRoot().GetStorageId()
-			spaceItem := g.getSpecialDriveItem(ctx, rid, itemName, baseURL, space)
-			if spaceItem != nil {
-				spaceItems = append(spaceItems, *spaceItem)
+			ref = storageprovider.Reference{
+				ResourceId: &rid,
 			}
+		} else {
+			ref = storageprovider.Reference{
+				ResourceId: space.GetRoot(),
+				Path:       itemPath,
+			}
+		}
+		spaceItem := g.getSpecialDriveItem(ctx, ref, itemName, baseURL, space)
+		if spaceItem != nil {
+			spaceItems = append(spaceItems, *spaceItem)
 		}
 	}
 
@@ -271,21 +282,28 @@ type specialDriveItemEntry struct {
 	rootMtime         *types.Timestamp
 }
 
-func (g Graph) getSpecialDriveItem(ctx context.Context, id storageprovider.ResourceId, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
+func (g Graph) getSpecialDriveItem(ctx context.Context, ref storageprovider.Reference, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
 	var spaceItem *libregraph.DriveItem
-	if id.SpaceId == "" && id.OpaqueId == "" {
+	if ref.GetResourceId().GetSpaceId() == "" && ref.GetResourceId().GetOpaqueId() == "" {
 		return nil
 	}
 
-	spaceItem, err := g.getDriveItem(ctx, id)
+	// FIXME we should send a fieldmask 'path' and return it as the Path property to save an additional call to the storage.
+	// To do that we need to align the useg of ResourceInfo.Name vs ResourceInfo.Path. By default, only the name should be set
+	// and Path should always be relative to the space root OR the resource the current user can access ...
+	spaceItem, err := g.getDriveItem(ctx, ref)
 	if err != nil {
-		g.logger.Error().Err(err).Str("ID", id.OpaqueId).Str("name", itemName).Msg("Could not get item info")
+		g.logger.Error().Err(err).Str("ID", ref.GetResourceId().GetOpaqueId()).Str("name", itemName).Msg("Could not get item info")
 		return nil
 	}
-	itemPath, err := g.getPathForResource(ctx, id)
-	if err != nil {
-		g.logger.Error().Err(err).Str("ID", id.OpaqueId).Str("name", itemName).Msg("Could not get item path")
-		return nil
+	itemPath := ref.Path
+	if itemPath == "" {
+		// lookup by id
+		itemPath, err = g.getPathForResource(ctx, *ref.ResourceId)
+		if err != nil {
+			g.logger.Error().Err(err).Str("ID", ref.GetResourceId().GetOpaqueId()).Str("name", itemName).Msg("Could not get item path")
+			return nil
+		}
 	}
 	spaceItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(itemName)}
 	webdavURL := *baseURL
