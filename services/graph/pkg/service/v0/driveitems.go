@@ -13,6 +13,7 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
@@ -215,13 +216,17 @@ func (g Graph) getPathForResource(ctx context.Context, id storageprovider.Resour
 
 // getSpecialDriveItems reads properties from the opaque and transforms them into driveItems
 func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace) []libregraph.DriveItem {
+	if space.GetRoot().GetStorageId() == utils.ShareStorageProviderID {
+		return nil // no point in stating the ShareStorageProvider
+	}
 
 	// if the root is older or equal to our cache we can reuse the cached extended spaces properties
 	if entry := g.specialDriveItemsCache.Get(spaceRootStatKey(space.Root)); entry != nil {
-		if spe, ok := entry.Value().(specialDriveItemEntry); ok {
-			if spe.rootMtime != nil && space.Mtime != nil {
-				if spe.rootMtime.Seconds >= space.Mtime.Seconds { // second precision is good enough
-					return spe.specialDriveItems
+		if cached, ok := entry.Value().(specialDriveItemEntry); ok {
+			if cached.rootMtime != nil && space.Mtime != nil {
+				// beware, LaterTS does not handle equalness. it returns t1 if t1 > t2, else t2, so a >= check looks like this
+				if utils.LaterTS(space.Mtime, cached.rootMtime) == cached.rootMtime {
+					return cached.specialDriveItems
 				}
 			}
 		}
@@ -293,7 +298,7 @@ func (g Graph) getSpecialDriveItem(ctx context.Context, ref storageprovider.Refe
 	// and Path should always be relative to the space root OR the resource the current user can access ...
 	spaceItem, err := g.getDriveItem(ctx, ref)
 	if err != nil {
-		g.logger.Error().Err(err).Str("ID", ref.GetResourceId().GetOpaqueId()).Str("name", itemName).Msg("Could not get item info")
+		g.logger.Debug().Err(err).Str("ID", ref.GetResourceId().GetOpaqueId()).Str("name", itemName).Msg("Could not get item info")
 		return nil
 	}
 	itemPath := ref.Path
@@ -301,7 +306,7 @@ func (g Graph) getSpecialDriveItem(ctx context.Context, ref storageprovider.Refe
 		// lookup by id
 		itemPath, err = g.getPathForResource(ctx, *ref.ResourceId)
 		if err != nil {
-			g.logger.Error().Err(err).Str("ID", ref.GetResourceId().GetOpaqueId()).Str("name", itemName).Msg("Could not get item path")
+			g.logger.Debug().Err(err).Str("ID", ref.GetResourceId().GetOpaqueId()).Str("name", itemName).Msg("Could not get item path")
 			return nil
 		}
 	}
