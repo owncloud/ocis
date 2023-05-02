@@ -1,4 +1,4 @@
-@api @files_trashbin-app-required @issue-1324
+@api @issue-1324
 Feature: files and folders exist in the trashbin after being deleted
   As a user
   I want deleted files and folders to be available in the trashbin

@@ -61,7 +61,7 @@ Feature: sharing
       | pending_share_path |
       | /sub               |
 
-  @smokeTest @files_trashbin-app-required
+  @smokeTest
   Scenario: deleting a file out of a share as recipient creates a backup for the owner
     Given using OCS API version "1"
     And user "Alice" has created folder "/shared"
@@ -75,7 +75,7 @@ Feature: sharing
     And as "Alice" file "/shared_file.txt" should exist in the trashbin
     And as "Brian" file "/shared_file.txt" should exist in the trashbin
 
-  @files_trashbin-app-required
+ 
   Scenario: deleting a folder out of a share as recipient creates a backup for the owner
     Given using OCS API version "1"
     And user "Alice" has created folder "/shared"
