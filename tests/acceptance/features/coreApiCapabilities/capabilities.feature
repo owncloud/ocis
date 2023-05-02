@@ -93,7 +93,7 @@ Feature: capabilities
     }
     """
 
-  @files_versions-app-required @skipOnReva
+ @skipOnReva
   Scenario: getting versions app capability with admin user
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
