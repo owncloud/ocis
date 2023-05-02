@@ -18,6 +18,12 @@ func FullDefaultConfig() *config.Config {
 // DefaultConfig return the default configuration
 func DefaultConfig() *config.Config {
 	return &config.Config{
+		Debug: config.Debug{
+			Addr:   "127.0.0.1:9270",
+			Token:  "",
+			Pprof:  false,
+			Zpages: false,
+		},
 		Service: config.Service{
 			Name: "eventhistory",
 		},
