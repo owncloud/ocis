@@ -56,6 +56,9 @@ web:
         - image/bmp
         - image/x-ms-bmp
     options:
+      homeFolder: ""
+      openAppsInTab: false
+      disablePreviews: false
       previewFileMimeTypes:
       - image/gif
       - image/png
@@ -64,6 +67,22 @@ web:
       - image/tiff
       - image/bmp
       - image/x-ms-bmp
+      accountEditLink: null
+      disableFeedbackLink: false
+      feedbackLink: null
+      sharingRecipientsPerPage: 200
+      sidebar:
+        shares:
+          showAllOnLoad: false
+      runningOnEos: false
+      cernFeatures: false
+      hoverableQuickActions: false
+      routing:
+        idBased: true
+      upload: null
+      editor: null
+      contextHelpersReadMore: true
+      logoutURL: ""
     styles: []
     scripts: []
     custom_translations: []

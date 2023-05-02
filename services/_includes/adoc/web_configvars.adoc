@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-02-07-55-12]
+[#deprecation-note-2023-05-02-08-55-56]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -299,6 +299,114 @@ a| [subs=-attributes]
 ++openid profile email ++
 a| [subs=-attributes]
 OIDC scopes to request during authentication to authorize access to user details. Defaults to 'openid profile email'. Values are separated by blank. More example values but not limited to are 'address' or 'phone' etc.
+
+a|`WEB_OPTION_HOME_FOLDER` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Specifies a folder that is used when the user navigates 'home'. Navigating home gets triggered by clicking on the 'All files' menu item. The user will not be jailed in that directory, it simply serves as a default location. A static location can be provided, or variables of the user object to come up with a user specific home path can be used. This uses the twig template variable style and allows to pick a value or a substring of a value of the authenticated user. Examples are '/Shares', '/{{.Id}}' and '/{{substr 0 3 .Id}}/{{.Id}'.
+
+a|`WEB_OPTION_OPEN_APPS_IN_TAB` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Configures whether apps and extensions should generally open in a new tab. Defaults to false.
+
+a|`WEB_OPTION_DISABLE_PREVIEWS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Set this option to 'true' to disable previews in all the different file listing views. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.
+
+a|`WEB_OPTION_PREVIEW_FILE_MIMETYPES` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[image/gif image/png image/jpeg text/plain image/tiff image/bmp image/x-ms-bmp] ++
+a| [subs=-attributes]
+Specifies which mimeTypes will be previewed in the UI. For example to only preview jpg and text files, set this option to ['image/jpeg', 'text/plain'].
+
+a|`WEB_OPTION_DISABLE_FEEDBACK_LINK` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Set this option to 'true' to disable the feedback link in the topbar. Keeping it enabled by setting the value to 'false' or with the absence of the option, allows ownCloud to get feedback from your user base through a dedicated survey website.
+
+a|`WEB_OPTION_SHARING_RECIPIENTS_PER_PAGE` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++200 ++
+a| [subs=-attributes]
+Sets the amount of users shown as recipients in the dropdown menu when sharing resources. Default amount is 200.
+
+a|`WEB_OPTION_SIDEBAR_SHARES_SHOW_ALL_ON_LOAD` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Sets the list of the (link) shares list in the sidebar to be initially expanded. Default is a collapsed state, only showing the first three shares.
+
+a|`WEB_OPTION_RUNNING_ON_EOS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Set this option to 'true' if running on an EOS storage backend (\https://eos-web.web.cern.ch/eos-web/) to enable its specific features. Defaults to 'false'.
+
+a|`WEB_OPTION_HOVERABLE_QUICK_ACTIONS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Set this option to 'true' to hide quick actions (buttons appearing on file rows) and only show them when the user hovers over the row with his mouse. Defaults to 'false'.
+
+a|`WEB_OPTION_ROUTING_ID_BASED` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Enable or disable fileIds being added to the URL. Defaults to 'true', because otherwise spaces with name clashes cannot be resolved correctly. Note: Only disable this if you can guarantee on the server side, that spaces of the same namespace cannot have name clashes.
+
+a|`WEB_OPTION_CONTEXTHELPERS_READ_MORE` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Specifies whether the 'Read more' link should be displayed or not.
+
+a|`WEB_OPTION_LOGOUT_URL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Adds a link to the user's profile page to point him to an external page, where he can manage his session and devices. This is helpful when an external IdP is used. This option is disabled by default.
 
 a|`OCIS_JWT_SECRET` +
 `WEB_JWT_SECRET` +
