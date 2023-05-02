@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Bump Reva Version: [#6186](https://github.com/owncloud/ocis/pull/6186)
 * Enhancement - Disable Notifications: [#6137](https://github.com/owncloud/ocis/pull/6137)
 * Enhancement - Open Debug endpoint for Nats: [#5002](https://github.com/owncloud/ocis/issues/5002)
+* Enhancement - Update web to v7.0.0-rc.35: [#6190](https://github.com/owncloud/ocis/pull/6190)
 
 # Changelog for [3.0.0] (2023-04-24)
 
