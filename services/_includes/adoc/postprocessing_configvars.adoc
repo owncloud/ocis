@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-02-15-31-44]
+[#deprecation-note-2023-05-02-17-18-11]
 [caption=]
 .Deprecation notes for the postprocessing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -30,6 +30,46 @@ endif::[]
 | Type
 | Default Value
 | Description
+
+a|`OCIS_TRACING_ENABLED` +
+`POSTPROCESSING_TRACING_ENABLED` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Activates tracing.
+
+a|`OCIS_TRACING_TYPE` +
+`POSTPROCESSING_TRACING_TYPE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.
+
+a|`OCIS_TRACING_ENDPOINT` +
+`POSTPROCESSING_TRACING_ENDPOINT` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The endpoint of the tracing agent.
+
+a|`OCIS_TRACING_COLLECTOR` +
+`POSTPROCESSING_TRACING_COLLECTOR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The HTTP endpoint for sending spans directly to a collector, i.e. \http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset.
 
 a|`OCIS_LOG_LEVEL` +
 `POSTPROCESSING_LOG_LEVEL` +
@@ -70,6 +110,42 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The path to the log file. Activates logging to this file if set.
+
+a|`POSTPROCESSING_DEBUG_ADDR` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++127.0.0.1:9255 ++
+a| [subs=-attributes]
+Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.
+
+a|`POSTPROCESSING_DEBUG_TOKEN` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Token to secure the metrics endpoint.
+
+a|`POSTPROCESSING_DEBUG_PPROF` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables pprof, which can be used for profiling.
+
+a|`POSTPROCESSING_DEBUG_ZPAGES` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Enables zpages, which can be used for collecting and viewing in-memory traces.
 
 a|`OCIS_EVENTS_ENDPOINT` +
 `POSTPROCESSING_EVENTS_ENDPOINT` +
@@ -130,7 +206,7 @@ a| [subs=-attributes]
 A comma separated list of postprocessing steps, processed in order of their appearance. Currently supported values by the system are: 'virusscan', 'policies' and 'delay'. Custom steps are allowed. See the documentation for instructions.
 
 a|`POSTPROCESSING_VIRUSSCAN` +
-xref:deprecation-note-2023-05-02-15-31-44[Deprecation Note]
+xref:deprecation-note-2023-05-02-17-18-11[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]

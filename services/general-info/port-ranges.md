@@ -61,7 +61,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9240-9244  | [app-registry]({{< ref "../app-registry/_index.md" >}})                                |
 | 9245-9249  | FREE                                                                                   |
 | 9250-9254  | [ocis server (runtime)](https://github.com/owncloud/ocis/tree/master/ocis/pkg/runtime) |
-| 9255-9259  | FREE                                                                                   |
+| 9255-9259  | [postprocessing]({{ ref "../postprocessing/_index.md" >}})                             |
 | 9260-9264  | FREE                                                                                   |
 | 9265-9269  | FREE                                                                                   |
 | 9270-9274  | FREE                                                                                   |
