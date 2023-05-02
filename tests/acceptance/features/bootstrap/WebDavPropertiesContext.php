@@ -34,17 +34,13 @@ require_once 'bootstrap.php';
  * Steps that relate to managing file/folder properties via WebDav
  */
 class WebDavPropertiesContext implements Context {
-	/**
-	 *
-	 * @var FeatureContext
-	 */
-	private $featureContext;
+	private FeatureContext $featureContext;
 
 	/**
 	 * @var array map with user as key and another map as value,
 	 *            which has path as key and etag as value
 	 */
-	private $storedETAG = null;
+	private array $storedETAG = [];
 
 	/**
 	 * @When /^user "([^"]*)" gets the properties of (?:file|folder|entry) "([^"]*)" using the WebDAV API$/
@@ -111,10 +107,8 @@ class WebDavPropertiesContext implements Context {
 		$properties = null;
 		$this->featureContext->verifyTableNodeColumns($propertiesTable, ["propertyName"]);
 		$this->featureContext->verifyTableNodeColumnsCount($propertiesTable, 1);
-		if ($propertiesTable instanceof TableNode) {
-			foreach ($propertiesTable->getColumnsHash() as $row) {
-				$properties[] = $row["propertyName"];
-			}
+		foreach ($propertiesTable->getColumnsHash() as $row) {
+			$properties[] = $row["propertyName"];
 		}
 		$depth = "1";
 		$this->featureContext->setResponseXmlObject(
@@ -146,10 +140,8 @@ class WebDavPropertiesContext implements Context {
 		$properties = null;
 		$this->featureContext->verifyTableNodeColumns($propertiesTable, ["propertyName"]);
 		$this->featureContext->verifyTableNodeColumnsCount($propertiesTable, 1);
-		if ($propertiesTable instanceof TableNode) {
-			foreach ($propertiesTable->getColumnsHash() as $row) {
-				$properties[] = $row["propertyName"];
-			}
+		foreach ($propertiesTable->getColumnsHash() as $row) {
+			$properties[] = $row["propertyName"];
 		}
 
 		$user = $this->featureContext->getActualUsername($user);
@@ -299,10 +291,8 @@ class WebDavPropertiesContext implements Context {
 	public function publicGetsThePropertiesOfFolder(string $path, TableNode $propertiesTable):void {
 		$user = $this->featureContext->getLastPublicShareToken();
 		$properties = null;
-		if ($propertiesTable instanceof TableNode) {
-			foreach ($propertiesTable->getRows() as $row) {
-				$properties[] = $row[0];
-			}
+		foreach ($propertiesTable->getRows() as $row) {
+			$properties[] = $row[0];
 		}
 		$this->featureContext->setResponseXmlObject(
 			$this->featureContext->listFolderAndReturnResponseXml(

@@ -24,13 +24,9 @@ use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Ring\Exception\ConnectException;
-use Helmich\JsonAssert\JsonAssertions;
 use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Stream\StreamInterface;
-use TestHelpers\OcisHelper;
-use TestHelpers\OcsApiHelper;
-use TestHelpers\SetupHelper;
 use TestHelpers\UploadHelper;
 use TestHelpers\WebDavHelper;
 use TestHelpers\HttpRequestHelper;
@@ -40,82 +36,56 @@ use TestHelpers\Asserts\WebDav as WebDavAssert;
  * WebDav functions
  */
 trait WebDav {
-	/**
-	 * @var string
-	 */
-	private $davPath = "remote.php/webdav";
-
-	/**
-	 * @var boolean
-	 */
-	private $usingOldDavPath = true;
-
-	/**
-	 * @var boolean
-	 */
-	private $usingSpacesDavPath = false;
+	private string $davPath = "remote.php/webdav";
+	private bool $usingOldDavPath = true;
+	private bool $usingSpacesDavPath = false;
 
 	/**
 	 * @var ResponseInterface[]
 	 */
-	private $uploadResponses;
+	private array $uploadResponses;
 
 	/**
-	 * @var integer
+	 * @var int|string|null
 	 */
 	private $storedFileID = null;
 
-	/**
-	 * @var int
-	 */
-	private $lastUploadDeleteTime = null;
+	private ?int $lastUploadDeleteTime = null;
 
 	/**
 	 * a variable that contains the DAV path without "remote.php/(web)dav"
 	 * when setting $this->davPath directly by usingDavPath()
-	 *
-	 * @var string
 	 */
-	private $customDavPath = null;
-
-	private $previousAsyncSetting = null;
+	private ?string $customDavPath = null;
 
 	/**
 	 * response content parsed from XML to an array
-	 *
-	 * @var array
 	 */
-	private $responseXml = [];
+	private array $responseXml = [];
 
 	/**
 	 * add resource created by admin in an array
 	 * This array is used while cleaning up the resource created by admin during test run
 	 * As of now it tracks only for (files|folder) creation
 	 * This can be expanded and modified to track other actions like (upload, deleted ..)
-	 *
-	 * @var array
 	 */
-	private $adminResources = [];
+	private array $adminResources = [];
 
 	/**
 	 * response content parsed into a SimpleXMLElement
-	 *
-	 * @var SimpleXMLElement
 	 */
-	private $responseXmlObject;
+	private ?SimpleXMLElement $responseXmlObject;
 
-	private $httpRequestTimeout = 0;
+	private int $httpRequestTimeout = 0;
 
-	private $chunkingToUse = null;
+	private ?int $chunkingToUse = null;
 
 	/**
 	 * The ability to do requests with depth infinity is disabled by default.
 	 * This remembers when the setting dav.propfind.depth_infinity has been
 	 * enabled, so that test code can make use of it as appropriate.
-	 *
-	 * @var bool
 	 */
-	private $davPropfindDepthInfinityEnabled = false;
+	private bool $davPropfindDepthInfinityEnabled = false;
 
 	/**
 	 * @return void
@@ -328,7 +298,7 @@ trait WebDav {
 	public function getFullDavFilesPath(string $user):string {
 		$spaceId = null;
 		if ($this->getDavPathVersion() === WebDavHelper::DAV_VERSION_SPACES) {
-			$spaceId = (WebDavHelper::$SPACE_ID_FROM_OCIS) ? WebDavHelper::$SPACE_ID_FROM_OCIS : WebDavHelper::getPersonalSpaceIdForUser(
+			$spaceId = (WebDavHelper::$SPACE_ID_FROM_OCIS) ?: WebDavHelper::getPersonalSpaceIdForUser(
 				$this->getBaseUrl(),
 				$user,
 				$this->getPasswordForUser($user),
@@ -564,7 +534,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function setHttpTimeout(int $timeout):void {
-		$this->httpRequestTimeout = (int) $timeout;
+		$this->httpRequestTimeout = $timeout;
 	}
 
 	/**
@@ -651,11 +621,7 @@ trait WebDav {
 		foreach ($table->getHash() as $row) {
 			// Allow the "filename" column to be optionally be called "foldername"
 			// to help readability of scenarios that test moving folders
-			if (isset($row['foldername'])) {
-				$targetName = $row['foldername'];
-			} else {
-				$targetName = $row['filename'];
-			}
+			$targetName = $row['foldername'] ?? $row['filename'];
 			$this->userMovesFileUsingTheAPI(
 				$user,
 				$fileSource,
@@ -1124,7 +1090,7 @@ trait WebDav {
 	 * @return void
 	 *
 	 */
-	public function theDownloadedContentForMultipartByterangeShouldBe(int $statusCode, PyStringNode $content):void {
+	public function theDownloadedContentForMultipartByteRangeShouldBe(int $statusCode, PyStringNode $content):void {
 		$actualStatusCode = $this->response->getStatusCode();
 		if ($actualStatusCode === $statusCode) {
 			$actualContent = (string) $this->response->getBody();
@@ -1524,14 +1490,11 @@ trait WebDav {
 	public function publicGetsSizeOfLastSharedPublicLinkUsingTheWebdavApi():void {
 		$tokenArray = $this->getLastPublicShareData()->data->token;
 		$token = (string)$tokenArray[0];
-		$url = $this->getBaseUrl() . "/remote.php/dav/public-files/{$token}";
+		$url = $this->getBaseUrl() . "/remote.php/dav/public-files/$token";
 		$this->response = HttpRequestHelper::sendRequest(
 			$url,
 			$this->getStepLineRef(),
-			"PROPFIND",
-			null,
-			null,
-			null
+			"PROPFIND"
 		);
 	}
 
@@ -1602,19 +1565,15 @@ trait WebDav {
 			$returnedHeader = $this->response->getHeader($headerName);
 			$expectedHeaderValue = $this->substituteInLineCodes($expectedHeaderValue);
 
-			if (\is_array($returnedHeader)) {
-				if (empty($returnedHeader)) {
-					throw new Exception(
-						\sprintf(
-							"Missing expected header '%s'",
-							$headerName
-						)
-					);
-				}
-				$headerValue = $returnedHeader[0];
-			} else {
-				$headerValue = $returnedHeader;
+			if (empty($returnedHeader)) {
+				throw new Exception(
+					\sprintf(
+						"Missing expected header '%s'",
+						$headerName
+					)
+				);
 			}
+			$headerValue = $returnedHeader[0];
 
 			Assert::assertEquals(
 				$expectedHeaderValue,
@@ -2488,7 +2447,7 @@ trait WebDav {
 		$duplicateRemovedStatusCodes = \array_unique($this->lastHttpStatusCodesArray);
 		if (\count($duplicateRemovedStatusCodes) === 1) {
 			Assert::assertSame(
-				\intval($statusCode),
+				$statusCode,
 				\intval($duplicateRemovedStatusCodes[0]),
 				'Responses did not return expected http status code'
 			);
@@ -3217,7 +3176,7 @@ trait WebDav {
 		$fileIds = [];
 		foreach ($files as $destination) {
 			$fileId = $this->userHasUploadedAFileWithContentTo($user, $content, $destination["path"])[0];
-			\array_push($fileIds, $fileId);
+			$fileIds[] = $fileId;
 		}
 		return $fileIds;
 	}
@@ -3409,7 +3368,7 @@ trait WebDav {
 		$this->userDeletesFile($user, $entry);
 		// If the file or folder was there and got deleted then we get a 204
 		// That is good and the expected status
-		// If the file or folder was already not there then then we get a 404
+		// If the file or folder was already not there then we get a 404
 		// That is not expected. Scenarios that use "Given user has deleted..."
 		// should only be using such steps when it is a file that exists and needs
 		// to be deleted.
@@ -3552,7 +3511,7 @@ trait WebDav {
 	public function userOnHasDeletedFile(string $user, string $server, string $deletedOrUnshared, string $fileOrFolder, string $entry):void {
 		$this->userOnDeletesFile($user, $server, $entry);
 		// If the file was there and got deleted then we get a 204
-		// If the file was already not there then then get a 404
+		// If the file was already not there then we get a 404
 		// Either way, the outcome of the "given" step is OK
 		if ($deletedOrUnshared === "deleted") {
 			$deleteText = "delete";
@@ -4382,9 +4341,8 @@ trait WebDav {
 	 */
 	public function encodePath(string $path):string {
 		// slashes need to stay
-		$encodedPath = \str_replace('%2F', '/', \rawurlencode($path));
 		// in ocis even brackets are encoded
-		return $encodedPath;
+		return \str_replace('%2F', '/', \rawurlencode($path));
 	}
 
 	/**
@@ -4446,11 +4404,7 @@ trait WebDav {
 			$headerName = $header['header'];
 			$headerValue = $this->response->getHeader($headerName);
 			//Note: getHeader returns an empty array if the named header does not exist
-			if (isset($headerValue[0])) {
-				$headerValue0 = $headerValue[0];
-			} else {
-				$headerValue0 = '';
-			}
+			$headerValue0 = $headerValue[0] ?? '';
 			Assert::assertEmpty(
 				$headerValue,
 				"header $headerName should not exist " .
@@ -4782,7 +4736,7 @@ trait WebDav {
 			$currentFileID,
 			$this->storedFileID,
 			__METHOD__
-			. " User '$user' $fileOrFolder '$path' does not have the previously stored id '{$this->storedFileID}', but has '$currentFileID'."
+			. " User '$user' $fileOrFolder '$path' does not have the previously stored id '$this->storedFileID', but has '$currentFileID'."
 		);
 	}
 
@@ -4880,7 +4834,7 @@ trait WebDav {
 	public function thePropfindResultShouldNotContainAnyEntries(
 		string $user
 	):void {
-		$multistatusResults = $this->getMultistatusResultFromPropfindResult($user);
+		$multistatusResults = $this->getMultiStatusResultFromPropfindResult($user);
 		Assert::assertEmpty($multistatusResults, 'The propfind response was expected to be empty but was not');
 	}
 
@@ -4942,11 +4896,11 @@ trait WebDav {
 			$multistatusResults = [];
 		}
 		Assert::assertEquals(
-			(int) $numFiles,
+			$numFiles,
 			\count($multistatusResults),
 			__METHOD__
 			. " Expected result to contain '"
-			. (int) $numFiles
+			. $numFiles
 			. "' files/entries, but got '"
 			. \count($multistatusResults)
 			. "' files/entries."
@@ -5135,7 +5089,7 @@ trait WebDav {
 			$hrefParts = \explode("/", (string)$href[0]);
 			if (\in_array($user, $hrefParts)) {
 				$entry = \urldecode(\end($hrefParts));
-				\array_push($responseResources, $entry);
+				$responseResources[] = $entry;
 			} else {
 				throw new Error("Expected user: $hrefParts[5] but found: $user");
 			}
@@ -5154,7 +5108,7 @@ trait WebDav {
 	public function getNumberOfEntriesInPropfindResponse(
 		?string $user = null
 	):int {
-		$multistatusResults = $this->getMultistatusResultFromPropfindResult($user);
+		$multistatusResults = $this->getMultiStatusResultFromPropfindResult($user);
 		return \count($multistatusResults);
 	}
 
@@ -5166,7 +5120,7 @@ trait WebDav {
 	 *
 	 * @return array
 	 */
-	public function getMultistatusResultFromPropfindResult(
+	public function getMultiStatusResultFromPropfindResult(
 		?string $user = null
 	):array {
 		//if we are using that step the second time in a scenario e.g. 'But ... should not'
@@ -5257,32 +5211,30 @@ trait WebDav {
 			default:
 				throw new Exception("error");
 		}
-		$multistatusResults = $this->getMultistatusResultFromPropfindResult($user);
+		$multistatusResults = $this->getMultiStatusResultFromPropfindResult($user);
 		$results = [];
-		if ($multistatusResults !== null) {
-			foreach ($multistatusResults as $multistatusResult) {
-				$entryPath = $multistatusResult['value'][0]['value'];
-				if ($method === "REPORT") {
-					if ($entryNameToSearch !== null && str_ends_with($entryPath, $entryNameToSearch)) {
-						return $multistatusResult;
-					} else {
-						$spaceId = (WebDavHelper::$SPACE_ID_FROM_OCIS) ? WebDavHelper::$SPACE_ID_FROM_OCIS : WebDavHelper::getPersonalSpaceIdForUser(
-							$this->getBaseUrl(),
-							$user,
-							$this->getPasswordForUser($user),
-							$this->getStepLineRef()
-						);
-						$topWebDavPath = "/remote.php/dav/spaces/" . $spaceId . "/" . $folderPath;
-					}
-				}
-				$entryName = \str_replace($topWebDavPath, "", $entryPath);
-				$entryName = \rawurldecode($entryName);
-				$entryName = \trim($entryName, "/");
-				if ($trimmedEntryNameToSearch === $entryName) {
+		foreach ($multistatusResults as $multistatusResult) {
+			$entryPath = $multistatusResult['value'][0]['value'];
+			if ($method === "REPORT") {
+				if ($entryNameToSearch !== null && str_ends_with($entryPath, $entryNameToSearch)) {
 					return $multistatusResult;
+				} else {
+					$spaceId = (WebDavHelper::$SPACE_ID_FROM_OCIS) ?: WebDavHelper::getPersonalSpaceIdForUser(
+						$this->getBaseUrl(),
+						$user,
+						$this->getPasswordForUser($user),
+						$this->getStepLineRef()
+					);
+					$topWebDavPath = "/remote.php/dav/spaces/" . $spaceId . "/" . $folderPath;
 				}
-				\array_push($results, $entryName);
 			}
+			$entryName = \str_replace($topWebDavPath, "", $entryPath);
+			$entryName = \rawurldecode($entryName);
+			$entryName = \trim($entryName, "/");
+			if ($trimmedEntryNameToSearch === $entryName) {
+				return $multistatusResult;
+			}
+			$results[] = $entryName;
 		}
 		if ($entryNameToSearch === null) {
 			return $results;

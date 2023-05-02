@@ -29,25 +29,10 @@ use TestHelpers\SetupHelper;
  * Authentication functions
  */
 class AuthContext implements Context {
-	/**
-	 * @var string
-	 */
-	private $clientToken;
-
-	/**
-	 * @var string
-	 */
-	private $appToken;
-
-	/**
-	 * @var array
-	 */
-	private $appTokens;
-
-	/**
-	 * @var FeatureContext
-	 */
-	private $featureContext;
+	private string $clientToken;
+	private string $appToken;
+	private array $appTokens;
+	private FeatureContext $featureContext;
 
 	/**
 	 * get the client token that was last generated
@@ -156,15 +141,15 @@ class AuthContext implements Context {
 	 * @throws Exception
 	 */
 	public function verifyStatusCode(string $ocsCode, string $httpCode, string $endPoint):void {
-		if ($ocsCode !== null) {
+		if ($ocsCode !== '') {
 			$this->featureContext->ocsContext->theOCSStatusCodeShouldBe(
 				$ocsCode,
-				$message = "Got unexpected OCS code while sending request to endpoint " . $endPoint
+				"Got unexpected OCS code while sending request to endpoint " . $endPoint
 			);
 		}
 		$this->featureContext->theHTTPStatusCodeShouldBe(
 			$httpCode,
-			$message = "Got unexpected HTTP code while sending request to endpoint " . $endPoint
+			"Got unexpected HTTP code while sending request to endpoint " . $endPoint
 		);
 	}
 
@@ -173,11 +158,11 @@ class AuthContext implements Context {
 	 *
 	 * @param string $method
 	 * @param ?string $body
-	 * @param string $ofUser
+	 * @param string|null $ofUser
 	 * @param TableNode $table
 	 *
 	 * @return void
-	 * @throws Exception
+	 * @throws JsonException
 	 */
 	public function userRequestsEndpointsWithBodyAndNoAuthThenStatusCodeAboutUser(string $method, ?string $body, ?string $ofUser, TableNode $table):void {
 		$ofUser = \strtolower($this->featureContext->getActualUsername($ofUser));

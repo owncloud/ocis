@@ -18,20 +18,9 @@ require_once 'bootstrap.php';
  * Defines application features from the specific context.
  */
 class NotificationContext implements Context {
-	/**
-	 * @var FeatureContext
-	 */
-	private $featureContext;
-
-	/**
-	 * @var string
-	 */
+	private FeatureContext $featureContext;
 	private string $notificationEndpointPath = '/apps/notifications/api/v1/notifications?format=json';
-
-	/**
-	 * @var array[]
-	 */
-	private $notificationIds;
+	private array $notificationIds;
 
 	/**
 	 * @return array[]

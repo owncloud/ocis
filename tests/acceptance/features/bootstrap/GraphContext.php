@@ -26,17 +26,12 @@ require_once 'bootstrap.php';
  * Context for the provisioning specific steps using the Graph API
  */
 class GraphContext implements Context {
-	/**
-	 * @var FeatureContext
-	 */
 	private FeatureContext $featureContext;
 
 	/**
 	 * application Entity
-	 *
-	 * @var array
 	 */
-	private $appEntity = [];
+	private array $appEntity = [];
 
 	/**
 	 * This will run before EVERY scenario.
@@ -195,7 +190,7 @@ class GraphContext implements Context {
 	 * @throws Exception
 	 */
 	public function theUserEnablesUserToUsingTheGraphApi(string $byUser, string $user): void {
-		$response = $this->editUserUsingTheGraphApi($byUser, $user, null, null, null, null, true);
+		$response = $this->editUserUsingTheGraphApi($byUser, $user);
 		$this->featureContext->setResponse($response);
 	}
 
@@ -257,7 +252,7 @@ class GraphContext implements Context {
 	public function adminHasRetrievedUserUsingTheGraphApi(string $user): void {
 		$user = $this->featureContext->getActualUsername($user);
 		$userId = $this->featureContext->getAttributeOfCreatedUser($user, "id");
-		$userId = $userId ? $userId : $user;
+		$userId = $userId ?: $user;
 		$result = GraphHelper::getUser(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getStepLineRef(),
@@ -1162,7 +1157,7 @@ class GraphContext implements Context {
 	 *
 	 * @return void
 	 */
-	public function userGetsAllTheMembersOfGroupUsingTheGraphApi($user, $group): void {
+	public function userGetsAllTheMembersOfGroupUsingTheGraphApi(string $user, string $group): void {
 		$this->featureContext->setResponse($this->listGroupMembers($group, $user));
 	}
 
@@ -1231,7 +1226,7 @@ class GraphContext implements Context {
 	 *
 	 * @param string $oldGroupId
 	 * @param string $newGroup
-	 * @param string $user
+	 * @param string|null $user
 	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
@@ -1682,7 +1677,7 @@ class GraphContext implements Context {
 		$groupId = $this->featureContext->getAttributeOfCreatedGroup($group, "id");
 		foreach ($table->getHash() as $row) {
 			$userId = $this->featureContext->getAttributeOfCreatedUser($row['username'], "id");
-			$userIds[] = $userId ? $userId : WebDavHelper::generateUUIDv4();
+			$userIds[] = $userId ?: WebDavHelper::generateUUIDv4();
 		}
 		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
 	}
@@ -1781,7 +1776,7 @@ class GraphContext implements Context {
 	public function userGetsAllUsersOfTwoGroupsUsingTheGraphApi(string $user, string $groups) {
 		$groupsIdArray = [];
 		foreach (explode(',', $groups) as $group) {
-			array_push($groupsIdArray, $this->featureContext->getGroupIdByGroupName($group));
+			$groupsIdArray[] = $this->featureContext->getGroupIdByGroupName($group);
 		}
 		$response = GraphHelper::getUsersOfTwoGroups(
 			$this->featureContext->getBaseUrl(),
@@ -2066,7 +2061,7 @@ class GraphContext implements Context {
 		$this->addMultipleUsersToGroup($user, $userIds, $groupId, $table);
 		$response = $this->featureContext->getResponse();
 		if ($response->getStatusCode() !== 204) {
-			$$this->throwHttpException($response, "Cannot add users to group '$group'");
+			$this->throwHttpException($response, "Cannot add users to group '$group'");
 		}
 		$this->featureContext->emptyLastHTTPStatusCodesArray();
 	}

@@ -22,9 +22,9 @@
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use GuzzleHttp\Exception\GuzzleException;
 use PHPUnit\Framework\Assert;
 use TestHelpers\HttpRequestHelper;
-use TestHelpers\OcisHelper;
 use TestHelpers\WebDavHelper;
 
 require_once 'bootstrap.php';
@@ -33,11 +33,7 @@ require_once 'bootstrap.php';
  * context file for steps that execute actions as "the public".
  */
 class PublicWebDavContext implements Context {
-	/**
-	 *
-	 * @var FeatureContext
-	 */
-	private $featureContext;
+	private FeatureContext $featureContext;
 
 	/**
 	 * @When /^the public downloads the last public link shared file with range "([^"]*)" using the (old|new) public WebDAV API$/
@@ -390,13 +386,7 @@ class PublicWebDavContext implements Context {
 			"COPY",
 			null,
 			null,
-			$headers,
-			null,
-			null,
-			null,
-			false,
-			0,
-			null
+			$headers
 		);
 		$this->featureContext->setResponse($response);
 	}
@@ -1115,10 +1105,9 @@ class PublicWebDavContext implements Context {
 	 * @Then /^the public upload to the last publicly shared folder using the (old|new) public WebDAV API should fail with HTTP status code "([^"]*)"$/
 	 *
 	 * @param string $publicWebDAVAPIVersion
-	 * @param string $expectedHttpCode
+	 * @param string|null $expectedHttpCode
 	 *
 	 * @return void
-	 * @throws Exception
 	 */
 	public function publiclyUploadingShouldNotWork(
 		string $publicWebDAVAPIVersion,
@@ -1285,8 +1274,7 @@ class PublicWebDavContext implements Context {
 
 			$this->downloadPublicFileWithRange(
 				"",
-				$publicWebDAVAPIVersion,
-				""
+				$publicWebDAVAPIVersion
 			);
 
 			$this->featureContext->checkDownloadedContentMatches(
@@ -1581,7 +1569,7 @@ class PublicWebDavContext implements Context {
 	 *
 	 * @param string $method
 	 * @param string $publicWebDAVAPIVersion
-	 * @param string $password
+	 * @param string|null $password
 	 *
 	 * @return void
 	 * @throws GuzzleException
@@ -1602,6 +1590,8 @@ class PublicWebDavContext implements Context {
 					<oc:public-link-share-owner/>
 				</d:prop>
 			</d:propfind>';
+		} else {
+			$body = null;
 		}
 		$token = $this->featureContext->getLastPublicShareToken();
 		$davPath = WebDavHelper::getDavPath(

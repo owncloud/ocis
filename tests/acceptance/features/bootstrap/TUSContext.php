@@ -37,13 +37,9 @@ require_once 'bootstrap.php';
  * TUS related test steps
  */
 class TUSContext implements Context {
-	/**
-	 *
-	 * @var FeatureContext
-	 */
-	private $featureContext;
+	private FeatureContext $featureContext;
 
-	private $resourceLocation = null;
+	private ?string $resourceLocation = null;
 
 	/**
 	 * @When user :user creates a new TUS resource on the WebDAV API with these headers:
@@ -196,8 +192,7 @@ class TUSContext implements Context {
 				$this->featureContext->getDavPathVersion(),
 				"files",
 				WebDavHelper::$SPACE_ID_FROM_OCIS
-					? WebDavHelper::$SPACE_ID_FROM_OCIS
-					: $this->featureContext->getPersonalSpaceIdForUser($user)
+					?: $this->featureContext->getPersonalSpaceIdForUser($user)
 			)
 		);
 		WebDavHelper::$SPACE_ID_FROM_OCIS = '';
@@ -433,7 +428,7 @@ class TUSContext implements Context {
 		string $content
 	): void {
 		$this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $content, $checksum);
-		$this->featureContext->theHTTPStatusCodeShouldBe(204, "");
+		$this->featureContext->theHTTPStatusCodeShouldBe(204);
 	}
 
 	/**
@@ -464,7 +459,7 @@ class TUSContext implements Context {
 	 */
 	public function userHasUploadedChunkFileWithChecksum(string $user, string $offset, string $data, string $checksum): void {
 		$this->sendsAChunkToTUSLocationWithOffsetAndData($user, $offset, $data, $checksum);
-		$this->featureContext->theHTTPStatusCodeShouldBe(204, "");
+		$this->featureContext->theHTTPStatusCodeShouldBe(204);
 	}
 
 	/**

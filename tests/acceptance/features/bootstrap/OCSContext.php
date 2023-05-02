@@ -35,11 +35,7 @@ require_once 'bootstrap.php';
  * steps needed to send requests to the OCS API
  */
 class OCSContext implements Context {
-	/**
-	 *
-	 * @var FeatureContext
-	 */
-	private $featureContext;
+	private FeatureContext $featureContext;
 
 	/**
 	 * @When /^the user sends HTTP method "([^"]*)" to OCS API endpoint "([^"]*)"$/
@@ -50,7 +46,7 @@ class OCSContext implements Context {
 	 * @return void
 	 */
 	public function theUserSendsToOcsApiEndpoint(string $verb, string $url):void {
-		$this->theUserSendsToOcsApiEndpointWithBody($verb, $url, null);
+		$this->theUserSendsToOcsApiEndpointWithBody($verb, $url);
 	}
 
 	/**
@@ -62,7 +58,7 @@ class OCSContext implements Context {
 	 * @return void
 	 */
 	public function theUserHasSentToOcsApiEndpoint(string $verb, string $url):void {
-		$this->theUserSendsToOcsApiEndpointWithBody($verb, $url, null);
+		$this->theUserSendsToOcsApiEndpointWithBody($verb, $url);
 		$this->featureContext->theHTTPStatusCodeShouldBeSuccess();
 	}
 
@@ -129,14 +125,10 @@ class OCSContext implements Context {
 		/**
 		 * array of the data to be sent in the body.
 		 * contains $body data converted to an array
-		 *
-		 * @var array $bodyArray
 		 */
 		$bodyArray = [];
 		if ($body instanceof TableNode) {
 			$bodyArray = $body->getRowsHash();
-		} elseif ($body !== null && \is_array($body)) {
-			$bodyArray = $body;
 		}
 
 		if ($user !== 'UNAUTHORIZED_USER') {
@@ -233,7 +225,7 @@ class OCSContext implements Context {
 	 * @param string $verb
 	 * @param string $url
 	 * @param TableNode|null $body
-	 * @param string $password
+	 * @param string|null $password
 	 *
 	 * @return void
 	 */
@@ -793,7 +785,7 @@ class OCSContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function theOCSStatusCodeShouldBe(string $statusCode, $message = ""):void {
+	public function theOCSStatusCodeShouldBe(string $statusCode, string $message = ""):void {
 		$statusCodes = explode(",", $statusCode);
 		$responseStatusCode = $this->getOCSResponseStatusCode(
 			$this->featureContext->getResponse()
