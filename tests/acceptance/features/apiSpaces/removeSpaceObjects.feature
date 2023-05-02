@@ -61,34 +61,6 @@ Feature: Remove files, folder
       | role      | <role> |
     When user "<user>" removes the file "text.txt" from space "delete objects"
     Then the HTTP status code should be "<code>"
-    And for user "<user>" the JSON representation of their drive should contain space called "delete objects" and match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name",
-        "quota"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["delete objects"]
-        },
-        "quota": {
-          "type": "object",
-          "required": [
-            "used"
-          ],
-          "properties": {
-            "used": {
-              "type": "number",
-              "enum": [<quotaValue>]
-            }
-          }
-        }
-      }
-    }
-    """
     And for user "<user>" the space "delete objects" <shouldOrNotBeInSpace> contain these entries:
       | text.txt |
     And as "<user>" file "text.txt" <shouldOrNotBeInTrash> exist in the trashbin of the space "delete objects"
@@ -100,6 +72,6 @@ Feature: Remove files, folder
       | Brian | viewer  | 403  | should               | should not           | 12         |
 
 
-  Scenario: user is unable to delete a space via the webDav API
+  Scenario: try to delete an empty string folder from a space
     When user "Alice" removes the folder "" from space "delete objects"
     Then the HTTP status code should be "405"

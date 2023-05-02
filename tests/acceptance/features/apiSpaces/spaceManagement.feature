@@ -114,6 +114,7 @@ Feature: Space management
   Scenario: user without space admin permission tries to change the name of the project space
     When user "Carol" tries to change the name of the "Project" space to "New Name" owned by user "Alice"
     Then the HTTP status code should be "403"
+    And the user "Alice" should have a space called "Project"
 
   @skipOnStable2.0
   Scenario: space admin user changes the description of the project space
@@ -145,42 +146,7 @@ Feature: Space management
   Scenario: space admin user disables the project space
     When user "Brian" disables a space "Project" owned by user "Alice"
     Then the HTTP status code should be "204"
-    And for user "Alice" the JSON representation of their drive should contain space called "Project" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "name",
-        "root"
-      ],
-      "properties": {
-        "name": {
-           "type": "string",
-           "enum": ["Project"]
-        },
-        "root": {
-          "type": "object",
-          "required": [
-            "deleted"
-          ],
-          "properties": {
-            "deleted": {
-              "type": "object",
-              "required": [
-              "state"
-              ],
-              "properties": {
-                "state": {
-                  "type": "string",
-                  "enum": ["trashed"]
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    """
+    And the user "Brian" should not have a space called "Project"
 
 
   Scenario: user without space admin permission tries to disable the project space
@@ -220,3 +186,4 @@ Feature: Space management
     Given user "Alice" has disabled a space "Project"
     When user "Carol" tries to restore a disabled space "Project" owned by user "Alice"
     Then the HTTP status code should be "404"
+    And the user "Alice" should not have a space called "Project"

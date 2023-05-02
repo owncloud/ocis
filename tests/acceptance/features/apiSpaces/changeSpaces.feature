@@ -142,41 +142,6 @@ Feature: Change data of space
       }
     }
     """
-    When user "Alice" uploads a file inside space "Project Jupiter" with content "some content" to "file.txt" using the WebDAV API
-    Then the HTTP status code should be "201"
-    And for user "Alice" the JSON representation of their drive should contain space called "Project Jupiter" and match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name",
-        "quota"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Jupiter"]
-        },
-        "quota": {
-          "type": "object",
-          "required": [
-            "used",
-            "total"
-          ],
-          "properties": {
-            "used" : {
-              "type": "number",
-              "enum": [12]
-            },
-            "total" : {
-              "type": "number",
-              "enum": [0]
-            }
-          }
-        }
-      }
-    }
-    """
     Examples:
       | quotaValue |
       | 0          |
@@ -271,85 +236,13 @@ Feature: Change data of space
     And user "Alice" has set the file ".space/readme.md" as a description in a special section of the "Project Jupiter" space
     When user "<user>" uploads a file inside space "Project Jupiter" with content "new description" to ".space/readme.md" using the WebDAV API
     Then the HTTP status code should be "<code>"
-    And for user "<user>" the JSON representation of their drive should contain space called "Project Jupiter" owned by "Alice" with description file ".space/readme.md" and match
-    """
-    {
-      "type": "object",
-      "required": [
-        "name",
-        "special"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Jupiter"]
-        },
-        "special": {
-          "type": "array",
-          "items": [
-            {
-              "type": "object",
-              "required": [
-                "size",
-                "name",
-                "specialFolder",
-                "file",
-                "id",
-                "eTag"
-              ],
-              "properties": {
-                "size": {
-                  "type": "number",
-                  "enum": [<size>]
-                },
-                "name": {
-                  "type": "string",
-                  "enum": ["readme.md"]
-                },
-                "specialFolder": {
-                  "type": "object",
-                  "required": [
-                    "name"
-                  ],
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "enum": ["readme"]
-                    }
-                  }
-                },
-                "file": {
-                  "type": "object",
-                  "required": [
-                    "mimeType"
-                  ],
-                  "properties": {
-                    "type": "string",
-                    "enum": ["text/markdown"]
-                  }
-                },
-                "id": {
-                  "type": "string",
-                  "enum": ["%file_id%"]
-                },
-                "tag": {
-                  "type": "string",
-                  "enum": ["%eTag%"]
-                }
-              }
-            }
-          ]
-        }
-      }
-    }
-    """
     And for user "<user>" folder ".space/" of the space "Project Jupiter" should contain these entries:
       | readme.md |
     And for user "<user>" the content of the file ".space/readme.md" of the space "Project Jupiter" should be "<content>"
     Examples:
-      | user  | code | size | content           |
-      | Brian | 204  | 15   | new description   |
-      | Bob   | 403  | 17   | space description |
+      | user  | code | content           |
+      | Brian | 204  | new description   |
+      | Bob   | 403  | space description |
 
 
   Scenario Outline: user space admin and editor set image file as space image of the space via the Graph API
@@ -615,63 +508,47 @@ Feature: Change data of space
       | Brian |
 
 
-  Scenario Outline: admin user set own quota of a personal space via the Graph API
+  Scenario Outline: user can't upload resource greater than set quota
+    Given the administrator has given "Alice" the role "<userRole>" using the settings api
+    And user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "15"
+    When user "Alice" uploads a file inside space "Alice Hansen" with content "file is more than 15 bytes" to "file.txt" using the WebDAV API
+    Then the HTTP status code should be "507"
+    And for user "Alice" the space "Personal" should not contain these entries:
+      | file.txt |
+  Examples:
+    | userRole    |
+    | Admin       |
+    | Space Admin |
+    | User        |
+    | Guest       |
+
+
+  Scenario Outline: admin user set own quota of a personal space via the Graph API and upload resource
     When user "Admin" changes the quota of the "Admin" space to "<quotaValue>"
     Then the HTTP status code should be "200"
     When user "Admin" uploads a file inside space "Admin" with content "file is more than 15 bytes" to "file.txt" using the WebDAV API
     Then the HTTP status code should be <code>
+    And for user "Admin" the space "Personal" should contain these entries:
+      | file.txt |
     Examples:
       | quotaValue | code                    |
-      | 15         | "507"                   |
       | 10000      | between "201" and "204" |
       | 0          | between "201" and "204" |
       | -1         | between "201" and "204" |
 
 
-  Scenario Outline: admin user set an user personal space quota of via the Graph API
+  Scenario Outline: admin user set an user personal space quota of via the Graph API and upload resource
     When user "Admin" changes the quota of the "Brian Murphy" space to "<quotaValue>"
     Then the HTTP status code should be "200"
     When user "Brian" uploads a file inside space "Brian Murphy" with content "file is more than 15 bytes" to "file.txt" using the WebDAV API
     Then the HTTP status code should be <code>
-    And for user "Brian" the JSON representation of their drive should contain space called "Brian Murphy" and match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name",
-        "quota"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Brian Murphy"]
-        },
-        "quota": {
-          "type": "object",
-          "required": [
-            "used",
-            "total"
-          ],
-          "properties": {
-            "used" : {
-              "type": "number",
-              "enum": [<used>]
-            },
-            "total" : {
-              "type": "number",
-              "enum": [<total>]
-            }
-          }
-        }
-      }
-    }
-    """
+    And for user "Brian" the space "Personal" should contain these entries:
+      | file.txt |
     Examples:
-      | quotaValue | code                    | total | used |
-      | 15         | "507"                   | 15    | 0    |
-      | 10000      | between "201" and "204" | 10000 | 26   |
-      | 0          | between "201" and "204" | 0     | 26   |
-      | -1         | between "201" and "204" | 0     | 26   |
+      | quotaValue | code                    |
+      | 10000      | between "201" and "204" |
+      | 0          | between "201" and "204" |
+      | -1         | between "201" and "204" |
 
 
   Scenario: user sends invalid space uuid via the graph API

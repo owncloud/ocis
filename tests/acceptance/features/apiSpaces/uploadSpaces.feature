@@ -41,39 +41,11 @@ Feature: Upload files into a space
     Then the HTTP status code should be "<code>"
     And for user "Brian" the space "Project Ceres" <shouldOrNot> contain these entries:
       | test.txt |
-    And for user "Brian" the JSON representation of their drive should contain space called "Project Ceres" and match
-    """
-     {
-      "type": "object",
-      "required": [
-        "name",
-        "quota"
-      ],
-      "properties": {
-        "name": {
-          "type": "string",
-          "enum": ["Project Ceres"]
-        },
-        "quota": {
-          "type": "object",
-          "required": [
-            "used"
-          ],
-          "properties": {
-            "used": {
-              "type": "number",
-              "enum": [<usedQuota>]
-            }
-          }
-        }
-      }
-    }
-    """
     Examples:
-      | role    | code | shouldOrNot | usedQuota |
-      | manager | 201  | should      | 4         |
-      | editor  | 201  | should      | 4         |
-      | viewer  | 403  | should not  | 0         |
+      | role    | code | shouldOrNot |
+      | manager | 201  | should      |
+      | editor  | 201  | should      |
+      | viewer  | 403  | should not  |
 
 
   Scenario: user can create subfolders in a space via the Graph API

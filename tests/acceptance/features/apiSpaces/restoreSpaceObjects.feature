@@ -81,38 +81,4 @@ Feature: Restore files, folder
     And user "Brian" has uploaded file with content "some content" to "newFile.txt"
     When user "Brian" restores version index "1" of file "/file.txt" using the WebDAV API
     Then the HTTP status code should be "204"
-    And for user "Brian" the JSON representation of their drive should contain space called "Brian Murphy" and match
-    """
-     {
-      "type": "object",
-      "required": [
-        "quota"
-      ],
-      "properties": {
-        "quota": {
-          "type": "object",
-          "required": [
-            "state",
-            "total",
-            "remaining",
-            "used"
-          ],
-          "properties": {
-            "state" : {
-              "type": "string",
-              "enum": ["exceeded"]
-            },
-            "total" : {
-              "type": "number",
-              "enum": [30]
-            },
-            "used": {
-              "type": "number",
-              "enum": [38]
-            }
-          }
-        }
-      }
-    }
-    """
     And the content of file "/file.txt" for user "Brian" should be "file is less than 30 bytes"

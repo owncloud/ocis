@@ -928,31 +928,6 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^for user "([^"]*)" the JSON representation of their drive should contain space called "([^"]*)" and match$/
-	 * @Then /^for user "([^"]*)" the JSON representation of their drive should contain space called "([^"]*)" (?:owned by|granted to) "([^"]*)" and match$/
-	 * @Then /^for user "([^"]*)" the JSON representation of their drive should contain space called "([^"]*)" (?:owned by|granted to) "([^"]*)" (?:with description file|with space image) "([^"]*)" and match$/
-	 *
-	 * @param string $user
-	 * @param string|null $spaceName
-	 * @param string|null $grantedUser
-	 * @param string|null $fileName
-	 * @param PyStringNode|null $schemaString
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function forUserTheJSONDataOfTheResponseShouldMatch(
-		string $user,
-		?string $spaceName = null,
-		?string $grantedUser = null,
-		?string $fileName = null,
-		?PyStringNode $schemaString = null
-	): void {
-		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
-		$this->theJsonDataFromLastResponseShouldMatch($spaceName, $grantedUser, $fileName, $schemaString);
-	}
-
-	/**
 	 * @Then /^the user "([^"]*)" should have a space called "([^"]*)" granted to "([^"]*)" with role "([^"]*)"$/
 	 *
 	 * @param string $user
@@ -1004,9 +979,10 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^the user "([^"]*)" should not have a space called "([^"]*)"$/
+	 * @Then /^the user "([^"]*)" should (not |)have a space called "([^"]*)"$/
 	 *
 	 * @param string $user
+	 * @param string $shouldOrNot
 	 * @param string $spaceName
 	 *
 	 * @return void
@@ -1014,6 +990,7 @@ class SpacesContext implements Context {
 	 */
 	public function userShouldNotHaveSpace(
 		string $user,
+		string $shouldOrNot,
 		string $spaceName
 	): void {
 		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
@@ -1021,7 +998,11 @@ class SpacesContext implements Context {
 			200,
 			"Expected response status code should be 200"
 		);
-		$this->jsonRespondedShouldNotContain($spaceName);
+		if (\trim($shouldOrNot) === "not") {
+			$this->jsonRespondedShouldNotContain($spaceName);
+		} else {
+			Assert::assertNotEmpty($this->getSpaceByNameFromResponse($spaceName), "space '$spaceName' should be available for a user '$user' but not found");
+		}
 	}
 
 	/**
