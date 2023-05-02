@@ -55,7 +55,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9210-9214  | FREE                                                                                   |
 | 9215-9219  | [storage-system]({{< ref "../storage-system/_index.md" >}})                            |
 | 9220-9224  | [search]({{< ref "../search/_index.md" >}})                                            |
-| 9225-9229  | FREE                                                                                   |
+| 9225-9229  | [audit]({{< ref "../audit/_index.md" >}})                                              |
 | 9230-9234  | [nats]({{< ref "../nats/_index.md" >}})                                                |
 | 9235-9239  | [idm]({{< ref "../idm/_index.md" >}})                                                  |
 | 9240-9244  | [app-registry]({{< ref "../app-registry/_index.md" >}})                                |
