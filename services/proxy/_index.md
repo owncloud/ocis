@@ -1,6 +1,6 @@
 ---
 title: Proxy
-date: 2023-05-02T17:18:14.234259609Z
+date: 2023-05-02T19:52:29.453422341Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/proxy
@@ -25,6 +25,7 @@ The proxy service is the only service communicating to the outside and needs the
 * [Automatic Role Assignments](#automatic-role-assignments)
 * [Recommendations for Production Deployments](#recommendations-for-production-deployments)
 * [Caching](#caching)
+* [Special Settings](#special-settings)
 * [Example Yaml Config](#example-yaml-config)
 
 ## Authentication
@@ -131,6 +132,14 @@ The `proxy` service can use a configured store via `PROXY_STORE_TYPE`. Possible 
 2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store apply.
 3.  The proxy service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
 4.  When using `redis-sentinel`, the Redis master to use is configured via `PROXY_OIDC_USERINFO_CACHE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
+
+## Special Settings
+
+When using the ocis IDP service instead of an external IDP:
+
+-   Use the environment variable `OCIS_URL` to define how ocis can be accessed, mandatory use `https` as protocol for the URL.
+-   If no reverse proxy is set up, the `PROXY_TLS` environment variable **must** be set to `true` because the embedded `libreConnect` shipped with the IDP service has a hard check if the connection is on TLS and uses the HTTPS protocol. If this mismatches, an error will be logged and no connection from the client can be established.
+-   `PROXY_TLS` **can** be set to `false` if a reverse proxy is used and the https connection is terminated at the reverse proxy. When setting to `false`, the communication between the reverse proxy and ocis is not secured. If set to `true`, you must provide certificates.
 ## Example Yaml Config
 {{< include file="services/_includes/proxy-config-example.yaml"  language="yaml" >}}
 

@@ -64,7 +64,7 @@ We also suggest to use the last port in your extensions' range as a debug/metric
 | 9255-9259  | [postprocessing]({{ ref "../postprocessing/_index.md" >}})                             |
 | 9260-9264  | FREE                                                                                   |
 | 9265-9269  | FREE                                                                                   |
-| 9270-9274  | FREE                                                                                   |
+| 9270-9274  | [eventhistory]({{< ref "../eventhistory/_index.md" >}})                                |
 | 9275-9279  | FREE                                                                                   |
 | 9280-9284  | FREE                                                                                   |
 | 9285-9289  | FREE                                                                                   |

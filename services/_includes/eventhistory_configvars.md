@@ -6,7 +6,7 @@
 | OCIS_LOG_PRETTY<br/>EVENTHISTORY_LOG_PRETTY | bool | false | Activates pretty log output.|
 | OCIS_LOG_COLOR<br/>EVENTHISTORY_LOG_COLOR | bool | false | Activates colorized log output.|
 | OCIS_LOG_FILE<br/>EVENTHISTORY_LOG_FILE | string |  | The path to the log file. Activates logging to this file if set.|
-| EVENTHISTORY_DEBUG_ADDR | string |  | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
+| EVENTHISTORY_DEBUG_ADDR | string | 127.0.0.1:9270 | Bind address of the debug server, where metrics, health, config and debug endpoints will be exposed.|
 | EVENTHISTORY_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | EVENTHISTORY_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | EVENTHISTORY_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|

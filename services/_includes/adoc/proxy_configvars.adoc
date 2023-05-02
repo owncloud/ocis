@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-02-17-18-11]
+[#deprecation-note-2023-05-02-19-52-27]
 [caption=]
 .Deprecation notes for the proxy service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -190,11 +190,11 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++true ++
 a| [subs=-attributes]
-Enable/Disable HTTPS for the external HTTP services.
+Enable/Disable HTTPS for external HTTP services. Must be set to 'true' if the built-in IDP service an no reverse proxy is used. See the text description for details.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-05-02-17-18-11[Deprecation Note]
+xref:deprecation-note-2023-05-02-19-52-27[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
