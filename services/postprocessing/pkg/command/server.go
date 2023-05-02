@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -8,7 +9,11 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/go-micro/plugins/v4/events/natsjs"
+	"github.com/oklog/run"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
+	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/config/parser"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/logging"
@@ -31,45 +36,92 @@ func Server(cfg *config.Config) *cli.Command {
 			return err
 		},
 		Action: func(c *cli.Context) error {
-			logger := logging.Configure(cfg.Service.Name, cfg.Log)
+			var (
+				gr     = run.Group{}
+				logger = logging.Configure(cfg.Service.Name, cfg.Log)
 
-			evtsCfg := cfg.Postprocessing.Events
-			var tlsConf *tls.Config
+				evtsCfg = cfg.Postprocessing.Events
+				tlsConf *tls.Config
 
-			if evtsCfg.EnableTLS {
-				var rootCAPool *x509.CertPool
-				if evtsCfg.TLSRootCACertificate != "" {
-					rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
-					if err != nil {
-						return err
+				ctx, cancel = func() (context.Context, context.CancelFunc) {
+					if cfg.Context == nil {
+						return context.WithCancel(context.Background())
 					}
-
-					rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
-					if err != nil {
-						return err
-					}
-					evtsCfg.TLSInsecure = false
-				}
-
-				tlsConf = &tls.Config{
-					RootCAs: rootCAPool,
-				}
-			}
-
-			bus, err := stream.Nats(
-				natsjs.TLSConfig(tlsConf),
-				natsjs.Address(evtsCfg.Endpoint),
-				natsjs.ClusterID(evtsCfg.Cluster),
+					return context.WithCancel(cfg.Context)
+				}()
 			)
-			if err != nil {
-				return err
+			defer cancel()
+
+			{
+				if evtsCfg.EnableTLS {
+					var rootCAPool *x509.CertPool
+					if evtsCfg.TLSRootCACertificate != "" {
+						rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
+						if err != nil {
+							return err
+						}
+
+						rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
+						if err != nil {
+							return err
+						}
+						evtsCfg.TLSInsecure = false
+					}
+
+					tlsConf = &tls.Config{
+						RootCAs: rootCAPool,
+					}
+				}
+
+				bus, err := stream.Nats(
+					natsjs.TLSConfig(tlsConf),
+					natsjs.Address(evtsCfg.Endpoint),
+					natsjs.ClusterID(evtsCfg.Cluster),
+				)
+				if err != nil {
+					return err
+				}
+
+				svc, err := service.NewPostprocessingService(bus, logger, cfg.Postprocessing)
+				if err != nil {
+					return err
+				}
+				gr.Add(func() error {
+					err := make(chan error)
+					select {
+					case <-ctx.Done():
+						return nil
+
+					case err <- svc.Run():
+						return <-err
+					}
+				}, func(err error) {
+					logger.Error().
+						Err(err).
+						Msg("Shutting down server")
+					cancel()
+				})
 			}
 
-			svc, err := service.NewPostprocessingService(bus, logger, cfg.Postprocessing)
-			if err != nil {
-				return err
+			{
+				server := debug.NewService(
+					debug.Logger(logger),
+					debug.Name(cfg.Service.Name),
+					debug.Version(version.GetString()),
+					debug.Address(cfg.Debug.Addr),
+					debug.Token(cfg.Debug.Token),
+					debug.Pprof(cfg.Debug.Pprof),
+					debug.Zpages(cfg.Debug.Zpages),
+					debug.Health(handlers.Health),
+					debug.Ready(handlers.Ready),
+				)
+
+				gr.Add(server.ListenAndServe, func(_ error) {
+					_ = server.Shutdown(ctx)
+					cancel()
+				})
 			}
-			return svc.Run()
+			return gr.Run()
 		},
 	}
 }
