@@ -10,6 +10,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
+	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
+	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
@@ -125,6 +127,25 @@ func Server(cfg *config.Config) *cli.Command {
 						Err(err).
 						Msg("Shutting down server")
 
+					cancel()
+				})
+			}
+
+			{
+				server := debug.NewService(
+					debug.Logger(logger),
+					debug.Name(cfg.Service.Name),
+					debug.Version(version.GetString()),
+					debug.Address(cfg.Debug.Addr),
+					debug.Token(cfg.Debug.Token),
+					debug.Pprof(cfg.Debug.Pprof),
+					debug.Zpages(cfg.Debug.Zpages),
+					debug.Health(handlers.Health),
+					debug.Ready(handlers.Ready),
+				)
+
+				gr.Add(server.ListenAndServe, func(_ error) {
+					_ = server.Shutdown(ctx)
 					cancel()
 				})
 			}
