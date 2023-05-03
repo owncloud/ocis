@@ -42,7 +42,7 @@
 | OCIS_URL<br/>GRAPH_SPACES_WEBDAV_BASE | string | https://localhost:9200 | The public facing URL of WebDAV.|
 | GRAPH_SPACES_WEBDAV_PATH | string | /dav/spaces/ | The WebDAV subpath for spaces.|
 | GRAPH_SPACES_DEFAULT_QUOTA | string | 1000000000 | The default quota in bytes.|
-| GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL | int | 0 | Max TTL in seconds for the spaces property cache.|
+| GRAPH_SPACES_EXTENDED_SPACE_PROPERTIES_CACHE_TTL | int | 1800000000000 | Max TTL in seconds for the spaces property cache.|
 | GRAPH_SPACES_USERS_CACHE_TTL | int | 1800000000000 | Max TTL in seconds for the spaces users cache.|
 | GRAPH_SPACES_GROUPS_CACHE_TTL | int | 1800000000000 | Max TTL in seconds for the spaces groups cache.|
 | GRAPH_IDENTITY_BACKEND | string | ldap | The user identity backend to use. Supported backend types are 'ldap' and 'cs3'.|
