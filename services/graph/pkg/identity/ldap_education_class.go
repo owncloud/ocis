@@ -460,9 +460,5 @@ func (i *LDAP) RemoveTeacherFromEducationClass(ctx context.Context, classID stri
 		return err
 	}
 
-	if mr, err := i.removeEntryByDNAndAttributeFromEntry(class, teacher.DN, i.educationConfig.classAttributeMap.teachers); err == nil {
-		return i.conn.Modify(mr)
-	}
-
-	return nil
+	return i.removeEntryByDNAndAttributeFromEntry(class, teacher.DN, i.educationConfig.classAttributeMap.teachers)
 }

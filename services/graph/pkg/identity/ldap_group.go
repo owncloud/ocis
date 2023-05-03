@@ -325,18 +325,37 @@ func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs 
 	}
 
 	if len(newMemberDN) > 0 {
-		mr.Add(i.groupAttributeMap.member, newMemberDN)
-
-		if err := i.conn.Modify(&mr); err != nil {
-			if lerr, ok := err.(*ldap.Error); ok {
-				if lerr.ResultCode == ldap.LDAPResultAttributeOrValueExists {
-					err = fmt.Errorf("Duplicate member entries in request")
-				} else {
-					logger.Info().Err(err).Msg("Failed to modify group member entries on PATCH group")
-					err = fmt.Errorf("Unknown error when trying to modify group member entries")
+		// Small retry loop. It might be that, when reading the group we found the empty group member ("",
+		// line 289 above). Our modify operation tries to delete that value. However another go-routine
+		// might have done that in parallel. In that case
+		// (LDAPResultNoSuchAttribute) we need to retry the modification
+		// without the delete.
+		for j := 0; j < 2; j++ {
+			mr.Add(i.groupAttributeMap.member, newMemberDN)
+			if err := i.conn.Modify(&mr); err != nil {
+				if lerr, ok := err.(*ldap.Error); ok {
+					switch lerr.ResultCode {
+					case ldap.LDAPResultAttributeOrValueExists:
+						err = fmt.Errorf("Duplicate member entries in request")
+					case ldap.LDAPResultNoSuchAttribute:
+						if len(mr.Changes) == 2 {
+							// We tried the special case for adding the first group member, but some
+							// other request running in parallel did that already. Retry with a "normal"
+							// modification
+							logger.Debug().Err(err).
+								Msg("Failed to add first group member. Retrying once, without deleting the empty member value.")
+							mr.Changes = make([]ldap.Change, 0, 1)
+							continue
+						}
+					default:
+						logger.Info().Err(err).Msg("Failed to modify group member entries on PATCH group")
+						err = fmt.Errorf("Unknown error when trying to modify group member entries")
+					}
 				}
+				return err
 			}
-			return err
+			// succeeded
+			break
 		}
 	}
 	return nil
@@ -365,12 +384,13 @@ func (i *LDAP) RemoveMemberFromGroup(ctx context.Context, groupID string, member
 		logger.Debug().Str("backend", "ldap").Str("memberID", memberID).Msg("Error looking up group member")
 		return err
 	}
+
 	logger.Debug().Str("backend", "ldap").Str("groupdn", ge.DN).Str("member", me.DN).Msg("remove member")
 
-	if mr, err := i.removeEntryByDNAndAttributeFromEntry(ge, me.DN, i.groupAttributeMap.member); err == nil {
-		return i.conn.Modify(mr)
+	if err = i.removeEntryByDNAndAttributeFromEntry(ge, me.DN, i.groupAttributeMap.member); err != nil {
+		logger.Error().Err(err).Str("backend", "ldap").Str("group", groupID).Str("member", memberID).Msg("Failed to remove member from group.")
 	}
-	return nil
+	return err
 }
 
 func (i *LDAP) groupToAddRequest(group libregraph.Group) (*ldap.AddRequest, error) {
