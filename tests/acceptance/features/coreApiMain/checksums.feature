@@ -177,8 +177,7 @@ Feature: checksums
 
   @issue-1291
   Scenario Outline: sharing a file with checksum should return the checksum in the propfind using new DAV path
-    Given auto-accept shares has been disabled
-    And using <dav_version> DAV path
+    Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     And user "Alice" has shared file "/myChecksumFile.txt" with user "Brian"
@@ -192,8 +191,7 @@ Feature: checksums
 
   @issue-1291
   Scenario Outline: modifying a shared file should return correct checksum in the propfind using new DAV path
-    Given auto-accept shares has been disabled
-    And using <dav_version> DAV path
+    Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     And user "Alice" has shared file "/myChecksumFile.txt" with user "Brian"

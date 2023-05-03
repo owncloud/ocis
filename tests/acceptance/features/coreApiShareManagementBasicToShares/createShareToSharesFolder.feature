@@ -5,8 +5,7 @@ Feature: sharing
   So that they can have access on them
 
   Background:
-    Given auto-accept shares has been disabled
-    And user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes and without skeleton files
 
   @smokeTest
   Scenario Outline: creating a share of a file with a user, the default permissions are read(1)+update(2)+can-share(16)

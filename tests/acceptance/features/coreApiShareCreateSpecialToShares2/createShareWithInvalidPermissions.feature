@@ -5,8 +5,7 @@ Feature: cannot share resources with invalid permissions
   So that I can make sure it doesn't work
 
   Background:
-    Given auto-accept shares has been disabled
-    And user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
     And user "Alice" has created folder "/PARENT"
 

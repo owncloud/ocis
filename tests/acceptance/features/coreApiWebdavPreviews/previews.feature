@@ -79,8 +79,7 @@ Feature: previews of files downloaded through the webdav API
 
 
   Scenario: download previews of shared files (to shares folder)
-    Given auto-accept shares has been disabled
-    And user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
     And user "Alice" has shared file "/parent.txt" with user "Brian"
     And user "Brian" has accepted share "/parent.txt" offered by user "Alice"
@@ -122,8 +121,7 @@ Feature: previews of files downloaded through the webdav API
 
   @issue-2538
   Scenario: when owner updates a shared file, previews for sharee are also updated (to shared folder)
-    Given auto-accept shares has been disabled
-    And user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/lorem.txt" to "/parent.txt"
     And user "Alice" has shared file "/parent.txt" with user "Brian"
     And user "Brian" has accepted share "/parent.txt" offered by user "Alice"
@@ -143,8 +141,7 @@ Feature: previews of files downloaded through the webdav API
 
 
   Scenario: updates to a file should change the preview for both sharees and sharers
-    Given auto-accept shares has been disabled
-    And user "Brian" has been created with default attributes and without skeleton files
+    Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded file with content "file to upload" to "/FOLDER/lorem.txt"
     And user "Alice" has shared folder "FOLDER" with user "Brian"
@@ -162,8 +159,7 @@ Feature: previews of files downloaded through the webdav API
 
 
   Scenario: updates to a group shared file should change the preview for both sharees and sharers
-    Given auto-accept shares has been disabled
-    And group "grp1" has been created
+    Given group "grp1" has been created
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Brian" has been added to group "grp1"

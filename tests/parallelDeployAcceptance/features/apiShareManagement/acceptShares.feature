@@ -7,7 +7,6 @@ Feature: sharing files and folders
 
   Background:
     Given using "oc10" as owncloud selector
-    And auto-accept shares has been disabled
     And using OCS API version "1"
     And using new DAV path
     And user "Alice" has been created with default attributes and without skeleton files

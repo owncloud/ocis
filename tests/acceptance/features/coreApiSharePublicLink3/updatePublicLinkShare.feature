@@ -249,8 +249,7 @@ Feature: update a public link share
 
 
   Scenario Outline: Adding public upload to a read only shared folder as recipient is not allowed using the public API
-    Given auto-accept shares has been disabled
-    And using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "share,read"
@@ -273,8 +272,7 @@ Feature: update a public link share
 
 
   Scenario Outline: Adding public upload to a shared folder as recipient is allowed with permissions using the public API
-    Given auto-accept shares has been disabled
-    And using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "all"
@@ -297,8 +295,7 @@ Feature: update a public link share
 
 
   Scenario Outline: Adding public link with all permissions to a read only shared folder as recipient is not allowed using the public API
-    Given auto-accept shares has been disabled
-    And using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "share,read"
@@ -321,8 +318,7 @@ Feature: update a public link share
 
 
   Scenario Outline: Adding public link with all permissions to a read only shared folder as recipient is allowed with permissions using the public API
-    Given auto-accept shares has been disabled
-    And using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
     And user "Alice" has shared folder "/test" with user "Brian" with permissions "all"

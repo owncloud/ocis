@@ -2,8 +2,7 @@
 Feature: sharing
 
   Background:
-    Given auto-accept shares has been disabled
-    And using OCS API version "1"
+    Given using OCS API version "1"
     And these users have been created with default attributes and without skeleton files:
       | username |
       | Alice    |

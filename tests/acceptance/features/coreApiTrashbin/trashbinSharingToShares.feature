@@ -2,8 +2,7 @@
 Feature: using trashbin together with sharing
 
   Background:
-    Given auto-accept shares has been disabled
-    And user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "file to delete" to "/textfile0.txt"
 
   @smokeTest
