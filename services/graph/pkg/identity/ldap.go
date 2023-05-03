@@ -238,12 +238,10 @@ func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 		for _, group := range groupEntries {
 			logger.Debug().Str("group", group.DN).Str("user", e.DN).Msg("Cleaning up group membership")
 
-			if mr, err := i.removeEntryByDNAndAttributeFromEntry(group, e.DN, i.groupAttributeMap.member); err == nil {
-				if err = i.conn.Modify(mr); err != nil {
-					// Errors when deleting the memberships are only logged as warnings but not returned
-					// to the user as we already successfully deleted the users itself
-					logger.Warn().Str("group", group.DN).Str("user", e.DN).Err(err).Msg("failed to remove member")
-				}
+			if err := i.removeEntryByDNAndAttributeFromEntry(group, e.DN, i.groupAttributeMap.member); err != nil {
+				// Errors when deleting the memberships are only logged as warnings but not returned
+				// to the user as we already successfully deleted the users itself
+				logger.Warn().Str("group", group.DN).Str("user", e.DN).Err(err).Msg("failed to remove member")
 			}
 		}
 	}
@@ -878,40 +876,62 @@ func stringToScope(scope string) (int, error) {
 }
 
 // removeEntryByDNAndAttributeFromEntry creates a request to remove a single member entry by attribute and DN from an ldap entry
-func (i *LDAP) removeEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string, attribute string) (*ldap.ModifyRequest, error) {
+func (i *LDAP) removeEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string, attribute string) error {
 	nOldDN, err := ldapdn.ParseNormalize(dn)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	entries := entry.GetEqualFoldAttributeValues(attribute)
+
+	currentValues := entry.GetEqualFoldAttributeValues(attribute)
+	i.logger.Error().Interface("members", currentValues).Msg("current values")
 	found := false
-	for _, entry := range entries {
-		if entry == "" {
+	for _, currentValue := range currentValues {
+		if currentValue == "" {
 			continue
 		}
-		if nEntry, err := ldapdn.ParseNormalize(entry); err != nil {
+		if normalizedCurrentValue, err := ldapdn.ParseNormalize(currentValue); err != nil {
 			// We couldn't parse the entry value as a DN. Let's keep it
 			// as it is but log a warning
-			i.logger.Warn().Str("entryDN", entry).Err(err).Msg("Couldn't parse DN")
+			i.logger.Warn().Str("member", currentValue).Err(err).Msg("Couldn't parse DN")
 			continue
 		} else {
-			if nEntry == nOldDN {
+			if normalizedCurrentValue == nOldDN {
 				found = true
 			}
 		}
 	}
 	if !found {
-		i.logger.Debug().Str("backend", "ldap").Str("entry", entry.DN).Str("target", dn).
-			Msg("The target is not an entry in the attribute list")
-		return nil, ErrNotFound
+		i.logger.Error().Str("backend", "ldap").Str("entry", entry.DN).Str("target", dn).
+			Msg("The target value is not present in the attribute list")
+		return ErrNotFound
 	}
 
-	mr := ldap.ModifyRequest{DN: entry.DN}
-	if len(entries) == 1 {
+	mr := &ldap.ModifyRequest{DN: entry.DN}
+	if len(currentValues) == 1 {
 		mr.Add(attribute, []string{""})
 	}
 	mr.Delete(attribute, []string{dn})
-	return &mr, nil
+
+	err = i.conn.Modify(mr)
+	var lerr *ldap.Error
+	if err != nil && errors.As(err, &lerr) {
+		if lerr.ResultCode == ldap.LDAPResultObjectClassViolation {
+			// objectclass "groupOfName" requires at least one member to be present, some other go-routine
+			// must have removed the 2nd last member from the group after we read the group. We adapt the
+			// modification request to replace the last member with an empty member and re-try.
+			i.logger.Debug().Err(err).
+				Msg("Failed to remove last group member. Retrying once. Replacing last group member with an empty member value.")
+			mr.Add(attribute, []string{""})
+			err = i.conn.Modify(mr)
+		}
+	}
+
+	if err != nil {
+		i.logger.Error().Err(err).Str("entry", entry.DN).Str("attribute", attribute).Str("target value", dn).
+			Msg("Failed to remove dn attribute from entry")
+	}
+
+	return err
 }
 
 // expandLDAPAttributeEntries reads an attribute from an ldap entry and expands to users
