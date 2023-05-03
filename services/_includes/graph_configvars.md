@@ -63,6 +63,7 @@
 | LDAP_USER_SCHEMA_DISPLAY_NAME<br/>GRAPH_LDAP_USER_DISPLAYNAME_ATTRIBUTE | string | displayName | LDAP Attribute to use for the displayname of users.|
 | OCIS_LDAP_USER_SCHEMA_USERNAME<br/>LDAP_USER_SCHEMA_USERNAME<br/>GRAPH_LDAP_USER_NAME_ATTRIBUTE | string | uid | LDAP Attribute to use for username of users.|
 | OCIS_LDAP_USER_SCHEMA_ID<br/>LDAP_USER_SCHEMA_ID<br/>GRAPH_LDAP_USER_UID_ATTRIBUTE | string | owncloudUUID | LDAP Attribute to use as the unique ID for users. This should be a stable globally unique ID like a UUID.|
+| OCIS_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING<br/>GRAPH_LDAP_USER_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'ID' attribute for users is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the user ID's.|
 | OCIS_LDAP_USER_SCHEMA_USER_TYPE<br/>LDAP_USER_SCHEMA_USER_TYPE<br/>GRAPH_LDAP_USER_TYPE_ATTRIBUTE | string | ownCloudUserType | LDAP Attribute to distinguish between 'Member' and 'Guest' users. Default is 'ownCloudUserType'.|
 | OCIS_LDAP_USER_ENABLED_ATTRIBUTE<br/>LDAP_USER_ENABLED_ATTRIBUTE<br/>GRAPH_USER_ENABLED_ATTRIBUTE | string | ownCloudUserEnabled | LDAP Attribute to use as a flag telling if the user is enabled or disabled.|
 | OCIS_LDAP_DISABLE_USER_MECHANISM<br/>LDAP_DISABLE_USER_MECHANISM<br/>GRAPH_DISABLE_USER_MECHANISM | string | attribute | An option to control the behavior for disabling users. Supported options are 'none', 'attribute' and 'group'. If set to 'group', disabling a user via API will add the user to the configured group for disabled users, if set to 'attribute' this will be done in the ldap user entry, if set to 'none' the disable request is not processed. Default is 'attribute'.|
@@ -74,6 +75,7 @@
 | OCIS_LDAP_GROUP_OBJECTCLASS<br/>LDAP_GROUP_OBJECTCLASS<br/>GRAPH_LDAP_GROUP_OBJECTCLASS | string | groupOfNames | The object class to use for groups in the default group search filter ('groupOfNames').|
 | OCIS_LDAP_GROUP_SCHEMA_GROUPNAME<br/>LDAP_GROUP_SCHEMA_GROUPNAME<br/>GRAPH_LDAP_GROUP_NAME_ATTRIBUTE | string | cn | LDAP Attribute to use for the name of groups.|
 | OCIS_LDAP_GROUP_SCHEMA_ID<br/>LDAP_GROUP_SCHEMA_ID<br/>GRAPH_LDAP_GROUP_ID_ATTRIBUTE | string | owncloudUUID | LDAP Attribute to use as the unique id for groups. This should be a stable globally unique ID like a UUID.|
+| OCIS_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING<br/>GRAPH_LDAP_GROUP_SCHEMA_ID_IS_OCTETSTRING | bool | false | Set this to true if the defined 'ID' attribute for groups is of the 'OCTETSTRING' syntax. This is required when using the 'objectGUID' attribute of Active Directory for the group ID's.|
 | GRAPH_LDAP_EDUCATION_RESOURCES_ENABLED | bool | false | Enable LDAP support for managing education related resources.|
 | GRAPH_LDAP_SCHOOL_BASE_DN | string |  | Search base DN for looking up LDAP schools.|
 | GRAPH_LDAP_SCHOOL_SEARCH_SCOPE | string |  | LDAP search scope to use when looking up schools. Supported scopes are 'base', 'one' and 'sub'.|

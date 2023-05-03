@@ -92,6 +92,7 @@ identity:
     user_displayname_attribute: displayName
     user_name_attribute: uid
     user_id_attribute: owncloudUUID
+    user_id_is_octet_string: false
     user_type_attribute: ownCloudUserType
     user_enabled_attribute: ownCloudUserEnabled
     disable_user_mechanism: attribute
@@ -103,6 +104,7 @@ identity:
     group_objectclass: groupOfNames
     group_name_attribute: cn
     group_id_attribute: owncloudUUID
+    group_id_is_octet_string: false
     education_resources_enabled: false
     educationconfig:
       school_base_dn: ""
