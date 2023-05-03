@@ -11,4 +11,4 @@ If you want to use your custom compiled web client assets instead of the embedde
 
 ## WebUI Options
 
-Beside theming, the behaviour of the embedded WebUI can be configured via options. See the environment variables `WEB_OPTIONS_xxx` for more details.
+Beside theming, the behaviour of the embedded WebUI can be configured via options. See the environment variables `WEB_OPTION_xxx` for more details.
