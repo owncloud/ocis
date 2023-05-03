@@ -1,7 +1,7 @@
 @api
 Feature: get robots.txt
   As a user
-  I want to get a file
+  I want to get file robots.txt
   So that I can check its content
 
   @issue-1314
