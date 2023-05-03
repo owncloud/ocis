@@ -17,6 +17,7 @@ import (
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	"golang.org/x/crypto/sha3"
 )
 
 // GetRootDriveChildren implements the Service interface.
@@ -219,9 +220,16 @@ func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space
 	if space.GetRoot().GetStorageId() == utils.ShareStorageProviderID {
 		return nil // no point in stating the ShareStorageProvider
 	}
+	if space.Opaque == nil {
+		return nil
+	}
 
+	imageNode := utils.ReadPlainFromOpaque(space.Opaque, SpaceImageSpecialFolderName)
+	readmeNode := utils.ReadPlainFromOpaque(space.Opaque, ReadmeSpecialFolderName)
+
+	cachekey := spaceRootStatKey(space.Root, imageNode, readmeNode)
 	// if the root is older or equal to our cache we can reuse the cached extended spaces properties
-	if entry := g.specialDriveItemsCache.Get(spaceRootStatKey(space.Root)); entry != nil {
+	if entry := g.specialDriveItemsCache.Get(cachekey); entry != nil {
 		if cached, ok := entry.Value().(specialDriveItemEntry); ok {
 			if cached.rootMtime != nil && space.Mtime != nil {
 				// beware, LaterTS does not handle equalness. it returns t1 if t1 > t2, else t2, so a >= check looks like this
@@ -233,17 +241,14 @@ func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space
 	}
 
 	var spaceItems []libregraph.DriveItem
-	if space.Opaque == nil {
-		return nil
-	}
-	metadata := space.Opaque.Map
-	names := [2]string{SpaceImageSpecialFolderName, ReadmeSpecialFolderName}
 
-	for _, itemName := range names {
-		// The default is a path relative to the space root
+	for itemName, itemNode := range map[string]string{
+		SpaceImageSpecialFolderName: imageNode,
+		ReadmeSpecialFolderName:     readmeNode,
+	} {
 		var ref storageprovider.Reference
-		if itemID, ok := metadata[itemName]; ok {
-			rid, _ := storagespace.ParseID(string(itemID.Value))
+		if itemNode != "" {
+			rid, _ := storagespace.ParseID(itemNode)
 			// add the storageID of the space, all drive items of this space belong to the same storageID
 			rid.StorageId = space.GetRoot().GetStorageId()
 			ref = storageprovider.Reference{
@@ -261,17 +266,26 @@ func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space
 		specialDriveItems: spaceItems,
 		rootMtime:         space.Mtime,
 	}
-	g.specialDriveItemsCache.Set(spaceRootStatKey(space.Root), spacePropertiesEntry, time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL))
+	g.specialDriveItemsCache.Set(cachekey, spacePropertiesEntry, time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL))
 
 	return spaceItems
 }
 
 // generates a space root stat cache key used to detect changes in a space
-func spaceRootStatKey(id *storageprovider.ResourceId) string {
+// takes into account the special nodes because changing metadata does not affect the etag / mtime
+func spaceRootStatKey(id *storageprovider.ResourceId, imagenode, readmeNode string) string {
 	if id == nil {
 		return ""
 	}
-	return id.StorageId + "$" + id.SpaceId + "!" + id.OpaqueId
+	sha3 := sha3.NewShake256()
+	sha3.Write([]byte(id.GetStorageId()))
+	sha3.Write([]byte(id.GetSpaceId()))
+	sha3.Write([]byte(id.GetOpaqueId()))
+	sha3.Write([]byte(imagenode))
+	sha3.Write([]byte(readmeNode))
+	h := make([]byte, 64)
+	sha3.Read(h)
+	return fmt.Sprintf("%x", h)
 }
 
 type specialDriveItemEntry struct {
