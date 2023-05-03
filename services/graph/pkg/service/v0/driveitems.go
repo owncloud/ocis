@@ -242,24 +242,8 @@ func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space
 
 	var spaceItems []libregraph.DriveItem
 
-	for itemName, itemNode := range map[string]string{
-		SpaceImageSpecialFolderName: imageNode,
-		ReadmeSpecialFolderName:     readmeNode,
-	} {
-		var ref storageprovider.Reference
-		if itemNode != "" {
-			rid, _ := storagespace.ParseID(itemNode)
-			// add the storageID of the space, all drive items of this space belong to the same storageID
-			rid.StorageId = space.GetRoot().GetStorageId()
-			ref = storageprovider.Reference{
-				ResourceId: &rid,
-			}
-			spaceItem := g.getSpecialDriveItem(ctx, ref, itemName, baseURL, space)
-			if spaceItem != nil {
-				spaceItems = append(spaceItems, *spaceItem)
-			}
-		}
-	}
+	spaceItems = g.fetchSpecialDriveItem(ctx, spaceItems, SpaceImageSpecialFolderName, imageNode, space, baseURL)
+	spaceItems = g.fetchSpecialDriveItem(ctx, spaceItems, ReadmeSpecialFolderName, readmeNode, space, baseURL)
 
 	// cache properties
 	spacePropertiesEntry := specialDriveItemEntry{
@@ -268,6 +252,23 @@ func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space
 	}
 	g.specialDriveItemsCache.Set(cachekey, spacePropertiesEntry, time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL))
 
+	return spaceItems
+}
+
+func (g Graph) fetchSpecialDriveItem(ctx context.Context, spaceItems []libregraph.DriveItem, itemName string, itemNode string, space *storageprovider.StorageSpace, baseURL *url.URL) []libregraph.DriveItem {
+	var ref storageprovider.Reference
+	if itemNode != "" {
+		rid, _ := storagespace.ParseID(itemNode)
+
+		rid.StorageId = space.GetRoot().GetStorageId()
+		ref = storageprovider.Reference{
+			ResourceId: &rid,
+		}
+		spaceItem := g.getSpecialDriveItem(ctx, ref, itemName, baseURL, space)
+		if spaceItem != nil {
+			spaceItems = append(spaceItems, *spaceItem)
+		}
+	}
 	return spaceItems
 }
 
@@ -284,7 +285,7 @@ func spaceRootStatKey(id *storageprovider.ResourceId, imagenode, readmeNode stri
 	_, _ = sha3.Write([]byte(imagenode))
 	_, _ = sha3.Write([]byte(readmeNode))
 	h := make([]byte, 64)
-	sha3.Read(h)
+	_, _ = sha3.Read(h)
 	return fmt.Sprintf("%x", h)
 }
 
