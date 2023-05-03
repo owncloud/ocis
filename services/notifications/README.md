@@ -24,7 +24,7 @@ The source templates provided by ocis you can derive from are located in the fol
 -   [text/email.text.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/text/email.text.tmpl)
 -   [html/email.html.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/html/email.html.tmpl)
 
-#### Templates subfolder hierarchy
+### Templates subfolder hierarchy
 ```text
 templates
 │
