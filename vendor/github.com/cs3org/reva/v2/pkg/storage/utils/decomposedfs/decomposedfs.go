@@ -438,11 +438,18 @@ func (fs *Decomposedfs) GetQuota(ctx context.Context, ref *provider.Reference) (
 		quotaStr = string(ri.Opaque.Map["quota"].Value)
 	}
 
+	// FIXME this reads remaining disk size from the local disk, not the blobstore
 	remaining, err = node.GetAvailableSize(n.InternalPath())
 	if err != nil {
 		return 0, 0, 0, err
 	}
 
+	return fs.calculateTotalUsedRemaining(quotaStr, ri.Size, remaining)
+}
+
+func (fs *Decomposedfs) calculateTotalUsedRemaining(quotaStr string, inUse, remaining uint64) (uint64, uint64, uint64, error) {
+	var err error
+	var total uint64
 	switch quotaStr {
 	case node.QuotaUncalculated, node.QuotaUnknown:
 		// best we can do is return current total
@@ -457,15 +464,14 @@ func (fs *Decomposedfs) GetQuota(ctx context.Context, ref *provider.Reference) (
 
 		if total <= remaining {
 			// Prevent overflowing
-			if ri.Size >= total {
+			if inUse >= total {
 				remaining = 0
 			} else {
-				remaining = total - ri.Size
+				remaining = total - inUse
 			}
 		}
 	}
-
-	return total, ri.Size, remaining, nil
+	return total, inUse, remaining, nil
 }
 
 // CreateHome creates a new home node for the given user
@@ -553,6 +559,9 @@ func (fs *Decomposedfs) CreateDir(ctx context.Context, ref *provider.Reference) 
 	// verify parent exists
 	var n *node.Node
 	if n, err = fs.lu.NodeFromResource(ctx, parentRef); err != nil {
+		if e, ok := err.(errtypes.NotFound); ok {
+			return errtypes.PreconditionFailed(e.Error())
+		}
 		return
 	}
 	// TODO check if user has access to root / space

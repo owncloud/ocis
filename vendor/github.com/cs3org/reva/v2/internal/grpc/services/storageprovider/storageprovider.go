@@ -728,7 +728,7 @@ func (s *service) Stat(ctx context.Context, req *provider.StatRequest) (*provide
 
 	span.SetAttributes(attribute.KeyValue{
 		Key:   "reference",
-		Value: attribute.StringValue(req.Ref.String()),
+		Value: attribute.StringValue(req.GetRef().String()),
 	})
 
 	md, err := s.storage.GetMD(ctx, req.GetRef(), req.GetArbitraryMetadataKeys(), req.GetFieldMask().GetPaths())
