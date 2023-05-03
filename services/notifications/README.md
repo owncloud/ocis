@@ -19,7 +19,7 @@ In addition, the notifications service supports custom templates. Custom email t
 {NOTIFICATIONS_EMAIL_TEMPLATE_PATH}/templates/html/email.html.tmpl
 {NOTIFICATIONS_EMAIL_TEMPLATE_PATH}/templates/html/img/
 ```
-The source templates provided by ocis you can derive from are located in following base folder [https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates](https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates) with subfolders `templates/text` and `templates/html`.
+The source templates provided by ocis you can derive from are located in the following base folder [https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates](https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates) with subfolders `templates/text` and `templates/html`.
 
 -   [text/email.text.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/text/email.text.tmpl)
 -   [html/email.html.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/html/email.html.tmpl)
