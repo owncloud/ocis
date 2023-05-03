@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-03-16-17-06]
+[#deprecation-note-2023-05-03-16-31-24]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -205,7 +205,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-05-03-16-17-06[Deprecation Note]
+xref:deprecation-note-2023-05-03-16-31-24[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -257,7 +257,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++xattrs ++
 a| [subs=-attributes]
-The backend to use for storing metadata. Supported values are 'xattrs' and 'messagepack'. The setting 'xattrs' uses extended attributes to store file metadata while 'messagepack' uses a dedicated file to store file metadata. Defaults to 'xattrs'.
+The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
 
 a|`STORAGE_USERS_OCIS_ROOT` +
 
@@ -342,7 +342,7 @@ Maximum number of concurrent go-routines. Higher values can potentially get work
 
 a|`OCIS_ASYNC_UPLOADS` +
 `STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
-xref:deprecation-note-2023-05-03-16-17-06[Deprecation Note]
+xref:deprecation-note-2023-05-03-16-31-24[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -365,7 +365,7 @@ a|`STORAGE_USERS_S3NG_METADATA_BACKEND` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++xattrs ++
+++messagepack ++
 a| [subs=-attributes]
 The backend to use for storing metadata. Supported values are 'xattrs' and 'messagepack'. The setting 'xattrs' uses extended attributes to store file metadata while 'messagepack' uses a dedicated file to store file metadata. Defaults to 'xattrs'.
 
@@ -645,7 +645,7 @@ Whether to verify the server TLS certificates.
 
 a|`STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT` +
-xref:deprecation-note-2023-05-03-16-17-06[Deprecation Note]
+xref:deprecation-note-2023-05-03-16-31-24[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-03-16-17-06]
+[#deprecation-note-2023-05-03-16-31-24]
 [caption=]
 .Deprecation notes for the storage-system service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -195,7 +195,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-05-03-16-17-06[Deprecation Note]
+xref:deprecation-note-2023-05-03-16-31-24[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -312,9 +312,9 @@ a|`OCIS_DECOMPOSEDFS_METADATA_BACKEND` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++xattrs ++
+++messagepack ++
 a| [subs=-attributes]
-The backend to use for storing metadata. Supported values are 'xattrs' and 'messagepack'. The setting 'xattrs' uses extended attributes to store file metadata while 'messagepack' uses a dedicated file to store file metadata. Defaults to 'xattrs'.
+The backend to use for storing metadata. Supported values are 'messagepack' and 'xattrs'. The setting 'messagepack' uses a dedicated file to store file metadata while 'xattrs' uses extended attributes to store file metadata. Defaults to 'messagepack'.
 
 a|`STORAGE_SYSTEM_OCIS_ROOT` +
 
