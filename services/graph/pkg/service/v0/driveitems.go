@@ -13,9 +13,11 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/render"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	"golang.org/x/crypto/sha3"
 )
 
 // GetRootDriveChildren implements the Service interface.
@@ -77,18 +79,16 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, &ListResponse{Value: files})
 }
 
-func (g Graph) getDriveItem(ctx context.Context, root storageprovider.ResourceId) (*libregraph.DriveItem, error) {
+func (g Graph) getDriveItem(ctx context.Context, ref storageprovider.Reference) (*libregraph.DriveItem, error) {
 	client := g.GetGatewayClient()
 
-	ref := &storageprovider.Reference{
-		ResourceId: &root,
-	}
-	res, err := client.Stat(ctx, &storageprovider.StatRequest{Ref: ref})
+	res, err := client.Stat(ctx, &storageprovider.StatRequest{Ref: &ref})
 	if err != nil {
 		return nil, err
 	}
 	if res.Status.Code != cs3rpc.Code_CODE_OK {
-		return nil, fmt.Errorf("could not stat %s: %s", ref, res.Status.Message)
+		refStr, _ := storagespace.FormatReference(&ref)
+		return nil, fmt.Errorf("could not stat %s: %s", refStr, res.Status.Message)
 	}
 	return cs3ResourceToDriveItem(res.Info)
 }
@@ -215,44 +215,107 @@ func (g Graph) getPathForResource(ctx context.Context, id storageprovider.Resour
 	return res.Path, err
 }
 
-// getExtendedSpaceProperties reads properties from the opaque and transforms them into driveItems
-func (g Graph) getExtendedSpaceProperties(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace) []libregraph.DriveItem {
-	var spaceItems []libregraph.DriveItem
+// getSpecialDriveItems reads properties from the opaque and transforms them into driveItems
+func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space *storageprovider.StorageSpace) []libregraph.DriveItem {
+	if space.GetRoot().GetStorageId() == utils.ShareStorageProviderID {
+		return nil // no point in stating the ShareStorageProvider
+	}
 	if space.Opaque == nil {
 		return nil
 	}
-	metadata := space.Opaque.Map
-	names := [2]string{SpaceImageSpecialFolderName, ReadmeSpecialFolderName}
 
-	for _, itemName := range names {
-		if itemID, ok := metadata[itemName]; ok {
-			rid, _ := storagespace.ParseID(string(itemID.Value))
-			// add the storageID of the space, all drive items of this space belong to the same storageID
-			rid.StorageId = space.GetRoot().GetStorageId()
-			spaceItem := g.getSpecialDriveItem(ctx, rid, itemName, baseURL, space)
-			if spaceItem != nil {
-				spaceItems = append(spaceItems, *spaceItem)
+	imageNode := utils.ReadPlainFromOpaque(space.Opaque, SpaceImageSpecialFolderName)
+	readmeNode := utils.ReadPlainFromOpaque(space.Opaque, ReadmeSpecialFolderName)
+
+	cachekey := spaceRootStatKey(space.Root, imageNode, readmeNode)
+	// if the root is older or equal to our cache we can reuse the cached extended spaces properties
+	if entry := g.specialDriveItemsCache.Get(cachekey); entry != nil {
+		if cached, ok := entry.Value().(specialDriveItemEntry); ok {
+			if cached.rootMtime != nil && space.Mtime != nil {
+				// beware, LaterTS does not handle equalness. it returns t1 if t1 > t2, else t2, so a >= check looks like this
+				if utils.LaterTS(space.Mtime, cached.rootMtime) == cached.rootMtime {
+					return cached.specialDriveItems
+				}
 			}
+		}
+	}
+
+	var spaceItems []libregraph.DriveItem
+
+	spaceItems = g.fetchSpecialDriveItem(ctx, spaceItems, SpaceImageSpecialFolderName, imageNode, space, baseURL)
+	spaceItems = g.fetchSpecialDriveItem(ctx, spaceItems, ReadmeSpecialFolderName, readmeNode, space, baseURL)
+
+	// cache properties
+	spacePropertiesEntry := specialDriveItemEntry{
+		specialDriveItems: spaceItems,
+		rootMtime:         space.Mtime,
+	}
+	g.specialDriveItemsCache.Set(cachekey, spacePropertiesEntry, time.Duration(g.config.Spaces.ExtendedSpacePropertiesCacheTTL))
+
+	return spaceItems
+}
+
+func (g Graph) fetchSpecialDriveItem(ctx context.Context, spaceItems []libregraph.DriveItem, itemName string, itemNode string, space *storageprovider.StorageSpace, baseURL *url.URL) []libregraph.DriveItem {
+	var ref storageprovider.Reference
+	if itemNode != "" {
+		rid, _ := storagespace.ParseID(itemNode)
+
+		rid.StorageId = space.GetRoot().GetStorageId()
+		ref = storageprovider.Reference{
+			ResourceId: &rid,
+		}
+		spaceItem := g.getSpecialDriveItem(ctx, ref, itemName, baseURL, space)
+		if spaceItem != nil {
+			spaceItems = append(spaceItems, *spaceItem)
 		}
 	}
 	return spaceItems
 }
 
-func (g Graph) getSpecialDriveItem(ctx context.Context, id storageprovider.ResourceId, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
+// generates a space root stat cache key used to detect changes in a space
+// takes into account the special nodes because changing metadata does not affect the etag / mtime
+func spaceRootStatKey(id *storageprovider.ResourceId, imagenode, readmeNode string) string {
+	if id == nil {
+		return ""
+	}
+	sha3 := sha3.NewShake256()
+	_, _ = sha3.Write([]byte(id.GetStorageId()))
+	_, _ = sha3.Write([]byte(id.GetSpaceId()))
+	_, _ = sha3.Write([]byte(id.GetOpaqueId()))
+	_, _ = sha3.Write([]byte(imagenode))
+	_, _ = sha3.Write([]byte(readmeNode))
+	h := make([]byte, 64)
+	_, _ = sha3.Read(h)
+	return fmt.Sprintf("%x", h)
+}
+
+type specialDriveItemEntry struct {
+	specialDriveItems []libregraph.DriveItem
+	rootMtime         *types.Timestamp
+}
+
+func (g Graph) getSpecialDriveItem(ctx context.Context, ref storageprovider.Reference, itemName string, baseURL *url.URL, space *storageprovider.StorageSpace) *libregraph.DriveItem {
 	var spaceItem *libregraph.DriveItem
-	if id.SpaceId == "" && id.OpaqueId == "" {
+	if ref.GetResourceId().GetSpaceId() == "" && ref.GetResourceId().GetOpaqueId() == "" {
 		return nil
 	}
 
-	spaceItem, err := g.getDriveItem(ctx, id)
+	// FIXME we should send a fieldmask 'path' and return it as the Path property to save an additional call to the storage.
+	// To do that we need to align the useg of ResourceInfo.Name vs ResourceInfo.Path. By default, only the name should be set
+	// and Path should always be relative to the space root OR the resource the current user can access ...
+	spaceItem, err := g.getDriveItem(ctx, ref)
 	if err != nil {
-		g.logger.Error().Err(err).Str("ID", id.OpaqueId).Str("name", itemName).Msg("Could not get item info")
+		g.logger.Debug().Err(err).Str("ID", ref.GetResourceId().GetOpaqueId()).Str("name", itemName).Msg("Could not get item info")
 		return nil
 	}
-	itemPath, err := g.getPathForResource(ctx, id)
-	if err != nil {
-		g.logger.Error().Err(err).Str("ID", id.OpaqueId).Str("name", itemName).Msg("Could not get item path")
-		return nil
+	itemPath := ref.Path
+	if itemPath == "" {
+		// lookup by id
+		itemPath, err = g.getPathForResource(ctx, *ref.ResourceId)
+		if err != nil {
+			g.logger.Debug().Err(err).Str("ID", ref.GetResourceId().GetOpaqueId()).Str("name", itemName).Msg("Could not get item path")
+			return nil
+		}
 	}
 	spaceItem.SpecialFolder = &libregraph.SpecialFolder{Name: libregraph.PtrString(itemName)}
 	webdavURL := *baseURL

@@ -202,6 +202,9 @@ var _ = Describe("Graph", func() {
 				gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
 					Status: status.NewUnimplemented(ctx, fmt.Errorf("not supported"), "not supported"),
 				}, nil)
+				gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
+					Status: status.NewNotFound(ctx, "no special files found"),
+				}, nil)
 
 				r := httptest.NewRequest(http.MethodGet, "/graph/v1.0/me/drives?$orderby=name%20asc", nil)
 				r = r.WithContext(ctx)
@@ -891,16 +894,30 @@ var _ = Describe("Graph", func() {
 				Status: status.NewOK(ctx),
 				Path:   "thepath",
 			}, nil)
-			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
-				Status: status.NewOK(ctx),
-				Info: &provider.ResourceInfo{
-					Id: &provider.ResourceId{
-						StorageId: "pro-1",
-						SpaceId:   "spaceID",
-						OpaqueId:  "specialID",
+			// no stat for the image
+			gatewayClient.On("Stat",
+				mock.Anything,
+				mock.MatchedBy(
+					func(req *provider.StatRequest) bool {
+						return req.Ref.Path == "/.space/logo.png"
+					})).
+				Return(&provider.StatResponse{
+					Status: status.NewNotFound(ctx, "not found"),
+				}, nil)
+			// mock readme stats
+			gatewayClient.On("Stat",
+				mock.Anything,
+				mock.Anything).
+				Return(&provider.StatResponse{
+					Status: status.NewOK(ctx),
+					Info: &provider.ResourceInfo{
+						Id: &provider.ResourceId{
+							StorageId: "pro-1",
+							SpaceId:   "spaceID",
+							OpaqueId:  "specialID",
+						},
 					},
-				},
-			}, nil)
+				}, nil)
 			gatewayClient.On("ListStorageSpaces",
 				mock.Anything,
 				mock.MatchedBy(
@@ -993,6 +1010,9 @@ var _ = Describe("Graph", func() {
 					Status:       status.NewOK(ctx),
 					StorageSpace: req.StorageSpace,
 				}
+			}, nil)
+			gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
+				Status: status.NewNotFound(ctx, "no special files found"),
 			}, nil)
 
 			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/drives/{driveID}/", bytes.NewBuffer(driveJson))

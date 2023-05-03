@@ -136,7 +136,7 @@ func NewService(opts ...Option) (Graph, error) {
 		config:                   options.Config,
 		mux:                      m,
 		logger:                   &options.Logger,
-		spacePropertiesCache:     spacePropertiesCache,
+		specialDriveItemsCache:   spacePropertiesCache,
 		usersCache:               usersCache,
 		groupsCache:              groupsCache,
 		eventsPublisher:          options.EventsPublisher,

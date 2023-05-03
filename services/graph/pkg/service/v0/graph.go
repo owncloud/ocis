@@ -65,7 +65,7 @@ type Graph struct {
 	gatewayClient            gateway.GatewayAPIClient
 	roleService              RoleService
 	permissionsService       Permissions
-	spacePropertiesCache     *ttlcache.Cache[string, interface{}]
+	specialDriveItemsCache   *ttlcache.Cache[string, interface{}]
 	usersCache               *ttlcache.Cache[string, libregraph.User]
 	groupsCache              *ttlcache.Cache[string, libregraph.Group]
 	eventsPublisher          events.Publisher
