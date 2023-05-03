@@ -278,11 +278,11 @@ func spaceRootStatKey(id *storageprovider.ResourceId, imagenode, readmeNode stri
 		return ""
 	}
 	sha3 := sha3.NewShake256()
-	sha3.Write([]byte(id.GetStorageId()))
-	sha3.Write([]byte(id.GetSpaceId()))
-	sha3.Write([]byte(id.GetOpaqueId()))
-	sha3.Write([]byte(imagenode))
-	sha3.Write([]byte(readmeNode))
+	_, _ = sha3.Write([]byte(id.GetStorageId()))
+	_, _ = sha3.Write([]byte(id.GetSpaceId()))
+	_, _ = sha3.Write([]byte(id.GetOpaqueId()))
+	_, _ = sha3.Write([]byte(imagenode))
+	_, _ = sha3.Write([]byte(readmeNode))
 	h := make([]byte, 64)
 	sha3.Read(h)
 	return fmt.Sprintf("%x", h)
