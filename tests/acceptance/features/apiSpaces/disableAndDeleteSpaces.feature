@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: Disabling and deleting space
   As a manager of space
   I want to be able to disable the space first, then delete it.

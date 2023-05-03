@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: Change data of space
   As a user with space admin rights
   I want to be able to change the meta-data of a created space (increase the quota, change name, etc.)
