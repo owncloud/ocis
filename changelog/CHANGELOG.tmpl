@@ -33,4 +33,25 @@ The following sections list the changes for {{ .Version}}.
 * {{ .Type }} - {{ .Title }}: [#{{ .PrimaryID }}]({{ .PrimaryURL }})
 {{- end }}{{ end }}
 
+## Details
+{{ range $entry := .Entries }}{{ with $entry }}
+* {{ .Type }} - {{ .Title }}: [#{{ .PrimaryID }}]({{ .PrimaryURL }})
+{{ range $par := .Paragraphs -}}
+{{/* Workaround for keeping lists inside of changelog items well formatted */ -}}
+{{ if hasPrefix "*" $par }}
+  {{ $par | replace " *" "\n  *" }}
+{{- else }}
+   {{ wrapIndent $par 80 3 -}}
+{{ end }}
+{{ end -}}
+{{ range $url := .IssueURLs }}
+   {{ $url -}}
+{{ end -}}
+{{ range $url := .PRURLs }}
+   {{ $url -}}
+{{ end -}}
+{{ range $url := .OtherURLs }}
+   {{ $url -}}
+{{ end }}
+{{ end }}{{ end -}}
 {{ end }}{{ end -}}
