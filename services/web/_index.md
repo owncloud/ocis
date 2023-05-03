@@ -1,6 +1,6 @@
 ---
 title: Web
-date: 2023-05-03T09:17:28.135516147Z
+date: 2023-05-03T09:27:54.912584652Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/web
@@ -31,7 +31,7 @@ If you want to use your custom compiled web client assets instead of the embedde
 
 ## WebUI Options
 
-Beside theming, the behaviour of the embedded WebUI can be configured via options. See the environment variables `WEB_OPTIONS_xxx` for more details.
+Beside theming, the behaviour of the embedded WebUI can be configured via options. See the environment variables `WEB_OPTION_xxx` for more details.
 ## Example Yaml Config
 {{< include file="services/_includes/web-config-example.yaml"  language="yaml" >}}
 
