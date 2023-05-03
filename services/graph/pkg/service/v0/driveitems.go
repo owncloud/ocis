@@ -237,12 +237,9 @@ func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space
 		return nil
 	}
 	metadata := space.Opaque.Map
-	names := map[string]string{
-		SpaceImageSpecialFolderName: "/.space/logo.png",
-		ReadmeSpecialFolderName:     "/.space/readme.md",
-	}
+	names := [2]string{SpaceImageSpecialFolderName, ReadmeSpecialFolderName}
 
-	for itemName, itemPath := range names {
+	for _, itemName := range names {
 		// The default is a path relative to the space root
 		var ref storageprovider.Reference
 		if itemID, ok := metadata[itemName]; ok {
@@ -252,15 +249,10 @@ func (g Graph) getSpecialDriveItems(ctx context.Context, baseURL *url.URL, space
 			ref = storageprovider.Reference{
 				ResourceId: &rid,
 			}
-		} else {
-			ref = storageprovider.Reference{
-				ResourceId: space.GetRoot(),
-				Path:       itemPath,
+			spaceItem := g.getSpecialDriveItem(ctx, ref, itemName, baseURL, space)
+			if spaceItem != nil {
+				spaceItems = append(spaceItems, *spaceItem)
 			}
-		}
-		spaceItem := g.getSpecialDriveItem(ctx, ref, itemName, baseURL, space)
-		if spaceItem != nil {
-			spaceItems = append(spaceItems, *spaceItem)
 		}
 	}
 
