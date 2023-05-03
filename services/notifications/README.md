@@ -4,37 +4,43 @@ The notification service is responsible for sending emails to users informing th
 
 ## Email Notification Templates
 
-The `notifications` service has embedded email body templates. Email templates can use the placeholders `{{ .Greeting }}`, `{{ .MessageBody }}` and `{{ .CallToAction }}` which are replaced with translations when sent, see the [Translations](#translations) section for more details. Depending on the email purpose, placeholders will contain different strings. An individual translatable string is available for each purpose, finally resolved by the placeholder. Though the email subject is also part of translations, it has no placeholder as it is a mandatory email component. The embedded templates are available for all deployment scenarios.
+The `notifications` service has embedded email text and html body templates. Email templates can use the placeholders `{{ .Greeting }}`, `{{ .MessageBody }}` and `{{ .CallToAction }}` which are replaced with translations when sent, see the [Translations](#translations) section for more details. Depending on the email purpose, placeholders will contain different strings. An individual translatable string is available for each purpose, finally resolved by the placeholder. Though the email subject is also part of translations, it has no placeholder as it is a mandatory email component. The embedded templates are available for all deployment scenarios.
 
 ```text
-template 
+template
   placeholders
     translated strings <-- source strings <-- purpose
 final output
 ```
 
-In addition, the notifications service supports custom templates. Custom email templates take precedence over the embedded ones. If a custom email template exists, the embedded templates are not used. To configure custom email templates, the `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` environment variable needs to point to a base folder that will contain the email templates. This path must be available from all instances of the notifications service, a shared storage is recommended. The source templates provided by ocis you can derive from are located in following base folder [https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates](https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates) with subfolders `shares` and `spaces`.
+In addition, the notifications service supports custom templates. Custom email templates take precedence over the embedded ones. If a custom email template exists, the embedded templates are not used. To configure custom email templates, the `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` environment variable needs to point to a base folder that will contain the email templates and follow the [templates subfolder hierarchy](#templates-subfolder-hierarchy).This path must be available from all instances of the notifications service, a shared storage is recommended.
+```text
+{NOTIFICATIONS_EMAIL_TEMPLATE_PATH}/templates/text/email.text.tmpl
+{NOTIFICATIONS_EMAIL_TEMPLATE_PATH}/templates/html/email.html.tmpl
+{NOTIFICATIONS_EMAIL_TEMPLATE_PATH}/templates/html/img/
+```
+The source templates provided by ocis you can derive from are located in the following base folder [https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates](https://github.com/owncloud/ocis/tree/master/services/notifications/pkg/email/templates) with subfolders `templates/text` and `templates/html`.
 
--   [shares/shareCreated.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/shares/shareCreated.email.body.tmpl)
--   [shares/shareExpired.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/shares/shareExpired.email.body.tmpl)
--   [spaces/membershipExpired.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/spaces/membershipExpired.email.body.tmpl)
--   [spaces/sharedSpace.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/spaces/sharedSpace.email.body.tmpl)
--   [spaces/unsharedSpace.email.body.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/spaces/unsharedSpace.email.body.tmpl)
+-   [text/email.text.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/text/email.text.tmpl)
+-   [html/email.html.tmpl](https://github.com/owncloud/ocis/blob/master/services/notifications/pkg/email/templates/html/email.html.tmpl)
 
+### Templates subfolder hierarchy
 ```text
 templates
 │
-└───shares
-│   │   shareCreated.email.body.tmpl
-│   │   shareExpired.email.body.tmpl
+└───html
+│   │   email.html.tmpl
+│   │
+│   └───img
+│       │   logo-mail.gif
 │
-└───spaces
-    │   membershipExpired.email.body.tmpl
-    │   sharedSpace.email.body.tmpl
-    │   unsharedSpace.email.body.tmpl
+└───text
+    │   email.text.tmpl
 ```
 
-Custom email templates referenced via `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` must also be located in subfolders `shares` and `spaces` and must have the same names as the embedded templates. It is important that the names of these files and  folders match the embedded ones.
+Custom email templates referenced via `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` must also be located in subfolder `templates/text` and `templates/html` and must have the same names as the embedded templates. It is important that the names of these files and folders match the embedded ones.
+The `templates/html` subfolder contains a default HTML template provided by ocis. When using a custom HTML template, hosted images can either be linked with standard HTML code like ```<img src="https://raw.githubusercontent.com/owncloud/core/master/core/img/logo-mail.gif" alt="logo-mail"/>``` or embedded as a CID source ```<img src="cid:logo-mail.gif" alt="logo-mail"/>```. In the latter case, image files must be located in the `templates/html/img` subfolder. Supported embedded image types are png, jpeg, and gif.
+Consider that embedding images via a CID resource may not be fully supported in all email web clients.
 
 ## Translations
 

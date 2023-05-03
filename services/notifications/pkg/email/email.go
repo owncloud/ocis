@@ -6,68 +6,87 @@ package email
 import (
 	"bytes"
 	"embed"
-	"html"
 	"html/template"
+	"io/fs"
+	"os"
 	"path/filepath"
+	"strings"
+
+	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 )
 
 var (
 	//go:embed templates
 	templatesFS embed.FS
+
+	imgDir = filepath.Join("templates", "html", "img")
 )
 
 // RenderEmailTemplate renders the email template for a new share
-func RenderEmailTemplate(mt MessageTemplate, locale string, emailTemplatePath string, translationPath string, vars map[string]interface{}) (string, string, error) {
-	// translate a message
-	mt.Subject = ComposeMessage(mt.Subject, locale, translationPath)
-	mt.Greeting = ComposeMessage(mt.Greeting, locale, translationPath)
-	mt.MessageBody = ComposeMessage(mt.MessageBody, locale, translationPath)
-	mt.CallToAction = ComposeMessage(mt.CallToAction, locale, translationPath)
-
-	// replace the body email placeholders with the values
-	subject, err := executeRaw(mt.Subject, vars)
+func RenderEmailTemplate(mt MessageTemplate, locale string, emailTemplatePath string, translationPath string, vars map[string]interface{}) (*channels.Message, error) {
+	textMt, err := NewTextTemplate(mt, locale, translationPath, vars)
 	if err != nil {
-		return "", "", err
+		return nil, err
+	}
+	tpl, err := parseTemplate(emailTemplatePath, mt.textTemplate)
+	if err != nil {
+		return nil, err
+	}
+	textBody, err := emailTemplate(tpl, textMt)
+	if err != nil {
+		return nil, err
 	}
 
-	// replace the body email template placeholders with the translated template
-	rawBody, err := executeEmailTemplate(emailTemplatePath, mt)
+	htmlMt, err := NewHTMLTemplate(mt, locale, translationPath, vars)
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
-	// replace the body email placeholders with the values
-	body, err := executeRaw(rawBody, vars)
+	htmlTpl, err := parseTemplate(emailTemplatePath, mt.htmlTemplate)
 	if err != nil {
-		return "", "", err
+		return nil, err
 	}
-	return subject, body, nil
-}
-
-func executeEmailTemplate(emailTemplatePath string, mt MessageTemplate) (string, error) {
-	var err error
-	var tpl *template.Template
-	// try to lookup the files in the filesystem
-	tpl, err = template.ParseFiles(filepath.Join(emailTemplatePath, mt.bodyTemplate))
+	htmlBody, err := emailTemplate(htmlTpl, htmlMt)
 	if err != nil {
-		// template has not been found in the fs, or path has not been specified => use embed templates
-		tpl, err = template.ParseFS(templatesFS, filepath.Join("templates/", mt.bodyTemplate))
+		return nil, err
+	}
+	var data map[string][]byte
+	if emailTemplatePath != "" {
+		data, err = readImages(emailTemplatePath)
 		if err != nil {
-			return "", err
+			return nil, err
+		}
+	} else {
+		data, err = readImagesFs()
+		if err != nil {
+			return nil, err
 		}
 	}
-	str, err := executeTemplate(tpl, mt)
-	if err != nil {
-		return "", err
-	}
-	return html.UnescapeString(str), err
+
+	return &channels.Message{
+		Subject:      textMt.Subject,
+		TextBody:     textBody,
+		HTMLBody:     htmlBody,
+		AttachInline: data,
+	}, nil
 }
 
-func executeRaw(raw string, vars map[string]interface{}) (string, error) {
-	tpl, err := template.New("").Parse(raw)
+func emailTemplate(tpl *template.Template, mt MessageTemplate) (string, error) {
+	str, err := executeTemplate(tpl, map[string]interface{}{
+		"Greeting":     template.HTML(strings.TrimSpace(mt.Greeting)),
+		"MessageBody":  template.HTML(strings.TrimSpace(mt.MessageBody)),
+		"CallToAction": template.HTML(strings.TrimSpace(mt.CallToAction)),
+	})
 	if err != nil {
 		return "", err
 	}
-	return executeTemplate(tpl, vars)
+	return str, err
+}
+
+func parseTemplate(emailTemplatePath string, file string) (*template.Template, error) {
+	if emailTemplatePath != "" {
+		return template.ParseFiles(filepath.Join(emailTemplatePath, file))
+	}
+	return template.ParseFS(templatesFS, filepath.Join(file))
 }
 
 func executeTemplate(tpl *template.Template, vars any) (string, error) {
@@ -76,4 +95,57 @@ func executeTemplate(tpl *template.Template, vars any) (string, error) {
 		return "", err
 	}
 	return writer.String(), nil
+}
+
+func readImagesFs() (map[string][]byte, error) {
+	dir := filepath.Join(imgDir)
+	entries, err := templatesFS.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+	return read(entries, templatesFS)
+}
+
+func readImages(emailTemplatePath string) (map[string][]byte, error) {
+	dir := filepath.Join(emailTemplatePath, imgDir)
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		return nil, err
+	}
+	return read(entries, os.DirFS(emailTemplatePath))
+}
+
+func read(entries []fs.DirEntry, fsys fs.FS) (map[string][]byte, error) {
+	list := make(map[string][]byte)
+	for _, e := range entries {
+		if !e.IsDir() {
+			file, err := fs.ReadFile(fsys, filepath.Join(imgDir, e.Name()))
+			if err != nil {
+				return nil, err
+			}
+			if !validateMime(file) {
+				continue
+			}
+			list[e.Name()] = file
+		}
+	}
+	return list, nil
+}
+
+// signature image formats signature https://go.dev/src/net/http/sniff.go #L:118
+var signature = map[string]string{
+	"\xff\xd8\xff":      "image/jpeg",
+	"\x89PNG\r\n\x1a\n": "image/png",
+	"GIF87a":            "image/gif",
+	"GIF89a":            "image/gif",
+}
+
+// validateMime validate the mime type of image file from its first few bytes
+func validateMime(incipit []byte) bool {
+	for s := range signature {
+		if strings.HasPrefix(string(incipit), s) {
+			return true
+		}
+	}
+	return false
 }
