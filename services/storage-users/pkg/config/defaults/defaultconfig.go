@@ -61,7 +61,7 @@ func DefaultConfig() *config.Config {
 				UsersProviderEndpoint: "localhost:9144",
 			},
 			S3NG: config.S3NGDriver{
-				MetadataBackend:            "xattrs",
+				MetadataBackend:            "messagepack",
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),
 				ShareFolder:                "/Shares",
 				UserLayout:                 "{{.Id.OpaqueId}}",
