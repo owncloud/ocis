@@ -38,8 +38,8 @@ templates
     │   email.text.tmpl
 ```
 
-Custom email templates referenced via `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` must also be located in subfolder `templates/text` and `templates/html` and must have the same names as the embedded templates. It is important that the names of these files and  folders match the embedded ones.
-The `templates/html` subfolder contains a default HTML template provided by ocis. When using a custom HTML template, hosted images can either be linked with standard HTML code ```<img src="https://raw.githubusercontent.com/owncloud/core/master/core/img/logo-mail.gif" alt="logo-mail"/>``` or embedded as a CID source ```<img src="cid:logo-mail.gif" alt="logo-mail"/>``` In the latter case, image files must be located in the `templates/html/img` subfolder. Supported embedded image types are png, jpeg, and gif.
+Custom email templates referenced via `NOTIFICATIONS_EMAIL_TEMPLATE_PATH` must also be located in subfolder `templates/text` and `templates/html` and must have the same names as the embedded templates. It is important that the names of these files and folders match the embedded ones.
+The `templates/html` subfolder contains a default HTML template provided by ocis. When using a custom HTML template, hosted images can either be linked with standard HTML code like ```<img src="https://raw.githubusercontent.com/owncloud/core/master/core/img/logo-mail.gif" alt="logo-mail"/>``` or embedded as a CID source ```<img src="cid:logo-mail.gif" alt="logo-mail"/>```. In the latter case, image files must be located in the `templates/html/img` subfolder. Supported embedded image types are png, jpeg, and gif.
 Consider that embedding images via a CID resource may not be fully supported in all email web clients.
 
 ## Translations
