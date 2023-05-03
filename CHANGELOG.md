@@ -11,6 +11,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add debug server to postprocessing: [#6203](https://github.com/owncloud/ocis/pull/6203)
 * Enhancement - Add debug server to userlog: [#6202](https://github.com/owncloud/ocis/pull/6202)
 * Enhancement - Add debug server to eventhistory: [#6204](https://github.com/owncloud/ocis/pull/6204)
+* Enhancement - Add the email HTML templates: [#6147](https://github.com/owncloud/ocis/pull/6147)
 * Enhancement - Open Debug endpoint for Notifications: [#5002](https://github.com/owncloud/ocis/issues/5002)
 * Enhancement - Bump Reva Version: [#6186](https://github.com/owncloud/ocis/pull/6186)
 * Enhancement - Disable Notifications: [#6137](https://github.com/owncloud/ocis/pull/6137)
