@@ -13,7 +13,7 @@ require (
 	github.com/coreos/go-oidc v2.2.1+incompatible
 	github.com/coreos/go-oidc/v3 v3.4.0
 	github.com/cs3org/go-cs3apis v0.0.0-20221012090518-ef2996678965
-	github.com/cs3org/reva/v2 v2.12.1-0.20230428092715-44a95fb7c7df
+	github.com/cs3org/reva/v2 v2.13.1-0.20230503120957-2118139f5420
 	github.com/disintegration/imaging v1.6.2
 	github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e
 	github.com/egirna/icap-client v0.1.1
@@ -90,6 +90,7 @@ require (
 	golang.org/x/image v0.6.0
 	golang.org/x/net v0.8.0
 	golang.org/x/oauth2 v0.6.0
+	golang.org/x/sync v0.1.0
 	golang.org/x/term v0.6.0
 	golang.org/x/text v0.9.0
 	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f
@@ -308,7 +309,6 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	go.uber.org/zap v1.23.0 // indirect
 	golang.org/x/mod v0.9.0 // indirect
-	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/sys v0.6.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/tools v0.7.0 // indirect

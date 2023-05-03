@@ -165,10 +165,14 @@ func (fs *Decomposedfs) InitiateUpload(ctx context.Context, ref *provider.Refere
 	if metadata != nil {
 		info.MetaData["providerID"] = metadata["providerID"]
 		if mtime, ok := metadata["mtime"]; ok {
-			info.MetaData["mtime"] = mtime
+			if mtime != "null" {
+				info.MetaData["mtime"] = mtime
+			}
 		}
 		if expiration, ok := metadata["expires"]; ok {
-			info.MetaData["expires"] = expiration
+			if expiration != "null" {
+				info.MetaData["expires"] = expiration
+			}
 		}
 		if _, ok := metadata["sizedeferred"]; ok {
 			info.SizeIsDeferred = true

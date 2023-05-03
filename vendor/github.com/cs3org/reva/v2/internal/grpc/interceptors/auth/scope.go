@@ -251,16 +251,25 @@ func checkIfNestedResource(ctx context.Context, ref *provider.Reference, parent 
 		// We mint a token as the owner of the public share and try to stat the reference
 		// TODO(ishank011): We need to find a better alternative to this
 
-		userResp, err := client.GetUser(ctx, &userpb.GetUserRequest{UserId: statResponse.Info.Owner, SkipFetchingUserGroups: true})
-		if err != nil || userResp.Status.Code != rpc.Code_CODE_OK {
-			return false, err
+		var user *userpb.User
+		if statResponse.GetInfo().GetOwner().GetType() == userpb.UserType_USER_TYPE_SPACE_OWNER {
+			// fake a space owner user
+			user = &userpb.User{
+				Id: statResponse.GetInfo().GetOwner(),
+			}
+		} else {
+			userResp, err := client.GetUser(ctx, &userpb.GetUserRequest{UserId: statResponse.Info.Owner, SkipFetchingUserGroups: true})
+			if err != nil || userResp.Status.Code != rpc.Code_CODE_OK {
+				return false, err
+			}
+			user = userResp.User
 		}
 
 		scope, err := scope.AddOwnerScope(map[string]*authpb.Scope{})
 		if err != nil {
 			return false, err
 		}
-		token, err := mgr.MintToken(ctx, userResp.User, scope)
+		token, err := mgr.MintToken(ctx, user, scope)
 		if err != nil {
 			return false, err
 		}

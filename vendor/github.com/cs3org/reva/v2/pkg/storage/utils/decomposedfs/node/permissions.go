@@ -146,7 +146,7 @@ func (p *Permissions) AssemblePermissions(ctx context.Context, n *Node) (ap prov
 			// continue with next segment
 		}
 		if cn, err = cn.Parent(); err != nil {
-			return ap, errors.Wrap(err, "Decomposedfs: error getting parent "+cn.ParentID)
+			return ap, errors.Wrap(err, "Decomposedfs: error getting parent for node "+cn.ID)
 		}
 	}
 
