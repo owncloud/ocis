@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-03-16-31-24]
+[#deprecation-note-2023-05-03-16-40-14]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -231,7 +231,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++https://localhost:9200 ++
 a| [subs=-attributes]
-URL to load themes from. Will be prepended to the theme path.
+Base URL to load themes from. Will be prepended to the theme path.
 
 a|`WEB_UI_THEME_PATH` +
 
@@ -240,7 +240,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++/themes/owncloud/theme.json ++
 a| [subs=-attributes]
-URL path to load themes from. The theme server will be prepended.
+Subpath/file to load the theme. Will be appended to the URL of the theme server.
 
 a|`OCIS_URL` +
 `WEB_UI_CONFIG_SERVER` +

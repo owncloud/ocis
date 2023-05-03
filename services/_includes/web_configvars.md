@@ -23,8 +23,8 @@
 | WEB_ASSET_PATH | string | ~/.ocis/web/assets | Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets.|
 | WEB_UI_CONFIG | string |  | Read the ownCloud Web configuration from this file.|
 | WEB_UI_PATH | string |  | Read the ownCloud Web configuration from this file path.|
-| OCIS_URL<br/>WEB_UI_THEME_SERVER | string | https://localhost:9200 | URL to load themes from. Will be prepended to the theme path.|
-| WEB_UI_THEME_PATH | string | /themes/owncloud/theme.json | URL path to load themes from. The theme server will be prepended.|
+| OCIS_URL<br/>WEB_UI_THEME_SERVER | string | https://localhost:9200 | Base URL to load themes from. Will be prepended to the theme path.|
+| WEB_UI_THEME_PATH | string | /themes/owncloud/theme.json | Subpath/file to load the theme. Will be appended to the URL of the theme server.|
 | OCIS_URL<br/>WEB_UI_CONFIG_SERVER | string | https://localhost:9200 | URL, where the oCIS APIs are reachable for ownCloud Web.|
 | WEB_OIDC_METADATA_URL | string | https://localhost:9200/.well-known/openid-configuration | URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + "/.well-known/openid-configuration".|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>WEB_OIDC_AUTHORITY | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
