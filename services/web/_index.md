@@ -1,6 +1,6 @@
 ---
 title: Web
-date: 2023-05-03T03:12:23.130545051Z
+date: 2023-05-03T06:06:55.291093014Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/web
@@ -22,11 +22,16 @@ The web service also provides a minimal API for branding functionality like chan
 ## Table of Contents
 
 * [Custom Compiled Web Assets](#custom-compiled-web-assets)
+* [WebUI Options](#webui-options)
 * [Example Yaml Config](#example-yaml-config)
 
 ## Custom Compiled Web Assets
 
 If you want to use your custom compiled web client assets instead of the embedded ones, then you can do that by setting the `WEB_ASSET_PATH` variable to point to your compiled files. See [ownCloud Web / Getting Started](https://owncloud.dev/clients/web/getting-started/) and [ownCloud Web / Setup with oCIS](https://owncloud.dev/clients/web/backend-ocis/) for more details.
+
+## WebUI Options
+
+Beside theming, the behaviour of the embedded WebUI can be configured via options. See the environment variables `WEB_OPTIONS_xxx` for more details.
 ## Example Yaml Config
 {{< include file="services/_includes/web-config-example.yaml"  language="yaml" >}}
 
