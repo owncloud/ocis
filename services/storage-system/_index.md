@@ -1,6 +1,6 @@
 ---
 title: Storage-System
-date: 2023-05-04T03:44:29.689767247Z
+date: 2023-05-04T07:43:35.215849517Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/storage-system
@@ -18,8 +18,13 @@ Purpose and description to be added
 
 ## Table of Contents
 
+* [Deprecated Metadata Backend](#deprecated-metadata-backend)
 * [Caching](#caching)
 * [Example Yaml Config](#example-yaml-config)
+
+## Deprecated Metadata Backend
+
+Starting with ocis version 3.0.0, the default backend for metadata switched to messagepack. If the setting `STORAGE_SYSTEM_OCIS_METADATA_BACKEND` has not been defined manually, the backend will be migrated to `messagepack` automatically. Though still possible to manually configure `xattrs`, this setting should not be used anymore as it will be removed in a later version.
 
 ## Caching
 
