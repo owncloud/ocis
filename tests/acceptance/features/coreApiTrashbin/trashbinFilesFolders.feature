@@ -158,7 +158,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | spaces   |
 
-  @issue-3561 @skipOnLDAP
+  @issue-3561 
   Scenario Outline: Listing other user's trashbin is prohibited
     Given using <dav-path> DAV path
     And user "testtrashbin100" has been created with default attributes and without skeleton files
@@ -176,7 +176,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | new      | 404         |
       | spaces   | 404         |
 
-  @issue-3561 @smokeTest @skipOnLDAP
+  @issue-3561 @smokeTest 
   Scenario Outline: Listing other user's trashbin is prohibited with multiple files on trashbin
     Given using <dav-path> DAV path
     And user "testtrashbin101" has been created with default attributes and without skeleton files
@@ -197,7 +197,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | new      | 404         |
       | spaces   | 404         |
 
-  @issue-3561 @skipOnLDAP @provisioning_api-app-required
+  @issue-3561  @provisioning_api-app-required
   Scenario Outline: Listing other user's trashbin is prohibited for newly recreated user with same name
     Given using <dav-path> DAV path
     And user "testtrashbin102" has been created with default attributes and without skeleton files
@@ -223,7 +223,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | new      | 404         |
       | spaces   | 404         |
 
-  @issue-3561 @skipOnLDAP
+  @issue-3561 
   Scenario Outline: Listing other user's empty unused trashbin is prohibited
     Given using <dav-path> DAV path
     And user "testtrashbinempty" has been created with default attributes and without skeleton files
@@ -239,7 +239,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | spaces   |
 
-  @issue-3561 @skipOnLDAP
+  @issue-3561 
   Scenario Outline: Listing non-existent user's trashbin is prohibited
     Given using <dav-path> DAV path
     When user "Alice" tries to list the trashbin content for user "testtrashbinnotauser"

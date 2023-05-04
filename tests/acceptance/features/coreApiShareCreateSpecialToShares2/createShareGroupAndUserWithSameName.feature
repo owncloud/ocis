@@ -8,7 +8,7 @@ Feature: sharing works when a username and group name are the same
     Given auto-accept shares has been disabled
     And user "Alice" has been created with default attributes and without skeleton files
 
-  @skipOnLDAP
+
   Scenario: creating a new share with user and a group having same name
     Given these users have been created without skeleton files:
       | username |
@@ -30,7 +30,7 @@ Feature: sharing works when a username and group name are the same
     And the content of file "/Shares/randomfile.txt" for user "Brian" should be "Random data"
     And the content of file "/Shares/randomfile.txt" for user "Carol" should be "Random data"
 
-  @skipOnLDAP
+
   Scenario: creating a new share with group and a user having same name
     Given these users have been created without skeleton files:
       | username |
@@ -52,7 +52,7 @@ Feature: sharing works when a username and group name are the same
     And the content of file "/Shares/randomfile.txt" for user "Brian" should be "Random data"
     And the content of file "/Shares/randomfile.txt" for user "Carol" should be "Random data"
 
-  @skipOnLDAP
+
   Scenario: creating a new share with user and a group having same name but different case
     Given these users have been created without skeleton files:
       | username |
@@ -74,7 +74,7 @@ Feature: sharing works when a username and group name are the same
     And the content of file "/Shares/randomfile.txt" for user "Brian" should be "Random data"
     And the content of file "/Shares/randomfile.txt" for user "Carol" should be "Random data"
 
-  @skipOnLDAP
+
   Scenario: creating a new share with group and a user having same name but different case
     Given these users have been created without skeleton files:
       | username |

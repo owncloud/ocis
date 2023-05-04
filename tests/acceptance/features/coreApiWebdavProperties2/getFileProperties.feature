@@ -243,7 +243,7 @@ Feature: get file properties
       | dav_version |
       | spaces      |
 
-  @skipOnLDAP @user_ldap-issue-268
+
   Scenario Outline: A file that is shared by user,group and link has a share-types property
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files

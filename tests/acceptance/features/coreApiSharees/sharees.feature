@@ -57,7 +57,7 @@ Feature: search sharees
       | 1               | 100        | 200         |
       | 2               | 200        | 200         |
 
-  @skipOnLDAP
+
   Scenario Outline: search only with group members - allowed
     Given using OCS API version "<ocs-api-version>"
     And parameter "shareapi_only_share_with_group_members" of app "core" has been set to "yes"
@@ -200,7 +200,7 @@ Feature: search sharees
       | 1               | 100        | 200         |
       | 2               | 200        | 200         |
 
-  @skipOnLDAP
+
   Scenario Outline: enumerate only group members - only show partial results from member of groups
     Given using OCS API version "<ocs-api-version>"
     And these users have been created with default attributes and without skeleton files:

@@ -418,7 +418,7 @@ Feature: accept/decline shares coming from internal users
       | /textfile0.txt        |
       | /Shares/textfile0.txt |
 
-  @skipOnLDAP
+
   Scenario: user shares folder with matching folder name to  a user before that user has logged in
     Given these users have been created without skeleton files and not initialized:
       | username |

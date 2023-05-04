@@ -150,7 +150,7 @@ Feature: sharing
       | 1               | 200              |
       | 2               | 404              |
 
-  @skipOnLDAP @issue-1289 @skipOnGraph
+ @issue-1289 @skipOnGraph
   Scenario: Share of folder to a group, remove user from that group
     Given using OCS API version "1"
     And user "Carol" has been created with default attributes and without skeleton files

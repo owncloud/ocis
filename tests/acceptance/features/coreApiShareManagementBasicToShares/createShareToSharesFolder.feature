@@ -420,7 +420,7 @@ Feature: sharing
      | /Shares/randomfile.txt |
     And the content of file "Shares/randomfile.txt" for user "brian" should be "Random data"
 
-  @skipOnLDAP
+
   Scenario: creating a new share with user of a group when username contains capital letters
     Given these users have been created without skeleton files:
       | username |
@@ -468,7 +468,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @skipOnLDAP @skipOnGraph
+ @skipOnGraph
   Scenario Outline: share with a group and then add a user to that group
     Given using OCS API version "<ocs_api_version>"
     And these users have been created with default attributes and without skeleton files:
@@ -493,7 +493,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @skipOnLDAP
+
   # deleting an LDAP group is not relevant or possible using the provisioning API
   Scenario Outline: shares shared to deleted group should not be available
     Given using OCS API version "<ocs_api_version>"
