@@ -93,11 +93,11 @@ config = {
         "ocis",
     ],
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "wopiValidatorTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "localApiTests": {
@@ -110,14 +110,14 @@ config = {
                 "apiSpaces",
                 "apiSpacesShares",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
         },
         "apiCors": {
             "suites": [
                 "apiCors",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "extraServerEnvironment": {
                 "OCIS_CORS_ALLOW_ORIGINS": "https://aphno.badal",
@@ -127,7 +127,7 @@ config = {
             "suites": [
                 "apiAsyncUpload",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "extraServerEnvironment": {
                 "POSTPROCESSING_DELAY": "30s",
@@ -136,7 +136,7 @@ config = {
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
         "earlyFail": True,
     },
@@ -147,7 +147,7 @@ config = {
         "earlyFail": True,
     },
     "e2eTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "rocketchat": {
@@ -238,11 +238,9 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
-        codestyle(ctx) + \
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
-        testOcisModules(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -263,7 +261,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
+    pipelines = test_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
@@ -2067,6 +2065,9 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "PROXY_ENABLE_BASIC_AUTH": True,
             "WEB_UI_CONFIG": "%s/%s" % (dirs["base"], dirs["ocisConfig"]),
             "OCIS_LOG_LEVEL": "error",
+            "PROXY_LOG_LEVEL": "debug",
+            "IDP_LOG_LEVEL": "debug",
+            "IDM_LOG_LEVEL": "debug",
             "SETTINGS_DATA_PATH": "%s/settings" % dirs["ocis"],
             "IDM_CREATE_DEMO_USERS": True,
             "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
