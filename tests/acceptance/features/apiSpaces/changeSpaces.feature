@@ -97,7 +97,7 @@ Feature: Change data of space
       | Bob   |
 
 
-  Scenario Outline: user with normal space permission can't increases the quota of a Space via the Graph API
+  Scenario Outline: user with normal space permission can't increase the quota of a Space via the Graph API
     When user "<user>" changes the quota of the "Project Jupiter" space to "100"
     Then the HTTP status code should be "403"
     Examples:

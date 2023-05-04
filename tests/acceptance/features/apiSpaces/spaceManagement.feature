@@ -186,4 +186,4 @@ Feature: Space management
     Given user "Alice" has disabled a space "Project"
     When user "Carol" tries to restore a disabled space "Project" owned by user "Alice"
     Then the HTTP status code should be "404"
-    And the user "Alice" should not have a space called "Project"
+    And the user "Alice" should have a space "Project" in the disable state

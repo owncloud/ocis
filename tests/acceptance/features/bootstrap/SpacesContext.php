@@ -1006,6 +1006,40 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Then /^the user "([^"]*)" should have a space "([^"]*)" in the disable state$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return mixed
+	 * @throws Exception
+	 */
+	public function theUserShouldHaveASpaceInTheDisableState(
+		string $user,
+		string $spaceName
+	): void {
+		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+		$response = json_decode((string)$this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
+		if (isset($response["value"])) {
+			foreach ($response["value"] as $spaceCandidate) {
+				if ($spaceCandidate['name'] === $spaceName) {
+					if ($spaceCandidate['root']['deleted']['state'] !== 'trashed') {
+						throw new \Exception(
+							"space $spaceName should be in disable state but it's not "
+						);
+					}
+					return;
+				}
+			}
+		}
+		throw new \Exception("space '$spaceName' should be available for a user '$user' but not found");
+	}
+
+	/**
 	 * @Then /^the json responded should (not|only|)\s?contain spaces of type "([^"]*)"$/
 	 *
 	 * @param string $onlyOrNot (not|only|)
