@@ -18,7 +18,7 @@ type Options struct {
 	Upload                   *Upload          `json:"upload,omitempty" yaml:"upload"`
 	Editor                   *Editor          `json:"editor,omitempty" yaml:"editor"`
 	ContextHelpersReadMore   bool             `json:"contextHelpersReadMore,omitempty" yaml:"contextHelpersReadMore" env:"WEB_OPTION_CONTEXTHELPERS_READ_MORE" desc:"Specifies whether the 'Read more' link should be displayed or not."`
-	LogoutURL                string           `json:"logoutURL,omitempty" yaml:"logoutURL" env:"WEB_OPTION_LOGOUT_URL" desc:"Adds a link to the user's profile page to point him to an external page, where he can manage his session and devices. This is helpful when an external IdP is used. This option is disabled by default."`
+	LogoutURL                string           `json:"logoutUrl,omitempty" yaml:"logoutUrl" env:"WEB_OPTION_LOGOUT_URL" desc:"Adds a link to the user's profile page to point him to an external page, where he can manage his session and devices. This is helpful when an external IdP is used. This option is disabled by default."`
 }
 
 // AccountEditLink are the AccountEditLink options
