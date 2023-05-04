@@ -27,30 +27,28 @@ use PHPUnit\Framework\Assert;
  class OcisConfigContext implements Context {
 	/**
 	 * This is used to determine if the ocis config has been changed via tests
-	 * 
-	 * @var bool
 	 */
-	private static $touched = false;
+	private bool $touched = false;
 
 	/**
 	 * @return bool
 	 */
-	public static function hasTouched(): bool {
-		return self::$touched;
+	public function hasTouched(): bool {
+		return $this->touched;
 	}
 
 	/**
 	 * set the touched flag
 	 */
-	public static function setTouched(): void {
-		self::$touched = true;
+	public function setTouched(): void {
+		$this->touched = true;
 	}
 
 	/**
 	 * reset the touched flag
 	 */
-	public static function reset(): void {
-		self::$touched = false;
+	public function reset(): void {
+		$this->touched = false;
 	}
 
 	/**
@@ -76,7 +74,7 @@ use PHPUnit\Framework\Assert;
 		);
 		// ocis config has been changed
 		// set the touched flag
-		self::setTouched();
+		$this->setTouched();
 	}
 
 	/**
@@ -100,7 +98,7 @@ use PHPUnit\Framework\Assert;
 		);
 		// ocis config has been changed
 		// set the touched flag
-		self::setTouched();
+		$this->setTouched();
 	}
 
 	/**
@@ -116,6 +114,6 @@ use PHPUnit\Framework\Assert;
 			"Failed to rollback ocis server"
 		);
 
-		self::reset();
+		$this->reset();
 	}
  }

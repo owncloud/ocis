@@ -45,7 +45,7 @@ class OcisConfigHelper {
         $request = new Request(
 			$method,
 			$url,
-            [],
+			[],
 			$body
 		);
 		return $client->send($request);
