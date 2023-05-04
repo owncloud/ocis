@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
+	stdlog "log"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -44,6 +45,8 @@ func NewMultiHostReverseProxy(opts ...Option) (*MultiHostReverseProxy, error) {
 		logger:    options.Logger,
 		config:    options.Config,
 	}
+
+	rp.ErrorLog = stdlog.New(options.Logger, "MultiHostReverseProxy: ", 0)
 
 	rp.Director = func(r *http.Request) {
 		ri := router.ContextRoutingInfo(r.Context())
