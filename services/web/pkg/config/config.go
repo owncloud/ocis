@@ -19,7 +19,7 @@ type Config struct {
 	HTTP HTTP `yaml:"http"`
 
 	Asset Asset  `yaml:"asset"`
-	File  string `yaml:"file" env:"WEB_UI_CONFIG" desc:"Read the ownCloud Web configuration from this file."` // TODO: rename this to a more self explaining string
+	File  string `yaml:"file" env:"WEB_UI_CONFIG_FILE;WEB_UI_CONFIG" desc:"Read the ownCloud Web json based configuration from this path/file. The config file takes precedence over WEB_OPTION_xxx environment variables. See the text description for more details." deprecationVersion:"3.0" removalVersion:"4.0.0" deprecationInfo:"WEB_UI_CONFIG name changing to make the usecase clear" deprecationReplacement:"WEB_UI_CONFIG_FILE"`
 	Web   Web    `yaml:"web"`
 
 	TokenManager *TokenManager `yaml:"token_manager"`
@@ -104,7 +104,7 @@ type ExternalAppConfig struct {
 
 // Web defines the available web configuration.
 type Web struct {
-	Path        string    `yaml:"path" env:"WEB_UI_PATH" desc:"Read the ownCloud Web configuration from this file path."`
+	Path        string    `yaml:"path" env:"WEB_UI_CONFIG_FILE;WEB_UI_PATH" desc:"Read the ownCloud Web configuration from this file path." deprecationVersion:"3.0" removalVersion:"4.0.0" deprecationInfo:"WEB_UI_PATH will be superceded by WEB_UI_CONFIG_FILE" deprecationReplacement:"WEB_UI_CONFIG_FILE"`
 	ThemeServer string    `yaml:"theme_server" env:"OCIS_URL;WEB_UI_THEME_SERVER" desc:"Base URL to load themes from. Will be prepended to the theme path."`  // used to build Theme in WebConfig
 	ThemePath   string    `yaml:"theme_path" env:"WEB_UI_THEME_PATH" desc:"Subpath/file to load the theme. Will be appended to the URL of the theme server."` // used to build Theme in WebConfig
 	Config      WebConfig `yaml:"config"`
