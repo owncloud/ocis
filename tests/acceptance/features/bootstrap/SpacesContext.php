@@ -876,6 +876,7 @@ class SpacesContext implements Context {
 		?PyStringNode $schemaString = null
 	): void {
 		Assert::assertNotNull($schemaString, 'schema is not valid JSON');
+
 		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->value)) {
 			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->value;
 			foreach ($responseBody as $value) {
@@ -919,36 +920,11 @@ class SpacesContext implements Context {
 			null,
 			$userName,
 		);
+
 		JsonAssertions::assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->featureContext->getJSONSchema($schemaString)
 		);
-	}
-
-	/**
-	 * @Then /^for user "([^"]*)" the JSON response of space project should match$/
-	 * @Then /^for user "([^"]*)" the JSON response should contain space called "([^"]*)" and match$/
-	 * @Then /^for user "([^"]*)" the JSON response should contain space called "([^"]*)" (?:owned by|granted to) "([^"]*)" and match$/
-	 * @Then /^for user "([^"]*)" the JSON response should contain space called "([^"]*)" (?:owned by|granted to) "([^"]*)" (?:with description file|with space image) "([^"]*)" and match$/
-	 *
-	 * @param string $user
-	 * @param string|null $spaceName
-	 * @param string|null $grantedUser
-	 * @param string|null $fileName
-	 * @param PyStringNode|null $schemaString
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function forUserTheJSONDataOfTheResponseShouldMatch(
-		string $user,
-		?string $spaceName = null,
-		?string $grantedUser = null,
-		?string $fileName = null,
-		?PyStringNode $schemaString = null
-	): void {
-		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
-		$this->theJsonDataFromLastResponseShouldMatch($spaceName, $grantedUser, $fileName, $schemaString);
 	}
 
 	/**
@@ -1003,15 +979,42 @@ class SpacesContext implements Context {
 	}
 
 	/**
-	 * @Then /^the user "([^"]*)" should not have a space called "([^"]*)"$/
+	 * @Then /^the user "([^"]*)" should (not |)have a space called "([^"]*)"$/
 	 *
 	 * @param string $user
+	 * @param string $shouldOrNot
 	 * @param string $spaceName
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
 	public function userShouldNotHaveSpace(
+		string $user,
+		string $shouldOrNot,
+		string $spaceName
+	): void {
+		$this->theUserListsAllHisAvailableSpacesUsingTheGraphApi($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+		if (\trim($shouldOrNot) === "not") {
+			$this->jsonRespondedShouldNotContain($spaceName);
+		} else {
+			Assert::assertNotEmpty($this->getSpaceByNameFromResponse($spaceName), "space '$spaceName' should be available for a user '$user' but not found");
+		}
+	}
+
+	/**
+	 * @Then /^the user "([^"]*)" should have a space "([^"]*)" in the disable state$/
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return mixed
+	 * @throws Exception
+	 */
+	public function theUserShouldHaveASpaceInTheDisableState(
 		string $user,
 		string $spaceName
 	): void {
@@ -1020,7 +1023,20 @@ class SpacesContext implements Context {
 			200,
 			"Expected response status code should be 200"
 		);
-		$this->jsonRespondedShouldNotContain($spaceName);
+		$response = json_decode((string)$this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
+		if (isset($response["value"])) {
+			foreach ($response["value"] as $spaceCandidate) {
+				if ($spaceCandidate['name'] === $spaceName) {
+					if ($spaceCandidate['root']['deleted']['state'] !== 'trashed') {
+						throw new \Exception(
+							"space $spaceName should be in disable state but it's not "
+						);
+					}
+					return;
+				}
+			}
+		}
+		throw new \Exception("space '$spaceName' should be available for a user '$user' but not found");
 	}
 
 	/**

@@ -4,7 +4,7 @@ Feature: State of the quota
   I want to be able to see the state of the quota
   So that I will not let the quota overrun
 
-  
+
   quota state indication:
   | 0 - 75%  | normal   |
   | 76 - 90% | nearing  |
@@ -23,7 +23,8 @@ Feature: State of the quota
   Scenario Outline: quota information is returned in the list of spaces returned via the Graph API
     Given user "Alice" has created a space "<spaceName>" of type "project" with quota "<total>"
     When user "Alice" uploads a file inside space "<spaceName>" with content "<fileContent>" to "test.txt" using the WebDAV API
-    Then for user "Alice" the JSON response should contain space called "<spaceName>" and match
+    And user "Alice" lists all available spaces via the GraphApi
+    Then the JSON response should contain space called "<spaceName>" and match
     """
      {
       "type": "object",
