@@ -82,7 +82,7 @@ web:
       upload: null
       editor: null
       contextHelpersReadMore: true
-      logoutURL: ""
+      logoutUrl: ""
     styles: []
     scripts: []
     custom_translations: []
