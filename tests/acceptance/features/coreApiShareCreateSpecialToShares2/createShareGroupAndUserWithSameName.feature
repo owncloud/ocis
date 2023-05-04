@@ -1,5 +1,8 @@
 @api @files_sharing-app-required
 Feature: sharing works when a username and group name are the same
+  As a user
+  I want to share resources with group and users having same name
+  So that I can make sure that the sharing works
 
   Background:
     Given auto-accept shares has been disabled

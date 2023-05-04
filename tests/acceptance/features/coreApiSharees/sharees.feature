@@ -1,5 +1,8 @@
 @api @files_sharing-app-required
-Feature: sharees
+Feature: search sharees
+  As a user
+  I want to search sharees
+  So that I can find them quickly
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -11,7 +14,7 @@ Feature: sharees
     And user "Alice" has been added to group "ShareeGroup2"
 
   @smokeTest
-  Scenario Outline: Search without exact match
+  Scenario Outline: search without exact match
     Given using OCS API version "<ocs-api-version>"
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | sharee |
@@ -33,7 +36,7 @@ Feature: sharees
       | 2               | 200        | 200         |
 
 
-  Scenario Outline: Search without exact match not-exact casing
+  Scenario Outline: search without exact match not-exact casing
     Given using OCS API version "<ocs-api-version>"
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | sHaRee |
@@ -55,7 +58,7 @@ Feature: sharees
       | 2               | 200        | 200         |
 
   @skipOnLDAP
-  Scenario Outline: Search only with group members - allowed
+  Scenario Outline: search only with group members - allowed
     Given using OCS API version "<ocs-api-version>"
     And parameter "shareapi_only_share_with_group_members" of app "core" has been set to "yes"
     And user "Sharee1" has been added to group "ShareeGroup2"
@@ -79,7 +82,7 @@ Feature: sharees
       | 2               | 200        | 200         |
 
 
-  Scenario Outline: Search with exact match
+  Scenario Outline: search with exact match
     Given using OCS API version "<ocs-api-version>"
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | Sharee1 |
@@ -99,7 +102,7 @@ Feature: sharees
       | 2               | 200        | 200         |
 
 
-  Scenario Outline: Search with exact match not-exact casing
+  Scenario Outline: search with exact match not-exact casing
     Given using OCS API version "<ocs-api-version>"
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | sharee1 |
@@ -119,7 +122,7 @@ Feature: sharees
       | 2               | 200        | 200         |
 
 
-  Scenario Outline: Search with exact match not-exact casing group
+  Scenario Outline: search with exact match not-exact casing group
     Given using OCS API version "<ocs-api-version>"
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | shareegroup2 |
@@ -139,7 +142,7 @@ Feature: sharees
       | 2               | 200        | 200         |
 
 
-  Scenario Outline: Search with "self"
+  Scenario Outline: search with "self"
     Given using OCS API version "<ocs-api-version>"
     When user "Sharee1" gets the sharees using the sharing API with parameters
       | search   | Sharee1 |
@@ -159,7 +162,7 @@ Feature: sharees
       | 2               | 200        | 200         |
 
 
-  Scenario Outline: Federated sharee for files
+  Scenario Outline: federated sharee for files
     Given using OCS API version "<ocs-api-version>"
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | test@localhost |
@@ -179,7 +182,7 @@ Feature: sharees
       | 2               | 200        | 200         |
 
 
-  Scenario Outline: Federated sharee for calendars not allowed
+  Scenario Outline: federated sharee for calendars not allowed
     Given using OCS API version "<ocs-api-version>"
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | test@localhost |
@@ -198,7 +201,7 @@ Feature: sharees
       | 2               | 200        | 200         |
 
   @skipOnLDAP
-  Scenario Outline: Enumerate only group members - only show partial results from member of groups
+  Scenario Outline: enumerate only group members - only show partial results from member of groups
     Given using OCS API version "<ocs-api-version>"
     And these users have been created with default attributes and without skeleton files:
       | username | displayname |
@@ -223,7 +226,7 @@ Feature: sharees
       | 2               | 200        | 200         |
 
 
-  Scenario Outline: Search without exact match such that the search string matches the user getting the sharees
+  Scenario Outline: search without exact match such that the search string matches the user getting the sharees
     Given user "sharee2" has been created with default attributes and without skeleton files
     And using OCS API version "<ocs-api-version>"
     When user "sharee1" gets the sharees using the sharing API with parameters

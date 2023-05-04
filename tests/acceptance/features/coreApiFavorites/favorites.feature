@@ -1,5 +1,8 @@
 @api
 Feature: favorite
+  As a user
+  I want to favorite resources
+  So that I can access them quickly
 
   Background:
     Given using OCS API version "1"
@@ -14,7 +17,7 @@ Feature: favorite
     And user "Alice" has uploaded file with content "some data" to "/PARENT/parent.txt"
 
   @issue-1263
-  Scenario Outline: Favorite a folder
+  Scenario Outline: favorite a folder
     Given using <dav_version> DAV path
     When user "Alice" favorites element "/FOLDER" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -35,7 +38,7 @@ Feature: favorite
       | spaces      |
 
   @issue-1263
-  Scenario Outline: Unfavorite a folder
+  Scenario Outline: unfavorite a folder
     Given using <dav_version> DAV path
     And user "Alice" has favorited element "/FOLDER"
     When user "Alice" unfavorites element "/FOLDER" using the WebDAV API
@@ -57,7 +60,7 @@ Feature: favorite
       | spaces      |
 
   @smokeTest @issue-1263
-  Scenario Outline: Favorite a file
+  Scenario Outline: favorite a file
     Given using <dav_version> DAV path
     When user "Alice" favorites element "/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "207"
@@ -78,7 +81,7 @@ Feature: favorite
       | spaces      |
 
   @smokeTest @issue-1263
-  Scenario Outline: Unfavorite a file
+  Scenario Outline: unfavorite a file
     Given using <dav_version> DAV path
     And user "Alice" has favorited element "/textfile0.txt"
     When user "Alice" unfavorites element "/textfile0.txt" using the WebDAV API
@@ -100,7 +103,7 @@ Feature: favorite
       | spaces      |
 
   @smokeTest
-  Scenario Outline: Get favorited elements of a folder
+  Scenario Outline: get favorited elements of a folder
     Given using <dav_version> DAV path
     When user "Alice" favorites element "/FOLDER" using the WebDAV API
     And user "Alice" favorites element "/textfile0.txt" using the WebDAV API
@@ -121,7 +124,7 @@ Feature: favorite
       | spaces      |
 
 
-  Scenario Outline: Get favorited elements of a subfolder
+  Scenario Outline: get favorited elements of a subfolder
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/subfolder"
     And user "Alice" has uploaded file with content "some data" to "/subfolder/textfile0.txt"
@@ -148,7 +151,7 @@ Feature: favorite
       | spaces      |
 
 
-  Scenario Outline: Get favorited elements and limit count of entries
+  Scenario Outline: get favorited elements and limit count of entries
     Given using <dav_version> DAV path
     And user "Alice" has favorited element "/textfile0.txt"
     And user "Alice" has favorited element "/textfile1.txt"
@@ -173,7 +176,7 @@ Feature: favorite
       | spaces      |
 
 
-  Scenario Outline: Get favorited elements paginated in subfolder
+  Scenario Outline: get favorited elements paginated in subfolder
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/subfolder"
     And user "Alice" has copied file "/textfile0.txt" to "/subfolder/textfile0.txt"

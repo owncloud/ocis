@@ -1,10 +1,13 @@
 @api
 Feature: checksums
+  As a user
+  I want to upload files with checksum
+  So that I can make sure that the files are uploaded with correct checksums
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
-  Scenario Outline: Uploading a file with checksum should work
+  Scenario Outline: uploading a file with checksum should work
     Given using <dav_version> DAV path
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -19,7 +22,7 @@ Feature: checksums
       | spaces      |
 
   @smokeTest @issue-1291
-  Scenario Outline: Uploading a file with checksum should return the checksum in the propfind
+  Scenario Outline: uploading a file with checksum should return the checksum in the propfind
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     When user "Alice" requests the checksum of "/myChecksumFile.txt" via propfind
@@ -35,7 +38,7 @@ Feature: checksums
       | spaces      |
 
   @smokeTest @issue-1316
-  Scenario Outline: Uploading a file with checksum should return the checksum in the download header
+  Scenario Outline: uploading a file with checksum should return the checksum in the download header
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     When user "Alice" downloads file "/myChecksumFile.txt" using the WebDAV API
@@ -52,7 +55,7 @@ Feature: checksums
       | spaces      |
 
   @issue-1291
-  Scenario Outline: Moving a file with checksum should return the checksum in the propfind
+  Scenario Outline: moving a file with checksum should return the checksum in the propfind
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     When user "Alice" moves file "/myChecksumFile.txt" to "/myMovedChecksumFile.txt" using the WebDAV API
@@ -69,7 +72,7 @@ Feature: checksums
       | spaces      |
 
   @issue-1316
-  Scenario Outline: Downloading a file with checksum should return the checksum in the download header
+  Scenario Outline: downloading a file with checksum should return the checksum in the download header
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     And user "Alice" has moved file "/myChecksumFile.txt" to "/myMovedChecksumFile.txt"
@@ -87,7 +90,7 @@ Feature: checksums
       | spaces      |
 
   @issue-1291
-  Scenario Outline: Uploading a chunked file with checksum should return the checksum in the propfind
+  Scenario Outline: uploading a chunked file with checksum should return the checksum in the propfind
     Given using <dav_version> DAV path
     And user "Alice" has uploaded chunk file "1" of "3" with "AAAAA" to "/myChecksumFile.txt" with checksum "MD5:45a72715acdd5019c5be30bdbb75233e"
     And user "Alice" has uploaded chunk file "2" of "3" with "BBBBB" to "/myChecksumFile.txt" with checksum "MD5:45a72715acdd5019c5be30bdbb75233e"
@@ -105,7 +108,7 @@ Feature: checksums
       | spaces      |
 
   @issue-1343
-  Scenario Outline: Uploading a chunked file with checksum should return the checksum in the download header
+  Scenario Outline: uploading a chunked file with checksum should return the checksum in the download header
     Given using <dav_version> DAV path
     And user "Alice" has uploaded chunk file "1" of "3" with "AAAAA" to "/myChecksumFile.txt" with checksum "MD5:45a72715acdd5019c5be30bdbb75233e"
     And user "Alice" has uploaded chunk file "2" of "3" with "BBBBB" to "/myChecksumFile.txt" with checksum "MD5:45a72715acdd5019c5be30bdbb75233e"
@@ -123,7 +126,7 @@ Feature: checksums
       | spaces      |
 
 
-  Scenario Outline: Moving file with checksum should return the checksum in the download header
+  Scenario Outline: moving file with checksum should return the checksum in the download header
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     When user "Alice" moves file "/myChecksumFile.txt" to "/myMovedChecksumFile.txt" using the WebDAV API
@@ -141,7 +144,7 @@ Feature: checksums
       | spaces      |
 
   @issue-1291
-  Scenario Outline: Copying a file with checksum should return the checksum in the propfind using new DAV path
+  Scenario Outline: copying a file with checksum should return the checksum in the propfind using new DAV path
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     When user "Alice" copies file "/myChecksumFile.txt" to "/myChecksumFileCopy.txt" using the WebDAV API
@@ -157,7 +160,7 @@ Feature: checksums
       | spaces      |
 
   @issue-1316
-  Scenario Outline: Copying file with checksum should return the checksum in the download header using new DAV path
+  Scenario Outline: copying file with checksum should return the checksum in the download header using new DAV path
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     When user "Alice" copies file "/myChecksumFile.txt" to "/myChecksumFileCopy.txt" using the WebDAV API
@@ -173,7 +176,7 @@ Feature: checksums
       | spaces      |
 
   @files_sharing-app-required @issue-1291
-  Scenario Outline: Sharing a file with checksum should return the checksum in the propfind using new DAV path
+  Scenario Outline: sharing a file with checksum should return the checksum in the propfind using new DAV path
     Given auto-accept shares has been disabled
     And using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -188,7 +191,7 @@ Feature: checksums
       | new         |
 
   @files_sharing-app-required @issue-1291 @skipOnOcV10
-  Scenario Outline: Modifying a shared file should return correct checksum in the propfind using new DAV path
+  Scenario Outline: modifying a shared file should return correct checksum in the propfind using new DAV path
     Given auto-accept shares has been disabled
     And using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -203,7 +206,7 @@ Feature: checksums
       | new         | SHA1:ce5582148c6f0c1282335b87df5ed4be4b781399 MD5:56e57920c3c8c727bfe7a5288cdf61c4 ADLER32:1048035a |
 
   @issue-1315
-  Scenario Outline: Upload a file where checksum does not match
+  Scenario Outline: upload a file where checksum does not match
     Given using <dav_version> DAV path
     When user "Alice" uploads file with checksum "SHA1:f005ba11" and content "Some Text" to "/chksumtst.txt" using the WebDAV API
     Then the HTTP status code should be "400"
@@ -220,7 +223,7 @@ Feature: checksums
       | spaces      |
 
 
-  Scenario Outline: Upload a file where checksum does match
+  Scenario Outline: upload a file where checksum does match
     Given using <dav_version> DAV path
     When user "Alice" uploads file with checksum "SHA1:ce5582148c6f0c1282335b87df5ed4be4b781399" and content "Some Text" to "/chksumtst.txt" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -235,7 +238,7 @@ Feature: checksums
       | spaces      |
 
   @issue-1315
-  Scenario Outline: Uploaded file should have the same checksum when downloaded
+  Scenario Outline: uploaded file should have the same checksum when downloaded
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with checksum "SHA1:ce5582148c6f0c1282335b87df5ed4be4b781399" and content "Some Text" to "/chksumtst.txt"
     When user "Alice" downloads file "/chksumtst.txt" using the WebDAV API
@@ -255,7 +258,7 @@ Feature: checksums
 
   ## Validation Plugin or Old Endpoint Specific
   @issue-1343
-  Scenario Outline: Uploading an old method chunked file with checksum should fail using new DAV path
+  Scenario Outline: uploading an old method chunked file with checksum should fail using new DAV path
     Given using <dav_version> DAV path
     When user "Alice" uploads chunk file "1" of "3" with "AAAAA" to "/myChecksumFile.txt" with checksum "MD5:45a72715acdd5019c5be30bdbb75233e" using the WebDAV API
     Then the HTTP status code should be "503"
@@ -272,7 +275,7 @@ Feature: checksums
 
   ## upload overwriting
   @issue-1291
-  Scenario Outline: Uploading a file with MD5 checksum overwriting an existing file
+  Scenario Outline: uploading a file with MD5 checksum overwriting an existing file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "some data" to "textfile0.txt"
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/textfile0.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a" using the WebDAV API
@@ -295,7 +298,7 @@ Feature: checksums
       | spaces      |
 
   @issue-1291
-  Scenario Outline: Uploading a file with SHA1 checksum overwriting an existing file
+  Scenario Outline: uploading a file with SHA1 checksum overwriting an existing file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "some data" to "textfile0.txt"
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/textfile0.txt" with checksum "SHA1:3ee962b839762adb0ad8ba6023a4690be478de6f" using the WebDAV API
@@ -318,7 +321,7 @@ Feature: checksums
       | spaces      |
 
   @skipOnStorage:ceph @skipOnStorage:scality @files_primary_s3-issue-224 @issue-1291
-  Scenario Outline: Uploading a file with invalid SHA1 checksum overwriting an existing file
+  Scenario Outline: uploading a file with invalid SHA1 checksum overwriting an existing file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/textfile0.txt" with checksum "SHA1:f005ba11f005ba11f005ba11f005ba11f005ba11" using the WebDAV API
@@ -336,7 +339,7 @@ Feature: checksums
       | spaces      |
 
   @issue-1296
-  Scenario Outline: Uploading a file with checksum should work for file with special characters
+  Scenario Outline: uploading a file with checksum should work for file with special characters
     Given using <dav_version> DAV path
     When user "Alice" uploads file "filesForUpload/textfile.txt" to <renamed_file> with checksum "MD5:d70b40f177b14b470d1756a3c12b963a" using the WebDAV API
     Then the HTTP status code should be "201"

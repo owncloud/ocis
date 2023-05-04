@@ -1,5 +1,8 @@
 @api
 Feature: Status
+  As a admin
+  I want to check status of the server
+  So that I can ensure that the server is working
 
   @smokeTest
   Scenario: Status.php is correct

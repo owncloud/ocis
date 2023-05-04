@@ -1,5 +1,8 @@
 @api
-Feature: Other tests related to api
+Feature: get robots.txt
+  As a user
+  I want to get file robots.txt
+  So that I can check its content
 
   @issue-1314
   Scenario: robots.txt file should be accessible

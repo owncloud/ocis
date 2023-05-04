@@ -1,5 +1,8 @@
 @api @files_sharing-app-required
 Feature: Sharing resources with different case names with the sharee and checking the coexistence of resources on sharee/receivers side
+  As a user
+  I want to share resources with case sensitive names
+  So that I can make sure that the shares aren't case sensitive
 
   Background:
     Given auto-accept shares has been disabled

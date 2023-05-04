@@ -1,5 +1,8 @@
 @api @files_sharing-app-required @issue-1328 @issue-1289
 Feature: sharing
+  As a user
+  I want to delete shares
+  So that I don't have redundant shares
 
   Background:
     Given auto-accept shares has been disabled
@@ -10,7 +13,7 @@ Feature: sharing
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
 
 
-  Scenario Outline: Delete all group shares
+  Scenario Outline: delete all group shares
     Given using OCS API version "<ocs_api_version>"
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
@@ -152,7 +155,7 @@ Feature: sharing
     And as "Brian" file "/Shares/shared/textfile.txt" should not exist
 
 
-  Scenario Outline: A Group share recipient tries to delete the share
+  Scenario Outline: group share recipient tries to delete the share
     Given using OCS API version "<ocs_api_version>"
     And group "grp1" has been created
     And these users have been created with default attributes and without skeleton files:
@@ -179,7 +182,7 @@ Feature: sharing
       | /shared                 | 2               | 404              | /Shares/shared          | /Shares/shared          |
 
 
-  Scenario Outline: An individual share recipient tries to delete the share
+  Scenario Outline: individual share recipient tries to delete the share
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/shared"
     And user "Alice" has moved file "/textfile0.txt" to "/shared/shared_file.txt"

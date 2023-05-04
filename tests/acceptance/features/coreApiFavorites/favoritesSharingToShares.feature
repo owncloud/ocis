@@ -1,5 +1,8 @@
 @api @files_sharing-app-required
 Feature: favorite
+  As a user
+  I want to favorite the shared resources
+  So that I can access them quickly
 
   Background:
     Given auto-accept shares has been disabled
