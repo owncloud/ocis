@@ -13,7 +13,7 @@ Feature: dav-versions
     Then the HTTP status code should be "201"
     And the version folder of file "/davtest.txt" for user "Alice" should contain "0" elements
 
-  
+
   Scenario: Upload file and no version is available using various chunking methods (except new chunking)
     When user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms except new chunking using the WebDAV API
     Then the HTTP status code should be "200"
@@ -29,7 +29,7 @@ Feature: dav-versions
     And the version folder of file "/davtest.txt" for user "Alice" should contain "1" element
     And the content length of file "/davtest.txt" with version index "1" for user "Alice" in versions folder should be "8"
 
-  
+
   Scenario: Upload a file twice and versions are available using various chunking methods (except new chunking)
     When user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms except new chunking using the WebDAV API
     And user "Alice" uploads file "filesForUpload/davtest.txt" to filenames based on "/davtest.txt" with all mechanisms except new chunking using the WebDAV API
@@ -57,7 +57,7 @@ Feature: dav-versions
     Then the HTTP status code should be "204"
     And the content of file "/davtest.txt" for user "Alice" should be "Test Content."
 
-  @smokeTest @skipOnStorage:ceph @skipOnStorage:scality @files_primary_s3-issue-278
+  @smokeTest @skipOnStorage:ceph @skipOnStorage:scality
   Scenario: Restore a file back to bigger content and check, if the content is now in the current file
     Given user "Alice" has uploaded file with content "Back To The Future." to "/davtest.txt"
     And user "Alice" has uploaded file with content "Update Content." to "/davtest.txt"
@@ -66,7 +66,7 @@ Feature: dav-versions
     Then the HTTP status code should be "204"
     And the content of file "/davtest.txt" for user "Alice" should be "Back To The Future."
 
-  @smokeTest @skipOnStorage:ceph @files_primary_s3-issue-161
+  @smokeTest @skipOnStorage:ceph
   Scenario Outline: Uploading a chunked file does create the correct version that can be restored
     Given using <dav-path> DAV path
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
@@ -82,7 +82,7 @@ Feature: dav-versions
       | dav-path | status-code |
       | old      | 201         |
 
-  @skipOnStorage:ceph @skipOnStorage:scality @files_primary_s3-issue-156
+  @skipOnStorage:ceph @skipOnStorage:scality
   Scenario: Restore a file and check, if the content and correct checksum is now in the current file
     Given user "Alice" has uploaded file with content "AAAAABBBBBCCCCC" and checksum "MD5:45a72715acdd5019c5be30bdbb75233e" to "/davtest.txt"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/davtest.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
@@ -127,7 +127,7 @@ Feature: dav-versions
     Then the HTTP status code should be "204"
     And the content of file "/renamedfile.txt" for user "Alice" should be "old content"
 
-  
+
   Scenario: User can access version number after moving a file
     Given user "Alice" has created folder "testFolder"
     And user "Alice" has uploaded file with content "uploaded content" to "textfile0.txt"
@@ -146,7 +146,7 @@ Feature: dav-versions
     Then the HTTP status code should be "207"
     And the number of versions should be "0"
 
-  
+
   Scenario: the number of etag elements in response changes according to version of the file
     Given user "Alice" has uploaded file with content "uploaded content" to "textfile0.txt"
     And user "Alice" has uploaded file with content "version 1" to "textfile0.txt"
@@ -174,7 +174,7 @@ Feature: dav-versions
       | Content-Disposition | attachment; filename*=UTF-8''textfile0.txt; filename="textfile0.txt" |
     And the downloaded content should be "uploaded content"
 
-  @skipOnStorage:ceph @skipOnStorage:scality @files_primary_s3-issue-463
+  @skipOnStorage:ceph @skipOnStorage:scality
   Scenario: download an old version of a restored file
     Given user "Alice" has uploaded file with content "uploaded content" to "textfile0.txt"
     And user "Alice" has uploaded file with content "version 1" to "textfile0.txt"
@@ -249,14 +249,14 @@ Feature: dav-versions
     Then the HTTP status code should be "204"
     And the content of file "/davtest.txt" for user "Alice" should be "Old Test Content."
 
-  
+
   Scenario: Upload the same file twice with the same mtime and a version is available
     Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
     Then the HTTP status code should be "204"
     And the version folder of file "/file.txt" for user "Alice" should contain "1" element
 
-  
+
   Scenario: Upload the same file more than twice with the same mtime and only one version is available
     Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
@@ -264,7 +264,7 @@ Feature: dav-versions
     Then the HTTP status code should be "204"
     And the version folder of file "/file.txt" for user "Alice" should contain "1" element
 
-  
+
   Scenario: Upload the same file twice with the same mtime and no version after restoring
     Given user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
@@ -272,7 +272,7 @@ Feature: dav-versions
     Then the HTTP status code should be "204"
     And the version folder of file "/file.txt" for user "Alice" should contain "0" element
 
- 
+
   Scenario: sharer of a file can see the old version information when the sharee changes the content of the file
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "First content" to "sharefile.txt"
@@ -284,7 +284,7 @@ Feature: dav-versions
     When user "Brian" gets the number of versions of file "/Shares/sharefile.txt"
     Then the HTTP status code should be "403"
 
- 
+
   Scenario: sharer of a file can restore the original content of a shared file after the file has been modified by the sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "First content" to "sharefile.txt"
@@ -296,7 +296,7 @@ Feature: dav-versions
     And the content of file "/sharefile.txt" for user "Alice" should be "First content"
     And the content of file "/Shares/sharefile.txt" for user "Brian" should be "First content"
 
- 
+
   Scenario: sharer can restore a file inside a shared folder modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
@@ -309,7 +309,7 @@ Feature: dav-versions
     And the content of file "/sharingfolder/sharefile.txt" for user "Alice" should be "First content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "First content"
 
- 
+
   Scenario: sharee cannot see a version of a file inside a shared folder when modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
@@ -322,7 +322,7 @@ Feature: dav-versions
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "Second content"
     And the content of file "/sharingfolder/sharefile.txt" for user "Alice" should be "Second content"
 
- 
+
   Scenario: sharer can restore a file inside a shared folder created by sharee and modified by sharer
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
@@ -335,7 +335,7 @@ Feature: dav-versions
     And the content of file "/sharingfolder/sharefile.txt" for user "Alice" should be "First content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "First content"
 
- 
+
   Scenario: sharer can restore a file inside a shared folder created by sharee and modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/sharingfolder"
@@ -348,7 +348,7 @@ Feature: dav-versions
     And the content of file "/sharingfolder/sharefile.txt" for user "Alice" should be "old content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "old content"
 
- 
+
   Scenario: sharer can restore a file inside a group shared folder modified by sharee
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
@@ -368,7 +368,7 @@ Feature: dav-versions
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Brian" should be "First content"
     And the content of file "/Shares/sharingfolder/sharefile.txt" for user "Carol" should be "First content"
 
- 
+
   Scenario Outline: Moving a file (with versions) into a shared folder as the sharee and as the sharer
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -393,7 +393,7 @@ Feature: dav-versions
       | old         | Brian | /testshare        |
       | new         | Brian | /testshare        |
 
- 
+
   Scenario Outline: Moving a file (with versions) out of a shared folder as the sharee and as the sharer
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -418,7 +418,7 @@ Feature: dav-versions
       | old         | Brian | /testshare |
       | new         | Brian | /testshare |
 
- 
+
   Scenario: Receiver tries to get file versions of unshared file from the sharer
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
@@ -429,7 +429,7 @@ Feature: dav-versions
     Then the HTTP status code should be "404"
     And the value of the item "//s:exception" in the response about user "Alice" should be "Sabre\DAV\Exception\NotFound"
 
-  @skipOnStorage:ceph @files_primary_s3-issue-161
+  @skipOnStorage:ceph
   Scenario: Receiver tries get file versions of shared file from the sharer
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"
@@ -441,7 +441,7 @@ Feature: dav-versions
     When user "Brian" tries to get versions of file "textfile0.txt" from "Alice"
     Then the HTTP status code should be "403"
 
-  
+
   Scenario: Receiver tries get file versions of shared file before receiving it
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "textfile0" to "textfile0.txt"

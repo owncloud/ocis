@@ -1,4 +1,4 @@
-@api @public_link_share-feature-required
+@api
 Feature: multilinksharing
 
   Background:

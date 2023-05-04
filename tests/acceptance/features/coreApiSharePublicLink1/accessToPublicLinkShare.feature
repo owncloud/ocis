@@ -1,4 +1,4 @@
-@api @public_link_share-feature-required
+@api
 Feature: accessing a public link share
 
   Background:

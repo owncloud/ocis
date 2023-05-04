@@ -1,4 +1,4 @@
-@api @public_link_share-feature-required @issue-1276 @issue-1277 @issue-2079
+@api @issue-1276 @issue-1277 @issue-2079
 
 Feature: upload to a public link share
 
