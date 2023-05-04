@@ -161,6 +161,10 @@ func TestGetGroup(t *testing.T) {
 func TestGetGroupReadOnlyBackend(t *testing.T) {
 	readOnlyConfig := lconfig
 	readOnlyConfig.WriteEnabled = false
+	readOnlyConfig.GroupBaseDN = "ou=groups,dc=test"
+	readOnlyConfig.GroupCreateBaseDN = "ou=local,ou=group,dc=test"
+	localGroupEntry := groupEntry
+	localGroupEntry.DN = "cn=local,ou=local,o=base"
 
 	lm := &mocks.Client{}
 	lm.On("Search", groupLookupSearchRequest).Return(&ldap.SearchResult{Entries: []*ldap.Entry{groupEntry}}, nil)
