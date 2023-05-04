@@ -1,3 +1,20 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v3.0.0...master
+
+## Summary
+
+* Bugfix - Fix Logout Url config name: [#6226](https://github.com/owncloud/ocis/pull/6226)
+
+## Details
+
+* Bugfix - Fix Logout Url config name: [#6226](https://github.com/owncloud/ocis/pull/6226)
+
+   We fixed the yaml and json name of the logout url option.
+
+   https://github.com/owncloud/ocis/pull/6226
 # Changelog for [3.0.0] (2023-05-03)
 
 The following sections list the changes for 3.0.0.
