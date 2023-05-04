@@ -320,7 +320,7 @@ Feature: checksums
       | dav_version |
       | spaces      |
 
-  @skipOnStorage:ceph @skipOnStorage:scality @files_primary_s3-issue-224 @issue-1291
+  @skipOnStorage:ceph @skipOnStorage:scality @issue-1291
   Scenario Outline: uploading a file with invalid SHA1 checksum overwriting an existing file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"

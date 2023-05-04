@@ -8,7 +8,7 @@ Feature: sharing
     Given auto-accept shares has been disabled
     And user "Alice" has been created with default attributes and without skeleton files
 
-  @smokeTest @skipOnEncryptionType:user-keys
+  @smokeTest
   Scenario Outline: creating a share of a file with a user, the default permissions are read(1)+update(2)+can-share(16)
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
@@ -38,7 +38,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @smokeTest @skipOnEncryptionType:user-keys @issue-2133
+  @smokeTest @issue-2133
   Scenario Outline: creating a share of a file containing commas in the filename, with a user, the default permissions are read(1)+update(2)+can-share(16)
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
@@ -468,7 +468,7 @@ Feature: sharing
       | 1               | 100             |
       | 2               | 200             |
 
-  @skipOnEncryptionType:user-keys @encryption-issue-132 @skipOnLDAP @skipOnGraph
+  @skipOnLDAP @skipOnGraph
   Scenario Outline: share with a group and then add a user to that group
     Given using OCS API version "<ocs_api_version>"
     And these users have been created with default attributes and without skeleton files:
@@ -531,7 +531,7 @@ Feature: sharing
       | 1               | 100             | /textfile0.txt |
       | 2               | 200             | /textfile0.txt |
 
-  @skipOnFilesClassifier @issue-files-classifier-291 @issue-2146
+  @issue-2146
   Scenario: share a file by multiple channels and download from sub-folder and direct file share
     Given these users have been created with default attributes and without skeleton files:
       | username |

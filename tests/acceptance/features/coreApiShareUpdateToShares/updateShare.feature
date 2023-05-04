@@ -123,7 +123,7 @@ Feature: sharing
       | 1               | 200              | create,delete |
       | 2               | 400              | create,delete |
 
-  @skipOnFilesClassifier @issue-files-classifier-291 @toFixOnOCIS @issue-2201
+  @issue-2201
   Scenario Outline: Share ownership change after moving a shared file outside of an outer share
     Given these users have been created with default attributes and without skeleton files:
       | username |
@@ -194,7 +194,7 @@ Feature: sharing
       | path          |
       | /Carol-folder |
 
-  @toFixOnOCIS @toFixOnOcV10 @issue-1253 @issue-1224 @issue-1225
+  @issue-1253 @issue-1224 @issue-1225
   #after fixing all the issues merge this scenario with the one below
   Scenario Outline: API responds with a full set of parameters when owner changes the permission of a share
     Given using OCS API version "<ocs_api_version>"

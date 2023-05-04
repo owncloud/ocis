@@ -68,7 +68,7 @@ Feature: Restore deleted files/folders
       | old      |
       | new      |
 
-  @skipOnFilesClassifier @issue-files-classifier-291
+
   Scenario Outline: a file is deleted and restored to a new destination
     Given using <dav-path> DAV path
     And user "Alice" has created folder "/PARENT"
