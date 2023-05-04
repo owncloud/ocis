@@ -106,7 +106,7 @@ type Settings struct {
 
 	SigningKid             string   `yaml:"signing_kid" env:"IDP_SIGNING_KID" desc:"Value of the KID (Key ID) field which is used in created tokens to uniquely identify the signing-private-key."`
 	SigningMethod          string   `yaml:"signing_method" env:"IDP_SIGNING_METHOD" desc:"Signing method of IDP requests like 'PS256'"`
-	SigningPrivateKeyFiles []string `yaml:"signing_private_key_files" env:"IDP_SIGNING_PRIVATE_KEY_FILES" desc:"Private key files for signing IDP requests. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp."`
+	SigningPrivateKeyFiles []string `yaml:"signing_private_key_files" env:"IDP_SIGNING_PRIVATE_KEY_FILES" desc:"Private key files for signing IDP requests. Separate multiple keys by blank or comma. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/idp."`
 	ValidationKeysPath     string   `yaml:"validation_keys_path" env:"IDP_VALIDATION_KEYS_PATH" desc:"Path to validation keys for IDP requests."`
 
 	CookieBackendURI string
