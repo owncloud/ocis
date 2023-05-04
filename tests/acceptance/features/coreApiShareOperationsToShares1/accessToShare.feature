@@ -10,7 +10,7 @@ Feature: sharing
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
 
   @smokeTest
-  Scenario Outline: Sharee can see the share
+  Scenario Outline: sharee can see the share
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
@@ -24,7 +24,7 @@ Feature: sharing
       | 2               | 200             |
 
   @smokeTest
-  Scenario Outline: Sharee can see the filtered share
+  Scenario Outline: sharee can see the filtered share
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "some data" to "/textfile1.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
@@ -41,7 +41,7 @@ Feature: sharing
       | 2               | 200             |
 
   @smokeTest @issue-1257
-  Scenario Outline: Sharee can't see the share that is filtered out
+  Scenario Outline: sharee can't see the share that is filtered out
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "some data" to "/textfile1.txt"
     And user "Alice" has shared file "textfile0.txt" with user "Brian"
@@ -58,7 +58,7 @@ Feature: sharing
       | 2               | 200             |
 
   @smokeTest @issue-1289
-  Scenario Outline: Sharee can see the group share
+  Scenario Outline: sharee can see the group share
     Given using OCS API version "<ocs_api_version>"
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"

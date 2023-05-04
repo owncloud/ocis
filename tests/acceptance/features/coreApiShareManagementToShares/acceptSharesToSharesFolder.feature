@@ -14,7 +14,7 @@ Feature: accept/decline shares coming from internal users to the Shares folder
       | Brian    |
 
 
-  Scenario: When accepting a share of a file, the received file is accessible
+  Scenario: accept an incoming file share
     Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian"
     When user "Brian" accepts share "/textfile0.txt" offered by user "Alice" using the sharing API
@@ -23,7 +23,7 @@ Feature: accept/decline shares coming from internal users to the Shares folder
     And the content of file "/Shares/textfile0.txt" for user "Brian" should be "ownCloud test text file 0"
 
 
-  Scenario: When accepting a share of a folder, the received folder is accessible
+  Scenario: accept an incoming folder share
     Given user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "ownCloud test text file parent" to "PARENT/parent.txt"
     And user "Alice" has shared file "/PARENT" with user "Brian"
@@ -31,7 +31,7 @@ Feature: accept/decline shares coming from internal users to the Shares folder
     Then the content of file "/Shares/PARENT/parent.txt" for user "Brian" should be "ownCloud test text file parent"
 
 
-  Scenario: When accepting a share of a file, the response is valid
+  Scenario: accept an incoming file share and check the response
     Given user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian"
     When user "Brian" accepts share "/textfile0.txt" offered by user "Alice" using the sharing API
@@ -52,7 +52,7 @@ Feature: accept/decline shares coming from internal users to the Shares folder
     And the content of file "/Shares/textfile0.txt" for user "Brian" should be "ownCloud test text file 0"
 
 
-  Scenario: When accepting a share of a folder, the response is valid
+  Scenario: accept an incoming folder share and check the response
     Given user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "ownCloud test text file parent" to "PARENT/parent.txt"
     And user "Alice" has shared file "/PARENT" with user "Brian"

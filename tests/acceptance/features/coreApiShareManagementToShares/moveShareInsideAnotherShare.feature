@@ -2,7 +2,7 @@
 Feature: moving a share inside another share
   As a user
   I want to move a shared resource inside another shared resource
-  Because I need full flexibility when managing resources.
+  So that I have full flexibility when managing resources
 
   Background:
     Given auto-accept shares has been disabled

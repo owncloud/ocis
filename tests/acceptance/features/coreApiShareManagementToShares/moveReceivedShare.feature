@@ -11,7 +11,7 @@ Feature: sharing
       | Carol    |
 
 
-  Scenario: Keep usergroup shares when the user renames the share within the Shares folder(#22143)
+  Scenario: keep user/group shares when the user renames the share within the Shares folder
     Given group "grp1" has been created
     And user "Brian" has been added to group "grp1"
     And user "Carol" has been added to group "grp1"
