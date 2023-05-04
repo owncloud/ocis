@@ -267,7 +267,12 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("UpdateUser")
 	if !i.writeEnabled {
-		return nil, ErrReadOnly
+		// still allow eanble/disable User when using DisableMechanismGroup
+		if i.disableUserMechanism == DisableMechanismGroup && isUserEnabledUpdate(user) {
+			logger.Error().Str("backend", "ldap").Msg("Allowing accountEnabled Update on read-only backend")
+		} else {
+			return nil, ErrReadOnly
+		}
 	}
 	e, err := i.getLDAPUserByNameOrID(nameOrID)
 	if err != nil {
@@ -1191,4 +1196,20 @@ func (i *LDAP) mapLDAPError(err error, errmap ldapResultToErrMap) errorcode.Erro
 		return res
 	}
 	return errorcode.New(errorcode.GeneralException, err.Error())
+}
+
+func isUserEnabledUpdate(user libregraph.User) bool {
+	switch {
+	case user.Id != nil, user.DisplayName != nil,
+		user.Drive != nil, user.Mail != nil, user.OnPremisesSamAccountName != nil,
+		user.PasswordProfile != nil, user.Surname != nil, user.GivenName != nil,
+		user.UserType != nil:
+		return false
+	case len(user.AppRoleAssignments) != 0,
+		len(user.MemberOf) != 0,
+		len(user.Identities) != 0,
+		len(user.Drives) != 0:
+		return false
+	}
+	return user.AccountEnabled != nil
 }
