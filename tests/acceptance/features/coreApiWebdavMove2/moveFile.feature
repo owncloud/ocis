@@ -23,7 +23,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -43,7 +43,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -61,7 +61,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -80,7 +80,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -100,7 +100,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -116,7 +116,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -132,7 +132,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -153,7 +153,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -176,7 +176,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -204,7 +204,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -222,7 +222,7 @@ Feature: move (rename) file
       | old         | #oc ab?cd=ef# |
       | new         | #oc ab?cd=ef# |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | renamed_file  |
       | spaces      | #oc ab?cd=ef# |
@@ -250,7 +250,7 @@ Feature: move (rename) file
       | new         | /...          | ...         |
       | new         | /..upload     | ..abc       |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | folder_name   | file_name   |
       | spaces      | /upload.      | abc.        |
@@ -272,7 +272,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -288,7 +288,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -319,7 +319,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -349,7 +349,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -384,7 +384,7 @@ Feature: move (rename) file
       | new         | texta         | file.txt    | textb         | 0           |
       | new         | texta         | file.txt    | textb         | 1           |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | source_folder | source_file | target_folder | target_file |
       | spaces      | text          | file.txt    | 0             | file.txt    |
@@ -421,7 +421,7 @@ Feature: move (rename) file
       | new         | texta         | file.txt    | 0           |
       | new         | texta         | file.txt    | 0           |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | source_folder | source_file | target_file |
       | spaces      | 0             | file.txt    | file.txt    |
@@ -445,7 +445,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -463,7 +463,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |

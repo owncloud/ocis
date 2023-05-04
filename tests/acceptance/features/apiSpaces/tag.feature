@@ -1,4 +1,4 @@
-@api @skipOnOcV10 @skipOnStable2.0
+@api @skipOnStable2.0
 Feature: Tag
   As a user 
   I want to tag resources 

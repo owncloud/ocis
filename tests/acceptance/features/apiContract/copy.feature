@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: Copy test
   As a user
   I want to check the PROPFIND response

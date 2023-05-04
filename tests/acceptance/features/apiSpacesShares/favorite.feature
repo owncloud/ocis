@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: favorite
   As a user
   I want to favorite resources

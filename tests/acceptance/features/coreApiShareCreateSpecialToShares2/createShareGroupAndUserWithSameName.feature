@@ -1,4 +1,4 @@
-@api @files_sharing-app-required
+@api
 Feature: sharing works when a username and group name are the same
   As a user
   I want to share resources with group and users having same name

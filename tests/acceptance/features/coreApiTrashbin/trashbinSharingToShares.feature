@@ -1,4 +1,4 @@
-@api @files_trashbin-app-required @files_sharing-app-required
+@api
 Feature: using trashbin together with sharing
 
   Background:
@@ -22,7 +22,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -44,7 +44,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -71,7 +71,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -98,7 +98,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -126,7 +126,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -154,7 +154,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -182,7 +182,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -205,7 +205,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -229,7 +229,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |

@@ -1,4 +1,4 @@
-@api @files_sharing-app-required @issue-1289 @issue-1328
+@api @issue-1289 @issue-1328
 Feature: updating shares to users and groups that have the same name
 
   Background:

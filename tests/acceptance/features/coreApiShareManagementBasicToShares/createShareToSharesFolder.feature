@@ -1,4 +1,4 @@
-@api @files_sharing-app-required
+@api
 Feature: sharing
   As a user
   I want to share resources to others
@@ -525,7 +525,7 @@ Feature: sharing
     And file "/textfile0.txt" should not be included as path in the response
     And as "Brian" file "/Shares/textfile0.txt" should not exist
     And as "Carol" file "/Shares/textfile0.txt" should not exist
-    @skipOnOcV10 @issue-2441
+    @issue-2441
     Examples:
       | ocs_api_version | ocs_status_code | path           |
       | 1               | 100             | /textfile0.txt |

@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: create user
   As a admin
   I want to create a user

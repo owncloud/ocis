@@ -1,4 +1,4 @@
-@api @files_sharing-app-required
+@api
 Feature: Sharing resources with different case names with the sharee and checking the coexistence of resources on sharee/receivers side
   As a user
   I want to share resources with case sensitive names

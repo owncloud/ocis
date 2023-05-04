@@ -1,4 +1,4 @@
-@api @files_sharing-app-required
+@api
 Feature: moving a share inside another share
   As a user
   I want to move a shared resource inside another shared resource
@@ -54,7 +54,7 @@ Feature: moving a share inside another share
     And as "Alice" file "/folderA/localFolder/localFile.txt" should exist
     And as "Brian" file "/Shares/folderA/localFolder/localFile.txt" should exist
 
-  @skipOnOcV10
+  
   Scenario: share receiver tries to move a whole share inside a local folder
     Given user "Brian" has created folder "localFolder"
     And user "Brian" has uploaded file with content "local text" to "/localFolder/localFile.txt"

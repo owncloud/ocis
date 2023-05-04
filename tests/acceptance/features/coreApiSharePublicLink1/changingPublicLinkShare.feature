@@ -1,4 +1,4 @@
-@api @files_sharing-app-required @public_link_share-feature-required @issue-1276 @issue-1277 @issue-2079 @issue-1269
+@api @public_link_share-feature-required @issue-1276 @issue-1277 @issue-2079 @issue-1269
 
 Feature: changing a public link share
 

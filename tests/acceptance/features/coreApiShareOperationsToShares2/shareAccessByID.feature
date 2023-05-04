@@ -1,4 +1,4 @@
-@api @files_sharing-app-required
+@api
 Feature: share access by ID
 
   Background:

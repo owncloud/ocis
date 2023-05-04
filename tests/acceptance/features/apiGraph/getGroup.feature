@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: get groups and their members
   As an admin
   I want to be able to get groups

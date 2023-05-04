@@ -22,7 +22,7 @@ Feature: propagation of etags when moving files or folders
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -48,7 +48,7 @@ Feature: propagation of etags when moving files or folders
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -74,7 +74,7 @@ Feature: propagation of etags when moving files or folders
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -97,7 +97,7 @@ Feature: propagation of etags when moving files or folders
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -123,7 +123,7 @@ Feature: propagation of etags when moving files or folders
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -149,7 +149,7 @@ Feature: propagation of etags when moving files or folders
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -371,7 +371,7 @@ Feature: propagation of etags when moving files or folders
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -397,7 +397,7 @@ Feature: propagation of etags when moving files or folders
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |

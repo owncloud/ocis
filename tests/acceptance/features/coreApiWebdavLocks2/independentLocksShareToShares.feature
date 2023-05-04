@@ -31,7 +31,7 @@ Feature: independent locks
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |
@@ -60,7 +60,7 @@ Feature: independent locks
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |

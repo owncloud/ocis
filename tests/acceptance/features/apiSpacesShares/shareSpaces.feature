@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: Share spaces
   As the owner of a space
   I want to be able to add members to a space, and to remove access for them

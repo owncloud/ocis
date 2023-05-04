@@ -26,7 +26,7 @@ Feature: get file properties
       | new         | /नेपाली.txt         |
       | new         | s,a,m,p,l,e.txt   |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | file_name         |
       | spaces      | /upload.txt       |
@@ -53,7 +53,7 @@ Feature: get file properties
       | new         | /file ?2.txt  | remote.php/dav/files/%username%/file ?2.txt   |
       | new         | /file &2.txt  | remote.php/dav/files/%username%/file &2.txt   |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | file_name     | expected_href                     |
       | spaces      | /C++ file.cpp | dav/spaces/%spaceid%/C++ file.cpp |
@@ -89,7 +89,7 @@ Feature: get file properties
       | new         | /folder ?2.txt  | remote.php/dav/files/%username%/folder ?2.txt  |
       | new         | /folder &2.txt  | remote.php/dav/files/%username%/folder &2.txt  |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | folder_name     | expected_href                       |
       | spaces      | /upload         | dav/spaces/%spaceid%/upload         |
@@ -121,7 +121,7 @@ Feature: get file properties
       | new         | /नेपाली                          | नेपाली                        |
       | new         | /folder #2.txt                   | file #2.txt                   |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | folder_name     | file_name        |
       | spaces      | /upload         | abc.txt          |
@@ -144,7 +144,7 @@ Feature: get file properties
       | old         | /folder ?2.txt | file ?2.txt |
       | new         | /folder ?2.txt | file ?2.txt |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | folder_name    | file_name   |
       | spaces      | /folder ?2.txt | file ?2.txt |
@@ -163,12 +163,12 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: A file that is shared to a user has a share-types property
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -189,12 +189,12 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: A file that is shared to a group has a share-types property
     Given using <dav_version> DAV path
     And group "grp1" has been created
@@ -215,12 +215,12 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
 
-  @public_link_share-feature-required @files_sharing-app-required
+  @public_link_share-feature-required
   Scenario Outline: A file that is shared by link has a share-types property
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/test"
@@ -238,12 +238,12 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
 
-  @skipOnLDAP @user_ldap-issue-268 @public_link_share-feature-required @files_sharing-app-required
+  @skipOnLDAP @user_ldap-issue-268 @public_link_share-feature-required
   Scenario Outline: A file that is shared by user,group and link has a share-types property
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -275,7 +275,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -294,7 +294,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -340,12 +340,12 @@ Feature: get file properties
       | dav_version |
       | new         |
 
-    @skipOnOcV10
+    
     Examples:
       | dav_version |
       | old         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -380,12 +380,12 @@ Feature: get file properties
       | dav_version |
       | new         |
 
-    @skipOnOcV10
+    
     Examples:
       | dav_version |
       | old         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -404,7 +404,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -423,7 +423,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -442,7 +442,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -461,7 +461,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -480,7 +480,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -499,7 +499,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -518,7 +518,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -537,7 +537,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -556,7 +556,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -575,7 +575,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -594,7 +594,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -613,7 +613,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -632,7 +632,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |

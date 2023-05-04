@@ -1,4 +1,4 @@
-@api @files_sharing-app-required
+@api
 Feature: cannot share resources with invalid permissions
   As a user
   I want to share resources with invalid permission

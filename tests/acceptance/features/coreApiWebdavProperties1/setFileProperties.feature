@@ -20,7 +20,7 @@ Feature: set file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -37,7 +37,7 @@ Feature: set file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -55,12 +55,12 @@ Feature: set file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
 
-  @files_sharing-app-required @issue-1297
+  @issue-1297
   Scenario Outline: Setting custom DAV property on a shared file as an owner and reading as a recipient
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -78,7 +78,7 @@ Feature: set file properties
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -96,7 +96,7 @@ Feature: set file properties
       | old                | new               |
       | new                | old               |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | action_dav_version | other_dav_version |
       | spaces             | new               |

@@ -1,4 +1,4 @@
-@api @files_sharing-app-required
+@api
 Feature: accept/decline shares coming from internal users to the Shares folder
   As a user
   I want to have control of which received shares I accept

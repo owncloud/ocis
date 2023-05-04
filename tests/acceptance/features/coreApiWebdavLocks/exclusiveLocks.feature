@@ -21,13 +21,13 @@ Feature: there can be only one exclusive lock on a resource
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |
       | spaces   | exclusive  |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: a share receiver cannot lock a resource exclusively locked by itself
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -48,13 +48,13 @@ Feature: there can be only one exclusive lock on a resource
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |
       | spaces   | exclusive  |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: a share receiver cannot lock a resource exclusively locked by the owner
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -75,13 +75,13 @@ Feature: there can be only one exclusive lock on a resource
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |
       | spaces   | exclusive  |
 
-  @files_sharing-app-required
+ 
   Scenario Outline: a share owner cannot lock a resource exclusively locked by a share receiver
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -102,7 +102,7 @@ Feature: there can be only one exclusive lock on a resource
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |

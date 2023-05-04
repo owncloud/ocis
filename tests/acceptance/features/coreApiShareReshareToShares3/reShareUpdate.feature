@@ -1,4 +1,4 @@
-@api @files_sharing-app-required @issue-1328
+@api @issue-1328
 Feature: sharing
 
   Background:

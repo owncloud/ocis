@@ -25,7 +25,7 @@ Feature: independent locks
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |
@@ -57,7 +57,7 @@ Feature: independent locks
       | new      | exclusive  | .git       | config   | .git        |
       | new      | exclusive  | .git       | config   | .git/config |
 
-    @personalSpace @skipOnOcV10
+    @personalSpace 
     Examples:
       | dav-path | lock-scope | foldername | filename | to-lock     |
       | spaces   | shared     | .git       | config   | .git        |

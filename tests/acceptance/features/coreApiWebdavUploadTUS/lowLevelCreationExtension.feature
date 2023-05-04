@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: low level tests of the creation extension see https://tus.io/protocols/resumable-upload.html#creation
 
   Background:

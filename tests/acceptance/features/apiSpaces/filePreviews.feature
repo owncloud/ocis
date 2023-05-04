@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: Preview file in project space
   As a user
   I want to be able to download different files for the preview

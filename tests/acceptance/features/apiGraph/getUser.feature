@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: get users
   As an admin
   I want to be able to retrieve user information

@@ -91,9 +91,3 @@ if (!\defined('ACCEPTANCE_TEST_DIR_ON_REMOTE_SERVER')) {
 if (!\defined('TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER')) {
 	\define('TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER', ACCEPTANCE_TEST_DIR_ON_REMOTE_SERVER . '/server_tmp');
 }
-
-// The following directory is created, used, and deleted by tests that need to
-// use some "local external storage" on the server.
-if (!\defined('LOCAL_STORAGE_DIR_ON_REMOTE_SERVER')) {
-	\define('LOCAL_STORAGE_DIR_ON_REMOTE_SERVER', TEMPORARY_STORAGE_DIR_ON_REMOTE_SERVER . '/local_storage');
-}

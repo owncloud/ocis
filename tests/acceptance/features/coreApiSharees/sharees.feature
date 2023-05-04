@@ -1,4 +1,4 @@
-@api @files_sharing-app-required
+@api
 Feature: search sharees
   As a user
   I want to search sharees

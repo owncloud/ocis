@@ -1,4 +1,4 @@
-@api @skipOnOcV10.10.0
+@api
 Feature: make webdav request with special urls
   As a user
   I want to make webdav request with special urls
@@ -23,7 +23,7 @@ Feature: make webdav request with special urls
       | //remote.php/dav//files/%username%//FOLDER          |
     Then the HTTP status code of responses on all endpoints should be "204"
 
-  @skipOnOcV10 @personalSpace
+  @personalSpace
   Scenario: send DELETE requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When user "Alice" requests these endpoints with "DELETE" using password "%regular%" about user "Alice"
       | endpoint                                             |
@@ -44,7 +44,7 @@ Feature: make webdav request with special urls
       | //remote.php/dav//files/%username%//FOLDER          |
     Then the HTTP status code of responses on all endpoints should be "200"
 
-  @skipOnOcV10 @personalSpace
+  @personalSpace
   Scenario: send GET requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When user "Alice" requests these endpoints with "GET" using password "%regular%" about user "Alice"
       | endpoint                                             |
@@ -65,7 +65,7 @@ Feature: make webdav request with special urls
       | //remote.php/dav//files/%username%//FOLDER          |
     Then the HTTP status code of responses on all endpoints should be "200"
 
-  @skipOnOcV10 @personalSpace
+  @personalSpace
   Scenario: send LOCK requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When the user "Alice" requests these endpoints with "LOCK" to get property "d:shared" with password "%regular%" about user "Alice"
       | endpoint                                             |
@@ -87,7 +87,7 @@ Feature: make webdav request with special urls
       | /remote.php/dav//files/%username%/PARENT6  |
     Then the HTTP status code of responses on all endpoints should be "201"
 
-  @skipOnOcV10 @personalSpace
+  @personalSpace
   Scenario: send MKCOL requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When user "Alice" requests these endpoints with "MKCOL" using password "%regular%" about user "Alice"
       | endpoint                                   |
@@ -110,7 +110,7 @@ Feature: make webdav request with special urls
       | /remote.php/dav//files/%username%/PARENT2/parent.txt | /remote.php/dav/files/%username%/PARENT2/parent1.txt |
     Then the HTTP status code of responses on all endpoints should be "201"
 
-  @skipOnOcV10 @personalSpace
+  @personalSpace
   Scenario: send MOVE requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When user "Alice" requests these endpoints with "MOVE" using password "%regular%" about user "Alice"
       | endpoint                                             | destination                                          |
@@ -131,7 +131,7 @@ Feature: make webdav request with special urls
       | //remote.php/dav//files/%username%//FOLDER          |
     Then the HTTP status code of responses on all endpoints should be "500" or "501"
 
-  @skipOnOcV10 @personalSpace
+  @personalSpace
   Scenario: send POST requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When user "Alice" requests these endpoints with "POST" including body "doesnotmatter" using password "%regular%" about user "Alice"
       | endpoint                                            |
@@ -152,7 +152,7 @@ Feature: make webdav request with special urls
       | //remote.php/dav//files/%username%//FOLDER           |
     Then the HTTP status code of responses on all endpoints should be "207"
 
-  @skipOnOcV10 @personalSpace
+  @personalSpace
   Scenario: send PROPFIND requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When the user "Alice" requests these endpoints with "PROPFIND" to get property "d:href" with password "%regular%" about user "Alice"
       | endpoint                                            |
@@ -173,7 +173,7 @@ Feature: make webdav request with special urls
       | //remote.php/dav//files/%username%//FOLDER           |
     Then the HTTP status code of responses on all endpoints should be "207"
 
-  @skipOnOcV10 @personalSpace
+  @personalSpace
   Scenario: send PROPPATCH requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When the user "Alice" requests these endpoints with "PROPPATCH" to set property "d:getlastmodified" with password "%regular%" about user "Alice"
       | endpoint                                            |
@@ -194,7 +194,7 @@ Feature: make webdav request with special urls
       | //remote.php/dav/files/%username%/PARENT//parent.txt |
     Then the HTTP status code of responses on all endpoints should be "204" or "201"
 
-  @skipOnOcV10 @personalSpace
+  @personalSpace
   Scenario: send PUT requests to webDav endpoints with 2 slashes using the spaces WebDAV API
     When user "Alice" requests these endpoints with "PUT" including body "doesnotmatter" using password "%regular%" about user "Alice"
       | endpoint                                             |

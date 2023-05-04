@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: Report test
   As a user
   I want to check the share REPORT response

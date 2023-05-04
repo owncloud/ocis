@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: Download file in project space
   As a user with different role
   I want to be able to download files

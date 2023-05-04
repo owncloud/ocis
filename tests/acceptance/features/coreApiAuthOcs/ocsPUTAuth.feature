@@ -1,4 +1,4 @@
-@api @files_sharing-app-required
+@api
 Feature: auth
   As a user
   I want to send PUT request to various endpoints
@@ -7,7 +7,7 @@ Feature: auth
   Background:
     Given user "another-admin" has been created with default attributes and without skeleton files
 
-  @issue-1337 @smokeTest @skipOnBruteForceProtection @issue-brute_force_protection-112
+  @issue-1337 @smokeTest
   Scenario: send PUT request to OCS endpoints as admin with wrong password
     Given user "another-admin" has been added to group "admin"
     When user "another-admin" requests these endpoints with "PUT" including body "doesnotmatter" using password "invalid" about user "Alice"

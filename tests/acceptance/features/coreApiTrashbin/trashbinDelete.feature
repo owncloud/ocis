@@ -1,4 +1,4 @@
-@api @files_trashbin-app-required @issue-1324
+@api @issue-1324
 Feature: files and folders can be deleted from the trashbin
   As a user
   I want to delete files and folders from the trashbin
@@ -29,7 +29,7 @@ Feature: files and folders can be deleted from the trashbin
       | new      | textfile0.txt | textfile1.txt |
       | new      | sample,0.txt  | sample,1.txt  |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path | filename1     | filename2     |
       | spaces   | textfile0.txt | textfile1.txt |
@@ -52,7 +52,7 @@ Feature: files and folders can be deleted from the trashbin
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -79,7 +79,7 @@ Feature: files and folders can be deleted from the trashbin
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -122,7 +122,7 @@ Feature: files and folders can be deleted from the trashbin
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -145,7 +145,7 @@ Feature: files and folders can be deleted from the trashbin
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -170,7 +170,7 @@ Feature: files and folders can be deleted from the trashbin
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -195,7 +195,7 @@ Feature: files and folders can be deleted from the trashbin
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -232,7 +232,7 @@ Feature: files and folders can be deleted from the trashbin
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -269,7 +269,7 @@ Feature: files and folders can be deleted from the trashbin
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -318,7 +318,7 @@ Feature: files and folders can be deleted from the trashbin
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |

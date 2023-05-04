@@ -1,4 +1,4 @@
-@api @files_sharing-app-required
+@api
 Feature: capabilities
   As an admin
   I want to list the capabilities
@@ -54,7 +54,7 @@ Feature: capabilities
     }
     """
 
-  @files_trashbin-app-required @skipOnReva
+  @skipOnReva
   Scenario: getting trashbin app capability with admin user
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"
@@ -93,7 +93,7 @@ Feature: capabilities
     }
     """
 
-  @files_versions-app-required @skipOnReva
+ @skipOnReva
   Scenario: getting versions app capability with admin user
     When the administrator retrieves the capabilities using the capabilities API
     Then the OCS status code should be "100"

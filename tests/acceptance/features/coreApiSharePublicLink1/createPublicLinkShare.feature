@@ -1,4 +1,4 @@
-@api @files_sharing-app-required @public_link_share-feature-required @issue-1276 @issue-1277
+@api @public_link_share-feature-required @issue-1276 @issue-1277
 
 Feature: create a public link share
 

@@ -1,4 +1,4 @@
-@api @files_trashbin-app-required @issue-1324
+@api @issue-1324
 Feature: files and folders exist in the trashbin after being deleted
   As a user
   I want deleted files and folders to be available in the trashbin
@@ -19,7 +19,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -35,7 +35,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -54,12 +54,12 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
 
-  @files_sharing-app-required
+
   Scenario Outline: deleting a file in a shared folder moves it to the trashbin root
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -75,12 +75,12 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
 
-  @files_sharing-app-required
+
   Scenario Outline: deleting a shared folder moves it to trashbin
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -94,7 +94,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -130,7 +130,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -153,24 +153,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
-    Examples:
-      | dav-path |
-      | spaces   |
-
-  @local_storage @files_external-app-required @skipOnEncryptionType:user-keys @encryption-issue-42 @skip_on_objectstore
-  Scenario Outline: Deleting a folder into external storage moves it to the trashbin
-    Given using <dav-path> DAV path
-    And user "Alice" has created folder "/local_storage/tmp"
-    And user "Alice" has moved file "/textfile0.txt" to "/local_storage/tmp/textfile0.txt"
-    When user "Alice" deletes folder "/local_storage/tmp" using the WebDAV API
-    Then the HTTP status code should be "204"
-    And as "Alice" the folder with original path "/local_storage/tmp" should exist in the trashbin
-    Examples:
-      | dav-path |
-      | new      |
-
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -262,7 +245,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -281,7 +264,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -300,7 +283,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -323,7 +306,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | new      | -123     |
       | new      | 0.0      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path | username |
       | spaces   | dash-123 |
@@ -345,7 +328,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -365,7 +348,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -382,7 +365,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -419,7 +402,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |
@@ -456,7 +439,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | new      |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav-path |
       | spaces   |

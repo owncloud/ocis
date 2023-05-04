@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: edit user
   As an admin
   I want to be able to edit user information

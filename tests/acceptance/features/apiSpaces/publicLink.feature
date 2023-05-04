@@ -1,4 +1,4 @@
-@api @skipOnOcV10
+@api 
 Feature: public link for a space
 
   Background:

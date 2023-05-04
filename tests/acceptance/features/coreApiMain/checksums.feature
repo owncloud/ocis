@@ -16,7 +16,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -32,7 +32,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -49,7 +49,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -66,7 +66,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -84,7 +84,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -102,7 +102,7 @@ Feature: checksums
       | dav_version |
       | old         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -120,7 +120,7 @@ Feature: checksums
       | dav_version |
       | old         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -138,7 +138,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -154,7 +154,7 @@ Feature: checksums
       | dav_version |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -170,12 +170,12 @@ Feature: checksums
       | dav_version |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
 
-  @files_sharing-app-required @issue-1291
+  @issue-1291
   Scenario Outline: sharing a file with checksum should return the checksum in the propfind using new DAV path
     Given auto-accept shares has been disabled
     And using <dav_version> DAV path
@@ -190,7 +190,7 @@ Feature: checksums
       | dav_version |
       | new         |
 
-  @files_sharing-app-required @issue-1291 @skipOnOcV10
+  @issue-1291
   Scenario Outline: modifying a shared file should return correct checksum in the propfind using new DAV path
     Given auto-accept shares has been disabled
     And using <dav_version> DAV path
@@ -217,7 +217,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -232,7 +232,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -251,7 +251,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -268,7 +268,7 @@ Feature: checksums
       | dav_version |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -292,7 +292,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -315,7 +315,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -333,7 +333,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version |
       | spaces      |
@@ -356,7 +356,7 @@ Feature: checksums
       | new         | " oc?test=ab&cd " |
       | new         | "# %ab ab?=ed"    |
 
-    @skipOnOcV10 @personalSpace
+    @personalSpace
     Examples:
       | dav_version | renamed_file      |
       | spaces      | " oc?test=ab&cd " |
