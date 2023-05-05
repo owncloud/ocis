@@ -41,7 +41,7 @@ Feature: Disabling and deleting space
   Scenario Outline: user with role user and guest cannot disable other space via the Graph API
     Given the administrator has given "Carol" the role "<role>" using the settings api
     When user "Carol" tries to disable a space "Project Moon" owned by user "Alice"
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "404"
     And the user "Brian" should have a space called "Project Moon"
     And the user "Bob" should have a space called "Project Moon"
     Examples:
@@ -115,7 +115,7 @@ Feature: Disabling and deleting space
     Given the administrator has given "Carol" the role "<role>" using the settings api
     And user "Alice" has disabled a space "Project Moon"
     When user "Carol" tries to delete a space "Project Moon" owned by user "Alice"
-    Then the HTTP status code should be "403"
+    Then the HTTP status code should be "404"
     Examples:
       | role  |
       | User  |

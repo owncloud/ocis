@@ -349,7 +349,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.13.2-0.20230504093557-756a84314af0
+# github.com/cs3org/reva/v2 v2.13.2-0.20230504093557-756a84314af0 => github.com/2403905/reva/v2 v2.0.0-20230504205508-69238ad9d885
 ## explicit; go 1.19
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -2124,3 +2124,4 @@ stash.kopano.io/kgol/oidc-go
 ## explicit; go 1.13
 stash.kopano.io/kgol/rndm
 # github.com/cs3org/go-cs3apis => github.com/c0rby/go-cs3apis v0.0.0-20230110100311-5b424f1baa35
+# github.com/cs3org/reva/v2 => github.com/2403905/reva/v2 v2.0.0-20230504205508-69238ad9d885
