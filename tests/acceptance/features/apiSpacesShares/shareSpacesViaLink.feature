@@ -106,3 +106,10 @@ Feature: Share spaces via link
     And the OCS status code should be "404"
     And the OCS status message should be "Wrong path, file/folder doesn't exist"
     And for user "Alice" the space "share space" should not contain the last created public link
+
+  @issue-6238
+  Scenario: user cannot share a personal space to public via link
+    When user "Alice" creates a public link share of the space "Alice Hansen" with settings:
+      | permissions | 1 |
+    Then the HTTP status code should be "200"
+    And for user "Alice" the space "Alice Hansen" should not contain the last created public link

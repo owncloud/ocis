@@ -435,3 +435,28 @@ Feature: Share spaces
       | manager |
       | editor  |
       | viewer  |
+
+  @issue-6238
+  Scenario Outline: user cannot share a personal to user
+    Given the administrator has given "Brian" the role "<role>" using the settings api
+    And user "Brian" shares a space "Brian Murphy" with settings:
+      | shareWith | Bob    |
+      | role      | viewer |
+    Then the HTTP status code should be "403"
+    And the user "Bob" should not have a space called "Brian Murphy"
+    Examples:
+      | role        |
+      | Space Admin |
+      | Admin       |
+      | User        |
+
+  @issue-6238
+  Scenario: user cannot share a personal to group
+    Given group "sales" has been created
+    And the administrator has added a user "Brian" to the group "sales" using GraphApi
+    And user "Alice" shares a space "Alice Hansen" with settings:
+      | shareWith | sales   |
+      | shareType | 8       |
+      | role      | manager |
+    Then the HTTP status code should be "403"
+    And the user "Brian" should not have a space called "Alice Hansen"
