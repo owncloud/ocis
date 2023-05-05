@@ -628,3 +628,27 @@ Feature: get file properties
     Examples:
       | dav_version |
       | spaces      |
+
+
+  Scenario Outline: propfind the size of a folder with files using webdav api
+    Given using <dav_version> DAV path
+    And user "Alice" has created folder "/test"
+    And user "Alice" has uploaded file with content "a" to "/test/file.txt"
+    And user "Alice" has uploaded file with content "b" to "/test/file1.txt"
+    And user "Alice" has uploaded file with content "c" to "/test/file2.txt"
+    And user "Alice" has uploaded file with content "d" to "/test/file3.txt"
+    And user "Alice" has uploaded file with content "e" to "/test/file4.txt"
+    When user "Alice" gets the following properties of folder "/test" using the WebDAV API
+      | propertyName |
+      | oc:size      |
+    Then the HTTP status code should be "201"
+    And the single response should contain a property "oc:size" with value "5"
+    Examples:
+      | dav_version |
+      | old         |
+      | new         |
+
+    @personalSpace
+    Examples:
+      | dav_version |
+      | spaces      |
