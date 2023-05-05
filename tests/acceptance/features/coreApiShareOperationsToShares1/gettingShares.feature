@@ -1,5 +1,8 @@
 @api
 Feature: sharing
+  As a user
+  I want to get all the shares
+  So that I can know I have proper access to them
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -8,12 +11,12 @@ Feature: sharing
       | Brian    |
 
   @smokeTest @issue-1258
-  Scenario Outline: getting all shares of a user using that user
+  Scenario Outline: getting all shares from a user
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "some data" to "/file_to_share.txt"
     And user "Alice" has shared file "file_to_share.txt" with user "Brian"
     And user "Brian" has accepted share "/file_to_share.txt" offered by user "Alice"
-    When user "Alice" gets all shares shared by him using the sharing API
+    When user "Alice" gets all shares shared by her using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And file "/Shares/file_to_share.txt" should be included in the response
@@ -49,7 +52,7 @@ Feature: sharing
     And user "Alice" has shared file "textfile0.txt" with user "Carol"
     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     And user "Carol" has accepted share "/textfile0.txt" offered by user "Alice"
-    When user "Alice" gets all the shares from the file "textfile0.txt" using the sharing API
+    When user "Alice" gets all the shares of the file "textfile0.txt" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And user "Brian" should be included in the response
@@ -72,7 +75,7 @@ Feature: sharing
     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     And user "Brian" has shared file "/Shares/textfile0.txt" with user "Carol"
     And user "Carol" has accepted share "/textfile0.txt" offered by user "Brian"
-    When user "Alice" gets all the shares with reshares from the file "textfile0.txt" using the sharing API
+    When user "Alice" gets all the shares with reshares of the file "textfile0.txt" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And user "Brian" should be included in the response
@@ -84,7 +87,7 @@ Feature: sharing
       | 2               | 200             |
 
   @smokeTest
-  Scenario Outline: User's own shares reshared to him don't appear when getting "shared with me" shares
+  Scenario Outline: resource cannot be reshared to resource owner
     Given using OCS API version "<ocs_api_version>"
     And group "grp1" has been created
     And user "Carol" has been created with default attributes and without skeleton files
@@ -95,7 +98,7 @@ Feature: sharing
     And user "Brian" has accepted share "/shared" offered by user "Carol"
     And user "Brian" has shared folder "/Shares/shared" with group "grp1"
     # no need to accept this share as it is Carol's file
-    When user "Carol" gets all the shares shared with him using the sharing API
+    When user "Carol" gets all the shares shared with her using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And the last share id should not be included in the response
@@ -136,7 +139,7 @@ Feature: sharing
       | 2               | 200             |
 
   @issue-1233
-  Scenario Outline: Get a share with a user that didn't receive the share
+  Scenario Outline: get a share with a user that didn't receive the share
     Given using OCS API version "<ocs_api_version>"
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"
@@ -149,8 +152,8 @@ Feature: sharing
       | 1               | 200              |
       | 2               | 404              |
 
- @issue-1289 @skipOnGraph
-  Scenario: Share of folder to a group, remove user from that group
+  @issue-1289 @skipOnGraph
+  Scenario: share a folder to a group, and remove user from that group
     Given using OCS API version "1"
     And user "Carol" has been created with default attributes and without skeleton files
     And group "group0" has been created

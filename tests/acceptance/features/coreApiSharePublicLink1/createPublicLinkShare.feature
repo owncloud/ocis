@@ -1,12 +1,15 @@
 @api @issue-1276 @issue-1277
 
 Feature: create a public link share
+  As a user
+  I want to create public links
+  So that I can share resources to people who aren't owncloud users
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
   @smokeTest
-  Scenario Outline: A new public link share of a file using the default permissions only grants read access using the public WebDAV API
+  Scenario Outline: new public link share of a file using the default permissions only grants read access using the public WebDAV API
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -37,7 +40,7 @@ Feature: create a public link share
       | 2               | 200             |
 
   @smokeTest @issue-1293
-  Scenario Outline: Creating a new public link share of a file with password using the new public WebDAV API
+  Scenario Outline: creating a new public link share of a file with password using the new public WebDAV API
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -69,7 +72,7 @@ Feature: create a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Create a new public link share of a file with edit permissions
+  Scenario Outline: create a new public link share of a file with edit permissions
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -101,7 +104,7 @@ Feature: create a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Creating a new public link share of a folder using the default permissions only grants read access and can be accessed with no password or any password using the public WebDAV API
+  Scenario Outline: creating a new public link share of a folder using the default permissions only grants read access and can be accessed with no password or any password using the public WebDAV API
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "Random data" to "/PARENT/randomfile.txt"
@@ -133,7 +136,7 @@ Feature: create a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Creating a new public link share of a folder, with a password and accessing using the public WebDAV API
+  Scenario Outline: creating a new public link share of a folder, with a password and accessing using the public WebDAV API
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has uploaded file with content "Random data" to "/PARENT/randomfile.txt"
@@ -168,7 +171,7 @@ Feature: create a public link share
       | 2               | 200             |
 
   @smokeTest
-  Scenario Outline: Getting the share information of public link share from the OCS API does not expose sensitive information
+  Scenario Outline: getting the share information of public link share from the OCS API does not expose sensitive information
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -191,7 +194,7 @@ Feature: create a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Getting the share information of passwordless public-links hides credential placeholders
+  Scenario Outline: getting the share information of password less public-links hides credential placeholders
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -214,7 +217,7 @@ Feature: create a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Creating a link share with no specified permissions defaults to read permissions when public upload is disabled globally and accessing using the public WebDAV API
+  Scenario Outline: creating a link share with no specified permissions defaults to read permissions when public upload is disabled globally and accessing using the public WebDAV API
     Given using OCS API version "<ocs_api_version>"
     And parameter "shareapi_allow_public_upload" of app "core" has been set to "no"
     And user "Alice" has created folder "/afolder"
@@ -236,7 +239,7 @@ Feature: create a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Creating a link share with edit permissions keeps it using the public WebDAV API
+  Scenario Outline: creating a link share with edit permissions keeps it using the public WebDAV API
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/afolder"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -258,7 +261,7 @@ Feature: create a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Creating a link share with upload permissions keeps it using the public WebDAV API
+  Scenario Outline: creating a link share with upload permissions keeps it using the public WebDAV API
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/afolder"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -280,7 +283,7 @@ Feature: create a public link share
       | 2               | 200             |
 
   @issue-1265 @issue-2079
-  Scenario Outline: Allow public sharing of the root on OCIS when the default permission is read and access using the public WebDAV API
+  Scenario Outline: allow public sharing of the root on OCIS when the default permission is read and access using the public WebDAV API
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings
@@ -340,7 +343,7 @@ Feature: create a public link share
       | 2               | 200             |
 
   @issue-1293
-  Scenario: Delete a folder that has been publicly shared and try to access using the public WebDAV API
+  Scenario: delete a folder that has been publicly shared and try to access using the public WebDAV API
     Given user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file with content "Random data" to "/PARENT/parent.txt"
     And user "Alice" has created a public link share with settings
@@ -361,7 +364,7 @@ Feature: create a public link share
     And the HTTP status code should be "404"
 
 
-  Scenario: Get the size of a file shared by public link
+  Scenario: get the size of a file shared by public link
     Given user "Alice" has uploaded file with content "This is a test file" to "test-file.txt"
     And user "Alice" has created a public link share with settings
       | path        | test-file.txt |
@@ -371,7 +374,7 @@ Feature: create a public link share
     And the size of the file should be "19"
 
 
-  Scenario Outline: Get the mtime of a file shared by public link
+  Scenario Outline: get the mtime of a file shared by public link
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
     When user "Alice" creates a public link share using the sharing API with settings
@@ -385,7 +388,7 @@ Feature: create a public link share
       | new         |
 
 
-  Scenario Outline: Get the mtime of a file inside a folder shared by public link
+  Scenario Outline: get the mtime of a file inside a folder shared by public link
     Given using <dav_version> DAV path
     And user "Alice" has created folder "testFolder"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "testFolder/file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
@@ -400,7 +403,7 @@ Feature: create a public link share
       | new         |
 
 
-  Scenario: Get the mtime of a file inside a folder shared by public link using new webDAV version
+  Scenario: get the mtime of a file inside a folder shared by public link using new webDAV version
     Given user "Alice" has created folder "testFolder"
     And user "Alice" has created a public link share with settings
       | path        | /testFolder               |

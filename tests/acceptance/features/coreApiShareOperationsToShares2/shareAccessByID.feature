@@ -1,5 +1,8 @@
 @api
 Feature: share access by ID
+  As an API consumer (app)
+  I want to access a share by its id
+  So that the app can more easily manage shares
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -8,7 +11,7 @@ Feature: share access by ID
       | Brian    |
 
 
-  Scenario Outline: Get a share with a valid share ID
+  Scenario Outline: get a share with a valid share ID
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "/textfile0.txt"
     When user "Alice" shares file "textfile0.txt" with user "Brian" using the sharing API
@@ -35,7 +38,7 @@ Feature: share access by ID
       | 2               | 200             |
 
 
-  Scenario Outline: Get a share with an invalid share id
+  Scenario Outline: get a share with an invalid share id
     Given using OCS API version "<ocs_api_version>"
     When user "Alice" gets share with id "<share_id>" using the sharing API
     Then the OCS status code should be "404"

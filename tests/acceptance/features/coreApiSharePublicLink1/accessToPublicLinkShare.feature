@@ -1,5 +1,8 @@
 @api
 Feature: accessing a public link share
+  As a person who knows a public link
+  I want be able to access the preview of a public link file
+  So that I can see a small preview of the file before deciding to download it
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -7,7 +10,7 @@ Feature: accessing a public link share
       | Alice    |
 
 
-  Scenario: Access to the preview of password protected public link without providing the password is not allowed
+  Scenario: access to the preview of password protected public link without providing the password is not allowed
     Given user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
     And user "Alice" has created a public link share with settings
       | path        | /testavatar.jpg |
@@ -17,7 +20,7 @@ Feature: accessing a public link share
     Then the HTTP status code should be "404"
 
 
-  Scenario: Access to the preview of public shared file without password
+  Scenario: access to the preview of public shared file without password
     Given user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "testavatar.jpg"
     And user "Alice" has created a public link share with settings
       | path        | /testavatar.jpg |
@@ -26,7 +29,7 @@ Feature: accessing a public link share
     Then the HTTP status code should be "200"
 
 
-  Scenario: Access to the preview of password protected public shared file inside a folder without providing the password is not allowed
+  Scenario: access to the preview of password protected public shared file inside a folder without providing the password is not allowed
     Given user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "FOLDER/testavatar.jpg"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "FOLDER/textfile0.txt"
@@ -41,7 +44,7 @@ Feature: accessing a public link share
     Then the HTTP status code of responses on all endpoints should be "404"
 
 
-  Scenario: Access to the preview of public shared file inside a folder without password
+  Scenario: access to the preview of public shared file inside a folder without password
     Given user "Alice" has created folder "FOLDER"
     And user "Alice" has uploaded file "filesForUpload/testavatar.jpg" to "FOLDER/testavatar.jpg"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "FOLDER/textfile0.txt"

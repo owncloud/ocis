@@ -1,11 +1,14 @@
 @api
 Feature: create a public link share when share_folder is set to Shares
+  As a user
+  I want to create public links
+  So that I can share resources to people who aren't owncloud users
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: Creating a new public link share of a file gives the correct response
+  Scenario Outline: creating a new public link share of a file gives the correct response
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     When user "Alice" creates a public link share using the sharing API with settings

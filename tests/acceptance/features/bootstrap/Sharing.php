@@ -2271,7 +2271,7 @@ trait Sharing {
 	}
 
 	/**
-	 * @When user :user gets all the shares shared with him using the sharing API
+	 * @When user :user gets all the shares shared with him/her using the sharing API
 	 *
 	 * @param string $user
 	 *
@@ -2303,7 +2303,7 @@ trait Sharing {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" gets the (|pending)\s?(user|group|user and group|public link) shares shared with him using the sharing API$/
+	 * @When /^user "([^"]*)" gets the (|pending)\s?(user|group|user and group|public link) shares shared with (?:him|her) using the sharing API$/
 	 *
 	 * @param string $user
 	 * @param string $pending
@@ -2336,7 +2336,7 @@ trait Sharing {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" gets all the shares shared with him that are received as (?:file|folder|entry) "([^"]*)" using the provisioning API$/
+	 * @When /^user "([^"]*)" gets all the shares shared with (?:him|her|them) that are received as (?:file|folder|entry) "([^"]*)" using the provisioning API$/
 	 *
 	 * @param string $user
 	 * @param string $path
@@ -2355,7 +2355,7 @@ trait Sharing {
 	}
 
 	/**
-	 * @When user :user gets all shares shared by him using the sharing API
+	 * @When user :user gets all shares shared by him/her using the sharing API
 	 *
 	 * @param string $user
 	 *
@@ -2376,7 +2376,7 @@ trait Sharing {
 	}
 
 	/**
-	 * @When the administrator gets all shares shared by him using the sharing API
+	 * @When the administrator gets all shares shared by him/her using the sharing API
 	 *
 	 * @return void
 	 */
@@ -2385,7 +2385,7 @@ trait Sharing {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" gets the (user|group|user and group|public link) shares shared by him using the sharing API$/
+	 * @When /^user "([^"]*)" gets the (user|group|user and group|public link) shares shared by (?:him|her) using the sharing API$/
 	 *
 	 * @param string $user
 	 * @param string $shareType
@@ -2415,7 +2415,7 @@ trait Sharing {
 	}
 
 	/**
-	 * @When user :user gets all the shares from the file :path using the sharing API
+	 * @When user :user gets all the shares of the file :path using the sharing API
 	 *
 	 * @param string $user
 	 * @param string $path
@@ -2437,7 +2437,7 @@ trait Sharing {
 	}
 
 	/**
-	 * @When user :user gets all the shares with reshares from the file :path using the sharing API
+	 * @When user :user gets all the shares with reshares of the file :path using the sharing API
 	 *
 	 * @param string $user
 	 * @param string $path
