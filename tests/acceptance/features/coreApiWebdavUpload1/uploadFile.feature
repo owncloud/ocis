@@ -9,7 +9,7 @@ Feature: upload file
     And user "Alice" has been created with default attributes and without skeleton files
 
   @smokeTest
-  Scenario Outline: upload a file and check download content
+  Scenario Outline: upload a file and check etag and download content
     Given using <dav_version> DAV path
     When user "Alice" uploads file with content "uploaded content" to "<file_name>" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -56,7 +56,7 @@ Feature: upload file
 
   @issue-1259
   #after fixing all issues delete this Scenario and merge with the one above
-  Scenario Outline: upload a file and check download content
+  Scenario Outline: upload a file with character '?' in its name and check download content
     Given using <dav_version> DAV path
     When user "Alice" uploads file with content "uploaded content" to <file_name> using the WebDAV API
     Then the HTTP status code should be "201"
@@ -130,7 +130,7 @@ Feature: upload file
 
   @issue-1259
     #after fixing all issues delete this Scenario and merge with the one above
-  Scenario Outline: upload a file into a folder and check download content
+  Scenario Outline: upload a file into a folder with character '?' in its name and check download content
     Given using <dav_version> DAV path
     And user "Alice" has created folder "<folder_name>"
     When user "Alice" uploads file with content "uploaded content" to "<folder_name>/<file_name>" using the WebDAV API

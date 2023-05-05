@@ -101,7 +101,7 @@ Feature: get file properties
       | spaces      | /folder &2.txt  | dav/spaces/%spaceid%/folder &2.txt  |
 
 
-  Scenario Outline: Do a PROPFIND of various files inside various folders
+  Scenario Outline: do a PROPFIND of various files inside various folders
     Given using <dav_version> DAV path
     And user "Alice" has created folder "<folder_name>"
     And user "Alice" has uploaded file with content "uploaded content" to "<folder_name>/<file_name>"
@@ -132,7 +132,7 @@ Feature: get file properties
 
   @issue-1259
   #after fixing all issues delete this Scenario and merge with the one above
-  Scenario Outline: Do a PROPFIND of various files inside various folders
+  Scenario Outline: do a PROPFIND of various files inside various folders with '?' character in its name
     Given using <dav_version> DAV path
     And user "Alice" has created folder "<folder_name>"
     And user "Alice" has uploaded file with content "uploaded content" to "<folder_name>/<file_name>"
