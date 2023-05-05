@@ -419,7 +419,6 @@ Feature: move (rename) file
       | new         | texta         | 0           | file.txt    |
       | new         | texta         | 1           | file.txt    |
       | new         | texta         | file.txt    | 0           |
-      | new         | texta         | file.txt    | 0           |
 
     @personalSpace
     Examples:
