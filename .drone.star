@@ -240,7 +240,7 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
-        cacheOcisWrapperPipeline() + \
+        cacheOcisWrapperPipeline(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
         testPipelines(ctx)
 
