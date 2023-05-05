@@ -50,6 +50,7 @@ dirs = {
     "ocisConfig": "tests/config/drone/ocis-config.json",
     "ocis": "/srv/app/tmp/ocis",
     "ocisRevaDataRoot": "/srv/app/tmp/ocis/owncloud/data",
+    "ocisWrapper": "/drone/src/tests/ociswrapper",
 }
 
 # configuration
@@ -239,6 +240,7 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
+        cacheOcisWrapperPipeline() + \
         [buildOcisBinaryForTesting(ctx)] + \
         testPipelines(ctx)
 
