@@ -349,3 +349,108 @@ Feature: user GDPR (General Data Protection Regulation) report
       }
     }
     """
+
+
+  Scenario: generate a GDPR report and check events when a user is added to a group
+    Given group "tea-lover" has been created
+    And user "Alice" has been added to group "tea-lover"
+    When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
+    And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
+    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    And the downloaded JSON content should contain event type "events.GroupMemberAdded" in item 'events' and should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "event"
+      ],
+      "properties": {
+        "event" : {
+          "type": "object",
+          "required": [
+            "Executant",
+            "GroupID",
+            "UserID"
+          ],
+          "properties": {
+            "Executant": {
+              "type": "object",
+              "required": [
+                "idp",
+                "opaque_id",
+                "type"
+              ],
+              "properties": {
+                "idp": {
+                  "type": "string",
+                  "pattern": "^%base_url%$"
+                },
+                "opaque_id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "type": {
+                  "type": "number",
+                  "enum": [1]
+                }
+              }
+            },
+            "GroupID": {
+              "type": "string",
+              "pattern": "^%group_id_pattern%$"
+            },
+            "UserID": {
+              "type": "string",
+              "pattern": "^%user_id_pattern%$"
+            }
+          }
+        }
+      }
+    }
+    """
+    And the downloaded JSON content should contain key 'user' and match
+    """
+    {
+      "type": "object",
+      "required": [
+        "id",
+        "username",
+        "mail",
+        "display_name",
+        "groups",
+        "uid_number",
+        "gid_number"
+      ],
+      "properties": {
+        "username": {
+          "type": "string",
+          "enum": ["Alice"]
+        },
+        "mail": {
+          "type": "string",
+          "enum": ["alice@example.org"]
+        },
+        "display_name": {
+          "type": "string",
+          "enum": ["Alice Hansen"]
+        },
+        "groups": {
+          "type": "array",
+          "items": [
+            {
+              "type": "string",
+              "pattern": "^%group_id_pattern%$"
+            }
+          ]
+        },
+        "uid_number": {
+          "type": "number",
+          "enum": [99]
+        },
+        "gid_number": {
+          "type": "number",
+          "enum": [99]
+        }
+      }
+    }
+    """
