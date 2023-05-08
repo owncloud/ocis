@@ -13,7 +13,7 @@ default:
           ldapGroupsOU: TestGroups
           ldapInitialUserFilePath: /../../config/ldap-users.ldif
       contexts:
-        - RoleAssignmentContext:
+        - SettingsContext:
         - GraphContext:
         - SpacesContext:
         - FeatureContext: &common_feature_context_params
@@ -37,7 +37,7 @@ default:
         - '%paths.base%/../features/apiSpaces'
       context: *common_ldap_suite_context
       contexts:
-        - RoleAssignmentContext:
+        - SettingsContext:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
@@ -60,7 +60,7 @@ default:
         - '%paths.base%/../features/apiSpacesShares'
       context: *common_ldap_suite_context
       contexts:
-        - RoleAssignmentContext:
+        - SettingsContext:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
@@ -82,7 +82,7 @@ default:
         - '%paths.base%/../features/apiContract'
       context: *common_ldap_suite_context
       contexts:
-        - RoleAssignmentContext:
+        - SettingsContext:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
@@ -103,7 +103,7 @@ default:
         - '%paths.base%/../features/apiArchiver'
       context: *common_ldap_suite_context
       contexts:
-        - RoleAssignmentContext:
+        - SettingsContext:
         - ArchiverContext:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
@@ -122,7 +122,7 @@ default:
         - '%paths.base%/../features/apiGraph'
       context: *common_ldap_suite_context
       contexts:
-        - RoleAssignmentContext:
+        - SettingsContext:
         - GraphContext:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
