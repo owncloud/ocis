@@ -145,8 +145,14 @@ func (p *Permissions) AssemblePermissions(ctx context.Context, n *Node) (ap prov
 			appctx.GetLogger(ctx).Error().Err(err).Interface("node", cn.ID).Msg("error reading permissions")
 			// continue with next segment
 		}
+
 		if cn, err = cn.Parent(); err != nil {
-			return ap, errors.Wrap(err, "Decomposedfs: error getting parent for node "+cn.ID)
+			// We get an error but get a parent, but can not read it from disk (eg. it has been deleted already)
+			if cn != nil {
+				return ap, errors.Wrap(err, "Decomposedfs: error getting parent for node "+cn.ID)
+			}
+			// We do not have a parent, so we assume the next valid parent is the spaceRoot (which must always exist)
+			cn = n.SpaceRoot
 		}
 	}
 

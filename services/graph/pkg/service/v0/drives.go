@@ -468,11 +468,11 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 		switch resp.Status.GetCode() {
 		case cs3rpc.Code_CODE_NOT_FOUND:
 			logger.Debug().Interface("id", rid).Msg("could not update drive: drive not found")
-			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, resp.GetStatus().GetMessage())
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "drive not found")
 			return
 		case cs3rpc.Code_CODE_PERMISSION_DENIED:
 			logger.Debug().Interface("id", rid).Msg("could not update drive, permission denied")
-			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, resp.GetStatus().GetMessage())
+			errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "drive not found")
 			return
 		case cs3rpc.Code_CODE_INVALID_ARGUMENT:
 			logger.Debug().Interface("id", rid).Msg("could not update drive, invalid argument")
@@ -480,7 +480,7 @@ func (g Graph) UpdateDrive(w http.ResponseWriter, r *http.Request) {
 			return
 		default:
 			logger.Debug().Interface("id", rid).Str("grpc", resp.GetStatus().GetMessage()).Msg("could not update drive: grpc error")
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, resp.GetStatus().GetMessage())
+			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, "grpc error")
 			return
 		}
 	}
@@ -1054,7 +1054,11 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 		return
 	case cs3rpc.Code_CODE_PERMISSION_DENIED:
 		logger.Debug().Interface("id", rid).Msg("could not delete drive: permission denied")
-		errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "permission denied to delete drive")
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "drive not found")
+		return
+	case cs3rpc.Code_CODE_NOT_FOUND:
+		logger.Debug().Interface("id", rid).Msg("could not delete drive: drive not found")
+		errorcode.ItemNotFound.Render(w, r, http.StatusNotFound, "drive not found")
 		return
 	// don't expose internal error codes to the outside world
 	default:

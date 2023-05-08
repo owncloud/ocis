@@ -50,5 +50,6 @@ protogen/buf.sha1.lock
 
 # misc
 go.work
+go.work.sum
 .env
 .envrc
