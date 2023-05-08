@@ -456,7 +456,7 @@ Feature: user GDPR (General Data Protection Regulation) report
     """
 
 
-  Scenario: generate a GDPR report and check when admin updates the quota of personal space
+  Scenario: generate a GDPR report after the admin updates the quota of personal space
     Given user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "10000"
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
@@ -539,7 +539,8 @@ Feature: user GDPR (General Data Protection Regulation) report
     }
     """
 
-  Scenario Outline: admin user tries to generate a GDPR report of another
+
+  Scenario Outline: user tries to generate GDPR report of other users
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "<userRole>" using the settings api
     And the administrator has given "Brian" the role "<role>" using the settings api

@@ -2402,14 +2402,13 @@ class GraphContext implements Context {
 	 */
 	public function userTriesToExportGdprReportOfAnotherUserUsingGraphApi(string $user, string $ofUser, string $path): void {
 		$credentials = $this->getAdminOrUserCredentials($user);
-		$userId = $this->featureContext->getAttributeOfCreatedUser($ofUser, 'id');
 		$this->featureContext->setResponse(
 			GraphHelper::generateGDPRReport(
 				$this->featureContext->getBaseUrl(),
 				$this->featureContext->getStepLineRef(),
 				$credentials['username'],
 				$credentials['password'],
-				$userId,
+				$this->featureContext->getAttributeOfCreatedUser($ofUser, 'id'),
 				$path
 			)
 		);
