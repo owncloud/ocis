@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-08-08-04-50]
+[#deprecation-note-2023-05-08-10-02-06]
 [caption=]
 .Deprecation notes for the ocdav service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -226,7 +226,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-05-08-08-04-50[Deprecation Note]
+xref:deprecation-note-2023-05-08-10-02-06[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -326,5 +326,15 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Machine auth API key used to validate internal requests necessary for the access to resources from other services.
+
+a|`OCIS_EDITION` +
+`OCDAV_EDITION` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++Community ++
+a| [subs=-attributes]
+
 |===
 

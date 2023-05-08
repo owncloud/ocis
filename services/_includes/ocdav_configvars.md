@@ -33,3 +33,4 @@
 | OCIS_INSECURE<br/>OCDAV_INSECURE | bool | false | Allow insecure connections to the GATEWAY service.|
 | OCDAV_GATEWAY_REQUEST_TIMEOUT | int64 | 84300 | Request timeout in seconds for requests from the oCDAV service to the GATEWAY service.|
 | OCIS_MACHINE_AUTH_API_KEY<br/>OCDAV_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
+| OCIS_EDITION<br/>OCDAV_EDITION | string | Community | |
