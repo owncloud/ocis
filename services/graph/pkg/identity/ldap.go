@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 
@@ -84,6 +85,10 @@ type userAttributeMap struct {
 }
 
 type ldapAttributeValues map[string][]string
+
+type ldapResultToErrMap map[uint16]errorcode.Error
+
+const ldapGenericErr = math.MaxUint16
 
 // ParseDisableMechanismType checks that the configuration option for how to disable users is correct.
 func ParseDisableMechanismType(disableMechanism string) (DisableUserMechanismType, error) {
@@ -188,14 +193,15 @@ func (i *LDAP) CreateUser(ctx context.Context, user libregraph.User) (*libregrap
 	}
 
 	if err := i.conn.Add(ar); err != nil {
-		var lerr *ldap.Error
-		logger.Debug().Err(err).Msg("error adding user")
-		if errors.As(err, &lerr) {
-			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
-				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
-			}
+		msg := "failed to add user"
+		logger.Error().Err(err).Msg(msg)
+		errMap := ldapResultToErrMap{
+			ldap.LDAPResultEntryAlreadyExists:       errorcode.New(errorcode.NameAlreadyExists, "a user with that name already exists"),
+			ldap.LDAPResultUnwillingToPerform:       errorcode.New(errorcode.NotAllowed, msg),
+			ldap.LDAPResultInsufficientAccessRights: errorcode.New(errorcode.NotAllowed, msg),
+			ldapGenericErr:                          errorcode.New(errorcode.GeneralException, msg),
 		}
-		return nil, err
+		return nil, i.mapLDAPError(err, errMap)
 	}
 
 	if i.usePwModifyExOp && user.PasswordProfile != nil && user.PasswordProfile.Password != nil {
@@ -226,7 +232,15 @@ func (i *LDAP) DeleteUser(ctx context.Context, nameOrID string) error {
 	}
 	dr := ldap.DelRequest{DN: e.DN}
 	if err = i.conn.Del(&dr); err != nil {
-		return err
+		msg := "error deleting user"
+		logger.Error().Err(err).Msg(msg)
+		errMap := ldapResultToErrMap{
+			ldap.LDAPResultNoSuchObject:             errorcode.New(errorcode.ItemNotFound, "user not found"),
+			ldap.LDAPResultUnwillingToPerform:       errorcode.New(errorcode.NotAllowed, msg),
+			ldap.LDAPResultInsufficientAccessRights: errorcode.New(errorcode.NotAllowed, msg),
+			ldapGenericErr:                          errorcode.New(errorcode.GeneralException, msg),
+		}
+		return i.mapLDAPError(err, errMap)
 	}
 
 	if !i.refintEnabled {
@@ -253,7 +267,12 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("UpdateUser")
 	if !i.writeEnabled {
-		return nil, ErrReadOnly
+		// still allow eanble/disable User when using DisableMechanismGroup
+		if i.disableUserMechanism == DisableMechanismGroup && isUserEnabledUpdate(user) {
+			logger.Error().Str("backend", "ldap").Msg("Allowing accountEnabled Update on read-only backend")
+		} else {
+			return nil, ErrReadOnly
+		}
 	}
 	e, err := i.getLDAPUserByNameOrID(nameOrID)
 	if err != nil {
@@ -303,7 +322,15 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 	if user.PasswordProfile != nil && user.PasswordProfile.GetPassword() != "" {
 		if i.usePwModifyExOp {
 			if err := i.updateUserPassowrd(ctx, e.DN, user.PasswordProfile.GetPassword()); err != nil {
-				return nil, err
+				msg := "error updating user password"
+				logger.Error().Err(err).Msg(msg)
+				errMap := ldapResultToErrMap{
+					ldap.LDAPResultNoSuchObject:             errorcode.New(errorcode.ItemNotFound, "user not found"),
+					ldap.LDAPResultUnwillingToPerform:       errorcode.New(errorcode.NotAllowed, msg),
+					ldap.LDAPResultInsufficientAccessRights: errorcode.New(errorcode.NotAllowed, msg),
+					ldapGenericErr:                          errorcode.New(errorcode.GeneralException, msg),
+				}
+				return nil, i.mapLDAPError(err, errMap)
 			}
 		} else {
 			// password are hashed server side there is no need to check if the new password
@@ -331,7 +358,15 @@ func (i *LDAP) UpdateUser(ctx context.Context, nameOrID string, user libregraph.
 
 	if updateNeeded {
 		if err := i.conn.Modify(&mr); err != nil {
-			return nil, err
+			msg := "error updating user"
+			logger.Error().Err(err).Msg(msg)
+			errMap := ldapResultToErrMap{
+				ldap.LDAPResultNoSuchObject:             errorcode.New(errorcode.ItemNotFound, "user not found"),
+				ldap.LDAPResultUnwillingToPerform:       errorcode.New(errorcode.NotAllowed, msg),
+				ldap.LDAPResultInsufficientAccessRights: errorcode.New(errorcode.NotAllowed, msg),
+				ldapGenericErr:                          errorcode.New(errorcode.GeneralException, msg),
+			}
+			return nil, i.mapLDAPError(err, errMap)
 		}
 	}
 
@@ -395,7 +430,7 @@ func (i *LDAP) getEntryByDN(dn string, attrs []string, filter string) (*ldap.Ent
 	res, err := i.conn.Search(searchRequest)
 	if err != nil {
 		i.logger.Error().Err(err).Str("backend", "ldap").Str("dn", dn).Msg("Search ldap by DN failed")
-		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
+		return nil, errorcode.New(errorcode.ItemNotFound, "user lookup failed")
 	}
 	if len(res.Entries) == 0 {
 		return nil, ErrNotFound
@@ -428,7 +463,7 @@ func (i *LDAP) searchLDAPEntryByFilter(basedn string, attrs []string, filter str
 	res, err := i.conn.Search(searchRequest)
 	if err != nil {
 		i.logger.Error().Err(err).Str("backend", "ldap").Str("dn", basedn).Str("filter", filter).Msg("Search user by filter failed")
-		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
+		return nil, errorcode.New(errorcode.ItemNotFound, "user search failed")
 	}
 	if len(res.Entries) == 0 {
 		return nil, ErrNotFound
@@ -580,7 +615,13 @@ func (i *LDAP) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*lib
 		Msg("GetUsers")
 	res, err := i.conn.Search(searchRequest)
 	if err != nil {
-		return nil, errorcode.New(errorcode.ItemNotFound, err.Error())
+		msg := "error listing users"
+		logger.Error().Err(err).Msg(msg)
+		errMap := ldapResultToErrMap{
+			ldap.LDAPResultInsufficientAccessRights: errorcode.New(errorcode.AccessDenied, msg),
+			ldapGenericErr:                          errorcode.New(errorcode.GeneralException, msg),
+		}
+		return nil, i.mapLDAPError(err, errMap)
 	}
 
 	users := make([]*libregraph.User, 0, len(res.Entries))
@@ -626,14 +667,16 @@ func (i *LDAP) changeUserName(ctx context.Context, dn, originalUserName, newUser
 	mrdn := ldap.NewModifyDNRequest(dn, newDNString, true, "")
 
 	if err := i.conn.ModifyDN(mrdn); err != nil {
-		var lerr *ldap.Error
-		logger.Debug().Str("originalDN", dn).Str("newDN", newDNString).Err(err).Msg("Failed to modify DN")
-		if errors.As(err, &lerr) {
-			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
-				err = errorcode.New(errorcode.NameAlreadyExists, lerr.Error())
-			}
+		msg := "error renaming user"
+		logger.Error().Err(err).Msg(msg)
+		errMap := ldapResultToErrMap{
+			ldap.LDAPResultEntryAlreadyExists:       errorcode.New(errorcode.NameAlreadyExists, "a user with that name already exists"),
+			ldap.LDAPResultNoSuchObject:             errorcode.New(errorcode.ItemNotFound, msg),
+			ldap.LDAPResultUnwillingToPerform:       errorcode.New(errorcode.NotAllowed, msg),
+			ldap.LDAPResultInsufficientAccessRights: errorcode.New(errorcode.NotAllowed, msg),
+			ldapGenericErr:                          errorcode.New(errorcode.GeneralException, msg),
 		}
-		return nil, err
+		return nil, i.mapLDAPError(err, errMap)
 	}
 
 	parsed, err := ldap.ParseDN(dn)
@@ -678,17 +721,17 @@ func (i *LDAP) renameMemberInGroup(ctx context.Context, group *ldap.Entry, oldMe
 	mr.Delete(i.groupAttributeMap.member, []string{oldMember})
 	mr.Add(i.groupAttributeMap.member, []string{newMember})
 	if err := i.conn.Modify(mr); err != nil {
+		logger.Warn().Err(err).
+			Str("oldMember", oldMember).
+			Str("newMember", newMember).
+			Str("groupDN", group.DN).
+			Msg("Error renaming group members.")
 		var lerr *ldap.Error
 		if errors.As(err, &lerr) {
-			if lerr.ResultCode == ldap.LDAPResultNoSuchObject {
-				logger.Warn().Str("group", group.DN).Msg("Group no longer exists")
-				return nil
-			} else if lerr.ResultCode == ldap.LDAPResultNoSuchAttribute {
-				logger.Warn().
-					Str("oldMember", oldMember).
-					Str("newMember", newMember).
-					Str("groupDN", group.DN).
-					Msg("member attribute not found, this probably means that the server has refint enabled, please configure the OCIS to respect that.")
+			// NoSuchObject means that the group no longer exists. Some other client might have deleted it. There is
+			// not much we can do
+			// NoSuchAttribute means that the old value is no longer present. We can't do much here either
+			if lerr.ResultCode == ldap.LDAPResultNoSuchObject || lerr.ResultCode == ldap.LDAPResultNoSuchAttribute {
 				return nil
 			}
 		}
@@ -929,9 +972,17 @@ func (i *LDAP) removeEntryByDNAndAttributeFromEntry(entry *ldap.Entry, dn string
 	if err != nil {
 		i.logger.Error().Err(err).Str("entry", entry.DN).Str("attribute", attribute).Str("target value", dn).
 			Msg("Failed to remove dn attribute from entry")
+		msg := "failed to update object"
+		errMap := ldapResultToErrMap{
+			ldap.LDAPResultNoSuchObject:             errorcode.New(errorcode.ItemNotFound, "object does not exists"),
+			ldap.LDAPResultUnwillingToPerform:       errorcode.New(errorcode.NotAllowed, msg),
+			ldap.LDAPResultInsufficientAccessRights: errorcode.New(errorcode.NotAllowed, msg),
+			ldapGenericErr:                          errorcode.New(errorcode.GeneralException, msg),
+		}
+		return i.mapLDAPError(err, errMap)
 	}
 
-	return err
+	return nil
 }
 
 // expandLDAPAttributeEntries reads an attribute from an ldap entry and expands to users
@@ -1132,4 +1183,33 @@ func (i *LDAP) updateAccountEnabledState(logger log.Logger, accountEnabled bool,
 	}
 
 	return updateNeeded, err
+}
+
+func (i *LDAP) mapLDAPError(err error, errmap ldapResultToErrMap) errorcode.Error {
+	var lerr *ldap.Error
+	if errors.As(err, &lerr) {
+		if res, ok := errmap[lerr.ResultCode]; ok {
+			return res
+		}
+	}
+	if res, ok := errmap[ldapGenericErr]; ok {
+		return res
+	}
+	return errorcode.New(errorcode.GeneralException, err.Error())
+}
+
+func isUserEnabledUpdate(user libregraph.User) bool {
+	switch {
+	case user.Id != nil, user.DisplayName != nil,
+		user.Drive != nil, user.Mail != nil, user.OnPremisesSamAccountName != nil,
+		user.PasswordProfile != nil, user.Surname != nil, user.GivenName != nil,
+		user.UserType != nil:
+		return false
+	case len(user.AppRoleAssignments) != 0,
+		len(user.MemberOf) != 0,
+		len(user.Identities) != 0,
+		len(user.Drives) != 0:
+		return false
+	}
+	return user.AccountEnabled != nil
 }

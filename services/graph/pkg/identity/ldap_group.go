@@ -177,7 +177,7 @@ func (i *LDAP) GetGroupMembers(ctx context.Context, groupID string, req *godata.
 func (i *LDAP) CreateGroup(ctx context.Context, group libregraph.Group) (*libregraph.Group, error) {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("create group")
-	if !i.writeEnabled {
+	if !i.writeEnabled && i.groupCreateBaseDN == i.groupBaseDN {
 		return nil, errorcode.New(errorcode.NotAllowed, "server is configured read-only")
 	}
 	ar, err := i.groupToAddRequest(group)
@@ -201,7 +201,7 @@ func (i *LDAP) CreateGroup(ctx context.Context, group libregraph.Group) (*libreg
 func (i *LDAP) DeleteGroup(ctx context.Context, id string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("DeleteGroup")
-	if !i.writeEnabled {
+	if !i.writeEnabled && i.groupCreateBaseDN == i.groupBaseDN {
 		return errorcode.New(errorcode.NotAllowed, "server is configured read-only")
 	}
 
@@ -225,7 +225,7 @@ func (i *LDAP) DeleteGroup(ctx context.Context, id string) error {
 func (i *LDAP) UpdateGroupName(ctx context.Context, groupID string, groupName string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("AddMembersToGroup")
-	if !i.writeEnabled {
+	if !i.writeEnabled && i.groupCreateBaseDN == i.groupBaseDN {
 		return errorcode.New(errorcode.NotAllowed, "server is configured read-only")
 	}
 
@@ -271,7 +271,7 @@ func (i *LDAP) UpdateGroupName(ctx context.Context, groupID string, groupName st
 func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs []string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("AddMembersToGroup")
-	if !i.writeEnabled {
+	if !i.writeEnabled && i.groupCreateBaseDN == i.groupBaseDN {
 		return errorcode.New(errorcode.NotAllowed, "server is configured read-only")
 	}
 	ge, err := i.getLDAPGroupByNameOrID(groupID, true)
@@ -365,7 +365,7 @@ func (i *LDAP) AddMembersToGroup(ctx context.Context, groupID string, memberIDs 
 func (i *LDAP) RemoveMemberFromGroup(ctx context.Context, groupID string, memberID string) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "ldap").Msg("RemoveMemberFromGroup")
-	if !i.writeEnabled {
+	if !i.writeEnabled && i.groupCreateBaseDN == i.groupBaseDN {
 		return errorcode.New(errorcode.NotAllowed, "server is configured read-only")
 	}
 
@@ -562,10 +562,6 @@ func (i *LDAP) createGroupModelFromLDAP(e *ldap.Entry) *libregraph.Group {
 }
 
 func (i *LDAP) isLDAPGroupReadOnly(e *ldap.Entry) bool {
-	if !i.writeEnabled {
-		return true
-	}
-
 	groupDN, err := ldap.ParseDN(e.DN)
 	if err != nil {
 		i.logger.Warn().Err(err).Str("dn", e.DN).Msg("Failed to parse DN")

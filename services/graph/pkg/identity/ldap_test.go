@@ -282,8 +282,8 @@ func TestGetUsers(t *testing.T) {
 
 	b, _ := getMockedBackend(lm, lconfig, &logger)
 	_, err = b.GetUsers(context.Background(), odataReqDefault)
-	if err == nil || err.Error() != "itemNotFound" {
-		t.Errorf("Expected 'itemNotFound' got '%s'", err.Error())
+	if err == nil || err.Error() != "generalException" {
+		t.Errorf("Expected 'generalException' got '%s'", err.Error())
 	}
 
 	lm = &mocks.Client{}
