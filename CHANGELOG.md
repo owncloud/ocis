@@ -6,17 +6,17 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
-* Bugfix - Fix Logout Url config name: [#6226](https://github.com/owncloud/ocis/pull/6226)
+* Bugfix - Fix Logout Url config name: [#6227](https://github.com/owncloud/ocis/pull/6227)
 * Enhancement - Update Reva to version TODO: [#6232](https://github.com/owncloud/ocis/pull/6232)
 * Enhancement - Update web to v7.0.0-rc.36: [#6234](https://github.com/owncloud/ocis/pull/6234)
 
 ## Details
 
-* Bugfix - Fix Logout Url config name: [#6226](https://github.com/owncloud/ocis/pull/6226)
+* Bugfix - Fix Logout Url config name: [#6227](https://github.com/owncloud/ocis/pull/6227)
 
    We fixed the yaml and json name of the logout url option.
 
-   https://github.com/owncloud/ocis/pull/6226
+   https://github.com/owncloud/ocis/pull/6227
 
 * Enhancement - Update Reva to version TODO: [#6232](https://github.com/owncloud/ocis/pull/6232)
 
