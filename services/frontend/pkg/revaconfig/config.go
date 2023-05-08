@@ -191,7 +191,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 									"needsDbUpgrade": false,
 									"version":        version.Legacy,
 									"versionstring":  version.LegacyString,
-									"edition":        "Community",
+									"edition":        cfg.Edition,
 									"productname":    "Infinite Scale",
 									"product":        "Infinite Scale",
 									"productversion": version.GetString(),
