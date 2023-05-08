@@ -596,11 +596,11 @@ func (s *service) DeleteStorageSpace(ctx context.Context, req *provider.DeleteSt
 	id := &provider.StorageSpaceId{OpaqueId: storagespace.FormatResourceID(idraw)}
 
 	spaces, err := s.storage.ListStorageSpaces(ctx, []*provider.ListStorageSpacesRequest_Filter{{Type: provider.ListStorageSpacesRequest_Filter_TYPE_ID, Term: &provider.ListStorageSpacesRequest_Filter_Id{Id: id}}}, true)
-	if err != nil || len(spaces) != 1 {
+	if err != nil {
 		var st *rpc.Status
 		switch err.(type) {
 		case errtypes.IsNotFound:
-			st = status.NewNotFound(ctx, "not found when deleting space")
+			st = status.NewNotFound(ctx, "space not found")
 		case errtypes.PermissionDenied:
 			st = status.NewPermissionDenied(ctx, err, "permission denied")
 		case errtypes.BadRequest:
@@ -608,11 +608,12 @@ func (s *service) DeleteStorageSpace(ctx context.Context, req *provider.DeleteSt
 		default:
 			st = status.NewInternal(ctx, "error deleting space: "+req.Id.String())
 		}
-		if len(spaces) == 0 {
-			st = status.NewNotFound(ctx, "not found when deleting space")
-		}
 		return &provider.DeleteStorageSpaceResponse{
 			Status: st,
+		}, nil
+	} else if len(spaces) != 1 {
+		return &provider.DeleteStorageSpaceResponse{
+			Status: status.NewNotFound(ctx, "space not found"),
 		}, nil
 	}
 
@@ -620,7 +621,7 @@ func (s *service) DeleteStorageSpace(ctx context.Context, req *provider.DeleteSt
 		var st *rpc.Status
 		switch err.(type) {
 		case errtypes.IsNotFound:
-			st = status.NewNotFound(ctx, "not found when deleting space")
+			st = status.NewNotFound(ctx, "space not found")
 		case errtypes.PermissionDenied:
 			st = status.NewPermissionDenied(ctx, err, "permission denied")
 		case errtypes.BadRequest:
