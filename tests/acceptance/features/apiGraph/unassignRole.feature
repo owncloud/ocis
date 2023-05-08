@@ -15,7 +15,7 @@ Feature: unassign user role
     When user "Alice" unassigns the role of user "Brian" using the Graph API
     Then the HTTP status code should be "204"
     And user "Brian" should not have any role assigned
-    When user "Brian" tries to create a group "assigns-role-to-default" using the Graph API
+    When user "Brian" uploads file with content "this step will assign the role to default" to "assign-to-default.txt" using the WebDAV API
     And user "Brian" should have the role "User" assigned
     Examples:
       | role        |
@@ -28,5 +28,5 @@ Feature: unassign user role
   Scenario: admin user tries to unassign his/her own role using graph API
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When user "Alice" tries to unassign the role of user "Alice" using the Graph API
-    Then the HTTP status code should be "500"
+    Then the HTTP status code should be "403"
     And user "Alice" should have the role "Admin" assigned
