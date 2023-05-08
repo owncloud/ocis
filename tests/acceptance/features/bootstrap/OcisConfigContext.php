@@ -118,7 +118,7 @@ class OcisConfigContext implements Context {
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to rollback ocis server"
+			"Failed to rollback ocis server. Check if oCIS is started with ociswrapper."
 		);
 
 		$this->reset();

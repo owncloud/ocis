@@ -2153,7 +2153,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "commands": [
                 "%s init --insecure true" % ocis_bin,
                 "cat $OCIS_CONFIG_DIR/ocis.yaml",
-            ] + wrapper_commands if with_wrapper else ["%s server" % ocis_bin],
+            ] + (wrapper_commands if with_wrapper else ["%s server" % ocis_bin]),
             "volumes": volumes,
             "depends_on": depends_on,
         },
