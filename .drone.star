@@ -33,7 +33,6 @@ PLUGINS_SLACK = "plugins/slack:1"
 REDIS = "redis:6-alpine"
 SELENIUM_STANDALONE_CHROME = "selenium/standalone-chrome:104.0-20220812"
 SONARSOURCE_SONAR_SCANNER_CLI = "sonarsource/sonar-scanner-cli:4.7.0"
-SAWJAN_OCISWRAPPER = "sawjan/ociswrapper:latest"
 THEGEEKLAB_DRONE_GITHUB_COMMENT = "thegeeklab/drone-github-comment:1"
 
 DEFAULT_PHP_VERSION = "7.4"
@@ -2756,20 +2755,32 @@ def setupForLitmus():
 def getDroneEnvAndCheckScript(ctx):
     ocis_git_base_url = "https://raw.githubusercontent.com/owncloud/ocis"
     path_to_drone_env = "%s/%s/.drone.env" % (ocis_git_base_url, ctx.build.commit)
-    path_to_check_script = "%s/%s/tests/config/drone/check_cache.sh" % (ocis_git_base_url, ctx.build.commit)
+    path_to_check_script = "%s/%s/tests/config/drone/check_web_cache.sh" % (ocis_git_base_url, ctx.build.commit)
     return {
         "name": "get-drone-env-and-check-script",
         "image": OC_UBUNTU,
         "commands": [
             "curl -s -o .drone.env %s" % path_to_drone_env,
-            "curl -s -o check_cache.sh %s" % path_to_check_script,
+            "curl -s -o check_web_cache.sh %s" % path_to_check_script,
         ],
     }
 
 def checkForWebCache(name):
-    cache_key = "web-test-runner/$WEB_COMMITID/%s.tar.gz" % name
-
-    return checkCache(name, cache_key)
+    return {
+        "name": "check-for-%s-cache" % name,
+        "image": OC_UBUNTU,
+        "environment": {
+            "CACHE_ENDPOINT": {
+                "from_secret": "cache_public_s3_server",
+            },
+            "CACHE_BUCKET": {
+                "from_secret": "cache_public_s3_bucket",
+            },
+        },
+        "commands": [
+            "bash -x check_web_cache.sh %s" % name,
+        ],
+    }
 
 def cloneWeb():
     return {
