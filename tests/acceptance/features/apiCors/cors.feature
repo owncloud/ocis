@@ -1,5 +1,5 @@
 # NOTE: set env OCIS_CORS_ALLOW_ORIGINS=https://aphno.badal while running ocis server
-@api
+@api @env-config
 Feature: CORS headers
   As a user
   I want to send a cross-origin request

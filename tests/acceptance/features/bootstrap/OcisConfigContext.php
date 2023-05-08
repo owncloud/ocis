@@ -29,36 +29,6 @@ use PHPUnit\Framework\Assert;
  */
 class OcisConfigContext implements Context {
 	/**
-	 * This is used to determine if the ocis config has been changed via tests
-	 */
-	private bool $touched = false;
-
-	/**
-	 * @return bool
-	 */
-	public function hasTouched(): bool {
-		return $this->touched;
-	}
-
-	/**
-	 * set the touched flag
-	 *
-	 * @return void
-	 */
-	public function setTouched(): void {
-		$this->touched = true;
-	}
-
-	/**
-	 * reset the touched flag
-	 *
-	 * @return void
-	 */
-	public function reset(): void {
-		$this->touched = false;
-	}
-
-	/**
 	 * @Given async upload has been enabled with post processing delayed to :delayTime seconds
 	 *
 	 * @param string $delayTime
@@ -79,9 +49,6 @@ class OcisConfigContext implements Context {
 			$response->getStatusCode(),
 			"Failed to set async upload with delayed post processing"
 		);
-		// ocis config has been changed
-		// set the touched flag
-		$this->setTouched();
 	}
 
 	/**
@@ -103,13 +70,10 @@ class OcisConfigContext implements Context {
 			$response->getStatusCode(),
 			"Failed to set OCIS_CORS_ALLOW_ORIGINS=" . $allowedOrigins
 		);
-		// ocis config has been changed
-		// set the touched flag
-		$this->setTouched();
 	}
 
 	/**
-	 * @AfterScenario
+	 * @AfterScenario @env-config
 	 *
 	 * @return void
 	 */
@@ -120,7 +84,5 @@ class OcisConfigContext implements Context {
 			$response->getStatusCode(),
 			"Failed to rollback ocis server. Check if oCIS is started with ociswrapper."
 		);
-
-		$this->reset();
 	}
 }

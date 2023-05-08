@@ -1,4 +1,4 @@
-@api
+@api @env-config
 Feature: delay post-processing of uploaded files
   As a user
   I want to delay the post-processing of uploaded files
