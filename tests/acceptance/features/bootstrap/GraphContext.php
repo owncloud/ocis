@@ -2389,4 +2389,29 @@ class GraphContext implements Context {
 			$this->featureContext->getJSONSchema($schemaString)
 		);
 	}
+
+	/**
+	 * @When user :user tries to export GDPR report of user :ofUser to :path using Graph API
+	 *
+	 * @param string $user
+	 * @param string $ofUser
+	 * @param string $path
+	 *
+	 * @return void
+	 *
+	 */
+	public function userTriesToExportGdprReportOfAnotherUserUsingGraphApi(string $user, string $ofUser, string $path): void {
+		$credentials = $this->getAdminOrUserCredentials($user);
+		$userId = $this->featureContext->getAttributeOfCreatedUser($ofUser, 'id');
+		$this->featureContext->setResponse(
+			GraphHelper::generateGDPRReport(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials['username'],
+				$credentials['password'],
+				$userId,
+				$path
+			)
+		);
+	}
 }
