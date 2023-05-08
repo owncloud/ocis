@@ -240,7 +240,6 @@ def main(ctx):
 
     test_pipelines = \
         cancelPreviousBuilds() + \
-        cacheOcisWrapperPipeline(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
         testPipelines(ctx)
 
@@ -781,7 +780,7 @@ def localApiTestPipeline(ctx):
                             },
                             "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                                      restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"]) +
+                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
                                      localApiTests(suite, storage, params["extraEnvironment"]) +
                                      failEarly(ctx, early_fail),
@@ -2055,7 +2054,7 @@ def notify():
         },
     }
 
-def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}):
+def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on = [], deploy_type = "", extra_server_environment = {}, with_wrapper = False):
     if deploy_type == "":
         user = "0:0"
         environment = {
@@ -2135,18 +2134,24 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
     for item in extra_server_environment:
         environment[item] = extra_server_environment[item]
 
+    ocis_bin = "ocis/bin/ocis"
+
+    wrapper_commands = [
+        "make -C %s build" % dirs["ocisWrapper"],
+        "%s/bin/ociswrapper serve --bin %s --url %s" % (dirs["ocisWrapper"], ocis_bin, OCIS_URL),
+    ]
+
     return [
         {
             "name": "ocis-server",
-            "image": SAWJAN_OCISWRAPPER,
+            "image": OC_CI_GOLANG,
             "detach": True,
             "environment": environment,
             "user": user,
             "commands": [
-                "ocis/bin/ocis init --insecure true",
+                "%s init --insecure true" % ocis_bin,
                 "cat $OCIS_CONFIG_DIR/ocis.yaml",
-                "ociswrapper --bin-path=ocis/bin/ocis",
-            ],
+            ] + wrapper_commands if with_wrapper else ["%s server" % ocis_bin],
             "volumes": volumes,
             "depends_on": depends_on,
         },
