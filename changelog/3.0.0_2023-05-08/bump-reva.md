@@ -1,4 +1,11 @@
-Enhancement: Update Reva to version 2.13.1
+Enhancement: Update Reva to version 2.13.2
+
+Changelog for reva 2.13.2 (2023-05-08)
+=======================================
+
+*   Bugfix [cs3org/reva#3845](https://github.com/cs3org/reva/pull/3845): Fix propagation
+*   Bugfix [cs3org/reva#3856](https://github.com/cs3org/reva/pull/3856): Fix response code
+*   Bugfix [cs3org/reva#3857](https://github.com/cs3org/reva/pull/3857): Fix trashbin purge
 
 Changelog for reva 2.13.1 (2023-05-03)
 =======================================
