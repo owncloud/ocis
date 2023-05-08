@@ -1,10 +1,10 @@
 // set the attribute to true or leave empty, true without any quotes.
 
-:show-deprecation: false
+:show-deprecation: true
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-08-10-02-06]
+[#deprecation-note-2023-05-08-11-43-52]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -13,6 +13,16 @@ ifeval::[{show-deprecation} == true]
 | Deprecation Version
 | Removal Version
 | Deprecation Replacement
+
+| WEB_UI_CONFIG name changing to make the usecase clear
+| 3.0
+| 4.0.0
+| WEB_UI_CONFIG_FILE
+
+| WEB_UI_PATH will be superceded by WEB_UI_CONFIG_FILE
+| 3.0
+| 4.0.0
+| WEB_UI_CONFIG_FILE
 |===
 
 endif::[]
@@ -205,17 +215,19 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets.
 
-a|`WEB_UI_CONFIG` +
-
+a|`WEB_UI_CONFIG_FILE` +
+`WEB_UI_CONFIG` +
+xref:deprecation-note-2023-05-08-11-43-52[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Read the ownCloud Web configuration from this file.
+Read the ownCloud Web json based configuration from this path/file. The config file takes precedence over WEB_OPTION_xxx environment variables. See the text description for more details.
 
-a|`WEB_UI_PATH` +
-
+a|`WEB_UI_CONFIG_FILE` +
+`WEB_UI_PATH` +
+xref:deprecation-note-2023-05-08-11-43-52[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

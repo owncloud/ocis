@@ -21,8 +21,8 @@
 | WEB_HTTP_ROOT | string | / | Subdirectory that serves as the root for this HTTP service.|
 | WEB_CACHE_TTL | int | 604800 | Cache policy in seconds for ownCloud Web assets.|
 | WEB_ASSET_PATH | string | ~/.ocis/web/assets | Serve ownCloud Web assets from a path on the filesystem instead of the builtin assets.|
-| WEB_UI_CONFIG | string |  | Read the ownCloud Web configuration from this file.|
-| WEB_UI_PATH | string |  | Read the ownCloud Web configuration from this file path.|
+| WEB_UI_CONFIG_FILE<br/>WEB_UI_CONFIG | string |  | Read the ownCloud Web json based configuration from this path/file. The config file takes precedence over WEB_OPTION_xxx environment variables. See the text description for more details.|
+| WEB_UI_CONFIG_FILE<br/>WEB_UI_PATH | string |  | Read the ownCloud Web configuration from this file path.|
 | OCIS_URL<br/>WEB_UI_THEME_SERVER | string | https://localhost:9200 | Base URL to load themes from. Will be prepended to the theme path.|
 | WEB_UI_THEME_PATH | string | /themes/owncloud/theme.json | Subpath/file to load the theme. Will be appended to the URL of the theme server.|
 | OCIS_URL<br/>WEB_UI_CONFIG_SERVER | string | https://localhost:9200 | URL, where the oCIS APIs are reachable for ownCloud Web.|
