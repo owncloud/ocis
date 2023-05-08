@@ -5,8 +5,7 @@ Feature: share resources where the sharee receives the share in multiple ways
   So that I can make sure that the sharing works
 
   Background:
-    Given auto-accept shares has been disabled
-    And these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes and without skeleton files:
       | username |
       | Alice    |
       | Brian    |

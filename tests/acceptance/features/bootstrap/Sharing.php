@@ -395,17 +395,6 @@ trait Sharing {
 	}
 
 	/**
-	 * @Given auto-accept shares has been disabled
-	 *
-	 * @return void
-	 */
-	public function autoAcceptSharesHasBeenDisabled():void {
-		// auto-accept shares is disabled by default on OCIS.
-		// so there is nothing to do, just return
-		return;
-	}
-
-	/**
 	 * @When /^user "([^"]*)" creates a share using the sharing API with settings$/
 	 *
 	 * @param string $user

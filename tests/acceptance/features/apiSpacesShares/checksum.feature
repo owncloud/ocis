@@ -6,7 +6,6 @@ Feature: checksums
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
-    And auto-accept shares has been disabled
     And using spaces DAV path
     And user "Brian" has been created with default attributes and without skeleton files
 

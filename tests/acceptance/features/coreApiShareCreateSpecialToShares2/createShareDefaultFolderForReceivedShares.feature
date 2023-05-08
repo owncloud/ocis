@@ -5,8 +5,7 @@ Feature: shares are received in the default folder for received shares
   So that I can make sure it does not work
 
   Background:
-    Given auto-accept shares has been disabled
-    And user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes and without skeleton files
 
 
   Scenario Outline: do not allow sharing of the entire share folder

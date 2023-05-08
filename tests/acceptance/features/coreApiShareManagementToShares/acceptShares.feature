@@ -5,8 +5,7 @@ Feature: accept/decline shares coming from internal users
   So that I can keep my file system clean
 
   Background:
-    Given auto-accept shares has been disabled
-    And using OCS API version "1"
+    Given using OCS API version "1"
     And using new DAV path
     And these users have been created with default attributes and without skeleton files:
       | username |

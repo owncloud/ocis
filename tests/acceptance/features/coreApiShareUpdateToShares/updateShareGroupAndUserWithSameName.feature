@@ -2,8 +2,7 @@
 Feature: updating shares to users and groups that have the same name
 
   Background:
-    Given auto-accept shares has been disabled
-    And these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes and without skeleton files:
       | username |
       | Alice    |
       | Brian    |

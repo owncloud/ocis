@@ -5,8 +5,7 @@ Feature: share resources with a disabled user
   So that I can make sure it doesn't work
 
   Background:
-    Given auto-accept shares has been disabled
-    And user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
 
   @issue-2212

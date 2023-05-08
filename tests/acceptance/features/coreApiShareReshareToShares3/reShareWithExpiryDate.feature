@@ -2,8 +2,7 @@
 Feature: resharing a resource with an expiration date
 
   Background:
-    Given auto-accept shares has been disabled
-    And these users have been created with default attributes and without skeleton files:
+    Given these users have been created with default attributes and without skeleton files:
       | username |
       | Alice    |
       | Brian    |

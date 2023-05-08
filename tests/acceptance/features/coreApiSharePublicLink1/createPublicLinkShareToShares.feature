@@ -2,8 +2,7 @@
 Feature: create a public link share when share_folder is set to Shares
 
   Background:
-    Given auto-accept shares has been disabled
-    And user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes and without skeleton files
 
 
   Scenario Outline: Creating a new public link share of a file gives the correct response

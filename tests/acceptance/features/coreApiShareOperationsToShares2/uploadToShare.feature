@@ -2,8 +2,7 @@
 Feature: sharing
 
   Background:
-    Given auto-accept shares has been disabled
-    And user "Alice" has been created with default attributes and without skeleton files
+    Given user "Alice" has been created with default attributes and without skeleton files
 
 
   Scenario: Uploading file to a user read-only share folder does not work
