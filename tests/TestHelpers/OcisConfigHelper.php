@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /**
  * ownCloud
- * 
+ *
  * @author Sajan Gurung <sajan@jankaritech.com>
  * @copyright Copyright (c) 2023 Sajan Gurung sajan@jankaritech.com
  *
@@ -27,58 +27,61 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * A helper class for configureing oCIS server
+ */
 class OcisConfigHelper {
-    /**
-     * @param string $url
-     * @param string $method
-     * @param ?string $body
-     * 
-     * @return ResponseInterface
-     * @throws GuzzleException
-     */
-    private static function sendRequest(
-        string $url,
-        string $method,
-        ?string $body = ""
-    ): ResponseInterface {
-        $client = HttpRequestHelper::createClient();
-        $request = new Request(
+	/**
+	 * @param string $url
+	 * @param string $method
+	 * @param ?string $body
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	private static function sendRequest(
+		string $url,
+		string $method,
+		?string $body = ""
+	): ResponseInterface {
+		$client = HttpRequestHelper::createClient();
+		$request = new Request(
 			$method,
 			$url,
 			[],
 			$body
 		);
 		return $client->send($request);
-    }
+	}
 
-    /**
-     * @return string
-     */
-    public static function getWrapperUrl(): string {
-        $url = \getenv("OCIS_WRAPPER_URL");
-        if ($url === false) {
-            $url = "http://localhost:5000";
-        }
-        return $url;
-    }
+	/**
+	 * @return string
+	 */
+	public static function getWrapperUrl(): string {
+		$url = \getenv("OCIS_WRAPPER_URL");
+		if ($url === false) {
+			$url = "http://localhost:5000";
+		}
+		return $url;
+	}
 
 	/**
 	 * @param array $envs
-	 * 
+	 *
 	 * @return ResponseInterface
 	 * @throws GuzzleException
 	 */
 	public static function reConfigureOcis(array $envs): ResponseInterface {
-        $url = self::getWrapperUrl() . "/config";
-        return self::sendRequest($url, "PUT", \json_encode($envs));
+		$url = self::getWrapperUrl() . "/config";
+		return self::sendRequest($url, "PUT", \json_encode($envs));
 	}
 
-    /**
-     * @return ResponseInterface
+	/**
+	 * @return ResponseInterface
 	 * @throws GuzzleException
-     */
-    public static function rollbackOcis(): ResponseInterface {
-        $url = self::getWrapperUrl() . "/rollback";
-        return self::sendRequest($url, "DELETE");
-    }
+	 */
+	public static function rollbackOcis(): ResponseInterface {
+		$url = self::getWrapperUrl() . "/rollback";
+		return self::sendRequest($url, "DELETE");
+	}
 }

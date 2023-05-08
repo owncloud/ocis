@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 /**
  * ownCloud
- * 
+ *
  * @author Sajan Gurung <sajan@jankaritech.com>
  * @copyright Copyright (c) 2023 Sajan Gurung sajan@jankaritech.com
  *
@@ -24,7 +24,10 @@ use Behat\Behat\Context\Context;
 use TestHelpers\OcisConfigHelper;
 use PHPUnit\Framework\Assert;
 
- class OcisConfigContext implements Context {
+/**
+ * steps needed to re-configure oCIS server
+ */
+class OcisConfigContext implements Context {
 	/**
 	 * This is used to determine if the ocis config has been changed via tests
 	 */
@@ -39,6 +42,8 @@ use PHPUnit\Framework\Assert;
 
 	/**
 	 * set the touched flag
+	 *
+	 * @return void
 	 */
 	public function setTouched(): void {
 		$this->touched = true;
@@ -46,6 +51,8 @@ use PHPUnit\Framework\Assert;
 
 	/**
 	 * reset the touched flag
+	 *
+	 * @return void
 	 */
 	public function reset(): void {
 		$this->touched = false;
@@ -94,7 +101,7 @@ use PHPUnit\Framework\Assert;
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to set OCIS_CORS_ALLOW_ORIGINS=". $allowedOrigins
+			"Failed to set OCIS_CORS_ALLOW_ORIGINS=" . $allowedOrigins
 		);
 		// ocis config has been changed
 		// set the touched flag
@@ -116,4 +123,4 @@ use PHPUnit\Framework\Assert;
 
 		$this->reset();
 	}
- }
+}
