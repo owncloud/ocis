@@ -32,7 +32,7 @@ Feature: Email notification
     Given user "Alice" has uploaded file with content "sample text" to "lorem.txt"
     When user "Alice" has shared file "lorem.txt" with user "Brian" with permissions "17"
     Then the HTTP status code should be "200"
-    And user "Brian" should have reveived the following email from user "Alice"
+    And user "Brian" should have received the following email from user "Alice"
       """
       Hello Brian Murphy
 

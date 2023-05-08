@@ -148,8 +148,6 @@ config = {
             "extraServerEnvironment": {
                 "NOTIFICATIONS_SMTP_HOST": "email",
                 "NOTIFICATIONS_SMTP_PORT": "2500",
-                "NOTIFICATIONS_SMTP_SENDER": "ownCloud <notifications@${OCIS_DOMAIN:-ocis.owncloud.test}>",
-                "NOTIFICATIONS_SMTP_USERNAME": "notifications@${OCIS_DOMAIN:-ocis.owncloud.test}",
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
             },
         },

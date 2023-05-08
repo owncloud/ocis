@@ -182,7 +182,7 @@ class NotificationContext implements Context {
 	}
 
 	/**
-	 * @Then user :user should have reveived the following email from user :sender
+	 * @Then user :user should have received the following email from user :sender
 	 *
 	 * @param string $user
 	 * @param string $sender
@@ -191,7 +191,7 @@ class NotificationContext implements Context {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userShouldHaveReveivedTheFollowingEmailFromUser(string $user, string $sender, PyStringNode $content):void {
+	public function userShouldHaveReceivedTheFollowingEmailFromUser(string $user, string $sender, PyStringNode $content):void {
 		$rawExpectedEmailBodyContent = \str_replace("\r\n", "\n", $content->getRaw());
 		$expectedEmailBodyContent = $this->featureContext->substituteInLineCodes(
 			$rawExpectedEmailBodyContent,

@@ -260,3 +260,40 @@ make test-paralleldeployment-api \
 ... \
 BEHAT_FEATURE="tests/parallelDeployAcceptance/features/apiShareManagement/acceptShares.feature"
 ```
+
+## Running test suite with email service (inbucket)
+
+### Setup inbucket
+
+Run the following command to setup inbucket
+
+```bash
+docker run -d --name inbucket -p 9000:9000 -p 2500:2500 -p 1100:1100 inbucket/inbucket
+```
+
+### Run oCIS with following environment variables
+
+Documentation for environment variables is available [here](https://owncloud.dev/services/notifications/#environment-variables)
+
+```bash
+OCIS_INSECURE=true \
+PROXY_ENABLE_BASIC_AUTH=true \
+NOTIFICATIONS_SMTP_HOST=localhost \
+NOTIFICATIONS_SMTP_INSECURE=true \
+NOTIFICATIONS_SMTP_PORT=2500 \
+OCIS_URL=https://localhost:9200 \
+<path_to_ocis>/ocis/bin/ocis server
+```
+
+### Run the acceptance test
+
+Run the acceptance test with the following command:
+```bash
+make test-acceptance-api \
+TEST_SERVER_URL="https://localhost:9200" \
+TEST_OCIS=true \
+TEST_WITH_GRAPH_API=true \
+EMAIL_HOST="localhost" \
+EMAIL_PORT=9000 \
+BEHAT_FEATURE="tests/acceptance/features/apiEmailNotification/emailNotification.feature"
+```

@@ -107,7 +107,6 @@ class EmailHelper {
 			null,
 			['Content-Type' => 'application/json']
 		);
-
 		return \json_decode($response->getBody()->getContents());
 	}
 
