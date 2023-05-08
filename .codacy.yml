@@ -18,4 +18,5 @@ exclude_paths:
   - 'tests/TestHelpers/**'
   - 'tests/acceptance/run.sh'
   - 'vendor/**/*'
+  - 'tests/ociswrapper/vendor/**'
 ...
