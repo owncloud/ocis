@@ -30,7 +30,7 @@ func NewAntivirus(c *config.Config, l log.Logger) (Antivirus, error) {
 	av := Antivirus{c: c, l: l, client: rhttp.GetHTTPClient(rhttp.Insecure(true))}
 
 	var err error
-	av.s, err = scanners.New(c.Scanner)
+	av.s, err = scanners.New(c)
 	if err != nil {
 		return av, err
 	}
@@ -100,6 +100,27 @@ func (av Antivirus) Run() error {
 		ev := e.Event.(events.StartPostprocessingStep)
 		if ev.StepToStart != events.PPStepAntivirus {
 			continue
+		}
+
+		if av.c.DebugScanOutcome != "" {
+			av.l.Warn().Str("antivir, clamav", ">>>>>>> ANTIVIRUS_DEBUG_SCAN_OUTCOME IS SET NO ACTUAL VIRUS SCAN IS PERFORMED!")
+			if err := events.Publish(stream, events.PostprocessingStepFinished{
+				FinishedStep:  events.PPStepAntivirus,
+				Outcome:       events.PostprocessingOutcome(av.c.DebugScanOutcome),
+				UploadID:      ev.UploadID,
+				ExecutingUser: ev.ExecutingUser,
+				Filename:      ev.Filename,
+				Result: events.VirusscanResult{
+					Infected:    true,
+					Description: "DEBUG: forced outcome",
+					Scandate:    time.Now(),
+					ResourceID:  ev.ResourceID,
+					ErrorMsg:    "DEBUG: forced outcome",
+				},
+			}); err != nil {
+				av.l.Fatal().Err(err).Str("uploadid", ev.UploadID).Interface("resourceID", ev.ResourceID).Msg("cannot publish events - exiting")
+				return err
+			}
 		}
 
 		av.l.Debug().Str("uploadid", ev.UploadID).Str("filename", ev.Filename).Msg("Starting virus scan.")

@@ -21,14 +21,14 @@ type Scanner interface {
 }
 
 // New returns a new scanner from config
-func New(c config.Scanner) (Scanner, error) {
-	switch c.Type {
+func New(c *config.Config) (Scanner, error) {
+	switch c.Scanner.Type {
 	default:
-		return nil, fmt.Errorf("unknown av scanner: '%s'", c.Type)
+		return nil, fmt.Errorf("unknown av scanner: '%s'", c.Scanner.Type)
 	case "clamav":
-		return NewClamAV(c.ClamAV.Socket), nil
+		return NewClamAV(c.Scanner.ClamAV.Socket), nil
 	case "icap":
-		return NewICAP(c.ICAP.URL, c.ICAP.Service, time.Duration(c.ICAP.Timeout)*time.Second)
+		return NewICAP(c.Scanner.ICAP.URL, c.Scanner.ICAP.Service, time.Duration(c.Scanner.ICAP.Timeout)*time.Second)
 	}
 
 }
