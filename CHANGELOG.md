@@ -1,3 +1,21 @@
+# Changelog for [unreleased] (UNRELEASED)
+
+The following sections list the changes for unreleased.
+
+[unreleased]: https://github.com/owncloud/ocis/compare/v3.0.0...master
+
+## Summary
+
+* Enhancement - Add specific result to antivirus for debugging: [#6265](https://github.com/owncloud/ocis/pull/6265)
+
+## Details
+
+* Enhancement - Add specific result to antivirus for debugging: [#6265](https://github.com/owncloud/ocis/pull/6265)
+
+   We added the ability to define a specific result for the virus scanner via env-var
+   (ANTIVIRUS_DEBUG_SCAN_OUTCOME)
+
+   https://github.com/owncloud/ocis/pull/6265
 # Changelog for [3.0.0] (2023-05-08)
 
 The following sections list the changes for 3.0.0.
