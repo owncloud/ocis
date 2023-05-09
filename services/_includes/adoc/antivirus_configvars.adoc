@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-09-14-06-22]
+[#deprecation-note-2023-05-09-15-09-13]
 [caption=]
 .Deprecation notes for the antivirus service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -213,5 +213,14 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 The maximum scan size the virusscanner can handle. Only this many bytes of a file will be scanned. 0 means unlimited and is the default. Usable common abbreviations: [KB, KiB, GB, GiB, TB, TiB, PB, PiB, EB, EiB], example: 2GB.
+
+a|`ANTIVIRUS_DEBUG_SCAN_OUTCOME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+A predefined outcome for virus scanning, FOR DEBUG PURPOSES ONLY! (example values: "found,infected")
 |===
 
