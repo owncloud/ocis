@@ -322,27 +322,6 @@ class SettingsContext implements Context {
 
 	/**
 	 * @param string $user
-	 * @param string $valueName
-	 *
-	 * @return array
-	 *
-	 * @throws GuzzleException
-	 * @throws Exception
-	 */
-	public function getSettingsValues(string $user, string $valueName): array {
-		$this->sendRequestGetSettingsValuesList($user);
-		$body = json_decode((string)$this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
-		foreach ($body["values"] as $value) {
-			if ($value["identifier"]["setting"] === $valueName) {
-				return $value["value"];
-				break;
-			}
-		}
-		return [];
-	}
-
-	/**
-	 * @param string $user
 	 *
 	 * @return string
 	 *
@@ -350,10 +329,19 @@ class SettingsContext implements Context {
 	 * @throws Exception
 	 */
 	public function getSettingLanguageValue(string $user): string {
-		$languageValue = $this->getSettingsValues($user, "language");
-		Assert::assertNotEmpty($languageValue, "settings values are empty");
-
-		return $languageValue["listValue"]["values"][0]["stringValue"];
+		$this->sendRequestGetSettingsValuesList($user);
+		$body = json_decode((string)$this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
+	
+		// if no language is set, the request body is empty return English as the default language
+		if (empty($body)) {
+			return "en";
+		}
+		foreach ($body["values"] as $value) {
+			if ($value["identifier"]["setting"] === "language") {
+				return $value["value"]["listValue"]["values"][0]["stringValue"];
+				break;
+			}
+		}
 	}
 
 	/**
