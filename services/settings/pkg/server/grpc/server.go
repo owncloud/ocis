@@ -7,7 +7,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
-	svc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
 	"go-micro.dev/v4/api"
 	"go-micro.dev/v4/server"
 )
@@ -34,7 +33,7 @@ func Server(opts ...Option) grpc.Service {
 		options.Logger.Fatal().Err(err).Msg("Error creating settings service")
 	}
 
-	handle := svc.NewService(options.Config, options.Logger)
+	handle := options.ServiceHandler
 	if err := settingssvc.RegisterBundleServiceHandler(service.Server(), handle); err != nil {
 		options.Logger.Fatal().Err(err).Msg("could not register Bundle service handler")
 	}

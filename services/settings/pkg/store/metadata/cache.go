@@ -11,10 +11,6 @@ import (
 
 var (
 	cachettl = 0
-	// these need to be global instances for now as the `Service` (and therefore the `Store`) are instantiated twice (for grpc and http)
-	// therefore caches need to cover both instances
-	dircache   = initCache(cachettl)
-	filescache = initCache(cachettl)
 )
 
 // CachedMDC is cache for the metadataclient
@@ -99,8 +95,8 @@ func (c *CachedMDC) MakeDirIfNotExist(ctx context.Context, id string) error {
 
 // Init instantiates the caches
 func (c *CachedMDC) Init(ctx context.Context, id string) error {
-	c.dirs = dircache
-	c.files = filescache
+	c.dirs = initCache(cachettl)
+	c.files = initCache(cachettl)
 	return c.next.Init(ctx, id)
 }
 
