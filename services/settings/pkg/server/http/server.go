@@ -37,7 +37,7 @@ func Server(opts ...Option) (ohttp.Service, error) {
 		return ohttp.Service{}, fmt.Errorf("could not initialize http service: %w", err)
 	}
 
-	handle := svc.NewService(options.Config, options.Logger)
+	handle := options.ServiceHandler
 
 	{
 		handle = svc.NewInstrument(handle, options.Metrics)
