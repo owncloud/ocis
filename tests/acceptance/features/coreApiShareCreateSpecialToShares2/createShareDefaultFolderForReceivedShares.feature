@@ -20,5 +20,5 @@ Feature: shares are received in the default folder for received shares
     And the HTTP status code of responses on each endpoint should be "<http_status_code>" respectively
     Examples:
       | ocs_api_version | ocs_status_code | http_status_code   |
-      | 1               | 100, 100, 404   | 200, 200, 204, 200 |
-      | 2               | 200, 200, 404   | 200, 200, 204, 404 |
+      | 1               | 100, 100, 400   | 200, 200, 204, 200 |
+      | 2               | 200, 200, 400   | 200, 200, 204, 400 |
