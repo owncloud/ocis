@@ -80,8 +80,17 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 		return nil, err
 	}
 
-	mountpointMap := map[string]string{}
+	spaces := []*provider.StorageSpace{}
 	for _, space := range listSpacesRes.StorageSpaces {
+		if utils.ReadPlainFromOpaque(space.Opaque, "trashed") == "trashed" {
+			// Do not consider disabled spaces
+			continue
+		}
+		spaces = append(spaces, space)
+	}
+
+	mountpointMap := map[string]string{}
+	for _, space := range spaces {
 		if space.SpaceType != "mountpoint" {
 			continue
 		}
@@ -96,7 +105,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 
 	matches := matchArray{}
 	total := int32(0)
-	for _, space := range listSpacesRes.StorageSpaces {
+	for _, space := range spaces {
 		searchRootID := &searchmsg.ResourceID{
 			StorageId: space.Root.StorageId,
 			SpaceId:   space.Root.SpaceId,
