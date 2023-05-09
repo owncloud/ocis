@@ -37,7 +37,7 @@ ci-node-generate:
 ############ translations ########
 .PHONY: l10n-pull
 l10n-pull:
-	cd $(OUTPUT_DIR) && tx pull -a --skip --minimum-perc=75
+	cd $(OUTPUT_DIR) && tx pull --all --force --skip --minimum-perc=75
 
 .PHONY: l10n-push
 l10n-push:
