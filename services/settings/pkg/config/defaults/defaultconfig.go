@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
@@ -55,6 +56,13 @@ func DefaultConfig() *config.Config {
 			GatewayAddress: "127.0.0.1:9215", // system storage
 			StorageAddress: "127.0.0.1:9215",
 			SystemUserIDP:  "internal",
+			Cache: &config.Cache{
+				Store:          "memory",
+				Database:       "ocis",
+				FileTable:      "settings_files",
+				DirectoryTable: "settings_dirs",
+				TTL:            time.Minute * 10,
+			},
 		},
 		BundlesPath: "",
 		Bundles:     nil,

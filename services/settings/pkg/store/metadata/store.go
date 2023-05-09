@@ -60,7 +60,11 @@ func (s *Store) Init() {
 		return
 	}
 
-	mdc := &CachedMDC{next: NewMetadataClient(s.cfg.Metadata)}
+	mdc := &CachedMDC{
+		next:   NewMetadataClient(s.cfg.Metadata),
+		cfg:    s.cfg,
+		logger: s.Logger,
+	}
 	if err := s.initMetadataClient(mdc); err != nil {
 		s.Logger.Error().Err(err).Msg("error initializing metadata client")
 	}
