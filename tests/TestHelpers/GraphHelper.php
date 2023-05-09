@@ -8,7 +8,6 @@
 
 namespace TestHelpers;
 
-use TestHelpers\HttpRequestHelper;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -71,7 +70,7 @@ class GraphHelper {
 	 * @return string
 	 */
 	public static function separateAndGetValueForKey(string $keyName, array $actualDriveInformation): string {
-		// break the segment with @@@  to find the actual value from the actual drive information
+		// break the segment with @@@ to find the actual value from the actual drive information
 		$separatedKey = explode("@@@", $keyName);
 		// this stores the actual value of each key from drive information response used for assertion
 		$actualKeyValue = $actualDriveInformation;
@@ -107,7 +106,6 @@ class GraphHelper {
 	 * @param array|null $headers
 	 *
 	 * @return RequestInterface
-	 * @throws GuzzleException
 	 */
 	public static function createRequest(
 		string $baseUrl,
@@ -736,8 +734,10 @@ class GraphHelper {
 		$payload['onPremisesSamAccountName'] = $userName;
 		$payload['passwordProfile'] = ['password' => $password];
 		$payload['displayName'] = $displayName ?? $userName;
-		if (!empty($email)) {
-			$payload['mail'] = $email ?? $userName . '@example.com';
+		if (empty($email)) {
+			$payload['mail'] = $userName . '@example.com';
+		} else {
+			$payload['mail'] = $email;
 		}
 		$payload['accountEnabled'] = true;
 		return \json_encode($payload);
@@ -908,6 +908,7 @@ class GraphHelper {
 	 *
 	 * @return ResponseInterface
 	 *
+	 * @throws GuzzleException
 	 */
 	public static function getSingleSpace(
 		string $baseUrl,

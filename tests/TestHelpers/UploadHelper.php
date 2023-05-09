@@ -21,6 +21,8 @@
  */
 namespace TestHelpers;
 
+use GuzzleHttp\Exception\GuzzleException;
+use PHPUnit\Framework\Assert;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -29,7 +31,7 @@ use Psr\Http\Message\ResponseInterface;
  * @author Artur Neumann <artur@jankaritech.com>
  *
  */
-class UploadHelper extends \PHPUnit\Framework\Assert {
+class UploadHelper extends Assert {
 	/**
 	 *
 	 * @param string|null $baseUrl URL of owncloud
@@ -46,9 +48,10 @@ class UploadHelper extends \PHPUnit\Framework\Assert {
 	 * @param int|null $davPathVersionToUse (1|2)
 	 * @param int|null $chunkingVersion (1|2|null)
 	 *                                  if set to null chunking will not be used
-	 * @param int|null $noOfChunks how many chunks do we want to upload
+	 * @param int|null $noOfChunks how many chunks to upload
 	 *
 	 * @return ResponseInterface
+	 * @throws GuzzleException
 	 */
 	public static function upload(
 		?string $baseUrl,
@@ -79,9 +82,11 @@ class UploadHelper extends \PHPUnit\Framework\Assert {
 		} else {
 			//prepare chunking
 			$chunks = self::chunkFile($source, $noOfChunks);
-			$chunkingId = 'chunking-' . (string)\rand(1000, 9999);
+			$chunkingId = 'chunking-' . \rand(1000, 9999);
 			$v2ChunksDestination = '/uploads/' . $user . '/' . $chunkingId;
 		}
+
+		$result = null;
 
 		//prepare chunking version specific stuff
 		if ($chunkingVersion === 1) {
@@ -108,10 +113,11 @@ class UploadHelper extends \PHPUnit\Framework\Assert {
 		foreach ($chunks as $index => $chunk) {
 			if ($chunkingVersion === 1) {
 				$filename = $destination . "-" . $chunkingId . "-" .
-					\count($chunks) . '-' . ( string ) $index;
+					\count($chunks) . '-' . $index;
 				$davRequestType = "files";
-			} elseif ($chunkingVersion === 2) {
-				$filename = $v2ChunksDestination . '/' . (string)($index);
+			} else {
+				// do chunking version 2
+				$filename = $v2ChunksDestination . '/' . $index;
 				$davRequestType = "uploads";
 			}
 			$result = WebDavHelper::makeDavRequest(
@@ -152,6 +158,7 @@ class UploadHelper extends \PHPUnit\Framework\Assert {
 				return $result;
 			}
 		}
+		self::assertNotNull($result, __METHOD__ . " chunking version $chunkingVersion was requested but no upload was done.");
 		return $result;
 	}
 
@@ -169,6 +176,7 @@ class UploadHelper extends \PHPUnit\Framework\Assert {
 	 * @param string|null $exceptChunkingType empty string or "old" or "new"
 	 *
 	 * @return array of ResponseInterface
+	 * @throws GuzzleException
 	 */
 	public static function uploadWithAllMechanisms(
 		?string $baseUrl,
