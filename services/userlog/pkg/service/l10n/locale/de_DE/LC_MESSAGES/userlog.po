@@ -4,6 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 # 
 # Translators:
+# Michael Barz <mbarz@owncloud.com>, 2023
 # Edith Parzefall, 2023
 # 
 #, fuzzy
@@ -11,76 +12,93 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2023-03-15 23:03+0000\n"
+"POT-Creation-Date: 2023-05-09 10:02+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
 "Last-Translator: Edith Parzefall, 2023\n"
-"Language-Team: German (Germany) (https://www.transifex.com/owncloud-org/teams/6149/de_DE/)\n"
+"Language-Team: German (Germany) (https://app.transifex.com/owncloud-org/teams/6149/de_DE/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: de_DE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: pkg/service/templates.go:30
+#: pkg/service/templates.go:40
 msgid "Access to Space {space} lost"
 msgstr "Der Zugriff zu dem Space {space} wurde entfernt"
 
-#: pkg/service/templates.go:45
+#: pkg/service/templates.go:55
 msgid "Access to {resource} expired"
 msgstr "Der Zugriff auf {resource} ist abgelaufen"
 
-#: pkg/service/templates.go:29
+#: pkg/service/templates.go:15
+msgid "File {resource} was deleted because it violates the policies"
+msgstr ""
+"Datei {resource} wurde gelöscht, weil sie gegen Bestimmungen verstößt."
+
+#: pkg/service/templates.go:39
 msgid "Membership expired"
 msgstr "Mitgliedschaft abgelaufen"
 
 #: pkg/service/templates.go:14
+msgid "Policies enforced"
+msgstr "Bestimmungen erzwungen"
+
+#: pkg/service/templates.go:24
 msgid "Removed from Space"
 msgstr "Aus dem Space entfernt"
 
-#: pkg/service/templates.go:34
+#: pkg/service/templates.go:44
 msgid "Resource shared"
 msgstr "Ressource geteilt"
 
-#: pkg/service/templates.go:39
+#: pkg/service/templates.go:49
 msgid "Resource unshared"
 msgstr "Resource nicht mehr geteilt"
 
-#: pkg/service/templates.go:44
+#: pkg/service/templates.go:54
 msgid "Share expired"
 msgstr "Freigabe abgelaufen"
 
-#: pkg/service/templates.go:24
+#: pkg/service/templates.go:34
 msgid "Space deleted"
 msgstr "Space gelöscht"
 
-#: pkg/service/templates.go:19
+#: pkg/service/templates.go:29
 msgid "Space disabled"
 msgstr "Space deaktiviert"
 
-#: pkg/service/templates.go:9
+#: pkg/service/templates.go:19
 msgid "Space shared"
 msgstr "Space freigegeben"
 
+#: pkg/service/templates.go:9
+msgid "Virus found"
+msgstr "Virus gefunden"
+
 #: pkg/service/templates.go:10
+msgid "Virus found in {resource}. Upload not possible. Virus: {virus}"
+msgstr "Virus in {resource} gefunden. Upload nicht möglich. Virus: {virus}"
+
+#: pkg/service/templates.go:20
 msgid "{user} added you to Space {space}"
 msgstr "{user} hat Sie zum Space {space} hinzugefügt"
 
-#: pkg/service/templates.go:25
+#: pkg/service/templates.go:35
 msgid "{user} deleted Space {space}"
 msgstr "{user} hat den Space {space} gelöscht"
 
-#: pkg/service/templates.go:20
+#: pkg/service/templates.go:30
 msgid "{user} disabled Space {space}"
 msgstr "{user} hat den Space {space} deaktiviert"
 
-#: pkg/service/templates.go:15
+#: pkg/service/templates.go:25
 msgid "{user} removed you from Space {space}"
 msgstr "{user} hat Sie aus dem Space {space} entfernt"
 
-#: pkg/service/templates.go:35
+#: pkg/service/templates.go:45
 msgid "{user} shared {resource} with you"
 msgstr "{user} hat {resource} mit Ihnen geteilt"
 
-#: pkg/service/templates.go:40
+#: pkg/service/templates.go:50
 msgid "{user} unshared {resource} with you"
 msgstr "{user} hat die Freigabe {resource} für Sie zurückgenommen"

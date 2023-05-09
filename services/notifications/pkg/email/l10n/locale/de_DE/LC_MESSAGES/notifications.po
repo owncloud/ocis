@@ -2,101 +2,118 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
+# Translators:
+# Edith Parzefall, 2023
+# 
 #, fuzzy
-msgid   ""
-msgstr  "Project-Id-Version: \n"
-        "Report-Msgid-Bugs-To: EMAIL\n"
-        "POT-Creation-Date: 2023-04-14 16:58+0200\n"
-        "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-        "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-        "Language-Team: LANGUAGE <LL@li.org>\n"
-        "Language: \n"
-        "MIME-Version: 1.0\n"
-        "Content-Type: text/plain; charset=CHARSET\n"
-        "Content-Transfer-Encoding: 8bit\n"
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: EMAIL\n"
+"POT-Creation-Date: 2023-05-09 10:02+0000\n"
+"PO-Revision-Date: 2023-04-19 11:11+0000\n"
+"Last-Translator: Edith Parzefall, 2023\n"
+"Language-Team: German (Germany) (https://app.transifex.com/owncloud-org/teams/6149/de_DE/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de_DE\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#. UnsharedSpace email template, CallToAction field
-#: pkg/email/templates.go:57
-msgid   "Click here to check it: {ShareLink}"
-msgstr  ""
+#. UnsharedSpace email template, resolves via {{ .CallToAction }}
+#: pkg/email/templates.go:61
+msgid "Click here to check it: {ShareLink}"
+msgstr "Hier klicken, um zu prüfen: {ShareLink}"
 
-#. ShareCreated email template, CallToAction field
-#. SharedSpace email template, CallToAction field
-#: pkg/email/templates.go:18 pkg/email/templates.go:43
-msgid   "Click here to view it: {ShareLink}"
-msgstr  ""
+#. ShareCreated email template, resolves via {{ .CallToAction }}
+#. SharedSpace email template, resolves via {{ .CallToAction }}
+#: pkg/email/templates.go:19 pkg/email/templates.go:46
+msgid "Click here to view it: {ShareLink}"
+msgstr "Zum Ansehen hier klicken: {ShareLink}"
 
-#. ShareCreated email template, Greeting field
-#: pkg/email/templates.go:14
-msgid   "Hello {ShareGrantee}"
-msgstr  ""
+#. ShareCreated email template, resolves via {{ .Greeting }}
+#: pkg/email/templates.go:15
+msgid "Hello {ShareGrantee}"
+msgstr "Hallo {ShareGrantee}"
 
-#. ShareExpired email template, Greeting field
-#: pkg/email/templates.go:26
-msgid   "Hello {ShareGrantee},"
-msgstr  ""
-
-#. SharedSpace email template, Greeting field
-#. UnsharedSpace email template, Greeting field
-#. MembershipExpired email template, Greeting field
-#: pkg/email/templates.go:39 pkg/email/templates.go:51 pkg/email/templates.go:65
-msgid   "Hello {SpaceGrantee},"
-msgstr  ""
-
-#. MembershipExpired email template, Subject field
-#: pkg/email/templates.go:63
-msgid   "Membership of '{SpaceName}' expired at {ExpiredAt}"
-msgstr  ""
-
-#. ShareExpired email template, Subject field
-#: pkg/email/templates.go:24
-msgid   "Share to '{ShareFolder}' expired at {ExpiredAt}"
-msgstr  ""
-
-#. MembershipExpired email template, Message field
-#: pkg/email/templates.go:67
-msgid   "Your membership of space {SpaceName} has expired at {ExpiredAt}\n"
-        "\n"
-        "Even though this membership has expired you still might have access through other shares and/or space memberships"
-msgstr  ""
-
-#. ShareExpired email template, Message field
+#. ShareExpired email template, resolves via {{ .Greeting }}
 #: pkg/email/templates.go:28
-msgid   "Your share to {ShareFolder} has expired at {ExpiredAt}\n"
-        "\n"
-        "Even though this share has been revoked you still might have access through other shares and/or space memberships."
-msgstr  ""
+msgid "Hello {ShareGrantee},"
+msgstr "Hallo {ShareGrantee},"
 
-#. ShareCreated email template, Message field
-#: pkg/email/templates.go:16
-msgid   "{ShareSharer} has shared \"{ShareFolder}\" with you."
-msgstr  ""
+#. SharedSpace email template, resolves via {{ .Greeting }}
+#. UnsharedSpace email template, resolves via {{ .Greeting }}
+#. MembershipExpired email template, resolves via {{ .Greeting }}
+#: pkg/email/templates.go:42 pkg/email/templates.go:55
+#: pkg/email/templates.go:70
+msgid "Hello {SpaceGrantee},"
+msgstr "Hallo {ShareGrantee},"
 
-#. ShareCreated email template, Subject field
-#: pkg/email/templates.go:12
-msgid   "{ShareSharer} shared '{ShareFolder}' with you"
-msgstr  ""
+#. MembershipExpired email template, Subject field (resolves directly)
+#: pkg/email/templates.go:68
+msgid "Membership of '{SpaceName}' expired at {ExpiredAt}"
+msgstr "Mitgliedschaft in '{SpaceName}' abgelaufen am {ExpiredAt}"
 
-#. SharedSpace email template, Message field
-#: pkg/email/templates.go:41
-msgid   "{SpaceSharer} has invited you to join \"{SpaceName}\"."
-msgstr  ""
+#. ShareExpired email template, Subject field (resolves directly)
+#: pkg/email/templates.go:26
+msgid "Share to '{ShareFolder}' expired at {ExpiredAt}"
+msgstr "Freigabe für '{ShareFolder}' abgelaufen am {ExpiredAt}"
 
-#. UnsharedSpace email template, Message field
+#. MembershipExpired email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:72
+msgid ""
+"Your membership of space {SpaceName} has expired at {ExpiredAt}\n"
+"\n"
+"Even though this membership has expired you still might have access through other shares and/or space memberships"
+msgstr ""
+"Die Mitgliedschaft im Space {SpaceName} ist am {ExpiredAt} abgelaufen.\n"
+"\n"
+"Trotzdem haben Sie möglicherweise noch Zugriff durch andere Freigaben oder Space-Mitgliedschaften."
+
+#. ShareExpired email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:30
+msgid ""
+"Your share to {ShareFolder} has expired at {ExpiredAt}\n"
+"\n"
+"Even though this share has been revoked you still might have access through other shares and/or space memberships."
+msgstr ""
+"Ihre Freigabe für {ShareFolder} ist am {ExpiredAt} abgelaufen.\n"
+"\n"
+"Obwohl die Freigabe zurückgezogen wurde, haben Sie vielleicht noch Zugriff durch andere Freigaben oder Space-Mitgliedschaften.."
+
+#. ShareCreated email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:17
+msgid "{ShareSharer} has shared \"{ShareFolder}\" with you."
+msgstr "{ShareSharer} hat \"{ShareFolder}\" mit Ihnen geteilt."
+
+#. ShareCreated email template, Subject field (resolves directly)
+#: pkg/email/templates.go:13
+msgid "{ShareSharer} shared '{ShareFolder}' with you"
+msgstr "{ShareSharer} hat \"{ShareFolder}\" mit Ihnen geteilt."
+
+#. SharedSpace email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:44
+msgid "{SpaceSharer} has invited you to join \"{SpaceName}\"."
+msgstr "{SpaceSharer} hat Sie in den Space \"{SpaceName}\" eingeladen."
+
+#. UnsharedSpace email template, resolves via {{ .MessageBody }}
+#: pkg/email/templates.go:57
+msgid ""
+"{SpaceSharer} has removed you from \"{SpaceName}\".\n"
+"\n"
+"You might still have access through your other groups or direct membership."
+msgstr ""
+"{SpaceSharer} hat Sie aus dem Space \"{SpaceName}\" entfernt.\n"
+"\n"
+"Sie haben möglicherweise noch Zugriff durch andere Gruppen oder direkte Mitgliedschaft."
+
+#. SharedSpace email template, Subject field (resolves directly)
+#: pkg/email/templates.go:40
+msgid "{SpaceSharer} invited you to join {SpaceName}"
+msgstr "{SpaceSharer} hat Sie in den Space {SpaceName} eingeladen."
+
+#. UnsharedSpace email template, Subject field (resolves directly)
 #: pkg/email/templates.go:53
-msgid   "{SpaceSharer} has removed you from \"{SpaceName}\".\n"
-        "\n"
-        "You might still have access through your other groups or direct membership."
-msgstr  ""
-
-#. SharedSpace email template, Subject field
-#: pkg/email/templates.go:37
-msgid   "{SpaceSharer} invited you to join {SpaceName}"
-msgstr  ""
-
-#. UnsharedSpace email template, Subject field
-#: pkg/email/templates.go:49
-msgid   "{SpaceSharer} removed you from {SpaceName}"
-msgstr  ""
-
+msgid "{SpaceSharer} removed you from {SpaceName}"
+msgstr "{SpaceSharer} hat Sie aus dem Space {SpaceName} entfernt."
