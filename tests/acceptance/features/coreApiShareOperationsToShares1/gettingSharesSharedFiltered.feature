@@ -1,8 +1,8 @@
 @api
 Feature: get shares filtered by type (user, group etc)
   As a user
-  I want to be able to know the shares that I have made of a particular type (user, group etc)
-  So that I can reduce the amount of data that has to be transferred to be just the data that I need
+  I want to filter the shares that I have received of a particular type (user, group etc)
+  So that I can know about the status of the shares I've received
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -35,7 +35,7 @@ Feature: get shares filtered by type (user, group etc)
 
   Scenario Outline: getting shares shared to users
     Given using OCS API version "<ocs_api_version>"
-    When user "Alice" gets the user shares shared by him using the sharing API
+    When user "Alice" gets the user shares shared by her using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And exactly 2 files or folders should be included in the response
@@ -49,7 +49,7 @@ Feature: get shares filtered by type (user, group etc)
 
   Scenario Outline: getting shares shared to groups
     Given using OCS API version "<ocs_api_version>"
-    When user "Alice" gets the group shares shared by him using the sharing API
+    When user "Alice" gets the group shares shared by her using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And exactly 2 files or folders should be included in the response
@@ -63,7 +63,7 @@ Feature: get shares filtered by type (user, group etc)
 
   Scenario Outline: getting shares shared to public links
     Given using OCS API version "<ocs_api_version>"
-    When user "Alice" gets the public link shares shared by him using the sharing API
+    When user "Alice" gets the public link shares shared by her using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And exactly 2 files or folders should be included in the response
@@ -77,7 +77,7 @@ Feature: get shares filtered by type (user, group etc)
 
   Scenario Outline: getting shares shared to users and groups
     Given using OCS API version "<ocs_api_version>"
-    When user "Alice" gets the user and group shares shared by him using the sharing API
+    When user "Alice" gets the user and group shares shared by her using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And exactly 4 files or folders should be included in the response

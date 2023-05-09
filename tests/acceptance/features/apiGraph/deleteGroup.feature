@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: delete groups
   As an admin
   I want to be able to delete groups
@@ -72,7 +72,7 @@ Feature: delete groups
     And user "Alice" has shared file "lorem.txt" with group "grp1"
     And user "Alice" has shared file "lorem.txt" with group "grp2"
     And group "grp1" has been deleted
-    When user "Alice" gets all the shares from the file "lorem.txt" using the sharing API
+    When user "Alice" gets all the shares of the file "lorem.txt" using the sharing API
     Then the HTTP status code should be "200"
     And group "grp2" should be included in the response
     But group "grp1" should not be included in the response

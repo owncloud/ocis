@@ -1,5 +1,8 @@
 @api @issue-1289 @issue-1328
 Feature: sharing
+  As a user
+  I want to move shares that I received
+  So that I can organise them according to my needs
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -24,7 +27,7 @@ Feature: sharing
       | new         |
 
 
-  Scenario Outline: Move files between shares by same user
+  Scenario Outline: move files between shares by same user
     Given using <dav_version> DAV path
     And user "Alice" has created folder "share1"
     And user "Alice" has created folder "share2"
@@ -46,7 +49,7 @@ Feature: sharing
       | new         |
 
 
-  Scenario Outline: Move files between shares by same user added by sharee
+  Scenario Outline: move files between shares by same user added by sharee
     Given using <dav_version> DAV path
     And user "Alice" has created folder "share1"
     And user "Alice" has created folder "share2"
@@ -68,7 +71,7 @@ Feature: sharing
       | new         |
 
 
-  Scenario Outline: Move files between shares by different users
+  Scenario Outline: move files between shares by different users
     Given using <dav_version> DAV path
     And user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file with content "some data" to "/textfile0.txt"

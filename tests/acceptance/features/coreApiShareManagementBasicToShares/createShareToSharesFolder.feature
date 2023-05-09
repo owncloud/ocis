@@ -668,7 +668,7 @@ Feature: sharing
     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     And user "Carol" has accepted share "/textfile0.txt" offered by user "Alice"
     And the administrator has deleted user "Brian" using the provisioning API
-    When user "Alice" gets all the shares from the file "textfile0.txt" using the sharing API
+    When user "Alice" gets all the shares of the file "textfile0.txt" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And user "Carol" should be included in the response

@@ -1,5 +1,8 @@
 @api
 Feature: sharing
+  As a user
+  I want to share resources with other users
+  So that they can have access to the resources
 
   Background:
     Given these users have been created with default attributes and without skeleton files:

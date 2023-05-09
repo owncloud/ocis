@@ -1,8 +1,8 @@
 @api
 Feature: get shares filtered by type (user, group etc)
   As a user
-  I want to be able to know the shares that I have made of a particular type (user, group etc)
-  So that I can reduce the amount of data that has to be transferred to be just the data that I need
+  I want to filter the shares that I have received of a particular type (user, group etc)
+  So that I can know about the status of the shares I've received
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -31,7 +31,7 @@ Feature: get shares filtered by type (user, group etc)
     And user "Alice" has created a public link share with settings
       | path        | /fileToShareWithPublic.txt |
       | permissions | read                       |
-    When user "Alice" gets the user shares shared by him using the sharing API
+    When user "Alice" gets the user shares shared by her using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And no files or folders should be included in the response
@@ -53,7 +53,7 @@ Feature: get shares filtered by type (user, group etc)
     And user "Alice" has created a public link share with settings
       | path        | /fileToShareWithPublic.txt |
       | permissions | read                       |
-    When user "Alice" gets the group shares shared by him using the sharing API
+    When user "Alice" gets the group shares shared by her using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And no files or folders should be included in the response
@@ -73,7 +73,7 @@ Feature: get shares filtered by type (user, group etc)
     And user "Brian" has accepted share "/fileToShareWithUser.txt" offered by user "Alice"
     And user "Alice" has shared file "/fileToShareWithGroup.txt" with group "grp1"
     And user "Brian" has accepted share "/fileToShareWithGroup.txt" offered by user "Alice"
-    When user "Alice" gets the public link shares shared by him using the sharing API
+    When user "Alice" gets the public link shares shared by her using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"
     And no files or folders should be included in the response
