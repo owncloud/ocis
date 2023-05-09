@@ -784,7 +784,6 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 	if err != nil {
 		i.logger.Warn().Str("dn", e.DN).Str(i.userAttributeMap.id, e.GetAttributeValue(i.userAttributeMap.id)).Msg("Invalid User. Cannot convert UUID")
 	}
-	givenName := e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName)
 	surname := e.GetEqualFoldAttributeValue(i.userAttributeMap.surname)
 
 	if id != "" && opsan != "" {
@@ -793,7 +792,7 @@ func (i *LDAP) createUserModelFromLDAP(e *ldap.Entry) *libregraph.User {
 			Mail:                     pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.mail)),
 			OnPremisesSamAccountName: &opsan,
 			Id:                       &id,
-			GivenName:                &givenName,
+			GivenName:                pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.givenName)),
 			Surname:                  &surname,
 			UserType:                 pointerOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.userType)),
 			AccountEnabled:           booleanOrNil(e.GetEqualFoldAttributeValue(i.userAttributeMap.accountEnabled)),

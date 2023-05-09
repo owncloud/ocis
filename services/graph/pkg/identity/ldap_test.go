@@ -308,6 +308,7 @@ func TestUpdateUser(t *testing.T) {
 		displayName              string
 		onPremisesSamAccountName string
 		accountEnabled           *bool
+		givenName                *string
 		userType                 *string
 	}
 	type args struct {
@@ -1441,7 +1442,7 @@ func TestUpdateUser(t *testing.T) {
 					DisplayName:              &tt.want.displayName,
 					OnPremisesSamAccountName: &tt.want.onPremisesSamAccountName,
 					Surname:                  &emptyString,
-					GivenName:                &emptyString,
+					GivenName:                tt.want.givenName,
 					UserType:                 tt.want.userType,
 				}
 
