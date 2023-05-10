@@ -278,18 +278,28 @@ var _ = Describe("Graph", func() {
 									"grantOpaqueID":  {Decoder: "plain", Value: []byte("opaqueID")},
 								},
 							},
+							RootInfo: &provider.ResourceInfo{Path: "New Folder", Name: "Project Mars"},
 						},
 					},
 				}, nil)
+				var opaque *typesv1beta1.Opaque
+				opaque = utils.AppendPlainToOpaque(opaque, "spaceAlias", "project/project-mars")
 				gatewayClient.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
 					Status: status.NewOK(ctx),
 					Info: &provider.ResourceInfo{
 						Etag:  "123456789",
 						Type:  provider.ResourceType_RESOURCE_TYPE_CONTAINER,
 						Id:    &provider.ResourceId{StorageId: "ownerStorageID", SpaceId: "spaceID", OpaqueId: "opaqueID"},
-						Path:  "New Folder",
+						Path:  "Folder/New Folder",
 						Mtime: &typesv1beta1.Timestamp{Seconds: 1648327606, Nanos: 0},
 						Size:  uint64(1234),
+						Name:  "New Folder",
+						Space: &provider.StorageSpace{
+							Name:      "Project Mars",
+							SpaceType: "project",
+							Opaque:    opaque,
+							Root:      &provider.ResourceId{StorageId: "ownerStorageID", SpaceId: "spaceID", OpaqueId: "opaqueID"},
+						},
 					},
 				}, nil)
 				gatewayClient.On("GetQuota", mock.Anything, mock.Anything).Return(&provider.GetQuotaResponse{
@@ -322,8 +332,9 @@ var _ = Describe("Graph", func() {
 				Expect(value.Root.RemoteItem.LastModifiedDateTime.UTC()).To(Equal(time.Unix(1648327606, 0).UTC()))
 				Expect(*value.Root.RemoteItem.Folder).To(Equal(libregraph.Folder{}))
 				Expect(*value.Root.RemoteItem.Name).To(Equal("New Folder"))
+				Expect(*value.Root.RemoteItem.Path).To(Equal("Folder/New Folder"))
 				Expect(*value.Root.RemoteItem.Size).To(Equal(int64(1234)))
-				Expect(*value.Root.RemoteItem.WebDavUrl).To(Equal("https://localhost:9200/dav/spaces/ownerStorageID$spaceID%21opaqueID"))
+				Expect(*value.Root.RemoteItem.WebDavUrl).To(Equal("https://localhost:9200/dav/spaces/ownerStorageID$spaceID%21opaqueID/Folder/New%20Folder"))
 			})
 			It("can not list spaces with wrong sort parameter", func() {
 				gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{
