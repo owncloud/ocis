@@ -1,6 +1,6 @@
 ---
 title: Graph
-date: 2023-05-10T08:19:26.146722068Z
+date: 2023-05-10T12:09:05.391899828Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/graph
@@ -40,7 +40,7 @@ The following image gives an overview of the scenario when a client requests to 
 
 ## Caching
 
-The `graph` service can use a configured store via `GRAPH_STORE_TYPE`. Possible stores are:
+The `graph` service can use a configured store via `GRAPH_CACHE_STORE`. Possible stores are:
   -   `memory`: Basic in-memory store and the default.
   -   `ocmem`: Advanced in-memory store allowing max size.
   -   `redis`: Stores data in a configured Redis cluster.

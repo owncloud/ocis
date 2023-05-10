@@ -1,6 +1,6 @@
 ---
 title: Proxy
-date: 2023-05-10T08:19:26.147886468Z
+date: 2023-05-10T12:09:05.393019553Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/proxy
@@ -119,7 +119,7 @@ In a production deployment, you want to have basic authentication (`PROXY_ENABLE
 
 ## Caching
 
-The `proxy` service can use a configured store via `PROXY_STORE_TYPE`. Possible stores are:
+The `proxy` service can use a configured store via `PROXY_OIDC_USERINFO_CACHE_STORE`. Possible stores are:
   -   `memory`: Basic in-memory store and the default.
   -   `ocmem`: Advanced in-memory store allowing max size.
   -   `redis`: Stores data in a configured Redis cluster.
