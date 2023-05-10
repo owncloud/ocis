@@ -42,10 +42,7 @@ use GuzzleHttp\Pool;
 class HttpRequestHelper {
 	public const HTTP_TOO_EARLY = 425;
 
-	/**
-	 * @var string
-	 */
-	private static $oCSelectorCookie = null;
+	private static ?string $oCSelectorCookie = null;
 
 	/**
 	 * @return string
@@ -65,7 +62,7 @@ class HttpRequestHelper {
 
 	/**
 	 * Some systems-under-test do async post-processing of operations like upload,
-	 * move etc. If a client does a request on the resource before the post-processing
+	 * move, etc. If a client does a request on the resource before the post-processing
 	 * is finished, then the server should return HTTP_TOO_EARLY "425". Clients are
 	 * expected to retry the request "some time later" (tm).
 	 *
@@ -124,9 +121,6 @@ class HttpRequestHelper {
 				$timeout
 			);
 		}
-		/**
-		 * @var RequestInterface $request
-		 */
 		$request = self::createRequest(
 			$url,
 			$xRequestId,
@@ -148,7 +142,7 @@ class HttpRequestHelper {
 		// The exceptions that might happen here include:
 		// ConnectException - in that case there is no response. Don't catch the exception.
 		// RequestException - if there is something in the response then pass it back.
-		//                    otherwise re-throw the exception.
+		//                    Otherwise, re-throw the exception.
 		// GuzzleException - something else unexpected happened. Don't catch the exception.
 		try {
 			$response = $client->send($request);
@@ -325,8 +319,7 @@ class HttpRequestHelper {
 		?array $requests,
 		?Client $client
 	):array {
-		$results = Pool::batch($client, $requests);
-		return $results;
+		return Pool::batch($client, $requests);
 	}
 
 	/**
@@ -364,8 +357,7 @@ class HttpRequestHelper {
 		$options['stream'] = $stream;
 		$options['verify'] = false;
 		$options['timeout'] = $timeout;
-		$client = new Client($options);
-		return $client;
+		return new Client($options);
 	}
 
 	/**
@@ -397,7 +389,7 @@ class HttpRequestHelper {
 			$headers['X-Request-ID'] = $xRequestId;
 		}
 		if (\is_array($body)) {
-			// when creating the client, it is possible to set 'form_params' and
+			// When creating the client, it is possible to set 'form_params' and
 			// the Client constructor sorts out doing this http_build_query stuff.
 			// But 'new Request' does not have the flexibility to do that.
 			// So we need to do it here.

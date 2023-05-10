@@ -23,9 +23,7 @@ namespace TestHelpers;
 
 use Behat\Testwork\Hook\Scope\HookScope;
 use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Exception\ServerException;
 use Exception;
-use Psr\Http\Message\ResponseInterface;
 use SimpleXMLElement;
 
 /**
@@ -35,22 +33,9 @@ use SimpleXMLElement;
  *
  */
 class SetupHelper extends \PHPUnit\Framework\Assert {
-	/**
-	 * @var string
-	 */
-	private static $ocPath = null;
-	/**
-	 * @var string
-	 */
-	private static $baseUrl = null;
-	/**
-	 * @var string
-	 */
-	private static $adminUsername = null;
-	/**
-	 * @var string
-	 */
-	private static $adminPassword = null;
+	private static ?string $baseUrl = null;
+	private static ?string $adminUsername = null;
+	private static ?string $adminPassword = null;
 
 	/**
 	 *
@@ -61,18 +46,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	public static function getSuiteParameters(HookScope $scope):array {
 		return $scope->getEnvironment()->getSuite()
 			->getSettings() ['context'] ['parameters'];
-	}
-
-	/**
-	 * Fixup OC path so that it always starts with a "/" and does not end with
-	 * a "/".
-	 *
-	 * @param string|null $ocPath
-	 *
-	 * @return string
-	 */
-	private static function normaliseOcPath(?string $ocPath):string {
-		return '/' . \trim($ocPath, '/');
 	}
 
 	/**
@@ -101,7 +74,6 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 		self::$adminUsername = $adminUsername;
 		self::$adminPassword = $adminPassword;
 		self::$baseUrl = \rtrim($baseUrl, '/');
-		self::$ocPath = self::normaliseOcPath($ocPath);
 	}
 
 	/**
@@ -113,6 +85,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 *
 	 * @return SimpleXMLElement
 	 * @throws GuzzleException
+	 * @throws Exception
 	 */
 	public static function getSysInfo(
 		?string $baseUrl,
@@ -315,6 +288,7 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 	 *
 	 * @return void
 	 * @throws GuzzleException
+	 * @throws Exception
 	 */
 	public static function createFileOnServer(
 		?string $filePathFromServerRoot,
@@ -421,13 +395,13 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			$adminUsername,
 			$adminPassword,
 			'GET',
-			"/apps/testing/api/v1/file?file={$fileInCore}",
+			"/apps/testing/api/v1/file?file=$fileInCore",
 			$xRequestId
 		);
 		self::assertSame(
 			200,
 			$response->getStatusCode(),
-			"Failed to read the file {$fileInCore}"
+			"Failed to read the file $fileInCore"
 		);
 		$localContent = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$localContent = (string)$localContent->data->element->contentUrlEncoded;
@@ -470,17 +444,16 @@ class SetupHelper extends \PHPUnit\Framework\Assert {
 			$adminUsername,
 			$adminPassword,
 			'GET',
-			"/apps/testing/api/v1/file?file={$fileInSkeletonFolder}&absolute=true",
+			"/apps/testing/api/v1/file?file=$fileInSkeletonFolder&absolute=true",
 			$xRequestId
 		);
 		self::assertSame(
 			200,
 			$response->getStatusCode(),
-			"Failed to read the file {$fileInSkeletonFolder}"
+			"Failed to read the file $fileInSkeletonFolder"
 		);
 		$localContent = HttpRequestHelper::getResponseXml($response, __METHOD__);
 		$localContent = (string)$localContent->data->element->contentUrlEncoded;
-		$localContent = \urldecode($localContent);
-		return $localContent;
+		return \urldecode($localContent);
 	}
 }

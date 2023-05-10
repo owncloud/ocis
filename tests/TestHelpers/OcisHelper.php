@@ -145,7 +145,7 @@ class OcisHelper {
 	 * @param string|null $destination
 	 *
 	 * @return void
-	 * @throws Exception
+	 * @throws Exception|GuzzleException
 	 */
 	public static function recurseUpload(
 		?string $baseUrl,
@@ -231,7 +231,7 @@ class OcisHelper {
 	 */
 	public static function getBaseDN():string {
 		$dn = \getenv("REVA_LDAP_BASE_DN");
-		return $dn ? $dn : "dc=owncloud,dc=com";
+		return $dn ?: "dc=owncloud,dc=com";
 	}
 
 	/**
@@ -239,7 +239,7 @@ class OcisHelper {
 	 */
 	public static function getGroupsOU():string {
 		$ou = \getenv("REVA_LDAP_GROUPS_OU");
-		return $ou ? $ou : "TestGroups";
+		return $ou ?: "TestGroups";
 	}
 
 	/**
@@ -247,7 +247,7 @@ class OcisHelper {
 	 */
 	public static function getUsersOU():string {
 		$ou = \getenv("REVA_LDAP_USERS_OU");
-		return $ou ? $ou : "TestUsers";
+		return $ou ?: "TestUsers";
 	}
 
 	/**
@@ -255,14 +255,14 @@ class OcisHelper {
 	 */
 	public static function getGroupSchema():string {
 		$schema = \getenv("REVA_LDAP_GROUP_SCHEMA");
-		return $schema ? $schema : "rfc2307";
+		return $schema ?: "rfc2307";
 	}
 	/**
 	 * @return string
 	 */
 	public static function getHostname():string {
 		$hostname = \getenv("REVA_LDAP_HOSTNAME");
-		return $hostname ? $hostname : "localhost";
+		return $hostname ?: "localhost";
 	}
 
 	/**
@@ -270,7 +270,7 @@ class OcisHelper {
 	 */
 	public static function getBindDN():string {
 		$dn = \getenv("REVA_LDAP_BIND_DN");
-		return $dn ? $dn : "cn=admin,dc=owncloud,dc=com";
+		return $dn ?: "cn=admin,dc=owncloud,dc=com";
 	}
 
 	/**
@@ -278,7 +278,7 @@ class OcisHelper {
 	 */
 	public static function getBindPassword():string {
 		$pw = \getenv("REVA_LDAP_BIND_PASSWORD");
-		return $pw ? $pw : "";
+		return $pw ?: "";
 	}
 
 	/**
