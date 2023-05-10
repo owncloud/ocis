@@ -26,7 +26,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-The default role assignments the demo users should be setup.
+Flag to enable or disable the creation of the demo users.
 
 a| `IDM_TRACING_COLLECTOR`
 
@@ -580,7 +580,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
+ID of the user who collects all necessary information for deletion.
 
 a| `OCIS_ASYNC_UPLOADS`
 
@@ -638,7 +638,7 @@ a| [subs=-attributes]
 ++0 ++
 
 a| [subs=-attributes]
-The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
+The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
 a| `OCIS_CACHE_STORE`
 
@@ -657,7 +657,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++noop ++
+++memory ++
 
 a| [subs=-attributes]
 The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
@@ -701,10 +701,10 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++5m0s ++
+++24m0s ++
 
 a| [subs=-attributes]
-Default time to live for user info in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
 
 a| `OCIS_CORS_ALLOW_CREDENTIALS`
 
@@ -723,7 +723,7 @@ a| [subs=-attributes]
 ++bool ++
 
 a| [subs=-attributes]
-++true ++
+++false ++
 
 a| [subs=-attributes]
 Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
@@ -745,7 +745,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With] ++
+++[] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
@@ -767,7 +767,7 @@ a| [subs=-attributes]
 ++[]string ++
 
 a| [subs=-attributes]
-++[GET POST PUT PATCH DELETE OPTIONS] ++
+++[] ++
 
 a| [subs=-attributes]
 A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
@@ -1061,7 +1061,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Whether to verify the server TLS certificates.
+Whether the NATS server should skip the client certificate verification during the TLS handshake.
 
 a| `OCIS_JWT_SECRET`
 
@@ -1889,7 +1889,7 @@ a| [subs=-attributes]
 ++https://localhost:9200 ++
 
 a| [subs=-attributes]
-URL of the OIDC issuer. It defaults to URL of the builtin IDP.
+The identity provider value to set in the userids of the CS3 user objects for users returned by this user provider.
 
 a| `OCIS_PERSISTENT_STORE`
 
@@ -2299,10 +2299,10 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++https://localhost:9200 ++
+++https://localhost:9200/ ++
 
 a| [subs=-attributes]
-The public facing URL of the oCIS frontend.
+Base url to navigate back from the app to the containing folder in the file list.
 
 a| `REVA_GATEWAY`
 
