@@ -35,7 +35,6 @@ require_once 'bootstrap.php';
  * Context for Archiver specific steps
  */
 class ArchiverContext implements Context {
-
 	/**
 	 * @var FeatureContext
 	 */

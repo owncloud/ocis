@@ -31,7 +31,6 @@ require_once 'bootstrap.php';
  * Steps related to parallel deploy setup
  */
 class ParallelContext implements Context {
-
 	/**
 	 * @var FeatureContext
 	 */
