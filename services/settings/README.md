@@ -1,14 +1,4 @@
----
-title: "Settings"
-date: 2018-05-02T00:00:00+00:00
-weight: 20
-geekdocRepo: https://github.com/owncloud/ocis
-geekdocEditPath: edit/master/docs/services/settings
-geekdocFilePath: _index.md
-geekdocCollapseSection: true
----
-
-## Abstract
+# Settings
 
 When using oCIS, the requirement to store settings arises. This extension provides functionality
 for other extensions to register new settings within oCIS. It is responsible for storing the respective
@@ -31,7 +21,3 @@ The diagram shows how the settings service integrates into oCIS:
 
 **Settings usage:**
 - Extensions can query ocis-settings for *settings values* of a user.
-
-## Table of Contents
-
-{{< toc-tree >}}
