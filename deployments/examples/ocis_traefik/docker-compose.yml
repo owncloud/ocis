@@ -46,7 +46,7 @@ services:
     restart: always
 
   ocis:
-    image: owncloud/ocis:3.0.0-rc.3
+    image: owncloud/ocis:${OCIS_DOCKER_TAG:-latest}
     networks:
       ocis-net:
     entrypoint:
@@ -63,18 +63,17 @@ services:
       # INSECURE: needed if oCIS / Traefik is using self generated certificates
       OCIS_INSECURE: "${INSECURE:-false}"
       # basic auth (not recommended, but needed for eg. WebDav clients that do not support OpenID Connect)
-      PROXY_ENABLE_BASIC_AUTH: "true"
+      PROXY_ENABLE_BASIC_AUTH: "${PROXY_ENABLE_BASIC_AUTH:-false}"
       # admin user password
       IDM_ADMIN_PASSWORD: "${ADMIN_PASSWORD:-admin}" # this overrides the admin password from the configuration file
       # demo users
-      IDM_CREATE_DEMO_USERS: "true"
+      IDM_CREATE_DEMO_USERS: "${DEMO_USERS:-false}"
       # email server (in this case inbucket acts as mail catcher)
       NOTIFICATIONS_SMTP_HOST: inbucket
       NOTIFICATIONS_SMTP_PORT: 2500
       NOTIFICATIONS_SMTP_SENDER: oCIS notifications <notifications@${OCIS_DOMAIN:-ocis.owncloud.test}>
       NOTIFICATIONS_SMTP_USERNAME: notifications@${OCIS_DOMAIN:-ocis.owncloud.test}
       NOTIFICATIONS_SMTP_INSECURE: "true" # the mail catcher uses self signed certificates
-      OCIS_DECOMPOSEDFS_METADATA_BACKEND: "messagepack"
     volumes:
       - ocis-config:/etc/ocis
       - ocis-data:/var/lib/ocis

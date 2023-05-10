@@ -173,7 +173,7 @@ Feature: Notification
       }
       """
     Examples:
-      | language | subject           | message                                                          |
+      | language | subject           | message                                                               |
       | de       | Space freigegeben | Alice Hansen hat Sie zum Space notification checking hinzugef\u00fcgt |
-      | en       | Space shared      | Alice Hansen added you to Space notification checking            |
-      | es       | Space compartido  | Alice Hansen te añadió al Space notification checking            |
+      | en       | Space shared      | Alice Hansen added you to Space notification checking                 |
+      | es       | Space compartido  | Alice Hansen te añadió al Space notification checking                 |
