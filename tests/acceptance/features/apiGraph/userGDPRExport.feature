@@ -454,3 +454,113 @@ Feature: user GDPR (General Data Protection Regulation) report
       }
     }
     """
+
+
+  Scenario: generate a GDPR report after the admin updates the quota of personal space
+    Given user "Admin" has changed the quota of the personal space of "Alice Hansen" space to "10000"
+    When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
+    And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
+    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    And the downloaded JSON content should contain event type "events.SpaceUpdated" in item 'events' and should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "event"
+      ],
+      "properties": {
+        "event" : {
+          "type": "object",
+          "required": [
+            "Executant",
+            "Space"
+          ],
+          "properties": {
+            "Executant": {
+              "type": "object",
+              "required": [
+                "idp",
+                "opaque_id",
+                "type"
+              ],
+              "properties": {
+                "idp": {
+                  "type": "string",
+                  "pattern": "^%base_url%$"
+                },
+                "opaque_id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "type": {
+                  "type": "number",
+                  "enum": [1]
+                }
+              }
+            },
+            "Space": {
+              "type": "object",
+              "required": [
+                "name",
+                "quota",
+                "space_type"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "enum": ["Alice Hansen"]
+                },
+                "quota": {
+                  "type": "object",
+                  "required": [
+                    "quota_max_bytes",
+                    "quota_max_files"
+                  ],
+                  "properties": {
+                    "quota_max_bytes": {
+                      "type": "number",
+                      "enum": [10000]
+                    },
+                    "quota_max_files": {
+                      "type": "number",
+                      "enum": [18446744073709552000]
+                    }
+                  }
+                },
+                "space_type": {
+                  "type": "string",
+                  "enum": ["personal"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
+
+  Scenario Outline: user tries to generate GDPR report of other users
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has given "Alice" the role "<userRole>" using the settings api
+    And the administrator has given "Brian" the role "<role>" using the settings api
+    When user "Alice" tries to export GDPR report of user "Brian" to "/.personal_data_export.json" using Graph API
+    Then the HTTP status code should be "400"
+    Examples:
+      | userRole    | role        |
+      | Space Admin | Space Admin |
+      | Space Admin | User        |
+      | Space Admin | Guest       |
+      | Space Admin | Admin       |
+      | User        | Space Admin |
+      | User        | User        |
+      | User        | Guest       |
+      | User        | Admin       |
+      | Guest       | Space Admin |
+      | Guest       | User        |
+      | Guest       | Guest       |
+      | Guest       | Admin       |
+      | Admin       | Space Admin |
+      | Admin       | User        |
+      | Admin       | Guest       |
+      | Admin       | Admin       |
