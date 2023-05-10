@@ -10,6 +10,7 @@ import (
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	merrors "go-micro.dev/v4/errors"
 )
 
 const principalTypeUser = "User"
@@ -67,6 +68,10 @@ func (g Graph) CreateAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 		RoleId:      appRoleAssignment.AppRoleId,
 	})
 	if err != nil {
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusForbidden {
+			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, err.Error())
+			return
+		}
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -108,6 +113,10 @@ func (g Graph) DeleteAppRoleAssignment(w http.ResponseWriter, r *http.Request) {
 		Id: appRoleAssignmentID,
 	})
 	if err != nil {
+		if merr, ok := merrors.As(err); ok && merr.Code == http.StatusForbidden {
+			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, err.Error())
+			return
+		}
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
 		return
 	}
