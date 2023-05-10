@@ -6,9 +6,17 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix the empty string givenName attribute when creating user: [#5431](https://github.com/owncloud/ocis/issues/5431)
 * Enhancement - Add specific result to antivirus for debugging: [#6265](https://github.com/owncloud/ocis/pull/6265)
 
 ## Details
+
+* Bugfix - Fix the empty string givenName attribute when creating user: [#5431](https://github.com/owncloud/ocis/issues/5431)
+
+   Omitempty givenName attribute when creating user
+
+   https://github.com/owncloud/ocis/issues/5431
+   https://github.com/owncloud/ocis/pull/6259
 
 * Enhancement - Add specific result to antivirus for debugging: [#6265](https://github.com/owncloud/ocis/pull/6265)
 
