@@ -60,13 +60,12 @@ Feature: search sharees
 
   Scenario Outline: search only with group members - allowed
     Given using OCS API version "<ocs-api-version>"
-    And parameter "shareapi_only_share_with_group_members" of app "core" has been set to "yes"
     And user "Sharee1" has been added to group "ShareeGroup2"
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | sharee |
       | itemType | file   |
     Then the OCS status code should be "<ocs-status>"
-    And the HTTP status code should be "<http-status>"
+    And the HTTP status code should be "200"
     And the "exact users" sharees returned should be empty
     And the "users" sharees returned should be
       | Sharee One | 0 | sharee1 |
@@ -77,9 +76,9 @@ Feature: search sharees
     And the "exact remotes" sharees returned should be empty
     And the "remotes" sharees returned should be empty
     Examples:
-      | ocs-api-version | ocs-status | http-status |
-      | 1               | 100        | 200         |
-      | 2               | 200        | 200         |
+      | ocs-api-version | ocs-status |
+      | 1               | 100        |
+      | 2               | 200        |
 
 
   Scenario Outline: search with exact match
@@ -207,7 +206,6 @@ Feature: search sharees
       | username | displayname |
       | another  | Another     |
     And user "Another" has been added to group "ShareeGroup2"
-    And parameter "shareapi_share_dialog_user_enumeration_group_members" of app "core" has been set to "yes"
     When user "Alice" gets the sharees using the sharing API with parameters
       | search   | anot |
       | itemType | file |

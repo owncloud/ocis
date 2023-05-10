@@ -11,7 +11,6 @@ Feature: resharing can be disabled
 
   Scenario Outline: ordinary sharing is allowed when allow resharing has been disabled
     Given using OCS API version "<ocs_api_version>"
-    And parameter "shareapi_allow_resharing" of app "core" has been set to "no"
     When user "Alice" shares file "/textfile0.txt" with user "Brian" with permissions "share,update,read" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"

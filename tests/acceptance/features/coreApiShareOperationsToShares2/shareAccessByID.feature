@@ -75,8 +75,7 @@ Feature: share access by ID
 
 
   Scenario Outline: accept a share using the invalid share Id
-    Given parameter "shareapi_auto_accept_share" of app "core" has been set to "yes"
-    And using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs_api_version>"
     When user "Brian" accepts share with ID "<share_id>" using the sharing API
     Then the OCS status code should be "404"
     And the HTTP status code should be "<http_status_code>"
@@ -94,8 +93,7 @@ Feature: share access by ID
 
 
   Scenario Outline: accept a share using empty share Id
-    Given parameter "shareapi_auto_accept_share" of app "core" has been set to "yes"
-    And using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs_api_version>"
     When user "Brian" accepts share with ID "" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "<http_status_code>"
@@ -118,16 +116,15 @@ Feature: share access by ID
       | /Shares/textfile0.txt |
     And the sharing API should report to user "Brian" that these shares are in the declined state
       | path                  |
-      | <declined_share_path> |
+      | /Shares/textfile0.txt |
     Examples:
-      | ocs_api_version | ocs_status_code | declined_share_path   |
-      | 1               | 100             | /Shares/textfile0.txt |
-      | 2               | 200             | /Shares/textfile0.txt |
+      | ocs_api_version | ocs_status_code |
+      | 1               | 100             |
+      | 2               | 200             |
 
 
   Scenario Outline: decline a share using a invalid share Id
-    Given parameter "shareapi_auto_accept_share" of app "core" has been set to "yes"
-    And using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs_api_version>"
     When user "Brian" declines share with ID "<share_id>" using the sharing API
     Then the OCS status code should be "404"
     And the HTTP status code should be "<http_status_code>"
@@ -145,8 +142,7 @@ Feature: share access by ID
 
 
   Scenario Outline: decline a share using empty share Id
-    Given parameter "shareapi_auto_accept_share" of app "core" has been set to "yes"
-    And using OCS API version "<ocs_api_version>"
+    Given using OCS API version "<ocs_api_version>"
     When user "Brian" declines share with ID "" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "<http_status_code>"

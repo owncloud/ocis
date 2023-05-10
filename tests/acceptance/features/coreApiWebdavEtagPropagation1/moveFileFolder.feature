@@ -157,7 +157,6 @@ Feature: propagation of etags when moving files or folders
 
   Scenario Outline: as share receiver renaming a file inside a folder changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And parameter "shareapi_auto_accept_share" of app "core" has been set to "no"
     And using <dav_version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
@@ -185,7 +184,6 @@ Feature: propagation of etags when moving files or folders
 
   Scenario Outline: as sharer renaming a file inside a folder changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And parameter "shareapi_auto_accept_share" of app "core" has been set to "no"
     And using <dav_version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
@@ -213,7 +211,6 @@ Feature: propagation of etags when moving files or folders
   @issue-product-280
   Scenario Outline: as sharer moving a file from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And parameter "shareapi_auto_accept_share" of app "core" has been set to "no"
     And using <dav_version> DAV path
     And user "Alice" has created folder "/src"
     And user "Alice" has created folder "/dst"
@@ -248,7 +245,6 @@ Feature: propagation of etags when moving files or folders
 
   Scenario Outline: as share receiver moving a file from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And parameter "shareapi_auto_accept_share" of app "core" has been set to "no"
     And using <dav_version> DAV path
     And user "Alice" has created folder "/src"
     And user "Alice" has created folder "/dst"
@@ -283,7 +279,6 @@ Feature: propagation of etags when moving files or folders
   @issue-product-280
   Scenario Outline: as sharer moving a folder from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And parameter "shareapi_auto_accept_share" of app "core" has been set to "no"
     And using <dav_version> DAV path
     And user "Alice" has created folder "/src"
     And user "Alice" has created folder "/dst"
@@ -318,7 +313,6 @@ Feature: propagation of etags when moving files or folders
 
   Scenario Outline: as share receiver moving a folder from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And parameter "shareapi_auto_accept_share" of app "core" has been set to "no"
     And using <dav_version> DAV path
     And user "Alice" has created folder "/src"
     And user "Alice" has created folder "/dst"

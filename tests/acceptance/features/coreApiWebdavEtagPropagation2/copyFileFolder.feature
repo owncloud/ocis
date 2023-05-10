@@ -154,7 +154,6 @@ Feature: propagation of etags when copying files or folders
 
   Scenario Outline: as share receiver copying a file inside a folder changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And parameter "shareapi_auto_accept_share" of app "core" has been set to "no"
     And using <dav_version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"
@@ -192,7 +191,6 @@ Feature: propagation of etags when copying files or folders
   @issue-product-280
   Scenario Outline: as sharer copying a file inside a folder changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And parameter "shareapi_auto_accept_share" of app "core" has been set to "no"
     And using <dav_version> DAV path
     And user "Alice" has created folder "/upload"
     And user "Alice" has uploaded file with content "uploaded content" to "/upload/file.txt"

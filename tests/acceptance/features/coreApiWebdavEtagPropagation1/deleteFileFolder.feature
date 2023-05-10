@@ -3,7 +3,6 @@ Feature: propagation of etags when deleting a file or folder
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
-    And parameter "shareapi_auto_accept_share" of app "core" has been set to "no"
     And user "Alice" has created folder "/upload"
 
 
@@ -147,7 +146,6 @@ Feature: propagation of etags when deleting a file or folder
   @issue-product-280
   Scenario Outline: as share receiver deleting a folder changes the etags of all parents for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And parameter "shareapi_auto_accept_share" of app "core" has been set to "no"
     And using <dav_version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
@@ -179,7 +177,6 @@ Feature: propagation of etags when deleting a file or folder
   @issue-product-280
   Scenario Outline: as sharer deleting a folder changes the etags of all parents for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
-    And parameter "shareapi_auto_accept_share" of app "core" has been set to "no"
     And using <dav_version> DAV path
     And user "Alice" has created folder "/upload/sub"
     And user "Alice" has created folder "/upload/sub/toDelete"
