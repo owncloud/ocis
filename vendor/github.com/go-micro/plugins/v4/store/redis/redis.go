@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -177,6 +178,10 @@ func (r *rkv) List(opts ...store.ListOption) ([]string, error) {
 		keys, cursor, err = r.Client.Scan(r.ctx, cursor, key, count).Result()
 		if err != nil {
 			return nil, err
+		}
+
+		for i, key := range keys {
+			keys[i] = strings.TrimPrefix(key, options.Table)
 		}
 
 		allKeys = append(allKeys, keys...)
