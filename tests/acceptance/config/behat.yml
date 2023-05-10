@@ -185,7 +185,7 @@ default:
         - FavoritesContext:
         - ChecksumContext:
         - FilesVersionsContext:
-        - RoleAssignmentContext:
+        - SettingsContext:
 
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
