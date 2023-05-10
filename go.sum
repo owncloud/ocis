@@ -661,8 +661,6 @@ github.com/dnaeon/go-vcr v1.0.1/go.mod h1:aBB1+wY4s93YsC3HHjMBMrwTj2R9FHDzUr9KyG
 github.com/dnsimple/dnsimple-go v0.63.0/go.mod h1:O5TJ0/U6r7AfT8niYNlmohpLbCSG+c71tQlGr9SeGrg=
 github.com/docker/go-units v0.4.0 h1:3uh0PgVws3nIA0Q+MwDC8yjEPf9zjRfZZWXZYDct3Tw=
 github.com/docker/go-units v0.4.0/go.mod h1:fgPhTUdO+D/Jk86RDLlptpiXQzgHJF7gydDDbaIK4Dk=
-github.com/dragonchaser/go-micro-plugins/v4/store/redis v0.0.0-20230508144354-06738dcca00f h1:5siFx2qvzmMSIWJvN2JhdJmU0tlqIFzgcfOnJm8sGTg=
-github.com/dragonchaser/go-micro-plugins/v4/store/redis v0.0.0-20230508144354-06738dcca00f/go.mod h1:MbCG0YiyPqETTtm7uHFmxQNCaW1o9hBoYtFwhbVjLUg=
 github.com/dustin/go-humanize v1.0.0 h1:VSnTsYCnlFHaM2/igO1h6X3HA71jcobQuxemgkq4zYo=
 github.com/dustin/go-humanize v1.0.0/go.mod h1:HtrtbFcZ19U5GC7JDqmcUSB87Iq5E25KnS6fMYU6eOk=
 github.com/dutchcoders/go-clamd v0.0.0-20170520113014-b970184f4d9e h1:rcHHSQqzCgvlwP0I/fQ8rQMn/MpHE5gWSLdtpxtP6KQ=
@@ -794,6 +792,8 @@ github.com/go-micro/plugins/v4/server/http v1.2.1 h1:Cia924J90rgFT/4qWWvyLvN+XqE
 github.com/go-micro/plugins/v4/server/http v1.2.1/go.mod h1:YuAjaSPxcn3LI8j2FUsqx0Rxunrj4YwDV41Ax76rLl0=
 github.com/go-micro/plugins/v4/store/nats-js v1.1.0 h1:6Fe1/eLtg8kRyaGvMILp4olYtTDGwYNBXyb1sYfAWGk=
 github.com/go-micro/plugins/v4/store/nats-js v1.1.0/go.mod h1:jJf7Gm39OafZlT3s3UE2/9NIYj6OlI2fmZ4czSA3gvo=
+github.com/go-micro/plugins/v4/store/redis v1.2.1-0.20230510195111-07cd57e1bc9d h1:HQoDDVyMfdkrgXNo03ZY4vzhoOXMDZVZ4SnpBDVID6E=
+github.com/go-micro/plugins/v4/store/redis v1.2.1-0.20230510195111-07cd57e1bc9d/go.mod h1:MbCG0YiyPqETTtm7uHFmxQNCaW1o9hBoYtFwhbVjLUg=
 github.com/go-micro/plugins/v4/transport/grpc v1.1.0 h1:mXfDYfFQLnVDzjGY3o84oe4prfux9h8txsnA19dKsj8=
 github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.2.0 h1:EQj4l7fuOSz8ueUYhFlpZPp9+tN4JeONL32ARRKXW/U=
 github.com/go-micro/plugins/v4/wrapper/breaker/gobreaker v1.2.0/go.mod h1:JR9Ox/iJIrcXm8nCWdAEBsyG7Q7lyMLzsTZPfXrqvwo=
