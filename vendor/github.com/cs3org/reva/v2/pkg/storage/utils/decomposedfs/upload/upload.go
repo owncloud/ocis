@@ -370,7 +370,7 @@ func (upload *Upload) cleanup(cleanNode, cleanBin, cleanInfo bool) {
 			upload.Node = nil
 		default:
 
-			if err := upload.lu.CopyMetadata(upload.Node.InternalPath(), p, func(attributeName string) bool {
+			if err := upload.lu.CopyMetadata(p, upload.Node.InternalPath(), func(attributeName string) bool {
 				return strings.HasPrefix(attributeName, prefixes.ChecksumPrefix) ||
 					attributeName == prefixes.TypeAttr ||
 					attributeName == prefixes.BlobIDAttr ||

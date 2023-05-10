@@ -78,6 +78,11 @@ func (h *Handler) getGrantee(ctx context.Context, name string) (provider.Grantee
 func (h *Handler) addSpaceMember(w http.ResponseWriter, r *http.Request, info *provider.ResourceInfo, role *conversions.Role, roleVal []byte) {
 	ctx := r.Context()
 
+	if info.Space.SpaceType == "personal" {
+		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "can not add members to personal spaces", nil)
+		return
+	}
+
 	shareWith := r.FormValue("shareWith")
 	if shareWith == "" {
 		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "missing shareWith", nil)

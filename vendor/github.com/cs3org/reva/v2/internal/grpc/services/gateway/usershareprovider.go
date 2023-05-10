@@ -20,7 +20,6 @@ package gateway
 
 import (
 	"context"
-	"path"
 
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
@@ -265,97 +264,6 @@ func (s *svc) UpdateReceivedShare(ctx context.Context, req *collaboration.Update
 			}
 			return res, nil
 	*/
-}
-
-func (s *svc) removeReference(ctx context.Context, resourceID *provider.ResourceId) *rpc.Status {
-	log := appctx.GetLogger(ctx)
-
-	idReference := &provider.Reference{ResourceId: resourceID}
-	storageProvider, _, err := s.find(ctx, idReference)
-	if err != nil {
-		appctx.GetLogger(ctx).
-			Err(err).
-			Interface("reference", idReference).
-			Msg("removeReference: failed to get storage provider")
-		if _, ok := err.(errtypes.IsNotFound); ok {
-			return status.NewNotFound(ctx, "storage provider not found")
-		}
-		return status.NewInternal(ctx, "error finding storage provider")
-	}
-
-	statRes, err := storageProvider.Stat(ctx, &provider.StatRequest{Ref: idReference})
-	if err != nil {
-		log.Error().Err(err).Interface("reference", idReference).Msg("removeReference: error calling Stat")
-		return status.NewInternal(ctx, "gateway: error calling Stat for the share resource id: "+resourceID.String())
-	}
-
-	// FIXME how can we delete a reference if the original resource was deleted?
-	if statRes.Status.Code != rpc.Code_CODE_OK {
-		log.Error().Interface("status", statRes.Status).Interface("reference", idReference).Msg("removeReference: error calling Stat")
-		return status.NewInternal(ctx, "could not delete share reference")
-	}
-
-	homeRes, err := s.GetHome(ctx, &provider.GetHomeRequest{})
-	if err != nil {
-		return status.NewInternal(ctx, "could not delete share reference")
-	}
-
-	sharePath := path.Join(homeRes.Path, s.c.ShareFolder, path.Base(statRes.Info.Path))
-	log.Debug().Str("share_path", sharePath).Msg("remove reference of share")
-
-	sharePathRef := &provider.Reference{Path: sharePath}
-	homeProvider, providerInfo, err := s.find(ctx, sharePathRef)
-	if err != nil {
-		appctx.GetLogger(ctx).
-			Err(err).
-			Interface("reference", sharePathRef).
-			Msg("removeReference: failed to get storage provider for share ref")
-		if _, ok := err.(errtypes.IsNotFound); ok {
-			return status.NewNotFound(ctx, "storage provider not found")
-		}
-		return status.NewInternal(ctx, "error finding storage provider")
-	}
-
-	var (
-		root      *provider.ResourceId
-		mountPath string
-	)
-	for _, space := range decodeSpaces(providerInfo) {
-		mountPath = decodePath(space)
-		root = space.Root
-		break // TODO can there be more than one space for a path?
-	}
-
-	ref := unwrap(sharePathRef, mountPath, root)
-
-	deleteReq := &provider.DeleteRequest{
-		Opaque: &typesv1beta1.Opaque{
-			Map: map[string]*typesv1beta1.OpaqueEntry{
-				// This signals the storageprovider that we want to delete the share reference and not the underlying file.
-				"deleting_shared_resource": {},
-			},
-		},
-		Ref: ref,
-	}
-
-	deleteResp, err := homeProvider.Delete(ctx, deleteReq)
-	if err != nil {
-		return status.NewInternal(ctx, "could not delete share reference")
-	}
-
-	switch deleteResp.Status.Code {
-	case rpc.Code_CODE_OK:
-		// we can continue deleting the reference
-	case rpc.Code_CODE_NOT_FOUND:
-		// This is fine, we wanted to delete it anyway
-		return status.NewOK(ctx)
-	default:
-		return status.NewInternal(ctx, "could not delete share reference")
-	}
-
-	log.Debug().Str("share_path", sharePath).Msg("share reference successfully removed")
-
-	return status.NewOK(ctx)
 }
 
 func (s *svc) denyGrant(ctx context.Context, id *provider.ResourceId, g *provider.Grantee, opaque *typesv1beta1.Opaque) (*rpc.Status, error) {
@@ -674,11 +582,6 @@ func (s *svc) removeShare(ctx context.Context, req *collaboration.RemoveShareReq
 	res, err := c.RemoveShare(ctx, req)
 	if err != nil {
 		return nil, errors.Wrap(err, "gateway: error calling RemoveShare")
-	}
-
-	// we do not want to remove the reference if it is a reshare
-	if utils.UserEqual(share.Owner, share.Creator) {
-		s.removeReference(ctx, share.ResourceId)
 	}
 
 	if s.c.CommitShareToStorageGrant {

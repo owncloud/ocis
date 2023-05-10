@@ -231,6 +231,13 @@ func (h *Handler) CreateShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// check that this is a valid share
+	if statRes.Info.Id.OpaqueId == statRes.Info.Id.SpaceId &&
+		(shareType != int(conversions.ShareTypeSpaceMembershipUser) && shareType != int(conversions.ShareTypeSpaceMembershipGroup)) {
+		response.WriteOCSError(w, r, http.StatusBadRequest, "Can not share space root", nil)
+		return
+	}
+
 	// check user has share permissions
 	if !conversions.RoleFromResourcePermissions(statRes.Info.PermissionSet, false).OCSPermissions().Contain(conversions.PermissionShare) {
 		response.WriteOCSError(w, r, http.StatusNotFound, "No share permission", nil)

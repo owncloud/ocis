@@ -373,9 +373,10 @@ func (s *svc) UpdateReceivedOCMShare(ctx context.Context, req *ocm.UpdateReceive
 					Status: createRefStatus,
 				}, err
 			case ocm.ShareState_SHARE_STATE_REJECTED:
-				s.removeReference(ctx, req.GetShare().GetShare().ResourceId) // error is logged inside removeReference
-				// FIXME we are ignoring an error from removeReference here
-				return res, nil
+				return &ocm.UpdateReceivedOCMShareResponse{
+					Status: status.NewUnimplemented(ctx, err, "ocm share rejection not supported at the moment"),
+				}, nil
+
 			}
 		case "mount_point":
 			// TODO(labkode): implementing updating mount point
