@@ -17,7 +17,7 @@ The following image gives an overview of the scenario when a client requests to 
 
 ## Caching
 
-The `graph` service can use a configured store via `GRAPH_STORE_TYPE`. Possible stores are:
+The `graph` service can use a configured store via `GRAPH_CACHE_STORE`. Possible stores are:
   -   `memory`: Basic in-memory store and the default.
   -   `ocmem`: Advanced in-memory store allowing max size.
   -   `redis`: Stores data in a configured Redis cluster.
