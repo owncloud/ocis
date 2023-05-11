@@ -56,7 +56,7 @@ role_assignment:
               claim_value: mySpaceAdminRole
             - role_name: user
               claim_value: myUserRole
-            - role_name: guest:
+            - role_name: guest
               claim_value: myGuestRole
 ```
 
@@ -85,7 +85,7 @@ The default `role_claim` (or `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM`) is `roles`. The
   claim_value: ocisSpaceAdmin
 - role_name: user
   claim_value: ocisUser
-- role_name: guest:
+- role_name: guest
   claim_value: ocisGuest
 ```
 
