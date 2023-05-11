@@ -36,7 +36,7 @@ class OcisConfigContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function asyncUploadHasbeenEnabledWithDeplayedPostProcessing(string $delayTime): void {
+	public function asyncUploadHasbeenEnabledWithDelayedPostProcessing(string $delayTime): void {
 		$envs = [
 			"STORAGE_USERS_OCIS_ASYNC_UPLOADS" => true,
 			"OCIS_EVENTS_ENABLE_TLS" => false,
@@ -59,7 +59,7 @@ class OcisConfigContext implements Context {
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function corsAllowedOriginsHasbeenSet(string $allowedOrigins): void {
+	public function corsAllowedOriginsHasBeenSet(string $allowedOrigins): void {
 		$envs = [
 			"OCIS_CORS_ALLOW_ORIGINS" => $allowedOrigins,
 		];

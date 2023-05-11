@@ -28,7 +28,7 @@ use GuzzleHttp\Psr7\Request;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * A helper class for configureing oCIS server
+ * A helper class for configuring oCIS server
  */
 class OcisConfigHelper {
 	/**
