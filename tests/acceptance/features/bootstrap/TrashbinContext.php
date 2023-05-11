@@ -254,7 +254,11 @@ class TrashbinContext implements Context {
 			// avoid "common" situations that could cause infinite recursion.
 			$trashbinRef = $file["href"];
 			$trimmedTrashbinRef = \trim($trashbinRef, "/");
-			$expectedStart = "remote.php/dav/trash-bin/$user";
+			if ($davPathVersion === WebDavHelper::DAV_VERSION_SPACES) {
+				$expectedStart = "remote.php/dav/spaces/trash-bin";
+			} else {
+				$expectedStart = "remote.php/dav/trash-bin/$user";
+			}
 			$expectedStartLength = \strlen($expectedStart);
 			if ((\substr($trimmedTrashbinRef, 0, $expectedStartLength) !== $expectedStart)
 				|| (\strlen($trimmedTrashbinRef) === $expectedStartLength)

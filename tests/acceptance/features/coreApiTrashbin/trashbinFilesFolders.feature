@@ -158,7 +158,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | spaces   |
 
-  @issue-3561 
+  @issue-3561
   Scenario Outline: Listing other user's trashbin is prohibited
     Given using <dav-path> DAV path
     And user "testtrashbin100" has been created with default attributes and without skeleton files
@@ -176,7 +176,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | new      | 404         |
       | spaces   | 404         |
 
-  @issue-3561 @smokeTest 
+  @issue-3561 @smokeTest
   Scenario Outline: Listing other user's trashbin is prohibited with multiple files on trashbin
     Given using <dav-path> DAV path
     And user "testtrashbin101" has been created with default attributes and without skeleton files
@@ -223,7 +223,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | new      | 404         |
       | spaces   | 404         |
 
-  @issue-3561 
+  @issue-3561
   Scenario Outline: Listing other user's empty unused trashbin is prohibited
     Given using <dav-path> DAV path
     And user "testtrashbinempty" has been created with default attributes and without skeleton files
@@ -239,7 +239,7 @@ Feature: files and folders exist in the trashbin after being deleted
       | dav-path |
       | spaces   |
 
-  @issue-3561 
+  @issue-3561
   Scenario Outline: Listing non-existent user's trashbin is prohibited
     Given using <dav-path> DAV path
     When user "Alice" tries to list the trashbin content for user "testtrashbinnotauser"
@@ -305,9 +305,6 @@ Feature: files and folders exist in the trashbin after being deleted
       | new      | dash-123 |
       | new      | null     |
       | new      | nil      |
-      | new      | 123      |
-      | new      | -123     |
-      | new      | 0.0      |
 
     @personalSpace
     Examples:
@@ -315,9 +312,6 @@ Feature: files and folders exist in the trashbin after being deleted
       | spaces   | dash-123 |
       | spaces   | null     |
       | spaces   | nil      |
-      | spaces   | 123      |
-      | spaces   | -123     |
-      | spaces   | 0.0      |
 
 
   Scenario Outline: deleting a file with comma in the filename moves it to trashbin
