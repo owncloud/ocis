@@ -1,6 +1,5 @@
-# NOTE: for running this feature locally, you need to run oCIS with the following env var:
-# CORS_ALLOWED_ORIGINS=https://aphno.badal
-@api 
+# NOTE: set env OCIS_CORS_ALLOW_ORIGINS=https://aphno.badal while running ocis server
+@api @env-config
 Feature: CORS headers
   As a user
   I want to send a cross-origin request
@@ -8,6 +7,7 @@ Feature: CORS headers
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
+    And cors allowed origins has been set to "https://aphno.badal"
 
   @issue-5195
   Scenario Outline: CORS headers should be returned when setting CORS domain sending origin header

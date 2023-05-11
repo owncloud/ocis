@@ -1,4 +1,4 @@
-@api
+@api @env-config
 Feature: delay post-processing of uploaded files
   As a user
   I want to delay the post-processing of uploaded files
@@ -6,6 +6,7 @@ Feature: delay post-processing of uploaded files
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
+    And async upload has been enabled with post processing delayed to "30" seconds
 
   @issue-5326
   Scenario Outline: user sends GET request to the file while it's still being processed
