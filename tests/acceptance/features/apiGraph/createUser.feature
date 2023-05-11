@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: create user
   As a admin
   I want to create a user
@@ -22,13 +22,17 @@ Feature: create user
     Then the HTTP status code should be "<code>"
     And user "<userName>" <shouldOrNot> exist
     Examples:
-      | userName                     | displayName     | email               | password                     | code | enable | shouldOrNot |
-      | SameDisplayName              | Alice Hansen    | new@example.org     | containsCharacters(*:!;_+-&) | 200  | true   | should      |
-      | withoutPassSameEmail         | without pass    | alice@example.org   |                              | 200  | true   | should      |
-      | name                         | pass with space | example@example.org | my pass                      | 200  | true   | should      |
-      | nameWithCharacters(*:!;_+-&) | user            | new@example.org     | 123                          | 400  | true   | should not  |
-      | name with space              | name with space | example@example.org | 123                          | 400  | true   | should not  |
-      | createDisabledUser           | disabled user   | example@example.org | 123                          | 200  | false  | should      |
+      | userName                     | displayName     | email                   | password                     | code | enable | shouldOrNot |
+      | SameDisplayName              | Alice Hansen    | new@example.org         | containsCharacters(*:!;_+-&) | 200  | true   | should      |
+      | withoutPassSameEmail         | without pass    | alice@example.org       |                              | 200  | true   | should      |
+      | name                         | pass with space | example@example.org     | my pass                      | 200  | true   | should      |
+      | nameWithCharacters(*:!;_+-&) | user            | new@example.org         | 123                          | 400  | true   | should not  |
+      | name with space              | name with space | example@example.org     | 123                          | 400  | true   | should not  |
+      | createDisabledUser           | disabled user   | example@example.org     | 123                          | 200  | false  | should      |
+      | nameWithNumbers0123456       | user            | name0123456@example.org | 123                          | 200  | true   | should      |
+      | name.with.dots               | user            | name.w.dots@example.org | 123                          | 200  | true   | should      |
+      | 123456789                    | user            | 123456789@example.org   | 123                          | 400  | true   | should not  |
+      | 0.0                          | user            | float@example.org       | 123                          | 400  | true   | should not  |
 
     @skipOnStable2.0
     Examples:
