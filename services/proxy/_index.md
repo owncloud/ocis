@@ -1,6 +1,6 @@
 ---
 title: Proxy
-date: 2023-05-11T00:29:55.940028868Z
+date: 2023-05-11T08:24:50.199885678Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/proxy
@@ -80,7 +80,7 @@ role_assignment:
               claim_value: mySpaceAdminRole
             - role_name: user
               claim_value: myUserRole
-            - role_name: guest:
+            - role_name: guest
               claim_value: myGuestRole
 ```
 
@@ -109,7 +109,7 @@ The default `role_claim` (or `PROXY_ROLE_ASSIGNMENT_OIDC_CLAIM`) is `roles`. The
   claim_value: ocisSpaceAdmin
 - role_name: user
   claim_value: ocisUser
-- role_name: guest:
+- role_name: guest
   claim_value: ocisGuest
 ```
 
