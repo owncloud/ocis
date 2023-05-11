@@ -654,15 +654,6 @@ Not everything needs to be implemented for ocis. While the oc10 testsuite covers
 
 - [coreApiTrashbin/trashbinDelete.feature:105](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinDelete.feature#L105)
 
-#### [Problem accessing trashbin with personal space id](https://github.com/owncloud/ocis/issues/3639)
-
-- [coreApiTrashbin/trashbinFilesFolders.feature:308](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L308)
-- [coreApiTrashbin/trashbinFilesFolders.feature:309](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L309)
-- [coreApiTrashbin/trashbinFilesFolders.feature:310](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L310)
-- [coreApiTrashbin/trashbinFilesFolders.feature:318](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L318)
-- [coreApiTrashbin/trashbinFilesFolders.feature:319](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L319)
-- [coreApiTrashbin/trashbinFilesFolders.feature:320](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiTrashbin/trashbinFilesFolders.feature#L320)
-
 #### [Default capabilities for normal user and admin user not same as in oC-core](https://github.com/owncloud/ocis/issues/1285)
 - [coreApiCapabilities/capabilities.feature:11](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiCapabilities/capabilities.feature#L11)
 - [coreApiCapabilities/capabilities.feature:136](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiCapabilities/capabilities.feature#L136)
