@@ -2,8 +2,12 @@ package middleware
 
 import (
 	"net/http"
+	"path"
+	"time"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/render"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	pMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/policies/v0"
@@ -11,6 +15,23 @@ import (
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/net"
 	tusd "github.com/tus/tusd/pkg/handler"
 )
+
+type (
+	// RequestDenied struct for OdataErrorMain
+	RequestDenied struct {
+		Error RequestDeniedError `json:"error"`
+	}
+
+	// RequestDeniedError struct for RequestDenied
+	RequestDeniedError struct {
+		Code    string `json:"code"`
+		Message string `json:"message"`
+		// The structure of this object is service-specific
+		Innererror map[string]interface{} `json:"innererror,omitempty"`
+	}
+)
+
+const DeniedMessage = "Operation denied due to security policies"
 
 // Policies verifies if a request is granted or not.
 func Policies(logger log.Logger, qs string) func(next http.Handler) http.Handler {
@@ -59,11 +80,38 @@ func Policies(logger log.Logger, qs string) func(next http.Handler) http.Handler
 			}
 
 			if !rsp.Result {
-				w.WriteHeader(http.StatusForbidden)
+				RenderError(w, r, req, http.StatusForbidden, DeniedMessage)
 				return
 			}
 
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+// RenderError writes a Policies ErrorObject to the response writer
+func RenderError(w http.ResponseWriter, r *http.Request, evaluateReq *pService.EvaluateRequest, status int, msg string) {
+	filename := evaluateReq.Environment.GetResource().GetName()
+	if filename == "" {
+		filename = path.Base(evaluateReq.Environment.GetRequest().GetPath())
+	}
+
+	innererror := map[string]interface{}{
+		"date": time.Now().UTC().Format(time.RFC3339),
+	}
+
+	innererror["request-id"] = middleware.GetReqID(r.Context())
+	innererror["method"] = evaluateReq.Environment.GetRequest().GetMethod()
+	innererror["filename"] = filename
+	innererror["path"] = evaluateReq.Environment.GetRequest().GetPath()
+
+	resp := &RequestDenied{
+		Error: RequestDeniedError{
+			Code:       "deniedByPolicy",
+			Message:    msg,
+			Innererror: innererror,
+		},
+	}
+	render.Status(r, status)
+	render.JSON(w, r, resp)
 }
