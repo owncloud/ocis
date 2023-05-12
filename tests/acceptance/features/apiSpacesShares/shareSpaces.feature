@@ -437,7 +437,7 @@ Feature: Share spaces
       | viewer  |
 
 
-  Scenario Outline: user cannot share a personal to user
+  Scenario Outline: user cannot share the personal space to an other user
     Given the administrator has given "Brian" the role "<role>" using the settings api
     And user "Brian" shares a space "Brian Murphy" with settings:
       | shareWith | Bob    |
@@ -452,7 +452,7 @@ Feature: Share spaces
       | User        |
 
 
-  Scenario: user cannot share a personal to group
+  Scenario: user cannot share the personal space to a group
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
     And user "Alice" shares a space "Alice Hansen" with settings:

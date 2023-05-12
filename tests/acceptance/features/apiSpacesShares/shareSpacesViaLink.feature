@@ -108,7 +108,7 @@ Feature: Share spaces via link
     And for user "Alice" the space "share space" should not contain the last created public link
 
 
-  Scenario: user cannot share a personal space to public via link
+  Scenario: user cannot create a public link from the personal space
     When user "Alice" creates a public link share of the space "Alice Hansen" with settings:
       | permissions | 1 |
     Then the HTTP status code should be "400"
