@@ -210,6 +210,46 @@ If you want to work on a specific issue
 5. remove those tests from the expected failures file
 6. make a PR that has the fixed code, and the relevant lines removed from the expected failures file.
 
+## Running ENV config tests (@env-config)
+
+Test suites tagged with `@env-config` are used to test the environment variables that are used to configure oCIS. These tests are special tests that require oCIS server to be run using [ociswrapper](https://github.com/owncloud/ocis/blob/master/tests/ociswrapper/README.md).
+
+### Run oCIS with ociswrapper
+
+```bash
+# working dir: ocis repo root dir
+
+# init oCIS
+IDM_ADMIN_PASSWORD=admin \
+ocis/bin/ocis init --insecure true
+
+# build the wrapper
+cd tests/ociswrapper
+make build
+
+# run oCIS
+PROXY_ENABLE_BASIC_AUTH=true \
+./bin/ociswrapper serve --bin=../../ocis/bin/ocis
+```
+
+### Run the tests
+
+```bash
+TEST_WITH_GRAPH_API=true \
+TEST_OCIS=true \
+TEST_SERVER_URL="https://localhost:9200" \
+BEHAT_FEATURE=tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature \
+make test-acceptance-api
+```
+
+### Writing new ENV config tests
+
+While writing tests for a new oCIS ENV configuration, please make sure to follow the below guidelines:
+
+1. Tag the test suite (or test scenarios) with `@env-config`
+2. Use `OcisConfigHelper.php` for helper functions - provides functions to reconfigure running oCIS instance.
+3. Recommended: add the new step implementations in `OcisConfigContext.php`
+
 ## Running tests for parallel deployment
 
 ### Setup the parallel deployment environment
