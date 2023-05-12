@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/cs3org/reva/v2/pkg/events/stream"
+	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/oklog/run"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
@@ -19,6 +20,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/logging"
 	"github.com/owncloud/ocis/v2/services/postprocessing/pkg/service"
 	"github.com/urfave/cli/v2"
+	microstore "go-micro.dev/v4/store"
 )
 
 // Server is the entrypoint for the server command.
@@ -82,7 +84,16 @@ func Server(cfg *config.Config) *cli.Command {
 					return err
 				}
 
-				svc, err := service.NewPostprocessingService(bus, logger, cfg.Postprocessing)
+				st := store.Create(
+					store.Store(cfg.Store.Store),
+					store.TTL(cfg.Store.TTL),
+					store.Size(cfg.Store.Size),
+					microstore.Nodes(cfg.Store.Nodes...),
+					microstore.Database(cfg.Store.Database),
+					microstore.Table(cfg.Store.Table),
+				)
+
+				svc, err := service.NewPostprocessingService(bus, logger, st, cfg.Postprocessing)
 				if err != nil {
 					return err
 				}

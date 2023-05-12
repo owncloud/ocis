@@ -17,6 +17,7 @@ type Config struct {
 	Log     *Log     `yaml:"log"`
 	Debug   Debug    `yaml:"debug"`
 
+	Store          Store          `yaml:"store"`
 	Postprocessing Postprocessing `yaml:"postprocessing"`
 
 	Context context.Context `yaml:"-"`
@@ -54,4 +55,14 @@ type Tracing struct {
 	Type      string `yaml:"type" env:"OCIS_TRACING_TYPE;POSTPROCESSING_TRACING_TYPE" desc:"The type of tracing. Defaults to \"\", which is the same as \"jaeger\". Allowed tracing types are \"jaeger\" and \"\" as of now."`
 	Endpoint  string `yaml:"endpoint" env:"OCIS_TRACING_ENDPOINT;POSTPROCESSING_TRACING_ENDPOINT" desc:"The endpoint of the tracing agent."`
 	Collector string `yaml:"collector" env:"OCIS_TRACING_COLLECTOR;POSTPROCESSING_TRACING_COLLECTOR" desc:"The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces. Only used if the tracing endpoint is unset."`
+}
+
+// Store configures the store to use
+type Store struct {
+	Store    string        `yaml:"store" env:"OCIS_PERSISTENT_STORE;POSTPROCESSING_STORE" desc:"The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	Nodes    []string      `yaml:"nodes" env:"OCIS_PERSISTENT_STORE_NODES;POSTPROCESSING_STORE_NODES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`
+	Database string        `yaml:"database" env:"POSTPROCESSING_STORE_DATABASE" desc:"The database name the configured store should use."`
+	Table    string        `yaml:"table" env:"POSTPROCESSING_STORE_TABLE" desc:"The database table the store should use."`
+	TTL      time.Duration `yaml:"ttl" env:"OCIS_PERSISTENT_STORE_TTL;POSTPROCESSING_STORE_TTL" desc:"Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks)."`
+	Size     int           `yaml:"size" env:"OCIS_PERSISTENT_STORE_SIZE;POSTPROCESSING_STORE_SIZE" desc:"The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512."`
 }
