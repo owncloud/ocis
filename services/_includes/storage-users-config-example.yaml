@@ -35,7 +35,7 @@ skip_user_groups_in_token: false
 driver: ocis
 drivers:
   ocis:
-    metadata_backend: xattrs
+    metadata_backend: messagepack
     root: ~/.ocis/storage/users
     user_layout: '{{.Id.OpaqueId}}'
     permissions_endpoint: 127.0.0.1:9191
