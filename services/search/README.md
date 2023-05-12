@@ -45,6 +45,8 @@ This extractor is the most simple one and just uses the resource information pro
 This extractor is more advanced compared to the [Basic extractor](#basic-extractor). The main difference is that this extractor is able to search file contents.
 However, [Apache Tika](https://tika.apache.org/) is required for this task. Read the [Getting Started with Apache Tika](https://tika.apache.org/2.6.0/gettingstarted.html) guide on how to install and run Tika or use a ready to run [Tika container](https://hub.docker.com/r/apache/tika).
 
+See this [link](https://github.com/apache/tika-docker#usage) if you want to quickstart and use a tika container for development purposes.
+
 As soon as Tika is installed and accessible, the search service must be configured for the use with Tika. The following settings must be set:
 
 *   `SEARCH_EXTRACTOR_TYPE=tika`
