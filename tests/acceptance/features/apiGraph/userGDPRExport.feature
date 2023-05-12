@@ -279,8 +279,7 @@ Feature: user GDPR (General Data Protection Regulation) report
           "type": "object",
           "required": [
             "ExecutingUser",
-            "Filename",
-            "Result"
+            "Filename"
           ],
           "properties": {
             "ExecutingUser": {
@@ -298,51 +297,6 @@ Feature: user GDPR (General Data Protection Regulation) report
             "Filename": {
               "type": "string",
               "enum": ["lorem.txt"]
-            },
-            "Result": {
-              "type": "object",
-              "required": [
-                "init"
-              ],
-              "properties": {
-                "init": {
-                  "type": "object",
-                  "required": [
-                    "ExecutingUser",
-                    "Filename",
-                    "ResourceID",
-                    "Filesize",
-                    "UploadID",
-                    "SpaceOwner"
-                  ],
-                  "properties": {
-                    "ExecutingUser": {
-                      "type": "object",
-                      "required": [
-                        "username"
-                      ],
-                      "properties": {
-                        "username": {
-                          "type": "string",
-                          "enum": ["Alice"]
-                        }
-                      }
-                    },
-                    "Filename": {
-                      "type": "string",
-                      "enum": ["lorem.txt"]
-                    },
-                    "Filesize": {
-                      "type": "number",
-                      "enum": [11]
-                    },
-                    "Quota": {
-                      "type": ["number", "null"],
-                      "enum": [null]
-                    }
-                  }
-                }
-              }
             }
           }
         }
