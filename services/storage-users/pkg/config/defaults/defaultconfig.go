@@ -73,7 +73,7 @@ func DefaultConfig() *config.Config {
 				LockCycleDurationFactor:    30,
 			},
 			OCIS: config.OCISDriver{
-				MetadataBackend:            "xattrs",
+				MetadataBackend:            "messagepack",
 				Root:                       filepath.Join(defaults.BaseDataPath(), "storage", "users"),
 				ShareFolder:                "/Shares",
 				UserLayout:                 "{{.Id.OpaqueId}}",
