@@ -28,6 +28,10 @@ import (
 
 //go:generate mockery --name=Searcher
 
+const (
+	_spaceStateTrashed = "trashed"
+)
+
 // Searcher is the interface to the SearchService
 type Searcher interface {
 	Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error)
@@ -85,7 +89,7 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 
 	spaces := []*provider.StorageSpace{}
 	for _, space := range listSpacesRes.StorageSpaces {
-		if utils.ReadPlainFromOpaque(space.Opaque, "trashed") == "trashed" {
+		if utils.ReadPlainFromOpaque(space.Opaque, "trashed") == _spaceStateTrashed {
 			// Do not consider disabled spaces
 			continue
 		}
