@@ -40,6 +40,7 @@ import (
 const (
 	_spaceTypePersonal = "personal"
 	_spaceTypeProject  = "project"
+	_spaceStateTrashed = "trashed"
 
 	_sortDescending = "desc"
 )
@@ -535,7 +536,7 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 				}
 
 				// can't access disabled space
-				if utils.ReadPlainFromOpaque(storageSpace.Opaque, "trashed") != "trashed" {
+				if utils.ReadPlainFromOpaque(storageSpace.Opaque, "trashed") != _spaceStateTrashed {
 					res.Special = g.getSpecialDriveItems(ctx, baseURL, storageSpace)
 					quota, err := g.getDriveQuota(ctx, storageSpace)
 					res.Quota = &quota

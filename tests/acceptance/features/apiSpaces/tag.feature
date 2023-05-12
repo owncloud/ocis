@@ -231,7 +231,7 @@ Feature: Tag
     And user "Alice" has disabled a space "use-tag"
     When user "Alice" lists all available tags via the GraphApi
     Then the HTTP status code should be "200"
-    And the response should contain following tags:
+    And the response should not contain following tags:
       | folderTag |
       | marketing |
     When user "Alice" deletes a space "use-tag"

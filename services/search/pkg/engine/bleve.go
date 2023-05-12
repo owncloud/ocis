@@ -134,10 +134,6 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 					},
 				),
 			},
-			&query.PrefixQuery{
-				Prefix:   utils.MakeRelativePath(path.Join(sir.Ref.Path, "/")),
-				FieldVal: "Path",
-			},
 		)
 	}
 
@@ -160,6 +156,10 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 
 	matches := make([]*searchMessage.Match, 0, len(res.Hits))
 	for _, hit := range res.Hits {
+		if sir.Ref != nil && !strings.HasPrefix(getValue[string](hit.Fields, "Path"), utils.MakeRelativePath(path.Join(sir.Ref.Path, "/"))) {
+			continue
+		}
+
 		rootID, err := storagespace.ParseID(getValue[string](hit.Fields, "RootID"))
 		if err != nil {
 			return nil, err
