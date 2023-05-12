@@ -14,6 +14,12 @@
 | POSTPROCESSING_DEBUG_TOKEN | string |  | Token to secure the metrics endpoint.|
 | POSTPROCESSING_DEBUG_PPROF | bool | false | Enables pprof, which can be used for profiling.|
 | POSTPROCESSING_DEBUG_ZPAGES | bool | false | Enables zpages, which can be used for collecting and viewing in-memory traces.|
+| OCIS_PERSISTENT_STORE<br/>POSTPROCESSING_STORE | string |  | The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
+| OCIS_PERSISTENT_STORE_NODES<br/>POSTPROCESSING_STORE_NODES | []string | [] | A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.|
+| POSTPROCESSING_STORE_DATABASE | string |  | The database name the configured store should use.|
+| POSTPROCESSING_STORE_TABLE | string |  | The database table the store should use.|
+| OCIS_PERSISTENT_STORE_TTL<br/>POSTPROCESSING_STORE_TTL | Duration | 0s | Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).|
+| OCIS_PERSISTENT_STORE_SIZE<br/>POSTPROCESSING_STORE_SIZE | int | 0 | The maximum quantity of items in the store. Only applies when store type 'ocmem' is configured. Defaults to 512.|
 | OCIS_EVENTS_ENDPOINT<br/>POSTPROCESSING_EVENTS_ENDPOINT | string | 127.0.0.1:9233 | The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.|
 | OCIS_EVENTS_CLUSTER<br/>POSTPROCESSING_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | OCIS_INSECURE<br/>POSTPROCESSING_EVENTS_TLS_INSECURE | bool | false | Whether the ocis server should skip the client certificate verification during the TLS handshake.|

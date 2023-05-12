@@ -16,6 +16,13 @@ debug:
   token: ""
   pprof: false
   zpages: false
+store:
+  store: ""
+  nodes: []
+  database: ""
+  table: ""
+  ttl: 0s
+  size: 0
 postprocessing:
   events:
     endpoint: 127.0.0.1:9233
