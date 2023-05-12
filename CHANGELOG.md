@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Fix the empty string givenName attribute when creating user: [#5431](https://github.com/owncloud/ocis/issues/5431)
+* Bugfix - Add missing response to blocked requests: [#6277](https://github.com/owncloud/ocis/pull/6277)
 * Enhancement - Add specific result to antivirus for debugging: [#6265](https://github.com/owncloud/ocis/pull/6265)
 
 ## Details
@@ -17,6 +18,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/5431
    https://github.com/owncloud/ocis/pull/6259
+
+* Bugfix - Add missing response to blocked requests: [#6277](https://github.com/owncloud/ocis/pull/6277)
+
+   We added the missing response body to requests which were blocked by the policy engine.
+
+   https://github.com/owncloud/ocis/pull/6277
 
 * Enhancement - Add specific result to antivirus for debugging: [#6265](https://github.com/owncloud/ocis/pull/6265)
 
