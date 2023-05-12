@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-12-12-39-21]
+[#deprecation-note-2023-05-12-12-49-58]
 [caption=]
 .Deprecation notes for the settings service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -300,6 +300,73 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 API key for the STORAGE-SYSTEM system user.
+
+a|`OCIS_CACHE_STORE` +
+`SETTINGS_CACHE_STORE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++memory ++
+a| [subs=-attributes]
+The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+
+a|`OCIS_CACHE_STORE_NODES` +
+`SETTINGS_CACHE_STORE_NODES` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+
+a|`OCIS_CACHE_DATABASE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ocis ++
+a| [subs=-attributes]
+The database name the configured store should use.
+
+a|`SETTINGS_FILE_CACHE_TABLE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++settings_files ++
+a| [subs=-attributes]
+The database table the store should use for the file cache.
+
+a|`SETTINGS_DIRECTORY_CACHE_TABLE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++settings_dirs ++
+a| [subs=-attributes]
+The database table the store should use for the directory cache.
+
+a|`OCIS_CACHE_TTL` +
+`SETTINGS_CACHE_TTL` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++10m0s ++
+a| [subs=-attributes]
+Default time to live for entries in the cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10m' (10 minutes).
+
+a|`OCIS_CACHE_SIZE` +
+`SETTINGS_CACHE_SIZE` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+The maximum quantity of items in the cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
 
 a|`SETTINGS_BUNDLES_PATH` +
 

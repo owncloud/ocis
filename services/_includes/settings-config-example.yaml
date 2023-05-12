@@ -52,6 +52,14 @@ metadata_config:
   system_user_id: ""
   system_user_idp: internal
   system_user_api_key: ""
+  cache:
+    store: memory
+    addresses: []
+    database: ocis
+    files_table: settings_files
+    directories_table: settings_dirs
+    ttl: 10m0s
+    size: 0
 bundles_path: ""
 admin_user_id: ""
 token_manager:
