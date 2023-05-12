@@ -91,8 +91,6 @@ Feature: update a public link share
     And the HTTP status code should be "200"
     And the public should be able to download the last publicly shared file using the old public WebDAV API with password "%public%" and the content should be "Random data"
     And the public should be able to download the last publicly shared file using the new public WebDAV API with password "%public%" and the content should be "Random data"
-
-    @issue-2079
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
@@ -112,8 +110,6 @@ Feature: update a public link share
     And the HTTP status code should be "200"
     And the public should be able to download the last publicly shared file using the old public WebDAV API without a password and the content should be "Random data"
     And the public should be able to download the last publicly shared file using the new public WebDAV API without a password and the content should be "Random data"
-
-    @issue-2079
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
@@ -263,8 +259,6 @@ Feature: update a public link share
     And the HTTP status code should be "<http_status_code>"
     And uploading a file should not work using the old public WebDAV API
     And uploading a file should not work using the new public WebDAV API
-
-    @issue-2079
     Examples:
       | ocs_api_version | http_status_code |
       | 1               | 200              |
@@ -286,8 +280,6 @@ Feature: update a public link share
     And the HTTP status code should be "200"
     And uploading a file should work using the old public WebDAV API
     And uploading a file should work using the new public WebDAV API
-
-    @issue-2079
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
@@ -309,8 +301,6 @@ Feature: update a public link share
     And the HTTP status code should be "<http_status_code>"
     And uploading a file should not work using the old public WebDAV API
     And uploading a file should not work using the new public WebDAV API
-
-    @issue-2079
     Examples:
       | ocs_api_version | http_status_code |
       | 1               | 200              |
@@ -332,8 +322,6 @@ Feature: update a public link share
     And the HTTP status code should be "200"
     And uploading a file should work using the old public WebDAV API
     And uploading a file should work using the new public WebDAV API
-
-    @issue-2079
     Examples:
       | ocs_api_version | ocs_status_code |
       | 1               | 100             |
@@ -355,7 +343,7 @@ Feature: update a public link share
     And the HTTP status code of responses on all endpoints should be "403"
     And as "Alice" file "PARENT/CHILD/child.txt" should exist
 
-    @issue-2079 @issue-1269
+    @issue-1269
     Examples:
       | ocs_api_version |
       | 1               |

@@ -435,3 +435,30 @@ Feature: Share spaces
       | manager |
       | editor  |
       | viewer  |
+
+
+  Scenario Outline: user cannot share the personal space to an other user
+    Given the administrator has given "Brian" the role "<role>" using the settings api
+    And user "Brian" shares a space "Brian Murphy" with settings:
+      | shareWith | Bob    |
+      | role      | viewer |
+    Then the HTTP status code should be "400"
+    And the OCS status message should be "can not add members to personal spaces"
+    And the user "Bob" should not have a space called "Brian Murphy"
+    Examples:
+      | role        |
+      | Space Admin |
+      | Admin       |
+      | User        |
+
+
+  Scenario: user cannot share the personal space to a group
+    Given group "sales" has been created
+    And the administrator has added a user "Brian" to the group "sales" using GraphApi
+    And user "Alice" shares a space "Alice Hansen" with settings:
+      | shareWith | sales   |
+      | shareType | 8       |
+      | role      | manager |
+    Then the HTTP status code should be "400"
+    And the OCS status message should be "can not add members to personal spaces"
+    And the user "Brian" should not have a space called "Alice Hansen"
