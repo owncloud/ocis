@@ -1,22 +1,21 @@
 # Settings
 
-The "settings" service provides functionality for other services to register
-new settings within oCIS. It is also responsible for storing the respective settings
-values as well.
+The `settings` service provides functionality for other services to register new settings as well as storing and retrieving the respective settings values.
 
-The "settings" service is currently used for
-* managing the users' "profile" settings. E.g. the language and the Email notification
-  settings
-* managing the possible user roles and their respecitve permssions
-* managing the assignment of roles to users
+The settings service is currently used for managing the:
 
-The "settings" service supports two different backends for persisting the data. The backend
-can be set using `SETTINGS_STORE_TYPE` environment variable. Supported values are:
+* users' `profile` settings like the language and the Email notification settings,
+* possible user roles and their respecitve permssions,
+* assignment of roles to users.
 
-* `metadata`: The default. This backend persists the settings data via the `storeage-system` service
+As an example, user profile settings that can be changed in the Web UI must be persisted.  
+
+The settings service supports two different backends for persisting the data. The backend can be set using `SETTINGS_STORE_TYPE` environment variable. Supported values are:
+
+* `metadata`: The default. This backend persists the settings data via the `storage-system` service.
 * `filesystem`: This backend persists the settings data in a directory on the local filesystem.
-  The directory can be configured with `SETTINGS_DATA_PATH`. This backend is not suitable for running
-  multiple intances of the `settings` service in a scale-out deployment. It should be considered
+  The directory can be configured with `SETTINGS_DATA_PATH`. This backend is **not** suitable for running
+  multiple intances of the `settings` service in a scale-out deployment and should be therefore considered
   deprecated.
 
 <!--- Note: The diagramm is outdate, leaving it here for a future rework
@@ -37,10 +36,10 @@ graph TD
 
 ## Caching
 
-When using the `SETTINGS_STORE_TYPE=metadata` The `settings` services, caches
-the results of queries to the `system-storage` for providing faster responses.
-The store used for the cache can be configured using the `SETTINGS_CACHE_STORE`
-environment variable. Possible stores are:
+When using `SETTINGS_STORE_TYPE=metadata`, the settings service caches the results of queries to the `system-storage` for providing faster responses.
+
+The store used for the cache can be configured using the `SETTINGS_CACHE_STORE` environment variable. Possible stores are:
+
   -   `memory`: Basic in-memory store and the default.
   -   `redis`: Stores metadata in a configured Redis cluster.
   -   `redis-sentinel`: Stores metadata in a configured Redis Sentinel cluster.
@@ -63,8 +62,8 @@ environment variable. Possible stores are:
 
 ## Settings Management
 
-oCIS services can register *settings bundles* with the ocis-settings service.
+oCIS services can register *settings bundles* with the settings service.
 
 ## Settings Usage
 
-Services can query ocis-settings for *settings values* of a user.
+Services can set or query ocis *setting values* of a user from settings bundles.
