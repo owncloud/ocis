@@ -136,6 +136,7 @@ vendor-bin/behat/vendor: vendor/bamarni/composer-bin-plugin vendor-bin/behat/com
 
 vendor-bin/behat/composer.lock: vendor-bin/behat/composer.json
 	@echo behat composer.lock is not up to date.
+	@composer update behat --no-progress
 
 composer.lock: composer.json
 	@echo composer.lock is not up to date.
