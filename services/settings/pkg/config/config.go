@@ -23,7 +23,7 @@ type Config struct {
 
 	GRPCClientTLS *shared.GRPCClientTLS `yaml:"grpc_client_tls"`
 
-	StoreType   string                `yaml:"store_type" env:"SETTINGS_STORE_TYPE" desc:"Store type configures the persistency driver. Supported values are \"metadata\" and \"filesystem\"."`
+	StoreType   string                `yaml:"store_type" env:"SETTINGS_STORE_TYPE" desc:"Store type configures the persistency driver. Supported values are 'metadata' and 'filesystem'. Note that the value 'filesystem' is considered deprecated."`
 	DataPath    string                `yaml:"data_path" env:"SETTINGS_DATA_PATH" desc:"The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/settings."`
 	Metadata    Metadata              `yaml:"metadata_config"`
 	BundlesPath string                `yaml:"bundles_path" env:"SETTINGS_BUNDLES_PATH" desc:"The path to a JSON file with a list of bundles. If not defined, the default bundles will be loaded."`
