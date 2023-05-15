@@ -8,7 +8,7 @@ Feature: unassign user role
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: admin user unassigns the role of a user with different role using graph API
+  Scenario Outline: admin user unassigns the role of another user
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
@@ -25,7 +25,7 @@ Feature: unassign user role
       | Guest       |
 
   @issue-6035
-  Scenario: admin user tries to unassign his/her own role using graph API
+  Scenario: admin user tries to unassign his/her own role
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When user "Alice" tries to unassign the role of user "Alice" using the Graph API
     Then the HTTP status code should be "403"

@@ -2479,7 +2479,8 @@ class GraphContext implements Context {
 			$this->appEntity["appRoles"][$role],
 			$jsonDecodedResponse['appRoleId'],
 			__METHOD__
-			. "\nExpected role ID for role '$role'' to be '" . $this->appEntity["appRoles"][$role] . "' but got '" . $jsonDecodedResponse['appRoleId'] . "'"
+			. "\nExpected user '$user' to have role '$role' with role id '" . $this->appEntity["appRoles"][$role] .
+			"' but got the role id is '" . $jsonDecodedResponse['appRoleId'] . "'"
 		);
 	}
 
@@ -2506,7 +2507,7 @@ class GraphContext implements Context {
 		Assert::assertEmpty(
 			$jsonDecodedResponse,
 			__METHOD__
-			. "\nExpected no roles should be assigned"
+			. "\nExpected user '$user' to have no roles assigned but got '" . json_encode($jsonDecodedResponse) . "'"
 		);
 	}
 }
