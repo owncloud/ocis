@@ -2413,4 +2413,101 @@ class GraphContext implements Context {
 			)
 		);
 	}
+
+	/**
+	 * @When user :user unassigns the role of user :ofUser using the Graph API
+	 * @When user :user tries to unassign the role of user :ofUser using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $ofUser
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function theUserUnassignsTheRoleOfUserUsingTheGraphApi(string $user, string $ofUser): void {
+		$userId = $this->featureContext->getAttributeOfCreatedUser($ofUser, 'id') ?? $ofUser;
+		$credentials = $this->getAdminOrUserCredentials($user);
+
+		$response = GraphHelper::getAssignedRole(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getAdminUsername(),
+			$this->featureContext->getAdminPassword(),
+			$userId
+		);
+		$appRoleAssignmentId = $this->featureContext->getJsonDecodedResponse($response)["value"][0]["id"];
+
+		$this->featureContext->setResponse(
+			GraphHelper::unassignRole(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials['username'],
+				$credentials['password'],
+				$appRoleAssignmentId,
+				$userId
+			)
+		);
+	}
+
+	/**
+	 * @Then user :user should have the role :role assigned
+	 *
+	 * @param string $user
+	 * @param string $role
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userShouldHaveTheRoleAssigned(string $user, string $role): void {
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $user;
+		$response = GraphHelper::getAssignedRole(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getAdminUserName(),
+			$this->featureContext->getAdminPassword(),
+			$userId
+		);
+
+		$jsonDecodedResponse = $this->featureContext->getJsonDecodedResponse($response)['value'][0];
+		if (empty($this->appEntity)) {
+			$this->setApplicationEntity();
+		}
+		Assert::assertEquals(
+			$this->appEntity["appRoles"][$role],
+			$jsonDecodedResponse['appRoleId'],
+			__METHOD__
+			. "\nExpected user '$user' to have role '$role' with role id '" . $this->appEntity["appRoles"][$role] .
+			"' but got the role id is '" . $jsonDecodedResponse['appRoleId'] . "'"
+		);
+	}
+
+	/**
+	 * @Then user :user should not have any role assigned
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userShouldNotHaveAnyRoleAssigned(string $user): void {
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $user;
+		$response = GraphHelper::getAssignedRole(
+			$this->featureContext->getBaseUrl(),
+			$this->featureContext->getStepLineRef(),
+			$this->featureContext->getAdminUserName(),
+			$this->featureContext->getAdminPassword(),
+			$userId
+		);
+
+		$jsonDecodedResponse = $this->featureContext->getJsonDecodedResponse($response)['value'];
+		Assert::assertEmpty(
+			$jsonDecodedResponse,
+			__METHOD__
+			. "\nExpected user '$user' to have no roles assigned but got '" . json_encode($jsonDecodedResponse) . "'"
+		);
+	}
 }

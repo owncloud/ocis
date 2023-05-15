@@ -1394,4 +1394,34 @@ class GraphHelper {
 			\json_encode($payload)
 		);
 	}
+
+	/**
+	 * @param string $baseUrl
+	 * @param string $xRequestId
+	 * @param string $user
+	 * @param string $password
+	 * @param string $appRoleAssignmentId
+	 * @param string $userId
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 */
+	public static function unassignRole(
+		string $baseUrl,
+		string $xRequestId,
+		string $user,
+		string $password,
+		string $appRoleAssignmentId,
+		string $userId
+	): ResponseInterface {
+		$url = self::getFullUrl($baseUrl, 'users/' . $userId . '/appRoleAssignments/' . $appRoleAssignmentId);
+		return HttpRequestHelper::sendRequest(
+			$url,
+			$xRequestId,
+			"DELETE",
+			$user,
+			$password,
+			self::getRequestHeaders(),
+		);
+	}
 }
