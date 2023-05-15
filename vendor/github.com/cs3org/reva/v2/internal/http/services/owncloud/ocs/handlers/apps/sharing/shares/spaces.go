@@ -61,8 +61,9 @@ func (h *Handler) getGrantee(ctx context.Context, name string) (provider.Grantee
 	log.Debug().Str("name", name).Msg("no user found")
 
 	groupRes, err := client.GetGroupByClaim(ctx, &groupv1beta1.GetGroupByClaimRequest{
-		Claim: "group_name",
-		Value: name,
+		Claim:               "group_name",
+		Value:               name,
+		SkipFetchingMembers: true,
 	})
 	if err == nil && groupRes.Status.Code == rpc.Code_CODE_OK {
 		return provider.Grantee{

@@ -19,6 +19,7 @@
 package node
 
 import (
+	"io"
 	"strconv"
 
 	"github.com/pkg/xattr"
@@ -84,19 +85,32 @@ func (n *Node) RemoveXattr(key string) error {
 	return n.lu.MetadataBackend().Remove(n.InternalPath(), key)
 }
 
-// Xattrs returns the extended attributes of the node. If the attributes have already
+// XattrsWithReader returns the extended attributes of the node. If the attributes have already
 // been cached they are not read from disk again.
-func (n *Node) Xattrs() (Attributes, error) {
+func (n *Node) XattrsWithReader(r io.Reader) (Attributes, error) {
 	if n.xattrsCache != nil {
 		return n.xattrsCache, nil
 	}
 
-	attrs, err := n.lu.MetadataBackend().All(n.InternalPath())
+	var attrs Attributes
+	var err error
+	if r != nil {
+		attrs, err = n.lu.MetadataBackend().AllWithLockedSource(n.InternalPath(), r)
+	} else {
+		attrs, err = n.lu.MetadataBackend().All(n.InternalPath())
+	}
 	if err != nil {
 		return nil, err
 	}
+
 	n.xattrsCache = attrs
 	return n.xattrsCache, nil
+}
+
+// Xattrs returns the extended attributes of the node. If the attributes have already
+// been cached they are not read from disk again.
+func (n *Node) Xattrs() (Attributes, error) {
+	return n.XattrsWithReader(nil)
 }
 
 // Xattr returns an extended attribute of the node. If the attributes have already

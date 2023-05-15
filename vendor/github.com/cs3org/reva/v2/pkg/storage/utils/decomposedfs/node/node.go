@@ -405,8 +405,8 @@ func (n *Node) Child(ctx context.Context, name string) (*Node, error) {
 	return c, nil
 }
 
-// Parent returns the parent node
-func (n *Node) Parent() (p *Node, err error) {
+// ParentWithReader returns the parent node
+func (n *Node) ParentWithReader(r io.Reader) (p *Node, err error) {
 	if n.ParentID == "" {
 		return nil, fmt.Errorf("decomposedfs: root has no parent")
 	}
@@ -417,6 +417,9 @@ func (n *Node) Parent() (p *Node, err error) {
 		SpaceRoot: n.SpaceRoot,
 	}
 
+	// fill metadata cache using the reader
+	_, _ = p.XattrsWithReader(r)
+
 	// lookup name and parent id in extended attributes
 	p.ParentID, _ = p.XattrString(prefixes.ParentidAttr)
 	p.Name, _ = p.XattrString(prefixes.NameAttr)
@@ -426,6 +429,11 @@ func (n *Node) Parent() (p *Node, err error) {
 		p.Exists = true
 	}
 	return
+}
+
+// Parent returns the parent node
+func (n *Node) Parent() (p *Node, err error) {
+	return n.ParentWithReader(nil)
 }
 
 // Owner returns the space owner
