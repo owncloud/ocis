@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Fix the wrong status code when appRoleAssignments is forbidden: [#6037](https://github.com/owncloud/ocis/issues/6037)
 * Bugfix - Add missing response to blocked requests: [#6277](https://github.com/owncloud/ocis/pull/6277)
 * Enhancement - Add specific result to antivirus for debugging: [#6265](https://github.com/owncloud/ocis/pull/6265)
+* Enhancement - Update Reva: [#6305](https://github.com/owncloud/ocis/pull/6305)
 * Enhancement - Add Store to `postprocessing`: [#6281](https://github.com/owncloud/ocis/pull/6281)
 
 ## Details
@@ -41,6 +42,10 @@ The following sections list the changes for unreleased.
    (ANTIVIRUS_DEBUG_SCAN_OUTCOME)
 
    https://github.com/owncloud/ocis/pull/6265
+
+* Enhancement - Update Reva: [#6305](https://github.com/owncloud/ocis/pull/6305)
+
+   https://github.com/owncloud/ocis/pull/6305
 
 * Enhancement - Add Store to `postprocessing`: [#6281](https://github.com/owncloud/ocis/pull/6281)
 
