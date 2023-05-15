@@ -195,7 +195,7 @@ testSuite: $(OCIS_WRAPPER) build-dev-image clean-docker-container
 show-test-logs: ## show logs of test
 	@COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 	COMPOSE_FILE=$(COMPOSE_FILE) \
-	docker-compose logs --no-log-prefix -f ocis-server | less
+	docker-compose logs --no-log-prefix -f acceptance-tests | less
 
 $(OCIS_WRAPPER):
 	@if [ "$(WITH_WRAPPER)" == "true" ]; then \
