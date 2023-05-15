@@ -731,7 +731,7 @@ func (t *Tree) Propagate(ctx context.Context, n *node.Node, sizeDiff int64) (err
 			}
 		}()
 
-		if n, err = n.Parent(); err != nil {
+		if n, err = n.ParentWithReader(f); err != nil {
 			return err
 		}
 

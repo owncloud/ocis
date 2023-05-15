@@ -211,9 +211,6 @@ func (cache cacheStore) List(opts ...microstore.ListOption) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	for i, key := range keys {
-		keys[i] = strings.TrimPrefix(key, cache.table)
-	}
 	return keys, nil
 }
 
