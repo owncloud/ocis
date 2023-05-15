@@ -4,16 +4,16 @@ The `settings` service provides functionality for other services to register new
 
 The settings service is currently used for managing the:
 
-* users' `profile` settings like the language and the Email notification settings,
-* possible user roles and their respecitve permssions,
-* assignment of roles to users.
+*   users' `profile` settings like the language and the Email notification settings,
+*   possible user roles and their respecitve permssions,
+*   assignment of roles to users.
 
 As an example, user profile settings that can be changed in the Web UI must be persisted.  
 
 The settings service supports two different backends for persisting the data. The backend can be set using `SETTINGS_STORE_TYPE` environment variable. Supported values are:
 
-* `metadata`: The default. This backend persists the settings data via the `storage-system` service.
-* `filesystem`: This backend persists the settings data in a directory on the local filesystem.
+*   `metadata`: The default. This backend persists the settings data via the `storage-system` service.
+*   `filesystem`: This backend persists the settings data in a directory on the local filesystem.
   The directory can be configured with `SETTINGS_DATA_PATH`. This backend is **not** suitable for running
   multiple intances of the `settings` service in a scale-out deployment and should be therefore considered
   deprecated.
