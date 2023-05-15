@@ -282,10 +282,7 @@ func (s *service) InitiateFileDownload(ctx context.Context, req *provider.Initia
 	protocol := &provider.FileDownloadProtocol{Expose: s.conf.ExposeDataServer}
 
 	if utils.IsRelativeReference(req.Ref) {
-		// fill in storage provider id if it is missing
-		if req.GetRef().GetResourceId().GetStorageId() == "" {
-			req.GetRef().GetResourceId().StorageId = s.conf.MountID
-		}
+		s.addMissingStorageProviderID(req.GetRef().GetResourceId(), nil)
 		protocol.Protocol = "spaces"
 		u.Path = path.Join(u.Path, "spaces", storagespace.FormatResourceID(*req.Ref.ResourceId), req.Ref.Path)
 	} else {
@@ -517,9 +514,7 @@ func (s *service) CreateStorageSpace(ctx context.Context, req *provider.CreateSt
 		}, nil
 	}
 
-	if resp.StorageSpace != nil {
-		s.addMissingStorageProviderID(resp.StorageSpace.Root, resp.StorageSpace.Id)
-	}
+	s.addMissingStorageProviderID(resp.GetStorageSpace().GetRoot(), resp.GetStorageSpace().GetId())
 	return resp, nil
 }
 
@@ -563,7 +558,7 @@ func (s *service) ListStorageSpaces(ctx context.Context, req *provider.ListStora
 			continue
 		}
 
-		s.addMissingStorageProviderID(sp.Root, sp.Id)
+		s.addMissingStorageProviderID(sp.GetRoot(), sp.GetId())
 	}
 
 	return &provider.ListStorageSpacesResponse{
@@ -582,9 +577,7 @@ func (s *service) UpdateStorageSpace(ctx context.Context, req *provider.UpdateSt
 			Msg("failed to update storage space")
 		return nil, err
 	}
-	if res.StorageSpace != nil {
-		s.addMissingStorageProviderID(res.StorageSpace.Root, res.StorageSpace.Id)
-	}
+	s.addMissingStorageProviderID(res.GetStorageSpace().GetRoot(), res.GetStorageSpace().GetId())
 	return res, nil
 }
 
@@ -744,15 +737,9 @@ func (s *service) Stat(ctx context.Context, req *provider.StatRequest) (*provide
 		}, nil
 	}
 
-	// The storage driver might set the mount ID by itself, in which case skip this step
-	if md.Id.GetStorageId() == "" {
-		md.Id.StorageId = s.conf.MountID
-	}
-
-	// The storage driver might set the mount ID by itself, in which case skip this step
-	if md.ParentId != nil && md.ParentId.GetStorageId() == "" {
-		md.ParentId.StorageId = s.conf.MountID
-	}
+	s.addMissingStorageProviderID(md.GetId(), nil)
+	s.addMissingStorageProviderID(md.GetParentId(), nil)
+	s.addMissingStorageProviderID(md.GetSpace().GetRoot(), nil)
 
 	return &provider.StatResponse{
 		Status: status.NewOK(ctx),
@@ -791,7 +778,9 @@ func (s *service) ListContainerStream(req *provider.ListContainerStreamRequest, 
 	}
 
 	for _, md := range mds {
-		s.addMissingStorageProviderID(md.Id, nil)
+		s.addMissingStorageProviderID(md.GetId(), nil)
+		s.addMissingStorageProviderID(md.GetParentId(), nil)
+		s.addMissingStorageProviderID(md.GetSpace().GetRoot(), nil)
 		res := &provider.ListContainerStreamResponse{
 			Info:   md,
 			Status: status.NewOK(ctx),
@@ -816,10 +805,9 @@ func (s *service) ListContainer(ctx context.Context, req *provider.ListContainer
 	}
 
 	for _, i := range res.Infos {
-		s.addMissingStorageProviderID(i.Id, nil)
-		if i.ParentId != nil {
-			s.addMissingStorageProviderID(i.ParentId, nil)
-		}
+		s.addMissingStorageProviderID(i.GetId(), nil)
+		s.addMissingStorageProviderID(i.GetParentId(), nil)
+		s.addMissingStorageProviderID(i.GetSpace().GetRoot(), nil)
 	}
 	return res, nil
 }
@@ -879,9 +867,7 @@ func (s *service) ListRecycleStream(req *provider.ListRecycleStreamRequest, ss p
 
 	// TODO(labkode): CRITICAL: fill recycle info with storage provider.
 	for _, item := range items {
-		if item.Ref != nil && item.Ref.ResourceId != nil {
-			s.addMissingStorageProviderID(item.Ref.GetResourceId(), nil)
-		}
+		s.addMissingStorageProviderID(item.GetRef().GetResourceId(), nil)
 		res := &provider.ListRecycleStreamResponse{
 			RecycleItem: item,
 			Status:      status.NewOK(ctx),
@@ -920,9 +906,7 @@ func (s *service) ListRecycle(ctx context.Context, req *provider.ListRecycleRequ
 	}
 
 	for _, i := range items {
-		if i.Ref != nil && i.Ref.ResourceId != nil {
-			s.addMissingStorageProviderID(i.Ref.GetResourceId(), nil)
-		}
+		s.addMissingStorageProviderID(i.GetRef().GetResourceId(), nil)
 	}
 	res := &provider.ListRecycleResponse{
 		Status:       status.NewOK(ctx),
@@ -1220,7 +1204,7 @@ func (s *service) GetQuota(ctx context.Context, req *provider.GetQuotaRequest) (
 
 func (s *service) addMissingStorageProviderID(resourceID *provider.ResourceId, spaceID *provider.StorageSpaceId) {
 	// The storage driver might set the mount ID by itself, in which case skip this step
-	if resourceID.GetStorageId() == "" {
+	if resourceID != nil && resourceID.GetStorageId() == "" {
 		resourceID.StorageId = s.conf.MountID
 		if spaceID != nil {
 			rid, _ := storagespace.ParseID(spaceID.GetOpaqueId())

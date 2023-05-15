@@ -897,7 +897,7 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 		&provider.Reference{
 			ResourceId: &provider.ResourceId{
 				SpaceId:  n.SpaceRoot.SpaceID,
-				OpaqueId: n.ID},
+				OpaqueId: n.SpaceRoot.ID},
 		},
 	)
 	if err != nil {
@@ -923,7 +923,7 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 		Id: &provider.StorageSpaceId{OpaqueId: ssID},
 		Root: &provider.ResourceId{
 			SpaceId:  n.SpaceRoot.SpaceID,
-			OpaqueId: n.ID,
+			OpaqueId: n.SpaceRoot.ID,
 		},
 		Name: sname,
 		// SpaceType is read from xattr below
@@ -974,7 +974,7 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 		Value:   []byte(etag),
 	}
 
-	spaceAttributes, err := n.Xattrs()
+	spaceAttributes, err := n.SpaceRoot.Xattrs()
 	if err != nil {
 		return nil, err
 	}
