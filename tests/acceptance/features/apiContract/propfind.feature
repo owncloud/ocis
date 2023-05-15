@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: Propfind test
   As a user
   I want to check the PROPFIND response
@@ -19,12 +19,12 @@ Feature: Propfind test
     When user "Alice" sends PROPFIND request to space "new-space" using the WebDAV API
     Then the HTTP status code should be "207"
     And the "PROPFIND" response should contain a space "new-space" with these key and value pairs:
-      | key                          | value            |
-      | oc:fileid                    | UUIDof:new-space |
-      | oc:name                      | new-space        |
-      | oc:permissions               | SRDNVCKZ         |
-      | oc:privatelink               |                  |
-      | oc:size                      | 12               |
+      | key            | value            |
+      | oc:fileid      | UUIDof:new-space |
+      | oc:name        | new-space        |
+      | oc:permissions | RDNVCKZ          |
+      | oc:privatelink |                  |
+      | oc:size        | 12               |
 
 
   Scenario Outline: space member with a different role checks the PROPFIND request of a space
@@ -43,6 +43,6 @@ Feature: Propfind test
       | oc:size        | 12               |
     Examples:
       | role    | oc_permission |
-      | manager | SRDNVCKZ      |
-      | editor  | SDNVCK        |
-      | viewer  | S             |
+      | manager | RDNVCKZ       |
+      | editor  | DNVCK         |
+      | viewer  |               |

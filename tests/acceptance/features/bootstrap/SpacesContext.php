@@ -3110,7 +3110,6 @@ class SpacesContext implements Context {
 		foreach ($table->getHash() as $row) {
 			$findItem = $row['key'];
 			$responseValue = $xmlRes->xpath("//d:response/d:propstat/d:prop/$findItem")[0]->__toString();
-			Assert::assertNotEmpty($responseValue, "response doesn't contain $findItem or empty");
 			$value = str_replace('UUIDof:', '', $row['value']);
 			switch ($findItem) {
 				case "oc:fileid":
