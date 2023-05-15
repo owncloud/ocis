@@ -10,7 +10,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	graphMiddleware "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"go.opencensus.io/zpages"
+	"go.opentelemetry.io/contrib/zpages"
 )
 
 // NewService initializes a new debug service.
@@ -42,7 +42,8 @@ func NewService(opts ...Option) *http.Server {
 	}
 
 	if dopts.Zpages {
-		zpages.Handle(mux, "/debug")
+		h := zpages.NewTracezHandler(zpages.NewSpanProcessor())
+		mux.Handle("/debug", h)
 	}
 
 	return &http.Server{

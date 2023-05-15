@@ -23,6 +23,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity/ldap"
 	graphm "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
+	gtracing "github.com/owncloud/ocis/v2/services/graph/pkg/tracing"
 	microstore "go-micro.dev/v4/store"
 )
 
@@ -155,7 +156,11 @@ func NewService(opts ...Option) (Graph, error) {
 	}
 
 	if options.PermissionService == nil {
-		svc.permissionsService = settingssvc.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient())
+		grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(options.Config.GRPCClientTLS), grpc.WithTraceProvider(gtracing.TraceProvider))...)
+		if err != nil {
+			return svc, err
+		}
+		svc.permissionsService = settingssvc.NewPermissionService("com.owncloud.api.settings", grpcClient)
 	} else {
 		svc.permissionsService = options.PermissionService
 	}

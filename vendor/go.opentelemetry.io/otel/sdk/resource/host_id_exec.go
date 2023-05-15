@@ -1,4 +1,4 @@
-// Copyright 2017, OpenCensus Authors
+// Copyright The OpenTelemetry Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package ocgrpc contains OpenCensus stats and trace
-// integrations for gRPC.
-//
-// Use ServerHandler for servers and ClientHandler for clients.
-package ocgrpc // import "go.opencensus.io/plugin/ocgrpc"
+//go:build bsd || darwin
+
+package resource // import "go.opentelemetry.io/otel/sdk/resource"
+
+import "os/exec"
+
+func execCommand(name string, arg ...string) (string, error) {
+	cmd := exec.Command(name, arg...)
+	b, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+
+	return string(b), nil
+}
