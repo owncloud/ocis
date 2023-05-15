@@ -43,7 +43,7 @@ This extractor is the most simple one and just uses the resource information pro
 ### Tika Extractor
 
 This extractor is more advanced compared to the [Basic extractor](#basic-extractor). The main difference is that this extractor is able to search file contents.
-However, [Apache Tika](https://tika.apache.org/) is required for this task. Read the [Getting Started with Apache Tika](https://tika.apache.org/2.6.0/gettingstarted.html) guide on how to install and run Tika or use a ready to run [Tika container](https://hub.docker.com/r/apache/tika).
+However, [Apache Tika](https://tika.apache.org/) is required for this task. Read the [Getting Started with Apache Tika](https://tika.apache.org/2.6.0/gettingstarted.html) guide on how to install and run Tika or use a ready to run [Tika container](https://hub.docker.com/r/apache/tika). Note that at the time of writing, containers are only available for the amd64 platform.
 
 See this [link](https://github.com/apache/tika-docker#usage) if you want to quickstart and use a tika container for development purposes.
 
