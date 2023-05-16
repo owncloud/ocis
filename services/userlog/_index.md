@@ -1,6 +1,6 @@
 ---
 title: Userlog
-date: 2023-05-16T13:19:42.401237536Z
+date: 2023-05-16T14:06:10.096326569Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/userlog
@@ -33,7 +33,7 @@ Running the `userlog` service without running the `eventhistory` service is not 
 
 ## Storing
 
-The `userlog` service persists information via the configured store in `USERLOG_STORE_TYPE`. Possible stores are:
+The `userlog` service persists information via the configured store in `USERLOG_STORE`. Possible stores are:
   -   `memory`: Basic in-memory store and the default.
   -   `ocmem`: Advanced in-memory store allowing max size.
   -   `redis`: Stores data in a configured Redis cluster.

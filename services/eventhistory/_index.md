@@ -1,6 +1,6 @@
 ---
 title: Eventhistory
-date: 2023-05-16T13:19:42.399646059Z
+date: 2023-05-16T14:06:10.09457589Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/eventhistory
@@ -34,7 +34,7 @@ The `eventhistory` services consumes all events from the configured event system
 
 ## Storing
 
-The `eventhistory` service stores each consumed event via the configured store in `EVENTHISTORY_STORE_TYPE`. Possible stores are:
+The `eventhistory` service stores each consumed event via the configured store in `EVENTHISTORY_STORE`. Possible stores are:
   -   `memory`: Basic in-memory store and the default.
   -   `ocmem`: Advanced in-memory store allowing max size.
   -   `redis`: Stores data in a configured Redis cluster.
@@ -45,7 +45,6 @@ The `eventhistory` service stores each consumed event via the configured store i
 
 1.  Note that in-memory stores are by nature not reboot-persistent.
 2.  Though usually not necessary, a database name and a database table can be configured for event stores if the event store supports this. Generally not applicable for stores of type `in-memory`. These settings are blank by default which means that the standard settings of the configured store apply.
-3.  Events stay in the store for 2 weeks by default. Use `EVENTHISTORY_RECORD_EXPIRY` to adjust this value.
 4.  The eventhistory service can be scaled if not using `in-memory` stores and the stores are configured identically over all instances.
 5.  When using `redis-sentinel`, the Redis master to use is configured via `EVENTHISTORY_STORE_NODES` in the form of `<sentinel-host>:<sentinel-port>/<redis-master>` like `10.10.0.200:26379/mymaster`.
 

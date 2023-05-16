@@ -1,6 +1,6 @@
 ---
 title: Postprocessing
-date: 2023-05-16T13:19:42.400544043Z
+date: 2023-05-16T14:06:10.095588735Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/postprocessing
@@ -46,7 +46,7 @@ When all postprocessing steps have completed successfully, the file will be made
 
 The `postprocessing` service needs to store some metadata about uploads to be able to orchestrate post-processing. When running in single binary mode, the default in-memory implementation will be just fine. In distributed deployments it is recommended to use a persistent store, see below for more details.
 
-The `postprocessing` service stores its metadata via the configured store in `POSTPROCESSING_STORE_TYPE`. Possible stores are:
+The `postprocessing` service stores its metadata via the configured store in `POSTPROCESSING_STORE`. Possible stores are:
   -   `memory`: Basic in-memory store and the default.
   -   `ocmem`: Advanced in-memory store allowing max size.
   -   `redis`: Stores data in a configured Redis cluster.
