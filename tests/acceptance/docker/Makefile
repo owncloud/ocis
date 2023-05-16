@@ -26,6 +26,10 @@ else
 endif
 OCIS_IMAGE_TAG ?= dev
 
+# run tests with ociswrapper by default
+WITH_WRAPPER ?= true
+OCIS_WRAPPER := ../../ociswrapper/bin/ociswrapper
+
 # static
 DIVIDE_INTO_NUM_PARTS := 10
 PARTS = 1 2 3 4 5 6 7 8 9 10
@@ -171,7 +175,7 @@ $(targets):
 	$(MAKE) --no-print-directory testSuite
 
 .PHONY: testSuite
-testSuite: build-dev-image clean-docker-container
+testSuite: $(OCIS_WRAPPER) build-dev-image clean-docker-container
 	@if [ -n "${START_CEPH}" ]; then \
 		COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 		COMPOSE_FILE=src/ceph.yml \
@@ -181,6 +185,7 @@ testSuite: build-dev-image clean-docker-container
 	COMPOSE_FILE=$(COMPOSE_FILE) \
 	STORAGE_DRIVER=$(STORAGE_DRIVER) \
 	TEST_SOURCE=$(TEST_SOURCE) \
+	WITH_WRAPPER=$(WITH_WRAPPER) \
 	OCIS_IMAGE_TAG=$(OCIS_IMAGE_TAG) \
 	BEHAT_SUITE=$(BEHAT_SUITE) \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
@@ -194,9 +199,13 @@ show-test-logs: ## show logs of test
 	COMPOSE_FILE=$(COMPOSE_FILE) \
 	docker-compose logs --no-log-prefix -f acceptance-tests | less
 
+$(OCIS_WRAPPER):
+	@if [ "$(WITH_WRAPPER)" == "true" ]; then \
+		$(MAKE) --no-print-directory -C ../../ociswrapper build \
+	; fi;
+
 .PHONY: build-dev-image
 build-dev-image:
-	@rm -rf ../../../vendor
 	@if [ $(BUILD_DEV_IMAGE) -eq 1 ]; then \
 		$(MAKE) --no-print-directory -C ../../../ocis dev-docker \
 	; fi;

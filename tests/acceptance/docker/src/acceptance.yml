@@ -1,6 +1,7 @@
 services:
   acceptance-tests:
     image: owncloudci/php:7.4
+    working_dir: /drone/src
     command: /bin/bash /test/run-tests.sh
     environment:
       OCIS_ROOT: /drone/src
@@ -8,7 +9,7 @@ services:
       RUN_ON_OCIS: "true"
       TEST_SERVER_URL: https://ocis-server:9200
       TEST_WITH_GRAPH_API: "true"
-
+      OCIS_WRAPPER_URL: http://ocis-server:5000
       STORAGE_DRIVER: $STORAGE_DRIVER
       TEST_SOURCE: $TEST_SOURCE
       BEHAT_SUITE: ${BEHAT_SUITE:-}
