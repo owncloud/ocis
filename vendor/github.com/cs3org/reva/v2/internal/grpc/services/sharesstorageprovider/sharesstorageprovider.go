@@ -683,6 +683,9 @@ func (s *service) Stat(ctx context.Context, req *provider.StatRequest) (*provide
 				PermissionSet: &provider.ResourcePermissions{
 					// TODO
 				},
+				Space: &provider.StorageSpace{
+					SpaceType: "virtual",
+				},
 				Etag:  etag,
 				Owner: owner.Id,
 			},

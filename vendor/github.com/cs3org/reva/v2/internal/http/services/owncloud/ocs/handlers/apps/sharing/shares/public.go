@@ -46,7 +46,7 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 	ctx := r.Context()
 	log := appctx.GetLogger(ctx)
 
-	c, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	c, err := h.getClient()
 	if err != nil {
 		return nil, &ocsError{
 			Code:    response.MetaServerError.StatusCode,
