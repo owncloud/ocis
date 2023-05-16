@@ -143,8 +143,8 @@ github.com/aws/aws-sdk-go/service/sts/stsiface
 # github.com/bbalet/stopwords v1.0.0
 ## explicit
 github.com/bbalet/stopwords
-# github.com/beevik/etree v1.1.0
-## explicit
+# github.com/beevik/etree v1.2.0
+## explicit; go 1.13
 github.com/beevik/etree
 # github.com/beorn7/perks v1.0.1
 ## explicit; go 1.11
@@ -1120,7 +1120,7 @@ github.com/iancoleman/strcase
 # github.com/imdario/mergo v0.3.13
 ## explicit; go 1.13
 github.com/imdario/mergo
-# github.com/inconshreveable/mousetrap v1.0.1
+# github.com/inconshreveable/mousetrap v1.1.0
 ## explicit; go 1.18
 github.com/inconshreveable/mousetrap
 # github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99
@@ -1172,7 +1172,7 @@ github.com/libregraph/idm/server
 github.com/libregraph/idm/server/handler
 github.com/libregraph/idm/server/handler/boltdb
 github.com/libregraph/idm/server/handler/ldif
-# github.com/libregraph/lico v0.59.4
+# github.com/libregraph/lico v0.60.1-0.20230516115351-f904ff5fd200
 ## explicit; go 1.18
 github.com/libregraph/lico
 github.com/libregraph/lico/bootstrap
@@ -1503,7 +1503,7 @@ github.com/prometheus/alertmanager/asset
 github.com/prometheus/alertmanager/pkg/labels
 github.com/prometheus/alertmanager/template
 github.com/prometheus/alertmanager/types
-# github.com/prometheus/client_golang v1.15.0
+# github.com/prometheus/client_golang v1.15.1
 ## explicit; go 1.17
 github.com/prometheus/client_golang/prometheus
 github.com/prometheus/client_golang/prometheus/internal
@@ -1539,7 +1539,7 @@ github.com/rogpeppe/go-internal/internal/syscall/windows
 github.com/rogpeppe/go-internal/internal/syscall/windows/sysdll
 github.com/rogpeppe/go-internal/lockedfile
 github.com/rogpeppe/go-internal/lockedfile/internal/filelock
-# github.com/rs/cors v1.8.2
+# github.com/rs/cors v1.9.0
 ## explicit; go 1.13
 github.com/rs/cors
 # github.com/rs/xid v1.4.0
@@ -1552,7 +1552,7 @@ github.com/rs/zerolog/internal/cbor
 github.com/rs/zerolog/internal/json
 github.com/rs/zerolog/log
 github.com/rs/zerolog/pkgerrors
-# github.com/russellhaering/goxmldsig v1.2.0
+# github.com/russellhaering/goxmldsig v1.4.0
 ## explicit; go 1.15
 github.com/russellhaering/goxmldsig
 github.com/russellhaering/goxmldsig/etreeutils
@@ -1598,7 +1598,7 @@ github.com/sony/gobreaker
 # github.com/spacewander/go-suffix-tree v0.0.0-20191010040751-0865e368c784
 ## explicit
 github.com/spacewander/go-suffix-tree
-# github.com/spf13/cobra v1.6.1
+# github.com/spf13/cobra v1.7.0
 ## explicit; go 1.15
 github.com/spf13/cobra
 # github.com/spf13/pflag v1.0.5
@@ -1838,7 +1838,7 @@ go.uber.org/zap/internal/color
 go.uber.org/zap/internal/exit
 go.uber.org/zap/zapcore
 go.uber.org/zap/zapgrpc
-# golang.org/x/crypto v0.7.0
+# golang.org/x/crypto v0.9.0
 ## explicit; go 1.17
 golang.org/x/crypto/argon2
 golang.org/x/crypto/bcrypt
@@ -1883,7 +1883,7 @@ golang.org/x/image/vector
 # golang.org/x/mod v0.9.0
 ## explicit; go 1.17
 golang.org/x/mod/semver
-# golang.org/x/net v0.8.0
+# golang.org/x/net v0.10.0
 ## explicit; go 1.17
 golang.org/x/net/bpf
 golang.org/x/net/context
@@ -1906,7 +1906,7 @@ golang.org/x/net/netutil
 golang.org/x/net/proxy
 golang.org/x/net/publicsuffix
 golang.org/x/net/trace
-# golang.org/x/oauth2 v0.6.0
+# golang.org/x/oauth2 v0.8.0
 ## explicit; go 1.17
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
@@ -1915,7 +1915,7 @@ golang.org/x/oauth2/internal
 golang.org/x/sync/errgroup
 golang.org/x/sync/semaphore
 golang.org/x/sync/singleflight
-# golang.org/x/sys v0.6.0
+# golang.org/x/sys v0.8.0
 ## explicit; go 1.17
 golang.org/x/sys/cpu
 golang.org/x/sys/execabs
@@ -1927,7 +1927,7 @@ golang.org/x/sys/windows/registry
 golang.org/x/sys/windows/svc
 golang.org/x/sys/windows/svc/eventlog
 golang.org/x/sys/windows/svc/mgr
-# golang.org/x/term v0.6.0
+# golang.org/x/term v0.8.0
 ## explicit; go 1.17
 golang.org/x/term
 # golang.org/x/text v0.9.0

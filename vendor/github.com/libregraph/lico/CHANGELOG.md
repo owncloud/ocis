@@ -4,6 +4,27 @@
 
 
 
+## v0.60.0 (2023-05-11)
+
+- Bump golang.org/x/oauth2 from 0.5.0 to 0.8.0
+- Bump identifier third party dependencies
+- Support Node 17 or higher for development
+- Bump caniuse-lite to latest version
+- Bump github.com/spf13/cobra from 1.5.0 to 1.7.0
+- Bump golang.org/x/time from 0.0.0-20220224211638-0e9765cccd65 to 0.3.0
+- Bump golang.org/x/net from 0.8.0 to 0.10.0
+- Bump github.com/gabriel-vasile/mimetype from 1.4.1 to 1.4.2
+- Bump github.com/go-ldap/ldap/v3 from 3.4.2 to 3.4.4
+- Bump github.com/russellhaering/goxmldsig from 1.2.0 to 1.4.0
+- Bump github.com/rs/cors from 1.8.2 to 1.9.0
+- Bump github.com/prometheus/client_golang from 1.13.0 to 1.15.1
+- Bump github.com/golang-jwt/jwt/v4 from 4.4.3 to 4.5.0
+- Bump github.com/gofrs/uuid from 4.2.0+incompatible to 4.4.0+incompatible
+- Bump github.com/crewjam/saml from 0.4.10 to 0.4.13
+- Bump golang.org/x/net from 0.0.0-20220624214902-1bab6f366d9e to 0.8.0
+- Bump golang.org/x/text from 0.3.7 to 0.3.8
+
+
 ## v0.59.4 (2022-12-02)
 
 - Pull survey client dependency from Github
