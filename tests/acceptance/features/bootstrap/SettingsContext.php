@@ -293,7 +293,6 @@ class SettingsContext implements Context {
 		foreach ($body["bundles"] as $value) {
 			if ($value["displayName"] === $bundleName) {
 				return $value;
-				break;
 			}
 		}
 		return [];
@@ -339,7 +338,6 @@ class SettingsContext implements Context {
 		foreach ($body["values"] as $value) {
 			if ($value["identifier"]["setting"] === "language") {
 				return $value["value"]["listValue"]["values"][0]["stringValue"];
-				break;
 			}
 		}
 	}

@@ -116,7 +116,8 @@ Feature: Notification
             "type": "string"
           },
           "object_id": {
-            "type": "string"
+            "type": "string",
+            "pattern": "^%space_id_pattern%$"
           },
           "object_type": {
             "type": "string",
@@ -173,7 +174,7 @@ Feature: Notification
       }
       """
     Examples:
-      | language | subject           | message                                                               |
-      | de       | Space freigegeben | Alice Hansen hat Sie zum Space notification checking hinzugef\u00fcgt |
-      | en       | Space shared      | Alice Hansen added you to Space notification checking                 |
-      | es       | Space compartido  | Alice Hansen te añadió al Space notification checking                 |
+      | language | subject           | message                                                         |
+      | de       | Space freigegeben | Alice Hansen hat Sie zu Space notification checking hinzugefügt |
+      | en       | Space shared      | Alice Hansen added you to Space notification checking           |
+      | es       | Space compartido  | Alice Hansen te añadió al Space notification checking           |
