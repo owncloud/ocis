@@ -2,13 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:build darwin || dragonfly || freebsd || linux || netbsd || openbsd
-// +build darwin dragonfly freebsd linux netbsd openbsd
+//go:build darwin || dragonfly || freebsd || illumos || linux || netbsd || openbsd
+// +build darwin dragonfly freebsd illumos linux netbsd openbsd
 
 package filelock
 
 import (
-	"os"
+	"io/fs"
 	"syscall"
 )
 
@@ -27,7 +27,7 @@ func lock(f File, lt lockType) (err error) {
 		}
 	}
 	if err != nil {
-		return &os.PathError{
+		return &fs.PathError{
 			Op:   lt.String(),
 			Path: f.Name(),
 			Err:  err,
