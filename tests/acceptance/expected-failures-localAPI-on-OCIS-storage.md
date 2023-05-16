@@ -179,29 +179,5 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 
 - [apiGraph/addUserToGroup.feature:421](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L421)
 
-### [Sharing of project space root via public link does no longer work](https://github.com/owncloud/ocis/issues/6278)
-
-- [apiSpaces/editPublicLinkOfSpace.feature:50](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/editPublicLinkOfSpace.feature#L50)
-- [apiSpaces/editPublicLinkOfSpace.feature:51](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/editPublicLinkOfSpace.feature#L51)
-- [apiSpaces/editPublicLinkOfSpace.feature:65](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/editPublicLinkOfSpace.feature#L65)
-- [apiSpaces/editPublicLinkOfSpace.feature:66](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/editPublicLinkOfSpace.feature#L66)
-- [apiSpaces/editPublicLinkOfSpace.feature:67](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/editPublicLinkOfSpace.feature#L67)
-- [apiSpaces/editPublicLinkOfSpace.feature:81](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/editPublicLinkOfSpace.feature#L81)
-- [apiSpaces/editPublicLinkOfSpace.feature:82](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/editPublicLinkOfSpace.feature#L82)
-- [apiSpaces/editPublicLinkOfSpace.feature:83](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/editPublicLinkOfSpace.feature#L83)
-- [apiSpaces/publicLink.feature:15](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/publicLink.feature#L15)
-- [apiSpaces/publicLink.feature:20](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/publicLink.feature#L20)
-- [apiSpaces/publicLink.feature:25](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/publicLink.feature#L25)
-- [apiSpaces/publicLink.feature:31](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/publicLink.feature#L31)
-- [apiSpaces/publicLink.feature:37](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/publicLink.feature#L37)
-- [apiSpacesShares/publicLinkDownload.feature:17](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/publicLinkDownload.feature#L17)
-- [apiSpacesShares/shareSpacesViaLink.feature:45](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSpacesViaLink.feature#L45)
-- [apiSpacesShares/shareSpacesViaLink.feature:46](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSpacesViaLink.feature#L46)
-- [apiSpacesShares/shareSpacesViaLink.feature:47](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSpacesViaLink.feature#L47)
-- [apiSpacesShares/shareSpacesViaLink.feature:50](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSpacesViaLink.feature#L50)
-- [apiSpacesShares/shareSpacesViaLink.feature:86](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSpacesViaLink.feature#L86)
-- [apiSpacesShares/shareSpacesViaLink.feature:87](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSpacesViaLink.feature#L87)
-- [apiSpacesShares/shareSpacesViaLink.feature:90](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSpacesViaLink.feature#L90)
-
 Note: always have an empty line at the end of this file.
 The bash script that processes this file requires that the last line has a newline on the end.
