@@ -122,7 +122,7 @@ func DefaultConfig() *config.Config {
 			LoginAttribute:       "uid",
 			EmailAttribute:       "mail",
 			NameAttribute:        "displayName",
-			UUIDAttribute:        "uid",
+			UUIDAttribute:        "ownCloudUUID",
 			UUIDAttributeType:    "text",
 			Filter:               "",
 			ObjectClass:          "inetOrgPerson",
