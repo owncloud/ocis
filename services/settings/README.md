@@ -36,7 +36,7 @@ graph TD
 
 ## Caching
 
-When using `SETTINGS_STORE_TYPE=metadata`, the settings service caches the results of queries to the `system-storage` for providing faster responses.
+When using `SETTINGS_STORE_TYPE=metadata`, the settings service caches the results of queries against the storage backend for providing faster responses. The content of this cache is independent of the cache used in the `storage-system` service as it caches directory listing and settings content stored in files.
 
 The store used for the cache can be configured using the `SETTINGS_CACHE_STORE` environment variable. Possible stores are:
 
