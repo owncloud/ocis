@@ -1,7 +1,7 @@
 package config
 
 var config = map[string]string{
-	"port": "5000",
+	"port": "5200",
 }
 
 func Get(key string) string {

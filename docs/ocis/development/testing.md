@@ -245,7 +245,7 @@ PROXY_ENABLE_BASIC_AUTH=true \
 ### Run the tests
 
 ```bash
-OCIS_WRAPPER_URL=http://localhost:5000 \
+OCIS_WRAPPER_URL=http://localhost:5200 \
 TEST_WITH_GRAPH_API=true \
 TEST_OCIS=true \
 TEST_SERVER_URL="https://localhost:9200" \
