@@ -175,10 +175,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/addUserToGroup.feature:370](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L370)
 - [apiGraph/addUserToGroup.feature:384](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L384)
 
-#### [Admin user can't restore other user spaces](https://github.com/owncloud/ocis/issues/5872)
-
-- [apiSpaces/restoreSpaces.feature:93](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpaces/restoreSpaces.feature#L93)
-
 ### [Adding the same user as multiple members in a single request results in listing the same user twice in the group](https://github.com/owncloud/ocis/issues/5855)
 
 - [apiGraph/addUserToGroup.feature:421](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/addUserToGroup.feature#L421)

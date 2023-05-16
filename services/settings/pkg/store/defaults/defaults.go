@@ -345,6 +345,36 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 					},
 				},
 			},
+			{
+				Id:          ManageSpacePropertiesPermissionID,
+				Name:        ManageSpacePropertiesPermissionName,
+				DisplayName: "Manage space properties",
+				Description: "This permission allows to manage space properties such as name and description.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SYSTEM,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+			{
+				Id:          SpaceAbilityPermissionID,
+				Name:        SpaceAbilityPermissionName,
+				DisplayName: "Space ability",
+				Description: "This permission allows to enable and disable spaces.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SYSTEM,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_READWRITE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
 		},
 	}
 }
