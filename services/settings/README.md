@@ -1,16 +1,16 @@
 # Settings
 
-The `settings` service provides functionality for other services to register new settings as well as storing and retrieving the respective settings values.
+The `settings` service provides functionality for other services to register new settings as well as storing and retrieving the respective settings' values.
 
 The settings service is currently used for managing the:
 
-*   users' `profile` settings like the language and the Email notification settings,
-*   possible user roles and their respecitve permssions,
+*   users' `profile` settings like the language and the email notification settings,
+*   possible user roles and their respective permissions,
 *   assignment of roles to users.
 
-As an example, user profile settings that can be changed in the Web UI must be persisted.  
+As an example, user profile settings that can be changed in the Web UI must be persistent.  
 
-The settings service supports two different backends for persisting the data. The backend can be set using `SETTINGS_STORE_TYPE` environment variable. Supported values are:
+The settings service supports two different backends for persisting the data. The backend can be set via the `SETTINGS_STORE_TYPE` environment variable. Supported values are:
 
 *   `metadata`: The default. This backend persists the settings data via the `storage-system` service.
 *   `filesystem`: This backend persists the settings data in a directory on the local filesystem.
@@ -36,7 +36,7 @@ graph TD
 
 ## Caching
 
-When using `SETTINGS_STORE_TYPE=metadata`, the settings service caches the results of queries against the storage backend for providing faster responses. The content of this cache is independent of the cache used in the `storage-system` service as it caches directory listing and settings content stored in files.
+When using `SETTINGS_STORE_TYPE=metadata`, the `settings` service caches the results of queries against the storage backend to provide faster responses. The content of this cache is independent of the cache used in the `storage-system` service as it caches directory listing and settings content stored in files.
 
 The store used for the cache can be configured using the `SETTINGS_CACHE_STORE` environment variable. Possible stores are:
 
@@ -62,7 +62,7 @@ The store used for the cache can be configured using the `SETTINGS_CACHE_STORE` 
 
 ## Settings Management
 
-oCIS services can register *settings bundles* with the settings service.
+Infinite Scale services can register *settings bundles* with the settings service.
 
 ## Settings Usage
 
