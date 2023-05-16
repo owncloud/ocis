@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Use UUID attribute for computing "sub" claim in lico idp: [#904](https://github.com/owncloud/ocis/issues/904)
 * Bugfix - Fix the empty string givenName attribute when creating user: [#5431](https://github.com/owncloud/ocis/issues/5431)
 * Bugfix - Fix the wrong status code when appRoleAssignments is forbidden: [#6037](https://github.com/owncloud/ocis/issues/6037)
 * Bugfix - Add missing response to blocked requests: [#6277](https://github.com/owncloud/ocis/pull/6277)
@@ -15,6 +16,16 @@ The following sections list the changes for unreleased.
 * Enhancement - Add Store to `postprocessing`: [#6281](https://github.com/owncloud/ocis/pull/6281)
 
 ## Details
+
+* Bugfix - Use UUID attribute for computing "sub" claim in lico idp: [#904](https://github.com/owncloud/ocis/issues/904)
+
+   By default the LDAP backend for lico uses the User DN for computing the "sub" claim of a user. This
+   caused the "sub" claim to stay the same even if a user was deleted and recreated (and go a new UUID
+   assgined with that). We now use the user's unique id (`owncloudUUID` by default) for computing
+   the `sub` claim. So that user's recreated with the same name will be treated as different users
+   by the IDP.
+
+   https://github.com/owncloud/ocis/issues/904
 
 * Bugfix - Fix the empty string givenName attribute when creating user: [#5431](https://github.com/owncloud/ocis/issues/5431)
 
