@@ -197,6 +197,7 @@ func initLicoInternalLDAPEnvVars(ldap *config.Ldap) error {
 		"LDAP_EMAIL_ATTRIBUTE":     ldap.EmailAttribute,
 		"LDAP_NAME_ATTRIBUTE":      ldap.NameAttribute,
 		"LDAP_UUID_ATTRIBUTE":      ldap.UUIDAttribute,
+		"LDAP_SUB_ATTRIBUTES":      ldap.UUIDAttribute,
 		"LDAP_UUID_ATTRIBUTE_TYPE": ldap.UUIDAttributeType,
 		"LDAP_FILTER":              filter,
 	}
