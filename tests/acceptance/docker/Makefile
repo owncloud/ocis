@@ -26,7 +26,8 @@ else
 endif
 OCIS_IMAGE_TAG ?= dev
 
-WITH_WRAPPER ?= false
+# run tests with ociswrapper by default
+WITH_WRAPPER ?= true
 OCIS_WRAPPER := ../../ociswrapper/bin/ociswrapper
 
 # static
@@ -184,6 +185,7 @@ testSuite: $(OCIS_WRAPPER) build-dev-image clean-docker-container
 	COMPOSE_FILE=$(COMPOSE_FILE) \
 	STORAGE_DRIVER=$(STORAGE_DRIVER) \
 	TEST_SOURCE=$(TEST_SOURCE) \
+	WITH_WRAPPER=$(WITH_WRAPPER) \
 	OCIS_IMAGE_TAG=$(OCIS_IMAGE_TAG) \
 	BEHAT_SUITE=$(BEHAT_SUITE) \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \

@@ -1,6 +1,6 @@
 ## oCIS Wrapper
 
-A tool to wraps the oCIS binary and provides a way to re-configure the running oCIS instance.
+A tool that wraps the oCIS binary and provides a way to re-configure the running oCIS instance.
 
 When run, **ociswrapper** starts an API server that exposes some endpoints to re-configure the oCIS server.
 
@@ -33,7 +33,7 @@ Also, see `./bin/ociswrapper help` for more information.
 
    ```json
    {
-     "ENV_KEY1": "value1"
+     "ENV_KEY1": "value1",
      "ENV_KEY2": "value2"
    }
    ```
