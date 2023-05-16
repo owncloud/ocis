@@ -18,7 +18,7 @@ When run, **ociswrapper** starts an API server that exposes some endpoints to re
     ./bin/ociswrapper serve --bin=<path-to-ocis-binary>
     ```
 
-Access the API server at `http://localhost:5000`.
+Access the API server at `http://localhost:5200`.
 
 Also, see `./bin/ociswrapper help` for more information.
 
