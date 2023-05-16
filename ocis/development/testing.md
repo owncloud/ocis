@@ -45,7 +45,17 @@ For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDiffic
 
 For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-s3ng` runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with s3 storage.
 
-> Note: To run the tests from `apiAsyncUpload` suite you need to provide extra environment variable `POSTPROCESSING_DELAY`
+{{< hint info >}}
+While running the tests, oCIS server is started with [ociswrapper](https://github.com/owncloud/ocis/blob/master/tests/ociswrapper/README.md) (i.e. `WITH_WRAPPER=true`) by default. In order to run the tests without ociswrapper, provide `WITH_WRAPPER=false` when running the tests. For example:
+
+```bash
+WITH_WRAPPER=false \
+BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21' \
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage
+```
+
+But some test suites that are tagged with `@env-config` require the oCIS server to be run with ociswrapper. So, running those tests require `WITH_WRAPPER=true` (default setting).
+{{< /hint >}}
 
 For example `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suite transferred from ownCloud against an oCIS with ocis storage.
 
@@ -209,6 +219,47 @@ If you want to work on a specific issue
 4. go back to 1. and repeat till the tests are passing.
 5. remove those tests from the expected failures file
 6. make a PR that has the fixed code, and the relevant lines removed from the expected failures file.
+
+## Running ENV config tests (@env-config)
+
+Test suites tagged with `@env-config` are used to test the environment variables that are used to configure oCIS. These tests are special tests that require the oCIS server to be run using [ociswrapper](https://github.com/owncloud/ocis/blob/master/tests/ociswrapper/README.md).
+
+### Run oCIS with ociswrapper
+
+```bash
+# working dir: ocis repo root dir
+
+# init oCIS
+IDM_ADMIN_PASSWORD=admin \
+ocis/bin/ocis init --insecure true
+
+# build the wrapper
+cd tests/ociswrapper
+make build
+
+# run oCIS
+PROXY_ENABLE_BASIC_AUTH=true \
+./bin/ociswrapper serve --bin=../../ocis/bin/ocis
+```
+
+### Run the tests
+
+```bash
+OCIS_WRAPPER_URL=http://localhost:5000 \
+TEST_WITH_GRAPH_API=true \
+TEST_OCIS=true \
+TEST_SERVER_URL="https://localhost:9200" \
+BEHAT_FEATURE=tests/acceptance/features/apiAsyncUpload/delayPostprocessing.feature \
+make test-acceptance-api
+```
+
+### Writing new ENV config tests
+
+While writing tests for a new oCIS ENV configuration, please make sure to follow these guidelines:
+
+1. Tag the test suite (or test scenarios) with `@env-config`
+2. Use `OcisConfigHelper.php` for helper functions - provides functions to reconfigure the running oCIS instance.
+3. Recommended: add the new step implementations in `OcisConfigContext.php`
 
 ## Running tests for parallel deployment
 

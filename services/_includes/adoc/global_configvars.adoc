@@ -289,7 +289,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group ID's.
+Set this to true if the defined 'id' attribute for groups is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the group IDs.
 
 a| `LDAP_GROUP_SCHEMA_MAIL`
 
@@ -495,7 +495,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user ID's.
+Set this to true if the defined 'id' attribute for users is of the 'OCTETSTRING' syntax. This is e.g. required when using the 'objectGUID' attribute of Active Directory for the user IDs.
 
 a| `LDAP_USER_SCHEMA_MAIL`
 
@@ -580,7 +580,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-ID of the user who collects all necessary information for deletion.
+ID of the user that should receive admin privileges. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.
 
 a| `OCIS_ASYNC_UPLOADS`
 
@@ -706,7 +706,7 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++24m0s ++
+++10s ++
 
 a| [subs=-attributes]
 Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '10s' (10 seconds).
@@ -851,7 +851,7 @@ a| [subs=-attributes]
 ++ocis-cluster ++
 
 a| [subs=-attributes]
-The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
+The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.
 
 a| `OCIS_EVENTS_ENABLE_TLS`
 
@@ -900,7 +900,7 @@ a| [subs=-attributes]
 ++127.0.0.1:9233 ++
 
 a| [subs=-attributes]
-The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Set to a empty string to disable emitting events.
+The address of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture.
 
 a| `OCIS_GRPC_CLIENT_TLS_CACERT`
 
@@ -1066,7 +1066,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Allow insecure connections to the OIDC issuer.
+Whether to verify the server TLS certificates.
 
 a| `OCIS_JWT_SECRET`
 
@@ -1907,7 +1907,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++memory ++
+++ ++
 
 a| [subs=-attributes]
 The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
@@ -1955,7 +1955,7 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++336h0m0s ++
+++0s ++
 
 a| [subs=-attributes]
 Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
@@ -2010,7 +2010,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares. If not using the global OCIS_SHARING_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD, you must define the FRONTEND_OCS_PUBLIC_WRITEABLE_SHARE_MUST_HAVE_PASSWORD in the frontend service.
+Set this to true if you want to enforce passwords on Uploader, Editor or Contributor shares.
 
 a| `OCIS_SPACES_MAX_QUOTA`
 
