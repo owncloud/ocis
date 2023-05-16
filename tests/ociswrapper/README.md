@@ -6,17 +6,17 @@ When run, **ociswrapper** starts an API server that exposes some endpoints to re
 
 ### Usage
 
-1. Build
+1.  Build
 
-   ```bash
-   make build
-   ```
+    ```bash
+    make build
+    ```
 
-2. Run
+2.  Run
 
-   ```bash
-   ./bin/ociswrapper serve --bin=<path-to-ocis-binary>
-   ```
+    ```bash
+    ./bin/ociswrapper serve --bin=<path-to-ocis-binary>
+    ```
 
 Access the API server at `http://localhost:5000`.
 
@@ -26,29 +26,29 @@ Also, see `./bin/ociswrapper help` for more information.
 
 **ociswrapper** exposes two endpoints:
 
-1. `PUT /config`
+1.  `PUT /config`
 
-   Updates the configuration of the running oCIS instance.
-   Body of the request should be a JSON object with the following structure:
+    Updates the configuration of the running oCIS instance.
+    Body of the request should be a JSON object with the following structure:
 
-   ```json
-   {
-     "ENV_KEY1": "value1",
-     "ENV_KEY2": "value2"
-   }
-   ```
+    ```json
+    {
+      "ENV_KEY1": "value1",
+      "ENV_KEY2": "value2"
+    }
+    ```
 
-   Returns:
+    Returns:
 
-   - `200 OK` - oCIS is successfully reconfigured
-   - `400 Bad Request` - request body is not a valid JSON object
-   - `500 Internal Server Error` - oCIS server is not running
+    *   `200 OK` - oCIS is successfully reconfigured
+    *   `400 Bad Request` - request body is not a valid JSON object
+    *   `500 Internal Server Error` - oCIS server is not running
 
-2. `DELETE /rollback`
+2.  `DELETE /rollback`
 
-   Rolls back the configuration to the starting point.
+    Rolls back the configuration to the starting point.
 
-   Returns:
+    Returns:
 
-   - `200 OK` - rollback is successful
-   - `500 Internal Server Error` - oCIS server is not running
+    *   `200 OK` - rollback is successful
+    *   `500 Internal Server Error` - oCIS server is not running
