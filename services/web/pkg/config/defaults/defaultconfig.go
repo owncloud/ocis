@@ -79,7 +79,8 @@ func DefaultConfig() *config.Config {
 					Sidebar: config.Sidebar{
 						Shares: config.SidebarShares{},
 					},
-					Upload: &config.Upload{},
+					Upload:                  &config.Upload{},
+					OpenLinksWithDefaultApp: true,
 				},
 			},
 		},

@@ -19,6 +19,7 @@ type Options struct {
 	Editor                   *Editor          `json:"editor,omitempty" yaml:"editor"`
 	ContextHelpersReadMore   bool             `json:"contextHelpersReadMore,omitempty" yaml:"contextHelpersReadMore" env:"WEB_OPTION_CONTEXTHELPERS_READ_MORE" desc:"Specifies whether the 'Read more' link should be displayed or not."`
 	LogoutURL                string           `json:"logoutUrl,omitempty" yaml:"logoutUrl" env:"WEB_OPTION_LOGOUT_URL" desc:"Adds a link to the user's profile page to point him to an external page, where he can manage his session and devices. This is helpful when an external IdP is used. This option is disabled by default."`
+	OpenLinksWithDefaultApp  bool             `json:"openLinksWithDefaultApp,omitempty" yaml:"openLinksWithDefaultApp" env:"WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP" desc:"Specifies whether single file link shares should be opened with the default app or not. If not opened by the default app, the Web UI just displays the file details. Defaults to 'true'."`
 }
 
 // AccountEditLink are the AccountEditLink options

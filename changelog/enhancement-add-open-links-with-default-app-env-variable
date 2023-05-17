@@ -1,0 +1,6 @@
+Enhancement: add WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP env variable
+
+We introduced the open file links with default app feature in web which is enabled by default,
+this is now configurable and can be disabled by setting the env `WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP` to `false`.
+
+https://github.com/owncloud/ocis/pull/6328
