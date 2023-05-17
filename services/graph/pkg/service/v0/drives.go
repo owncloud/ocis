@@ -538,10 +538,14 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 				// can't access disabled space
 				if utils.ReadPlainFromOpaque(storageSpace.Opaque, "trashed") != _spaceStateTrashed {
 					res.Special = g.getSpecialDriveItems(ctx, baseURL, storageSpace)
-					quota, err := g.getDriveQuota(ctx, storageSpace)
-					res.Quota = &quota
-					if err != nil {
-						return err
+					if storageSpace.SpaceType != "mountpoint" && storageSpace.SpaceType != "virtual" {
+						quota, err := g.getDriveQuota(ctx, storageSpace)
+						res.Quota = &quota
+						if err != nil {
+							return err
+						}
+					} else {
+						res.Quota = nil
 					}
 				}
 				select {
