@@ -334,7 +334,7 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				Id:          WritePublicLinkPermissionID,
 				Name:        WritePublicLinkPermissionName,
 				DisplayName: "Write publiclink",
-				Description: "This permission permits to write into a public link.",
+				Description: "This permission allows to create public links.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SHARE,
 				},
