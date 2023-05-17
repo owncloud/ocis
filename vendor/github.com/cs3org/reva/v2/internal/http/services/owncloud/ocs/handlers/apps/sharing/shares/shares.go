@@ -1411,6 +1411,19 @@ func (h *Handler) createCs3Share(ctx context.Context, w http.ResponseWriter, r *
 		}
 	}
 
+	expiry := r.PostFormValue("expireDate")
+	if expiry != "" {
+		ts, err := time.Parse("2006-01-02T15:04:05-0700", expiry)
+		if err != nil {
+			return nil, &ocsError{
+				Code:    response.MetaBadRequest.StatusCode,
+				Message: "could not parse expiry timestamp on this item",
+				Error:   err,
+			}
+		}
+		req.Grant.Expiration = utils.TimeToTS(ts)
+	}
+
 	createShareResponse, err := client.CreateShare(ctx, req)
 	if err != nil {
 		return nil, &ocsError{
