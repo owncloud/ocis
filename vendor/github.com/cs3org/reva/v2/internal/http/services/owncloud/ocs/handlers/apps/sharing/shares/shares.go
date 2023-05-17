@@ -210,7 +210,7 @@ func (h *Handler) CreateShare(w http.ResponseWriter, r *http.Request) {
 	}
 	sublog := appctx.GetLogger(ctx).With().Interface("ref", ref).Logger()
 
-	statReq := provider.StatRequest{Ref: &ref}
+	statReq := provider.StatRequest{Ref: &ref, FieldMask: &fieldmaskpb.FieldMask{Paths: []string{"space"}}}
 	statRes, err := client.Stat(ctx, &statReq)
 	if err != nil {
 		sublog.Debug().Err(err).Msg("CreateShare: error on stat call")
@@ -233,6 +233,7 @@ func (h *Handler) CreateShare(w http.ResponseWriter, r *http.Request) {
 
 	// check that this is a valid share
 	if statRes.Info.Id.OpaqueId == statRes.Info.Id.SpaceId &&
+		statRes.GetInfo().GetSpace().GetSpaceType() == "personal" &&
 		(shareType != int(conversions.ShareTypeSpaceMembershipUser) && shareType != int(conversions.ShareTypeSpaceMembershipGroup)) {
 		response.WriteOCSError(w, r, http.StatusBadRequest, "Can not share space root", nil)
 		return

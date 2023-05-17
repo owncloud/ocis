@@ -604,6 +604,7 @@ func (fs *Decomposedfs) UpdateStorageSpace(ctx context.Context, req *provider.Up
 			}, nil
 		}
 	}
+	metadata[prefixes.TreeMTimeAttr] = []byte(time.Now().UTC().Format(time.RFC3339Nano))
 
 	err = spaceNode.SetXattrs(metadata, true)
 	if err != nil {
