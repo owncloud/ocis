@@ -116,10 +116,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiGraph/getUser.feature:617](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L617)
 - [apiGraph/getUser.feature:618](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L618)
 
-#### [Sharing to a group with an expiration date does not work #5442](https://github.com/owncloud/ocis/issues/5442)
-
-- [apiSpacesShares/shareSubItemOfSpace.feature:105](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpace.feature#L105)
-
 #### [Normal user can get expanded members information of a group](https://github.com/owncloud/ocis/issues/5604)
 
 - [apiGraph/getGroup.feature:382](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getGroup.feature#L382)
