@@ -53,12 +53,12 @@ func DefaultConfig() *config.Config {
 			WebDavBase:   "https://localhost:9200",
 			WebDavPath:   "/dav/spaces/",
 			DefaultQuota: "1000000000",
-			// 30 minutes
-			ExtendedSpacePropertiesCacheTTL: 1800,
-			// 30 minutes
-			GroupsCacheTTL: 1800,
-			// 30 minutes
-			UsersCacheTTL: 1800,
+			// 1 minute
+			ExtendedSpacePropertiesCacheTTL: 60,
+			// 1 minute
+			GroupsCacheTTL: 60,
+			// 1 minute
+			UsersCacheTTL: 60,
 		},
 		Identity: config.Identity{
 			Backend: "ldap",
