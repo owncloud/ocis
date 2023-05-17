@@ -112,6 +112,7 @@ checksums:
   - adler32
   preferred_upload_type: sha1
 read_only_user_attributes: []
+ldap_server_write_enabled: false
 middleware:
   auth:
     credentials_by_user_agent: {}
