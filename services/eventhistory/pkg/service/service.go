@@ -73,7 +73,7 @@ func (eh *EventHistoryService) StoreEvents() {
 	}
 }
 
-// GetEvents allows to retrieve events from the eventstore by id
+// GetEvents allows retrieving events from the eventstore by id
 func (eh *EventHistoryService) GetEvents(ctx context.Context, req *ehsvc.GetEventsRequest, resp *ehsvc.GetEventsResponse) error {
 	for _, id := range req.Ids {
 		ev, err := eh.getEvent(id)
@@ -87,7 +87,7 @@ func (eh *EventHistoryService) GetEvents(ctx context.Context, req *ehsvc.GetEven
 	return nil
 }
 
-// GetEventsForUser allows to retrieve events from the eventstore by userID
+// GetEventsForUser allows retrieving events from the eventstore by userID
 // This function will match all events that contains the user ID between two non-word characters.
 // The reasoning behind this is that events put the userID in many different fields, which can differ
 // per event type. This function will match all events that contain the userID by using a regex.

@@ -42,7 +42,7 @@ var _ = Describe("EventHistoryService", func() {
 		close(bus)
 	})
 
-	It("Records events, stores them and allows to retrieve them", func() {
+	It("Records events, stores them and allows them to be retrieved", func() {
 		id := bus.Publish(events.UploadReady{})
 
 		// service will store eventually

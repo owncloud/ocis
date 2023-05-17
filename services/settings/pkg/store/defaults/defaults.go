@@ -229,7 +229,7 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				Id:          SetPersonalSpaceQuotaPermissionID,
 				Name:        SetPersonalSpaceQuotaPermissionName,
 				DisplayName: "Set Personal Space Quota",
-				Description: "This permission allows to manage personal space quotas.",
+				Description: "This permission allows managing personal space quotas.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -244,7 +244,7 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				Id:          SetProjectSpaceQuotaPermissionID,
 				Name:        SetProjectSpaceQuotaPermissionName,
 				DisplayName: "Set Project Space Quota",
-				Description: "This permission allows to manage project space quotas.",
+				Description: "This permission allows managing project space quotas.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -259,7 +259,7 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				Id:          CreateSpacePermissionID,
 				Name:        CreateSpacePermissionName,
 				DisplayName: "Create Space",
-				Description: "This permission allows to create new spaces.",
+				Description: "This permission allows creating new spaces.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -274,7 +274,7 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				Id:          ListAllSpacesPermissionID,
 				Name:        ListAllSpacesPermissionName,
 				DisplayName: "List All Spaces",
-				Description: "This permission allows to list all spaces.",
+				Description: "This permission allows listing all spaces.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -289,7 +289,7 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				Id:          DeleteHomeSpacesPermissionID,
 				Name:        DeleteHomeSpacesPermissionName,
 				DisplayName: "Delete All Home Spaces",
-				Description: "This permission allows to delete home spaces.",
+				Description: "This permission allows deleting home spaces.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -304,7 +304,7 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				Id:          DeleteAllSpacesPermissionID,
 				Name:        DeleteAllSpacesPermissionName,
 				DisplayName: "Delete AllSpaces",
-				Description: "This permission allows to delete all spaces.",
+				Description: "This permission allows deleting all spaces.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -334,7 +334,7 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				Id:          WritePublicLinkPermissionID,
 				Name:        WritePublicLinkPermissionName,
 				DisplayName: "Write publiclink",
-				Description: "This permission allows to create public links.",
+				Description: "This permission allows creating public links.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SHARE,
 				},
@@ -349,7 +349,7 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				Id:          ManageSpacePropertiesPermissionID,
 				Name:        ManageSpacePropertiesPermissionName,
 				DisplayName: "Manage space properties",
-				Description: "This permission allows to manage space properties such as name and description.",
+				Description: "This permission allows managing space properties such as name and description.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -364,7 +364,7 @@ func generateBundleAdminRole() *settingsmsg.Bundle {
 				Id:          SpaceAbilityPermissionID,
 				Name:        SpaceAbilityPermissionName,
 				DisplayName: "Space ability",
-				Description: "This permission allows to enable and disable spaces.",
+				Description: "This permission allows enabling and disabling spaces.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -394,7 +394,7 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 				Id:          ManageSpacePropertiesPermissionID,
 				Name:        ManageSpacePropertiesPermissionName,
 				DisplayName: "Manage space properties",
-				Description: "This permission allows to manage space properties such as name and description.",
+				Description: "This permission allows managing space properties such as name and description.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -409,7 +409,7 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 				Id:          SpaceAbilityPermissionID,
 				Name:        SpaceAbilityPermissionName,
 				DisplayName: "Space ability",
-				Description: "This permission allows to enable and disable spaces.",
+				Description: "This permission allows enabling and disabling spaces.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -439,7 +439,7 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 				Id:          SetProjectSpaceQuotaPermissionID,
 				Name:        SetProjectSpaceQuotaPermissionName,
 				DisplayName: "Set Project Space Quota",
-				Description: "This permission allows to manage project space quotas.",
+				Description: "This permission allows managing project space quotas.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -454,7 +454,7 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 				Id:          CreateSpacePermissionID,
 				Name:        CreateSpacePermissionName,
 				DisplayName: "Create Space",
-				Description: "This permission allows to create new spaces.",
+				Description: "This permission allows creating new spaces.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -530,7 +530,7 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 				Id:          CreateSpacePermissionID,
 				Name:        CreateSpacePermissionName,
 				DisplayName: "Create own Space",
-				Description: "This permission allows to create a space owned by the current user.",
+				Description: "This permission allows creating a space owned by the current user.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM, // TODO resource type space? self? me? own?
 				},
@@ -621,7 +621,7 @@ func generateBundleUserRole() *settingsmsg.Bundle {
 				Id:          CreateSpacePermissionID,
 				Name:        CreateSpacePermissionName,
 				DisplayName: "Create own Space",
-				Description: "This permission allows to create a space owned by the current user.",
+				Description: "This permission allows creating a space owned by the current user.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM, // TODO resource type space? self? me? own?
 				},

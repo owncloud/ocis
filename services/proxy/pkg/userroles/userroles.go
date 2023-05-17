@@ -12,7 +12,7 @@ import (
 
 //go:generate mockery --name=UserRoleAssigner
 
-// UserRoleAssigner allows to provide different implemenation for how users get their default roles
+// UserRoleAssigner allows providing different implementations for how users get their default roles
 // assigned by the proxy during authentication
 type UserRoleAssigner interface {
 	// UpdateUserRoleAssignment is called by the account resolver middleware. It updates the user's role assignment

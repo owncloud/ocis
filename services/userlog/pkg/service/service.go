@@ -162,7 +162,7 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 	}
 }
 
-// GetEvents allows to retrieve events from the eventhistory by userid
+// GetEvents allows retrieving events from the eventhistory by userid
 func (ul *UserlogService) GetEvents(ctx context.Context, userid string) ([]*ehmsg.Event, error) {
 	rec, err := ul.store.Read(userid)
 	if err != nil && err != store.ErrNotFound {
