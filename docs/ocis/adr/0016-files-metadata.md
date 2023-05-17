@@ -57,7 +57,7 @@ Use a Database or an external key/value store to persist metadata.
 
 ### Extended File Attributes
 
-Extended File Attributes allow to store arbitrary properties. There are 4 namespaces `user`, `system`, `trusted` and `security`. We can safely use the `user` namespace. An example attribute name would be `user.ocis.owner.id`. The linux kernel has length limits on attribute names and values.
+Extended File Attributes allow storing arbitrary properties. There are 4 namespaces `user`, `system`, `trusted` and `security`. We can safely use the `user` namespace. An example attribute name would be `user.ocis.owner.id`. The linux kernel has length limits on attribute names and values.
 
 From Wikipedia on [Extended file attributes](https://en.wikipedia.org/wiki/Extended_file_attributes#Linux):
 
