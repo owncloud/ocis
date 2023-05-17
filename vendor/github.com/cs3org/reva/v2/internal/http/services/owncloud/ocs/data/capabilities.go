@@ -80,8 +80,16 @@ type CapabilitiesCore struct {
 
 // CapabilitiesGraph holds the graph capabilities
 type CapabilitiesGraph struct {
-	PersonalDataExport     ocsBool  `json:"personal-data-export" xml:"personal-data-export" mapstructure:"personal_data_export"`
-	ReadOnlyUserAttributes []string `json:"read_only_user_attributes" xml:"read_only_user_attributes" mapstructure:"read_only_user_attributes"`
+	PersonalDataExport ocsBool                `json:"personal-data-export" xml:"personal-data-export" mapstructure:"personal_data_export"`
+	Users              CapabilitiesGraphUsers `json:"users" xml:"users" mapstructure:"users"`
+}
+
+// CapabilitiesGraphUsers holds the graph user capabilities
+type CapabilitiesGraphUsers struct {
+	ReadOnlyAttributes         []string `json:"read_only_attributes" xml:"read_only_attributes" mapstructure:"read_only_attributes"`
+	CreateDisabled             ocsBool  `json:"create_disabled" xml:"create_disabled" mapstructure:"create_disabled"`
+	DeleteDisabled             ocsBool  `json:"delete_disabled" xml:"delete_disabled" mapstructure:"delete_disabled"`
+	ChangePasswordSelfDisabled ocsBool  `json:"change_password_self_disabled" xml:"change_password_self_disabled" mapstructure:"change_password_self_disabled"`
 }
 
 // Status holds basic status information

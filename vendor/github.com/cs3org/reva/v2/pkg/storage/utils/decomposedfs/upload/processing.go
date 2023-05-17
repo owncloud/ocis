@@ -154,6 +154,7 @@ func New(ctx context.Context, info tusd.FileInfo, lu *lookup.Lookup, tp Tree, p 
 		"BinPath": binPath,
 
 		"NodeId":              n.ID,
+		"NodeExists":          "true",
 		"NodeParentId":        n.ParentID,
 		"NodeName":            n.Name,
 		"SpaceRoot":           spaceRoot,
@@ -165,6 +166,11 @@ func New(ctx context.Context, info tusd.FileInfo, lu *lookup.Lookup, tp Tree, p 
 		"UserName": usr.Username,
 
 		"LogLevel": log.GetLevel().String(),
+	}
+	if !n.Exists {
+		// fill future node info
+		info.Storage["NodeId"] = uuid.New().String()
+		info.Storage["NodeExists"] = "false"
 	}
 	// Create binary file in the upload folder with no content
 	log.Debug().Interface("info", info).Msg("Decomposedfs: built storage info")
@@ -267,8 +273,8 @@ func CreateNodeForUpload(upload *Upload, initAttrs node.Attributes) (*node.Node,
 	}
 
 	var f *lockedfile.File
-	switch n.ID {
-	case "":
+	switch upload.Info.Storage["NodeExists"] {
+	case "false":
 		f, err = initNewNode(upload, n, uint64(fsize))
 	default:
 		f, err = updateExistingNode(upload, n, spaceID, uint64(fsize))
@@ -320,8 +326,6 @@ func CreateNodeForUpload(upload *Upload, initAttrs node.Attributes) (*node.Node,
 }
 
 func initNewNode(upload *Upload, n *node.Node, fsize uint64) (*lockedfile.File, error) {
-	n.ID = uuid.New().String()
-
 	// create folder structure (if needed)
 	if err := os.MkdirAll(filepath.Dir(n.InternalPath()), 0700); err != nil {
 		return nil, err
