@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 /**
@@ -18,7 +19,7 @@ require_once 'bootstrap.php';
 /**
  * Context for the TUS-specific steps using the Graph API
  */
-class RoleAssignmentContext implements Context {
+class SettingsContext implements Context {
 	private FeatureContext $featureContext;
 	private SpacesContext $spacesContext;
 	private string $baseUrl;
@@ -255,5 +256,158 @@ class RoleAssignmentContext implements Context {
 	public function theSettingApiResponseShouldHaveTheRole(string $role): void {
 		$assignmentRoleId = $this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())["assignments"][0]["roleId"];
 		Assert::assertEquals($this->userGetRoleIdByRoleName($this->featureContext->getAdminUserName(), $role), $assignmentRoleId, "user has no role $role");
+	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function sendRequestGetBundlesList(string $user): void {
+		$fullUrl = $this->baseUrl . $this->settingsUrl . "bundles-list";
+		$this->featureContext->setResponse(
+			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), '{}')
+		);
+
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201"
+		);
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $bundleName
+	 *
+	 * @return array
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function getBundlesList(string $user, string $bundleName): array {
+		$this->sendRequestGetBundlesList($user);
+		$body = json_decode((string)$this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
+		foreach ($body["bundles"] as $value) {
+			if ($value["displayName"] === $bundleName) {
+				return $value;
+			}
+		}
+		return [];
+	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function sendRequestGetSettingsValuesList(string $user): void {
+		$fullUrl = $this->baseUrl . $this->settingsUrl . "values-list";
+		$body = json_encode(["account_uuid" => "me"], JSON_THROW_ON_ERROR);
+		$this->featureContext->setResponse(
+			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body)
+		);
+
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201"
+		);
+	}
+
+	/**
+	 * @param string $user
+	 *
+	 * @return string
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function getSettingLanguageValue(string $user): string {
+		$this->sendRequestGetSettingsValuesList($user);
+		$body = json_decode((string)$this->featureContext->getResponse()->getBody(), true, 512, JSON_THROW_ON_ERROR);
+	
+		// if no language is set, the request body is empty return English as the default language
+		if (empty($body)) {
+			return "en";
+		}
+		foreach ($body["values"] as $value) {
+			if ($value["identifier"]["setting"] === "language") {
+				return $value["value"]["listValue"]["values"][0]["stringValue"];
+			}
+		}
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $language
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function sendRequestToSwitchSystemLanguage(string $user, string $language): void {
+		$profileBundlesList = $this->getBundlesList($user, "Profile");
+		Assert::assertNotEmpty($profileBundlesList, "bundles list is empty");
+
+		$settingId = '';
+		foreach ($profileBundlesList["settings"] as $value) {
+			if ($value["name"] === "language") {
+				$settingId = $value["id"];
+				break;
+			}
+		}
+		Assert::assertNotEmpty($settingId, "settingId is empty");
+
+		$fullUrl = $this->baseUrl . $this->settingsUrl . "values-save";
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id');
+		$body = json_encode(
+			[
+			"value" => [
+			"account_uuid" => "me",
+			"bundleId" => $profileBundlesList["id"],
+			"id" => $userId,
+			"listValue" => [
+			"values" => [
+			  [
+				"stringValue" => $language
+			  ]
+			]
+			],
+			"resource" => [
+			"type" => "TYPE_USER"
+			],
+			"settingId" => $settingId
+			]
+			],
+			JSON_THROW_ON_ERROR
+		);
+
+		$this->featureContext->setResponse(
+			$this->spacesContext->sendPostRequestToUrl($fullUrl, $user, $this->featureContext->getPasswordForUser($user), $body)
+		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has switched the system language to "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $language
+	 *
+	 * @return void
+	 *
+	 * @throws Exception
+	 */
+	public function theUserHasSwitchedSysemLanguage(string $user, string $language): void {
+		$this->sendRequestToSwitchSystemLanguage($user, $language);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			201,
+			"Expected response status code should be 201"
+		);
 	}
 }

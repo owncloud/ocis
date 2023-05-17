@@ -22,9 +22,8 @@ require_once 'bootstrap.php';
  */
 class NotificationContext implements Context {
 	private FeatureContext $featureContext;
-
 	private SpacesContext $spacesContext;
-
+	private SettingsContext $settingsContext;
 	private string $notificationEndpointPath = '/apps/notifications/api/v1/notifications?format=json';
 
 	private array $notificationIds;
@@ -78,6 +77,7 @@ class NotificationContext implements Context {
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
 		$this->spacesContext = $environment->getContext('SpacesContext');
+		$this->settingsContext = $environment->getContext('SettingsContext');
 	}
 
 	/**
@@ -89,13 +89,17 @@ class NotificationContext implements Context {
 	 */
 	public function userListAllNotifications(string $user):void {
 		$this->setUserRecipient($user);
+		$headers = ["accept-language" => $this->settingsContext->getSettingLanguageValue($user)];
 		$response = OcsApiHelper::sendRequest(
 			$this->featureContext->getBaseUrl(),
 			$this->featureContext->getActualUsername($user),
 			$this->featureContext->getPasswordForUser($user),
 			'GET',
 			$this->notificationEndpointPath,
-			$this->featureContext->getStepLineRef()
+			$this->featureContext->getStepLineRef(),
+			[],
+			2,
+			$headers
 		);
 		$this->featureContext->setResponse($response);
 	}
