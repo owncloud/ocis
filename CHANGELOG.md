@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Update the default admin role: [#6310](https://github.com/owncloud/ocis/pull/6310)
 * Enhancement - Add specific result to antivirus for debugging: [#6265](https://github.com/owncloud/ocis/pull/6265)
 * Enhancement - Update Reva to 2.13.3: [#6305](https://github.com/owncloud/ocis/pull/6305)
+* Enhancement - Graph user capabilities: [#6339](https://github.com/owncloud/ocis/pull/6339)
 * Enhancement - Add Store to `postprocessing`: [#6281](https://github.com/owncloud/ocis/pull/6281)
 * Enhancement - Remove quota from share jails api responses: [#6309](https://github.com/owncloud/ocis/pull/6309)
 
@@ -89,6 +90,14 @@ The following sections list the changes for unreleased.
   *   Enhancement [cs3org/reva#3895](https://github.com/cs3org/reva/pull/3895): Add missing expiry date to shares
 
    https://github.com/owncloud/ocis/pull/6305
+   https://github.com/owncloud/ocis/pull/6339
+
+* Enhancement - Graph user capabilities: [#6339](https://github.com/owncloud/ocis/pull/6339)
+
+   Adds capablities to show if users are writeable in LDAP so clients can block their specific
+   fields
+
+   https://github.com/owncloud/ocis/pull/6339
 
 * Enhancement - Add Store to `postprocessing`: [#6281](https://github.com/owncloud/ocis/pull/6281)
 
