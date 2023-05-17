@@ -421,6 +421,21 @@ func generateBundleSpaceAdminRole() *settingsmsg.Bundle {
 				},
 			},
 			{
+				Id:          DeleteAllSpacesPermissionID,
+				Name:        DeleteAllSpacesPermissionName,
+				DisplayName: "Delete AllSpaces",
+				Description: "This permission allows to delete all spaces.",
+				Resource: &settingsmsg.Resource{
+					Type: settingsmsg.Resource_TYPE_SYSTEM,
+				},
+				Value: &settingsmsg.Setting_PermissionValue{
+					PermissionValue: &settingsmsg.Permission{
+						Operation:  settingsmsg.Permission_OPERATION_DELETE,
+						Constraint: settingsmsg.Permission_CONSTRAINT_ALL,
+					},
+				},
+			},
+			{
 				Id:          SetProjectSpaceQuotaPermissionID,
 				Name:        SetProjectSpaceQuotaPermissionName,
 				DisplayName: "Set Project Space Quota",
