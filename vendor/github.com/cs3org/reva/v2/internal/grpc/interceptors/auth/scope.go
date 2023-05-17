@@ -247,43 +247,55 @@ func checkIfNestedResource(ctx context.Context, ref *provider.Reference, parent 
 	parentPath := statResponse.Info.Path
 
 	childPath := ref.GetPath()
-	if childPath == "" || childPath == "." {
-		// We mint a token as the owner of the public share and try to stat the reference
-		// TODO(ishank011): We need to find a better alternative to this
-
-		var user *userpb.User
-		if statResponse.GetInfo().GetOwner().GetType() == userpb.UserType_USER_TYPE_SPACE_OWNER {
-			// fake a space owner user
-			user = &userpb.User{
-				Id: statResponse.GetInfo().GetOwner(),
-			}
-		} else {
-			userResp, err := client.GetUser(ctx, &userpb.GetUserRequest{UserId: statResponse.Info.Owner, SkipFetchingUserGroups: true})
-			if err != nil || userResp.Status.Code != rpc.Code_CODE_OK {
-				return false, err
-			}
-			user = userResp.User
-		}
-
-		scope, err := scope.AddOwnerScope(map[string]*authpb.Scope{})
-		if err != nil {
-			return false, err
-		}
-		token, err := mgr.MintToken(ctx, user, scope)
-		if err != nil {
-			return false, err
-		}
-		ctx = metadata.AppendToOutgoingContext(context.Background(), ctxpkg.TokenHeader, token)
-
-		childStat, err := client.Stat(ctx, &provider.StatRequest{Ref: ref})
-		if err != nil {
-			return false, err
-		}
-		if childStat.Status.Code != rpc.Code_CODE_OK {
-			return false, statuspkg.NewErrorFromCode(childStat.Status.Code, "auth interceptor")
-		}
-		childPath = statResponse.Info.Path
+	if childPath != "" && childPath != "." && strings.HasPrefix(childPath, parentPath) {
+		// if the request is relative from the root, we can return directly
+		return true, nil
 	}
+
+	// The request is not relative to the root. We need to find out if the requested resource is child of the `parent` (coming from token scope)
+	// We mint a token as the owner of the public share and try to stat the reference
+	// TODO(ishank011): We need to find a better alternative to this
+	// NOTE: did somebody say service accounts? ...
+
+	var user *userpb.User
+	if statResponse.GetInfo().GetOwner().GetType() == userpb.UserType_USER_TYPE_SPACE_OWNER {
+		// fake a space owner user
+		user = &userpb.User{
+			Id: statResponse.GetInfo().GetOwner(),
+		}
+	} else {
+		userResp, err := client.GetUser(ctx, &userpb.GetUserRequest{UserId: statResponse.Info.Owner, SkipFetchingUserGroups: true})
+		if err != nil || userResp.Status.Code != rpc.Code_CODE_OK {
+			return false, err
+		}
+		user = userResp.User
+	}
+
+	scope, err := scope.AddOwnerScope(map[string]*authpb.Scope{})
+	if err != nil {
+		return false, err
+	}
+	token, err := mgr.MintToken(ctx, user, scope)
+	if err != nil {
+		return false, err
+	}
+	ctx = metadata.AppendToOutgoingContext(context.Background(), ctxpkg.TokenHeader, token)
+
+	childStat, err := client.Stat(ctx, &provider.StatRequest{Ref: ref})
+	if err != nil {
+		return false, err
+	}
+	if childStat.Status.Code != rpc.Code_CODE_OK {
+		return false, statuspkg.NewErrorFromCode(childStat.Status.Code, "auth interceptor")
+	}
+	pathResp, err := client.GetPath(ctx, &provider.GetPathRequest{ResourceId: childStat.GetInfo().GetId()})
+	if err != nil {
+		return false, err
+	}
+	if pathResp.Status.Code != rpc.Code_CODE_OK {
+		return false, statuspkg.NewErrorFromCode(pathResp.Status.Code, "auth interceptor")
+	}
+	childPath = pathResp.Path
 
 	return strings.HasPrefix(childPath, parentPath), nil
 
