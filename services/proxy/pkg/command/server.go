@@ -340,8 +340,10 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 	if cfg.EnableBasicAuth {
 		logger.Warn().Msg("basic auth enabled, use only for testing or development")
 		authenticators = append(authenticators, middleware.BasicAuthenticator{
-			Logger:       logger,
-			UserProvider: userProvider,
+			Logger:        logger,
+			UserProvider:  userProvider,
+			UserCS3Claim:  cfg.UserCS3Claim,
+			UserOIDCClaim: cfg.UserOIDCClaim,
 		})
 	}
 

@@ -8,3 +8,5 @@ claim. So that user's recreated with the same name will be treated as different
 users by the IDP.
 
 https://github.com/owncloud/ocis/issues/904
+https://github.com/owncloud/ocis/pull/6326
+https://github.com/owncloud/ocis/pull/6338
