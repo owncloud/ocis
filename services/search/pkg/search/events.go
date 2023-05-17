@@ -23,6 +23,7 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 		events.FileVersionRestored{},
 		events.TagsAdded{},
 		events.TagsRemoved{},
+		events.SpaceRenamed{},
 	}
 
 	if cfg.Events.AsyncUploads {
@@ -103,6 +104,8 @@ func HandleEvents(s Searcher, bus events.Consumer, logger log.Logger, cfg *confi
 					indexSpaceDebouncer.Debounce(getSpaceID(ev.Ref), getUser(ev.SpaceOwner, ev.Executant))
 				case events.UploadReady:
 					indexSpaceDebouncer.Debounce(getSpaceID(ev.FileRef), getUser(ev.SpaceOwner, ev.ExecutingUser.Id))
+				case events.SpaceRenamed:
+					indexSpaceDebouncer.Debounce(ev.ID, getUser(ev.Executant))
 				}
 
 				if err != nil {
