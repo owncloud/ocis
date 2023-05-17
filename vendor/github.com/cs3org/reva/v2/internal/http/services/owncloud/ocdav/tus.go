@@ -278,6 +278,12 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 		if length == 0 || httpRes.Header.Get(net.HeaderUploadOffset) == r.Header.Get(net.HeaderUploadLength) {
 			// get uploaded file metadata
 
+			if resid, err := storagespace.ParseID(httpRes.Header.Get(net.HeaderOCFileID)); err == nil {
+				sReq.Ref = &provider.Reference{
+					ResourceId: &resid,
+				}
+			}
+
 			sRes, err := s.gwClient.Stat(ctx, sReq)
 			if err != nil {
 				log.Error().Err(err).Msg("error sending grpc stat request")

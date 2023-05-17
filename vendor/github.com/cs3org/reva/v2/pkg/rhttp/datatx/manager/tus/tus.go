@@ -40,6 +40,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rhttp/datatx/metrics"
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/cache"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/mitchellh/mapstructure"
 )
@@ -144,6 +145,7 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 				metrics.UploadsActive.Sub(1)
 			}()
 			// set etag, mtime and file id
+			setHeaders(fs, w, r)
 			handler.PostFile(w, r)
 		case "HEAD":
 			handler.HeadFile(w, r)
@@ -153,7 +155,7 @@ func (m *manager) Handler(fs storage.FS) (http.Handler, error) {
 				metrics.UploadsActive.Sub(1)
 			}()
 			// set etag, mtime and file id
-			setExpiresHeader(fs, w, r)
+			setHeaders(fs, w, r)
 			handler.PatchFile(w, r)
 		case "DELETE":
 			handler.DelFile(w, r)
@@ -180,7 +182,7 @@ type composable interface {
 	UseIn(composer *tusd.StoreComposer)
 }
 
-func setExpiresHeader(fs storage.FS, w http.ResponseWriter, r *http.Request) {
+func setHeaders(fs storage.FS, w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	id := path.Base(r.URL.Path)
 	datastore, ok := fs.(tusd.DataStore)
@@ -202,4 +204,10 @@ func setExpiresHeader(fs storage.FS, w http.ResponseWriter, r *http.Request) {
 	if expires != "" {
 		w.Header().Set(net.HeaderTusUploadExpires, expires)
 	}
+	resourceid := provider.ResourceId{
+		StorageId: info.MetaData["providerID"],
+		SpaceId:   info.Storage["SpaceRoot"],
+		OpaqueId:  info.Storage["NodeId"],
+	}
+	w.Header().Set(net.HeaderOCFileID, storagespace.FormatResourceID(resourceid))
 }

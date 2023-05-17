@@ -33,6 +33,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typespb "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/datagateway"
+	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
@@ -283,26 +284,32 @@ func (s *svc) handleNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Stat the newly created file
-	statRes, err := client.Stat(ctx, statFileReq)
-	if err != nil {
-		writeError(w, r, appErrorServerError, "statting the created file failed", err)
-		return
-	}
+	var fileid string
+	if httpRes.Header.Get(net.HeaderOCFileID) != "" {
+		fileid = httpRes.Header.Get(net.HeaderOCFileID)
+	} else {
+		// Stat the newly created file
+		statRes, err := client.Stat(ctx, statFileReq)
+		if err != nil {
+			writeError(w, r, appErrorServerError, "statting the created file failed", err)
+			return
+		}
 
-	if statRes.Status.Code != rpc.Code_CODE_OK {
-		writeError(w, r, appErrorServerError, "statting the created file failed", nil)
-		return
-	}
+		if statRes.Status.Code != rpc.Code_CODE_OK {
+			writeError(w, r, appErrorServerError, "statting the created file failed", nil)
+			return
+		}
 
-	if statRes.Info.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
-		writeError(w, r, appErrorInvalidParameter, "the given file id does not point to a file", nil)
-		return
+		if statRes.Info.Type != provider.ResourceType_RESOURCE_TYPE_FILE {
+			writeError(w, r, appErrorInvalidParameter, "the given file id does not point to a file", nil)
+			return
+		}
+		fileid = storagespace.FormatResourceID(*statRes.Info.Id)
 	}
 
 	js, err := json.Marshal(
 		map[string]interface{}{
-			"file_id": storagespace.FormatResourceID(*statRes.Info.Id),
+			"file_id": fileid,
 		},
 	)
 	if err != nil {

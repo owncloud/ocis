@@ -200,8 +200,13 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 								"support_url_signing": true,
 							},
 							"graph": map[string]interface{}{
-								"personal_data_export":      true,
-								"read_only_user_attributes": readOnlyUserAttributes,
+								"personal_data_export": true,
+								"users": map[string]interface{}{
+									"read_only_attributes":          readOnlyUserAttributes,
+									"create_disabled":               !cfg.LDAPServerWriteEnabled,
+									"delete_disabled":               !cfg.LDAPServerWriteEnabled,
+									"change_password_self_disabled": !cfg.LDAPServerWriteEnabled,
+								},
 							},
 							"checksums": map[string]interface{}{
 								"supported_types":       cfg.Checksums.SupportedTypes,

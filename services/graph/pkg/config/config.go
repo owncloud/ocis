@@ -53,7 +53,7 @@ type LDAP struct {
 	BindPassword       string `yaml:"bind_password" env:"LDAP_BIND_PASSWORD;GRAPH_LDAP_BIND_PASSWORD" desc:"Password to use for authenticating the 'bind_dn'."`
 	UseServerUUID      bool   `yaml:"use_server_uuid" env:"GRAPH_LDAP_SERVER_UUID" desc:"If set to true, rely on the LDAP Server to generate a unique ID for users and groups, like when using 'entryUUID' as the user ID attribute."`
 	UsePasswordModExOp bool   `yaml:"use_password_modify_exop" env:"GRAPH_LDAP_SERVER_USE_PASSWORD_MODIFY_EXOP" desc:"Use the 'Password Modify Extended Operation' for updating user passwords."`
-	WriteEnabled       bool   `yaml:"write_enabled" env:"GRAPH_LDAP_SERVER_WRITE_ENABLED" desc:"Allow to create, modify and delete LDAP users via GRAPH API. This is only works when the default Schema is used."`
+	WriteEnabled       bool   `yaml:"write_enabled" env:"OCIS_LDAP_SERVER_WRITE_ENABLED;GRAPH_LDAP_SERVER_WRITE_ENABLED" desc:"Allow to create, modify and delete LDAP users via the GRAPH API. This is only works when the default Schema is used."`
 	RefintEnabled      bool   `yaml:"refint_enabled" env:"GRAPH_LDAP_REFINT_ENABLED" desc:"Signals that the server has the refint plugin enabled, which makes some actions not needed."`
 
 	UserBaseDN               string `yaml:"user_base_dn" env:"OCIS_LDAP_USER_BASE_DN;LDAP_USER_BASE_DN;GRAPH_LDAP_USER_BASE_DN" desc:"Search base DN for looking up LDAP users." deprecationVersion:"3.0" removalVersion:"4.0.0" deprecationInfo:"LDAP_USER_BASE_DN changing name for consistency" deprecationReplacement:"OCIS_LDAP_USER_BASE_DN"`

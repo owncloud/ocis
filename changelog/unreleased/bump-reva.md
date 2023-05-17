@@ -16,3 +16,4 @@ Changelog for reva 2.13.3 (2023-05-17)
 *   Enhancement [cs3org/reva#3895](https://github.com/cs3org/reva/pull/3895): Add missing expiry date to shares
 
 https://github.com/owncloud/ocis/pull/6305
+https://github.com/owncloud/ocis/pull/6339

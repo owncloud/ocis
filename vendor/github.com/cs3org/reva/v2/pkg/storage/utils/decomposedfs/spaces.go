@@ -652,26 +652,9 @@ func (fs *Decomposedfs) DeleteStorageSpace(ctx context.Context, req *provider.De
 		return errtypes.InternalError(fmt.Sprintf("space %s does not have a spacetype, possible corrupt decompsedfs", n.ID))
 	}
 
-	// - a User with the "delete-all-spaces" permission can delete any space
-	// - spaces of type personal can also be deleted by users with the "delete-all-home-spaces" permission
-	// - otherwise a space can be deleted by its manager (i.e. users have the "remove" grant)
-	switch {
-	case fs.p.DeleteAllSpaces(ctx):
-		// We are allowed to delete any space, no further permission checks needed
-	case st == "personal":
-		if !fs.p.DeleteAllHomeSpaces(ctx) {
-			return errtypes.PermissionDenied(fmt.Sprintf("user is not allowed to delete home space %s", n.ID))
-		}
-	default:
-		// managers and users with 'space ability' permission are allowed to disable or purge a drive
-		if !fs.p.SpaceAbility(ctx, spaceID) {
-			rp, err := fs.p.AssemblePermissions(ctx, n)
-			if err != nil || !IsManager(rp) {
-				return errtypes.PermissionDenied(fmt.Sprintf("user is not allowed to delete spaces %s", n.ID))
-			}
-		}
+	if err := canDeleteSpace(ctx, spaceID, st, purge, n, fs.p); err != nil {
+		return err
 	}
-
 	if purge {
 		if !n.IsDisabled() {
 			return errtypes.NewErrtypeFromStatus(status.NewInvalid(ctx, "can't purge enabled space"))
@@ -1055,4 +1038,36 @@ func isGrantExpired(g *provider.Grant) bool {
 
 func (fs *Decomposedfs) getSpaceRoot(spaceID string) string {
 	return filepath.Join(fs.o.Root, "spaces", lookup.Pathify(spaceID, 1, 2))
+}
+
+// Space deletion can be tricky as there are lots of different cases:
+// - spaces of type personal can only be disabled and deleted by users with the "delete-all-home-spaces" permission
+// - a user with the "delete-all-spaces" permission may delete but not enable/disable any project space
+// - a user with the "Drive.ReadWriteEnabled" permission may enable/disable but not delete any project space
+// - a project space can always be enabled/disabled/deleted by its manager (i.e. users have the "remove" grant)
+func canDeleteSpace(ctx context.Context, spaceID string, typ string, purge bool, n *node.Node, p Permissions) error {
+	// delete-all-home spaces allows to disable and delete a personal space
+	if typ == "personal" {
+		if p.DeleteAllHomeSpaces(ctx) {
+			return nil
+		}
+		return errtypes.PermissionDenied("user is not allowed to delete a personal space")
+	}
+
+	// space managers are allowed to disable and delete their project spaces
+	if rp, err := p.AssemblePermissions(ctx, n); err == nil && IsManager(rp) {
+		return nil
+	}
+
+	// delete-all-spaces permissions allows to delete (purge, NOT disable) project spaces
+	if purge && p.DeleteAllSpaces(ctx) {
+		return nil
+	}
+
+	// Drive.ReadWriteEnabled allows to disable a space
+	if !purge && p.SpaceAbility(ctx, spaceID) {
+		return nil
+	}
+
+	return errtypes.PermissionDenied(fmt.Sprintf("user is not allowed to delete space %s", n.ID))
 }
