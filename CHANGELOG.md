@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Reduced default TTL of user and group caches in graph API: [#6320](https://github.com/owncloud/ocis/issues/6320)
 * Bugfix - Use UUID attribute for computing "sub" claim in lico idp: [#904](https://github.com/owncloud/ocis/issues/904)
 * Bugfix - Fix the empty string givenName attribute when creating user: [#5431](https://github.com/owncloud/ocis/issues/5431)
 * Bugfix - Fix the wrong status code when appRoleAssignments is forbidden: [#6037](https://github.com/owncloud/ocis/issues/6037)
@@ -17,6 +18,14 @@ The following sections list the changes for unreleased.
 * Enhancement - Remove quota from share jails api responses: [#6309](https://github.com/owncloud/ocis/pull/6309)
 
 ## Details
+
+* Bugfix - Reduced default TTL of user and group caches in graph API: [#6320](https://github.com/owncloud/ocis/issues/6320)
+
+   We reduced the default TTL of the cache for user and group information on the /drives endpoints
+   to 60 seconds. This fixes in issue where outdated information was show on the spaces list for a
+   very long time.
+
+   https://github.com/owncloud/ocis/issues/6320
 
 * Bugfix - Use UUID attribute for computing "sub" claim in lico idp: [#904](https://github.com/owncloud/ocis/issues/904)
 
