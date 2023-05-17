@@ -115,6 +115,7 @@ func NewService(opts ...Option) (Graph, error) {
 		ttlcache.WithTTL[string, interface{}](
 			time.Duration(options.Config.Spaces.ExtendedSpacePropertiesCacheTTL),
 		),
+		ttlcache.WithDisableTouchOnHit[string, interface{}](),
 	)
 	go spacePropertiesCache.Start()
 
@@ -122,6 +123,7 @@ func NewService(opts ...Option) (Graph, error) {
 		ttlcache.WithTTL[string, libregraph.User](
 			time.Duration(options.Config.Spaces.UsersCacheTTL),
 		),
+		ttlcache.WithDisableTouchOnHit[string, libregraph.User](),
 	)
 	go usersCache.Start()
 
@@ -129,6 +131,7 @@ func NewService(opts ...Option) (Graph, error) {
 		ttlcache.WithTTL[string, libregraph.Group](
 			time.Duration(options.Config.Spaces.GroupsCacheTTL),
 		),
+		ttlcache.WithDisableTouchOnHit[string, libregraph.Group](),
 	)
 	go groupsCache.Start()
 
