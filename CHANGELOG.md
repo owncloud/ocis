@@ -14,6 +14,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add specific result to antivirus for debugging: [#6265](https://github.com/owncloud/ocis/pull/6265)
 * Enhancement - Update Reva: [#6305](https://github.com/owncloud/ocis/pull/6305)
 * Enhancement - Add Store to `postprocessing`: [#6281](https://github.com/owncloud/ocis/pull/6281)
+* Enhancement - Remove quota from share jails api responses: [#6309](https://github.com/owncloud/ocis/pull/6309)
 
 ## Details
 
@@ -72,6 +73,14 @@ The following sections list the changes for unreleased.
    instances
 
    https://github.com/owncloud/ocis/pull/6281
+
+* Enhancement - Remove quota from share jails api responses: [#6309](https://github.com/owncloud/ocis/pull/6309)
+
+   We have removed the quota object from api responses for share jails, which would permanently
+   show exceeded due to restrictions in the permission system.
+
+   https://github.com/owncloud/ocis/issues/4472
+   https://github.com/owncloud/ocis/pull/6309
 # Changelog for [3.0.0] (2023-05-08)
 
 The following sections list the changes for 3.0.0.
