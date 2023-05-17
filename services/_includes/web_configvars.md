@@ -43,5 +43,6 @@
 | WEB_OPTION_ROUTING_ID_BASED | bool | true | Enable or disable fileIds being added to the URL. Defaults to 'true', because otherwise spaces with name clashes cannot be resolved correctly. Note: Only disable this if you can guarantee on the server side, that spaces of the same namespace cannot have name clashes.|
 | WEB_OPTION_CONTEXTHELPERS_READ_MORE | bool | true | Specifies whether the 'Read more' link should be displayed or not.|
 | WEB_OPTION_LOGOUT_URL | string |  | Adds a link to the user's profile page to point him to an external page, where he can manage his session and devices. This is helpful when an external IdP is used. This option is disabled by default.|
+| WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP | bool | true | Specifies whether single file link shares should be opened with the default app or not. If not opened by the default app, the Web UI just displays the file details. Defaults to 'true'.|
 | OCIS_JWT_SECRET<br/>WEB_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | WEB_GATEWAY_GRPC_ADDR | string | 127.0.0.1:9142 | The bind address of the GRPC service.|

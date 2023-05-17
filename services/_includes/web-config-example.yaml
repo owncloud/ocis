@@ -83,6 +83,7 @@ web:
       editor: null
       contextHelpersReadMore: true
       logoutUrl: ""
+      openLinksWithDefaultApp: true
     styles: []
     scripts: []
     custom_translations: []

@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-17-09-55-48]
+[#deprecation-note-2023-05-17-13-21-07]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -217,7 +217,7 @@ Serve ownCloud Web assets from a path on the filesystem instead of the builtin a
 
 a|`WEB_UI_CONFIG_FILE` +
 `WEB_UI_CONFIG` +
-xref:deprecation-note-2023-05-17-09-55-48[Deprecation Note]
+xref:deprecation-note-2023-05-17-13-21-07[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -227,7 +227,7 @@ Read the ownCloud Web json based configuration from this path/file. The config f
 
 a|`WEB_UI_CONFIG_FILE` +
 `WEB_UI_PATH` +
-xref:deprecation-note-2023-05-17-09-55-48[Deprecation Note]
+xref:deprecation-note-2023-05-17-13-21-07[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -419,6 +419,15 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 Adds a link to the user's profile page to point him to an external page, where he can manage his session and devices. This is helpful when an external IdP is used. This option is disabled by default.
+
+a|`WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Specifies whether single file link shares should be opened with the default app or not. If not opened by the default app, the Web UI just displays the file details. Defaults to 'true'.
 
 a|`OCIS_JWT_SECRET` +
 `WEB_JWT_SECRET` +
