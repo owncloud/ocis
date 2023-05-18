@@ -78,23 +78,29 @@ make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='te
 ```
 
 Similarly, with S3 storage,
+
 - run a whole feature
+
 ```
 make -C tests/acceptance/docker test-ocis-feature-s3ng-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature'
 ```
 
 - run a single scenario
+
 ```
 make -C tests/acceptance/docker test-ocis-feature-s3ng-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21'
 ```
 
 In the same way for the tests transferred from oc10 can be run as
+
 - run a whole feature
+
 ```
 make -C tests/acceptance/docker test-core-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
 ```
 
 - run a single scenario
+
 ```
 make -C tests/acceptance/docker test-core-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature:13'
 ```
@@ -132,11 +138,11 @@ make -C tests/acceptance/docker clean
 ## Testing with test suite natively installed
 
 We have two sets of tests:
+
 - `test-acceptance-from-core-api` set was transferred from [core](https://github.com/owncloud/core) repository
-The suite name of all tests transferred from the core starts with "core"
+  The suite name of all tests transferred from the core starts with "core"
 
 - `test-acceptance-api` set was created for ocis. Mainly for testing spaces features
-
 
 ### Run ocis
 
@@ -162,6 +168,7 @@ TEST_SERVER_URL=https://localhost:9200 \
 TEST_WITH_GRAPH_API=true \
 TEST_OCIS=true \
 ```
+
 Note: This command only works for suites that start with core
 
 ### Run the test-acceptance-api tests
@@ -203,16 +210,16 @@ If you want to work on a specific issue
 
 1. locally run each of the tests marked with that issue in the expected failures file.
 
-    E.g.:
+   E.g.:
 
-    ```bash
-    make test-acceptance-from-core-api \
-    TEST_SERVER_URL=https://localhost:9200 \
-    TEST_OCIS=true \
-    TEST_WITH_GRAPH_API=true \
-    STORAGE_DRIVER=OCIS \
-    BEHAT_FEATURE='tests/acceptance/features/coreApiVersions/fileVersions.feature:147'
-    ```
+   ```bash
+   make test-acceptance-from-core-api \
+   TEST_SERVER_URL=https://localhost:9200 \
+   TEST_OCIS=true \
+   TEST_WITH_GRAPH_API=true \
+   STORAGE_DRIVER=OCIS \
+   BEHAT_FEATURE='tests/acceptance/features/coreApiVersions/fileVersions.feature:147'
+   ```
 
 2. the tests will fail, try to understand how and why they are failing
 3. fix the code
@@ -339,6 +346,7 @@ OCIS_URL=https://localhost:9200 \
 ### Run the acceptance test
 
 Run the acceptance test with the following command:
+
 ```bash
 make test-acceptance-api \
 TEST_SERVER_URL="https://localhost:9200" \
