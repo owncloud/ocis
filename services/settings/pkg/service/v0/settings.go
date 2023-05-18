@@ -378,7 +378,7 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 				Id:          SetSpaceQuotaPermissionID,
 				Name:        SetSpaceQuotaPermissionName,
 				DisplayName: "Set Space Quota",
-				Description: "This permission allows to manage space quotas.",
+				Description: "This permission allows managing space quotas.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -396,7 +396,7 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 				Id:          CreateSpacePermissionID,
 				Name:        CreateSpacePermissionName,
 				DisplayName: "Create own Space",
-				Description: "This permission allows to create a space owned by the current user.",
+				Description: "This permission allows creating a space owned by the current user.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM, // TODO resource type space? self? me? own?
 				},
@@ -414,7 +414,7 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 				Id:          CreateSpacePermissionID,
 				Name:        CreateSpacePermissionName,
 				DisplayName: "Create Space",
-				Description: "This permission allows to create new spaces.",
+				Description: "This permission allows creating new spaces.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -468,7 +468,7 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 				Id:          CreateSpacePermissionID,
 				Name:        CreateSpacePermissionName,
 				DisplayName: "Create Space",
-				Description: "This permission allows to create new spaces.",
+				Description: "This permission allows creating new spaces.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},
@@ -486,7 +486,7 @@ func generatePermissionRequests() []*settingssvc.AddSettingToBundleRequest {
 				Id:          SetSpaceQuotaPermissionID,
 				Name:        SetSpaceQuotaPermissionName,
 				DisplayName: "Set Space Quota",
-				Description: "This permission allows to manage space quotas.",
+				Description: "This permission allows managing space quotas.",
 				Resource: &settingsmsg.Resource{
 					Type: settingsmsg.Resource_TYPE_SYSTEM,
 				},

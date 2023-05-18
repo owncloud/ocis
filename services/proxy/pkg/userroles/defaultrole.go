@@ -15,7 +15,7 @@ type defaultRoleAssigner struct {
 	Options
 }
 
-// NewDefaultRoleAssigner returns an implemenation of the UserRoleAssigner interface
+// NewDefaultRoleAssigner returns an implementation of the UserRoleAssigner interface
 func NewDefaultRoleAssigner(opts ...Option) UserRoleAssigner {
 	opt := Options{}
 	for _, o := range opts {

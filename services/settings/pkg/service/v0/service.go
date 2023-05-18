@@ -373,7 +373,7 @@ func (g Service) ListRoles(c context.Context, req *settingssvc.ListBundlesReques
 	if err != nil {
 		return merrors.NotFound(g.id, "%s", err)
 	}
-	// TODO: only allow to list roles when user has account/role/... management permissions
+	// TODO: only allow listing roles when user has account/role/... management permissions
 	res.Bundles = r
 	return nil
 }

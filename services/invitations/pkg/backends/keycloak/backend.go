@@ -86,10 +86,10 @@ func (b Backend) CreateUser(ctx context.Context, invitation *invitations.Invitat
 	return id, nil
 }
 
-// CanSendMail returns true because keycloak does allow to send mail.
+// CanSendMail returns true because keycloak does allow sending mail.
 func (b Backend) CanSendMail() bool { return true }
 
-// SendMail sends a mail to the user with details on how to reedeem the invitation.
+// SendMail sends a mail to the user with details on how to redeem the invitation.
 func (b Backend) SendMail(ctx context.Context, id string) error {
 	return b.client.SendActionsMail(ctx, b.userRealm, id, userRequiredActions)
 }

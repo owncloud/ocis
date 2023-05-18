@@ -28,14 +28,14 @@ type ClientOptions struct {
 // Option is used to pass client options
 type ClientOption func(opts *ClientOptions)
 
-// WithTLSMode allows to set the TLSMode option for grpc clients
+// WithTLSMode allows setting the TLSMode option for grpc clients
 func WithTLSMode(v string) ClientOption {
 	return func(o *ClientOptions) {
 		o.tlsMode = v
 	}
 }
 
-// WithTLSCACert allows to set the CA Certificate for grpc clients
+// WithTLSCACert allows setting the CA Certificate for grpc clients
 func WithTLSCACert(v string) ClientOption {
 	return func(o *ClientOptions) {
 		o.caCert = v

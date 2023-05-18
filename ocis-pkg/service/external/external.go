@@ -9,7 +9,7 @@ import (
 	"go-micro.dev/v4/registry"
 )
 
-// RegisterGRPCEndpoint publishes an arbitrary endpoint to the service-registry. This allows to query nodes of
+// RegisterGRPCEndpoint publishes an arbitrary endpoint to the service-registry. This allows querying nodes of
 // non-micro GRPC-services like reva. No health-checks are done, thus the caller is responsible for canceling.
 func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, version string, logger log.Logger) error {
 	node := &registry.Node{
@@ -64,7 +64,7 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, ver
 	return nil
 }
 
-// RegisterHTTPEndpoint publishes an arbitrary endpoint to the service-registry. This allows to query nodes of
+// RegisterHTTPEndpoint publishes an arbitrary endpoint to the service-registry. This allows querying nodes of
 // non-micro HTTP-services like reva. No health-checks are done, thus the caller is responsible for canceling.
 func RegisterHTTPEndpoint(ctx context.Context, serviceID, uuid, addr string, version string, logger log.Logger) error {
 	node := &registry.Node{

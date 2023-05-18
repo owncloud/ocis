@@ -18,7 +18,7 @@ type oidcRoleAssigner struct {
 	Options
 }
 
-// NewOIDCRoleAssigner returns an implemenation of the UserRoleAssigner interface
+// NewOIDCRoleAssigner returns an implementation of the UserRoleAssigner interface
 func NewOIDCRoleAssigner(opts ...Option) UserRoleAssigner {
 	opt := Options{}
 	for _, o := range opts {
