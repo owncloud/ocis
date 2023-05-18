@@ -77,7 +77,7 @@ And `make -C tests/acceptance/docker Core-API-Tests-s3ng-storage-3` runs the thi
 
 ### Run single feature test
 
-A single feature tests (a feature file) can also be run against the different storage backends. To do that, multiple make targets with the schema test-\<test source\>-feature-\<storage-backend\> are available. To select a single feature you have to add an additional `BEHAT_FEATURE=<path-to-feature-file>` parameter when invoking the make command.
+The tests for a single feature (a feature file) can also be run against the different storage backends. To do that, multiple make targets with the schema test-\<test source\>-feature-\<storage-backend\> are available. To select a single feature you have to add an additional `BEHAT_FEATURE=<path-to-feature-file>` parameter when invoking the make command.
 
 For example;
 
@@ -158,10 +158,9 @@ make -C tests/acceptance/docker clean
 
 We have two sets of tests:
 
-- `test-acceptance-from-core-api` set was transferred from [core](https://github.com/owncloud/core) repository
-  The suite name of all tests transferred from the core starts with "core"
+- `test-acceptance-api` set was created for oCIS. Mainly for testing spaces features.
 
-- `test-acceptance-api` set was created for oCIS. Mainly for testing spaces features
+- `test-acceptance-from-core-api` set was transferred from [ownCloud core](https://github.com/owncloud/core) repository. The suite name of all tests transferred from the ownCloud core repository starts with `coreApi`
 
 ### Run oCIS
 
@@ -287,6 +286,8 @@ While writing tests for a new oCIS ENV configuration, please make sure to follow
 
 ## Running test suite with email service (@email)
 
+Test suites that are tagged with `@email` require an email service. We use inbucket as the email service in our tests.
+
 ### Setup inbucket
 
 Run the following command to setup inbucket
@@ -317,13 +318,13 @@ ocis/bin/ocis server
 Run the acceptance test with the following command:
 
 ```bash
-make test-acceptance-api \
-TEST_SERVER_URL="https://localhost:9200" \
-TEST_OCIS=true \
 TEST_WITH_GRAPH_API=true \
+TEST_OCIS=true \
+TEST_SERVER_URL="https://localhost:9200" \
 EMAIL_HOST="localhost" \
 EMAIL_PORT=9000 \
-BEHAT_FEATURE="tests/acceptance/features/apiEmailNotification/emailNotification.feature"
+BEHAT_FEATURE="tests/acceptance/features/apiEmailNotification/emailNotification.feature" \
+make test-acceptance-api
 ```
 
 ## Running tests for parallel deployment
