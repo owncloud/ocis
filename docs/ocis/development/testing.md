@@ -92,6 +92,10 @@ make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 
 And to run a single scenario in a feature, you can do:
 
+{{< hint info >}}
+A specific scenario from a feature can be run by adding `:<line-number>` at the end of the feature file path. For example, to run the scenario at line 26 of the feature file `apiGraph/createUser.feature`, simply add the line number like this: `apiGraph/createUser.feature:26`
+{{< /hint >}}
+
 ```bash
 BEHAT_FEATURE='tests/acceptance/features/apiGraph/createUser.feature:26' \
 make -C tests/acceptance/docker test-ocis-feature-ocis-storage
@@ -198,7 +202,13 @@ TEST_OCIS=true \
 
 Useful environment variables:
 
+`TEST_SERVER_URL`: oCIS server url. Please, adjust the server url according to your setup.
+
 `BEHAT_FEATURE`: to run a single feature
+
+{{< hint info >}}
+A specific scenario from a feature can be run by adding `:<line-number>` at the end of the feature file path. For example, to run the scenario at line 26 of the feature file `apiGraph/createUser.feature`, simply add the line number like this: `apiGraph/createUser.feature:26`
+{{< /hint >}}
 
 > Example:
 >
