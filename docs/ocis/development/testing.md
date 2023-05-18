@@ -17,7 +17,7 @@ Both ways to run tests with the test suites are described here.
 
 Let's see what is available. Invoke the following command from within the root of the oCIS repository.
 
-```
+```bash
 make -C tests/acceptance/docker help
 ```
 
@@ -37,89 +37,108 @@ You can invoke two types of test suite runs:
 
 ### Run full test suite
 
-The names of the full test suite make targets have the same naming as in the CI pipeline. The available local oCIS specific test suites are `apiAccountsHashDifficulty`, `apiArchiver`, `apiContract`, `apiGraph`, `apiSpaces`, `apiSpacesShares`, `apiCors`, `apiAsyncUpload`. They can be run with `ocis` storage and `S3` storage.
+#### Local oCIS tests (prefix `api`)
 
-> Note: In order to see the tests log attach `show-test-logs` in the command
+The names of the full test suite make targets have the same naming as in the CI pipeline. See the available local oCIS specific test suites [here](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features). They can be run with `ocis` storage and `S3` storage.
 
-For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis` runs the same tests as the `localApiTests-apiAccountsHashDifficulty-ocis` CI pipeline, which runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with ocis storage.
+For example, command:
 
-For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-s3ng` runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with s3 storage.
+```bash
+make -C tests/acceptance/docker localApiTests-apiGraph-ocis
+```
+
+runs the same tests as the `localApiTests-apiGraph-ocis` CI pipeline, which runs the oCIS test suite "apiGraph" against the oCIS server with ocis storage.
+
+And command:
+
+```bash
+make -C tests/acceptance/docker localApiTests-apiGraph-s3ng
+```
+
+runs the oCIS test suite `apiGraph` against the oCIS server with s3 storage.
 
 {{< hint info >}}
 While running the tests, oCIS server is started with [ociswrapper](https://github.com/owncloud/ocis/blob/master/tests/ociswrapper/README.md) (i.e. `WITH_WRAPPER=true`) by default. In order to run the tests without ociswrapper, provide `WITH_WRAPPER=false` when running the tests. For example:
 
 ```bash
 WITH_WRAPPER=false \
-BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21' \
+BEHAT_FEATURE='tests/acceptance/features/apiGraph/createUser.feature:26' \
 make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 ```
 
 But some test suites that are tagged with `@env-config` require the oCIS server to be run with ociswrapper. So, running those tests require `WITH_WRAPPER=true` (default setting).
 {{< /hint >}}
 
-For example `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suite transferred from ownCloud against an oCIS with ocis storage.
+#### Tests transferred from ownCloud core (prefix `coreApi`)
 
-For example `make -C tests/acceptance/docker Core-API-Tests-s3ng-storage-3` runs the third (out of ten) test suite transferred from ownCloud against an oCIS with s3 storage.
+Command `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suites transferred from the ownCloud core against the oCIS server with ocis storage.
+
+And `make -C tests/acceptance/docker Core-API-Tests-s3ng-storage-3` runs the third (out of ten) test suite transferred from the ownCloud core against the oCIS server with s3 storage.
 
 ### Run single feature test
 
-The single feature tests can also be run against the different storage backends. Therefore, multiple make targets with the schema test-<test source>-feature-<storage backend> exist. To select a single feature you have to add an additional `BEHAT_FEATURE=...` parameter when invoking the make command:
+A single feature tests (a feature file) can also be run against the different storage backends. To do that, multiple make targets with the schema test-\<test source\>-feature-\<storage-backend\> are available. To select a single feature you have to add an additional `BEHAT_FEATURE=<path-to-feature-file>` parameter when invoking the make command.
 
-```
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21'
-```
+For example;
 
-This must be pointing to a valid feature definition.
-
-To run a single scenario in a feature, then mention the line number of the scenario:
-
-```
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21'
+```bash
+BEHAT_FEATURE='tests/acceptance/features/apiGraph/createUser.feature' \
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 ```
 
-Similarly, with S3 storage,
+{{< hint info >}}
+`BEHAT_FEATURE` must be pointing to a valid feature file
+{{< /hint >}}
 
-- run a whole feature
+And to run a single scenario in a feature, you can do:
 
-```
-make -C tests/acceptance/docker test-ocis-feature-s3ng-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature'
-```
-
-- run a single scenario
-
-```
-make -C tests/acceptance/docker test-ocis-feature-s3ng-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21'
+```bash
+BEHAT_FEATURE='tests/acceptance/features/apiGraph/createUser.feature:26' \
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 ```
 
-In the same way for the tests transferred from oc10 can be run as
+Similarly, with S3 storage;
 
-- run a whole feature
+```bash
+# run a whole feature
+BEHAT_FEATURE='tests/acceptance/features/apiGraph/createUser.feature' \
+make -C tests/acceptance/docker test-ocis-feature-s3ng-storage
 
-```
-make -C tests/acceptance/docker test-core-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
-```
-
-- run a single scenario
-
-```
-make -C tests/acceptance/docker test-core-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature:13'
+# run a single scenario
+BEHAT_FEATURE='tests/acceptance/features/apiGraph/createUser.feature:26' \
+make -C tests/acceptance/docker test-ocis-feature-s3ng-storage
 ```
 
-> Note: the tests transferred from oc10 start with coreApi
+In the same way, tests transferred from ownCloud core can be run as:
 
-### oCIS image to be tested (or: skip build and take existing image)
+```bash
+# run a whole feature
+BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature' \
+make -C tests/acceptance/docker test-core-feature-ocis-storage
+
+# run a single scenario
+BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature:13' \
+make -C tests/acceptance/docker test-core-feature-ocis-storage
+```
+
+{{< hint info >}}
+The tests suites transferred from ownCloud core have `coreApi` prefixed
+{{< /hint >}}
+
+### oCIS image to be tested (skip local image build)
 
 By default, the tests will be run against the docker image built from your current working state of the oCIS repository. For some purposes it might also be handy to use an oCIS image from Docker Hub. Therefore, you can provide the optional flag `OCIS_IMAGE_TAG=...` which must contain an available docker tag of the [owncloud/ocis registry on Docker Hub](https://hub.docker.com/r/owncloud/ocis) (e.g. 'latest').
 
-```
-make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis OCIS_IMAGE_TAG=latest
+```bash
+OCIS_IMAGE_TAG=latest \
+make -C tests/acceptance/docker localApiTests-apiGraph-ocis
 ```
 
 ### Test log output
 
 While a test is running or when it is finished, you can attach to the logs generated by the tests.
 
-```
+```bash
 make -C tests/acceptance/docker show-test-logs
 ```
 
@@ -131,7 +150,7 @@ The log output is opened in `less`. You can navigate up and down with your curso
 
 During testing we start a redis and oCIS docker container. These will not be stopped automatically. You can stop them with:
 
-```
+```bash
 make -C tests/acceptance/docker clean
 ```
 
