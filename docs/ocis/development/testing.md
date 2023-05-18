@@ -37,7 +37,7 @@ You can invoke two types of test suite runs:
 
 ### Run full test suite
 
-The names of the full test suite make targets have the same naming as in the CI pipeline. The available local ocis specific test suites are `apiAccountsHashDifficulty`, `apiArchiver`, `apiContract`, `apiGraph`, `apiSpaces`, `apiSpacesShares`, `apiCors`, `apiAsyncUpload`. They can be run with `ocis` storage and `S3` storage.
+The names of the full test suite make targets have the same naming as in the CI pipeline. The available local oCIS specific test suites are `apiAccountsHashDifficulty`, `apiArchiver`, `apiContract`, `apiGraph`, `apiSpaces`, `apiSpacesShares`, `apiCors`, `apiAsyncUpload`. They can be run with `ocis` storage and `S3` storage.
 
 > Note: In order to see the tests log attach `show-test-logs` in the command
 
@@ -142,13 +142,13 @@ We have two sets of tests:
 - `test-acceptance-from-core-api` set was transferred from [core](https://github.com/owncloud/core) repository
   The suite name of all tests transferred from the core starts with "core"
 
-- `test-acceptance-api` set was created for ocis. Mainly for testing spaces features
+- `test-acceptance-api` set was created for oCIS. Mainly for testing spaces features
 
-### Run ocis
+### Run oCIS
 
-Create an up-to-date ocis binary by [building oCIS]({{< ref "build" >}})
+Create an up-to-date oCIS binary by [building oCIS]({{< ref "build" >}})
 
-To start ocis:
+To start oCIS:
 
 ```bash
 IDM_ADMIN_PASSWORD=admin \
@@ -198,7 +198,7 @@ To run tests with a different storage driver set `STORAGE_DRIVER` to the correct
 
 ### use existing tests for BDD
 
-As a lot of scenarios from `test-acceptance-from-core-api` are written for oC10, we can use those tests for Behaviour driven development in ocis.
+As a lot of scenarios from `test-acceptance-from-core-api` are written for oC10, we can use those tests for Behaviour driven development in oCIS.
 Every scenario that does not work in oCIS with "ocis" storage, is listed in `tests/acceptance/expected-failures-API-on-OCIS-storage.md` with a link to the related issue.
 
 Those scenarios are run in the ordinary acceptance test pipeline in CI. The scenarios that fail are checked against the
