@@ -71,9 +71,9 @@ But some test suites that are tagged with `@env-config` require the oCIS server 
 
 #### Tests transferred from ownCloud core (prefix `coreApi`)
 
-Command `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suites transferred from the ownCloud core against the oCIS server with ocis storage.
+Command `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suite groups transferred from ownCloud core against the oCIS server with ocis storage.
 
-And `make -C tests/acceptance/docker Core-API-Tests-s3ng-storage-3` runs the third (out of ten) test suite transferred from the ownCloud core against the oCIS server with s3 storage.
+And `make -C tests/acceptance/docker Core-API-Tests-s3ng-storage-3` runs the third (out of ten) test suite groups transferred from ownCloud core against the oCIS server with s3 storage.
 
 ### Run single feature test
 
@@ -301,7 +301,7 @@ Test suites that are tagged with `@email` require an email service. We use inbuc
 Run the following command to setup inbucket
 
 ```bash
-docker run -d --name inbucket -p 9000:9000 -p 2500:2500 -p 1100:1100 inbucket/inbucket
+docker run -d -p9000:9000 -p2500:2500 --name inbucket inbucket/inbucket
 ```
 
 ### Run oCIS
