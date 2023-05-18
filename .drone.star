@@ -117,9 +117,9 @@ config = {
             "skip": False,
             "earlyFail": True,
         },
-        "apiEmailNotification": {
+        "apiNotification": {
             "suites": [
-                "apiEmailNotification",
+                "apiNotification",
             ],
             "skip": False,
             "earlyFail": True,

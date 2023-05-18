@@ -3023,13 +3023,13 @@ trait Sharing {
 	public function userHasRemovedAllSharesFromTheFileNamed(string $user, string $fileName):void {
 		$user = $this->getActualUsername($user);
 		$this->removeAllSharesFromResource($user, $fileName);
-		$dataResponded = $this->getShares($user, $fileName);
+		$response = $this->getShares($user, $fileName);
 		Assert::assertEquals(
 			0,
-			\count($dataResponded),
+			\count($response),
 			__METHOD__
 			. " Expected all shares to be removed from '$fileName' but got '"
-			. \count($dataResponded)
+			. \count($response)
 			. "' shares still present"
 		);
 	}
@@ -3055,7 +3055,7 @@ trait Sharing {
 			$user,
 			$this->getPasswordForUser($user),
 			"GET",
-			$this->getSharesEndpointPath("?path=$path"),
+			$this->getSharesEndpointPath($path),
 			$this->getStepLineRef(),
 			[],
 			$this->ocsApiVersion
@@ -3075,7 +3075,7 @@ trait Sharing {
 	 */
 	public function checkPublicShares(string $user, string $path, ?TableNode $TableNode):void {
 		$user = $this->getActualUsername($user);
-		$dataResponded = $this->getShares($user, $path);
+		$response = $this->getShares($user, "?path=$path");
 
 		$this->verifyTableNodeColumns($TableNode, ['path', 'permissions', 'name']);
 		if ($TableNode instanceof TableNode) {
@@ -3083,7 +3083,7 @@ trait Sharing {
 
 			foreach ($elementRows as $expectedElementsArray) {
 				$nameFound = false;
-				foreach ($dataResponded as $elementResponded) {
+				foreach ($response as $elementResponded) {
 					if ((string) $elementResponded->name[0] === $expectedElementsArray['name']) {
 						Assert::assertEquals(
 							$expectedElementsArray['path'],
@@ -3126,14 +3126,14 @@ trait Sharing {
 	public function checkPublicSharesAreEmpty(string $user, string $entry, string $path):void {
 		$user = $this->getActualUsername($user);
 		$this->asFileOrFolderShouldExist($user, $entry, $path);
-		$dataResponded = $this->getShares($user, $path);
+		$response = $this->getShares($user, "?path=$path");
 		//It shouldn't have public shares
 		Assert::assertEquals(
 			0,
-			\count($dataResponded),
+			\count($response),
 			__METHOD__
 			. " As '$user', '$path' was expected to have no shares, but got '"
-			. \count($dataResponded)
+			. \count($response)
 			. "' shares present"
 		);
 	}
@@ -3146,8 +3146,8 @@ trait Sharing {
 	 * @return string|null
 	 */
 	public function getPublicShareIDByName(string $user, string $path, string $name):?string {
-		$dataResponded = $this->getShares($user, $path);
-		foreach ($dataResponded as $elementResponded) {
+		$response = $this->getShares($user, "?path=$path");
+		foreach ($response as $elementResponded) {
 			if ((string) $elementResponded->name[0] === $name) {
 				return (string) $elementResponded->id[0];
 			}
@@ -3236,9 +3236,9 @@ trait Sharing {
 		$user = $this->getActualUsername($user);
 		$offeredBy = $this->getActualUsername($offeredBy);
 
-		$dataResponded = $this->getAllSharesSharedWithUser($user);
+		$response = $this->getAllSharesSharedWithUser($user);
 		$shareId = null;
-		foreach ($dataResponded as $shareElement) {
+		foreach ($response as $shareElement) {
 			// SharingHelper::SHARE_STATES has the mapping between the words for share states
 			// like "accepted", "pending",... and the integer constants 0, 1,... that are in
 			// the "state" field of the share data.
@@ -3477,6 +3477,47 @@ trait Sharing {
 			$usersShares,
 			"user has " . \count($usersShares) . " share(s) in the $state state"
 		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has unshared folder "([^"]*)" for "([^"]*)"$/
+	 *
+	 * @param string $sharer
+	 * @param string $path
+	 * @param string $sharee
+	 *
+	 * @return void
+	 * @throws JsonException
+	 */
+	public function userHasUnsharedFolderFor(string $sharer, string $path, string $sharee): void {
+		$sharer = $this->getActualUsername($sharer);
+		$sharee = $this->getActualUsername($sharee);
+
+		$path = "?path=$path&share_types=0";
+		$response = $this->getShares($sharer, $path);
+		$shareId = null;
+		foreach ($response as $shareElement) {
+			if ((string)$shareElement->share_with[0] === $sharee) {
+				$shareId = (string) $shareElement->id;
+				break;
+			}
+		}
+		Assert::assertNotNull(
+			$shareId,
+			__METHOD__ . " could not find share, offered by $sharer to $sharee"
+		);
+
+		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+			$sharer,
+			'DELETE',
+			'/apps/files_sharing/api/v' . $this->sharingApiVersion . '/shares/' . $shareId
+		);
+
+		$this->ocsContext->assertOCSResponseIndicatesSuccess(
+			'The ocs share response does not indicate success.',
+		);
+		$this->emptyLastHTTPStatusCodesArray();
+		$this->emptyLastOCSStatusCodesArray();
 	}
 
 	/**
