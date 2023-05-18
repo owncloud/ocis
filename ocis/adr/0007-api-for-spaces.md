@@ -23,7 +23,7 @@ The purpose of this new API is to give clients a very simple way to query the dy
 
 This API is supposed to be queried often, to give clients a condensed view of the available spaces for a user, but also their eTags and cTags. Hence the clients do not have to perform a PROPFIND for every space separately.
 
-This API would even allow to provide (WebDAV-) endpoints depending on the kind and version of the client asking for it.
+This API would even allow providing (WebDAV-) endpoints depending on the kind and version of the client asking for it.
 
 ## Decision Drivers
 

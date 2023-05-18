@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-18-00-05-15]
+[#deprecation-note-2023-05-18-05-21-16]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -217,7 +217,7 @@ Serve ownCloud Web assets from a path on the filesystem instead of the builtin a
 
 a|`WEB_UI_CONFIG_FILE` +
 `WEB_UI_CONFIG` +
-xref:deprecation-note-2023-05-18-00-05-15[Deprecation Note]
+xref:deprecation-note-2023-05-18-05-21-16[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -227,7 +227,7 @@ Read the ownCloud Web json based configuration from this path/file. The config f
 
 a|`WEB_UI_CONFIG_FILE` +
 `WEB_UI_PATH` +
-xref:deprecation-note-2023-05-18-00-05-15[Deprecation Note]
+xref:deprecation-note-2023-05-18-05-21-16[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -319,7 +319,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Specifies a folder that is used when the user navigates 'home'. Navigating home gets triggered by clicking on the 'All files' menu item. The user will not be jailed in that directory, it simply serves as a default location. A static location can be provided, or variables of the user object to come up with a user specific home path can be used. This uses the twig template variable style and allows to pick a value or a substring of a value of the authenticated user. Examples are '/Shares', '/{{.Id}}' and '/{{substr 0 3 .Id}}/{{.Id}'.
+Specifies a folder that is used when the user navigates 'home'. Navigating home gets triggered by clicking on the 'All files' menu item. The user will not be jailed in that directory, it simply serves as a default location. A static location can be provided, or variables of the user object to come up with a user specific home path can be used. This uses the twig template variable style and allows picking a value or a substring of a value of the authenticated user. Examples are '/Shares', '/{{.Id}}' and '/{{substr 0 3 .Id}}/{{.Id}'.
 
 a|`WEB_OPTION_OPEN_APPS_IN_TAB` +
 
