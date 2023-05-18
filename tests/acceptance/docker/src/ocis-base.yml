@@ -28,6 +28,10 @@ services:
       STORAGE_USERS_S3NG_ACCESS_KEY: test
       STORAGE_USERS_S3NG_SECRET_KEY: test
       STORAGE_USERS_S3NG_BUCKET: test
+      # email
+      NOTIFICATIONS_SMTP_HOST: email
+      NOTIFICATIONS_SMTP_PORT: 2500
+      NOTIFICATIONS_SMTP_INSECURE: "true"
     volumes:
       - ../../../config:/drone/src/tests/config
       - ../../../ociswrapper/bin/ociswrapper:/usr/bin/ociswrapper
