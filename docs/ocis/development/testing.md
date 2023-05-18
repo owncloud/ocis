@@ -179,21 +179,19 @@ ocis/bin/ocis server
 
 `PROXY_ENABLE_BASIC_AUTH` will allow the acceptance tests to make requests against the provisioning api (and other endpoints) using basic auth.
 
-### Run the test-acceptance-from-core-api tests
+#### Run local oCIS tests (prefix `api`)
 
 ```bash
-make test-acceptance-from-core-api \
+make test-acceptance-api \
 TEST_SERVER_URL=https://localhost:9200 \
 TEST_WITH_GRAPH_API=true \
 TEST_OCIS=true \
 ```
 
-Note: This command only works for suites that start with core
-
-### Run the test-acceptance-api tests
+#### Run tests transferred from ownCloud core (prefix `coreApi`)
 
 ```bash
-make test-acceptance-api \
+make test-acceptance-from-core-api \
 TEST_SERVER_URL=https://localhost:9200 \
 TEST_WITH_GRAPH_API=true \
 TEST_OCIS=true \
@@ -215,7 +213,7 @@ example: `BEHAT_SUITE=apiGraph`
 
 To run tests with a different storage driver set `STORAGE_DRIVER` to the correct value. It can be set to `OCIS` or `OWNCLOUD` and uses `OWNCLOUD` as the default value.
 
-### use existing tests for BDD
+### Use existing tests for BDD
 
 As a lot of scenarios from `test-acceptance-from-core-api` are written for oC10, we can use those tests for Behaviour driven development in oCIS.
 Every scenario that does not work in oCIS with "ocis" storage, is listed in `tests/acceptance/expected-failures-API-on-OCIS-storage.md` with a link to the related issue.
@@ -287,7 +285,7 @@ While writing tests for a new oCIS ENV configuration, please make sure to follow
 2. Use `OcisConfigHelper.php` for helper functions - provides functions to reconfigure the running oCIS instance.
 3. Recommended: add the new step implementations in `OcisConfigContext.php`
 
-## Running test suite with email service (inbucket)
+## Running test suite with email service (@email)
 
 ### Setup inbucket
 
@@ -297,18 +295,21 @@ Run the following command to setup inbucket
 docker run -d --name inbucket -p 9000:9000 -p 2500:2500 -p 1100:1100 inbucket/inbucket
 ```
 
-### Run oCIS with following environment variables
+### Run oCIS
 
 Documentation for environment variables is available [here](https://owncloud.dev/services/notifications/#environment-variables)
 
 ```bash
-OCIS_INSECURE=true \
+# init oCIS
+IDM_ADMIN_PASSWORD=admin \
+ocis/bin/ocis init --insecure true
+
+# run oCIS
 PROXY_ENABLE_BASIC_AUTH=true \
 NOTIFICATIONS_SMTP_HOST=localhost \
-NOTIFICATIONS_SMTP_INSECURE=true \
 NOTIFICATIONS_SMTP_PORT=2500 \
-OCIS_URL=https://localhost:9200 \
-<path_to_ocis>/ocis/bin/ocis server
+NOTIFICATIONS_SMTP_INSECURE=true \
+ocis/bin/ocis server
 ```
 
 ### Run the acceptance test
