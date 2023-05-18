@@ -24,11 +24,11 @@ make -C tests/acceptance/docker help
 Basically we have two sources for feature tests and test suites:
 
 - [oCIS feature test and test suites](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
-- [tests and test suites transferred from ownCloud, they have prefix coreApi](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
+- [tests and test suites transferred from ownCloud core, they have prefix coreApi](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
 
-At the moment both can be applied to oCIS since the api of oCIS is designed to be compatible with ownCloud.
+At the moment, both can be applied to oCIS since the api of oCIS is designed to be compatible with ownCloud.
 
-As a storage backend, we offer oCIS native storage, also called "ocis". This stores files directly on disk. Along with that we also provide `S3` storage driver.
+As a storage backend, we offer oCIS native storage, also called `ocis`. This stores files directly on disk. Along with that we also provide `S3` storage driver.
 
 You can invoke two types of test suite runs:
 
@@ -196,21 +196,29 @@ TEST_WITH_GRAPH_API=true \
 TEST_OCIS=true \
 ```
 
-Make sure to adjust the settings `TEST_SERVER_URL` according to your environment.
+Useful environment variables:
 
-To run a single feature add `BEHAT_FEATURE=<feature file>`
+`BEHAT_FEATURE`: to run a single feature
 
-example: `BEHAT_SUITE=tests/acceptance/features/apiGraph/createUser.feature`
+> Example:
+>
+> BEHAT_FEATURE=tests/acceptance/features/apiGraph/createUser.feature
+>
+> Or
+>
+> BEHAT_FEATURE=tests/acceptance/features/apiGraph/createUser.feature:12
 
-To run a single test add `BEHAT_FEATURE=<file.feature:(line number)>`
+`BEHAT_SUITE`: to run a single suite
 
-example: `BEHAT_SUITE=tests/acceptance/features/apiGraph/createUser.feature:12`
+> Example:
+>
+> BEHAT_SUITE=apiGraph
 
-To run a single suite add `BEHAT_SUITE=<test suite>`
+`STORAGE_DRIVER`: to run tests with a different user storage driver. Available options are `ocis` (default), `owncloudsql` and `s3ng`
 
-example: `BEHAT_SUITE=apiGraph`
-
-To run tests with a different storage driver set `STORAGE_DRIVER` to the correct value. It can be set to `OCIS` or `OWNCLOUD` and uses `OWNCLOUD` as the default value.
+> Example:
+>
+> STORAGE_DRIVER=owncloudsql
 
 ### Use existing tests for BDD
 
