@@ -77,7 +77,7 @@ And `make -C tests/acceptance/docker Core-API-Tests-s3ng-storage-3` runs the thi
 
 ### Run single feature test
 
-The tests for a single feature (a feature file) can also be run against the different storage backends. To do that, multiple make targets with the schema test-\<test source\>-feature-\<storage-backend\> are available. To select a single feature you have to add an additional `BEHAT_FEATURE=<path-to-feature-file>` parameter when invoking the make command.
+The tests for a single feature (a feature file) can also be run against the different storage backends. To do that, multiple make targets with the schema **test-_\<test-source\>_-feature-_\<storage-backend\>_** are available. To select a single feature you have to add an additional `BEHAT_FEATURE=<path-to-feature-file>` parameter when invoking the make command.
 
 For example;
 
