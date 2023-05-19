@@ -16,6 +16,9 @@ services:
       BEHAT_FEATURE: ${BEHAT_FEATURE:-}
       DIVIDE_INTO_NUM_PARTS: $DIVIDE_INTO_NUM_PARTS
       RUN_PART: $RUN_PART
+      # email
+      EMAIL_HOST: email
+      EMAIL_PORT: 9000
     env_file:
       - ../../../../.drone.env
     volumes:

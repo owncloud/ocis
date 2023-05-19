@@ -69,6 +69,17 @@ make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 But some test suites that are tagged with `@env-config` require the oCIS server to be run with ociswrapper. So, running those tests require `WITH_WRAPPER=true` (default setting).
 {{< /hint >}}
 
+{{< hint info >}}
+To run the tests that require an email server (tests tagged with `@email`), you need to provide `START_EMAIL=true` while running the tests.
+
+```bash
+START_EMAIL=true \
+BEHAT_FEATURE='tests/acceptance/features/apiEmailNotification/emailNotification.feature' \
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage
+```
+
+{{< /hint >}}
+
 #### Tests Transferred From ownCloud Core (prefix `coreApi`)
 
 Command `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suite groups transferred from ownCloud core against the oCIS server with ocis storage.

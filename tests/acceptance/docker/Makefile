@@ -181,6 +181,11 @@ testSuite: $(OCIS_WRAPPER) build-dev-image clean-docker-container
 		COMPOSE_FILE=src/ceph.yml \
 		docker-compose run start_ceph; \
 	fi; \
+	if [ "${START_EMAIL}" == "true" ]; then \
+		COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
+		COMPOSE_FILE=src/email.yml \
+		docker-compose run start_email; \
+	fi; \
 	COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 	COMPOSE_FILE=$(COMPOSE_FILE) \
 	STORAGE_DRIVER=$(STORAGE_DRIVER) \
