@@ -69,7 +69,7 @@ make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 But some test suites that are tagged with `@env-config` require the oCIS server to be run with ociswrapper. So, running those tests require `WITH_WRAPPER=true` (default setting).
 {{< /hint >}}
 
-{{< hint ingo >}}
+{{< hint info >}}
 To run the tests that require an email server (tests tagged with `@email`), you need to provide `START_EMAIL=true` while running the tests.
 
 ```bash
