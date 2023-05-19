@@ -13,107 +13,136 @@ To run tests in the test suite you have two options. You may go the easy way and
 
 Both ways to run tests with the test suites are described here.
 
-## Testing with test suite in docker
+## Testing With Test Suite in Docker
 
 Let's see what is available. Invoke the following command from within the root of the oCIS repository.
 
-```
+```bash
 make -C tests/acceptance/docker help
 ```
 
 Basically we have two sources for feature tests and test suites:
 
 - [oCIS feature test and test suites](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
-- [tests and test suites transferred from ownCloud, they have prefix coreApi](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
+- [tests and test suites transferred from ownCloud core, they have prefix coreApi](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features)
 
-At the moment both can be applied to oCIS since the api of oCIS is designed to be compatible with ownCloud.
+At the moment, both can be applied to oCIS since the api of oCIS is designed to be compatible with ownCloud.
 
-As a storage backend, we offer oCIS native storage, also called "ocis". This stores files directly on disk. Along with that we also provide `S3` storage driver.
+As a storage backend, we offer oCIS native storage, also called `ocis`. This stores files directly on disk. Along with that we also provide `S3` storage driver.
 
 You can invoke two types of test suite runs:
 
 - run a full test suite, which consists of multiple feature tests
 - run a single feature or single scenario in a feature
 
-### Run full test suite
+### Run Full Test Suite
 
-The names of the full test suite make targets have the same naming as in the CI pipeline. The available local ocis specific test suites are `apiAccountsHashDifficulty`, `apiArchiver`, `apiContract`, `apiGraph`, `apiSpaces`, `apiSpacesShares`, `apiCors`, `apiAsyncUpload`. They can be run with `ocis` storage and `S3` storage.
+#### Local oCIS Tests (prefix `api`)
 
-> Note: In order to see the tests log attach `show-test-logs` in the command
+The names of the full test suite make targets have the same naming as in the CI pipeline. See the available local oCIS specific test suites [here](https://github.com/owncloud/ocis/tree/master/tests/acceptance/features). They can be run with `ocis` storage and `S3` storage.
 
-For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis` runs the same tests as the `localApiTests-apiAccountsHashDifficulty-ocis` CI pipeline, which runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with ocis storage.
+For example, command:
 
-For example `make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-s3ng` runs the oCIS test suite "apiAccountsHashDifficulty" against an oCIS with s3 storage.
+```bash
+make -C tests/acceptance/docker localApiTests-apiGraph-ocis
+```
+
+runs the same tests as the `localApiTests-apiGraph-ocis` CI pipeline, which runs the oCIS test suite "apiGraph" against the oCIS server with ocis storage.
+
+And command:
+
+```bash
+make -C tests/acceptance/docker localApiTests-apiGraph-s3ng
+```
+
+runs the oCIS test suite `apiGraph` against the oCIS server with s3 storage.
 
 {{< hint info >}}
 While running the tests, oCIS server is started with [ociswrapper](https://github.com/owncloud/ocis/blob/master/tests/ociswrapper/README.md) (i.e. `WITH_WRAPPER=true`) by default. In order to run the tests without ociswrapper, provide `WITH_WRAPPER=false` when running the tests. For example:
 
 ```bash
 WITH_WRAPPER=false \
-BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21' \
+BEHAT_FEATURE='tests/acceptance/features/apiGraph/createUser.feature:26' \
 make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 ```
 
 But some test suites that are tagged with `@env-config` require the oCIS server to be run with ociswrapper. So, running those tests require `WITH_WRAPPER=true` (default setting).
 {{< /hint >}}
 
-For example `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suite transferred from ownCloud against an oCIS with ocis storage.
+#### Tests Transferred From ownCloud Core (prefix `coreApi`)
 
-For example `make -C tests/acceptance/docker Core-API-Tests-s3ng-storage-3` runs the third (out of ten) test suite transferred from ownCloud against an oCIS with s3 storage.
+Command `make -C tests/acceptance/docker Core-API-Tests-ocis-storage-3` runs the same tests as the `Core-API-Tests-ocis-storage-3` CI pipeline, which runs the third (out of ten) test suite groups transferred from ownCloud core against the oCIS server with ocis storage.
 
-### Run single feature test
+And `make -C tests/acceptance/docker Core-API-Tests-s3ng-storage-3` runs the third (out of ten) test suite groups transferred from ownCloud core against the oCIS server with s3 storage.
 
-The single feature tests can also be run against the different storage backends. Therefore, multiple make targets with the schema test-<test source>-feature-<storage backend> exist. To select a single feature you have to add an additional `BEHAT_FEATURE=...` parameter when invoking the make command:
+### Run Single Feature Test
 
-```
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21'
-```
+The tests for a single feature (a feature file) can also be run against the different storage backends. To do that, multiple make targets with the schema **test-_\<test-source\>_-feature-_\<storage-backend\>_** are available. To select a single feature you have to add an additional `BEHAT_FEATURE=<path-to-feature-file>` parameter when invoking the make command.
 
-This must be pointing to a valid feature definition.
+For example;
 
-To run a single scenario in a feature, then mention the line number of the scenario:
-
-```
-make -C tests/acceptance/docker test-ocis-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21'
+```bash
+BEHAT_FEATURE='tests/acceptance/features/apiGraph/createUser.feature' \
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 ```
 
-Similarly, with S3 storage,
-- run a whole feature
-```
-make -C tests/acceptance/docker test-ocis-feature-s3ng-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature'
+{{< hint info >}}
+`BEHAT_FEATURE` must be pointing to a valid feature file
+{{< /hint >}}
+
+And to run a single scenario in a feature, you can do:
+
+{{< hint info >}}
+A specific scenario from a feature can be run by adding `:<line-number>` at the end of the feature file path. For example, to run the scenario at line 26 of the feature file `apiGraph/createUser.feature`, simply add the line number like this: `apiGraph/createUser.feature:26`. Note that the line numbers mentioned in the examples might not always point to a scenario, so always check the line numbers before running the test.
+{{< /hint >}}
+
+```bash
+BEHAT_FEATURE='tests/acceptance/features/apiGraph/createUser.feature:26' \
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 ```
 
-- run a single scenario
-```
-make -C tests/acceptance/docker test-ocis-feature-s3ng-storage BEHAT_FEATURE='tests/acceptance/features/apiAccountsHashDifficulty/addUser.feature:21'
+Similarly, with S3 storage;
+
+```bash
+# run a whole feature
+BEHAT_FEATURE='tests/acceptance/features/apiGraph/createUser.feature' \
+make -C tests/acceptance/docker test-ocis-feature-s3ng-storage
+
+# run a single scenario
+BEHAT_FEATURE='tests/acceptance/features/apiGraph/createUser.feature:26' \
+make -C tests/acceptance/docker test-ocis-feature-s3ng-storage
 ```
 
-In the same way for the tests transferred from oc10 can be run as
-- run a whole feature
-```
-make -C tests/acceptance/docker test-core-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature'
+In the same way, tests transferred from ownCloud core can be run as:
+
+```bash
+# run a whole feature
+BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature' \
+make -C tests/acceptance/docker test-core-feature-ocis-storage
+
+# run a single scenario
+BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature:13' \
+make -C tests/acceptance/docker test-core-feature-ocis-storage
 ```
 
-- run a single scenario
-```
-make -C tests/acceptance/docker test-core-feature-ocis-storage BEHAT_FEATURE='tests/acceptance/features/coreApiAuth/webDavAuth.feature:13'
-```
+{{< hint info >}}
+The test suites transferred from ownCloud core have `coreApi` prefixed
+{{< /hint >}}
 
-> Note: the tests transferred from oc10 start with coreApi
-
-### oCIS image to be tested (or: skip build and take existing image)
+### oCIS Image to Be Tested (Skip Local Image Build)
 
 By default, the tests will be run against the docker image built from your current working state of the oCIS repository. For some purposes it might also be handy to use an oCIS image from Docker Hub. Therefore, you can provide the optional flag `OCIS_IMAGE_TAG=...` which must contain an available docker tag of the [owncloud/ocis registry on Docker Hub](https://hub.docker.com/r/owncloud/ocis) (e.g. 'latest').
 
-```
-make -C tests/acceptance/docker localApiTests-apiAccountsHashDifficulty-ocis OCIS_IMAGE_TAG=latest
+```bash
+OCIS_IMAGE_TAG=latest \
+make -C tests/acceptance/docker localApiTests-apiGraph-ocis
 ```
 
-### Test log output
+### Test Log Output
 
 While a test is running or when it is finished, you can attach to the logs generated by the tests.
 
-```
+```bash
 make -C tests/acceptance/docker show-test-logs
 ```
 
@@ -125,24 +154,23 @@ The log output is opened in `less`. You can navigate up and down with your curso
 
 During testing we start a redis and oCIS docker container. These will not be stopped automatically. You can stop them with:
 
-```
+```bash
 make -C tests/acceptance/docker clean
 ```
 
-## Testing with test suite natively installed
+## Testing With Test Suite Natively Installed
 
 We have two sets of tests:
-- `test-acceptance-from-core-api` set was transferred from [core](https://github.com/owncloud/core) repository
-The suite name of all tests transferred from the core starts with "core"
 
-- `test-acceptance-api` set was created for ocis. Mainly for testing spaces features
+- `test-acceptance-api` set was created for oCIS. Mainly for testing spaces features.
 
+- `test-acceptance-from-core-api` set was transferred from [ownCloud core](https://github.com/owncloud/core) repository. The suite name of all tests transferred from the ownCloud core repository starts with `coreApi`
 
-### Run ocis
+### Run oCIS
 
-Create an up-to-date ocis binary by [building oCIS]({{< ref "build" >}})
+Create an up-to-date oCIS binary by [building oCIS]({{< ref "build" >}})
 
-To start ocis:
+To start oCIS:
 
 ```bash
 IDM_ADMIN_PASSWORD=admin \
@@ -154,17 +182,7 @@ ocis/bin/ocis server
 
 `PROXY_ENABLE_BASIC_AUTH` will allow the acceptance tests to make requests against the provisioning api (and other endpoints) using basic auth.
 
-### Run the test-acceptance-from-core-api tests
-
-```bash
-make test-acceptance-from-core-api \
-TEST_SERVER_URL=https://localhost:9200 \
-TEST_WITH_GRAPH_API=true \
-TEST_OCIS=true \
-```
-Note: This command only works for suites that start with core
-
-### Run the test-acceptance-api tests
+#### Run Local oCIS Tests (prefix `api`)
 
 ```bash
 make test-acceptance-api \
@@ -173,25 +191,48 @@ TEST_WITH_GRAPH_API=true \
 TEST_OCIS=true \
 ```
 
-Make sure to adjust the settings `TEST_SERVER_URL` according to your environment.
+#### Run Tests Transferred From ownCloud Core (prefix `coreApi`)
 
-To run a single feature add `BEHAT_FEATURE=<feature file>`
+```bash
+make test-acceptance-from-core-api \
+TEST_SERVER_URL=https://localhost:9200 \
+TEST_WITH_GRAPH_API=true \
+TEST_OCIS=true \
+```
 
-example: `BEHAT_SUITE=tests/acceptance/features/apiGraph/createUser.feature`
+Useful environment variables:
 
-To run a single test add `BEHAT_FEATURE=<file.feature:(line number)>`
+`TEST_SERVER_URL`: oCIS server url. Please, adjust the server url according to your setup.
 
-example: `BEHAT_SUITE=tests/acceptance/features/apiGraph/createUser.feature:12`
+`BEHAT_FEATURE`: to run a single feature
 
-To run a single suite add `BEHAT_SUITE=<test suite>`
+{{< hint info >}}
+A specific scenario from a feature can be run by adding `:<line-number>` at the end of the feature file path. For example, to run the scenario at line 26 of the feature file `apiGraph/createUser.feature`, simply add the line number like this: `apiGraph/createUser.feature:26`. Note that the line numbers mentioned in the examples might not always point to a scenario, so always check the line numbers before running the test.
+{{< /hint >}}
 
-example: `BEHAT_SUITE=apiGraph`
+> Example:
+>
+> BEHAT_FEATURE=tests/acceptance/features/apiGraph/createUser.feature
+>
+> Or
+>
+> BEHAT_FEATURE=tests/acceptance/features/apiGraph/createUser.feature:12
 
-To run tests with a different storage driver set `STORAGE_DRIVER` to the correct value. It can be set to `OCIS` or `OWNCLOUD` and uses `OWNCLOUD` as the default value.
+`BEHAT_SUITE`: to run a single suite
 
-### use existing tests for BDD
+> Example:
+>
+> BEHAT_SUITE=apiGraph
 
-As a lot of scenarios from `test-acceptance-from-core-api` are written for oC10, we can use those tests for Behaviour driven development in ocis.
+`STORAGE_DRIVER`: to run tests with a different user storage driver. Available options are `ocis` (default), `owncloudsql` and `s3ng`
+
+> Example:
+>
+> STORAGE_DRIVER=owncloudsql
+
+### Use Existing Tests for BDD
+
+As a lot of scenarios from `test-acceptance-from-core-api` are written for oC10, we can use those tests for Behaviour driven development in oCIS.
 Every scenario that does not work in oCIS with "ocis" storage, is listed in `tests/acceptance/expected-failures-API-on-OCIS-storage.md` with a link to the related issue.
 
 Those scenarios are run in the ordinary acceptance test pipeline in CI. The scenarios that fail are checked against the
@@ -203,16 +244,16 @@ If you want to work on a specific issue
 
 1. locally run each of the tests marked with that issue in the expected failures file.
 
-    E.g.:
+   E.g.:
 
-    ```bash
-    make test-acceptance-from-core-api \
-    TEST_SERVER_URL=https://localhost:9200 \
-    TEST_OCIS=true \
-    TEST_WITH_GRAPH_API=true \
-    STORAGE_DRIVER=OCIS \
-    BEHAT_FEATURE='tests/acceptance/features/coreApiVersions/fileVersions.feature:147'
-    ```
+   ```bash
+   make test-acceptance-from-core-api \
+   TEST_SERVER_URL=https://localhost:9200 \
+   TEST_OCIS=true \
+   TEST_WITH_GRAPH_API=true \
+   STORAGE_DRIVER=OCIS \
+   BEHAT_FEATURE='tests/acceptance/features/coreApiVersions/fileVersions.feature:147'
+   ```
 
 2. the tests will fail, try to understand how and why they are failing
 3. fix the code
@@ -220,11 +261,11 @@ If you want to work on a specific issue
 5. remove those tests from the expected failures file
 6. make a PR that has the fixed code, and the relevant lines removed from the expected failures file.
 
-## Running ENV config tests (@env-config)
+## Running ENV Config Tests (@env-Config)
 
 Test suites tagged with `@env-config` are used to test the environment variables that are used to configure oCIS. These tests are special tests that require the oCIS server to be run using [ociswrapper](https://github.com/owncloud/ocis/blob/master/tests/ociswrapper/README.md).
 
-### Run oCIS with ociswrapper
+### Run oCIS With ociswrapper
 
 ```bash
 # working dir: ocis repo root dir
@@ -242,7 +283,7 @@ PROXY_ENABLE_BASIC_AUTH=true \
 ./bin/ociswrapper serve --bin=../../ocis/bin/ocis
 ```
 
-### Run the tests
+### Run the Tests
 
 ```bash
 OCIS_WRAPPER_URL=http://localhost:5200 \
@@ -253,7 +294,7 @@ BEHAT_FEATURE=tests/acceptance/features/apiAsyncUpload/delayPostprocessing.featu
 make test-acceptance-api
 ```
 
-### Writing new ENV config tests
+### Writing New ENV Config Tests
 
 While writing tests for a new oCIS ENV configuration, please make sure to follow these guidelines:
 
@@ -261,9 +302,52 @@ While writing tests for a new oCIS ENV configuration, please make sure to follow
 2. Use `OcisConfigHelper.php` for helper functions - provides functions to reconfigure the running oCIS instance.
 3. Recommended: add the new step implementations in `OcisConfigContext.php`
 
-## Running tests for parallel deployment
+## Running Test Suite With Email Service (@Email)
 
-### Setup the parallel deployment environment
+Test suites that are tagged with `@email` require an email service. We use inbucket as the email service in our tests.
+
+### Setup Inbucket
+
+Run the following command to setup inbucket
+
+```bash
+docker run -d -p9000:9000 -p2500:2500 --name inbucket inbucket/inbucket
+```
+
+### Run oCIS
+
+Documentation for environment variables is available [here](https://owncloud.dev/services/notifications/#environment-variables)
+
+```bash
+# init oCIS
+IDM_ADMIN_PASSWORD=admin \
+ocis/bin/ocis init --insecure true
+
+# run oCIS
+PROXY_ENABLE_BASIC_AUTH=true \
+NOTIFICATIONS_SMTP_HOST=localhost \
+NOTIFICATIONS_SMTP_PORT=2500 \
+NOTIFICATIONS_SMTP_INSECURE=true \
+ocis/bin/ocis server
+```
+
+### Run the Acceptance Test
+
+Run the acceptance test with the following command:
+
+```bash
+TEST_WITH_GRAPH_API=true \
+TEST_OCIS=true \
+TEST_SERVER_URL="https://localhost:9200" \
+EMAIL_HOST="localhost" \
+EMAIL_PORT=9000 \
+BEHAT_FEATURE="tests/acceptance/features/apiEmailNotification/emailNotification.feature" \
+make test-acceptance-api
+```
+
+## Running Tests for Parallel Deployment
+
+### Setup the Parallel Deployment Environment
 
 Instruction on setup is available [here](https://owncloud.dev/ocis/deployment/oc10_ocis_parallel/#local-setup)
 
@@ -279,7 +363,7 @@ Start the docker stack with the following command:
 docker-compose up -d
 ```
 
-### Getting the test helpers
+### Getting the Test Helpers
 
 All the test helpers are located in the core repo.
 
@@ -287,7 +371,7 @@ All the test helpers are located in the core repo.
 git clone https://github.com/owncloud/core.git
 ```
 
-### Run the acceptance tests
+### Run the Acceptance Tests
 
 Run the acceptance tests with the following command from the root of the oCIS repository:
 
@@ -310,41 +394,4 @@ In order to run a single test, use the `BEHAT_FEATURE` environment variable.
 make test-paralleldeployment-api \
 ... \
 BEHAT_FEATURE="tests/parallelDeployAcceptance/features/apiShareManagement/acceptShares.feature"
-```
-
-## Running test suite with email service (inbucket)
-
-### Setup inbucket
-
-Run the following command to setup inbucket
-
-```bash
-docker run -d --name inbucket -p 9000:9000 -p 2500:2500 -p 1100:1100 inbucket/inbucket
-```
-
-### Run oCIS with following environment variables
-
-Documentation for environment variables is available [here](https://owncloud.dev/services/notifications/#environment-variables)
-
-```bash
-OCIS_INSECURE=true \
-PROXY_ENABLE_BASIC_AUTH=true \
-NOTIFICATIONS_SMTP_HOST=localhost \
-NOTIFICATIONS_SMTP_INSECURE=true \
-NOTIFICATIONS_SMTP_PORT=2500 \
-OCIS_URL=https://localhost:9200 \
-<path_to_ocis>/ocis/bin/ocis server
-```
-
-### Run the acceptance test
-
-Run the acceptance test with the following command:
-```bash
-make test-acceptance-api \
-TEST_SERVER_URL="https://localhost:9200" \
-TEST_OCIS=true \
-TEST_WITH_GRAPH_API=true \
-EMAIL_HOST="localhost" \
-EMAIL_PORT=9000 \
-BEHAT_FEATURE="tests/acceptance/features/apiEmailNotification/emailNotification.feature"
 ```
