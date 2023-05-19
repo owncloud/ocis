@@ -63,14 +63,19 @@ func NewBleveEngine(index bleve.Index) *Bleve {
 
 // BuildBleveMapping builds a bleve index mapping which can be used for indexing
 func BuildBleveMapping() (mapping.IndexMapping, error) {
+	nameMapping := bleve.NewTextFieldMapping()
+	nameMapping.Analyzer = "lowercaseKeyword"
+
 	lowercaseMapping := bleve.NewTextFieldMapping()
+	lowercaseMapping.IncludeInAll = false
 	lowercaseMapping.Analyzer = "lowercaseKeyword"
 
 	fulltextFieldMapping := bleve.NewTextFieldMapping()
 	fulltextFieldMapping.Analyzer = "fulltext"
+	fulltextFieldMapping.IncludeInAll = false
 
 	docMapping := bleve.NewDocumentMapping()
-	docMapping.AddFieldMappingsAt("Name", lowercaseMapping)
+	docMapping.AddFieldMappingsAt("Name", nameMapping)
 	docMapping.AddFieldMappingsAt("Tags", lowercaseMapping)
 	docMapping.AddFieldMappingsAt("Content", fulltextFieldMapping)
 
