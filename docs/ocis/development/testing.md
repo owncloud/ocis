@@ -126,7 +126,7 @@ make -C tests/acceptance/docker test-core-feature-ocis-storage
 ```
 
 {{< hint info >}}
-The tests suites transferred from ownCloud core have `coreApi` prefixed
+The test suites transferred from ownCloud core have `coreApi` prefixed
 {{< /hint >}}
 
 ### oCIS Image to Be Tested (Skip Local Image Build)
