@@ -56,7 +56,7 @@ var _ = Describe("Users changing their own password", func() {
 			UserIDAttribute:          "ownclouduuid",
 			UserSearchScope:          "sub",
 			GroupNameAttribute:       "cn",
-			GroupIDAttribute:         "ownclouduui",
+			GroupIDAttribute:         "ownclouduuid",
 			GroupSearchScope:         "sub",
 		}
 		loggger := log.NewLogger()
