@@ -56,9 +56,11 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/filelocks"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/jellydator/ttlcache/v2"
 	"github.com/pkg/errors"
+	microstore "go-micro.dev/v4/store"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -117,8 +119,14 @@ func NewDefault(m map[string]interface{}, bs tree.Blobstore, es events.Stream) (
 		return nil, fmt.Errorf("unknown metadata backend %s, only 'messagepack' or 'xattrs' (default) supported", o.MetadataBackend)
 	}
 
-	tp := tree.New(lu, bs, o)
-
+	tp := tree.New(lu, bs, o, store.Create(
+		store.Store(o.IDCache.Store),
+		store.TTL(time.Duration(o.IDCache.TTL)*time.Second),
+		store.Size(o.IDCache.Size),
+		microstore.Nodes(o.IDCache.Nodes...),
+		microstore.Database(o.IDCache.Database),
+		microstore.Table(o.IDCache.Table),
+	))
 	permissionsClient, err := pool.GetPermissionsClient(o.PermissionsSVC, pool.WithTLSMode(o.PermTLSMode))
 	if err != nil {
 		return nil, err
