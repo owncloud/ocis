@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: EMAIL\n"
-"POT-Creation-Date: 2023-05-09 10:02+0000\n"
+"POT-Creation-Date: 2023-05-20 00:06+0000\n"
 "PO-Revision-Date: 2023-03-15 08:28+0000\n"
 "Last-Translator: Andi Chandler <andi@gowling.com>, 2023\n"
 "Language-Team: English (United Kingdom) (https://app.transifex.com/owncloud-org/teams/6149/en_GB/)\n"
@@ -31,7 +31,7 @@ msgstr "Access to {resource} expired"
 
 #: pkg/service/templates.go:15
 msgid "File {resource} was deleted because it violates the policies"
-msgstr ""
+msgstr "File {resource} was deleted because it violates the policies"
 
 #: pkg/service/templates.go:39
 msgid "Membership expired"
@@ -39,7 +39,7 @@ msgstr "Membership expired"
 
 #: pkg/service/templates.go:14
 msgid "Policies enforced"
-msgstr ""
+msgstr "Policies enforced"
 
 #: pkg/service/templates.go:24
 msgid "Removed from Space"
@@ -71,11 +71,11 @@ msgstr "Space shared"
 
 #: pkg/service/templates.go:9
 msgid "Virus found"
-msgstr ""
+msgstr "Virus found"
 
 #: pkg/service/templates.go:10
 msgid "Virus found in {resource}. Upload not possible. Virus: {virus}"
-msgstr ""
+msgstr "Virus found in {resource}. Upload not possible. Virus: {virus}"
 
 #: pkg/service/templates.go:20
 msgid "{user} added you to Space {space}"
