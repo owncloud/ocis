@@ -26,7 +26,7 @@ a| [subs=-attributes]
 ++false ++
 
 a| [subs=-attributes]
-Flag to enable or disable the creation of the demo users.
+The default role assignments the demo users should be setup.
 
 a| `IDM_TRACING_COLLECTOR`
 
@@ -609,6 +609,7 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-system.adoc[storage-system] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
 ++string ++
@@ -630,6 +631,7 @@ a| [subs=attributes+]
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
@@ -655,6 +657,7 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-system.adoc[storage-system] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
 ++string ++
@@ -678,6 +681,7 @@ a| [subs=attributes+]
 * xref:{s-path}/storage-system.adoc[storage-system] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
 ++[]string ++
@@ -699,6 +703,7 @@ a| [subs=attributes+]
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
+* xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
@@ -1457,10 +1462,10 @@ a| [subs=-attributes]
 ++bool ++
 
 a| [subs=-attributes]
-++false ++
+++true ++
 
 a| [subs=-attributes]
-Allow to create, modify and delete LDAP users via the GRAPH API.
+Allow creating, modifying and deleting LDAP users via the GRAPH API. This is only works when the default Schema is used.
 
 a| `OCIS_LDAP_URI`
 
@@ -1922,7 +1927,7 @@ a| [subs=-attributes]
 ++string ++
 
 a| [subs=-attributes]
-++memory ++
+++ ++
 
 a| [subs=-attributes]
 The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
@@ -1970,7 +1975,7 @@ a| [subs=-attributes]
 ++Duration ++
 
 a| [subs=-attributes]
-++336h0m0s ++
+++0s ++
 
 a| [subs=-attributes]
 Time to live for events in the store. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '336h' (2 weeks).
@@ -2295,7 +2300,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Transfer secret for signing file up- and download requests.
+The storage transfer secret.
 
 a| `OCIS_URL`
 
@@ -2378,7 +2383,7 @@ a| [subs=-attributes]
 ++ ++
 
 a| [subs=-attributes]
-Transfer secret for signing file up- and download requests.
+The storage transfer secret.
 
 a| `STORAGE_USERS_OCIS_ASYNC_UPLOADS`
 

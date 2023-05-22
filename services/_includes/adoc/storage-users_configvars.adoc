@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-22-07-52-01]
+[#deprecation-note-2023-05-22-13-46-22]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -205,7 +205,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-05-22-07-52-01[Deprecation Note]
+xref:deprecation-note-2023-05-22-13-46-22[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -343,7 +343,7 @@ Maximum number of concurrent go-routines. Higher values can potentially get work
 
 a|`OCIS_ASYNC_UPLOADS` +
 `STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
-xref:deprecation-note-2023-05-22-07-52-01[Deprecation Note]
+xref:deprecation-note-2023-05-22-13-46-22[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -646,7 +646,7 @@ Whether to verify the server TLS certificates.
 
 a|`STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT` +
-xref:deprecation-note-2023-05-22-07-52-01[Deprecation Note]
+xref:deprecation-note-2023-05-22-13-46-22[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -763,6 +763,55 @@ Default time to live for user info in the user info cache. Only applied when acc
 
 a|`OCIS_CACHE_SIZE` +
 `STORAGE_USERS_FILEMETADATA_CACHE_SIZE` +
+
+a| [subs=-attributes]
+++int ++
+a| [subs=-attributes]
+++0 ++
+a| [subs=-attributes]
+The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512.
+
+a|`OCIS_CACHE_STORE` +
+`STORAGE_USERS_ID_CACHE_STORE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
+
+a|`OCIS_CACHE_STORE_NODES` +
+`STORAGE_USERS_ID_CACHE_STORE_NODES` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[] ++
+a| [subs=-attributes]
+A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.
+
+a|`OCIS_CACHE_DATABASE` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+The database name the configured store should use.
+
+a|`OCIS_CACHE_TTL` +
+`STORAGE_USERS_ID_CACHE_TTL` +
+
+a| [subs=-attributes]
+++Duration ++
+a| [subs=-attributes]
+++0s ++
+a| [subs=-attributes]
+Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).
+
+a|`OCIS_CACHE_SIZE` +
+`STORAGE_USERS_ID_CACHE_SIZE` +
 
 a| [subs=-attributes]
 ++int ++

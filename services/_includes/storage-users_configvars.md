@@ -80,6 +80,11 @@
 | OCIS_CACHE_DATABASE | string | ocis | The database name the configured store should use.|
 | OCIS_CACHE_TTL<br/>STORAGE_USERS_FILEMETADATA_CACHE_TTL | Duration | 24m0s | Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '24h' (24 hours).|
 | OCIS_CACHE_SIZE<br/>STORAGE_USERS_FILEMETADATA_CACHE_SIZE | int | 0 | The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512.|
+| OCIS_CACHE_STORE<br/>STORAGE_USERS_ID_CACHE_STORE | string |  | The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.|
+| OCIS_CACHE_STORE_NODES<br/>STORAGE_USERS_ID_CACHE_STORE_NODES | []string | [] | A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store.|
+| OCIS_CACHE_DATABASE | string |  | The database name the configured store should use.|
+| OCIS_CACHE_TTL<br/>STORAGE_USERS_ID_CACHE_TTL | Duration | 0s | Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds).|
+| OCIS_CACHE_SIZE<br/>STORAGE_USERS_ID_CACHE_SIZE | int | 0 | The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512.|
 | STORAGE_USERS_MOUNT_ID | string |  | Mount ID of this storage.|
 | STORAGE_USERS_EXPOSE_DATA_SERVER | bool | false | Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users.|
 | STORAGE_USERS_READ_ONLY | bool | false | Set this storage to be read-only.|

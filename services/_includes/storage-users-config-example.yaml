@@ -96,6 +96,12 @@ filemetadata_cache:
   database: ocis
   ttl: 24m0s
   size: 0
+id_cache:
+  store: ""
+  nodes: []
+  database: ""
+  ttl: 0s
+  size: 0
 mount_id: ""
 expose_data_server: false
 readonly: false
