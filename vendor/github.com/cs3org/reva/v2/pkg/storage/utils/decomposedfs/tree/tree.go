@@ -32,7 +32,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bluele/gcache"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
@@ -47,6 +46,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"github.com/rs/zerolog/log"
+	"go-micro.dev/v4/store"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -80,19 +80,19 @@ type Tree struct {
 
 	options *options.Options
 
-	idCache gcache.Cache
+	idCache store.Store
 }
 
 // PermissionCheckFunc defined a function used to check resource permissions
 type PermissionCheckFunc func(rp *provider.ResourcePermissions) bool
 
 // New returns a new instance of Tree
-func New(lu PathLookup, bs Blobstore, o *options.Options) *Tree {
+func New(lu PathLookup, bs Blobstore, o *options.Options, cache store.Store) *Tree {
 	return &Tree{
 		lookup:    lu,
 		blobstore: bs,
 		options:   o,
-		idCache:   gcache.New(1_000_000).LRU().Build(),
+		idCache:   cache,
 	}
 }
 
@@ -234,6 +234,9 @@ func (t *Tree) Move(ctx context.Context, oldNode *node.Node, newNode *node.Node)
 		}
 	}
 
+	// remove cache entry in any case to avoid inconsistencies
+	defer func() { _ = t.idCache.Delete(filepath.Join(oldNode.ParentPath(), oldNode.Name)) }()
+
 	// Always target the old node ID for xattr updates.
 	// The new node id is empty if the target does not exist
 	// and we need to overwrite the new one when overwriting an existing path.
@@ -271,7 +274,6 @@ func (t *Tree) Move(ctx context.Context, oldNode *node.Node, newNode *node.Node)
 	if err != nil {
 		return errors.Wrap(err, "Decomposedfs: could not move child")
 	}
-	t.idCache.Remove(filepath.Join(oldNode.ParentPath(), oldNode.Name))
 
 	// update target parentid and name
 	attribs := node.Attributes{}
@@ -361,16 +363,14 @@ func (t *Tree) ListFolder(ctx context.Context, n *node.Node) ([]*node.Node, erro
 	for i := 0; i < numWorkers; i++ {
 		g.Go(func() error {
 			for name := range work {
-				nodeID := ""
 				path := filepath.Join(dir, name)
-				if val, err := t.idCache.Get(path); err == nil {
-					nodeID = val.(string)
-				} else {
+				nodeID := getNodeIDFromCache(path, t.idCache)
+				if nodeID == "" {
 					nodeID, err = readChildNodeFromLink(path)
 					if err != nil {
 						return err
 					}
-					err = t.idCache.Set(path, nodeID)
+					err = storeNodeIDInCache(path, nodeID, t.idCache)
 					if err != nil {
 						return err
 					}
@@ -416,6 +416,10 @@ func (t *Tree) ListFolder(ctx context.Context, n *node.Node) ([]*node.Node, erro
 
 // Delete deletes a node in the tree by moving it to the trash
 func (t *Tree) Delete(ctx context.Context, n *node.Node) (err error) {
+	path := filepath.Join(n.ParentPath(), n.Name)
+	// remove entry from cache immediately to avoid inconsistencies
+	defer func() { _ = t.idCache.Delete(path) }()
+
 	deletingSharedResource := ctx.Value(appctx.DeletingSharedResource)
 
 	if deletingSharedResource != nil && deletingSharedResource.(bool) {
@@ -492,10 +496,7 @@ func (t *Tree) Delete(ctx context.Context, n *node.Node) (err error) {
 	_ = os.Remove(n.LockFilePath())
 
 	// finally remove the entry from the parent dir
-	path := filepath.Join(n.ParentPath(), n.Name)
-	err = os.Remove(path)
-	t.idCache.Remove(path)
-	if err != nil {
+	if err = os.Remove(path); err != nil {
 		// To roll back changes
 		// TODO revert the rename
 		// TODO remove symlink
@@ -979,4 +980,19 @@ func (t *Tree) readRecycleItem(ctx context.Context, spaceID, key, path string) (
 	}
 
 	return
+}
+
+func getNodeIDFromCache(path string, cache store.Store) string {
+	recs, err := cache.Read(path)
+	if err == nil && len(recs) > 0 {
+		return string(recs[0].Value)
+	}
+	return ""
+}
+
+func storeNodeIDInCache(path string, nodeID string, cache store.Store) error {
+	return cache.Write(&store.Record{
+		Key:   path,
+		Value: []byte(nodeID),
+	})
 }

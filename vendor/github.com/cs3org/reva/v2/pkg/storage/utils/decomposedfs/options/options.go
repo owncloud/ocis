@@ -69,6 +69,7 @@ type Options struct {
 
 	StatCache         cache.Config `mapstructure:"statcache"`
 	FileMetadataCache cache.Config `mapstructure:"filemetadatacache"`
+	IDCache           cache.Config `mapstructure:"idcache"`
 
 	MaxAcquireLockCycles    int `mapstructure:"max_acquire_lock_cycles"`
 	LockCycleDurationFactor int `mapstructure:"lock_cycle_duration_factor"`

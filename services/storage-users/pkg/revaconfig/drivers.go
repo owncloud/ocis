@@ -144,6 +144,13 @@ func Ocis(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":      cfg.FilemetadataCache.TTL / time.Second,
 			"cache_size":     cfg.FilemetadataCache.Size,
 		},
+		"idcache": map[string]interface{}{
+			"cache_store":    cfg.IDCache.Store,
+			"cache_nodes":    cfg.IDCache.Nodes,
+			"cache_database": cfg.IDCache.Database,
+			"cache_ttl":      cfg.IDCache.TTL / time.Second,
+			"cache_size":     cfg.IDCache.Size,
+		},
 		"events": map[string]interface{}{
 			"natsaddress":          cfg.Events.Addr,
 			"natsclusterid":        cfg.Events.ClusterID,
@@ -190,6 +197,13 @@ func OcisNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_database": cfg.FilemetadataCache.Database,
 			"cache_ttl":      cfg.FilemetadataCache.TTL / time.Second,
 			"cache_size":     cfg.FilemetadataCache.Size,
+		},
+		"idcache": map[string]interface{}{
+			"cache_store":    cfg.IDCache.Store,
+			"cache_nodes":    cfg.IDCache.Nodes,
+			"cache_database": cfg.IDCache.Database,
+			"cache_ttl":      cfg.IDCache.TTL / time.Second,
+			"cache_size":     cfg.IDCache.Size,
 		},
 	}
 }
@@ -243,6 +257,13 @@ func S3NG(cfg *config.Config) map[string]interface{} {
 			"cache_ttl":      cfg.FilemetadataCache.TTL / time.Second,
 			"cache_size":     cfg.FilemetadataCache.Size,
 		},
+		"idcache": map[string]interface{}{
+			"cache_store":    cfg.IDCache.Store,
+			"cache_nodes":    cfg.IDCache.Nodes,
+			"cache_database": cfg.IDCache.Database,
+			"cache_ttl":      cfg.IDCache.TTL / time.Second,
+			"cache_size":     cfg.IDCache.Size,
+		},
 		"events": map[string]interface{}{
 			"natsaddress":          cfg.Events.Addr,
 			"natsclusterid":        cfg.Events.ClusterID,
@@ -293,6 +314,13 @@ func S3NGNoEvents(cfg *config.Config) map[string]interface{} {
 			"cache_database": cfg.FilemetadataCache.Database,
 			"cache_ttl":      cfg.FilemetadataCache.TTL / time.Second,
 			"cache_size":     cfg.FilemetadataCache.Size,
+		},
+		"idcache": map[string]interface{}{
+			"cache_store":    cfg.IDCache.Store,
+			"cache_nodes":    cfg.IDCache.Nodes,
+			"cache_database": cfg.IDCache.Database,
+			"cache_ttl":      cfg.IDCache.TTL / time.Second,
+			"cache_size":     cfg.IDCache.Size,
 		},
 	}
 }
