@@ -118,6 +118,7 @@ func DefaultConfig() *config.Config {
 				CredentialsByUserAgent: map[string]string{},
 			},
 		},
+		LDAPServerWriteEnabled: true,
 	}
 }
 
