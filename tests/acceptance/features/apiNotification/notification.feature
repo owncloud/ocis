@@ -1,7 +1,7 @@
 @api
 Feature: Notification
   As a user
-  I want to be notified of actions
+  I want to be notified of various events
   So that I can stay updated about the information
 
   Background:
@@ -130,7 +130,7 @@ Feature: Notification
   Scenario Outline: user gets a notification of unsharing resource
     Given user "Alice" has shared entry "<resource>" with user "Brian"
     And user "Brian" has accepted share "/<resource>" offered by user "Alice"
-    And user "Alice" has unshared folder "<resource>" for "Brian"
+    And user "Alice" has unshared entity "<resource>" shared to "Brian"
     When user "Brian" lists all notifications
     Then the HTTP status code should be "200"
     And the JSON response should contain a notification message with the subject "Resource unshared" and the message-details should match

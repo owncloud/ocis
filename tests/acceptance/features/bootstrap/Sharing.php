@@ -3055,7 +3055,7 @@ trait Sharing {
 			$user,
 			$this->getPasswordForUser($user),
 			"GET",
-			$this->getSharesEndpointPath($path),
+			$this->getSharesEndpointPath("?path=$path"),
 			$this->getStepLineRef(),
 			[],
 			$this->ocsApiVersion
@@ -3075,7 +3075,7 @@ trait Sharing {
 	 */
 	public function checkPublicShares(string $user, string $path, ?TableNode $TableNode):void {
 		$user = $this->getActualUsername($user);
-		$response = $this->getShares($user, "?path=$path");
+		$response = $this->getShares($user, $path);
 
 		$this->verifyTableNodeColumns($TableNode, ['path', 'permissions', 'name']);
 		if ($TableNode instanceof TableNode) {
@@ -3126,7 +3126,7 @@ trait Sharing {
 	public function checkPublicSharesAreEmpty(string $user, string $entry, string $path):void {
 		$user = $this->getActualUsername($user);
 		$this->asFileOrFolderShouldExist($user, $entry, $path);
-		$response = $this->getShares($user, "?path=$path");
+		$response = $this->getShares($user, $path);
 		//It shouldn't have public shares
 		Assert::assertEquals(
 			0,
@@ -3146,7 +3146,7 @@ trait Sharing {
 	 * @return string|null
 	 */
 	public function getPublicShareIDByName(string $user, string $path, string $name):?string {
-		$response = $this->getShares($user, "?path=$path");
+		$response = $this->getShares($user, $path);
 		foreach ($response as $elementResponded) {
 			if ((string) $elementResponded->name[0] === $name) {
 				return (string) $elementResponded->id[0];
@@ -3480,7 +3480,7 @@ trait Sharing {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has unshared folder "([^"]*)" for "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has unshared (?:folder|file|entity) "([^"]*)" shared to "([^"]*)"$/
 	 *
 	 * @param string $sharer
 	 * @param string $path
@@ -3489,12 +3489,11 @@ trait Sharing {
 	 * @return void
 	 * @throws JsonException
 	 */
-	public function userHasUnsharedFolderFor(string $sharer, string $path, string $sharee): void {
+	public function userHasUnsharedResourceSharedTo(string $sharer, string $path, string $sharee): void {
 		$sharer = $this->getActualUsername($sharer);
 		$sharee = $this->getActualUsername($sharee);
 
-		$path = "?path=$path&share_types=0";
-		$response = $this->getShares($sharer, $path);
+		$response = $this->getShares($sharer, "$path&share_types=0");
 		$shareId = null;
 		foreach ($response as $shareElement) {
 			if ((string)$shareElement->share_with[0] === $sharee) {
