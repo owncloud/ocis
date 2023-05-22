@@ -2510,4 +2510,37 @@ class GraphContext implements Context {
 			. "\nExpected user '$user' to have no roles assigned but got '" . json_encode($jsonDecodedResponse) . "'"
 		);
 	}
+
+	/**
+	 * @When user :user changes the role of user :ofUser to role :role using the Graph API
+	 * @When user :user tries to change the role of user :ofUser to role :role using the Graph API
+	 *
+	 * @param string $user
+	 * @param string $ofUser
+	 * @param string $role
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 * @throws Exception
+	 */
+	public function userChangesTheRoleOfUserToRoleUsingTheGraphApi(string $user, string $ofUser, string $role): void {
+		$userId = $this->featureContext->getAttributeOfCreatedUser($ofUser, 'id') ?? $ofUser;
+		$credentials = $this->getAdminOrUserCredentials($user);
+		if (empty($this->appEntity)) {
+			$this->setApplicationEntity();
+		}
+
+		$this->featureContext->setResponse(
+			GraphHelper::assignRole(
+				$this->featureContext->getBaseUrl(),
+				$this->featureContext->getStepLineRef(),
+				$credentials['username'],
+				$credentials['password'],
+				$this->appEntity["appRoles"][$role],
+				$this->appEntity["id"],
+				$userId
+			)
+		);
+	}
 }
