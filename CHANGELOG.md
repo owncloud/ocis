@@ -6,93 +6,10 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
-* Bugfix - Reduced default TTL of user and group caches in graph API: [#6320](https://github.com/owncloud/ocis/issues/6320)
-* Bugfix - Use UUID attribute for computing "sub" claim in lico idp: [#904](https://github.com/owncloud/ocis/issues/904)
-* Bugfix - Fix the empty string givenName attribute when creating user: [#5431](https://github.com/owncloud/ocis/issues/5431)
-* Bugfix - Fix the wrong status code when appRoleAssignments is forbidden: [#6037](https://github.com/owncloud/ocis/issues/6037)
-* Bugfix - Add missing response to blocked requests: [#6277](https://github.com/owncloud/ocis/pull/6277)
-* Bugfix - Update the default admin role: [#6310](https://github.com/owncloud/ocis/pull/6310)
-* Enhancement - Add specific result to antivirus for debugging: [#6265](https://github.com/owncloud/ocis/pull/6265)
-* Enhancement - Update Reva to 2.13.3: [#6305](https://github.com/owncloud/ocis/pull/6305)
 * Enhancement - Default LDAP write to true: [#6362](https://github.com/owncloud/ocis/pull/6362)
-* Enhancement - Graph user capabilities: [#6339](https://github.com/owncloud/ocis/pull/6339)
 * Enhancement - Configurable ID Cache: [#6353](https://github.com/owncloud/ocis/pull/6353)
-* Enhancement - Add Store to `postprocessing`: [#6281](https://github.com/owncloud/ocis/pull/6281)
-* Enhancement - Remove quota from share jails api responses: [#6309](https://github.com/owncloud/ocis/pull/6309)
 
 ## Details
-
-* Bugfix - Reduced default TTL of user and group caches in graph API: [#6320](https://github.com/owncloud/ocis/issues/6320)
-
-   We reduced the default TTL of the cache for user and group information on the /drives endpoints
-   to 60 seconds. This fixes in issue where outdated information was show on the spaces list for a
-   very long time.
-
-   https://github.com/owncloud/ocis/issues/6320
-
-* Bugfix - Use UUID attribute for computing "sub" claim in lico idp: [#904](https://github.com/owncloud/ocis/issues/904)
-
-   By default the LDAP backend for lico uses the User DN for computing the "sub" claim of a user. This
-   caused the "sub" claim to stay the same even if a user was deleted and recreated (and go a new UUID
-   assgined with that). We now use the user's unique id (`owncloudUUID` by default) for computing
-   the `sub` claim. So that user's recreated with the same name will be treated as different users
-   by the IDP.
-
-   https://github.com/owncloud/ocis/issues/904
-
-* Bugfix - Fix the empty string givenName attribute when creating user: [#5431](https://github.com/owncloud/ocis/issues/5431)
-
-   Omitempty givenName attribute when creating user
-
-   https://github.com/owncloud/ocis/issues/5431
-   https://github.com/owncloud/ocis/pull/6259
-
-* Bugfix - Fix the wrong status code when appRoleAssignments is forbidden: [#6037](https://github.com/owncloud/ocis/issues/6037)
-
-   Fix the wrong status code when appRoleAssignments is forbidden in the
-   CreateAppRoleAssignment and DeleteAppRoleAssignment methods.
-
-   https://github.com/owncloud/ocis/issues/6037
-   https://github.com/owncloud/ocis/pull/6276
-
-* Bugfix - Add missing response to blocked requests: [#6277](https://github.com/owncloud/ocis/pull/6277)
-
-   We added the missing response body to requests which were blocked by the policy engine.
-
-   https://github.com/owncloud/ocis/pull/6277
-
-* Bugfix - Update the default admin role: [#6310](https://github.com/owncloud/ocis/pull/6310)
-
-   The admin role was missing two permissions. We added them to make the space admin role a subset of
-   the admin role. This matches better with the default user expectations.
-
-   https://github.com/owncloud/ocis/pull/6310
-
-* Enhancement - Add specific result to antivirus for debugging: [#6265](https://github.com/owncloud/ocis/pull/6265)
-
-   We added the ability to define a specific result for the virus scanner via env-var
-   (ANTIVIRUS_DEBUG_SCAN_OUTCOME)
-
-   https://github.com/owncloud/ocis/pull/6265
-
-* Enhancement - Update Reva to 2.13.3: [#6305](https://github.com/owncloud/ocis/pull/6305)
-
-   Changelog for reva 2.13.3 (2023-05-17) =======================================
-
-  *   Bugfix [cs3org/reva#3890](https://github.com/cs3org/reva/pull/3890): Bring back public link sharing of project space roots
-  *   Bugfix [cs3org/reva#3888](https://github.com/cs3org/reva/pull/3888): We fixed a bug that unnecessarily fetched all members of a group
-  *   Bugfix [cs3org/reva#3886](https://github.com/cs3org/reva/pull/3886): Decomposedfs no longer deadlocks when cache is disabled
-  *   Bugfix [cs3org/reva#3892](https://github.com/cs3org/reva/pull/3892): Fix public links
-  *   Bugfix [cs3org/reva#3876](https://github.com/cs3org/reva/pull/3876): Remove go-micro/store/redis specific workaround
-  *   Bugfix [cs3org/reva#3889](https://github.com/cs3org/reva/pull/3889): Update space root mtime when changing space metadata
-  *   Bugfix [cs3org/reva#3836](https://github.com/cs3org/reva/pull/3836): Fix spaceID in the decomposedFS
-  *   Bugfix [cs3org/reva#3867](https://github.com/cs3org/reva/pull/3867): Restore last version after positive result
-  *   Bugfix [cs3org/reva#3849](https://github.com/cs3org/reva/pull/3849): Prevent sharing space roots and personal spaces
-  *   Enhancement [cs3org/reva#3865](https://github.com/cs3org/reva/pull/3865): Remove unneccessary code from gateway
-  *   Enhancement [cs3org/reva#3895](https://github.com/cs3org/reva/pull/3895): Add missing expiry date to shares
-
-   https://github.com/owncloud/ocis/pull/6305
-   https://github.com/owncloud/ocis/pull/6339
 
 * Enhancement - Default LDAP write to true: [#6362](https://github.com/owncloud/ocis/pull/6362)
 
@@ -100,35 +17,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/6362
 
-* Enhancement - Graph user capabilities: [#6339](https://github.com/owncloud/ocis/pull/6339)
-
-   Adds capablities to show if users are writeable in LDAP so clients can block their specific
-   fields
-
-   https://github.com/owncloud/ocis/pull/6339
-
 * Enhancement - Configurable ID Cache: [#6353](https://github.com/owncloud/ocis/pull/6353)
 
    Makes the integrated idcache (used to reduce reads from disc) configurable with the general
    cache envvars
 
    https://github.com/owncloud/ocis/pull/6353
-
-* Enhancement - Add Store to `postprocessing`: [#6281](https://github.com/owncloud/ocis/pull/6281)
-
-   Add a gomicro store for the postprocessing service. Needed to run multiple postprocessing
-   instances
-
-   https://github.com/owncloud/ocis/pull/6281
-
-* Enhancement - Remove quota from share jails api responses: [#6309](https://github.com/owncloud/ocis/pull/6309)
-
-   We have removed the quota object from api responses for share jails, which would permanently
-   show exceeded due to restrictions in the permission system.
-
-   https://github.com/owncloud/ocis/issues/4472
-   https://github.com/owncloud/ocis/pull/6309
-# Changelog for [3.0.0] (2023-05-08)
+# Changelog for [3.0.0] (2023-05-22)
 
 The following sections list the changes for 3.0.0.
 
@@ -140,23 +35,30 @@ The following sections list the changes for 3.0.0.
 * Bugfix - Allow selected updates on graph users: [#6233](https://github.com/owncloud/ocis/pull/6233)
 * Bugfix - Disassociate users from deleted school: [#5343](https://github.com/owncloud/ocis/pull/5343)
 * Bugfix - Fix default role assignment for demo users: [#3432](https://github.com/owncloud/ocis/issues/3432)
+* Bugfix - Reduced default TTL of user and group caches in graph API: [#6320](https://github.com/owncloud/ocis/issues/6320)
 * Bugfix - Fix so that PATCH requests for groups actually updates the group name: [#5949](https://github.com/owncloud/ocis/pull/5949)
+* Bugfix - Use UUID attribute for computing "sub" claim in lico idp: [#904](https://github.com/owncloud/ocis/issues/904)
 * Bugfix - Hide the existence of space when deleting/updating: [#5031](https://github.com/owncloud/ocis/issues/5031)
 * Bugfix - Fix OIDC auth cache: [#5997](https://github.com/owncloud/ocis/pull/5997)
+* Bugfix - Fix the empty string givenName attribute when creating user: [#5431](https://github.com/owncloud/ocis/issues/5431)
 * Bugfix - Fix Postprocessing events: [#5269](https://github.com/owncloud/ocis/pull/5269)
 * Bugfix - Fix Search reindexing performance regression: [#6085](https://github.com/owncloud/ocis/pull/6085)
 * Bugfix - Fix Search tag indexing: [#5405](https://github.com/owncloud/ocis/pull/5405)
+* Bugfix - Fix the wrong status code when appRoleAssignments is forbidden: [#6037](https://github.com/owncloud/ocis/issues/6037)
 * Bugfix - Fix user type config for user provider: [#6027](https://github.com/owncloud/ocis/pull/6027)
 * Bugfix - Fix userlog panic: [#6114](https://github.com/owncloud/ocis/pull/6114)
 * Bugfix - Fix Logout Url config name: [#6227](https://github.com/owncloud/ocis/pull/6227)
 * Bugfix - Add missing CORS config: [#5987](https://github.com/owncloud/ocis/pull/5987)
+* Bugfix - Add missing response to blocked requests: [#6277](https://github.com/owncloud/ocis/pull/6277)
 * Bugfix - Populate expanded properties: [#5421](https://github.com/owncloud/ocis/pull/5421)
 * Bugfix - Add portrait thumbnail resolutions: [#5656](https://github.com/owncloud/ocis/pull/5656)
+* Bugfix - Update the default admin role: [#6310](https://github.com/owncloud/ocis/pull/6310)
 * Bugfix - Fix authenticate headers for API requests: [#5992](https://github.com/owncloud/ocis/pull/5992)
 * Change - Bump libregraph lico: [#5768](https://github.com/owncloud/ocis/pull/5768)
 * Change - Updated Cache Configuration: [#5829](https://github.com/owncloud/ocis/pull/5829)
 * Change - Remove the settings ui: [#5463](https://github.com/owncloud/ocis/pull/5463)
 * Change - Do not share versions: [#5531](https://github.com/owncloud/ocis/pull/5531)
+* Enhancement - Add specific result to antivirus for debugging: [#6265](https://github.com/owncloud/ocis/pull/6265)
 * Enhancement - Add debug server to audit: [#6178](https://github.com/owncloud/ocis/pull/6178)
 * Enhancement - Add debug server to idm: [#6153](https://github.com/owncloud/ocis/pull/6153)
 * Enhancement - Add debug server to postprocessing: [#6203](https://github.com/owncloud/ocis/pull/6203)
@@ -175,7 +77,7 @@ The following sections list the changes for 3.0.0.
 * Enhancement - Add endpoints to upload a custom logo: [#5735](https://github.com/owncloud/ocis/pull/5735)
 * Enhancement - Bump go-ldap version: [#6004](https://github.com/owncloud/ocis/pull/6004)
 * Enhancement - Bump libre-graph-api-go: [#5309](https://github.com/owncloud/ocis/pull/5309)
-* Enhancement - Update Reva to version 2.13.2: [#6205](https://github.com/owncloud/ocis/pull/6205)
+* Enhancement - Update Reva to version 2.13.3 and beyond: [#6205](https://github.com/owncloud/ocis/pull/6205)
 * Enhancement - Collect global envvars: [#5367](https://github.com/owncloud/ocis/pull/5367)
 * Enhancement - Make the settings bundles part of the service config: [#5589](https://github.com/owncloud/ocis/pull/5589)
 * Enhancement - Configure GRPC in ocs: [#6022](https://github.com/owncloud/ocis/pull/6022)
@@ -195,6 +97,7 @@ The following sections list the changes for 3.0.0.
 * Enhancement - Expiration Notifications: [#5330](https://github.com/owncloud/ocis/pull/5330)
 * Enhancement - GDPR Export: [#6064](https://github.com/owncloud/ocis/pull/6064)
 * Enhancement - Make graph/education API errors more consistent: [#5682](https://github.com/owncloud/ocis/pull/5682)
+* Enhancement - Graph user capabilities: [#6339](https://github.com/owncloud/ocis/pull/6339)
 * Enhancement - Add endpoint to list permissions: [#5594](https://github.com/owncloud/ocis/pull/5594)
 * Enhancement - Notifications: [#6038](https://github.com/owncloud/ocis/pull/6038)
 * Enhancement - Open Debug endpoint for Nats: [#5002](https://github.com/owncloud/ocis/issues/5002)
@@ -203,8 +106,10 @@ The following sections list the changes for 3.0.0.
 * Enhancement - Add a capability for the Personal Data export: [#5984](https://github.com/owncloud/ocis/pull/5984)
 * Enhancement - Introduce policies-service: [#5714](https://github.com/owncloud/ocis/pull/5714)
 * Enhancement - Better config for postprocessing service: [#5457](https://github.com/owncloud/ocis/pull/5457)
+* Enhancement - Add Store to `postprocessing`: [#6281](https://github.com/owncloud/ocis/pull/6281)
 * Enhancement - Add config option to enforce passwords on public links: [#5848](https://github.com/owncloud/ocis/pull/5848)
 * Enhancement - Add new permission for public links: [#5690](https://github.com/owncloud/ocis/pull/5690)
+* Enhancement - Remove quota from share jails api responses: [#6309](https://github.com/owncloud/ocis/pull/6309)
 * Enhancement - Added possibility to assign roles based on OIDC claims: [#6048](https://github.com/owncloud/ocis/pull/6048)
 * Enhancement - Added option to configure default quota per role: [#5616](https://github.com/owncloud/ocis/pull/5616)
 * Enhancement - Add optional services to the runtime: [#6071](https://github.com/owncloud/ocis/pull/6071)
@@ -212,7 +117,7 @@ The following sections list the changes for 3.0.0.
 * Enhancement - Add expiration to user and group shares: [#5389](https://github.com/owncloud/ocis/pull/5389)
 * Enhancement - Space Management permissions: [#5441](https://github.com/owncloud/ocis/pull/5441)
 * Enhancement - Cli to purge expired trash-bin items: [#5500](https://github.com/owncloud/ocis/pull/5500)
-* Enhancement - Update web to v7.0.0-rc.36: [#6234](https://github.com/owncloud/ocis/pull/6234)
+* Enhancement - Update web to v7.0.0-rc.37: [#6294](https://github.com/owncloud/ocis/pull/6294)
 * Enhancement - Use Accept-Language Header: [#5918](https://github.com/owncloud/ocis/pull/5918)
 * Enhancement - Use gotext master: [#5867](https://github.com/owncloud/ocis/pull/5867)
 * Enhancement - Userlog: [#5699](https://github.com/owncloud/ocis/pull/5699)
@@ -253,9 +158,27 @@ The following sections list the changes for 3.0.0.
 
    https://github.com/owncloud/ocis/issues/3432
 
+* Bugfix - Reduced default TTL of user and group caches in graph API: [#6320](https://github.com/owncloud/ocis/issues/6320)
+
+   We reduced the default TTL of the cache for user and group information on the /drives endpoints
+   to 60 seconds. This fixes in issue where outdated information was show on the spaces list for a
+   very long time.
+
+   https://github.com/owncloud/ocis/issues/6320
+
 * Bugfix - Fix so that PATCH requests for groups actually updates the group name: [#5949](https://github.com/owncloud/ocis/pull/5949)
 
    https://github.com/owncloud/ocis/pull/5949
+
+* Bugfix - Use UUID attribute for computing "sub" claim in lico idp: [#904](https://github.com/owncloud/ocis/issues/904)
+
+   By default the LDAP backend for lico uses the User DN for computing the "sub" claim of a user. This
+   caused the "sub" claim to stay the same even if a user was deleted and recreated (and go a new UUID
+   assgined with that). We now use the user's unique id (`owncloudUUID` by default) for computing
+   the `sub` claim. So that user's recreated with the same name will be treated as different users
+   by the IDP.
+
+   https://github.com/owncloud/ocis/issues/904
 
 * Bugfix - Hide the existence of space when deleting/updating: [#5031](https://github.com/owncloud/ocis/issues/5031)
 
@@ -269,6 +192,13 @@ The following sections list the changes for 3.0.0.
    We've fixed an issue rendering the OIDC auth cache useless.
 
    https://github.com/owncloud/ocis/pull/5997
+
+* Bugfix - Fix the empty string givenName attribute when creating user: [#5431](https://github.com/owncloud/ocis/issues/5431)
+
+   Omitempty givenName attribute when creating user
+
+   https://github.com/owncloud/ocis/issues/5431
+   https://github.com/owncloud/ocis/pull/6259
 
 * Bugfix - Fix Postprocessing events: [#5269](https://github.com/owncloud/ocis/pull/5269)
 
@@ -288,6 +218,14 @@ The following sections list the changes for 3.0.0.
    We've fixed an issue where search is not able to index tags for space resources.
 
    https://github.com/owncloud/ocis/pull/5405
+
+* Bugfix - Fix the wrong status code when appRoleAssignments is forbidden: [#6037](https://github.com/owncloud/ocis/issues/6037)
+
+   Fix the wrong status code when appRoleAssignments is forbidden in the
+   CreateAppRoleAssignment and DeleteAppRoleAssignment methods.
+
+   https://github.com/owncloud/ocis/issues/6037
+   https://github.com/owncloud/ocis/pull/6276
 
 * Bugfix - Fix user type config for user provider: [#6027](https://github.com/owncloud/ocis/pull/6027)
 
@@ -313,6 +251,12 @@ The following sections list the changes for 3.0.0.
 
    https://github.com/owncloud/ocis/pull/5987
 
+* Bugfix - Add missing response to blocked requests: [#6277](https://github.com/owncloud/ocis/pull/6277)
+
+   We added the missing response body to requests which were blocked by the policy engine.
+
+   https://github.com/owncloud/ocis/pull/6277
+
 * Bugfix - Populate expanded properties: [#5421](https://github.com/owncloud/ocis/pull/5421)
 
    We now return an empty array when an expanded relation has no entries. This makes consuming the
@@ -329,6 +273,13 @@ The following sections list the changes for 3.0.0.
    web viewer.
 
    https://github.com/owncloud/ocis/pull/5656
+
+* Bugfix - Update the default admin role: [#6310](https://github.com/owncloud/ocis/pull/6310)
+
+   The admin role was missing two permissions. We added them to make the space admin role a subset of
+   the admin role. This matches better with the default user expectations.
+
+   https://github.com/owncloud/ocis/pull/6310
 
 * Bugfix - Fix authenticate headers for API requests: [#5992](https://github.com/owncloud/ocis/pull/5992)
 
@@ -374,6 +325,13 @@ The following sections list the changes for 3.0.0.
    in spaces with the "Editor" or "Manager" role can still see versions and work with them.
 
    https://github.com/owncloud/ocis/pull/5531
+
+* Enhancement - Add specific result to antivirus for debugging: [#6265](https://github.com/owncloud/ocis/pull/6265)
+
+   We added the ability to define a specific result for the virus scanner via env-var
+   (ANTIVIRUS_DEBUG_SCAN_OUTCOME)
+
+   https://github.com/owncloud/ocis/pull/6265
 
 * Enhancement - Add debug server to audit: [#6178](https://github.com/owncloud/ocis/pull/6178)
 
@@ -505,9 +463,31 @@ The following sections list the changes for 3.0.0.
    https://github.com/owncloud/ocis/pull/5309
    https://github.com/owncloud/ocis/pull/5312
 
-* Enhancement - Update Reva to version 2.13.2: [#6205](https://github.com/owncloud/ocis/pull/6205)
+* Enhancement - Update Reva to version 2.13.3 and beyond: [#6205](https://github.com/owncloud/ocis/pull/6205)
 
-   Changelog for reva 2.13.2 (2023-05-08) =======================================
+   Changelog for reva unreleased =======================================
+
+  *   Bugfix [cs3org/reva#3899](https://github.com/cs3org/reva/pull/3899): Harden uploads
+  *   Enhancement [cs3org/reva#3893](https://github.com/cs3org/reva/pull/3893): Cleanup Space Delete permissions
+  *   Enhancement [cs3org/reva#3898](https://github.com/cs3org/reva/pull/3898): Add Graph User capabilities
+
+   Changelog for reva 2.13.3 (2023-05-17) =======================================
+
+  *   Bugfix [cs3org/reva#3890](https://github.com/cs3org/reva/pull/3890): Bring back public link sharing of project space roots
+  *   Bugfix [cs3org/reva#3888](https://github.com/cs3org/reva/pull/3888): We fixed a bug that unnecessarily fetched all members of a group
+  *   Bugfix [cs3org/reva#3886](https://github.com/cs3org/reva/pull/3886): Decomposedfs no longer deadlocks when cache is disabled
+  *   Bugfix [cs3org/reva#3892](https://github.com/cs3org/reva/pull/3892): Fix public links
+  *   Bugfix [cs3org/reva#3876](https://github.com/cs3org/reva/pull/3876): Remove go-micro/store/redis specific workaround
+  *   Bugfix [cs3org/reva#3889](https://github.com/cs3org/reva/pull/3889): Update space root mtime when changing space metadata
+  *   Bugfix [cs3org/reva#3836](https://github.com/cs3org/reva/pull/3836): Fix spaceID in the decomposedFS
+  *   Bugfix [cs3org/reva#3867](https://github.com/cs3org/reva/pull/3867): Restore last version after positive result
+  *   Bugfix [cs3org/reva#3849](https://github.com/cs3org/reva/pull/3849): Prevent sharing space roots and personal spaces
+  *   Enhancement [cs3org/reva#3865](https://github.com/cs3org/reva/pull/3865): Remove unneccessary code from gateway
+  *   Enhancement [cs3org/reva#3895](https://github.com/cs3org/reva/pull/3895): Add missing expiry date to shares
+
+   Https://github.com/owncloud/ocis/pull/6305
+   https://github.com/owncloud/ocis/pull/6339 Changelog for reva 2.13.2 (2023-05-08)
+   =======================================
 
   *   Bugfix [cs3org/reva#3845](https://github.com/cs3org/reva/pull/3845): Fix propagation
   *   Bugfix [cs3org/reva#3856](https://github.com/cs3org/reva/pull/3856): Fix response code
@@ -757,6 +737,13 @@ The following sections list the changes for 3.0.0.
    https://github.com/owncloud/ocis/issues/5660
    https://github.com/owncloud/ocis/pull/5682
 
+* Enhancement - Graph user capabilities: [#6339](https://github.com/owncloud/ocis/pull/6339)
+
+   Adds capablities to show if users are writeable in LDAP so clients can block their specific
+   fields
+
+   https://github.com/owncloud/ocis/pull/6339
+
 * Enhancement - Add endpoint to list permissions: [#5594](https://github.com/owncloud/ocis/pull/5594)
 
    We added 'https://cloud.ocis.test/api/v0/settings/permissions-list' to retrieve all
@@ -834,6 +821,13 @@ The following sections list the changes for 3.0.0.
 
    https://github.com/owncloud/ocis/pull/5457
 
+* Enhancement - Add Store to `postprocessing`: [#6281](https://github.com/owncloud/ocis/pull/6281)
+
+   Add a gomicro store for the postprocessing service. Needed to run multiple postprocessing
+   instances
+
+   https://github.com/owncloud/ocis/pull/6281
+
 * Enhancement - Add config option to enforce passwords on public links: [#5848](https://github.com/owncloud/ocis/pull/5848)
 
    Added a new config option to enforce passwords on public links with "Uploader, Editor,
@@ -853,6 +847,14 @@ The following sections list the changes for 3.0.0.
    Added a new permission 'PublicLink.Write' to check if a user can create or update public links.
 
    https://github.com/owncloud/ocis/pull/5690
+
+* Enhancement - Remove quota from share jails api responses: [#6309](https://github.com/owncloud/ocis/pull/6309)
+
+   We have removed the quota object from api responses for share jails, which would permanently
+   show exceeded due to restrictions in the permission system.
+
+   https://github.com/owncloud/ocis/issues/4472
+   https://github.com/owncloud/ocis/pull/6309
 
 * Enhancement - Added possibility to assign roles based on OIDC claims: [#6048](https://github.com/owncloud/ocis/pull/6048)
 
@@ -938,14 +940,15 @@ The following sections list the changes for 3.0.0.
    https://github.com/owncloud/ocis/issues/5499
    https://github.com/owncloud/ocis/pull/5500
 
-* Enhancement - Update web to v7.0.0-rc.36: [#6234](https://github.com/owncloud/ocis/pull/6234)
+* Enhancement - Update web to v7.0.0-rc.37: [#6294](https://github.com/owncloud/ocis/pull/6294)
 
    Tags: web
 
-   We updated ownCloud Web to v7.0.0-rc.36. Please refer to the changelog (linked) for details on
+   We updated ownCloud Web to v7.0.0-rc.37. Please refer to the changelog (linked) for details on
    the web release.
 
   * Bugfix [owncloud/web#6423](https://github.com/owncloud/web/issues/6423): Archiver in protected public links
+  * Bugfix [owncloud/web#6434](https://github.com/owncloud/web/issues/6434): Endless lazy loading indicator after sorting file table
   * Bugfix [owncloud/web#6731](https://github.com/owncloud/web/issues/6731): Layout with long breadcrumb
   * Bugfix [owncloud/web#6768](https://github.com/owncloud/web/issues/6768): Pagination after increasing items per page
   * Bugfix [owncloud/web#7513](https://github.com/owncloud/web/issues/7513): Calendar popup position in right sidebar
@@ -997,6 +1000,10 @@ The following sections list the changes for 3.0.0.
   * Bugfix [owncloud/web#8864](https://github.com/owncloud/web/pull/8864): Public link empty password stays forever
   * Bugfix [owncloud/web#8880](https://github.com/owncloud/web/issues/8880): Sidebar header after deleting resource
   * Bugfix [owncloud/web#8928](https://github.com/owncloud/web/issues/8928): Infinite login redirect
+  * Bugfix [owncloud/web#8987](https://github.com/owncloud/web/pull/8987): Limit amount of concurrent tus requests
+  * Bugfix [owncloud/web#8992](https://github.com/owncloud/web/pull/8992): Personal space name after language change
+  * Bugfix [owncloud/web#9004](https://github.com/owncloud/web/issues/9004): Endless loading when encountering a public link error
+  * Bugfix [owncloud/web#9015](https://github.com/owncloud/web/pull/9015): Prevent "virtual" spaces from being displayed in the UI
   * Change [owncloud/web#6661](https://github.com/owncloud/web/issues/6661): Streamline new tab handling in extensions
   * Change [owncloud/web#7948](https://github.com/owncloud/web/issues/7948): Update Vue to v3.2
   * Change [owncloud/web#8431](https://github.com/owncloud/web/pull/8431): Remove permission manager
@@ -1085,8 +1092,8 @@ The following sections list the changes for 3.0.0.
   * Enhancement [owncloud/web#8898](https://github.com/owncloud/web/pull/8898): Rename "Quicklink" to "link"
   * Enhancement [owncloud/web#8911](https://github.com/owncloud/web/pull/8911): Add notification setting to account page
 
-   https://github.com/owncloud/ocis/pull/6234
-   https://github.com/owncloud/web/releases/tag/v7.0.0-rc.36
+   https://github.com/owncloud/ocis/pull/6294
+   https://github.com/owncloud/web/releases/tag/v7.0.0-rc.37
 
 * Enhancement - Use Accept-Language Header: [#5918](https://github.com/owncloud/ocis/pull/5918)
 
