@@ -518,3 +518,193 @@ Feature: user GDPR (General Data Protection Regulation) report
       | Admin       | User        |
       | Admin       | Guest       |
       | Admin       | Admin       |
+
+
+  Scenario: generate a GDPR report and check events when user creates a folder
+    Given user "Alice" has created folder "/folderMain"
+    When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
+    And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
+    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    And the downloaded JSON content should contain event type "events.ContainerCreated" in item 'events' and should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "event"
+      ],
+      "properties": {
+        "event" : {
+          "type": "object",
+          "required": [
+            "Executant",
+            "Owner",
+            "Ref",
+            "SpaceOwner"
+          ],
+          "properties": {
+            "Executant": {
+                "type": "object",
+                "required": [
+                  "idp",
+                  "opaque_id",
+                  "type"
+                ],
+                "properties": {
+                  "idp": {
+                    "type": "string",
+                    "pattern": "^%base_url%$"
+                  },
+                  "opaque_id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  },
+                  "type": {
+                    "type": "number",
+                    "enum": [1]
+                  }
+                }
+              },
+            "Ref": {
+              "type": "object",
+              "required": [
+                "path",
+                "resource_id"
+              ],
+              "properties": {
+                "path" : {
+                  "type": "string",
+                  "enum": ["./folderMain"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
+
+  Scenario: generate a GDPR report and check events when user share a file
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has uploaded file with content "sample text" to "lorem.txt"
+    And user "Alice" has shared file "lorem.txt" with user "Brian"
+    When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
+    And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
+    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    And the downloaded JSON content should contain event type "events.ShareCreated" in item 'events' and should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "event"
+      ],
+      "properties": {
+        "event" : {
+          "type": "object",
+          "required": [
+            "CTime",
+            "Executant",
+            "GranteeGroupID",
+            "GranteeUserID",
+            "ItemID",
+            "Permissions",
+            "ShareID",
+            "Sharee",
+            "Sharer"
+          ],
+          "properties": {
+            "GranteeGroupID": {
+              "type": ["number", "null"],
+              "enum": [null]
+            },
+            "Permissions": {
+              "type": "object",
+              "required": [
+                "permissions"
+              ],
+              "properties": {
+                "permissions": {
+                  "type": "object",
+                  "required": [
+                    "add_grant",
+                    "get_path",
+                    "get_quota",
+                    "initiate_file_download",
+                    "list_container",
+                    "list_recycle",
+                    "stat"
+                  ],
+                  "properties": {
+                    "add_grant" : {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "get_path" : {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "get_quota" : {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "initiate_file_download" : {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "list_container" : {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "list_recycle" : {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "stat" : {
+                      "type": "boolean",
+                      "enum": [true]
+                    }
+                  }
+                }
+              }
+            },
+            "ShareID": {
+              "type": "object",
+              "required": [
+                "opaque_id"
+              ],
+              "properties": {
+                "type": "object",
+                "pattern": "^%user_id_pattern%:%user_id_pattern%:%user_id_pattern%$"
+              }
+            },
+            "Sharee": {
+              "type": ["number", "null"],
+              "enum": [null]
+            },
+            "Sharer": {
+              "type": "object",
+                "required": [
+                  "idp",
+                  "opaque_id",
+                  "type"
+                ],
+                "properties": {
+                  "idp": {
+                    "type": "string",
+                    "pattern": "^%base_url%$"
+                  },
+                  "opaque_id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  },
+                  "type": {
+                    "type": "number",
+                    "enum": [1]
+                  }
+                }
+            }
+          }
+        }
+      }
+    }
+    """
