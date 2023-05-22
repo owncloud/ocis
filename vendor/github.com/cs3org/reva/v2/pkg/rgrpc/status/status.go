@@ -144,6 +144,15 @@ func NewConflict(ctx context.Context, err error, msg string) *rpc.Status {
 	}
 }
 
+// NewLocked returns a status Code_CODE_LOCKED
+func NewLocked(ctx context.Context, msg string) *rpc.Status {
+	return &rpc.Status{
+		Code:    rpc.Code_CODE_LOCKED,
+		Message: msg,
+		Trace:   getTrace(ctx),
+	}
+}
+
 // NewStatusFromErrType returns a status that corresponds to the given errtype
 func NewStatusFromErrType(ctx context.Context, msg string, err error) *rpc.Status {
 	switch e := err.(type) {
@@ -161,7 +170,7 @@ func NewStatusFromErrType(ctx context.Context, msg string, err error) *rpc.Statu
 	case errtypes.Locked:
 		// FIXME a locked error returns the current lockid
 		// FIXME use NewAborted as per the rpc code docs
-		return NewPermissionDenied(ctx, e, msg+": "+err.Error())
+		return NewLocked(ctx, msg+": "+err.Error())
 	case errtypes.Aborted:
 		return NewAborted(ctx, e, msg+": "+err.Error())
 	case errtypes.PreconditionFailed:
@@ -231,6 +240,7 @@ var httpStatusCode = map[rpc.Code]int{
 	rpc.Code_CODE_UNAVAILABLE:          http.StatusServiceUnavailable,
 	rpc.Code_CODE_UNIMPLEMENTED:        http.StatusNotImplemented,
 	rpc.Code_CODE_UNKNOWN:              http.StatusInternalServerError,
+	rpc.Code_CODE_LOCKED:               http.StatusLocked,
 }
 
 // HTTPStatusFromCode returns an HTTP status code for the rpc code. It returns

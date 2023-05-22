@@ -1453,6 +1453,12 @@ func (h *Handler) createCs3Share(ctx context.Context, w http.ResponseWriter, r *
 				Message: createShareResponse.Status.Message,
 				Error:   nil,
 			}
+		case rpc.Code_CODE_LOCKED:
+			return nil, &ocsError{
+				Code:    response.MetaLocked.StatusCode,
+				Message: response.MessageLockedForSharing,
+				Error:   nil,
+			}
 		default:
 			return nil, &ocsError{
 				Code:    response.MetaServerError.StatusCode,

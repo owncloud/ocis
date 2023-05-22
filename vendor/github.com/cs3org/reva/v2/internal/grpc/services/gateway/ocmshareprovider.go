@@ -345,12 +345,12 @@ func (s *svc) UpdateReceivedOCMShare(ctx context.Context, req *ocm.UpdateReceive
 							},
 						},
 					}
-					req := &datatx.PullTransferRequest{
+					req := &datatx.CreateTransferRequest{
 						SrcTargetUri:  srcTargetURI,
 						DestTargetUri: destTargetURI,
 						Opaque:        opaqueObj,
 					}
-					res, err := s.PullTransfer(ctx, req)
+					res, err := s.CreateTransfer(ctx, req)
 					if err != nil {
 						log.Err(err).Msg("gateway: error calling PullTransfer")
 						return &ocm.UpdateReceivedOCMShareResponse{

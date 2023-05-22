@@ -92,7 +92,7 @@ func (s *svc) handleSpacesTusPost(w http.ResponseWriter, r *http.Request, spaceI
 
 func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.Request, meta map[string]string, ref *provider.Reference, log zerolog.Logger) {
 	w.Header().Add(net.HeaderAccessControlAllowHeaders, strings.Join([]string{net.HeaderTusResumable, net.HeaderUploadLength, net.HeaderUploadMetadata, net.HeaderIfMatch}, ", "))
-	w.Header().Add(net.HeaderAccessControlExposeHeaders, strings.Join([]string{net.HeaderTusResumable, net.HeaderLocation}, ", "))
+	w.Header().Add(net.HeaderAccessControlExposeHeaders, strings.Join([]string{net.HeaderTusResumable, net.HeaderUploadOffset, net.HeaderLocation}, ", "))
 	w.Header().Set(net.HeaderTusExtension, "creation,creation-with-upload,checksum,expiration")
 
 	w.Header().Set(net.HeaderTusResumable, "1.0.0")

@@ -127,6 +127,9 @@ var MetaBadRequest = Meta{Status: "error", StatusCode: 400, Message: "Bad Reques
 // MetaPathNotFound is returned when trying to share not existing resources
 var MetaPathNotFound = Meta{Status: "failure", StatusCode: 404, Message: MessagePathNotFound}
 
+// MetaLocked is returned when trying to share not existing resources
+var MetaLocked = Meta{Status: "failure", StatusCode: 423, Message: "The file is locked"}
+
 // MetaServerError is returned on server errors
 var MetaServerError = Meta{Status: "error", StatusCode: 996, Message: "Server Error"}
 
@@ -150,6 +153,9 @@ var MessagePathNotFound = "Wrong path, file/folder doesn't exist"
 
 // MessageShareExists is used when a user tries to create a new share for the same user
 var MessageShareExists = "A share for the recipient already exists"
+
+// MessageLockedForSharing is used when a user tries to create a new share until the file is in use by at least one user
+var MessageLockedForSharing = "The file is locked until the file is in use by at least one user"
 
 // WriteOCSSuccess handles writing successful ocs response data
 func WriteOCSSuccess(w http.ResponseWriter, r *http.Request, d interface{}) {

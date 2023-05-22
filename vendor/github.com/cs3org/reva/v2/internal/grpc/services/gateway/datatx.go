@@ -27,15 +27,15 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (s *svc) PullTransfer(ctx context.Context, req *datatx.PullTransferRequest) (*datatx.PullTransferResponse, error) {
+func (s *svc) CreateTransfer(ctx context.Context, req *datatx.CreateTransferRequest) (*datatx.CreateTransferResponse, error) {
 	c, err := pool.GetDataTxClient(s.c.DataTxEndpoint)
 	if err != nil {
-		return &datatx.PullTransferResponse{
+		return &datatx.CreateTransferResponse{
 			Status: status.NewInternal(ctx, "error getting data transfer client"),
 		}, nil
 	}
 
-	res, err := c.PullTransfer(ctx, req)
+	res, err := c.CreateTransfer(ctx, req)
 	if err != nil {
 		return nil, errors.Wrap(err, "gateway: error calling PullTransfer")
 	}

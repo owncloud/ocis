@@ -393,7 +393,7 @@ func (s *svc) doPatch(w http.ResponseWriter, r *http.Request) {
 func copyHeader(dst, src http.Header) {
 	for key, values := range src {
 		for i := range values {
-			dst.Add(key, values[i])
+			dst.Set(key, values[i])
 		}
 	}
 }
