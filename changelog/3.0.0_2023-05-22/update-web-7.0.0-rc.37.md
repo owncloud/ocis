@@ -1,10 +1,11 @@
-Enhancement: Update web to v7.0.0-rc.36
+Enhancement: Update web to v7.0.0-rc.37
 
 Tags: web
 
-We updated ownCloud Web to v7.0.0-rc.36. Please refer to the changelog (linked) for details on the web release.
+We updated ownCloud Web to v7.0.0-rc.37. Please refer to the changelog (linked) for details on the web release.
 
 * Bugfix [owncloud/web#6423](https://github.com/owncloud/web/issues/6423): Archiver in protected public links
+* Bugfix [owncloud/web#6434](https://github.com/owncloud/web/issues/6434): Endless lazy loading indicator after sorting file table
 * Bugfix [owncloud/web#6731](https://github.com/owncloud/web/issues/6731): Layout with long breadcrumb
 * Bugfix [owncloud/web#6768](https://github.com/owncloud/web/issues/6768): Pagination after increasing items per page
 * Bugfix [owncloud/web#7513](https://github.com/owncloud/web/issues/7513): Calendar popup position in right sidebar
@@ -56,6 +57,10 @@ We updated ownCloud Web to v7.0.0-rc.36. Please refer to the changelog (linked) 
 * Bugfix [owncloud/web#8864](https://github.com/owncloud/web/pull/8864): Public link empty password stays forever
 * Bugfix [owncloud/web#8880](https://github.com/owncloud/web/issues/8880): Sidebar header after deleting resource
 * Bugfix [owncloud/web#8928](https://github.com/owncloud/web/issues/8928): Infinite login redirect
+* Bugfix [owncloud/web#8987](https://github.com/owncloud/web/pull/8987): Limit amount of concurrent tus requests
+* Bugfix [owncloud/web#8992](https://github.com/owncloud/web/pull/8992): Personal space name after language change
+* Bugfix [owncloud/web#9004](https://github.com/owncloud/web/issues/9004): Endless loading when encountering a public link error
+* Bugfix [owncloud/web#9015](https://github.com/owncloud/web/pull/9015): Prevent "virtual" spaces from being displayed in the UI
 * Change [owncloud/web#6661](https://github.com/owncloud/web/issues/6661): Streamline new tab handling in extensions
 * Change [owncloud/web#7948](https://github.com/owncloud/web/issues/7948): Update Vue to v3.2
 * Change [owncloud/web#8431](https://github.com/owncloud/web/pull/8431): Remove permission manager
@@ -144,5 +149,5 @@ We updated ownCloud Web to v7.0.0-rc.36. Please refer to the changelog (linked) 
 * Enhancement [owncloud/web#8898](https://github.com/owncloud/web/pull/8898): Rename "Quicklink" to "link"
 * Enhancement [owncloud/web#8911](https://github.com/owncloud/web/pull/8911): Add notification setting to account page
 
-https://github.com/owncloud/ocis/pull/6234
-https://github.com/owncloud/web/releases/tag/v7.0.0-rc.36
+https://github.com/owncloud/ocis/pull/6294
+https://github.com/owncloud/web/releases/tag/v7.0.0-rc.37
