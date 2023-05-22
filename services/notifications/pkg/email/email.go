@@ -55,11 +55,6 @@ func RenderEmailTemplate(mt MessageTemplate, locale string, emailTemplatePath st
 		if err != nil {
 			return nil, err
 		}
-	} else {
-		data, err = readImagesFs()
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	return &channels.Message{
@@ -95,15 +90,6 @@ func executeTemplate(tpl *template.Template, vars any) (string, error) {
 		return "", err
 	}
 	return writer.String(), nil
-}
-
-func readImagesFs() (map[string][]byte, error) {
-	dir := filepath.Join(imgDir)
-	entries, err := templatesFS.ReadDir(dir)
-	if err != nil {
-		return nil, err
-	}
-	return read(entries, templatesFS)
 }
 
 func readImages(emailTemplatePath string) (map[string][]byte, error) {
