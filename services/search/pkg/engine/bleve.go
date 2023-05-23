@@ -383,5 +383,6 @@ func formatQuery(q string) string {
 	}
 
 	// this is a basic filename search
+	cq = strings.ReplaceAll(cq, ":", `\:`)
 	return "Name:*" + strings.ReplaceAll(strings.ToLower(cq), " ", `\ `) + "*"
 }
