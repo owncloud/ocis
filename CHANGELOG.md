@@ -9,6 +9,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Default LDAP write to true: [#6362](https://github.com/owncloud/ocis/pull/6362)
 * Enhancement - Fix err when the user share the locked file: [#6357](https://github.com/owncloud/ocis/pull/6357)
 * Enhancement - Configurable ID Cache: [#6353](https://github.com/owncloud/ocis/pull/6353)
+* Enhancement - Remove the email logo: [#6359](https://github.com/owncloud/ocis/issues/6359)
 
 ## Details
 
@@ -31,6 +32,13 @@ The following sections list the changes for unreleased.
    cache envvars
 
    https://github.com/owncloud/ocis/pull/6353
+
+* Enhancement - Remove the email logo: [#6359](https://github.com/owncloud/ocis/issues/6359)
+
+   Remove the email logo
+
+   https://github.com/owncloud/ocis/issues/6359
+   https://github.com/owncloud/ocis/pull/6361
 # Changelog for [3.0.0] (2023-05-22)
 
 The following sections list the changes for 3.0.0.
