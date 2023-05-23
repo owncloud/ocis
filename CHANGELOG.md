@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Default LDAP write to true: [#6362](https://github.com/owncloud/ocis/pull/6362)
+* Enhancement - Fix err when the user share the locked file: [#6357](https://github.com/owncloud/ocis/pull/6357)
 * Enhancement - Configurable ID Cache: [#6353](https://github.com/owncloud/ocis/pull/6353)
 
 ## Details
@@ -16,6 +17,13 @@ The following sections list the changes for unreleased.
    Default `OCIS_LDAP_SERVER_WRITE_ENABLED` to true
 
    https://github.com/owncloud/ocis/pull/6362
+
+* Enhancement - Fix err when the user share the locked file: [#6357](https://github.com/owncloud/ocis/pull/6357)
+
+   Fix unexpected behavior when the user try to share the locked file
+
+   https://github.com/owncloud/ocis/issues/6197
+   https://github.com/owncloud/ocis/pull/6357
 
 * Enhancement - Configurable ID Cache: [#6353](https://github.com/owncloud/ocis/pull/6353)
 
