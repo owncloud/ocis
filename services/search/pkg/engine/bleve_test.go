@@ -215,14 +215,14 @@ var _ = Describe("Bleve", func() {
 				}
 			})
 
-			It("uses a lower-case index", func() {
+			It("does a case-insensitive search", func() {
 				parentResource.Document.Name = "foo.pdf"
 
 				err := eng.Upsert(parentResource.ID, parentResource)
 				Expect(err).ToNot(HaveOccurred())
 
 				assertDocCount(rootResource.ID, "Name:foo*", 1)
-				assertDocCount(rootResource.ID, "Name:Foo*", 0)
+				assertDocCount(rootResource.ID, "Name:Foo*", 1)
 			})
 
 			Context("and an additional file in a subdirectory", func() {
