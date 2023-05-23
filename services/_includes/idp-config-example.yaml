@@ -63,6 +63,8 @@ clients:
 - id: web
   name: ownCloud Web app
   trusted: true
+  implicit_scopes:
+  - LibgreGraph.UUID
   secret: ""
   redirect_uris:
   - '{{OCIS_URL}}/'
@@ -74,6 +76,8 @@ clients:
 - id: xdXOt13JKxym1B1QcEncf2XDkLAexMBFwiT9j6EfhhHFJhs2KM9jbjTmf8JBXE69
   name: ownCloud desktop app
   trusted: false
+  implicit_scopes:
+  - LibgreGraph.UUID
   secret: UBntmLjC2yYCeHwsyj73Uwo9TAaecAetRwMw0xYcvNL9yRdLSUi0hUAHfvCHFeFh
   redirect_uris:
   - http://127.0.0.1
@@ -83,6 +87,8 @@ clients:
 - id: e4rAsNUSIUs0lF4nbv9FmCeUkTlV9GdgTLDH1b5uie7syb90SzEVrbN7HIpmWJeD
   name: ownCloud Android app
   trusted: false
+  implicit_scopes:
+  - LibgreGraph.UUID
   secret: dInFYGV33xKzhbRmpqQltYNdfLdJIfJ9L5ISoKhNoT9qZftpdWSP71VrpGR9pmoD
   redirect_uris:
   - oc://android.owncloud.com
@@ -91,6 +97,8 @@ clients:
 - id: mxd5OQDk6es5LzOzRvidJNfXLUZS2oN3oUFeXPP8LpPrhx3UroJFduGEYIBOxkY1
   name: ownCloud iOS app
   trusted: false
+  implicit_scopes:
+  - LibgreGraph.UUID
   secret: KFeFWWEZO9TkisIQzR3fo7hfiMXlOpaqP8CFuTbSHzV1TUuGECglPxpiVKJfOXIx
   redirect_uris:
   - oc://ios.owncloud.com
