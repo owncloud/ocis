@@ -18,13 +18,19 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
 	"github.com/r3labs/sse/v2"
+	micrometadata "go-micro.dev/v4/metadata"
 	"go-micro.dev/v4/store"
 	"google.golang.org/grpc/metadata"
 )
+
+var _defaultLocale = "en"
 
 // UserlogService is the service responsible for user activities
 type UserlogService struct {
@@ -34,6 +40,7 @@ type UserlogService struct {
 	cfg              *config.Config
 	historyClient    ehsvc.EventHistoryService
 	gatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
+	valueClient      settingssvc.ValueService
 	sse              *sse.Server
 	registeredEvents map[string]events.Unmarshaller
 	translationPath  string
@@ -62,6 +69,7 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		cfg:              o.Config,
 		historyClient:    o.HistoryClient,
 		gatewaySelector:  o.GatewaySelector,
+		valueClient:      o.ValueClient,
 		sse:              sse.New(),
 		registeredEvents: make(map[string]events.Unmarshaller),
 	}
@@ -224,7 +232,7 @@ func (ul *UserlogService) DeleteEvents(userid string, evids []string) error {
 }
 
 func (ul *UserlogService) addEventToUser(userid string, event events.Event) error {
-	loc := "en" // TODO: where to get the locale from?
+	loc := getUserLang(context.Background(), userid, ul.valueClient)
 	ev, _ := NewConverter(loc, ul.gatewaySelector, ul.cfg.MachineAuthAPIKey, ul.cfg.Service.Name, ul.cfg.TranslationPath).ConvertEvent(event.ID, event.Event)
 	b, _ := json.Marshal(ev)
 
@@ -541,4 +549,20 @@ func editor(perms *storageprovider.ResourcePermissions) bool {
 
 func manager(perms *storageprovider.ResourcePermissions) bool {
 	return perms.DenyGrant
+}
+
+func getUserLang(ctx context.Context, userid string, vs settingssvc.ValueService) string {
+	granteeCtx := micrometadata.Set(ctx, middleware.AccountID, userid)
+	if resp, err := vs.GetValueByUniqueIdentifiers(granteeCtx,
+		&settingssvc.GetValueByUniqueIdentifiersRequest{
+			AccountUuid: userid,
+			SettingId:   defaults.SettingUUIDProfileLanguage,
+		},
+	); err == nil {
+		val := resp.GetValue().GetValue().GetListValue().GetValues()
+		if len(val) > 0 && val[0] != nil {
+			return val[0].GetStringValue()
+		}
+	}
+	return _defaultLocale
 }

@@ -22,10 +22,12 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/userlog/mocks"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/service"
 	"github.com/stretchr/testify/mock"
+	"go-micro.dev/v4/client"
 	microevents "go-micro.dev/v4/events"
 	microstore "go-micro.dev/v4/store"
 	"google.golang.org/grpc"
@@ -43,6 +45,7 @@ var _ = Describe("UserlogService", func() {
 		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 
 		ehc mocks.EventHistoryService
+		vc  settingssvc.MockValueService
 	)
 
 	BeforeEach(func() {
@@ -69,6 +72,9 @@ var _ = Describe("UserlogService", func() {
 		}, Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
 		gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{User: &user.User{Id: &user.UserId{OpaqueId: "userid"}}, Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
 		gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
+		vc.GetValueByUniqueIdentifiersFunc = func(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settingssvc.GetValueResponse, error) {
+			return nil, nil
+		}
 
 		ul, err = service.NewUserlogService(
 			service.Config(cfg),
@@ -78,6 +84,7 @@ var _ = Describe("UserlogService", func() {
 			service.Mux(chi.NewMux()),
 			service.GatewaySelector(gatewaySelector),
 			service.HistoryClient(&ehc),
+			service.ValueClient(&vc),
 			service.RegisteredEvents([]events.Unmarshaller{
 				events.SpaceDisabled{},
 			}),

@@ -7,6 +7,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
 	"go-micro.dev/v4/store"
 )
@@ -23,6 +24,7 @@ type Options struct {
 	Config           *config.Config
 	HistoryClient    ehsvc.EventHistoryService
 	GatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
+	ValueClient      settingssvc.ValueService
 	RegisteredEvents []events.Unmarshaller
 }
 
@@ -79,5 +81,11 @@ func GatewaySelector(gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) 
 func RegisteredEvents(e []events.Unmarshaller) Option {
 	return func(o *Options) {
 		o.RegisteredEvents = e
+	}
+}
+
+func ValueClient(vs settingssvc.ValueService) Option {
+	return func(o *Options) {
+		o.ValueClient = vs
 	}
 }
