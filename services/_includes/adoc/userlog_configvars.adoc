@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-23-09-32-12]
+[#deprecation-note-2023-05-23-10-43-58]
 [caption=]
 .Deprecation notes for the userlog service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -254,7 +254,7 @@ Machine auth API key used to validate internal requests necessary to access reso
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-05-23-09-32-12[Deprecation Note]
+xref:deprecation-note-2023-05-23-10-43-58[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
