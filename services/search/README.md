@@ -8,7 +8,7 @@ The search service is responsible for metadata and content extraction, stores th
 ## General Considerations
 
 *   To use the search service, an event system needs to be configured for all services like NATS, which is shipped and preconfigured.
-*   The search service consumes events and does not block other tasks. 
+*   The search service consumes events and does not block other tasks.
 *   When looking for content extraction, [Apache Tika - a content analysis toolkit](https://tika.apache.org) can be used but needs to be installed separately.
 
 Extractions are stored as index via the search service. Consider that indexing requires adequate storage capacity - and the space requirement will grow. To avoid filling up the filesystem with the index and rendering Infinite Scale unusable, the index should reside on its own filesystem.
@@ -56,6 +56,8 @@ When using the Tika container and docker-compose, consider the following:
 
 *   See the [ocis_wopi](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_wopi) example.
 *   Containers for the linked service are reachable at a hostname identical to the alias or the service name if no alias was specified.
+
+If using `tika` extractor, make sure to also set `FRONTEND_FULL_TEXT_SEARCH_ENABLED` in the frontend service. This will tell the webclient that full-text search is enabled.
 
 ## Search Functionality
 
@@ -131,6 +133,6 @@ Note that not names but IDs are necessary and that the specified user ID needs a
 
 The indexing process tries to be self-healing in some situations.
 
-In the following example, let's assume a file tree `foo/bar/baz` exists.  
-If the folder `bar` gets renamed to `new-bar`, the path to `baz` is no longer `foo/bar/baz` but `foo/new-bar/baz`.  
+In the following example, let's assume a file tree `foo/bar/baz` exists.
+If the folder `bar` gets renamed to `new-bar`, the path to `baz` is no longer `foo/bar/baz` but `foo/new-bar/baz`.
 The search service checks the change and either just updates the path in the index or creates a new index for all items affected if none was present.

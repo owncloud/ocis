@@ -52,6 +52,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 		"archivers":         archivers,
 		"app_providers":     appProviders,
 		"favorites":         cfg.EnableFavorites,
+		"full_text_search":  cfg.FullTextSearch,
 	}
 
 	if cfg.DefaultUploadProtocol == "tus" {
