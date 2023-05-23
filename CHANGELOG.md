@@ -179,6 +179,8 @@ The following sections list the changes for 3.0.0.
    by the IDP.
 
    https://github.com/owncloud/ocis/issues/904
+   https://github.com/owncloud/ocis/pull/6326
+   https://github.com/owncloud/ocis/pull/6338
 
 * Bugfix - Hide the existence of space when deleting/updating: [#5031](https://github.com/owncloud/ocis/issues/5031)
 
