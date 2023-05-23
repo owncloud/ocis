@@ -584,10 +584,10 @@ Feature: user GDPR (General Data Protection Regulation) report
     """
 
 
-  Scenario: generate a GDPR report and check events when user share a file
+  Scenario: generate a GDPR report and check events when user creates a share for a folder
     Given user "Brian" has been created with default attributes and without skeleton files
-    And user "Alice" has uploaded file with content "sample text" to "lorem.txt"
-    And user "Alice" has shared file "lorem.txt" with user "Brian"
+    And user "Alice" has created folder "/folderMain"
+    And user "Alice" has shared entry "/folderMain" with user "Brian"
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
     Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
@@ -702,6 +702,106 @@ Feature: user GDPR (General Data Protection Regulation) report
                     "enum": [1]
                   }
                 }
+            }
+          }
+        }
+      }
+    }
+    """
+
+
+  Scenario: generate a GDPR report and check events when user creates a link for a resource
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has created folder "/folderMain"
+    And user "Alice" has created a public link share with settings
+      | path        | /folderMain |
+      | name        | sharedlink  |
+    When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
+    And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
+    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    And the downloaded JSON content should contain event type "events.LinkCreated" in item 'events' and should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "event"
+      ],
+      "properties": {
+        "event" : {
+          "type": "object",
+          "required": [
+            "CTime",
+            "DisplayName",
+            "Executant",
+            "Expiration",
+            "ItemID",
+            "PasswordProtected",
+            "Permissions",
+            "ShareID",
+            "Sharer",
+            "Token"
+          ],
+          "properties": {
+            "DisplayName": {
+              "type": "string",
+              "enum": ["sharedlink"]
+            },
+            "Expiration": {
+              "type": ["string", "null"],
+              "enum": [null]
+            },
+            "PasswordProtected": {
+              "type": "boolean",
+              "enum": [false]
+            },
+            "Permissions": {
+              "type": "object",
+              "required": [
+                "permissions"
+              ],
+              "properties": {
+                "permissions": {
+                  "type": "object",
+                  "required": [
+                    "get_path",
+                    "get_quota",
+                    "initiate_file_download",
+                    "list_container",
+                    "list_recycle",
+                    "stat"
+                  ],
+                  "properties": {
+                    "get_path" : {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "get_quota" : {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "initiate_file_download" : {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "list_container" : {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "list_recycle" : {
+                      "type": "boolean",
+                      "enum": [true]
+                    },
+                    "stat" : {
+                      "type": "boolean",
+                      "enum": [true]
+                    }
+                  }
+                }
+              }
+            },
+            "Token": {
+              "type": "string",
+              "pattern": "^[a-zA-Z]{15}$"
             }
           }
         }
