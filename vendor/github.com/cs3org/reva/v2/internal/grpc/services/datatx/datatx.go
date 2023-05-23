@@ -156,7 +156,7 @@ func (s *service) UnprotectedEndpoints() []string {
 	return []string{}
 }
 
-func (s *service) PullTransfer(ctx context.Context, req *datatx.PullTransferRequest) (*datatx.PullTransferResponse, error) {
+func (s *service) CreateTransfer(ctx context.Context, req *datatx.CreateTransferRequest) (*datatx.CreateTransferResponse, error) {
 	srcEp, err := s.extractEndpointInfo(ctx, req.SrcTargetUri)
 	if err != nil {
 		return nil, err
@@ -189,7 +189,7 @@ func (s *service) PullTransfer(ctx context.Context, req *datatx.PullTransferRequ
 	s.txShareDriver.model.TxShares[txInfo.GetId().OpaqueId] = txShare
 	if err := s.txShareDriver.model.saveTxShare(); err != nil {
 		err = errors.Wrap(err, "datatx service: error saving transfer share: "+datatx.Status_STATUS_INVALID.String())
-		return &datatx.PullTransferResponse{
+		return &datatx.CreateTransferResponse{
 			Status: status.NewInvalid(ctx, "error pulling transfer"),
 		}, err
 	}
@@ -197,13 +197,13 @@ func (s *service) PullTransfer(ctx context.Context, req *datatx.PullTransferRequ
 	// now check start transfer outcome
 	if startTransferErr != nil {
 		startTransferErr = errors.Wrap(startTransferErr, "datatx service: error starting transfer job")
-		return &datatx.PullTransferResponse{
+		return &datatx.CreateTransferResponse{
 			Status: status.NewInvalid(ctx, "datatx service: error pulling transfer"),
 			TxInfo: txInfo,
 		}, startTransferErr
 	}
 
-	return &datatx.PullTransferResponse{
+	return &datatx.CreateTransferResponse{
 		Status: status.NewOK(ctx),
 		TxInfo: txInfo,
 	}, err

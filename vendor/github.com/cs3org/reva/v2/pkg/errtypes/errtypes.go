@@ -286,8 +286,8 @@ func NewErrtypeFromStatus(status *rpc.Status) error {
 			return Locked(strings.TrimPrefix(status.Message, "set lock: error: locked by "))
 		}
 		return PermissionDenied(status.Message)
-	// case rpc.Code_CODE_LOCKED:
-	//	return Locked(status.Message)
+	case rpc.Code_CODE_LOCKED:
+		return Locked(status.Message)
 	// case rpc.Code_CODE_DATA_LOSS: ?
 	//	IsPartialContent
 	case rpc.Code_CODE_ABORTED:

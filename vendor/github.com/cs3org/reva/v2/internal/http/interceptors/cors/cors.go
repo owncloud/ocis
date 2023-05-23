@@ -112,7 +112,7 @@ func New(m map[string]interface{}) (global.Middleware, int, error) {
 	}
 
 	// TODO(jfd): use log from request context, otherwise fmt will be used to log,
-	// preventing us from pinging the log to eg jq
+	// preventing us from piping the log to eg jq
 	c := cors.New(cors.Options{
 		AllowCredentials:   conf.AllowCredentials,
 		AllowedHeaders:     conf.AllowedHeaders,

@@ -6,9 +6,9 @@ package txv1beta1
 import (
 	context "context"
 	fmt "fmt"
-	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
-	v1beta12 "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
-	v1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	v1beta12 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
+	v1beta1 "github.com/cs3org/go-cs3apis/cs3/sharing/ocm/v1beta1"
+	v1beta11 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 	proto "github.com/golang/protobuf/proto"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -59,7 +59,7 @@ func (ListTransfersRequest_Filter_Type) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_13b0cfd696cc0a1f, []int{6, 0, 0}
 }
 
-type PullTransferRequest struct {
+type CreateTransferRequest struct {
 	// REQUIRED.
 	// The source target URI. Should include at the minimum all the info needed to access the source.
 	// https://golang.org/pkg/net/url/#URL provides a quick view of the format.
@@ -68,115 +68,125 @@ type PullTransferRequest struct {
 	// The destination target URI. Should include at the minimum all the info needed to access the destination.
 	// https://golang.org/pkg/net/url/#URL provides a quick view of the format.
 	DestTargetUri string `protobuf:"bytes,2,opt,name=dest_target_uri,json=destTargetUri,proto3" json:"dest_target_uri,omitempty"`
+	// REQUIRED.
+	// The share Id of the share this transfer is based on.
+	ShareId *v1beta1.ShareId `protobuf:"bytes,3,opt,name=share_id,json=shareId,proto3" json:"share_id,omitempty"`
 	// OPTIONAL.
 	// Opaque information.
-	Opaque               *v1beta1.Opaque `protobuf:"bytes,3,opt,name=opaque,proto3" json:"opaque,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	Opaque               *v1beta11.Opaque `protobuf:"bytes,4,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
-func (m *PullTransferRequest) Reset()         { *m = PullTransferRequest{} }
-func (m *PullTransferRequest) String() string { return proto.CompactTextString(m) }
-func (*PullTransferRequest) ProtoMessage()    {}
-func (*PullTransferRequest) Descriptor() ([]byte, []int) {
+func (m *CreateTransferRequest) Reset()         { *m = CreateTransferRequest{} }
+func (m *CreateTransferRequest) String() string { return proto.CompactTextString(m) }
+func (*CreateTransferRequest) ProtoMessage()    {}
+func (*CreateTransferRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_13b0cfd696cc0a1f, []int{0}
 }
 
-func (m *PullTransferRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PullTransferRequest.Unmarshal(m, b)
+func (m *CreateTransferRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateTransferRequest.Unmarshal(m, b)
 }
-func (m *PullTransferRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PullTransferRequest.Marshal(b, m, deterministic)
+func (m *CreateTransferRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateTransferRequest.Marshal(b, m, deterministic)
 }
-func (m *PullTransferRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PullTransferRequest.Merge(m, src)
+func (m *CreateTransferRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateTransferRequest.Merge(m, src)
 }
-func (m *PullTransferRequest) XXX_Size() int {
-	return xxx_messageInfo_PullTransferRequest.Size(m)
+func (m *CreateTransferRequest) XXX_Size() int {
+	return xxx_messageInfo_CreateTransferRequest.Size(m)
 }
-func (m *PullTransferRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_PullTransferRequest.DiscardUnknown(m)
+func (m *CreateTransferRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateTransferRequest.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_PullTransferRequest proto.InternalMessageInfo
+var xxx_messageInfo_CreateTransferRequest proto.InternalMessageInfo
 
-func (m *PullTransferRequest) GetSrcTargetUri() string {
+func (m *CreateTransferRequest) GetSrcTargetUri() string {
 	if m != nil {
 		return m.SrcTargetUri
 	}
 	return ""
 }
 
-func (m *PullTransferRequest) GetDestTargetUri() string {
+func (m *CreateTransferRequest) GetDestTargetUri() string {
 	if m != nil {
 		return m.DestTargetUri
 	}
 	return ""
 }
 
-func (m *PullTransferRequest) GetOpaque() *v1beta1.Opaque {
+func (m *CreateTransferRequest) GetShareId() *v1beta1.ShareId {
+	if m != nil {
+		return m.ShareId
+	}
+	return nil
+}
+
+func (m *CreateTransferRequest) GetOpaque() *v1beta11.Opaque {
 	if m != nil {
 		return m.Opaque
 	}
 	return nil
 }
 
-type PullTransferResponse struct {
+type CreateTransferResponse struct {
 	// REQUIRED.
 	// The response status.
-	Status *v1beta11.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Status *v1beta12.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
 	// REQUIRED.
 	// TxInfo, includes transfer id, status, description.
 	TxInfo *TxInfo `protobuf:"bytes,2,opt,name=tx_info,json=txInfo,proto3" json:"tx_info,omitempty"`
 	// OPTIONAL.
 	// Opaque information.
-	Opaque               *v1beta1.Opaque `protobuf:"bytes,3,opt,name=opaque,proto3" json:"opaque,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	Opaque               *v1beta11.Opaque `protobuf:"bytes,3,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
-func (m *PullTransferResponse) Reset()         { *m = PullTransferResponse{} }
-func (m *PullTransferResponse) String() string { return proto.CompactTextString(m) }
-func (*PullTransferResponse) ProtoMessage()    {}
-func (*PullTransferResponse) Descriptor() ([]byte, []int) {
+func (m *CreateTransferResponse) Reset()         { *m = CreateTransferResponse{} }
+func (m *CreateTransferResponse) String() string { return proto.CompactTextString(m) }
+func (*CreateTransferResponse) ProtoMessage()    {}
+func (*CreateTransferResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_13b0cfd696cc0a1f, []int{1}
 }
 
-func (m *PullTransferResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_PullTransferResponse.Unmarshal(m, b)
+func (m *CreateTransferResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateTransferResponse.Unmarshal(m, b)
 }
-func (m *PullTransferResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_PullTransferResponse.Marshal(b, m, deterministic)
+func (m *CreateTransferResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateTransferResponse.Marshal(b, m, deterministic)
 }
-func (m *PullTransferResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_PullTransferResponse.Merge(m, src)
+func (m *CreateTransferResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateTransferResponse.Merge(m, src)
 }
-func (m *PullTransferResponse) XXX_Size() int {
-	return xxx_messageInfo_PullTransferResponse.Size(m)
+func (m *CreateTransferResponse) XXX_Size() int {
+	return xxx_messageInfo_CreateTransferResponse.Size(m)
 }
-func (m *PullTransferResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_PullTransferResponse.DiscardUnknown(m)
+func (m *CreateTransferResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateTransferResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_PullTransferResponse proto.InternalMessageInfo
+var xxx_messageInfo_CreateTransferResponse proto.InternalMessageInfo
 
-func (m *PullTransferResponse) GetStatus() *v1beta11.Status {
+func (m *CreateTransferResponse) GetStatus() *v1beta12.Status {
 	if m != nil {
 		return m.Status
 	}
 	return nil
 }
 
-func (m *PullTransferResponse) GetTxInfo() *TxInfo {
+func (m *CreateTransferResponse) GetTxInfo() *TxInfo {
 	if m != nil {
 		return m.TxInfo
 	}
 	return nil
 }
 
-func (m *PullTransferResponse) GetOpaque() *v1beta1.Opaque {
+func (m *CreateTransferResponse) GetOpaque() *v1beta11.Opaque {
 	if m != nil {
 		return m.Opaque
 	}
@@ -189,10 +199,10 @@ type GetTransferStatusRequest struct {
 	TxId *TxId `protobuf:"bytes,1,opt,name=tx_id,json=txId,proto3" json:"tx_id,omitempty"`
 	// OPTIONAL.
 	// Opaque information.
-	Opaque               *v1beta1.Opaque `protobuf:"bytes,2,opt,name=opaque,proto3" json:"opaque,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	Opaque               *v1beta11.Opaque `protobuf:"bytes,2,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
 func (m *GetTransferStatusRequest) Reset()         { *m = GetTransferStatusRequest{} }
@@ -227,7 +237,7 @@ func (m *GetTransferStatusRequest) GetTxId() *TxId {
 	return nil
 }
 
-func (m *GetTransferStatusRequest) GetOpaque() *v1beta1.Opaque {
+func (m *GetTransferStatusRequest) GetOpaque() *v1beta11.Opaque {
 	if m != nil {
 		return m.Opaque
 	}
@@ -237,16 +247,16 @@ func (m *GetTransferStatusRequest) GetOpaque() *v1beta1.Opaque {
 type GetTransferStatusResponse struct {
 	// REQUIRED.
 	// The response status.
-	Status *v1beta11.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Status *v1beta12.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
 	// REQUIRED.
 	// TxInfo, includes ao. transfer id, status, description.
 	TxInfo *TxInfo `protobuf:"bytes,2,opt,name=tx_info,json=txInfo,proto3" json:"tx_info,omitempty"`
 	// OPTIONAL.
 	// Opaque information.
-	Opaque               *v1beta1.Opaque `protobuf:"bytes,3,opt,name=opaque,proto3" json:"opaque,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	Opaque               *v1beta11.Opaque `protobuf:"bytes,3,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
 func (m *GetTransferStatusResponse) Reset()         { *m = GetTransferStatusResponse{} }
@@ -274,7 +284,7 @@ func (m *GetTransferStatusResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GetTransferStatusResponse proto.InternalMessageInfo
 
-func (m *GetTransferStatusResponse) GetStatus() *v1beta11.Status {
+func (m *GetTransferStatusResponse) GetStatus() *v1beta12.Status {
 	if m != nil {
 		return m.Status
 	}
@@ -288,7 +298,7 @@ func (m *GetTransferStatusResponse) GetTxInfo() *TxInfo {
 	return nil
 }
 
-func (m *GetTransferStatusResponse) GetOpaque() *v1beta1.Opaque {
+func (m *GetTransferStatusResponse) GetOpaque() *v1beta11.Opaque {
 	if m != nil {
 		return m.Opaque
 	}
@@ -301,10 +311,10 @@ type CancelTransferRequest struct {
 	TxId *TxId `protobuf:"bytes,1,opt,name=tx_id,json=txId,proto3" json:"tx_id,omitempty"`
 	// OPTIONAL.
 	// Opaque information.
-	Opaque               *v1beta1.Opaque `protobuf:"bytes,2,opt,name=opaque,proto3" json:"opaque,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	Opaque               *v1beta11.Opaque `protobuf:"bytes,2,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
 func (m *CancelTransferRequest) Reset()         { *m = CancelTransferRequest{} }
@@ -339,7 +349,7 @@ func (m *CancelTransferRequest) GetTxId() *TxId {
 	return nil
 }
 
-func (m *CancelTransferRequest) GetOpaque() *v1beta1.Opaque {
+func (m *CancelTransferRequest) GetOpaque() *v1beta11.Opaque {
 	if m != nil {
 		return m.Opaque
 	}
@@ -349,16 +359,16 @@ func (m *CancelTransferRequest) GetOpaque() *v1beta1.Opaque {
 type CancelTransferResponse struct {
 	// REQUIRED.
 	// The response status.
-	Status *v1beta11.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Status *v1beta12.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
 	// REQUIRED.
 	// TxInfo, includes ao. transfer id, status, description.
 	TxInfo *TxInfo `protobuf:"bytes,2,opt,name=tx_info,json=txInfo,proto3" json:"tx_info,omitempty"`
 	// OPTIONAL.
 	// Opaque information.
-	Opaque               *v1beta1.Opaque `protobuf:"bytes,3,opt,name=opaque,proto3" json:"opaque,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	Opaque               *v1beta11.Opaque `protobuf:"bytes,3,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
 func (m *CancelTransferResponse) Reset()         { *m = CancelTransferResponse{} }
@@ -386,7 +396,7 @@ func (m *CancelTransferResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CancelTransferResponse proto.InternalMessageInfo
 
-func (m *CancelTransferResponse) GetStatus() *v1beta11.Status {
+func (m *CancelTransferResponse) GetStatus() *v1beta12.Status {
 	if m != nil {
 		return m.Status
 	}
@@ -400,7 +410,7 @@ func (m *CancelTransferResponse) GetTxInfo() *TxInfo {
 	return nil
 }
 
-func (m *CancelTransferResponse) GetOpaque() *v1beta1.Opaque {
+func (m *CancelTransferResponse) GetOpaque() *v1beta11.Opaque {
 	if m != nil {
 		return m.Opaque
 	}
@@ -410,7 +420,7 @@ func (m *CancelTransferResponse) GetOpaque() *v1beta1.Opaque {
 type ListTransfersRequest struct {
 	// OPTIONAL.
 	// Opaque information.
-	Opaque *v1beta1.Opaque `protobuf:"bytes,1,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	Opaque *v1beta11.Opaque `protobuf:"bytes,1,opt,name=opaque,proto3" json:"opaque,omitempty"`
 	// OPTIONAL.
 	// The list of filters to apply if any.
 	Filters              []*ListTransfersRequest_Filter `protobuf:"bytes,2,rep,name=filters,proto3" json:"filters,omitempty"`
@@ -444,7 +454,7 @@ func (m *ListTransfersRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ListTransfersRequest proto.InternalMessageInfo
 
-func (m *ListTransfersRequest) GetOpaque() *v1beta1.Opaque {
+func (m *ListTransfersRequest) GetOpaque() *v1beta11.Opaque {
 	if m != nil {
 		return m.Opaque
 	}
@@ -516,7 +526,7 @@ type ListTransfersRequest_Filter_Status struct {
 }
 
 type ListTransfersRequest_Filter_ShareId struct {
-	ShareId *v1beta12.ShareId `protobuf:"bytes,3,opt,name=share_id,json=shareId,proto3,oneof"`
+	ShareId *v1beta1.ShareId `protobuf:"bytes,3,opt,name=share_id,json=shareId,proto3,oneof"`
 }
 
 type ListTransfersRequest_Filter_TxId struct {
@@ -543,7 +553,7 @@ func (m *ListTransfersRequest_Filter) GetStatus() Status {
 	return Status_STATUS_INVALID
 }
 
-func (m *ListTransfersRequest_Filter) GetShareId() *v1beta12.ShareId {
+func (m *ListTransfersRequest_Filter) GetShareId() *v1beta1.ShareId {
 	if x, ok := m.GetTerm().(*ListTransfersRequest_Filter_ShareId); ok {
 		return x.ShareId
 	}
@@ -569,16 +579,16 @@ func (*ListTransfersRequest_Filter) XXX_OneofWrappers() []interface{} {
 type ListTransfersResponse struct {
 	// REQUIRED.
 	// The response status.
-	Status *v1beta11.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Status *v1beta12.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
 	// REQUIRED.
 	// List of TxInfo types representing transfers.
 	Transfers []*TxInfo `protobuf:"bytes,2,rep,name=transfers,proto3" json:"transfers,omitempty"`
 	// OPTIONAL.
 	// Opaque information.
-	Opaque               *v1beta1.Opaque `protobuf:"bytes,3,opt,name=opaque,proto3" json:"opaque,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	Opaque               *v1beta11.Opaque `protobuf:"bytes,3,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
 func (m *ListTransfersResponse) Reset()         { *m = ListTransfersResponse{} }
@@ -606,7 +616,7 @@ func (m *ListTransfersResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ListTransfersResponse proto.InternalMessageInfo
 
-func (m *ListTransfersResponse) GetStatus() *v1beta11.Status {
+func (m *ListTransfersResponse) GetStatus() *v1beta12.Status {
 	if m != nil {
 		return m.Status
 	}
@@ -620,7 +630,7 @@ func (m *ListTransfersResponse) GetTransfers() []*TxInfo {
 	return nil
 }
 
-func (m *ListTransfersResponse) GetOpaque() *v1beta1.Opaque {
+func (m *ListTransfersResponse) GetOpaque() *v1beta11.Opaque {
 	if m != nil {
 		return m.Opaque
 	}
@@ -633,10 +643,10 @@ type RetryTransferRequest struct {
 	TxId *TxId `protobuf:"bytes,1,opt,name=tx_id,json=txId,proto3" json:"tx_id,omitempty"`
 	// OPTIONAL.
 	// Opaque information.
-	Opaque               *v1beta1.Opaque `protobuf:"bytes,2,opt,name=opaque,proto3" json:"opaque,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	Opaque               *v1beta11.Opaque `protobuf:"bytes,2,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
 func (m *RetryTransferRequest) Reset()         { *m = RetryTransferRequest{} }
@@ -671,7 +681,7 @@ func (m *RetryTransferRequest) GetTxId() *TxId {
 	return nil
 }
 
-func (m *RetryTransferRequest) GetOpaque() *v1beta1.Opaque {
+func (m *RetryTransferRequest) GetOpaque() *v1beta11.Opaque {
 	if m != nil {
 		return m.Opaque
 	}
@@ -681,16 +691,16 @@ func (m *RetryTransferRequest) GetOpaque() *v1beta1.Opaque {
 type RetryTransferResponse struct {
 	// REQUIRED.
 	// The response status.
-	Status *v1beta11.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Status *v1beta12.Status `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
 	// REQUIRED.
 	// TxInfo, includes ao. transfer id, status, description.
 	TxInfo *TxInfo `protobuf:"bytes,2,opt,name=tx_info,json=txInfo,proto3" json:"tx_info,omitempty"`
 	// OPTIONAL.
 	// Opaque information.
-	Opaque               *v1beta1.Opaque `protobuf:"bytes,3,opt,name=opaque,proto3" json:"opaque,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	Opaque               *v1beta11.Opaque `protobuf:"bytes,3,opt,name=opaque,proto3" json:"opaque,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
+	XXX_unrecognized     []byte           `json:"-"`
+	XXX_sizecache        int32            `json:"-"`
 }
 
 func (m *RetryTransferResponse) Reset()         { *m = RetryTransferResponse{} }
@@ -718,7 +728,7 @@ func (m *RetryTransferResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_RetryTransferResponse proto.InternalMessageInfo
 
-func (m *RetryTransferResponse) GetStatus() *v1beta11.Status {
+func (m *RetryTransferResponse) GetStatus() *v1beta12.Status {
 	if m != nil {
 		return m.Status
 	}
@@ -732,7 +742,7 @@ func (m *RetryTransferResponse) GetTxInfo() *TxInfo {
 	return nil
 }
 
-func (m *RetryTransferResponse) GetOpaque() *v1beta1.Opaque {
+func (m *RetryTransferResponse) GetOpaque() *v1beta11.Opaque {
 	if m != nil {
 		return m.Opaque
 	}
@@ -741,8 +751,8 @@ func (m *RetryTransferResponse) GetOpaque() *v1beta1.Opaque {
 
 func init() {
 	proto.RegisterEnum("cs3.tx.v1beta1.ListTransfersRequest_Filter_Type", ListTransfersRequest_Filter_Type_name, ListTransfersRequest_Filter_Type_value)
-	proto.RegisterType((*PullTransferRequest)(nil), "cs3.tx.v1beta1.PullTransferRequest")
-	proto.RegisterType((*PullTransferResponse)(nil), "cs3.tx.v1beta1.PullTransferResponse")
+	proto.RegisterType((*CreateTransferRequest)(nil), "cs3.tx.v1beta1.CreateTransferRequest")
+	proto.RegisterType((*CreateTransferResponse)(nil), "cs3.tx.v1beta1.CreateTransferResponse")
 	proto.RegisterType((*GetTransferStatusRequest)(nil), "cs3.tx.v1beta1.GetTransferStatusRequest")
 	proto.RegisterType((*GetTransferStatusResponse)(nil), "cs3.tx.v1beta1.GetTransferStatusResponse")
 	proto.RegisterType((*CancelTransferRequest)(nil), "cs3.tx.v1beta1.CancelTransferRequest")
@@ -757,55 +767,55 @@ func init() {
 func init() { proto.RegisterFile("cs3/tx/v1beta1/tx_api.proto", fileDescriptor_13b0cfd696cc0a1f) }
 
 var fileDescriptor_13b0cfd696cc0a1f = []byte{
-	// 753 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0x5d, 0x4f, 0xda, 0x50,
-	0x18, 0xa6, 0x05, 0x71, 0xbe, 0x28, 0xe2, 0x19, 0x3a, 0x64, 0x1f, 0x21, 0x4c, 0x1d, 0xc6, 0xa4,
-	0x08, 0xec, 0x76, 0x17, 0xa0, 0x6e, 0x90, 0x98, 0x8d, 0xd4, 0x6a, 0x74, 0x31, 0x21, 0xb5, 0x1c,
-	0xb4, 0x89, 0xd0, 0x7a, 0xce, 0x61, 0xa9, 0x7f, 0x64, 0x3f, 0x60, 0x97, 0xfb, 0x48, 0xb6, 0xbf,
-	0xb0, 0xcb, 0xdd, 0xef, 0x47, 0xec, 0x5f, 0x2c, 0x3d, 0x3d, 0x14, 0x29, 0x75, 0x32, 0x93, 0x2d,
-	0x5e, 0x69, 0xdf, 0xf7, 0x79, 0xdf, 0xe7, 0xe1, 0xe9, 0xd3, 0xd3, 0xc2, 0x43, 0x83, 0x56, 0x8a,
-	0xcc, 0x29, 0xbe, 0x2b, 0x9d, 0x60, 0xa6, 0x97, 0x8a, 0xcc, 0x69, 0xe9, 0xb6, 0xa9, 0xd8, 0xc4,
-	0x62, 0x16, 0x4a, 0x1a, 0xb4, 0xa2, 0x30, 0x47, 0x11, 0xcd, 0xec, 0x23, 0x17, 0x4c, 0x6c, 0xc3,
-	0x47, 0x53, 0xa6, 0xb3, 0x3e, 0xf5, 0xd0, 0xd9, 0x67, 0x6e, 0x97, 0x9e, 0xe9, 0xc4, 0xec, 0x9d,
-	0x16, 0x2d, 0xa3, 0xeb, 0xa3, 0x08, 0xa6, 0x56, 0x9f, 0x18, 0x78, 0x00, 0x7c, 0x12, 0xe0, 0x0c,
-	0xf6, 0x1f, 0xf3, 0xfe, 0xa5, 0x8d, 0xe9, 0x50, 0x96, 0x7b, 0xe5, 0xb5, 0xf3, 0xef, 0x25, 0xb8,
-	0xdf, 0xec, 0x9f, 0x9f, 0x6b, 0x44, 0xef, 0xd1, 0x0e, 0x26, 0x2a, 0xbe, 0xe8, 0x63, 0xca, 0xd0,
-	0x0a, 0x24, 0x29, 0x31, 0x5a, 0x4c, 0x27, 0xa7, 0x98, 0xb5, 0xfa, 0xc4, 0xcc, 0x48, 0x39, 0xa9,
-	0x30, 0xa3, 0xce, 0x52, 0x62, 0x68, 0xbc, 0xb8, 0x4f, 0x4c, 0xb4, 0x06, 0xf3, 0x6d, 0x4c, 0xd9,
-	0x55, 0x98, 0xcc, 0x61, 0x73, 0x6e, 0x79, 0x88, 0x2b, 0x41, 0xdc, 0xb2, 0xf5, 0x8b, 0x3e, 0xce,
-	0x44, 0x73, 0x52, 0x21, 0x51, 0x5e, 0x56, 0xb8, 0x19, 0x5c, 0x87, 0x50, 0xa5, 0xbc, 0xe1, 0x00,
-	0x55, 0x00, 0xf3, 0x9f, 0x24, 0x48, 0x8f, 0x0a, 0xa3, 0xb6, 0xd5, 0xa3, 0x18, 0x15, 0x21, 0xee,
-	0x39, 0xc5, 0x15, 0x25, 0xca, 0x0f, 0xf8, 0x2e, 0x62, 0x1b, 0xfe, 0xa6, 0x3d, 0xde, 0x56, 0x05,
-	0x0c, 0x15, 0x61, 0x9a, 0x39, 0x2d, 0xb3, 0xd7, 0xb1, 0xb8, 0xb8, 0x44, 0x79, 0x49, 0x19, 0xbd,
-	0x15, 0x8a, 0xe6, 0x34, 0x7a, 0x1d, 0x4b, 0x8d, 0x33, 0xfe, 0xf7, 0x36, 0x6a, 0x1d, 0xc8, 0xbc,
-	0xc2, 0x6c, 0xa0, 0x55, 0x08, 0x10, 0x56, 0xae, 0xc3, 0x94, 0xcb, 0xdf, 0x16, 0x7a, 0xd3, 0x21,
-	0xec, 0x6d, 0x35, 0xc6, 0x9c, 0x46, 0xfb, 0x0a, 0xb3, 0x3c, 0x29, 0xf3, 0x57, 0x09, 0x96, 0x43,
-	0xa8, 0xef, 0xb2, 0x59, 0x7d, 0x58, 0xdc, 0xd2, 0x7b, 0x06, 0x1e, 0x0b, 0xdd, 0xbf, 0x75, 0xea,
-	0x8b, 0x04, 0x4b, 0x41, 0xde, 0xbb, 0x6c, 0xd3, 0xcf, 0x28, 0xa4, 0x77, 0x4d, 0xea, 0xdf, 0x5a,
-	0x3f, 0x50, 0xc3, 0x5d, 0xd2, 0x84, 0xbb, 0xd0, 0x0e, 0x4c, 0x77, 0xcc, 0x73, 0x86, 0x09, 0xcd,
-	0xc8, 0xb9, 0x68, 0x21, 0x51, 0xde, 0x08, 0xea, 0x0d, 0x63, 0x52, 0x5e, 0xf2, 0x19, 0x75, 0x30,
-	0x9b, 0xfd, 0x2e, 0x43, 0xdc, 0xab, 0xa1, 0x6d, 0x88, 0xb9, 0x8c, 0x5c, 0x42, 0xb2, 0xbc, 0xf9,
-	0x17, 0xeb, 0x14, 0xed, 0xd2, 0xc6, 0x2a, 0x9f, 0x46, 0x9b, 0xbe, 0xf1, 0x32, 0xdf, 0x33, 0x66,
-	0xa3, 0xe7, 0x7b, 0x3d, 0xe2, 0x3b, 0xff, 0x02, 0xee, 0xb9, 0xc7, 0x22, 0x76, 0x63, 0xe2, 0x59,
-	0x99, 0xe3, 0x33, 0xe2, 0xac, 0x54, 0x2c, 0xa3, 0x3b, 0x1c, 0x76, 0x81, 0x8d, 0x76, 0x3d, 0xa2,
-	0x4e, 0x53, 0xef, 0x5f, 0xb4, 0x31, 0x88, 0x58, 0xec, 0xfa, 0x88, 0xd5, 0x23, 0x5e, 0xc8, 0xf2,
-	0xbb, 0x10, 0x73, 0xb5, 0xa2, 0x14, 0xcc, 0x6a, 0x47, 0xcd, 0x9d, 0x56, 0xe3, 0xf5, 0x41, 0x75,
-	0xb7, 0xb1, 0x9d, 0x8a, 0xa0, 0x79, 0x48, 0xf0, 0xca, 0x9e, 0x56, 0xd5, 0xf6, 0xf7, 0x52, 0x12,
-	0x5a, 0x80, 0x39, 0xaf, 0x50, 0xaf, 0xaa, 0x3b, 0xad, 0xc6, 0x76, 0x4a, 0x46, 0x49, 0x00, 0x5e,
-	0xd2, 0x0e, 0xdd, 0xeb, 0x68, 0x2d, 0x0e, 0x31, 0x86, 0x49, 0x37, 0xff, 0x4d, 0x82, 0xc5, 0x80,
-	0x3d, 0xb7, 0x8d, 0xe1, 0x73, 0x98, 0x61, 0x83, 0x2d, 0xe2, 0xc6, 0x5e, 0x17, 0xc4, 0x21, 0xf0,
-	0x36, 0x59, 0x64, 0x90, 0x56, 0x31, 0x23, 0x97, 0xff, 0xf7, 0x89, 0xfd, 0x2c, 0xc1, 0x62, 0x80,
-	0xf6, 0x0e, 0x3f, 0xb0, 0xe5, 0x5f, 0x51, 0x98, 0xd2, 0x9c, 0x6a, 0xb3, 0x81, 0x8e, 0x60, 0xf6,
-	0xea, 0xbb, 0x0b, 0x3d, 0x0d, 0x92, 0x85, 0xbc, 0x72, 0xb3, 0x2b, 0x7f, 0x06, 0x89, 0x5f, 0x7e,
-	0x06, 0x0b, 0x63, 0xc7, 0x3d, 0x2a, 0x04, 0x47, 0xaf, 0x7b, 0x19, 0x65, 0xd7, 0x27, 0x40, 0x0a,
-	0xa6, 0x16, 0x24, 0x47, 0x8f, 0x4b, 0xb4, 0x1a, 0x1c, 0x0e, 0x3d, 0xc6, 0xb3, 0x6b, 0x37, 0xc1,
-	0x04, 0xc1, 0x31, 0xcc, 0x8d, 0x3c, 0x07, 0x68, 0x65, 0x92, 0x53, 0x24, 0xbb, 0x7a, 0x03, 0x6a,
-	0xb8, 0x7d, 0x24, 0x3b, 0xe3, 0xdb, 0xc3, 0x12, 0x3d, 0xbe, 0x3d, 0x34, 0x80, 0xb5, 0x7d, 0x40,
-	0x86, 0xd5, 0x0d, 0x60, 0x6b, 0xa0, 0x39, 0x55, 0xdb, 0x6c, 0xba, 0x5f, 0x56, 0x4d, 0xe9, 0xed,
-	0x0c, 0x73, 0x44, 0xe3, 0x83, 0x1c, 0xdd, 0xd2, 0x0e, 0x3f, 0xca, 0xc9, 0x2d, 0x5a, 0x51, 0x34,
-	0x47, 0x39, 0x28, 0xd5, 0xdc, 0xf2, 0x0f, 0x5e, 0x38, 0xd6, 0x9c, 0x63, 0x51, 0x38, 0x89, 0xf3,
-	0xaf, 0xb2, 0xca, 0xef, 0x00, 0x00, 0x00, 0xff, 0xff, 0xa7, 0x1c, 0xfd, 0x29, 0x4a, 0x0a, 0x00,
-	0x00,
+	// 759 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xcc, 0x56, 0x5f, 0x4f, 0xda, 0x5c,
+	0x18, 0xa7, 0x05, 0xf1, 0xf5, 0x41, 0x11, 0x4f, 0xc4, 0x17, 0x79, 0xff, 0x84, 0x10, 0x75, 0x18,
+	0x93, 0x22, 0xb0, 0xbb, 0x65, 0x17, 0x80, 0x6e, 0x90, 0x98, 0x8d, 0xd4, 0x6a, 0xdc, 0x62, 0xd2,
+	0xd4, 0x72, 0xd0, 0x26, 0x42, 0xeb, 0x39, 0x87, 0xa5, 0x7e, 0x9d, 0x5d, 0x2e, 0x5b, 0xb2, 0x7d,
+	0x85, 0x5d, 0xee, 0xde, 0xcf, 0xb1, 0xaf, 0xb0, 0x9c, 0xd3, 0x42, 0xa5, 0xd4, 0x88, 0x26, 0x5b,
+	0xbc, 0x82, 0x3e, 0xcf, 0xef, 0xf9, 0xf7, 0x3b, 0xbf, 0x3e, 0xa7, 0xf0, 0x8f, 0x49, 0x6b, 0x65,
+	0xe6, 0x96, 0x3f, 0x54, 0xce, 0x30, 0x33, 0x2a, 0x65, 0xe6, 0xea, 0x86, 0x63, 0x29, 0x0e, 0xb1,
+	0x99, 0x8d, 0xd2, 0x26, 0xad, 0x29, 0xcc, 0x55, 0x7c, 0x67, 0xfe, 0x5f, 0x0e, 0x26, 0x8e, 0x39,
+	0x46, 0x53, 0x66, 0xb0, 0x21, 0xf5, 0xd0, 0xf9, 0x67, 0xdc, 0x4b, 0x2f, 0x0c, 0x62, 0x0d, 0xce,
+	0xcb, 0xb6, 0xd9, 0x1f, 0xa3, 0x08, 0xa6, 0xf6, 0x90, 0x98, 0x78, 0x04, 0xfc, 0x3f, 0x54, 0x33,
+	0xec, 0xff, 0x4f, 0xf8, 0xaf, 0x1d, 0x4c, 0x83, 0xb6, 0xf8, 0x93, 0xe7, 0x2e, 0xde, 0x48, 0x90,
+	0x6d, 0x12, 0x6c, 0x30, 0xac, 0x11, 0x63, 0x40, 0x7b, 0x98, 0xa8, 0xf8, 0x6a, 0x88, 0x29, 0x43,
+	0x1b, 0x90, 0xa6, 0xc4, 0xd4, 0x99, 0x41, 0xce, 0x31, 0xd3, 0x87, 0xc4, 0xca, 0x49, 0x05, 0xa9,
+	0xb4, 0xa0, 0x2e, 0x52, 0x62, 0x6a, 0xc2, 0x78, 0x44, 0x2c, 0xb4, 0x05, 0xcb, 0x5d, 0x4c, 0xd9,
+	0x6d, 0x98, 0x2c, 0x60, 0x4b, 0xdc, 0x1c, 0xe0, 0x5e, 0xc0, 0x5f, 0x7c, 0x1a, 0xac, 0x5b, 0xdd,
+	0x5c, 0xbc, 0x20, 0x95, 0x52, 0xd5, 0x82, 0xc2, 0x09, 0xf1, 0x47, 0x54, 0x6c, 0xb3, 0x3f, 0x62,
+	0x46, 0x39, 0xe4, 0xc0, 0x76, 0x57, 0x9d, 0xa7, 0xde, 0x1f, 0x54, 0x81, 0xa4, 0xed, 0x18, 0x57,
+	0x43, 0x9c, 0x4b, 0x88, 0xd0, 0x75, 0x11, 0xea, 0x8d, 0x31, 0x0a, 0x7a, 0x2b, 0x00, 0xaa, 0x0f,
+	0x2c, 0x7e, 0x91, 0x60, 0x2d, 0x3c, 0x17, 0x75, 0xec, 0x01, 0xc5, 0xa8, 0x0c, 0x49, 0x8f, 0x6a,
+	0x31, 0x50, 0xaa, 0xfa, 0xb7, 0xc8, 0x46, 0x1c, 0x33, 0x68, 0x40, 0xb8, 0x55, 0x1f, 0x86, 0xca,
+	0x30, 0xcf, 0x5c, 0xdd, 0x1a, 0xf4, 0x6c, 0x31, 0x5b, 0xaa, 0xba, 0xa6, 0x4c, 0x9e, 0xa5, 0xa2,
+	0xb9, 0xed, 0x41, 0xcf, 0x56, 0x93, 0x4c, 0xfc, 0xde, 0xea, 0x37, 0x3e, 0x6b, 0xbf, 0x2e, 0xe4,
+	0x5e, 0x63, 0x36, 0xea, 0xd5, 0x6f, 0xc0, 0x3f, 0x89, 0x6d, 0x98, 0xe3, 0xf5, 0xbb, 0x7e, 0xbf,
+	0xab, 0x11, 0xd5, 0xbb, 0x6a, 0x82, 0xb9, 0x13, 0x4c, 0xc9, 0xb3, 0x56, 0xfe, 0x2a, 0xc1, 0x7a,
+	0x44, 0xe9, 0xa7, 0x4c, 0xd6, 0x10, 0xb2, 0x4d, 0x63, 0x60, 0xe2, 0xcb, 0xb0, 0x66, 0x7f, 0x2f,
+	0x53, 0x42, 0x53, 0xa1, 0xba, 0x4f, 0x99, 0xa6, 0x9b, 0x38, 0xac, 0x1e, 0x58, 0x74, 0x7c, 0xb4,
+	0x63, 0x41, 0x05, 0xb9, 0xa4, 0x19, 0x73, 0xa1, 0x7d, 0x98, 0xef, 0x59, 0x97, 0x0c, 0x13, 0x9a,
+	0x93, 0x0b, 0xf1, 0x52, 0xaa, 0xba, 0x13, 0xee, 0x37, 0xaa, 0x92, 0xf2, 0x4a, 0xc4, 0xa8, 0xa3,
+	0xd8, 0xfc, 0x77, 0x19, 0x92, 0x9e, 0x0d, 0xed, 0x41, 0x82, 0x57, 0x14, 0x2d, 0xa4, 0xab, 0xbb,
+	0x0f, 0x48, 0xa7, 0x68, 0xd7, 0x0e, 0x56, 0x45, 0x34, 0xda, 0x1d, 0x13, 0x2f, 0x8b, 0x3c, 0x53,
+	0x34, 0x7a, 0xbc, 0xb7, 0x62, 0x63, 0xe6, 0x5f, 0x3e, 0x7c, 0x13, 0xb5, 0x62, 0xc1, 0x2e, 0xda,
+	0x19, 0x49, 0x2c, 0x71, 0xb7, 0xc4, 0x5a, 0x31, 0x4f, 0x64, 0xc5, 0x03, 0x48, 0xf0, 0x5e, 0x51,
+	0x06, 0x16, 0xb5, 0x77, 0x9d, 0x7d, 0xbd, 0xfd, 0xe6, 0xb8, 0x7e, 0xd0, 0xde, 0xcb, 0xc4, 0xd0,
+	0x32, 0xa4, 0x84, 0xe5, 0x50, 0xab, 0x6b, 0x47, 0x87, 0x19, 0x09, 0xad, 0xc0, 0x92, 0x67, 0x68,
+	0xd5, 0xd5, 0x7d, 0xbd, 0xbd, 0x97, 0x91, 0x51, 0x1a, 0x40, 0x98, 0xb4, 0x13, 0xfe, 0x1c, 0x6f,
+	0x24, 0x21, 0xc1, 0x30, 0xe9, 0x17, 0xbf, 0x49, 0x90, 0x0d, 0xd1, 0xf3, 0x58, 0x19, 0x3e, 0x87,
+	0x05, 0x36, 0xca, 0xe2, 0x1f, 0xec, 0x5d, 0x42, 0x0c, 0x80, 0x8f, 0xd1, 0x22, 0x83, 0x55, 0x15,
+	0x33, 0x72, 0xfd, 0x67, 0xdf, 0xd8, 0xcf, 0x12, 0x64, 0x43, 0x65, 0x9f, 0xf0, 0x0b, 0x5b, 0xfd,
+	0x19, 0x87, 0x39, 0xcd, 0xad, 0x77, 0xda, 0x48, 0x87, 0xf4, 0xe4, 0xed, 0x85, 0x36, 0xc3, 0xe5,
+	0x22, 0x6f, 0xed, 0xfc, 0xd6, 0x7d, 0x30, 0x7f, 0xfe, 0x0b, 0x58, 0x99, 0x5a, 0xfa, 0xa8, 0x14,
+	0x0e, 0xbe, 0xeb, 0x4a, 0xca, 0x6f, 0xcf, 0x80, 0xf4, 0x2b, 0xf1, 0x51, 0x26, 0x96, 0x66, 0xc4,
+	0x28, 0x51, 0xcb, 0x3c, 0x62, 0x94, 0xe8, 0xdd, 0x7b, 0x0a, 0x4b, 0x13, 0x6f, 0x03, 0xda, 0x98,
+	0x65, 0x97, 0xe4, 0x37, 0xef, 0x41, 0x05, 0xd9, 0x27, 0x14, 0x34, 0x9d, 0x3d, 0x4a, 0xd7, 0xd3,
+	0xd9, 0x23, 0x65, 0xd8, 0x38, 0x02, 0x64, 0xda, 0xfd, 0x10, 0xb6, 0x01, 0x9a, 0x5b, 0x77, 0xac,
+	0x0e, 0xff, 0x40, 0xeb, 0x48, 0xef, 0x17, 0x98, 0xeb, 0x3b, 0x3e, 0xca, 0xf1, 0xa6, 0x76, 0xf2,
+	0x49, 0x4e, 0x37, 0x69, 0x4d, 0xd1, 0x5c, 0xe5, 0xb8, 0xd2, 0xe0, 0xe6, 0x1f, 0xc2, 0x70, 0xaa,
+	0xb9, 0xa7, 0xbe, 0xe1, 0x2c, 0x29, 0x3e, 0xee, 0x6a, 0xbf, 0x02, 0x00, 0x00, 0xff, 0xff, 0xfc,
+	0xba, 0x11, 0x1e, 0x91, 0x0a, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -820,9 +830,9 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type TxAPIClient interface {
-	// Requests the destination to pull a resource from source.
-	// Returns a PullTransferResponse
-	PullTransfer(ctx context.Context, in *PullTransferRequest, opts ...grpc.CallOption) (*PullTransferResponse, error)
+	// Requests creation of a transfer.
+	// Returns a CreateTransferResponse.
+	CreateTransfer(ctx context.Context, in *CreateTransferRequest, opts ...grpc.CallOption) (*CreateTransferResponse, error)
 	// Requests a transfer status.
 	GetTransferStatus(ctx context.Context, in *GetTransferStatusRequest, opts ...grpc.CallOption) (*GetTransferStatusResponse, error)
 	// Requests to cancel a transfer.
@@ -842,9 +852,9 @@ func NewTxAPIClient(cc *grpc.ClientConn) TxAPIClient {
 	return &txAPIClient{cc}
 }
 
-func (c *txAPIClient) PullTransfer(ctx context.Context, in *PullTransferRequest, opts ...grpc.CallOption) (*PullTransferResponse, error) {
-	out := new(PullTransferResponse)
-	err := c.cc.Invoke(ctx, "/cs3.tx.v1beta1.TxAPI/PullTransfer", in, out, opts...)
+func (c *txAPIClient) CreateTransfer(ctx context.Context, in *CreateTransferRequest, opts ...grpc.CallOption) (*CreateTransferResponse, error) {
+	out := new(CreateTransferResponse)
+	err := c.cc.Invoke(ctx, "/cs3.tx.v1beta1.TxAPI/CreateTransfer", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -889,9 +899,9 @@ func (c *txAPIClient) RetryTransfer(ctx context.Context, in *RetryTransferReques
 
 // TxAPIServer is the server API for TxAPI service.
 type TxAPIServer interface {
-	// Requests the destination to pull a resource from source.
-	// Returns a PullTransferResponse
-	PullTransfer(context.Context, *PullTransferRequest) (*PullTransferResponse, error)
+	// Requests creation of a transfer.
+	// Returns a CreateTransferResponse.
+	CreateTransfer(context.Context, *CreateTransferRequest) (*CreateTransferResponse, error)
 	// Requests a transfer status.
 	GetTransferStatus(context.Context, *GetTransferStatusRequest) (*GetTransferStatusResponse, error)
 	// Requests to cancel a transfer.
@@ -907,8 +917,8 @@ type TxAPIServer interface {
 type UnimplementedTxAPIServer struct {
 }
 
-func (*UnimplementedTxAPIServer) PullTransfer(ctx context.Context, req *PullTransferRequest) (*PullTransferResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PullTransfer not implemented")
+func (*UnimplementedTxAPIServer) CreateTransfer(ctx context.Context, req *CreateTransferRequest) (*CreateTransferResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateTransfer not implemented")
 }
 func (*UnimplementedTxAPIServer) GetTransferStatus(ctx context.Context, req *GetTransferStatusRequest) (*GetTransferStatusResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTransferStatus not implemented")
@@ -927,20 +937,20 @@ func RegisterTxAPIServer(s *grpc.Server, srv TxAPIServer) {
 	s.RegisterService(&_TxAPI_serviceDesc, srv)
 }
 
-func _TxAPI_PullTransfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PullTransferRequest)
+func _TxAPI_CreateTransfer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTransferRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TxAPIServer).PullTransfer(ctx, in)
+		return srv.(TxAPIServer).CreateTransfer(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/cs3.tx.v1beta1.TxAPI/PullTransfer",
+		FullMethod: "/cs3.tx.v1beta1.TxAPI/CreateTransfer",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TxAPIServer).PullTransfer(ctx, req.(*PullTransferRequest))
+		return srv.(TxAPIServer).CreateTransfer(ctx, req.(*CreateTransferRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1022,8 +1032,8 @@ var _TxAPI_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*TxAPIServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "PullTransfer",
-			Handler:    _TxAPI_PullTransfer_Handler,
+			MethodName: "CreateTransfer",
+			Handler:    _TxAPI_CreateTransfer_Handler,
 		},
 		{
 			MethodName: "GetTransferStatus",

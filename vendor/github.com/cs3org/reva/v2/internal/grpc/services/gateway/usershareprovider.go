@@ -468,6 +468,23 @@ func (s *svc) addShare(ctx context.Context, req *collaboration.CreateShareReques
 		return res, nil
 	}
 
+	rollBackFn := func(status *rpc.Status) {
+		rmvReq := &collaboration.RemoveShareRequest{
+			Ref: &collaboration.ShareReference{
+				Spec: &collaboration.ShareReference_Key{
+					Key: &collaboration.ShareKey{
+						ResourceId: req.ResourceInfo.Id,
+						Grantee:    req.Grant.Grantee,
+					},
+				},
+			},
+		}
+		appctx.GetLogger(ctx).Debug().Interface("status", status).Interface("req", req).Msg("rollback the CreateShare attempt")
+		if resp, err := s.removeShare(ctx, rmvReq); err != nil {
+			appctx.GetLogger(ctx).Debug().Interface("status", resp.GetStatus()).Interface("req", req).Msg(err.Error())
+		}
+	}
+
 	if s.c.CommitShareToStorageGrant {
 		// If the share is a denial we call  denyGrant instead.
 		var status *rpc.Status
@@ -479,6 +496,8 @@ func (s *svc) addShare(ctx context.Context, req *collaboration.CreateShareReques
 		} else {
 			status, err = s.addGrant(ctx, req.ResourceInfo.Id, req.Grant.Grantee, req.Grant.Permissions.Permissions, req.Grant.Expiration, nil)
 			if err != nil {
+				appctx.GetLogger(ctx).Debug().Interface("status", status).Interface("req", req).Msg(err.Error())
+				rollBackFn(status)
 				return nil, errors.Wrap(err, "gateway: error adding grant to storage")
 			}
 		}
@@ -488,7 +507,10 @@ func (s *svc) addShare(ctx context.Context, req *collaboration.CreateShareReques
 			s.statCache.RemoveStat(ctxpkg.ContextMustGetUser(ctx).GetId(), req.ResourceInfo.Id)
 		case rpc.Code_CODE_UNIMPLEMENTED:
 			appctx.GetLogger(ctx).Debug().Interface("status", status).Interface("req", req).Msg("storing grants not supported, ignoring")
+			rollBackFn(status)
 		default:
+			appctx.GetLogger(ctx).Debug().Interface("status", status).Interface("req", req).Msg("storing grants is not successful")
+			rollBackFn(status)
 			return &collaboration.CreateShareResponse{
 				Status: status,
 			}, err
