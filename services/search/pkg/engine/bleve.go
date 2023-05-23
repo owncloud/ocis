@@ -6,6 +6,7 @@ import (
 	"math"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -143,6 +144,7 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 	}
 
 	bleveReq := bleve.NewSearchRequest(q)
+	bleveReq.Highlight = bleve.NewHighlight()
 
 	switch {
 	case sir.PageSize == -1:
@@ -364,7 +366,19 @@ func formatQuery(q string) string {
 		cq = strings.ReplaceAll(cq, strings.ToLower(field)+":", field+":")
 	}
 
-	if strings.Contains(cq, ":") {
+	fieldRe := regexp.MustCompile(`\w+:[^ ]+`)
+	if fieldRe.MatchString(cq) {
+		parts := strings.Split(cq, " ")
+
+		cq = ""
+		for _, part := range parts {
+			fieldParts := strings.SplitN(part, ":", 2)
+			if len(fieldParts) > 1 {
+				cq += fieldParts[0] + ":" + strings.ToLower(fieldParts[1]) + " "
+			} else {
+				cq += part
+			}
+		}
 		return cq // Sophisticated field based search
 	}
 
