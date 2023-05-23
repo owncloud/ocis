@@ -808,3 +808,46 @@ Feature: user GDPR (General Data Protection Regulation) report
       }
     }
     """
+
+
+  Scenario: generate a GDPR report and check events when user deletes a resource
+    Given user "Alice" has created folder "/folderMain"
+    And user "Alice" has deleted folder "/folderMain"
+    When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
+    And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
+    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    And the downloaded JSON content should contain event type "events.ItemTrashed" in item 'events' and should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "event"
+      ],
+      "properties": {
+        "event" : {
+          "type": "object",
+          "required": [
+            "Executant",
+            "Owner",
+            "ID",
+            "Ref",
+            "SpaceOwner"
+          ],
+          "properties": {
+            "Ref": {
+              "type": "object",
+              "required": [
+                "path"
+              ],
+              "properties": {
+                "path" : {
+                  "type": "string",
+                  "enum": ["./folderMain"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
