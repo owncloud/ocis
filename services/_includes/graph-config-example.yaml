@@ -47,6 +47,7 @@ http:
     - Content-Type
     - Accept
     - X-Requested-With
+    - X-Request-Id
     - Purge
     - Restore
     allow_credentials: true

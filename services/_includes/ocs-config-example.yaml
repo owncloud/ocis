@@ -35,6 +35,7 @@ http:
     - Content-Type
     - Accept
     - X-Requested-With
+    - X-Request-Id
     allow_credentials: true
   tls:
     enabled: false

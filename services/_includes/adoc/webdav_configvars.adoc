@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-24-07-13-32]
+[#deprecation-note-2023-05-24-07-40-36]
 [caption=]
 .Deprecation notes for the webdav service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -201,7 +201,7 @@ a|`OCIS_CORS_ALLOW_HEADERS` +
 a| [subs=-attributes]
 ++[]string ++
 a| [subs=-attributes]
-++[Authorization Origin Content-Type Accept X-Requested-With] ++
+++[Authorization Origin Content-Type Accept X-Requested-With X-Request-Id] ++
 a| [subs=-attributes]
 A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
 
@@ -263,7 +263,7 @@ CS3 path layout to use when forwarding /webdav requests
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-05-24-07-13-32[Deprecation Note]
+xref:deprecation-note-2023-05-24-07-40-36[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -273,7 +273,7 @@ CS3 gateway used to look up user metadata
 
 a|`OCIS_REVA_GATEWAY_TLS_MODE` +
 `REVA_GATEWAY_TLS_MODE` +
-xref:deprecation-note-2023-05-24-07-13-32[Deprecation Note]
+xref:deprecation-note-2023-05-24-07-40-36[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -283,7 +283,7 @@ TLS mode for grpc connection to the CS3 gateway endpoint. Possible values are 'o
 
 a|`OCIS_REVA_GATEWAY_TLS_CACERT` +
 `REVA_GATEWAY_TLS_CACERT` +
-xref:deprecation-note-2023-05-24-07-13-32[Deprecation Note]
+xref:deprecation-note-2023-05-24-07-40-36[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

@@ -24,6 +24,48 @@ http:
     key: ""
   root: /
   cache_ttl: 604800
+  cors:
+    allow_origins:
+    - '*'
+    allow_methods:
+    - OPTIONS
+    - HEAD
+    - GET
+    - PUT
+    - PATCH
+    - POST
+    - DELETE
+    - MKCOL
+    - PROPFIND
+    - PROPPATCH
+    - MOVE
+    - COPY
+    - REPORT
+    - SEARCH
+    allow_headers:
+    - Origin
+    - Accept
+    - Content-Type
+    - Depth
+    - Authorization
+    - Ocs-Apirequest
+    - If-None-Match
+    - If-Match
+    - Destination
+    - Overwrite
+    - X-Request-Id
+    - X-Requested-With
+    - Tus-Resumable
+    - Tus-Checksum-Algorithm
+    - Upload-Concat
+    - Upload-Length
+    - Upload-Metadata
+    - Upload-Defer-Length
+    - Upload-Expires
+    - Upload-Checksum
+    - Upload-Offset
+    - X-HTTP-Method-Override
+    allow_credentials: true
 asset:
   path: ~/.ocis/web/assets
 file: ""

@@ -39,6 +39,7 @@ http:
     - Content-Type
     - Accept
     - X-Requested-With
+    - X-Request-Id
     allow_credentials: true
 grpc:
   addr: 127.0.0.1:9191

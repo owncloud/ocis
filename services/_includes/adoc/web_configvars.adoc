@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-05-24-07-13-32]
+[#deprecation-note-2023-05-24-07-40-36]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -206,6 +206,46 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 Cache policy in seconds for ownCloud Web assets.
 
+a|`OCIS_CORS_ALLOW_ORIGINS` +
+`WEB_CORS_ALLOW_ORIGINS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[*] ++
+a| [subs=-attributes]
+A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin
+
+a|`OCIS_CORS_ALLOW_METHODS` +
+`WEB_CORS_ALLOW_METHODS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[OPTIONS HEAD GET PUT PATCH POST DELETE MKCOL PROPFIND PROPPATCH MOVE COPY REPORT SEARCH] ++
+a| [subs=-attributes]
+A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method
+
+a|`OCIS_CORS_ALLOW_HEADERS` +
+`WEB_CORS_ALLOW_HEADERS` +
+
+a| [subs=-attributes]
+++[]string ++
+a| [subs=-attributes]
+++[Origin Accept Content-Type Depth Authorization Ocs-Apirequest If-None-Match If-Match Destination Overwrite X-Request-Id X-Requested-With Tus-Resumable Tus-Checksum-Algorithm Upload-Concat Upload-Length Upload-Metadata Upload-Defer-Length Upload-Expires Upload-Checksum Upload-Offset X-HTTP-Method-Override] ++
+a| [subs=-attributes]
+A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.
+
+a|`OCIS_CORS_ALLOW_CREDENTIALS` +
+`WEB_CORS_ALLOW_CREDENTIALS` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++true ++
+a| [subs=-attributes]
+Allow credentials for CORS. See following chapter for more details: *Access-Control-Allow-Credentials* at \https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
+
 a|`WEB_ASSET_PATH` +
 
 a| [subs=-attributes]
@@ -217,7 +257,7 @@ Serve ownCloud Web assets from a path on the filesystem instead of the builtin a
 
 a|`WEB_UI_CONFIG_FILE` +
 `WEB_UI_CONFIG` +
-xref:deprecation-note-2023-05-24-07-13-32[Deprecation Note]
+xref:deprecation-note-2023-05-24-07-40-36[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -227,7 +267,7 @@ Read the ownCloud Web json based configuration from this path/file. The config f
 
 a|`WEB_UI_CONFIG_FILE` +
 `WEB_UI_PATH` +
-xref:deprecation-note-2023-05-24-07-13-32[Deprecation Note]
+xref:deprecation-note-2023-05-24-07-40-36[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

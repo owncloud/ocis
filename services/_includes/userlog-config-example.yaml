@@ -30,6 +30,8 @@ http:
     - Content-Type
     - Accept
     - X-Requested-With
+    - X-Request-Id
+    - Ocs-Apirequest
     allow_credentials: true
   tls:
     enabled: false
