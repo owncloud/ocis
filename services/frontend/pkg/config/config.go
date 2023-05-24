@@ -47,7 +47,7 @@ type Config struct {
 	OCS                    OCS         `yaml:"ocs"`
 	Checksums              Checksums   `yaml:"checksums"`
 	ReadOnlyUserAttributes []string    `yaml:"read_only_user_attributes" env:"FRONTEND_READONLY_USER_ATTRIBUTES" desc:"Comma separated list of user attributes to indicate as read-only. Supported values: 'user.onPremisesSamAccountName' (username), 'user.displayName', 'user.mail', 'user.passwordProfile' (password), 'user.appRoleAssignments' (role), 'user.accountEnabled' (login allowed), 'drive.quota' (quota)."`
-	LDAPServerWriteEnabled bool        `yaml:"ldap_server_write_enabled" env:"OCIS_LDAP_SERVER_WRITE_ENABLED;FRONTEND_LDAP_SERVER_WRITE_ENABLED" desc:"Allow to create, modify and delete LDAP users via the GRAPH API."`
+	LDAPServerWriteEnabled bool        `yaml:"ldap_server_write_enabled" env:"OCIS_LDAP_SERVER_WRITE_ENABLED;FRONTEND_LDAP_SERVER_WRITE_ENABLED" desc:"Allow creating, modifying and deleting LDAP users via the GRAPH API. This can only be set to 'true' when keeping default settings for the LDAP user and group attribute types (the 'OCIS_LDAP_USER_SCHEMA_* and 'OCIS_LDAP_GROUP_SCHEMA_* variables)."`
 
 	Middleware Middleware `yaml:"middleware"`
 
