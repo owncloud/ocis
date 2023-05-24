@@ -240,3 +240,46 @@ Feature: Notification
       | resource      |
       | textfile1.txt |
       | my_data       |
+
+
+  Scenario Outline: get a notification about a file share in various languages
+    Given user "Brian" has switched the system language to "<language>"
+    And user "Alice" has shared entry "textfile1.txt" with user "Brian" with permissions "17"
+    When user "Brian" lists all notifications
+    Then the HTTP status code should be "200"
+    And the JSON response should contain a notification message with the subject "<subject>" and the message-details should match
+      """
+      {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "enum": [
+              "<message>"
+            ]
+          }
+        }
+      }
+      """
+    Examples:
+      | language | subject            | message                                          |
+      | de       | Neue Freigabe      | Alice Hansen hat textfile1.txt mit Ihnen geteilt |
+      | en       | Resource shared    | Alice Hansen shared textfile1.txt with you       |
+      | es       | Recurso compartido | Alice Hansen compartió textfile1.txt contigo     |
+
+
+  Scenario Outline: notifications related to a resource get deleted when the resource is deleted
+    Given user "Alice" has shared entry "<resource>" with user "Brian"
+    And user "Brian" has accepted share "/<resource>" offered by user "Alice"
+    And user "Alice" has unshared entity "<resource>" shared to "Brian"
+    And user "Alice" has deleted entity "/<resource>"
+    When user "Brian" lists all notifications
+    Then the HTTP status code should be "200"
+    And the notifications should be empty
+    Examples:
+      | resource      |
+      | textfile1.txt |
+      | my_data       |
