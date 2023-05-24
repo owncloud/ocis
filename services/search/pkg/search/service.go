@@ -30,6 +30,7 @@ import (
 
 const (
 	_spaceStateTrashed = "trashed"
+	_slowQueryDuration = 500 * time.Millisecond
 )
 
 // Searcher is the interface to the SearchService
@@ -255,19 +256,26 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		permissions = space.GetRootInfo().GetPermissionSet()
 	}
 
-	res, err := s.engine.Search(ctx, &searchsvc.SearchIndexRequest{
+	searchRequest := &searchsvc.SearchIndexRequest{
 		Query: req.Query,
 		Ref: &searchmsg.Reference{
 			ResourceId: searchRootID,
 			Path:       mountpointPrefix,
 		},
 		PageSize: req.PageSize,
-	})
+	}
+	start := time.Now()
+	res, err := s.engine.Search(ctx, searchRequest)
+	duration := time.Since(start)
 	if err != nil {
-		s.logger.Error().Err(err).Str("space", space.Id.OpaqueId).Msg("failed to search the index")
+		s.logger.Error().Err(err).Str("duration", fmt.Sprint(duration)).Str("space", space.Id.OpaqueId).Msg("failed to search the index")
 		return nil, err
 	}
-	s.logger.Debug().Str("space", space.Id.OpaqueId).Int("hits", len(res.Matches)).Msg("space search done")
+	if duration > _slowQueryDuration {
+		s.logger.Info().Interface("searchRequest", searchRequest).Str("duration", fmt.Sprint(duration)).Str("space", space.Id.OpaqueId).Int("hits", len(res.Matches)).Msg("slow space search")
+	} else {
+		s.logger.Debug().Interface("searchRequest", searchRequest).Str("duration", fmt.Sprint(duration)).Str("space", space.Id.OpaqueId).Int("hits", len(res.Matches)).Msg("space search done")
+	}
 
 	for _, match := range res.Matches {
 		if mountpointPrefix != "" {
