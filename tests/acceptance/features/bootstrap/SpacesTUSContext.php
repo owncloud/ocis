@@ -151,6 +151,30 @@ class SpacesTUSContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" has uploaded a file with content "([^"]*)" to "([^"]*)" via TUS inside of the space "([^"]*)"$/
+	 *
+	 * @param string $user
+	 * @param string $content
+	 * @param string $resource
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 * @throws Exception|GuzzleException
+	 */
+	public function userHasUploadedAFileWithContentToViaTusInsideOfTheSpace(
+		string $user,
+		string $content,
+		string $resource,
+		string $spaceName
+	): void {
+		$this->userUploadsAFileWithContentToViaTusInsideOfTheSpaceUsingTheWebdavApi($user, $content, $resource, $spaceName);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" uploads a file "([^"]*)" to "([^"]*)" with mtime "([^"]*)" via TUS inside of the space "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
