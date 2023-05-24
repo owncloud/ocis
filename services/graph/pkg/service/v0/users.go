@@ -31,7 +31,7 @@ import (
 // GetMe implements the Service interface.
 func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling get user in /me")
+	logger.Debug().Msg("calling get user in /me")
 	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 
 	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
@@ -116,7 +116,7 @@ func (g Graph) fetchAppRoleAssignments(ctx context.Context, accountuuid string) 
 // GetUserDrive implements the Service interface.
 func (g Graph) GetUserDrive(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Interface("query", r.URL.Query()).Msg("calling get user drive")
+	logger.Debug().Interface("query", r.URL.Query()).Msg("calling get user drive")
 
 	userID, err := url.PathUnescape(chi.URLParam(r, "userID"))
 	if err != nil {
@@ -191,7 +191,7 @@ func (g Graph) GetUserDrive(w http.ResponseWriter, r *http.Request) {
 // GetUsers implements the Service interface.
 func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Interface("query", r.URL.Query()).Msg("calling get users")
+	logger.Debug().Interface("query", r.URL.Query()).Msg("calling get users")
 	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
 	if err != nil {
@@ -262,36 +262,36 @@ func (g Graph) GetUsers(w http.ResponseWriter, r *http.Request) {
 // PostUser implements the Service interface.
 func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Interface("body", r.Body).Msg("calling create user")
+	logger.Debug().Msg("calling create user")
 	u := libregraph.NewUser()
 	err := StrictJSONUnmarshal(r.Body, u)
 	if err != nil {
-		logger.Debug().Err(err).Interface("body", r.Body).Msg("could not create user: invalid request body")
+		logger.Info().Err(err).Msg("could not create user: invalid request body")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("invalid request body: %v", err.Error()))
 		return
 	}
 
 	if _, ok := u.GetDisplayNameOk(); !ok {
-		logger.Debug().Err(err).Interface("user", u).Msg("could not create user: missing required Attribute: 'displayName'")
+		logger.Info().Err(err).Interface("user", u).Msg("could not create user: missing required Attribute: 'displayName'")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'displayName'")
 		return
 	}
 	if accountName, ok := u.GetOnPremisesSamAccountNameOk(); ok {
 		if !g.isValidUsername(*accountName) {
-			logger.Debug().Str("username", *accountName).Msg("could not create user: username must be at least the local part of an email")
-			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("username %s must be at least the local part of an email", *u.OnPremisesSamAccountName))
+			logger.Info().Str("username", *accountName).Msg("could not create user: invalid username")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Invalid username")
 			return
 		}
 	} else {
-		logger.Debug().Interface("user", u).Msg("could not create user: missing required Attribute: 'onPremisesSamAccountName'")
+		logger.Info().Interface("user", u).Msg("could not create user: missing required Attribute: 'onPremisesSamAccountName'")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing required Attribute: 'onPremisesSamAccountName'")
 		return
 	}
 
 	if mail, ok := u.GetMailOk(); ok {
 		if !isValidEmail(*mail) {
-			logger.Debug().Str("mail", *u.Mail).Msg("could not create user: invalid email address")
-			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("%v is not a valid email address", *u.Mail))
+			logger.Info().Str("mail", *u.Mail).Msg("could not create user: invalid email address")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid email address")
 			return
 		}
 	}
@@ -300,14 +300,14 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	// generating them in the backend ourselves or rely on the Backend's
 	// storage (e.g. LDAP) to provide a unique ID.
 	if _, ok := u.GetIdOk(); ok {
-		logger.Debug().Interface("user", u).Msg("could not create user: user id is a read-only attribute")
+		logger.Info().Interface("user", u).Msg("could not create user: user id is a read-only attribute")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "user id is a read-only attribute")
 		return
 	}
 
 	if u.HasUserType() {
 		if !isValidUserType(*u.UserType) {
-			logger.Debug().Interface("user", u).Msg("invalid userType attribute")
+			logger.Info().Interface("user", u).Msg("invalid userType attribute")
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid userType attribute, valid options are 'Member' or 'Guest'")
 			return
 		}
@@ -317,7 +317,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 
 	logger.Debug().Interface("user", u).Msg("calling create user on backend")
 	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {
-		logger.Debug().Err(err).Msg("could not create user: backend error")
+		logger.Error().Err(err).Msg("could not create user: backend error")
 		var ecErr errorcode.Error
 		if errors.As(err, &ecErr) {
 			ecErr.Render(w, r)
@@ -355,7 +355,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 // GetUser implements the Service interface.
 func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling get user")
+	logger.Debug().Msg("calling get user")
 
 	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 
@@ -499,7 +499,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 // DeleteUser implements the Service interface.
 func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling delete user")
+	logger.Debug().Msg("calling delete user")
 	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
 	userID := chi.URLParam(r, "userID")
 	userID, err := url.PathUnescape(userID)
@@ -624,7 +624,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 // ExistingUser
 func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling patch user")
+	logger.Debug().Msg("calling patch user")
 	nameOrID := chi.URLParam(r, "userID")
 	nameOrID, err := url.PathUnescape(nameOrID)
 	if err != nil {
