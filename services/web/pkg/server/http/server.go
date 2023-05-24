@@ -5,6 +5,7 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/cors"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -55,6 +56,13 @@ func Server(opts ...Option) (http.Service, error) {
 			),
 			middleware.Logger(
 				options.Logger,
+			),
+			middleware.Cors(
+				cors.Logger(options.Logger),
+				cors.AllowedOrigins(options.Config.HTTP.CORS.AllowedOrigins),
+				cors.AllowedMethods(options.Config.HTTP.CORS.AllowedMethods),
+				cors.AllowedHeaders(options.Config.HTTP.CORS.AllowedHeaders),
+				cors.AllowCredentials(options.Config.HTTP.CORS.AllowCredentials),
 			),
 		),
 	)
