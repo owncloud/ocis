@@ -229,6 +229,8 @@ func (c cs3backend) isAlreadyExists(resp *http.Response) (bool, error) {
 		return false, err
 	}
 
+	c.logger.Warn().Str("OData Error", oDataErr.Error.Message).Msg("Error Response")
+
 	if oDataErr.Error.Code == errorcode.NameAlreadyExists.String() {
 		return true, nil
 	}
