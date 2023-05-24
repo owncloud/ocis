@@ -584,7 +584,7 @@ Feature: user GDPR (General Data Protection Regulation) report
     """
 
 
-  Scenario: generate a GDPR report and check events when user creates a share for a folder
+  Scenario: generate a GDPR report and check events when a user shares a folder
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folderMain"
     And user "Alice" has shared entry "/folderMain" with user "Brian"
@@ -710,7 +710,7 @@ Feature: user GDPR (General Data Protection Regulation) report
     """
 
 
-  Scenario: generate a GDPR report and check events when user creates a link for a resource
+  Scenario: generate a GDPR report and check events when a user creates a public link share
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folderMain"
     And user "Alice" has created a public link share with settings
