@@ -170,9 +170,9 @@ default:
         - GraphContext:
         - OcisConfigContext:
 
-    apiEmailNotification:
+    apiNotification:
       paths:
-        - '%paths.base%/../features/apiEmailNotification'
+        - '%paths.base%/../features/apiNotification'
       context: *common_ldap_suite_context
       contexts:
         - NotificationContext:

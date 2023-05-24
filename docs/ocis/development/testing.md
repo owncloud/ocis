@@ -352,7 +352,7 @@ TEST_OCIS=true \
 TEST_SERVER_URL="https://localhost:9200" \
 EMAIL_HOST="localhost" \
 EMAIL_PORT=9000 \
-BEHAT_FEATURE="tests/acceptance/features/apiEmailNotification/emailNotification.feature" \
+BEHAT_FEATURE="tests/acceptance/features/apiNotification/emailNotification.feature" \
 make test-acceptance-api
 ```
 
