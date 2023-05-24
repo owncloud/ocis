@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2019 The NATS Authors
+ * Copyright 2018-2022 The NATS Authors
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,6 +39,10 @@ const (
 	UserClaim = "user"
 	// ActivationClaim is the type of an activation JWT
 	ActivationClaim = "activation"
+	// AuthorizationRequestClaim is the type of an auth request claim JWT
+	AuthorizationRequestClaim = "authorization_request"
+	// AuthorizationResponseClaim is the response for an auth request
+	AuthorizationResponseClaim = "authorization_response"
 	// GenericClaim is a type that doesn't match Operator/Account/User/ActionClaim
 	GenericClaim = "generic"
 )
@@ -50,6 +54,10 @@ func IsGenericClaimType(s string) bool {
 	case AccountClaim:
 		fallthrough
 	case UserClaim:
+		fallthrough
+	case AuthorizationRequestClaim:
+		fallthrough
+	case AuthorizationResponseClaim:
 		fallthrough
 	case ActivationClaim:
 		return false

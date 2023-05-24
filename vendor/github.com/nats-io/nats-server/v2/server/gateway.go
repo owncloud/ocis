@@ -761,7 +761,7 @@ func (s *Server) createGateway(cfg *gatewayCfg, url *url.URL, conn net.Conn) {
 	// Snapshot server options.
 	opts := s.getOpts()
 
-	now := time.Now().UTC()
+	now := time.Now()
 	c := &client{srv: s, nc: conn, start: now, last: now, kind: GATEWAY}
 
 	// Are we creating the gateway based on the configuration
@@ -1320,7 +1320,7 @@ func (s *Server) processGatewayInfoFromRoute(info *Info, routeSrvID string, rout
 
 // Sends INFO protocols to the given route connection for each known Gateway.
 // These will be processed by the route and delegated to the gateway code to
-// imvoke processImplicitGateway.
+// invoke processImplicitGateway.
 func (s *Server) sendGatewayConfigsToRoute(route *client) {
 	gw := s.gateway
 	gw.RLock()
@@ -2680,12 +2680,11 @@ func (s *Server) gatewayHandleSubjectNoInterest(c *client, acc *Account, accName
 	// If there is no subscription for this account, we would normally
 	// send an A-, however, if this account has the internal subscription
 	// for service reply, send a specific RS- for the subject instead.
-	hasSubs := acc.sl.Count() > 0
-	if !hasSubs {
-		acc.mu.RLock()
-		hasSubs = acc.siReply != nil
-		acc.mu.RUnlock()
-	}
+	// Need to grab the lock here since sublist can change during reload.
+	acc.mu.RLock()
+	hasSubs := acc.sl.Count() > 0 || acc.siReply != nil
+	acc.mu.RUnlock()
+
 	// If there is at least a subscription, possibly send RS-
 	if hasSubs {
 		sendProto := false

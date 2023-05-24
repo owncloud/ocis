@@ -93,6 +93,9 @@ type JetStreamManager interface {
 
 	// AccountInfo retrieves info about the JetStream usage from an account.
 	AccountInfo(opts ...JSOpt) (*AccountInfo, error)
+
+	// StreamNameBySubject returns a stream matching given subject.
+	StreamNameBySubject(string, ...JSOpt) (string, error)
 }
 
 // StreamConfig will determine the properties for a stream.
@@ -307,7 +310,7 @@ func (js *js) AddConsumer(stream string, cfg *ConsumerConfig, opts ...JSOpt) (*C
 		consumerName = cfg.Durable
 	}
 	if consumerName != _EMPTY_ {
-		consInfo, err := js.ConsumerInfo(stream, consumerName)
+		consInfo, err := js.ConsumerInfo(stream, consumerName, opts...)
 		if err != nil && !errors.Is(err, ErrConsumerNotFound) && !errors.Is(err, ErrStreamNotFound) {
 			return nil, err
 		}
@@ -316,6 +319,8 @@ func (js *js) AddConsumer(stream string, cfg *ConsumerConfig, opts ...JSOpt) (*C
 			sameConfig := checkConfig(&consInfo.Config, cfg)
 			if sameConfig != nil {
 				return nil, fmt.Errorf("%w: creating consumer %q on stream %q", ErrConsumerNameAlreadyInUse, consumerName, stream)
+			} else {
+				return consInfo, nil
 			}
 		}
 	}
@@ -406,19 +411,20 @@ func checkStreamName(stream string) error {
 	if stream == _EMPTY_ {
 		return ErrStreamNameRequired
 	}
-	if strings.Contains(stream, ".") {
+	if strings.ContainsAny(stream, ". ") {
 		return ErrInvalidStreamName
 	}
 	return nil
 }
 
-// Check that the durable name exists and is valid, that is, that it does not contain any "."
+// Check that the consumer name is not empty and is valid (does not contain "." and " ").
+// Additional consumer name validation is done in nats-server.
 // Returns ErrConsumerNameRequired if consumer name is empty, ErrInvalidConsumerName is invalid, otherwise nil
 func checkConsumerName(consumer string) error {
 	if consumer == _EMPTY_ {
 		return ErrConsumerNameRequired
 	}
-	if strings.Contains(consumer, ".") {
+	if strings.ContainsAny(consumer, ". ") {
 		return ErrInvalidConsumerName
 	}
 	return nil
@@ -864,12 +870,20 @@ func (js *js) StreamInfo(stream string, opts ...JSOpt) (*StreamInfo, error) {
 
 // StreamInfo shows config and current state for this stream.
 type StreamInfo struct {
-	Config  StreamConfig        `json:"config"`
-	Created time.Time           `json:"created"`
-	State   StreamState         `json:"state"`
-	Cluster *ClusterInfo        `json:"cluster,omitempty"`
-	Mirror  *StreamSourceInfo   `json:"mirror,omitempty"`
-	Sources []*StreamSourceInfo `json:"sources,omitempty"`
+	Config     StreamConfig        `json:"config"`
+	Created    time.Time           `json:"created"`
+	State      StreamState         `json:"state"`
+	Cluster    *ClusterInfo        `json:"cluster,omitempty"`
+	Mirror     *StreamSourceInfo   `json:"mirror,omitempty"`
+	Sources    []*StreamSourceInfo `json:"sources,omitempty"`
+	Alternates []*StreamAlternate  `json:"alternates,omitempty"`
+}
+
+// StreamAlternate is an alternate stream represented by a mirror.
+type StreamAlternate struct {
+	Name    string `json:"name"`
+	Domain  string `json:"domain,omitempty"`
+	Cluster string `json:"cluster"`
 }
 
 // StreamSourceInfo shows information about an upstream stream source.
@@ -1513,6 +1527,40 @@ func (jsc *js) StreamNames(opts ...JSOpt) <-chan string {
 	}()
 
 	return ch
+}
+
+// StreamNameBySubject returns a stream name that matches the subject.
+func (jsc *js) StreamNameBySubject(subj string, opts ...JSOpt) (string, error) {
+	o, cancel, err := getJSContextOpts(jsc.opts, opts...)
+	if err != nil {
+		return "", err
+	}
+	if cancel != nil {
+		defer cancel()
+	}
+
+	var slr streamNamesResponse
+	req := &streamRequest{subj}
+	j, err := json.Marshal(req)
+	if err != nil {
+		return _EMPTY_, err
+	}
+
+	resp, err := jsc.apiRequestWithContext(o.ctx, jsc.apiSubj(apiStreams), j)
+	if err != nil {
+		if err == ErrNoResponders {
+			err = ErrJetStreamNotEnabled
+		}
+		return _EMPTY_, err
+	}
+	if err := json.Unmarshal(resp.Data, &slr); err != nil {
+		return _EMPTY_, err
+	}
+
+	if slr.Error != nil || len(slr.Streams) != 1 {
+		return _EMPTY_, ErrNoMatchingStream
+	}
+	return slr.Streams[0], nil
 }
 
 func getJSContextOpts(defs *jsOpts, opts ...JSOpt) (*jsOpts, context.CancelFunc, error) {

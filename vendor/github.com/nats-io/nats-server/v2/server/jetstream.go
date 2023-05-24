@@ -1,4 +1,4 @@
-// Copyright 2019-2022 The NATS Authors
+// Copyright 2019-2023 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -109,11 +109,14 @@ type jetStream struct {
 	started       time.Time
 
 	// System level request to purge a stream move
-	accountPurge   *subscription
+	accountPurge *subscription
+
+	// Some bools regarding general state.
 	metaRecovering bool
 	standAlone     bool
 	disabled       bool
 	oos            bool
+	shuttingDown   bool
 }
 
 type remoteUsage struct {
@@ -137,12 +140,13 @@ type jsAccount struct {
 	js        *jetStream
 	account   *Account
 	storeDir  string
+	inflight  sync.Map
 	streams   map[string]*stream
 	templates map[string]*streamTemplate
 	store     TemplateStore
 
 	// From server
-	sendq *ipQueue // of *pubMsg
+	sendq *ipQueue[*pubMsg]
 
 	// Usage/limits related fields that will be protected by usageMu
 	usageMu    sync.RWMutex
@@ -463,7 +467,7 @@ func (s *Server) restartJetStream() error {
 	return nil
 }
 
-// checkStreamExports will check if we have the JS exports setup
+// checkJetStreamExports will check if we have the JS exports setup
 // on the system account, and if not go ahead and set them up.
 func (s *Server) checkJetStreamExports() {
 	if sacc := s.SystemAccount(); sacc != nil {
@@ -578,6 +582,9 @@ func (s *Server) DisableJetStream() error {
 	// Normal shutdown.
 	s.shutdownJetStream()
 
+	// Shut down the RAFT groups.
+	s.shutdownRaftNodes()
+
 	return nil
 }
 
@@ -634,7 +641,7 @@ func (a *Account) enableAllJetStreamServiceImportsAndMappings() error {
 	return nil
 }
 
-// enableJetStreamEnabledServiceImportOnly will enable the single service import responder.
+// enableJetStreamInfoServiceImportOnly will enable the single service import responder.
 // Should we do them all regardless?
 func (a *Account) enableJetStreamInfoServiceImportOnly() error {
 	// Check if this import would be overshadowed. This can happen when accounts
@@ -784,9 +791,9 @@ func (js *jetStream) setJetStreamStandAlone(isStandAlone bool) {
 // JetStreamEnabled reports if jetstream is enabled for this server.
 func (s *Server) JetStreamEnabled() bool {
 	var js *jetStream
-	s.mu.Lock()
+	s.mu.RLock()
 	js = s.js
-	s.mu.Unlock()
+	s.mu.RUnlock()
 	return js.isEnabled()
 }
 
@@ -851,11 +858,18 @@ func (s *Server) signalPullConsumers() {
 	}
 }
 
+// Helper for determining if we are shutting down.
+func (js *jetStream) isShuttingDown() bool {
+	js.mu.RLock()
+	defer js.mu.RUnlock()
+	return js.shuttingDown
+}
+
 // Shutdown jetstream for this server.
 func (s *Server) shutdownJetStream() {
-	s.mu.Lock()
+	s.mu.RLock()
 	js := s.js
-	s.mu.Unlock()
+	s.mu.RUnlock()
 
 	if js == nil {
 		return
@@ -883,6 +897,8 @@ func (s *Server) shutdownJetStream() {
 	}
 	accPurgeSub := js.accountPurge
 	js.accountPurge = nil
+	// Signal we are shutting down.
+	js.shuttingDown = true
 	js.mu.Unlock()
 
 	if accPurgeSub != nil {
@@ -1142,6 +1158,10 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits) erro
 	}
 	var consumers []*ce
 
+	// Collect any interest policy streams to check for
+	// https://github.com/nats-io/nats-server/issues/3612
+	var ipstreams []*stream
+
 	// Remember if we should be encrypted and what cipher we think we should use.
 	encrypted := s.getOpts().JetStreamKey != _EMPTY_
 	plaintext := true
@@ -1284,6 +1304,12 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits) erro
 		state := mset.state()
 		s.Noticef("  Restored %s messages for stream '%s > %s'", comma(int64(state.Msgs)), mset.accName(), mset.name())
 
+		// Collect to check for dangling messages.
+		// TODO(dlc) - Can be removed eventually.
+		if cfg.StreamConfig.Retention == InterestPolicy {
+			ipstreams = append(ipstreams, mset)
+		}
+
 		// Now do the consumers.
 		odir := filepath.Join(sdir, fi.Name(), consumerDir)
 		consumers = append(consumers, &ce{mset, odir})
@@ -1367,6 +1393,12 @@ func (a *Account) EnableJetStream(limits map[string]JetStreamAccountLimits) erro
 
 	// Make sure to cleanup any old remaining snapshots.
 	os.RemoveAll(filepath.Join(jsa.storeDir, snapsDir))
+
+	// Check interest policy streams for auto cleanup.
+	for _, mset := range ipstreams {
+		mset.checkForOrphanMsgs()
+		mset.checkConsumerReplication()
+	}
 
 	s.Debugf("JetStream state for account %q recovered", a.Name)
 
@@ -1682,14 +1714,13 @@ func (a *Account) JetStreamEnabled() bool {
 }
 
 func (jsa *jsAccount) remoteUpdateUsage(sub *subscription, c *client, _ *Account, subject, _ string, msg []byte) {
-	const usageSize = 32
-
 	// jsa.js.srv is immutable and guaranteed to no be nil, so no lock needed.
 	s := jsa.js.srv
 
 	jsa.usageMu.Lock()
-	if len(msg) < usageSize {
-		jsa.usageMu.Unlock()
+	defer jsa.usageMu.Unlock()
+
+	if len(msg) < minUsageUpdateLen {
 		s.Warnf("Ignoring remote usage update with size too short")
 		return
 	}
@@ -1698,7 +1729,6 @@ func (jsa *jsAccount) remoteUpdateUsage(sub *subscription, c *client, _ *Account
 		rnode = subject[li+1:]
 	}
 	if rnode == _EMPTY_ {
-		jsa.usageMu.Unlock()
 		s.Warnf("Received remote usage update with no remote node")
 		return
 	}
@@ -1733,21 +1763,31 @@ func (jsa *jsAccount) remoteUpdateUsage(sub *subscription, c *client, _ *Account
 	apiTotal, apiErrors := le.Uint64(msg[16:]), le.Uint64(msg[24:])
 	memUsed, storeUsed := int64(le.Uint64(msg[0:])), int64(le.Uint64(msg[8:]))
 
-	// we later extended the data structure to support multiple tiers
-	excessRecordCnt := uint32(0)
-	tierName := _EMPTY_
-	if len(msg) >= 44 {
-		excessRecordCnt = le.Uint32(msg[32:])
-		length := le.Uint64(msg[36:])
-		tierName = string(msg[44 : 44+length])
-		msg = msg[44+length:]
+	// We later extended the data structure to support multiple tiers
+	var excessRecordCnt uint32
+	var tierName string
+
+	if len(msg) >= usageMultiTiersLen {
+		excessRecordCnt = le.Uint32(msg[minUsageUpdateLen:])
+		length := le.Uint64(msg[minUsageUpdateLen+4:])
+		// Need to protect past this point in case this is wrong.
+		if uint64(len(msg)) < usageMultiTiersLen+length {
+			s.Warnf("Received corrupt remote usage update")
+			return
+		}
+		tierName = string(msg[usageMultiTiersLen : usageMultiTiersLen+length])
+		msg = msg[usageMultiTiersLen+length:]
 	}
 	updateTotal(tierName, memUsed, storeUsed)
-	for ; excessRecordCnt > 0 && len(msg) >= 24; excessRecordCnt-- {
+	for ; excessRecordCnt > 0 && len(msg) >= usageRecordLen; excessRecordCnt-- {
 		memUsed, storeUsed := int64(le.Uint64(msg[0:])), int64(le.Uint64(msg[8:]))
 		length := le.Uint64(msg[16:])
-		tierName = string(msg[24 : 24+length])
-		msg = msg[24+length:]
+		if uint64(len(msg)) < usageRecordLen+length {
+			s.Warnf("Received corrupt remote usage update on excess record")
+			return
+		}
+		tierName = string(msg[usageRecordLen : usageRecordLen+length])
+		msg = msg[usageRecordLen+length:]
 		updateTotal(tierName, memUsed, storeUsed)
 	}
 	jsa.apiTotal -= rUsage.api
@@ -1756,7 +1796,79 @@ func (jsa *jsAccount) remoteUpdateUsage(sub *subscription, c *client, _ *Account
 	rUsage.err = apiErrors
 	jsa.apiTotal += apiTotal
 	jsa.apiErrors += apiErrors
-	jsa.usageMu.Unlock()
+}
+
+// When we detect a skew of some sort this will verify the usage reporting is correct.
+// No locks should be held.
+func (jsa *jsAccount) checkAndSyncUsage(tierName string, storeType StorageType) {
+	// Hold the account read lock and the usage lock while we calculate.
+	// We scope by tier and storage type, but if R3 File has 200 streams etc. could
+	// show a pause. I did test with > 100 non-active streams and was 80-200ns or so.
+	// Should be rare this gets called as well.
+	jsa.mu.RLock()
+	defer jsa.mu.RUnlock()
+	js := jsa.js
+	if js == nil {
+		return
+	}
+	s := js.srv
+
+	// We need to collect the stream stores before we acquire the usage lock since in storeUpdates the
+	// stream lock could be held if deletion are inline with storing a new message, e.g. via limits.
+	var stores []StreamStore
+	for _, mset := range jsa.streams {
+		mset.mu.RLock()
+		if mset.tier == tierName && mset.stype == storeType && mset.store != nil {
+			stores = append(stores, mset.store)
+		}
+		mset.mu.RUnlock()
+	}
+
+	// Now range and qualify, hold usage lock to prevent updates.
+	jsa.usageMu.Lock()
+	defer jsa.usageMu.Unlock()
+
+	usage, ok := jsa.usage[tierName]
+	if !ok {
+		return
+	}
+
+	// Collect current total for all stream stores that matched.
+	var total int64
+	var state StreamState
+	for _, store := range stores {
+		store.FastState(&state)
+		total += int64(state.Bytes)
+	}
+
+	var needClusterUpdate bool
+	// If we do not match on our calculations compute delta and adjust.
+	if storeType == MemoryStorage {
+		if total != usage.local.mem {
+			s.Warnf("MemStore usage drift of %v vs %v detected for account %q",
+				friendlyBytes(total), friendlyBytes(usage.local.mem), jsa.account.GetName())
+			delta := total - usage.local.mem
+			usage.local.mem += delta
+			usage.total.mem += delta
+			atomic.AddInt64(&js.memUsed, delta)
+			needClusterUpdate = true
+		}
+	} else {
+		if total != usage.local.store {
+			s.Warnf("FileStore usage drift of %v vs %v detected for account %q",
+				friendlyBytes(total), friendlyBytes(usage.local.store), jsa.account.GetName())
+			delta := total - usage.local.store
+			usage.local.store += delta
+			usage.total.store += delta
+			atomic.AddInt64(&js.storeUsed, delta)
+			needClusterUpdate = true
+		}
+	}
+
+	// Publish our local updates if in clustered mode.
+	if needClusterUpdate && js.isClusteredNoLock() {
+		jsa.sendClusterUsageUpdate()
+	}
 }
 
 // Updates accounting on in use memory and storage. This is called from locally
@@ -1769,9 +1881,8 @@ func (jsa *jsAccount) updateUsage(tierName string, storeType StorageType, delta 
 	// use of an atomic to do the check without having data race reports.
 	isClustered := js.isClusteredNoLock()
 
+	var needsCheck bool
 	jsa.usageMu.Lock()
-	defer jsa.usageMu.Unlock()
-
 	s, ok := jsa.usage[tierName]
 	if !ok {
 		s = &jsaStorage{}
@@ -1781,14 +1892,21 @@ func (jsa *jsAccount) updateUsage(tierName string, storeType StorageType, delta 
 		s.local.mem += delta
 		s.total.mem += delta
 		atomic.AddInt64(&js.memUsed, delta)
+		needsCheck = s.local.mem < 0
 	} else {
 		s.local.store += delta
 		s.total.store += delta
 		atomic.AddInt64(&js.storeUsed, delta)
+		needsCheck = s.local.store < 0
 	}
 	// Publish our local updates if in clustered mode.
 	if isClustered {
 		jsa.sendClusterUsageUpdate()
+	}
+	jsa.usageMu.Unlock()
+
+	if needsCheck {
+		jsa.checkAndSyncUsage(tierName, storeType)
 	}
 }
 
@@ -1803,12 +1921,22 @@ func (jsa *jsAccount) sendClusterUsageUpdateTimer() {
 	}
 }
 
+// For usage fields.
+const (
+	minUsageUpdateLen    = 32
+	stackUsageUpdate     = 72
+	usageRecordLen       = 24
+	usageMultiTiersLen   = 44
+	apiStatsAndNumTiers  = 20
+	minUsageUpdateWindow = 250 * time.Millisecond
+)
+
 // Send updates to our account usage for this server.
 // jsa.usageMu lock should be held.
 func (jsa *jsAccount) sendClusterUsageUpdate() {
 	// These values are absolute so we can limit send rates.
 	now := time.Now()
-	if now.Sub(jsa.lupdate) < 250*time.Millisecond {
+	if now.Sub(jsa.lupdate) < minUsageUpdateWindow {
 		return
 	}
 	jsa.lupdate = now
@@ -1818,32 +1946,37 @@ func (jsa *jsAccount) sendClusterUsageUpdate() {
 		return
 	}
 	// every base record contains mem/store/len(tier) as well as the tier name
-	l := 24 * lenUsage
+	l := usageRecordLen * lenUsage
 	for tier := range jsa.usage {
 		l += len(tier)
 	}
-	if lenUsage > 0 {
-		// first record contains api/usage errors as well as count for extra base records
-		l += 20
-	}
-	var le = binary.LittleEndian
-	b := make([]byte, l)
-	i := 0
+	// first record contains api/usage errors as well as count for extra base records
+	l += apiStatsAndNumTiers
 
+	var raw [stackUsageUpdate]byte
+	var b []byte
+	if l > stackUsageUpdate {
+		b = make([]byte, l)
+	} else {
+		b = raw[:l]
+	}
+
+	var i int
+	var le = binary.LittleEndian
 	for tier, usage := range jsa.usage {
 		le.PutUint64(b[i+0:], uint64(usage.local.mem))
 		le.PutUint64(b[i+8:], uint64(usage.local.store))
 		if i == 0 {
-			le.PutUint64(b[i+16:], jsa.usageApi)
-			le.PutUint64(b[i+24:], jsa.usageErr)
-			le.PutUint32(b[i+32:], uint32(len(jsa.usage)-1))
-			le.PutUint64(b[i+36:], uint64(len(tier)))
-			copy(b[i+44:], tier)
-			i += 44 + len(tier)
+			le.PutUint64(b[16:], jsa.usageApi)
+			le.PutUint64(b[24:], jsa.usageErr)
+			le.PutUint32(b[32:], uint32(len(jsa.usage)-1))
+			le.PutUint64(b[36:], uint64(len(tier)))
+			copy(b[usageMultiTiersLen:], tier)
+			i = usageMultiTiersLen + len(tier)
 		} else {
 			le.PutUint64(b[i+16:], uint64(len(tier)))
-			copy(b[i+24:], tier)
-			i += 24 + len(tier)
+			copy(b[i+usageRecordLen:], tier)
+			i += usageRecordLen + len(tier)
 		}
 	}
 	jsa.sendq.push(newPubMsg(nil, jsa.updatesPub, _EMPTY_, nil, nil, b, noCompression, false, false))
@@ -2076,15 +2209,24 @@ func (js *jetStream) usageStats() *JetStreamStats {
 	var stats JetStreamStats
 	js.mu.RLock()
 	stats.Accounts = len(js.accounts)
-	stats.ReservedMemory = (uint64)(js.memReserved)
-	stats.ReservedStore = (uint64)(js.storeReserved)
+	stats.ReservedMemory = uint64(js.memReserved)
+	stats.ReservedStore = uint64(js.storeReserved)
 	s := js.srv
 	js.mu.RUnlock()
-	stats.API.Total = (uint64)(atomic.LoadInt64(&js.apiTotal))
-	stats.API.Errors = (uint64)(atomic.LoadInt64(&js.apiErrors))
-	stats.API.Inflight = (uint64)(atomic.LoadInt64(&js.apiInflight))
-	stats.Memory = (uint64)(atomic.LoadInt64(&js.memUsed))
-	stats.Store = (uint64)(atomic.LoadInt64(&js.storeUsed))
+	stats.API.Total = uint64(atomic.LoadInt64(&js.apiTotal))
+	stats.API.Errors = uint64(atomic.LoadInt64(&js.apiErrors))
+	stats.API.Inflight = uint64(atomic.LoadInt64(&js.apiInflight))
+	// Make sure we do not report negative.
+	used := atomic.LoadInt64(&js.memUsed)
+	if used < 0 {
+		used = 0
+	}
+	stats.Memory = uint64(used)
+	used = atomic.LoadInt64(&js.storeUsed)
+	if used < 0 {
+		used = 0
+	}
+	stats.Store = uint64(used)
 	stats.HAAssets = s.numRaftNodes()
 	return &stats
 }
@@ -2550,9 +2692,13 @@ func (jsa *jsAccount) checkTemplateOwnership(tname, sname string) bool {
 	return false
 }
 
+type Number interface {
+	int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64 | float32 | float64
+}
+
 // friendlyBytes returns a string with the given bytes int64
 // represented as a size, such as 1KB, 10MB, etc...
-func friendlyBytes(bytes int64) string {
+func friendlyBytes[T Number](bytes T) string {
 	fbytes := float64(bytes)
 	base := 1024
 	pre := []string{"K", "M", "G", "T", "P", "E"}

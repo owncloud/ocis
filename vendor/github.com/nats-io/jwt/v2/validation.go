@@ -44,7 +44,7 @@ func CreateValidationResults() *ValidationResults {
 	}
 }
 
-//Add appends an issue to the list
+// Add appends an issue to the list
 func (v *ValidationResults) Add(vi *ValidationIssue) {
 	v.Issues = append(v.Issues, vi)
 }

@@ -1,4 +1,4 @@
-// Copyright 2018-2022 The NATS Authors
+// Copyright 2018-2023 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -21,6 +21,7 @@ import (
 	"hash/fnv"
 	"hash/maphash"
 	"io"
+	"io/fs"
 	"math"
 	"math/rand"
 	"net/http"
@@ -73,7 +74,9 @@ type Account struct {
 	lqws         map[string]int32
 	usersRevoked map[string]int64
 	mappings     []*mapping
+	lmu          sync.RWMutex
 	lleafs       []*client
+	leafClusters map[string]uint64
 	imports      importMap
 	exports      exportMap
 	js           *jsAccount
@@ -165,14 +168,17 @@ const (
 	Chunked
 )
 
-var commaSeparatorRegEx = regexp.MustCompile(`,\s*`)
-var partitionMappingFunctionRegEx = regexp.MustCompile(`{{\s*[pP]artition\s*\((.*)\)\s*}}`)
-var wildcardMappingFunctionRegEx = regexp.MustCompile(`{{\s*[wW]ildcard\s*\((.*)\)\s*}}`)
-var splitFromLeftMappingFunctionRegEx = regexp.MustCompile(`{{\s*[sS]plit[fF]rom[lL]eft\s*\((.*)\)\s*}}`)
-var splitFromRightMappingFunctionRegEx = regexp.MustCompile(`{{\s*[sS]plit[fF]rom[rR]ight\s*\((.*)\)\s*}}`)
-var sliceFromLeftMappingFunctionRegEx = regexp.MustCompile(`{{\s*[sS]lice[fF]rom[lL]eft\s*\((.*)\)\s*}}`)
-var sliceFromRightMappingFunctionRegEx = regexp.MustCompile(`{{\s*[sS]lice[fF]rom[rR]ight\s*\((.*)\)\s*}}`)
-var splitMappingFunctionRegEx = regexp.MustCompile(`{{\s*[sS]plit\s*\((.*)\)\s*}}`)
+// Subject mapping and transform setups.
+var (
+	commaSeparatorRegEx                = regexp.MustCompile(`,\s*`)
+	partitionMappingFunctionRegEx      = regexp.MustCompile(`{{\s*[pP]artition\s*\((.*)\)\s*}}`)
+	wildcardMappingFunctionRegEx       = regexp.MustCompile(`{{\s*[wW]ildcard\s*\((.*)\)\s*}}`)
+	splitFromLeftMappingFunctionRegEx  = regexp.MustCompile(`{{\s*[sS]plit[fF]rom[lL]eft\s*\((.*)\)\s*}}`)
+	splitFromRightMappingFunctionRegEx = regexp.MustCompile(`{{\s*[sS]plit[fF]rom[rR]ight\s*\((.*)\)\s*}}`)
+	sliceFromLeftMappingFunctionRegEx  = regexp.MustCompile(`{{\s*[sS]lice[fF]rom[lL]eft\s*\((.*)\)\s*}}`)
+	sliceFromRightMappingFunctionRegEx = regexp.MustCompile(`{{\s*[sS]lice[fF]rom[rR]ight\s*\((.*)\)\s*}}`)
+	splitMappingFunctionRegEx          = regexp.MustCompile(`{{\s*[sS]plit\s*\((.*)\)\s*}}`)
+)
 
 // Enum for the subject mapping transform function types
 const (
@@ -261,8 +267,7 @@ func (a *Account) String() string {
 
 // Used to create shallow copies of accounts for transfer
 // from opts to real accounts in server struct.
-func (a *Account) shallowCopy() *Account {
-	na := NewAccount(a.Name)
+func (a *Account) shallowCopy(na *Account) {
 	na.Nkey = a.Nkey
 	na.Issuer = a.Issuer
 
@@ -302,12 +307,14 @@ func (a *Account) shallowCopy() *Account {
 			}
 		}
 	}
+	na.mappings = a.mappings
+	if len(na.mappings) > 0 && na.prand == nil {
+		na.prand = rand.New(rand.NewSource(time.Now().UnixNano()))
+	}
 	// JetStream
 	na.jsLimits = a.jsLimits
 	// Server config account limits.
 	na.limits = a.limits
-
-	return na
 }
 
 // nextEventID uses its own lock for better concurrency.
@@ -372,12 +379,14 @@ func (a *Account) updateRemoteServer(m *AccountNumConns) []*client {
 	mtlce := a.mleafs != jwt.NoLimit && (a.nleafs+a.nrleafs > a.mleafs)
 	if mtlce {
 		// Take ones from the end.
+		a.lmu.RLock()
 		leafs := a.lleafs
 		over := int(a.nleafs + a.nrleafs - a.mleafs)
 		if over < len(leafs) {
 			leafs = leafs[len(leafs)-over:]
 		}
 		clients = append(clients, leafs...)
+		a.lmu.RUnlock()
 	}
 	a.mu.Unlock()
 
@@ -554,6 +563,9 @@ func (a *Account) RoutedSubs() int {
 func (a *Account) TotalSubs() int {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
+	if a.sl == nil {
+		return 0
+	}
 	return int(a.sl.Count())
 }
 
@@ -604,7 +616,7 @@ func (a *Account) AddMapping(src, dest string) error {
 	return a.AddWeightedMappings(src, NewMapDest(dest, 100))
 }
 
-// AddWeightedMapping will add in a weighted mappings for the destinations.
+// AddWeightedMappings will add in a weighted mappings for the destinations.
 // TODO(dlc) - Allow cluster filtering
 func (a *Account) AddWeightedMappings(src string, dests ...*MapDest) error {
 	a.mu.Lock()
@@ -704,8 +716,8 @@ func (a *Account) AddWeightedMappings(src string, dests ...*MapDest) error {
 	}
 
 	// Replace an old one if it exists.
-	for i, m := range a.mappings {
-		if m.src == src {
+	for i, em := range a.mappings {
+		if em.src == src {
 			a.mappings[i] = m
 			return nil
 		}
@@ -714,13 +726,15 @@ func (a *Account) AddWeightedMappings(src string, dests ...*MapDest) error {
 	a.mappings = append(a.mappings, m)
 
 	// If we have connected leafnodes make sure to update.
-	if len(a.lleafs) > 0 {
-		leafs := append([]*client(nil), a.lleafs...)
+	if a.nleafs > 0 {
 		// Need to release because lock ordering is client -> account
 		a.mu.Unlock()
-		for _, lc := range leafs {
+		// Now grab the leaf list lock. We can hold client lock under this one.
+		a.lmu.RLock()
+		for _, lc := range a.lleafs {
 			lc.forceAddToSmap(src)
 		}
+		a.lmu.RUnlock()
 		a.mu.Lock()
 	}
 	return nil
@@ -906,10 +920,16 @@ func (a *Account) addClient(c *client) int {
 			a.sysclients++
 		} else if c.kind == LEAF {
 			a.nleafs++
-			a.lleafs = append(a.lleafs, c)
 		}
 	}
 	a.mu.Unlock()
+
+	// If we added a new leaf use the list lock and add it to the list.
+	if added && c.kind == LEAF {
+		a.lmu.Lock()
+		a.lleafs = append(a.lleafs, c)
+		a.lmu.Unlock()
+	}
 
 	if c != nil && c.srv != nil && added {
 		c.srv.accConnsUpdate(a)
@@ -918,11 +938,38 @@ func (a *Account) addClient(c *client) int {
 	return n
 }
 
+// For registering clusters for remote leafnodes.
+// We only register as the hub.
+func (a *Account) registerLeafNodeCluster(cluster string) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if a.leafClusters == nil {
+		a.leafClusters = make(map[string]uint64)
+	}
+	a.leafClusters[cluster]++
+}
+
+// Check to see if this cluster is isolated, meaning the only one.
+// Read Lock should be held.
+func (a *Account) isLeafNodeClusterIsolated(cluster string) bool {
+	if cluster == _EMPTY_ {
+		return false
+	}
+	if len(a.leafClusters) > 1 {
+		return false
+	}
+	return a.leafClusters[cluster] > 0
+}
+
 // Helper function to remove leaf nodes. If number of leafnodes gets large
 // this may need to be optimized out of linear search but believe number
 // of active leafnodes per account scope to be small and therefore cache friendly.
-// Lock should be held on account.
+// Lock should not be held on general account lock.
 func (a *Account) removeLeafNode(c *client) {
+	// Make sure we hold the list lock as well.
+	a.lmu.Lock()
+	defer a.lmu.Unlock()
+
 	ll := len(a.lleafs)
 	for i, l := range a.lleafs {
 		if l == c {
@@ -948,10 +995,23 @@ func (a *Account) removeClient(c *client) int {
 			a.sysclients--
 		} else if c.kind == LEAF {
 			a.nleafs--
-			a.removeLeafNode(c)
+			// Need to do cluster accounting here.
+			// Do cluster accounting if we are a hub.
+			if c.isHubLeafNode() {
+				cluster := c.remoteCluster()
+				if count := a.leafClusters[cluster]; count > 1 {
+					a.leafClusters[cluster]--
+				} else if count == 1 {
+					delete(a.leafClusters, cluster)
+				}
+			}
 		}
 	}
 	a.mu.Unlock()
+
+	if removed && c.kind == LEAF {
+		a.removeLeafNode(c)
+	}
 
 	if c != nil && c.srv != nil && removed {
 		c.srv.mu.Lock()
@@ -1131,7 +1191,7 @@ func (a *Account) UnTrackServiceExport(service string) {
 	}
 
 	a.mu.Lock()
-	if a == nil || a.exports.services == nil {
+	if a.exports.services == nil {
 		a.mu.Unlock()
 		return
 	}
@@ -1339,7 +1399,7 @@ func (a *Account) sendBackendErrorTrackingLatency(si *serviceImport, reason rsiR
 	a.sendLatencyResult(si, sl)
 }
 
-// sendTrackingMessage will send out the appropriate tracking information for the
+// sendTrackingLatency will send out the appropriate tracking information for the
 // service request/response latency. This is called when the requestor's server has
 // received the response.
 // TODO(dlc) - holding locks for RTTs may be too much long term. Should revisit.
@@ -1599,7 +1659,7 @@ func (a *Account) NumPendingAllResponses() int {
 	return a.NumPendingResponses(_EMPTY_)
 }
 
-// NumResponsesPending returns the number of responses outstanding for service exports
+// NumPendingResponses returns the number of responses outstanding for service exports
 // on this account. An empty filter string returns all responses regardless of which export.
 // If you specify the filter we will only return ones that are for that export.
 // NOTE this is only for what this server is tracking.
@@ -1698,7 +1758,7 @@ func (a *Account) addReverseRespMapEntry(acc *Account, reply, from string) {
 // checkForReverseEntries is for when we are trying to match reverse entries to a wildcard.
 // This will be called from checkForReverseEntry when the reply arg is a wildcard subject.
 // This will usually be called in a go routine since we need to walk all the entries.
-func (a *Account) checkForReverseEntries(reply string, checkInterest bool) {
+func (a *Account) checkForReverseEntries(reply string, checkInterest, recursed bool) {
 	a.mu.RLock()
 	if len(a.imports.rrMap) == 0 {
 		a.mu.RUnlock()
@@ -1707,7 +1767,7 @@ func (a *Account) checkForReverseEntries(reply string, checkInterest bool) {
 
 	if subjectIsLiteral(reply) {
 		a.mu.RUnlock()
-		a.checkForReverseEntry(reply, nil, checkInterest)
+		a._checkForReverseEntry(reply, nil, checkInterest, recursed)
 		return
 	}
 
@@ -1720,14 +1780,20 @@ func (a *Account) checkForReverseEntries(reply string, checkInterest bool) {
 	}
 	a.mu.RUnlock()
 
-	for _, reply := range rs {
-		a.checkForReverseEntry(reply, nil, checkInterest)
+	for _, r := range rs {
+		a._checkForReverseEntry(r, nil, checkInterest, recursed)
 	}
 }
 
 // This checks for any response map entries. If you specify an si we will only match and
 // clean up for that one, otherwise we remove them all.
 func (a *Account) checkForReverseEntry(reply string, si *serviceImport, checkInterest bool) {
+	a._checkForReverseEntry(reply, si, checkInterest, false)
+}
+
+// Callers should use checkForReverseEntry instead. This function exists to help prevent
+// infinite recursion.
+func (a *Account) _checkForReverseEntry(reply string, si *serviceImport, checkInterest, recursed bool) {
 	a.mu.RLock()
 	if len(a.imports.rrMap) == 0 {
 		a.mu.RUnlock()
@@ -1735,13 +1801,23 @@ func (a *Account) checkForReverseEntry(reply string, si *serviceImport, checkInt
 	}
 
 	if subjectHasWildcard(reply) {
+		if recursed {
+			// If we have reached this condition then it is because the reverse entries also
+			// contain wildcards (that shouldn't happen but a client *could* provide an inbox
+			// prefix that is illegal because it ends in a wildcard character), at which point
+			// we will end up with infinite recursion between this func and checkForReverseEntries.
+			// To avoid a stack overflow panic, we'll give up instead.
+			a.mu.RUnlock()
+			return
+		}
+
 		doInline := len(a.imports.rrMap) <= 64
 		a.mu.RUnlock()
 
 		if doInline {
-			a.checkForReverseEntries(reply, checkInterest)
+			a.checkForReverseEntries(reply, checkInterest, true)
 		} else {
-			go a.checkForReverseEntries(reply, checkInterest)
+			go a.checkForReverseEntries(reply, checkInterest, true)
 		}
 		return
 	}
@@ -1969,7 +2045,7 @@ func (a *Account) addServiceImportSub(si *serviceImport) error {
 	// This is similar to what initLeafNodeSmapAndSendSubs does
 	// TODO we need to consider performing this update as we get client subscriptions.
 	//      This behavior would result in subscription propagation only where actually used.
-	a.srv.updateLeafNodes(a, sub, 1)
+	a.updateLeafNodes(sub, 1)
 	return nil
 }
 
@@ -1998,7 +2074,14 @@ func (a *Account) removeAllServiceImportSubs() {
 
 // Add in subscriptions for all registered service imports.
 func (a *Account) addAllServiceImportSubs() {
+	var sis [32]*serviceImport
+	serviceImports := sis[:0]
+	a.mu.RLock()
 	for _, si := range a.imports.services {
+		serviceImports = append(serviceImports, si)
+	}
+	a.mu.RUnlock()
+	for _, si := range serviceImports {
 		a.addServiceImportSub(si)
 	}
 }
@@ -2183,12 +2266,12 @@ func (a *Account) newServiceReply(tracking bool) []byte {
 		a.createRespWildcard()
 		createdSiReply = true
 	}
-	replyPre, isBoundToLeafnode := a.siReply, a.lds != _EMPTY_
+	replyPre := a.siReply
 	a.mu.Unlock()
 
 	// If we created the siReply and we are not bound to a leafnode
 	// we need to do the wildcard subscription.
-	if createdSiReply && !isBoundToLeafnode {
+	if createdSiReply {
 		a.subscribeServiceImportResponse(string(append(replyPre, '>')))
 	}
 
@@ -2218,7 +2301,7 @@ func (si *serviceImport) isRespServiceImport() bool {
 	return si != nil && si.response
 }
 
-// Sets the response theshold timer for a service export.
+// Sets the response threshold timer for a service export.
 // Account lock should be held
 func (se *serviceExport) setResponseThresholdTimer() {
 	if se.rtmr != nil {
@@ -2341,25 +2424,16 @@ func (a *Account) addRespServiceImport(dest *Account, to string, osi *serviceImp
 
 	// Always grab time and make sure response threshold timer is running.
 	si.ts = time.Now().UnixNano()
-	osi.se.setResponseThresholdTimer()
+	if osi.se != nil {
+		osi.se.setResponseThresholdTimer()
+	}
 
 	if rt == Singleton && tracking {
 		si.latency = osi.latency
 		si.tracking = true
 		si.trackingHdr = header
 	}
-	isBoundToLeafnode := a.lds != _EMPTY_
 	a.mu.Unlock()
-
-	// We might not do individual subscriptions here like we do on configured imports.
-	// If we are bound to a leafnode we do explicit subscriptions for these.
-	// We have an internal callback for all responses inbound to this account and
-	// will process appropriately there. This does not pollute the sublist and the caches.
-
-	if isBoundToLeafnode {
-		sub, _ := a.subscribeServiceImportResponse(nrr)
-		si.sid = sub.sid
-	}
 
 	// We do add in the reverse map such that we can detect loss of interest and do proper
 	// cleanup of this si as interest goes away.
@@ -2784,7 +2858,12 @@ func (a *Account) checkStreamImportsEqual(b *Account) bool {
 	return true
 }
 
+// Returns true if `a` and `b` stream exports are the same.
+// Acquires `a` read lock, but `b` is assumed to not be accessed
+// by anyone but the caller (`b` is not registered anywhere).
 func (a *Account) checkStreamExportsEqual(b *Account) bool {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
 	if len(a.exports.streams) != len(b.exports.streams) {
 		return false
 	}
@@ -2793,14 +2872,29 @@ func (a *Account) checkStreamExportsEqual(b *Account) bool {
 		if !ok {
 			return false
 		}
-		if !reflect.DeepEqual(aea, bea) {
+		if !isStreamExportEqual(aea, bea) {
 			return false
 		}
 	}
 	return true
 }
 
+func isStreamExportEqual(a, b *streamExport) bool {
+	if a == nil && b == nil {
+		return true
+	}
+	if (a == nil && b != nil) || (a != nil && b == nil) {
+		return false
+	}
+	return isExportAuthEqual(&a.exportAuth, &b.exportAuth)
+}
+
+// Returns true if `a` and `b` service exports are the same.
+// Acquires `a` read lock, but `b` is assumed to not be accessed
+// by anyone but the caller (`b` is not registered anywhere).
 func (a *Account) checkServiceExportsEqual(b *Account) bool {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
 	if len(a.exports.services) != len(b.exports.services) {
 		return false
 	}
@@ -2809,7 +2903,66 @@ func (a *Account) checkServiceExportsEqual(b *Account) bool {
 		if !ok {
 			return false
 		}
-		if !reflect.DeepEqual(aea, bea) {
+		if !isServiceExportEqual(aea, bea) {
+			return false
+		}
+	}
+	return true
+}
+
+func isServiceExportEqual(a, b *serviceExport) bool {
+	if a == nil && b == nil {
+		return true
+	}
+	if (a == nil && b != nil) || (a != nil && b == nil) {
+		return false
+	}
+	if !isExportAuthEqual(&a.exportAuth, &b.exportAuth) {
+		return false
+	}
+	if a.acc.Name != b.acc.Name {
+		return false
+	}
+	if a.respType != b.respType {
+		return false
+	}
+	if a.latency != nil || b.latency != nil {
+		if (a.latency != nil && b.latency == nil) || (a.latency == nil && b.latency != nil) {
+			return false
+		}
+		if a.latency.sampling != b.latency.sampling {
+			return false
+		}
+		if a.latency.subject != b.latency.subject {
+			return false
+		}
+	}
+	return true
+}
+
+// Returns true if `a` and `b` exportAuth structures are equal.
+// Both `a` and `b` are guaranteed to be non-nil.
+// Locking is handled by the caller.
+func isExportAuthEqual(a, b *exportAuth) bool {
+	if a.tokenReq != b.tokenReq {
+		return false
+	}
+	if a.accountPos != b.accountPos {
+		return false
+	}
+	if len(a.approved) != len(b.approved) {
+		return false
+	}
+	for ak, av := range a.approved {
+		if bv, ok := b.approved[ak]; !ok || av.Name != bv.Name {
+			return false
+		}
+	}
+	if len(a.actsRevoked) != len(b.actsRevoked) {
+		return false
+	}
+	for ak, av := range a.actsRevoked {
+		if bv, ok := b.actsRevoked[ak]; !ok || av != bv {
 			return false
 		}
 	}
@@ -2959,7 +3112,7 @@ func (a *Account) isClaimAccount() bool {
 	return a.claimJWT != _EMPTY_
 }
 
-// updateAccountClaims will update an existing account with new claims.
+// UpdateAccountClaims will update an existing account with new claims.
 // This will replace any exports or imports previously defined.
 // Lock MUST NOT be held upon entry.
 func (s *Server) UpdateAccountClaims(a *Account, ac *jwt.AccountClaims) {
@@ -3350,7 +3503,7 @@ func (s *Server) updateAccountClaimsWithRefresh(a *Account, ac *jwt.AccountClaim
 		a.jsLimits = nil
 	}
 
-	a.updated = time.Now().UTC()
+	a.updated = time.Now()
 	clients := a.getClientsLocked()
 	a.mu.Unlock()
 
@@ -3809,10 +3962,21 @@ func removeCb(s *Server, pubKey string) {
 	a.mpay = 0
 	a.mconns = 0
 	a.mleafs = 0
-	a.updated = time.Now().UTC()
+	a.updated = time.Now()
+	jsa := a.js
 	a.mu.Unlock()
 	// set the account to be expired and disconnect clients
 	a.expiredTimeout()
+	// For JS, we need also to disable it.
+	if js := s.getJetStream(); js != nil && jsa != nil {
+		js.disableJetStream(jsa)
+		// Remove JetStream state in memory, this will be reset
+		// on the changed callback from the account in case it is
+		// enabled again.
+		a.js = nil
+	}
+	// We also need to remove all ServerImport subscriptions
+	a.removeAllServiceImportSubs()
 	a.mu.Lock()
 	a.clearExpirationTimer()
 	a.mu.Unlock()
@@ -3828,11 +3992,25 @@ func (dr *DirAccResolver) Start(s *Server) error {
 	dr.Server = s
 	dr.operator = opKeys
 	dr.DirJWTStore.changed = func(pubKey string) {
-		if v, ok := s.accounts.Load(pubKey); !ok {
-		} else if theJwt, err := dr.LoadAcc(pubKey); err != nil {
-			s.Errorf("update got error on load: %v", err)
-		} else if err := s.updateAccountWithClaimJWT(v.(*Account), theJwt); err != nil {
-			s.Errorf("update resulted in error %v", err)
+		if v, ok := s.accounts.Load(pubKey); ok {
+			if theJwt, err := dr.LoadAcc(pubKey); err != nil {
+				s.Errorf("DirResolver - Update got error on load: %v", err)
+			} else {
+				acc := v.(*Account)
+				if err = s.updateAccountWithClaimJWT(acc, theJwt); err != nil {
+					s.Errorf("DirResolver - Update for account %q resulted in error %v", pubKey, err)
+				} else {
+					if _, jsa, err := acc.checkForJetStream(); err != nil {
+						if !IsNatsErr(err, JSNotEnabledForAccountErr) {
+							s.Warnf("DirResolver - Error checking for JetStream support for account %q: %v", pubKey, err)
+						}
+					} else if jsa == nil {
+						if err = s.configJetStream(acc); err != nil {
+							s.Errorf("DirResolver - Error configuring JetStream for account %q: %v", pubKey, err)
+						}
+					}
+				}
+			}
 		}
 	}
 	dr.DirJWTStore.deleted = func(pubKey string) {
@@ -3842,14 +4020,14 @@ func (dr *DirAccResolver) Start(s *Server) error {
 	for _, reqSub := range []string{accUpdateEventSubjOld, accUpdateEventSubjNew} {
 		// subscribe to account jwt update requests
 		if _, err := s.sysSubscribe(fmt.Sprintf(reqSub, "*"), func(_ *subscription, _ *client, _ *Account, subj, resp string, msg []byte) {
-			pubKey := _EMPTY_
+			var pubKey string
 			tk := strings.Split(subj, tsep)
 			if len(tk) == accUpdateTokensNew {
 				pubKey = tk[accReqAccIndex]
 			} else if len(tk) == accUpdateTokensOld {
 				pubKey = tk[accUpdateAccIdxOld]
 			} else {
-				s.Debugf("jwt update skipped due to bad subject %q", subj)
+				s.Debugf("DirResolver - jwt update skipped due to bad subject %q", subj)
 				return
 			}
 			if claim, err := jwt.DecodeAccountClaims(string(msg)); err != nil {
@@ -3871,7 +4049,10 @@ func (dr *DirAccResolver) Start(s *Server) error {
 			return fmt.Errorf("error setting up update handling: %v", err)
 		}
 	}
-	if _, err := s.sysSubscribe(accClaimsReqSubj, func(_ *subscription, _ *client, _ *Account, subj, resp string, msg []byte) {
+	if _, err := s.sysSubscribe(accClaimsReqSubj, func(_ *subscription, c *client, _ *Account, _, resp string, msg []byte) {
+		// As this is a raw message, we need to extract payload and only decode claims from it,
+		// in case request is sent with headers.
+		_, msg = c.msgParts(msg)
 		if claim, err := jwt.DecodeAccountClaims(string(msg)); err != nil {
 			respondToUpdate(s, resp, "n/a", "jwt update resulted in error", err)
 		} else if claim.Issuer == op && strict {
@@ -3896,8 +4077,15 @@ func (dr *DirAccResolver) Start(s *Server) error {
 		if len(tk) != accLookupReqTokens {
 			return
 		}
-		if theJWT, err := dr.DirJWTStore.LoadAcc(tk[accReqAccIndex]); err != nil {
-			s.Errorf("Merging resulted in error: %v", err)
+		accName := tk[accReqAccIndex]
+		if theJWT, err := dr.DirJWTStore.LoadAcc(accName); err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				s.Debugf("DirResolver - Could not find account %q", accName)
+				// Reply with empty response to signal absence of JWT to others.
+				s.sendInternalMsgLocked(reply, _EMPTY_, nil, nil)
+			} else {
+				s.Errorf("DirResolver - Error looking up account %q: %v", accName, err)
+			}
 		} else {
 			s.sendInternalMsgLocked(reply, _EMPTY_, nil, []byte(theJWT))
 		}
@@ -3905,7 +4093,7 @@ func (dr *DirAccResolver) Start(s *Server) error {
 		return fmt.Errorf("error setting up lookup request handling: %v", err)
 	}
 	// respond to pack requests with one or more pack messages
-	// an empty message signifies the end of the response responder
+	// an empty message signifies the end of the response responder.
 	if _, err := s.sysSubscribeQ(accPackReqSubj, "responder", func(_ *subscription, _ *client, _ *Account, _, reply string, theirHash []byte) {
 		if reply == _EMPTY_ {
 			return
@@ -3913,14 +4101,14 @@ func (dr *DirAccResolver) Start(s *Server) error {
 		ourHash := dr.DirJWTStore.Hash()
 		if bytes.Equal(theirHash, ourHash[:]) {
 			s.sendInternalMsgLocked(reply, _EMPTY_, nil, []byte{})
-			s.Debugf("pack request matches hash %x", ourHash[:])
+			s.Debugf("DirResolver - Pack request matches hash %x", ourHash[:])
 		} else if err := dr.DirJWTStore.PackWalk(1, func(partialPackMsg string) {
 			s.sendInternalMsgLocked(reply, _EMPTY_, nil, []byte(partialPackMsg))
 		}); err != nil {
 			// let them timeout
-			s.Errorf("pack request error: %v", err)
+			s.Errorf("DirResolver - Pack request error: %v", err)
 		} else {
-			s.Debugf("pack request hash %x - finished responding with hash %x", theirHash, ourHash)
+			s.Debugf("DirResolver - Pack request hash %x - finished responding with hash %x", theirHash, ourHash)
 			s.sendInternalMsgLocked(reply, _EMPTY_, nil, []byte{})
 		}
 	}); err != nil {
@@ -3941,12 +4129,12 @@ func (dr *DirAccResolver) Start(s *Server) error {
 	if _, err := s.sysSubscribe(packRespIb, func(_ *subscription, _ *client, _ *Account, _, _ string, msg []byte) {
 		hash := dr.DirJWTStore.Hash()
 		if len(msg) == 0 { // end of response stream
-			s.Debugf("Merging Finished and resulting in: %x", dr.DirJWTStore.Hash())
+			s.Debugf("DirResolver - Merging finished and resulting in: %x", dr.DirJWTStore.Hash())
 			return
 		} else if err := dr.DirJWTStore.Merge(string(msg)); err != nil {
-			s.Errorf("Merging resulted in error: %v", err)
+			s.Errorf("DirResolver - Merging resulted in error: %v", err)
 		} else {
-			s.Debugf("Merging succeeded and changed %x to %x", hash, dr.DirJWTStore.Hash())
+			s.Debugf("DirResolver - Merging succeeded and changed %x to %x", hash, dr.DirJWTStore.Hash())
 		}
 	}); err != nil {
 		return fmt.Errorf("error setting up pack response handling: %v", err)
@@ -3964,7 +4152,7 @@ func (dr *DirAccResolver) Start(s *Server) error {
 			case <-ticker.C:
 			}
 			ourHash := dr.DirJWTStore.Hash()
-			s.Debugf("Checking store state: %x", ourHash)
+			s.Debugf("DirResolver - Checking store state: %x", ourHash)
 			s.sendInternalMsgLocked(accPackReqSubj, packRespIb, nil, ourHash[:])
 		}
 	})
@@ -4013,18 +4201,14 @@ func (dr *DirAccResolver) apply(opts ...DirResOption) error {
 	return nil
 }
 
-func NewDirAccResolver(path string, limit int64, syncInterval time.Duration, delete bool, opts ...DirResOption) (*DirAccResolver, error) {
+func NewDirAccResolver(path string, limit int64, syncInterval time.Duration, delete deleteType, opts ...DirResOption) (*DirAccResolver, error) {
 	if limit == 0 {
 		limit = math.MaxInt64
 	}
 	if syncInterval <= 0 {
 		syncInterval = time.Minute
 	}
-	deleteType := NoDelete
-	if delete {
-		deleteType = RenameDeleted
-	}
-	store, err := NewExpiringDirJWTStore(path, false, true, deleteType, 0, limit, false, 0, nil)
+	store, err := NewExpiringDirJWTStore(path, false, true, delete, 0, limit, false, 0, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -4053,20 +4237,35 @@ func (s *Server) fetch(res AccountResolver, name string, timeout time.Duration) 
 		s.mu.Unlock()
 		return _EMPTY_, fmt.Errorf("eventing shut down")
 	}
+	// Resolver will wait for detected active servers to reply
+	// before serving an error in case there weren't any found.
+	expectedServers := len(s.sys.servers)
 	replySubj := s.newRespInbox()
 	replies := s.sys.replies
+
 	// Store our handler.
 	replies[replySubj] = func(sub *subscription, _ *client, _ *Account, subject, _ string, msg []byte) {
-		clone := make([]byte, len(msg))
-		copy(clone, msg)
+		var clone []byte
+		isEmpty := len(msg) == 0
+		if !isEmpty {
+			clone = make([]byte, len(msg))
+			copy(clone, msg)
+		}
 		s.mu.Lock()
+		defer s.mu.Unlock()
+		expectedServers--
+		// Skip empty responses until getting all the available servers.
+		if isEmpty && expectedServers > 0 {
+			return
+		}
+		// Use the first valid response if there is still interest or
+		// one of the empty responses to signal that it was not found.
 		if _, ok := replies[replySubj]; ok {
 			select {
-			case respC <- clone: // only use first response and only if there is still interest
+			case respC <- clone:
 			default:
 			}
 		}
-		s.mu.Unlock()
 	}
 	s.sendInternalMsg(accountLookupRequest, replySubj, nil, []byte{})
 	quit := s.quitCh
@@ -4079,7 +4278,9 @@ func (s *Server) fetch(res AccountResolver, name string, timeout time.Duration) 
 	case <-time.After(timeout):
 		err = errors.New("fetching jwt timed out")
 	case m := <-respC:
-		if err = res.Store(name, string(m)); err == nil {
+		if len(m) == 0 {
+			err = errors.New("account jwt not found")
+		} else if err = res.Store(name, string(m)); err == nil {
 			theJWT = string(m)
 		}
 	}
@@ -4117,9 +4318,9 @@ func (dr *CacheDirAccResolver) Start(s *Server) error {
 	dr.DirJWTStore.changed = func(pubKey string) {
 		if v, ok := s.accounts.Load(pubKey); !ok {
 		} else if theJwt, err := dr.LoadAcc(pubKey); err != nil {
-			s.Errorf("update got error on load: %v", err)
+			s.Errorf("DirResolver - Update got error on load: %v", err)
 		} else if err := s.updateAccountWithClaimJWT(v.(*Account), theJwt); err != nil {
-			s.Errorf("update resulted in error %v", err)
+			s.Errorf("DirResolver - Update resulted in error %v", err)
 		}
 	}
 	dr.DirJWTStore.deleted = func(pubKey string) {
@@ -4128,14 +4329,14 @@ func (dr *CacheDirAccResolver) Start(s *Server) error {
 	for _, reqSub := range []string{accUpdateEventSubjOld, accUpdateEventSubjNew} {
 		// subscribe to account jwt update requests
 		if _, err := s.sysSubscribe(fmt.Sprintf(reqSub, "*"), func(_ *subscription, _ *client, _ *Account, subj, resp string, msg []byte) {
-			pubKey := _EMPTY_
+			var pubKey string
 			tk := strings.Split(subj, tsep)
 			if len(tk) == accUpdateTokensNew {
 				pubKey = tk[accReqAccIndex]
 			} else if len(tk) == accUpdateTokensOld {
 				pubKey = tk[accUpdateAccIdxOld]
 			} else {
-				s.Debugf("jwt update cache skipped due to bad subject %q", subj)
+				s.Debugf("DirResolver - jwt update cache skipped due to bad subject %q", subj)
 				return
 			}
 			if claim, err := jwt.DecodeAccountClaims(string(msg)); err != nil {
@@ -4159,7 +4360,10 @@ func (dr *CacheDirAccResolver) Start(s *Server) error {
 			return fmt.Errorf("error setting up update handling: %v", err)
 		}
 	}
-	if _, err := s.sysSubscribe(accClaimsReqSubj, func(_ *subscription, _ *client, _ *Account, subj, resp string, msg []byte) {
+	if _, err := s.sysSubscribe(accClaimsReqSubj, func(_ *subscription, c *client, _ *Account, _, resp string, msg []byte) {
+		// As this is a raw message, we need to extract payload and only decode claims from it,
+		// in case request is sent with headers.
+		_, msg = c.msgParts(msg)
 		if claim, err := jwt.DecodeAccountClaims(string(msg)); err != nil {
 			respondToUpdate(s, resp, "n/a", "jwt update cache resulted in error", err)
 		} else if claim.Issuer == op && strict {
@@ -4400,7 +4604,9 @@ func newTransform(src, dest string) (*transform, error) {
 				dtokMappingFunctionIntArgs = append(dtokMappingFunctionIntArgs, -1)
 				dtokMappingFunctionStringArgs = append(dtokMappingFunctionStringArgs, _EMPTY_)
 			} else {
-				nphs++
+				// We might combine multiple tokens into one, for example with a partition
+				nphs += len(transformArgWildcardIndexes)
+
 				// Now build up our runtime mapping from dest to source tokens.
 				var stis []int
 				for _, wildcardIndex := range transformArgWildcardIndexes {
