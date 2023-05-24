@@ -53,7 +53,7 @@
 | LDAP_BIND_PASSWORD<br/>GRAPH_LDAP_BIND_PASSWORD | string |  | Password to use for authenticating the 'bind_dn'.|
 | GRAPH_LDAP_SERVER_UUID | bool | false | If set to true, rely on the LDAP Server to generate a unique ID for users and groups, like when using 'entryUUID' as the user ID attribute.|
 | GRAPH_LDAP_SERVER_USE_PASSWORD_MODIFY_EXOP | bool | true | Use the 'Password Modify Extended Operation' for updating user passwords.|
-| OCIS_LDAP_SERVER_WRITE_ENABLED<br/>GRAPH_LDAP_SERVER_WRITE_ENABLED | bool | true | Allow creating, modifying and deleting LDAP users via the GRAPH API. This is only works when the default Schema is used.|
+| OCIS_LDAP_SERVER_WRITE_ENABLED<br/>GRAPH_LDAP_SERVER_WRITE_ENABLED | bool | true | Allow creating, modifying and deleting LDAP users via the GRAPH API. This can only be set to 'true' when keeping default settings for the LDAP user and group attribute types (the 'OCIS_LDAP_USER_SCHEMA_* and 'OCIS_LDAP_GROUP_SCHEMA_* variables).|
 | GRAPH_LDAP_REFINT_ENABLED | bool | false | Signals that the server has the refint plugin enabled, which makes some actions not needed.|
 | OCIS_LDAP_USER_BASE_DN<br/>LDAP_USER_BASE_DN<br/>GRAPH_LDAP_USER_BASE_DN | string | ou=users,o=libregraph-idm | Search base DN for looking up LDAP users.|
 | OCIS_LDAP_USER_SCOPE<br/>LDAP_USER_SCOPE<br/>GRAPH_LDAP_USER_SCOPE | string | sub | LDAP search scope to use when looking up users. Supported scopes are 'base', 'one' and 'sub'.|
