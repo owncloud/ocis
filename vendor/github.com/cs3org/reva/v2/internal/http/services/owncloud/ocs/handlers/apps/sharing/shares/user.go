@@ -129,7 +129,7 @@ func (h *Handler) createUserShare(w http.ResponseWriter, r *http.Request, statIn
 	return share, nil
 }
 
-func (h *Handler) isUserShare(r *http.Request, oid string) bool {
+func (h *Handler) isUserShare(r *http.Request, oid string) (*collaboration.Share, bool) {
 	logger := appctx.GetLogger(r.Context())
 	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
 	if err != nil {
@@ -147,13 +147,13 @@ func (h *Handler) isUserShare(r *http.Request, oid string) bool {
 	})
 	if err != nil {
 		logger.Err(err)
-		return false
+		return nil, false
 	}
 
-	return getShareRes.GetShare() != nil
+	return getShareRes.GetShare(), getShareRes.GetShare() != nil
 }
 
-func (h *Handler) removeUserShare(w http.ResponseWriter, r *http.Request, shareID string) {
+func (h *Handler) removeUserShare(w http.ResponseWriter, r *http.Request, share *collaboration.Share) {
 	ctx := r.Context()
 
 	uClient, err := h.getClient()
@@ -164,26 +164,11 @@ func (h *Handler) removeUserShare(w http.ResponseWriter, r *http.Request, shareI
 
 	shareRef := &collaboration.ShareReference{
 		Spec: &collaboration.ShareReference_Id{
-			Id: &collaboration.ShareId{
-				OpaqueId: shareID,
-			},
+			Id: share.Id,
 		},
 	}
-	// Get the share, so that we can include it in the response.
-	getShareResp, err := uClient.GetShare(ctx, &collaboration.GetShareRequest{Ref: shareRef})
-	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error sending a grpc delete share request", err)
-		return
-	} else if getShareResp.Status.Code != rpc.Code_CODE_OK {
-		if getShareResp.Status.Code == rpc.Code_CODE_NOT_FOUND {
-			response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "not found", nil)
-			return
-		}
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "deleting share failed", err)
-		return
-	}
 
-	data, err := conversions.CS3Share2ShareData(ctx, getShareResp.Share)
+	data, err := conversions.CS3Share2ShareData(ctx, share)
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "deleting share failed", err)
 		return
@@ -207,7 +192,7 @@ func (h *Handler) removeUserShare(w http.ResponseWriter, r *http.Request, shareI
 		return
 	}
 	if currentUser, ok := ctxpkg.ContextGetUser(ctx); ok {
-		h.statCache.RemoveStat(currentUser.Id, getShareResp.Share.ResourceId)
+		h.statCache.RemoveStat(currentUser.Id, share.ResourceId)
 	}
 	response.WriteOCSSuccess(w, r, data)
 }

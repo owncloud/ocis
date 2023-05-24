@@ -22,6 +22,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
@@ -534,9 +535,10 @@ func (r *registry) findProvidersForResource(ctx context.Context, id string, find
 
 // findProvidersForAbsolutePathReference takes a path and returns the storage provider with the longest matching path prefix
 // FIXME use regex to return the correct provider when multiple are configured
-func (r *registry) findProvidersForAbsolutePathReference(ctx context.Context, path string, unique, unrestricted bool, _ string) []*registrypb.ProviderInfo {
+func (r *registry) findProvidersForAbsolutePathReference(ctx context.Context, requestedPath string, unique, unrestricted bool, _ string) []*registrypb.ProviderInfo {
 	currentUser := ctxpkg.ContextMustGetUser(ctx)
 
+	pathSegments := strings.Split(strings.TrimPrefix(requestedPath, string(os.PathSeparator)), string(os.PathSeparator))
 	deepestMountPath := ""
 	var deepestMountSpace *providerpb.StorageSpace
 	var deepestMountPathProvider *registrypb.ProviderInfo
@@ -549,12 +551,42 @@ func (r *registry) findProvidersForAbsolutePathReference(ctx context.Context, pa
 		var spaces []*providerpb.StorageSpace
 		var err error
 
+		// check if any space in the provider has a valid mountpoint
+		containsRelatedSpace := false
+
+	spaceLoop:
+		for _, space := range provider.Spaces {
+			spacePath, _ := space.SpacePath(currentUser, nil)
+			spacePathSegments := strings.Split(strings.TrimPrefix(spacePath, string(os.PathSeparator)), string(os.PathSeparator))
+
+			for i, segment := range spacePathSegments {
+				if i >= len(pathSegments) {
+					break
+				}
+				if pathSegments[i] != segment {
+					if segment != "" && !strings.Contains(segment, "{{") {
+						// Mount path points elsewhere -> irrelevant
+						continue spaceLoop
+					}
+					// Encountered a template which couldn't be filled -> potentially relevant
+					break
+				}
+			}
+
+			containsRelatedSpace = true
+			break
+		}
+
+		if !containsRelatedSpace {
+			continue
+		}
+
 		// when listing paths also return mountpoints
 		filters := []*providerpb.ListStorageSpacesRequest_Filter{
 			{
 				Type: providerpb.ListStorageSpacesRequest_Filter_TYPE_PATH,
 				Term: &providerpb.ListStorageSpacesRequest_Filter_Path{
-					Path: strings.TrimPrefix(path, p.ProviderPath),
+					Path: strings.TrimPrefix(requestedPath, p.ProviderPath), // FIXME this no longer has an effect as the p.Providerpath is always empty
 				},
 			},
 			{
@@ -595,14 +627,14 @@ func (r *registry) findProvidersForAbsolutePathReference(ctx context.Context, pa
 
 			// determine deepest mount point
 			switch {
-			case spacePath == path && unique:
+			case spacePath == requestedPath && unique:
 				validSpaces = append(validSpaces, space)
 
 				deepestMountPath = spacePath
 				deepestMountSpace = space
 				deepestMountPathProvider = p
 
-			case !unique && isSubpath(spacePath, path):
+			case !unique && isSubpath(spacePath, requestedPath):
 				// and add all providers below and exactly matching the path
 				// requested /foo, mountPath /foo/sub
 				validSpaces = append(validSpaces, space)
@@ -612,7 +644,7 @@ func (r *registry) findProvidersForAbsolutePathReference(ctx context.Context, pa
 					deepestMountPathProvider = p
 				}
 
-			case isSubpath(path, spacePath) && len(spacePath) > len(deepestMountPath):
+			case isSubpath(requestedPath, spacePath) && len(spacePath) > len(deepestMountPath):
 				// eg. three providers: /foo, /foo/sub, /foo/sub/bar
 				// requested /foo/sub/mob
 				deepestMountPath = spacePath

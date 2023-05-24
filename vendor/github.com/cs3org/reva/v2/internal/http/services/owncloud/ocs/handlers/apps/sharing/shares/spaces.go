@@ -143,7 +143,21 @@ func (h *Handler) addSpaceMember(w http.ResponseWriter, r *http.Request, info *p
 	response.WriteOCSSuccess(w, r, nil)
 }
 
-func (h *Handler) removeSpaceMember(w http.ResponseWriter, r *http.Request, spaceID string) {
+func (h *Handler) isSpaceShare(r *http.Request, spaceID string) (*registry.ProviderInfo, bool) {
+	ref, err := storagespace.ParseReference(spaceID)
+	if err != nil {
+		return nil, false
+	}
+
+	if ref.ResourceId.OpaqueId == "" {
+		ref.ResourceId.OpaqueId = ref.ResourceId.SpaceId
+	}
+
+	p, err := h.findProvider(r.Context(), &ref)
+	return p, err == nil
+}
+
+func (h *Handler) removeSpaceMember(w http.ResponseWriter, r *http.Request, spaceID string, prov *registry.ProviderInfo) {
 	ctx := r.Context()
 
 	shareWith := r.URL.Query().Get("shareWith")
@@ -168,13 +182,7 @@ func (h *Handler) removeSpaceMember(w http.ResponseWriter, r *http.Request, spac
 		ref.ResourceId.OpaqueId = ref.ResourceId.SpaceId
 	}
 
-	p, err := h.findProvider(ctx, &ref)
-	if err != nil {
-		response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting storage provider", err)
-		return
-	}
-
-	providerClient, err := h.getStorageProviderClient(p)
+	providerClient, err := h.getStorageProviderClient(prov)
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting storage provider client", err)
 		return
