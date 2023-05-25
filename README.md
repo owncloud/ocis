@@ -121,7 +121,11 @@ We are _very_ happy that oCIS does not require a Contributor License Agreement (
 Infinite Scale is carefully internationalized so that everyone, no matter what language they speak, has a great experience. To achieve this we rely on the help of volunteer translators. If you want to help, you can find the project behind this link:
  [Transifex for ownCloud web](https://explore.transifex.com/owncloud-org/owncloud-web/).
 
-Please always refer to our [Contribution Guidelines](CONTRIBUTING.md).
+Please always refer to our [Contribution Guidelines](https://github.com/owncloud/ocis/blob/master/CONTRIBUTING.md).
+
+## End User License Agreement
+
+Stable versions of ownCloud Infinite Scale are subject to the [End User License Agreement](https://github.com/owncloud/ocis/blob/master/assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf).
 
 ## Copyright
 
