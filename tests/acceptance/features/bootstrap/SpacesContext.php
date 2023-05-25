@@ -1140,6 +1140,25 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @When /^user "([^"]*)" tries to create subfolder "([^"]*)" in the nonexistent folder of the space "([^"]*)" using the WebDav Api$/
+	 *
+	 * @param string $user
+	 * @param string $subfolder
+	 * @param string $spaceName
+	 *
+	 * @return void
+	 *
+	 * @throws GuzzleException
+	 */
+	public function theUserTriesToCreatesASubFolderUsingTheGraphApi(
+		string $user,
+		string $subfolder,
+		string $spaceName
+	): void {
+		$this->theUserCreatesAFolderToAnotherOwnerSpaceUsingTheGraphApi($user, $subfolder, $spaceName);
+	}
+
+	/**
 	 * @Given /^user "([^"]*)" has created a (?:folder|subfolder) "([^"]*)" in space "([^"]*)"$/
 	 *
 	 * @param string $user
