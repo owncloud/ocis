@@ -1587,6 +1587,7 @@ class SpacesContext implements Context {
 			$fileDestination,
 			$spaceName
 		);
+		$headers['Overwrite'] = 'F';
 
 		$fileSource = $this->escapePath(\trim($fileSource, "/"));
 		$fullUrl = $space["root"]["webDavUrl"] . '/' . $fileSource;

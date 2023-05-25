@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: upload resources using TUS protocol
   As a user
   I want to be able to upload files
@@ -32,3 +32,11 @@ Feature: upload resources using TUS protocol
     And for user "Alice" the space "Project Jupiter" should not contain these entries:
       | upload.txt |
 
+
+  Scenario: upload the same file after renaming the first one
+    Given user "Alice" has uploaded a file with content "uploaded content" to "/upload.txt" via TUS inside of the space "Alice Hansen"
+    And user "Alice" has moved file "upload.txt" to "test.txt" in space "Alice Hansen"
+    When user "Alice" uploads a file with content "uploaded content" to "/upload.txt" via TUS inside of the space "Alice Hansen" using the WebDAV API
+    Then for user "Alice" the space "Alice Hansen" should contain these entries:
+      | test.txt   |
+      | upload.txt |
