@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Enhancement - Default LDAP write to true: [#6362](https://github.com/owncloud/ocis/pull/6362)
 * Enhancement - Fix err when the user share the locked file: [#6357](https://github.com/owncloud/ocis/pull/6357)
+* Enhancement - Add fulltextsearch capabilty: [#6366](https://github.com/owncloud/ocis/pull/6366)
 * Enhancement - Configurable ID Cache: [#6353](https://github.com/owncloud/ocis/pull/6353)
 * Enhancement - Remove the email logo: [#6359](https://github.com/owncloud/ocis/issues/6359)
 * Enhancement - Unify CA Cert envvars: [#6392](https://github.com/owncloud/ocis/pull/6392)
@@ -27,6 +28,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/6197
    https://github.com/owncloud/ocis/pull/6357
+
+* Enhancement - Add fulltextsearch capabilty: [#6366](https://github.com/owncloud/ocis/pull/6366)
+
+   It needs an extra envvar `FRONTEND_FULL_TEXT_SEARCH_ENABLED`
+
+   https://github.com/owncloud/ocis/pull/6366
 
 * Enhancement - Configurable ID Cache: [#6353](https://github.com/owncloud/ocis/pull/6353)
 
