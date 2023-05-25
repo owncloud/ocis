@@ -18,7 +18,7 @@
 | OCIS_EVENTS_CLUSTER<br/>AUDIT_EVENTS_CLUSTER | string | ocis-cluster | The clusterID of the event system. The event system is the message queuing service. It is used as message broker for the microservice architecture. Mandatory when using NATS as event system.|
 | AUDIT_EVENTS_GROUP | string | audit | The consumergroup of the service. One group will only get one copy of an event.|
 | OCIS_INSECURE<br/>AUDIT_EVENTS_TLS_INSECURE | bool | false | Whether to verify the server TLS certificates.|
-| AUDIT_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided AUDIT_EVENTS_TLS_INSECURE will be seen as false.|
+| OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE<br/>AUDIT_EVENTS_TLS_ROOT_CA_CERTIFICATE | string |  | The root CA certificate used to validate the server's TLS certificate. If provided AUDIT_EVENTS_TLS_INSECURE will be seen as false.|
 | OCIS_EVENTS_ENABLE_TLS<br/>AUDIT_EVENTS_ENABLE_TLS | bool | false | Enable TLS for the connection to the events broker. The events broker is the ocis service which receives and delivers events between the services..|
 | AUDIT_LOG_TO_CONSOLE | bool | true | Logs to Stdout if true. Independent of the log to file option.|
 | AUDIT_LOG_TO_FILE | bool | false | Logs to file if true. Independent of the log to Stdout file option.|
