@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: Share spaces
   As the owner of a space
   I want to be able to add members to a space, and to remove access for them
@@ -39,7 +39,7 @@ Feature: Share spaces
       | role      | viewer |
     Then the user "Alice" should have a space called "share space" granted to user "Brian" with role "viewer"
 
-  @skipOnStable2.0
+
   Scenario: user can see that the group has been granted access
     Given group "sales" has been created
     When user "Alice" shares a space "share space" with settings:
@@ -193,7 +193,7 @@ Feature: Share spaces
       | viewer | manager  |
       | viewer | editor   |
 
-  @skipOnStable2.0
+
   Scenario Outline: user shares a space with a group
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using GraphApi
@@ -211,7 +211,7 @@ Feature: Share spaces
       | editor  |
       | viewer  |
 
-  @skipOnStable2.0
+
   Scenario Outline: user has no access to the space if access for the group has been removed
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using GraphApi
@@ -228,7 +228,7 @@ Feature: Share spaces
       | editor  |
       | viewer  |
 
-  @skipOnStable2.0
+
   Scenario: user has no access to the space if he has been removed from the group
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using GraphApi
@@ -244,7 +244,7 @@ Feature: Share spaces
     And the user "Brian" should not have a space called "share space"
     But the user "Bob" should have a space called "share space"
 
-  @skipOnStable2.0
+
   Scenario: users don't have access to the space if the group has been deleted
     Given group "group2" has been created
     And the administrator has added a user "Brian" to the group "group2" using GraphApi
@@ -258,7 +258,7 @@ Feature: Share spaces
     And the user "Bob" should not have a space called "share space"
     And the user "Brian" should not have a space called "share space"
 
-  @skipOnStable2.0
+
   Scenario: user increases permissions for one member of the group or for the entire group
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
@@ -275,7 +275,7 @@ Feature: Share spaces
     When user "Brian" uploads a file inside space "share space" with content "Test" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "201"
 
-  @skipOnStable2.0
+
   Scenario: user increases permissions for the group, so the user's permissions are increased
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
@@ -292,7 +292,7 @@ Feature: Share spaces
     When user "Brian" uploads a file inside space "share space" with content "Test" to "test.txt" using the WebDAV API
     Then the HTTP status code should be "201"
 
-  @skipOnStable2.0
+
   Scenario Outline: space Admin can share a space to the user with an expiration date
     When user "Alice" shares a space "share space" with settings:
       | shareWith  | Brian                    |
@@ -323,7 +323,7 @@ Feature: Share spaces
       | editor  |
       | viewer  |
 
-  @skipOnStable2.0
+
   Scenario Outline: update the expiration date of a space in user share
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith  | Brian                    |
@@ -381,7 +381,7 @@ Feature: Share spaces
       | editor  |
       | viewer  |
 
-  @skipOnStable2.0
+
   Scenario Outline: delete the expiration date of a space in group share
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
@@ -403,7 +403,7 @@ Feature: Share spaces
       | editor  |
       | viewer  |
 
-  @skipOnStable2.0
+
   Scenario Outline: check the end of expiration of a space in user share
     Given user "Alice" has shared a space "share space" with settings:
       | shareWith  | Brian                    |
@@ -418,7 +418,7 @@ Feature: Share spaces
       | editor  |
       | viewer  |
 
-  @skipOnStable2.0
+
   Scenario Outline: check the end of expiration of a space in group share
     Given group "sales" has been created
     And the administrator has added a user "Brian" to the group "sales" using GraphApi
@@ -462,3 +462,21 @@ Feature: Share spaces
     Then the HTTP status code should be "400"
     And the OCS status message should be "can not add members to personal spaces"
     And the user "Brian" should not have a space called "Alice Hansen"
+
+
+  Scenario: last space manager cannot change his role
+    Given user "Alice" has shared a space "share space" with settings:
+      | shareWith | Brian   |
+      | role      | manager |
+    When user "Alice" updates the space "share space" with settings:
+      | shareWith | Alice  |
+      | role      | editor |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "200"
+    When user "Brian" updates the space "share space" with settings:
+      | shareWith | Brian  |
+      | role      | editor |
+    Then the HTTP status code should be "403"
+    And the OCS status code should be "403"
+    And the user "Alice" should have a space called "share space" granted to "Brian" with role "manager"
+    And the user "Alice" should have a space called "share space" granted to "Alice" with role "editor"
