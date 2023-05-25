@@ -616,18 +616,22 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 			return nil
 		}
 
-		// delete existing tree
-		delReq := &provider.DeleteRequest{Ref: dstRef}
-		delRes, err := s.gwClient.Delete(ctx, delReq)
-		if err != nil {
-			log.Error().Err(err).Msg("error sending grpc delete request")
-			w.WriteHeader(http.StatusInternalServerError)
-			return nil
-		}
+		// delete existing tree when overwriting a directory or replacing a file with a directory
+		if dstStatRes.Info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER ||
+			(dstStatRes.Info.Type == provider.ResourceType_RESOURCE_TYPE_FILE &&
+				srcStatRes.Info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER) {
+			delReq := &provider.DeleteRequest{Ref: dstRef}
+			delRes, err := s.gwClient.Delete(ctx, delReq)
+			if err != nil {
+				log.Error().Err(err).Msg("error sending grpc delete request")
+				w.WriteHeader(http.StatusInternalServerError)
+				return nil
+			}
 
-		if delRes.Status.Code != rpc.Code_CODE_OK && delRes.Status.Code != rpc.Code_CODE_NOT_FOUND {
-			errors.HandleErrorStatus(log, w, delRes.Status)
-			return nil
+			if delRes.Status.Code != rpc.Code_CODE_OK && delRes.Status.Code != rpc.Code_CODE_NOT_FOUND {
+				errors.HandleErrorStatus(log, w, delRes.Status)
+				return nil
+			}
 		}
 	} else if p := path.Dir(dstRef.Path); p != "" {
 		// check if an intermediate path / the parent exists
