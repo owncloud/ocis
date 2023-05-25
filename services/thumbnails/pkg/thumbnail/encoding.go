@@ -110,3 +110,7 @@ func EncoderForType(fileType string) (Encoder, error) {
 		return nil, ErrNoEncoderForType
 	}
 }
+
+func EncoderForMime(fileMime string) (Encoder, error) {
+	return EncoderForType(strings.TrimPrefix(strings.TrimSpace(fileMime), "image/"))
+}

@@ -3,6 +3,7 @@ package svc
 import (
 	"context"
 	"image"
+	"mime"
 	"net/http"
 	"net/url"
 	"path"
@@ -17,7 +18,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
 	thumbnailssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/thumbnails/v0"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/preprocessor"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/service/grpc/v0/decorators"
@@ -77,26 +77,13 @@ type PreprocessorOpts struct {
 
 // GetThumbnail retrieves a thumbnail for an image
 func (g Thumbnail) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest, rsp *thumbnailssvc.GetThumbnailResponse) error {
-	tType, ok := thumbnailsmsg.ThumbnailType_name[int32(req.ThumbnailType)]
-	if !ok {
-		g.logger.Debug().Str("thumbnail_type", tType).Msg("unsupported thumbnail type")
-		return nil
-	}
-	generator, err := thumbnail.GeneratorForType(tType)
-	if err != nil {
-		return merrors.BadRequest(g.serviceID, "unsupported thumbnail type")
-	}
-	encoder, err := thumbnail.EncoderForType(tType)
-	if err != nil {
-		return merrors.BadRequest(g.serviceID, "unsupported thumbnail type")
-	}
-
+	var err error
 	var key string
 	switch {
 	case req.GetWebdavSource() != nil:
-		key, err = g.handleWebdavSource(ctx, req, generator, encoder)
+		key, err = g.handleWebdavSource(ctx, req)
 	case req.GetCs3Source() != nil:
-		key, err = g.handleCS3Source(ctx, req, generator, encoder)
+		key, err = g.handleCS3Source(ctx, req)
 	default:
 		g.logger.Error().Msg("no image source provided")
 		return merrors.BadRequest(g.serviceID, "image source is missing")
@@ -123,18 +110,27 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumb
 	}
 	rsp.DataEndpoint = g.dataEndpoint
 	rsp.TransferToken = transferToken
-	rsp.Mimetype = encoder.MimeType()
+	rsp.Mimetype = ""
 	return nil
 }
 
-func (g Thumbnail) handleCS3Source(ctx context.Context,
-	req *thumbnailssvc.GetThumbnailRequest,
-	generator thumbnail.Generator,
-	encoder thumbnail.Encoder) (string, error) {
+func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest) (string, error) {
 	src := req.GetCs3Source()
 	sRes, err := g.stat(src.Path, src.Authorization)
 	if err != nil {
 		return "", err
+	}
+
+	ext, _ := mime.ExtensionsByType(sRes.GetInfo().GetMimeType())
+	_ = ext
+
+	generator, err := thumbnail.GeneratorForMime(sRes.GetInfo().GetMimeType())
+	if err != nil {
+		return "", merrors.BadRequest(g.serviceID, "unsupported thumbnail type")
+	}
+	encoder, err := thumbnail.EncoderForMime(sRes.GetInfo().GetMimeType())
+	if err != nil {
+		return "", merrors.BadRequest(g.serviceID, "unsupported thumbnail type")
 	}
 
 	tr := thumbnail.Request{
@@ -170,10 +166,7 @@ func (g Thumbnail) handleCS3Source(ctx context.Context,
 	return key, nil
 }
 
-func (g Thumbnail) handleWebdavSource(ctx context.Context,
-	req *thumbnailssvc.GetThumbnailRequest,
-	generator thumbnail.Generator,
-	encoder thumbnail.Encoder) (string, error) {
+func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.GetThumbnailRequest) (string, error) {
 	src := req.GetWebdavSource()
 	imgURL, err := url.Parse(src.Url)
 	if err != nil {
@@ -217,6 +210,16 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context,
 	if err != nil {
 		return "", err
 	}
+
+	generator, err := thumbnail.GeneratorForMime(sRes.GetInfo().GetMimeType())
+	if err != nil {
+		return "", merrors.BadRequest(g.serviceID, "unsupported thumbnail type")
+	}
+	encoder, err := thumbnail.EncoderForMime(sRes.GetInfo().GetMimeType())
+	if err != nil {
+		return "", merrors.BadRequest(g.serviceID, "unsupported thumbnail type")
+	}
+
 	tr := thumbnail.Request{
 		Resolution: image.Rect(0, 0, int(req.Width), int(req.Height)),
 		Generator:  generator,

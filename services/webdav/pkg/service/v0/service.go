@@ -232,10 +232,10 @@ func (g Webdav) SpacesThumbnail(w http.ResponseWriter, r *http.Request) {
 
 	fullPath := filepath.Join(tr.Identifier, tr.Filepath)
 	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
-		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
-		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
-		Width:         tr.Width,
-		Height:        tr.Height,
+		Filepath: strings.TrimLeft(tr.Filepath, "/"),
+		//ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
+		Width:  tr.Width,
+		Height: tr.Height,
 		Source: &thumbnailssvc.GetThumbnailRequest_Cs3Source{
 			Cs3Source: &thumbnailsmsg.CS3Source{
 				Path:          fullPath,
@@ -318,10 +318,9 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 
 	fullPath := filepath.Join(templates.WithUser(user, g.config.WebdavNamespace), tr.Filepath)
 	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
-		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
-		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
-		Width:         tr.Width,
-		Height:        tr.Height,
+		Filepath: strings.TrimLeft(tr.Filepath, "/"),
+		Width:    tr.Width,
+		Height:   tr.Height,
 		Source: &thumbnailssvc.GetThumbnailRequest_Cs3Source{
 			Cs3Source: &thumbnailsmsg.CS3Source{
 				Path:          fullPath,
@@ -358,10 +357,9 @@ func (g Webdav) PublicThumbnail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	rsp, err := g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
-		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
-		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
-		Width:         tr.Width,
-		Height:        tr.Height,
+		Filepath: strings.TrimLeft(tr.Filepath, "/"),
+		Width:    tr.Width,
+		Height:   tr.Height,
 		Source: &thumbnailssvc.GetThumbnailRequest_WebdavSource{
 			WebdavSource: &thumbnailsmsg.WebdavSource{
 				Url:             g.config.OcisPublicURL + r.URL.RequestURI(),
@@ -399,10 +397,9 @@ func (g Webdav) PublicThumbnailHead(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, err = g.thumbnailsClient.GetThumbnail(r.Context(), &thumbnailssvc.GetThumbnailRequest{
-		Filepath:      strings.TrimLeft(tr.Filepath, "/"),
-		ThumbnailType: extensionToThumbnailType(strings.TrimLeft(tr.Extension, ".")),
-		Width:         tr.Width,
-		Height:        tr.Height,
+		Filepath: strings.TrimLeft(tr.Filepath, "/"),
+		Width:    tr.Width,
+		Height:   tr.Height,
 		Source: &thumbnailssvc.GetThumbnailRequest_WebdavSource{
 			WebdavSource: &thumbnailsmsg.WebdavSource{
 				Url:             g.config.OcisPublicURL + r.URL.RequestURI(),
@@ -463,7 +460,7 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", rsp.Mimetype)
+	w.Header().Set("Content-Type", dlRsp.Header.Get("Content-Type"))
 	_, err = io.Copy(w, dlRsp.Body)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to write thumbnail to response writer")
