@@ -25,7 +25,7 @@ Feature: upload file using old chunking
       | dav_version |
       | old         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -45,7 +45,7 @@ Feature: upload file using old chunking
       | dav_version |
       | old         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -65,7 +65,7 @@ Feature: upload file using old chunking
       | dav_version |
       | old         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -89,7 +89,7 @@ Feature: upload file using old chunking
       | dav_version |
       | old         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -114,7 +114,7 @@ Feature: upload file using old chunking
       | old         | &#? TIÄFÜ @a#8a=b?c=d ?abc=oc # |
       | old         | 0                               |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | file-name                       |
       | spaces      | &#? TIÄFÜ @a#8a=b?c=d ?abc=oc # |
@@ -137,7 +137,7 @@ Feature: upload file using old chunking
       | dav_version |
       | old         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |

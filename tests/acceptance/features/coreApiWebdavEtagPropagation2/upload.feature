@@ -21,7 +21,7 @@ Feature: propagation of etags when uploading data
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -45,7 +45,7 @@ Feature: propagation of etags when uploading data
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -171,7 +171,7 @@ Feature: propagation of etags when uploading data
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |

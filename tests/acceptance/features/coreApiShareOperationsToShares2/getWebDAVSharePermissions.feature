@@ -25,7 +25,7 @@ Feature: sharing
       | old      |
       | new      |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path |
       | spaces   |
@@ -156,7 +156,7 @@ Feature: sharing
       | old      |
       | new      |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path |
       | spaces   |

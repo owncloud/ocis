@@ -26,7 +26,7 @@ Feature: get file properties
       | new         | /नेपाली.txt         |
       | new         | s,a,m,p,l,e.txt   |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | file_name         |
       | spaces      | /upload.txt       |
@@ -53,7 +53,7 @@ Feature: get file properties
       | new         | /file ?2.txt  | remote.php/dav/files/%username%/file ?2.txt   |
       | new         | /file &2.txt  | remote.php/dav/files/%username%/file &2.txt   |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | file_name     | expected_href                     |
       | spaces      | /C++ file.cpp | dav/spaces/%spaceid%/C++ file.cpp |
@@ -89,7 +89,7 @@ Feature: get file properties
       | new         | /folder ?2.txt  | remote.php/dav/files/%username%/folder ?2.txt  |
       | new         | /folder &2.txt  | remote.php/dav/files/%username%/folder &2.txt  |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | folder_name     | expected_href                       |
       | spaces      | /upload         | dav/spaces/%spaceid%/upload         |
@@ -121,7 +121,7 @@ Feature: get file properties
       | new         | /नेपाली                          | नेपाली                        |
       | new         | /folder #2.txt                   | file #2.txt                   |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | folder_name     | file_name        |
       | spaces      | /upload         | abc.txt          |
@@ -134,20 +134,20 @@ Feature: get file properties
   #after fixing all issues delete this Scenario and merge with the one above
   Scenario Outline: do a PROPFIND of various files inside various folders with '?' character in its name
     Given using <dav_version> DAV path
-    And user "Alice" has created folder "<folder_name>"
-    And user "Alice" has uploaded file with content "uploaded content" to "<folder_name>/<file_name>"
-    When user "Alice" gets the properties of file "<folder_name>/<file_name>" using the WebDAV API
+    And user "Alice" has created folder "/folder ?2.txt"
+    And user "Alice" has uploaded file with content "uploaded content" to "/folder ?2.txt/file ?2.txt"
+    When user "Alice" gets the properties of file "/folder ?2.txt/file ?2.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And the properties response should contain an etag
     Examples:
-      | dav_version | folder_name    | file_name   |
-      | old         | /folder ?2.txt | file ?2.txt |
-      | new         | /folder ?2.txt | file ?2.txt |
+      | dav_version |
+      | old         |
+      | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
-      | dav_version | folder_name    | file_name   |
-      | spaces      | /folder ?2.txt | file ?2.txt |
+      | dav_version |
+      | spaces      |
 
 
   Scenario Outline: A file that is not shared does not have a share-types property
@@ -163,7 +163,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -189,7 +189,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -215,7 +215,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -238,7 +238,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -275,7 +275,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -294,7 +294,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -311,7 +311,7 @@ Feature: get file properties
       | /remote.php/dav/files/does-not-exist | Resource not found     | Resource not found |
       | /remote.php/dav/does-not-exist       | File not found in root |                    |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | url                                             | message1           | message2 |
       | /remote.php/dav/spaces/%spaceid%/does-not-exist | Resource not found |          |
@@ -341,7 +341,7 @@ Feature: get file properties
       | new         |
       | old         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -377,7 +377,7 @@ Feature: get file properties
       | new         |
       | old         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -396,7 +396,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -415,7 +415,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -434,7 +434,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -453,7 +453,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -472,7 +472,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -491,7 +491,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -510,7 +510,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -529,7 +529,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -548,7 +548,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -567,7 +567,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -586,7 +586,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -605,7 +605,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -624,7 +624,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -648,7 +648,7 @@ Feature: get file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |

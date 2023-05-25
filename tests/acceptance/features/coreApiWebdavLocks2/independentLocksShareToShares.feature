@@ -30,7 +30,7 @@ Feature: independent locks
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace 
+    @skipOnRevaMaster
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |
@@ -59,7 +59,7 @@ Feature: independent locks
       | new      | shared     |
       | new      | exclusive  |
 
-    @personalSpace 
+    @skipOnRevaMaster
     Examples:
       | dav-path | lock-scope |
       | spaces   | shared     |

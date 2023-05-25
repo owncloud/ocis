@@ -19,7 +19,7 @@ Feature: delete folder
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -37,7 +37,7 @@ Feature: delete folder
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -57,7 +57,7 @@ Feature: delete folder
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -86,7 +86,7 @@ Feature: delete folder
       | new         | /fo.xyz     |
       | new         | /fo.exe     |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | folder_name |
       | spaces      | /fo.        |

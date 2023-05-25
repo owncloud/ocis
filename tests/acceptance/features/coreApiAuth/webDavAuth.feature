@@ -8,14 +8,13 @@ Feature: auth
     Given user "Alice" has been created with default attributes and without skeleton files
 
   @smokeTest
-  Scenario: using WebDAV anonymously
-    When a user requests "/remote.php/webdav" with "PROPFIND" and no authentication
+  Scenario Outline: using WebDAV anonymously
+    When a user requests "<dav_path>" with "PROPFIND" and no authentication
     Then the HTTP status code should be "401"
-
-  @smokeTest @personalSpace
-  Scenario: using spaces WebDAV anonymously
-    When user "Alice" requests "/dav/spaces/%spaceid%" with "PROPFIND" and no authentication
-    Then the HTTP status code should be "401"
+    Examples:
+      | dav_path              |
+      | /remote.php/webdav    |
+      | /dav/spaces/%spaceid% |
 
   @smokeTest
   Scenario Outline: using WebDAV with basic auth
@@ -25,7 +24,7 @@ Feature: auth
       | dav_path           |
       | /remote.php/webdav |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_path              |
       | /dav/spaces/%spaceid% |

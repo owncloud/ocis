@@ -21,7 +21,7 @@ Feature: propagation of etags when creating folders
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -46,7 +46,7 @@ Feature: propagation of etags when creating folders
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -123,7 +123,7 @@ Feature: propagation of etags when creating folders
       | old         |
       | new         |
 
-  @personalSpace
+  @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |

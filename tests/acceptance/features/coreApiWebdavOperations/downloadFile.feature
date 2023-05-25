@@ -20,7 +20,7 @@ Feature: download file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -36,7 +36,7 @@ Feature: download file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -54,7 +54,7 @@ Feature: download file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -72,7 +72,7 @@ Feature: download file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -91,7 +91,7 @@ Feature: download file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -110,7 +110,7 @@ Feature: download file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -131,7 +131,7 @@ Feature: download file
       | new         | ",,,.txt"      |
       | new         | ",,,.,"        |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | filename          |
       | spaces         | "sample,1.txt" |
@@ -153,7 +153,7 @@ Feature: download file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -184,7 +184,7 @@ Feature: download file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -200,7 +200,7 @@ Feature: download file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -216,7 +216,7 @@ Feature: download file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -231,7 +231,7 @@ Feature: download file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -258,12 +258,12 @@ Feature: download file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
 
-  @smokeTest 
+  @smokeTest
   Scenario Outline: Downloading a file should serve security headers
     Given using <dav_version> DAV path
     When user "Alice" downloads file "/welcome.txt" using the WebDAV API
@@ -284,7 +284,7 @@ Feature: download file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |

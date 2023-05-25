@@ -19,7 +19,7 @@ Feature: delete file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -39,7 +39,7 @@ Feature: delete file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -69,7 +69,7 @@ Feature: delete file
       | new         | /..upload     | abc         |
       | new         | /..upload     | ..abc       |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version    | folder_name   | file_name   |
       | spaces         | /upload.      | abc.        |
@@ -96,7 +96,7 @@ Feature: delete file
       | new         | ",,,.txt"      |
       | new         | ",,,.,"        |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version    | filename       |
       | spaces         | "sample,1.txt" |
@@ -125,7 +125,7 @@ Feature: delete file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version    |
       | spaces         |

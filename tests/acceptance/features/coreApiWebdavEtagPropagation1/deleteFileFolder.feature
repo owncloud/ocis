@@ -25,7 +25,7 @@ Feature: propagation of etags when deleting a file or folder
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -50,7 +50,7 @@ Feature: propagation of etags when deleting a file or folder
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -76,7 +76,7 @@ Feature: propagation of etags when deleting a file or folder
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -225,7 +225,7 @@ Feature: propagation of etags when deleting a file or folder
       | old         |
       | new         |
 
-  @personalSpace
+  @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -250,7 +250,7 @@ Feature: propagation of etags when deleting a file or folder
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |

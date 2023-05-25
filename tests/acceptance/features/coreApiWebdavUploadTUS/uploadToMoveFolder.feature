@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: move folders
   As a user
   I want to be able to move and upload files/folders
@@ -21,7 +21,7 @@ Feature: move folders
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |

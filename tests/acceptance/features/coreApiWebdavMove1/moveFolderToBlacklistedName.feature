@@ -21,7 +21,7 @@ Feature: users cannot move (rename) a folder to a blacklisted name
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |

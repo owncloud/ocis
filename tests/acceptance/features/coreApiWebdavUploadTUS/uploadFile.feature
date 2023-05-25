@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: upload file
   As a user
   I want to be able to upload files
@@ -29,7 +29,7 @@ Feature: upload file
       | new         | /?fi=le&%#2 . txt |
       | new         | /# %ab ab?=ed     |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | file_name         |
       | spaces      | /upload.txt       |
@@ -63,7 +63,7 @@ Feature: upload file
       | new         | /folder ?2.txt                   | file ?2.txt                   |
       | new         | /?fi=le&%#2 . txt                | # %ab ab?=ed                  |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | folder_name                      | file_name                     |
       | spaces      | /upload                          | abc.txt                       |
@@ -84,7 +84,7 @@ Feature: upload file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -99,7 +99,7 @@ Feature: upload file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -115,7 +115,7 @@ Feature: upload file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -130,7 +130,7 @@ Feature: upload file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -147,7 +147,7 @@ Feature: upload file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -174,7 +174,7 @@ Feature: upload file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -202,7 +202,7 @@ Feature: upload file
       | new         | "folder/file"           | Zm9sZGVyL2ZpbGU=             |
       | new         | "my\\file"              | bXkMaWxl                     |
 
-  @personalSpace
+  @skipOnRevaMaster
   Examples:
     | dav_version | file_name               | metadata                     |
     | spaces      | " "                     | IA==                         |

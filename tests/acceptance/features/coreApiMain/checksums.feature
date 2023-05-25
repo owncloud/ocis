@@ -16,7 +16,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -32,7 +32,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -49,7 +49,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -66,7 +66,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -84,7 +84,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -102,7 +102,7 @@ Feature: checksums
       | dav_version |
       | old         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -120,7 +120,7 @@ Feature: checksums
       | dav_version |
       | old         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -138,13 +138,13 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
 
   @issue-1291
-  Scenario Outline: copying a file with checksum should return the checksum in the propfind using new DAV path
+  Scenario Outline: copying a file with checksum should return the checksum in the propfind
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     When user "Alice" copies file "/myChecksumFile.txt" to "/myChecksumFileCopy.txt" using the WebDAV API
@@ -154,13 +154,13 @@ Feature: checksums
       | dav_version |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
 
   @issue-1316
-  Scenario Outline: copying file with checksum should return the checksum in the download header using new DAV path
+  Scenario Outline: copying file with checksum should return the checksum in the download header
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/myChecksumFile.txt" with checksum "MD5:d70b40f177b14b470d1756a3c12b963a"
     When user "Alice" copies file "/myChecksumFile.txt" to "/myChecksumFileCopy.txt" using the WebDAV API
@@ -170,7 +170,7 @@ Feature: checksums
       | dav_version |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -209,7 +209,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -224,7 +224,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -243,7 +243,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -260,7 +260,7 @@ Feature: checksums
       | dav_version |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -284,7 +284,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -307,7 +307,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -325,7 +325,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -348,7 +348,7 @@ Feature: checksums
       | new         | " oc?test=ab&cd " |
       | new         | "# %ab ab?=ed"    |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | renamed_file      |
       | spaces      | " oc?test=ab&cd " |

@@ -36,7 +36,7 @@ Feature: upload to a public link share
       | old      |
       | new      |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path |
       | spaces   |

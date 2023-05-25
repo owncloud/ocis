@@ -19,7 +19,7 @@ Feature: users cannot move (rename) a file to a blacklisted name
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |

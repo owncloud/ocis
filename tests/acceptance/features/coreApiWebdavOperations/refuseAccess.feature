@@ -35,7 +35,7 @@ Feature: refuse access
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version    |
       | spaces         |
