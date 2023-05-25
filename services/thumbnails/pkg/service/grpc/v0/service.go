@@ -2,7 +2,6 @@ package svc
 
 import (
 	"context"
-	"image"
 	"net/http"
 	"net/url"
 	"path"
@@ -109,7 +108,6 @@ func (g Thumbnail) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumb
 	}
 	rsp.DataEndpoint = g.dataEndpoint
 	rsp.TransferToken = transferToken
-	rsp.Mimetype = ""
 	return nil
 }
 
@@ -124,20 +122,9 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 	if tType == "" {
 		tType = req.GetThumbnailType().String()
 	}
-	generator, err := thumbnail.GeneratorForType(tType)
+	tr, err := thumbnail.PrepareRequest(int(req.Width), int(req.Height), tType, sRes.GetInfo().GetChecksum().GetSum())
 	if err != nil {
 		return "", merrors.BadRequest(g.serviceID, err.Error())
-	}
-	encoder, err := thumbnail.EncoderForType(tType)
-	if err != nil {
-		return "", merrors.BadRequest(g.serviceID, err.Error())
-	}
-
-	tr := thumbnail.Request{
-		Resolution: image.Rect(0, 0, int(req.Width), int(req.Height)),
-		Generator:  generator,
-		Encoder:    encoder,
-		Checksum:   sRes.GetInfo().GetChecksum().GetSum(),
 	}
 
 	if key, exists := g.manager.CheckThumbnail(tr); exists {
@@ -215,20 +202,9 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	if tType == "" {
 		tType = req.GetThumbnailType().String()
 	}
-	generator, err := thumbnail.GeneratorForType(tType)
+	tr, err := thumbnail.PrepareRequest(int(req.Width), int(req.Height), tType, sRes.GetInfo().GetChecksum().GetSum())
 	if err != nil {
 		return "", merrors.BadRequest(g.serviceID, err.Error())
-	}
-	encoder, err := thumbnail.EncoderForType(tType)
-	if err != nil {
-		return "", merrors.BadRequest(g.serviceID, err.Error())
-	}
-
-	tr := thumbnail.Request{
-		Resolution: image.Rect(0, 0, int(req.Width), int(req.Height)),
-		Generator:  generator,
-		Encoder:    encoder,
-		Checksum:   sRes.GetInfo().GetChecksum().GetSum(),
 	}
 
 	if key, exists := g.manager.CheckThumbnail(tr); exists {
