@@ -113,6 +113,7 @@ checksums:
   preferred_upload_type: sha1
 read_only_user_attributes: []
 ldap_server_write_enabled: true
+full_text_search: false
 middleware:
   auth:
     credentials_by_user_agent: {}
