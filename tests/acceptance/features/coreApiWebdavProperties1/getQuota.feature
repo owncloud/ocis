@@ -18,10 +18,6 @@ Feature: get quota
       | dav_version |
       | old         |
       | new         |
-
-    @personalSpace
-    Examples:
-      | dav_version |
       | spaces      |
 
   @smokeTest
@@ -34,13 +30,9 @@ Feature: get quota
       | dav_version |
       | old         |
       | new         |
-
-    @personalSpace
-    Examples:
-      | dav_version |
       | spaces      |
 
- 
+
   Scenario Outline: Retrieving folder quota of shared folder with quota when no quota is set for recipient
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and small skeleton files
@@ -61,10 +53,6 @@ Feature: get quota
       | dav_version |
       | old         |
       | new         |
-
-    @personalSpace
-    Examples:
-      | dav_version |
       | spaces      |
 
 
@@ -81,13 +69,9 @@ Feature: get quota
       | dav_version |
       | old         |
       | new         |
-
-    @personalSpace
-    Examples:
-      | dav_version |
       | spaces      |
 
- 
+
   Scenario Outline: Retrieving folder quota when quota is set and a file was received
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and small skeleton files
@@ -103,8 +87,4 @@ Feature: get quota
       | dav_version |
       | old         |
       | new         |
-
-    @personalSpace
-    Examples:
-      | dav_version |
       | spaces      |

@@ -24,12 +24,6 @@ Feature: LOCK file/folder
       | /remote.php/webdav/PARENT                          |
       | /remote.php/dav/files/%username%/PARENT            |
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
-    Then the HTTP status code of responses on all endpoints should be "401"
-
-  @smokeTest @personalSpace
-  Scenario: send LOCK requests to webDav endpoints as normal user with wrong password using the spaces WebDAV API
-    When user "Alice" requests these endpoints with "LOCK" including body "doesnotmatter" using password "invalid" about user "Alice"
-      | endpoint                                           |
       | /remote.php/dav/spaces/%spaceid%/textfile0.txt     |
       | /remote.php/dav/spaces/%spaceid%/PARENT            |
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
@@ -44,12 +38,6 @@ Feature: LOCK file/folder
       | /remote.php/webdav/PARENT                          |
       | /remote.php/dav/files/%username%/PARENT            |
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
-    Then the HTTP status code of responses on all endpoints should be "401"
-
-  @smokeTest @personalSpace
-  Scenario: send LOCK requests to webDav endpoints as normal user with no password using the spaces WebDAV API
-    When user "Alice" requests these endpoints with "LOCK" including body "doesnotmatter" using password "" about user "Alice"
-      | endpoint                                           |
       | /remote.php/dav/spaces/%spaceid%/textfile0.txt     |
       | /remote.php/dav/spaces/%spaceid%/PARENT            |
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
@@ -67,7 +55,7 @@ Feature: LOCK file/folder
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
     Then the HTTP status code of responses on all endpoints should be "409"
 
-  @issue-1347 @personalSpace
+  @issue-1347 @skipOnRevaMaster
   Scenario: send LOCK requests to another user's webDav endpoints as normal user using the spaces WebDAV API
     When user "Brian" requests these endpoints with "LOCK" to get property "d:shared" about user "Alice"
       | endpoint                                       |
@@ -88,12 +76,6 @@ Feature: LOCK file/folder
       | /remote.php/webdav/PARENT                          |
       | /remote.php/dav/files/%username%/PARENT            |
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
-    Then the HTTP status code of responses on all endpoints should be "401"
-
-  @personalSpace
-  Scenario: send LOCK requests to webDav endpoints using invalid username but correct password using the spaces WebDAV API
-    When user "usero" requests these endpoints with "LOCK" including body "doesnotmatter" using the password of user "Alice"
-      | endpoint                                           |
       | /remote.php/dav/spaces/%spaceid%/textfile0.txt     |
       | /remote.php/dav/spaces/%spaceid%/PARENT            |
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
@@ -108,12 +90,6 @@ Feature: LOCK file/folder
       | /remote.php/webdav/PARENT                          |
       | /remote.php/dav/files/%username%/PARENT            |
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
-    Then the HTTP status code of responses on all endpoints should be "401"
-
-  @personalSpace
-  Scenario: send LOCK requests to webDav endpoints using valid password and username of different user using the spaces WebDAV API
-    When user "Brian" requests these endpoints with "LOCK" including body "doesnotmatter" using the password of user "Alice"
-      | endpoint                                           |
       | /remote.php/dav/spaces/%spaceid%/textfile0.txt     |
       | /remote.php/dav/spaces/%spaceid%/PARENT            |
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |
@@ -128,12 +104,6 @@ Feature: LOCK file/folder
       | /remote.php/webdav/PARENT                          |
       | /remote.php/dav/files/%username%/PARENT            |
       | /remote.php/dav/files/%username%/PARENT/parent.txt |
-    Then the HTTP status code of responses on all endpoints should be "401"
-
-  @smokeTest @personalSpace
-  Scenario: send LOCK requests to webDav endpoints without any authentication using the spaces WebDAV API
-    When a user requests these endpoints with "LOCK" with body "doesnotmatter" and no authentication about user "Alice"
-      | endpoint                                           |
       | /remote.php/dav/spaces/%spaceid%/textfile0.txt     |
       | /remote.php/dav/spaces/%spaceid%/PARENT            |
       | /remote.php/dav/spaces/%spaceid%/PARENT/parent.txt |

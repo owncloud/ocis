@@ -23,7 +23,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -43,7 +43,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -61,7 +61,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -80,7 +80,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -100,7 +100,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -116,7 +116,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -132,7 +132,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -153,7 +153,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -176,7 +176,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -204,7 +204,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -214,18 +214,18 @@ Feature: move (rename) file
   Scenario Outline: renaming to a file with question mark in its name
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "ownCloud test text file 0" to "textfile0.txt"
-    When user "Alice" moves file "/textfile0.txt" to "/<renamed_file>" using the WebDAV API
+    When user "Alice" moves file "/textfile0.txt" to "/#oc ab?cd=ef#" using the WebDAV API
     Then the HTTP status code should be "201"
-    And the content of file "/<renamed_file>" for user "Alice" should be "ownCloud test text file 0"
+    And the content of file "/#oc ab?cd=ef#" for user "Alice" should be "ownCloud test text file 0"
     Examples:
-      | dav_version | renamed_file  |
-      | old         | #oc ab?cd=ef# |
-      | new         | #oc ab?cd=ef# |
+      | dav_version |
+      | old         |
+      | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
-      | dav_version | renamed_file  |
-      | spaces      | #oc ab?cd=ef# |
+      | dav_version |
+      | spaces      |
 
 
   Scenario Outline: renaming file with dots in the path
@@ -250,7 +250,7 @@ Feature: move (rename) file
       | new         | /...          | ...         |
       | new         | /..upload     | ..abc       |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | folder_name   | file_name   |
       | spaces      | /upload.      | abc.        |
@@ -272,7 +272,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -288,7 +288,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -319,7 +319,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -328,9 +328,9 @@ Feature: move (rename) file
   Scenario Outline: Renaming to/from a hidden file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded the following files with content "hidden file"
-      | path                    |
-      | .hidden_file101         |
-      | hidden_file101.txt      |
+      | path               |
+      | .hidden_file101    |
+      | hidden_file101.txt |
     When user "Alice" moves the following files using the WebDAV API
       | from               | to                 |
       | .hidden_file101    | hidden_file102.txt |
@@ -349,7 +349,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -384,7 +384,7 @@ Feature: move (rename) file
       | new         | texta         | file.txt    | textb         | 0           |
       | new         | texta         | file.txt    | textb         | 1           |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | source_folder | source_file | target_folder | target_file |
       | spaces      | text          | file.txt    | 0             | file.txt    |
@@ -419,8 +419,9 @@ Feature: move (rename) file
       | new         | texta         | 0           | file.txt    |
       | new         | texta         | 1           | file.txt    |
       | new         | texta         | file.txt    | 0           |
+      | new         | texta         | file.txt    | 1           |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | source_folder | source_file | target_file |
       | spaces      | 0             | file.txt    | file.txt    |
@@ -428,7 +429,7 @@ Feature: move (rename) file
       | spaces      | texta         | 0           | file.txt    |
       | spaces      | texta         | 1           | file.txt    |
       | spaces      | texta         | file.txt    | 0           |
-      | spaces      | texta         | file.txt    | 0           |
+      | spaces      | texta         | file.txt    | 1           |
 
 
   Scenario Outline: move a file of size zero byte
@@ -444,7 +445,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -462,7 +463,7 @@ Feature: move (rename) file
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |

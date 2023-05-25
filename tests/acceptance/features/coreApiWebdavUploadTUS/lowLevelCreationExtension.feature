@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: low level tests of the creation extension see https://tus.io/protocols/resumable-upload.html#creation
 
   Background:
@@ -21,7 +21,7 @@ Feature: low level tests of the creation extension see https://tus.io/protocols/
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -42,7 +42,7 @@ Feature: low level tests of the creation extension see https://tus.io/protocols/
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |

@@ -42,7 +42,7 @@ Feature: list files
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -68,7 +68,7 @@ Feature: list files
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -97,7 +97,7 @@ Feature: list files
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -121,7 +121,7 @@ Feature: list files
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -149,7 +149,7 @@ Feature: list files
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -174,14 +174,14 @@ Feature: list files
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
 
 
-  Scenario Outline: Get the list of resources in a folder shared through public link with depth 0
-    Given using <dav_version> DAV path
+  Scenario: Get the list of resources in a folder shared through public link with depth 0
+    Given using new DAV path
     And user "Alice" has created the following folders
       | path                                                                       |
       | /simple-folder/simple-folder1/simple-folder2/simple-folder3                |
@@ -201,13 +201,10 @@ Feature: list files
       | /simple-folder1/simple-folder2/welcome.txt                   |
       | /simple-folder1/simple-folder2/simple-folder3                |
       | /simple-folder1/simple-folder2/simple-folder3/simple-folder4 |
-    Examples:
-      | dav_version |
-      | new         |
 
 
-  Scenario Outline: Get the list of resources in a folder shared through public link with depth 1
-    Given using <dav_version> DAV path
+  Scenario: Get the list of resources in a folder shared through public link with depth 1
+    Given using new DAV path
     And user "Alice" has created the following folders
       | path                                                                       |
       | /simple-folder/simple-folder1/simple-folder2/simple-folder3                |
@@ -229,13 +226,10 @@ Feature: list files
       | /simple-folder1/simple-folder2                               |
       | /simple-folder1/textfile0.txt                                |
       | /simple-folder1/simple-folder2/simple-folder3/simple-folder4 |
-    Examples:
-      | dav_version |
-      | new         |
 
   @depthInfinityPropfindEnabled
-  Scenario Outline: Get the list of resources in a folder shared through public link with depth infinity
-    Given using <dav_version> DAV path
+  Scenario: Get the list of resources in a folder shared through public link with depth infinity
+    Given using new DAV path
     And user "Alice" has created the following folders
       | path                                                                       |
       | /simple-folder/simple-folder1/simple-folder2/simple-folder3                |
@@ -255,9 +249,6 @@ Feature: list files
       | /simple-folder1/simple-folder2/welcome.txt                   |
       | /simple-folder1/simple-folder2/simple-folder3                |
       | /simple-folder1/simple-folder2/simple-folder3/simple-folder4 |
-    Examples:
-      | dav_version |
-      | new         |
 
 
   Scenario Outline: Get the list of files in the trashbin with depth 0
@@ -285,7 +276,7 @@ Feature: list files
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -318,7 +309,7 @@ Feature: list files
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -349,7 +340,7 @@ Feature: list files
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -364,7 +355,7 @@ Feature: list files
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -383,7 +374,7 @@ Feature: list files
       | dav_version |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -403,7 +394,7 @@ Feature: list files
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |

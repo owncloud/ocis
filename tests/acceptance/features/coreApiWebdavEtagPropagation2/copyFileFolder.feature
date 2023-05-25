@@ -25,7 +25,7 @@ Feature: propagation of etags when copying files or folders
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -52,7 +52,7 @@ Feature: propagation of etags when copying files or folders
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -80,7 +80,7 @@ Feature: propagation of etags when copying files or folders
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -113,7 +113,7 @@ Feature: propagation of etags when copying files or folders
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -146,7 +146,7 @@ Feature: propagation of etags when copying files or folders
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |

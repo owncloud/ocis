@@ -21,7 +21,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path |
       | spaces   |
@@ -43,7 +43,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path |
       | spaces   |
@@ -70,7 +70,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path |
       | spaces   |
@@ -97,7 +97,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path |
       | spaces   |
@@ -125,7 +125,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path |
       | spaces   |
@@ -153,7 +153,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path |
       | spaces   |
@@ -181,7 +181,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path |
       | spaces   |
@@ -204,7 +204,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path |
       | spaces   |
@@ -228,7 +228,7 @@ Feature: using trashbin together with sharing
       | dav-path |
       | new      |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path |
       | spaces   |

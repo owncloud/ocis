@@ -411,7 +411,7 @@ Feature: update a public link share
       | new      | 1               | 100             |
       | new      | 2               | 200             |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path | ocs_api_version | ocs_status_code |
       | spaces   | 1               | 100             |
@@ -457,7 +457,7 @@ Feature: update a public link share
       | new      | 1               | 100             |
       | new      | 2               | 200             |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path | ocs_api_version | ocs_status_code |
       | spaces   | 1               | 100             |
@@ -482,7 +482,7 @@ Feature: update a public link share
       | new      | 1               | 100             |
       | new      | 2               | 200             |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav-path | ocs_api_version | ocs_status_code |
       | spaces   | 1               | 100             |

@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: low level tests for upload of chunks
 
   Background:
@@ -20,7 +20,7 @@ Feature: low level tests for upload of chunks
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -42,7 +42,7 @@ Feature: low level tests for upload of chunks
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -64,7 +64,7 @@ Feature: low level tests for upload of chunks
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -84,7 +84,7 @@ Feature: low level tests for upload of chunks
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |

@@ -20,7 +20,7 @@ Feature: set file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -37,7 +37,7 @@ Feature: set file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -55,7 +55,7 @@ Feature: set file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -78,7 +78,7 @@ Feature: set file properties
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -96,7 +96,7 @@ Feature: set file properties
       | old                | new               |
       | new                | old               |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | action_dav_version | other_dav_version |
       | spaces             | new               |

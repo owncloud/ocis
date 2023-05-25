@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: checksums
 
   Background:
@@ -21,7 +21,7 @@ Feature: checksums
       | old         | SHA1 8cb2237d0679ca88db6464eac60da96345513964 |
       | new         | SHA1 8cb2237d0679ca88db6464eac60da96345513964 |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | checksum                                      |
       | spaces      | MD5 827ccb0eea8a706c4c34a16891f84e7b          |
@@ -43,7 +43,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -64,7 +64,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -86,7 +86,7 @@ Feature: checksums
       | old         | SHA1 8cb2237d0679ca88db6464eac60da96345513963 |
       | new         | SHA1 8cb2237d0679ca88db6464eac60da96345513963 |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | incorrect_checksum                            |
       | spaces      | MD5 827ccb0eea8a706c4c34a16891f84e7a          |
@@ -108,7 +108,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -130,7 +130,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -152,7 +152,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -173,7 +173,7 @@ Feature: checksums
       | old         |
       | new         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version |
       | spaces      |
@@ -201,7 +201,7 @@ Feature: checksums
       | old         | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
       | new         | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | overwriteChecksum                             |
       | spaces      | MD5 5d41402abc4b2a76b9719d911017c592          |
@@ -228,7 +228,7 @@ Feature: checksums
       | old         | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |
       | new         | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | overwriteInvalidChecksum                      |
       | spaces      | MD5 5d41402abc4b2a76b9719d911017c593          |
@@ -257,7 +257,7 @@ Feature: checksums
       | old         | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
       | new         | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | overwriteChecksum                             |
       | spaces      | MD5 5d41402abc4b2a76b9719d911017c592          |
@@ -284,7 +284,7 @@ Feature: checksums
       | old         | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |
       | new         | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_version | overwriteChecksum                             |
       | spaces      | MD5 5d41402abc4b2a76b9719d911017c593          |

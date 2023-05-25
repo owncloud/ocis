@@ -10,7 +10,7 @@ Feature: PROPFIND
       | dav_path                      |
       | /remote.php/dav/files         |
 
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_path                      |
       | /remote.php/dav/spaces        |
@@ -26,7 +26,7 @@ Feature: PROPFIND
       | dav_path                    | depth    | http_status |
       | /remote.php/dav/files/alice | 0        | 207         |
       | /remote.php/dav/files/alice | infinity | 207         |
-    @personalSpace
+    @skipOnRevaMaster
     Examples:
       | dav_path                         | depth    | http_status |
       | /remote.php/dav/spaces/%spaceid% | 0        | 207         |
