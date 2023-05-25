@@ -374,11 +374,12 @@ func formatQuery(q string) string {
 		for _, part := range parts {
 			fieldParts := strings.SplitN(part, ":", 2)
 			if len(fieldParts) > 1 {
+				key := fieldParts[0]
 				value := fieldParts[1]
-				if value != "T" && value != "F" {
-					value = strings.ToLower(value) // do a lowercase query unless this is a boolean flag
+				if key == "Name" || key == "Tags" {
+					value = strings.ToLower(value) // do a lowercase query on the lowercased fields
 				}
-				cq += fieldParts[0] + ":" + value + " "
+				cq += key + ":" + value + " "
 			} else {
 				cq += part + " "
 			}
