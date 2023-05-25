@@ -111,6 +111,13 @@ func EncoderForType(fileType string) (Encoder, error) {
 	}
 }
 
-func EncoderForMime(fileMime string) (Encoder, error) {
-	return EncoderForType(strings.TrimPrefix(strings.TrimSpace(fileMime), "image/"))
+// GetExtForMime return the supported extension by mime
+func GetExtForMime(mime string) string {
+	ext := strings.TrimPrefix(strings.TrimSpace(strings.ToLower(mime)), "image/")
+	switch ext {
+	case typeJpg, typeJpeg, typePng, typeGif:
+		return ext
+	default:
+		return ""
+	}
 }

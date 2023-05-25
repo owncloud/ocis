@@ -86,7 +86,3 @@ func GeneratorForType(fileType string) (Generator, error) {
 		return nil, ErrNoEncoderForType
 	}
 }
-
-func GeneratorForMime(fileMime string) (Generator, error) {
-	return GeneratorForType(strings.TrimPrefix(strings.TrimSpace(fileMime), "image/"))
-}

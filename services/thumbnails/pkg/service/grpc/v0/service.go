@@ -3,7 +3,6 @@ package svc
 import (
 	"context"
 	"image"
-	"mime"
 	"net/http"
 	"net/url"
 	"path"
@@ -121,16 +120,17 @@ func (g Thumbnail) handleCS3Source(ctx context.Context, req *thumbnailssvc.GetTh
 		return "", err
 	}
 
-	ext, _ := mime.ExtensionsByType(sRes.GetInfo().GetMimeType())
-	_ = ext
-
-	generator, err := thumbnail.GeneratorForMime(sRes.GetInfo().GetMimeType())
-	if err != nil {
-		return "", merrors.BadRequest(g.serviceID, "unsupported thumbnail type")
+	tType := thumbnail.GetExtForMime(sRes.GetInfo().GetMimeType())
+	if tType == "" {
+		tType = req.GetThumbnailType().String()
 	}
-	encoder, err := thumbnail.EncoderForMime(sRes.GetInfo().GetMimeType())
+	generator, err := thumbnail.GeneratorForType(tType)
 	if err != nil {
-		return "", merrors.BadRequest(g.serviceID, "unsupported thumbnail type")
+		return "", merrors.BadRequest(g.serviceID, err.Error())
+	}
+	encoder, err := thumbnail.EncoderForType(tType)
+	if err != nil {
+		return "", merrors.BadRequest(g.serviceID, err.Error())
 	}
 
 	tr := thumbnail.Request{
@@ -211,13 +211,17 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 		return "", err
 	}
 
-	generator, err := thumbnail.GeneratorForMime(sRes.GetInfo().GetMimeType())
-	if err != nil {
-		return "", merrors.BadRequest(g.serviceID, "unsupported thumbnail type")
+	tType := thumbnail.GetExtForMime(sRes.GetInfo().GetMimeType())
+	if tType == "" {
+		tType = req.GetThumbnailType().String()
 	}
-	encoder, err := thumbnail.EncoderForMime(sRes.GetInfo().GetMimeType())
+	generator, err := thumbnail.GeneratorForType(tType)
 	if err != nil {
-		return "", merrors.BadRequest(g.serviceID, "unsupported thumbnail type")
+		return "", merrors.BadRequest(g.serviceID, err.Error())
+	}
+	encoder, err := thumbnail.EncoderForType(tType)
+	if err != nil {
+		return "", merrors.BadRequest(g.serviceID, err.Error())
 	}
 
 	tr := thumbnail.Request{
