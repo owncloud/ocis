@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Fix err when the user share the locked file: [#6357](https://github.com/owncloud/ocis/pull/6357)
 * Enhancement - Configurable ID Cache: [#6353](https://github.com/owncloud/ocis/pull/6353)
 * Enhancement - Remove the email logo: [#6359](https://github.com/owncloud/ocis/issues/6359)
+* Enhancement - Unify CA Cert envvars: [#6392](https://github.com/owncloud/ocis/pull/6392)
 * Enhancement - Update web to v7.0.0-rc.38: [#6375](https://github.com/owncloud/ocis/pull/6375)
 
 ## Details
@@ -40,6 +41,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/6359
    https://github.com/owncloud/ocis/pull/6361
+
+* Enhancement - Unify CA Cert envvars: [#6392](https://github.com/owncloud/ocis/pull/6392)
+
+   Introduce a global `OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` to avoid needing to configure
+   all `{SERVICENAME}_EVENTS_TLS_ROOT_CA_CERTIFICATE` envvars
+
+   https://github.com/owncloud/ocis/pull/6392
 
 * Enhancement - Update web to v7.0.0-rc.38: [#6375](https://github.com/owncloud/ocis/pull/6375)
 
