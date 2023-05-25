@@ -77,14 +77,14 @@ Feature: Upload files into a space
       | test.txt |
 
 
-  Scenario: user cannot create folder with a existing name
+  Scenario: user cannot create folder with an existing name
     Given user "Alice" has created a folder "NewFolder" in space "Project Ceres"
     When user "Alice" creates a folder "NewFolder" in space "Project Ceres" using the WebDav Api
     Then the HTTP status code should be "405"
 
 
-  Scenario Outline: user cannot create subfolder in the nonexistent folder
-    When user "Alice" tries to create subfolder "<path>" in the nonexistent folder of the space "Project Ceres" using the WebDav Api
+  Scenario Outline: user cannot create subfolder in a nonexistent folder
+    When user "Alice" tries to create subfolder "<path>" in a nonexistent folder of the space "Project Ceres" using the WebDav Api
     Then the HTTP status code should be "409"
     Examples:
       | path        |
