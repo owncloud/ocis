@@ -24,7 +24,7 @@ message CS3Source {
 
 // The file types to which the thumbnail can be encoded to.
 enum ThumbnailType {
-        JPG = 0; // Represents JPG type
-        PNG = 1; // Represents PNG type
+        PNG = 0; // Represents PNG type
+        JPG = 1; // Represents JPG type
         GIF = 2; // Represents GIF type
 }
