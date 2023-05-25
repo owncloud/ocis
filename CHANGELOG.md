@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Enhancement - Bump Reva: [#6381](https://github.com/owncloud/ocis/pull/6381)
 * Enhancement - Default LDAP write to true: [#6362](https://github.com/owncloud/ocis/pull/6362)
 * Enhancement - Fix err when the user share the locked file: [#6357](https://github.com/owncloud/ocis/pull/6357)
 * Enhancement - Add fulltextsearch capabilty: [#6366](https://github.com/owncloud/ocis/pull/6366)
@@ -15,6 +16,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Update web to v7.0.0-rc.38: [#6375](https://github.com/owncloud/ocis/pull/6375)
 
 ## Details
+
+* Enhancement - Bump Reva: [#6381](https://github.com/owncloud/ocis/pull/6381)
+
+   Bumps reva
+
+   https://github.com/owncloud/ocis/pull/6381
 
 * Enhancement - Default LDAP write to true: [#6362](https://github.com/owncloud/ocis/pull/6362)
 
