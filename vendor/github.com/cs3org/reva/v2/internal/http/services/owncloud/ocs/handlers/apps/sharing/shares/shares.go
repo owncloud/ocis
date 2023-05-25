@@ -679,16 +679,21 @@ func (h *Handler) UpdateShare(w http.ResponseWriter, r *http.Request) {
 	shareID := chi.URLParam(r, "shareid")
 	// FIXME: isPublicShare is already doing a GetShare and GetPublicShare,
 	// we should just reuse that object when doing updates
-	if h.isPublicShare(r, shareID) {
-		h.updatePublicShare(w, r, shareID)
+	if share, ok := h.isPublicShare(r, shareID); ok {
+		h.updatePublicShare(w, r, share)
 		return
 	}
-	h.updateShare(w, r, shareID) // TODO PUT is used with incomplete data to update a share}
+
+	if share, ok := h.isUserShare(r, shareID); ok {
+		h.updateShare(w, r, share) // TODO PUT is used with incomplete data to update a share}
+		return
+	}
+	response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "cannot find share", nil)
 }
 
-func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, shareID string) {
+func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, share *collaboration.Share) {
 	ctx := r.Context()
-	sublog := appctx.GetLogger(ctx).With().Str("shareID", shareID).Logger()
+	sublog := appctx.GetLogger(ctx).With().Str("shareID", share.GetId().GetOpaqueId()).Logger()
 
 	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
 	if err != nil {
@@ -696,28 +701,7 @@ func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, shareID st
 		return
 	}
 
-	shareR, err := client.GetShare(r.Context(), &collaboration.GetShareRequest{
-		Ref: &collaboration.ShareReference{
-			Spec: &collaboration.ShareReference_Id{
-				Id: &collaboration.ShareId{
-					OpaqueId: shareID,
-				},
-			},
-		},
-	})
-
-	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error sending a grpc update share request", err)
-		return
-	}
-
-	if shareR.Status.GetCode() != rpc.Code_CODE_OK {
-		// TODO: error code from shareR response
-		response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "cant find requested share", fmt.Errorf("Can't find share %s. Response code: %v", shareID, shareR.Status.GetCode()))
-		return
-	}
-
-	info, status, err := h.getResourceInfoByID(ctx, client, shareR.Share.ResourceId)
+	info, status, err := h.getResourceInfoByID(ctx, client, share.ResourceId)
 	if err != nil || status.Code != rpc.Code_CODE_OK {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error mapping share data", err)
 		return
@@ -729,7 +713,7 @@ func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, shareID st
 		return
 	}
 
-	shareR.Share.Permissions = &collaboration.SharePermissions{Permissions: role.CS3ResourcePermissions()}
+	share.Permissions = &collaboration.SharePermissions{Permissions: role.CS3ResourcePermissions()}
 
 	var fieldMaskPaths = []string{"permissions"}
 
@@ -747,16 +731,16 @@ func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, shareID st
 			Nanos:   uint32(expiration.UnixNano() % int64(time.Second)),
 		}
 
-		shareR.Share.Expiration = expirationTs
+		share.Expiration = expirationTs
 		fieldMaskPaths = append(fieldMaskPaths, "expiration")
 	} else if r.Form.Has("expireDate") {
 		// If the expiration parameter was sent but is empty, then the expiration should be removed.
-		shareR.Share.Expiration = nil
+		share.Expiration = nil
 		fieldMaskPaths = append(fieldMaskPaths, "expiration")
 	}
 
 	uReq := &collaboration.UpdateShareRequest{
-		Share: shareR.Share,
+		Share: share,
 		UpdateMask: &fieldmaskpb.FieldMask{
 			Paths: fieldMaskPaths,
 		},
@@ -777,10 +761,10 @@ func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, shareID st
 	}
 
 	if currentUser, ok := ctxpkg.ContextGetUser(ctx); ok {
-		h.statCache.RemoveStat(currentUser.Id, shareR.Share.ResourceId)
+		h.statCache.RemoveStat(currentUser.Id, share.ResourceId)
 	}
 
-	share, err := conversions.CS3Share2ShareData(ctx, uRes.Share)
+	resultshare, err := conversions.CS3Share2ShareData(ctx, uRes.Share)
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error mapping share data", err)
 		return
@@ -807,24 +791,30 @@ func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, shareID st
 		return
 	}
 
-	h.addFileInfo(r.Context(), share, statRes.Info)
-	h.mapUserIds(ctx, client, share)
+	h.addFileInfo(r.Context(), resultshare, statRes.Info)
+	h.mapUserIds(ctx, client, resultshare)
 
-	response.WriteOCSSuccess(w, r, share)
+	response.WriteOCSSuccess(w, r, resultshare)
 }
 
 // RemoveShare handles DELETE requests on /apps/files_sharing/api/v1/shares/(shareid)
 func (h *Handler) RemoveShare(w http.ResponseWriter, r *http.Request) {
 	shareID := chi.URLParam(r, "shareid")
-	switch {
-	case h.isPublicShare(r, shareID):
-		h.removePublicShare(w, r, shareID)
-	case h.isUserShare(r, shareID):
-		h.removeUserShare(w, r, shareID)
-	default:
-		// The request is a remove space member request.
-		h.removeSpaceMember(w, r, shareID)
+	if share, ok := h.isPublicShare(r, shareID); ok {
+		h.removePublicShare(w, r, share)
+		return
 	}
+	if share, ok := h.isUserShare(r, shareID); ok {
+		h.removeUserShare(w, r, share)
+		return
+	}
+
+	if prov, ok := h.isSpaceShare(r, shareID); ok {
+		// The request is a remove space member request.
+		h.removeSpaceMember(w, r, shareID, prov)
+		return
+	}
+	response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "cannot find share", nil)
 }
 
 // ListShares handles GET requests on /apps/files_sharing/api/v1/shares

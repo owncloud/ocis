@@ -85,7 +85,7 @@ Feature: Resharing
     Examples:
       | user  | code | exists           |
       | Alice | 100  | should not exist |
-      | Brian | 400  | should exist     |
+      | Brian | 998  | should exist     |
       | Carol | 100  | should not exist |
 
 

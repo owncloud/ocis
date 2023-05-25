@@ -53,6 +53,7 @@ import (
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
@@ -876,13 +877,67 @@ func ReadPropfind(r io.Reader) (pf XML, status int, err error) {
 
 // MultistatusResponse converts a list of resource infos into a multistatus response string
 func MultistatusResponse(ctx context.Context, pf *XML, mds []*provider.ResourceInfo, publicURL, ns string, linkshares map[string]struct{}, returnMinimal bool) ([]byte, error) {
-	responses := make([]*ResponseXML, 0, len(mds))
-	for i := range mds {
-		res, err := mdToPropResponse(ctx, pf, mds[i], publicURL, ns, linkshares, returnMinimal)
-		if err != nil {
-			return nil, err
+	g, ctx := errgroup.WithContext(ctx)
+
+	type work struct {
+		position int
+		info     *provider.ResourceInfo
+	}
+	type result struct {
+		position int
+		info     *ResponseXML
+	}
+	workChan := make(chan work, len(mds))
+	resultChan := make(chan result, len(mds))
+
+	// Distribute work
+	g.Go(func() error {
+		defer close(workChan)
+		for i, md := range mds {
+			select {
+			case workChan <- work{position: i, info: md}:
+			case <-ctx.Done():
+				return ctx.Err()
+			}
 		}
-		responses = append(responses, res)
+		return nil
+	})
+
+	// Spawn workers that'll concurrently work the queue
+	numWorkers := 50
+	if len(mds) < numWorkers {
+		numWorkers = len(mds)
+	}
+	for i := 0; i < numWorkers; i++ {
+		g.Go(func() error {
+			for work := range workChan {
+				res, err := mdToPropResponse(ctx, pf, work.info, publicURL, ns, linkshares, returnMinimal)
+				if err != nil {
+					return err
+				}
+				select {
+				case resultChan <- result{position: work.position, info: res}:
+				case <-ctx.Done():
+					return ctx.Err()
+				}
+			}
+			return nil
+		})
+	}
+
+	// Wait for things to settle down, then close results chan
+	go func() {
+		_ = g.Wait() // error is checked later
+		close(resultChan)
+	}()
+
+	if err := g.Wait(); err != nil {
+		return nil, err
+	}
+
+	responses := make([]*ResponseXML, len(mds))
+	for res := range resultChan {
+		responses[res.position] = res.info
 	}
 
 	msr := NewMultiStatusResponseXML()
@@ -904,11 +959,12 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 	defer span.End()
 
 	sublog := appctx.GetLogger(ctx).With().Interface("md", md).Str("ns", ns).Logger()
-	md.Path = strings.TrimPrefix(md.Path, ns)
+	id := md.Id
+	p := strings.TrimPrefix(md.Path, ns)
 
 	baseURI := ctx.Value(net.CtxKeyBaseURI).(string)
 
-	ref := path.Join(baseURI, md.Path)
+	ref := path.Join(baseURI, p)
 	if md.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
 		ref += "/"
 	}
@@ -952,7 +1008,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 
 	role := conversions.RoleFromResourcePermissions(md.PermissionSet, ls != nil)
 
-	if md.Space != nil && md.Space.SpaceType != "grant" && utils.ResourceIDEqual(md.Space.Root, md.Id) {
+	if md.Space != nil && md.Space.SpaceType != "grant" && utils.ResourceIDEqual(md.Space.Root, id) {
 		// a space root is never shared
 		shareTypes = ""
 	}
@@ -969,8 +1025,8 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 	}
 
 	// replace fileid of /public/{token} mountpoint with grant fileid
-	if ls != nil && md.Id != nil && md.Id.SpaceId == utils.PublicStorageSpaceID && md.Id.OpaqueId == ls.Token {
-		md.Id = ls.ResourceId
+	if ls != nil && id != nil && id.SpaceId == utils.PublicStorageSpaceID && id.OpaqueId == ls.Token {
+		id = ls.ResourceId
 	}
 
 	propstatOK := PropstatXML{
@@ -996,12 +1052,12 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 	if pf.Allprop != nil {
 		// return all known properties
 
-		if md.Id != nil {
-			id := storagespace.FormatResourceID(*md.Id)
+		if id != nil {
+			sid := storagespace.FormatResourceID(*id)
 			appendToOK(
-				prop.Escaped("oc:id", id),
-				prop.Escaped("oc:fileid", id),
-				prop.Escaped("oc:spaceid", md.Id.SpaceId),
+				prop.Escaped("oc:id", sid),
+				prop.Escaped("oc:fileid", sid),
+				prop.Escaped("oc:spaceid", id.SpaceId),
 			)
 		}
 
@@ -1012,7 +1068,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 		}
 
 		// we need to add the shareid if possible - the only way to extract it here is to parse it from the path
-		if ref, err := storagespace.ParseReference(strings.TrimPrefix(md.Path, "/")); err == nil && ref.GetResourceId().GetSpaceId() == utils.ShareStorageSpaceID {
+		if ref, err := storagespace.ParseReference(strings.TrimPrefix(p, "/")); err == nil && ref.GetResourceId().GetSpaceId() == utils.ShareStorageSpaceID {
 			appendToOK(prop.Raw("oc:shareid", ref.GetResourceId().GetOpaqueId()))
 		}
 
@@ -1119,14 +1175,14 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 				// TODO(jfd): maybe phoenix and the other clients can just use this id as an opaque string?
 				// I tested the desktop client and phoenix to annotate which properties are requestted, see below cases
 				case "fileid": // phoenix only
-					if md.Id != nil {
-						appendToOK(prop.Escaped("oc:fileid", storagespace.FormatResourceID(*md.Id)))
+					if id != nil {
+						appendToOK(prop.Escaped("oc:fileid", storagespace.FormatResourceID(*id)))
 					} else {
 						appendToNotFound(prop.NotFound("oc:fileid"))
 					}
 				case "id": // desktop client only
-					if md.Id != nil {
-						appendToOK(prop.Escaped("oc:id", storagespace.FormatResourceID(*md.Id)))
+					if id != nil {
+						appendToOK(prop.Escaped("oc:id", storagespace.FormatResourceID(*id)))
 					} else {
 						appendToNotFound(prop.NotFound("oc:id"))
 					}
@@ -1137,8 +1193,8 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 						appendToNotFound(prop.NotFound("oc:file-parent"))
 					}
 				case "spaceid":
-					if md.Id != nil {
-						appendToOK(prop.Escaped("oc:spaceid", md.Id.SpaceId))
+					if id != nil {
+						appendToOK(prop.Escaped("oc:spaceid", id.SpaceId))
 					} else {
 						appendToNotFound(prop.Escaped("oc:spaceid", ""))
 					}
@@ -1204,7 +1260,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 					// TODO what is the difference to d:quota-used-bytes (which only exists for collections)?
 					// oc:size is available on files and folders and behaves like d:getcontentlength or d:quota-used-bytes respectively
 					// The hasPrefix is a workaround to make children of the link root show a size if they have 0 bytes
-					if ls == nil || strings.HasPrefix(md.Path, "/"+ls.Token+"/") {
+					if ls == nil || strings.HasPrefix(p, "/"+ls.Token+"/") {
 						appendToOK(prop.Escaped("oc:size", size))
 					} else {
 						// link share root collection has no size
@@ -1289,8 +1345,8 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 						}
 					}
 
-					if md.Id != nil {
-						if _, ok := linkshares[md.Id.OpaqueId]; ok {
+					if id != nil {
+						if _, ok := linkshares[id.OpaqueId]; ok {
 							types.WriteString("<oc:share-type>3</oc:share-type>")
 						}
 					}
@@ -1316,12 +1372,12 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 					if isPublic && md.Type == provider.ResourceType_RESOURCE_TYPE_FILE {
 						var path string
 						if !ls.PasswordProtected {
-							path = md.Path
+							path = p
 						} else {
 							expiration := time.Unix(int64(ls.Signature.SignatureExpiration.Seconds), int64(ls.Signature.SignatureExpiration.Nanos))
 							var sb strings.Builder
 
-							sb.WriteString(md.Path)
+							sb.WriteString(p)
 							sb.WriteString("?signature=")
 							sb.WriteString(ls.Signature.Signature)
 							sb.WriteString("&expiration=")
@@ -1335,8 +1391,8 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 					}
 				case "privatelink":
 					privateURL, err := url.Parse(publicURL)
-					if err == nil && md.Id != nil {
-						privateURL.Path = path.Join(privateURL.Path, "f", storagespace.FormatResourceID(*md.Id))
+					if err == nil && id != nil {
+						privateURL.Path = path.Join(privateURL.Path, "f", storagespace.FormatResourceID(*id))
 						propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:privatelink", privateURL.String()))
 					} else {
 						propstatNotFound.Prop = append(propstatNotFound.Prop, prop.NotFound("oc:privatelink"))
@@ -1344,7 +1400,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 				case "signature-auth":
 					if isPublic {
 						// We only want to add the attribute to the root of the propfind.
-						if strings.HasSuffix(md.Path, ls.Token) && ls.Signature != nil {
+						if strings.HasSuffix(p, ls.Token) && ls.Signature != nil {
 							expiration := time.Unix(int64(ls.Signature.SignatureExpiration.Seconds), int64(ls.Signature.SignatureExpiration.Nanos))
 							var sb strings.Builder
 							sb.WriteString("<oc:signature>")
@@ -1366,7 +1422,7 @@ func mdToPropResponse(ctx context.Context, pf *XML, md *provider.ResourceInfo, p
 				case "name":
 					appendToOK(prop.Escaped("oc:name", md.Name))
 				case "shareid":
-					if ref, err := storagespace.ParseReference(strings.TrimPrefix(md.Path, "/")); err == nil && ref.GetResourceId().GetSpaceId() == utils.ShareStorageSpaceID {
+					if ref, err := storagespace.ParseReference(strings.TrimPrefix(p, "/")); err == nil && ref.GetResourceId().GetSpaceId() == utils.ShareStorageSpaceID {
 						appendToOK(prop.Raw("oc:shareid", ref.GetResourceId().GetOpaqueId()))
 					}
 				case "dDC": // desktop

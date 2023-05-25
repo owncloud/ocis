@@ -273,7 +273,7 @@ func (h *Handler) listPublicShares(r *http.Request, filters []*link.ListPublicSh
 	return ocsDataPayload, nil, errors.New("bad request")
 }
 
-func (h *Handler) isPublicShare(r *http.Request, oid string) bool {
+func (h *Handler) isPublicShare(r *http.Request, oid string) (*link.PublicShare, bool) {
 	logger := appctx.GetLogger(r.Context())
 	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
 	if err != nil {
@@ -291,19 +291,19 @@ func (h *Handler) isPublicShare(r *http.Request, oid string) bool {
 	})
 	if err != nil {
 		logger.Err(err)
-		return false
+		return nil, false
 	}
 
-	return psRes.GetShare() != nil
+	return psRes.GetShare(), psRes.GetShare() != nil
 }
 
-func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shareID string) {
+func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, share *link.PublicShare) {
 	updates := []*link.UpdatePublicShareRequest_Update{}
 	logger := appctx.GetLogger(r.Context())
 
 	gwC, err := pool.GetGatewayServiceClient(h.gatewayAddr)
 	if err != nil {
-		log.Err(err).Str("shareID", shareID).Msg("updatePublicShare")
+		log.Err(err).Str("shareID", share.GetId().GetOpaqueId()).Msg("updatePublicShare")
 		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "error getting a connection to the gateway service", nil)
 		return
 	}
@@ -317,21 +317,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 		return
 	}
 
-	before, err := gwC.GetPublicShare(r.Context(), &link.GetPublicShareRequest{
-		Ref: &link.PublicShareReference{
-			Spec: &link.PublicShareReference_Id{
-				Id: &link.PublicShareId{
-					OpaqueId: shareID,
-				},
-			},
-		},
-	})
-	if err != nil {
-		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "failed to get public share", nil)
-		return
-	}
-
-	createdByUser := publicshare.IsCreatedByUser(*before.Share, user)
+	createdByUser := publicshare.IsCreatedByUser(*share, user)
 
 	// NOTE: you are allowed to update a link TO a public link without the `PublicLink.Write` permission if you created it yourself
 	if (permKey != nil && *permKey != 0) || !createdByUser {
@@ -355,9 +341,9 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 	}
 
 	if !createdByUser {
-		sRes, err := gwC.Stat(r.Context(), &provider.StatRequest{Ref: &provider.Reference{ResourceId: before.Share.ResourceId}})
+		sRes, err := gwC.Stat(r.Context(), &provider.StatRequest{Ref: &provider.Reference{ResourceId: share.ResourceId}})
 		if err != nil {
-			log.Err(err).Interface("resource_id", before.Share.ResourceId).Msg("failed to stat shared resource")
+			log.Err(err).Interface("resource_id", share.ResourceId).Msg("failed to stat shared resource")
 			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "failed to get public share", nil)
 			return
 		}
@@ -382,7 +368,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 	newName, ok := r.Form["name"]
 	if ok {
 		updatesFound = true
-		if newName[0] != before.Share.DisplayName {
+		if newName[0] != share.DisplayName {
 			updates = append(updates, &link.UpdatePublicShareRequest_Update{
 				Type:        link.UpdatePublicShareRequest_Update_TYPE_DISPLAYNAME,
 				DisplayName: newName[0],
@@ -404,7 +390,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 		publicSharePermissions := &link.PublicSharePermissions{
 			Permissions: newPermissions,
 		}
-		beforePerm, _ := json.Marshal(before.GetShare().Permissions)
+		beforePerm, _ := json.Marshal(share.Permissions)
 		afterPerm, _ := json.Marshal(publicSharePermissions)
 		if string(beforePerm) != string(afterPerm) {
 			logger.Info().Str("shares", "update").Msgf("updating permissions from %v to: %v", string(beforePerm), string(afterPerm))
@@ -418,7 +404,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 		}
 	}
 
-	statReq := provider.StatRequest{Ref: &provider.Reference{ResourceId: before.Share.ResourceId}}
+	statReq := provider.StatRequest{Ref: &provider.Reference{ResourceId: share.ResourceId}}
 	statRes, err := gwC.Stat(r.Context(), &statReq)
 	if err != nil {
 		log.Debug().Err(err).Str("shares", "update public share").Msg("error during stat")
@@ -446,7 +432,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 			}
 		}
 
-		beforeExpiration, _ := json.Marshal(before.Share.Expiration)
+		beforeExpiration, _ := json.Marshal(share.Expiration)
 		afterExpiration, _ := json.Marshal(newExpiration)
 		if string(afterExpiration) != string(beforeExpiration) {
 			logger.Debug().Str("shares", "update").Msgf("updating expire date from %v to: %v", string(beforeExpiration), string(afterExpiration))
@@ -473,47 +459,45 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 		})
 	}
 
-	publicShare := before.Share
-
 	// Updates are atomical. See: https://github.com/cs3org/cs3apis/pull/67#issuecomment-617651428 so in order to get the latest updated version
 	if len(updates) > 0 {
-		uRes := &link.UpdatePublicShareResponse{Share: before.Share}
+		uRes := &link.UpdatePublicShareResponse{Share: share}
 		for k := range updates {
 			uRes, err = gwC.UpdatePublicShare(r.Context(), &link.UpdatePublicShareRequest{
 				Ref: &link.PublicShareReference{
 					Spec: &link.PublicShareReference_Id{
 						Id: &link.PublicShareId{
-							OpaqueId: shareID,
+							OpaqueId: share.Id.OpaqueId,
 						},
 					},
 				},
 				Update: updates[k],
 			})
 			if err != nil {
-				log.Err(err).Str("shareID", shareID).Msg("sending update request to public link provider")
+				log.Err(err).Str("shareID", share.Id.OpaqueId).Msg("sending update request to public link provider")
 				response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "Error sending update request to public link provider", err)
 				return
 			}
 			if uRes.Status.Code != rpc.Code_CODE_OK {
-				log.Debug().Str("shareID", shareID).Msgf("sending update request to public link provider failed: %s", uRes.Status.Message)
+				log.Debug().Str("shareID", share.Id.OpaqueId).Msgf("sending update request to public link provider failed: %s", uRes.Status.Message)
 				response.WriteOCSError(w, r, response.MetaServerError.StatusCode, fmt.Sprintf("Error sending update request to public link provider: %s", uRes.Status.Message), nil)
 				return
 			}
 		}
-		publicShare = uRes.Share
+		share = uRes.Share
 	} else if !updatesFound {
 		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "No updates specified in request", nil)
 		return
 	}
 
-	s := conversions.PublicShare2ShareData(publicShare, r, h.publicURL)
+	s := conversions.PublicShare2ShareData(share, r, h.publicURL)
 	h.addFileInfo(r.Context(), s, statRes.Info)
 	h.mapUserIds(r.Context(), gwC, s)
 
 	response.WriteOCSSuccess(w, r, s)
 }
 
-func (h *Handler) removePublicShare(w http.ResponseWriter, r *http.Request, shareID string) {
+func (h *Handler) removePublicShare(w http.ResponseWriter, r *http.Request, share *link.PublicShare) {
 	ctx := r.Context()
 
 	c, err := pool.GetGatewayServiceClient(h.gatewayAddr)
@@ -522,25 +506,11 @@ func (h *Handler) removePublicShare(w http.ResponseWriter, r *http.Request, shar
 		return
 	}
 
-	before, err := c.GetPublicShare(r.Context(), &link.GetPublicShareRequest{
-		Ref: &link.PublicShareReference{
-			Spec: &link.PublicShareReference_Id{
-				Id: &link.PublicShareId{
-					OpaqueId: shareID,
-				},
-			},
-		},
-	})
-	if err != nil {
-		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "failed to get public share", nil)
-		return
-	}
-
 	u := ctxpkg.ContextMustGetUser(ctx)
-	if !publicshare.IsCreatedByUser(*before.Share, u) {
-		sRes, err := c.Stat(r.Context(), &provider.StatRequest{Ref: &provider.Reference{ResourceId: before.Share.ResourceId}})
+	if !publicshare.IsCreatedByUser(*share, u) {
+		sRes, err := c.Stat(r.Context(), &provider.StatRequest{Ref: &provider.Reference{ResourceId: share.ResourceId}})
 		if err != nil {
-			log.Err(err).Interface("resource_id", before.Share.ResourceId).Msg("failed to stat shared resource")
+			log.Err(err).Interface("resource_id", share.ResourceId).Msg("failed to stat shared resource")
 			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "failed to get public share", nil)
 			return
 		}
@@ -555,7 +525,7 @@ func (h *Handler) removePublicShare(w http.ResponseWriter, r *http.Request, shar
 		Ref: &link.PublicShareReference{
 			Spec: &link.PublicShareReference_Id{
 				Id: &link.PublicShareId{
-					OpaqueId: shareID,
+					OpaqueId: share.GetId().GetOpaqueId(),
 				},
 			},
 		},
