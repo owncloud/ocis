@@ -11,7 +11,7 @@ Feature: Email notification
       | Brian    |
 
 
-  Scenario: a user gets an email notification when someone shares a project space
+  Scenario: user gets an email notification when someone shares a project space
     Given the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "new-space" with the default quota using the GraphApi
     When user "Alice" shares a space "new-space" with settings:
@@ -28,7 +28,7 @@ Feature: Email notification
       """
 
 
-  Scenario: a user gets an email notification when someone shares a file
+  Scenario: user gets an email notification when someone shares a file
     Given user "Alice" has uploaded file with content "sample text" to "lorem.txt"
     When user "Alice" has shared file "lorem.txt" with user "Brian" with permissions "17"
     Then the HTTP status code should be "200"

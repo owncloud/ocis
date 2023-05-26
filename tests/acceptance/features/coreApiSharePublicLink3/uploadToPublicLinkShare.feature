@@ -1,14 +1,17 @@
 @api @issue-1276 @issue-1277
 
 Feature: upload to a public link share
+  As a user
+  I want to create a public link with upload permission
+  So that the recipient can upload resources
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "FOLDER"
 
   @smokeTest @issue-1267
-  Scenario: Uploading same file to a public upload-only share multiple times via new API
-    # The new API does the autorename automatically in upload-only folders
+  Scenario: uploading same file to a public upload-only share multiple times via new API
+    # The new API does the auto rename in upload-only folders
     Given user "Alice" has created a public link share with settings
       | path        | FOLDER |
       | permissions | create |
@@ -21,7 +24,7 @@ Feature: upload to a public link share
     And the content of file "/FOLDER/test (2).txt" for user "Alice" should be "test2"
 
 
-  Scenario Outline: Uploading file to a public upload-only share using public API that was deleted does not work
+  Scenario Outline: uploading file to a public upload-only share using public API that was deleted does not work
     Given using <dav-path> DAV path
     And user "Alice" has created a public link share with settings
       | path        | FOLDER |
@@ -42,7 +45,7 @@ Feature: upload to a public link share
       | spaces   |
 
   @issue-1269
-  Scenario: Uploading file to a public read-only share folder with public API does not work
+  Scenario: uploading file to a public read-only share folder with public API does not work
     Given user "Alice" has created a public link share with settings
       | path        | FOLDER |
       | permissions | read   |
@@ -50,7 +53,7 @@ Feature: upload to a public link share
     And the HTTP status code should be "403"
 
 
-  Scenario: Uploading to a public upload-only share with public API
+  Scenario: uploading to a public upload-only share with public API
     Given user "Alice" has created a public link share with settings
       | path        | FOLDER |
       | permissions | create |
@@ -61,7 +64,7 @@ Feature: upload to a public link share
       | ETag | /^"[a-f0-9:\.]{1,32}"$/ |
 
 
-  Scenario: Uploading to a public upload-only share with password with public API
+  Scenario: uploading to a public upload-only share with password with public API
     Given user "Alice" has created a public link share with settings
       | path        | FOLDER   |
       | password    | %public% |
@@ -71,7 +74,7 @@ Feature: upload to a public link share
     And the content of file "/FOLDER/test.txt" for user "Alice" should be "test-file"
 
 
-  Scenario: Uploading to a public read/write share with password with public API
+  Scenario: uploading to a public read/write share with password with public API
     Given user "Alice" has created a public link share with settings
       | path        | FOLDER   |
       | password    | %public% |
@@ -81,7 +84,7 @@ Feature: upload to a public link share
     And the content of file "/FOLDER/test.txt" for user "Alice" should be "test-file"
 
 
-  Scenario: Uploading file to a public shared folder with read/write permission when the sharer has insufficient quota does not work with public API
+  Scenario: uploading file to a public shared folder with read/write permission when the sharer has insufficient quota does not work with public API
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | FOLDER |
       | permissions | change |
@@ -90,7 +93,7 @@ Feature: upload to a public link share
     Then the HTTP status code should be "507"
 
   @issue-1290
-  Scenario: Uploading file to a public shared folder with upload-only permission when the sharer has insufficient quota does not work with public API
+  Scenario: uploading file to a public shared folder with upload-only permission when the sharer has insufficient quota does not work with public API
     When user "Alice" creates a public link share using the sharing API with settings
       | path        | FOLDER |
       | permissions | create |
@@ -99,7 +102,7 @@ Feature: upload to a public link share
     Then the HTTP status code should be "507"
 
   @smokeTest
-  Scenario: Uploading to a public upload-write and no edit and no overwrite share with public API
+  Scenario:uUploading to a public upload-write and no edit and no overwrite share with public API
     Given user "Alice" has created a public link share with settings
       | path        | FOLDER          |
       | permissions | uploadwriteonly |
@@ -108,7 +111,7 @@ Feature: upload to a public link share
     And the content of file "/FOLDER/test.txt" for user "Alice" should be "test-file"
 
   @smokeTest @issue-1267
-  Scenario: Uploading same file to a public upload-write and no edit and no overwrite share multiple times with new public API
+  Scenario: uploading same file to a public upload-write and no edit and no overwrite share multiple times with new public API
     Given user "Alice" has created a public link share with settings
       | path        | FOLDER          |
       | permissions | uploadwriteonly |

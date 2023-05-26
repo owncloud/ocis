@@ -1,5 +1,8 @@
 @api @issue-1328
 Feature: sharing
+  As a user
+  I want to update share permissions
+  So that I can decide what resources can be shared with which permission
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -7,11 +10,11 @@ Feature: sharing
       | Alice    |
       | Brian    |
       | Carol    |
-
-
-  Scenario Outline: Update of reshare can reduce permissions
-    Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "/TMP"
+
+
+  Scenario Outline: update of reshare can reduce permissions
+    Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,create,update,read"
     And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "Shares/TMP" with user "Carol" with permissions "share,create,update,read"
@@ -27,9 +30,8 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario Outline: Update of reshare can increase permissions to the maximum allowed
+  Scenario Outline: update of reshare can increase permissions to the maximum allowed
     Given using OCS API version "<ocs_api_version>"
-    And user "Alice" has created folder "/TMP"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,create,update,read"
     And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "Shares/TMP" with user "Carol" with permissions "share,read"
@@ -45,9 +47,8 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario Outline: Do not allow update of reshare to exceed permissions
+  Scenario Outline: do not allow update of reshare to exceed permissions
     Given using OCS API version "<ocs_api_version>"
-    And user "Alice" has created folder "/TMP"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,read"
     And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "Shares/TMP" with user "Carol" with permissions "share,read"
@@ -63,9 +64,8 @@ Feature: sharing
       | 2               | 404              |
 
 
-  Scenario Outline: Update of user reshare by the original share owner can increase permissions up to the permissions of the top-level share
+  Scenario Outline: update of user reshare by the original share owner can increase permissions up to the permissions of the top-level share
     Given using OCS API version "<ocs_api_version>"
-    And user "Alice" has created folder "/TMP"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,create,update,read"
     And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "Shares/TMP" with user "Carol" with permissions "share,read"
@@ -81,9 +81,8 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario Outline: Update of user reshare by the original share owner can increase permissions to more than the permissions of the top-level share
+  Scenario Outline: update of user reshare by the original share owner can increase permissions to more than the permissions of the top-level share
     Given using OCS API version "<ocs_api_version>"
-    And user "Alice" has created folder "/TMP"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,update,read"
     And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "Shares/TMP" with user "Carol" with permissions "share,read"
@@ -99,11 +98,10 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario Outline: Update of group reshare by the original share owner can increase permissions up to permissions of the top-level share
+  Scenario Outline: update of group reshare by the original share owner can increase permissions up to permissions of the top-level share
     Given using OCS API version "<ocs_api_version>"
     And group "grp1" has been created
     And user "Carol" has been added to group "grp1"
-    And user "Alice" has created folder "/TMP"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,create,update,read"
     And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "Shares/TMP" with group "grp1" with permissions "share,read"
@@ -119,11 +117,10 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario Outline: Update of group reshare by the original share owner can increase permissions to more than the permissions of the top-level share
+  Scenario Outline: update of group reshare by the original share owner can increase permissions to more than the permissions of the top-level share
     Given using OCS API version "<ocs_api_version>"
     And group "grp1" has been created
     And user "Carol" has been added to group "grp1"
-    And user "Alice" has created folder "/TMP"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,update,read"
     And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "Shares/TMP" with group "grp1" with permissions "share,read"
@@ -139,9 +136,8 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario Outline: After losing share permissions user can still delete a previously reshared share
+  Scenario Outline: after losing share permissions user can still delete a previously reshared share
     Given using OCS API version "<ocs_api_version>"
-    And user "Alice" has created folder "/TMP"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,create,update,read"
     And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "Shares/TMP" with user "Carol" with permissions "share,create,update,read"

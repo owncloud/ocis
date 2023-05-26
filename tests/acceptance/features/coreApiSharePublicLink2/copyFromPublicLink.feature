@@ -1,12 +1,15 @@
 @api
 Feature: copying from public link share
+  As a user
+  I want to make a copy of a resource within a public link
+  So that I can have a backup
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/PARENT"
 
 
-  Scenario: Copy file within a public link folder new public WebDAV API
+  Scenario: copy file within a public link folder new public WebDAV API
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
     And user "Alice" has created a public link share with settings
       | path        | /PARENT                   |
@@ -19,7 +22,7 @@ Feature: copying from public link share
     And the content of file "/PARENT/copy1.txt" for user "Alice" should be "some data"
 
 
-  Scenario: Copy folder within a public link folder new public WebDAV API
+  Scenario: copy folder within a public link folder new public WebDAV API
     Given user "Alice" has created folder "/PARENT/testFolder"
     And user "Alice" has uploaded file with content "some data" to "/PARENT/testFolder/testfile.txt"
     And user "Alice" has created a public link share with settings
@@ -33,7 +36,7 @@ Feature: copying from public link share
     And the content of file "/PARENT/testFolder-copy/testfile.txt" for user "Alice" should be "some data"
 
 
-  Scenario: Copy file within a public link folder to a new folder
+  Scenario: copy file within a public link folder to a new folder
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
     And user "Alice" has created folder "/PARENT/testFolder"
     And user "Alice" has created a public link share with settings
@@ -47,7 +50,7 @@ Feature: copying from public link share
     And the content of file "/PARENT/testFolder/copy1.txt" for user "Alice" should be "some data"
 
 
-  Scenario: Copy file within a public link folder to same file name as already existing one
+  Scenario: copy file within a public link folder to same file name as already existing one
     Given user "Alice" has uploaded file with content "some data 0" to "/PARENT/testfile.txt"
     And user "Alice" has uploaded file with content "some data 1" to "/PARENT/copy1.txt"
     And user "Alice" has created a public link share with settings
@@ -60,7 +63,7 @@ Feature: copying from public link share
     And the content of file "/PARENT/copy1.txt" for user "Alice" should be "some data 0"
 
   @issue-1232
-  Scenario: Copy folder within a public link folder to the same folder name as an already existing file
+  Scenario: copy folder within a public link folder to the same folder name as an already existing file
     Given user "Alice" has created folder "/PARENT/testFolder"
     And user "Alice" has uploaded file with content "some data" to "/PARENT/testFolder/testfile.txt"
     And user "Alice" has uploaded file with content "some data 1" to "/PARENT/copy1.txt"
@@ -75,7 +78,7 @@ Feature: copying from public link share
     And the content of file "/PARENT/testFolder/testfile.txt" for user "Alice" should be "some data"
 
 
-  Scenario: Copy file within a public link folder and delete file
+  Scenario: copy file within a public link folder and delete file
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
     And user "Alice" has created a public link share with settings
       | path        | /PARENT                   |
@@ -86,7 +89,7 @@ Feature: copying from public link share
     And as "Alice" file "/PARENT/copy1.txt" should not exist
 
   @issue-1232
-  Scenario: Copy file within a public link folder to a file with name same as an existing folder
+  Scenario: copy file within a public link folder to a file with name same as an existing folder
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
     And user "Alice" has created folder "/PARENT/new-folder"
     And user "Alice" has uploaded file with content "some data 1" to "/PARENT/new-folder/testfile1.txt"
@@ -101,7 +104,7 @@ Feature: copying from public link share
     And the content of file "/PARENT/new-folder/testfile.txt" for user "Alice" should be "some data"
 
 
-  Scenario Outline: Copy file with special characters in it's name within a public link folder
+  Scenario Outline: copy file with special characters in it's name within a public link folder
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/<file-name>"
     And user "Alice" has created a public link share with settings
       | path        | /PARENT                   |
@@ -120,7 +123,7 @@ Feature: copying from public link share
       | sample,1.txt     |
 
 
-  Scenario Outline: Copy file within a public link folder to a file with special characters in it's name
+  Scenario Outline: copy file within a public link folder to a file with special characters in it's name
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
     And user "Alice" has created a public link share with settings
       | path        | /PARENT                   |
@@ -139,7 +142,7 @@ Feature: copying from public link share
       | sample,1.txt          |
 
 
-  Scenario Outline: Copy file within a public link folder into a folder with special characters
+  Scenario Outline: copy file within a public link folder into a folder with special characters
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
     And user "Alice" has created folder "/PARENT/<destination-folder-name>"
     And user "Alice" has created a public link share with settings
@@ -159,7 +162,7 @@ Feature: copying from public link share
       | sample,1.txt            |
 
   @issue-1230
-  Scenario Outline: Copy file within a public link folder to a file with unusual destination names
+  Scenario Outline: copy file within a public link folder to a file with unusual destination names
     Given user "Alice" has uploaded file with content "some data" to "/PARENT/testfile.txt"
     And user "Alice" has created a public link share with settings
       | path        | /PARENT                   |
@@ -174,7 +177,7 @@ Feature: copying from public link share
       |                       |
 
   @issue-1230
-  Scenario Outline: Copy folder within a public link folder to a folder with unusual destination names
+  Scenario Outline: copy folder within a public link folder to a folder with unusual destination names
     Given user "Alice" has created folder "/PARENT/testFolder"
     And user "Alice" has uploaded file with content "some data" to "/PARENT/testFolder/testfile.txt"
     And user "Alice" has created a public link share with settings
