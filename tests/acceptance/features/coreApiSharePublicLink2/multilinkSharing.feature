@@ -1,8 +1,8 @@
 @api
 Feature: multi-link sharing
   As a user
-  I want to create multiple public link for a single resource
-  So that I can share them with various permissions
+  I want to create multiple public links for a single resource
+  So that I can share them with various permissions and/or different groups of people
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
