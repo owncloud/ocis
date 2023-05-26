@@ -714,8 +714,8 @@ Feature: user GDPR (General Data Protection Regulation) report
     Given user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/folderMain"
     And user "Alice" has created a public link share with settings
-      | path        | /folderMain |
-      | name        | sharedlink  |
+      | path | /folderMain |
+      | name | sharedlink  |
     When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
     And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
     Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
@@ -844,6 +844,110 @@ Feature: user GDPR (General Data Protection Regulation) report
                   "type": "string",
                   "enum": ["./folderMain"]
                 }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
+
+  Scenario: generate a GDPR report and check events when a space is shared
+    Given user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "GDPR Space" with the default quota using the GraphApi
+    And user "Alice" has shared a space "GDPR Space" with settings:
+      | shareWith | Brian  |
+      | role      | viewer |
+    When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
+    And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
+    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    And the downloaded JSON content should contain event type "events.SpaceShared" in item 'events' and should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "event"
+      ],
+      "properties": {
+        "event": {
+          "type": "object",
+          "required": [
+            "Creator",
+            "Executant",
+            "GranteeGroupID",
+            "GranteeUserID"
+          ],
+          "properties": {
+            "Creator": {
+                "type": "object",
+                "required": [
+                    "idp",
+                    "opaque_id",
+                    "type"
+                ],
+                "properties": {
+                    "idp": {
+                      "type": "string",
+                      "pattern": "^%base_url%$"
+                    },
+                    "opaque_id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "type": {
+                      "type": "number",
+                      "enum": [1]
+                    }
+                }
+            },
+            "Executant": {
+                "type": "object",
+                "required": [
+                    "idp",
+                    "opaque_id",
+                    "type"
+                ],
+                "properties": {
+                    "idp": {
+                      "type": "string",
+                      "pattern": "^%base_url%$"
+                    },
+                    "opaque_id": {
+                      "type": "string",
+                      "pattern": "^%user_id_pattern%$"
+                    },
+                    "type": {
+                      "type": "number",
+                      "enum": [1]
+                    }
+                }
+            },
+            "GranteeGroupID": {
+              "type": ["number", "null"],
+              "enum": [null]
+            },
+            "GranteeUserID": {
+              "type": "object",
+              "required": [
+                  "idp",
+                  "opaque_id",
+                  "type"
+              ],
+              "properties": {
+                  "idp": {
+                    "type": "string",
+                    "pattern": "^%base_url%$"
+                  },
+                  "opaque_id": {
+                    "type": "string",
+                    "pattern": "^%user_id_pattern%$"
+                  },
+                  "type": {
+                    "type": "number",
+                    "enum": [1]
+                  }
               }
             }
           }
