@@ -104,6 +104,7 @@ func mapToStorageRequest(r Request) storage.Request {
 	}
 }
 
+// IsMimeTypeSupported validate if the mime type is supported
 func IsMimeTypeSupported(m string) bool {
 	mimeType, _, err := mime.ParseMediaType(m)
 	if err != nil {
@@ -111,4 +112,23 @@ func IsMimeTypeSupported(m string) bool {
 	}
 	_, supported := SupportedMimeTypes[mimeType]
 	return supported
+}
+
+// PrepareRequest prepare the request based on image parameters
+func PrepareRequest(width, height int, tType, checksum string) (Request, error) {
+	generator, err := GeneratorForType(tType)
+	if err != nil {
+		return Request{}, err
+	}
+	encoder, err := EncoderForType(tType)
+	if err != nil {
+		return Request{}, err
+	}
+
+	return Request{
+		Resolution: image.Rect(0, 0, width, height),
+		Generator:  generator,
+		Encoder:    encoder,
+		Checksum:   checksum,
+	}, nil
 }

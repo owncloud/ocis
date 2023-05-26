@@ -80,6 +80,7 @@ func (e JpegEncoder) MimeType() string {
 
 type GifEncoder struct{}
 
+// Encode encodes the image to a gif format
 func (e GifEncoder) Encode(w io.Writer, img interface{}) error {
 	g, ok := img.(*gif.GIF)
 	if !ok {
@@ -92,6 +93,7 @@ func (e GifEncoder) Types() []string {
 	return []string{typeGif}
 }
 
+// MimeType returns the mimetype used by the encoder.
 func (e GifEncoder) MimeType() string {
 	return "image/gif"
 }
@@ -108,5 +110,16 @@ func EncoderForType(fileType string) (Encoder, error) {
 		return GifEncoder{}, nil
 	default:
 		return nil, ErrNoEncoderForType
+	}
+}
+
+// GetExtForMime return the supported extension by mime
+func GetExtForMime(mime string) string {
+	ext := strings.TrimPrefix(strings.TrimSpace(strings.ToLower(mime)), "image/")
+	switch ext {
+	case typeJpg, typeJpeg, typePng, typeGif:
+		return ext
+	default:
+		return ""
 	}
 }

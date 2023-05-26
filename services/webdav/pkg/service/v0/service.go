@@ -463,7 +463,7 @@ func (g Webdav) sendThumbnailResponse(rsp *thumbnailssvc.GetThumbnailResponse, w
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", rsp.Mimetype)
+	w.Header().Set("Content-Type", dlRsp.Header.Get("Content-Type"))
 	_, err = io.Copy(w, dlRsp.Body)
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to write thumbnail to response writer")
