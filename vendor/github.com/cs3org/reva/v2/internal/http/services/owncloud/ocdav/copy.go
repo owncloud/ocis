@@ -52,7 +52,7 @@ type copy struct {
 }
 
 func (s *svc) handlePathCopy(w http.ResponseWriter, r *http.Request, ns string) {
-	ctx, span := s.tracerProvider.Tracer(tracerName).Start(r.Context(), "copy")
+	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), "copy")
 	defer span.End()
 
 	if r.Body != http.NoBody {
@@ -315,7 +315,7 @@ func (s *svc) executePathCopy(ctx context.Context, client gateway.GatewayAPIClie
 }
 
 func (s *svc) handleSpacesCopy(w http.ResponseWriter, r *http.Request, spaceID string) {
-	ctx, span := s.tracerProvider.Tracer(tracerName).Start(r.Context(), "spaces_copy")
+	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), "spaces_copy")
 	defer span.End()
 
 	if r.Body != http.NoBody {

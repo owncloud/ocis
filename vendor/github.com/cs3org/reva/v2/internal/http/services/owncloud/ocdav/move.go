@@ -39,7 +39,7 @@ import (
 )
 
 func (s *svc) handlePathMove(w http.ResponseWriter, r *http.Request, ns string) {
-	ctx, span := s.tracerProvider.Tracer(tracerName).Start(r.Context(), "move")
+	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), "move")
 	defer span.End()
 
 	if r.Body != http.NoBody {
@@ -103,7 +103,7 @@ func (s *svc) handlePathMove(w http.ResponseWriter, r *http.Request, ns string) 
 }
 
 func (s *svc) handleSpacesMove(w http.ResponseWriter, r *http.Request, srcSpaceID string) {
-	ctx, span := s.tracerProvider.Tracer(tracerName).Start(r.Context(), "spaces_move")
+	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), "spaces_move")
 	defer span.End()
 
 	if r.Body != http.NoBody {

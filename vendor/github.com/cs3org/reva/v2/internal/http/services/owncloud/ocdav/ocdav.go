@@ -41,12 +41,10 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/favorite"
 	"github.com/cs3org/reva/v2/pkg/storage/favorite/registry"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
-	rtrace "github.com/cs3org/reva/v2/pkg/trace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/jellydator/ttlcache/v2"
 	"github.com/mitchellh/mapstructure"
 	"github.com/rs/zerolog"
-	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -150,7 +148,6 @@ type svc struct {
 	// LockSystem is the lock management system.
 	LockSystem          LockSystem
 	userIdentifierCache *ttlcache.Cache
-	tracerProvider      trace.TracerProvider
 	nameValidators      []Validator
 }
 
@@ -191,11 +188,11 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 		return nil, err
 	}
 
-	return NewWith(conf, fm, ls, log, rtrace.DefaultProvider(), nil)
+	return NewWith(conf, fm, ls, log, nil)
 }
 
 // NewWith returns a new ocdav service
-func NewWith(conf *Config, fm favorite.Manager, ls LockSystem, _ *zerolog.Logger, tp trace.TracerProvider, gwc gateway.GatewayAPIClient) (global.Service, error) {
+func NewWith(conf *Config, fm favorite.Manager, ls LockSystem, _ *zerolog.Logger, gwc gateway.GatewayAPIClient) (global.Service, error) {
 	// be safe - init the conf again
 	conf.init()
 
@@ -211,7 +208,6 @@ func NewWith(conf *Config, fm favorite.Manager, ls LockSystem, _ *zerolog.Logger
 		favoritesManager:    fm,
 		LockSystem:          ls,
 		userIdentifierCache: ttlcache.NewCache(),
-		tracerProvider:      tp,
 		nameValidators:      ValidatorsFromConfig(conf),
 	}
 	_ = s.userIdentifierCache.SetTTL(60 * time.Second)
