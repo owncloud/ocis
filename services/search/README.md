@@ -52,6 +52,8 @@ As soon as Tika is installed and accessible, the search service must be configur
 
 When the search service can reach Tika, it begins to read out the content on demand. Note that files must be downloaded during the process, which can lead to delays with larger documents.
 
+Content extraction and handling the extracted content can be very resource intensive. Therefor content extraction is limited to files with a certain file size. The default limit is 20MB and can be configured using the `SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT` variable.
+
 When using the Tika container and docker-compose, consider the following:
 
 *   See the [ocis_wopi](https://github.com/owncloud/ocis/tree/master/deployments/examples/ocis_wopi) example.

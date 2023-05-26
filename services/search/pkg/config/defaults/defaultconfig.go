@@ -53,7 +53,8 @@ func DefaultConfig() *config.Config {
 			AsyncUploads:     false,
 			EnableTLS:        false,
 		},
-		MachineAuthAPIKey: "",
+		ContentExtractionSizeLimit: 20 * 1024 * 1024, // Limit content extraction to <20MB files by default
+		MachineAuthAPIKey:          "",
 	}
 }
 

@@ -18,7 +18,8 @@ import (
 type Tika struct {
 	*Basic
 	Retriever
-	tika *tika.Client
+	tika                       *tika.Client
+	contentExtractionSizeLimit uint64
 }
 
 // NewTikaExtractor creates a new Tika instance.
@@ -36,9 +37,10 @@ func NewTikaExtractor(gw gateway.GatewayAPIClient, logger log.Logger, cfg *confi
 	logger.Info().Msgf("Tika version: %s", tkv)
 
 	return &Tika{
-		Basic:     basic,
-		Retriever: newCS3Retriever(gw, logger, cfg.Extractor.CS3AllowInsecure),
-		tika:      tika.NewClient(nil, cfg.Extractor.Tika.TikaURL),
+		Basic:                      basic,
+		Retriever:                  newCS3Retriever(gw, logger, cfg.Extractor.CS3AllowInsecure),
+		tika:                       tika.NewClient(nil, cfg.Extractor.Tika.TikaURL),
+		contentExtractionSizeLimit: cfg.ContentExtractionSizeLimit,
 	}, nil
 }
 
@@ -50,6 +52,11 @@ func (t Tika) Extract(ctx context.Context, ri *provider.ResourceInfo) (Document,
 	}
 
 	if ri.Size == 0 {
+		return doc, nil
+	}
+
+	if ri.Size > t.contentExtractionSizeLimit {
+		t.logger.Info().Interface("ResourceID", ri.Id).Str("Name", ri.Name).Msg("file exceeds content extraction size limit. skipping.")
 		return doc, nil
 	}
 
