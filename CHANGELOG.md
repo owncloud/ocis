@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Fix err when the user share the locked file: [#6357](https://github.com/owncloud/ocis/pull/6357)
 * Enhancement - Add fulltextsearch capabilty: [#6366](https://github.com/owncloud/ocis/pull/6366)
 * Enhancement - Configurable ID Cache: [#6353](https://github.com/owncloud/ocis/pull/6353)
+* Enhancement - Add otlp tracing exporter: [#5132](https://github.com/owncloud/ocis/pull/5132)
 * Enhancement - Remove the email logo: [#6359](https://github.com/owncloud/ocis/issues/6359)
 * Enhancement - Unify CA Cert envvars: [#6392](https://github.com/owncloud/ocis/pull/6392)
 * Enhancement - Update web to v7.0.0-rc.38: [#6375](https://github.com/owncloud/ocis/pull/6375)
@@ -56,6 +57,13 @@ The following sections list the changes for unreleased.
    cache envvars
 
    https://github.com/owncloud/ocis/pull/6353
+
+* Enhancement - Add otlp tracing exporter: [#5132](https://github.com/owncloud/ocis/pull/5132)
+
+   We can now configure otlp to send traces using the otlp exporter.
+
+   https://github.com/owncloud/ocis/pull/5132
+   https://github.com/cs3org/reva/pull/3496
 
 * Enhancement - Remove the email logo: [#6359](https://github.com/owncloud/ocis/issues/6359)
 
