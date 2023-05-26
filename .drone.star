@@ -1517,6 +1517,7 @@ def binaryRelease(ctx, name):
                 "image": OC_CI_GOLANG,
                 "commands": [
                     "make -C ocis release-finish",
+                    "cp assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf ocis/dist/release/",
                 ],
                 "when": {
                     "ref": [

@@ -118,10 +118,14 @@ If you find a security issue, please contact [security@owncloud.com](mailto:secu
 
 We are _very_ happy that oCIS does not require a Contributor License Agreement (CLA) as it is [Apache 2.0 licensed](LICENSE). We hope this will make it easier to contribute code. If you want to get in touch, most of the developers hang out in our [rocket chat channel](https://talk.owncloud.com/channel/infinitescale) or reach out to  the [ownCloud central forum](https://central.owncloud.org/).
 
-Infinite Scale is carefully internationalized so that everyone, no matter what language they speak, has a great experience. To achieve this we rely on the help of volunteer translators. If you want to help, you can find the project behind this link:
- [Transifex for ownCloud web](https://explore.transifex.com/owncloud-org/owncloud-web/).
+Infinite Scale is carefully internationalized so that everyone, no matter what language they speak, has a great experience. To achieve this we rely on the help of volunteer translators. If you want to help, you can find the projects behind the following links:
+ [Transifex for ownCloud web](https://app.transifex.com/owncloud-org/owncloud-web/translate/) and [Transifex for ownCloud](https://app.transifex.com/owncloud-org/owncloud/translate/) (Select the resource by filtering for `ocis-`).
 
-Please always refer to our [Contribution Guidelines](CONTRIBUTING.md).
+Please always refer to our [Contribution Guidelines](https://github.com/owncloud/ocis/blob/master/CONTRIBUTING.md).
+
+## End User License Agreement
+
+Stable versions of ownCloud Infinite Scale are subject to the [End User License Agreement](https://github.com/owncloud/ocis/blob/master/assets/End-User-License-Agreement-for-ownCloud-Infinite-Scale.pdf).
 
 ## Copyright
 
