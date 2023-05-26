@@ -1,12 +1,15 @@
 @api
 Feature: sharing
+  As a user
+  I want to update share permissions
+  So that I can decide what resources can be shared with which permission
 
   Background:
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and without skeleton files
 
   @smokeTest
-  Scenario Outline: Allow modification of reshare
+  Scenario Outline: allow modification of reshare
     Given using OCS API version "<ocs_api_version>"
     And these users have been created with default attributes and without skeleton files:
       | username |
@@ -62,7 +65,7 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario Outline: Cannot set permissions to zero
+  Scenario Outline: cannot set permissions to zero
     Given using OCS API version "<ocs_api_version>"
     And group "grp1" has been created
     And user "Alice" has created folder "/FOLDER"
@@ -77,7 +80,7 @@ Feature: sharing
       | 2               | 400              |
 
   @issue-2173
-  Scenario Outline: Cannot update a share of a file with a user to have only create and/or delete permission
+  Scenario Outline: cannot update a share of a file with a user to have only create and/or delete permission
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
@@ -99,7 +102,7 @@ Feature: sharing
       | 2               | 400              | create,delete |
 
   @issue-2173
-  Scenario Outline: Cannot update a share of a file with a group to have only create and/or delete permission
+  Scenario Outline: cannot update a share of a file with a group to have only create and/or delete permission
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
@@ -123,7 +126,7 @@ Feature: sharing
       | 2               | 400              | create,delete |
 
   @issue-2201
-  Scenario Outline: Share ownership change after moving a shared file outside of an outer share
+  Scenario Outline: share ownership change after moving a shared file outside of an outer share
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -158,7 +161,7 @@ Feature: sharing
       | /folder2           |
 
 
-  Scenario Outline: Share ownership change after moving a shared file to another share
+  Scenario Outline: share ownership change after moving a shared file to another share
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Brian    |
@@ -195,7 +198,7 @@ Feature: sharing
 
   @issue-1253 @issue-1224 @issue-1225
   #after fixing all the issues merge this scenario with the one below
-  Scenario Outline: API responds with a full set of parameters when owner changes the permission of a share
+  Scenario Outline: change the permission of the share and check the API response
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/Alice-folder"
@@ -241,7 +244,7 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario Outline: Increasing permissions is allowed for owner
+  Scenario Outline: increasing permissions is allowed for owner
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
@@ -264,7 +267,7 @@ Feature: sharing
       | 2               | 200             |
 
 
-  Scenario Outline: Sharer deletes file uploaded with upload-only permission by sharee to a shared folder
+  Scenario Outline: sharer deletes file uploaded with upload-only permission by sharee to a shared folder
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/FOLDER"

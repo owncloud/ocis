@@ -1,16 +1,17 @@
 @api @issue-1328
 Feature: resharing can be disabled
+  As a user
+  I want to share a resource without reshare permission
+  So that the resource won't be accessible to unwanted individuals
 
-  Background:
+
+  Scenario Outline: ordinary sharing is allowed when allow resharing has been disabled
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Alice    |
       | Brian    |
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
-
-
-  Scenario Outline: ordinary sharing is allowed when allow resharing has been disabled
-    Given using OCS API version "<ocs_api_version>"
+    And using OCS API version "<ocs_api_version>"
     When user "Alice" shares file "/textfile0.txt" with user "Brian" with permissions "share,update,read" using the sharing API
     Then the OCS status code should be "<ocs_status_code>"
     And the HTTP status code should be "200"

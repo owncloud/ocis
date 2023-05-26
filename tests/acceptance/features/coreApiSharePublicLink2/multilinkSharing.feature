@@ -1,11 +1,14 @@
 @api
-Feature: multilinksharing
+Feature: multi-link sharing
+  As a user
+  I want to create multiple public links for a single resource
+  So that I can share them with various permissions and/or different groups of people
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
   @smokeTest
-  Scenario Outline: Creating three public shares of a folder
+  Scenario Outline: creating three public shares of a folder
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
@@ -44,7 +47,7 @@ Feature: multilinksharing
       | 2               | 200             |
 
 
-  Scenario Outline: Creating three public shares of a file
+  Scenario Outline: creating three public shares of a file
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has created a public link share with settings
@@ -80,7 +83,7 @@ Feature: multilinksharing
       | 2               | 200             |
 
 
-  Scenario Outline: Check that updating password doesn't remove name of links
+  Scenario Outline: check that updating password doesn't remove name of links
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
@@ -111,7 +114,7 @@ Feature: multilinksharing
       | 2               | 200             |
 
 
-  Scenario Outline: Deleting a file deletes also its public links
+  Scenario Outline: deleting a file also deletes its public links
     Given using OCS API version "1"
     And using <dav-path> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
@@ -143,7 +146,7 @@ Feature: multilinksharing
       | spaces   |
 
 
-  Scenario Outline: Deleting one public link share of a file doesn't affect the rest
+  Scenario Outline: deleting one public link share of a file doesn't affect the rest
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
     And user "Alice" has created a public link share with settings
@@ -177,7 +180,7 @@ Feature: multilinksharing
       | 2               | 200             |
 
 
-  Scenario Outline: Overwriting a file doesn't remove its public shares
+  Scenario Outline: overwriting a file doesn't remove its public shares
     Given using OCS API version "1"
     And using <dav-path> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
@@ -210,7 +213,7 @@ Feature: multilinksharing
       | spaces   |
 
   @issue-1251
-  Scenario Outline: Renaming a folder doesn't remove its public shares
+  Scenario Outline: renaming a folder doesn't remove its public shares
     Given using OCS API version "1"
     And using <dav-path> DAV path
     And user "Alice" has created folder "FOLDER"

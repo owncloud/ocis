@@ -1,12 +1,15 @@
 @api
 Feature: update a public link share
+  As a user
+  I want to update a public link
+  So that I change permissions whenever I want
 
   Background:
     Given using OCS API version "1"
     And user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: API responds with a full set of parameters when owner changes the expireDate of a public share
+  Scenario Outline: change expiration date of a public link share and get its info
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
@@ -46,7 +49,7 @@ Feature: update a public link share
       | 2               | 200             |
 
   @smokeTest
-  Scenario Outline: Creating a new public link share, updating its expiration date and getting its info
+  Scenario Outline: change expiration date of a newly created public link share and get its info
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
@@ -79,7 +82,7 @@ Feature: update a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Creating a new public link share with password and adding an expiration date using public API
+  Scenario Outline: creating a new public link share with password and adding an expiration date using public API
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     And user "Alice" has created a public link share with settings
@@ -97,7 +100,7 @@ Feature: update a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Creating a new public link share with password and removing (updating) it to make the resources accessible without password using public API
+  Scenario Outline: creating a new public link share with password and removing (updating) it to make the resources accessible without password using public API
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has uploaded file with content "Random data" to "/randomfile.txt"
     And user "Alice" has created a public link share with settings
@@ -116,7 +119,7 @@ Feature: update a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Creating a new public link share, updating its password and getting its info
+  Scenario Outline: creating a new public link share, updating its password and getting its info
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
@@ -148,7 +151,7 @@ Feature: update a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Creating a new public link share, updating its permissions and getting its info
+  Scenario Outline: creating a new public link share, updating its permissions and getting its info
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
@@ -180,7 +183,7 @@ Feature: update a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Creating a new public link share, updating its permissions to view download and upload and getting its info
+  Scenario Outline: creating a new public link share, updating its permissions to view download and upload and getting its info
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
@@ -212,7 +215,7 @@ Feature: update a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Creating a new public link share, updating publicUpload option and getting its info
+  Scenario Outline: creating a new public link share, updating publicUpload option and getting its info
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "FOLDER"
     And user "Alice" has created a public link share with settings
@@ -244,7 +247,7 @@ Feature: update a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Adding public upload to a read only shared folder as recipient is not allowed using the public API
+  Scenario Outline: adding public upload to a read only shared folder as recipient is not allowed using the public API
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
@@ -265,7 +268,7 @@ Feature: update a public link share
       | 2               | 404              |
 
 
-  Scenario Outline: Adding public upload to a shared folder as recipient is allowed with permissions using the public API
+  Scenario Outline:adding public upload to a shared folder as recipient is allowed with permissions using the public API
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
@@ -286,7 +289,7 @@ Feature: update a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Adding public link with all permissions to a read only shared folder as recipient is not allowed using the public API
+  Scenario Outline: adding public link with all permissions to a read only shared folder as recipient is not allowed using the public API
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
@@ -307,7 +310,7 @@ Feature: update a public link share
       | 2               | 404              |
 
 
-  Scenario Outline: Adding public link with all permissions to a read only shared folder as recipient is allowed with permissions using the public API
+  Scenario Outline: adding public link with all permissions to a read only shared folder as recipient is allowed with permissions using the public API
     Given using OCS API version "<ocs_api_version>"
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
@@ -328,7 +331,7 @@ Feature: update a public link share
       | 2               | 200             |
 
 
-  Scenario Outline: Updating share permissions from change to read restricts public from deleting files using the public API
+  Scenario Outline: updating share permissions from change to read restricts public from deleting files using the public API
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "PARENT"
     And user "Alice" has created folder "PARENT/CHILD"
@@ -350,7 +353,7 @@ Feature: update a public link share
       | 2               |
 
 
-  Scenario Outline: Updating share permissions from read to change allows public to delete files using the public API
+  Scenario Outline: updating share permissions from read to change allows public to delete files using the public API
     Given using OCS API version "<ocs_api_version>"
     And user "Alice" has created folder "PARENT"
     And user "Alice" has created folder "PARENT/CHILD"
@@ -372,7 +375,7 @@ Feature: update a public link share
       | 2               |
 
 
-  Scenario Outline: API responds with a full set of parameters when owner renames the folder with a public link in ocis
+  Scenario Outline: rename a folder with public link and get its info
     Given using OCS API version "<ocs_api_version>"
     And using <dav-path> DAV path
     And user "Alice" has created folder "FOLDER"
@@ -418,7 +421,7 @@ Feature: update a public link share
       | spaces   | 2               | 200             |
 
 
-  Scenario Outline: API responds with a full set of parameters when owner renames the file with a public link in ocis
+  Scenario Outline: rename a file with public link and get its info
     Given using OCS API version "<ocs_api_version>"
     And using <dav-path> DAV path
     And user "Alice" has uploaded file with content "some content" to "/lorem.txt"
@@ -464,7 +467,7 @@ Feature: update a public link share
       | spaces   | 2               | 200             |
 
 
-  Scenario Outline: Updating the role of a public link to internal
+  Scenario Outline: update the role of a public link to internal
     Given using OCS API version "<ocs_api_version>"
     And using <dav-path> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile.txt"

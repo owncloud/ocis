@@ -1,18 +1,21 @@
 @api @issue-1328
 Feature: a subfolder of a received share can be reshared
+  As a user
+  I want to re-share a resource
+  So that other users can have access to it
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Alice    |
       | Brian    |
-
-  @smokeTest @issue-2214
-  Scenario Outline: User is allowed to reshare a sub-folder with the same permissions
-    Given using OCS API version "<ocs_api_version>"
-    And user "Carol" has been created with default attributes and without skeleton files
+      | Carol    |
     And user "Alice" has created folder "/TMP"
     And user "Alice" has created folder "/TMP/SUB"
+
+  @smokeTest @issue-2214
+  Scenario Outline: user is allowed to reshare a sub-folder with the same permissions
+    Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,read"
     And user "Brian" has accepted share "/TMP" offered by user "Alice"
     When user "Brian" shares folder "/Shares/TMP/SUB" with user "Carol" with permissions "share,read" using the sharing API
@@ -27,11 +30,8 @@ Feature: a subfolder of a received share can be reshared
       | 2               | 200             | /SUB                   |
 
 
-  Scenario Outline: User is not allowed to reshare a sub-folder with more permissions
+  Scenario Outline: user is not allowed to reshare a sub-folder with more permissions
     Given using OCS API version "<ocs_api_version>"
-    And user "Carol" has been created with default attributes and without skeleton files
-    And user "Alice" has created folder "/TMP"
-    And user "Alice" has created folder "/TMP/SUB"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions <received_permissions>
     And user "Brian" has accepted share "/TMP" offered by user "Alice"
     When user "Brian" shares folder "/Shares/TMP/SUB" with user "Carol" with permissions <reshare_permissions> using the sharing API
@@ -84,11 +84,8 @@ Feature: a subfolder of a received share can be reshared
       | 2               | 404              | 23                   | 15                  |
 
   @issue-2214
-  Scenario Outline: User is allowed to update reshare of a sub-folder with less permissions
+  Scenario Outline: user is allowed to update reshare of a sub-folder with less permissions
     Given using OCS API version "<ocs_api_version>"
-    And user "Carol" has been created with default attributes and without skeleton files
-    And user "Alice" has created folder "/TMP"
-    And user "Alice" has created folder "/TMP/SUB"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,create,update,read"
     And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "/Shares/TMP/SUB" with user "Carol" with permissions "share,create,update,read"
@@ -107,11 +104,8 @@ Feature: a subfolder of a received share can be reshared
       | 2               | 200             | /SUB                   |
 
   @issue-2214
-  Scenario Outline: User is allowed to update reshare of a sub-folder to the maximum allowed permissions
+  Scenario Outline: user is allowed to update reshare of a sub-folder to the maximum allowed permissions
     Given using OCS API version "<ocs_api_version>"
-    And user "Carol" has been created with default attributes and without skeleton files
-    And user "Alice" has created folder "/TMP"
-    And user "Alice" has created folder "/TMP/SUB"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,create,update,read"
     And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "/Shares/TMP/SUB" with user "Carol" with permissions "share,read"
@@ -130,11 +124,8 @@ Feature: a subfolder of a received share can be reshared
       | 2               | 200             | /SUB                   |
 
   @issue-2214
-  Scenario Outline: User is not allowed to update reshare of a sub-folder with more permissions
+  Scenario Outline: user is not allowed to update reshare of a sub-folder with more permissions
     Given using OCS API version "<ocs_api_version>"
-    And user "Carol" has been created with default attributes and without skeleton files
-    And user "Alice" has created folder "/TMP"
-    And user "Alice" has created folder "/TMP/SUB"
     And user "Alice" has shared folder "/TMP" with user "Brian" with permissions "share,read"
     And user "Brian" has accepted share "/TMP" offered by user "Alice"
     And user "Brian" has shared folder "/Shares/TMP/SUB" with user "Carol" with permissions "share,read"

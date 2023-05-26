@@ -1,5 +1,8 @@
 @api @issue-1289 @issue-1328
 Feature: updating shares to users and groups that have the same name
+  As a user
+  I want to update share permissions
+  So that I can decide what resources can be shared with which permission
 
   Background:
     Given these users have been created with default attributes and without skeleton files:

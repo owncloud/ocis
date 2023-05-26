@@ -1,5 +1,8 @@
 @api @issue-1328
 Feature: resharing a resource with an expiration date
+  As a user
+  I want to reshare resources with expiration date
+  So that other users will have access to the resources only for a limited amount of time
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -7,11 +10,11 @@ Feature: resharing a resource with an expiration date
       | Alice    |
       | Brian    |
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/textfile0.txt"
-
-
-  Scenario Outline: User should be able to set expiration while resharing a file with user
-    Given using OCS API version "<ocs_api_version>"
     And user "Carol" has been created with default attributes and without skeleton files
+
+
+  Scenario Outline: user should be able to set expiration while resharing a file with user
+    Given using OCS API version "<ocs_api_version>"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions "read,update,share"
     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" creates a share using the sharing API with settings
@@ -33,9 +36,8 @@ Feature: resharing a resource with an expiration date
       | 2               | 200             |
 
   @issue-1289
-  Scenario Outline: User should be able to set expiration while resharing a file with group
+  Scenario Outline: user should be able to set expiration while resharing a file with group
     Given using OCS API version "<ocs_api_version>"
-    And user "Carol" has been created with default attributes and without skeleton files
     And group "grp1" has been created
     And user "Carol" has been added to group "grp1"
     And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions "read,update,share"
@@ -61,7 +63,6 @@ Feature: resharing a resource with an expiration date
 
   Scenario Outline: resharing using the sharing API with default expire date set but not enforced
     Given using OCS API version "<ocs_api_version>"
-    And user "Carol" has been created with default attributes and without skeleton files
     And user "Alice" has shared file "/textfile0.txt" with user "Brian" with permissions "read,update,share"
     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
     When user "Brian" creates a share using the sharing API with settings
