@@ -92,6 +92,8 @@ func Configure(opts ...ClientOption) error {
 				tlsConfig.RootCAs = certs
 			}
 			cOpts = append(cOpts, mgrpcc.AuthTLS(tlsConfig))
+			//case "off":
+			//default:
 		}
 
 		defaultClient = mgrpcc.NewClient(cOpts...)
@@ -133,7 +135,7 @@ func NewClient(opts ...ClientOption) (client.Client, error) {
 			InsecureSkipVerify: true,
 		}
 		cOpts = append(cOpts, mgrpcc.AuthTLS(tlsConfig))
-	default:
+	case "on":
 		tlsConfig = &tls.Config{}
 		// Note: If caCert is empty we use the system's default set of trusted CAs
 		if options.caCert != "" {
@@ -148,6 +150,8 @@ func NewClient(opts ...ClientOption) (client.Client, error) {
 			tlsConfig.RootCAs = certs
 		}
 		cOpts = append(cOpts, mgrpcc.AuthTLS(tlsConfig))
+		//case "off":
+		//default:
 	}
 
 	return mgrpcc.NewClient(cOpts...), nil
