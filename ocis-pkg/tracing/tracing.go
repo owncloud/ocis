@@ -1,17 +1,23 @@
 package tracing
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"strings"
+	"time"
 
 	rtrace "github.com/cs3org/reva/v2/pkg/trace"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 // Propagator ensures the importer module uses the same trace propagation strategy.
@@ -21,7 +27,7 @@ var Propagator = propagation.NewCompositeTextMapPropagator(
 )
 
 // GetTraceProvider returns a configured open-telemetry trace provider.
-func GetTraceProvider(agentEndpoint, collectorEndpoint, serviceName, traceType string) (*sdktrace.TracerProvider, error) {
+func GetTraceProvider(endpoint, collector, serviceName, traceType string) (*sdktrace.TracerProvider, error) {
 	switch t := traceType; t {
 	case "", "jaeger":
 		var (
@@ -29,11 +35,11 @@ func GetTraceProvider(agentEndpoint, collectorEndpoint, serviceName, traceType s
 			err error
 		)
 
-		if agentEndpoint != "" {
+		if endpoint != "" {
 			var agentHost string
 			var agentPort string
 
-			agentHost, agentPort, err = parseAgentConfig(agentEndpoint)
+			agentHost, agentPort, err = parseAgentConfig(endpoint)
 			if err != nil {
 				return nil, err
 			}
@@ -44,10 +50,10 @@ func GetTraceProvider(agentEndpoint, collectorEndpoint, serviceName, traceType s
 					jaeger.WithAgentPort(agentPort),
 				),
 			)
-		} else if collectorEndpoint != "" {
+		} else if collector != "" {
 			exp, err = jaeger.New(
 				jaeger.WithCollectorEndpoint(
-					jaeger.WithEndpoint(collectorEndpoint),
+					jaeger.WithEndpoint(collector),
 				),
 			)
 		}
@@ -55,7 +61,15 @@ func GetTraceProvider(agentEndpoint, collectorEndpoint, serviceName, traceType s
 			return nil, err
 		}
 
-		rtrace.InitDefaultTracerProvider(collectorEndpoint, agentEndpoint)
+		tp := rtrace.NewTracerProvider(
+			rtrace.WithEnabled(),
+			rtrace.WithExporter(traceType),
+			rtrace.WithInsecure(),
+			rtrace.WithCollector(collector),
+			rtrace.WithEndpoint(endpoint),
+			rtrace.WithServiceName(serviceName),
+		)
+		rtrace.SetDefaultTracerProvider(tp)
 		return sdktrace.NewTracerProvider(
 			sdktrace.WithBatcher(exp),
 			sdktrace.WithResource(resource.NewWithAttributes(
@@ -63,7 +77,50 @@ func GetTraceProvider(agentEndpoint, collectorEndpoint, serviceName, traceType s
 				semconv.ServiceNameKey.String(serviceName)),
 			),
 		), nil
+	case "otlp":
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+		conn, err := grpc.DialContext(ctx, endpoint,
+			// Note the use of insecure transport here. TLS is recommended in production.
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+			grpc.WithBlock(),
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
+		}
+		exporter, err := otlptracegrpc.New(
+			context.Background(),
+			otlptracegrpc.WithGRPCConn(conn),
+		)
 
+		if err != nil {
+			return nil, err
+		}
+		resources, err := resource.New(
+			context.Background(),
+			resource.WithAttributes(
+				attribute.String("service.name", serviceName),
+				attribute.String("library.language", "go"),
+			),
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		tp := rtrace.NewTracerProvider(
+			rtrace.WithEnabled(),
+			rtrace.WithExporter(traceType),
+			rtrace.WithInsecure(),
+			rtrace.WithCollector(collector),
+			rtrace.WithEndpoint(endpoint),
+			rtrace.WithServiceName(serviceName),
+		)
+		rtrace.SetDefaultTracerProvider(tp)
+		return sdktrace.NewTracerProvider(
+			sdktrace.WithSampler(sdktrace.AlwaysSample()),
+			sdktrace.WithBatcher(exporter),
+			sdktrace.WithResource(resources),
+		), nil
 	case "agent":
 		fallthrough
 	case "zipkin":
@@ -105,22 +162,27 @@ func Configure(enabled bool, tracingType string, logger log.Logger) {
 		case "agent":
 			logger.Error().
 				Str("type", tracingType).
-				Msg("Reva only supports the jaeger tracing backend")
+				Msg("Reva only supports the jaeger or otel tracing exporter")
 
 		case "jaeger":
 			logger.Info().
 				Str("type", tracingType).
-				Msg("configuring storage to use the jaeger tracing backend")
+				Msg("configuring storage to use the jaeger tracing exporter")
+
+		case "otlp":
+			logger.Info().
+				Str("type", tracingType).
+				Msg("configuring storage to use the otlp tracing exporter")
 
 		case "zipkin":
 			logger.Error().
 				Str("type", tracingType).
-				Msg("Reva only supports the jaeger tracing backend")
+				Msg("Reva only supports the jaeger or otel tracing exporter")
 
 		default:
 			logger.Warn().
 				Str("type", tracingType).
-				Msg("Unknown tracing backend")
+				Msg("Unknown tracing exporter")
 		}
 
 	} else {

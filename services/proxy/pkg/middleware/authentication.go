@@ -8,7 +8,9 @@ import (
 	"strings"
 
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
+	proxytracing "github.com/owncloud/ocis/v2/services/proxy/pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/webdav"
+	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
@@ -48,10 +50,18 @@ type Authenticator interface {
 func Authentication(auths []Authenticator, opts ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(opts...)
 	configureSupportedChallenges(options)
+	tracer := proxytracing.TraceProvider.Tracer("proxy")
+	spanOpts := []trace.SpanStartOption{
+		trace.WithSpanKind(trace.SpanKindServer),
+	}
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ri := router.ContextRoutingInfo(r.Context())
+			ctx, span := tracer.Start(r.Context(), fmt.Sprintf("%s %v", r.Method, r.URL.Path), spanOpts...)
+			defer span.End()
+			r = r.WithContext(ctx)
+
+			ri := router.ContextRoutingInfo(ctx)
 			if isOIDCTokenAuth(r) || ri.IsRouteUnprotected() || r.Method == "OPTIONS" {
 				// Either this is a request that does not need any authentication or
 				// the authentication for this request is handled by the IdP.

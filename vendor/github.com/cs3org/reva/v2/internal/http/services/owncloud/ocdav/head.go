@@ -41,7 +41,7 @@ import (
 )
 
 func (s *svc) handlePathHead(w http.ResponseWriter, r *http.Request, ns string) {
-	ctx, span := s.tracerProvider.Tracer(tracerName).Start(r.Context(), "head")
+	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), "head")
 	defer span.End()
 
 	fn := path.Join(ns, r.URL.Path)
@@ -100,7 +100,7 @@ func (s *svc) handleHead(ctx context.Context, w http.ResponseWriter, r *http.Req
 }
 
 func (s *svc) handleSpacesHead(w http.ResponseWriter, r *http.Request, spaceID string) {
-	ctx, span := s.tracerProvider.Tracer(tracerName).Start(r.Context(), "spaces_head")
+	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), "spaces_head")
 	defer span.End()
 
 	sublog := appctx.GetLogger(ctx).With().Str("spaceid", spaceID).Str("path", r.URL.Path).Logger()

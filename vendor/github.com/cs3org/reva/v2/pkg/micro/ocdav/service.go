@@ -68,8 +68,7 @@ func Service(opts ...Option) (micro.Service, error) {
 		server.Version(sopts.config.VersionString),
 	)
 
-	tp := rtrace.GetTracerProvider(sopts.TracingEnabled, sopts.TracingCollector, sopts.TracingEndpoint, sopts.Name)
-	revaService, err := ocdav.NewWith(&sopts.config, sopts.FavoriteManager, sopts.lockSystem, &sopts.Logger, tp, sopts.GatewayClient)
+	revaService, err := ocdav.NewWith(&sopts.config, sopts.FavoriteManager, sopts.lockSystem, &sopts.Logger, sopts.GatewayClient)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +85,19 @@ func Service(opts ...Option) (micro.Service, error) {
 	// chi.RegisterMethod(ocdav.MethodMkcol)
 	// chi.RegisterMethod(ocdav.MethodReport)
 	r := chi.NewRouter()
-
+	topts := []rtrace.Option{
+		rtrace.WithExporter(sopts.TracingExporter),
+		rtrace.WithEndpoint(sopts.TracingEndpoint),
+		rtrace.WithCollector(sopts.TracingCollector),
+		rtrace.WithServiceName(sopts.Name),
+	}
+	if sopts.TracingEnabled {
+		topts = append(topts, rtrace.WithEnabled())
+	}
+	if sopts.TracingInsecure {
+		topts = append(topts, rtrace.WithInsecure())
+	}
+	tp := rtrace.NewTracerProvider(topts...)
 	if err := useMiddlewares(r, &sopts, revaService, tp); err != nil {
 		return nil, err
 	}

@@ -73,6 +73,7 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 	return map[string]interface{}{
 		"core": map[string]interface{}{
 			"tracing_enabled":      cfg.Tracing.Enabled,
+			"tracing_exporter":     cfg.Tracing.Type,
 			"tracing_endpoint":     cfg.Tracing.Endpoint,
 			"tracing_collector":    cfg.Tracing.Collector,
 			"tracing_service_name": cfg.Service.Name,

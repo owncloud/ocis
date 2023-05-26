@@ -28,6 +28,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/spacelookup"
+	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	rstatus "github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/utils"
@@ -35,7 +36,7 @@ import (
 
 func (s *svc) handlePathDelete(w http.ResponseWriter, r *http.Request, ns string) (status int, err error) {
 	ctx := r.Context()
-	ctx, span := s.tracerProvider.Tracer(tracerName).Start(ctx, "path_delete")
+	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(ctx, "path_delete")
 	defer span.End()
 
 	if r.Body != http.NoBody {
@@ -57,7 +58,7 @@ func (s *svc) handlePathDelete(w http.ResponseWriter, r *http.Request, ns string
 }
 
 func (s *svc) handleDelete(ctx context.Context, w http.ResponseWriter, r *http.Request, ref *provider.Reference) (status int, err error) {
-	ctx, span := s.tracerProvider.Tracer(tracerName).Start(ctx, "delete")
+	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(ctx, "delete")
 	defer span.End()
 
 	req := &provider.DeleteRequest{Ref: ref}
@@ -114,7 +115,7 @@ func (s *svc) handleDelete(ctx context.Context, w http.ResponseWriter, r *http.R
 
 func (s *svc) handleSpacesDelete(w http.ResponseWriter, r *http.Request, spaceID string) (status int, err error) {
 	ctx := r.Context()
-	ctx, span := s.tracerProvider.Tracer(tracerName).Start(ctx, "spaces_delete")
+	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(ctx, "spaces_delete")
 	defer span.End()
 
 	if r.Body != http.NoBody {

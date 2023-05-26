@@ -53,6 +53,7 @@ import (
 	"github.com/rs/zerolog"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
+	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
@@ -234,6 +235,9 @@ func (p *Handler) HandleSpacesPropfind(w http.ResponseWriter, r *http.Request, s
 
 	depth, err := net.ParseDepth(dh)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "Invalid Depth header value")
+		span.SetAttributes(semconv.HTTPStatusCodeKey.Int(http.StatusBadRequest))
 		sublog.Debug().Str("depth", dh).Msg(err.Error())
 		w.WriteHeader(http.StatusBadRequest)
 		m := fmt.Sprintf("Invalid Depth header value: %v", dh)

@@ -48,7 +48,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage"
 	"github.com/cs3org/reva/v2/pkg/storage/fs/registry"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
-	rtrace "github.com/cs3org/reva/v2/pkg/trace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/mitchellh/mapstructure"
@@ -722,7 +721,7 @@ func (s *service) Move(ctx context.Context, req *provider.MoveRequest) (*provide
 }
 
 func (s *service) Stat(ctx context.Context, req *provider.StatRequest) (*provider.StatResponse, error) {
-	ctx, span := rtrace.DefaultProvider().Tracer(tracerName).Start(ctx, "stat")
+	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "stat")
 	defer span.End()
 
 	span.SetAttributes(attribute.KeyValue{

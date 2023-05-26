@@ -76,6 +76,8 @@ func RunWithOptions(mainConf map[string]interface{}, pidFile string, opts ...Opt
 type coreConf struct {
 	MaxCPUs            string `mapstructure:"max_cpus"`
 	TracingEnabled     bool   `mapstructure:"tracing_enabled"`
+	TracingInsecure    bool   `mapstructure:"tracing_insecure"`
+	TracingExporter    string `mapstructure:"tracing_exporter"`
 	TracingEndpoint    string `mapstructure:"tracing_endpoint"`
 	TracingCollector   string `mapstructure:"tracing_collector"`
 	TracingServiceName string `mapstructure:"tracing_service_name"`
@@ -149,9 +151,23 @@ func initServers(mainConf map[string]interface{}, log *zerolog.Logger, tp trace.
 
 func initTracing(conf *coreConf) trace.TracerProvider {
 	if conf.TracingEnabled {
-		rtrace.InitDefaultTracerProvider(conf.TracingCollector, conf.TracingEndpoint)
+		opts := []rtrace.Option{
+			rtrace.WithExporter(conf.TracingExporter),
+			rtrace.WithEndpoint(conf.TracingEndpoint),
+			rtrace.WithCollector(conf.TracingCollector),
+			rtrace.WithServiceName(conf.TracingServiceName),
+		}
+		if conf.TracingEnabled {
+			opts = append(opts, rtrace.WithEnabled())
+		}
+		if conf.TracingInsecure {
+			opts = append(opts, rtrace.WithInsecure())
+		}
+		tp := rtrace.NewTracerProvider(opts...)
+		rtrace.SetDefaultTracerProvider(tp)
+		return tp
 	}
-	return rtrace.GetTracerProvider(conf.TracingEnabled, conf.TracingCollector, conf.TracingEndpoint, conf.TracingServiceName)
+	return rtrace.DefaultProvider()
 }
 
 func initCPUCount(conf *coreConf, log *zerolog.Logger) {

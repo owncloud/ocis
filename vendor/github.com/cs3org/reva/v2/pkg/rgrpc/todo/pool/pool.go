@@ -45,6 +45,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	rtrace "github.com/cs3org/reva/v2/pkg/trace"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
@@ -77,8 +78,9 @@ const (
 
 // ClientOptions represent additional options (e.g. tls settings) for the grpc clients
 type ClientOptions struct {
-	tlsMode TLSMode
-	caCert  string
+	tlsMode        TLSMode
+	caCert         string
+	tracerProvider trace.TracerProvider
 }
 
 // Option is used to pass client options
@@ -132,6 +134,7 @@ func (o *ClientOptions) init() error {
 		return err
 	}
 	o.caCert = sharedOpt.CACertFile
+	o.tracerProvider = rtrace.DefaultProvider()
 	return nil
 }
 
@@ -146,6 +149,13 @@ func WithTLSMode(v TLSMode) Option {
 func WithTLSCACert(v string) Option {
 	return func(o *ClientOptions) {
 		o.caCert = v
+	}
+}
+
+// WithTracerProvider allows to set the opentelemetry tracer provider for grpc clients
+func WithTracerProvider(v trace.TracerProvider) Option {
+	return func(o *ClientOptions) {
+		o.tracerProvider = v
 	}
 }
 
@@ -194,7 +204,7 @@ func NewConn(endpoint string, opts ...Option) (*grpc.ClientConn, error) {
 		),
 		grpc.WithStreamInterceptor(otelgrpc.StreamClientInterceptor(
 			otelgrpc.WithTracerProvider(
-				rtrace.DefaultProvider(),
+				options.tracerProvider,
 			),
 			otelgrpc.WithPropagators(
 				rtrace.Propagator,
@@ -203,7 +213,7 @@ func NewConn(endpoint string, opts ...Option) (*grpc.ClientConn, error) {
 		grpc.WithUnaryInterceptor(
 			otelgrpc.UnaryClientInterceptor(
 				otelgrpc.WithTracerProvider(
-					rtrace.DefaultProvider(),
+					options.tracerProvider,
 				),
 				otelgrpc.WithPropagators(
 					rtrace.Propagator,

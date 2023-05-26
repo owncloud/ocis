@@ -45,7 +45,7 @@ import (
 )
 
 func (s *svc) handlePathTusPost(w http.ResponseWriter, r *http.Request, ns string) {
-	ctx, span := s.tracerProvider.Tracer(tracerName).Start(r.Context(), "tus-post")
+	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), "tus-post")
 	defer span.End()
 
 	// read filename from metadata
@@ -69,7 +69,7 @@ func (s *svc) handlePathTusPost(w http.ResponseWriter, r *http.Request, ns strin
 }
 
 func (s *svc) handleSpacesTusPost(w http.ResponseWriter, r *http.Request, spaceID string) {
-	ctx, span := s.tracerProvider.Tracer(tracerName).Start(r.Context(), "spaces-tus-post")
+	ctx, span := appctx.GetTracerProvider(r.Context()).Tracer(tracerName).Start(r.Context(), "spaces-tus-post")
 	defer span.End()
 
 	// read filename from metadata
