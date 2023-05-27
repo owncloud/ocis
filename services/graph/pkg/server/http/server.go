@@ -18,7 +18,6 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
-	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
@@ -26,6 +25,7 @@ import (
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	graphMiddleware "github.com/owncloud/ocis/v2/services/graph/pkg/middleware"
 	svc "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	"github.com/owncloud/ocis/v2/services/graph/pkg/tracing"
 	"github.com/pkg/errors"
 	"go-micro.dev/v4"
 	"go-micro.dev/v4/events"
@@ -115,13 +115,17 @@ func Server(opts ...Option) (http.Service, error) {
 	var requireAdminMiddleware func(stdhttp.Handler) stdhttp.Handler
 	var roleService svc.RoleService
 	var gatewayClient gateway.GatewayAPIClient
+	grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(options.Config.GRPCClientTLS), grpc.WithTraceProvider(tracing.TraceProvider))...)
+	if err != nil {
+		return http.Service{}, err
+	}
 	if options.Config.HTTP.APIToken == "" {
 		middlewares = append(middlewares,
 			graphMiddleware.Auth(
 				account.Logger(options.Logger),
 				account.JWTSecret(options.Config.TokenManager.JWTSecret),
 			))
-		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
+		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
 		gatewayClient, err = pool.GetGatewayServiceClient(options.Config.Reva.Address, options.Config.Reva.GetRevaOptions()...)
 		if err != nil {
 			return http.Service{}, errors.Wrap(err, "could not initialize gateway client")
@@ -145,7 +149,7 @@ func Server(opts ...Option) (http.Service, error) {
 		keyCloakClient = keycloak.New(kcc.BasePath, kcc.ClientID, kcc.ClientSecret, kcc.ClientRealm, kcc.InsecureSkipVerify)
 	}
 
-	hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", ogrpc.DefaultClient())
+	hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", grpcClient)
 
 	var handle svc.Service
 	handle, err = svc.NewService(
@@ -156,7 +160,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.WithRoleService(roleService),
 		svc.WithRequireAdminMiddleware(requireAdminMiddleware),
 		svc.WithGatewayClient(gatewayClient),
-		svc.WithSearchService(searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient())),
+		svc.WithSearchService(searchsvc.NewSearchProviderService("com.owncloud.api.search", grpcClient)),
 		svc.KeycloakClient(keyCloakClient),
 		svc.EventHistoryClient(hClient),
 	)

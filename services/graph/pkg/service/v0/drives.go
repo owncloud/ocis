@@ -31,6 +31,7 @@ import (
 	v0 "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	gtracing "github.com/owncloud/ocis/v2/services/graph/pkg/tracing"
 	settingsServiceExt "github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/pkg/errors"
 	merrors "go-micro.dev/v4/errors"
@@ -582,13 +583,17 @@ func (g Graph) formatDrives(ctx context.Context, baseURL *url.URL, storageSpaces
 func (g Graph) ListStorageSpacesWithFilters(ctx context.Context, filters []*storageprovider.ListStorageSpacesRequest_Filter, unrestricted bool) (*storageprovider.ListStorageSpacesResponse, error) {
 	client := g.GetGatewayClient()
 
-	permissions := make(map[string]struct{}, 1)
-	s := settingssvc.NewPermissionService("com.owncloud.api.settings", grpc.DefaultClient())
+	grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(g.config.GRPCClientTLS), grpc.WithTraceProvider(gtracing.TraceProvider))...)
+	if err != nil {
+		return nil, err
+	}
+	s := settingssvc.NewPermissionService("com.owncloud.api.settings", grpcClient)
 
-	_, err := s.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{
+	_, err = s.GetPermissionByID(ctx, &settingssvc.GetPermissionByIDRequest{
 		PermissionId: settingsServiceExt.ListAllSpacesPermissionID,
 	})
 
+	permissions := make(map[string]struct{}, 1)
 	// No error means the user has the permission
 	if err == nil {
 		permissions[settingsServiceExt.ListAllSpacesPermissionName] = struct{}{}

@@ -18,6 +18,7 @@ import (
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
@@ -44,6 +45,7 @@ var _ = Describe("Users changing their own password", func() {
 		ctx = context.Background()
 		cfg = defaults.FullDefaultConfig()
 		cfg.TokenManager.JWTSecret = "loremipsum"
+		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 
 		gatewayClient = &cs3mocks.GatewayAPIClient{}
 		ldapClient = mockedLDAPClient()

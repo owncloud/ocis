@@ -1,4 +1,4 @@
-// Copyright 2018, OpenCensus Authors
+// Copyright The OpenTelemetry Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,9 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-//
 
-package internal // import "go.opencensus.io/zpages/internal"
+//go:build dragonfly || freebsd || netbsd || openbsd || solaris
+// +build dragonfly freebsd netbsd openbsd solaris
 
-// go get https://github.com/mjibson/esc.git
-//go:generate esc -pkg internal -o resources.go public/ templates/
+package resource // import "go.opentelemetry.io/otel/sdk/resource"
+
+var platformHostIDReader hostIDReader = &hostIDReaderBSD{
+	execCommand: execCommand,
+	readFile:    readFile,
+}

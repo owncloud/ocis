@@ -271,7 +271,11 @@ func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 }
 
 func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache microstore.Store) alice.Chain {
-	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpc.DefaultClient())
+	grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(cfg.GRPCClientTLS), grpc.WithTraceProvider(tracing.TraceProvider))...)
+	if err != nil {
+		logger.Fatal().Err(err).Msg("Failed to get gateway client")
+	}
+	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
 	revaClient, err := pool.GetGatewayServiceClient(cfg.Reva.Address, cfg.Reva.GetRevaOptions()...)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to get gateway client")
@@ -318,7 +322,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		logger.Fatal().Msgf("Invalid role assignment driver '%s'", cfg.RoleAssignment.Driver)
 	}
 
-	storeClient := storesvc.NewStoreService("com.owncloud.api.store", grpc.DefaultClient())
+	storeClient := storesvc.NewStoreService("com.owncloud.api.store", grpcClient)
 	if err != nil {
 		logger.Error().Err(err).
 			Str("gateway", cfg.Reva.Address).
@@ -375,6 +379,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 
 	return alice.New(
 		// first make sure we log all requests and redirect to https if necessary
+		middleware.Tracer(),
 		pkgmiddleware.TraceContext,
 		chimiddleware.RealIP,
 		chimiddleware.RequestID,

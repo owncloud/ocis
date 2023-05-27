@@ -8,7 +8,7 @@ import (
 
 	mgrpcs "github.com/go-micro/plugins/v4/server/grpc"
 	"github.com/go-micro/plugins/v4/wrapper/monitoring/prometheus"
-	"github.com/go-micro/plugins/v4/wrapper/trace/opencensus"
+	mtracer "github.com/go-micro/plugins/v4/wrapper/trace/opentelemetry"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"go-micro.dev/v4"
@@ -62,9 +62,9 @@ func NewService(opts ...Option) (Service, error) {
 		micro.RegisterTTL(time.Second * 30),
 		micro.RegisterInterval(time.Second * 10),
 		micro.WrapHandler(prometheus.NewHandlerWrapper()),
-		micro.WrapClient(opencensus.NewClientWrapper()),
-		micro.WrapHandler(opencensus.NewHandlerWrapper()),
-		micro.WrapSubscriber(opencensus.NewSubscriberWrapper()),
+		micro.WrapClient(mtracer.NewClientWrapper()),
+		micro.WrapHandler(mtracer.NewHandlerWrapper()),
+		micro.WrapSubscriber(mtracer.NewSubscriberWrapper()),
 	}
 
 	return Service{micro.NewService(mopts...)}, nil
