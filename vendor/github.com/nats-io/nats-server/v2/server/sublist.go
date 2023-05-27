@@ -1,4 +1,4 @@
-// Copyright 2016-2020 The NATS Authors
+// Copyright 2016-2023 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -84,8 +84,8 @@ type notifyMaps struct {
 // A node contains subscriptions and a pointer to the next level.
 type node struct {
 	next  *level
-	psubs map[*subscription]*subscription
-	qsubs map[string](map[*subscription]*subscription)
+	psubs map[*subscription]struct{}
+	qsubs map[string]map[*subscription]struct{}
 	plist []*subscription
 }
 
@@ -98,7 +98,7 @@ type level struct {
 
 // Create a new default node.
 func newNode() *node {
-	return &node{psubs: make(map[*subscription]*subscription)}
+	return &node{psubs: make(map[*subscription]struct{})}
 }
 
 // Create a new default level.
@@ -413,30 +413,30 @@ func (s *Sublist) Insert(sub *subscription) error {
 		l = n.next
 	}
 	if sub.queue == nil {
-		n.psubs[sub] = sub
+		n.psubs[sub] = struct{}{}
 		isnew = len(n.psubs) == 1
 		if n.plist != nil {
 			n.plist = append(n.plist, sub)
 		} else if len(n.psubs) > plistMin {
 			n.plist = make([]*subscription, 0, len(n.psubs))
 			// Populate
-			for _, psub := range n.psubs {
+			for psub := range n.psubs {
 				n.plist = append(n.plist, psub)
 			}
 		}
 	} else {
 		if n.qsubs == nil {
-			n.qsubs = make(map[string]map[*subscription]*subscription)
+			n.qsubs = make(map[string]map[*subscription]struct{})
 		}
 		qname := string(sub.queue)
 		// This is a queue subscription
 		subs, ok := n.qsubs[qname]
 		if !ok {
-			subs = make(map[*subscription]*subscription)
+			subs = make(map[*subscription]struct{})
 			n.qsubs[qname] = subs
 			isnew = true
 		}
-		subs[sub] = sub
+		subs[sub] = struct{}{}
 	}
 
 	s.count++
@@ -636,7 +636,7 @@ func addNodeToResults(n *node, results *SublistResult) {
 	if n.plist != nil {
 		results.psubs = append(results.psubs, n.plist...)
 	} else {
-		for _, psub := range n.psubs {
+		for psub := range n.psubs {
 			results.psubs = append(results.psubs, psub)
 		}
 	}
@@ -652,7 +652,7 @@ func addNodeToResults(n *node, results *SublistResult) {
 			nqsub := make([]*subscription, 0, len(qr))
 			results.qsubs = append(results.qsubs, nqsub)
 		}
-		for _, sub := range qr {
+		for sub := range qr {
 			if isRemoteQSub(sub) {
 				ns := atomic.LoadInt32(&sub.qw)
 				// Shadow these subscriptions
@@ -820,9 +820,13 @@ func (s *Sublist) RemoveBatch(subs []*subscription) error {
 	// Turn off our cache if enabled.
 	wasEnabled := s.cache != nil
 	s.cache = nil
+	// We will try to remove all subscriptions but will report the first that caused
+	// an error. In other words, we don't bail out at the first error which would
+	// possibly leave a bunch of subscriptions that could have been removed.
+	var err error
 	for _, sub := range subs {
-		if err := s.remove(sub, false, false); err != nil {
-			return err
+		if lerr := s.remove(sub, false, false); lerr != nil && err == nil {
+			err = lerr
 		}
 	}
 	// Turn caching back on here.
@@ -830,7 +834,7 @@ func (s *Sublist) RemoveBatch(subs []*subscription) error {
 	if wasEnabled {
 		s.cache = make(map[string]*SublistResult)
 	}
-	return nil
+	return err
 }
 
 // pruneNode is used to prune an empty node from the tree.
@@ -927,6 +931,7 @@ type SublistStats struct {
 	AvgFanout    float64 `json:"avg_fanout"`
 	totFanout    int
 	cacheCnt     int
+	cacheHits    uint64
 }
 
 func (s *SublistStats) add(stat *SublistStats) {
@@ -935,7 +940,7 @@ func (s *SublistStats) add(stat *SublistStats) {
 	s.NumInserts += stat.NumInserts
 	s.NumRemoves += stat.NumRemoves
 	s.NumMatches += stat.NumMatches
-	s.CacheHitRate += stat.CacheHitRate
+	s.cacheHits += stat.cacheHits
 	if s.MaxFanout < stat.MaxFanout {
 		s.MaxFanout = stat.MaxFanout
 	}
@@ -946,6 +951,9 @@ func (s *SublistStats) add(stat *SublistStats) {
 	s.cacheCnt += stat.cacheCnt
 	if s.totFanout > 0 {
 		s.AvgFanout = float64(s.totFanout) / float64(s.cacheCnt)
+	}
+	if s.NumMatches > 0 {
+		s.CacheHitRate = float64(s.cacheHits) / float64(s.NumMatches)
 	}
 }
 
@@ -963,8 +971,9 @@ func (s *Sublist) Stats() *SublistStats {
 
 	st.NumCache = uint32(cc)
 	st.NumMatches = atomic.LoadUint64(&s.matches)
+	st.cacheHits = atomic.LoadUint64(&s.cacheHits)
 	if st.NumMatches > 0 {
-		st.CacheHitRate = float64(atomic.LoadUint64(&s.cacheHits)) / float64(st.NumMatches)
+		st.CacheHitRate = float64(st.cacheHits) / float64(st.NumMatches)
 	}
 
 	// whip through cache for fanout stats, this can be off if cache is full and doing evictions.
@@ -1430,13 +1439,13 @@ func (s *Sublist) addNodeToSubs(n *node, subs *[]*subscription, includeLeafHubs 
 			addLocalSub(sub, subs, includeLeafHubs)
 		}
 	} else {
-		for _, sub := range n.psubs {
+		for sub := range n.psubs {
 			addLocalSub(sub, subs, includeLeafHubs)
 		}
 	}
 	// Queue subscriptions
 	for _, qr := range n.qsubs {
-		for _, sub := range qr {
+		for sub := range qr {
 			addLocalSub(sub, subs, includeLeafHubs)
 		}
 	}
@@ -1476,13 +1485,13 @@ func (s *Sublist) addAllNodeToSubs(n *node, subs *[]*subscription) {
 	if n.plist != nil {
 		*subs = append(*subs, n.plist...)
 	} else {
-		for _, sub := range n.psubs {
+		for sub := range n.psubs {
 			*subs = append(*subs, sub)
 		}
 	}
 	// Queue subscriptions
 	for _, qr := range n.qsubs {
-		for _, sub := range qr {
+		for sub := range qr {
 			*subs = append(*subs, sub)
 		}
 	}
@@ -1524,13 +1533,13 @@ func (s *Sublist) ReverseMatch(subject string) *SublistResult {
 
 	result := &SublistResult{}
 
-	s.Lock()
+	s.RLock()
 	reverseMatchLevel(s.root, tokens, nil, result)
 	// Check for empty result.
 	if len(result.psubs) == 0 && len(result.qsubs) == 0 {
 		result = emptyResult
 	}
-	s.Unlock()
+	s.RUnlock()
 
 	return result
 }
@@ -1548,8 +1557,21 @@ func reverseMatchLevel(l *level, toks []string, n *node, results *SublistResult)
 				for _, n := range l.nodes {
 					reverseMatchLevel(n.next, toks[i+1:], n, results)
 				}
+				if l.pwc != nil {
+					reverseMatchLevel(l.pwc.next, toks[i+1:], n, results)
+				}
+				if l.fwc != nil {
+					getAllNodes(l, results)
+				}
 				return
 			}
+		}
+		// If the sub tree has a fwc at this position, match as well.
+		if l.fwc != nil {
+			getAllNodes(l, results)
+			return
+		} else if l.pwc != nil {
+			reverseMatchLevel(l.pwc.next, toks[i+1:], n, results)
 		}
 		n = l.nodes[t]
 		if n == nil {

@@ -52,13 +52,14 @@ func formatJwt(kind string, jwtString string) ([]byte, error) {
 
 // DecorateSeed takes a seed and returns a string that wraps
 // the seed in the form:
-//  ************************* IMPORTANT *************************
-//  NKEY Seed printed below can be used sign and prove identity.
-//  NKEYs are sensitive and should be treated as secrets.
 //
-//  -----BEGIN USER NKEY SEED-----
-//  SUAIO3FHUX5PNV2LQIIP7TZ3N4L7TX3W53MQGEIVYFIGA635OZCKEYHFLM
-//  ------END USER NKEY SEED------
+//	************************* IMPORTANT *************************
+//	NKEY Seed printed below can be used sign and prove identity.
+//	NKEYs are sensitive and should be treated as secrets.
+//
+//	-----BEGIN USER NKEY SEED-----
+//	SUAIO3FHUX5PNV2LQIIP7TZ3N4L7TX3W53MQGEIVYFIGA635OZCKEYHFLM
+//	------END USER NKEY SEED------
 func DecorateSeed(seed []byte) ([]byte, error) {
 	w := bytes.NewBuffer(nil)
 	ts := bytes.TrimSpace(seed)

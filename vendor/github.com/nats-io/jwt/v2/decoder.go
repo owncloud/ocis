@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The NATS Authors
+ * Copyright 2020-2022 The NATS Authors
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -110,6 +110,10 @@ func Decode(token string) (Claims, error) {
 				if nkeys.IsValidPublicUserKey(issuer) {
 					ok = true
 				}
+			case nkeys.PrefixByteServer:
+				if nkeys.IsValidPublicServerKey(issuer) {
+					ok = true
+				}
 			}
 		}
 		if !ok {
@@ -140,6 +144,10 @@ func loadClaims(data []byte) (int, Claims, error) {
 		claim, err = loadUser(data, id.Version())
 	case ActivationClaim:
 		claim, err = loadActivation(data, id.Version())
+	case AuthorizationRequestClaim:
+		claim, err = loadAuthorizationRequest(data, id.Version())
+	case AuthorizationResponseClaim:
+		claim, err = loadAuthorizationResponse(data, id.Version())
 	case "cluster":
 		return -1, nil, errors.New("ClusterClaims are not supported")
 	case "server":

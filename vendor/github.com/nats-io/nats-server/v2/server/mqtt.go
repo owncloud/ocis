@@ -91,6 +91,7 @@ const (
 	mqttTopicLevelSep = '/'
 	mqttSingleLevelWC = '+'
 	mqttMultiLevelWC  = '#'
+	mqttReservedPre   = '$'
 
 	// This is appended to the sid of a subscription that is
 	// created on the upper level subject because of the MQTT
@@ -227,17 +228,17 @@ type mqttAccountSessionManager struct {
 	sl         *Sublist                    // sublist allowing to find retained messages for given subscription
 	retmsgs    map[string]*mqttRetainedMsg // retained messages
 	jsa        mqttJSA
-	rrmLastSeq uint64        // Restore retained messages expected last sequence
-	rrmDoneCh  chan struct{} // To notify the caller that all retained messages have been loaded
-	sp         *ipQueue      // of uint64. Used for cluster-wide processing of session records being persisted
-	domainTk   string        // Domain (with trailing "."), or possibly empty. This is added to session subject.
+	rrmLastSeq uint64           // Restore retained messages expected last sequence
+	rrmDoneCh  chan struct{}    // To notify the caller that all retained messages have been loaded
+	sp         *ipQueue[uint64] // Used for cluster-wide processing of session records being persisted
+	domainTk   string           // Domain (with trailing "."), or possibly empty. This is added to session subject.
 }
 
 type mqttJSA struct {
 	mu        sync.Mutex
 	id        string
 	c         *client
-	sendq     *ipQueue // of *mqttJSPubMsg
+	sendq     *ipQueue[*mqttJSPubMsg]
 	rplyr     string
 	replies   sync.Map
 	nuid      *nuid.NUID
@@ -304,6 +305,8 @@ type mqttSub struct {
 	prm *mqttWriter
 	// This is the JS durable name this subscription is attached to.
 	jsDur string
+	// If this subscription needs to be checked for being reserved. E.g. # or * or */
+	reserved bool
 }
 
 type mqtt struct {
@@ -419,7 +422,7 @@ func (s *Server) createMQTTClient(conn net.Conn, ws *websocket) *client {
 	if maxSubs == 0 {
 		maxSubs = -1
 	}
-	now := time.Now().UTC()
+	now := time.Now()
 
 	c := &client{srv: s, nc: conn, mpay: maxPay, msubs: maxSubs, start: now, last: now, mqtt: &mqtt{}, ws: ws}
 	c.headers = true
@@ -979,11 +982,11 @@ func (s *Server) mqttCreateAccountSessionManager(acc *Account, quitCh chan struc
 			id:     id,
 			c:      c,
 			rplyr:  mqttJSARepliesPrefix + id + ".",
-			sendq:  s.newIPQueue(qname + "send"), // of *mqttJSPubMsg
+			sendq:  newIPQueue[*mqttJSPubMsg](s, qname+"send"),
 			nuid:   nuid.New(),
 			quitCh: quitCh,
 		},
-		sp: s.newIPQueue(qname + "sp"), // of uint64
+		sp: newIPQueue[uint64](s, qname+"sp"),
 	}
 	// TODO record domain name in as here
 
@@ -1648,7 +1651,7 @@ func (as *mqttAccountSessionManager) sessPersistProcessing(closeCh chan struct{}
 		case <-sp.ch:
 			seqs := sp.pop()
 			for _, seq := range seqs {
-				as.processSessPersistRecord(seq.(uint64))
+				as.processSessPersistRecord(seq)
 			}
 			sp.recycle(&seqs)
 		case <-closeCh:
@@ -1747,9 +1750,7 @@ func (as *mqttAccountSessionManager) sendJSAPIrequests(s *Server, c *client, acc
 		select {
 		case <-sendq.ch:
 			pmis := sendq.pop()
-			for _, pmi := range pmis {
-				r := pmi.(*mqttJSPubMsg)
-
+			for _, r := range pmis {
 				var nsize int
 
 				msg := r.msg
@@ -1994,6 +1995,7 @@ func (as *mqttAccountSessionManager) processSubs(sess *mqttSession, c *client,
 				sub.mqtt = &mqttSub{}
 			}
 			sub.mqtt.qos = qos
+			sub.mqtt.reserved = isMQTTReservedSubscription(string(sub.subject))
 			if fromSubProto {
 				as.serializeRetainedMsgsForSub(sess, c, sub, trace)
 			}
@@ -3218,6 +3220,7 @@ func mqttWritePublish(w *mqttWriter, qos byte, dup, retain bool, subject string,
 	if retain {
 		flags |= mqttPubFlagRetain
 	}
+
 	w.WriteByte(mqttPacketPub | flags)
 	pkLen := 2 + len(subject) + len(payload)
 	if qos > 0 {
@@ -3347,7 +3350,6 @@ func (c *client) mqttParseSubsOrUnsubs(r *mqttReader, b byte, pl int, sub bool) 
 		filter, err := mqttFilterToNATSSubject(topic)
 		if err != nil {
 			c.Errorf("invalid topic %q: %v", topic, err)
-			err = nil
 		}
 		if sub {
 			qos, err = r.readByte("QoS")
@@ -3422,7 +3424,13 @@ func mqttDeliverMsgCbQos0(sub *subscription, pc *client, _ *Account, subject, _ 
 	// the client may change an existing subscription at any time.
 	sess.mu.Lock()
 	subQos := sub.mqtt.qos
+	isReserved := mqttCheckReserved(sub, subject)
 	sess.mu.Unlock()
+
+	// We have a wildcard subscription and this subject starts with '$' so ignore per Spec [MQTT-4.7.2-1].
+	if isReserved {
+		return
+	}
 
 	var retained bool
 	var topic []byte
@@ -3509,20 +3517,56 @@ func mqttDeliverMsgCbQos1(sub *subscription, pc *client, _ *Account, subject, re
 		sess.mu.Unlock()
 		return
 	}
+
 	// This is a QoS1 message for a QoS1 subscription, so get the pi and keep
 	// track of ack subject.
 	pQoS := byte(1)
 	pi, dup := sess.trackPending(pQoS, reply, sub)
+
+	// Check for reserved subject violation.
+	strippedSubj := string(subject[len(mqttStreamSubjectPrefix):])
+	if isReserved := mqttCheckReserved(sub, strippedSubj); isReserved {
+		sess.mu.Unlock()
+		if pi > 0 {
+			cc.mqttProcessPubAck(pi)
+		}
+		return
+	}
 	sess.mu.Unlock()
+
 	if pi == 0 {
 		// We have reached max pending, don't send the message now.
 		// JS will cause a redelivery and if by then the number of pending
 		// messages has fallen below threshold, the message will be resent.
 		return
 	}
-	topic := natsSubjectToMQTTTopic(string(subject[len(mqttStreamSubjectPrefix):]))
+
+	topic := natsSubjectToMQTTTopic(strippedSubj)
 
 	pc.mqttDeliver(cc, sub, pi, dup, retained, topic, msg)
+}
+
+// The MQTT Server MUST NOT match Topic Filters starting with a wildcard character (# or +)
+// with Topic Names beginning with a $ character, Spec [MQTT-4.7.2-1].
+// We will return true if there is a violation.
+func mqttCheckReserved(sub *subscription, subject string) bool {
+	// If the subject does not start with $ nothing to do here.
+	if !sub.mqtt.reserved || len(subject) == 0 || subject[0] != mqttReservedPre {
+		return false
+	}
+	return true
+}
+
+// Check if a sub is a reserved wildcard. E.g. '#', '*', or '*/" prefix.
+func isMQTTReservedSubscription(subject string) bool {
+	if len(subject) == 1 && subject[0] == fwc || subject[0] == pwc {
+		return true
+	}
+	// Match "*.<>"
+	if len(subject) > 1 && subject[0] == pwc && subject[1] == btsep {
+		return true
+	}
+	return false
 }
 
 // Common function to mqtt delivery callbacks to serialize and send the message
@@ -3702,9 +3746,6 @@ func (sess *mqttSession) processJSConsumer(c *client, subject, sid string,
 			MaxAckPending:  maxAckPending,
 			MemoryStorage:  opts.MQTT.ConsumerMemoryStorage,
 		}
-		if r := opts.MQTT.ConsumerReplicas; r > 0 {
-			cc.Replicas = r
-		}
 		if opts.MQTT.ConsumerInactiveThreshold > 0 {
 			cc.InactiveThreshold = opts.MQTT.ConsumerInactiveThreshold
 		}
@@ -3729,6 +3770,7 @@ func (sess *mqttSession) processJSConsumer(c *client, subject, sid string,
 	}
 	sub.mqtt.qos = qos
 	sub.mqtt.jsDur = cc.Durable
+	sub.mqtt.reserved = isMQTTReservedSubscription(subject)
 	sess.mu.Unlock()
 	return cc, sub, nil
 }

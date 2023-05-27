@@ -1,4 +1,4 @@
-// Copyright 2012-2019 The NATS Authors
+// Copyright 2012-2022 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -171,13 +171,14 @@ func (p *Permissions) clone() *Permissions {
 // Lock is assumed held.
 func (s *Server) checkAuthforWarnings() {
 	warn := false
-	if s.opts.Password != _EMPTY_ && !isBcrypt(s.opts.Password) {
+	opts := s.getOpts()
+	if opts.Password != _EMPTY_ && !isBcrypt(opts.Password) {
 		warn = true
 	}
 	for _, u := range s.users {
 		// Skip warn if using TLS certs based auth
 		// unless a password has been left in the config.
-		if u.Password == _EMPTY_ && s.opts.TLSMap {
+		if u.Password == _EMPTY_ && opts.TLSMap {
 			continue
 		}
 		// Check if this is our internal sys client created on the fly.
@@ -758,7 +759,6 @@ func (s *Server) processClientOrLeafAuthentication(c *client, opts *Options) boo
 			if len(allowedConnTypes) == 0 {
 				return false
 			}
-			err = nil
 		}
 		if !c.connectionTypeAllowed(allowedConnTypes) {
 			c.Debugf("Connection type not allowed")
@@ -1079,7 +1079,7 @@ URLS:
 		}
 		hostLabels := strings.Split(strings.ToLower(url.Hostname()), ".")
 		// Following https://tools.ietf.org/html/rfc6125#section-6.4.3, should not => will not, may => will not
-		// The wilcard * never matches multiple label and only matches the left most label.
+		// The wildcard * never matches multiple label and only matches the left most label.
 		if len(hostLabels) != len(dnsAltNameLabels) {
 			continue URLS
 		}

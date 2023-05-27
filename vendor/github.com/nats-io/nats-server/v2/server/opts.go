@@ -439,6 +439,9 @@ type MQTTOpts struct {
 	// replicas count (lower than StreamReplicas if specified, but also lower
 	// than the automatic value determined by cluster size).
 	// Note that existing consumers are not modified.
+	//
+	// UPDATE: This is no longer used while messages stream has interest policy retention
+	// which requires consumer replica count to match the parent stream.
 	ConsumerReplicas int
 
 	// Indicate if the consumers should be created with memory storage.
@@ -1127,8 +1130,10 @@ func (o *Options) processConfigFileLine(k string, v interface{}, errors *[]error
 			}
 		case map[string]interface{}:
 			del := false
-			dir := ""
-			dirType := ""
+			hdel := false
+			hdel_set := false
+			dir := _EMPTY_
+			dirType := _EMPTY_
 			limit := int64(0)
 			ttl := time.Duration(0)
 			sync := time.Duration(0)
@@ -1145,6 +1150,11 @@ func (o *Options) processConfigFileLine(k string, v interface{}, errors *[]error
 			if v, ok := v["allow_delete"]; ok {
 				_, v := unwrapValue(v, &lt)
 				del = v.(bool)
+			}
+			if v, ok := v["hard_delete"]; ok {
+				_, v := unwrapValue(v, &lt)
+				hdel_set = true
+				hdel = v.(bool)
 			}
 			if v, ok := v["limit"]; ok {
 				_, v := unwrapValue(v, &lt)
@@ -1186,12 +1196,26 @@ func (o *Options) processConfigFileLine(k string, v interface{}, errors *[]error
 				if del {
 					*errors = append(*errors, &configErr{tk, "CACHE does not accept allow_delete"})
 				}
+				if hdel_set {
+					*errors = append(*errors, &configErr{tk, "CACHE does not accept hard_delete"})
+				}
 				res, err = NewCacheDirAccResolver(dir, limit, ttl, opts...)
 			case "FULL":
 				if ttl != 0 {
 					*errors = append(*errors, &configErr{tk, "FULL does not accept ttl"})
 				}
-				res, err = NewDirAccResolver(dir, limit, sync, del, opts...)
+				if hdel_set && !del {
+					*errors = append(*errors, &configErr{tk, "hard_delete has no effect without delete"})
+				}
+				delete := NoDelete
+				if del {
+					if hdel {
+						delete = HardDelete
+					} else {
+						delete = RenameDeleted
+					}
+				}
+				res, err = NewDirAccResolver(dir, limit, sync, delete, opts...)
 			}
 			if err != nil {
 				*errors = append(*errors, &configErr{tk, err.Error()})
@@ -4223,7 +4247,14 @@ func parseMQTT(v interface{}, o *Options, errors *[]error, warnings *[]error) er
 		case "stream_replicas":
 			o.MQTT.StreamReplicas = int(mv.(int64))
 		case "consumer_replicas":
-			o.MQTT.ConsumerReplicas = int(mv.(int64))
+			err := &configWarningErr{
+				field: mk,
+				configErr: configErr{
+					token:  tk,
+					reason: `consumer replicas setting ignored in this server version`,
+				},
+			}
+			*warnings = append(*warnings, err)
 		case "consumer_memory_storage":
 			o.MQTT.ConsumerMemoryStorage = mv.(bool)
 		case "consumer_inactive_threshold", "consumer_auto_cleanup":
@@ -4669,8 +4700,8 @@ func ConfigureOptions(fs *flag.FlagSet, args []string, printVersion, printHelp, 
 	fs.StringVar(&configFile, "c", "", "Configuration file.")
 	fs.StringVar(&configFile, "config", "", "Configuration file.")
 	fs.BoolVar(&opts.CheckConfig, "t", false, "Check configuration and exit.")
-	fs.StringVar(&signal, "sl", "", "Send signal to nats-server process (stop, quit, reopen, reload).")
-	fs.StringVar(&signal, "signal", "", "Send signal to nats-server process (stop, quit, reopen, reload).")
+	fs.StringVar(&signal, "sl", "", "Send signal to nats-server process (ldm, stop, quit, term, reopen, reload).")
+	fs.StringVar(&signal, "signal", "", "Send signal to nats-server process (ldm, stop, quit, term, reopen, reload).")
 	fs.StringVar(&opts.PidFile, "P", "", "File to store process pid.")
 	fs.StringVar(&opts.PidFile, "pid", "", "File to store process pid.")
 	fs.StringVar(&opts.PortsFileDir, "ports_file_dir", "", "Creates a ports file in the specified directory (<executable_name>_<pid>.ports).")
