@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Trace proxy middlewares: [#6313](https://github.com/owncloud/ocis/pull/6313)
 * Enhancement - Bump Reva: [#6381](https://github.com/owncloud/ocis/pull/6381)
 * Enhancement - Default LDAP write to true: [#6362](https://github.com/owncloud/ocis/pull/6362)
 * Enhancement - Fix preview or viewing of shared animated GIFs: [#6386](https://github.com/owncloud/ocis/pull/6386)
@@ -18,6 +19,13 @@ The following sections list the changes for unreleased.
 * Enhancement - Update web to v7.0.0-rc.38: [#6375](https://github.com/owncloud/ocis/pull/6375)
 
 ## Details
+
+* Bugfix - Trace proxy middlewares: [#6313](https://github.com/owncloud/ocis/pull/6313)
+
+   We moved trace initialization to an early middleware to also trace requests made by other proxy
+   middlewares.
+
+   https://github.com/owncloud/ocis/pull/6313
 
 * Enhancement - Bump Reva: [#6381](https://github.com/owncloud/ocis/pull/6381)
 
