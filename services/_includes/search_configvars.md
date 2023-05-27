@@ -31,4 +31,5 @@
 | SEARCH_EXTRACTOR_TYPE | string | basic | Defines the content extraction engine. Defaults to 'basic'. Supported values are: 'basic' and 'tika'.|
 | OCIS_INSECURE<br/>SEARCH_EXTRACTOR_CS3SOURCE_INSECURE | bool | false | Ignore untrusted SSL certificates when connecting to the CS3 source.|
 | SEARCH_EXTRACTOR_TIKA_TIKA_URL | string | http://127.0.0.1:9998 | URL of the tika server.|
+| SEARCH_CONTENT_EXTRACTION_SIZE_LIMIT | uint64 | 20971520 | Maximum file size in bytes that is allowed for content extraction.|
 | OCIS_MACHINE_AUTH_API_KEY<br/>SEARCH_MACHINE_AUTH_API_KEY | string |  | Machine auth API key used to validate internal requests necessary for the access to resources from other services.|
