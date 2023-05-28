@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"os"
 	"path"
 
@@ -44,12 +45,16 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
-
-			rcfg := revaconfig.StorageUsersConfigFromStruct(cfg)
-
 			gr.Add(func() error {
-				runtime.RunWithOptions(rcfg, pidFile, runtime.WithLogger(&logger.Logger))
+				pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
+				rCfg := revaconfig.StorageUsersConfigFromStruct(cfg)
+				reg := registry.GetRegistry()
+
+				runtime.RunWithOptions(rCfg, pidFile,
+					runtime.WithLogger(&logger.Logger),
+					runtime.WithRegistry(reg),
+				)
+
 				return nil
 			}, func(err error) {
 				logger.Error().

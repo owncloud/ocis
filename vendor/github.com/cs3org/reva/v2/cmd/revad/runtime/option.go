@@ -19,8 +19,9 @@
 package runtime
 
 import (
-	"github.com/cs3org/reva/v2/pkg/registry"
+	"github.com/go-micro/plugins/v4/registry/memory"
 	"github.com/rs/zerolog"
+	"go-micro.dev/v4/registry"
 )
 
 // Option defines a single option function.
@@ -34,7 +35,9 @@ type Options struct {
 
 // newOptions initializes the available default options.
 func newOptions(opts ...Option) Options {
-	opt := Options{}
+	opt := Options{
+		Registry: memory.NewRegistry(),
+	}
 
 	for _, o := range opts {
 		o(&opt)

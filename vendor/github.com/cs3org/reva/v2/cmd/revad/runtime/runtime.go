@@ -30,12 +30,11 @@ import (
 
 	"github.com/cs3org/reva/v2/cmd/revad/internal/grace"
 	"github.com/cs3org/reva/v2/pkg/logger"
-	"github.com/cs3org/reva/v2/pkg/registry/memory"
+	"github.com/cs3org/reva/v2/pkg/registry"
 	"github.com/cs3org/reva/v2/pkg/rgrpc"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	rtrace "github.com/cs3org/reva/v2/pkg/trace"
-	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
@@ -55,18 +54,11 @@ func RunWithOptions(mainConf map[string]interface{}, pidFile string, opts ...Opt
 	parseSharedConfOrDie(mainConf["shared"])
 	coreConf := parseCoreConfOrDie(mainConf["core"])
 
-	// TODO: one can pass the options from the config file to registry.New() and initialize a registry based upon config files.
-	if options.Registry != nil {
-		utils.GlobalRegistry = options.Registry
-	} else if _, ok := mainConf["registry"]; ok {
-		for _, services := range mainConf["registry"].(map[string]interface{}) {
-			for sName, nodes := range services.(map[string]interface{}) {
-				for _, instance := range nodes.([]interface{}) {
-					if err := utils.GlobalRegistry.Add(memory.NewService(sName, instance.(map[string]interface{})["nodes"].([]interface{}))); err != nil {
-						panic(err)
-					}
-				}
-			}
+	if confMap, ok := mainConf["registry"].(map[string]interface{}); ok {
+		registryConfiguration, _ := registry.ConfigurationFromMap(confMap)
+
+		if err := registry.Init(registryConfiguration, options.Registry); err != nil {
+			panic(err)
 		}
 	}
 

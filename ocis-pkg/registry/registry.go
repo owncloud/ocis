@@ -13,7 +13,7 @@ import (
 	memr "github.com/go-micro/plugins/v4/registry/memory"
 	natsr "github.com/go-micro/plugins/v4/registry/nats"
 
-	"go-micro.dev/v4/registry"
+	mRegistry "go-micro.dev/v4/registry"
 	"go-micro.dev/v4/registry/cache"
 )
 
@@ -25,7 +25,7 @@ const (
 var (
 	once      sync.Once
 	regPlugin string
-	reg       registry.Registry
+	reg       mRegistry.Registry
 )
 
 func Configure(plugin string) {
@@ -37,7 +37,7 @@ func Configure(plugin string) {
 // GetRegistry returns a configured micro registry based on Micro env vars.
 // It defaults to mDNS, so mind that systems with mDNS disabled by default (i.e SUSE) will have a hard time
 // and it needs to explicitly use etcd. Os awareness for providing a working registry out of the box should be done.
-func GetRegistry() registry.Registry {
+func GetRegistry() mRegistry.Registry {
 	once.Do(func() {
 		addresses := strings.Split(os.Getenv(registryAddressEnv), ",")
 		// prefer env of setting from Configure()
@@ -49,19 +49,19 @@ func GetRegistry() registry.Registry {
 		switch plugin {
 		case "nats":
 			reg = natsr.NewRegistry(
-				registry.Addrs(addresses...),
+				mRegistry.Addrs(addresses...),
 			)
 		case "kubernetes":
 			reg = kubernetesr.NewRegistry(
-				registry.Addrs(addresses...),
+				mRegistry.Addrs(addresses...),
 			)
 		case "etcd":
 			reg = etcdr.NewRegistry(
-				registry.Addrs(addresses...),
+				mRegistry.Addrs(addresses...),
 			)
 		case "consul":
 			reg = consulr.NewRegistry(
-				registry.Addrs(addresses...),
+				mRegistry.Addrs(addresses...),
 			)
 		case "memory":
 			reg = memr.NewRegistry()

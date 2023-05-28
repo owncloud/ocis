@@ -12,24 +12,9 @@ import (
 // RegisterGRPCEndpoint publishes an arbitrary endpoint to the service-registry. This allows querying nodes of
 // non-micro GRPC-services like reva. No health-checks are done, thus the caller is responsible for canceling.
 func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, version string, logger log.Logger) error {
-	node := &registry.Node{
-		Id:       serviceID + "-" + uuid,
-		Address:  addr,
-		Metadata: make(map[string]string),
-	}
 	ocisRegistry := oregistry.GetRegistry()
-
-	node.Metadata["registry"] = ocisRegistry.String()
-	node.Metadata["server"] = "grpc"
-	node.Metadata["transport"] = "grpc"
-	node.Metadata["protocol"] = "grpc"
-
-	service := &registry.Service{
-		Name:      serviceID,
-		Version:   version,
-		Nodes:     []*registry.Node{node},
-		Endpoints: make([]*registry.Endpoint, 0),
-	}
+	service := oregistry.BuildGRPCService(serviceID, uuid, addr, version)
+	node := service.Nodes[0]
 
 	logger.Info().Msgf("registering external service %v@%v", node.Id, node.Address)
 
@@ -67,24 +52,10 @@ func RegisterGRPCEndpoint(ctx context.Context, serviceID, uuid, addr string, ver
 // RegisterHTTPEndpoint publishes an arbitrary endpoint to the service-registry. This allows querying nodes of
 // non-micro HTTP-services like reva. No health-checks are done, thus the caller is responsible for canceling.
 func RegisterHTTPEndpoint(ctx context.Context, serviceID, uuid, addr string, version string, logger log.Logger) error {
-	node := &registry.Node{
-		Id:       serviceID + "-" + uuid,
-		Address:  addr,
-		Metadata: make(map[string]string),
-	}
+
 	ocisRegistry := oregistry.GetRegistry()
-
-	node.Metadata["registry"] = ocisRegistry.String()
-	node.Metadata["server"] = "http"
-	node.Metadata["transport"] = "http"
-	node.Metadata["protocol"] = "http"
-
-	service := &registry.Service{
-		Name:      serviceID,
-		Version:   version,
-		Nodes:     []*registry.Node{node},
-		Endpoints: make([]*registry.Endpoint, 0),
-	}
+	service := oregistry.BuildHTTPService(serviceID, uuid, addr, version)
+	node := service.Nodes[0]
 
 	logger.Info().Msgf("registering external service %v@%v", node.Id, node.Address)
 

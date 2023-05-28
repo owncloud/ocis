@@ -52,16 +52,16 @@ func DefaultConfig() *config.Config {
 
 		FrontendPublicURL: "https://localhost:9200",
 
-		AppRegistryEndpoint:       "localhost:9242",
-		AuthBasicEndpoint:         "localhost:9146",
-		AuthMachineEndpoint:       "localhost:9166",
-		GroupsEndpoint:            "localhost:9160",
-		PermissionsEndpoint:       "localhost:9191",
-		SharingEndpoint:           "localhost:9150",
-		StoragePublicLinkEndpoint: "localhost:9178",
-		StorageSharesEndpoint:     "localhost:9154",
-		StorageUsersEndpoint:      "localhost:9157",
-		UsersEndpoint:             "localhost:9144",
+		AppRegistryEndpoint:       "127.0.0.1:9242",
+		AuthBasicEndpoint:         "127.0.0.1:9146",
+		AuthMachineEndpoint:       "127.0.0.1:9166",
+		GroupsEndpoint:            "127.0.0.1:9160",
+		PermissionsEndpoint:       "127.0.0.1:9191",
+		SharingEndpoint:           "127.0.0.1:9150",
+		StoragePublicLinkEndpoint: "127.0.0.1:9178",
+		StorageSharesEndpoint:     "127.0.0.1:9154",
+		StorageUsersEndpoint:      "127.0.0.1:9157",
+		UsersEndpoint:             "127.0.0.1:9144",
 
 		StorageRegistry: config.StorageRegistry{
 			Driver: "spaces",

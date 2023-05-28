@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"os"
 	"path"
 
@@ -43,10 +44,6 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
-
-			rcfg := revaconfig.UsersConfigFromStruct(cfg)
-
 			// the reva runtime calls os.Exit in the case of a failure and there is no way for the oCIS
 			// runtime to catch it and restart a reva service. Therefore we need to ensure the service has
 			// everything it needs, before starting the service.
@@ -60,7 +57,15 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			gr.Add(func() error {
-				runtime.RunWithOptions(rcfg, pidFile, runtime.WithLogger(&logger.Logger))
+				pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
+				rCfg := revaconfig.UsersConfigFromStruct(cfg)
+				reg := registry.GetRegistry()
+
+				runtime.RunWithOptions(rCfg, pidFile,
+					runtime.WithLogger(&logger.Logger),
+					runtime.WithRegistry(reg),
+				)
+
 				return nil
 			}, func(err error) {
 				logger.Error().

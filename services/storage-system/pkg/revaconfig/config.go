@@ -1,15 +1,28 @@
 package revaconfig
 
 import (
-	"time"
-
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	"github.com/gofrs/uuid"
+	oRegistry "github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/storage-system/pkg/config"
+	mRegistry "go-micro.dev/v4/registry"
+	"time"
 )
 
 // StorageSystemFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 	rcfg := map[string]interface{}{
+		"registry": map[string]interface{}{
+			"services": []*mRegistry.Service{
+				oRegistry.BuildGRPCService(
+					cfg.GRPC.Namespace+"."+cfg.Service.Name,
+					uuid.Must(uuid.NewV4()).String(),
+					cfg.GRPC.Addr,
+					version.GetString(),
+				),
+			},
+		},
 		"core": map[string]interface{}{
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_exporter":     cfg.Tracing.Type,

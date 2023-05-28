@@ -39,8 +39,6 @@ import (
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/registry"
-	"github.com/cs3org/reva/v2/pkg/registry/memory"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -51,7 +49,6 @@ var (
 	matchEmail    = regexp.MustCompile(`^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$`)
 	// GlobalRegistry configures a service registry globally accessible. It defaults to a memory registry. The usage of
 	// globals is not encouraged, and this is a workaround until the PR is out of a draft state.
-	GlobalRegistry registry.Registry = memory.New(map[string]interface{}{})
 
 	// ShareStorageProviderID is the provider id used by the sharestorageprovider
 	ShareStorageProviderID = "a0ca6a90-a365-4782-871e-d44447bbc668"
