@@ -13,7 +13,13 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 		Str("itemid", e.ID.OpaqueId).
 		Logger()
 
-	executantCtx, executant, err := utils.Impersonate(e.Executant, s.gwClient, s.machineAuthAPIKey)
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		logger.Error().Err(err).Msg("could not select next gateway client")
+		return
+	}
+
+	executantCtx, executant, err := utils.Impersonate(e.Executant, gatewayClient, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().
 			Err(err).
@@ -75,7 +81,13 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 		Str("itemid", e.ID.OpaqueId).
 		Logger()
 
-	executantCtx, executant, err := utils.Impersonate(e.Executant, s.gwClient, s.machineAuthAPIKey)
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		logger.Error().Err(err).Msg("could not select next gateway client")
+		return
+	}
+
+	executantCtx, executant, err := utils.Impersonate(e.Executant, gatewayClient, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().Err(err).Msg("could not handle space unshared event")
 		return
@@ -135,7 +147,13 @@ func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExp
 		Str("itemid", e.SpaceID.GetOpaqueId()).
 		Logger()
 
-	ownerCtx, owner, err := utils.Impersonate(e.SpaceOwner, s.gwClient, s.machineAuthAPIKey)
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		logger.Error().Err(err).Msg("could not select next gateway client")
+		return
+	}
+
+	ownerCtx, owner, err := utils.Impersonate(e.SpaceOwner, gatewayClient, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not impersonate sharer")
 		return

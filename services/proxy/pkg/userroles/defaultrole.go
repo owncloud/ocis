@@ -35,7 +35,7 @@ func (d defaultRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user 
 		var err error
 		roleIDs, err = loadRolesIDs(ctx, user.Id.OpaqueId, d.roleService)
 		if err != nil {
-			d.logger.Error().Err(err).Msgf("Could not load roles")
+			d.logger.Error().Err(err).Msg("Could not load roles")
 			return nil, err
 		}
 
@@ -68,7 +68,7 @@ func (d defaultRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user 
 func (d defaultRoleAssigner) ApplyUserRole(ctx context.Context, user *cs3.User) (*cs3.User, error) {
 	roleIDs, err := loadRolesIDs(ctx, user.Id.OpaqueId, d.roleService)
 	if err != nil {
-		d.logger.Error().Err(err).Msgf("Could not load roles")
+		d.logger.Error().Err(err).Msg("Could not load roles")
 		return nil, err
 	}
 

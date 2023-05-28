@@ -11,6 +11,7 @@ import (
 	cs3 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
@@ -31,7 +32,7 @@ type Option func(o *Options)
 // Options defines the available options for this package.
 type Options struct {
 	logger              log.Logger
-	authProvider        RevaAuthenticator
+	gatewaySelector     pool.Selectable[gateway.GatewayAPIClient]
 	machineAuthAPIKey   string
 	oidcISS             string
 	autoProvsionCreator autoprovision.Creator
@@ -44,10 +45,10 @@ func WithLogger(l log.Logger) Option {
 	}
 }
 
-// WithRevaAuthenticator set the RevaAuthenticator option
-func WithRevaAuthenticator(ra RevaAuthenticator) Option {
+// WithRevaGatewaySelector set the gatewaySelector option
+func WithRevaGatewaySelector(selectable pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
-		o.authProvider = ra
+		o.gatewaySelector = selectable
 	}
 }
 
@@ -91,7 +92,12 @@ func NewCS3UserBackend(opts ...Option) UserBackend {
 }
 
 func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string) (*cs3.User, string, error) {
-	res, err := c.authProvider.Authenticate(ctx, &gateway.AuthenticateRequest{
+	gatewayClient, err := c.gatewaySelector.Next()
+	if err != nil {
+		return nil, "", fmt.Errorf("could not obtain gatewayClient: %s", err)
+	}
+
+	res, err := gatewayClient.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     claim + ":" + value,
 		ClientSecret: c.machineAuthAPIKey,
@@ -113,7 +119,12 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string) (
 }
 
 func (c *cs3backend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, string, error) {
-	res, err := c.authProvider.Authenticate(ctx, &gateway.AuthenticateRequest{
+	gatewayClient, err := c.gatewaySelector.Next()
+	if err != nil {
+		return nil, "", fmt.Errorf("could not obtain gatewayClient: %s", err)
+	}
+
+	res, err := gatewayClient.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "basic",
 		ClientId:     username,
 		ClientSecret: password,

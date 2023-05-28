@@ -5,6 +5,7 @@ import (
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -38,8 +39,8 @@ type Options struct {
 	OIDCClient oidc.OIDCClient
 	// OIDCIss is the oidcAuth-issuer
 	OIDCIss string
-	// RevaGatewayClient to send requests to the reva gateway
-	RevaGatewayClient gateway.GatewayAPIClient
+	// RevaGatewaySelector to send requests to the reva gateway
+	RevaGatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	// Store for persisting data
 	Store storesvc.StoreService
 	// PreSignedURLConfig to configure the middleware
@@ -135,10 +136,10 @@ func CredentialsByUserAgent(v map[string]string) Option {
 	}
 }
 
-// RevaGatewayClient provides a function to set the the reva gateway service client option.
-func RevaGatewayClient(gc gateway.GatewayAPIClient) Option {
+// WithRevaGatewaySelector provides a function to set the the reva gateway service selector option.
+func WithRevaGatewaySelector(val pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
-		o.RevaGatewayClient = gc
+		o.RevaGatewaySelector = val
 	}
 }
 

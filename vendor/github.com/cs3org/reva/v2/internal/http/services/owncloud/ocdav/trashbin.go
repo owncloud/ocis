@@ -111,7 +111,7 @@ func (h *TrashbinHandler) Handler(s *svc) http.Handler {
 		r.URL.Path = newPath
 
 		basePath := path.Join(ns, newPath)
-		space, rpcstatus, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gwClient, basePath)
+		space, rpcstatus, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gatewaySelector, basePath)
 		switch {
 		case err != nil:
 			log.Error().Err(err).Str("path", basePath).Msg("failed to look up storage space")
@@ -151,7 +151,7 @@ func (h *TrashbinHandler) Handler(s *svc) http.Handler {
 
 			p := path.Join(ns, dst)
 			// The destination can be in another space. E.g. the 'Shares Jail'.
-			space, rpcstatus, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gwClient, p)
+			space, rpcstatus, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gatewaySelector, p)
 			if err != nil {
 				log.Error().Err(err).Str("path", p).Msg("failed to look up destination storage space")
 				w.WriteHeader(http.StatusInternalServerError)
@@ -216,8 +216,14 @@ func (h *TrashbinHandler) listTrashbin(w http.ResponseWriter, r *http.Request, s
 		return
 	}
 
+	client, err := s.gatewaySelector.Next()
+	if err != nil {
+		sublog.Error().Err(err).Msg("error selecting next gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	// ask gateway for recycle items
-	getRecycleRes, err := s.gwClient.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: ref, Key: path.Join(key, itemPath)})
+	getRecycleRes, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: ref, Key: path.Join(key, itemPath)})
 	if err != nil {
 		sublog.Error().Err(err).Msg("error calling ListRecycle")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -247,7 +253,7 @@ func (h *TrashbinHandler) listTrashbin(w http.ResponseWriter, r *http.Request, s
 
 		for len(stack) > 0 {
 			key := stack[len(stack)-1]
-			getRecycleRes, err := s.gwClient.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: ref, Key: key})
+			getRecycleRes, err := client.ListRecycle(ctx, &provider.ListRecycleRequest{Ref: ref, Key: key})
 			if err != nil {
 				sublog.Error().Err(err).Msg("error calling ListRecycle")
 				w.WriteHeader(http.StatusInternalServerError)
@@ -465,8 +471,14 @@ func (h *TrashbinHandler) restore(w http.ResponseWriter, r *http.Request, s *svc
 		return
 	}
 
+	client, err := s.gatewaySelector.Next()
+	if err != nil {
+		sublog.Error().Err(err).Msg("error selecting next gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	dstStatReq := &provider.StatRequest{Ref: dst}
-	dstStatRes, err := s.gwClient.Stat(ctx, dstStatReq)
+	dstStatRes, err := client.Stat(ctx, dstStatReq)
 	if err != nil {
 		sublog.Error().Err(err).Msg("error sending grpc stat request")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -484,7 +496,7 @@ func (h *TrashbinHandler) restore(w http.ResponseWriter, r *http.Request, s *svc
 		parentRef := &provider.Reference{ResourceId: dst.ResourceId, Path: utils.MakeRelativePath(path.Dir(dst.Path))}
 		parentStatReq := &provider.StatRequest{Ref: parentRef}
 
-		parentStatResponse, err := s.gwClient.Stat(ctx, parentStatReq)
+		parentStatResponse, err := client.Stat(ctx, parentStatReq)
 		if err != nil {
 			sublog.Error().Err(err).Msg("error sending grpc stat request")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -515,7 +527,7 @@ func (h *TrashbinHandler) restore(w http.ResponseWriter, r *http.Request, s *svc
 		}
 		// delete existing tree
 		delReq := &provider.DeleteRequest{Ref: dst}
-		delRes, err := s.gwClient.Delete(ctx, delReq)
+		delRes, err := client.Delete(ctx, delReq)
 		if err != nil {
 			sublog.Error().Err(err).Msg("error sending grpc delete request")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -534,7 +546,7 @@ func (h *TrashbinHandler) restore(w http.ResponseWriter, r *http.Request, s *svc
 		RestoreRef: dst,
 	}
 
-	res, err := s.gwClient.RestoreRecycleItem(ctx, req)
+	res, err := client.RestoreRecycleItem(ctx, req)
 	if err != nil {
 		sublog.Error().Err(err).Msg("error sending a grpc restore recycle item request")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -551,7 +563,7 @@ func (h *TrashbinHandler) restore(w http.ResponseWriter, r *http.Request, s *svc
 		return
 	}
 
-	dstStatRes, err = s.gwClient.Stat(ctx, dstStatReq)
+	dstStatRes, err = client.Stat(ctx, dstStatReq)
 	if err != nil {
 		sublog.Error().Err(err).Msg("error sending grpc stat request")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -584,7 +596,13 @@ func (h *TrashbinHandler) delete(w http.ResponseWriter, r *http.Request, s *svc,
 		Key: trashPath,
 	}
 
-	res, err := s.gwClient.PurgeRecycle(ctx, req)
+	client, err := s.gatewaySelector.Next()
+	if err != nil {
+		sublog.Error().Err(err).Msg("error selecting next gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	res, err := client.PurgeRecycle(ctx, req)
 	if err != nil {
 		sublog.Error().Err(err).Msg("error sending a grpc restore recycle item request")
 		w.WriteHeader(http.StatusInternalServerError)

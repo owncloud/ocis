@@ -34,12 +34,12 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 			"services": map[string]interface{}{
 				"gateway": map[string]interface{}{
 					// registries are located on the gateway
-					"authregistrysvc":    cfg.GRPC.Addr,
-					"storageregistrysvc": cfg.GRPC.Addr,
+					"authregistrysvc":    "com.owncloud.api.storage-system",
+					"storageregistrysvc": "com.owncloud.api.storage-system",
 					// user metadata is located on the users services
-					"userprovidersvc":  cfg.GRPC.Addr,
-					"groupprovidersvc": cfg.GRPC.Addr,
-					"permissionssvc":   cfg.GRPC.Addr,
+					"userprovidersvc":  "com.owncloud.api.storage-system",
+					"groupprovidersvc": "com.owncloud.api.storage-system",
+					"permissionssvc":   "com.owncloud.api.storage-system",
 					// other
 					"disable_home_creation_on_login": true, // metadata manually creates a space
 					// metadata always uses the simple upload, so no transfer secret or datagateway needed
@@ -69,7 +69,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 					"drivers": map[string]interface{}{
 						"static": map[string]interface{}{
 							"rules": map[string]interface{}{
-								"machine": cfg.GRPC.Addr,
+								"machine": "com.owncloud.api.storage-system",
 							},
 						},
 					},
@@ -79,7 +79,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 					"auth_managers": map[string]interface{}{
 						"machine": map[string]interface{}{
 							"api_key":      cfg.SystemUserAPIKey,
-							"gateway_addr": cfg.GRPC.Addr,
+							"gateway_addr": "com.owncloud.api.storage-system",
 						},
 					},
 				},
@@ -95,7 +95,7 @@ func StorageSystemFromStruct(cfg *config.Config) map[string]interface{} {
 						"static": map[string]interface{}{
 							"rules": map[string]interface{}{
 								"/": map[string]interface{}{
-									"address": cfg.GRPC.Addr,
+									"address": "com.owncloud.api.storage-system",
 								},
 							},
 						},
@@ -161,7 +161,7 @@ func metadataDrivers(cfg *config.Config) map[string]interface{} {
 			"user_layout":                "{{.Id.OpaqueId}}",
 			"treetime_accounting":        false,
 			"treesize_accounting":        false,
-			"permissionssvc":             cfg.GRPC.Addr,
+			"permissionssvc":             "com.owncloud.api.storage-system",
 			"max_acquire_lock_cycles":    cfg.Drivers.OCIS.MaxAcquireLockCycles,
 			"lock_cycle_duration_factor": cfg.Drivers.OCIS.LockCycleDurationFactor,
 			"statcache": map[string]interface{}{

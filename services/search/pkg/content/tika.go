@@ -8,6 +8,7 @@ import (
 	"github.com/bbalet/stopwords"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/google/go-tika/tika"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"
@@ -23,7 +24,7 @@ type Tika struct {
 }
 
 // NewTikaExtractor creates a new Tika instance.
-func NewTikaExtractor(gw gateway.GatewayAPIClient, logger log.Logger, cfg *config.Config) (*Tika, error) {
+func NewTikaExtractor(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], logger log.Logger, cfg *config.Config) (*Tika, error) {
 	basic, err := NewBasicExtractor(logger)
 	if err != nil {
 		return nil, err
@@ -38,7 +39,7 @@ func NewTikaExtractor(gw gateway.GatewayAPIClient, logger log.Logger, cfg *confi
 
 	return &Tika{
 		Basic:                      basic,
-		Retriever:                  newCS3Retriever(gw, logger, cfg.Extractor.CS3AllowInsecure),
+		Retriever:                  newCS3Retriever(gatewaySelector, logger, cfg.Extractor.CS3AllowInsecure),
 		tika:                       tika.NewClient(nil, cfg.Extractor.Tika.TikaURL),
 		contentExtractionSizeLimit: cfg.ContentExtractionSizeLimit,
 	}, nil

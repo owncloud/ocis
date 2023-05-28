@@ -66,7 +66,13 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sres, err := g.gatewayClient.Stat(ctx, &provider.StatRequest{
+	client, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error selecting next gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	sres, err := client.Stat(ctx, &provider.StatRequest{
 		Ref: &provider.Reference{ResourceId: &rid},
 	})
 	if err != nil {
@@ -105,7 +111,7 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := g.gatewayClient.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
+	resp, err := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
 		Ref: &provider.Reference{ResourceId: &rid},
 		ArbitraryMetadata: &provider.ArbitraryMetadata{
 			Metadata: map[string]string{
@@ -155,7 +161,13 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sres, err := g.gatewayClient.Stat(ctx, &provider.StatRequest{
+	client, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("error selecting next gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	sres, err := client.Stat(ctx, &provider.StatRequest{
 		Ref: &provider.Reference{ResourceId: &rid},
 	})
 	if err != nil {
@@ -194,7 +206,7 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := g.gatewayClient.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
+	resp, err := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
 		Ref: &provider.Reference{ResourceId: &rid},
 		ArbitraryMetadata: &provider.ArbitraryMetadata{
 			Metadata: map[string]string{

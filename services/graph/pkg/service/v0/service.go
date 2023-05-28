@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -17,6 +18,7 @@ import (
 	"github.com/jellydator/ttlcache/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -144,7 +146,7 @@ func NewService(opts ...Option) (Graph, error) {
 		usersCache:               usersCache,
 		groupsCache:              groupsCache,
 		eventsPublisher:          options.EventsPublisher,
-		gatewayClient:            options.GatewayClient,
+		gatewaySelector:          options.GatewaySelector,
 		searchService:            options.SearchService,
 		identityEducationBackend: options.IdentityEducationBackend,
 		keycloakClient:           options.KeycloakClient,
@@ -316,9 +318,18 @@ func setIdentityBackends(options Options, svc *Graph) error {
 	if options.IdentityBackend == nil {
 		switch options.Config.Identity.Backend {
 		case "cs3":
+			gatewaySelector, err := pool.GatewaySelector(
+				options.Config.Reva.Address,
+				append(options.Config.Reva.GetRevaOptions(), pool.WithRegistry(registry.GetRegistry()))...,
+			)
+			if err != nil {
+				return err
+			}
+
 			svc.identityBackend = &identity.CS3{
-				Config: options.Config.Reva,
-				Logger: &options.Logger,
+				Config:          options.Config.Reva,
+				Logger:          &options.Logger,
+				GatewaySelector: gatewaySelector,
 			}
 		case "ldap":
 			var err error

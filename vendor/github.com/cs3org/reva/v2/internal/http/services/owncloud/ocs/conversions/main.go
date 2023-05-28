@@ -345,7 +345,7 @@ func ParseTimestamp(timestampString string) (*types.Timestamp, error) {
 		parsedTime, err = time.Parse("2006-01-02", timestampString)
 		if err == nil {
 			// the link needs to be valid for the whole day
-			parsedTime.Add(23*time.Hour + 59*time.Minute + 59*time.Second)
+			parsedTime = parsedTime.Add(23*time.Hour + 59*time.Minute + 59*time.Second)
 		}
 	}
 	if err != nil {

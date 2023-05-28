@@ -11,6 +11,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
@@ -25,14 +26,14 @@ const (
 )
 
 type CS3 struct {
-	client   gateway.GatewayAPIClient
-	insecure bool
+	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+	insecure        bool
 }
 
-func NewCS3Source(cfg config.Thumbnail, c gateway.GatewayAPIClient) CS3 {
+func NewCS3Source(cfg config.Thumbnail, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) CS3 {
 	return CS3{
-		client:   c,
-		insecure: cfg.CS3AllowInsecure,
+		gatewaySelector: gatewaySelector,
+		insecure:        cfg.CS3AllowInsecure,
 	}
 }
 
@@ -51,8 +52,13 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 			Path: path,
 		}
 	}
+
 	ctx = metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
-	rsp, err := s.client.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: &ref})
+	gwc, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+	rsp, err := gwc.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: &ref})
 
 	if err != nil {
 		return nil, err

@@ -1,9 +1,11 @@
 package shared
 
-import "github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+import (
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+)
 
 var defaultRevaConfig = Reva{
-	Address: "127.0.0.1:9142",
+	Address: "com.owncloud.api.gateway",
 }
 
 func DefaultRevaConfig() *Reva {

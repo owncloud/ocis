@@ -41,11 +41,11 @@ func DefaultConfig() *config.Config {
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "shares.json"),
 			},
 			CS3: config.UserSharingCS3Driver{
-				ProviderAddr:  "127.0.0.1:9215", // system storage
+				ProviderAddr:  "com.owncloud.api.storage-system",
 				SystemUserIDP: "internal",
 			},
 			JSONCS3: config.UserSharingJSONCS3Driver{
-				ProviderAddr:  "127.0.0.1:9215", // system storage
+				ProviderAddr:  "com.owncloud.api.storage-system",
 				SystemUserIDP: "internal",
 			},
 			OwnCloudSQL: config.UserSharingOwnCloudSQLDriver{
@@ -61,11 +61,11 @@ func DefaultConfig() *config.Config {
 				File: filepath.Join(defaults.BaseDataPath(), "storage", "publicshares.json"),
 			},
 			CS3: config.PublicSharingCS3Driver{
-				ProviderAddr:  "127.0.0.1:9215", // system storage
+				ProviderAddr:  "com.owncloud.api.storage-system", // system storage
 				SystemUserIDP: "internal",
 			},
 			JSONCS3: config.PublicSharingJSONCS3Driver{
-				ProviderAddr:  "127.0.0.1:9215", // system storage
+				ProviderAddr:  "com.owncloud.api.storage-system", // system storage
 				SystemUserIDP: "internal",
 			},
 			// TODO implement and add owncloudsql publicshare driver

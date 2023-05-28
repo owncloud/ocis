@@ -83,8 +83,14 @@ func (g Graph) ExportPersonalData(w http.ResponseWriter, r *http.Request) {
 
 // GatherPersonalData will all gather all personal data of the user and save it to a file in the users personal space
 func (g Graph) GatherPersonalData(usr *user.User, ref *provider.Reference, token string, marsh Marshaller) {
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not select next gateway client")
+		return
+	}
+
 	// the context might already be cancelled. We need to impersonate the acting user again
-	ctx, err := utils.ImpersonateUser(usr, g.gatewayClient, g.config.MachineAuthAPIKey)
+	ctx, err := utils.ImpersonateUser(usr, gatewayClient, g.config.MachineAuthAPIKey)
 	if err != nil {
 		g.logger.Error().Err(err).Str("userID", usr.GetId().GetOpaqueId()).Msg("cannot impersonate user")
 	}
@@ -141,13 +147,22 @@ func (g Graph) upload(u *user.User, data []byte, ref *provider.Reference, th str
 		Opaque: utils.AppendPlainToOpaque(nil, "Upload-Length", strconv.FormatUint(uint64(len(data)), 10)),
 	}
 
-	gwc := g.GetGatewayClient()
-	ctx, err := utils.ImpersonateUser(u, gwc, g.config.MachineAuthAPIKey)
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not select next gateway client")
+		return err
+	}
+
+	ctx, err := utils.ImpersonateUser(u, gatewayClient, g.config.MachineAuthAPIKey)
+	if err != nil {
+		return err
+	}
+	client, err := g.gatewaySelector.Next()
 	if err != nil {
 		return err
 	}
 	ctx = revactx.ContextSetToken(ctx, th)
-	uRes, err := gwc.InitiateFileUpload(ctx, uReq)
+	uRes, err := client.InitiateFileUpload(ctx, uReq)
 	if err != nil {
 		return err
 	}

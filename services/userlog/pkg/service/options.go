@@ -3,6 +3,7 @@ package service
 import (
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
@@ -21,7 +22,7 @@ type Options struct {
 	Store            store.Store
 	Config           *config.Config
 	HistoryClient    ehsvc.EventHistoryService
-	GatewayClient    gateway.GatewayAPIClient
+	GatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
 	RegisteredEvents []events.Unmarshaller
 }
 
@@ -67,10 +68,10 @@ func HistoryClient(hc ehsvc.EventHistoryService) Option {
 	}
 }
 
-// GatewayClient adds a grpc client for the gateway service
-func GatewayClient(gwc gateway.GatewayAPIClient) Option {
+// GatewaySelector adds a grpc client selector for the gateway service
+func GatewaySelector(gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
-		o.GatewayClient = gwc
+		o.GatewaySelector = gatewaySelector
 	}
 }
 

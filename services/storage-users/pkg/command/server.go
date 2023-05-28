@@ -11,7 +11,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/external"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
@@ -44,12 +44,16 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
-
-			rcfg := revaconfig.StorageUsersConfigFromStruct(cfg)
-
 			gr.Add(func() error {
-				runtime.RunWithOptions(rcfg, pidFile, runtime.WithLogger(&logger.Logger))
+				pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
+				rCfg := revaconfig.StorageUsersConfigFromStruct(cfg)
+				reg := registry.GetRegistry()
+
+				runtime.RunWithOptions(rCfg, pidFile,
+					runtime.WithLogger(&logger.Logger),
+					runtime.WithRegistry(reg),
+				)
+
 				return nil
 			}, func(err error) {
 				logger.Error().
@@ -79,15 +83,9 @@ func Server(cfg *config.Config) *cli.Command {
 				sync.Trap(&gr, cancel)
 			}
 
-			if err := external.RegisterGRPCEndpoint(
-				ctx,
-				cfg.GRPC.Namespace+"."+cfg.Service.Name,
-				uuid.Must(uuid.NewV4()).String(),
-				cfg.GRPC.Addr,
-				version.GetString(),
-				logger,
-			); err != nil {
-				logger.Fatal().Err(err).Msg("failed to register the grpc endpoint")
+			grpcSvc := registry.BuildGRPCService(cfg.GRPC.Namespace+"."+cfg.Service.Name, uuid.Must(uuid.NewV4()).String(), cfg.GRPC.Addr, version.GetString())
+			if err := registry.RegisterService(ctx, grpcSvc, logger); err != nil {
+				logger.Fatal().Err(err).Msg("failed to register the grpc service")
 			}
 
 			{
@@ -96,12 +94,12 @@ func Server(cfg *config.Config) *cli.Command {
 					logger.Fatal().Err(err).Msg("can't connect to nats")
 				}
 
-				gw, err := pool.GetGatewayServiceClient(cfg.Reva.Address)
+				selector, err := pool.GatewaySelector(cfg.Reva.Address, pool.WithRegistry(registry.GetRegistry()))
 				if err != nil {
 					return err
 				}
 
-				eventSVC, err := event.NewService(gw, stream, logger, *cfg)
+				eventSVC, err := event.NewService(selector, stream, logger, *cfg)
 				if err != nil {
 					logger.Fatal().Err(err).Msg("can't create event service")
 				}

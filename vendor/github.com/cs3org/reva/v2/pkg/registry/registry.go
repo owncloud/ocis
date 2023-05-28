@@ -1,4 +1,4 @@
-// Copyright 2018-2021 CERN
+// Copyright 2018-2023 CERN
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,32 +18,38 @@
 
 package registry
 
-// Registry provides with means for dynamically registering services.
-type Registry interface {
-	// Add registers a Service on the memoryRegistry. Repeated names is allowed, services are distinguished by their metadata.
-	Add(Service) error
+import (
+	mRegistry "go-micro.dev/v4/registry"
+	"go-micro.dev/v4/selector"
+)
 
-	// GetService retrieves a Service and all of its nodes by Service name. It returns []*Service because we can have
-	// multiple versions of the same Service running alongside each others.
-	GetService(string) (Service, error)
+var (
+	// fixme: get rid of global registry
+	gRegistry mRegistry.Registry
+)
+
+// Init prepares the service registry
+func Init(nRegistry mRegistry.Registry) error {
+	// first come first serves, the first service defines the registry type.
+	if gRegistry == nil && nRegistry != nil {
+		gRegistry = nRegistry
+	}
+
+	return nil
 }
 
-// Service defines a service.
-type Service interface {
-	Name() string
-	Nodes() []Node
+// GetRegistry exposes the registry
+func GetRegistry() mRegistry.Registry {
+	return gRegistry
 }
 
-// Node defines nodes on a service.
-type Node interface {
-	// Address where the given node is running.
-	Address() string
+// GetNodeAddress returns a random address from the service nodes
+func GetNodeAddress(services []*mRegistry.Service) (string, error) {
+	next := selector.Random(services)
+	node, err := next()
+	if err != nil {
+		return "", err
+	}
 
-	// metadata is used in order to differentiate services implementations. For instance an AuthProvider Service could
-	// have multiple implementations, basic, bearer ..., metadata would be used to select the Service type depending on
-	// its implementation.
-	Metadata() map[string]string
-
-	// ID returns the node ID.
-	ID() string
+	return node.Address, nil
 }

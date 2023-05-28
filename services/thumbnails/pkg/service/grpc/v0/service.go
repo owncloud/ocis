@@ -12,6 +12,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/golang-jwt/jwt/v4"
@@ -45,7 +46,7 @@ func NewService(opts ...Option) decorators.DecoratedService {
 		webdavSource: options.ImageSource,
 		cs3Source:    options.CS3Source,
 		logger:       logger,
-		cs3Client:    options.CS3Client,
+		selector:     options.GatewaySelector,
 		preprocessorOpts: PreprocessorOpts{
 			TxtFontFileMap: options.Config.Thumbnail.FontMapFile,
 		},
@@ -65,7 +66,7 @@ type Thumbnail struct {
 	webdavSource     imgsource.Source
 	cs3Source        imgsource.Source
 	logger           log.Logger
-	cs3Client        gateway.GatewayAPIClient
+	selector         pool.Selectable[gateway.GatewayAPIClient]
 	preprocessorOpts PreprocessorOpts
 }
 
@@ -161,21 +162,24 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 	}
 
 	var auth, statPath string
-
 	if src.IsPublicLink {
 		q := imgURL.Query()
 		var rsp *gateway.AuthenticateResponse
+		client, err := g.selector.Next()
+		if err != nil {
+			return "", merrors.InternalServerError(g.serviceID, "could not select next gateway client: %s", err.Error())
+		}
 		if q.Get("signature") != "" && q.Get("expiration") != "" {
 			// Handle pre-signed public links
 			sig := q.Get("signature")
 			exp := q.Get("expiration")
-			rsp, err = g.cs3Client.Authenticate(ctx, &gateway.AuthenticateRequest{
+			rsp, err = client.Authenticate(ctx, &gateway.AuthenticateRequest{
 				Type:         "publicshares",
 				ClientId:     src.PublicLinkToken,
 				ClientSecret: strings.Join([]string{"signature", sig, exp}, "|"),
 			})
 		} else {
-			rsp, err = g.cs3Client.Authenticate(ctx, &gateway.AuthenticateRequest{
+			rsp, err = client.Authenticate(ctx, &gateway.AuthenticateRequest{
 				Type:     "publicshares",
 				ClientId: src.PublicLinkToken,
 				// We pass an empty password because we expect non pre-signed public links
@@ -248,8 +252,12 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 		}
 	}
 
+	client, err := g.selector.Next()
+	if err != nil {
+		return nil, merrors.InternalServerError(g.serviceID, "could not select next gateway client: %s", err.Error())
+	}
 	req := &provider.StatRequest{Ref: &ref}
-	rsp, err := g.cs3Client.Stat(ctx, req)
+	rsp, err := client.Stat(ctx, req)
 	if err != nil {
 		g.logger.Error().Err(err).Str("path", path).Msg("could not stat file")
 		return nil, merrors.InternalServerError(g.serviceID, "could not stat file: %s", err.Error())

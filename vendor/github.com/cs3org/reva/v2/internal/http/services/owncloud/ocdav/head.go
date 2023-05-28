@@ -48,7 +48,7 @@ func (s *svc) handlePathHead(w http.ResponseWriter, r *http.Request, ns string) 
 
 	sublog := appctx.GetLogger(ctx).With().Str("path", fn).Logger()
 
-	space, status, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gwClient, fn)
+	space, status, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gatewaySelector, fn)
 	if err != nil {
 		sublog.Error().Err(err).Str("path", fn).Msg("failed to look up storage space")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -63,9 +63,14 @@ func (s *svc) handlePathHead(w http.ResponseWriter, r *http.Request, ns string) 
 }
 
 func (s *svc) handleHead(ctx context.Context, w http.ResponseWriter, r *http.Request, ref *provider.Reference, log zerolog.Logger) {
-
+	client, err := s.gatewaySelector.Next()
+	if err != nil {
+		log.Error().Err(err).Msg("error selecting next client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	req := &provider.StatRequest{Ref: ref}
-	res, err := s.gwClient.Stat(ctx, req)
+	res, err := client.Stat(ctx, req)
 	if err != nil {
 		log.Error().Err(err).Msg("error sending grpc stat request")
 		w.WriteHeader(http.StatusInternalServerError)

@@ -17,6 +17,7 @@ import (
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -114,7 +115,7 @@ func Server(opts ...Option) (http.Service, error) {
 	// how do we secure the api?
 	var requireAdminMiddleware func(stdhttp.Handler) stdhttp.Handler
 	var roleService svc.RoleService
-	var gatewayClient gateway.GatewayAPIClient
+	var gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(options.Config.GRPCClientTLS), grpc.WithTraceProvider(tracing.TraceProvider))...)
 	if err != nil {
 		return http.Service{}, err
@@ -126,9 +127,9 @@ func Server(opts ...Option) (http.Service, error) {
 				account.JWTSecret(options.Config.TokenManager.JWTSecret),
 			))
 		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
-		gatewayClient, err = pool.GetGatewayServiceClient(options.Config.Reva.Address, options.Config.Reva.GetRevaOptions()...)
+		gatewaySelector, err = pool.GatewaySelector(options.Config.Reva.Address, append(options.Config.Reva.GetRevaOptions(), pool.WithRegistry(registry.GetRegistry()))...)
 		if err != nil {
-			return http.Service{}, errors.Wrap(err, "could not initialize gateway client")
+			return http.Service{}, errors.Wrap(err, "could not initialize gateway selector")
 		}
 	} else {
 		middlewares = append(middlewares, graphMiddleware.Token(options.Config.HTTP.APIToken))
@@ -159,7 +160,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.EventsPublisher(publisher),
 		svc.WithRoleService(roleService),
 		svc.WithRequireAdminMiddleware(requireAdminMiddleware),
-		svc.WithGatewayClient(gatewayClient),
+		svc.WithGatewaySelector(gatewaySelector),
 		svc.WithSearchService(searchsvc.NewSearchProviderService("com.owncloud.api.search", grpcClient)),
 		svc.KeycloakClient(keyCloakClient),
 		svc.EventHistoryClient(hClient),
