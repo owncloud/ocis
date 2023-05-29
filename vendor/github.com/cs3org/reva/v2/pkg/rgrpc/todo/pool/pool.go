@@ -363,7 +363,7 @@ func GetDataTxClient(endpoint string, opts ...Option) (datatx.TxAPIClient, error
 }
 
 func getClient[T any](endpoint string, p *provider, cf func(cc *grpc.ClientConn) T, opts ...Option) (T, error) {
-	services, _ := registry.GetServiceByAddress(endpoint)
+	services, _ := registry.DiscoverServicesByAddress(endpoint)
 	address, err := registry.GetNodeAddress(services)
 	if err == nil && endpoint != "" {
 		endpoint = address

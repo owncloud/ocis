@@ -54,12 +54,8 @@ func RunWithOptions(mainConf map[string]interface{}, pidFile string, opts ...Opt
 	parseSharedConfOrDie(mainConf["shared"])
 	coreConf := parseCoreConfOrDie(mainConf["core"])
 
-	if confMap, ok := mainConf["registry"].(map[string]interface{}); ok {
-		registryConfiguration, _ := registry.ConfigurationFromMap(confMap)
-
-		if err := registry.Init(registryConfiguration, options.Registry); err != nil {
-			panic(err)
-		}
+	if err := registry.Init(options.Registry); err != nil {
+		panic(err)
 	}
 
 	run(mainConf, coreConf, options.Logger, pidFile)

@@ -6,11 +6,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gofrs/uuid"
-	oRegistry "github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
-	mRegistry "go-micro.dev/v4/registry"
 )
 
 // FrontendConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
@@ -74,16 +71,6 @@ func FrontendConfigFromStruct(cfg *config.Config) (map[string]interface{}, error
 	}
 
 	return map[string]interface{}{
-		"registry": map[string]interface{}{
-			"services": []*mRegistry.Service{
-				oRegistry.BuildHTTPService(
-					cfg.HTTP.Namespace+"."+cfg.Service.Name,
-					uuid.Must(uuid.NewV4()).String(),
-					cfg.HTTP.Addr,
-					version.GetString(),
-				),
-			},
-		},
 		"core": map[string]interface{}{
 			"tracing_enabled":      cfg.Tracing.Enabled,
 			"tracing_exporter":     cfg.Tracing.Type,

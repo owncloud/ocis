@@ -19,7 +19,6 @@
 package runtime
 
 import (
-	"github.com/go-micro/plugins/v4/registry/memory"
 	"github.com/rs/zerolog"
 	"go-micro.dev/v4/registry"
 )
@@ -35,9 +34,7 @@ type Options struct {
 
 // newOptions initializes the available default options.
 func newOptions(opts ...Option) Options {
-	opt := Options{
-		Registry: memory.NewRegistry(),
-	}
+	opt := Options{}
 
 	for _, o := range opts {
 		o(&opt)

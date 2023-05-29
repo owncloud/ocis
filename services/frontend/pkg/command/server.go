@@ -3,7 +3,6 @@ package command
 import (
 	"context"
 	"fmt"
-	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"os"
 	"path"
 
@@ -11,7 +10,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/external"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
@@ -86,15 +85,9 @@ func Server(cfg *config.Config) *cli.Command {
 				sync.Trap(&gr, cancel)
 			}
 
-			if err := external.RegisterHTTPEndpoint(
-				ctx,
-				cfg.HTTP.Namespace+"."+cfg.Service.Name,
-				uuid.Must(uuid.NewV4()).String(),
-				cfg.HTTP.Addr,
-				version.GetString(),
-				logger,
-			); err != nil {
-				logger.Fatal().Err(err).Msg("failed to register the http endpoint")
+			httpSvc := registry.BuildHTTPService(cfg.HTTP.Namespace+"."+cfg.Service.Name, uuid.Must(uuid.NewV4()).String(), cfg.HTTP.Addr, version.GetString())
+			if err := registry.RegisterService(ctx, httpSvc, logger); err != nil {
+				logger.Fatal().Err(err).Msg("failed to register the http service")
 			}
 
 			return gr.Run()
