@@ -122,7 +122,7 @@ Feature: user GDPR (General Data Protection Regulation) report
       }
     }
     """
-    And the downloaded JSON content should contain event type "events.SpaceCreated" in item 'events' and should match
+    And the downloaded JSON content should contain event type "events.SpaceCreated" for "personal" space and should match
     """
     {
       "type": "object",
@@ -949,6 +949,65 @@ Feature: user GDPR (General Data Protection Regulation) report
                     "enum": [1]
                   }
               }
+            }
+          }
+        }
+      }
+    }
+    """
+
+
+  Scenario: generate a GDPR report and check events when a space is created
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "GDPR Space" with the default quota using the GraphApi
+    When user "Alice" exports her GDPR report to "/.personal_data_export.json" using the Graph API
+    And user "Alice" downloads the content of GDPR report ".personal_data_export.json"
+    Then the HTTP status code of responses on each endpoint should be "201, 200" respectively
+    And the downloaded JSON content should contain event type "events.SpaceCreated" for "project" space and should match
+    """
+    {
+      "type": "object",
+      "required": [
+        "event"
+      ],
+      "properties": {
+        "event" : {
+          "type": "object",
+          "required": [
+            "Executant",
+            "Name",
+            "Type"
+          ],
+          "properties": {
+            "Executant": {
+              "type": "object",
+              "required": [
+                "idp",
+                "opaque_id",
+                "type"
+              ],
+              "properties": {
+                "idp": {
+                  "type": "string",
+                  "pattern": "^%base_url%$"
+                },
+                "opaque_id": {
+                  "type": "string",
+                  "pattern": "^%user_id_pattern%$"
+                },
+                "type": {
+                  "type": "number",
+                  "enum": [1]
+                }
+              }
+            },
+            "Name": {
+              "type": "string",
+              "enum": ["GDPR Space"]
+            },
+            "Type": {
+              "type": "string",
+              "enum": ["project"]
             }
           }
         }
