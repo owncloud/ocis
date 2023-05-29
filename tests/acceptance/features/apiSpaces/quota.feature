@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: State of the quota
   As a user
   I want to be able to see the state of the quota
@@ -122,3 +122,14 @@ Feature: State of the quota
       | /filesForUpload/lorem-big.txt | /ocs/v1.php/cloud/users/%username% | 100      | 91.17          |
       | /filesForUpload/lorem.txt     | /ocs/v2.php/cloud/users/%username% | 200      | 6.99           |
       | /filesForUpload/lorem-big.txt | /ocs/v2.php/cloud/users/%username% | 200      | 91.17          |
+
+
+    Scenario Outline: upload a file by setting OCIS spaces max quota
+      Given spaces max quota has been set to "10" bytes with "OCIS_SPACES_MAX_QUOTA"
+      When user "Alice" uploads file with content "<file_content>" to "lorem.txt" using the WebDAV API
+      Then the HTTP status code should be "<http_status_code>"
+      Examples:
+        | file_content               | http_status_code |
+        | 7 bytes                    | 201              |
+        | 10   bytes                 | 201              |
+        | more than 10 bytes content | 507              |

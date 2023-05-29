@@ -21,6 +21,7 @@
  */
 
 use Behat\Behat\Context\Context;
+use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\OcisConfigHelper;
 use PHPUnit\Framework\Assert;
 
@@ -41,6 +42,28 @@ class OcisConfigContext implements Context {
 			"STORAGE_USERS_OCIS_ASYNC_UPLOADS" => true,
 			"OCIS_EVENTS_ENABLE_TLS" => false,
 			"POSTPROCESSING_DELAY" => $delayTime . "s",
+		];
+
+		$response =  OcisConfigHelper::reConfigureOcis($envs);
+		Assert::assertEquals(
+			200,
+			$response->getStatusCode(),
+			"Failed to set async upload with delayed post processing"
+		);
+	}
+
+	/**
+	 * @Given spaces max quota has been set to :spacesQuotaSize bytes with :envToSetMaxSpacesQuotaSize
+	 *
+	 * @param string $spacesQuotaSize
+	 * @param string $envToSetMaxSpacesQuotaSize
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function spacesMaxQuotaSizeHasBeenSetToWithEnv(string $spacesQuotaSize, string $envToSetMaxSpacesQuotaSize): void {
+		$envs = [
+			$envToSetMaxSpacesQuotaSize => $spacesQuotaSize,
 		];
 
 		$response =  OcisConfigHelper::reConfigureOcis($envs);
