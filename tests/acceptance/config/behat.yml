@@ -54,6 +54,7 @@ default:
         - TUSContext:
         - SpacesTUSContext:
         - GraphContext:
+        - OcisConfigContext:
 
     apiSpacesShares:
       paths:
