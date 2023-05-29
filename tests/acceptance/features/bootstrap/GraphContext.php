@@ -2340,19 +2340,28 @@ class GraphContext implements Context {
 
 	/**
 	 * @Then the downloaded JSON content should contain event type :eventType in item 'events' and should match
+	 * @Then the downloaded JSON content should contain event type :eventType for :spaceType space and should match
 	 *
 	 * @param string $eventType
-	 * @param PyStringNode $schemaString
+	 * @param string|null $spaceType
+	 * @param PyStringNode|null $schemaString
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 *
 	 */
-	public function downloadedJsonContentShouldContainEventTypeInItemAndShouldMatch(string $eventType, PyStringNode $schemaString): void {
+	public function downloadedJsonContentShouldContainEventTypeInItemAndShouldMatch(string $eventType, ?string $spaceType=null, PyStringNode $schemaString=null): void {
 		$actualResponseToAssert = null;
 		$events = $this->featureContext->getJsonDecodedResponseBodyContent()->events;
 		foreach ($events as $event) {
 			if ($event->type === $eventType) {
+				if ($spaceType !== null) {
+					if ($event->event->Type === $spaceType) {
+						$actualResponseToAssert = $event;
+						break;
+					}
+					continue;
+				}
 				$actualResponseToAssert = $event;
 				break;
 			}
