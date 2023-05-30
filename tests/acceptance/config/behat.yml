@@ -138,6 +138,7 @@ default:
         - WebDavPropertiesContext:
         - TUSContext:
         - SpacesTUSContext:
+        - OcisConfigContext:
 
     apiCors:
       paths:
