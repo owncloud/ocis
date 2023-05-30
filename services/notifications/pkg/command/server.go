@@ -122,7 +122,7 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			gwclient, err := pool.GetGatewayServiceClient(
+			gatewaySelector, err := pool.GatewaySelector(
 				cfg.Notifications.RevaGateway,
 				pool.WithTLSCACert(cfg.Notifications.GRPCClientTLS.CACert),
 				pool.WithTLSMode(tm),
@@ -131,7 +131,7 @@ func Server(cfg *config.Config) *cli.Command {
 				logger.Fatal().Err(err).Str("addr", cfg.Notifications.RevaGateway).Msg("could not get reva client")
 			}
 			valueService := settingssvc.NewValueService("com.owncloud.api.settings", grpc.DefaultClient())
-			svc := service.NewEventsNotifier(evts, channel, logger, gwclient, valueService, cfg.Notifications.MachineAuthAPIKey, cfg.Notifications.EmailTemplatePath, cfg.WebUIURL)
+			svc := service.NewEventsNotifier(evts, channel, logger, gatewaySelector, valueService, cfg.Notifications.MachineAuthAPIKey, cfg.Notifications.EmailTemplatePath, cfg.WebUIURL)
 
 			gr.Add(svc.Run, func(error) {
 				cancel()

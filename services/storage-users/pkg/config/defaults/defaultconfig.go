@@ -58,7 +58,7 @@ func DefaultConfig() *config.Config {
 				DBHost:                "",
 				DBPort:                3306,
 				DBName:                "owncloud",
-				UsersProviderEndpoint: "localhost:9144",
+				UsersProviderEndpoint: "com.owncloud.api.users",
 			},
 			S3NG: config.S3NGDriver{
 				MetadataBackend:            "messagepack",

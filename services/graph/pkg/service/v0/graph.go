@@ -10,6 +10,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-chi/chi/v5"
 	"github.com/jellydator/ttlcache/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -62,7 +63,7 @@ type Graph struct {
 	logger                   *log.Logger
 	identityBackend          identity.Backend
 	identityEducationBackend identity.EducationBackend
-	gatewayClient            gateway.GatewayAPIClient
+	gatewaySelector          pool.Selectable[gateway.GatewayAPIClient]
 	roleService              RoleService
 	permissionsService       Permissions
 	specialDriveItemsCache   *ttlcache.Cache[string, interface{}]
@@ -88,7 +89,8 @@ func (g Graph) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // GetGatewayClient returns a gateway client to talk to reva
 func (g Graph) GetGatewayClient() gateway.GatewayAPIClient {
-	return g.gatewayClient
+	gatewayClient, _ := g.gatewaySelector.Next()
+	return gatewayClient
 }
 
 func (g Graph) publishEvent(ev interface{}) {

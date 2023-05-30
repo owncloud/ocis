@@ -52,16 +52,19 @@ func DefaultConfig() *config.Config {
 
 		FrontendPublicURL: "https://localhost:9200",
 
-		AppRegistryEndpoint:       "127.0.0.1:9242",
-		AuthBasicEndpoint:         "127.0.0.1:9146",
-		AuthMachineEndpoint:       "127.0.0.1:9166",
-		GroupsEndpoint:            "127.0.0.1:9160",
+		AppRegistryEndpoint:       "com.owncloud.api.app-registry", // 127.0.0.1:9242
+		AuthBasicEndpoint:         "com.owncloud.api.auth-basic",   // 127.0.0.1:9146
+		AuthMachineEndpoint:       "com.owncloud.api.auth-machine", // 127.0.0.1:9166
+		GroupsEndpoint:            "com.owncloud.api.groups",       // 127.0.0.1:9160
 		PermissionsEndpoint:       "127.0.0.1:9191",
-		SharingEndpoint:           "127.0.0.1:9150",
-		StoragePublicLinkEndpoint: "127.0.0.1:9178",
-		StorageSharesEndpoint:     "127.0.0.1:9154",
-		StorageUsersEndpoint:      "127.0.0.1:9157",
-		UsersEndpoint:             "127.0.0.1:9144",
+		SharingEndpoint:           "com.owncloud.api.sharing",            // 127.0.0.1:9150
+		StoragePublicLinkEndpoint: "com.owncloud.api.storage-publiclink", // 127.0.0.1:9178
+		StorageSharesEndpoint:     "com.owncloud.api.storage-shares",     // 127.0.0.1:9154
+		StorageUsersEndpoint:      "com.owncloud.api.storage-users",      // 127.0.0.1:9157
+		UsersEndpoint:             "com.owncloud.api.users",              // 127.0.0.1:9144
+
+		//		PermissionsEndpoint:       "com.owncloud.settings",               // 127.0.0.1:9191
+		//
 
 		StorageRegistry: config.StorageRegistry{
 			Driver: "spaces",

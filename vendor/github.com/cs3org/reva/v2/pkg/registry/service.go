@@ -21,16 +21,30 @@ package registry
 import (
 	mRegistry "go-micro.dev/v4/registry"
 	"go-micro.dev/v4/selector"
+	"strings"
 )
 
-// DiscoverServicesByAddress searches all available services for nodes that match the given address
-func DiscoverServicesByAddress(address string) ([]*mRegistry.Service, error) {
+// DiscoverServices looks in the registry whether he can find the services using the id
+func DiscoverServices(id string) ([]*mRegistry.Service, error) {
 	var services []*mRegistry.Service
 
 	// registry not set, return an empty service map and re-try next time.
 	if gRegistry == nil {
 		return services, nil
 	}
+
+	isAddress := len(strings.Split(id, ":")) > 1
+
+	if isAddress {
+		return discoverServicesByAddress(id)
+	}
+
+	return gRegistry.GetService(id)
+}
+
+// discoverServicesByAddress searches all available services for nodes that match the given address
+func discoverServicesByAddress(address string) ([]*mRegistry.Service, error) {
+	var services []*mRegistry.Service
 
 	availableServices, err := gRegistry.ListServices()
 	if err != nil {

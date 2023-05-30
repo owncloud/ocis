@@ -276,7 +276,9 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		logger.Fatal().Err(err).Msg("Failed to get gateway client")
 	}
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
-	revaClient, err := pool.GetGatewayServiceClient(cfg.Reva.Address, cfg.Reva.GetRevaOptions()...)
+	gatewaySelector, _ := pool.GatewaySelector(cfg.Reva.Address, cfg.Reva.GetRevaOptions()...)
+	gatewayClient, err := gatewaySelector.Next()
+
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to get gateway client")
 	}
@@ -294,7 +296,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 
 		userProvider = backend.NewCS3UserBackend(
 			backend.WithLogger(logger),
-			backend.WithRevaAuthenticator(revaClient),
+			backend.WithRevaAuthenticator(gatewayClient),
 			backend.WithMachineAuthAPIKey(cfg.MachineAuthAPIKey),
 			backend.WithOIDCissuer(cfg.OIDC.Issuer),
 			backend.WithAutoProvisonCreator(autoProvsionCreator),

@@ -1041,8 +1041,8 @@ func (g Graph) DeleteDrive(w http.ResponseWriter, r *http.Request) {
 			},
 		}
 	}
-
-	dRes, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+	gatewayClient, _ := g.gatewaySelector.Next()
+	dRes, err := gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 		Opaque: opaque,
 		Id: &storageprovider.StorageSpaceId{
 			OpaqueId: storagespace.FormatResourceID(rid),

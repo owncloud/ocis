@@ -114,7 +114,7 @@ func Server(opts ...Option) (http.Service, error) {
 	// how do we secure the api?
 	var requireAdminMiddleware func(stdhttp.Handler) stdhttp.Handler
 	var roleService svc.RoleService
-	var gatewayClient gateway.GatewayAPIClient
+	var gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(options.Config.GRPCClientTLS), grpc.WithTraceProvider(tracing.TraceProvider))...)
 	if err != nil {
 		return http.Service{}, err
@@ -126,7 +126,7 @@ func Server(opts ...Option) (http.Service, error) {
 				account.JWTSecret(options.Config.TokenManager.JWTSecret),
 			))
 		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
-		gatewayClient, err = pool.GetGatewayServiceClient(options.Config.Reva.Address, options.Config.Reva.GetRevaOptions()...)
+		gatewaySelector, _ = pool.GatewaySelector(options.Config.Reva.Address, options.Config.Reva.GetRevaOptions()...)
 		if err != nil {
 			return http.Service{}, errors.Wrap(err, "could not initialize gateway client")
 		}
@@ -159,7 +159,7 @@ func Server(opts ...Option) (http.Service, error) {
 		svc.EventsPublisher(publisher),
 		svc.WithRoleService(roleService),
 		svc.WithRequireAdminMiddleware(requireAdminMiddleware),
-		svc.WithGatewayClient(gatewayClient),
+		svc.WithGatewaySelector(gatewaySelector),
 		svc.WithSearchService(searchsvc.NewSearchProviderService("com.owncloud.api.search", grpcClient)),
 		svc.KeycloakClient(keyCloakClient),
 		svc.EventHistoryClient(hClient),
