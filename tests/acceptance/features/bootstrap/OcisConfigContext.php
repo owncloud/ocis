@@ -53,24 +53,24 @@ class OcisConfigContext implements Context {
 	}
 
 	/**
-	 * @Given spaces max quota has been set to :spacesQuotaSize bytes with :envToSetMaxSpacesQuotaSize
+	 * @Given :env has been enabled and set to :envValue
 	 *
-	 * @param string $spacesQuotaSize
-	 * @param string $envToSetMaxSpacesQuotaSize
+	 * @param string $env
+	 * @param string $envValue
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function spacesMaxQuotaSizeHasBeenSetToWithEnv(string $spacesQuotaSize, string $envToSetMaxSpacesQuotaSize): void {
+	public function envHasBeenEnabledAndSetTo(string $env, string $envValue): void {
 		$envs = [
-			$envToSetMaxSpacesQuotaSize => $spacesQuotaSize,
+			$env => $envValue,
 		];
 
 		$response =  OcisConfigHelper::reConfigureOcis($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to set async upload with delayed post processing"
+			"Failed to set OCIS_CORS_ALLOW_ORIGINS=" . $envValue
 		);
 	}
 
