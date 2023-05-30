@@ -124,6 +124,7 @@ Feature: State of the quota
       | /filesForUpload/lorem-big.txt | /ocs/v2.php/cloud/users/%username% | 200      | 91.17          |
 
 
+    @env-config
     Scenario Outline: upload a file by setting OCIS spaces max quota
       Given spaces max quota has been set to "10" bytes with "OCIS_SPACES_MAX_QUOTA"
       When user "Alice" uploads file with content "<file_content>" to "lorem.txt" using the WebDAV API
