@@ -313,7 +313,7 @@ While writing tests for a new oCIS ENV configuration, please make sure to follow
 2. Use `OcisConfigHelper.php` for helper functions - provides functions to reconfigure the running oCIS instance.
 3. Recommended: add the new step implementations in `OcisConfigContext.php`
 
-## Running Test Suite With Email Service (@Email)
+## Running Test Suite With Email Service (@email)
 
 Test suites that are tagged with `@email` require an email service. We use inbucket as the email service in our tests.
 
@@ -405,4 +405,81 @@ In order to run a single test, use the `BEHAT_FEATURE` environment variable.
 make test-paralleldeployment-api \
 ... \
 BEHAT_FEATURE="tests/parallelDeployAcceptance/features/apiShareManagement/acceptShares.feature"
+```
+
+## Running Test Suite With Antivirus Service (@antivirus)
+Test suites that are tagged with `@antivirus` require antivirus service. The available antivirus and the configuration related to them can be found [here](https://doc.owncloud.com/ocis/next/deployment/services/s-list/antivirus.html). This documentation is only going to use `clamAv` as antivirus.
+
+### Setup clamAV
+#### 1. Setup Locally
+Run the following command to set up calmAV and clamAV daemon
+```bash
+sudo apt install clamav clamav-daemon -y
+```
+
+Make sure that the  clamAV daemon is up and running
+
+```bash
+sudo service clamav-daemon status
+```
+{{< hint info >}}
+The commands are ubuntu specific and may differ according to your system. You can find information related to installation of clamAV in their official documentation [here](https://docs.clamav.net/manual/Installing/Packages.html).
+{{< /hint>}}
+
+#### 2. Setup clamAV With Docker
+##### a. Create a Volume
+For `clamAV` only local sockets can currently be configured we need to create a volume in order to share the socket with `oCIS server`. Run the following command to do so:
+```bash
+ docker volume create -d local -o device=/your/local/filesystem/path/ -o o=bind -o type=none clamav_vol
+```
+##### b. Run the Container
+Run `clamAV` through docker and bind the path to the socket of clamAV from the image to the pre-created volume
+```bash
+docker run -v clamav_vol:/var/run/clamav/ owncloudci/clamavd
+```
+{{< hint info >}}
+The path to the socket i.e. `/var/run/clamav/` may differ as per the image you are using. Make sure that you're providing the correct path to the socket if you're using image other than `owncloudci/clamavd`.
+{{< /hint>}}
+
+##### b. Change Ownership
+Change the ownership of the path of your local filesystem that the volume `clamav_vol` is mounted on. After running `clamav` through docker the ownership of the bound path gets changed. As we need to provide this path to ocis server the ownership should be changed back to $USER or whatever ownership that your server requires.
+```bash
+ sudo chown -R $USER:$USER /your/local/filesystem/path/
+```
+{{< hint info >}}
+Make sure that `clamAV` is fully up before running this command. The command is ubuntu specific and may differ according to your system.
+{{< /hint>}}
+
+{{< hint info >}}
+If you want to use the same volume after the container is down. Before running the container once again you need to either remove all the data inside `/your/local/filesystem/path/` or give the ownership back. For instance, it ubuntu it might be `sudo chown -R systemd-network:systemd-journal /your/local/filesystem/path/`  and repeat step 2 and 3`
+{{< /hint>}}
+
+### Run oCIS
+
+As `antivirus` service is not enabled by default we need to enable the service while running oCIS server. We also need to enable `async upload` and as virus scan is performed in post-processing step, we need to set it as well. Documentation for environment variables related to antivirus is available [here](https://owncloud.dev/services/antivirus/#environment-variables)
+
+```bash
+# run oCIS
+PROXY_ENABLE_BASIC_AUTH=true \
+ANTIVIRUS_SCANNER_TYPE="clamav" \
+ANTIVIRUS_CLAMAV_SOCKET="/var/run/clamav/clamd.ctl" \
+POSTPROCESSING_STEPS="virusscan" \
+OCIS_ASYNC_UPLOADS=true \
+OCIS_ADD_RUN_SERVICES="antivirus"
+ocis/bin/ocis server
+```
+{{< hint info >}}
+The value for `ANTIVIRUS_CLAMAV_SOCKET` is an example which needs adaption according your OS. If you are running `clamAv` with docker as per this documentation check the path that you mounted the volume i.e. `/your/local/filesystem/path/` to make sure the socket exists and give the full path to socket i.e. `/your/local/filesystem/path/clamd.sock` to `ANTIVIRUS_CLAMAV_SOCKET`.
+{{< /hint>}}
+
+#### Run the Acceptance Test
+
+Run the acceptance test with the following command:
+
+```bash
+TEST_WITH_GRAPH_API=true \
+TEST_OCIS=true \
+TEST_SERVER_URL="https://localhost:9200" \
+BEHAT_FEATURE="tests/acceptance/features/apiAntivirus/antivirus.feature" \
+make test-acceptance-api
 ```

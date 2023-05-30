@@ -13,6 +13,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use TestHelpers\EmailHelper;
 use PHPUnit\Framework\Assert;
 use TestHelpers\GraphHelper;
+use Behat\Gherkin\Node\TableNode;
 
 require_once 'bootstrap.php';
 
@@ -80,7 +81,7 @@ class NotificationContext implements Context {
 	}
 
 	/**
-	 * @Then /^user "([^"]*)" lists all notifications$/
+	 * @When /^user "([^"]*)" lists all notifications$/
 	 *
 	 * @param string $user
 	 *
@@ -127,20 +128,7 @@ class NotificationContext implements Context {
 		string $subject,
 		PyStringNode $schemaString
 	): void {
-		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data)) {
-			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data;
-			foreach ($responseBody as $value) {
-				if (isset($value->subject) && $value->subject === $subject) {
-					$responseBody = $value;
-					// set notificationId
-					$this->notificationIds[] = $value->notification_id;
-					break;
-				}
-			}
-		} else {
-			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent();
-		}
-
+		$responseBody = $this->filterResponseAccordingToNotificationSubject($subject);
 		// substitute the value here
 		$schemaString = $schemaString->getRaw();
 		$schemaString = $this->featureContext->substituteInLineCodes(
@@ -154,6 +142,50 @@ class NotificationContext implements Context {
 		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->featureContext->getJSONSchema($schemaString)
+		);
+	}
+
+	/**
+	 * @param string $subject
+	 *
+	 * @return object
+	 */
+	public function filterResponseAccordingToNotificationSubject(string $subject): object {
+		$responseBody =  null;
+		if (isset($this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data)) {
+			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data;
+			foreach ($responseBody as $value) {
+				if (isset($value->subject) && $value->subject === $subject) {
+					$responseBody = $value;
+					// set notificationId
+					$this->notificationIds[] = $value->notification_id;
+					break;
+				}
+			}
+		} else {
+			$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent();
+		}
+		return $responseBody;
+	}
+
+	/**
+	 * @Then user :user should get a notification with subject :subject and message:
+	 *
+	 * @param string $user
+	 * @param string $subject
+	 * @param TableNode $table
+	 *
+	 * @return void
+	 */
+	public function userShouldGetANotificationWithMessage(string $user, string $subject, TableNode $table):void {
+		$this->userListAllNotifications($user);
+		$this->featureContext->theHTTPStatusCodeShouldBe(200);
+		$actualMessage = $this->filterResponseAccordingToNotificationSubject($subject)->message;
+		$expectedMessage = $table->getColumnsHash()[0]['message'];
+		Assert::assertSame(
+			$expectedMessage,
+			$actualMessage,
+			__METHOD__ . "expected message to be '$expectedMessage' but found'$actualMessage'"
 		);
 	}
 

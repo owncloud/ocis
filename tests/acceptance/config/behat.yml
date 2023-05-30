@@ -187,6 +187,24 @@ default:
         - FilesVersionsContext:
         - SettingsContext:
 
+    apiAntivirus:
+      paths:
+        - '%paths.base%/../features/apiAntivirus'
+      context: *common_ldap_suite_context
+      contexts:
+        - NotificationContext:
+        - SpacesContext:
+        - FeatureContext: *common_feature_context_params
+        - WebDavPropertiesContext:
+        - OCSContext:
+        - GraphContext:
+        - TrashbinContext:
+        - FavoritesContext:
+        - ChecksumContext:
+        - FilesVersionsContext:
+        - SettingsContext:
+        - OcisConfigContext:
+
   extensions:
     rdx\behatvars\BehatVariablesExtension: ~
 

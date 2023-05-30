@@ -9,6 +9,7 @@ INBUCKET_INBUCKET = "inbucket/inbucket"
 MINIO_MC = "minio/mc:RELEASE.2021-10-07T04-19-58Z"
 OC_CI_ALPINE = "owncloudci/alpine:latest"
 OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier:latest"
+OC_CI_CLAMAVD = "owncloudci/clamavd"
 OC_CI_DRONE_ANSIBLE = "owncloudci/drone-ansible:latest"
 OC_CI_DRONE_CANCEL_PREVIOUS_BUILDS = "owncloudci/drone-cancel-previous-builds"
 OC_CI_DRONE_SKIP_PIPELINE = "owncloudci/drone-skip-pipeline"
@@ -134,6 +135,21 @@ config = {
                 "NOTIFICATIONS_SMTP_INSECURE": "true",
             },
         },
+        "apiAntivirus": {
+            "suites": [
+                "apiAntivirus",
+            ],
+            "skip": False,
+            "earlyFail": True,
+            "antivirusNeeded": True,
+            "extraServerEnvironment": {
+                "ANTIVIRUS_SCANNER_TYPE": "clamav",
+                "ANTIVIRUS_CLAMAV_SOCKET": "/var/run/clamav/clamd.sock",
+                "POSTPROCESSING_STEPS": "virusscan",
+                "OCIS_ASYNC_UPLOADS": True,
+                "OCIS_ADD_RUN_SERVICES": "antivirus",
+            },
+        },
     },
     "apiTests": {
         "numberOfParts": 10,
@@ -179,6 +195,22 @@ pipelineVolumeGo = \
     {
         "name": "gopath",
         "temp": {},
+    }
+
+# volume for pipeline to share clamav socket between steps of a pipeline
+# to be used in combination with stepVolumeClamav
+pipelineVolumeClamav = \
+    {
+        "name": "sockets",
+        "temp": {},
+    }
+
+# volume for steps to share clamav socket between steps of a pipeline
+# socket path must be set to /var/run/clamav/ inside the image, which is the case
+stepVolumeClamav = \
+    {
+        "name": "sockets",
+        "path": "/var/run/clamav/",
     }
 
 # minio mc environment variables
@@ -761,6 +793,7 @@ def localApiTestPipeline(ctx):
         "storages": ["ocis"],
         "accounts_hash_difficulty": 4,
         "emailNeeded": False,
+        "antivirusNeeded": False,
     }
 
     if "localApiTests" in config:
@@ -782,7 +815,9 @@ def localApiTestPipeline(ctx):
                             },
                             "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                                      restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True) +
+                                     (clamavService() if params["antivirusNeeded"] else []) +
+                                     (waitForClamavService() if params["antivirusNeeded"] else []) +
+                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, volumes = [stepVolumeClamav] if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
                                      localApiTests(suite, storage, params["extraEnvironment"]) +
                                      failEarly(ctx, early_fail),
@@ -794,6 +829,7 @@ def localApiTestPipeline(ctx):
                                     "refs/pull/**",
                                 ],
                             },
+                            "volumes": [pipelineVolumeClamav] if params["antivirusNeeded"] else [],
                         }
                         pipelines.append(pipeline)
     return pipelines
@@ -2917,5 +2953,25 @@ def waitForEmailService():
         "image": OC_CI_WAIT_FOR,
         "commands": [
             "wait-for -it email:9000 -t 600",
+        ],
+    }]
+
+def clamavService():
+    return [{
+        "name": "clamav",
+        "image": OC_CI_CLAMAVD,
+        "volumes": [{
+            "name": "sockets",
+            "path": "/var/run/clamav/",
+        }],
+        "detach": True,
+    }]
+
+def waitForClamavService():
+    return [{
+        "name": "wait-for-clamav",
+        "image": OC_CI_WAIT_FOR,
+        "commands": [
+            "wait-for -it clamav:3310 -t 600",
         ],
     }]
