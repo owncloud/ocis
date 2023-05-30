@@ -124,13 +124,18 @@ Feature: State of the quota
       | /filesForUpload/lorem-big.txt | /ocs/v2.php/cloud/users/%username% | 200      | 91.17          |
 
 
-    @env-config
-    Scenario Outline: upload a file by setting OCIS spaces max quota
-      Given spaces max quota has been set to "10" bytes with "OCIS_SPACES_MAX_QUOTA"
-      When user "Alice" uploads file with content "<file_content>" to "lorem.txt" using the WebDAV API
-      Then the HTTP status code should be "<http_status_code>"
-      Examples:
-        | file_content               | http_status_code |
-        | 7 bytes                    | 201              |
-        | 10   bytes                 | 201              |
-        | more than 10 bytes content | 507              |
+  @env-config
+  Scenario: upload a file by setting OCIS spaces max quota
+    Given "OCIS_SPACES_MAX_QUOTA" has been enabled and set to "10"
+    And user "Brian" has been created with default attributes and without skeleton files
+    When user "Brian" uploads file with content "more than 10 bytes content" to "lorem.txt" using the WebDAV API
+    Then the HTTP status code should be "507"
+
+
+  @env-config
+  Scenario: create a space by setting OCIS spaces max quota
+    Given "OCIS_SPACES_MAX_QUOTA" has been enabled and set to "50"
+    And user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has given "Brian" the role "Space Admin" using the settings api
+    When user "Brian" creates a space "new space" of type "project" with quota "51" using the Graph API
+    Then the HTTP status code should be "500"
