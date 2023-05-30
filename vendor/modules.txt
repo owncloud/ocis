@@ -1038,6 +1038,14 @@ github.com/google/go-tika/tika
 # github.com/google/pprof v0.0.0-20210720184732-4bb14d4b1be1
 ## explicit; go 1.14
 github.com/google/pprof/profile
+# github.com/google/safehtml v0.1.0
+## explicit; go 1.14
+github.com/google/safehtml
+github.com/google/safehtml/internal/raw
+github.com/google/safehtml/internal/safehtmlutil
+github.com/google/safehtml/internal/template/raw
+github.com/google/safehtml/template
+github.com/google/safehtml/uncheckedconversions
 # github.com/google/uuid v1.3.0
 ## explicit
 github.com/google/uuid
@@ -1987,6 +1995,7 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
+golang.org/x/text/unicode/rangetable
 golang.org/x/text/width
 # golang.org/x/time v0.3.0
 ## explicit

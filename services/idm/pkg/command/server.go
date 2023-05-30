@@ -5,9 +5,10 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"html/template"
 	"os"
 	"strings"
+
+	"html/template"
 
 	"github.com/go-ldap/ldif"
 	"github.com/libregraph/idm/pkg/ldappassword"

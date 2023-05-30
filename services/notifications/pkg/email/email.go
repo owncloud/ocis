@@ -6,12 +6,14 @@ package email
 import (
 	"bytes"
 	"embed"
-	"html/template"
+	"errors"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"github.com/google/safehtml"
+	"github.com/google/safehtml/template"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 )
 
@@ -67,9 +69,9 @@ func RenderEmailTemplate(mt MessageTemplate, locale string, emailTemplatePath st
 
 func emailTemplate(tpl *template.Template, mt MessageTemplate) (string, error) {
 	str, err := executeTemplate(tpl, map[string]interface{}{
-		"Greeting":     template.HTML(strings.TrimSpace(mt.Greeting)),
-		"MessageBody":  template.HTML(strings.TrimSpace(mt.MessageBody)),
-		"CallToAction": template.HTML(strings.TrimSpace(mt.CallToAction)),
+		"Greeting":     safehtml.HTMLEscaped(strings.TrimSpace(mt.Greeting)),
+		"MessageBody":  safehtml.HTMLEscaped(strings.TrimSpace(mt.MessageBody)),
+		"CallToAction": safehtml.HTMLEscaped(strings.TrimSpace(mt.CallToAction)),
 	})
 	if err != nil {
 		return "", err
@@ -79,9 +81,9 @@ func emailTemplate(tpl *template.Template, mt MessageTemplate) (string, error) {
 
 func parseTemplate(emailTemplatePath string, file string) (*template.Template, error) {
 	if emailTemplatePath != "" {
-		return template.ParseFiles(filepath.Join(emailTemplatePath, file))
+		return nil, errors.New("BLOCKED FOR TESTING") // template.ParseFiles(filepath.Join(emailTemplatePath, file))
 	}
-	return template.ParseFS(templatesFS, filepath.Join(file))
+	return template.ParseFS(template.TrustedFSFromEmbed(templatesFS), filepath.Join(file))
 }
 
 func executeTemplate(tpl *template.Template, vars any) (string, error) {
