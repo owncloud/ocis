@@ -427,10 +427,18 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		logger.Debug().Str("id", user.GetId()).Msg("calling list storage spaces with filter")
+
+		gatewayClient, err := g.gatewaySelector.Next()
+		if err != nil {
+			g.logger.Error().Err(err).Msg("could not get reva gatewayClient")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		// use the unrestricted flag to get all possible spaces
 		// users with the canListAllSpaces permission should see all spaces
 		opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
-		lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
+		lspr, err := gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
 			Opaque:  opaque,
 			Filters: filters,
 		})
@@ -545,13 +553,20 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 		e.Executant = currentUser.GetId()
 	}
 
-	if g.gatewayClient != nil {
+	if g.gatewaySelector != nil {
+		gatewayClient, err := g.gatewaySelector.Next()
+		if err != nil {
+			g.logger.Error().Err(err).Msg("could not get reva gatewayClient")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
 		logger.Debug().
 			Str("user", user.GetId()).
 			Msg("calling list spaces with user filter to fetch the personal space for deletion")
 		opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
 		f := listStorageSpacesUserFilter(user.GetId())
-		lspr, err := g.gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
+		lspr, err := gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
 			Opaque:  opaque,
 			Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
 		})
@@ -572,7 +587,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 			// Deleting a space a two step process (1. disabling/trashing, 2. purging)
 			// Do the "disable/trash" step only if the space is not marked as trashed yet:
 			if _, ok := sp.Opaque.Map["trashed"]; !ok {
-				_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+				_, err := gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 					Id: &storageprovider.StorageSpaceId{
 						OpaqueId: sp.Id.OpaqueId,
 					},
@@ -584,7 +599,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			purgeFlag := utils.AppendPlainToOpaque(nil, "purge", "")
-			_, err := g.gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+			_, err := gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 				Opaque: purgeFlag,
 				Id: &storageprovider.StorageSpaceId{
 					OpaqueId: sp.Id.OpaqueId,

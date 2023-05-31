@@ -41,12 +41,13 @@ func NewService(opts ...Option) grpc.Service {
 		options.Logger.Error().Err(err).Msg("could not get gateway client tls mode")
 		return grpc.Service{}
 	}
-	gc, err := pool.GetGatewayServiceClient(tconf.RevaGateway,
+
+	gatewaySelector, err := pool.GatewaySelector(tconf.RevaGateway,
 		pool.WithTLSCACert(options.Config.GRPCClientTLS.CACert),
 		pool.WithTLSMode(tm),
 	)
 	if err != nil {
-		options.Logger.Error().Err(err).Msg("could not get gateway client")
+		options.Logger.Error().Err(err).Msg("could not get gateway selector")
 		return grpc.Service{}
 	}
 	var thumbnail decorators.DecoratedService
@@ -61,8 +62,8 @@ func NewService(opts ...Option) grpc.Service {
 					options.Logger,
 				),
 			),
-			svc.CS3Source(imgsource.NewCS3Source(tconf, gc)),
-			svc.CS3Client(gc),
+			svc.CS3Source(imgsource.NewCS3Source(tconf, gatewaySelector)),
+			svc.CS3ClientSelector(gatewaySelector),
 		)
 		thumbnail = decorators.NewInstrument(thumbnail, options.Metrics)
 		thumbnail = decorators.NewLogging(thumbnail, options.Logger)

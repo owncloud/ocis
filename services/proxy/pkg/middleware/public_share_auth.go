@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 )
 
@@ -21,8 +22,8 @@ const (
 // PublicShareAuthenticator is the authenticator which can authenticate public share requests.
 // It will add the share owner into the request context.
 type PublicShareAuthenticator struct {
-	Logger            log.Logger
-	RevaGatewayClient gateway.GatewayAPIClient
+	Logger              log.Logger
+	RevaGatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 }
 
 // The archiver is able to create archives from public shares in which case it needs to use the
@@ -83,7 +84,13 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 		}
 	}
 
-	authResp, err := a.RevaGatewayClient.Authenticate(r.Context(), &gateway.AuthenticateRequest{
+	gatewayClient, err := a.RevaGatewaySelector.Next()
+	if err != nil {
+		a.Logger.Error().Err(err).Msg("could not get reva gatewayClient")
+		return nil, false
+	}
+
+	authResp, err := gatewayClient.Authenticate(r.Context(), &gateway.AuthenticateRequest{
 		Type:         authenticationType,
 		ClientId:     shareToken,
 		ClientSecret: sharePassword,

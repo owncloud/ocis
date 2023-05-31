@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"strings"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -20,12 +21,17 @@ import (
 )
 
 // ResolveReference makes sure the path is relative to the space root
-func ResolveReference(ctx context.Context, ref *provider.Reference, ri *provider.ResourceInfo, gw gateway.GatewayAPIClient) (*provider.Reference, error) {
+func ResolveReference(ctx context.Context, ref *provider.Reference, ri *provider.ResourceInfo, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*provider.Reference, error) {
 	if ref.GetResourceId().GetOpaqueId() == ref.GetResourceId().GetSpaceId() {
 		return ref, nil
 	}
 
-	gpRes, err := gw.GetPath(ctx, &provider.GetPathRequest{
+	gatewayClient, err := gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	gpRes, err := gatewayClient.GetPath(ctx, &provider.GetPathRequest{
 		ResourceId: ri.Id,
 	})
 	if err != nil || gpRes.Status.Code != rpc.Code_CODE_OK {
@@ -61,9 +67,15 @@ func logDocCount(engine engine.Engine, logger log.Logger) {
 	logger.Debug().Interface("count", c).Msg("new document count")
 }
 
-func getAuthContext(owner *user.User, gw gateway.GatewayAPIClient, secret string, logger log.Logger) (context.Context, error) {
+func getAuthContext(owner *user.User, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], secret string, logger log.Logger) (context.Context, error) {
+	gatewayClient, err := gatewaySelector.Next()
+	if err != nil {
+		logger.Error().Err(err).Msg("could not get reva gatewayClient")
+		return nil, err
+	}
+
 	ownerCtx := ctxpkg.ContextSetUser(context.Background(), owner)
-	authRes, err := gw.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
+	authRes, err := gatewayClient.Authenticate(ownerCtx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + owner.GetId().GetOpaqueId(),
 		ClientSecret: secret,
@@ -81,8 +93,13 @@ func getAuthContext(owner *user.User, gw gateway.GatewayAPIClient, secret string
 	return metadata.AppendToOutgoingContext(ownerCtx, ctxpkg.TokenHeader, authRes.Token), nil
 }
 
-func statResource(ctx context.Context, ref *provider.Reference, gw gateway.GatewayAPIClient, logger log.Logger) (*provider.StatResponse, error) {
-	res, err := gw.Stat(ctx, &provider.StatRequest{Ref: ref})
+func statResource(ctx context.Context, ref *provider.Reference, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], logger log.Logger) (*provider.StatResponse, error) {
+	gatewayClient, err := gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: ref})
 	if err != nil {
 		logger.Error().Err(err).Msg("failed to stat the moved resource")
 		return nil, err

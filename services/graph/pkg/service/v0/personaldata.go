@@ -85,7 +85,7 @@ func (g Graph) ExportPersonalData(w http.ResponseWriter, r *http.Request) {
 // GatherPersonalData will all gather all personal data of the user and save it to a file in the users personal space
 func (g Graph) GatherPersonalData(usr *user.User, ref *provider.Reference, token string, marsh Marshaller) {
 	// the context might already be cancelled. We need to impersonate the acting user again
-	ctx, err := utils.ImpersonateUser(usr, g.gatewayClient, g.config.MachineAuthAPIKey)
+	ctx, err := utils.ImpersonateUser(usr, g.gatewaySelector, g.config.MachineAuthAPIKey)
 	if err != nil {
 		g.logger.Error().Err(err).Str("userID", usr.GetId().GetOpaqueId()).Msg("cannot impersonate user")
 	}
@@ -143,7 +143,7 @@ func (g Graph) upload(u *user.User, data []byte, ref *provider.Reference, th str
 	}
 
 	gwc := g.GetGatewayClient()
-	ctx, err := utils.ImpersonateUser(u, gwc, g.config.MachineAuthAPIKey)
+	ctx, err := utils.ImpersonateUser(u, g.gatewaySelector, g.config.MachineAuthAPIKey)
 	if err != nil {
 		return err
 	}

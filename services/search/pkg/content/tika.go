@@ -3,6 +3,7 @@ package content
 import (
 	"context"
 	"fmt"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"strings"
 
 	"github.com/bbalet/stopwords"
@@ -23,7 +24,7 @@ type Tika struct {
 }
 
 // NewTikaExtractor creates a new Tika instance.
-func NewTikaExtractor(gw gateway.GatewayAPIClient, logger log.Logger, cfg *config.Config) (*Tika, error) {
+func NewTikaExtractor(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], logger log.Logger, cfg *config.Config) (*Tika, error) {
 	basic, err := NewBasicExtractor(logger)
 	if err != nil {
 		return nil, err
@@ -38,7 +39,7 @@ func NewTikaExtractor(gw gateway.GatewayAPIClient, logger log.Logger, cfg *confi
 
 	return &Tika{
 		Basic:                      basic,
-		Retriever:                  newCS3Retriever(gw, logger, cfg.Extractor.CS3AllowInsecure),
+		Retriever:                  newCS3Retriever(gatewaySelector, logger, cfg.Extractor.CS3AllowInsecure),
 		tika:                       tika.NewClient(nil, cfg.Extractor.Tika.TikaURL),
 		contentExtractionSizeLimit: cfg.ContentExtractionSizeLimit,
 	}, nil

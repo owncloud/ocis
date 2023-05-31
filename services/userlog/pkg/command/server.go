@@ -90,13 +90,13 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			gwclient, err := pool.GetGatewayServiceClient(
+			gatewaySelector, err := pool.GatewaySelector(
 				cfg.RevaGateway,
 				pool.WithTLSCACert(cfg.GRPCClientTLS.CACert),
 				pool.WithTLSMode(tm),
 			)
 			if err != nil {
-				return fmt.Errorf("could not get reva client: %s", err)
+				return fmt.Errorf("could not get reva client selector: %s", err)
 			}
 
 			hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", ogrpc.DefaultClient())
@@ -109,7 +109,7 @@ func Server(cfg *config.Config) *cli.Command {
 					http.Metrics(mtrcs),
 					http.Store(st),
 					http.Consumer(consumer),
-					http.Gateway(gwclient),
+					http.GatewaySelector(gatewaySelector),
 					http.History(hClient),
 					http.RegisteredEvents(_registeredEvents),
 				)

@@ -9,6 +9,7 @@ import (
 	apiRpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	apiProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
 )
 
@@ -16,13 +17,18 @@ import (
 // the provided executantID must have space access.
 // removeBefore specifies how long an item must be in the trash-bin to be deleted,
 // items that stay there for a shorter time are ignored and kept in place.
-func PurgeTrashBin(executantID *apiUser.UserId, deleteBefore time.Time, spaceType SpaceType, gwc apiGateway.GatewayAPIClient, machineAuthAPIKey string) error {
-	executantCtx, _, err := utils.Impersonate(executantID, gwc, machineAuthAPIKey)
+func PurgeTrashBin(executantID *apiUser.UserId, deleteBefore time.Time, spaceType SpaceType, gatewaySelector pool.Selectable[apiGateway.GatewayAPIClient], machineAuthAPIKey string) error {
+	executantCtx, _, err := utils.Impersonate(executantID, gatewaySelector, machineAuthAPIKey)
 	if err != nil {
 		return err
 	}
 
-	listStorageSpacesResponse, err := gwc.ListStorageSpaces(executantCtx, &apiProvider.ListStorageSpacesRequest{
+	gatewayClient, err := gatewaySelector.Next()
+	if err != nil {
+		return err
+	}
+
+	listStorageSpacesResponse, err := gatewayClient.ListStorageSpaces(executantCtx, &apiProvider.ListStorageSpacesRequest{
 		Filters: []*apiProvider.ListStorageSpacesRequest_Filter{
 			{
 				Type: apiProvider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
@@ -77,12 +83,12 @@ func PurgeTrashBin(executantID *apiUser.UserId, deleteBefore time.Time, spaceTyp
 			return fmt.Errorf("can't impersonate space user for space: %s", storageSpace.GetId().GetOpaqueId())
 		}
 
-		impersonatedCtx, _, err := utils.Impersonate(impersonationID, gwc, machineAuthAPIKey)
+		impersonatedCtx, _, err := utils.Impersonate(impersonationID, gatewaySelector, machineAuthAPIKey)
 		if err != nil {
 			return err
 		}
 
-		listRecycleResponse, err := gwc.ListRecycle(impersonatedCtx, &apiProvider.ListRecycleRequest{Ref: storageSpaceReference})
+		listRecycleResponse, err := gatewayClient.ListRecycle(impersonatedCtx, &apiProvider.ListRecycleRequest{Ref: storageSpaceReference})
 		if err != nil {
 			return err
 		}
@@ -93,7 +99,7 @@ func PurgeTrashBin(executantID *apiUser.UserId, deleteBefore time.Time, spaceTyp
 				continue
 			}
 
-			purgeRecycleResponse, err := gwc.PurgeRecycle(impersonatedCtx, &apiProvider.PurgeRecycleRequest{
+			purgeRecycleResponse, err := gatewayClient.PurgeRecycle(impersonatedCtx, &apiProvider.PurgeRecycleRequest{
 				Ref: storageSpaceReference,
 				Key: recycleItem.Key,
 			})

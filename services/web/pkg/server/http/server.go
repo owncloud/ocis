@@ -35,7 +35,7 @@ func Server(opts ...Option) (http.Service, error) {
 		return http.Service{}, fmt.Errorf("could not initialize http service: %w", err)
 	}
 
-	client, err := pool.GetGatewayServiceClient(options.Config.GatewayAddress)
+	gatewaySelector, err := pool.GatewaySelector(options.Config.GatewayAddress)
 	if err != nil {
 		return http.Service{}, err
 	}
@@ -43,7 +43,7 @@ func Server(opts ...Option) (http.Service, error) {
 	handle := svc.NewService(
 		svc.Logger(options.Logger),
 		svc.Config(options.Config),
-		svc.GatewayClient(client),
+		svc.GatewaySelector(gatewaySelector),
 		svc.Middleware(
 			chimiddleware.RealIP,
 			chimiddleware.RequestID,

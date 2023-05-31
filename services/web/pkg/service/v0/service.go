@@ -3,6 +3,7 @@ package svc
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"net/http"
 	"net/url"
 	"os"
@@ -42,11 +43,11 @@ func NewService(opts ...Option) Service {
 	m.Use(options.Middleware...)
 
 	svc := Web{
-		logger:        options.Logger,
-		config:        options.Config,
-		mux:           m,
-		fs:            assetsfs.New(web.Assets, options.Config.Asset.Path, options.Logger),
-		gatewayClient: options.GatewayClient,
+		logger:          options.Logger,
+		config:          options.Config,
+		mux:             m,
+		fs:              assetsfs.New(web.Assets, options.Config.Asset.Path, options.Logger),
+		gatewaySelector: options.GatewaySelector,
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
@@ -72,11 +73,11 @@ func NewService(opts ...Option) Service {
 
 // Web defines implements the business logic for Service.
 type Web struct {
-	logger        log.Logger
-	config        *config.Config
-	mux           *chi.Mux
-	fs            *assetsfs.FileSystem
-	gatewayClient gateway.GatewayAPIClient
+	logger          log.Logger
+	config          *config.Config
+	mux             *chi.Mux
+	fs              *assetsfs.FileSystem
+	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 }
 
 // ServeHTTP implements the Service interface.

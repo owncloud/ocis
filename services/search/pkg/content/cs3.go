@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"io"
 	"net/http"
 
@@ -15,20 +16,20 @@ import (
 )
 
 type cs3 struct {
-	httpClient http.Client
-	gwClient   gateway.GatewayAPIClient
-	logger     log.Logger
+	httpClient      http.Client
+	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+	logger          log.Logger
 }
 
-func newCS3Retriever(client gateway.GatewayAPIClient, logger log.Logger, insecure bool) cs3 {
+func newCS3Retriever(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], logger log.Logger, insecure bool) cs3 {
 	return cs3{
 		httpClient: http.Client{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: insecure}, //nolint:gosec
 			},
 		},
-		gwClient: client,
-		logger:   logger,
+		gatewaySelector: gatewaySelector,
+		logger:          logger,
 	}
 }
 
@@ -40,7 +41,13 @@ func (s cs3) Retrieve(ctx context.Context, rID *provider.ResourceId) (io.ReadClo
 		return nil, fmt.Errorf("context without %s", revactx.TokenHeader)
 	}
 
-	res, err := s.gwClient.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: &provider.Reference{ResourceId: rID, Path: "."}})
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		s.logger.Error().Err(err).Msg("could not get reva gatewayClient")
+		return nil, err
+	}
+
+	res, err := gatewayClient.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: &provider.Reference{ResourceId: rID, Path: "."}})
 	if err != nil {
 		return nil, err
 	}

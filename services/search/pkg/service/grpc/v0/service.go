@@ -55,9 +55,9 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 	}
 
 	// initialize gateway
-	gw, err := pool.GetGatewayServiceClient(cfg.Reva.Address)
+	gatewaySelector, err := pool.GatewaySelector(cfg.Reva.Address)
 	if err != nil {
-		logger.Fatal().Err(err).Str("addr", cfg.Reva.Address).Msg("could not get reva client")
+		logger.Fatal().Err(err).Msg("could not get reva gateway selector")
 		return nil, teardown, err
 	}
 	// initialize search content extractor
@@ -68,7 +68,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 			return nil, teardown, err
 		}
 	case "tika":
-		if extractor, err = content.NewTikaExtractor(gw, logger, cfg); err != nil {
+		if extractor, err = content.NewTikaExtractor(gatewaySelector, logger, cfg); err != nil {
 			return nil, teardown, err
 		}
 	default:
@@ -106,7 +106,7 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, err
 	}
 
-	ss := search.NewService(gw, eng, extractor, logger, cfg)
+	ss := search.NewService(gatewaySelector, eng, extractor, logger, cfg)
 
 	// setup event handling
 	if err := search.HandleEvents(ss, bus, logger, cfg); err != nil {

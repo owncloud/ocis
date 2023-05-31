@@ -6,6 +6,7 @@ import (
 	apiGateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	apiUser "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/config"
 	"github.com/owncloud/ocis/v2/services/storage-users/pkg/task"
@@ -17,19 +18,19 @@ const (
 
 // Service wraps all common logic that is needed to react to incoming events.
 type Service struct {
-	gatewayClient apiGateway.GatewayAPIClient
-	eventStream   events.Stream
-	logger        log.Logger
-	config        config.Config
+	gatewaySelector pool.Selectable[apiGateway.GatewayAPIClient]
+	eventStream     events.Stream
+	logger          log.Logger
+	config          config.Config
 }
 
 // NewService prepares and returns a Service implementation.
-func NewService(gatewayClient apiGateway.GatewayAPIClient, eventStream events.Stream, logger log.Logger, conf config.Config) (Service, error) {
+func NewService(gatewaySelector pool.Selectable[apiGateway.GatewayAPIClient], eventStream events.Stream, logger log.Logger, conf config.Config) (Service, error) {
 	svc := Service{
-		gatewayClient: gatewayClient,
-		eventStream:   eventStream,
-		logger:        logger,
-		config:        conf,
+		gatewaySelector: gatewaySelector,
+		eventStream:     eventStream,
+		logger:          logger,
+		config:          conf,
 	}
 
 	return svc, nil
@@ -69,7 +70,7 @@ func (s Service) Run() error {
 					continue
 				}
 
-				if err = task.PurgeTrashBin(executantID, deleteBefore, spaceType, s.gatewayClient, s.config.Commons.MachineAuthAPIKey); err != nil {
+				if err = task.PurgeTrashBin(executantID, deleteBefore, spaceType, s.gatewaySelector, s.config.Commons.MachineAuthAPIKey); err != nil {
 					errs = append(errs, err)
 				}
 			}

@@ -276,11 +276,10 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		logger.Fatal().Err(err).Msg("Failed to get gateway client")
 	}
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
-	gatewaySelector, _ := pool.GatewaySelector(cfg.Reva.Address, cfg.Reva.GetRevaOptions()...)
-	gatewayClient, err := gatewaySelector.Next()
 
+	gatewaySelector, err := pool.GatewaySelector(cfg.Reva.Address, cfg.Reva.GetRevaOptions()...)
 	if err != nil {
-		logger.Fatal().Err(err).Msg("Failed to get gateway client")
+		logger.Fatal().Err(err).Msg("Failed to get gateway selector")
 	}
 	tokenManager, err := jwt.New(map[string]interface{}{
 		"secret": cfg.TokenManager.JWTSecret,
@@ -293,10 +292,9 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
 	case "cs3":
-
 		userProvider = backend.NewCS3UserBackend(
 			backend.WithLogger(logger),
-			backend.WithRevaAuthenticator(gatewayClient),
+			backend.WithRevaGatewaySelector(gatewaySelector),
 			backend.WithMachineAuthAPIKey(cfg.MachineAuthAPIKey),
 			backend.WithOIDCissuer(cfg.OIDC.Issuer),
 			backend.WithAutoProvisonCreator(autoProvsionCreator),
@@ -368,8 +366,8 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		)),
 	))
 	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
-		Logger:            logger,
-		RevaGatewayClient: revaClient,
+		Logger:              logger,
+		RevaGatewaySelector: gatewaySelector,
 	})
 	authenticators = append(authenticators, middleware.SignedURLAuthenticator{
 		Logger:             logger,
@@ -416,7 +414,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(logger),
-			middleware.RevaGatewayClient(revaClient),
+			middleware.RevaGatewaySelector(gatewaySelector),
 			middleware.RoleQuotas(cfg.RoleQuotas),
 		),
 	)

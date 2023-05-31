@@ -17,9 +17,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/templates"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
-	merrors "go-micro.dev/v4/errors"
-	"google.golang.org/grpc/metadata"
-
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
@@ -28,6 +25,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/config"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/constants"
 	"github.com/owncloud/ocis/v2/services/webdav/pkg/dav/requests"
+	merrors "go-micro.dev/v4/errors"
+	"google.golang.org/grpc/metadata"
 )
 
 const (
@@ -64,7 +63,7 @@ func NewService(opts ...Option) (Service, error) {
 	if err != nil {
 		return nil, err
 	}
-	gwc, err := pool.GetGatewayServiceClient(conf.RevaGateway,
+	gatewaySelector, err := pool.GatewaySelector(conf.RevaGateway,
 		pool.WithTLSCACert(conf.GRPCClientTLS.CACert),
 		pool.WithTLSMode(tm),
 	)
@@ -78,7 +77,7 @@ func NewService(opts ...Option) (Service, error) {
 		mux:              m,
 		searchClient:     searchsvc.NewSearchProviderService("com.owncloud.api.search", grpc.DefaultClient()),
 		thumbnailsClient: thumbnailssvc.NewThumbnailService("com.owncloud.api.thumbnails", grpc.DefaultClient()),
-		revaClient:       gwc,
+		gatewaySelector:  gatewaySelector,
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
@@ -149,7 +148,7 @@ type Webdav struct {
 	mux              *chi.Mux
 	searchClient     searchsvc.SearchProviderService
 	thumbnailsClient thumbnailssvc.ThumbnailService
-	revaClient       gatewayv1beta1.GatewayAPIClient
+	gatewaySelector  pool.Selectable[gatewayv1beta1.GatewayAPIClient]
 }
 
 // ServeHTTP implements the Service interface.
@@ -278,11 +277,17 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 
 	t := r.Header.Get(TokenHeader)
 
-	var user *userv1beta1.User
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		logger.Error().Err(err).Msg("could not get reva gatewayClient")
+		renderError(w, r, errInternalError("could not get reva gatewayClient"))
+		return
+	}
 
+	var user *userv1beta1.User
 	if tr.Identifier == "" {
 		// look up user from token via WhoAmI
-		userRes, err := g.revaClient.WhoAmI(r.Context(), &gatewayv1beta1.WhoAmIRequest{
+		userRes, err := gatewayClient.WhoAmI(r.Context(), &gatewayv1beta1.WhoAmIRequest{
 			Token: t,
 		})
 		if err != nil {
@@ -299,7 +304,7 @@ func (g Webdav) Thumbnail(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// look up user from URL via GetUserByClaim
 		ctx := metadata.AppendToOutgoingContext(r.Context(), TokenHeader, t)
-		userRes, err := g.revaClient.GetUserByClaim(ctx, &userv1beta1.GetUserByClaimRequest{
+		userRes, err := gatewayClient.GetUserByClaim(ctx, &userv1beta1.GetUserByClaimRequest{
 			Claim: "username",
 			Value: tr.Identifier,
 		})

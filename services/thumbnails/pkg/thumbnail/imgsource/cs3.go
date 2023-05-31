@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"io"
 	"net/http"
 
@@ -25,14 +26,14 @@ const (
 )
 
 type CS3 struct {
-	client   gateway.GatewayAPIClient
-	insecure bool
+	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+	insecure        bool
 }
 
-func NewCS3Source(cfg config.Thumbnail, c gateway.GatewayAPIClient) CS3 {
+func NewCS3Source(cfg config.Thumbnail, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) CS3 {
 	return CS3{
-		client:   c,
-		insecure: cfg.CS3AllowInsecure,
+		gatewaySelector: gatewaySelector,
+		insecure:        cfg.CS3AllowInsecure,
 	}
 }
 
@@ -51,8 +52,14 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 			Path: path,
 		}
 	}
+
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
 	ctx = metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
-	rsp, err := s.client.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: &ref})
+	rsp, err := gatewayClient.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: &ref})
 
 	if err != nil {
 		return nil, err

@@ -1,6 +1,7 @@
 package svc
 
 import (
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"net/http"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
@@ -13,10 +14,10 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Logger        log.Logger
-	Config        *config.Config
-	Middleware    []func(http.Handler) http.Handler
-	GatewayClient gateway.GatewayAPIClient
+	Logger          log.Logger
+	Config          *config.Config
+	Middleware      []func(http.Handler) http.Handler
+	GatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 }
 
 // newOptions initializes the available default options.
@@ -51,9 +52,9 @@ func Middleware(val ...func(http.Handler) http.Handler) Option {
 	}
 }
 
-// GatewayClient provides a function to set the GatewayClient option.
-func GatewayClient(client gateway.GatewayAPIClient) Option {
+// GatewaySelector provides a function to set the gatewaySelector option.
+func GatewaySelector(gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
-		o.GatewayClient = client
+		o.GatewaySelector = gatewaySelector
 	}
 }

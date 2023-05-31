@@ -2,6 +2,7 @@ package svc
 
 import (
 	"context"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"net/http"
 	"net/url"
 	"path"
@@ -42,10 +43,10 @@ func NewService(opts ...Option) decorators.DecoratedService {
 			options.ThumbnailStorage,
 			logger,
 		),
-		webdavSource: options.ImageSource,
-		cs3Source:    options.CS3Source,
-		logger:       logger,
-		cs3Client:    options.CS3Client,
+		webdavSource:       options.ImageSource,
+		cs3Source:          options.CS3Source,
+		logger:             logger,
+		cs3GatewaySelector: options.CS3GatewaySelector,
 		preprocessorOpts: PreprocessorOpts{
 			TxtFontFileMap: options.Config.Thumbnail.FontMapFile,
 		},
@@ -58,15 +59,15 @@ func NewService(opts ...Option) decorators.DecoratedService {
 
 // Thumbnail implements the GRPC handler.
 type Thumbnail struct {
-	serviceID        string
-	dataEndpoint     string
-	transferSecret   string
-	manager          thumbnail.Manager
-	webdavSource     imgsource.Source
-	cs3Source        imgsource.Source
-	logger           log.Logger
-	cs3Client        gateway.GatewayAPIClient
-	preprocessorOpts PreprocessorOpts
+	serviceID          string
+	dataEndpoint       string
+	transferSecret     string
+	manager            thumbnail.Manager
+	webdavSource       imgsource.Source
+	cs3Source          imgsource.Source
+	logger             log.Logger
+	cs3GatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+	preprocessorOpts   PreprocessorOpts
 }
 
 type PreprocessorOpts struct {
@@ -160,8 +161,12 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 		return "", errors.Wrap(err, "source url is invalid")
 	}
 
-	var auth, statPath string
+	gatewayClient, err := g.cs3GatewaySelector.Next()
+	if err != nil {
+		return "", err
+	}
 
+	var auth, statPath string
 	if src.IsPublicLink {
 		q := imgURL.Query()
 		var rsp *gateway.AuthenticateResponse
@@ -169,13 +174,13 @@ func (g Thumbnail) handleWebdavSource(ctx context.Context, req *thumbnailssvc.Ge
 			// Handle pre-signed public links
 			sig := q.Get("signature")
 			exp := q.Get("expiration")
-			rsp, err = g.cs3Client.Authenticate(ctx, &gateway.AuthenticateRequest{
+			rsp, err = gatewayClient.Authenticate(ctx, &gateway.AuthenticateRequest{
 				Type:         "publicshares",
 				ClientId:     src.PublicLinkToken,
 				ClientSecret: strings.Join([]string{"signature", sig, exp}, "|"),
 			})
 		} else {
-			rsp, err = g.cs3Client.Authenticate(ctx, &gateway.AuthenticateRequest{
+			rsp, err = gatewayClient.Authenticate(ctx, &gateway.AuthenticateRequest{
 				Type:     "publicshares",
 				ClientId: src.PublicLinkToken,
 				// We pass an empty password because we expect non pre-signed public links
@@ -248,8 +253,13 @@ func (g Thumbnail) stat(path, auth string) (*provider.StatResponse, error) {
 		}
 	}
 
+	gatewayClient, err := g.cs3GatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
 	req := &provider.StatRequest{Ref: &ref}
-	rsp, err := g.cs3Client.Stat(ctx, req)
+	rsp, err := gatewayClient.Stat(ctx, req)
 	if err != nil {
 		g.logger.Error().Err(err).Str("path", path).Msg("could not stat file")
 		return nil, merrors.InternalServerError(g.serviceID, "could not stat file: %s", err.Error())

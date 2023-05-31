@@ -13,7 +13,7 @@ func (s eventsNotifier) handleShareCreated(e events.ShareCreated) {
 		Str("itemid", e.ItemID.OpaqueId).
 		Logger()
 
-	ownerCtx, owner, err := utils.Impersonate(e.Sharer, s.gwClient, s.machineAuthAPIKey)
+	ownerCtx, owner, err := utils.Impersonate(e.Sharer, s.gatewaySelector, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not impersonate sharer")
 		return
@@ -62,7 +62,7 @@ func (s eventsNotifier) handleShareExpired(e events.ShareExpired) {
 		Str("itemid", e.ItemID.GetOpaqueId()).
 		Logger()
 
-	ownerCtx, owner, err := utils.Impersonate(e.ShareOwner, s.gwClient, s.machineAuthAPIKey)
+	ownerCtx, owner, err := utils.Impersonate(e.ShareOwner, s.gatewaySelector, s.machineAuthAPIKey)
 	if err != nil {
 		logger.Error().Err(err).Msg("Could not impersonate sharer")
 		return

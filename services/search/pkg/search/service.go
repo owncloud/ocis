@@ -3,6 +3,7 @@ package search
 import (
 	"context"
 	"fmt"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -46,23 +47,23 @@ type Searcher interface {
 // Service is responsible for indexing spaces and pass on a search
 // to it's underlying engine.
 type Service struct {
-	logger    log.Logger
-	gateway   gateway.GatewayAPIClient
-	engine    engine.Engine
-	extractor content.Extractor
-	secret    string
+	logger          log.Logger
+	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+	engine          engine.Engine
+	extractor       content.Extractor
+	secret          string
 }
 
 var errSkipSpace error
 
 // NewService creates a new Provider instance.
-func NewService(gw gateway.GatewayAPIClient, eng engine.Engine, extractor content.Extractor, logger log.Logger, cfg *config.Config) *Service {
+func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng engine.Engine, extractor content.Extractor, logger log.Logger, cfg *config.Config) *Service {
 	var s = &Service{
-		gateway:   gw,
-		engine:    eng,
-		secret:    cfg.MachineAuthAPIKey,
-		logger:    logger,
-		extractor: extractor,
+		gatewaySelector: gatewaySelector,
+		engine:          eng,
+		secret:          cfg.MachineAuthAPIKey,
+		logger:          logger,
+		extractor:       extractor,
 	}
 
 	return s
@@ -75,7 +76,12 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 	}
 	s.logger.Debug().Str("query", req.Query).Msg("performing a search")
 
-	listSpacesRes, err := s.gateway.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	listSpacesRes, err := gatewayClient.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
 		Filters: []*provider.ListStorageSpacesRequest_Filter{
 			{
 				Type: provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
@@ -227,7 +233,13 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 			s.logger.Warn().Interface("space", space).Msg("could not find mountpoint space for grant space")
 			return nil, errSkipSpace
 		}
-		gpRes, err := s.gateway.GetPath(ctx, &provider.GetPathRequest{
+
+		gatewayClient, err := s.gatewaySelector.Next()
+		if err != nil {
+			return nil, err
+		}
+
+		gpRes, err := gatewayClient.GetPath(ctx, &provider.GetPathRequest{
 			ResourceId: space.Root,
 		})
 		if err != nil {
@@ -296,7 +308,7 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 
 // IndexSpace (re)indexes all resources of a given space.
 func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, uID *user.UserId) error {
-	ownerCtx, err := getAuthContext(&user.User{Id: uID}, s.gateway, s.secret, s.logger)
+	ownerCtx, err := getAuthContext(&user.User{Id: uID}, s.gatewaySelector, s.secret, s.logger)
 	if err != nil {
 		return err
 	}
@@ -312,7 +324,7 @@ func (s *Service) IndexSpace(spaceID *provider.StorageSpaceId, uID *user.UserId)
 	}
 	rootID.OpaqueId = rootID.SpaceId
 
-	w := walker.NewWalker(s.gateway)
+	w := walker.NewWalker(s.gatewaySelector)
 	err = w.Walk(ownerCtx, &rootID, func(wd string, info *provider.ResourceInfo, err error) error {
 		if err != nil {
 			s.logger.Error().Err(err).Msg("error walking the tree")
@@ -426,17 +438,17 @@ func (s *Service) MoveItem(ref *provider.Reference, uID *user.UserId) {
 }
 
 func (s *Service) resInfo(uID *user.UserId, ref *provider.Reference) (context.Context, *provider.StatResponse, string) {
-	ownerCtx, err := getAuthContext(&user.User{Id: uID}, s.gateway, s.secret, s.logger)
+	ownerCtx, err := getAuthContext(&user.User{Id: uID}, s.gatewaySelector, s.secret, s.logger)
 	if err != nil {
 		return nil, nil, ""
 	}
 
-	statRes, err := statResource(ownerCtx, ref, s.gateway, s.logger)
+	statRes, err := statResource(ownerCtx, ref, s.gatewaySelector, s.logger)
 	if err != nil {
 		return nil, nil, ""
 	}
 
-	r, err := ResolveReference(ownerCtx, ref, statRes.GetInfo(), s.gateway)
+	r, err := ResolveReference(ownerCtx, ref, statRes.GetInfo(), s.gatewaySelector)
 	if err != nil {
 		return nil, nil, ""
 	}

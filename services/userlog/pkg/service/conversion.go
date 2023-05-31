@@ -6,6 +6,7 @@ import (
 	"embed"
 	"errors"
 	"fmt"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"io/fs"
 	"strings"
 	"text/template"
@@ -52,7 +53,7 @@ type OC10Notification struct {
 // Converter is responsible for converting eventhistory events to OC10Notifications
 type Converter struct {
 	locale            string
-	gwClient          gateway.GatewayAPIClient
+	gatewaySelector   pool.Selectable[gateway.GatewayAPIClient]
 	machineAuthAPIKey string
 	serviceName       string
 	registeredEvents  map[string]events.Unmarshaller
@@ -66,10 +67,10 @@ type Converter struct {
 }
 
 // NewConverter returns a new Converter
-func NewConverter(loc string, gwc gateway.GatewayAPIClient, machineAuthAPIKey string, name string, translationPath string, registeredEvents map[string]events.Unmarshaller) *Converter {
+func NewConverter(loc string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], machineAuthAPIKey string, name string, translationPath string, registeredEvents map[string]events.Unmarshaller) *Converter {
 	return &Converter{
 		locale:            loc,
-		gwClient:          gwc,
+		gatewaySelector:   gatewaySelector,
 		machineAuthAPIKey: machineAuthAPIKey,
 		serviceName:       name,
 		registeredEvents:  registeredEvents,
@@ -306,7 +307,7 @@ func (c *Converter) authenticate(usr *user.User) (context.Context, error) {
 	if ctx, ok := c.contexts[usr.GetId().GetOpaqueId()]; ok {
 		return ctx, nil
 	}
-	ctx, err := authenticate(usr, c.gwClient, c.machineAuthAPIKey)
+	ctx, err := authenticate(usr, c.gatewaySelector, c.machineAuthAPIKey)
 	if err == nil {
 		c.contexts[usr.GetId().GetOpaqueId()] = ctx
 	}
@@ -317,7 +318,7 @@ func (c *Converter) getSpace(ctx context.Context, spaceID string) (*storageprovi
 	if space, ok := c.spaces[spaceID]; ok {
 		return space, nil
 	}
-	space, err := getSpace(ctx, spaceID, c.gwClient)
+	space, err := getSpace(ctx, spaceID, c.gatewaySelector)
 	if err == nil {
 		c.spaces[spaceID] = space
 	}
@@ -328,7 +329,7 @@ func (c *Converter) getResource(ctx context.Context, resourceID *storageprovider
 	if r, ok := c.resources[resourceID.GetOpaqueId()]; ok {
 		return r, nil
 	}
-	resource, err := getResource(ctx, resourceID, c.gwClient)
+	resource, err := getResource(ctx, resourceID, c.gatewaySelector)
 	if err == nil {
 		c.resources[resourceID.GetOpaqueId()] = resource
 	}
@@ -339,7 +340,7 @@ func (c *Converter) getUser(ctx context.Context, userID *user.UserId) (*user.Use
 	if u, ok := c.users[userID.GetOpaqueId()]; ok {
 		return u, nil
 	}
-	usr, err := getUser(ctx, userID, c.gwClient)
+	usr, err := getUser(ctx, userID, c.gatewaySelector)
 	if err == nil {
 		c.users[userID.GetOpaqueId()] = usr
 	}

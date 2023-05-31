@@ -94,12 +94,12 @@ func Server(cfg *config.Config) *cli.Command {
 					logger.Fatal().Err(err).Msg("can't connect to nats")
 				}
 
-				gw, err := pool.GetGatewayServiceClient(cfg.Reva.Address)
+				gatewaySelector, err := pool.GatewaySelector(cfg.Reva.Address)
 				if err != nil {
 					return err
 				}
 
-				eventSVC, err := event.NewService(gw, stream, logger, *cfg)
+				eventSVC, err := event.NewService(gatewaySelector, stream, logger, *cfg)
 				if err != nil {
 					logger.Fatal().Err(err).Msg("can't create event service")
 				}
