@@ -41,7 +41,7 @@ func (p Permissions) AssemblePermissions(ctx context.Context, n *node.Node) (pro
 
 // CreateSpace returns true when the user is allowed to create the space
 func (p Permissions) CreateSpace(ctx context.Context, spaceid string) bool {
-	return p.checkPermission(ctx, "create-space", spaceRef(spaceid))
+	return p.checkPermission(ctx, "Drives.Create", spaceRef(spaceid))
 }
 
 // SetSpaceQuota returns true when the user is allowed to change the spaces quota
@@ -50,25 +50,25 @@ func (p Permissions) SetSpaceQuota(ctx context.Context, spaceid string, spaceTyp
 	default:
 		return false // only quotas of personal and project space may be changed
 	case _spaceTypePersonal:
-		return p.checkPermission(ctx, "set-space-quota", spaceRef(spaceid))
+		return p.checkPermission(ctx, "Drives.ReadWritePersonalQuota", spaceRef(spaceid))
 	case _spaceTypeProject:
-		return p.checkPermission(ctx, "Drive.ReadWriteQuota.Project", spaceRef(spaceid))
+		return p.checkPermission(ctx, "Drives.ReadWriteProjectQuota", spaceRef(spaceid))
 	}
 }
 
 // ManageSpaceProperties returns true when the user is allowed to change space properties (name/subtitle)
 func (p Permissions) ManageSpaceProperties(ctx context.Context, spaceid string) bool {
-	return p.checkPermission(ctx, "Drive.ReadWrite", spaceRef(spaceid))
+	return p.checkPermission(ctx, "Drives.ReadWrite", spaceRef(spaceid))
 }
 
 // SpaceAbility returns true when the user is allowed to enable/disable the space
 func (p Permissions) SpaceAbility(ctx context.Context, spaceid string) bool {
-	return p.checkPermission(ctx, "Drive.ReadWriteEnabled", spaceRef(spaceid))
+	return p.checkPermission(ctx, "Drives.ReadWriteEnabled", spaceRef(spaceid))
 }
 
 // ListAllSpaces returns true when the user is allowed to list all spaces
 func (p Permissions) ListAllSpaces(ctx context.Context) bool {
-	return p.checkPermission(ctx, "list-all-spaces", nil)
+	return p.checkPermission(ctx, "Drives.List", nil)
 }
 
 // ListSpacesOfUser returns true when the user is allowed to list the spaces of the given user
@@ -86,12 +86,12 @@ func (p Permissions) ListSpacesOfUser(ctx context.Context, userid *userv1beta1.U
 
 // DeleteAllSpaces returns true when the user is allowed to delete all spaces
 func (p Permissions) DeleteAllSpaces(ctx context.Context) bool {
-	return p.checkPermission(ctx, "delete-all-spaces", nil)
+	return p.checkPermission(ctx, "Drives.DeleteProject", nil)
 }
 
 // DeleteAllHomeSpaces returns true when the user is allowed to delete all home spaces
 func (p Permissions) DeleteAllHomeSpaces(ctx context.Context) bool {
-	return p.checkPermission(ctx, "delete-all-home-spaces", nil)
+	return p.checkPermission(ctx, "Drives.DeletePersonal", nil)
 }
 
 // checkPermission is used to check a users space permissions

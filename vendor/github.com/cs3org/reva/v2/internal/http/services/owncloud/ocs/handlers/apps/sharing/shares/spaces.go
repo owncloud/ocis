@@ -125,6 +125,33 @@ func (h *Handler) addSpaceMember(w http.ResponseWriter, r *http.Request, info *p
 			Nanos:   uint32(expiration.UnixNano() % int64(time.Second)),
 		}
 	}
+
+	if role.Name != conversions.RoleManager {
+		ref := provider.Reference{ResourceId: info.GetId()}
+		p, err := h.findProvider(ctx, &ref)
+		if err != nil {
+			response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting storage provider", err)
+			return
+		}
+
+		providerClient, err := h.getStorageProviderClient(p)
+		if err != nil {
+			response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting storage provider client", err)
+			return
+		}
+
+		lgRes, err := providerClient.ListGrants(ctx, &provider.ListGrantsRequest{Ref: &ref})
+		if err != nil || lgRes.Status.Code != rpc.Code_CODE_OK {
+			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error listing space grants", err)
+			return
+		}
+
+		if !isSpaceManagerRemaining(lgRes.Grants, grantee) {
+			response.WriteOCSError(w, r, http.StatusForbidden, "the space must have at least one manager", nil)
+			return
+		}
+	}
+
 	createShareRes, err := client.CreateShare(ctx, &collaborationv1beta1.CreateShareRequest{
 		ResourceInfo: info,
 		Grant: &collaborationv1beta1.ShareGrant{
