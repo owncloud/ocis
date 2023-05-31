@@ -20,6 +20,7 @@ package sharees
 
 import (
 	"net/http"
+	"strings"
 
 	grouppb "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -67,10 +68,15 @@ func (h *Handler) FindSharees(w http.ResponseWriter, r *http.Request) {
 	log.Debug().Int("count", len(usersRes.GetUsers())).Str("search", term).Msg("users found")
 
 	userMatches := make([]*conversions.MatchData, 0, len(usersRes.GetUsers()))
+	exactUserMatches := make([]*conversions.MatchData, 0)
 	for _, user := range usersRes.GetUsers() {
 		match := h.userAsMatch(user)
 		log.Debug().Interface("user", user).Interface("match", match).Msg("mapped")
-		userMatches = append(userMatches, match)
+		if h.isExactMatch(match, term) {
+			exactUserMatches = append(exactUserMatches, match)
+		} else {
+			userMatches = append(userMatches, match)
+		}
 	}
 
 	groupsRes, err := gwc.FindGroups(r.Context(), &grouppb.FindGroupsRequest{Filter: term, SkipFetchingMembers: true})
@@ -81,16 +87,21 @@ func (h *Handler) FindSharees(w http.ResponseWriter, r *http.Request) {
 	log.Debug().Int("count", len(groupsRes.GetGroups())).Str("search", term).Msg("groups found")
 
 	groupMatches := make([]*conversions.MatchData, 0, len(groupsRes.GetGroups()))
+	exactGroupMatches := make([]*conversions.MatchData, 0)
 	for _, g := range groupsRes.GetGroups() {
 		match := h.groupAsMatch(g)
 		log.Debug().Interface("group", g).Interface("match", match).Msg("mapped")
-		groupMatches = append(groupMatches, match)
+		if h.isExactMatch(match, term) {
+			exactGroupMatches = append(exactGroupMatches, match)
+		} else {
+			groupMatches = append(groupMatches, match)
+		}
 	}
 
 	response.WriteOCSSuccess(w, r, &conversions.ShareeData{
 		Exact: &conversions.ExactMatchesData{
-			Users:   []*conversions.MatchData{},
-			Groups:  []*conversions.MatchData{},
+			Users:   exactUserMatches,
+			Groups:  exactGroupMatches,
 			Remotes: []*conversions.MatchData{},
 		},
 		Users:   userMatches,
@@ -131,4 +142,12 @@ func (h *Handler) groupAsMatch(g *grouppb.Group) *conversions.MatchData {
 
 func (h *Handler) getAdditionalInfoAttribute(u *userpb.User) string {
 	return templates.WithUser(u, h.additionalInfoAttribute)
+}
+
+func (h *Handler) isExactMatch(match *conversions.MatchData, term string) bool {
+	if match == nil || match.Value == nil {
+		return false
+	}
+	return strings.EqualFold(match.Value.ShareWith, term) || strings.EqualFold(match.Value.ShareWithAdditionalInfo, term) ||
+		strings.EqualFold(match.Label, term)
 }
