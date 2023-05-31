@@ -126,7 +126,7 @@ Feature: State of the quota
 
   @env-config
   Scenario: upload a file by setting OCIS spaces max quota
-    Given "OCIS_SPACES_MAX_QUOTA" has been enabled and set to "10"
+    Given the config "OCIS_SPACES_MAX_QUOTA" has been set to "10"
     And user "Brian" has been created with default attributes and without skeleton files
     When user "Brian" uploads file with content "more than 10 bytes content" to "lorem.txt" using the WebDAV API
     Then the HTTP status code should be "507"
@@ -134,7 +134,7 @@ Feature: State of the quota
 
   @env-config
   Scenario: create a space by setting OCIS spaces max quota
-    Given "OCIS_SPACES_MAX_QUOTA" has been enabled and set to "50"
+    Given the config "OCIS_SPACES_MAX_QUOTA" has been set to "50"
     And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "Space Admin" using the settings api
     When user "Brian" creates a space "new space" of type "project" with quota "51" using the Graph API

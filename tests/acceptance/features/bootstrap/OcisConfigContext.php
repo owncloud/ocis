@@ -53,24 +53,24 @@ class OcisConfigContext implements Context {
 	}
 
 	/**
-	 * @Given :env has been enabled and set to :envValue
+	 * @Given the config :configVariable has been set to :configValue
 	 *
-	 * @param string $env
-	 * @param string $envValue
+	 * @param string $configVariable
+	 * @param string $configValue
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function envHasBeenEnabledAndSetTo(string $env, string $envValue): void {
+	public function theConfigHasBeenSetTo(string $configVariable, string $configValue): void {
 		$envs = [
-			$env => $envValue,
+            $configVariable => $configValue,
 		];
 
 		$response =  OcisConfigHelper::reConfigureOcis($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to set OCIS_CORS_ALLOW_ORIGINS=" . $envValue
+			"Failed to set config $configVariable=$configValue"
 		);
 	}
 
