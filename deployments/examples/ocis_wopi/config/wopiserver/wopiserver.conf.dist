@@ -45,11 +45,11 @@ tokenvalidity = 86400
 # WOPI lock expiration time [seconds]
 wopilockexpiration = 3600
 
-# WOPI lock strict check: if True, WOPI locks will be compared according to specs,
-# that is their representation must match. False (default) allows for a more relaxed
-# comparison, which compensates incorrect lock requests from Microsoft Office Online
+# WOPI lock strict check: if True (default), WOPI locks will be compared according to specs,
+# that is their representation must match. False allows for a more relaxed comparison,
+# which compensates incorrect lock requests from Microsoft Office Online 2016-2018
 # on-premise setups.
-wopilockstrictcheck = False
+#wopilockstrictcheck = True
 
 # Enable support of rename operations from WOPI apps. This is currently
 # disabled by default as it has been observed that both MS Office and Collabora
