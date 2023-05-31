@@ -105,6 +105,17 @@ class NotificationContext implements Context {
 	}
 
 	/**
+	 * @Then the notifications should be empty
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function theNotificationsShouldBeEmpty(): void {
+		$notifications = $this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data;
+		Assert::assertNull($notifications, "response should not contain any notification");
+	}
+
+	/**
 	 * @Then /^the JSON response should contain a notification message with the subject "([^"]*)" and the message-details should match$/
 	 *
 	 * @param string $subject

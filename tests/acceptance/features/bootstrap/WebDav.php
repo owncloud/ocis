@@ -3354,16 +3354,16 @@ trait WebDav {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has (deleted|unshared) (file|folder) "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has (deleted|unshared) (?:file|folder|entity) "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $deletedOrUnshared
-	 * @param string $fileOrFolder
 	 * @param string $entry
 	 *
 	 * @return void
+	 * @throws Exception
 	 */
-	public function userHasDeletedFile(string $user, string $deletedOrUnshared, string $fileOrFolder, string $entry):void {
+	public function userHasDeletedFile(string $user, string $deletedOrUnshared, string $entry):void {
 		$user = $this->getActualUsername($user);
 		$this->userDeletesFile($user, $entry);
 		// If the file or folder was there and got deleted then we get a 204
@@ -3380,30 +3380,28 @@ trait WebDav {
 
 		$this->theHTTPStatusCodeShouldBe(
 			["204"],
-			"HTTP status code was not 204 while trying to $deleteText $fileOrFolder '$entry' for user '$user'"
+			"HTTP status code was not 204 while trying to $deleteText resource '$entry' for user '$user'"
 		);
 		$this->emptyLastHTTPStatusCodesArray();
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has (deleted|unshared) the following (files|folders|resources)$/
+	 * @Given /^user "([^"]*)" has (deleted|unshared) the following (?:files|folders|resources)$/
 	 *
 	 * @param string $user
 	 * @param string $deletedOrUnshared
-	 * @param string $fileOrFolder
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasDeletedFollowingFiles(string $user, string $deletedOrUnshared, string $fileOrFolder, TableNode $table):void {
+	public function userHasDeletedFollowingFiles(string $user, string $deletedOrUnshared, TableNode $table):void {
 		$this->verifyTableNodeColumns($table, ["path"]);
 		$paths = $table->getHash();
 
 		foreach ($paths as $file) {
-			$this->userHasDeletedFile($user, $deletedOrUnshared, $fileOrFolder, $file["path"]);
+			$this->userHasDeletedFile($user, $deletedOrUnshared, $file["path"]);
 		}
-		$this->emptyLastHTTPStatusCodesArray();
 	}
 
 	/**
