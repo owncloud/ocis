@@ -86,6 +86,7 @@ The following sections list the changes for unreleased.
    Rename permissions to be consistent and future proof
 
    https://github.com/cs3org/reva/pull/3922
+   https://github.com/owncloud/ocis/pull/6418
 
 * Enhancement - Unify CA Cert envvars: [#6392](https://github.com/owncloud/ocis/pull/6392)
 
