@@ -34,6 +34,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/jellydator/ttlcache/v2"
+	"github.com/pkg/errors"
 )
 
 //go:generate make --no-print-directory -C ../../../.. mockery NAME=UserConverter
@@ -95,9 +96,13 @@ func (c *GatewayUserConverter) UserIDToUserName(ctx context.Context, userid *use
 		return username.(string), nil
 	}
 
-	gwConn, err := pool.GetGatewayServiceClient(c.gwAddr)
+	selector, err := pool.GatewaySelector(c.gwAddr)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "error getting gateway selector")
+	}
+	gwConn, err := selector.Next()
+	if err != nil {
+		return "", errors.Wrap(err, "error selecting next gateway client")
 	}
 	getUserResponse, err := gwConn.GetUser(ctx, &userprovider.GetUserRequest{
 		UserId:                 userid,
@@ -120,9 +125,13 @@ func (c *GatewayUserConverter) UserNameToUserID(ctx context.Context, username st
 		return id.(*userpb.UserId), nil
 	}
 
-	gwConn, err := pool.GetGatewayServiceClient(c.gwAddr)
+	selector, err := pool.GatewaySelector(c.gwAddr)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "error getting gateway selector")
+	}
+	gwConn, err := selector.Next()
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting next gateway client")
 	}
 	getUserResponse, err := gwConn.GetUserByClaim(ctx, &userpb.GetUserByClaimRequest{
 		Claim:                  "username",

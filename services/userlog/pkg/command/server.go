@@ -11,6 +11,7 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -94,6 +95,7 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.RevaGateway,
 				pool.WithTLSCACert(cfg.GRPCClientTLS.CACert),
 				pool.WithTLSMode(tm),
+				pool.WithRegistry(registry.GetRegistry()),
 			)
 			if err != nil {
 				return fmt.Errorf("could not get reva client selector: %s", err)

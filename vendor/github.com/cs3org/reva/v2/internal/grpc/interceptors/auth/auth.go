@@ -25,7 +25,7 @@ import (
 
 	"github.com/bluele/gcache"
 	authpb "github.com/cs3org/go-cs3apis/cs3/auth/provider/v1beta1"
-	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userpb "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/auth/scope"
@@ -273,11 +273,11 @@ func dismantleToken(ctx context.Context, tkn string, req interface{}, mgr token.
 	}
 
 	if sharedconf.SkipUserGroupsInToken() {
-		client, err := pool.GetGatewayServiceClient(gatewayAddr)
+		selector, err := pool.GatewaySelector(gatewayAddr)
 		if err != nil {
 			return nil, nil, err
 		}
-		groups, err := getUserGroups(ctx, u, client)
+		groups, err := getUserGroups(ctx, u, selector)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -300,11 +300,16 @@ func dismantleToken(ctx context.Context, tkn string, req interface{}, mgr token.
 	return u, tokenScope, nil
 }
 
-func getUserGroups(ctx context.Context, u *userpb.User, client gatewayv1beta1.GatewayAPIClient) ([]string, error) {
+func getUserGroups(ctx context.Context, u *userpb.User, selector pool.Selectable[gateway.GatewayAPIClient]) ([]string, error) {
 	if groupsIf, err := userGroupsCache.Get(u.Id.OpaqueId); err == nil {
 		log := appctx.GetLogger(ctx)
 		log.Info().Str("userid", u.Id.OpaqueId).Msg("user groups found in cache")
 		return groupsIf.([]string), nil
+	}
+
+	client, err := selector.Next()
+	if err != nil {
+		return nil, err
 	}
 
 	res, err := client.GetUserGroups(ctx, &userpb.GetUserGroupsRequest{UserId: u.Id})

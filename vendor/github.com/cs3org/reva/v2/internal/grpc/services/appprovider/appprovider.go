@@ -120,9 +120,13 @@ func (s *service) registerProvider() {
 		pInfo.MimeTypes = mimeTypes
 	}
 
-	client, err := pool.GetGatewayServiceClient(s.conf.GatewaySvc)
+	selector, err := pool.GatewaySelector(s.conf.GatewaySvc)
 	if err != nil {
-		log.Error().Err(err).Msg("error registering app provider: could not get gateway client")
+		log.Error().Err(err).Msg("error registering app provider: could not get gateway selector")
+		return
+	}
+	client, err := selector.Next()
+	if err != nil {
 		return
 	}
 	req := &registrypb.AddAppProviderRequest{Provider: pInfo}

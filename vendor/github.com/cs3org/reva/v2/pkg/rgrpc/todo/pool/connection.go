@@ -20,6 +20,7 @@ package pool
 
 import (
 	"crypto/tls"
+
 	rtrace "github.com/cs3org/reva/v2/pkg/trace"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
@@ -31,7 +32,7 @@ import (
 // with open census tracing support.
 // TODO(labkode): make grpc tls configurable.
 // TODO make maxCallRecvMsgSize configurable, raised from the default 4MB to be able to list 10k files
-func NewConn(id string, opts ...Option) (*grpc.ClientConn, error) {
+func NewConn(address string, opts ...Option) (*grpc.ClientConn, error) {
 
 	options := ClientOptions{}
 	if err := options.init(); err != nil {
@@ -65,7 +66,7 @@ func NewConn(id string, opts ...Option) (*grpc.ClientConn, error) {
 	}
 
 	conn, err := grpc.Dial(
-		id,
+		address,
 		grpc.WithTransportCredentials(cred),
 		grpc.WithDefaultCallOptions(
 			grpc.MaxCallRecvMsgSize(maxCallRecvMsgSize),

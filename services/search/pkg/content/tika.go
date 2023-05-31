@@ -3,12 +3,12 @@ package content
 import (
 	"context"
 	"fmt"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"strings"
 
 	"github.com/bbalet/stopwords"
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/google/go-tika/tika"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/search/pkg/config"

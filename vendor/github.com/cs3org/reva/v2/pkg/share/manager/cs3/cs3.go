@@ -94,9 +94,13 @@ func NewDefault(m map[string]interface{}) (share.Manager, error) {
 	}
 	indexer := indexer.CreateIndexer(s)
 
-	client, err := pool.GetGatewayServiceClient(c.GatewayAddr)
+	selector, err := pool.GatewaySelector(c.GatewayAddr)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "error getting gateway selector")
+	}
+	client, err := selector.Next()
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting next gateway client")
 	}
 
 	return New(client, s, indexer)

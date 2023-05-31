@@ -53,7 +53,7 @@ const (
 
 func expandAndVerifyScope(ctx context.Context, req interface{}, tokenScope map[string]*authpb.Scope, user *userpb.User, gatewayAddr string, mgr token.Manager) error {
 	log := appctx.GetLogger(ctx)
-	client, err := pool.GetGatewayServiceClient(gatewayAddr)
+	selector, err := pool.GatewaySelector(gatewayAddr)
 	if err != nil {
 		return err
 	}
@@ -70,17 +70,17 @@ func expandAndVerifyScope(ctx context.Context, req interface{}, tokenScope map[s
 		for k := range tokenScope {
 			switch {
 			case strings.HasPrefix(k, "publicshare"):
-				if err = resolvePublicShare(ctx, ref, tokenScope[k], client, mgr); err == nil {
+				if err = resolvePublicShare(ctx, ref, tokenScope[k], selector, mgr); err == nil {
 					return nil
 				}
 
 			case strings.HasPrefix(k, "share"):
-				if err = resolveUserShare(ctx, ref, tokenScope[k], client, mgr); err == nil {
+				if err = resolveUserShare(ctx, ref, tokenScope[k], selector, mgr); err == nil {
 					return nil
 				}
 
 			case strings.HasPrefix(k, "lightweight"):
-				if err = resolveLightweightScope(ctx, ref, tokenScope[k], user, client, mgr); err == nil {
+				if err = resolveLightweightScope(ctx, ref, tokenScope[k], user, selector, mgr); err == nil {
 					return nil
 				}
 			}
@@ -88,6 +88,10 @@ func expandAndVerifyScope(ctx context.Context, req interface{}, tokenScope map[s
 		}
 
 	} else if ref, ok := extractShareRef(req); ok {
+		client, err := selector.Next()
+		if err != nil {
+			return err
+		}
 		// It's a share ref
 		// The request might be coming from a share created for a lightweight account
 		// after the token was minted.
@@ -124,11 +128,16 @@ func expandAndVerifyScope(ctx context.Context, req interface{}, tokenScope map[s
 	return errtypes.PermissionDenied(fmt.Sprintf("access to resource %+v not allowed within the assigned scope", req))
 }
 
-func resolveLightweightScope(ctx context.Context, ref *provider.Reference, scope *authpb.Scope, user *userpb.User, client gateway.GatewayAPIClient, mgr token.Manager) error {
+func resolveLightweightScope(ctx context.Context, ref *provider.Reference, scope *authpb.Scope, user *userpb.User, selector pool.Selectable[gateway.GatewayAPIClient], mgr token.Manager) error {
 	// Check if this ref is cached
 	key := "lw:" + user.Id.OpaqueId + scopeDelimiter + getRefKey(ref)
 	if _, err := scopeExpansionCache.Get(key); err == nil {
 		return nil
+	}
+
+	client, err := selector.Next()
+	if err != nil {
+		return err
 	}
 
 	shares, err := client.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{})
@@ -143,7 +152,7 @@ func resolveLightweightScope(ctx context.Context, ref *provider.Reference, scope
 		if ref.ResourceId != nil && utils.ResourceIDEqual(share.Share.ResourceId, ref.ResourceId) {
 			return nil
 		}
-		if ok, err := checkIfNestedResource(ctx, ref, share.Share.ResourceId, client, mgr); err == nil && ok {
+		if ok, err := checkIfNestedResource(ctx, ref, share.Share.ResourceId, selector, mgr); err == nil && ok {
 			_ = scopeExpansionCache.SetWithExpire(key, nil, scopeCacheExpiration*time.Second)
 			return nil
 		}
@@ -152,20 +161,20 @@ func resolveLightweightScope(ctx context.Context, ref *provider.Reference, scope
 	return errtypes.PermissionDenied("request is not for a nested resource")
 }
 
-func resolvePublicShare(ctx context.Context, ref *provider.Reference, scope *authpb.Scope, client gateway.GatewayAPIClient, mgr token.Manager) error {
+func resolvePublicShare(ctx context.Context, ref *provider.Reference, scope *authpb.Scope, selector pool.Selectable[gateway.GatewayAPIClient], mgr token.Manager) error {
 	var share link.PublicShare
 	err := utils.UnmarshalJSONToProtoV1(scope.Resource.Value, &share)
 	if err != nil {
 		return err
 	}
 
-	if err := checkCacheForNestedResource(ctx, ref, share.ResourceId, client, mgr); err == nil {
+	if err := checkCacheForNestedResource(ctx, ref, share.ResourceId, selector, mgr); err == nil {
 		return nil
 	}
 
 	// Some services like wopi don't access the shared resource relative to the
 	// share root but instead relative to the shared resources parent.
-	return checkRelativeReference(ctx, ref, share.ResourceId, client)
+	return checkRelativeReference(ctx, ref, share.ResourceId, selector)
 }
 
 // checkRelativeReference checks if the shared resource is being accessed via a relative reference
@@ -178,7 +187,12 @@ func resolvePublicShare(ctx context.Context, ref *provider.Reference, scope *aut
 // Reference{ResourceId: {StorageId: "abcd", SpaceId: "efgh"}, Path: "./New file.txt"}
 // then the request is considered relative and this function would return true.
 // Only references which are relative to the immediate parent of a resource are considered valid.
-func checkRelativeReference(ctx context.Context, requested *provider.Reference, sharedResourceID *provider.ResourceId, client gateway.GatewayAPIClient) error {
+func checkRelativeReference(ctx context.Context, requested *provider.Reference, sharedResourceID *provider.ResourceId, selector pool.Selectable[gateway.GatewayAPIClient]) error {
+	client, err := selector.Next()
+	if err != nil {
+		return err
+	}
+
 	sRes, err := client.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: sharedResourceID}})
 	if err != nil {
 		return err
@@ -209,24 +223,24 @@ func checkRelativeReference(ctx context.Context, requested *provider.Reference, 
 	return nil
 }
 
-func resolveUserShare(ctx context.Context, ref *provider.Reference, scope *authpb.Scope, client gateway.GatewayAPIClient, mgr token.Manager) error {
+func resolveUserShare(ctx context.Context, ref *provider.Reference, scope *authpb.Scope, selector pool.Selectable[gateway.GatewayAPIClient], mgr token.Manager) error {
 	var share collaboration.Share
 	err := utils.UnmarshalJSONToProtoV1(scope.Resource.Value, &share)
 	if err != nil {
 		return err
 	}
 
-	return checkCacheForNestedResource(ctx, ref, share.ResourceId, client, mgr)
+	return checkCacheForNestedResource(ctx, ref, share.ResourceId, selector, mgr)
 }
 
-func checkCacheForNestedResource(ctx context.Context, ref *provider.Reference, resource *provider.ResourceId, client gateway.GatewayAPIClient, mgr token.Manager) error {
+func checkCacheForNestedResource(ctx context.Context, ref *provider.Reference, resource *provider.ResourceId, selector pool.Selectable[gateway.GatewayAPIClient], mgr token.Manager) error {
 	// Check if this ref is cached
 	key := storagespace.FormatResourceID(*resource) + scopeDelimiter + getRefKey(ref)
 	if _, err := scopeExpansionCache.Get(key); err == nil {
 		return nil
 	}
 
-	if ok, err := checkIfNestedResource(ctx, ref, resource, client, mgr); err == nil && ok {
+	if ok, err := checkIfNestedResource(ctx, ref, resource, selector, mgr); err == nil && ok {
 		_ = scopeExpansionCache.SetWithExpire(key, nil, scopeCacheExpiration*time.Second)
 		return nil
 	}
@@ -234,7 +248,11 @@ func checkCacheForNestedResource(ctx context.Context, ref *provider.Reference, r
 	return errtypes.PermissionDenied("request is not for a nested resource")
 }
 
-func checkIfNestedResource(ctx context.Context, ref *provider.Reference, parent *provider.ResourceId, client gateway.GatewayAPIClient, mgr token.Manager) (bool, error) {
+func checkIfNestedResource(ctx context.Context, ref *provider.Reference, parent *provider.ResourceId, selector pool.Selectable[gateway.GatewayAPIClient], mgr token.Manager) (bool, error) {
+	client, err := selector.Next()
+	if err != nil {
+		return false, err
+	}
 	// Since the resource ID is obtained from the scope, the current token
 	// has access to it.
 	statResponse, err := client.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: parent}})

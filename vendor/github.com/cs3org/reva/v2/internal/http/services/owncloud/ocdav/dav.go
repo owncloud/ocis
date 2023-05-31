@@ -24,6 +24,7 @@ import (
 	"path"
 	"strings"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	gatewayv1beta1 "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -32,6 +33,7 @@ import (
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/rhttp/router"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"google.golang.org/grpc/metadata"
@@ -271,7 +273,11 @@ func (h *DavHandler) Handler(s *svc) http.Handler {
 	})
 }
 
-func getTokenStatInfo(ctx context.Context, client gatewayv1beta1.GatewayAPIClient, token string) (*provider.StatResponse, error) {
+func getTokenStatInfo(ctx context.Context, selector pool.Selectable[gateway.GatewayAPIClient], token string) (*provider.StatResponse, error) {
+	client, err := selector.Next()
+	if err != nil {
+		return nil, err
+	}
 	return client.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{
 		ResourceId: &provider.ResourceId{
 			StorageId: utils.PublicStorageProviderID,
@@ -281,7 +287,11 @@ func getTokenStatInfo(ctx context.Context, client gatewayv1beta1.GatewayAPIClien
 	}})
 }
 
-func handleBasicAuth(ctx context.Context, c gatewayv1beta1.GatewayAPIClient, token, pw string) (*gatewayv1beta1.AuthenticateResponse, error) {
+func handleBasicAuth(ctx context.Context, selector pool.Selectable[gateway.GatewayAPIClient], token, pw string) (*gatewayv1beta1.AuthenticateResponse, error) {
+	c, err := selector.Next()
+	if err != nil {
+		return nil, err
+	}
 	authenticateRequest := gatewayv1beta1.AuthenticateRequest{
 		Type:         "publicshares",
 		ClientId:     token,
@@ -291,7 +301,11 @@ func handleBasicAuth(ctx context.Context, c gatewayv1beta1.GatewayAPIClient, tok
 	return c.Authenticate(ctx, &authenticateRequest)
 }
 
-func handleSignatureAuth(ctx context.Context, c gatewayv1beta1.GatewayAPIClient, token, sig, expiration string) (*gatewayv1beta1.AuthenticateResponse, error) {
+func handleSignatureAuth(ctx context.Context, selector pool.Selectable[gateway.GatewayAPIClient], token, sig, expiration string) (*gatewayv1beta1.AuthenticateResponse, error) {
+	c, err := selector.Next()
+	if err != nil {
+		return nil, err
+	}
 	authenticateRequest := gatewayv1beta1.AuthenticateRequest{
 		Type:         "publicshares",
 		ClientId:     token,

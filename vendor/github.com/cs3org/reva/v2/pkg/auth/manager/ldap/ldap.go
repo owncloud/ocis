@@ -146,9 +146,13 @@ func (am *mgr) Authenticate(ctx context.Context, clientID, clientSecret string) 
 		OpaqueId: uid,
 		Type:     am.c.LDAPIdentity.GetUserType(userEntry),
 	}
-	gwc, err := pool.GetGatewayServiceClient(am.c.GatewaySvc)
+	selector, err := pool.GatewaySelector(am.c.GatewaySvc)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "ldap: error getting gateway grpc client")
+		return nil, nil, err
+	}
+	gwc, err := selector.Next()
+	if err != nil {
+		return nil, nil, err
 	}
 	getGroupsResp, err := gwc.GetUserGroups(ctx, &user.GetUserGroupsRequest{
 		UserId: userID,

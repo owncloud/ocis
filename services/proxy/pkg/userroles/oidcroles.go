@@ -120,7 +120,7 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 func (ra oidcRoleAssigner) ApplyUserRole(ctx context.Context, user *cs3.User) (*cs3.User, error) {
 	roleIDs, err := loadRolesIDs(ctx, user.Id.OpaqueId, ra.roleService)
 	if err != nil {
-		ra.logger.Error().Err(err).Msgf("Could not load roles")
+		ra.logger.Error().Err(err).Msg("Could not load roles")
 		return nil, err
 	}
 

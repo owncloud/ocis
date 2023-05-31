@@ -66,14 +66,13 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gatewayClient, err := g.gatewaySelector.Next()
+	client, err := g.gatewaySelector.Next()
 	if err != nil {
-		g.logger.Error().Err(err).Msg("could not get reva gatewayClient")
+		g.logger.Error().Err(err).Msg("error selecting next gateway client")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	sres, err := gatewayClient.Stat(ctx, &provider.StatRequest{
+	sres, err := client.Stat(ctx, &provider.StatRequest{
 		Ref: &provider.Reference{ResourceId: &rid},
 	})
 	if err != nil {
@@ -112,7 +111,7 @@ func (g Graph) AssignTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := gatewayClient.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
+	resp, err := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
 		Ref: &provider.Reference{ResourceId: &rid},
 		ArbitraryMetadata: &provider.ArbitraryMetadata{
 			Metadata: map[string]string{
@@ -162,14 +161,13 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gatewayClient, err := g.gatewaySelector.Next()
+	client, err := g.gatewaySelector.Next()
 	if err != nil {
-		g.logger.Error().Err(err).Msg("could not get reva gatewayClient")
+		g.logger.Error().Err(err).Msg("error selecting next gateway client")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	sres, err := gatewayClient.Stat(ctx, &provider.StatRequest{
+	sres, err := client.Stat(ctx, &provider.StatRequest{
 		Ref: &provider.Reference{ResourceId: &rid},
 	})
 	if err != nil {
@@ -208,7 +206,7 @@ func (g Graph) UnassignTags(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := gatewayClient.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
+	resp, err := client.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
 		Ref: &provider.Reference{ResourceId: &rid},
 		ArbitraryMetadata: &provider.ArbitraryMetadata{
 			Metadata: map[string]string{

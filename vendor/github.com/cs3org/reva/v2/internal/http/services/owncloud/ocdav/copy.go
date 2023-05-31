@@ -36,6 +36,7 @@ import (
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/spacelookup"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/rhttp/router"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
@@ -138,9 +139,14 @@ func (s *svc) handlePathCopy(w http.ResponseWriter, r *http.Request, ns string) 
 	w.WriteHeader(cp.successCode)
 }
 
-func (s *svc) executePathCopy(ctx context.Context, client gateway.GatewayAPIClient, w http.ResponseWriter, r *http.Request, cp *copy) error {
+func (s *svc) executePathCopy(ctx context.Context, selector pool.Selectable[gateway.GatewayAPIClient], w http.ResponseWriter, r *http.Request, cp *copy) error {
 	log := appctx.GetLogger(ctx)
 	log.Debug().Str("src", cp.sourceInfo.Path).Str("dst", cp.destination.Path).Msg("descending")
+
+	client, err := selector.Next()
+	if err != nil {
+		return err
+	}
 
 	var fileid string
 	if cp.sourceInfo.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
@@ -148,6 +154,7 @@ func (s *svc) executePathCopy(ctx context.Context, client gateway.GatewayAPIClie
 		createReq := &provider.CreateContainerRequest{
 			Ref: cp.destination,
 		}
+
 		createRes, err := client.CreateContainer(ctx, createReq)
 		if err != nil {
 			log.Error().Err(err).Msg("error performing create container grpc request")
@@ -192,7 +199,7 @@ func (s *svc) executePathCopy(ctx context.Context, client gateway.GatewayAPIClie
 				ResourceId: cp.destination.ResourceId,
 				Path:       utils.MakeRelativePath(filepath.Join(cp.destination.Path, child)),
 			}
-			err := s.executePathCopy(ctx, client, w, r, &copy{source: src, sourceInfo: res.Infos[i], destination: childDst, depth: cp.depth, successCode: cp.successCode})
+			err := s.executePathCopy(ctx, selector, w, r, &copy{source: src, sourceInfo: res.Infos[i], destination: childDst, depth: cp.depth, successCode: cp.successCode})
 			if err != nil {
 				return err
 			}
@@ -362,9 +369,14 @@ func (s *svc) handleSpacesCopy(w http.ResponseWriter, r *http.Request, spaceID s
 	w.WriteHeader(cp.successCode)
 }
 
-func (s *svc) executeSpacesCopy(ctx context.Context, w http.ResponseWriter, client gateway.GatewayAPIClient, cp *copy) error {
+func (s *svc) executeSpacesCopy(ctx context.Context, w http.ResponseWriter, selector pool.Selectable[gateway.GatewayAPIClient], cp *copy) error {
 	log := appctx.GetLogger(ctx)
 	log.Debug().Interface("src", cp.sourceInfo).Interface("dst", cp.destination).Msg("descending")
+
+	client, err := selector.Next()
+	if err != nil {
+		return err
+	}
 
 	var fileid string
 	if cp.sourceInfo.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER {
@@ -410,7 +422,7 @@ func (s *svc) executeSpacesCopy(ctx context.Context, w http.ResponseWriter, clie
 				ResourceId: cp.destination.ResourceId,
 				Path:       utils.MakeRelativePath(path.Join(cp.destination.Path, res.Infos[i].Path)),
 			}
-			err := s.executeSpacesCopy(ctx, w, client, &copy{sourceInfo: res.Infos[i], destination: childRef, depth: cp.depth, successCode: cp.successCode})
+			err := s.executeSpacesCopy(ctx, w, selector, &copy{sourceInfo: res.Infos[i], destination: childRef, depth: cp.depth, successCode: cp.successCode})
 			if err != nil {
 				return err
 			}
@@ -573,8 +585,15 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 
 	log.Debug().Bool("overwrite", overwrite).Str("depth", depth.String()).Msg("copy")
 
+	client, err := s.gwClient.Next()
+	if err != nil {
+		log.Error().Err(err).Msg("error selecting next client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return nil
+	}
+
 	srcStatReq := &provider.StatRequest{Ref: srcRef}
-	srcStatRes, err := s.gwClient.Stat(ctx, srcStatReq)
+	srcStatRes, err := client.Stat(ctx, srcStatReq)
 	switch {
 	case err != nil:
 		log.Error().Err(err).Msg("error sending grpc stat request")
@@ -592,7 +611,7 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 	}
 
 	dstStatReq := &provider.StatRequest{Ref: dstRef}
-	dstStatRes, err := s.gwClient.Stat(ctx, dstStatReq)
+	dstStatRes, err := client.Stat(ctx, dstStatReq)
 	switch {
 	case err != nil:
 		log.Error().Err(err).Msg("error sending grpc stat request")
@@ -621,7 +640,7 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 			(dstStatRes.Info.Type == provider.ResourceType_RESOURCE_TYPE_FILE &&
 				srcStatRes.Info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER) {
 			delReq := &provider.DeleteRequest{Ref: dstRef}
-			delRes, err := s.gwClient.Delete(ctx, delReq)
+			delRes, err := client.Delete(ctx, delReq)
 			if err != nil {
 				log.Error().Err(err).Msg("error sending grpc delete request")
 				w.WriteHeader(http.StatusInternalServerError)
@@ -640,7 +659,7 @@ func (s *svc) prepareCopy(ctx context.Context, w http.ResponseWriter, r *http.Re
 			Path:       utils.MakeRelativePath(p),
 		}
 		intStatReq := &provider.StatRequest{Ref: pRef}
-		intStatRes, err := s.gwClient.Stat(ctx, intStatReq)
+		intStatRes, err := client.Stat(ctx, intStatReq)
 		if err != nil {
 			log.Error().Err(err).Msg("error sending grpc stat request")
 			w.WriteHeader(http.StatusInternalServerError)

@@ -136,10 +136,10 @@ func CredentialsByUserAgent(v map[string]string) Option {
 	}
 }
 
-// RevaGatewaySelector provides a function to set the reva gateway service selector option.
-func RevaGatewaySelector(gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) Option {
+// WithRevaGatewaySelector provides a function to set the the reva gateway service selector option.
+func WithRevaGatewaySelector(val pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
-		o.RevaGatewaySelector = gatewaySelector
+		o.RevaGatewaySelector = val
 	}
 }
 

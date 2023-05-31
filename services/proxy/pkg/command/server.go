@@ -20,6 +20,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -276,8 +277,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		logger.Fatal().Err(err).Msg("Failed to get gateway client")
 	}
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
-
-	gatewaySelector, err := pool.GatewaySelector(cfg.Reva.Address, cfg.Reva.GetRevaOptions()...)
+	gatewaySelector, err := pool.GatewaySelector(cfg.Reva.Address, append(cfg.Reva.GetRevaOptions(), pool.WithRegistry(registry.GetRegistry()))...)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to get gateway selector")
 	}
@@ -414,7 +414,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(logger),
-			middleware.RevaGatewaySelector(gatewaySelector),
+			middleware.WithRevaGatewaySelector(gatewaySelector),
 			middleware.RoleQuotas(cfg.RoleQuotas),
 		),
 	)

@@ -216,9 +216,13 @@ func (am *mgr) Authenticate(ctx context.Context, clientID, clientSecret string) 
 		Type:     getUserType(claims[am.c.IDClaim].(string)),
 	}
 
-	gwc, err := pool.GetGatewayServiceClient(am.c.GatewaySvc)
+	selector, err := pool.GatewaySelector(am.c.GatewaySvc)
 	if err != nil {
-		return nil, nil, errors.Wrap(err, "oidc: error getting gateway grpc client")
+		return nil, nil, errors.Wrap(err, "error getting gateway selector")
+	}
+	gwc, err := selector.Next()
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "error selecting next client")
 	}
 	getGroupsResp, err := gwc.GetUserGroups(ctx, &user.GetUserGroupsRequest{
 		UserId: userID,
@@ -323,9 +327,13 @@ func (am *mgr) resolveUser(ctx context.Context, claims map[string]interface{}) e
 			username = am.oidcUsersMapping[m.(string)].Username
 		}
 
-		upsc, err := pool.GetUserProviderServiceClient(am.c.GatewaySvc)
+		selector, err := pool.IdentityUserSelector(am.c.GatewaySvc)
 		if err != nil {
-			return errors.Wrap(err, "error getting user provider grpc client")
+			return errors.Wrap(err, "error getting identity user selector")
+		}
+		upsc, err := selector.Next()
+		if err != nil {
+			return errors.Wrap(err, "error selecting next identity user client")
 		}
 		getUserByClaimResp, err := upsc.GetUserByClaim(ctx, &user.GetUserByClaimRequest{
 			Claim: "username",

@@ -42,8 +42,8 @@ import (
 
 // CS3 represents a metadata storage with a cs3 storage backend
 type CS3 struct {
-	providerAddr      string
-	gatewayAddr       string
+	providerSelector  pool.Selectable[provider.ProviderAPIClient]
+	gatewaySelector   pool.Selectable[gateway.GatewayAPIClient]
 	serviceUser       *user.User
 	machineAuthAPIKey string
 	dataGatewayClient *http.Client
@@ -54,9 +54,18 @@ type CS3 struct {
 func NewCS3Storage(gwAddr, providerAddr, serviceUserID, serviceUserIDP, machineAuthAPIKey string) (s Storage, err error) {
 	c := http.DefaultClient
 
+	pws, err := pool.StorageProviderSelector(providerAddr)
+	if err != nil {
+		return nil, err
+	}
+	gws, err := pool.GatewaySelector(gwAddr)
+	if err != nil {
+		return nil, err
+	}
+
 	return &CS3{
-		providerAddr:      providerAddr,
-		gatewayAddr:       gwAddr,
+		providerSelector:  pws,
+		gatewaySelector:   gws,
 		dataGatewayClient: c,
 		machineAuthAPIKey: machineAuthAPIKey,
 		serviceUser: &user.User{
@@ -75,7 +84,7 @@ func (cs3 *CS3) Backend() string {
 
 // Init creates the metadata space
 func (cs3 *CS3) Init(ctx context.Context, spaceid string) (err error) {
-	client, err := cs3.providerClient()
+	client, err := cs3.providerSelector.Next()
 	if err != nil {
 		return err
 	}
@@ -122,7 +131,7 @@ func (cs3 *CS3) SimpleUpload(ctx context.Context, uploadpath string, content []b
 
 // Upload uploads a file to the metadata storage
 func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) error {
-	client, err := cs3.providerClient()
+	client, err := cs3.providerSelector.Next()
 	if err != nil {
 		return err
 	}
@@ -185,7 +194,7 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) error {
 
 // Stat returns the metadata for the given path
 func (cs3 *CS3) Stat(ctx context.Context, path string) (*provider.ResourceInfo, error) {
-	client, err := cs3.providerClient()
+	client, err := cs3.providerSelector.Next()
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +223,7 @@ func (cs3 *CS3) Stat(ctx context.Context, path string) (*provider.ResourceInfo, 
 
 // SimpleDownload reads a file from the metadata storage
 func (cs3 *CS3) SimpleDownload(ctx context.Context, downloadpath string) (content []byte, err error) {
-	client, err := cs3.providerClient()
+	client, err := cs3.providerSelector.Next()
 	if err != nil {
 		return nil, err
 	}
@@ -277,7 +286,7 @@ func (cs3 *CS3) SimpleDownload(ctx context.Context, downloadpath string) (conten
 
 // Delete deletes a path
 func (cs3 *CS3) Delete(ctx context.Context, path string) error {
-	client, err := cs3.providerClient()
+	client, err := cs3.providerSelector.Next()
 	if err != nil {
 		return err
 	}
@@ -318,7 +327,7 @@ func (cs3 *CS3) ReadDir(ctx context.Context, path string) ([]string, error) {
 
 // ListDir returns a list of ResourceInfos for the entries in a given directory
 func (cs3 *CS3) ListDir(ctx context.Context, path string) ([]*provider.ResourceInfo, error) {
-	client, err := cs3.providerClient()
+	client, err := cs3.providerSelector.Next()
 	if err != nil {
 		return nil, err
 	}
@@ -347,7 +356,7 @@ func (cs3 *CS3) ListDir(ctx context.Context, path string) ([]*provider.ResourceI
 
 // MakeDirIfNotExist will create a root node in the metadata storage. Requires an authenticated context.
 func (cs3 *CS3) MakeDirIfNotExist(ctx context.Context, folder string) error {
-	client, err := cs3.providerClient()
+	client, err := cs3.providerSelector.Next()
 	if err != nil {
 		return err
 	}
@@ -415,16 +424,11 @@ func (cs3 *CS3) ResolveSymlink(ctx context.Context, name string) (string, error)
 	return string(b), err
 }
 
-func (cs3 *CS3) providerClient() (provider.ProviderAPIClient, error) {
-	return pool.GetStorageProviderServiceClient(cs3.providerAddr)
-}
-
 func (cs3 *CS3) getAuthContext(ctx context.Context) (context.Context, error) {
-	client, err := pool.GetGatewayServiceClient(cs3.gatewayAddr)
+	client, err := cs3.gatewaySelector.Next()
 	if err != nil {
 		return nil, err
 	}
-
 	authCtx := ctxpkg.ContextSetUser(context.Background(), cs3.serviceUser)
 	authRes, err := client.Authenticate(authCtx, &gateway.AuthenticateRequest{
 		Type:         "machine",

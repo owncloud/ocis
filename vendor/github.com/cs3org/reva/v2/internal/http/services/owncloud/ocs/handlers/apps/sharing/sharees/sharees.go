@@ -54,9 +54,14 @@ func (h *Handler) FindSharees(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gwc, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting gateway grpc client", err)
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting gateway selector", err)
+		return
+	}
+	gwc, err := selector.Next()
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error selecting next client", err)
 		return
 	}
 	usersRes, err := gwc.FindUsers(r.Context(), &userpb.FindUsersRequest{Filter: term, SkipFetchingUserGroups: true})

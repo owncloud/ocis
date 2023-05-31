@@ -109,9 +109,14 @@ func (h *sharesHandler) createShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		WriteError(w, r, APIErrorServerError, "error getting storage grpc client", err)
+		WriteError(w, r, APIErrorServerError, "error getting gateway selector", err)
+		return
+	}
+	gatewayClient, err := selector.Next()
+	if err != nil {
+		WriteError(w, r, APIErrorServerError, "error selecting next client", err)
 		return
 	}
 

@@ -3,7 +3,6 @@ package search
 import (
 	"context"
 	"fmt"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -14,6 +13,7 @@ import (
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/walker"
 	"github.com/cs3org/reva/v2/pkg/storagespace"

@@ -436,9 +436,13 @@ func (m *mgr) ListShares(ctx context.Context, filters []*collaboration.Filter) (
 	log := appctx.GetLogger(ctx)
 	user := ctxpkg.ContextMustGetUser(ctx)
 
-	client, err := pool.GetGatewayServiceClient(m.c.GatewayAddr)
+	selector, err := pool.GatewaySelector(m.c.GatewayAddr)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to list shares")
+		return nil, errors.Wrap(err, "error getting gateway selector")
+	}
+	client, err := selector.Next()
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting next gateway client")
 	}
 	cache := make(map[string]struct{})
 	var ss []*collaboration.Share

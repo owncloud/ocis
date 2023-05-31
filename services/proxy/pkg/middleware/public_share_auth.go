@@ -84,13 +84,18 @@ func (a PublicShareAuthenticator) Authenticate(r *http.Request) (*http.Request, 
 		}
 	}
 
-	gatewayClient, err := a.RevaGatewaySelector.Next()
+	client, err := a.RevaGatewaySelector.Next()
 	if err != nil {
-		a.Logger.Error().Err(err).Msg("could not get reva gatewayClient")
+		a.Logger.Error().
+			Err(err).
+			Str("authenticator", "public_share").
+			Str("public_share_token", shareToken).
+			Str("path", r.URL.Path).
+			Msg("could not select next gateway client")
 		return nil, false
 	}
 
-	authResp, err := gatewayClient.Authenticate(r.Context(), &gateway.AuthenticateRequest{
+	authResp, err := client.Authenticate(r.Context(), &gateway.AuthenticateRequest{
 		Type:         authenticationType,
 		ClientId:     shareToken,
 		ClientSecret: sharePassword,

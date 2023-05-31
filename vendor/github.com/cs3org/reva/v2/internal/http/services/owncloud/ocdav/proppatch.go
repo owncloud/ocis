@@ -64,9 +64,14 @@ func (s *svc) handlePathProppatch(w http.ResponseWriter, r *http.Request, ns str
 	case rpcStatus.Code != rpc.Code_CODE_OK:
 		return rstatus.HTTPStatusFromCode(rpcStatus.Code), errtypes.NewErrtypeFromStatus(rpcStatus)
 	}
+
+	client, err := s.gwClient.Next()
+	if err != nil {
+		return http.StatusInternalServerError, errtypes.InternalError(err.Error())
+	}
 	// check if resource exists
 	statReq := &provider.StatRequest{Ref: spacelookup.MakeRelativeReference(space, fn, false)}
-	statRes, err := s.gwClient.Stat(ctx, statReq)
+	statRes, err := client.Stat(ctx, statReq)
 	switch {
 	case err != nil:
 		return http.StatusInternalServerError, err
@@ -137,6 +142,12 @@ func (s *svc) handleProppatch(ctx context.Context, w http.ResponseWriter, r *htt
 	acceptedProps := []xml.Name{}
 	removedProps := []xml.Name{}
 
+	client, err := s.gwClient.Next()
+	if err != nil {
+		log.Error().Err(err).Msg("error selecting next gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return nil, nil, false
+	}
 	for i := range patches {
 		if len(patches[i].Props) < 1 {
 			continue
@@ -161,7 +172,7 @@ func (s *svc) handleProppatch(ctx context.Context, w http.ResponseWriter, r *htt
 			// FIXME: batch this somehow
 			if remove {
 				rreq.ArbitraryMetadataKeys[0] = key
-				res, err := s.gwClient.UnsetArbitraryMetadata(ctx, rreq)
+				res, err := client.UnsetArbitraryMetadata(ctx, rreq)
 				if err != nil {
 					log.Error().Err(err).Msg("error sending a grpc UnsetArbitraryMetadata request")
 					w.WriteHeader(http.StatusInternalServerError)
@@ -178,7 +189,7 @@ func (s *svc) handleProppatch(ctx context.Context, w http.ResponseWriter, r *htt
 					m := res.Status.Message
 					if res.Status.Code == rpc.Code_CODE_PERMISSION_DENIED {
 						// check if user has access to resource
-						sRes, err := s.gwClient.Stat(ctx, &provider.StatRequest{Ref: ref})
+						sRes, err := client.Stat(ctx, &provider.StatRequest{Ref: ref})
 						if err != nil {
 							log.Error().Err(err).Msg("error performing stat grpc request")
 							w.WriteHeader(http.StatusInternalServerError)
@@ -200,7 +211,7 @@ func (s *svc) handleProppatch(ctx context.Context, w http.ResponseWriter, r *htt
 					return nil, nil, false
 				}
 				if key == "http://owncloud.org/ns/favorite" {
-					statRes, err := s.gwClient.Stat(ctx, &provider.StatRequest{Ref: ref})
+					statRes, err := client.Stat(ctx, &provider.StatRequest{Ref: ref})
 					if err != nil {
 						w.WriteHeader(http.StatusInternalServerError)
 						return nil, nil, false
@@ -215,7 +226,7 @@ func (s *svc) handleProppatch(ctx context.Context, w http.ResponseWriter, r *htt
 				removedProps = append(removedProps, propNameXML)
 			} else {
 				sreq.ArbitraryMetadata.Metadata[key] = value
-				res, err := s.gwClient.SetArbitraryMetadata(ctx, sreq)
+				res, err := client.SetArbitraryMetadata(ctx, sreq)
 				if err != nil {
 					log.Error().Err(err).Str("key", key).Str("value", value).Msg("error sending a grpc SetArbitraryMetadata request")
 					w.WriteHeader(http.StatusInternalServerError)
@@ -232,7 +243,7 @@ func (s *svc) handleProppatch(ctx context.Context, w http.ResponseWriter, r *htt
 					m := res.Status.Message
 					if res.Status.Code == rpc.Code_CODE_PERMISSION_DENIED {
 						// check if user has access to resource
-						sRes, err := s.gwClient.Stat(ctx, &provider.StatRequest{Ref: ref})
+						sRes, err := client.Stat(ctx, &provider.StatRequest{Ref: ref})
 						if err != nil {
 							log.Error().Err(err).Msg("error performing stat grpc request")
 							w.WriteHeader(http.StatusInternalServerError)
@@ -258,7 +269,7 @@ func (s *svc) handleProppatch(ctx context.Context, w http.ResponseWriter, r *htt
 				delete(sreq.ArbitraryMetadata.Metadata, key)
 
 				if key == "http://owncloud.org/ns/favorite" {
-					statRes, err := s.gwClient.Stat(ctx, &provider.StatRequest{Ref: ref})
+					statRes, err := client.Stat(ctx, &provider.StatRequest{Ref: ref})
 					if err != nil || statRes.Info == nil {
 						w.WriteHeader(http.StatusInternalServerError)
 						return nil, nil, false

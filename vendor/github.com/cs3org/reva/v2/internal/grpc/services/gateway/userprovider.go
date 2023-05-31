@@ -28,10 +28,16 @@ import (
 )
 
 func (s *svc) GetUser(ctx context.Context, req *user.GetUserRequest) (*user.GetUserResponse, error) {
-	c, err := pool.GetUserProviderServiceClient(s.c.UserProviderEndpoint)
+	selector, err := pool.IdentityUserSelector(s.c.UserProviderEndpoint)
 	if err != nil {
 		return &user.GetUserResponse{
-			Status: status.NewInternal(ctx, "error getting auth client"),
+			Status: status.NewInternal(ctx, "error getting identity user selector"),
+		}, nil
+	}
+	c, err := selector.Next()
+	if err != nil {
+		return &user.GetUserResponse{
+			Status: status.NewInternal(ctx, "error selecting next identity user client"),
 		}, nil
 	}
 
@@ -44,10 +50,16 @@ func (s *svc) GetUser(ctx context.Context, req *user.GetUserRequest) (*user.GetU
 }
 
 func (s *svc) GetUserByClaim(ctx context.Context, req *user.GetUserByClaimRequest) (*user.GetUserByClaimResponse, error) {
-	c, err := pool.GetUserProviderServiceClient(s.c.UserProviderEndpoint)
+	selector, err := pool.IdentityUserSelector(s.c.UserProviderEndpoint)
 	if err != nil {
 		return &user.GetUserByClaimResponse{
-			Status: status.NewInternal(ctx, "error getting auth client"),
+			Status: status.NewInternal(ctx, "error getting identity user selector"),
+		}, nil
+	}
+	c, err := selector.Next()
+	if err != nil {
+		return &user.GetUserByClaimResponse{
+			Status: status.NewInternal(ctx, "error selecting next identity user client"),
 		}, nil
 	}
 
@@ -60,10 +72,16 @@ func (s *svc) GetUserByClaim(ctx context.Context, req *user.GetUserByClaimReques
 }
 
 func (s *svc) FindUsers(ctx context.Context, req *user.FindUsersRequest) (*user.FindUsersResponse, error) {
-	c, err := pool.GetUserProviderServiceClient(s.c.UserProviderEndpoint)
+	selector, err := pool.IdentityUserSelector(s.c.UserProviderEndpoint)
 	if err != nil {
 		return &user.FindUsersResponse{
-			Status: status.NewInternal(ctx, "error getting auth client"),
+			Status: status.NewInternal(ctx, "error getting identity user selector"),
+		}, nil
+	}
+	c, err := selector.Next()
+	if err != nil {
+		return &user.FindUsersResponse{
+			Status: status.NewInternal(ctx, "error selecting next identity user client"),
 		}, nil
 	}
 
@@ -76,10 +94,16 @@ func (s *svc) FindUsers(ctx context.Context, req *user.FindUsersRequest) (*user.
 }
 
 func (s *svc) GetUserGroups(ctx context.Context, req *user.GetUserGroupsRequest) (*user.GetUserGroupsResponse, error) {
-	c, err := pool.GetUserProviderServiceClient(s.c.UserProviderEndpoint)
+	selector, err := pool.IdentityUserSelector(s.c.UserProviderEndpoint)
 	if err != nil {
 		return &user.GetUserGroupsResponse{
-			Status: status.NewInternal(ctx, "error getting auth client"),
+			Status: status.NewInternal(ctx, "error getting identity user selector"),
+		}, nil
+	}
+	c, err := selector.Next()
+	if err != nil {
+		return &user.GetUserGroupsResponse{
+			Status: status.NewInternal(ctx, "error selecting next identity user client"),
 		}, nil
 	}
 

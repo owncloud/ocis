@@ -79,8 +79,16 @@ func (h *sendHandler) Handler() http.Handler {
 		// "loginUsername": "einstein",
 		// "loginPassword": "Ny4Nv6WLoC1o70kVgrVOZLZ2vRgPjuej"
 
-		gatewayAddr := h.GatewaySvc
-		gatewayClient, err := pool.GetGatewayServiceClient(gatewayAddr)
+		selector, err := pool.GatewaySelector(h.GatewaySvc)
+		if err != nil {
+			WriteError(w, r, APIErrorServerError, "error getting gateway selector", err)
+			return
+		}
+		gatewayClient, err := selector.Next()
+		if err != nil {
+			WriteError(w, r, APIErrorServerError, "error selecting next client", err)
+			return
+		}
 		if err != nil {
 			log.Error().Msg("cannot get grpc client!")
 			w.WriteHeader(http.StatusInternalServerError)

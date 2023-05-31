@@ -216,9 +216,13 @@ func (fs *cephfs) getUserByID(ctx context.Context, uid string) (*userpb.User, er
 		return entity.(*userpb.User), nil
 	}
 
-	client, err := pool.GetGatewayServiceClient(fs.conf.GatewaySvc)
+	selector, err := pool.GatewaySelector(fs.conf.GatewaySvc)
 	if err != nil {
-		return nil, errors.Wrap(err, "cephfs: error getting gateway grpc client")
+		return nil, errors.Wrap(err, "error getting gateway selector")
+	}
+	client, err := selector.Next()
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting next gateway client")
 	}
 	getUserResp, err := client.GetUserByClaim(ctx, &userpb.GetUserByClaimRequest{
 		Claim: "uid",
@@ -241,9 +245,13 @@ func (fs *cephfs) getUserByOpaqueID(ctx context.Context, oid string) (*userpb.Us
 	if entity, found := fs.conn.userCache.Get(oid); found {
 		return entity.(*userpb.User), nil
 	}
-	client, err := pool.GetGatewayServiceClient(fs.conf.GatewaySvc)
+	selector, err := pool.GatewaySelector(fs.conf.GatewaySvc)
 	if err != nil {
-		return nil, errors.Wrap(err, "cephfs: error getting gateway grpc client")
+		return nil, errors.Wrap(err, "error getting gateway selector")
+	}
+	client, err := selector.Next()
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting next gateway client")
 	}
 	getUserResp, err := client.GetUser(ctx, &userpb.GetUserRequest{
 		UserId: &userpb.UserId{
@@ -268,9 +276,13 @@ func (fs *cephfs) getGroupByID(ctx context.Context, gid string) (*grouppb.Group,
 		return entity.(*grouppb.Group), nil
 	}
 
-	client, err := pool.GetGatewayServiceClient(fs.conf.GatewaySvc)
+	selector, err := pool.GatewaySelector(fs.conf.GatewaySvc)
 	if err != nil {
-		return nil, errors.Wrap(err, "cephfs: error getting gateway grpc client")
+		return nil, errors.Wrap(err, "error getting gateway selector")
+	}
+	client, err := selector.Next()
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting next gateway client")
 	}
 	getGroupResp, err := client.GetGroupByClaim(ctx, &grouppb.GetGroupByClaimRequest{
 		Claim: "gid",
@@ -292,9 +304,13 @@ func (fs *cephfs) getGroupByOpaqueID(ctx context.Context, oid string) (*grouppb.
 	if entity, found := fs.conn.groupCache.Get(oid); found {
 		return entity.(*grouppb.Group), nil
 	}
-	client, err := pool.GetGatewayServiceClient(fs.conf.GatewaySvc)
+	selector, err := pool.GatewaySelector(fs.conf.GatewaySvc)
 	if err != nil {
-		return nil, errors.Wrap(err, "cephfs: error getting gateway grpc client")
+		return nil, errors.Wrap(err, "error getting gateway selector")
+	}
+	client, err := selector.Next()
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting next gateway client")
 	}
 	getGroupResp, err := client.GetGroup(ctx, &grouppb.GetGroupRequest{
 		GroupId: &grouppb.GroupId{

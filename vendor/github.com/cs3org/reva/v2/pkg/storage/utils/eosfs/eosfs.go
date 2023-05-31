@@ -843,9 +843,13 @@ func (fs *eosfs) SetLock(ctx context.Context, ref *provider.Reference, l *provid
 }
 
 func (fs *eosfs) getUserFromID(ctx context.Context, userID *userpb.UserId) (*userpb.User, error) {
-	client, err := pool.GetGatewayServiceClient(fs.conf.GatewaySvc)
+	selector, err := pool.GatewaySelector(fs.conf.GatewaySvc)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "error getting gateway selector")
+	}
+	client, err := selector.Next()
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting next gateway client")
 	}
 	res, err := client.GetUser(ctx, &userpb.GetUserRequest{
 		UserId: userID,
@@ -2296,10 +2300,13 @@ func (fs *eosfs) getUIDGateway(ctx context.Context, u *userpb.UserId) (eosclient
 		log.Debug().Msg("eosfs: found cached user " + u.OpaqueId)
 		return fs.extractUIDAndGID(userIDInterface.(*userpb.User))
 	}
-
-	client, err := pool.GetGatewayServiceClient(fs.conf.GatewaySvc)
+	selector, err := pool.GatewaySelector(fs.conf.GatewaySvc)
 	if err != nil {
-		return eosclient.Authorization{}, errors.Wrap(err, "eosfs: error getting gateway grpc client")
+		return eosclient.Authorization{}, errors.Wrap(err, "error getting gateway selector")
+	}
+	client, err := selector.Next()
+	if err != nil {
+		return eosclient.Authorization{}, errors.Wrap(err, "error selecting next gateway client")
 	}
 	getUserResp, err := client.GetUser(ctx, &userpb.GetUserRequest{
 		UserId:                 u,
@@ -2331,9 +2338,13 @@ func (fs *eosfs) getUserIDGateway(ctx context.Context, uid string) (*userpb.User
 	}
 
 	log.Debug().Msg("eosfs: retrieving user from gateway for uid " + uid)
-	client, err := pool.GetGatewayServiceClient(fs.conf.GatewaySvc)
+	selector, err := pool.GatewaySelector(fs.conf.GatewaySvc)
 	if err != nil {
-		return nil, errors.Wrap(err, "eosfs: error getting gateway grpc client")
+		return nil, errors.Wrap(err, "error getting gateway selector")
+	}
+	client, err := selector.Next()
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting next gateway client")
 	}
 	getUserResp, err := client.GetUserByClaim(ctx, &userpb.GetUserByClaimRequest{
 		Claim:                  "uid",

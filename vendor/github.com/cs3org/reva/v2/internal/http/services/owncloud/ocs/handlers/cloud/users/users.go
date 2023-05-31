@@ -154,9 +154,14 @@ func (h Handler) fillPersonalQuota(ctx context.Context, d *User, u *cs3identity.
 
 	sublog := appctx.GetLogger(ctx)
 
-	gc, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		sublog.Error().Err(err).Msg("error getting gateway client")
+		sublog.Error().Err(err).Msg("error getting gateway selector")
+		return
+	}
+	gc, err := selector.Next()
+	if err != nil {
+		sublog.Error().Err(err).Msg("error selecting next client")
 		return
 	}
 

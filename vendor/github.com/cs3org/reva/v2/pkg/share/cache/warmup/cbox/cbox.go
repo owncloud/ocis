@@ -119,9 +119,13 @@ func (m *manager) GetResourceInfos() ([]*provider.ResourceInfo, error) {
 	}
 	ctx := metadata.AppendToOutgoingContext(context.Background(), ctxpkg.TokenHeader, tkn)
 
-	client, err := pool.GetGatewayServiceClient(m.conf.GatewaySvc)
+	selector, err := pool.GatewaySelector(m.conf.GatewaySvc)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "error getting gateway selector")
+	}
+	client, err := selector.Next()
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting next gateway client")
 	}
 
 	infos := []*provider.ResourceInfo{}

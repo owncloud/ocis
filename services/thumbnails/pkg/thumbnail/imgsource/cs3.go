@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"io"
 	"net/http"
 
@@ -12,6 +11,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/owncloud/ocis/v2/services/thumbnails/pkg/config"
@@ -53,13 +53,12 @@ func (s CS3) Get(ctx context.Context, path string) (io.ReadCloser, error) {
 		}
 	}
 
-	gatewayClient, err := s.gatewaySelector.Next()
+	ctx = metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
+	gwc, err := s.gatewaySelector.Next()
 	if err != nil {
 		return nil, err
 	}
-
-	ctx = metadata.AppendToOutgoingContext(context.Background(), revactx.TokenHeader, auth)
-	rsp, err := gatewayClient.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: &ref})
+	rsp, err := gwc.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{Ref: &ref})
 
 	if err != nil {
 		return nil, err

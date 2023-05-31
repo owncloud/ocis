@@ -65,20 +65,18 @@ func (m createHome) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		}
 	}
 
-	gatewayClient, err := m.revaGatewaySelector.Next()
+	client, err := m.revaGatewaySelector.Next()
 	if err != nil {
-		m.logger.Error().Err(err).Msg("could not get reva gatewayClient")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	createHomeRes, err := gatewayClient.CreateHome(ctx, createHomeReq)
-	if err != nil {
-		m.logger.Err(err).Msg("error calling CreateHome")
-	} else if createHomeRes.Status.Code != rpc.Code_CODE_OK {
-		err := status.NewErrorFromCode(createHomeRes.Status.Code, "gateway")
-		if createHomeRes.Status.Code != rpc.Code_CODE_ALREADY_EXISTS {
-			m.logger.Err(err).Msg("error when calling Createhome")
+		m.logger.Err(err).Msg("error selecting next gateway client")
+	} else {
+		createHomeRes, err := client.CreateHome(ctx, createHomeReq)
+		if err != nil {
+			m.logger.Err(err).Msg("error calling CreateHome")
+		} else if createHomeRes.Status.Code != rpc.Code_CODE_OK {
+			err := status.NewErrorFromCode(createHomeRes.Status.Code, "gateway")
+			if createHomeRes.Status.Code != rpc.Code_CODE_ALREADY_EXISTS {
+				m.logger.Err(err).Msg("error when calling Createhome")
+			}
 		}
 	}
 

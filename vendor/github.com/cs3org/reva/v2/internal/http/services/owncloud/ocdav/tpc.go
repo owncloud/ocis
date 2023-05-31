@@ -37,6 +37,7 @@ import (
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/net"
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 )
 
@@ -134,10 +135,16 @@ func (s *svc) handleTPCPull(ctx context.Context, w http.ResponseWriter, r *http.
 	}
 	sublog.Debug().Bool("overwrite", overwrite).Msg("TPC Pull")
 
+	client, err := s.gwClient.Next()
+	if err != nil {
+		sublog.Error().Err(err).Msg("error selecting next gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	// check if destination exists
 	ref := &provider.Reference{Path: dst}
 	dstStatReq := &provider.StatRequest{Ref: ref}
-	dstStatRes, err := s.gwClient.Stat(ctx, dstStatReq)
+	dstStatRes, err := client.Stat(ctx, dstStatReq)
 	if err != nil {
 		sublog.Error().Err(err).Msg("error sending grpc stat request")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -161,7 +168,7 @@ func (s *svc) handleTPCPull(ctx context.Context, w http.ResponseWriter, r *http.
 	fmt.Fprintf(w, "success: Created")
 }
 
-func (s *svc) performHTTPPull(ctx context.Context, client gateway.GatewayAPIClient, r *http.Request, w http.ResponseWriter, ns string) error {
+func (s *svc) performHTTPPull(ctx context.Context, selector pool.Selectable[gateway.GatewayAPIClient], r *http.Request, w http.ResponseWriter, ns string) error {
 	src := r.Header.Get("Source")
 	dst := path.Join(ns, r.URL.Path)
 	sublog := appctx.GetLogger(ctx)
@@ -197,6 +204,12 @@ func (s *svc) performHTTPPull(ctx context.Context, client gateway.GatewayAPIClie
 		return errtypes.InternalError(fmt.Sprintf("Remote GET returned status code %d", httpDownloadRes.StatusCode))
 	}
 
+	client, err := s.gwClient.Next()
+	if err != nil {
+		sublog.Error().Err(err).Msg("error selecting next gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return errtypes.InternalError(err.Error())
+	}
 	// get upload url
 	uReq := &provider.InitiateFileUploadRequest{
 		Ref: &provider.Reference{Path: dst},
@@ -287,9 +300,15 @@ func (s *svc) handleTPCPush(ctx context.Context, w http.ResponseWriter, r *http.
 
 	sublog.Debug().Bool("overwrite", overwrite).Msg("TPC Push")
 
+	client, err := s.gwClient.Next()
+	if err != nil {
+		sublog.Error().Err(err).Msg("error selecting next gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	ref := &provider.Reference{Path: src}
 	srcStatReq := &provider.StatRequest{Ref: ref}
-	srcStatRes, err := s.gwClient.Stat(ctx, srcStatReq)
+	srcStatRes, err := client.Stat(ctx, srcStatReq)
 	if err != nil {
 		sublog.Error().Err(err).Msg("error sending grpc stat request")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -305,7 +324,7 @@ func (s *svc) handleTPCPush(ctx context.Context, w http.ResponseWriter, r *http.
 		return
 	}
 
-	err = s.performHTTPPush(ctx, s.gwClient, r, w, srcStatRes.Info, ns)
+	err = s.performHTTPPush(ctx, r, w, srcStatRes.Info, ns)
 	if err != nil {
 		sublog.Error().Err(err).Msg("error performing TPC Push")
 		return
@@ -313,7 +332,7 @@ func (s *svc) handleTPCPush(ctx context.Context, w http.ResponseWriter, r *http.
 	fmt.Fprintf(w, "success: Created")
 }
 
-func (s *svc) performHTTPPush(ctx context.Context, client gateway.GatewayAPIClient, r *http.Request, w http.ResponseWriter, srcInfo *provider.ResourceInfo, ns string) error {
+func (s *svc) performHTTPPush(ctx context.Context, r *http.Request, w http.ResponseWriter, srcInfo *provider.ResourceInfo, ns string) error {
 	src := path.Join(ns, r.URL.Path)
 	dst := r.Header.Get("Destination")
 
@@ -325,6 +344,12 @@ func (s *svc) performHTTPPush(ctx context.Context, client gateway.GatewayAPIClie
 		Ref: &provider.Reference{Path: src},
 	}
 
+	client, err := s.gwClient.Next()
+	if err != nil {
+		sublog.Error().Err(err).Msg("error selecting next gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return err
+	}
 	dRes, err := client.InitiateFileDownload(ctx, dReq)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

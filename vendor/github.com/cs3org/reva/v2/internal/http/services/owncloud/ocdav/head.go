@@ -63,9 +63,14 @@ func (s *svc) handlePathHead(w http.ResponseWriter, r *http.Request, ns string) 
 }
 
 func (s *svc) handleHead(ctx context.Context, w http.ResponseWriter, r *http.Request, ref *provider.Reference, log zerolog.Logger) {
-
+	client, err := s.gwClient.Next()
+	if err != nil {
+		log.Error().Err(err).Msg("error selecting next client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	req := &provider.StatRequest{Ref: ref}
-	res, err := s.gwClient.Stat(ctx, req)
+	res, err := client.Stat(ctx, req)
 	if err != nil {
 		log.Error().Err(err).Msg("error sending grpc stat request")
 		w.WriteHeader(http.StatusInternalServerError)

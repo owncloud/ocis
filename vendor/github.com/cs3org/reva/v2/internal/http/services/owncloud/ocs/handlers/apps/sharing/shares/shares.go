@@ -503,9 +503,14 @@ func (h *Handler) GetShare(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	sublog := appctx.GetLogger(ctx).With().Str("shareID", shareID).Logger()
 
-	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting grpc gateway client", err)
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting gateway selector", nil)
+		return
+	}
+	client, err := selector.Next()
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error selecting next client", nil)
 		return
 	}
 
@@ -695,9 +700,14 @@ func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, share *col
 	ctx := r.Context()
 	sublog := appctx.GetLogger(ctx).With().Str("shareID", share.GetId().GetOpaqueId()).Logger()
 
-	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting grpc gateway client", err)
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting gateway selector", nil)
+		return
+	}
+	client, err := selector.Next()
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error selecting next client", nil)
 		return
 	}
 
@@ -1110,9 +1120,14 @@ func (h *Handler) addFilters(w http.ResponseWriter, r *http.Request, ref *provid
 	ctx := r.Context()
 
 	// first check if the file exists
-	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting grpc gateway client", err)
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting gateway selector", nil)
+		return nil, nil, err
+	}
+	client, err := selector.Next()
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error selecting next client", nil)
 		return nil, nil, err
 	}
 
@@ -1159,23 +1174,34 @@ func (h *Handler) addFileInfo(ctx context.Context, s *conversions.ShareData, inf
 	switch {
 	case h.sharePrefix == "/":
 		s.FileTarget = info.Path
-		client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+		selector, err := pool.GatewaySelector(h.gatewayAddr)
+		if err != nil {
+			sublog.Error().Err(err).Msg("error getting gateway selector")
+			return
+		}
 		if err == nil {
-			gpRes, err := client.GetPath(ctx, &provider.GetPathRequest{
-				ResourceId: info.Id,
-			})
-			if err == nil && gpRes.Status.Code == rpc.Code_CODE_OK {
-				// TODO log error?
+			client, err := selector.Next()
+			if err != nil {
+				sublog.Error().Err(err).Msg("error selecting next client")
+				return
+			}
+			if err == nil {
+				gpRes, err := client.GetPath(ctx, &provider.GetPathRequest{
+					ResourceId: info.Id,
+				})
+				if err == nil && gpRes.Status.Code == rpc.Code_CODE_OK {
+					// TODO log error?
 
-				// cut off configured home namespace, paths in ocs shares are relative to it
-				identifier := h.mustGetIdentifiers(ctx, client, info.GetOwner().GetOpaqueId(), false)
-				u := &userpb.User{
-					Id:          info.Owner,
-					Username:    identifier.Username,
-					DisplayName: identifier.DisplayName,
-					Mail:        identifier.Mail,
+					// cut off configured home namespace, paths in ocs shares are relative to it
+					identifier := h.mustGetIdentifiers(ctx, client, info.GetOwner().GetOpaqueId(), false)
+					u := &userpb.User{
+						Id:          info.Owner,
+						Username:    identifier.Username,
+						DisplayName: identifier.DisplayName,
+						Mail:        identifier.Mail,
+					}
+					s.Path = strings.TrimPrefix(gpRes.Path, h.getHomeNamespace(u))
 				}
-				s.Path = strings.TrimPrefix(gpRes.Path, h.getHomeNamespace(u))
 			}
 		}
 	default:
@@ -1493,7 +1519,11 @@ func getStateFilter(s string) collaboration.ShareState {
 }
 
 func (h *Handler) getPoolClient() (gateway.GatewayAPIClient, error) {
-	return pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
+	if err != nil {
+		return nil, err
+	}
+	return selector.Next()
 }
 
 func (h *Handler) getHomeNamespace(u *userpb.User) string {

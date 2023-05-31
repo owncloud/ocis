@@ -131,7 +131,11 @@ func (h *Handler) createUserShare(w http.ResponseWriter, r *http.Request, statIn
 
 func (h *Handler) isUserShare(r *http.Request, oid string) (*collaboration.Share, bool) {
 	logger := appctx.GetLogger(r.Context())
-	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
+	if err != nil {
+		logger.Err(err)
+	}
+	client, err := selector.Next()
 	if err != nil {
 		logger.Err(err)
 	}

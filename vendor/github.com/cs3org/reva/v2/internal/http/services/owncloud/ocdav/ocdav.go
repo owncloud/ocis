@@ -144,7 +144,7 @@ type svc struct {
 	davHandler       *DavHandler
 	favoritesManager favorite.Manager
 	client           *http.Client
-	gwClient         gateway.GatewayAPIClient
+	gwClient         pool.Selectable[gateway.GatewayAPIClient]
 	// LockSystem is the lock management system.
 	LockSystem          LockSystem
 	userIdentifierCache *ttlcache.Cache
@@ -163,11 +163,11 @@ func getFavoritesManager(c *Config) (favorite.Manager, error) {
 }
 func getLockSystem(c *Config) (LockSystem, error) {
 	// TODO in memory implementation
-	client, err := pool.GetGatewayServiceClient(c.GatewaySvc)
+	selector, err := pool.GatewaySelector(c.GatewaySvc)
 	if err != nil {
 		return nil, err
 	}
-	return NewCS3LS(client), nil
+	return NewCS3LS(selector), nil
 }
 
 // New returns a new ocdav service
@@ -192,7 +192,7 @@ func New(m map[string]interface{}, log *zerolog.Logger) (global.Service, error) 
 }
 
 // NewWith returns a new ocdav service
-func NewWith(conf *Config, fm favorite.Manager, ls LockSystem, _ *zerolog.Logger, gwc gateway.GatewayAPIClient) (global.Service, error) {
+func NewWith(conf *Config, fm favorite.Manager, ls LockSystem, _ *zerolog.Logger, selector pool.Selectable[gateway.GatewayAPIClient]) (global.Service, error) {
 	// be safe - init the conf again
 	conf.init()
 
@@ -204,7 +204,7 @@ func NewWith(conf *Config, fm favorite.Manager, ls LockSystem, _ *zerolog.Logger
 			rhttp.Timeout(time.Duration(conf.Timeout*int64(time.Second))),
 			rhttp.Insecure(conf.Insecure),
 		),
-		gwClient:            gwc,
+		gwClient:            selector,
 		favoritesManager:    fm,
 		LockSystem:          ls,
 		userIdentifierCache: ttlcache.NewCache(),
@@ -219,9 +219,9 @@ func NewWith(conf *Config, fm favorite.Manager, ls LockSystem, _ *zerolog.Logger
 	if err := s.davHandler.init(conf); err != nil {
 		return nil, err
 	}
-	if gwc == nil {
+	if selector == nil {
 		var err error
-		s.gwClient, err = pool.GetGatewayServiceClient(s.c.GatewaySvc)
+		s.gwClient, err = pool.GatewaySelector(s.c.GatewaySvc)
 		if err != nil {
 			return nil, err
 		}
@@ -326,7 +326,12 @@ func (s *svc) ApplyLayout(ctx context.Context, ns string, useLoggedInUserNS bool
 		requestUsernameOrID, requestPath = router.ShiftPath(requestPath)
 
 		// Check if this is a Userid
-		userRes, err := s.gwClient.GetUser(ctx, &userpb.GetUserRequest{
+		client, err := s.gwClient.Next()
+		if err != nil {
+			return "", "", err
+		}
+
+		userRes, err := client.GetUser(ctx, &userpb.GetUserRequest{
 			UserId: &userpb.UserId{OpaqueId: requestUsernameOrID},
 		})
 		if err != nil {
@@ -335,7 +340,7 @@ func (s *svc) ApplyLayout(ctx context.Context, ns string, useLoggedInUserNS bool
 
 		// If it's not a userid try if it is a user name
 		if userRes.Status.Code != rpc.Code_CODE_OK {
-			res, err := s.gwClient.GetUserByClaim(ctx, &userpb.GetUserByClaimRequest{
+			res, err := client.GetUserByClaim(ctx, &userpb.GetUserByClaimRequest{
 				Claim: "username",
 				Value: requestUsernameOrID,
 			})
@@ -406,7 +411,11 @@ func authContextForUser(client gateway.GatewayAPIClient, userID *userpb.UserId, 
 	return granteeCtx, nil
 }
 
-func (s *svc) sspReferenceIsChildOf(ctx context.Context, client gateway.GatewayAPIClient, child, parent *provider.Reference) (bool, error) {
+func (s *svc) sspReferenceIsChildOf(ctx context.Context, selector pool.Selectable[gateway.GatewayAPIClient], child, parent *provider.Reference) (bool, error) {
+	client, err := selector.Next()
+	if err != nil {
+		return false, err
+	}
 	parentStatRes, err := client.Stat(ctx, &provider.StatRequest{Ref: parent})
 	if err != nil {
 		return false, err
@@ -448,7 +457,7 @@ func (s *svc) sspReferenceIsChildOf(ctx context.Context, client gateway.GatewayA
 	return strings.HasPrefix(cp, pp), nil
 }
 
-func (s *svc) referenceIsChildOf(ctx context.Context, client gateway.GatewayAPIClient, child, parent *provider.Reference) (bool, error) {
+func (s *svc) referenceIsChildOf(ctx context.Context, selector pool.Selectable[gateway.GatewayAPIClient], child, parent *provider.Reference) (bool, error) {
 	if child.ResourceId.SpaceId != parent.ResourceId.SpaceId {
 		return false, nil // Not on the same storage -> not a child
 	}
@@ -459,7 +468,12 @@ func (s *svc) referenceIsChildOf(ctx context.Context, client gateway.GatewayAPIC
 
 	if child.ResourceId.SpaceId == utils.ShareStorageSpaceID || parent.ResourceId.SpaceId == utils.ShareStorageSpaceID {
 		// the sharesstorageprovider needs some special handling
-		return s.sspReferenceIsChildOf(ctx, client, child, parent)
+		return s.sspReferenceIsChildOf(ctx, selector, child, parent)
+	}
+
+	client, err := selector.Next()
+	if err != nil {
+		return false, err
 	}
 
 	// the references are on the same storage but relative to different resources

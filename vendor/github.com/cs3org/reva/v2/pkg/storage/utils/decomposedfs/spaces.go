@@ -451,9 +451,13 @@ func (fs *Decomposedfs) UserIDToUserAndGroups(ctx context.Context, userid *userv
 		return user.(*userv1beta1.User), nil
 	}
 
-	gwConn, err := pool.GetGatewayServiceClient(fs.o.GatewayAddr)
+	selector, err := pool.GatewaySelector(fs.o.GatewayAddr)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "error getting gateway selector")
+	}
+	gwConn, err := selector.Next()
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting next gateway client")
 	}
 	getUserResponse, err := gwConn.GetUser(ctx, &userv1beta1.GetUserRequest{
 		UserId:                 userid,

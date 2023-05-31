@@ -230,7 +230,11 @@ func (h *Handler) listPublicShares(r *http.Request, filters []*link.ListPublicSh
 	ocsDataPayload := make([]*conversions.ShareData, 0)
 	// TODO(refs) why is this guard needed? Are we moving towards a gateway only for service discovery? without a gateway this is dead code.
 	if h.gatewayAddr != "" {
-		client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+		selector, err := pool.GatewaySelector(h.gatewayAddr)
+		if err != nil {
+			return ocsDataPayload, nil, err
+		}
+		client, err := selector.Next()
 		if err != nil {
 			return ocsDataPayload, nil, err
 		}
@@ -275,7 +279,11 @@ func (h *Handler) listPublicShares(r *http.Request, filters []*link.ListPublicSh
 
 func (h *Handler) isPublicShare(r *http.Request, oid string) (*link.PublicShare, bool) {
 	logger := appctx.GetLogger(r.Context())
-	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
+	if err != nil {
+		logger.Err(err)
+	}
+	client, err := selector.Next()
 	if err != nil {
 		logger.Err(err)
 	}
@@ -301,10 +309,16 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 	updates := []*link.UpdatePublicShareRequest_Update{}
 	logger := appctx.GetLogger(r.Context())
 
-	gwC, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
 		log.Err(err).Str("shareID", share.GetId().GetOpaqueId()).Msg("updatePublicShare")
-		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "error getting a connection to the gateway service", nil)
+		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "error getting gateway selector", nil)
+		return
+	}
+	gwC, err := selector.Next()
+	if err != nil {
+		log.Err(err).Str("shareID", share.GetId().GetOpaqueId()).Msg("updatePublicShare")
+		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "error selecting next client", nil)
 		return
 	}
 
@@ -500,9 +514,16 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 func (h *Handler) removePublicShare(w http.ResponseWriter, r *http.Request, share *link.PublicShare) {
 	ctx := r.Context()
 
-	c, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting grpc gateway client", err)
+		log.Err(err).Str("shareID", share.GetId().GetOpaqueId()).Msg("updatePublicShare")
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting gateway selector", nil)
+		return
+	}
+	c, err := selector.Next()
+	if err != nil {
+		log.Err(err).Str("shareID", share.GetId().GetOpaqueId()).Msg("updatePublicShare")
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error selecting next client", nil)
 		return
 	}
 

@@ -48,7 +48,7 @@ import (
 
 type svc struct {
 	config     *Config
-	gtwClient  gateway.GatewayAPIClient
+	selector   pool.Selectable[gateway.GatewayAPIClient]
 	log        *zerolog.Logger
 	walker     walker.Walker
 	downloader downloader.Downloader
@@ -82,7 +82,7 @@ func New(conf map[string]interface{}, log *zerolog.Logger) (global.Service, erro
 
 	c.init()
 
-	gtw, err := pool.GetGatewayServiceClient(c.GatewaySvc)
+	selector, err := pool.GatewaySelector(c.GatewaySvc)
 	if err != nil {
 		return nil, err
 	}
@@ -99,9 +99,9 @@ func New(conf map[string]interface{}, log *zerolog.Logger) (global.Service, erro
 
 	return &svc{
 		config:         c,
-		gtwClient:      gtw,
-		downloader:     downloader.NewDownloader(gtw, rhttp.Insecure(c.Insecure), rhttp.Timeout(time.Duration(c.Timeout*int64(time.Second)))),
-		walker:         walker.NewWalker(gtw),
+		selector:       selector,
+		downloader:     downloader.NewDownloader(selector, rhttp.Insecure(c.Insecure), rhttp.Timeout(time.Duration(c.Timeout*int64(time.Second)))),
+		walker:         walker.NewWalker(selector),
 		log:            log,
 		allowedFolders: allowedFolderRegex,
 	}, nil
@@ -138,10 +138,14 @@ func (s *svc) getResources(ctx context.Context, paths, ids []string) ([]*provide
 
 	}
 
+	client, err := s.selector.Next()
+	if err != nil {
+		return nil, err
+	}
 	for _, p := range paths {
 		// id is base64 encoded and after decoding has the form <storage_id>:<resource_id>
 
-		resp, err := s.gtwClient.Stat(ctx, &provider.StatRequest{
+		resp, err := client.Stat(ctx, &provider.StatRequest{
 			Ref: &provider.Reference{
 				Path: p,
 			},

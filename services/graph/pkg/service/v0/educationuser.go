@@ -245,15 +245,13 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 			Msg("calling list spaces with user filter to fetch the personal space for deletion")
 		opaque := utils.AppendPlainToOpaque(nil, "unrestricted", "T")
 		f := listStorageSpacesUserFilter(user.GetId())
-
-		gatewayClient, err := g.gatewaySelector.Next()
+		client, err := g.gatewaySelector.Next()
 		if err != nil {
-			logger.Error().Err(err).Msg("could not get reva gatewayClient")
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+			logger.Error().Err(err).Msg("could not select next gateway client")
+			errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "could not select next gateway client, aborting")
 			return
 		}
-
-		lspr, err := gatewayClient.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
+		lspr, err := client.ListStorageSpaces(r.Context(), &storageprovider.ListStorageSpacesRequest{
 			Opaque:  opaque,
 			Filters: []*storageprovider.ListStorageSpacesRequest_Filter{f},
 		})
@@ -274,7 +272,7 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 			// Deleting a space a two step process (1. disabling/trashing, 2. purging)
 			// Do the "disable/trash" step only if the space is not marked as trashed yet:
 			if _, ok := sp.Opaque.Map["trashed"]; !ok {
-				_, err := gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+				_, err := client.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 					Id: &storageprovider.StorageSpaceId{
 						OpaqueId: sp.Id.OpaqueId,
 					},
@@ -286,7 +284,7 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 			purgeFlag := utils.AppendPlainToOpaque(nil, "purge", "")
-			_, err := gatewayClient.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
+			_, err := client.DeleteStorageSpace(r.Context(), &storageprovider.DeleteStorageSpaceRequest{
 				Opaque: purgeFlag,
 				Id: &storageprovider.StorageSpaceId{
 					OpaqueId: sp.Id.OpaqueId,

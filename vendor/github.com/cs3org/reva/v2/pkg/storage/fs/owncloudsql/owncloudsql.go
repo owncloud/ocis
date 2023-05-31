@@ -370,13 +370,22 @@ func (fs *owncloudsqlfs) getUser(ctx context.Context, usernameOrID string) (id *
 	// look up at the userprovider
 
 	// parts[0] contains the username or userid. use  user service to look up id
-	c, err := pool.GetUserProviderServiceClient(fs.c.UserProviderEndpoint)
+	selector, err := pool.IdentityUserSelector(fs.c.UserProviderEndpoint)
 	if err != nil {
 		appctx.GetLogger(ctx).
 			Error().Err(err).
 			Str("userprovidersvc", fs.c.UserProviderEndpoint).
 			Str("usernameOrID", usernameOrID).
-			Msg("could not get user provider client")
+			Msg("error getting identity user selector")
+		return nil, err
+	}
+	c, err := selector.Next()
+	if err != nil {
+		appctx.GetLogger(ctx).
+			Error().Err(err).
+			Str("userprovidersvc", fs.c.UserProviderEndpoint).
+			Str("usernameOrID", usernameOrID).
+			Msg("error selecting next identity user client")
 		return nil, err
 	}
 	res, err := c.GetUser(ctx, &userpb.GetUserRequest{

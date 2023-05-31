@@ -143,13 +143,7 @@ func (s *svc) Handler() http.Handler {
 func (s *svc) handleNew(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
-	client, err := pool.GetGatewayServiceClient(s.conf.GatewaySvc)
-	if err != nil {
-		writeError(w, r, appErrorServerError, "error getting grpc gateway client", err)
-		return
-	}
-
-	err = r.ParseForm()
+	err := r.ParseForm()
 	if err != nil {
 		writeError(w, r, appErrorInvalidParameter, "parameters could not be parsed", nil)
 	}
@@ -184,6 +178,16 @@ func (s *svc) handleNew(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	selector, err := pool.GatewaySelector(s.conf.GatewaySvc)
+	if err != nil {
+		writeError(w, r, appErrorServerError, "error getting grpc gateway selector", err)
+		return
+	}
+	client, err := selector.Next()
+	if err != nil {
+		writeError(w, r, appErrorServerError, "error selecting next client", err)
+		return
+	}
 	statParentContainerReq := &provider.StatRequest{
 		Ref: &provider.Reference{
 			ResourceId: &parentContainerID,
@@ -326,9 +330,14 @@ func (s *svc) handleNew(w http.ResponseWriter, r *http.Request) {
 
 func (s *svc) handleList(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	client, err := pool.GetGatewayServiceClient(s.conf.GatewaySvc)
+	selector, err := pool.GatewaySelector(s.conf.GatewaySvc)
 	if err != nil {
-		writeError(w, r, appErrorServerError, "error getting grpc gateway client", err)
+		writeError(w, r, appErrorServerError, "error getting grpc gateway selector", err)
+		return
+	}
+	client, err := selector.Next()
+	if err != nil {
+		writeError(w, r, appErrorServerError, "error selecting next client", err)
 		return
 	}
 
@@ -361,13 +370,7 @@ func (s *svc) handleOpen(openMode int) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		client, err := pool.GetGatewayServiceClient(s.conf.GatewaySvc)
-		if err != nil {
-			writeError(w, r, appErrorServerError, "Internal error with the gateway, please try again later", err)
-			return
-		}
-
-		err = r.ParseForm()
+		err := r.ParseForm()
 		if err != nil {
 			writeError(w, r, appErrorInvalidParameter, "parameters could not be parsed", nil)
 		}
@@ -397,6 +400,16 @@ func (s *svc) handleOpen(openMode int) http.HandlerFunc {
 			Path:       ".",
 		}
 
+		selector, err := pool.GatewaySelector(s.conf.GatewaySvc)
+		if err != nil {
+			writeError(w, r, appErrorServerError, "error getting grpc gateway selector", err)
+			return
+		}
+		client, err := selector.Next()
+		if err != nil {
+			writeError(w, r, appErrorServerError, "error selecting next client", err)
+			return
+		}
 		statRes, err := client.Stat(ctx, &provider.StatRequest{Ref: fileRef})
 		if err != nil {
 			writeError(w, r, appErrorServerError, "Internal error accessing the file, please try again later", err)

@@ -18,6 +18,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	thumbnailsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/thumbnails/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
@@ -66,6 +67,7 @@ func NewService(opts ...Option) (Service, error) {
 	gatewaySelector, err := pool.GatewaySelector(conf.RevaGateway,
 		pool.WithTLSCACert(conf.GRPCClientTLS.CACert),
 		pool.WithTLSMode(tm),
+		pool.WithRegistry(registry.GetRegistry()),
 	)
 	if err != nil {
 		return nil, err

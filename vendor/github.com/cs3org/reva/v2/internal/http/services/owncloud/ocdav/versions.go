@@ -122,8 +122,14 @@ func (h *VersionsHandler) doListVersions(w http.ResponseWriter, r *http.Request,
 		return
 	}
 
+	client, err := s.gwClient.Next()
+	if err != nil {
+		sublog.Error().Err(err).Msg("error selecting next gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	ref := &provider.Reference{ResourceId: rid}
-	res, err := s.gwClient.Stat(ctx, &provider.StatRequest{Ref: ref})
+	res, err := client.Stat(ctx, &provider.StatRequest{Ref: ref})
 	if err != nil {
 		sublog.Error().Err(err).Msg("error sending a grpc stat request")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -142,7 +148,7 @@ func (h *VersionsHandler) doListVersions(w http.ResponseWriter, r *http.Request,
 
 	info := res.Info
 
-	lvRes, err := s.gwClient.ListFileVersions(ctx, &provider.ListFileVersionsRequest{Ref: ref})
+	lvRes, err := client.ListFileVersions(ctx, &provider.ListFileVersionsRequest{Ref: ref})
 	if err != nil {
 		sublog.Error().Err(err).Msg("error sending list container grpc request")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -225,7 +231,13 @@ func (h *VersionsHandler) doRestore(w http.ResponseWriter, r *http.Request, s *s
 		Key: key,
 	}
 
-	res, err := s.gwClient.RestoreFileVersion(ctx, req)
+	client, err := s.gwClient.Next()
+	if err != nil {
+		sublog.Error().Err(err).Msg("error selecting next gateway client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	res, err := client.RestoreFileVersion(ctx, req)
 	if err != nil {
 		sublog.Error().Err(err).Msg("error sending a grpc restore version request")
 		w.WriteHeader(http.StatusInternalServerError)

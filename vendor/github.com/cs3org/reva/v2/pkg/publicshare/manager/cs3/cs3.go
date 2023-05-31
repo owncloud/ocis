@@ -58,7 +58,7 @@ func init() {
 
 // Manager implements a publicshare manager using a cs3 storage backend
 type Manager struct {
-	gatewayClient gateway.GatewayAPIClient
+	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	sync.RWMutex
 
 	storage          metadata.Storage
@@ -90,18 +90,18 @@ func NewDefault(m map[string]interface{}) (publicshare.Manager, error) {
 	}
 	indexer := indexer.CreateIndexer(s)
 
-	client, err := pool.GetGatewayServiceClient(c.GatewayAddr)
+	selector, err := pool.GatewaySelector(c.GatewayAddr)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "error getting gateway selector")
 	}
 
-	return New(client, s, indexer, bcrypt.DefaultCost)
+	return New(selector, s, indexer, bcrypt.DefaultCost)
 }
 
 // New returns a new manager instance
-func New(gatewayClient gateway.GatewayAPIClient, storage metadata.Storage, indexer indexer.Indexer, passwordHashCost int) (*Manager, error) {
+func New(selector pool.Selectable[gateway.GatewayAPIClient], storage metadata.Storage, indexer indexer.Indexer, passwordHashCost int) (*Manager, error) {
 	return &Manager{
-		gatewayClient:    gatewayClient,
+		gatewaySelector:  selector,
 		storage:          storage,
 		indexer:          indexer,
 		passwordHashCost: passwordHashCost,
@@ -492,8 +492,20 @@ func (m *Manager) ListPublicShares(ctx context.Context, u *user.User, filters []
 			sReq := &provider.StatRequest{
 				Ref: &provider.Reference{ResourceId: s.PublicShare.GetResourceId()},
 			}
-			sRes, err := m.gatewayClient.Stat(ctx, sReq)
+			client, err := m.gatewaySelector.Next()
 			if err != nil {
+				log.Error().Err(err).
+					Str("public_share_token", s.PublicShare.Token).
+					Str("public_share_id", s.PublicShare.Id.OpaqueId).
+					Msg("error selecting next gateway client")
+				continue
+			}
+			sRes, err := client.Stat(ctx, sReq)
+			if err != nil {
+				log.Error().Err(err).
+					Str("public_share_token", s.PublicShare.Token).
+					Str("public_share_id", s.PublicShare.Id.OpaqueId).
+					Msg("error stating resurce")
 				continue
 			}
 			if sRes.Status.Code != rpc.Code_CODE_OK {

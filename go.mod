@@ -328,4 +328,5 @@ require (
 
 replace github.com/cs3org/go-cs3apis => github.com/2403905/go-cs3apis v0.0.0-20230517122726-727045414fd1
 
-replace github.com/cs3org/reva/v2 => github.com/fschade/reva/v2 v2.0.0-20230529100804-2696626566e6
+//replace github.com/cs3org/reva/v2 => github.com/fschade/reva/v2 v2.0.0-20230529100804-2696626566e6
+replace github.com/cs3org/reva/v2 => ../reva

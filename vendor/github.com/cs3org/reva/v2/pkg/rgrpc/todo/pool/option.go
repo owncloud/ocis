@@ -21,6 +21,7 @@ package pool
 import (
 	"github.com/cs3org/reva/v2/pkg/sharedconf"
 	rtrace "github.com/cs3org/reva/v2/pkg/trace"
+	"go-micro.dev/v4/registry"
 	"go.opentelemetry.io/otel/trace"
 )
 
@@ -32,6 +33,7 @@ type ClientOptions struct {
 	tlsMode        TLSMode
 	caCert         string
 	tracerProvider trace.TracerProvider
+	registry       registry.Registry
 }
 
 func (o *ClientOptions) init() error {
@@ -65,5 +67,12 @@ func WithTLSCACert(v string) Option {
 func WithTracerProvider(v trace.TracerProvider) Option {
 	return func(o *ClientOptions) {
 		o.tracerProvider = v
+	}
+}
+
+// WithRegistry allows to set the registry for service lookup
+func WithRegistry(v registry.Registry) Option {
+	return func(o *ClientOptions) {
+		o.registry = v
 	}
 }

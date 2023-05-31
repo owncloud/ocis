@@ -49,10 +49,17 @@ func (h *Handler) TokenInfo(protected bool) http.HandlerFunc {
 		tkn := path.Base(r.URL.Path)
 		_, pw, _ := r.BasicAuth()
 
-		c, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+		selector, err := pool.GatewaySelector(h.gatewayAddr)
 		if err != nil {
 			// endpoint public - don't exponse information
-			log.Error().Err(err).Msg("error getting gateway client")
+			log.Error().Err(err).Msg("error getting gateway selector")
+			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "", nil)
+			return
+		}
+		c, err := selector.Next()
+		if err != nil {
+			// endpoint public - don't exponse information
+			log.Error().Err(err).Msg("error selecting next client")
 			response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "", nil)
 			return
 		}

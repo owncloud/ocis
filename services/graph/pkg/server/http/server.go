@@ -17,6 +17,7 @@ import (
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/keycloak"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -126,9 +127,9 @@ func Server(opts ...Option) (http.Service, error) {
 				account.JWTSecret(options.Config.TokenManager.JWTSecret),
 			))
 		roleService = settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
-		gatewaySelector, _ = pool.GatewaySelector(options.Config.Reva.Address, options.Config.Reva.GetRevaOptions()...)
+		gatewaySelector, err = pool.GatewaySelector(options.Config.Reva.Address, append(options.Config.Reva.GetRevaOptions(), pool.WithRegistry(registry.GetRegistry()))...)
 		if err != nil {
-			return http.Service{}, errors.Wrap(err, "could not initialize gateway client")
+			return http.Service{}, errors.Wrap(err, "could not initialize gateway selector")
 		}
 	} else {
 		middlewares = append(middlewares, graphMiddleware.Token(options.Config.HTTP.APIToken))

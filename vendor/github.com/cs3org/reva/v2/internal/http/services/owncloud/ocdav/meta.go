@@ -119,9 +119,14 @@ func (h *MetaHandler) handlePathForUser(w http.ResponseWriter, r *http.Request, 
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-
+	client, err := s.gwClient.Next()
+	if err != nil {
+		sublog.Error().Err(err).Msg("error selecting next client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	pathReq := &provider.GetPathRequest{ResourceId: rid}
-	pathRes, err := s.gwClient.GetPath(ctx, pathReq)
+	pathRes, err := client.GetPath(ctx, pathReq)
 	if err != nil {
 		sublog.Error().Err(err).Msg("could not send GetPath grpc request: transport error")
 		w.WriteHeader(http.StatusInternalServerError)

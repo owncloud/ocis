@@ -8,22 +8,27 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"google.golang.org/grpc/metadata"
 )
 
 // Impersonate returns an authenticated reva context and the user it represents
-func Impersonate(userID *user.UserId, gwc gateway.GatewayAPIClient, machineAuthAPIKey string) (context.Context, *user.User, error) {
-	usr, err := GetUser(userID, gwc, machineAuthAPIKey)
+func Impersonate(userID *user.UserId, selector pool.Selectable[gateway.GatewayAPIClient], machineAuthAPIKey string) (context.Context, *user.User, error) {
+	usr, err := GetUser(userID, selector, machineAuthAPIKey)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	ctx, err := ImpersonateUser(usr, gwc, machineAuthAPIKey)
+	ctx, err := ImpersonateUser(usr, selector, machineAuthAPIKey)
 	return ctx, usr, err
 }
 
 // GetUser gets the specified user
-func GetUser(userID *user.UserId, gwc gateway.GatewayAPIClient, machineAuthAPIKey string) (*user.User, error) {
+func GetUser(userID *user.UserId, selector pool.Selectable[gateway.GatewayAPIClient], machineAuthAPIKey string) (*user.User, error) {
+	gwc, err := selector.Next()
+	if err != nil {
+		return nil, err
+	}
 	getUserResponse, err := gwc.GetUser(context.Background(), &user.GetUserRequest{UserId: userID})
 	if err != nil {
 		return nil, err
@@ -36,8 +41,12 @@ func GetUser(userID *user.UserId, gwc gateway.GatewayAPIClient, machineAuthAPIKe
 }
 
 // ImpersonateUser impersonates the given user
-func ImpersonateUser(usr *user.User, gwc gateway.GatewayAPIClient, machineAuthAPIKey string) (context.Context, error) {
+func ImpersonateUser(usr *user.User, selector pool.Selectable[gateway.GatewayAPIClient], machineAuthAPIKey string) (context.Context, error) {
 	ctx := revactx.ContextSetUser(context.Background(), usr)
+	gwc, err := selector.Next()
+	if err != nil {
+		return nil, err
+	}
 	authRes, err := gwc.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + usr.GetId().GetOpaqueId(),

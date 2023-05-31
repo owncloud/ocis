@@ -223,7 +223,7 @@ func authenticateUser(w http.ResponseWriter, r *http.Request, conf *config, toke
 	// Add the request user-agent to the ctx
 	ctx = metadata.NewIncomingContext(ctx, metadata.New(map[string]string{ctxpkg.UserAgentHeader: r.UserAgent()}))
 
-	client, err := pool.GetGatewayServiceClient(conf.GatewaySvc)
+	selector, err := pool.GatewaySelector(conf.GatewaySvc)
 	if err != nil {
 		logError(isUnprotectedEndpoint, log, err, "error getting the authsvc client", http.StatusUnauthorized, w)
 		return nil, err
@@ -272,6 +272,10 @@ func authenticateUser(w http.ResponseWriter, r *http.Request, conf *config, toke
 
 		log.Debug().Msgf("AuthenticateRequest: type: %s, client_id: %s against %s", req.Type, req.ClientId, conf.GatewaySvc)
 
+		client, err := selector.Next()
+		if err != nil {
+			return nil, err
+		}
 		res, err := client.Authenticate(ctx, req)
 		if err != nil {
 			logError(isUnprotectedEndpoint, log, err, "error calling Authenticate", http.StatusUnauthorized, w)
@@ -304,6 +308,10 @@ func authenticateUser(w http.ResponseWriter, r *http.Request, conf *config, toke
 		if groupsIf, err := userGroupsCache.Get(u.Id.OpaqueId); err == nil {
 			groups = groupsIf.([]string)
 		} else {
+			client, err := selector.Next()
+			if err != nil {
+				return nil, err
+			}
 			groupsRes, err := client.GetUserGroups(ctx, &userpb.GetUserGroupsRequest{UserId: u.Id})
 			if err != nil {
 				logError(isUnprotectedEndpoint, log, err, "error retrieving user groups", http.StatusInternalServerError, w)

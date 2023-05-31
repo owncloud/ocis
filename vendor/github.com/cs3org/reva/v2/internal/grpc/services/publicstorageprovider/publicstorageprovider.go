@@ -60,7 +60,7 @@ type config struct {
 
 type service struct {
 	conf    *config
-	gateway gateway.GatewayAPIClient
+	gateway pool.Selectable[gateway.GatewayAPIClient]
 }
 
 func (s *service) Close() error {
@@ -91,14 +91,14 @@ func New(m map[string]interface{}, ss *grpc.Server) (rgrpc.Service, error) {
 		return nil, err
 	}
 
-	gateway, err := pool.GetGatewayServiceClient(c.GatewayAddr)
+	selector, err := pool.GatewaySelector(c.GatewayAddr)
 	if err != nil {
 		return nil, err
 	}
 
 	service := &service{
 		conf:    c,
-		gateway: gateway,
+		gateway: selector,
 	}
 
 	return service, nil
@@ -114,7 +114,11 @@ func (s *service) SetArbitraryMetadata(ctx context.Context, req *provider.SetArb
 			Status: st,
 		}, nil
 	}
-	return s.gateway.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{Opaque: req.Opaque, Ref: ref, ArbitraryMetadata: req.ArbitraryMetadata})
+	gatewayClient, err := s.gateway.Next()
+	if err != nil {
+		return nil, err
+	}
+	return gatewayClient.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{Opaque: req.Opaque, Ref: ref, ArbitraryMetadata: req.ArbitraryMetadata})
 }
 
 func (s *service) UnsetArbitraryMetadata(ctx context.Context, req *provider.UnsetArbitraryMetadataRequest) (*provider.UnsetArbitraryMetadataResponse, error) {
@@ -132,7 +136,11 @@ func (s *service) SetLock(ctx context.Context, req *provider.SetLockRequest) (*p
 			Status: st,
 		}, nil
 	}
-	return s.gateway.SetLock(ctx, &provider.SetLockRequest{Opaque: req.Opaque, Ref: ref, Lock: req.Lock})
+	gatewayClient, err := s.gateway.Next()
+	if err != nil {
+		return nil, err
+	}
+	return gatewayClient.SetLock(ctx, &provider.SetLockRequest{Opaque: req.Opaque, Ref: ref, Lock: req.Lock})
 }
 
 // GetLock returns an existing lock on the given reference
@@ -146,7 +154,11 @@ func (s *service) GetLock(ctx context.Context, req *provider.GetLockRequest) (*p
 			Status: st,
 		}, nil
 	}
-	return s.gateway.GetLock(ctx, &provider.GetLockRequest{Opaque: req.Opaque, Ref: ref})
+	gatewayClient, err := s.gateway.Next()
+	if err != nil {
+		return nil, err
+	}
+	return gatewayClient.GetLock(ctx, &provider.GetLockRequest{Opaque: req.Opaque, Ref: ref})
 }
 
 // RefreshLock refreshes an existing lock on the given reference
@@ -160,7 +172,11 @@ func (s *service) RefreshLock(ctx context.Context, req *provider.RefreshLockRequ
 			Status: st,
 		}, nil
 	}
-	return s.gateway.RefreshLock(ctx, &provider.RefreshLockRequest{Opaque: req.Opaque, Ref: ref, Lock: req.Lock})
+	gatewayClient, err := s.gateway.Next()
+	if err != nil {
+		return nil, err
+	}
+	return gatewayClient.RefreshLock(ctx, &provider.RefreshLockRequest{Opaque: req.Opaque, Ref: ref, Lock: req.Lock})
 }
 
 // Unlock removes an existing lock from the given reference
@@ -174,7 +190,11 @@ func (s *service) Unlock(ctx context.Context, req *provider.UnlockRequest) (*pro
 			Status: st,
 		}, nil
 	}
-	return s.gateway.Unlock(ctx, &provider.UnlockRequest{Opaque: req.Opaque, Ref: ref, Lock: req.Lock})
+	gatewayClient, err := s.gateway.Next()
+	if err != nil {
+		return nil, err
+	}
+	return gatewayClient.Unlock(ctx, &provider.UnlockRequest{Opaque: req.Opaque, Ref: ref, Lock: req.Lock})
 }
 
 func (s *service) InitiateFileDownload(ctx context.Context, req *provider.InitiateFileDownloadRequest) (*provider.InitiateFileDownloadResponse, error) {
@@ -265,7 +285,11 @@ func (s *service) initiateFileDownload(ctx context.Context, req *provider.Initia
 		Ref: cs3Ref,
 	}
 
-	dRes, err := s.gateway.InitiateFileDownload(ctx, dReq)
+	gatewayClient, err := s.gateway.Next()
+	if err != nil {
+		return nil, err
+	}
+	dRes, err := gatewayClient.InitiateFileDownload(ctx, dReq)
 	if err != nil {
 		return &provider.InitiateFileDownloadResponse{
 			Status: status.NewInternal(ctx, "initiateFileDownload: error calling InitiateFileDownload"),
@@ -319,7 +343,11 @@ func (s *service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 		Opaque: req.Opaque,
 	}
 
-	uRes, err := s.gateway.InitiateFileUpload(ctx, uReq)
+	gatewayClient, err := s.gateway.Next()
+	if err != nil {
+		return nil, err
+	}
+	uRes, err := gatewayClient.InitiateFileUpload(ctx, uReq)
 	if err != nil {
 		return &provider.InitiateFileUploadResponse{
 			Status: status.NewInternal(ctx, "InitiateFileUpload: error calling InitiateFileUpload"),
@@ -541,9 +569,13 @@ func (s *service) CreateContainer(ctx context.Context, req *provider.CreateConta
 		}, nil
 	}
 
+	gatewayClient, err := s.gateway.Next()
+	if err != nil {
+		return nil, err
+	}
 	var res *provider.CreateContainerResponse
 	// the call has to be made to the gateway instead of the storage.
-	res, err = s.gateway.CreateContainer(ctx, &provider.CreateContainerRequest{
+	res, err = gatewayClient.CreateContainer(ctx, &provider.CreateContainerRequest{
 		Ref: cs3Ref,
 	})
 	if err != nil {
@@ -568,7 +600,11 @@ func (s *service) TouchFile(ctx context.Context, req *provider.TouchFileRequest)
 			Status: st,
 		}, nil
 	}
-	return s.gateway.TouchFile(ctx, &provider.TouchFileRequest{Opaque: req.Opaque, Ref: ref})
+	gatewayClient, err := s.gateway.Next()
+	if err != nil {
+		return nil, err
+	}
+	return gatewayClient.TouchFile(ctx, &provider.TouchFileRequest{Opaque: req.Opaque, Ref: ref})
 }
 
 func (s *service) Delete(ctx context.Context, req *provider.DeleteRequest) (*provider.DeleteResponse, error) {
@@ -594,9 +630,13 @@ func (s *service) Delete(ctx context.Context, req *provider.DeleteRequest) (*pro
 		}, nil
 	}
 
+	gatewayClient, err := s.gateway.Next()
+	if err != nil {
+		return nil, err
+	}
 	var res *provider.DeleteResponse
 	// the call has to be made to the gateway instead of the storage.
-	res, err = s.gateway.Delete(ctx, &provider.DeleteRequest{
+	res, err = gatewayClient.Delete(ctx, &provider.DeleteRequest{
 		Ref: cs3Ref,
 	})
 	if err != nil {
@@ -656,9 +696,13 @@ func (s *service) Move(ctx context.Context, req *provider.MoveRequest) (*provide
 		}, nil
 	}
 
+	gatewayClient, err := s.gateway.Next()
+	if err != nil {
+		return nil, err
+	}
 	var res *provider.MoveResponse
 	// the call has to be made to the gateway instead of the storage.
-	res, err = s.gateway.Move(ctx, &provider.MoveRequest{
+	res, err = gatewayClient.Move(ctx, &provider.MoveRequest{
 		Source:      cs3RefSource,
 		Destination: cs3RefDestination,
 	})
@@ -721,7 +765,11 @@ func (s *service) Stat(ctx context.Context, req *provider.StatRequest) (*provide
 		Path:       utils.MakeRelativePath(req.Ref.Path),
 	}
 
-	statResponse, err := s.gateway.Stat(ctx, &provider.StatRequest{Ref: ref})
+	gatewayClient, err := s.gateway.Next()
+	if err != nil {
+		return nil, err
+	}
+	statResponse, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: ref})
 	if err != nil {
 		return &provider.StatResponse{
 			Status: status.NewInternal(ctx, "Stat: error calling Stat for ref:"+req.Ref.String()),
@@ -796,7 +844,11 @@ func (s *service) ListContainer(ctx context.Context, req *provider.ListContainer
 		}, nil
 	}
 
-	listContainerR, err := s.gateway.ListContainer(
+	gatewayClient, err := s.gateway.Next()
+	if err != nil {
+		return nil, err
+	}
+	listContainerR, err := gatewayClient.ListContainer(
 		ctx,
 		&provider.ListContainerRequest{
 			Ref: &provider.Reference{
@@ -903,12 +955,12 @@ func (s *service) GetQuota(ctx context.Context, req *provider.GetQuotaRequest) (
 
 // resolveToken returns the path and share for the publicly shared resource.
 func (s *service) resolveToken(ctx context.Context, token string) (*link.PublicShare, *provider.ResourceInfo, *rpc.Status, error) {
-	driver, err := pool.GetGatewayServiceClient(s.conf.GatewayAddr)
+	gatewayClient, err := s.gateway.Next()
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	publicShareResponse, err := driver.GetPublicShare(
+	publicShareResponse, err := gatewayClient.GetPublicShare(
 		ctx,
 		&link.GetPublicShareRequest{
 			Ref: &link.PublicShareReference{
@@ -926,7 +978,7 @@ func (s *service) resolveToken(ctx context.Context, token string) (*link.PublicS
 		return nil, nil, publicShareResponse.Status, nil
 	}
 
-	sRes, err := s.gateway.Stat(ctx, &provider.StatRequest{
+	sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{
 		Ref: &provider.Reference{
 			ResourceId: publicShareResponse.GetShare().GetResourceId(),
 		},

@@ -490,9 +490,13 @@ func (m *manager) ListPublicShares(ctx context.Context, u *user.User, filters []
 		return nil, err
 	}
 
-	client, err := pool.GetGatewayServiceClient(m.gatewayAddr)
+	selector, err := pool.GatewaySelector(m.gatewayAddr)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to list shares")
+		return nil, errors.Wrap(err, "error getting gateway selector")
+	}
+	client, err := selector.Next()
+	if err != nil {
+		return nil, errors.Wrap(err, "error selecting next gateway client")
 	}
 	cache := make(map[string]struct{})
 

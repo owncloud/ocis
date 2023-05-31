@@ -125,9 +125,15 @@ func (s *svc) handleGet(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	client, err := pool.GetGatewayServiceClient(s.conf.GatewaySvc)
+	selector, err := pool.GatewaySelector(s.conf.GatewaySvc)
 	if err != nil {
-		log.Error().Err(err).Msg("error getting grpc gateway client")
+		log.Error().Err(err).Msg("error getting gateway selector")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	client, err := selector.Next()
+	if err != nil {
+		log.Error().Err(err).Msg("error selecting next client")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -191,9 +197,15 @@ func (s *svc) handlePost(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	client, err := pool.GetGatewayServiceClient(s.conf.GatewaySvc)
+	selector, err := pool.GatewaySelector(s.conf.GatewaySvc)
 	if err != nil {
-		log.Error().Err(err).Msg("error getting grpc gateway client")
+		log.Error().Err(err).Msg("error getting gateway selector")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	client, err := selector.Next()
+	if err != nil {
+		log.Error().Err(err).Msg("error selecting next client")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

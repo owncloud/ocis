@@ -114,10 +114,15 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 
 	// TODO check Expect: 100-continue
 
+	client, err := s.gwClient.Next()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 	sReq := &provider.StatRequest{
 		Ref: ref,
 	}
-	sRes, err := s.gwClient.Stat(ctx, sReq)
+	sRes, err := client.Stat(ctx, sReq)
 	if err != nil {
 		log.Error().Err(err).Msg("error sending grpc stat request")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -155,7 +160,7 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 		return
 	}
 	if uploadLength == 0 {
-		tfRes, err := s.gwClient.TouchFile(ctx, &provider.TouchFileRequest{
+		tfRes, err := client.TouchFile(ctx, &provider.TouchFileRequest{
 			Ref: ref,
 		})
 		if err != nil {
@@ -193,7 +198,7 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 		},
 	}
 
-	uRes, err := s.gwClient.InitiateFileUpload(ctx, uReq)
+	uRes, err := client.InitiateFileUpload(ctx, uReq)
 	if err != nil {
 		log.Error().Err(err).Msg("error initiating file upload")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -284,7 +289,7 @@ func (s *svc) handleTusPost(ctx context.Context, w http.ResponseWriter, r *http.
 				}
 			}
 
-			sRes, err := s.gwClient.Stat(ctx, sReq)
+			sRes, err := client.Stat(ctx, sReq)
 			if err != nil {
 				log.Error().Err(err).Msg("error sending grpc stat request")
 				w.WriteHeader(http.StatusInternalServerError)

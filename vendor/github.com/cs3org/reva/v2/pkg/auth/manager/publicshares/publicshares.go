@@ -79,9 +79,13 @@ func (m *manager) Configure(ml map[string]interface{}) error {
 }
 
 func (m *manager) Authenticate(ctx context.Context, token, secret string) (*user.User, map[string]*authpb.Scope, error) {
-	gwConn, err := pool.GetGatewayServiceClient(m.c.GatewayAddr)
+	selector, err := pool.GatewaySelector(m.c.GatewayAddr)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, errors.Wrap(err, "error getting gateway selector")
+	}
+	gwConn, err := selector.Next()
+	if err != nil {
+		return nil, nil, errors.Wrap(err, "error selecting next client")
 	}
 
 	var auth *link.PublicShareAuthentication

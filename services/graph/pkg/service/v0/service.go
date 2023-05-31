@@ -18,6 +18,7 @@ import (
 	"github.com/jellydator/ttlcache/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	ocisldap "github.com/owncloud/ocis/v2/ocis-pkg/ldap"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/roles"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -317,10 +318,13 @@ func setIdentityBackends(options Options, svc *Graph) error {
 	if options.IdentityBackend == nil {
 		switch options.Config.Identity.Backend {
 		case "cs3":
-			gatewaySelector, _ := pool.GatewaySelector(
+			gatewaySelector, err := pool.GatewaySelector(
 				options.Config.Reva.Address,
-				options.Config.Reva.GetRevaOptions()...,
+				append(options.Config.Reva.GetRevaOptions(), pool.WithRegistry(registry.GetRegistry()))...,
 			)
+			if err != nil {
+				return err
+			}
 
 			svc.identityBackend = &identity.CS3{
 				Config:          options.Config.Reva,

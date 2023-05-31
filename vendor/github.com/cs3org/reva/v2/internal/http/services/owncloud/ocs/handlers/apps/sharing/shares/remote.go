@@ -39,9 +39,14 @@ import (
 func (h *Handler) createFederatedCloudShare(w http.ResponseWriter, r *http.Request, statInfo *provider.ResourceInfo, role *conversions.Role, roleVal []byte) {
 	ctx := r.Context()
 
-	c, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting grpc gateway client", err)
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting gateway selector", nil)
+		return
+	}
+	c, err := selector.Next()
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error selecting next client", nil)
 		return
 	}
 
@@ -127,9 +132,14 @@ func (h *Handler) GetFederatedShare(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
 	shareID := chi.URLParam(r, "shareid")
-	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting grpc gateway client", err)
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting gateway selector", nil)
+		return
+	}
+	gatewayClient, err := selector.Next()
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error selecting next client", nil)
 		return
 	}
 
@@ -163,9 +173,14 @@ func (h *Handler) ListFederatedShares(w http.ResponseWriter, r *http.Request) {
 	// TODO Implement response with HAL schemating
 	ctx := r.Context()
 
-	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting grpc gateway client", err)
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting gateway selector", nil)
+		return
+	}
+	gatewayClient, err := selector.Next()
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error selecting next client", nil)
 		return
 	}
 

@@ -19,9 +19,10 @@
 package registry
 
 import (
+	"strings"
+
 	mRegistry "go-micro.dev/v4/registry"
 	"go-micro.dev/v4/selector"
-	"strings"
 )
 
 // DiscoverServices looks in the registry whether he can find the services using the id

@@ -81,9 +81,14 @@ func (h *invitesHandler) generateInviteToken(w http.ResponseWriter, r *http.Requ
 
 	ctx := r.Context()
 
-	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		WriteError(w, r, APIErrorServerError, "error getting gateway grpc client", err)
+		WriteError(w, r, APIErrorServerError, "error getting gateway selector", err)
+		return
+	}
+	gatewayClient, err := selector.Next()
+	if err != nil {
+		WriteError(w, r, APIErrorServerError, "error selecting next client", err)
 		return
 	}
 
@@ -155,9 +160,14 @@ func (h *invitesHandler) forwardInvite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		WriteError(w, r, APIErrorServerError, "error getting gateway grpc client", err)
+		WriteError(w, r, APIErrorServerError, "error getting gateway selector", err)
+		return
+	}
+	gatewayClient, err := selector.Next()
+	if err != nil {
+		WriteError(w, r, APIErrorServerError, "error selecting next client", err)
 		return
 	}
 
@@ -226,9 +236,14 @@ func (h *invitesHandler) acceptInvite(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		WriteError(w, r, APIErrorServerError, "error getting gateway grpc client", err)
+		WriteError(w, r, APIErrorServerError, "error getting gateway selector", err)
+		return
+	}
+	gatewayClient, err := selector.Next()
+	if err != nil {
+		WriteError(w, r, APIErrorServerError, "error selecting next client", err)
 		return
 	}
 
@@ -297,9 +312,14 @@ func (h *invitesHandler) findAcceptedUsers(w http.ResponseWriter, r *http.Reques
 	log := appctx.GetLogger(r.Context())
 
 	ctx := r.Context()
-	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		WriteError(w, r, APIErrorServerError, "error getting gateway grpc client", err)
+		WriteError(w, r, APIErrorServerError, "error getting gateway selector", err)
+		return
+	}
+	gatewayClient, err := selector.Next()
+	if err != nil {
+		WriteError(w, r, APIErrorServerError, "error selecting next client", err)
 		return
 	}
 
@@ -323,9 +343,14 @@ func (h *invitesHandler) generate(w http.ResponseWriter, r *http.Request) {
 	log := appctx.GetLogger(r.Context())
 
 	ctx := r.Context()
-	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		WriteError(w, r, APIErrorServerError, "error getting gateway grpc client", err)
+		WriteError(w, r, APIErrorServerError, "error getting gateway selector", err)
+		return
+	}
+	gatewayClient, err := selector.Next()
+	if err != nil {
+		WriteError(w, r, APIErrorServerError, "error selecting next client", err)
 		return
 	}
 

@@ -44,7 +44,11 @@ import (
 
 func (h *Handler) getGrantee(ctx context.Context, name string) (provider.Grantee, error) {
 	log := appctx.GetLogger(ctx)
-	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
+	if err != nil {
+		return provider.Grantee{}, err
+	}
+	client, err := selector.Next()
 	if err != nil {
 		return provider.Grantee{}, err
 	}
@@ -96,9 +100,14 @@ func (h *Handler) addSpaceMember(w http.ResponseWriter, r *http.Request, info *p
 		return
 	}
 
-	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting gateway client", err)
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting gateway selector", nil)
+		return
+	}
+	client, err := selector.Next()
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error selecting next client", nil)
 		return
 	}
 
@@ -199,9 +208,14 @@ func (h *Handler) removeSpaceMember(w http.ResponseWriter, r *http.Request, spac
 		return
 	}
 
-	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	selector, err := pool.GatewaySelector(h.gatewayAddr)
 	if err != nil {
-		response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting gateway client", err)
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting gateway selector", nil)
+		return
+	}
+	gatewayClient, err := selector.Next()
+	if err != nil {
+		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error selecting next client", nil)
 		return
 	}
 
@@ -228,9 +242,14 @@ func (h *Handler) removeSpaceMember(w http.ResponseWriter, r *http.Request, spac
 }
 
 func (h *Handler) getStorageProviderClient(p *registry.ProviderInfo) (provider.ProviderAPIClient, error) {
-	c, err := pool.GetStorageProviderServiceClient(p.Address)
+	selector, err := pool.StorageProviderSelector(p.Address)
 	if err != nil {
-		err = errors.Wrap(err, "shares spaces: error getting a storage provider client")
+		err = errors.Wrap(err, "shares spaces: error getting storage provider selector")
+		return nil, err
+	}
+	c, err := selector.Next()
+	if err != nil {
+		err = errors.Wrap(err, "shares spaces: error selecting next client")
 		return nil, err
 	}
 
@@ -238,9 +257,15 @@ func (h *Handler) getStorageProviderClient(p *registry.ProviderInfo) (provider.P
 }
 
 func (h *Handler) findProvider(ctx context.Context, ref *provider.Reference) (*registry.ProviderInfo, error) {
-	c, err := pool.GetStorageRegistryClient(h.storageRegistryAddr)
+	selector, err := pool.StorageRegistrySelector(h.storageRegistryAddr)
 	if err != nil {
-		return nil, errors.Wrap(err, "shares spaces: error getting storage registry client")
+		err = errors.Wrap(err, "shares spaces: error getting storage provider selector")
+		return nil, err
+	}
+	c, err := selector.Next()
+	if err != nil {
+		err = errors.Wrap(err, "shares spaces: error selecting next client")
+		return nil, err
 	}
 
 	filters := map[string]string{}

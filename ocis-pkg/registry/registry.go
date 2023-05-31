@@ -4,17 +4,15 @@ import (
 	"os"
 	"strings"
 	"sync"
-	"time"
 
+	rRegistry "github.com/cs3org/reva/v2/pkg/registry"
 	consulr "github.com/go-micro/plugins/v4/registry/consul"
 	etcdr "github.com/go-micro/plugins/v4/registry/etcd"
 	kubernetesr "github.com/go-micro/plugins/v4/registry/kubernetes"
 	mdnsr "github.com/go-micro/plugins/v4/registry/mdns"
 	memr "github.com/go-micro/plugins/v4/registry/memory"
 	natsr "github.com/go-micro/plugins/v4/registry/nats"
-
 	mRegistry "go-micro.dev/v4/registry"
-	"go-micro.dev/v4/registry/cache"
 )
 
 const (
@@ -69,9 +67,10 @@ func GetRegistry() mRegistry.Registry {
 			reg = mdnsr.NewRegistry()
 		}
 		// No cache needed for in-memory registry
-		if plugin != "memory" {
-			reg = cache.New(reg, cache.WithTTL(20*time.Second))
-		}
+		//if plugin != "memory" {
+		//	reg = cache.New(reg, cache.WithTTL(20*time.Second))
+		//}
+		rRegistry.Init(reg)
 	})
 	// always use cached registry to prevent registry
 	// lookup for every request

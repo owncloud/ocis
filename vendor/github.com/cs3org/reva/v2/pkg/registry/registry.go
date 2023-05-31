@@ -36,3 +36,7 @@ func Init(nRegistry mRegistry.Registry) error {
 
 	return nil
 }
+
+func GetRegistry() mRegistry.Registry {
+	return gRegistry
+}

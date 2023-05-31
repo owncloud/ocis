@@ -45,9 +45,14 @@ func (s *svc) handlePathMkcol(w http.ResponseWriter, r *http.Request, ns string)
 	}
 	sublog := appctx.GetLogger(ctx).With().Str("path", fn).Logger()
 
+	client, err := s.gwClient.Next()
+	if err != nil {
+		return http.StatusInternalServerError, errtypes.InternalError(err.Error())
+	}
+
 	// stat requested path to make sure it isn't existing yet
 	// NOTE: It could be on another storage provider than the 'parent' of it
-	sr, err := s.gwClient.Stat(ctx, &provider.StatRequest{
+	sr, err := client.Stat(ctx, &provider.StatRequest{
 		Ref: &provider.Reference{
 			Path: fn,
 		},
@@ -108,8 +113,12 @@ func (s *svc) handleMkcol(ctx context.Context, w http.ResponseWriter, r *http.Re
 		return http.StatusUnsupportedMediaType, fmt.Errorf("extended-mkcol not supported")
 	}
 
+	client, err := s.gwClient.Next()
+	if err != nil {
+		return http.StatusInternalServerError, errtypes.InternalError(err.Error())
+	}
 	req := &provider.CreateContainerRequest{Ref: childRef}
-	res, err := s.gwClient.CreateContainer(ctx, req)
+	res, err := client.CreateContainer(ctx, req)
 	switch {
 	case err != nil:
 		return http.StatusInternalServerError, err
@@ -123,7 +132,7 @@ func (s *svc) handleMkcol(ctx context.Context, w http.ResponseWriter, r *http.Re
 		return http.StatusNotFound, errors.New("Resource not found")
 	case res.Status.Code == rpc.Code_CODE_PERMISSION_DENIED:
 		// check if user has access to parent
-		sRes, err := s.gwClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{
+		sRes, err := client.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{
 			ResourceId: childRef.GetResourceId(),
 			Path:       utils.MakeRelativePath(path.Dir(childRef.Path)),
 		}})

@@ -145,8 +145,8 @@ type Manager struct {
 
 	initialized bool
 
-	gateway     gatewayv1beta1.GatewayAPIClient
-	eventStream events.Stream
+	gatewaySelector pool.Selectable[gatewayv1beta1.GatewayAPIClient]
+	eventStream     events.Stream
 }
 
 // NewDefault returns a new manager instance with default dependencies
@@ -162,9 +162,9 @@ func NewDefault(m map[string]interface{}) (share.Manager, error) {
 		return nil, err
 	}
 
-	gc, err := pool.GetGatewayServiceClient(c.GatewayAddr)
+	selector, err := pool.GatewaySelector(c.GatewayAddr)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "error getting gateway selector")
 	}
 
 	var es events.Stream
@@ -205,11 +205,11 @@ func NewDefault(m map[string]interface{}) (share.Manager, error) {
 		}
 	}
 
-	return New(s, gc, c.CacheTTL, es)
+	return New(s, selector, c.CacheTTL, es)
 }
 
 // New returns a new manager instance.
-func New(s metadata.Storage, gc gatewayv1beta1.GatewayAPIClient, ttlSeconds int, es events.Stream) (*Manager, error) {
+func New(s metadata.Storage, selector pool.Selectable[gatewayv1beta1.GatewayAPIClient], ttlSeconds int, es events.Stream) (*Manager, error) {
 	ttl := time.Duration(ttlSeconds) * time.Second
 	return &Manager{
 		Cache:              providercache.New(s, ttl),
@@ -217,7 +217,7 @@ func New(s metadata.Storage, gc gatewayv1beta1.GatewayAPIClient, ttlSeconds int,
 		UserReceivedStates: receivedsharecache.New(s, ttl),
 		GroupReceivedCache: sharecache.New(s, "groups", "received.json", ttl),
 		storage:            s,
-		gateway:            gc,
+		gatewaySelector:    selector,
 		eventStream:        es,
 	}, nil
 }
@@ -447,10 +447,14 @@ func (m *Manager) GetShare(ctx context.Context, ref *collaboration.ShareReferenc
 		return s, nil
 	}
 
+	client, err := m.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
 	req := &provider.StatRequest{
 		Ref: &provider.Reference{ResourceId: s.ResourceId},
 	}
-	res, err := m.gateway.Stat(ctx, req)
+	res, err := client.Stat(ctx, req)
 	if err == nil &&
 		res.Status.Code == rpcv1beta1.Code_CODE_OK &&
 		res.Info.PermissionSet.ListGrants {
@@ -524,10 +528,14 @@ func (m *Manager) UpdateShare(ctx context.Context, ref *collaboration.ShareRefer
 
 	user := ctxpkg.ContextMustGetUser(ctx)
 	if !share.IsCreatedByUser(toUpdate, user) {
+		client, err := m.gatewaySelector.Next()
+		if err != nil {
+			return nil, err
+		}
 		req := &provider.StatRequest{
 			Ref: &provider.Reference{ResourceId: toUpdate.ResourceId},
 		}
-		res, err := m.gateway.Stat(ctx, req)
+		res, err := client.Stat(ctx, req)
 		if err != nil ||
 			res.Status.Code != rpcv1beta1.Code_CODE_OK ||
 			!res.Info.PermissionSet.UpdateGrant {
@@ -628,10 +636,14 @@ func (m *Manager) listSharesByIDs(ctx context.Context, user *userv1beta1.User, f
 				if !(share.IsCreatedByUser(s, user) || share.IsGrantedToUser(s, user)) {
 					key := storagespace.FormatResourceID(*s.ResourceId)
 					if _, hit := statCache[key]; !hit {
+						client, err := m.gatewaySelector.Next()
+						if err != nil {
+							continue
+						}
 						req := &provider.StatRequest{
 							Ref: &provider.Reference{ResourceId: s.ResourceId},
 						}
-						res, err := m.gateway.Stat(ctx, req)
+						res, err := client.Stat(ctx, req)
 						if err != nil ||
 							res.Status.Code != rpcv1beta1.Code_CODE_OK ||
 							!res.Info.PermissionSet.ListGrants {

@@ -23,7 +23,6 @@ import (
 	"net/http"
 	"path"
 
-	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/errors"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav/propfind"
 	"github.com/cs3org/reva/v2/pkg/appctx"
@@ -73,9 +72,7 @@ func (h *WebDavHandler) Handler(s *svc) http.Handler {
 		var status int // status 0 means the handler already sent the response
 		switch r.Method {
 		case MethodPropfind:
-			p := propfind.NewHandler(config.PublicURL, func() (gateway.GatewayAPIClient, error) {
-				return s.gwClient, nil
-			})
+			p := propfind.NewHandler(config.PublicURL, s.gwClient)
 			p.HandlePathPropfind(w, r, ns)
 		case MethodLock:
 			status, err = s.handleLock(w, r, ns)

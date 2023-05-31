@@ -29,7 +29,14 @@ import (
 )
 
 func (s *svc) ListAuthProviders(ctx context.Context, req *registry.ListAuthProvidersRequest) (*gateway.ListAuthProvidersResponse, error) {
-	c, err := pool.GetAuthRegistryServiceClient(s.c.AuthRegistryEndpoint)
+	sel, err := pool.AuthRegistrySelector(s.c.AuthRegistryEndpoint)
+	if err != nil {
+		return &gateway.ListAuthProvidersResponse{
+			Status: status.NewInternal(ctx, "gateway"),
+		}, nil
+	}
+
+	c, err := sel.Next()
 	if err != nil {
 		return &gateway.ListAuthProvidersResponse{
 			Status: status.NewInternal(ctx, "gateway"),

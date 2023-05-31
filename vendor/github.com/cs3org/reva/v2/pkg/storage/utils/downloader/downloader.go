@@ -29,6 +29,7 @@ import (
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/datagateway"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/rhttp"
 )
 
@@ -39,14 +40,14 @@ type Downloader interface {
 }
 
 type revaDownloader struct {
-	gtw        gateway.GatewayAPIClient
+	selector   pool.Selectable[gateway.GatewayAPIClient]
 	httpClient *http.Client
 }
 
 // NewDownloader creates a Downloader from the reva gateway
-func NewDownloader(gtw gateway.GatewayAPIClient, options ...rhttp.Option) Downloader {
+func NewDownloader(selector pool.Selectable[gateway.GatewayAPIClient], options ...rhttp.Option) Downloader {
 	return &revaDownloader{
-		gtw:        gtw,
+		selector:   selector,
 		httpClient: rhttp.GetHTTPClient(options...),
 	}
 }
@@ -62,7 +63,11 @@ func getDownloadProtocol(protocols []*gateway.FileDownloadProtocol, prot string)
 
 // Download downloads a resource given the path to the dst Writer
 func (r *revaDownloader) Download(ctx context.Context, id *provider.ResourceId, dst io.Writer) error {
-	downResp, err := r.gtw.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{
+	client, err := r.selector.Next()
+	if err != nil {
+		return err
+	}
+	downResp, err := client.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{
 		Ref: &provider.Reference{
 			ResourceId: id,
 			Path:       ".",

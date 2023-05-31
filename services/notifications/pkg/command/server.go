@@ -15,6 +15,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	"github.com/owncloud/ocis/v2/ocis-pkg/crypto"
 	"github.com/owncloud/ocis/v2/ocis-pkg/handlers"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/debug"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
@@ -126,9 +127,10 @@ func Server(cfg *config.Config) *cli.Command {
 				cfg.Notifications.RevaGateway,
 				pool.WithTLSCACert(cfg.Notifications.GRPCClientTLS.CACert),
 				pool.WithTLSMode(tm),
+				pool.WithRegistry(registry.GetRegistry()),
 			)
 			if err != nil {
-				logger.Fatal().Err(err).Str("addr", cfg.Notifications.RevaGateway).Msg("could not get reva client")
+				logger.Fatal().Err(err).Str("addr", cfg.Notifications.RevaGateway).Msg("could not get reva gateway selector")
 			}
 			valueService := settingssvc.NewValueService("com.owncloud.api.settings", grpc.DefaultClient())
 			svc := service.NewEventsNotifier(evts, channel, logger, gatewaySelector, valueService, cfg.Notifications.MachineAuthAPIKey, cfg.Notifications.EmailTemplatePath, cfg.WebUIURL)
