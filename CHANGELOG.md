@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Configurable ID Cache: [#6353](https://github.com/owncloud/ocis/pull/6353)
 * Enhancement - Add otlp tracing exporter: [#5132](https://github.com/owncloud/ocis/pull/5132)
 * Enhancement - Remove the email logo: [#6359](https://github.com/owncloud/ocis/issues/6359)
+* Enhancement - Rename permissions: [#3922](https://github.com/cs3org/reva/pull/3922)
 * Enhancement - Unify CA Cert envvars: [#6392](https://github.com/owncloud/ocis/pull/6392)
 * Enhancement - Update web to v7.0.0-rc.38: [#6375](https://github.com/owncloud/ocis/pull/6375)
 
@@ -79,6 +80,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/6359
    https://github.com/owncloud/ocis/pull/6361
+
+* Enhancement - Rename permissions: [#3922](https://github.com/cs3org/reva/pull/3922)
+
+   Rename permissions to be consistent and future proof
+
+   https://github.com/cs3org/reva/pull/3922
 
 * Enhancement - Unify CA Cert envvars: [#6392](https://github.com/owncloud/ocis/pull/6392)
 
