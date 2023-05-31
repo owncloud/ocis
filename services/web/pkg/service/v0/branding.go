@@ -28,7 +28,7 @@ var (
 func (p Web) UploadLogo(w http.ResponseWriter, r *http.Request) {
 	user := revactx.ContextMustGetUser(r.Context())
 	rsp, err := p.gatewayClient.CheckPermission(r.Context(), &permissionsapi.CheckPermissionRequest{
-		Permission: "change-logo",
+		Permission: "Logo.Write",
 		SubjectRef: &permissionsapi.SubjectReference{
 			Spec: &permissionsapi.SubjectReference_UserId{
 				UserId: user.Id,
@@ -81,7 +81,7 @@ func (p Web) UploadLogo(w http.ResponseWriter, r *http.Request) {
 func (p Web) ResetLogo(w http.ResponseWriter, r *http.Request) {
 	user := revactx.ContextMustGetUser(r.Context())
 	rsp, err := p.gatewayClient.CheckPermission(r.Context(), &permissionsapi.CheckPermissionRequest{
-		Permission: "change-logo",
+		Permission: "Logo.Write",
 		SubjectRef: &permissionsapi.SubjectReference{
 			Spec: &permissionsapi.SubjectReference_UserId{
 				UserId: user.Id,
