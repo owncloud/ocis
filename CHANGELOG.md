@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Empty exact list while searching for a sharee: [#6398](https://github.com/owncloud/ocis/pull/6398)
 * Bugfix - Trace proxy middlewares: [#6313](https://github.com/owncloud/ocis/pull/6313)
 * Enhancement - Bump Reva: [#6381](https://github.com/owncloud/ocis/pull/6381)
 * Enhancement - Default LDAP write to true: [#6362](https://github.com/owncloud/ocis/pull/6362)
@@ -20,6 +21,15 @@ The following sections list the changes for unreleased.
 * Enhancement - Update web to v7.0.0-rc.38: [#6375](https://github.com/owncloud/ocis/pull/6375)
 
 ## Details
+
+* Bugfix - Empty exact list while searching for a sharee: [#6398](https://github.com/owncloud/ocis/pull/6398)
+
+   We fixed a bug in the sharing api, it always returns an empty exact list while searching for a
+   sharee
+
+   https://github.com/owncloud/ocis/issues/4265
+   https://github.com/owncloud/ocis/pull/6398
+   https://github.com/cs3org/reva/pull/3877
 
 * Bugfix - Trace proxy middlewares: [#6313](https://github.com/owncloud/ocis/pull/6313)
 
