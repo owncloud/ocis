@@ -354,7 +354,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.16.1-0.20230828111521-594d4e103741
+# github.com/cs3org/reva/v2 v2.16.1-0.20230829124655-8ba013d7a129
 ## explicit; go 1.20
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -473,6 +473,7 @@ github.com/cs3org/reva/v2/pkg/auth/manager/owncloudsql
 github.com/cs3org/reva/v2/pkg/auth/manager/owncloudsql/accounts
 github.com/cs3org/reva/v2/pkg/auth/manager/publicshares
 github.com/cs3org/reva/v2/pkg/auth/manager/registry
+github.com/cs3org/reva/v2/pkg/auth/manager/serviceaccounts
 github.com/cs3org/reva/v2/pkg/auth/registry/loader
 github.com/cs3org/reva/v2/pkg/auth/registry/registry
 github.com/cs3org/reva/v2/pkg/auth/registry/static
