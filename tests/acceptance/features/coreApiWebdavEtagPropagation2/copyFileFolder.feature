@@ -1,5 +1,8 @@
 @api
 Feature: propagation of etags when copying files or folders
+  As a client app
+  I want metadata (etags) of parent folders to change when a file of folder is copied
+  So that the client app can know to re-scan and sync the content of the folder(s)
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
@@ -152,7 +155,7 @@ Feature: propagation of etags when copying files or folders
       | spaces      |
 
 
-  Scenario Outline: as share receiver copying a file inside a folder changes its etag for all collaborators
+  Scenario Outline: sharee copying a file inside a folder changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav_version> DAV path
     And user "Alice" has created folder "/upload"
@@ -189,7 +192,7 @@ Feature: propagation of etags when copying files or folders
       | new         |
 
   @issue-product-280
-  Scenario Outline: as sharer copying a file inside a folder changes its etag for all collaborators
+  Scenario Outline: sharer copying a file inside a folder changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav_version> DAV path
     And user "Alice" has created folder "/upload"

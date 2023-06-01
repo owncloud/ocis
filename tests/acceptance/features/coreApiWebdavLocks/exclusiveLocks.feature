@@ -1,11 +1,14 @@
 @api @issue-1284
 Feature: there can be only one exclusive lock on a resource
+  As a user
+  I want to lock a resource
+  So that other users cannot  access or change that resource
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: a second lock cannot be set on a folder when its exclusively locked
+  Scenario Outline: second lock cannot be set on a folder when its exclusively locked
     Given using <dav-path> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
     And user "Alice" has locked file "textfile0.txt" setting the following properties
@@ -28,7 +31,7 @@ Feature: there can be only one exclusive lock on a resource
       | spaces   | exclusive  |
 
 
-  Scenario Outline: a share receiver cannot lock a resource exclusively locked by itself
+  Scenario Outline: sharee cannot lock a resource exclusively locked by itself
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
@@ -55,7 +58,7 @@ Feature: there can be only one exclusive lock on a resource
       | spaces   | exclusive  |
 
 
-  Scenario Outline: a share receiver cannot lock a resource exclusively locked by the owner
+  Scenario Outline: sharee cannot lock a resource exclusively locked by the owner
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
@@ -82,7 +85,7 @@ Feature: there can be only one exclusive lock on a resource
       | spaces   | exclusive  |
 
 
-  Scenario Outline: a share owner cannot lock a resource exclusively locked by a share receiver
+  Scenario Outline: sharer cannot lock a resource exclusively locked by a sharee
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"

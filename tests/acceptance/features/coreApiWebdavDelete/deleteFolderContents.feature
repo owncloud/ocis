@@ -8,7 +8,7 @@ Feature: delete folder contents
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: Removing everything of a folder
+  Scenario Outline: removing everything from a folder
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/PARENT/"
     And user "Alice" has created folder "/FOLDER/"
