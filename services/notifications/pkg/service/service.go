@@ -98,7 +98,7 @@ func (s eventsNotifier) Run() error {
 }
 
 func (s eventsNotifier) render(ctx context.Context, template email.MessageTemplate,
-	granteeFieldName string, fields map[string]interface{}, granteeList []*user.User, sender string) ([]*channels.Message, error) {
+	granteeFieldName string, fields map[string]string, granteeList []*user.User, sender string) ([]*channels.Message, error) {
 	// Render the Email Template for each user
 	messageList := make([]*channels.Message, len(granteeList))
 	for i, usr := range granteeList {

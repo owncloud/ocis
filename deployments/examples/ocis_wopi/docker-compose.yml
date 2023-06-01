@@ -230,6 +230,10 @@ services:
 
   inbucket:
     image: inbucket/inbucket
+    ports:
+      - "9000:9000"
+      - "1100:1100"
+      - "2500:2500"
     networks:
       ocis-net:
     entrypoint:
