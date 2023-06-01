@@ -419,14 +419,10 @@ The following sections list the changes for 3.0.0.
    the `sub` claim. So that user's recreated with the same name will be treated as different users
    by the IDP.
 
-   This changed also the default values of the 'PROXY_USER_OIDC_CLAIM' and
-   'PROXY_USER_CS3_CLAIM' settings map the IDP users to CS3 user by the userid in the default
-   setup. The old behavior of matching by username can be achieved byt setting
-   'PROXY_USER_OIDC_CLAIM=preferred_username' and 'PROXY_USER_CS3_CLAIM=username'.
-
    https://github.com/owncloud/ocis/issues/904
    https://github.com/owncloud/ocis/pull/6326
    https://github.com/owncloud/ocis/pull/6338
+   https://github.com/owncloud/ocis/pull/6420
 
 * Bugfix - Hide the existence of space when deleting/updating: [#5031](https://github.com/owncloud/ocis/issues/5031)
 
