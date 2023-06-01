@@ -822,6 +822,11 @@ func DefaultRoleAssignments(cfg *config.Config) []*settingsmsg.UserRoleAssignmen
 				AccountUuid: "534bb038-6f9d-4093-946f-133be61fa4e7",
 				RoleId:      BundleUUIDRoleSpaceAdmin,
 			},
+			{
+				// service user
+				AccountUuid: "service-user-id",
+				RoleId:      BundleUUIDRoleAdmin,
+			},
 		}
 	}
 
@@ -829,6 +834,13 @@ func DefaultRoleAssignments(cfg *config.Config) []*settingsmsg.UserRoleAssignmen
 		// default admin user
 		assignments = append(assignments, &settingsmsg.UserRoleAssignment{
 			AccountUuid: cfg.AdminUserID,
+			RoleId:      BundleUUIDRoleAdmin,
+		})
+	}
+
+	if cfg.ServiceAccountIDAdmin != "" {
+		assignments = append(assignments, &settingsmsg.UserRoleAssignment{
+			AccountUuid: cfg.ServiceAccountIDAdmin,
 			RoleId:      BundleUUIDRoleAdmin,
 		})
 	}

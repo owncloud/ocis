@@ -8,7 +8,7 @@ The settings service is currently used for managing the:
 *   possible user roles and their respective permissions,
 *   assignment of roles to users.
 
-As an example, user profile settings that can be changed in the Web UI must be persistent.  
+As an example, user profile settings that can be changed in the Web UI must be persistent.
 
 The settings service supports two different backends for persisting the data. The backend can be set via the `SETTINGS_STORE_TYPE` environment variable. Supported values are:
 
@@ -67,3 +67,7 @@ Infinite Scale services can register *settings bundles* with the settings servic
 ## Settings Usage
 
 Services can set or query ocis *setting values* of a user from settings bundles.
+
+## Service Accounts
+
+The settings service needs to know the ID's of service accounts but it doesn't need their secrets. Currently only one service account can be configured which has the admin role. This can be set with the `SETTINGS_SERVICE_ACCOUNT_ID_ADMIN` envvar, but it will also pick up the global `OCIS_SERVICE_ACCOUNT_ID` envvar. Also see the 'auth-service' service description for additional details.

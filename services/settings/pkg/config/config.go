@@ -37,6 +37,8 @@ type Config struct {
 
 	SetupDefaultAssignments bool `yaml:"set_default_assignments" env:"SETTINGS_SETUP_DEFAULT_ASSIGNMENTS;IDM_CREATE_DEMO_USERS" desc:"The default role assignments the demo users should be setup."`
 
+	ServiceAccountIDAdmin string `yaml:"service_account_id_admin" env:"OCIS_SERVICE_ACCOUNT_ID;SETTINGS_SERVICE_ACCOUNT_ID_ADMIN" desc:"The ID of the service account having the admin role. See the 'auth-service' service description for more details."`
+
 	Context context.Context `yaml:"-"`
 }
 
