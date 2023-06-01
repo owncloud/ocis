@@ -15,6 +15,7 @@ import (
 	authbasic "github.com/owncloud/ocis/v2/services/auth-basic/pkg/command"
 	authbearer "github.com/owncloud/ocis/v2/services/auth-bearer/pkg/command"
 	authmachine "github.com/owncloud/ocis/v2/services/auth-machine/pkg/command"
+	authservice "github.com/owncloud/ocis/v2/services/auth-service/pkg/command"
 	eventhistory "github.com/owncloud/ocis/v2/services/eventhistory/pkg/command"
 	frontend "github.com/owncloud/ocis/v2/services/frontend/pkg/command"
 	gateway "github.com/owncloud/ocis/v2/services/gateway/pkg/command"
@@ -81,6 +82,11 @@ var svccmds = []register.Command{
 	func(cfg *config.Config) *cli.Command {
 		return ServiceCommand(cfg, cfg.AuthMachine.Service.Name, authmachine.GetCommands(cfg.AuthMachine), func(c *config.Config) {
 			cfg.AuthMachine.Commons = cfg.Commons
+		})
+	},
+	func(cfg *config.Config) *cli.Command {
+		return ServiceCommand(cfg, cfg.AuthService.Service.Name, authservice.GetCommands(cfg.AuthService), func(c *config.Config) {
+			cfg.AuthService.Commons = cfg.Commons
 		})
 	},
 	func(cfg *config.Config) *cli.Command {

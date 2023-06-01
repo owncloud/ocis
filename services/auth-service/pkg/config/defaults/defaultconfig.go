@@ -1,11 +1,9 @@
 package defaults
 
 import (
-	"time"
-
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
-	"github.com/owncloud/ocis/v2/services/gateway/pkg/config"
+	"github.com/owncloud/ocis/v2/services/auth-service/pkg/config"
 )
 
 // FullDefaultConfig returns a fully initialized default configuration
@@ -20,53 +18,23 @@ func FullDefaultConfig() *config.Config {
 func DefaultConfig() *config.Config {
 	return &config.Config{
 		Debug: config.Debug{
-			Addr:   "127.0.0.1:9143",
+			Addr:   "127.0.0.1:9169",
 			Token:  "",
 			Pprof:  false,
 			Zpages: false,
 		},
 		GRPC: config.GRPCConfig{
-			Addr:      "127.0.0.1:9142",
+			Addr:      "127.0.0.1:9199",
 			Namespace: "com.owncloud.api",
 			Protocol:  "tcp",
 		},
 		Service: config.Service{
-			Name: "gateway",
+			Name: "auth-service",
 		},
-		Reva:                       shared.DefaultRevaConfig(),
-		CommitShareToStorageGrant:  true,
-		ShareFolder:                "Shares",
-		DisableHomeCreationOnLogin: true,
-		TransferExpires:            24 * 60 * 60,
-		Cache: config.Cache{
-			StatCacheStore:          "noop",
-			StatCacheDatabase:       "ocis",
-			StatCacheTTL:            300 * time.Second,
-			ProviderCacheStore:      "noop",
-			ProviderCacheDatabase:   "ocis",
-			ProviderCacheTTL:        300 * time.Second,
-			CreateHomeCacheStore:    "noop",
-			CreateHomeCacheDatabase: "ocis",
-			CreateHomeCacheTTL:      300 * time.Second,
-		},
-
-		FrontendPublicURL: "https://localhost:9200",
-
-		AppRegistryEndpoint:       "com.owncloud.api.app-registry",
-		AuthBasicEndpoint:         "com.owncloud.api.auth-basic",
-		AuthMachineEndpoint:       "com.owncloud.api.auth-machine",
-		AuthServiceEndpoint:       "com.owncloud.api.auth-service",
-		GroupsEndpoint:            "com.owncloud.api.groups",
-		PermissionsEndpoint:       "com.owncloud.api.settings",
-		SharingEndpoint:           "com.owncloud.api.sharing",
-		StoragePublicLinkEndpoint: "com.owncloud.api.storage-publiclink",
-		StorageSharesEndpoint:     "com.owncloud.api.storage-shares",
-		StorageUsersEndpoint:      "com.owncloud.api.storage-users",
-		UsersEndpoint:             "com.owncloud.api.users",
-
-		StorageRegistry: config.StorageRegistry{
-			Driver: "spaces",
-			JSON:   "",
+		Reva: shared.DefaultRevaConfig(),
+		ServiceAccount: config.ServiceAccount{
+			ServiceAccountID:     "service-user-id",
+			ServiceAccountSecret: "secret-string",
 		},
 	}
 }
@@ -106,10 +74,6 @@ func EnsureDefaults(cfg *config.Config) {
 		}
 	} else if cfg.TokenManager == nil {
 		cfg.TokenManager = &config.TokenManager{}
-	}
-
-	if cfg.TransferSecret == "" && cfg.Commons != nil && cfg.Commons.TransferSecret != "" {
-		cfg.TransferSecret = cfg.Commons.TransferSecret
 	}
 
 	if cfg.GRPC.TLS == nil && cfg.Commons != nil {

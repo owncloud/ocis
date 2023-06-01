@@ -6,6 +6,14 @@ The `auth-basic` service is responsible for validating authentication of incomin
 
 To enable `auth-basic`, you first must set `PROXY_ENABLE_BASIC_AUTH` to `true`.
 
+## The `auth` Service Family
+
+ocis uses serveral authentication services for different use cases. All services that start with `auth-` are part of the authentication service family. Each member authenticates requests with different scopes. As of now, these services exist:
+  -   `auth-basic` handles basic authentication
+  -   `auth-bearer` handles oidc authentication
+  -   `auth-machine` handles interservice authentication when a user is impersonated
+  -   `auth-service` handles interservice authentication when using service accounts
+
 ## Auth Managers
 
 Since the `auth-basic` service does not do any validation itself, it needs to be configured with an authentication manager. One can use the `AUTH_BASIC_AUTH_MANAGER` environment variable to configure this. Currently only one auth manager is supported: `"ldap"`

@@ -61,6 +61,7 @@ config = {
         "services/auth-basic",
         "services/auth-bearer",
         "services/auth-machine",
+        "services/auth-service",
         "services/eventhistory",
         "services/frontend",
         "services/gateway",

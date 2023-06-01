@@ -38,6 +38,7 @@ type Config struct {
 	AuthBasicEndpoint         string `yaml:"-"`
 	AuthBearerEndpoint        string `yaml:"-"`
 	AuthMachineEndpoint       string `yaml:"-"`
+	AuthServiceEndpoint       string `yaml:"-"`
 	StoragePublicLinkEndpoint string `yaml:"-"`
 	StorageUsersEndpoint      string `yaml:"-"`
 	StorageSharesEndpoint     string `yaml:"-"`
