@@ -196,7 +196,7 @@ services:
     restart: always
 
   onlyoffice:
-    image: onlyoffice/documentserver:7.3.0
+    image: onlyoffice/documentserver-de:7.3.0
     networks:
       ocis-net:
     entrypoint:

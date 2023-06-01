@@ -1,4 +1,22 @@
 {
+  "editorConfig": {
+    "customization": {
+      "customer": {
+        "address": "Lorem Ipsum",
+        "info": "Lorem Ipsum",
+        "logo": "https://loremipsum.test/logo-big.png",
+        "logoDark": "https://lorem.ipsum/dark-logo-big.png",
+        "mail": "test@loremipsum.test",
+        "name": "Lorem Ipsum",
+        "www": "https://loremipsum.test"
+      },
+      "logo": {
+        "image": "https://loremipsum.test/logo.png",
+        "imageDark": "https://loremipsum.test/dark-logo.png",
+        "url": "https://loremipsum.test"
+      }
+    }
+  },
   "services": {
     "CoAuthoring": {
       "sql": {
@@ -8,6 +26,9 @@
         "dbName": "onlyoffice",
         "dbUser": "onlyoffice",
         "dbPass": "onlyoffice"
+      },
+      "redis": {
+        "host": "localhost"
       },
       "token": {
         "enable": {
@@ -40,32 +61,34 @@
   "rabbitmq": {
     "url": "amqp://guest:guest@localhost"
   },
+  "wopi": {
+    "enable": true
+  },
   "FileConverter": {
-		"converter": {
-			"inputLimits": [
-				{
-				"type": "docx;dotx;docm;dotm",
-				"zip": {
-					"uncompressed": "1GB",
-					"template": "*.xml"
-				}
-				},
-				{
-				"type": "xlsx;xltx;xlsm;xltm",
-				"zip": {
-					"uncompressed": "1GB",
-					"template": "*.xml"
-				}
-				},
-				{
-				"type": "pptx;ppsx;potx;pptm;ppsm;potm",
-				"zip": {
-					"uncompressed": "1GB",
-					"template": "*.xml"
-				}
-				}
-			]
-		}
-	}
-
+    "converter": {
+      "inputLimits": [
+        {
+          "type": "docx;dotx;docm;dotm",
+          "zip": {
+            "uncompressed": "1GB",
+            "template": "*.xml"
+          }
+        },
+        {
+          "type": "xlsx;xltx;xlsm;xltm",
+          "zip": {
+            "uncompressed": "1GB",
+            "template": "*.xml"
+          }
+        },
+        {
+          "type": "pptx;ppsx;potx;pptm;ppsm;potm",
+          "zip": {
+            "uncompressed": "1GB",
+            "template": "*.xml"
+          }
+        }
+      ]
+    }
+  }
 }
