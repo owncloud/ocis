@@ -63,7 +63,7 @@ class OcisConfigContext implements Context {
 	 */
 	public function theConfigHasBeenSetTo(string $configVariable, string $configValue): void {
 		$envs = [
-            $configVariable => $configValue,
+			$configVariable => $configValue,
 		];
 
 		$response =  OcisConfigHelper::reConfigureOcis($envs);
@@ -71,27 +71,6 @@ class OcisConfigContext implements Context {
 			200,
 			$response->getStatusCode(),
 			"Failed to set config $configVariable=$configValue"
-		);
-	}
-
-	/**
-	 * @Given cors allowed origins has been set to :allowedOrigins
-	 *
-	 * @param string $allowedOrigins
-	 *
-	 * @return void
-	 * @throws GuzzleException
-	 */
-	public function corsAllowedOriginsHasBeenSet(string $allowedOrigins): void {
-		$envs = [
-			"OCIS_CORS_ALLOW_ORIGINS" => $allowedOrigins,
-		];
-
-		$response =  OcisConfigHelper::reConfigureOcis($envs);
-		Assert::assertEquals(
-			200,
-			$response->getStatusCode(),
-			"Failed to set OCIS_CORS_ALLOW_ORIGINS=" . $allowedOrigins
 		);
 	}
 
