@@ -57,7 +57,7 @@ func (s eventsNotifier) handleSpaceShared(e events.SpaceShared) {
 	sharerDisplayName := executant.GetDisplayName()
 	recipientList, err := s.render(executantCtx, email.SharedSpace,
 		"SpaceGrantee",
-		map[string]interface{}{
+		map[string]string{
 			"SpaceSharer": sharerDisplayName,
 			"SpaceName":   resourceInfo.GetSpace().GetName(),
 			"ShareLink":   shareLink,
@@ -117,7 +117,7 @@ func (s eventsNotifier) handleSpaceUnshared(e events.SpaceUnshared) {
 	sharerDisplayName := executant.GetDisplayName()
 	recipientList, err := s.render(executantCtx, email.UnsharedSpace,
 		"SpaceGrantee",
-		map[string]interface{}{
+		map[string]string{
 			"SpaceSharer": sharerDisplayName,
 			"SpaceName":   resourceInfo.GetSpace().Name,
 			"ShareLink":   shareLink,
@@ -149,7 +149,7 @@ func (s eventsNotifier) handleSpaceMembershipExpired(e events.SpaceMembershipExp
 
 	recipientList, err := s.render(ownerCtx, email.MembershipExpired,
 		"SpaceGrantee",
-		map[string]interface{}{
+		map[string]string{
 			"SpaceName": e.SpaceName,
 			"ExpiredAt": e.ExpiredAt.Format("2006-01-02 15:04:05"),
 		}, granteeList, owner.GetDisplayName())

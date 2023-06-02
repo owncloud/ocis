@@ -82,7 +82,7 @@ var _ = Describe("Notifications", func() {
 		Entry("Share Created", testChannel{
 			expectedReceipients: []string{sharee.GetMail()},
 			expectedSubject:     "Dr. S. Harer shared 'secrets of the board' with you",
-			expectedMessage: `Hello Eric Expireling
+			expectedTextBody: `Hello Eric Expireling
 
 Dr. S. Harer has shared "secrets of the board" with you.
 
@@ -107,7 +107,7 @@ https://owncloud.com
 		Entry("Share Expired", testChannel{
 			expectedReceipients: []string{sharee.GetMail()},
 			expectedSubject:     "Share to 'secrets of the board' expired at 2023-04-17 16:42:00",
-			expectedMessage: `Hello Eric Expireling,
+			expectedTextBody: `Hello Eric Expireling,
 
 Your share to secrets of the board has expired at 2023-04-17 16:42:00
 
@@ -132,7 +132,7 @@ https://owncloud.com
 		Entry("Added to Space", testChannel{
 			expectedReceipients: []string{sharee.GetMail()},
 			expectedSubject:     "Dr. S. Harer invited you to join secret space",
-			expectedMessage: `Hello Eric Expireling,
+			expectedTextBody: `Hello Eric Expireling,
 
 Dr. S. Harer has invited you to join "secret space".
 
@@ -157,7 +157,7 @@ https://owncloud.com
 		Entry("Removed from Space", testChannel{
 			expectedReceipients: []string{sharee.GetMail()},
 			expectedSubject:     "Dr. S. Harer removed you from secret space",
-			expectedMessage: `Hello Eric Expireling,
+			expectedTextBody: `Hello Eric Expireling,
 
 Dr. S. Harer has removed you from "secret space".
 
@@ -183,7 +183,7 @@ https://owncloud.com
 		Entry("Space Expired", testChannel{
 			expectedReceipients: []string{sharee.GetMail()},
 			expectedSubject:     "Membership of 'secret space' expired at 2023-04-17 16:42:00",
-			expectedMessage: `Hello Eric Expireling,
+			expectedTextBody: `Hello Eric Expireling,
 
 Your membership of space secret space has expired at 2023-04-17 16:42:00
 
@@ -208,11 +208,209 @@ https://owncloud.com
 	)
 })
 
+var _ = Describe("Notifications X-Site Scripting", func() {
+	var (
+		gwc    *cs3mocks.GatewayAPIClient
+		vs     *settingssvc.MockValueService
+		sharer = &user.User{
+			Id: &user.UserId{
+				OpaqueId: "sharer",
+			},
+			Mail:        "sharer@owncloud.com",
+			DisplayName: "Dr. O'reilly",
+		}
+		sharee = &user.User{
+			Id: &user.UserId{
+				OpaqueId: "sharee",
+			},
+			Mail:        "sharee@owncloud.com",
+			DisplayName: "<script>alert('Eric Expireling');</script>",
+		}
+		resourceid = &provider.ResourceId{
+			StorageId: "storageid",
+			SpaceId:   "spaceid",
+			OpaqueId:  "itemid",
+		}
+	)
+
+	BeforeEach(func() {
+		gwc = &cs3mocks.GatewayAPIClient{}
+		gwc.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharer}, nil).Once()
+		gwc.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharee}, nil).Once()
+		gwc.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}, User: sharer}, nil)
+		gwc.On("Stat", mock.Anything, mock.Anything).Return(&provider.StatResponse{
+			Status: &rpc.Status{Code: rpc.Code_CODE_OK},
+			Info: &provider.ResourceInfo{
+				Name:  "<script>alert('secrets of the board');</script>",
+				Space: &provider.StorageSpace{Name: "<script>alert('secret space');</script>"}},
+		}, nil)
+		vs = &settingssvc.MockValueService{}
+		vs.GetValueByUniqueIdentifiersFunc = func(ctx context.Context, req *settingssvc.GetValueByUniqueIdentifiersRequest, opts ...client.CallOption) (*settingssvc.GetValueResponse, error) {
+			return nil, nil
+		}
+	})
+
+	DescribeTable("Sending notifications",
+		func(tc testChannel, ev events.Event) {
+			cfg := defaults.FullDefaultConfig()
+			cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
+			_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
+			ch := make(chan events.Event)
+			evts := service.NewEventsNotifier(ch, tc, log.NewLogger(), gwc, vs, "", "", "")
+			go evts.Run()
+
+			ch <- ev
+			select {
+			case <-tc.done:
+				// finished
+			case <-time.Tick(3 * time.Second):
+				Fail("timeout waiting for notification")
+			}
+		},
+
+		Entry("Share Created", testChannel{
+			expectedReceipients: []string{sharee.GetMail()},
+			expectedSubject:     "Dr. O'reilly shared '<script>alert('secrets of the board');</script>' with you",
+			expectedTextBody: `Hello <script>alert('Eric Expireling');</script>
+
+Dr. O'reilly has shared "<script>alert('secrets of the board');</script>" with you.
+
+Click here to view it: files/shares/with-me
+
+
+---
+ownCloud - Store. Share. Work.
+https://owncloud.com
+`,
+			expectedHTMLBody: `<!DOCTYPE html>
+<html>
+<body>
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr>
+        <td>
+            <table cellspacing="0" cellpadding="0" border="0" width="600px">
+                <tr>
+                    <td width="20px">&nbsp;</td>
+                    <td style="font-weight:normal; font-size:0.8em; line-height:1.2em; font-family:verdana,'arial',sans;">
+                        Hello &lt;script&gt;alert(&#39;Eric Expireling&#39;);&lt;/script&gt;
+                        <br><br>
+                        Dr. O&#39;reilly has shared "&lt;script&gt;alert(&#39;secrets of the board&#39;);&lt;/script&gt;" with you.
+                        <br><br>
+                        <a href="files/shares/with-me">Click here to view it: files/shares/with-me</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td width="20px">&nbsp;</td>
+                    <td style="font-weight:normal; font-size:0.8em; line-height:1.2em; font-family:verdana,'arial',sans;">
+                        <footer>
+                            <br>
+                            <br>
+                            --- <br>
+                            ownCloud - Store. Share. Work.<br>
+                            <a href="https://owncloud.com">https://owncloud.com</a>
+                        </footer>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
+`,
+			expectedSender: sharer.GetDisplayName(),
+
+			done: make(chan struct{}),
+		}, events.Event{
+			Event: events.ShareCreated{
+				Sharer:        sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				CTime:         utils.TimeToTS(time.Date(2023, 4, 17, 16, 42, 0, 0, time.UTC)),
+				ItemID:        resourceid,
+			},
+		}),
+
+		Entry("Added to Space", testChannel{
+			expectedReceipients: []string{sharee.GetMail()},
+			expectedSubject:     "Dr. O'reilly invited you to join <script>alert('secret space');</script>",
+			expectedTextBody: `Hello <script>alert('Eric Expireling');</script>,
+
+Dr. O'reilly has invited you to join "<script>alert('secret space');</script>".
+
+Click here to view it: f/spaceid
+
+
+---
+ownCloud - Store. Share. Work.
+https://owncloud.com
+`,
+			expectedSender: sharer.GetDisplayName(),
+			expectedHTMLBody: `<!DOCTYPE html>
+<html>
+<body>
+<table cellspacing="0" cellpadding="0" border="0" width="100%">
+    <tr>
+        <td>
+            <table cellspacing="0" cellpadding="0" border="0" width="600px">
+                <tr>
+                    <td width="20px">&nbsp;</td>
+                    <td style="font-weight:normal; font-size:0.8em; line-height:1.2em; font-family:verdana,'arial',sans;">
+                        Hello &lt;script&gt;alert(&#39;Eric Expireling&#39;);&lt;/script&gt;,
+                        <br><br>
+                        Dr. O&#39;reilly has invited you to join "&lt;script&gt;alert(&#39;secret space&#39;);&lt;/script&gt;".
+                        <br><br>
+                        <a href="f/spaceid">Click here to view it: f/spaceid</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+                <tr>
+                    <td width="20px">&nbsp;</td>
+                    <td style="font-weight:normal; font-size:0.8em; line-height:1.2em; font-family:verdana,'arial',sans;">
+                        <footer>
+                            <br>
+                            <br>
+                            --- <br>
+                            ownCloud - Store. Share. Work.<br>
+                            <a href="https://owncloud.com">https://owncloud.com</a>
+                        </footer>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
+`,
+			done: make(chan struct{}),
+		}, events.Event{
+			Event: events.SpaceShared{
+				Executant:     sharer.GetId(),
+				Creator:       sharer.GetId(),
+				GranteeUserID: sharee.GetId(),
+				ID:            &provider.StorageSpaceId{OpaqueId: "spaceid"},
+			},
+		}),
+	)
+})
+
 // NOTE: This is explictitly not testing the message itself. Should we?
 type testChannel struct {
 	expectedReceipients []string
 	expectedSubject     string
-	expectedMessage     string
+	expectedTextBody    string
+	expectedHTMLBody    string
 	expectedSender      string
 	done                chan struct{}
 }
@@ -220,10 +418,13 @@ type testChannel struct {
 func (tc testChannel) SendMessage(ctx context.Context, m *channels.Message) error {
 	defer GinkgoRecover()
 
-	Expect(m.Recipient).To(Equal(tc.expectedReceipients))
-	Expect(m.Subject).To(Equal(tc.expectedSubject))
-	Expect(m.TextBody).To(Equal(tc.expectedMessage))
-	Expect(m.Sender).To(Equal(tc.expectedSender))
+	Expect(tc.expectedReceipients).To(Equal(m.Recipient))
+	Expect(tc.expectedSubject).To(Equal(m.Subject))
+	Expect(tc.expectedTextBody).To(Equal(m.TextBody))
+	Expect(tc.expectedSender).To(Equal(m.Sender))
+	if tc.expectedHTMLBody != "" {
+		Expect(tc.expectedHTMLBody).To(Equal(m.HTMLBody))
+	}
 	tc.done <- struct{}{}
 	return nil
 }

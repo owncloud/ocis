@@ -9,7 +9,7 @@ import (
 )
 
 // NewTextTemplate replace the body message template placeholders with the translated template
-func NewTextTemplate(mt MessageTemplate, locale string, translationPath string, vars map[string]interface{}) (MessageTemplate, error) {
+func NewTextTemplate(mt MessageTemplate, locale string, translationPath string, vars map[string]string) (MessageTemplate, error) {
 	var err error
 	t := l10n.NewTranslator(locale, translationPath)
 	mt.Subject, err = composeMessage(t.Translate(mt.Subject), vars)
@@ -32,7 +32,7 @@ func NewTextTemplate(mt MessageTemplate, locale string, translationPath string, 
 }
 
 // NewHTMLTemplate replace the body message template placeholders with the translated template
-func NewHTMLTemplate(mt MessageTemplate, locale string, translationPath string, vars map[string]interface{}) (MessageTemplate, error) {
+func NewHTMLTemplate(mt MessageTemplate, locale string, translationPath string, vars map[string]string) (MessageTemplate, error) {
 	var err error
 	t := l10n.NewTranslator(locale, translationPath)
 	mt.Subject, err = composeMessage(t.Translate(mt.Subject), vars)
@@ -55,7 +55,7 @@ func NewHTMLTemplate(mt MessageTemplate, locale string, translationPath string, 
 }
 
 // composeMessage renders the message based on template
-func composeMessage(tmpl string, vars map[string]interface{}) (string, error) {
+func composeMessage(tmpl string, vars map[string]string) (string, error) {
 	tpl, err := template.New("").Parse(replacePlaceholders(tmpl))
 	if err != nil {
 		return "", err
