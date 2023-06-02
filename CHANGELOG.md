@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Trace proxy middlewares: [#6313](https://github.com/owncloud/ocis/pull/6313)
 * Enhancement - Bump Reva: [#6381](https://github.com/owncloud/ocis/pull/6381)
 * Enhancement - Default LDAP write to true: [#6362](https://github.com/owncloud/ocis/pull/6362)
+* Enhancement - Fix to prevent the email X-Site scripting: [#6429](https://github.com/owncloud/ocis/pull/6429)
 * Enhancement - Fix preview or viewing of shared animated GIFs: [#6386](https://github.com/owncloud/ocis/pull/6386)
 * Enhancement - Fix err when the user share the locked file: [#6357](https://github.com/owncloud/ocis/pull/6357)
 * Enhancement - Add fulltextsearch capabilty: [#6366](https://github.com/owncloud/ocis/pull/6366)
@@ -49,6 +50,13 @@ The following sections list the changes for unreleased.
    Default `OCIS_LDAP_SERVER_WRITE_ENABLED` to true
 
    https://github.com/owncloud/ocis/pull/6362
+
+* Enhancement - Fix to prevent the email X-Site scripting: [#6429](https://github.com/owncloud/ocis/pull/6429)
+
+   Fix to prevent the email notification X-Site scripting
+
+   https://github.com/owncloud/ocis/issues/6411
+   https://github.com/owncloud/ocis/pull/6429
 
 * Enhancement - Fix preview or viewing of shared animated GIFs: [#6386](https://github.com/owncloud/ocis/pull/6386)
 
