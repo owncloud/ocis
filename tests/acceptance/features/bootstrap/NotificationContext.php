@@ -10,7 +10,6 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use TestHelpers\OcsApiHelper;
 use Behat\Gherkin\Node\PyStringNode;
-use Helmich\JsonAssert\JsonAssertions;
 use TestHelpers\EmailHelper;
 use PHPUnit\Framework\Assert;
 use TestHelpers\GraphHelper;
@@ -152,7 +151,7 @@ class NotificationContext implements Context {
 			null,
 			$this->getUserRecipient(),
 		);
-		JsonAssertions::assertJsonDocumentMatchesSchema(
+		$this->featureContext->assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->featureContext->getJSONSchema($schemaString)
 		);
