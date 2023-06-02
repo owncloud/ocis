@@ -1,7 +1,7 @@
 @api @skipOnStable2.0
 Feature: Tag
-  As a user 
-  I want to tag resources 
+  As a user
+  I want to tag resources
   So that I can sort and search them quickly
 
   Note - this feature is run in CI with ACCOUNTS_HASH_DIFFICULTY set to the default for production
@@ -255,3 +255,32 @@ Feature: Tag
     And the response should contain following tags:
       | folderTag |
       | marketing |
+
+
+  Scenario: user creates a comma-separated list of tags for resources in the project space
+    Given user "Alice" has shared a space "use-tag" with settings:
+      | shareWith | Brian  |
+      | role      | viewer |
+    When user "Alice" creates the following tags for folder "folderMain" of space "use-tag":
+      | finance,नेपाल |
+    Then the HTTP status code should be "200"
+    When user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
+      | key     | value         |
+      | oc:tags | finance,नेपाल |
+    When user "Alice" creates the following tags for file "folderMain/insideTheFolder.txt" of space "use-tag":
+      | file,नेपाल,Tag |
+    Then the HTTP status code should be "200"
+    When user "Brian" sends PROPFIND request from the space "use-tag" to the resource "folderMain/insideTheFolder.txt" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
+      | key     | value          |
+      | oc:tags | file,नेपाल,Tag |
+    When user "Alice" lists all available tags via the GraphApi
+    Then the HTTP status code should be "200"
+    And the response should contain following tags:
+      | finance |
+      | नेपाल   |
+      | file    |
+      | Tag     |
