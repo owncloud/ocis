@@ -94,7 +94,7 @@ func NewCS3UserBackend(opts ...Option) UserBackend {
 func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string) (*cs3.User, string, error) {
 	gatewayClient, err := c.gatewaySelector.Next()
 	if err != nil {
-		return nil, "", fmt.Errorf("could not obtain gatewayClient")
+		return nil, "", fmt.Errorf("could not obtain gatewayClient: %s", err)
 	}
 
 	res, err := gatewayClient.Authenticate(ctx, &gateway.AuthenticateRequest{
@@ -121,7 +121,7 @@ func (c *cs3backend) GetUserByClaims(ctx context.Context, claim, value string) (
 func (c *cs3backend) Authenticate(ctx context.Context, username string, password string) (*cs3.User, string, error) {
 	gatewayClient, err := c.gatewaySelector.Next()
 	if err != nil {
-		return nil, "", fmt.Errorf("could not obtain gatewayClient")
+		return nil, "", fmt.Errorf("could not obtain gatewayClient: %s", err)
 	}
 
 	res, err := gatewayClient.Authenticate(ctx, &gateway.AuthenticateRequest{
