@@ -1,6 +1,8 @@
 package defaults
 
 import (
+	"time"
+
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/ocis-pkg/structs"
 	"github.com/owncloud/ocis/v2/services/storage-shares/pkg/config"
@@ -35,6 +37,11 @@ func DefaultConfig() *config.Config {
 		MountID:                "7639e57c-4433-4a12-8201-722fd0009154",
 		ReadOnly:               false,
 		SharesProviderEndpoint: "com.owncloud.api.sharing",
+		StatCache: config.StatCache{
+			Store:    "memory",
+			Database: "ocis",
+			TTL:      30 * time.Second,
+		},
 	}
 }
 

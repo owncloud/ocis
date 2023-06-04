@@ -1,6 +1,8 @@
 package revaconfig
 
 import (
+	"time"
+
 	"github.com/owncloud/ocis/v2/services/storage-shares/pkg/config"
 )
 
@@ -32,6 +34,13 @@ func StorageSharesConfigFromStruct(cfg *config.Config) map[string]interface{} {
 				"sharesstorageprovider": map[string]interface{}{
 					"usershareprovidersvc": cfg.SharesProviderEndpoint,
 					"mount_id":             cfg.MountID,
+					"statcache": map[string]interface{}{
+						"cache_store":    cfg.StatCache.Store,
+						"cache_nodes":    cfg.StatCache.Nodes,
+						"cache_database": cfg.StatCache.Database,
+						"cache_ttl":      cfg.StatCache.TTL / time.Second,
+						"cache_size":     cfg.StatCache.Size,
+					},
 				},
 			},
 			"interceptors": map[string]interface{}{

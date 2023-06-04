@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"time"
 
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 )
@@ -20,9 +21,10 @@ type Config struct {
 
 	SkipUserGroupsInToken bool `yaml:"skip_user_groups_in_token" env:"STORAGE_SHARES_SKIP_USER_GROUPS_IN_TOKEN" desc:"Disables the loading of user's group memberships from the reva access token."`
 
-	MountID                string `yaml:"mount_id" env:"STORAGE_SHARES_MOUNT_ID" desc:"Mount ID of this storage. Admins can set the ID for the storage in this config option manually which is then used to reference the storage. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
-	ReadOnly               bool   `yaml:"readonly" env:"STORAGE_SHARES_READ_ONLY" desc:"Set this storage to be read-only."`
-	SharesProviderEndpoint string `yaml:"user_share_provider_endpoint" env:"STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT" desc:"GRPC endpoint of the SHARING service."`
+	MountID                string    `yaml:"mount_id" env:"STORAGE_SHARES_MOUNT_ID" desc:"Mount ID of this storage. Admins can set the ID for the storage in this config option manually which is then used to reference the storage. Any reasonable long string is possible, preferably this would be an UUIDv4 format."`
+	ReadOnly               bool      `yaml:"readonly" env:"STORAGE_SHARES_READ_ONLY" desc:"Set this storage to be read-only."`
+	SharesProviderEndpoint string    `yaml:"user_share_provider_endpoint" env:"STORAGE_SHARES_USER_SHARE_PROVIDER_ENDPOINT" desc:"GRPC endpoint of the SHARING service."`
+	StatCache              StatCache `yaml:"stat_cache"`
 
 	Supervised bool            `yaml:"-"`
 	Context    context.Context `yaml:"-"`
@@ -57,4 +59,13 @@ type GRPCConfig struct {
 	TLS       *shared.GRPCServiceTLS `yaml:"tls"`
 	Namespace string                 `yaml:"-"`
 	Protocol  string                 `yaml:"protocol" env:"STORAGE_SHARES_GRPC_PROTOCOL" desc:"The transport protocol of the GRPC service."`
+}
+
+// StatCache holds cache config
+type StatCache struct {
+	Store    string        `yaml:"store" env:"OCIS_CACHE_STORE;STORAGE_SHARES_STAT_CACHE_STORE" desc:"The type of the cache store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details."`
+	Nodes    []string      `yaml:"nodes" env:"OCIS_CACHE_STORE_NODES;STORAGE_SHARES_STAT_CACHE_STORE_NODES" desc:"A comma separated list of nodes to access the configured store. This has no effect when 'memory' or 'ocmem' stores are configured. Note that the behaviour how nodes are used is dependent on the library of the configured store."`
+	Database string        `yaml:"database" env:"OCIS_CACHE_DATABASE" desc:"The database name the configured store should use."`
+	TTL      time.Duration `yaml:"ttl" env:"OCIS_CACHE_TTL;STORAGE_SHARES_STAT_CACHE_TTL" desc:"Default time to live for user info in the user info cache. Only applied when access tokens has no expiration. The duration can be set as number followed by a unit identifier like s, m or h. Defaults to '300s' (300 seconds)."`
+	Size     int           `yaml:"size" env:"OCIS_CACHE_SIZE;STORAGE_SHARES_STAT_CACHE_SIZE" desc:"The maximum quantity of items in the user info cache. Only applies when store type 'ocmem' is configured. Defaults to 512."`
 }
