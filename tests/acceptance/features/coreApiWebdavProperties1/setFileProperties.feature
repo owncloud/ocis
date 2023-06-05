@@ -9,7 +9,7 @@ Feature: set file properties
     And user "Alice" has been created with default attributes and without skeleton files
 
   @smokeTest @issue-1263
-  Scenario Outline: Setting custom DAV property and reading it
+  Scenario Outline: setting custom DAV property and reading it
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/testcustomprop.txt"
     And user "Alice" has set property "very-custom-prop" with namespace "x1='http://whatever.org/ns'" of file "/testcustomprop.txt" to "veryCustomPropValue"
@@ -26,7 +26,7 @@ Feature: set file properties
       | spaces      |
 
   @issue-1297
-  Scenario Outline: Setting custom complex DAV property and reading it
+  Scenario Outline: setting custom complex DAV property and reading it
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/testcustomprop.txt"
     And user "Alice" has set property "very-custom-prop" with namespace "x1='http://whatever.org/ns'" of file "/testcustomprop.txt" to "<foo xmlns='http://bar'/>"
@@ -43,7 +43,7 @@ Feature: set file properties
       | spaces      |
 
   @issue-1263
-  Scenario Outline: Setting custom DAV property and reading it after the file is renamed
+  Scenario Outline: setting custom DAV property and reading it after the file is renamed
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/testcustompropwithmove.txt"
     And user "Alice" has set property "very-custom-prop" with namespace "x1='http://whatever.org/ns'" of file "/testcustompropwithmove.txt" to "valueForMovetest"
@@ -61,7 +61,7 @@ Feature: set file properties
       | spaces      |
 
   @issue-1297
-  Scenario Outline: Setting custom DAV property on a shared file as an owner and reading as a recipient
+  Scenario Outline: setting custom DAV property on a shared file as an owner and reading as a recipient
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/testcustompropshared.txt"
@@ -84,7 +84,7 @@ Feature: set file properties
       | spaces      |
 
   @issue-1263
-  Scenario Outline: Setting custom DAV property using one endpoint and reading it with other endpoint
+  Scenario Outline: setting custom DAV property using one endpoint and reading it with other endpoint
     Given using <action_dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/testnewold.txt"
     And user "Alice" has set property "very-custom-prop" with namespace "x1='http://whatever.org/ns'" of file "/testnewold.txt" to "lucky"

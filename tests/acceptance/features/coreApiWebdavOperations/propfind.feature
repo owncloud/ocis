@@ -1,8 +1,11 @@
 @api
 Feature: PROPFIND
+  As a user
+  I want to retrieve all properties of a resource
+  So that I can get the information about a resource
 
   @issue-751
-  Scenario Outline: PROPFIND to "/remote.php/dav/(files|spaces)"
+  Scenario Outline: send PROPFIND request to "/remote.php/dav/(files|spaces)"
     Given user "Alice" has been created with default attributes and without skeleton files
     When user "Alice" requests "<dav_path>" with "PROPFIND" using basic auth
     Then the HTTP status code should be "405"
@@ -16,7 +19,7 @@ Feature: PROPFIND
       | /remote.php/dav/spaces        |
 
 
-  Scenario Outline: PROPFIND to "/remote.php/dav/(files|spaces)" with depth header
+  Scenario Outline: send PROPFIND request to "/remote.php/dav/(files|spaces)" with depth header
     Given user "Alice" has been created with default attributes and without skeleton files
     When user "Alice" requests "<dav_path>" with "PROPFIND" using basic auth and with headers
       | header | value   |

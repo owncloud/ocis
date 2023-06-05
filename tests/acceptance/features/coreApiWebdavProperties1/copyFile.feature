@@ -12,7 +12,7 @@ Feature: copy file
     And user "Alice" has created folder "/FOLDER"
 
   @smokeTest
-  Scenario Outline: Copying a file
+  Scenario Outline: copying a file
     Given using <dav_version> DAV path
     When user "Alice" copies file "/textfile0.txt" to "/FOLDER/textfile0.txt" using the WebDAV API
     Then the HTTP status code should be "201"
@@ -28,7 +28,7 @@ Feature: copy file
       | spaces      |
 
   @smokeTest
-  Scenario Outline: Copying and overwriting a file
+  Scenario Outline: copying and overwriting a file
     Given using <dav_version> DAV path
     When user "Alice" copies file "/textfile0.txt" to "/textfile1.txt" using the WebDAV API
     Then the HTTP status code should be "204"
@@ -44,7 +44,7 @@ Feature: copy file
       | spaces      |
 
 
-  Scenario Outline: Copying a file when 2 files exist with different case
+  Scenario Outline: copying a file when 2 files exist with different case
     Given using <dav_version> DAV path
     # "/textfile1.txt" already exists in the skeleton, make another with only case differences in the file name
     When user "Alice" copies file "/textfile0.txt" to "/TextFile1.txt" using the WebDAV API
@@ -62,7 +62,7 @@ Feature: copy file
       | spaces      |
 
 
-  Scenario Outline: Copying a file to a folder with no permissions
+  Scenario Outline: copying a file to a folder with no permissions
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
@@ -81,7 +81,7 @@ Feature: copy file
       | new         |
 
 
-  Scenario Outline: Copying a file to overwrite a file into a folder with no permissions
+  Scenario Outline: copying a file to overwrite a file into a folder with no permissions
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
@@ -102,7 +102,7 @@ Feature: copy file
       | new         |
 
   @issue-1345
-  Scenario Outline: Copying file to a path with extension .part should not be possible
+  Scenario Outline: copying file to a path with extension .part should not be possible
     Given using <dav_version> DAV path
     When user "Alice" copies file "/textfile1.txt" to "/textfile1.part" using the WebDAV API
     Then the HTTP status code should be "400"
@@ -567,7 +567,7 @@ Feature: copy file
       | spaces      |
 
 
-  Scenario Outline: Copy file into a nonexistent folder
+  Scenario Outline: copy file into a nonexistent folder
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "fileToCopy.txt"
     When user "Alice" copies file "/fileToCopy.txt" to "/not-existing-folder/fileToCopy.txt" using the WebDAV API
@@ -584,7 +584,7 @@ Feature: copy file
       | spaces      |
 
 
-  Scenario Outline: Copy a nonexistent file into a folder
+  Scenario Outline: copy a nonexistent file into a folder
     Given using <dav_version> DAV path
     When user "Alice" copies file "/doesNotExist.txt" to "/FOLDER/doesNotExist.txt" using the WebDAV API
     Then the HTTP status code should be "404"
@@ -600,7 +600,7 @@ Feature: copy file
       | spaces      |
 
 
-  Scenario Outline: Copy a folder into a nonexistent one
+  Scenario Outline: copy a folder into a nonexistent one
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/testshare"
     When user "Alice" copies folder "/testshare" to "/not-existing/testshare" using the WebDAV API
@@ -618,7 +618,7 @@ Feature: copy file
       | spaces      |
 
 
-  Scenario Outline: Copying a file into a shared folder as the sharee
+  Scenario Outline: copying a file into a shared folder as the sharee
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
@@ -638,7 +638,7 @@ Feature: copy file
       | new         |
 
 
-  Scenario Outline: Copying a file into a shared folder as the sharer
+  Scenario Outline: copying a file into a shared folder as the sharer
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
@@ -659,7 +659,7 @@ Feature: copy file
       | new         |
 
 
-  Scenario Outline: Copying a file out of a shared folder as the sharee
+  Scenario Outline: copying a file out of a shared folder as the sharee
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
@@ -681,7 +681,7 @@ Feature: copy file
       | new         |
 
 
-  Scenario Outline: Copying a file out of a shared folder as the sharer
+  Scenario Outline: copying a file out of a shared folder as the sharer
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created folder "/testshare"
@@ -703,7 +703,7 @@ Feature: copy file
       | new         |
 
 
-  Scenario Outline: Copying a hidden file
+  Scenario Outline: copying a hidden file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded the following files with content "hidden file"
       | path                    |
@@ -730,7 +730,7 @@ Feature: copy file
       | spaces      |
 
 
-  Scenario Outline: Copying a file between shares received from different users
+  Scenario Outline: copying a file between shares received from different users
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
@@ -761,7 +761,7 @@ Feature: copy file
       | new         |
 
 
-  Scenario Outline: Copying a folder between shares received from different users
+  Scenario Outline: copying a folder between shares received from different users
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
@@ -793,7 +793,7 @@ Feature: copy file
       | new         |
 
 
-  Scenario Outline: Copying a file to a folder that is shared with multiple users
+  Scenario Outline: copying a file to a folder that is shared with multiple users
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
@@ -822,7 +822,7 @@ Feature: copy file
       | new         |
 
 
-  Scenario Outline: Copy a folder into another one
+  Scenario Outline: copy a folder into another one
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/testshare"
     And user "Alice" has created folder "/an-other-folder"
@@ -843,7 +843,7 @@ Feature: copy file
       | spaces      |
 
   @skipOnRevaMaster @issue-3023
-  Scenario Outline: Copying a folder into a sub-folder of itself
+  Scenario Outline: copying a folder into a sub-folder of itself
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/PARENT"
     And user "Alice" has created folder "/PARENT/CHILD"
@@ -860,7 +860,7 @@ Feature: copy file
       | spaces      |
 
 
-  Scenario Outline: Copying a folder with a file into another folder
+  Scenario Outline: copying a folder with a file into another folder
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/FOLDER1"
     And user "Alice" has created folder "/FOLDER2"

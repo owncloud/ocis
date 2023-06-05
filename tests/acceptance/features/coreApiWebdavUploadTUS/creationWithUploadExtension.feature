@@ -1,5 +1,8 @@
 @api
 Feature: tests of the creation extension see https://tus.io/protocols/resumable-upload.html#creation-with-upload
+  As a user
+  I want to be able to include parts of upload while creating resources
+  So that I can provide basic information about the resources to the server
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
