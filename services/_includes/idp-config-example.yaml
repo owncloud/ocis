@@ -94,7 +94,6 @@ clients:
   secret: KFeFWWEZO9TkisIQzR3fo7hfiMXlOpaqP8CFuTbSHzV1TUuGECglPxpiVKJfOXIx
   redirect_uris:
   - oc://ios.owncloud.com
-  - oc.ios://ios.owncloud.com
   origins: []
   application_type: native
 ldap:
