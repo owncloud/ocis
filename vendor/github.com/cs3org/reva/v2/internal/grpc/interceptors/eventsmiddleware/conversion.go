@@ -37,6 +37,7 @@ func ContainerCreated(r *provider.CreateContainerResponse, req *provider.CreateC
 		SpaceOwner: spaceOwner,
 		Executant:  executant,
 		Ref:        req.Ref,
+		Timestamp:  utils.TSNow(),
 	}
 }
 
@@ -166,6 +167,7 @@ func LinkAccessFailed(r *link.GetPublicShareByTokenResponse, req *link.GetPublic
 		Executant: executant,
 		Status:    r.Status.Code,
 		Message:   r.Status.Message,
+		Timestamp: utils.TSNow(),
 	}
 	if r.Share != nil {
 		e.ShareID = r.Share.Id
@@ -180,6 +182,7 @@ func LinkRemoved(r *link.RemovePublicShareResponse, req *link.RemovePublicShareR
 		Executant:  executant,
 		ShareID:    req.Ref.GetId(),
 		ShareToken: req.Ref.GetToken(),
+		Timestamp:  utils.TSNow(),
 	}
 }
 
@@ -189,6 +192,7 @@ func FileTouched(r *provider.TouchFileResponse, req *provider.TouchFileRequest, 
 		SpaceOwner: spaceOwner,
 		Executant:  executant,
 		Ref:        req.Ref,
+		Timestamp:  utils.TSNow(),
 	}
 }
 
@@ -198,6 +202,7 @@ func FileUploaded(r *provider.InitiateFileUploadResponse, req *provider.Initiate
 		SpaceOwner: spaceOwner,
 		Executant:  executant,
 		Ref:        req.Ref,
+		Timestamp:  utils.TSNow(),
 	}
 }
 
@@ -206,6 +211,7 @@ func FileDownloaded(r *provider.InitiateFileDownloadResponse, req *provider.Init
 	return events.FileDownloaded{
 		Executant: executant,
 		Ref:       req.Ref,
+		Timestamp: utils.TSNow(),
 	}
 }
 
@@ -221,6 +227,7 @@ func ItemTrashed(r *provider.DeleteResponse, req *provider.DeleteRequest, spaceO
 			SpaceId:   req.Ref.GetResourceId().GetSpaceId(),
 			OpaqueId:  opaqueID,
 		},
+		Timestamp: utils.TSNow(),
 	}
 }
 
@@ -231,6 +238,7 @@ func ItemMoved(r *provider.MoveResponse, req *provider.MoveRequest, spaceOwner, 
 		Executant:    executant,
 		Ref:          req.Destination,
 		OldReference: req.Source,
+		Timestamp:    utils.TSNow(),
 	}
 }
 
@@ -239,6 +247,7 @@ func ItemPurged(r *provider.PurgeRecycleResponse, req *provider.PurgeRecycleRequ
 	return events.ItemPurged{
 		Executant: executant,
 		Ref:       req.Ref,
+		Timestamp: utils.TSNow(),
 	}
 }
 
@@ -254,6 +263,7 @@ func ItemRestored(r *provider.RestoreRecycleItemResponse, req *provider.RestoreR
 		Ref:          ref,
 		OldReference: req.Ref,
 		Key:          req.Key,
+		Timestamp:    utils.TSNow(),
 	}
 }
 
@@ -264,6 +274,7 @@ func FileVersionRestored(r *provider.RestoreFileVersionResponse, req *provider.R
 		Executant:  executant,
 		Ref:        req.Ref,
 		Key:        req.Key,
+		Timestamp:  utils.TSNow(),
 	}
 }
 
@@ -288,6 +299,7 @@ func SpaceRenamed(r *provider.UpdateStorageSpaceResponse, req *provider.UpdateSt
 		ID:        r.StorageSpace.Id,
 		Owner:     extractOwner(r.StorageSpace.Owner),
 		Name:      r.StorageSpace.Name,
+		Timestamp: utils.TSNow(),
 	}
 }
 
@@ -297,6 +309,7 @@ func SpaceUpdated(r *provider.UpdateStorageSpaceResponse, req *provider.UpdateSt
 		Executant: executant,
 		ID:        r.StorageSpace.Id,
 		Space:     r.StorageSpace,
+		Timestamp: utils.TSNow(),
 	}
 }
 
@@ -306,6 +319,7 @@ func SpaceEnabled(r *provider.UpdateStorageSpaceResponse, req *provider.UpdateSt
 		Executant: executant,
 		ID:        r.StorageSpace.Id,
 		Owner:     extractOwner(r.StorageSpace.Owner),
+		Timestamp: utils.TSNow(),
 	}
 }
 

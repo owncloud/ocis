@@ -20,15 +20,16 @@ package events
 
 import (
 	"encoding/json"
-	"time"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 )
 
 // UserCreated is emitted when a user was created
 type UserCreated struct {
 	Executant *user.UserId
 	UserID    string
+	Timestamp *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -42,6 +43,7 @@ func (UserCreated) Unmarshal(v []byte) (interface{}, error) {
 type UserDeleted struct {
 	Executant *user.UserId
 	UserID    string
+	Timestamp *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -53,8 +55,9 @@ func (UserDeleted) Unmarshal(v []byte) (interface{}, error) {
 
 // UserFeature represents a user feature
 type UserFeature struct {
-	Name  string
-	Value string
+	Name      string
+	Value     string
+	Timestamp *types.Timestamp
 }
 
 // UserFeatureChanged is emitted when a user feature was changed
@@ -62,6 +65,7 @@ type UserFeatureChanged struct {
 	Executant *user.UserId
 	UserID    string
 	Features  []UserFeature
+	Timestamp *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -74,7 +78,7 @@ func (UserFeatureChanged) Unmarshal(v []byte) (interface{}, error) {
 // PersonalDataExtracted is emitted when a user data extraction is finished
 type PersonalDataExtracted struct {
 	Executant *user.UserId
-	Timestamp time.Time
+	Timestamp *types.Timestamp
 	ErrorMsg  string
 }
 

@@ -24,6 +24,7 @@ import (
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 )
 
 type (
@@ -59,6 +60,7 @@ type BytesReceived struct {
 	Filename      string
 	Filesize      uint64
 	URL           string
+	Timestamp     *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -80,6 +82,7 @@ type StartPostprocessingStep struct {
 	RevaToken     string               // for file retrieval in after upload case
 
 	StepToStart Postprocessingstep
+	Timestamp   *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -99,6 +102,7 @@ type PostprocessingStepFinished struct {
 	Result       interface{}           // result information see VirusscanResult for example
 	Error        error                 // possible error of the step
 	Outcome      PostprocessingOutcome // some services may cause postprocessing to stop
+	Timestamp    *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -128,6 +132,7 @@ type VirusscanResult struct {
 	Scandate    time.Time
 	ResourceID  *provider.ResourceId
 	ErrorMsg    string // empty when no error
+	Timestamp   *types.Timestamp
 }
 
 // PostprocessingFinished is emitted by *some* service which can decide that
@@ -138,6 +143,7 @@ type PostprocessingFinished struct {
 	ExecutingUser *user.User
 	Result        map[Postprocessingstep]interface{} // it is a map[step]Event
 	Outcome       PostprocessingOutcome
+	Timestamp     *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -155,7 +161,7 @@ type UploadReady struct {
 	ExecutingUser *user.User
 	FileRef       *provider.Reference
 	Failed        bool
-	Timestamp     time.Time
+	Timestamp     *types.Timestamp
 	// add reference here? We could use it to inform client pp is finished
 }
 

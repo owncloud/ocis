@@ -23,6 +23,7 @@ import (
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 )
 
 // ContainerCreated is emitted when a directory has been created
@@ -31,6 +32,7 @@ type ContainerCreated struct {
 	Executant  *user.UserId
 	Ref        *provider.Reference
 	Owner      *user.UserId
+	Timestamp  *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -46,6 +48,7 @@ type FileUploaded struct {
 	Executant  *user.UserId
 	Ref        *provider.Reference
 	Owner      *user.UserId
+	Timestamp  *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -60,6 +63,7 @@ type FileTouched struct {
 	SpaceOwner *user.UserId
 	Executant  *user.UserId
 	Ref        *provider.Reference
+	Timestamp  *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -74,6 +78,7 @@ type FileDownloaded struct {
 	Executant *user.UserId
 	Ref       *provider.Reference
 	Owner     *user.UserId
+	Timestamp *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -90,6 +95,7 @@ type ItemTrashed struct {
 	ID         *provider.ResourceId
 	Ref        *provider.Reference
 	Owner      *user.UserId
+	Timestamp  *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -106,6 +112,7 @@ type ItemMoved struct {
 	Ref          *provider.Reference
 	Owner        *user.UserId
 	OldReference *provider.Reference
+	Timestamp    *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -121,6 +128,7 @@ type ItemPurged struct {
 	ID        *provider.ResourceId
 	Ref       *provider.Reference
 	Owner     *user.UserId
+	Timestamp *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -139,6 +147,7 @@ type ItemRestored struct {
 	Owner        *user.UserId
 	OldReference *provider.Reference
 	Key          string
+	Timestamp    *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -155,6 +164,7 @@ type FileVersionRestored struct {
 	Ref        *provider.Reference
 	Owner      *user.UserId
 	Key        string
+	Timestamp  *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface

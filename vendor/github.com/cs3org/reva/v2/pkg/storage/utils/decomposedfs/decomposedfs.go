@@ -270,7 +270,7 @@ func (fs *Decomposedfs) Postprocessing(ch <-chan events.Event) {
 						},
 						Path: utils.MakeRelativePath(filepath.Join(up.Info.MetaData["dir"], up.Info.MetaData["filename"])),
 					},
-					Timestamp:  now,
+					Timestamp:  utils.TimeToTS(now),
 					SpaceOwner: n.SpaceOwnerOrManager(ctx),
 				},
 			); err != nil {
