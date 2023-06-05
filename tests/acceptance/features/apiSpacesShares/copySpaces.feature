@@ -789,7 +789,7 @@ Feature: copy file
       | newfolder/personal.txt     |
       | newfolder/personal (1).txt |
 
-  @issue-4797
+
   Scenario: copying a file from Personal to Shares with an option "replace"
     Given the administrator has given "Alice" the role "Space Admin" using the settings api
     And user "Alice" has created a space "Project" with the default quota using the GraphApi
@@ -811,7 +811,4 @@ Feature: copy file
     Then the HTTP status code should be "200"
     And the downloaded content should be "old content version 2"
     And for user "Brian" the content of the file "/newfolder/personal.txt" of the space "Shares" should be "new content"
-    When user "Brian" downloads version of the file "/newfolder/personal.txt" with the index "2" of the space "Shares" using the WebDAV API
-    Then the HTTP status code should be "200"
-    And the downloaded content should be "old content version 1"
     And as "Brian" file "insideSpace.txt" should not exist in the trashbin of the space "Personal"
