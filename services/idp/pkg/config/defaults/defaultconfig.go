@@ -109,7 +109,6 @@ func DefaultConfig() *config.Config {
 				ApplicationType: "native",
 				RedirectURIs: []string{
 					"oc://ios.owncloud.com",
-					"oc.ios://ios.owncloud.com",
 				},
 			},
 		},

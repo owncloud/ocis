@@ -543,8 +543,7 @@
             "clientAuthenticatorType": "client-secret",
             "secret": "**********",
             "redirectUris": [
-                "oc://ios.owncloud.com",
-                "oc.ios://ios.owncloud.com"
+                "oc://ios.owncloud.com"
             ],
             "webOrigins": [],
             "notBefore": 0,
