@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: edit user
   As an admin
   I want to be able to edit user information
@@ -66,9 +66,9 @@ Feature: edit user
     Examples:
       | action description           | userName | code | newUserName |
       | change to a valid user name  | Lionel   | 200  | Lionel      |
-      | user name characters         | *:!;_+-& | 200  | *:!;_+-&    |
+      | user name characters         | a*!_+-&  | 200  | a*!_+-&     |
       | change to existing user name | Brian    | 409  | Brian       |
-      | empty user name              |          | 200  | Brian       |
+      | empty user name              |          | 400  | Brian       |
 
   @skipOnStable2.0
   Scenario: admin user changes the name of a user to the name of an existing disabled user

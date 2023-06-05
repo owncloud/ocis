@@ -654,6 +654,14 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if accountName, ok := changes.GetOnPremisesSamAccountNameOk(); ok {
+		if !g.isValidUsername(*accountName) {
+			logger.Info().Str("username", *accountName).Msg("could not update user: invalid username")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Invalid username")
+			return
+		}
+	}
+
 	var features []events.UserFeature
 	if mail, ok := changes.GetMailOk(); ok {
 		if !isValidEmail(*mail) {
