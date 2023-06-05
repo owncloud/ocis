@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Fix error message when disabling users: [#6435](https://github.com/owncloud/ocis/pull/6435)
 * Bugfix - Empty exact list while searching for a sharee: [#6398](https://github.com/owncloud/ocis/pull/6398)
 * Bugfix - Trace proxy middlewares: [#6313](https://github.com/owncloud/ocis/pull/6313)
 * Enhancement - Bump Reva: [#6381](https://github.com/owncloud/ocis/pull/6381)
@@ -22,6 +23,12 @@ The following sections list the changes for unreleased.
 * Enhancement - Update web to v7.0.0-rc.38: [#6375](https://github.com/owncloud/ocis/pull/6375)
 
 ## Details
+
+* Bugfix - Fix error message when disabling users: [#6435](https://github.com/owncloud/ocis/pull/6435)
+
+   When we disable users by adding them to a group we do not need to update the user entry.
+
+   https://github.com/owncloud/ocis/pull/6435
 
 * Bugfix - Empty exact list while searching for a sharee: [#6398](https://github.com/owncloud/ocis/pull/6398)
 
