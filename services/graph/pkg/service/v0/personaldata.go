@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
-	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -129,7 +128,7 @@ func (g Graph) GatherPersonalData(usr *user.User, ref *provider.Reference, token
 
 	if err := events.Publish(g.eventsPublisher, events.PersonalDataExtracted{
 		Executant: usr.GetId(),
-		Timestamp: time.Now(),
+		Timestamp: utils.TSNow(),
 		ErrorMsg:  errmsg,
 	}); err != nil {
 		g.logger.Error().Err(err).Msg("cannot publish event")

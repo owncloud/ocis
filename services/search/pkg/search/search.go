@@ -118,8 +118,7 @@ func convertToWebDAVPermissions(isShared, isMountpoint, isDir bool, p *provider.
 	if isMountpoint {
 		fmt.Fprintf(&b, "M")
 	}
-	if p.Delete &&
-		p.PurgeRecycle {
+	if p.Delete {
 		fmt.Fprintf(&b, "D")
 	}
 	if p.InitiateFileUpload &&

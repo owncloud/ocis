@@ -23,6 +23,7 @@ import (
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 )
 
 // TagsAdded is emitted when a Tag has been added
@@ -31,6 +32,7 @@ type TagsAdded struct {
 	Tags       string
 	Ref        *provider.Reference
 	Executant  *user.UserId
+	Timestamp  *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -46,6 +48,7 @@ type TagsRemoved struct {
 	Tags       string
 	Ref        *provider.Reference
 	Executant  *user.UserId
+	Timestamp  *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface

@@ -22,12 +22,14 @@ import (
 	"encoding/json"
 
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
+	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
 )
 
 // GroupCreated is emitted when a group was created
 type GroupCreated struct {
 	Executant *user.UserId
 	GroupID   string
+	Timestamp *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -41,6 +43,7 @@ func (GroupCreated) Unmarshal(v []byte) (interface{}, error) {
 type GroupDeleted struct {
 	Executant *user.UserId
 	GroupID   string
+	Timestamp *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -55,6 +58,7 @@ type GroupMemberAdded struct {
 	Executant *user.UserId
 	GroupID   string
 	UserID    string
+	Timestamp *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -69,6 +73,7 @@ type GroupMemberRemoved struct {
 	Executant *user.UserId
 	GroupID   string
 	UserID    string
+	Timestamp *types.Timestamp
 }
 
 // Unmarshal to fulfill umarshaller interface
@@ -80,8 +85,9 @@ func (GroupMemberRemoved) Unmarshal(v []byte) (interface{}, error) {
 
 // GroupFeature represents a group feature
 type GroupFeature struct {
-	Name  string
-	Value string
+	Name      string
+	Value     string
+	Timestamp *types.Timestamp
 }
 
 // GroupFeatureChanged is emitted when a group feature was changed
@@ -89,6 +95,7 @@ type GroupFeatureChanged struct {
 	Executant *user.UserId
 	GroupID   string
 	Features  []GroupFeature
+	Timestamp *types.Timestamp
 }
 
 // Unmarshal to fulfill unmarshaller interface
