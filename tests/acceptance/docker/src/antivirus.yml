@@ -1,0 +1,14 @@
+services:
+  start_antivirus:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - clamav
+    command: clamav:3310
+  clamav:
+    image: owncloudci/clamavd
+    volumes:
+      - clamavSocket:/var/run/clamav/
+
+volumes:
+  clamavSocket:
+
