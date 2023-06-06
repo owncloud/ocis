@@ -132,9 +132,9 @@ Feature: State of the quota
     Then the HTTP status code should be "507"
 
   @env-config
-  Scenario: create a space by setting OCIS spaces max quota
+  Scenario: try to create a space with quota greater than OCIS spaces max quota
     Given the config "OCIS_SPACES_MAX_QUOTA" has been set to "50"
     And user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Brian" the role "Space Admin" using the settings api
     When user "Brian" creates a space "new space" of type "project" with quota "51" using the Graph API
-    Then the HTTP status code should be "500"
+    Then the HTTP status code should be "507"
