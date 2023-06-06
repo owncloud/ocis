@@ -194,7 +194,7 @@ func Sanitize(cfg *config.Config) {
 		cfg.Web.Config.Options.FeedbackLink = nil
 	}
 	// remove Upload parent if no value is set
-	if cfg.Web.Config.Options.Upload.XHR.Timeout == 0 {
+	if cfg.Web.Config.Options.Upload.XHR.Timeout == 0 && cfg.Web.Config.Options.Upload.CompanionURL == "" {
 		cfg.Web.Config.Options.Upload = nil
 	}
 }

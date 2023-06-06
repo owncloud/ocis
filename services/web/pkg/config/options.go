@@ -51,7 +51,8 @@ type Routing struct {
 
 // Upload are the upload options
 type Upload struct {
-	XHR XHR `json:"xhr,omitempty" yaml:"xhr"`
+	XHR          XHR    `json:"xhr,omitempty" yaml:"xhr"`
+	CompanionURL string `json:"companionUrl,omitempty" yaml:"companionUrl" env:"WEB_OPTION_UPLOAD_COMPANION_URL" desc:"Sets the URL of Companion which is a service provided by Uppy to import files from external cloud providers. See https://uppy.io/docs/companion/ for instructions on how to set up Companion. This feature is disabled as long as no URL is given."`
 }
 
 // XHR are the XHR options
