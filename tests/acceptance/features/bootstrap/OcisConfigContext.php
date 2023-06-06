@@ -21,6 +21,7 @@
  */
 
 use Behat\Behat\Context\Context;
+use GuzzleHttp\Exception\GuzzleException;
 use TestHelpers\OcisConfigHelper;
 use PHPUnit\Framework\Assert;
 
@@ -52,23 +53,24 @@ class OcisConfigContext implements Context {
 	}
 
 	/**
-	 * @Given cors allowed origins has been set to :allowedOrigins
+	 * @Given the config :configVariable has been set to :configValue
 	 *
-	 * @param string $allowedOrigins
+	 * @param string $configVariable
+	 * @param string $configValue
 	 *
 	 * @return void
 	 * @throws GuzzleException
 	 */
-	public function corsAllowedOriginsHasBeenSet(string $allowedOrigins): void {
+	public function theConfigHasBeenSetTo(string $configVariable, string $configValue): void {
 		$envs = [
-			"OCIS_CORS_ALLOW_ORIGINS" => $allowedOrigins,
+			$configVariable => $configValue,
 		];
 
 		$response =  OcisConfigHelper::reConfigureOcis($envs);
 		Assert::assertEquals(
 			200,
 			$response->getStatusCode(),
-			"Failed to set OCIS_CORS_ALLOW_ORIGINS=" . $allowedOrigins
+			"Failed to set config $configVariable=$configValue"
 		);
 	}
 
