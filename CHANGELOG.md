@@ -20,6 +20,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Remove the email logo: [#6359](https://github.com/owncloud/ocis/issues/6359)
 * Enhancement - Rename permissions: [#3922](https://github.com/cs3org/reva/pull/3922)
 * Enhancement - Unify CA Cert envvars: [#6392](https://github.com/owncloud/ocis/pull/6392)
+* Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
 * Enhancement - Update web to v7.0.0-rc.38: [#6375](https://github.com/owncloud/ocis/pull/6375)
 * Enhancement - Update web to v7.0.0: [#6438](https://github.com/owncloud/ocis/pull/6438)
 
@@ -141,6 +142,12 @@ The following sections list the changes for unreleased.
    all `{SERVICENAME}_EVENTS_TLS_ROOT_CA_CERTIFICATE` envvars
 
    https://github.com/owncloud/ocis/pull/6392
+
+* Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
+
+   https://github.com/owncloud/ocis/pull/6457
+   https://github.com/go-micro/plugins/pull/114
+   https://github.com/go-micro/plugins/pull/113
 
 * Enhancement - Update web to v7.0.0-rc.38: [#6375](https://github.com/owncloud/ocis/pull/6375)
 
