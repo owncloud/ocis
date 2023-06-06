@@ -4,7 +4,6 @@ Feature: antivirus
   I want to protect myself and others from known viruses
   So that I can prevent files with viruses from being uploaded
 
-
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
@@ -25,6 +24,7 @@ Feature: antivirus
       | old              |
       | new              |
       | spaces           |
+
 
   Scenario Outline: upload a file with virus
     Given using <dav-path-version> DAV path
@@ -83,4 +83,47 @@ Feature: antivirus
     Examples:
       | dav-path-version |
       | old              |
+      | spaces           |
+
+
+  Scenario Outline: upload a file with the virus to a public share
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "/uploadFolder"
+    And user "Alice" has created a public link share with settings
+      | path        | /uploadFolder            |
+      | name        | sharedlink               |
+      | permissions | change                   |
+      | expireDate  | 2040-01-01T23:59:59+0100 |
+    When user "Alice" uploads file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And user "Alice" should get a notification with subject "Virus found" and message:
+      | message                                                                        |
+      | Virus found in virusFile.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And as "Alice" file "/uploadFolder/virusFile.txt" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+
+  Scenario Outline: upload a file with the virus to a password-protected public share
+    Given using <dav-path-version> DAV path
+    And user "Alice" has created folder "/uploadFolder"
+    And user "Alice" has created a public link share with settings
+      | path        | /uploadFolder            |
+      | name        | sharedlink               |
+      | permissions | change                   |
+      | password    | newpasswd                |
+      | expireDate  | 2040-01-01T23:59:59+0100 |
+    When user "Alice" uploads file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And user "Alice" should get a notification with subject "Virus found" and message:
+      | message                                                                        |
+      | Virus found in virusFile.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And as "Alice" file "/uploadFolder/virusFile.txt" should not exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
       | spaces           |
