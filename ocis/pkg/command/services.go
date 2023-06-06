@@ -48,159 +48,196 @@ import (
 
 var svccmds = []register.Command{
 	func(cfg *config.Config) *cli.Command {
-		// cfg.Antivirus.Commons = cfg.Commons // antivirus needs no commons atm
-		return ServiceCommand(cfg, cfg.Antivirus.Service.Name, antivirus.GetCommands(cfg.Antivirus))
+		return ServiceCommand(cfg, cfg.Antivirus.Service.Name, antivirus.GetCommands(cfg.Antivirus), func(c *config.Config) {
+			// cfg.Antivirus.Commons = cfg.Commons // antivirus needs no commons atm
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.AppProvider.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.AppProvider.Service.Name, appprovider.GetCommands(cfg.AppProvider))
+		return ServiceCommand(cfg, cfg.AppProvider.Service.Name, appprovider.GetCommands(cfg.AppProvider), func(c *config.Config) {
+			cfg.AppProvider.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.AppRegistry.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.AppRegistry.Service.Name, appregistry.GetCommands(cfg.AppRegistry))
+		return ServiceCommand(cfg, cfg.AppRegistry.Service.Name, appregistry.GetCommands(cfg.AppRegistry), func(c *config.Config) {
+			cfg.AppRegistry.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Audit.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Audit.Service.Name, audit.GetCommands(cfg.Audit))
+		return ServiceCommand(cfg, cfg.Audit.Service.Name, audit.GetCommands(cfg.Audit), func(c *config.Config) {
+			cfg.Audit.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.AuthBasic.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.AuthBasic.Service.Name, authbasic.GetCommands(cfg.AuthBasic))
+		return ServiceCommand(cfg, cfg.AuthBasic.Service.Name, authbasic.GetCommands(cfg.AuthBasic), func(c *config.Config) {
+			cfg.AuthBasic.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.AuthBearer.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.AuthBearer.Service.Name, authbearer.GetCommands(cfg.AuthBearer))
+		return ServiceCommand(cfg, cfg.AuthBearer.Service.Name, authbearer.GetCommands(cfg.AuthBearer), func(c *config.Config) {
+			cfg.AuthBearer.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.AuthMachine.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.AuthMachine.Service.Name, authmachine.GetCommands(cfg.AuthMachine))
+		return ServiceCommand(cfg, cfg.AuthMachine.Service.Name, authmachine.GetCommands(cfg.AuthMachine), func(c *config.Config) {
+			cfg.AuthMachine.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.EventHistory.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.EventHistory.Service.Name, eventhistory.GetCommands(cfg.EventHistory))
+		return ServiceCommand(cfg, cfg.EventHistory.Service.Name, eventhistory.GetCommands(cfg.EventHistory), func(c *config.Config) {
+			cfg.EventHistory.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Frontend.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Frontend.Service.Name, frontend.GetCommands(cfg.Frontend))
+		return ServiceCommand(cfg, cfg.Frontend.Service.Name, frontend.GetCommands(cfg.Frontend), func(c *config.Config) {
+			cfg.Frontend.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Gateway.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Gateway.Service.Name, gateway.GetCommands(cfg.Gateway))
+		return ServiceCommand(cfg, cfg.Gateway.Service.Name, gateway.GetCommands(cfg.Gateway), func(c *config.Config) {
+			cfg.Gateway.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Graph.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Graph.Service.Name, graph.GetCommands(cfg.Graph))
+		return ServiceCommand(cfg, cfg.Graph.Service.Name, graph.GetCommands(cfg.Graph), func(c *config.Config) {
+			cfg.Graph.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Groups.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Groups.Service.Name, groups.GetCommands(cfg.Groups))
+		return ServiceCommand(cfg, cfg.Groups.Service.Name, groups.GetCommands(cfg.Groups), func(c *config.Config) {
+			cfg.Groups.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.IDM.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.IDM.Service.Name, idm.GetCommands(cfg.IDM))
+		return ServiceCommand(cfg, cfg.IDM.Service.Name, idm.GetCommands(cfg.IDM), func(c *config.Config) {
+			cfg.IDM.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.IDP.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.IDP.Service.Name, idp.GetCommands(cfg.IDP))
+		return ServiceCommand(cfg, cfg.IDP.Service.Name, idp.GetCommands(cfg.IDP), func(c *config.Config) {
+			cfg.IDP.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Invitations.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Invitations.Service.Name, invitations.GetCommands(cfg.Invitations))
+		return ServiceCommand(cfg, cfg.Invitations.Service.Name, invitations.GetCommands(cfg.Invitations), func(c *config.Config) {
+			cfg.Invitations.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Nats.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Nats.Service.Name, nats.GetCommands(cfg.Nats))
+		return ServiceCommand(cfg, cfg.Nats.Service.Name, nats.GetCommands(cfg.Nats), func(c *config.Config) {
+			cfg.Nats.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Notifications.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Notifications.Service.Name, notifications.GetCommands(cfg.Notifications))
+		return ServiceCommand(cfg, cfg.Notifications.Service.Name, notifications.GetCommands(cfg.Notifications), func(c *config.Config) {
+			cfg.Notifications.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.OCDav.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.OCDav.Service.Name, ocdav.GetCommands(cfg.OCDav))
+		return ServiceCommand(cfg, cfg.OCDav.Service.Name, ocdav.GetCommands(cfg.OCDav), func(c *config.Config) {
+			cfg.OCDav.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.OCS.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.OCS.Service.Name, ocs.GetCommands(cfg.OCS))
+		return ServiceCommand(cfg, cfg.OCS.Service.Name, ocs.GetCommands(cfg.OCS), func(c *config.Config) {
+			cfg.OCS.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Policies.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Policies.Service.Name, policies.GetCommands(cfg.Policies))
+		return ServiceCommand(cfg, cfg.Policies.Service.Name, policies.GetCommands(cfg.Policies), func(c *config.Config) {
+			cfg.Policies.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Postprocessing.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Postprocessing.Service.Name, postprocessing.GetCommands(cfg.Postprocessing))
+		return ServiceCommand(cfg, cfg.Postprocessing.Service.Name, postprocessing.GetCommands(cfg.Postprocessing), func(c *config.Config) {
+			cfg.Postprocessing.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Proxy.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Proxy.Service.Name, proxy.GetCommands(cfg.Proxy))
+		return ServiceCommand(cfg, cfg.Proxy.Service.Name, proxy.GetCommands(cfg.Proxy), func(c *config.Config) {
+			cfg.Proxy.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Search.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Search.Service.Name, search.GetCommands(cfg.Search))
+		return ServiceCommand(cfg, cfg.Search.Service.Name, search.GetCommands(cfg.Search), func(c *config.Config) {
+			cfg.Search.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Settings.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Settings.Service.Name, settings.GetCommands(cfg.Settings))
+		return ServiceCommand(cfg, cfg.Settings.Service.Name, settings.GetCommands(cfg.Settings), func(c *config.Config) {
+			cfg.Settings.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Sharing.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Sharing.Service.Name, sharing.GetCommands(cfg.Sharing))
+		return ServiceCommand(cfg, cfg.Sharing.Service.Name, sharing.GetCommands(cfg.Sharing), func(c *config.Config) {
+			cfg.Sharing.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.StoragePublicLink.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.StoragePublicLink.Service.Name, storagepubliclink.GetCommands(cfg.StoragePublicLink))
+		return ServiceCommand(cfg, cfg.StoragePublicLink.Service.Name, storagepubliclink.GetCommands(cfg.StoragePublicLink), func(c *config.Config) {
+			cfg.StoragePublicLink.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.StorageShares.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.StorageShares.Service.Name, storageshares.GetCommands(cfg.StorageShares))
+		return ServiceCommand(cfg, cfg.StorageShares.Service.Name, storageshares.GetCommands(cfg.StorageShares), func(c *config.Config) {
+			cfg.StorageShares.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.StorageSystem.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.StorageSystem.Service.Name, storagesystem.GetCommands(cfg.StorageSystem))
+		return ServiceCommand(cfg, cfg.StorageSystem.Service.Name, storagesystem.GetCommands(cfg.StorageSystem), func(c *config.Config) {
+			cfg.StorageSystem.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.StorageUsers.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.StorageUsers.Service.Name, storageusers.GetCommands(cfg.StorageUsers))
+		return ServiceCommand(cfg, cfg.StorageUsers.Service.Name, storageusers.GetCommands(cfg.StorageUsers), func(c *config.Config) {
+			cfg.StorageUsers.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Store.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Store.Service.Name, store.GetCommands(cfg.Store))
+		return ServiceCommand(cfg, cfg.Store.Service.Name, store.GetCommands(cfg.Store), func(c *config.Config) {
+			cfg.Store.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Thumbnails.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Thumbnails.Service.Name, thumbnails.GetCommands(cfg.Thumbnails))
+		return ServiceCommand(cfg, cfg.Thumbnails.Service.Name, thumbnails.GetCommands(cfg.Thumbnails), func(c *config.Config) {
+			cfg.Thumbnails.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Userlog.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Userlog.Service.Name, userlog.GetCommands(cfg.Userlog))
+		return ServiceCommand(cfg, cfg.Userlog.Service.Name, userlog.GetCommands(cfg.Userlog), func(c *config.Config) {
+			cfg.Userlog.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Users.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Users.Service.Name, users.GetCommands(cfg.Users))
+		return ServiceCommand(cfg, cfg.Users.Service.Name, users.GetCommands(cfg.Users), func(c *config.Config) {
+			cfg.Users.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Web.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Web.Service.Name, web.GetCommands(cfg.Web))
+		return ServiceCommand(cfg, cfg.Web.Service.Name, web.GetCommands(cfg.Web), func(c *config.Config) {
+			cfg.Web.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.WebDAV.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.WebDAV.Service.Name, webdav.GetCommands(cfg.WebDAV))
+		return ServiceCommand(cfg, cfg.WebDAV.Service.Name, webdav.GetCommands(cfg.WebDAV), func(c *config.Config) {
+			cfg.WebDAV.Commons = cfg.Commons
+		})
 	},
 	func(cfg *config.Config) *cli.Command {
-		cfg.Webfinger.Commons = cfg.Commons
-		return ServiceCommand(cfg, cfg.Webfinger.Service.Name, webfinger.GetCommands(cfg.Webfinger))
+		return ServiceCommand(cfg, cfg.Webfinger.Service.Name, webfinger.GetCommands(cfg.Webfinger), func(c *config.Config) {
+			cfg.Webfinger.Commons = cfg.Commons
+		})
 	},
 }
 
 // ServiceCommand is the entry point for the all service commands.
-func ServiceCommand(cfg *config.Config, servicename string, subcommands []*cli.Command) *cli.Command {
+func ServiceCommand(cfg *config.Config, servicename string, subcommands []*cli.Command, f func(*config.Config)) *cli.Command {
 	return &cli.Command{
 		Name:     servicename,
 		Usage:    helper.SubcommandDescription(servicename),
 		Category: "services",
 		Before: func(c *cli.Context) error {
 			configlog.Error(parser.ParseConfig(cfg, true))
+			f(cfg)
 			return nil
 		},
 		Subcommands: subcommands,
