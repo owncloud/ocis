@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: delete user
   As an admin
   I want to be able to delete users
@@ -48,7 +48,7 @@ Feature: delete user
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin user tries to delete his/her own account
@@ -67,7 +67,7 @@ Feature: delete user
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin user tries to delete a nonexistent user
@@ -75,7 +75,7 @@ Feature: delete user
     When the user "Alice" tries to delete a nonexistent user using the Graph API
     Then the HTTP status code should be "404"
 
-  
+
   Scenario Outline: non-admin user tries to delete a nonexistent user
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When the user "Alice" tries to delete a nonexistent user using the Graph API
@@ -84,7 +84,7 @@ Feature: delete user
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario Outline: non-admin user tries to delete another user with different role
@@ -98,16 +98,16 @@ Feature: delete user
       | userRole    | role        |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | Guest       |
+      | Space Admin | User Light  |
       | Space Admin | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | Guest       |
+      | User        | User Light  |
       | User        | Admin       |
-      | Guest       | Space Admin |
-      | Guest       | User        |
-      | Guest       | Guest       |
-      | Guest       | Admin       |
+      | User Light  | Space Admin |
+      | User Light  | User        |
+      | User Light  | User Light  |
+      | User Light  | Admin       |
 
 
   Scenario: admin user deletes a disabled user
@@ -133,13 +133,13 @@ Feature: delete user
       | userRole    | role        |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | Guest       |
+      | Space Admin | User Light  |
       | Space Admin | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | Guest       |
+      | User        | User Light  |
       | User        | Admin       |
-      | Guest       | Space Admin |
-      | Guest       | User        |
-      | Guest       | Guest       |
-      | Guest       | Admin       |
+      | User Light  | Space Admin |
+      | User Light  | User        |
+      | User Light  | User Light  |
+      | User Light  | Admin       |

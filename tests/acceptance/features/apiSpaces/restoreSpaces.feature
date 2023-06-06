@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: Restoring space
   As a manager of space
   I want to be able to restore a disabled space
@@ -72,15 +72,15 @@ Feature: Restoring space
       | editor |
 
 
-  Scenario Outline: user with role user and guest cannot restore space
+  Scenario Outline: user with role user and user light cannot restore space
     Given the administrator has given "Brian" the role "<role>" using the settings api
     And user "Alice" has disabled a space "restore a space"
     When user "Brian" tries to restore a disabled space "restore a space" owned by user "Alice"
     Then the HTTP status code should be "404"
     Examples:
-      | role  |
-      | User  |
-      | Guest |
+      | role       |
+      | User       |
+      | User Light |
 
   @issue-5872
   Scenario Outline: admin and space admin can restore other space

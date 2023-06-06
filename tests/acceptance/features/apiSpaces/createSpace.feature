@@ -8,15 +8,15 @@ Feature: create space
     Given user "Alice" has been created with default attributes and without skeleton files
 
   @issue-5938
-  Scenario Outline: user with role user and guest can't create space via Graph API
+  Scenario Outline: user with role user and user light can't create space via Graph API
     Given the administrator has given "Alice" the role "<role>" using the settings api
     When user "Alice" tries to create a space "Project Mars" of type "project" with the default quota using the Graph API
     Then the HTTP status code should be "403"
     And the user "Alice" should not have a space called "share space"
     Examples:
-      | role  |
-      | User  |
-      | Guest |
+      | role       |
+      | User       |
+      | User Light |
 
 
   Scenario Outline: admin or space admin user can create a space via the Graph API with a default quota

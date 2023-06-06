@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: remove a user from a group
   As an admin
   I want to be able to remove a user from a group
@@ -191,7 +191,7 @@ Feature: remove a user from a group
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin removes a disabled user from a group

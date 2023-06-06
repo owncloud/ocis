@@ -504,19 +504,19 @@ Feature: user GDPR (General Data Protection Regulation) report
       | userRole    | role        |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | Guest       |
+      | Space Admin | User Light  |
       | Space Admin | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | Guest       |
+      | User        | User Light  |
       | User        | Admin       |
-      | Guest       | Space Admin |
-      | Guest       | User        |
-      | Guest       | Guest       |
-      | Guest       | Admin       |
+      | User Light  | Space Admin |
+      | User Light  | User        |
+      | User Light  | User Light  |
+      | User Light  | Admin       |
       | Admin       | Space Admin |
       | Admin       | User        |
-      | Admin       | Guest       |
+      | Admin       | User Light  |
       | Admin       | Admin       |
 
 

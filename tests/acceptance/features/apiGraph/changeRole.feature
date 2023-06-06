@@ -20,19 +20,19 @@ Feature: change role
       | Admin       | Admin       |
       | Admin       | Space Admin |
       | Admin       | User        |
-      | Admin       | Guest       |
+      | Admin       | User Light  |
       | Space Admin | Admin       |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | Guest       |
+      | Space Admin | User Light  |
       | User        | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | Guest       |
-      | Guest       | Admin       |
-      | Guest       | Space Admin |
-      | Guest       | User        |
-      | Guest       | Guest       |
+      | User        | User Light  |
+      | User Light  | Admin       |
+      | User Light  | Space Admin |
+      | User Light  | User        |
+      | User Light  | User Light  |
 
 
   Scenario Outline: admin user tries to change his/her own role
@@ -44,5 +44,5 @@ Feature: change role
       | newRole     |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
       | Admin       |

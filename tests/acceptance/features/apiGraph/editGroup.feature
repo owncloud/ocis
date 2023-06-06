@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: edit group name
   As an admin
   I want to be able to edit group name
@@ -34,7 +34,7 @@ Feature: edit group name
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin user tries to rename nonexistent group

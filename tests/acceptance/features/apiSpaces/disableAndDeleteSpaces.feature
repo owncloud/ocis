@@ -35,19 +35,19 @@ Feature: Disabling and deleting space
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
-  Scenario Outline: user with role user and guest cannot disable other space via the Graph API
+  Scenario Outline: user with role user and user light cannot disable other space via the Graph API
     Given the administrator has given "Carol" the role "<role>" using the settings api
     When user "Carol" tries to disable a space "Project Moon" owned by user "Alice"
     Then the HTTP status code should be "404"
     And the user "Brian" should have a space called "Project Moon"
     And the user "Bob" should have a space called "Project Moon"
     Examples:
-      | role  |
-      | User  |
-      | Guest |
+      | role       |
+      | User       |
+      | User Light |
 
 
   Scenario: a space manager can disable and delete space in which files and folders exist via the webDav API
@@ -70,7 +70,7 @@ Feature: Disabling and deleting space
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario Outline: user can delete their own disabled space via the Graph API
@@ -84,7 +84,7 @@ Feature: Disabling and deleting space
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario Outline: an admin and space manager can disable other space via the Graph API
@@ -111,12 +111,12 @@ Feature: Disabling and deleting space
       | Space Admin |
 
 
-  Scenario Outline: user with role user and guest cannot delete others disabled space via the Graph API
+  Scenario Outline: user with role user and user light cannot delete others disabled space via the Graph API
     Given the administrator has given "Carol" the role "<role>" using the settings api
     And user "Alice" has disabled a space "Project Moon"
     When user "Carol" tries to delete a space "Project Moon" owned by user "Alice"
     Then the HTTP status code should be "404"
     Examples:
-      | role  |
-      | User  |
-      | Guest |
+      | role       |
+      | User       |
+      | User Light |

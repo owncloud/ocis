@@ -520,7 +520,7 @@ Feature: Change data of space
     | Admin       |
     | Space Admin |
     | User        |
-    | Guest       |
+    | User Light  |
 
 
   Scenario Outline: admin user set own quota of a personal space via the Graph API and upload resource

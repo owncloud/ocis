@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: create group
   As an admin
   I want to create a group
@@ -42,7 +42,7 @@ Feature: create group
       | userRole    |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
   @issue-5050
   Scenario: admin user tries to create a group that is the empty string
