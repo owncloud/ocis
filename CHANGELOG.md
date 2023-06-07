@@ -6,9 +6,17 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Enhancement - Fix the username validation: [#6437](https://github.com/owncloud/ocis/pull/6437)
 * Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
 
 ## Details
+
+* Enhancement - Fix the username validation: [#6437](https://github.com/owncloud/ocis/pull/6437)
+
+   Fix the username validation when an admin update the user
+
+   https://github.com/owncloud/ocis/issues/6436
+   https://github.com/owncloud/ocis/pull/6437
 
 * Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
 
