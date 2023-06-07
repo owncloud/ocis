@@ -22,7 +22,7 @@ Feature: unassign user role
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
   @issue-6035
   Scenario: admin user tries to unassign his/her own role

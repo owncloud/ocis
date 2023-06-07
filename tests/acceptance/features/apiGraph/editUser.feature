@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: edit user
   As an admin
   I want to be able to edit user information
@@ -146,7 +146,7 @@ Feature: edit user
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario Outline: normal user should not be able to edit another user's email
@@ -178,16 +178,16 @@ Feature: edit user
       | userRole    | role        |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | Guest       |
+      | Space Admin | User Light  |
       | Space Admin | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | Guest       |
+      | User        | User Light  |
       | User        | Admin       |
-      | Guest       | Space Admin |
-      | Guest       | User        |
-      | Guest       | Guest       |
-      | Guest       | Admin       |
+      | User Light  | Space Admin |
+      | User Light  | User        |
+      | User Light  | User Light       |
+      | User Light  | Admin       |
 
 
   Scenario Outline: admin user can edit another user display name
@@ -239,7 +239,7 @@ Feature: edit user
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light       |
 
 
   Scenario Outline: normal user should not be able to edit another user's display name
@@ -271,16 +271,16 @@ Feature: edit user
       | userRole    | role        |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | Guest       |
+      | Space Admin | User Light  |
       | Space Admin | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | Guest       |
+      | User        | User Light  |
       | User        | Admin       |
-      | Guest       | Space Admin |
-      | Guest       | User        |
-      | Guest       | Guest       |
-      | Guest       | Admin       |
+      | User Light  | Space Admin |
+      | User Light  | User        |
+      | User Light  | User Light  |
+      | User Light  | Admin       |
 
 
   Scenario: admin user resets password of another user
@@ -307,16 +307,16 @@ Feature: edit user
       | userRole    | role        |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | Guest       |
+      | Space Admin | User Light  |
       | Space Admin | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | Guest       |
+      | User        | User Light  |
       | User        | Admin       |
-      | Guest       | Space Admin |
-      | Guest       | User        |
-      | Guest       | Guest       |
-      | Guest       | Admin       |
+      | User Light  | Space Admin |
+      | User Light  | User        |
+      | User Light  | User Light  |
+      | User Light  | Admin       |
 
   @skipOnStable2.0
   Scenario: admin user disables another user
@@ -407,7 +407,7 @@ Feature: edit user
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
   @skipOnStable2.0
   Scenario: admin user enables disabled user
@@ -500,4 +500,4 @@ Feature: edit user
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light       |

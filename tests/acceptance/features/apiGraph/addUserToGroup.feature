@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: add users to group
   As a admin
   I want to be able to add users to a group
@@ -150,7 +150,7 @@ Feature: add users to group
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
   @issue-5938
   Scenario Outline: user other than the admin tries to add other user to a group
@@ -184,7 +184,7 @@ Feature: add users to group
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin tries to add user to a nonexistent group
@@ -201,7 +201,7 @@ Feature: add users to group
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin tries to add a nonexistent user to a group

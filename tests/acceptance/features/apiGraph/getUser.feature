@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: get users
   As an admin
   I want to be able to retrieve user information
@@ -82,16 +82,16 @@ Feature: get users
       | userRole    | role        |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | Guest       |
+      | Space Admin | User Light  |
       | Space Admin | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | Guest       |
+      | User        | User Light  |
       | User        | Admin       |
-      | Guest       | Space Admin |
-      | Guest       | User        |
-      | Guest       | Guest       |
-      | Guest       | Admin       |
+      | User Light  | Space Admin |
+      | User Light  | User        |
+      | User Light  | User Light       |
+      | User Light  | Admin       |
 
   @skipOnStable2.0
   Scenario: admin user gets all users
@@ -256,7 +256,7 @@ Feature: get users
       | userRole    |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
   @skipOnStable2.0
   Scenario: admin user gets the drive information of a user
@@ -507,7 +507,7 @@ Feature: get users
       | userRole    |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
   @skipOnStable2.0
   Scenario: admin user gets the group information of a user
@@ -606,16 +606,16 @@ Feature: get users
       | userRole    | role        |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | Guest       |
+      | Space Admin | User Light  |
       | Space Admin | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | Guest       |
+      | User        | User Light  |
       | User        | Admin       |
-      | Guest       | Space Admin |
-      | Guest       | User        |
-      | Guest       | Guest       |
-      | Guest       | Admin       |
+      | User Light  | Space Admin |
+      | User Light  | User        |
+      | User Light  | User Light  |
+      | User Light  | Admin       |
 
   @skipOnStable2.0
   Scenario: admin user gets all users of certain groups
@@ -858,7 +858,7 @@ Feature: get users
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
   @skipOnStable2.0
   Scenario: admin user gets all users with certain roles and members of a certain group
@@ -995,16 +995,16 @@ Feature: get users
       | userRole    | role        |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | Guest       |
+      | Space Admin | User Light  |
       | Space Admin | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | Guest       |
+      | User        | User Light  |
       | User        | Admin       |
-      | Guest       | Space Admin |
-      | Guest       | User        |
-      | Guest       | Guest       |
-      | Guest       | Admin       |
+      | User Light  | Space Admin |
+      | User Light  | User        |
+      | User Light  | User Light  |
+      | User Light  | Admin       |
 
   @issue-6017
   Scenario Outline: admin user gets the drive information of a user with different user role
@@ -1105,11 +1105,11 @@ Feature: get users
       | Admin       | Admin       |
       | Admin       | Space Admin |
       | Admin       | User        |
-      | Admin       | Guest       |
+      | Admin       | User Light  |
       | Space Admin | Admin       |
       | Space Admin | Space Admin |
       | Space Admin | User        |
-      | Space Admin | Guest       |
+      | Space Admin | User Light  |
 
 
   Scenario Outline: non-admin user tries to get drive information of other user with different user role
@@ -1150,11 +1150,11 @@ Feature: get users
       | User        | Admin       |
       | User        | Space Admin |
       | User        | User        |
-      | User        | Guest       |
-      | Guest       | Admin       |
-      | Guest       | Space Admin |
-      | Guest       | User        |
-      | Guest       | Guest       |
+      | User        | User Light  |
+      | User Light  | Admin       |
+      | User Light  | Space Admin |
+      | User Light  | User        |
+      | User Light  | User Light  |
 
 
   Scenario Outline: user with different user role gets his/her own drive information
@@ -1253,4 +1253,4 @@ Feature: get users
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |

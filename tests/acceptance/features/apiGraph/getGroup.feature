@@ -1,4 +1,4 @@
-@api 
+@api
 Feature: get groups and their members
   As an admin
   I want to be able to get groups
@@ -54,7 +54,7 @@ Feature: get groups and their members
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin user gets users of a group
@@ -103,7 +103,7 @@ Feature: get groups and their members
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin user gets all groups along with its member's information
@@ -267,7 +267,7 @@ Feature: get groups and their members
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: admin user gets a group along with its member's information
@@ -381,7 +381,7 @@ Feature: get groups and their members
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
 
   Scenario: get details of a group

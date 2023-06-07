@@ -15,8 +15,8 @@ const (
 	// BundleUUIDRoleUser represents the user role.
 	BundleUUIDRoleUser = "d7beeea8-8ff4-406b-8fb6-ab2dd81e6b11"
 
-	// BundleUUIDRoleGuest represents the guest role.
-	BundleUUIDRoleGuest = "38071a68-456a-4553-846a-fa67bf5596cc"
+	// BundleUUIDRoleUserLight represents the user light role.
+	BundleUUIDRoleUserLight = "38071a68-456a-4553-846a-fa67bf5596cc"
 
 	// RoleManagementPermissionID is the hardcoded setting UUID for the role management permission
 	RoleManagementPermissionID string = "a53e601e-571f-4f86-8fec-d4576ef49c62"
@@ -114,7 +114,7 @@ func GenerateBundlesDefaultRoles() []*settingsmsg.Bundle {
 	return []*settingsmsg.Bundle{
 		generateBundleAdminRole(),
 		generateBundleUserRole(),
-		generateBundleGuestRole(),
+		generateBundleUserLightRole(),
 		generateBundleProfileRequest(),
 		generateBundleSpaceAdminRole(),
 	}
@@ -651,13 +651,13 @@ func generateBundleUserRole() *settingsmsg.Bundle {
 	}
 }
 
-func generateBundleGuestRole() *settingsmsg.Bundle {
+func generateBundleUserLightRole() *settingsmsg.Bundle {
 	return &settingsmsg.Bundle{
-		Id:          BundleUUIDRoleGuest,
-		Name:        "guest",
+		Id:          BundleUUIDRoleUserLight,
+		Name:        "user-light",
 		Type:        settingsmsg.Bundle_TYPE_ROLE,
 		Extension:   "ocis-roles",
-		DisplayName: "Guest",
+		DisplayName: "User Light",
 		Resource: &settingsmsg.Resource{
 			Type: settingsmsg.Resource_TYPE_SYSTEM,
 		},

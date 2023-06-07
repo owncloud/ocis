@@ -62,7 +62,7 @@ Feature: delete groups
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
   @issue-903
   Scenario: deleted group should not be listed in the sharees list

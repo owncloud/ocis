@@ -66,7 +66,7 @@ Feature: create user
       | role        |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
 
   @issue-3516 @skipOnStable2.0
   Scenario: user cannot be created with the name of the disabled user

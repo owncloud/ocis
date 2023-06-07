@@ -1,11 +1,26 @@
-Enhancement: Update Reva to version 2.13.3 and beyond
+Enhancement: Update Reva to version 2.14.0
 
-Changelog for reva unreleased
+Changelog for reva 2.14.0 (2023-06-05)
 =======================================
 
+*   Bugfix [cs3org/reva#3919](https://github.com/cs3org/reva/pull/3919): We added missing timestamps to events
+*   Bugfix [cs3org/reva#3911](https://github.com/cs3org/reva/pull/3911): Clean IDCache properly
+*   Bugfix [cs3org/reva#3896](https://github.com/cs3org/reva/pull/3896): Do not lose old revisions when overwriting a file during copy
+*   Bugfix [cs3org/reva#3918](https://github.com/cs3org/reva/pull/3918): Dont enumerate users
+*   Bugfix [cs3org/reva#3902](https://github.com/cs3org/reva/pull/3902): Do not try to use the cache for empty node
+*   Bugfix [cs3org/reva#3877](https://github.com/cs3org/reva/pull/3877): Empty exact list while searching for a sharee
+*   Bugfix [cs3org/reva#3906](https://github.com/cs3org/reva/pull/3906): Fix preflight requests
+*   Bugfix [cs3org/reva#3934](https://github.com/cs3org/reva/pull/3934): Fix the space editor permissions
 *   Bugfix [cs3org/reva#3899](https://github.com/cs3org/reva/pull/3899): Harden uploads
+*   Bugfix [cs3org/reva#3917](https://github.com/cs3org/reva/pull/3917): Prevent last space manager from leaving
+*   Bugfix [cs3org/reva#3866](https://github.com/cs3org/reva/pull/3866): Fix public link lookup performance
+*   Bugfix [cs3org/reva#3904](https://github.com/cs3org/reva/pull/3904): Improve performance of directory listings
 *   Enhancement [cs3org/reva#3893](https://github.com/cs3org/reva/pull/3893): Cleanup Space Delete permissions
+*   Enhancement [cs3org/reva#3894](https://github.com/cs3org/reva/pull/3894): Fix err when the user share the locked file
+*   Enhancement [cs3org/reva#3913](https://github.com/cs3org/reva/pull/3913): Introduce FullTextSearch Capability
 *   Enhancement [cs3org/reva#3898](https://github.com/cs3org/reva/pull/3898): Add Graph User capabilities
+*   Enhancement [cs3org/reva#3496](https://github.com/cs3org/reva/pull/3496): Add otlp tracing exporter
+*   Enhancement [cs3org/reva#3922](https://github.com/cs3org/reva/pull/3922): Rename permissions
 
 Changelog for reva 2.13.3 (2023-05-17)
 =======================================
@@ -22,8 +37,6 @@ Changelog for reva 2.13.3 (2023-05-17)
 *   Enhancement [cs3org/reva#3865](https://github.com/cs3org/reva/pull/3865): Remove unneccessary code from gateway
 *   Enhancement [cs3org/reva#3895](https://github.com/cs3org/reva/pull/3895): Add missing expiry date to shares
 
-https://github.com/owncloud/ocis/pull/6305
-https://github.com/owncloud/ocis/pull/6339
 Changelog for reva 2.13.2 (2023-05-08)
 =======================================
 
@@ -125,5 +138,11 @@ Changelog for reva 2.13.0 (2023-05-02)
 *   Enhancement [cs3org/reva#3739](https://github.com/cs3org/reva/pull/3739): Try to rename uploaded files to their final position
 *   Enhancement [cs3org/reva#3610](https://github.com/cs3org/reva/pull/3610): Walk and log chi routes
 
+
+https://github.com/owncloud/ocis/pull/6448
+https://github.com/owncloud/ocis/pull/6447
+https://github.com/owncloud/ocis/pull/6381
+https://github.com/owncloud/ocis/pull/6305
+https://github.com/owncloud/ocis/pull/6339
 https://github.com/owncloud/ocis/pull/6205
 https://github.com/owncloud/ocis/pull/6186

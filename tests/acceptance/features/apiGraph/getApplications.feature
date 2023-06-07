@@ -20,10 +20,10 @@ Feature: get applications
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
     Examples:
       | role        |
       | Admin       |
       | Space Admin |
       | User        |
-      | Guest       |
+      | User Light  |
