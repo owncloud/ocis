@@ -1,4 +1,4 @@
-Enhancement: Add companion URL config
+Enhancement: Add imprint and privacy url config
 
 Introduce a config to set the imprint and privacy url via `WEB_OPTION_IMPRINT_URL` and `WEB_OPTION_PRIVACY_URL`.
 
