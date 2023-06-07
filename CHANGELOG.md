@@ -7,7 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Add companion URL config: [#6453](https://github.com/owncloud/ocis/pull/6453)
-* Enhancement - Add companion URL config: [#6462](https://github.com/owncloud/ocis/pull/6462)
+* Enhancement - Add imprint and privacy url config: [#6462](https://github.com/owncloud/ocis/pull/6462)
 * Enhancement - Fix the username validation: [#6437](https://github.com/owncloud/ocis/pull/6437)
 * Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
 * Enhancement - Update web to v7.0.1: [#6470](https://github.com/owncloud/ocis/pull/6470)
@@ -20,7 +20,7 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/6453
 
-* Enhancement - Add companion URL config: [#6462](https://github.com/owncloud/ocis/pull/6462)
+* Enhancement - Add imprint and privacy url config: [#6462](https://github.com/owncloud/ocis/pull/6462)
 
    Introduce a config to set the imprint and privacy url via `WEB_OPTION_IMPRINT_URL` and
    `WEB_OPTION_PRIVACY_URL`.
