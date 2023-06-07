@@ -126,6 +126,8 @@ web:
       contextHelpersReadMore: true
       logoutUrl: ""
       openLinksWithDefaultApp: true
+      imprintUrl: ""
+      privacyUrl: ""
     styles: []
     scripts: []
     custom_translations: []
