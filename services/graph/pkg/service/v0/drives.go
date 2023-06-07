@@ -319,6 +319,11 @@ func (g Graph) CreateDrive(w http.ResponseWriter, r *http.Request) {
 			errorcode.NotAllowed.Render(w, r, http.StatusForbidden, "permission denied")
 			return
 		}
+		if resp.GetStatus().GetCode() == cs3rpc.Code_CODE_INVALID_ARGUMENT {
+			logger.Debug().Str("grpcmessage", resp.GetStatus().GetMessage()).Msg("could not create drive: bad request")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, resp.GetStatus().GetMessage())
+			return
+		}
 		logger.Debug().Interface("grpcmessage", csr).Str("grpc", resp.GetStatus().GetMessage()).Msg("could not create drive: grpc error")
 		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, resp.GetStatus().GetMessage())
 		return
