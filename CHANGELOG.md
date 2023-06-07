@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add companion URL config: [#6462](https://github.com/owncloud/ocis/pull/6462)
 * Enhancement - Fix the username validation: [#6437](https://github.com/owncloud/ocis/pull/6437)
 * Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
+* Enhancement - Update web to v7.0.1: [#6470](https://github.com/owncloud/ocis/pull/6470)
 
 ## Details
 
@@ -38,6 +39,19 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/6457
    https://github.com/go-micro/plugins/pull/114
    https://github.com/go-micro/plugins/pull/113
+
+* Enhancement - Update web to v7.0.1: [#6470](https://github.com/owncloud/ocis/pull/6470)
+
+   Tags: web
+
+   We updated ownCloud Web to v7.0.1. Please refer to the changelog (linked) for details on the web
+   release.
+
+   ## Summary * Bugfix [owncloud/web#9153](https://github.com/owncloud/web/pull/9153):
+   Reduce space preloading
+
+   https://github.com/owncloud/ocis/pull/6470
+   https://github.com/owncloud/web/releases/tag/v7.0.1
 # Changelog for [3.0.0] (2023-06-06)
 
 The following sections list the changes for 3.0.0.
