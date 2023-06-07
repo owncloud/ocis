@@ -60,3 +60,23 @@ Feature: enforce password on public link
       | ocs-api-version | ocs-code |
       | 1               | 100      |
       | 2               | 200      |
+
+
+  Scenario Outline: user tries to remove password on a public link with edit permission when enforce-password is enabled
+    Given using OCS API version "<ocs-api-version>"
+    And user "Alice" has created a public link share with settings
+      | path        | /testfile.txt |
+      | permissions | 3             |
+      | password    | testpassword  |
+    Then the HTTP status code should be "200"
+    And the OCS status code should be "<ocs-code>"
+    And the OCS status message should be "OK"
+    When user "Alice" updates the last public link share using the sharing API with
+      | password | %remove% |
+    Then the HTTP status code should be "<http-code>"
+    Then the OCS status code should be "996"
+    And the OCS status message should be "Error sending update request to public link provider: the public share needs to have a password"
+    Examples:
+      | ocs-api-version | ocs-code | http-code |
+      | 1               | 100      | 200       |
+      | 2               | 200      | 500       |
