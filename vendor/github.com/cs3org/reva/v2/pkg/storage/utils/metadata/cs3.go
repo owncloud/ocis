@@ -32,17 +32,21 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
-	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/metadata"
 )
 
-// name is the Tracer name used to identify this instrumentation library.
-const tracerName = "metadata.cs3"
+var tracer trace.Tracer
+
+func init() {
+	tracer = otel.Tracer("github.com/cs3org/reva/pkg/storage/utils/metadata")
+}
 
 // CS3 represents a metadata storage with a cs3 storage backend
 type CS3 struct {
@@ -79,6 +83,9 @@ func (cs3 *CS3) Backend() string {
 
 // Init creates the metadata space
 func (cs3 *CS3) Init(ctx context.Context, spaceid string) (err error) {
+	ctx, span := tracer.Start(ctx, "Init")
+	defer span.End()
+
 	client, err := cs3.providerClient()
 	if err != nil {
 		return err
@@ -118,7 +125,7 @@ func (cs3 *CS3) Init(ctx context.Context, spaceid string) (err error) {
 
 // SimpleUpload uploads a file to the metadata storage
 func (cs3 *CS3) SimpleUpload(ctx context.Context, uploadpath string, content []byte) error {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "SimpleUpload")
+	ctx, span := tracer.Start(ctx, "SimpleUpload")
 	defer span.End()
 
 	return cs3.Upload(ctx, UploadRequest{
@@ -129,7 +136,7 @@ func (cs3 *CS3) SimpleUpload(ctx context.Context, uploadpath string, content []b
 
 // Upload uploads a file to the metadata storage
 func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) error {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Upload")
+	ctx, span := tracer.Start(ctx, "Upload")
 	defer span.End()
 
 	client, err := cs3.providerClient()
@@ -195,7 +202,7 @@ func (cs3 *CS3) Upload(ctx context.Context, req UploadRequest) error {
 
 // Stat returns the metadata for the given path
 func (cs3 *CS3) Stat(ctx context.Context, path string) (*provider.ResourceInfo, error) {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Stat")
+	ctx, span := tracer.Start(ctx, "Stat")
 	defer span.End()
 
 	client, err := cs3.providerClient()
@@ -227,7 +234,7 @@ func (cs3 *CS3) Stat(ctx context.Context, path string) (*provider.ResourceInfo, 
 
 // SimpleDownload reads a file from the metadata storage
 func (cs3 *CS3) SimpleDownload(ctx context.Context, downloadpath string) (content []byte, err error) {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "SimpleDownload")
+	ctx, span := tracer.Start(ctx, "SimpleDownload")
 	defer span.End()
 
 	client, err := cs3.providerClient()
@@ -293,7 +300,7 @@ func (cs3 *CS3) SimpleDownload(ctx context.Context, downloadpath string) (conten
 
 // Delete deletes a path
 func (cs3 *CS3) Delete(ctx context.Context, path string) error {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Delete")
+	ctx, span := tracer.Start(ctx, "Delete")
 	defer span.End()
 
 	client, err := cs3.providerClient()
@@ -323,7 +330,7 @@ func (cs3 *CS3) Delete(ctx context.Context, path string) error {
 
 // ReadDir returns the entries in a given directory
 func (cs3 *CS3) ReadDir(ctx context.Context, path string) ([]string, error) {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "ReadDir")
+	ctx, span := tracer.Start(ctx, "ReadDir")
 	defer span.End()
 
 	infos, err := cs3.ListDir(ctx, path)
@@ -340,7 +347,7 @@ func (cs3 *CS3) ReadDir(ctx context.Context, path string) ([]string, error) {
 
 // ListDir returns a list of ResourceInfos for the entries in a given directory
 func (cs3 *CS3) ListDir(ctx context.Context, path string) ([]*provider.ResourceInfo, error) {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "ListDir")
+	ctx, span := tracer.Start(ctx, "ListDir")
 	defer span.End()
 
 	client, err := cs3.providerClient()
@@ -372,7 +379,7 @@ func (cs3 *CS3) ListDir(ctx context.Context, path string) ([]*provider.ResourceI
 
 // MakeDirIfNotExist will create a root node in the metadata storage. Requires an authenticated context.
 func (cs3 *CS3) MakeDirIfNotExist(ctx context.Context, folder string) error {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "MakeDirIfNotExist")
+	ctx, span := tracer.Start(ctx, "MakeDirIfNotExist")
 	defer span.End()
 
 	client, err := cs3.providerClient()
@@ -423,7 +430,7 @@ func (cs3 *CS3) MakeDirIfNotExist(ctx context.Context, folder string) error {
 
 // CreateSymlink creates a symlink
 func (cs3 *CS3) CreateSymlink(ctx context.Context, oldname, newname string) error {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "CreateSymlink")
+	ctx, span := tracer.Start(ctx, "CreateSymlink")
 	defer span.End()
 
 	if _, err := cs3.ResolveSymlink(ctx, newname); err == nil {
@@ -435,7 +442,7 @@ func (cs3 *CS3) CreateSymlink(ctx context.Context, oldname, newname string) erro
 
 // ResolveSymlink resolves a symlink
 func (cs3 *CS3) ResolveSymlink(ctx context.Context, name string) (string, error) {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "ResolveSymlink")
+	ctx, span := tracer.Start(ctx, "ResolveSymlink")
 	defer span.End()
 
 	b, err := cs3.SimpleDownload(ctx, name)
@@ -454,7 +461,9 @@ func (cs3 *CS3) providerClient() (provider.ProviderAPIClient, error) {
 }
 
 func (cs3 *CS3) getAuthContext(ctx context.Context) (context.Context, error) {
-	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "getAuthContext")
+	// we need to start a new context to get rid of an existing x-access-token in the outgoing context
+	authCtx := context.Background()
+	authCtx, span := tracer.Start(authCtx, "getAuthContext", trace.WithLinks(trace.LinkFromContext(ctx)))
 	defer span.End()
 
 	client, err := pool.GetGatewayServiceClient(cs3.gatewayAddr)
@@ -462,7 +471,7 @@ func (cs3 *CS3) getAuthContext(ctx context.Context) (context.Context, error) {
 		return nil, err
 	}
 
-	authCtx := ctxpkg.ContextSetUser(ctx, cs3.serviceUser)
+	authCtx = ctxpkg.ContextSetUser(authCtx, cs3.serviceUser)
 	authRes, err := client.Authenticate(authCtx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + cs3.serviceUser.Id.OpaqueId,
