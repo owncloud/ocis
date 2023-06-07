@@ -5,3 +5,4 @@ The service discovery now resolves reva services by name and the client selector
 
 https://github.com/owncloud/ocis/pull/6452
 https://github.com/cs3org/reva/pull/3939
+https://github.com/cs3org/reva/pull/3953

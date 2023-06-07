@@ -2144,7 +2144,7 @@ def ocisServer(storage, accounts_hash_difficulty = 4, volumes = [], depends_on =
             "IDM_ADMIN_PASSWORD": "admin",  # override the random admin password from `ocis init`
             "FRONTEND_SEARCH_MIN_LENGTH": "2",
             "GATEWAY_GRPC_ADDR": "0.0.0.0:9142",  # make gateway available to wopi server
-            "APP_PROVIDER_EXTERNAL_ADDR": "127.0.0.1:9164",
+            "APP_PROVIDER_EXTERNAL_ADDR": "com.owncloud.api.app-provider",
             "APP_PROVIDER_DRIVER": "wopi",
             "APP_PROVIDER_WOPI_APP_NAME": "FakeOffice",
             "APP_PROVIDER_WOPI_APP_URL": "http://fakeoffice:8080",
