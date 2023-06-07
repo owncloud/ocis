@@ -1,4 +1,4 @@
-@api @antivirus
+@api @antivirus @skipOnReva
 Feature: antivirus
   As a system administrator and user
   I want to protect myself and others from known viruses
@@ -24,10 +24,6 @@ Feature: antivirus
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
   Scenario Outline: upload a file with virus
@@ -43,10 +39,6 @@ Feature: antivirus
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -72,10 +64,6 @@ Feature: antivirus
       | dav-path-version |
       | old              |
       | new              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
 
 
@@ -95,8 +83,4 @@ Feature: antivirus
     Examples:
       | dav-path-version |
       | old              |
-
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
