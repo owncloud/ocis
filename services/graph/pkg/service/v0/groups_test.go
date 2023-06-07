@@ -9,14 +9,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/test-go/testify/mock"
-
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -26,6 +26,8 @@ import (
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+	"github.com/test-go/testify/mock"
+	"google.golang.org/grpc"
 )
 
 type groupList struct {
@@ -38,6 +40,7 @@ var _ = Describe("Groups", func() {
 		ctx             context.Context
 		cfg             *config.Config
 		gatewayClient   *cs3mocks.GatewayAPIClient
+		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 		eventsPublisher mocks.Publisher
 		identityBackend *identitymocks.Backend
 
@@ -54,8 +57,17 @@ var _ = Describe("Groups", func() {
 	BeforeEach(func() {
 		eventsPublisher.On("Publish", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
-		identityBackend = &identitymocks.Backend{}
+		pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
 		gatewayClient = &cs3mocks.GatewayAPIClient{}
+		gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
+			"GatewaySelector",
+			"com.owncloud.api.gateway",
+			func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+				return gatewayClient
+			},
+		)
+
+		identityBackend = &identitymocks.Backend{}
 		newGroup = libregraph.NewGroup()
 		newGroup.SetMembersodataBind([]string{"/users/user1"})
 		newGroup.SetId("group1")
@@ -72,7 +84,7 @@ var _ = Describe("Groups", func() {
 		_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
 		svc, _ = service.NewService(
 			service.Config(cfg),
-			service.WithGatewayClient(gatewayClient),
+			service.WithGatewaySelector(gatewaySelector),
 			service.EventsPublisher(&eventsPublisher),
 			service.WithIdentityBackend(identityBackend),
 		)
@@ -316,7 +328,7 @@ var _ = Describe("Groups", func() {
 				cfg.API.GroupMembersPatchLimit = 21
 				svc, _ = service.NewService(
 					service.Config(cfg),
-					service.WithGatewayClient(gatewayClient),
+					service.WithGatewaySelector(gatewaySelector),
 					service.EventsPublisher(&eventsPublisher),
 					service.WithIdentityBackend(identityBackend),
 				)

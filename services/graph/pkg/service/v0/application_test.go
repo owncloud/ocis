@@ -7,13 +7,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-	"github.com/stretchr/testify/mock"
-
-	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	settingsmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/settings/v0"
@@ -23,6 +23,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc"
 )
 
 type applicationList struct {
@@ -35,6 +37,7 @@ var _ = Describe("Applications", func() {
 		ctx             context.Context
 		cfg             *config.Config
 		gatewayClient   *cs3mocks.GatewayAPIClient
+		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 		eventsPublisher mocks.Publisher
 		roleService     *mocks.RoleService
 		identityBackend *identitymocks.Backend
@@ -47,7 +50,16 @@ var _ = Describe("Applications", func() {
 
 		identityBackend = &identitymocks.Backend{}
 		roleService = &mocks.RoleService{}
+
+		pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
 		gatewayClient = &cs3mocks.GatewayAPIClient{}
+		gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
+			"GatewaySelector",
+			"com.owncloud.api.gateway",
+			func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+				return gatewayClient
+			},
+		)
 
 		rr = httptest.NewRecorder()
 		ctx = context.Background()
@@ -62,7 +74,7 @@ var _ = Describe("Applications", func() {
 		_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
 		svc, _ = service.NewService(
 			service.Config(cfg),
-			service.WithGatewayClient(gatewayClient),
+			service.WithGatewaySelector(gatewaySelector),
 			service.EventsPublisher(&eventsPublisher),
 			service.WithIdentityBackend(identityBackend),
 			service.WithRoleService(roleService),

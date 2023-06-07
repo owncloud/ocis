@@ -12,6 +12,7 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-ldap/ldap/v3"
 	. "github.com/onsi/ginkgo/v2"
@@ -25,12 +26,14 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/identity"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc"
 )
 
 var _ = Describe("Users changing their own password", func() {
 	var (
 		svc             service.Service
 		gatewayClient   *cs3mocks.GatewayAPIClient
+		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 		ldapClient      *mocks.Client
 		ldapConfig      config.LDAP
 		identityBackend identity.Backend
@@ -47,7 +50,16 @@ var _ = Describe("Users changing their own password", func() {
 		cfg.TokenManager.JWTSecret = "loremipsum"
 		cfg.GRPCClientTLS = &shared.GRPCClientTLS{}
 
+		pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
 		gatewayClient = &cs3mocks.GatewayAPIClient{}
+		gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
+			"GatewaySelector",
+			"com.owncloud.api.gateway",
+			func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+				return gatewayClient
+			},
+		)
+
 		ldapClient = mockedLDAPClient()
 
 		ldapConfig = config.LDAP{
@@ -68,7 +80,7 @@ var _ = Describe("Users changing their own password", func() {
 		eventsPublisher = mocks.Publisher{}
 		svc, _ = service.NewService(
 			service.Config(cfg),
-			service.WithGatewayClient(gatewayClient),
+			service.WithGatewaySelector(gatewaySelector),
 			service.WithIdentityBackend(identityBackend),
 			service.EventsPublisher(&eventsPublisher),
 		)

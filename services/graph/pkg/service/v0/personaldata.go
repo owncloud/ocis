@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"strconv"
 
+	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
+
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
@@ -68,8 +70,15 @@ func (g Graph) ExportPersonalData(w http.ResponseWriter, r *http.Request) {
 		Path:       loc,
 	}
 
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not select next gateway client")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "could not select next gateway client, aborting")
+		return
+	}
+
 	// touch file
-	if err := mustTouchFile(ctx, ref, g.GetGatewayClient()); err != nil {
+	if err := mustTouchFile(ctx, ref, gatewayClient); err != nil {
 		g.logger.Error().Err(err).Msg("error touching file")
 		w.WriteHeader(http.StatusInternalServerError)
 		return

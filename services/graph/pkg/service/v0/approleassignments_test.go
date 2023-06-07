@@ -8,15 +8,15 @@ import (
 	"net/http"
 	"net/http/httptest"
 
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
 	"github.com/go-chi/chi/v5"
 	"github.com/golang/protobuf/ptypes/empty"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/stretchr/testify/mock"
-
 	libregraph "github.com/owncloud/libre-graph-api-go"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
@@ -27,6 +27,8 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	identitymocks "github.com/owncloud/ocis/v2/services/graph/pkg/identity/mocks"
 	service "github.com/owncloud/ocis/v2/services/graph/pkg/service/v0"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc"
 )
 
 type assignmentList struct {
@@ -39,6 +41,7 @@ var _ = Describe("AppRoleAssignments", func() {
 		ctx             context.Context
 		cfg             *config.Config
 		gatewayClient   *cs3mocks.GatewayAPIClient
+		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 		eventsPublisher mocks.Publisher
 		roleService     *mocks.RoleService
 		identityBackend *identitymocks.Backend
@@ -57,7 +60,16 @@ var _ = Describe("AppRoleAssignments", func() {
 
 		identityBackend = &identitymocks.Backend{}
 		roleService = &mocks.RoleService{}
+
+		pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
 		gatewayClient = &cs3mocks.GatewayAPIClient{}
+		gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
+			"GatewaySelector",
+			"com.owncloud.api.gateway",
+			func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+				return gatewayClient
+			},
+		)
 
 		rr = httptest.NewRecorder()
 		ctx = context.Background()
@@ -72,7 +84,7 @@ var _ = Describe("AppRoleAssignments", func() {
 		_ = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
 		svc, _ = service.NewService(
 			service.Config(cfg),
-			service.WithGatewayClient(gatewayClient),
+			service.WithGatewaySelector(gatewaySelector),
 			service.EventsPublisher(&eventsPublisher),
 			service.WithIdentityBackend(identityBackend),
 			service.WithRoleService(roleService),

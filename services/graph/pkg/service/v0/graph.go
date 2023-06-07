@@ -87,12 +87,6 @@ func (g Graph) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	g.mux.ServeHTTP(w, r)
 }
 
-// GetGatewayClient returns a gateway client to talk to reva
-func (g Graph) GetGatewayClient() gateway.GatewayAPIClient {
-	gatewayClient, _ := g.gatewaySelector.Next()
-	return gatewayClient
-}
-
 func (g Graph) publishEvent(ev interface{}) {
 	if g.eventsPublisher != nil {
 		if err := events.Publish(g.eventsPublisher, ev); err != nil {
