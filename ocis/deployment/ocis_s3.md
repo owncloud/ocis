@@ -45,7 +45,7 @@ See also [example server setup]({{< ref "preparing_server" >}})
 
 * Go to the deployment example
 
-  `cd ocis/deployments/examples/ocis_s3`
+  `cd deployments/examples/ocis_s3`
 
 * Open the `.env` file in a text editor.
 
