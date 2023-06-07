@@ -838,7 +838,7 @@ The following sections list the changes for 3.0.0.
    https://github.com/owncloud/ocis/issues/5418
    https://github.com/owncloud/ocis/pull/6386
 
-* Enhancement - Fix err when the user share the locked file: [#6357](https://github.com/owncloud/ocis/pull/6357)
+* Enhancement - Fix err when the user share the locked file: [#6358](https://github.com/owncloud/ocis/pull/6358)
 
    Fix unexpected behavior when the user try to share the locked file
 
