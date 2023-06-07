@@ -155,9 +155,9 @@ Synchronization features like etag propagation, setting mtime and locking files
 
 File and sync features in a shared scenario
 
-#### Contain the remotes list in response to getting sharees while searching
+#### [federation share is not implement in ocis] (https://github.com/owncloud/ocis/issues/1329)
 
-- [coreApiSharees/sharees.feature:180](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharees/sharees.feature#L180)
+- [coreApiSharees/sharees.feature:180](https://github.com/owncloud/ocis/blob/master/test-acceptance-apr/tests/acceptance/features/coreApiSharees/sharees.feature#L180)
 - [coreApiSharees/sharees.feature:181](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiSharees/sharees.feature#L181)
 
 #### [accepting matching name shared resources from different users/groups sets no serial identifiers on the resource name for the receiver](https://github.com/owncloud/ocis/issues/4289)
