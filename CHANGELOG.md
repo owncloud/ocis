@@ -6,10 +6,17 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Enhancement - Add companion URL config: [#6453](https://github.com/owncloud/ocis/pull/6453)
 * Enhancement - Fix the username validation: [#6437](https://github.com/owncloud/ocis/pull/6437)
 * Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
 
 ## Details
+
+* Enhancement - Add companion URL config: [#6453](https://github.com/owncloud/ocis/pull/6453)
+
+   Introduce a config to set the Uppy Companion URL via `WEB_OPTION_UPLOAD_COMPANION_URL`.
+
+   https://github.com/owncloud/ocis/pull/6453
 
 * Enhancement - Fix the username validation: [#6437](https://github.com/owncloud/ocis/pull/6437)
 
