@@ -284,3 +284,23 @@ Feature: Tag
       | नेपाल   |
       | file    |
       | Tag     |
+
+
+  Scenario: setting a comma-separated list of tags adds to any existing tags on the resource
+    Given user "Alice" has created the following tags for folder "folderMain" of the space "use-tag":
+      | finance,hr |
+    When user "Alice" creates the following tags for folder "folderMain" of space "use-tag":
+      | engineering,finance,qa |
+    Then the HTTP status code should be "200"
+    When user "Alice" sends PROPFIND request from the space "use-tag" to the resource "folderMain" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the "PROPFIND" response should contain a space "use-tag" with these key and value pairs:
+      | key     | value                     |
+      | oc:tags | engineering,finance,hr,qa |
+    When user "Alice" lists all available tags via the GraphApi
+    Then the HTTP status code should be "200"
+    And the response should contain following tags:
+      | engineering |
+      | finance     |
+      | hr          |
+      | qa          |
