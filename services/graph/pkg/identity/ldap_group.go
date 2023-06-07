@@ -529,7 +529,7 @@ func (i *LDAP) getGroupByDN(dn string) (*ldap.Entry, error) {
 func (i *LDAP) getGroupsForUser(dn string) ([]*ldap.Entry, error) {
 	groupFilter := fmt.Sprintf(
 		"(%s=%s)",
-		i.groupAttributeMap.member, dn,
+		i.groupAttributeMap.member, ldap.EscapeFilter(dn),
 	)
 	userGroups, err := i.getLDAPGroupsByFilter(groupFilter, false, false)
 	if err != nil {

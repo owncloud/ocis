@@ -341,6 +341,14 @@ func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if accountName, ok := changes.GetOnPremisesSamAccountNameOk(); ok {
+		if !g.isValidUsername(*accountName) {
+			logger.Debug().Str("username", *accountName).Msg("could not update education user: username must be at least the local part of an email")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, fmt.Sprintf("username %s must be at least the local part of an email", *changes.OnPremisesSamAccountName))
+			return
+		}
+	}
+
 	var features []events.UserFeature
 	if mail, ok := changes.GetMailOk(); ok {
 		if !isValidEmail(*mail) {
