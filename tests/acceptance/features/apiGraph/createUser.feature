@@ -38,7 +38,7 @@ Feature: create user
     Examples:
       | userName                     | displayName     | email               | password                     | code | enable | shouldOrNot |
       | withoutEmail                 | without email   |                     | 123                          | 200  | true   | should      |
-      | Alice                        | same userName   | new@example.org     | 123                          | 400  | true   | should      |
+      | Alice                        | same userName   | new@example.org     | 123                          | 409  | true   | should      |
 
 
   Scenario: user cannot be created with empty name
@@ -68,7 +68,7 @@ Feature: create user
       | User        |
       | User Light  |
 
-  @issue-3516 @skipOnStable2.0
+
   Scenario: user cannot be created with the name of the disabled user
     Given user "Brian" has been created with default attributes and without skeleton files
     And the administrator has given "Alice" the role "Admin" using the settings api
@@ -79,7 +79,7 @@ Feature: create user
       | email          | brian@example.com     |
       | password       | 123                   |
       | accountEnabled | true                  |
-    Then the HTTP status code should be "400"
+    Then the HTTP status code should be "409"
 
   @skipOnStable2.0
   Scenario: user can be created with the name of the deleted user
