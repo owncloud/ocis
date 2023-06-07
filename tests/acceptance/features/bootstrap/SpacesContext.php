@@ -2133,6 +2133,28 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * @Given user :user has unshared a space :spaceName shared with :recipient
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 * @param  string $recipient
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasUnsharedASpaceSharedWith(
+		string $user,
+		string $spaceName,
+		string $recipient
+	): void {
+		$this->sendUnshareSpaceRequest($user, $spaceName, $recipient);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			200,
+			"Expected response status code should be 200"
+		);
+	}
+
+	/**
 	 * @When /^user "([^"]*)" unshares a space "([^"]*)" to (?:user|group) "([^"]*)"$/
 	 *
 	 * @param  string $user
@@ -2184,6 +2206,26 @@ class SpacesContext implements Context {
 				$user,
 				$this->featureContext->getPasswordForUser($user)
 			)
+		);
+	}
+
+	/**
+	 * @Given /^user "([^"]*)" has deleted a space "([^"]*)"$/
+	 *
+	 * @param  string $user
+	 * @param  string $spaceName
+	 *
+	 * @return void
+	 * @throws GuzzleException
+	 */
+	public function userHasDeletedASpaceOwnedByUser(
+		string $user,
+		string $spaceName
+	):void {
+		$this->sendDeleteSpaceRequest($user, $spaceName);
+		$this->featureContext->theHTTPStatusCodeShouldBe(
+			204,
+			"Expected response status code should be 200"
 		);
 	}
 
