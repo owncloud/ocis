@@ -11,6 +11,7 @@ import (
 )
 
 func init() {
+	registry.Configure("memory")
 	r := registry.GetRegistry()
 	service := registry.BuildGRPCService("com.owncloud.api.gateway", "", "", "")
 	service.Nodes = []*mRegistry.Node{{
