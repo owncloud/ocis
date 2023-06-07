@@ -33,3 +33,22 @@ Feature: enforce password on public link
     And the OCS status message should be "OK"
     When the public accesses the preview of file "/textfile.txt" from the last shared public link using the sharing API
     Then the HTTP status code should be "404"
+
+
+  Scenario: user tries to create a public link with edit permission with a password when enforce password is enabled
+    Given user "Alice" has created a public link share with settings
+      | path        | /testfile.txt |
+      | permissions | 3             |
+      | password    | testpassword  |
+    Then the OCS status code should be "100"
+    And the OCS status message should be "OK"
+    When the public accesses the preview of file "/textfile.txt" from the last shared public link using the sharing API
+    Then the HTTP status code should be "404"
+
+
+  Scenario: user tries to create a public link with edit permission without a password when enforce-password is enabled
+    Given user "Alice" has created a public link share with settings
+      | path        | /testfile.txt |
+      | permissions | 3             |
+    Then the OCS status code should be "100"
+    And the OCS status message should be "OK"
