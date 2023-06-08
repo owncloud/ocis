@@ -43,7 +43,8 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 	claimRolesRaw, ok := claims[ra.rolesClaim].([]interface{})
 	if !ok {
 		logger.Error().Str("rolesClaim", ra.rolesClaim).Msg("No roles in user claims")
-		return nil, errors.New("no roles in user claims")
+		user.Opaque = utils.AppendJSONToOpaque(user.Opaque, "roles", []string{""})
+		return user, nil
 	}
 
 	logger.Debug().Str("rolesClaim", ra.rolesClaim).Interface("rolesInClaim", claims[ra.rolesClaim]).Msg("got roles in claim")
