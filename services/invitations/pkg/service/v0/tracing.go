@@ -22,9 +22,13 @@ type tracing struct {
 
 // Invite implements the Service interface.
 func (t tracing) Invite(ctx context.Context, invitation *invitations.Invitation) (*invitations.Invitation, error) {
-	ctx, span := invitationstracing.TraceProvider.Tracer("invitations").Start(ctx, "Invite", trace.WithAttributes(
-		attribute.KeyValue{Key: "invitation", Value: attribute.StringValue(invitation.InvitedUserEmailAddress)},
-	))
+	spanOpts := []trace.SpanStartOption{
+		trace.WithSpanKind(trace.SpanKindServer),
+		trace.WithAttributes(
+			attribute.KeyValue{
+				Key: "invitation", Value: attribute.StringValue(invitation.InvitedUserEmailAddress),
+			})}
+	ctx, span := invitationstracing.TraceProvider.Tracer("invitations").Start(ctx, "Invite", spanOpts...)
 	defer span.End()
 
 	return t.next.Invite(ctx, invitation)
