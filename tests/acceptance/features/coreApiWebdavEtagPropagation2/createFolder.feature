@@ -1,5 +1,8 @@
 @api
 Feature: propagation of etags when creating folders
+  As a client app
+  I want metadata (etags) of parent folders to change when a sub-folder is created
+  So that the client app can know to re-scan and sync the content of the folder(s)
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
@@ -52,7 +55,7 @@ Feature: propagation of etags when creating folders
       | spaces      |
 
   @issue-product-280
-  Scenario Outline: as share receiver creating a folder inside a folder received as a share changes its etag for all collaborators
+  Scenario Outline: sharee creating a folder inside a folder received as a share changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav_version> DAV path
     And user "Alice" has created folder "/folder"
@@ -78,7 +81,7 @@ Feature: propagation of etags when creating folders
       | new         |
 
   @issue-product-280
-  Scenario Outline: as a sharer creating a folder inside a shared folder changes etag for all collaborators
+  Scenario Outline: sharer creating a folder inside a shared folder changes etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav_version> DAV path
     And user "Alice" has created folder "/folder"

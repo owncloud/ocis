@@ -1,5 +1,8 @@
 @api
 Feature: propagation of etags when restoring a file or folder from trash
+  As a client app
+  I want metadata (etags) of parent folders to change when a file or folder is restored
+  So that the client app can know to re-scan and sync the content of the folder(s)
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files

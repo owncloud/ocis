@@ -1,5 +1,8 @@
 @api
 Feature: propagation of etags when moving files or folders
+  As a client app
+  I want metadata (etags) of parent folder(s) to change when a file or folder is moved
+  So that the client app can know to re-scan and sync the content of the folder(s)
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
@@ -155,7 +158,7 @@ Feature: propagation of etags when moving files or folders
       | spaces      |
 
 
-  Scenario Outline: as share receiver renaming a file inside a folder changes its etag for all collaborators
+  Scenario Outline: sharee renaming a file inside a folder changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav_version> DAV path
     And user "Alice" has created folder "/upload"
@@ -182,7 +185,7 @@ Feature: propagation of etags when moving files or folders
       | new         |
 
 
-  Scenario Outline: as sharer renaming a file inside a folder changes its etag for all collaborators
+  Scenario Outline: sharer renaming a file inside a folder changes its etag for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav_version> DAV path
     And user "Alice" has created folder "/upload"
@@ -209,7 +212,7 @@ Feature: propagation of etags when moving files or folders
       | new         |
 
   @issue-product-280
-  Scenario Outline: as sharer moving a file from one folder to an other changes the etags of both folders for all collaborators
+  Scenario Outline: sharer moving a file from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav_version> DAV path
     And user "Alice" has created folder "/src"
@@ -243,7 +246,7 @@ Feature: propagation of etags when moving files or folders
       | new         |
 
 
-  Scenario Outline: as share receiver moving a file from one folder to an other changes the etags of both folders for all collaborators
+  Scenario Outline: sharee moving a file from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav_version> DAV path
     And user "Alice" has created folder "/src"
@@ -277,7 +280,7 @@ Feature: propagation of etags when moving files or folders
       | new         |
 
   @issue-product-280
-  Scenario Outline: as sharer moving a folder from one folder to an other changes the etags of both folders for all collaborators
+  Scenario Outline: sharer moving a folder from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav_version> DAV path
     And user "Alice" has created folder "/src"
@@ -311,7 +314,7 @@ Feature: propagation of etags when moving files or folders
       | new         |
 
 
-  Scenario Outline: as share receiver moving a folder from one folder to an other changes the etags of both folders for all collaborators
+  Scenario Outline: sharee moving a folder from one folder to an other changes the etags of both folders for all collaborators
     Given user "Brian" has been created with default attributes and without skeleton files
     And using <dav_version> DAV path
     And user "Alice" has created folder "/src"

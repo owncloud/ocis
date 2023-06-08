@@ -1,6 +1,8 @@
 @api @issue-1284
-Feature: independent locks
-  Make sure all locks are independent and don't interact with other items that have the same name
+Feature: independent locks - make sure all locks are independent and don't interact with other items that have the same name
+  As a user
+  I want to lock resources independently
+  So that resources with same name in other parts of the file system will not be locked
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files

@@ -1,5 +1,8 @@
 @api @issue-1284
-Feature: UNLOCK locked items
+Feature: Unlock locked items
+  As a user
+  I want to unlock the resources previously locked by myself
+  So that other users can make changes to the resources
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
@@ -26,7 +29,7 @@ Feature: UNLOCK locked items
       | spaces   |
 
 
-  Scenario Outline: as public unlocking a file in a share that was locked by the file owner is not possible. To unlock use the owners locktoken
+  Scenario Outline: public unlocking a file in a share that was locked by the file owner is not possible. To unlock use the owners locktoken
     Given user "Alice" has created folder "PARENT"
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "PARENT/parent.txt"
     And user "Alice" has created a public link share of folder "PARENT" with change permission

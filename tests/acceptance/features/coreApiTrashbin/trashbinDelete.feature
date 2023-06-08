@@ -14,7 +14,7 @@ Feature: files and folders can be deleted from the trashbin
     And user "Alice" has uploaded file with content "to delete" to "/PARENT/CHILD/child.txt"
 
   @smokeTest
-  Scenario Outline: Trashbin can be emptied
+  Scenario Outline: trashbin can be emptied
     Given using <dav-path> DAV path
     And user "Alice" has uploaded file with content "file with comma" to "sample,0.txt"
     And user "Alice" has uploaded file with content "file with comma" to "sample,1.txt"
@@ -85,7 +85,7 @@ Feature: files and folders can be deleted from the trashbin
       | spaces   |
 
 
-  Scenario Outline: User tries to delete another user's trashbin
+  Scenario Outline: user tries to delete another user's trashbin
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has deleted file "/textfile0.txt"
@@ -105,7 +105,7 @@ Feature: files and folders can be deleted from the trashbin
       | spaces   | 404         |
 
 
-  Scenario Outline: User tries to delete trashbin file using invalid password
+  Scenario Outline: user tries to delete trashbin file using invalid password
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has deleted file "/textfile0.txt"
@@ -128,7 +128,7 @@ Feature: files and folders can be deleted from the trashbin
       | spaces   |
 
 
-  Scenario Outline: User tries to delete trashbin file using no password
+  Scenario Outline: user tries to delete trashbin file using no password
     Given using <dav-path> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has deleted file "/textfile0.txt"
