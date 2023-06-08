@@ -116,6 +116,28 @@ class NotificationContext implements Context {
 	}
 
 	/**
+	 * @Then /^user "([^"]*)" should have "([^"]*)" notifications$/
+	 *
+	 * @param string $user
+	 * @param int $numberOfNotification
+	 *
+	 * @return void
+	 * @throws Exception
+	 */
+	public function userShouldHaveNotifications(string $user, int $numberOfNotification): void {
+		if (!isset($this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data)) {
+			throw new Exception("Notification is empty");
+		}
+		$responseBody = $this->featureContext->getJsonDecodedResponseBodyContent()->ocs->data;
+		$actualNumber = \count($responseBody);
+		Assert::assertEquals(
+			$numberOfNotification,
+			$actualNumber,
+			"Expected number of notification was '$numberOfNotification', but got '$actualNumber'"
+		);
+	}
+
+	/**
 	 * @Then /^the JSON response should contain a notification message with the subject "([^"]*)" and the message-details should match$/
 	 *
 	 * @param string $subject

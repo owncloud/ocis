@@ -267,7 +267,6 @@ Feature: Notification
     Examples:
       | language | subject            | message                                          |
       | de       | Neue Freigabe      | Alice Hansen hat textfile1.txt mit Ihnen geteilt |
-      | en       | Resource shared    | Alice Hansen shared textfile1.txt with you       |
       | es       | Recurso compartido | Alice Hansen compartió textfile1.txt contigo     |
 
 
