@@ -24,6 +24,7 @@ import (
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocdav"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storage/favorite"
 	"github.com/rs/zerolog"
 	"go-micro.dev/v4/broker"
@@ -45,7 +46,7 @@ type Options struct {
 	JWTSecret string
 
 	FavoriteManager favorite.Manager
-	GatewayClient   gateway.GatewayAPIClient
+	GatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 
 	TracingEnabled   bool
 	TracingInsecure  bool
@@ -196,10 +197,10 @@ func FavoriteManager(val favorite.Manager) Option {
 	}
 }
 
-// GatewayClient provides a function to set the GatewayClient option.
-func GatewayClient(val gateway.GatewayAPIClient) Option {
+// GatewaySelector provides a function to set the GatewaySelector option.
+func GatewaySelector(val pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
-		o.GatewayClient = val
+		o.GatewaySelector = val
 	}
 }
 

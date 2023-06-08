@@ -16,6 +16,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -38,7 +39,7 @@ func NewEventsNotifier(
 	events <-chan events.Event,
 	channel channels.Channel,
 	logger log.Logger,
-	gwClient gateway.GatewayAPIClient,
+	gatewaySelector pool.Selectable[gateway.GatewayAPIClient],
 	valueService settingssvc.ValueService,
 	machineAuthAPIKey, emailTemplatePath, ocisURL string) Service {
 
@@ -47,7 +48,7 @@ func NewEventsNotifier(
 		channel:           channel,
 		events:            events,
 		signals:           make(chan os.Signal, 1),
-		gwClient:          gwClient,
+		gatewaySelector:   gatewaySelector,
 		valueService:      valueService,
 		machineAuthAPIKey: machineAuthAPIKey,
 		emailTemplatePath: emailTemplatePath,
@@ -60,7 +61,7 @@ type eventsNotifier struct {
 	channel           channels.Channel
 	events            <-chan events.Event
 	signals           chan os.Signal
-	gwClient          gateway.GatewayAPIClient
+	gatewaySelector   pool.Selectable[gateway.GatewayAPIClient]
 	valueService      settingssvc.ValueService
 	machineAuthAPIKey string
 	emailTemplatePath string
@@ -137,7 +138,12 @@ func (s eventsNotifier) getGranteeList(ctx context.Context, executant, u *user.U
 		}
 		return []*user.User{usr}, nil
 	case g != nil:
-		res, err := s.gwClient.GetGroup(ctx, &group.GetGroupRequest{GroupId: g})
+		gatewayClient, err := s.gatewaySelector.Next()
+		if err != nil {
+			return nil, err
+		}
+
+		res, err := gatewayClient.GetGroup(ctx, &group.GetGroupRequest{GroupId: g})
 		if err != nil {
 			return nil, err
 		}
@@ -171,7 +177,11 @@ func (s eventsNotifier) getUser(ctx context.Context, u *user.UserId) (*user.User
 	if u == nil {
 		return nil, errors.New("need at least one non-nil grantee")
 	}
-	r, err := s.gwClient.GetUser(ctx, &user.GetUserRequest{UserId: u})
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+	r, err := gatewayClient.GetUser(ctx, &user.GetUserRequest{UserId: u})
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +223,12 @@ func (s eventsNotifier) disableEmails(ctx context.Context, u *user.UserId) bool 
 
 func (s eventsNotifier) getResourceInfo(ctx context.Context, resourceID *provider.ResourceId, fieldmask *fieldmaskpb.FieldMask) (*provider.ResourceInfo, error) {
 	// TODO: maybe cache this stat to reduce storage iops
-	md, err := s.gwClient.Stat(ctx, &provider.StatRequest{
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	md, err := gatewayClient.Stat(ctx, &provider.StatRequest{
 		Ref: &provider.Reference{
 			ResourceId: resourceID,
 		},

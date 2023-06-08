@@ -11,6 +11,7 @@ import (
 	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/account"
 	"github.com/owncloud/ocis/v2/ocis-pkg/assetsfs"
@@ -42,11 +43,11 @@ func NewService(opts ...Option) Service {
 	m.Use(options.Middleware...)
 
 	svc := Web{
-		logger:        options.Logger,
-		config:        options.Config,
-		mux:           m,
-		fs:            assetsfs.New(web.Assets, options.Config.Asset.Path, options.Logger),
-		gatewayClient: options.GatewayClient,
+		logger:          options.Logger,
+		config:          options.Config,
+		mux:             m,
+		fs:              assetsfs.New(web.Assets, options.Config.Asset.Path, options.Logger),
+		gatewaySelector: options.GatewaySelector,
 	}
 
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
@@ -72,11 +73,11 @@ func NewService(opts ...Option) Service {
 
 // Web defines implements the business logic for Service.
 type Web struct {
-	logger        log.Logger
-	config        *config.Config
-	mux           *chi.Mux
-	fs            *assetsfs.FileSystem
-	gatewayClient gateway.GatewayAPIClient
+	logger          log.Logger
+	config          *config.Config
+	mux             *chi.Mux
+	fs              *assetsfs.FileSystem
+	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 }
 
 // ServeHTTP implements the Service interface.

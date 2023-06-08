@@ -10,7 +10,7 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/external"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/sync"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/frontend/pkg/config"
@@ -42,15 +42,20 @@ func Server(cfg *config.Config) *cli.Command {
 
 			defer cancel()
 
-			pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
-
-			rcfg, err := revaconfig.FrontendConfigFromStruct(cfg)
+			rCfg, err := revaconfig.FrontendConfigFromStruct(cfg)
 			if err != nil {
 				return err
 			}
 
 			gr.Add(func() error {
-				runtime.RunWithOptions(rcfg, pidFile, runtime.WithLogger(&logger.Logger))
+				pidFile := path.Join(os.TempDir(), "revad-"+cfg.Service.Name+"-"+uuid.Must(uuid.NewV4()).String()+".pid")
+				reg := registry.GetRegistry()
+
+				runtime.RunWithOptions(rCfg, pidFile,
+					runtime.WithLogger(&logger.Logger),
+					runtime.WithRegistry(reg),
+				)
+
 				return nil
 			}, func(err error) {
 				logger.Error().
@@ -80,15 +85,9 @@ func Server(cfg *config.Config) *cli.Command {
 				sync.Trap(&gr, cancel)
 			}
 
-			if err := external.RegisterHTTPEndpoint(
-				ctx,
-				cfg.HTTP.Namespace+"."+cfg.Service.Name,
-				uuid.Must(uuid.NewV4()).String(),
-				cfg.HTTP.Addr,
-				version.GetString(),
-				logger,
-			); err != nil {
-				logger.Fatal().Err(err).Msg("failed to register the http endpoint")
+			httpSvc := registry.BuildHTTPService(cfg.HTTP.Namespace+"."+cfg.Service.Name, uuid.Must(uuid.NewV4()).String(), cfg.HTTP.Addr, version.GetString())
+			if err := registry.RegisterService(ctx, httpSvc, logger); err != nil {
+				logger.Fatal().Err(err).Msg("failed to register the http service")
 			}
 
 			return gr.Run()

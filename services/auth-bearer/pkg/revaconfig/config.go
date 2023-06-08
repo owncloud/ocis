@@ -1,6 +1,9 @@
+// Package revaconfig transfers the config struct to reva config map
 package revaconfig
 
-import "github.com/owncloud/ocis/v2/services/auth-bearer/pkg/config"
+import (
+	"github.com/owncloud/ocis/v2/services/auth-bearer/pkg/config"
+)
 
 // AuthBearerConfigFromStruct will adapt an oCIS config struct into a reva mapstructure to start a reva service.
 func AuthBearerConfigFromStruct(cfg *config.Config) map[string]interface{} {

@@ -41,6 +41,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/google/uuid"
 	"go.opentelemetry.io/otel/attribute"
 )
@@ -159,14 +160,14 @@ type LockSystem interface {
 }
 
 // NewCS3LS returns a new CS3 based LockSystem.
-func NewCS3LS(c gateway.GatewayAPIClient) LockSystem {
+func NewCS3LS(s pool.Selectable[gateway.GatewayAPIClient]) LockSystem {
 	return &cs3LS{
-		client: c,
+		selector: s,
 	}
 }
 
 type cs3LS struct {
-	client gateway.GatewayAPIClient
+	selector pool.Selectable[gateway.GatewayAPIClient]
 }
 
 func (cls *cs3LS) Confirm(ctx context.Context, now time.Time, name0, name1 string, conditions ...Condition) (func(), error) {
@@ -205,7 +206,13 @@ func (cls *cs3LS) Create(ctx context.Context, now time.Time, details LockDetails
 			Nanos:   uint32(expiration.Nanosecond()),
 		}
 	}
-	res, err := cls.client.SetLock(ctx, r)
+
+	client, err := cls.selector.Next()
+	if err != nil {
+		return "", err
+	}
+
+	res, err := client.SetLock(ctx, r)
 	if err != nil {
 		return "", err
 	}
@@ -233,10 +240,17 @@ func (cls *cs3LS) Unlock(ctx context.Context, now time.Time, ref *provider.Refer
 			User:   u.Id,
 		},
 	}
-	res, err := cls.client.Unlock(ctx, r)
+
+	client, err := cls.selector.Next()
 	if err != nil {
 		return err
 	}
+
+	res, err := client.Unlock(ctx, r)
+	if err != nil {
+		return err
+	}
+
 	switch res.Status.Code {
 	case rpc.Code_CODE_OK:
 		return nil
@@ -388,7 +402,7 @@ func (s *svc) handleLock(w http.ResponseWriter, r *http.Request, ns string) (ret
 	fn := path.Join(ns, r.URL.Path) // TODO do we still need to jail if we query the registry about the spaces?
 
 	// TODO instead of using a string namespace ns pass in the space with the request?
-	ref, cs3Status, err := spacelookup.LookupReferenceForPath(ctx, s.gwClient, fn)
+	ref, cs3Status, err := spacelookup.LookupReferenceForPath(ctx, s.gatewaySelector, fn)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}
@@ -566,7 +580,7 @@ func (s *svc) handleUnlock(w http.ResponseWriter, r *http.Request, ns string) (s
 	fn := path.Join(ns, r.URL.Path) // TODO do we still need to jail if we query the registry about the spaces?
 
 	// TODO instead of using a string namespace ns pass in the space with the request?
-	ref, cs3Status, err := spacelookup.LookupReferenceForPath(ctx, s.gwClient, fn)
+	ref, cs3Status, err := spacelookup.LookupReferenceForPath(ctx, s.gatewaySelector, fn)
 	if err != nil {
 		return http.StatusInternalServerError, err
 	}

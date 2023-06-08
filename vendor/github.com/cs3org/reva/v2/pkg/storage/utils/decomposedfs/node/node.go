@@ -1039,7 +1039,6 @@ func (n *Node) ReadUserPermissions(ctx context.Context, u *userpb.User) (ap prov
 			}
 			AddPermissions(&ap, g.GetPermissions())
 		case metadata.IsAttrUnset(err):
-			err = nil
 			appctx.GetLogger(ctx).Error().Interface("node", n).Str("grant", grantees[i]).Interface("grantees", grantees).Msg("grant vanished from node after listing")
 			// continue with next segment
 		default:

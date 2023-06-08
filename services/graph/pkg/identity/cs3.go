@@ -5,12 +5,12 @@ import (
 	"net/url"
 
 	"github.com/CiscoM31/godata"
+	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	cs3group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	cs3user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	cs3rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	libregraph "github.com/owncloud/libre-graph-api-go"
-
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/ocis-pkg/shared"
 	"github.com/owncloud/ocis/v2/services/graph/pkg/service/v0/errorcode"
@@ -21,8 +21,9 @@ var (
 )
 
 type CS3 struct {
-	Config *shared.Reva
-	Logger *log.Logger
+	Config          *shared.Reva
+	Logger          *log.Logger
+	GatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 }
 
 // CreateUser implements the Backend Interface. It's currently not supported for the CS3 backend
@@ -44,13 +45,13 @@ func (i *CS3) UpdateUser(ctx context.Context, nameOrID string, user libregraph.U
 func (i *CS3) GetUser(ctx context.Context, userID string, _ *godata.GoDataRequest) (*libregraph.User, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetUser")
-	client, err := pool.GetGatewayServiceClient(i.Config.Address, i.Config.GetRevaOptions()...)
+	gatewayClient, err := i.GatewaySelector.Next()
 	if err != nil {
-		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get client")
+		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get gatewayClient")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	}
 
-	res, err := client.GetUserByClaim(ctx, &cs3user.GetUserByClaimRequest{
+	res, err := gatewayClient.GetUserByClaim(ctx, &cs3user.GetUserByClaimRequest{
 		Claim: "userid", // FIXME add consts to reva
 		Value: userID,
 	})
@@ -73,9 +74,9 @@ func (i *CS3) GetUser(ctx context.Context, userID string, _ *godata.GoDataReques
 func (i *CS3) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libregraph.User, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetUsers")
-	client, err := pool.GetGatewayServiceClient(i.Config.Address, i.Config.GetRevaOptions()...)
+	gatewayClient, err := i.GatewaySelector.Next()
 	if err != nil {
-		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get client")
+		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get gatewayClient")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	}
 
@@ -84,7 +85,7 @@ func (i *CS3) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libr
 		return nil, err
 	}
 
-	res, err := client.FindUsers(ctx, &cs3user.FindUsersRequest{
+	res, err := gatewayClient.FindUsers(ctx, &cs3user.FindUsersRequest{
 		// FIXME presence match is currently not implemented, an empty search currently leads to
 		// Unwilling To Perform": Search Error: error parsing filter: (&(objectclass=posixAccount)(|(cn=*)(displayname=*)(mail=*))), error: Present filter match for cn not implemented
 		Filter: search,
@@ -114,9 +115,9 @@ func (i *CS3) GetUsers(ctx context.Context, oreq *godata.GoDataRequest) ([]*libr
 func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregraph.Group, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetGroups")
-	client, err := pool.GetGatewayServiceClient(i.Config.Address, i.Config.GetRevaOptions()...)
+	gatewayClient, err := i.GatewaySelector.Next()
 	if err != nil {
-		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get client")
+		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get gatewayClient")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	}
 
@@ -125,7 +126,7 @@ func (i *CS3) GetGroups(ctx context.Context, queryParam url.Values) ([]*libregra
 		search = queryParam.Get("$search")
 	}
 
-	res, err := client.FindGroups(ctx, &cs3group.FindGroupsRequest{
+	res, err := gatewayClient.FindGroups(ctx, &cs3group.FindGroupsRequest{
 		// FIXME presence match is currently not implemented, an empty search currently leads to
 		// Unwilling To Perform": Search Error: error parsing filter: (&(objectclass=posixAccount)(|(cn=*)(displayname=*)(mail=*))), error: Present filter match for cn not implemented
 		Filter: search,
@@ -161,13 +162,13 @@ func (i *CS3) CreateGroup(ctx context.Context, group libregraph.Group) (*libregr
 func (i *CS3) GetGroup(ctx context.Context, groupID string, queryParam url.Values) (*libregraph.Group, error) {
 	logger := i.Logger.SubloggerWithRequestID(ctx)
 	logger.Debug().Str("backend", "cs3").Msg("GetGroup")
-	client, err := pool.GetGatewayServiceClient(i.Config.Address, i.Config.GetRevaOptions()...)
+	gatewayClient, err := i.GatewaySelector.Next()
 	if err != nil {
-		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get client")
+		logger.Error().Str("backend", "cs3").Err(err).Msg("could not get gatewayClient")
 		return nil, errorcode.New(errorcode.ServiceNotAvailable, err.Error())
 	}
 
-	res, err := client.GetGroupByClaim(ctx, &cs3group.GetGroupByClaimRequest{
+	res, err := gatewayClient.GetGroupByClaim(ctx, &cs3group.GetGroupByClaimRequest{
 		Claim: "groupid", // FIXME add consts to reva
 		Value: groupID,
 	})

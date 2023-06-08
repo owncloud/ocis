@@ -82,7 +82,7 @@ func DefaultConfig() *config.Config {
 		Asset: config.Asset{
 			Path: filepath.Join(defaults.BaseDataPath(), "web/assets"),
 		},
-		GatewayAddress: "127.0.0.1:9142",
+		GatewayAddress: "com.owncloud.api.gateway",
 		Web: config.Web{
 			Path:        "",
 			ThemeServer: "https://localhost:9200",

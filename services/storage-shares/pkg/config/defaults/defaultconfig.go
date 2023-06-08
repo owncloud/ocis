@@ -34,7 +34,7 @@ func DefaultConfig() *config.Config {
 		Reva:                   shared.DefaultRevaConfig(),
 		MountID:                "7639e57c-4433-4a12-8201-722fd0009154",
 		ReadOnly:               false,
-		SharesProviderEndpoint: "localhost:9150",
+		SharesProviderEndpoint: "com.owncloud.api.sharing",
 	}
 }
 

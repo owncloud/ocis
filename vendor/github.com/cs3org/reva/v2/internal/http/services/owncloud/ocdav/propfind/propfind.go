@@ -47,6 +47,7 @@ import (
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/publicshare"
 	rstatus "github.com/cs3org/reva/v2/pkg/rgrpc/status"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/rhttp/router"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
@@ -163,20 +164,17 @@ func NewMultiStatusResponseXML() *MultiStatusResponseXML {
 	}
 }
 
-// GetGatewayServiceClientFunc is a callback used to pass in a StorageProviderClient during testing
-type GetGatewayServiceClientFunc func() (gateway.GatewayAPIClient, error)
-
 // Handler handles propfind requests
 type Handler struct {
 	PublicURL string
-	getClient GetGatewayServiceClientFunc
+	selector  pool.Selectable[gateway.GatewayAPIClient]
 }
 
 // NewHandler returns a new PropfindHandler instance
-func NewHandler(publicURL string, getClientFunc GetGatewayServiceClientFunc) *Handler {
+func NewHandler(publicURL string, selector pool.Selectable[gateway.GatewayAPIClient]) *Handler {
 	return &Handler{
 		PublicURL: publicURL,
-		getClient: getClientFunc,
+		selector:  selector,
 	}
 }
 
@@ -197,7 +195,7 @@ func (p *Handler) HandlePathPropfind(w http.ResponseWriter, r *http.Request, ns 
 	}
 
 	// retrieve a specific storage space
-	client, err := p.getClient()
+	client, err := p.selector.Next()
 	if err != nil {
 		sublog.Error().Err(err).Msg("error retrieving a gateway service client")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -263,7 +261,7 @@ func (p *Handler) HandleSpacesPropfind(w http.ResponseWriter, r *http.Request, s
 		return
 	}
 
-	client, err := p.getClient()
+	client, err := p.selector.Next()
 	if err != nil {
 		sublog.Error().Err(err).Msg("error getting grpc client")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -386,7 +384,7 @@ func (p *Handler) propfindResponse(ctx context.Context, w http.ResponseWriter, r
 					// same as user / group shares for share indicators
 					filters = append(filters, publicshare.ResourceIDFilter(resourceInfos[i].Id))
 				}
-				client, err := p.getClient()
+				client, err := p.selector.Next()
 				if err != nil {
 					log.Error().Err(err).Msg("error getting grpc client")
 					w.WriteHeader(http.StatusInternalServerError)
@@ -465,7 +463,7 @@ func (p *Handler) getResourceInfos(ctx context.Context, w http.ResponseWriter, r
 	}
 	span.SetAttributes(attribute.KeyValue{Key: "depth", Value: attribute.StringValue(depth.String())})
 
-	client, err := p.getClient()
+	client, err := p.selector.Next()
 	if err != nil {
 		log.Error().Err(err).Msg("error getting grpc client")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -675,7 +673,7 @@ func (p *Handler) getSpaceResourceInfos(ctx context.Context, w http.ResponseWrit
 	span.SetAttributes(attribute.KeyValue{Key: "depth", Value: attribute.StringValue(depth.String())})
 	defer span.End()
 
-	client, err := p.getClient()
+	client, err := p.selector.Next()
 	if err != nil {
 		log.Error().Err(err).Msg("error getting grpc client")
 		w.WriteHeader(http.StatusInternalServerError)

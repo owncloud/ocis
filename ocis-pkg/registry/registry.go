@@ -6,14 +6,14 @@ import (
 	"sync"
 	"time"
 
+	rRegistry "github.com/cs3org/reva/v2/pkg/registry"
 	consulr "github.com/go-micro/plugins/v4/registry/consul"
 	etcdr "github.com/go-micro/plugins/v4/registry/etcd"
 	kubernetesr "github.com/go-micro/plugins/v4/registry/kubernetes"
 	mdnsr "github.com/go-micro/plugins/v4/registry/mdns"
 	memr "github.com/go-micro/plugins/v4/registry/memory"
 	natsr "github.com/go-micro/plugins/v4/registry/nats"
-
-	"go-micro.dev/v4/registry"
+	mRegistry "go-micro.dev/v4/registry"
 	"go-micro.dev/v4/registry/cache"
 )
 
@@ -25,7 +25,7 @@ const (
 var (
 	once      sync.Once
 	regPlugin string
-	reg       registry.Registry
+	reg       mRegistry.Registry
 )
 
 func Configure(plugin string) {
@@ -37,7 +37,7 @@ func Configure(plugin string) {
 // GetRegistry returns a configured micro registry based on Micro env vars.
 // It defaults to mDNS, so mind that systems with mDNS disabled by default (i.e SUSE) will have a hard time
 // and it needs to explicitly use etcd. Os awareness for providing a working registry out of the box should be done.
-func GetRegistry() registry.Registry {
+func GetRegistry() mRegistry.Registry {
 	once.Do(func() {
 		addresses := strings.Split(os.Getenv(registryAddressEnv), ",")
 		// prefer env of setting from Configure()
@@ -49,29 +49,33 @@ func GetRegistry() registry.Registry {
 		switch plugin {
 		case "nats":
 			reg = natsr.NewRegistry(
-				registry.Addrs(addresses...),
+				mRegistry.Addrs(addresses...),
 			)
 		case "kubernetes":
 			reg = kubernetesr.NewRegistry(
-				registry.Addrs(addresses...),
+				mRegistry.Addrs(addresses...),
 			)
 		case "etcd":
 			reg = etcdr.NewRegistry(
-				registry.Addrs(addresses...),
+				mRegistry.Addrs(addresses...),
 			)
 		case "consul":
 			reg = consulr.NewRegistry(
-				registry.Addrs(addresses...),
+				mRegistry.Addrs(addresses...),
 			)
 		case "memory":
 			reg = memr.NewRegistry()
 		default:
 			reg = mdnsr.NewRegistry()
 		}
+
 		// No cache needed for in-memory registry
 		if plugin != "memory" {
-			reg = cache.New(reg, cache.WithTTL(20*time.Second))
+			reg = cache.New(reg, cache.WithTTL(30*time.Second))
 		}
+
+		// fixme: lazy initialization of reva registry, needs refactor to a explicit call per service
+		_ = rRegistry.Init(reg)
 	})
 	// always use cached registry to prevent registry
 	// lookup for every request

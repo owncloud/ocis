@@ -14,6 +14,7 @@ import (
 	storageprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
@@ -31,7 +32,7 @@ type UserlogService struct {
 	store            store.Store
 	cfg              *config.Config
 	historyClient    ehsvc.EventHistoryService
-	gwClient         gateway.GatewayAPIClient
+	gatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
 	registeredEvents map[string]events.Unmarshaller
 	translationPath  string
 }
@@ -58,7 +59,7 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		store:            o.Store,
 		cfg:              o.Config,
 		historyClient:    o.HistoryClient,
-		gwClient:         o.GatewayClient,
+		gatewaySelector:  o.GatewaySelector,
 		registeredEvents: make(map[string]events.Unmarshaller),
 	}
 
@@ -283,7 +284,7 @@ func (ul *UserlogService) findSpaceMembers(ctx context.Context, spaceID string, 
 		return nil, errors.New("need authenticated context to find space members")
 	}
 
-	space, err := getSpace(ctx, spaceID, ul.gwClient)
+	space, err := getSpace(ctx, spaceID, ul.gatewaySelector)
 	if err != nil {
 		return nil, err
 	}
@@ -361,7 +362,7 @@ func (ul *UserlogService) resolveID(ctx context.Context, userid *user.UserId, gr
 
 // resolves the users of a group
 func (ul *UserlogService) resolveGroup(ctx context.Context, groupID string) ([]string, error) {
-	grp, err := getGroup(ctx, groupID, ul.gwClient)
+	grp, err := getGroup(ctx, groupID, ul.gatewaySelector)
 	if err != nil {
 		return nil, err
 	}
@@ -380,13 +381,13 @@ func (ul *UserlogService) impersonate(uid *user.UserId) context.Context {
 		return nil
 	}
 
-	u, err := getUser(context.Background(), uid, ul.gwClient)
+	u, err := getUser(context.Background(), uid, ul.gatewaySelector)
 	if err != nil {
 		ul.log.Error().Err(err).Msg("cannot get user")
 		return nil
 	}
 
-	ctx, err := authenticate(u, ul.gwClient, ul.cfg.MachineAuthAPIKey)
+	ctx, err := authenticate(u, ul.gatewaySelector, ul.cfg.MachineAuthAPIKey)
 	if err != nil {
 		ul.log.Error().Err(err).Str("userid", u.GetId().GetOpaqueId()).Msg("failed to impersonate user")
 		return nil
@@ -394,9 +395,14 @@ func (ul *UserlogService) impersonate(uid *user.UserId) context.Context {
 	return ctx
 }
 
-func authenticate(usr *user.User, gwc gateway.GatewayAPIClient, machineAuthAPIKey string) (context.Context, error) {
+func authenticate(usr *user.User, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], machineAuthAPIKey string) (context.Context, error) {
+	gatewayClient, err := gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
 	ctx := revactx.ContextSetUser(context.Background(), usr)
-	authRes, err := gwc.Authenticate(ctx, &gateway.AuthenticateRequest{
+	authRes, err := gatewayClient.Authenticate(ctx, &gateway.AuthenticateRequest{
 		Type:         "machine",
 		ClientId:     "userid:" + usr.GetId().GetOpaqueId(),
 		ClientSecret: machineAuthAPIKey,
@@ -411,8 +417,13 @@ func authenticate(usr *user.User, gwc gateway.GatewayAPIClient, machineAuthAPIKe
 	return metadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, authRes.Token), nil
 }
 
-func getSpace(ctx context.Context, spaceID string, gwc gateway.GatewayAPIClient) (*storageprovider.StorageSpace, error) {
-	res, err := gwc.ListStorageSpaces(ctx, listStorageSpaceRequest(spaceID))
+func getSpace(ctx context.Context, spaceID string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*storageprovider.StorageSpace, error) {
+	gatewayClient, err := gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := gatewayClient.ListStorageSpaces(ctx, listStorageSpaceRequest(spaceID))
 	if err != nil {
 		return nil, err
 	}
@@ -428,8 +439,13 @@ func getSpace(ctx context.Context, spaceID string, gwc gateway.GatewayAPIClient)
 	return res.StorageSpaces[0], nil
 }
 
-func getUser(ctx context.Context, userid *user.UserId, gwc gateway.GatewayAPIClient) (*user.User, error) {
-	getUserResponse, err := gwc.GetUser(context.Background(), &user.GetUserRequest{
+func getUser(ctx context.Context, userid *user.UserId, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*user.User, error) {
+	gatewayClient, err := gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	getUserResponse, err := gatewayClient.GetUser(context.Background(), &user.GetUserRequest{
 		UserId: userid,
 	})
 	if err != nil {
@@ -443,8 +459,13 @@ func getUser(ctx context.Context, userid *user.UserId, gwc gateway.GatewayAPICli
 	return getUserResponse.GetUser(), nil
 }
 
-func getGroup(ctx context.Context, groupid string, gwc gateway.GatewayAPIClient) (*group.Group, error) {
-	r, err := gwc.GetGroup(ctx, &group.GetGroupRequest{GroupId: &group.GroupId{OpaqueId: groupid}})
+func getGroup(ctx context.Context, groupid string, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*group.Group, error) {
+	gatewayClient, err := gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := gatewayClient.GetGroup(ctx, &group.GetGroupRequest{GroupId: &group.GroupId{OpaqueId: groupid}})
 	if err != nil {
 		return nil, err
 	}
@@ -456,8 +477,13 @@ func getGroup(ctx context.Context, groupid string, gwc gateway.GatewayAPIClient)
 	return r.GetGroup(), nil
 }
 
-func getResource(ctx context.Context, resourceid *storageprovider.ResourceId, gwc gateway.GatewayAPIClient) (*storageprovider.ResourceInfo, error) {
-	res, err := gwc.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: resourceid}})
+func getResource(ctx context.Context, resourceid *storageprovider.ResourceId, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) (*storageprovider.ResourceInfo, error) {
+	gatewayClient, err := gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &storageprovider.Reference{ResourceId: resourceid}})
 	if err != nil {
 		return nil, err
 	}

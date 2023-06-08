@@ -1,9 +1,8 @@
 package revaconfig
 
 import (
-	"github.com/owncloud/ocis/v2/ocis-pkg/log"
-
 	"github.com/mitchellh/mapstructure"
+	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	"github.com/owncloud/ocis/v2/services/app-registry/pkg/config"
 )
 

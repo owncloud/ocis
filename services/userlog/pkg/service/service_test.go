@@ -11,6 +11,7 @@ import (
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
@@ -27,6 +28,7 @@ import (
 	"github.com/test-go/testify/mock"
 	microevents "go-micro.dev/v4/events"
 	microstore "go-micro.dev/v4/store"
+	"google.golang.org/grpc"
 )
 
 var _ = Describe("UserlogService", func() {
@@ -37,7 +39,9 @@ var _ = Describe("UserlogService", func() {
 		bus testBus
 		sto microstore.Store
 
-		gwc cs3mocks.GatewayAPIClient
+		gatewayClient   *cs3mocks.GatewayAPIClient
+		gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
+
 		ehc mocks.EventHistoryService
 	)
 
@@ -45,15 +49,26 @@ var _ = Describe("UserlogService", func() {
 		var err error
 		sto = store.Create()
 		bus = testBus(make(chan events.Event))
+
+		pool.RemoveSelector("GatewaySelector" + "com.owncloud.api.gateway")
+		gatewayClient = &cs3mocks.GatewayAPIClient{}
+		gatewaySelector = pool.GetSelector[gateway.GatewayAPIClient](
+			"GatewaySelector",
+			"com.owncloud.api.gateway",
+			func(cc *grpc.ClientConn) gateway.GatewayAPIClient {
+				return gatewayClient
+			},
+		)
+
 		o := utils.AppendJSONToOpaque(nil, "grants", map[string]*provider.ResourcePermissions{"userid": {Stat: true}})
-		gwc.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{StorageSpaces: []*provider.StorageSpace{
+		gatewayClient.On("ListStorageSpaces", mock.Anything, mock.Anything).Return(&provider.ListStorageSpacesResponse{StorageSpaces: []*provider.StorageSpace{
 			{
 				Opaque:    o,
 				SpaceType: "project",
 			},
 		}, Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
-		gwc.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{User: &user.User{Id: &user.UserId{OpaqueId: "userid"}}, Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
-		gwc.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
+		gatewayClient.On("GetUser", mock.Anything, mock.Anything).Return(&user.GetUserResponse{User: &user.User{Id: &user.UserId{OpaqueId: "userid"}}, Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
+		gatewayClient.On("Authenticate", mock.Anything, mock.Anything).Return(&gateway.AuthenticateResponse{Status: &rpc.Status{Code: rpc.Code_CODE_OK}}, nil)
 
 		ul, err = service.NewUserlogService(
 			service.Config(cfg),
@@ -61,7 +76,7 @@ var _ = Describe("UserlogService", func() {
 			service.Store(sto),
 			service.Logger(log.NewLogger()),
 			service.Mux(chi.NewMux()),
-			service.GatewayClient(&gwc),
+			service.GatewaySelector(gatewaySelector),
 			service.HistoryClient(&ehc),
 			service.RegisteredEvents([]events.Unmarshaller{
 				events.SpaceDisabled{},

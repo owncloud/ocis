@@ -20,6 +20,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	pkgmiddleware "github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
@@ -276,9 +277,9 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		logger.Fatal().Err(err).Msg("Failed to get gateway client")
 	}
 	rolesClient := settingssvc.NewRoleService("com.owncloud.api.settings", grpcClient)
-	revaClient, err := pool.GetGatewayServiceClient(cfg.Reva.Address, cfg.Reva.GetRevaOptions()...)
+	gatewaySelector, err := pool.GatewaySelector(cfg.Reva.Address, append(cfg.Reva.GetRevaOptions(), pool.WithRegistry(registry.GetRegistry()))...)
 	if err != nil {
-		logger.Fatal().Err(err).Msg("Failed to get gateway client")
+		logger.Fatal().Err(err).Msg("Failed to get gateway selector")
 	}
 	tokenManager, err := jwt.New(map[string]interface{}{
 		"secret": cfg.TokenManager.JWTSecret,
@@ -291,10 +292,9 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 	var userProvider backend.UserBackend
 	switch cfg.AccountBackend {
 	case "cs3":
-
 		userProvider = backend.NewCS3UserBackend(
 			backend.WithLogger(logger),
-			backend.WithRevaAuthenticator(revaClient),
+			backend.WithRevaGatewaySelector(gatewaySelector),
 			backend.WithMachineAuthAPIKey(cfg.MachineAuthAPIKey),
 			backend.WithOIDCissuer(cfg.OIDC.Issuer),
 			backend.WithAutoProvisonCreator(autoProvsionCreator),
@@ -364,8 +364,8 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		)),
 	))
 	authenticators = append(authenticators, middleware.PublicShareAuthenticator{
-		Logger:            logger,
-		RevaGatewayClient: revaClient,
+		Logger:              logger,
+		RevaGatewaySelector: gatewaySelector,
 	})
 	authenticators = append(authenticators, middleware.SignedURLAuthenticator{
 		Logger:             logger,
@@ -412,7 +412,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		// finally, trigger home creation when a user logs in
 		middleware.CreateHome(
 			middleware.Logger(logger),
-			middleware.RevaGatewayClient(revaClient),
+			middleware.WithRevaGatewaySelector(gatewaySelector),
 			middleware.RoleQuotas(cfg.RoleQuotas),
 		),
 	)

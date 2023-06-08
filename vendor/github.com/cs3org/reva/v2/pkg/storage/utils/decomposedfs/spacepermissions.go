@@ -8,6 +8,7 @@ import (
 	v1beta11 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"google.golang.org/grpc"
@@ -25,13 +26,13 @@ type CS3PermissionsClient interface {
 
 // Permissions manages permissions
 type Permissions struct {
-	item  PermissionsChecker   // handles item permissions
-	space CS3PermissionsClient // handlers space permissions
+	item                PermissionsChecker                                   // handles item permissions
+	permissionsSelector pool.Selectable[cs3permissions.PermissionsAPIClient] // handlers space permissions
 }
 
 // NewPermissions returns a new Permissions instance
-func NewPermissions(item PermissionsChecker, space CS3PermissionsClient) Permissions {
-	return Permissions{item: item, space: space}
+func NewPermissions(item PermissionsChecker, permissionsSelector pool.Selectable[cs3permissions.PermissionsAPIClient]) Permissions {
+	return Permissions{item: item, permissionsSelector: permissionsSelector}
 }
 
 // AssemblePermissions is used to assemble file permissions
@@ -96,8 +97,13 @@ func (p Permissions) DeleteAllHomeSpaces(ctx context.Context) bool {
 
 // checkPermission is used to check a users space permissions
 func (p Permissions) checkPermission(ctx context.Context, perm string, ref *provider.Reference) bool {
+	permissionsClient, err := p.permissionsSelector.Next()
+	if err != nil {
+		return false
+	}
+
 	user := ctxpkg.ContextMustGetUser(ctx)
-	checkRes, err := p.space.CheckPermission(ctx, &cs3permissions.CheckPermissionRequest{
+	checkRes, err := permissionsClient.CheckPermission(ctx, &cs3permissions.CheckPermissionRequest{
 		Permission: perm,
 		SubjectRef: &cs3permissions.SubjectReference{
 			Spec: &cs3permissions.SubjectReference_UserId{

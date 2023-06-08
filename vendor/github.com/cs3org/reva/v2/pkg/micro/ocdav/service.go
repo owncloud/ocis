@@ -35,6 +35,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	httpServer "github.com/go-micro/plugins/v4/server/http"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
+	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"go-micro.dev/v4"
@@ -68,7 +69,7 @@ func Service(opts ...Option) (micro.Service, error) {
 		server.Version(sopts.config.VersionString),
 	)
 
-	revaService, err := ocdav.NewWith(&sopts.config, sopts.FavoriteManager, sopts.lockSystem, &sopts.Logger, sopts.GatewayClient)
+	revaService, err := ocdav.NewWith(&sopts.config, sopts.FavoriteManager, sopts.lockSystem, &sopts.Logger, sopts.GatewaySelector)
 	if err != nil {
 		return nil, err
 	}
@@ -137,11 +138,11 @@ func setDefaults(sopts *Options) error {
 		sopts.Name = ServerName
 	}
 	if sopts.lockSystem == nil {
-		client, err := pool.GetGatewayServiceClient(sopts.config.GatewaySvc)
+		selector, err := pool.GatewaySelector(sopts.config.GatewaySvc)
 		if err != nil {
-			return err
+			return errors.Wrap(err, "error getting gateway selector")
 		}
-		sopts.lockSystem = ocdav.NewCS3LS(client)
+		sopts.lockSystem = ocdav.NewCS3LS(selector)
 	}
 	if sopts.FavoriteManager == nil {
 		sopts.FavoriteManager, _ = memory.New(map[string]interface{}{})

@@ -379,6 +379,9 @@ func (c *EOSHTTPClient) PUTFile(ctx context.Context, remoteuser string, auth eos
 		// Execute the request. I don't like that there is no explicit timeout or buffer control on the input stream
 		log.Debug().Str("func", "PUTFile").Msg("sending req")
 		resp, err := c.cl.Do(req)
+		if resp != nil {
+			resp.Body.Close()
+		}
 
 		// Let's support redirections... and if we retry we retry at the same FST
 		if resp != nil && resp.StatusCode == 307 {
@@ -471,6 +474,9 @@ func (c *EOSHTTPClient) Head(ctx context.Context, remoteuser string, auth eoscli
 		}
 		// Execute the request. I don't like that there is no explicit timeout or buffer control on the input stream
 		resp, err := c.cl.Do(req)
+		if resp != nil {
+			resp.Body.Close()
+		}
 
 		// And get an error code (if error) that is worth propagating
 		e := c.getRespError(resp, err)

@@ -62,8 +62,8 @@ type config struct {
 }
 
 type service struct {
-	gateway              gateway.GatewayAPIClient
-	sharesProviderClient collaboration.CollaborationAPIClient
+	gatewaySelector              pool.Selectable[gateway.GatewayAPIClient]
+	sharingCollaborationSelector pool.Selectable[collaboration.CollaborationAPIClient]
 }
 
 func (s *service) Close() error {
@@ -86,24 +86,24 @@ func NewDefault(m map[string]interface{}, _ *grpc.Server) (rgrpc.Service, error)
 		return nil, err
 	}
 
-	gateway, err := pool.GetGatewayServiceClient(sharedconf.GetGatewaySVC(c.GatewayAddr))
+	gatewaySelector, err := pool.GatewaySelector(sharedconf.GetGatewaySVC(c.GatewayAddr))
 	if err != nil {
 		return nil, err
 	}
 
-	client, err := pool.GetUserShareProviderClient(sharedconf.GetGatewaySVC(c.UserShareProviderEndpoint))
+	sharingCollaborationSelector, err := pool.SharingCollaborationSelector(sharedconf.GetGatewaySVC(c.UserShareProviderEndpoint))
 	if err != nil {
 		return nil, errors.Wrap(err, "sharesstorageprovider: error getting UserShareProvider client")
 	}
 
-	return New(gateway, client)
+	return New(gatewaySelector, sharingCollaborationSelector)
 }
 
 // New returns a new instance of the SharesStorageProvider service
-func New(gateway gateway.GatewayAPIClient, c collaboration.CollaborationAPIClient) (rgrpc.Service, error) {
+func New(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], sharingCollaborationSelector pool.Selectable[collaboration.CollaborationAPIClient]) (rgrpc.Service, error) {
 	s := &service{
-		gateway:              gateway,
-		sharesProviderClient: c,
+		gatewaySelector:              gatewaySelector,
+		sharingCollaborationSelector: sharingCollaborationSelector,
 	}
 	return s, nil
 }
@@ -123,7 +123,12 @@ func (s *service) SetArbitraryMetadata(ctx context.Context, req *provider.SetArb
 		}, nil
 	}
 
-	return s.gateway.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return gatewayClient.SetArbitraryMetadata(ctx, &provider.SetArbitraryMetadataRequest{
 		Opaque:            req.Opaque,
 		Ref:               buildReferenceInShare(req.Ref, receivedShare),
 		ArbitraryMetadata: req.ArbitraryMetadata,
@@ -145,7 +150,12 @@ func (s *service) UnsetArbitraryMetadata(ctx context.Context, req *provider.Unse
 		}, nil
 	}
 
-	return s.gateway.UnsetArbitraryMetadata(ctx, &provider.UnsetArbitraryMetadataRequest{
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return gatewayClient.UnsetArbitraryMetadata(ctx, &provider.UnsetArbitraryMetadataRequest{
 		Opaque:                req.Opaque,
 		Ref:                   buildReferenceInShare(req.Ref, receivedShare),
 		ArbitraryMetadataKeys: req.ArbitraryMetadataKeys,
@@ -167,7 +177,12 @@ func (s *service) InitiateFileDownload(ctx context.Context, req *provider.Initia
 		}, nil
 	}
 
-	gwres, err := s.gateway.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	gwres, err := gatewayClient.InitiateFileDownload(ctx, &provider.InitiateFileDownloadRequest{
 		Opaque: req.Opaque,
 		Ref:    buildReferenceInShare(req.Ref, receivedShare),
 		LockId: req.LockId,
@@ -229,7 +244,13 @@ func (s *service) InitiateFileUpload(ctx context.Context, req *provider.Initiate
 			Status: status.NewPermissionDenied(ctx, nil, "share does not grant InitiateFileDownload permission"),
 		}, nil
 	}
-	gwres, err := s.gateway.InitiateFileUpload(ctx, &provider.InitiateFileUploadRequest{
+
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	gwres, err := gatewayClient.InitiateFileUpload(ctx, &provider.InitiateFileUploadRequest{
 		Opaque:  req.Opaque,
 		Ref:     buildReferenceInShare(req.Ref, receivedShare),
 		LockId:  req.LockId,
@@ -513,7 +534,12 @@ func (s *service) CreateContainer(ctx context.Context, req *provider.CreateConta
 		}, nil
 	}
 
-	return s.gateway.CreateContainer(ctx, &provider.CreateContainerRequest{
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return gatewayClient.CreateContainer(ctx, &provider.CreateContainerRequest{
 		Opaque: req.Opaque,
 		Ref:    buildReferenceInShare(req.Ref, receivedShare),
 	})
@@ -548,7 +574,12 @@ func (s *service) Delete(ctx context.Context, req *provider.DeleteRequest) (*pro
 		}, nil
 	}
 
-	return s.gateway.Delete(ctx, &provider.DeleteRequest{
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return gatewayClient.Delete(ctx, &provider.DeleteRequest{
 		Opaque: req.Opaque,
 		Ref:    buildReferenceInShare(req.Ref, receivedShare),
 	})
@@ -584,7 +615,12 @@ func (s *service) Move(ctx context.Context, req *provider.MoveRequest) (*provide
 			Path: filepath.Base(req.Destination.Path),
 		}
 
-		_, err = s.sharesProviderClient.UpdateReceivedShare(ctx, &collaboration.UpdateReceivedShareRequest{
+		sharingCollaborationClient, err := s.sharingCollaborationSelector.Next()
+		if err != nil {
+			return nil, err
+		}
+
+		_, err = sharingCollaborationClient.UpdateReceivedShare(ctx, &collaboration.UpdateReceivedShareRequest{
 			Share:      srcReceivedShare,
 			UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"state", "mount_point"}},
 		})
@@ -613,7 +649,12 @@ func (s *service) Move(ctx context.Context, req *provider.MoveRequest) (*provide
 		}, nil
 	}
 
-	return s.gateway.Move(ctx, &provider.MoveRequest{
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return gatewayClient.Move(ctx, &provider.MoveRequest{
 		Opaque:      req.Opaque,
 		Source:      buildReferenceInShare(req.Source, srcReceivedShare),
 		Destination: buildReferenceInShare(req.Destination, dstReceivedShare),
@@ -712,8 +753,13 @@ func (s *service) Stat(ctx context.Context, req *provider.StatRequest) (*provide
 		}, nil
 	}
 
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
 	// TODO return reference?
-	return s.gateway.Stat(ctx, &provider.StatRequest{
+	return gatewayClient.Stat(ctx, &provider.StatRequest{
 		Opaque:                req.Opaque,
 		Ref:                   buildReferenceInShare(req.Ref, receivedShare),
 		ArbitraryMetadataKeys: req.ArbitraryMetadataKeys,
@@ -742,13 +788,18 @@ func (s *service) ListContainer(ctx context.Context, req *provider.ListContainer
 			return nil, errors.Wrap(err, "sharesstorageprovider: error calling ListReceivedSharesRequest")
 		}
 
+		gatewayClient, err := s.gatewaySelector.Next()
+		if err != nil {
+			return nil, err
+		}
+
 		infos := []*provider.ResourceInfo{}
 		for _, share := range receivedShares {
 			if share.GetState() != collaboration.ShareState_SHARE_STATE_ACCEPTED {
 				continue
 			}
 
-			statRes, err := s.gateway.Stat(ctx, &provider.StatRequest{
+			statRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{
 				Opaque: req.Opaque,
 				Ref: &provider.Reference{
 					ResourceId: share.Share.ResourceId,
@@ -802,7 +853,12 @@ func (s *service) ListContainer(ctx context.Context, req *provider.ListContainer
 		}, nil
 	}
 
-	return s.gateway.ListContainer(ctx, &provider.ListContainerRequest{
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return gatewayClient.ListContainer(ctx, &provider.ListContainerRequest{
 		Opaque:                req.Opaque,
 		Ref:                   buildReferenceInShare(req.Ref, receivedShare),
 		ArbitraryMetadataKeys: req.ArbitraryMetadataKeys,
@@ -824,7 +880,12 @@ func (s *service) ListFileVersions(ctx context.Context, req *provider.ListFileVe
 		}, nil
 	}
 
-	return s.gateway.ListFileVersions(ctx, &provider.ListFileVersionsRequest{
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return gatewayClient.ListFileVersions(ctx, &provider.ListFileVersionsRequest{
 		Opaque: req.Opaque,
 		Ref:    buildReferenceInShare(req.Ref, receivedShare),
 	})
@@ -846,7 +907,12 @@ func (s *service) RestoreFileVersion(ctx context.Context, req *provider.RestoreF
 		}, nil
 	}
 
-	return s.gateway.RestoreFileVersion(ctx, &provider.RestoreFileVersionRequest{
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return gatewayClient.RestoreFileVersion(ctx, &provider.RestoreFileVersionRequest{
 		Opaque: req.Opaque,
 		Ref:    buildReferenceInShare(req.Ref, receivedShare),
 	})
@@ -911,7 +977,12 @@ func (s *service) TouchFile(ctx context.Context, req *provider.TouchFileRequest)
 		}, nil
 	}
 
-	return s.gateway.TouchFile(ctx, &provider.TouchFileRequest{
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
+
+	return gatewayClient.TouchFile(ctx, &provider.TouchFileRequest{
 		Opaque: req.Opaque,
 		Ref:    buildReferenceInShare(req.Ref, receivedShare),
 	})
@@ -938,10 +1009,15 @@ func (s *service) resolveAcceptedShare(ctx context.Context, ref *provider.Refere
 		return nil, status.NewNotFound(ctx, "sharesstorageprovider: not found "+ref.String()), nil
 	}
 
+	sharingCollaborationClient, err := s.sharingCollaborationSelector.Next()
+	if err != nil {
+		return nil, nil, err
+	}
+
 	// we can get the share if the reference carries a share id
 	if ref.ResourceId.OpaqueId != utils.ShareStorageProviderID {
 		// look up share for this resourceid
-		lsRes, err := s.sharesProviderClient.GetReceivedShare(ctx, &collaboration.GetReceivedShareRequest{
+		lsRes, err := sharingCollaborationClient.GetReceivedShare(ctx, &collaboration.GetReceivedShareRequest{
 			Ref: &collaboration.ShareReference{
 				Spec: &collaboration.ShareReference_Id{
 					Id: &collaboration.ShareId{
@@ -968,7 +1044,7 @@ func (s *service) resolveAcceptedShare(ctx context.Context, ref *provider.Refere
 		// we need to list accepted shares and match the path
 
 		// look up share for this resourceid
-		lsRes, err := s.sharesProviderClient.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
+		lsRes, err := sharingCollaborationClient.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
 			Filters: []*collaboration.Filter{
 				// FIXME filter by accepted ... and by mountpoint?
 			},
@@ -997,7 +1073,12 @@ func (s *service) rejectReceivedShare(ctx context.Context, receivedShare *collab
 	receivedShare.State = collaboration.ShareState_SHARE_STATE_REJECTED
 	receivedShare.MountPoint = nil
 
-	res, err := s.sharesProviderClient.UpdateReceivedShare(ctx, &collaboration.UpdateReceivedShareRequest{
+	sharingCollaborationClient, err := s.sharingCollaborationSelector.Next()
+	if err != nil {
+		return err
+	}
+
+	res, err := sharingCollaborationClient.UpdateReceivedShare(ctx, &collaboration.UpdateReceivedShareRequest{
 		Share:      receivedShare,
 		UpdateMask: &fieldmaskpb.FieldMask{Paths: []string{"state", "mount_point"}},
 	})
@@ -1009,7 +1090,12 @@ func (s *service) rejectReceivedShare(ctx context.Context, receivedShare *collab
 }
 
 func (s *service) fetchShares(ctx context.Context) ([]*collaboration.ReceivedShare, map[string]*provider.ResourceInfo, error) {
-	lsRes, err := s.sharesProviderClient.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
+	sharingCollaborationClient, err := s.sharingCollaborationSelector.Next()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	lsRes, err := sharingCollaborationClient.ListReceivedShares(ctx, &collaboration.ListReceivedSharesRequest{
 		// FIXME filter by received shares for resource id - listing all shares is tooo expensive!
 	})
 	if err != nil {
@@ -1017,6 +1103,11 @@ func (s *service) fetchShares(ctx context.Context) ([]*collaboration.ReceivedSha
 	}
 	if lsRes.Status.Code != rpc.Code_CODE_OK {
 		return nil, nil, fmt.Errorf("sharesstorageprovider: error calling ListReceivedSharesRequest")
+	}
+
+	gatewayClient, err := s.gatewaySelector.Next()
+	if err != nil {
+		return nil, nil, err
 	}
 
 	shareMetaData := make(map[string]*provider.ResourceInfo, len(lsRes.Shares))
@@ -1029,7 +1120,7 @@ func (s *service) fetchShares(ctx context.Context) ([]*collaboration.ReceivedSha
 			// convert backwards compatible share id
 			rs.Share.ResourceId.StorageId, rs.Share.ResourceId.SpaceId = storagespace.SplitStorageID(rs.Share.ResourceId.StorageId)
 		}
-		sRes, err := s.gateway.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: rs.Share.ResourceId}})
+		sRes, err := gatewayClient.Stat(ctx, &provider.StatRequest{Ref: &provider.Reference{ResourceId: rs.Share.ResourceId}})
 		if err != nil {
 			appctx.GetLogger(ctx).Error().
 				Err(err).

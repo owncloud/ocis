@@ -78,7 +78,7 @@ func (s *svc) handlePathMove(w http.ResponseWriter, r *http.Request, ns string) 
 
 	sublog := appctx.GetLogger(ctx).With().Str("src", srcPath).Str("dst", dstPath).Logger()
 
-	srcSpace, status, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gwClient, srcPath)
+	srcSpace, status, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gatewaySelector, srcPath)
 	if err != nil {
 		sublog.Error().Err(err).Str("path", srcPath).Msg("failed to look up source storage space")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -88,7 +88,7 @@ func (s *svc) handlePathMove(w http.ResponseWriter, r *http.Request, ns string) 
 		errors.HandleErrorStatus(&sublog, w, status)
 		return
 	}
-	dstSpace, status, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gwClient, dstPath)
+	dstSpace, status, err := spacelookup.LookUpStorageSpaceForPath(ctx, s.gatewaySelector, dstPath)
 	if err != nil {
 		sublog.Error().Err(err).Str("path", dstPath).Msg("failed to look up destination storage space")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -141,7 +141,7 @@ func (s *svc) handleSpacesMove(w http.ResponseWriter, r *http.Request, srcSpaceI
 }
 
 func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Request, src, dst *provider.Reference, log zerolog.Logger) {
-	isChild, err := s.referenceIsChildOf(ctx, s.gwClient, dst, src)
+	isChild, err := s.referenceIsChildOf(ctx, s.gatewaySelector, dst, src)
 	if err != nil {
 		switch err.(type) {
 		case errtypes.IsNotSupported:
@@ -169,9 +169,16 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return
 	}
 
+	client, err := s.gatewaySelector.Next()
+	if err != nil {
+		log.Error().Err(err).Msg("error selecting next client")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
 	// check src exists
 	srcStatReq := &provider.StatRequest{Ref: src}
-	srcStatRes, err := s.gwClient.Stat(ctx, srcStatReq)
+	srcStatRes, err := client.Stat(ctx, srcStatReq)
 	if err != nil {
 		log.Error().Err(err).Msg("error sending grpc stat request")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -190,7 +197,7 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 
 	// check dst exists
 	dstStatReq := &provider.StatRequest{Ref: dst}
-	dstStatRes, err := s.gwClient.Stat(ctx, dstStatReq)
+	dstStatRes, err := client.Stat(ctx, dstStatReq)
 	if err != nil {
 		log.Error().Err(err).Msg("error sending grpc stat request")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -213,7 +220,7 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 
 		// delete existing tree
 		delReq := &provider.DeleteRequest{Ref: dst}
-		delRes, err := s.gwClient.Delete(ctx, delReq)
+		delRes, err := client.Delete(ctx, delReq)
 		if err != nil {
 			log.Error().Err(err).Msg("error sending grpc delete request")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -230,7 +237,7 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 			ResourceId: dst.ResourceId,
 			Path:       utils.MakeRelativePath(path.Dir(dst.Path)),
 		}}
-		intStatRes, err := s.gwClient.Stat(ctx, intStatReq)
+		intStatRes, err := client.Stat(ctx, intStatReq)
 		if err != nil {
 			log.Error().Err(err).Msg("error sending grpc stat request")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -250,7 +257,7 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 	}
 
 	mReq := &provider.MoveRequest{Source: src, Destination: dst}
-	mRes, err := s.gwClient.Move(ctx, mReq)
+	mRes, err := client.Move(ctx, mReq)
 	if err != nil {
 		log.Error().Err(err).Msg("error sending move grpc request")
 		w.WriteHeader(http.StatusInternalServerError)
@@ -279,7 +286,7 @@ func (s *svc) handleMove(ctx context.Context, w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	dstStatRes, err = s.gwClient.Stat(ctx, dstStatReq)
+	dstStatRes, err = client.Stat(ctx, dstStatReq)
 	if err != nil {
 		log.Error().Err(err).Msg("error sending grpc stat request")
 		w.WriteHeader(http.StatusInternalServerError)

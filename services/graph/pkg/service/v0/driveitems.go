@@ -25,9 +25,14 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 	g.logger.Info().Msg("Calling GetRootDriveChildren")
 	ctx := r.Context()
 
-	client := g.GetGatewayClient()
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		g.logger.Error().Err(err).Msg("could not select next gateway client")
+		errorcode.ServiceNotAvailable.Render(w, r, http.StatusInternalServerError, "could not select next gateway client, aborting")
+		return
+	}
 
-	res, err := client.GetHome(ctx, &storageprovider.GetHomeRequest{})
+	res, err := gatewayClient.GetHome(ctx, &storageprovider.GetHomeRequest{})
 	switch {
 	case err != nil:
 		g.logger.Error().Err(err).Msg("error sending get home grpc request")
@@ -43,7 +48,7 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	lRes, err := client.ListContainer(ctx, &storageprovider.ListContainerRequest{
+	lRes, err := gatewayClient.ListContainer(ctx, &storageprovider.ListContainerRequest{
 		Ref: &storageprovider.Reference{
 			Path: res.Path,
 		},
@@ -80,9 +85,12 @@ func (g Graph) GetRootDriveChildren(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Graph) getDriveItem(ctx context.Context, ref storageprovider.Reference) (*libregraph.DriveItem, error) {
-	client := g.GetGatewayClient()
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
 
-	res, err := client.Stat(ctx, &storageprovider.StatRequest{Ref: &ref})
+	res, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: &ref})
 	if err != nil {
 		return nil, err
 	}
@@ -94,12 +102,15 @@ func (g Graph) getDriveItem(ctx context.Context, ref storageprovider.Reference) 
 }
 
 func (g Graph) getRemoteItem(ctx context.Context, root *storageprovider.ResourceId, baseURL *url.URL) (*libregraph.RemoteItem, error) {
-	client := g.GetGatewayClient()
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		return nil, err
+	}
 
 	ref := &storageprovider.Reference{
 		ResourceId: root,
 	}
-	res, err := client.Stat(ctx, &storageprovider.StatRequest{Ref: ref})
+	res, err := gatewayClient.Stat(ctx, &storageprovider.StatRequest{Ref: ref})
 	if err != nil {
 		return nil, err
 	}
@@ -204,8 +215,12 @@ func cs3ResourceToRemoteItem(res *storageprovider.ResourceInfo) (*libregraph.Rem
 }
 
 func (g Graph) getPathForResource(ctx context.Context, id storageprovider.ResourceId) (string, error) {
-	client := g.GetGatewayClient()
-	res, err := client.GetPath(ctx, &storageprovider.GetPathRequest{ResourceId: &id})
+	gatewayClient, err := g.gatewaySelector.Next()
+	if err != nil {
+		return "", err
+	}
+
+	res, err := gatewayClient.GetPath(ctx, &storageprovider.GetPathRequest{ResourceId: &id})
 	if err != nil {
 		return "", err
 	}

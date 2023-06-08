@@ -53,8 +53,8 @@ func DefaultConfig() *config.Config {
 		DataPath:                path.Join(defaults.BaseDataPath(), "settings"),
 		SetupDefaultAssignments: false,
 		Metadata: config.Metadata{
-			GatewayAddress: "127.0.0.1:9215", // system storage
-			StorageAddress: "127.0.0.1:9215",
+			GatewayAddress: "com.owncloud.api.storage-system",
+			StorageAddress: "com.owncloud.api.storage-system",
 			SystemUserIDP:  "internal",
 			Cache: &config.Cache{
 				Store:          "memory",
