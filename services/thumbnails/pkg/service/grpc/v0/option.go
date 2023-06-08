@@ -71,12 +71,14 @@ func ThumbnailSource(val imgsource.Source) Option {
 	}
 }
 
+// CS3Source provides a function to set the CS3Source option
 func CS3Source(val imgsource.Source) Option {
 	return func(o *Options) {
 		o.CS3Source = val
 	}
 }
 
+// GatewaySelector adds a grpc client selector for the gateway service
 func GatewaySelector(val pool.Selectable[gateway.GatewayAPIClient]) Option {
 	return func(o *Options) {
 		o.GatewaySelector = val

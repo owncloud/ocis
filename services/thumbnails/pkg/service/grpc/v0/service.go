@@ -70,6 +70,7 @@ type Thumbnail struct {
 	preprocessorOpts PreprocessorOpts
 }
 
+// PreprocessorOpts holds the options for the preprocessor
 type PreprocessorOpts struct {
 	TxtFontFileMap string
 }

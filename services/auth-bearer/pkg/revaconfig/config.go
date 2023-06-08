@@ -1,3 +1,4 @@
+// Package revaconfig transfers the config struct to reva config map
 package revaconfig
 
 import (

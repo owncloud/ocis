@@ -25,11 +25,13 @@ const (
 	TokenTransportHeader = "X-Reva-Transfer"
 )
 
+// CS3 implements a CS3 image source
 type CS3 struct {
 	gatewaySelector pool.Selectable[gateway.GatewayAPIClient]
 	insecure        bool
 }
 
+// NewCS3Source configures a new CS3 image source
 func NewCS3Source(cfg config.Thumbnail, gatewaySelector pool.Selectable[gateway.GatewayAPIClient]) CS3 {
 	return CS3{
 		gatewaySelector: gatewaySelector,
