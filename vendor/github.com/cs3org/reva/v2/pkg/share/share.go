@@ -242,6 +242,9 @@ func FilterFiltersByType(f []*collaboration.Filter, t collaboration.Filter_Type)
 
 // IsExpired tests whether a share is expired
 func IsExpired(s *collaboration.Share) bool {
-	expiration := time.Unix(int64(s.Expiration.GetSeconds()), int64(s.Expiration.GetNanos()))
-	return s.Expiration != nil && expiration.Before(time.Now())
+	if e := s.GetExpiration(); e != nil {
+		expiration := time.Unix(int64(e.Seconds), int64(e.Nanos))
+		return expiration.Before(time.Now())
+	}
+	return false
 }

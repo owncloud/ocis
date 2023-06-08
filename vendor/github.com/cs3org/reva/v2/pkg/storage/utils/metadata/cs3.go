@@ -396,36 +396,21 @@ func (cs3 *CS3) MakeDirIfNotExist(ctx context.Context, folder string) error {
 		Path:       utils.MakeRelativePath(folder),
 	}
 
-	resp, err := client.Stat(ctx, &provider.StatRequest{
+	resp, err := client.CreateContainer(ctx, &provider.CreateContainerRequest{
 		Ref: rootPathRef,
 	})
-
-	if err != nil {
-		return err
-	}
-
 	switch {
 	case err != nil:
 		return err
 	case resp.Status.Code == rpc.Code_CODE_OK:
 		// nothing to do in this case
-	case resp.Status.Code == rpc.Code_CODE_NOT_FOUND:
-		r, err := client.CreateContainer(ctx, &provider.CreateContainerRequest{
-			Ref: rootPathRef,
-		})
-
-		if err != nil {
-			return err
-		}
-
-		if r.Status.Code != rpc.Code_CODE_OK {
-			return errtypes.NewErrtypeFromStatus(r.Status)
-		}
+		return nil
+	case resp.Status.Code == rpc.Code_CODE_ALREADY_EXISTS:
+		// nothing to do in this case
+		return nil
 	default:
 		return errtypes.NewErrtypeFromStatus(resp.Status)
 	}
-
-	return nil
 }
 
 // CreateSymlink creates a symlink

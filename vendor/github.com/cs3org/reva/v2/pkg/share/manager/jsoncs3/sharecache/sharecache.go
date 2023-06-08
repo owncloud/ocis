@@ -217,11 +217,15 @@ func (c *Cache) Persist(ctx context.Context, userid string) error {
 	createdBytes, err := json.Marshal(c.UserShares[userid])
 	if err != nil {
 		c.UserShares[userid].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	jsonPath := c.userCreatedPath(userid)
 	if err := c.storage.MakeDirIfNotExist(ctx, path.Dir(jsonPath)); err != nil {
 		c.UserShares[userid].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 
@@ -231,8 +235,11 @@ func (c *Cache) Persist(ctx context.Context, userid string) error {
 		IfUnmodifiedSince: c.UserShares[userid].Mtime,
 	}); err != nil {
 		c.UserShares[userid].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
+	span.SetStatus(codes.Ok, "")
 	return nil
 }
 
