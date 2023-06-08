@@ -133,4 +133,4 @@ web:
     custom_translations: []
 token_manager:
   jwt_secret: ""
-gateway_addr: 127.0.0.1:9142
+gateway_addr: com.owncloud.api.gateway

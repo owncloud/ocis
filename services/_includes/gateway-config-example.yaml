@@ -23,7 +23,7 @@ grpc:
 token_manager:
   jwt_secret: ""
 reva:
-  address: 127.0.0.1:9142
+  address: com.owncloud.api.gateway
   tls:
     mode: ""
     cacert: ""
@@ -50,17 +50,17 @@ cache:
   create_home_cache_ttl: 5m0s
   create_home_cache_size: 0
 frontend_public_url: https://localhost:9200
-users_endpoint: localhost:9144
-groups_endpoint: localhost:9160
-permissions_endpoint: localhost:9191
-sharing_endpoint: localhost:9150
-auth_basic_endpoint: localhost:9146
+users_endpoint: com.owncloud.api.users
+groups_endpoint: com.owncloud.api.groups
+permissions_endpoint: com.owncloud.api.settings
+sharing_endpoint: com.owncloud.api.sharing
+auth_basic_endpoint: com.owncloud.api.auth-basic
 auth_bearer_endpoint: ""
-auth_machine_endpoint: localhost:9166
-storage_public_link_endpoint: localhost:9178
-storage_users_endpoint: localhost:9157
-storage_shares_endpoint: localhost:9154
-app_registry_endpoint: localhost:9242
+auth_machine_endpoint: com.owncloud.api.auth-machine
+storage_public_link_endpoint: com.owncloud.api.storage-publiclink
+storage_users_endpoint: com.owncloud.api.storage-users
+storage_shares_endpoint: com.owncloud.api.storage-shares
+app_registry_endpoint: com.owncloud.api.app-registry
 storage_registry:
   driver: spaces
   rules: []

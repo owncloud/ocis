@@ -51,4 +51,4 @@
 | WEB_OPTION_IMPRINT_URL | string |  | Specifies the target url for the imprint link in the account menu|
 | WEB_OPTION_PRIVACY_URL | string |  | Specifies the target url for the privacy link in the account menu|
 | OCIS_JWT_SECRET<br/>WEB_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
-| WEB_GATEWAY_GRPC_ADDR | string | 127.0.0.1:9142 | The bind address of the GRPC service.|
+| WEB_GATEWAY_GRPC_ADDR | string | com.owncloud.api.gateway | The bind address of the GRPC service.|

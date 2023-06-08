@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-06-08-09-53-08]
+[#deprecation-note-2023-06-08-10-41-55]
 [caption=]
 .Deprecation notes for the storage-users service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -205,11 +205,11 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-06-08-09-53-08[Deprecation Note]
+xref:deprecation-note-2023-06-08-10-41-55[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9142 ++
+++com.owncloud.api.gateway ++
 a| [subs=-attributes]
 The CS3 gateway endpoint.
 
@@ -283,7 +283,7 @@ a|`STORAGE_USERS_PERMISSION_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9191 ++
+++com.owncloud.api.settings ++
 a| [subs=-attributes]
 Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.
 
@@ -343,7 +343,7 @@ Maximum number of concurrent go-routines. Higher values can potentially get work
 
 a|`OCIS_ASYNC_UPLOADS` +
 `STORAGE_USERS_OCIS_ASYNC_UPLOADS` +
-xref:deprecation-note-2023-06-08-09-53-08[Deprecation Note]
+xref:deprecation-note-2023-06-08-10-41-55[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
@@ -394,7 +394,7 @@ a|`STORAGE_USERS_PERMISSION_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9191 ++
+++com.owncloud.api.settings ++
 a| [subs=-attributes]
 Endpoint of the permissions service. The endpoints can differ for 'ocis' and 's3ng'.
 
@@ -583,7 +583,7 @@ a|`STORAGE_USERS_OWNCLOUDSQL_USERS_PROVIDER_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++localhost:9144 ++
+++com.owncloud.api.users ++
 a| [subs=-attributes]
 Endpoint of the users provider.
 
@@ -647,7 +647,7 @@ Whether to verify the server TLS certificates.
 a|`OCIS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERTIFICATE` +
 `STORAGE_USERS_EVENTS_TLS_ROOT_CA_CERT` +
-xref:deprecation-note-2023-06-08-09-53-08[Deprecation Note]
+xref:deprecation-note-2023-06-08-10-41-55[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

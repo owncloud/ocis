@@ -26,8 +26,8 @@
 | SETTINGS_GRPC_ADDR | string | 127.0.0.1:9191 | The bind address of the GRPC service.|
 | SETTINGS_STORE_TYPE | string | metadata | Store type configures the persistency driver. Supported values are 'metadata' and 'filesystem'. Note that the value 'filesystem' is considered deprecated.|
 | SETTINGS_DATA_PATH | string | ~/.ocis/settings | The directory where the filesystem storage will store ocis settings. If not defined, the root directory derives from $OCIS_BASE_DATA_PATH:/settings.|
-| STORAGE_GATEWAY_GRPC_ADDR | string | 127.0.0.1:9215 | GRPC address of the STORAGE-SYSTEM service.|
-| STORAGE_GRPC_ADDR | string | 127.0.0.1:9215 | GRPC address of the STORAGE-SYSTEM service.|
+| STORAGE_GATEWAY_GRPC_ADDR | string | com.owncloud.api.storage-system | GRPC address of the STORAGE-SYSTEM service.|
+| STORAGE_GRPC_ADDR | string | com.owncloud.api.storage-system | GRPC address of the STORAGE-SYSTEM service.|
 | OCIS_SYSTEM_USER_ID<br/>SETTINGS_SYSTEM_USER_ID | string |  | ID of the oCIS STORAGE-SYSTEM system user. Admins need to set the ID for the STORAGE-SYSTEM system user in this config option which is then used to reference the user. Any reasonable long string is possible, preferably this would be an UUIDv4 format.|
 | OCIS_SYSTEM_USER_IDP<br/>SETTINGS_SYSTEM_USER_IDP | string | internal | IDP of the oCIS STORAGE-SYSTEM system user.|
 | OCIS_SYSTEM_USER_API_KEY | string |  | API key for the STORAGE-SYSTEM system user.|

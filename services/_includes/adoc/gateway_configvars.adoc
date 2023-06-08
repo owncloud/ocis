@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-06-08-09-53-08]
+[#deprecation-note-2023-06-08-10-41-55]
 [caption=]
 .Deprecation notes for the gateway service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -182,11 +182,11 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-06-08-09-53-08[Deprecation Note]
+xref:deprecation-note-2023-06-08-10-41-55[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++127.0.0.1:9142 ++
+++com.owncloud.api.gateway ++
 a| [subs=-attributes]
 The CS3 gateway endpoint.
 
@@ -246,7 +246,7 @@ Disable creation of the home space on login.
 
 a|`OCIS_TRANSFER_SECRET` +
 `STORAGE_TRANSFER_SECRET` +
-xref:deprecation-note-2023-06-08-09-53-08[Deprecation Note]
+xref:deprecation-note-2023-06-08-10-41-55[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -425,7 +425,7 @@ a|`GATEWAY_USERS_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++localhost:9144 ++
+++com.owncloud.api.users ++
 a| [subs=-attributes]
 The USERS API endpoint.
 
@@ -434,7 +434,7 @@ a|`GATEWAY_GROUPS_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++localhost:9160 ++
+++com.owncloud.api.groups ++
 a| [subs=-attributes]
 The GROUPS API endpoint.
 
@@ -443,7 +443,7 @@ a|`GATEWAY_PERMISSIONS_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++localhost:9191 ++
+++com.owncloud.api.settings ++
 a| [subs=-attributes]
 The SETTINGS API endpoint.
 
@@ -452,7 +452,7 @@ a|`GATEWAY_SHARING_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++localhost:9150 ++
+++com.owncloud.api.sharing ++
 a| [subs=-attributes]
 The SHARE API endpoint.
 
@@ -461,7 +461,7 @@ a|`GATEWAY_AUTH_BASIC_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++localhost:9146 ++
+++com.owncloud.api.auth-basic ++
 a| [subs=-attributes]
 The AUTH BASIC API endpoint.
 
@@ -479,7 +479,7 @@ a|`GATEWAY_AUTH_MACHINE_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++localhost:9166 ++
+++com.owncloud.api.auth-machine ++
 a| [subs=-attributes]
 The AUTH MACHINE API endpoint.
 
@@ -488,7 +488,7 @@ a|`GATEWAY_STORAGE_PUBLIC_LINK_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++localhost:9178 ++
+++com.owncloud.api.storage-publiclink ++
 a| [subs=-attributes]
 The STORAGE PUBLICLINK API endpoint.
 
@@ -497,7 +497,7 @@ a|`GATEWAY_STORAGE_USERS_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++localhost:9157 ++
+++com.owncloud.api.storage-users ++
 a| [subs=-attributes]
 The STORAGE USERS API endpoint.
 
@@ -506,7 +506,7 @@ a|`GATEWAY_STORAGE_SHARES_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++localhost:9154 ++
+++com.owncloud.api.storage-shares ++
 a| [subs=-attributes]
 The STORAGE SHARES API endpoint.
 
@@ -515,7 +515,7 @@ a|`GATEWAY_APP_REGISTRY_ENDPOINT` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++localhost:9242 ++
+++com.owncloud.api.app-registry ++
 a| [subs=-attributes]
 The APP REGISTRY API endpoint.
 
