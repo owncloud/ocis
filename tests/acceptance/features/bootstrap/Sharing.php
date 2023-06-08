@@ -26,6 +26,7 @@ use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Psr\Http\Message\ResponseInterface;
 use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\ExpectationFailedException;
 use TestHelpers\OcsApiHelper;
 use TestHelpers\SharingHelper;
 use TestHelpers\HttpRequestHelper;
@@ -3449,7 +3450,7 @@ trait Sharing {
 					Assert::assertEquals($row['path'], $share['path']);
 					$found = true;
 					break;
-				} catch (PHPUnit\Framework\ExpectationFailedException $e) {
+				} catch (ExpectationFailedException $e) {
 				}
 			}
 			if (!$found) {
