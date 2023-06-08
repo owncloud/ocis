@@ -1,5 +1,8 @@
 @api
 Feature: low level tests of the creation extension see https://tus.io/protocols/resumable-upload.html#creation
+  As a user
+  I want to able to create resources
+  So that I can manage my resources
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files

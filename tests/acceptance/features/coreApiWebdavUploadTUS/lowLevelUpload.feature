@@ -1,5 +1,8 @@
 @api
 Feature: low level tests for upload of chunks
+  As a user
+  I want to be able to upload resources in chunks
+  So that I can manage my resources
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files

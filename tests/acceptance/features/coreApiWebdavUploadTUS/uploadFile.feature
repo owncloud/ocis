@@ -75,7 +75,7 @@ Feature: upload file
       | spaces      | /?fi=le&%#2 . txt                | # %ab ab?=ed                  |
 
 
-  Scenario Outline: Upload chunked file with TUS
+  Scenario Outline: upload chunked file with TUS
     Given using <dav_version> DAV path
     When user "Alice" uploads file with content "uploaded content" in 3 chunks to "/myChunkedFile.txt" using the TUS protocol on the WebDAV API
     Then the content of file "/myChunkedFile.txt" for user "Alice" should be "uploaded content"
@@ -90,7 +90,7 @@ Feature: upload file
       | spaces      |
 
 
-  Scenario Outline: Upload 1 byte chunks with TUS
+  Scenario Outline: upload 1 byte chunks with TUS
     Given using <dav_version> DAV path
     When user "Alice" uploads file with content "0123456789" in 10 chunks to "/myChunkedFile.txt" using the TUS protocol on the WebDAV API
     Then the content of file "/myChunkedFile.txt" for user "Alice" should be "0123456789"
@@ -105,7 +105,7 @@ Feature: upload file
       | spaces      |
 
 
-  Scenario Outline: Upload to overwriting a file
+  Scenario Outline: upload to overwriting a file
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "original content" to "textfile.txt"
     When user "Alice" uploads file with content "overwritten content" to "textfile.txt" using the TUS protocol on the WebDAV API

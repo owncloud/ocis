@@ -1,6 +1,8 @@
-@api 
-
+@api
 Feature: upload file to shared folder
+  As a user
+  I want to upload files on a shared folder
+  So that other user with access on the shared folder can access the resource
 
   Background:
     Given these users have been created with default attributes and without skeleton files:
@@ -9,7 +11,7 @@ Feature: upload file to shared folder
       | Brian    |
 
 
-  Scenario Outline: Uploading file to a received share folder
+  Scenario Outline: uploading file to a received share folder
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
@@ -23,7 +25,7 @@ Feature: upload file to shared folder
       | new         |
 
 
-  Scenario Outline: Uploading file to a user read/write share folder works
+  Scenario Outline: uploading file to a user read/write share folder works
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian" with permissions "change"
@@ -37,7 +39,7 @@ Feature: upload file to shared folder
       | new         |
 
 
-  Scenario Outline: Uploading a file into a group share as share receiver
+  Scenario Outline: uploading a file into a group share as share receiver
     Given using <dav_version> DAV path
     And group "grp1" has been created
     And user "Brian" has been added to group "grp1"
@@ -53,7 +55,7 @@ Feature: upload file to shared folder
       | new         |
 
 
-  Scenario Outline: Overwrite file to a received share folder
+  Scenario Outline: overwrite file to a received share folder
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has uploaded file with content "original content" to "/FOLDER/textfile.txt"
@@ -81,7 +83,7 @@ Feature: upload file to shared folder
       | new         |
 
 
-  Scenario Outline: Upload a file to shared folder with checksum should return the checksum in the propfind for sharee
+  Scenario Outline: upload a file to shared folder with checksum should return the checksum in the propfind for sharee
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
@@ -100,7 +102,7 @@ Feature: upload file to shared folder
       | new         |
 
 
-  Scenario Outline: Upload a file to shared folder with checksum should return the checksum in the download header for sharee
+  Scenario Outline: upload a file to shared folder with checksum should return the checksum in the download header for sharee
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
@@ -119,7 +121,7 @@ Feature: upload file to shared folder
       | new         |
 
 
-  Scenario Outline: Sharer shares a file with correct checksum should return the checksum in the propfind for sharee
+  Scenario Outline: sharer shares a file with correct checksum should return the checksum in the propfind for sharee
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 5                         |
@@ -137,7 +139,7 @@ Feature: upload file to shared folder
       | new         |
 
 
-  Scenario Outline: Sharer shares a file with correct checksum should return the checksum in the download header for sharee
+  Scenario Outline: sharer shares a file with correct checksum should return the checksum in the download header for sharee
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 5                         |
@@ -155,7 +157,7 @@ Feature: upload file to shared folder
       | new         |
 
 
-  Scenario Outline: Sharee uploads a file to a received share folder with correct checksum
+  Scenario Outline: sharee uploads a file to a received share folder with correct checksum
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
@@ -175,7 +177,7 @@ Feature: upload file to shared folder
       | new         |
 
 
-  Scenario Outline: Sharee uploads a file to a received share folder with wrong checksum should not work
+  Scenario Outline: sharee uploads a file to a received share folder with wrong checksum should not work
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
@@ -194,7 +196,7 @@ Feature: upload file to shared folder
       | new         |
 
 
-  Scenario Outline: Sharer uploads a file to shared folder with wrong correct checksum should not work
+  Scenario Outline: sharer uploads a file to shared folder with wrong correct checksum should not work
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
@@ -213,7 +215,7 @@ Feature: upload file to shared folder
       | new         |
 
 
-  Scenario Outline: Sharer uploads a chunked file with correct checksum and share it with sharee should work
+  Scenario Outline: sharer uploads a chunked file with correct checksum and share it with sharee should work
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 10                        |
@@ -231,7 +233,7 @@ Feature: upload file to shared folder
       | new         |
 
 
-  Scenario Outline: Sharee uploads a chunked file with correct checksum to a received share folder should work
+  Scenario Outline: sharee uploads a chunked file with correct checksum to a received share folder should work
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/FOLDER"
     And user "Alice" has shared folder "/FOLDER" with user "Brian"
@@ -252,7 +254,7 @@ Feature: upload file to shared folder
       | new         |
 
 
-  Scenario Outline: Sharer uploads a file with checksum and as a sharee overwrites the shared file with new data and correct checksum
+  Scenario Outline: sharer uploads a file with checksum and as a sharee overwrites the shared file with new data and correct checksum
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 16                        |
@@ -273,7 +275,7 @@ Feature: upload file to shared folder
       | new         |
 
 
-  Scenario Outline: Sharer uploads a file with checksum and as a sharee overwrites the shared file with new data and invalid checksum
+  Scenario Outline: sharer uploads a file with checksum and as a sharee overwrites the shared file with new data and invalid checksum
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 16                        |

@@ -9,7 +9,7 @@ Feature: upload file using old chunking
     And user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: Upload chunked file asc
+  Scenario Outline: upload chunked file in ascending order
     Given using <dav_version> DAV path
     When user "Alice" uploads the following "3" chunks to "/myChunkedFile.txt" with old chunking and using the WebDAV API
       | number | content |
@@ -31,7 +31,7 @@ Feature: upload file using old chunking
       | spaces      |
 
 
-  Scenario Outline: Upload chunked file desc
+  Scenario Outline: upload chunked file in descending order
     Given using <dav_version> DAV path
     When user "Alice" uploads the following "3" chunks to "/myChunkedFile.txt" with old chunking and using the WebDAV API
       | number | content |
@@ -51,7 +51,7 @@ Feature: upload file using old chunking
       | spaces      |
 
 
-  Scenario Outline: Upload chunked file random
+  Scenario Outline: upload chunked file in random order
     Given using <dav_version> DAV path
     When user "Alice" uploads the following "3" chunks to "/myChunkedFile.txt" with old chunking and using the WebDAV API
       | number | content |
@@ -71,7 +71,7 @@ Feature: upload file using old chunking
       | spaces      |
 
 
-  Scenario Outline: Checking file id after a move overwrite using old chunking endpoint
+  Scenario Outline: checking file id after a move overwrite using old chunking endpoint
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"
     And user "Alice" has copied file "/textfile0.txt" to "/existingFile.txt"
@@ -98,7 +98,7 @@ Feature: upload file using old chunking
   # This smokeTest scenario does ordinary checks for chunked upload,
   # without adjusting the log level. This allows it to run in test environments
   # where the log level has been fixed and cannot be changed.
-  Scenario Outline: Chunked upload files with difficult name
+  Scenario Outline: chunked upload files with difficult name
     Given using <dav_version> DAV path
     When user "Alice" uploads file "filesForUpload/textfile.txt" to "/<file-name>" in 3 chunks using the WebDAV API
     Then the HTTP status code should be "201"
@@ -121,7 +121,7 @@ Feature: upload file using old chunking
       | spaces      | 0                               |
 
 
-  Scenario Outline: Upload chunked file with old chunking with lengthy filenames
+  Scenario Outline: upload chunked file with old chunking with lengthy filenames
     Given using <dav_version> DAV path
     When user "Alice" uploads the following chunks to "नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-नेपालि-file-नाम-12345678910.txt" with old chunking and using the WebDAV API
       | number | content                   |

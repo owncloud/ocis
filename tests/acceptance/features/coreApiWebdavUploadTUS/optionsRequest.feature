@@ -1,5 +1,8 @@
 @api
 Feature: OPTIONS request
+  As a user
+  I want to check OPTIONS request
+  So that I can get information about communication options for target resource
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files

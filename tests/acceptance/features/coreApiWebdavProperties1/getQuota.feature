@@ -9,7 +9,7 @@ Feature: get quota
     And user "Alice" has been created with default attributes and small skeleton files
 
 
-  Scenario Outline: Retrieving folder quota when no quota is set
+  Scenario Outline: retrieving folder quota when no quota is set
     Given using <dav_version> DAV path
     When the administrator gives unlimited quota to user "Alice" using the provisioning API
     Then the HTTP status code should be "200"
@@ -21,7 +21,7 @@ Feature: get quota
       | spaces      |
 
   @smokeTest
-  Scenario Outline: Retrieving folder quota when quota is set
+  Scenario Outline: retrieving folder quota when quota is set
     Given using <dav_version> DAV path
     When the administrator sets the quota of user "Alice" to "10 MB" using the provisioning API
     Then the HTTP status code should be "200"
@@ -33,7 +33,7 @@ Feature: get quota
       | spaces      |
 
 
-  Scenario Outline: Retrieving folder quota of shared folder with quota when no quota is set for recipient
+  Scenario Outline: retrieving folder quota of shared folder with quota when no quota is set for recipient
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and small skeleton files
     And user "Alice" has been given unlimited quota
@@ -56,7 +56,7 @@ Feature: get quota
       | spaces      |
 
 
-  Scenario Outline: Retrieving folder quota when quota is set and a file was uploaded
+  Scenario Outline: retrieving folder quota when quota is set and a file was uploaded
     Given using <dav_version> DAV path
     And the quota of user "Alice" has been set to "1 KB"
     And user "Alice" has uploaded file "/prueba.txt" of size 93 bytes
@@ -72,7 +72,7 @@ Feature: get quota
       | spaces      |
 
 
-  Scenario Outline: Retrieving folder quota when quota is set and a file was received
+  Scenario Outline: retrieving folder quota when quota is set and a file was received
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and small skeleton files
     And the quota of user "Brian" has been set to "1 KB"

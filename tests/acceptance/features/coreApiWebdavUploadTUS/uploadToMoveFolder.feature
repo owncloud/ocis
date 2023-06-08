@@ -8,7 +8,7 @@ Feature: move folders
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: Uploading file into a moved folder
+  Scenario Outline: uploading file into a moved folder
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/test"
     And user "Alice" has created folder "/test-moved"

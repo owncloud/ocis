@@ -8,7 +8,7 @@ Feature: refuse access
     Given using OCS API version "1"
 
   @smokeTest
-  Scenario Outline: Unauthenticated call
+  Scenario Outline: unauthenticated call
     # cannot perform with spaces WebDAV due to the absence of user
     Given using <dav_version> DAV path
     When an unauthenticated client connects to the DAV endpoint using the WebDAV API
@@ -23,7 +23,7 @@ Feature: refuse access
       | new         |
 
 
-  Scenario Outline: A disabled user cannot use webdav
+  Scenario Outline: disabled user cannot use webdav
     Given using <dav_version> DAV path
     And user "Alice" has been created with default attributes and without skeleton files
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "textfile0.txt"

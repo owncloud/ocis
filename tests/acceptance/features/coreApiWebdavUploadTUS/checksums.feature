@@ -1,11 +1,14 @@
 @api
 Feature: checksums
+  As a user
+  I want to upload resources with checksum
+  So that the integrity of the uploaded resources is maintained
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: Uploading a file with checksum should work
+  Scenario Outline: uploading a file with checksum should work
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 5                         |
@@ -28,7 +31,7 @@ Feature: checksums
       | spaces      | SHA1 8cb2237d0679ca88db6464eac60da96345513964 |
 
 
-  Scenario Outline: Uploading a file with checksum should return the checksum in the propfind
+  Scenario Outline: uploading a file with checksum should return the checksum in the propfind
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 5                         |
@@ -49,7 +52,7 @@ Feature: checksums
       | spaces      |
 
 
-  Scenario Outline: Uploading a file with checksum should return the checksum in the download header
+  Scenario Outline: uploading a file with checksum should return the checksum in the download header
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 5                         |
@@ -70,7 +73,7 @@ Feature: checksums
       | spaces      |
 
 
-  Scenario Outline: Uploading a file with incorrect checksum should not work
+  Scenario Outline: uploading a file with incorrect checksum should not work
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 5                         |
@@ -93,7 +96,7 @@ Feature: checksums
       | spaces      | SHA1 8cb2237d0679ca88db6464eac60da96345513963 |
 
 
-  Scenario Outline: Uploading a chunked file with correct checksum should work
+  Scenario Outline: uploading a chunked file with correct checksum should work
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 10                        |
@@ -114,7 +117,7 @@ Feature: checksums
       | spaces      |
 
 
-  Scenario Outline: Uploading a chunked file with correct checksum should return the checksum in the propfind
+  Scenario Outline: uploading a chunked file with correct checksum should return the checksum in the propfind
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 10                        |
@@ -136,7 +139,7 @@ Feature: checksums
       | spaces      |
 
 
-  Scenario Outline: Uploading a chunked file with checksum should return the checksum in the download header
+  Scenario Outline: uploading a chunked file with checksum should return the checksum in the download header
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 10                        |
@@ -158,7 +161,7 @@ Feature: checksums
       | spaces      |
 
 
-  Scenario Outline: Uploading second chunk of file with incorrect checksum should not work
+  Scenario Outline: uploading second chunk of file with incorrect checksum should not work
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 10                        |
@@ -179,7 +182,7 @@ Feature: checksums
       | spaces      |
 
 
-  Scenario Outline: Uploading a file with correct checksum and overwriting an existing file should return the checksum for new data in the propfind
+  Scenario Outline: uploading a file with correct checksum and overwriting an existing file should return the checksum for new data in the propfind
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 10                        |
@@ -208,7 +211,7 @@ Feature: checksums
       | spaces      | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
 
 
-  Scenario Outline: Uploading a file with correct checksum and overwriting an existing file with invalid checksum should not work
+  Scenario Outline: uploading a file with correct checksum and overwriting an existing file with invalid checksum should not work
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 10                        |
@@ -235,7 +238,7 @@ Feature: checksums
       | spaces      | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434a |
 
 
-  Scenario Outline: Overwriting an existing file with new data and checksum should return the checksum of new data in the propfind
+  Scenario Outline: overwriting an existing file with new data and checksum should return the checksum of new data in the propfind
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 5                         |
@@ -264,7 +267,7 @@ Feature: checksums
       | spaces      | SHA1 aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d |
 
 
-  Scenario Outline: Overwriting an existing file with new data and invalid checksum should not work
+  Scenario Outline: overwriting an existing file with new data and invalid checksum should not work
     Given using <dav_version> DAV path
     And user "Alice" has created a new TUS resource on the WebDAV API with these headers:
       | Upload-Length   | 5                         |

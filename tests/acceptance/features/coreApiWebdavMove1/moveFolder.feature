@@ -9,7 +9,7 @@ Feature: move (rename) folder
     And user "Alice" has been created with default attributes and without skeleton files
 
 
-  Scenario Outline: Renaming a folder to a backslash should return an error
+  Scenario Outline: renaming a folder to a backslash should return an error
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/testshare"
     When user "Alice" moves folder "/testshare" to "\" using the WebDAV API
@@ -27,7 +27,7 @@ Feature: move (rename) folder
       | spaces      |
 
 
-  Scenario Outline: Renaming a folder beginning with a backslash should return an error
+  Scenario Outline: renaming a folder beginning with a backslash should return an error
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/testshare"
     When user "Alice" moves folder "/testshare" to "\testshare" using the WebDAV API
@@ -45,7 +45,7 @@ Feature: move (rename) folder
       | spaces      |
 
 
-  Scenario Outline: Renaming a folder including a backslash encoded should return an error
+  Scenario Outline: renaming a folder including a backslash encoded should return an error
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/testshare"
     When user "Alice" moves folder "/testshare" to "/hola\hola" using the WebDAV API
@@ -63,7 +63,7 @@ Feature: move (rename) folder
       | spaces      |
 
 
-  Scenario Outline: Move a folder into an other one
+  Scenario Outline: move a folder into an other folder
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/testshare"
     And user "Alice" has created folder "/an-other-folder"
@@ -84,7 +84,7 @@ Feature: move (rename) folder
       | spaces      |
 
 
-  Scenario Outline: Move a folder into a nonexistent one
+  Scenario Outline: move a folder into a nonexistent folder
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/testshare"
     When user "Alice" moves folder "/testshare" to "/not-existing/testshare" using the WebDAV API
@@ -132,7 +132,7 @@ Feature: move (rename) folder
       | spaces      | /..upload     |
 
   @skipOnRevaMaster @issue-3023
-  Scenario Outline: Moving a folder into a sub-folder of itself
+  Scenario Outline: moving a folder into a sub-folder of itself
     Given using <dav_version> DAV path
     And user "Alice" has created folder "PARENT"
     And user "Alice" has created folder "PARENT/CHILD"
