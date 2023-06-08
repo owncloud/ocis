@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-06-08-20-00-23]
+[#deprecation-note-2023-06-08-20-17-01]
 [caption=]
 .Deprecation notes for the app-provider service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -30,6 +30,15 @@ endif::[]
 | Type
 | Default Value
 | Description
+
+a|`APP_PROVIDER_SERVICE_NAME` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++app-provider ++
+a| [subs=-attributes]
+The name of the service. This needs to be changed when using more than one app provider. Each of them needs be found by a unique service name. Possible examples are: "app-provider-collabora", "app-provider-onlyoffice", "app-provider-office365".
 
 a|`OCIS_TRACING_ENABLED` +
 `APP_PROVIDER_TRACING_ENABLED` +
@@ -177,7 +186,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-06-08-20-00-23[Deprecation Note]
+xref:deprecation-note-2023-06-08-20-17-01[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]

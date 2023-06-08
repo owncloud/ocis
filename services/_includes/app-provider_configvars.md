@@ -2,6 +2,7 @@
 
 | Name | Type | Default Value | Description |
 |------|------|---------------|-------------|
+| APP_PROVIDER_SERVICE_NAME | string | app-provider | The name of the service. This needs to be changed when using more than one app provider. Each of them needs be found by a unique service name. Possible examples are: "app-provider-collabora", "app-provider-onlyoffice", "app-provider-office365".|
 | OCIS_TRACING_ENABLED<br/>APP_PROVIDER_TRACING_ENABLED | bool | false | Activates tracing.|
 | OCIS_TRACING_TYPE<br/>APP_PROVIDER_TRACING_TYPE | string |  | The type of tracing. Defaults to "", which is the same as "jaeger". Allowed tracing types are "jaeger" and "" as of now.|
 | OCIS_TRACING_ENDPOINT<br/>APP_PROVIDER_TRACING_ENDPOINT | string |  | The endpoint of the tracing agent.|
