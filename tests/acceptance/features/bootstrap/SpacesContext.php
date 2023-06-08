@@ -3153,6 +3153,15 @@ class SpacesContext implements Context {
 				case "oc:privatelink":
 					Assert::assertEquals($this->getPrivateLink($user, $spaceNameOrMountPoint), $responseValue, 'cannot find private link for space or resource in the response');
 					break;
+				case "oc:tags":
+					// The value should be a comma-separated string of tag names.
+					// We do not care what order they happen to be in, so compare as sorted lists.
+					$expectedTags = \explode(",", $value);
+					$expectedTags = \sort($expectedTags);
+					$actualTags = \explode(",", $responseValue);
+					$actualTags = \sort($actualTags);
+					Assert::assertEquals($expectedTags, $actualTags, "wrong $findItem in the response");
+					break;
 				default:
 					Assert::assertEquals($value, $responseValue, "wrong $findItem in the response");
 					break;
