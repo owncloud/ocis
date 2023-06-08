@@ -179,6 +179,7 @@ func (c *Cache) Persist(ctx context.Context, userID string) error {
 	span.SetAttributes(attribute.String("cs3.userid", userID))
 
 	if c.ReceivedSpaces[userID] == nil {
+		span.SetStatus(codes.Ok, "no received shares")
 		return nil
 	}
 
@@ -188,11 +189,15 @@ func (c *Cache) Persist(ctx context.Context, userID string) error {
 	createdBytes, err := json.Marshal(c.ReceivedSpaces[userID])
 	if err != nil {
 		c.ReceivedSpaces[userID].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	jsonPath := userJSONPath(userID)
 	if err := c.storage.MakeDirIfNotExist(ctx, path.Dir(jsonPath)); err != nil {
 		c.ReceivedSpaces[userID].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 
@@ -202,8 +207,11 @@ func (c *Cache) Persist(ctx context.Context, userID string) error {
 		IfUnmodifiedSince: c.ReceivedSpaces[userID].Mtime,
 	}); err != nil {
 		c.ReceivedSpaces[userID].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
+	span.SetStatus(codes.Ok, "")
 	return nil
 }
 

@@ -168,6 +168,7 @@ func (c *Cache) PersistWithTime(ctx context.Context, storageID, spaceID string, 
 	span.SetAttributes(attribute.String("cs3.storageid", storageID), attribute.String("cs3.spaceid", spaceID))
 
 	if c.Providers[storageID] == nil || c.Providers[storageID].Spaces[spaceID] == nil {
+		span.SetStatus(codes.Ok, "no shares in provider or space")
 		return nil
 	}
 
@@ -178,11 +179,15 @@ func (c *Cache) PersistWithTime(ctx context.Context, storageID, spaceID string, 
 	createdBytes, err := json.Marshal(c.Providers[storageID].Spaces[spaceID])
 	if err != nil {
 		c.Providers[storageID].Spaces[spaceID].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 	jsonPath := spaceJSONPath(storageID, spaceID)
 	if err := c.storage.MakeDirIfNotExist(ctx, path.Dir(jsonPath)); err != nil {
 		c.Providers[storageID].Spaces[spaceID].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
 
@@ -192,8 +197,11 @@ func (c *Cache) PersistWithTime(ctx context.Context, storageID, spaceID string, 
 		IfUnmodifiedSince: c.Providers[storageID].Spaces[spaceID].Mtime,
 	}); err != nil {
 		c.Providers[storageID].Spaces[spaceID].Mtime = oldMtime
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return err
 	}
+	span.SetStatus(codes.Ok, "")
 	return nil
 }
 
