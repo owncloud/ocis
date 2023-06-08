@@ -41,7 +41,7 @@ type Log struct {
 }
 
 type Service struct {
-	Name string `yaml:"-"`
+	Name string `yaml:"name" env:"APP_PROVIDER_SERVICE_NAME" desc:"The name of the service. This needs to be changed when using more than one app provider. Each of them needs be found by a unique service name. Possible examples are: \"app-provider-collabora\", \"app-provider-onlyoffice\", \"app-provider-office365\"."`
 }
 
 type Debug struct {
