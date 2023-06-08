@@ -72,7 +72,7 @@ require (
 	github.com/shamaton/msgpack/v2 v2.1.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.7.0
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.2
 	github.com/tus/tusd v1.10.1
@@ -80,6 +80,7 @@ require (
 	github.com/xhit/go-simple-mail/v2 v2.13.0
 	go-micro.dev/v4 v4.9.0
 	go.etcd.io/bbolt v1.3.7
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.42.1-0.20230608065455-5cc3715df180
 	go.opentelemetry.io/contrib/zpages v0.42.0
 	go.opentelemetry.io/otel v1.16.0
 	go.opentelemetry.io/otel/exporters/jaeger v1.15.1

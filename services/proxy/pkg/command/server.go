@@ -40,6 +40,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 	"github.com/urfave/cli/v2"
 	microstore "go-micro.dev/v4/store"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 // Server is the entrypoint for the server command.
@@ -377,6 +378,12 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 
 	return alice.New(
 		// first make sure we log all requests and redirect to https if necessary
+		otelhttp.NewMiddleware("proxy",
+			otelhttp.WithTracerProvider(tracing.TraceProvider),
+			otelhttp.WithSpanNameFormatter(func(name string, r *http.Request) string {
+				return fmt.Sprintf("%s %s", r.Method, r.URL.Path)
+			}),
+		),
 		middleware.Tracer(),
 		pkgmiddleware.TraceContext,
 		chimiddleware.RealIP,
