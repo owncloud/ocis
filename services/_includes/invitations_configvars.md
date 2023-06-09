@@ -18,13 +18,13 @@
 | INVITATIONS_HTTP_ROOT | string | /graph/v1.0 | Subdirectory that serves as the root for this HTTP service.|
 | OCIS_CORS_ALLOW_ORIGINS<br/>INVITATIONS_CORS_ALLOW_ORIGINS | []string | [*] | A comma-separated list of allowed CORS origins. See following chapter for more details: *Access-Control-Allow-Origin* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin|
 | OCIS_CORS_ALLOW_METHODS<br/>INVITATIONS_CORS_ALLOW_METHODS | []string | [] | A comma-separated list of allowed CORS methods. See following chapter for more details: *Access-Control-Request-Method* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Method|
-| OCIS_CORS_ALLOW_HEADERS<br/>INVITATIONS_CORS_ALLOW_HEADERS | []string | [] | A comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.|
+| OCIS_CORS_ALLOW_HEADERS<br/>INVITATIONS_CORS_ALLOW_HEADERS | []string | [] | A blank or comma-separated list of allowed CORS headers. See following chapter for more details: *Access-Control-Request-Headers* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Request-Headers.|
 | OCIS_CORS_ALLOW_CREDENTIALS<br/>INVITATIONS_CORS_ALLOW_CREDENTIALS | bool | false | Allow credentials for CORS.See following chapter for more details: *Access-Control-Allow-Credentials* at https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.|
 | OCIS_HTTP_TLS_ENABLED | bool | false | Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.|
 | OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|
 | OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
 | OCIS_KEYCLOAK_BASE_PATH<br/>INVITATIONS_KEYCLOAK_BASE_PATH | string |  | The URL to access keycloak.|
-| OCIS_KEYCLOAK_CLIENT_ID<br/>INVITATIONS_KEYCLOAK_CLIENT_ID | string |  | The client id to authenticate with keycloak.|
+| OCIS_KEYCLOAK_CLIENT_ID<br/>INVITATIONS_KEYCLOAK_CLIENT_ID | string |  | The client ID to authenticate with keycloak.|
 | OCIS_KEYCLOAK_CLIENT_SECRET<br/>INVITATIONS_KEYCLOAK_CLIENT_SECRET | string |  | The client secret to use in authentication.|
 | OCIS_KEYCLOAK_CLIENT_REALM<br/>INVITATIONS_KEYCLOAK_CLIENT_REALM | string |  | The realm the client is defined in.|
 | OCIS_KEYCLOAK_USER_REALM<br/>INVITATIONS_KEYCLOAK_USER_REALM | string |  | The realm users are defined.|

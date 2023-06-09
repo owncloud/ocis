@@ -52,7 +52,7 @@
 | IDP_LDAP_LOGIN_ATTRIBUTE | string | uid | LDAP User attribute to use for login like 'uid'.|
 | OCIS_LDAP_USER_SCHEMA_MAIL<br/>LDAP_USER_SCHEMA_MAIL<br/>IDP_LDAP_EMAIL_ATTRIBUTE | string | mail | LDAP User email attribute like 'mail'.|
 | OCIS_LDAP_USER_SCHEMA_USERNAME<br/>LDAP_USER_SCHEMA_USERNAME<br/>IDP_LDAP_NAME_ATTRIBUTE | string | displayName | LDAP User name attribute like 'displayName'.|
-| OCIS_LDAP_USER_SCHEMA_ID<br/>LDAP_USER_SCHEMA_ID<br/>IDP_LDAP_UUID_ATTRIBUTE | string | ownCloudUUID | LDAP User uuid attribute like 'uid'.|
+| OCIS_LDAP_USER_SCHEMA_ID<br/>LDAP_USER_SCHEMA_ID<br/>IDP_LDAP_UUID_ATTRIBUTE | string | ownCloudUUID | LDAP User UUID attribute like 'uid'.|
 | IDP_LDAP_UUID_ATTRIBUTE_TYPE | string | text | LDAP User uuid attribute type like 'text'.|
 | OCIS_LDAP_USER_ENABLED_ATTRIBUTE<br/>LDAP_USER_ENABLED_ATTRIBUTE<br/>IDP_USER_ENABLED_ATTRIBUTE | string | ownCloudUserEnabled | LDAP Attribute to use as a flag telling if the user is enabled or disabled.|
 | OCIS_LDAP_USER_FILTER<br/>LDAP_USER_FILTER<br/>IDP_LDAP_FILTER | string |  | LDAP filter to add to the default filters for user search like '(objectclass=ownCloud)'.|

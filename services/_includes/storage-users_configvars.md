@@ -89,6 +89,6 @@
 | STORAGE_USERS_EXPOSE_DATA_SERVER | bool | false | Exposes the data server directly to users and bypasses the data gateway. Ensure that the data server address is reachable by users.|
 | STORAGE_USERS_READ_ONLY | bool | false | Set this storage to be read-only.|
 | STORAGE_USERS_UPLOAD_EXPIRATION | int64 | 86400 | Duration in seconds after which uploads will expire. Note that when setting this to a low number, uploads could be cancelled before they are finished and return a 403 to the user.|
-| OCIS_ADMIN_USER_ID<br/>STORAGE_USERS_PURGE_TRASH_BIN_USER_ID | string |  | ID of the user who collects all necessary information for deletion.|
+| OCIS_ADMIN_USER_ID<br/>STORAGE_USERS_PURGE_TRASH_BIN_USER_ID | string |  | ID of the user who collects all necessary information for deletion. Consider that the UUID can be encoded in some LDAP deployment configurations like in .ldif files. These need to be decoded beforehand.|
 | STORAGE_USERS_PURGE_TRASH_BIN_PERSONAL_DELETE_BEFORE | Duration | 720h0m0s | Specifies the period of time in which items that have been in the personal trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion. The value is human-readable, valid values are '24h', '60m', '60s' etc.|
 | STORAGE_USERS_PURGE_TRASH_BIN_PROJECT_DELETE_BEFORE | Duration | 720h0m0s | Specifies the period of time in which items that have been in the project trash-bin for longer than this value should be deleted. A value of 0 means no automatic deletion. The value is human-readable, valid values are '24h', '60m', '60s' etc.|
