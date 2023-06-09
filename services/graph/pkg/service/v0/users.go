@@ -65,12 +65,7 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 		me, err = g.identityBackend.GetUser(r.Context(), u.GetId().GetOpaqueId(), odataReq)
 		if err != nil {
 			logger.Debug().Err(err).Interface("user", u).Msg("could not get user from backend")
-			var errcode errorcode.Error
-			if errors.As(err, &errcode) {
-				errcode.Render(w, r)
-			} else {
-				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			}
+			errorcode.RenderError(w, r, err)
 			return
 		}
 		if me.MemberOf == nil {
@@ -84,12 +79,7 @@ func (g Graph) GetMe(w http.ResponseWriter, r *http.Request) {
 		me.AppRoleAssignments, err = g.fetchAppRoleAssignments(r.Context(), me.GetId())
 		if err != nil {
 			logger.Debug().Err(err).Str("userid", me.GetId()).Msg("could not get appRoleAssignments for self")
-			var errcode errorcode.Error
-			if errors.As(err, &errcode) {
-				errcode.Render(w, r)
-			} else {
-				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			}
+			errorcode.RenderError(w, r, err)
 			return
 		}
 	}
@@ -318,12 +308,7 @@ func (g Graph) PostUser(w http.ResponseWriter, r *http.Request) {
 	logger.Debug().Interface("user", u).Msg("calling create user on backend")
 	if u, err = g.identityBackend.CreateUser(r.Context(), *u); err != nil {
 		logger.Error().Err(err).Msg("could not create user: backend error")
-		var ecErr errorcode.Error
-		if errors.As(err, &ecErr) {
-			ecErr.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -392,12 +377,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get user: error fetching user from backend")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -490,12 +470,7 @@ func (g Graph) GetUser(w http.ResponseWriter, r *http.Request) {
 		user.AppRoleAssignments, err = g.fetchAppRoleAssignments(r.Context(), user.GetId())
 		if err != nil {
 			logger.Debug().Err(err).Str("userid", user.GetId()).Msg("could not get appRoleAssignments for user")
-			var errcode errorcode.Error
-			if errors.As(err, &errcode) {
-				errcode.Render(w, r)
-			} else {
-				errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			}
+			errorcode.RenderError(w, r, err)
 			return
 		}
 	}
@@ -534,12 +509,7 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	user, err := g.identityBackend.GetUser(r.Context(), userID, odataReq)
 	if err != nil {
 		logger.Debug().Err(err).Str("userID", userID).Msg("failed to get user from backend")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -619,13 +589,8 @@ func (g Graph) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete user: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			return
-		}
+		errorcode.RenderError(w, r, err)
+		return
 	}
 
 	g.publishEvent(e)
@@ -703,12 +668,7 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	u, err := g.identityBackend.UpdateUser(r.Context(), nameOrID, *changes)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not update user: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 

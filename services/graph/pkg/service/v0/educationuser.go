@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -35,12 +34,7 @@ func (g Graph) GetEducationUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := g.identityEducationBackend.GetEducationUsers(r.Context())
 	if err != nil {
 		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get education users from backend")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -144,12 +138,7 @@ func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger.Debug().Interface("user", u).Msg("calling create education user on backend")
 	if u, err = g.identityEducationBackend.CreateEducationUser(r.Context(), *u); err != nil {
 		logger.Debug().Err(err).Msg("could not create education user: backend error")
-		var ecErr errorcode.Error
-		if errors.As(err, &ecErr) {
-			ecErr.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -186,12 +175,7 @@ func (g Graph) GetEducationUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get education user: error fetching education user from backend")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -220,12 +204,7 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 	user, err := g.identityEducationBackend.GetEducationUser(r.Context(), userID)
 	if err != nil {
 		logger.Debug().Err(err).Str("userID", userID).Msg("failed to get education user from backend")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -305,13 +284,8 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete education user: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-			return
-		}
+		errorcode.RenderError(w, r, err)
+		return
 	}
 
 	g.publishEvent(e)
@@ -382,12 +356,7 @@ func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 	u, err := g.identityEducationBackend.UpdateEducationUser(r.Context(), nameOrID, *changes)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not update education user: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
