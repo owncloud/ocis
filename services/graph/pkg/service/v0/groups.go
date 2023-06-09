@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -36,12 +35,7 @@ func (g Graph) GetGroups(w http.ResponseWriter, r *http.Request) {
 	groups, err := g.identityBackend.GetGroups(r.Context(), r.URL.Query())
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get groups: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -67,7 +61,13 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if _, ok := grp.GetDisplayNameOk(); !ok {
+	if displayName, ok := grp.GetDisplayNameOk(); ok {
+		if !isValidGroupName(*displayName) {
+			logger.Info().Str("group", *displayName).Msg("could not create group: invalid displayName")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Invalid displayName")
+			return
+		}
+	} else {
 		logger.Debug().Err(err).Interface("group", grp).Msg("could not create group: missing required attribute")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Missing Required Attribute")
 		return
@@ -83,13 +83,8 @@ func (g Graph) PostGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if grp, err = g.identityBackend.CreateGroup(r.Context(), *grp); err != nil {
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			logger.Debug().Interface("group", grp).Msg("could not create group: backend error")
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		logger.Debug().Err(err).Interface("group", grp).Msg("could not create group: backend error")
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -139,8 +134,17 @@ func (g Graph) PatchGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if changes.HasDisplayName() {
-		groupName := changes.GetDisplayName()
-		err = g.identityBackend.UpdateGroupName(r.Context(), groupID, groupName)
+		displayName := changes.GetDisplayName()
+		if !isValidGroupName(displayName) {
+			logger.Info().Str("group", displayName).Msg("could not update group: invalid displayName")
+			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "Invalid displayName")
+			return
+		}
+		if err = g.identityBackend.UpdateGroupName(r.Context(), groupID, displayName); err != nil {
+			logger.Debug().Err(err).Msg("could not update group displayName")
+			errorcode.RenderError(w, r, err)
+			return
+		}
 	}
 
 	if memberRefs, ok := changes.GetMembersodataBindOk(); ok {
@@ -176,19 +180,13 @@ func (g Graph) PatchGroup(w http.ResponseWriter, r *http.Request) {
 			}
 			memberIDs = append(memberIDs, id)
 		}
-		err = g.identityBackend.AddMembersToGroup(r.Context(), groupID, memberIDs)
+		if err = g.identityBackend.AddMembersToGroup(r.Context(), groupID, memberIDs); err != nil {
+			logger.Debug().Err(err).Msg("could not change group: backend could not add members")
+			errorcode.RenderError(w, r, err)
+			return
+		}
 	}
 
-	if err != nil {
-		logger.Debug().Err(err).Msg("could not change group: backend could not add members")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
-		return
-	}
 	render.Status(r, http.StatusNoContent) // TODO StatusNoContent when prefer=minimal is used, otherwise OK and the resource in the body
 	render.NoContent(w, r)
 }
@@ -217,12 +215,8 @@ func (g Graph) GetGroup(w http.ResponseWriter, r *http.Request) {
 	group, err := g.identityBackend.GetGroup(r.Context(), groupID, r.URL.Query())
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get group: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
+		return
 	}
 
 	render.Status(r, http.StatusOK)
@@ -252,12 +246,7 @@ func (g Graph) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete group: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -302,12 +291,7 @@ func (g Graph) GetGroupMembers(w http.ResponseWriter, r *http.Request) {
 	members, err := g.identityBackend.GetGroupMembers(r.Context(), groupID, odataReq)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get group members: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -371,12 +355,7 @@ func (g Graph) PostGroupMember(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not add group member: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -429,12 +408,7 @@ func (g Graph) DeleteGroupMember(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete group member: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 	e := events.GroupMemberRemoved{
@@ -471,4 +445,9 @@ func sortGroups(req *godata.GoDataRequest, groups []*libregraph.Group) ([]*libre
 	}
 
 	return groups, nil
+}
+
+func isValidGroupName(e string) bool {
+	str := strings.TrimSpace(e)
+	return len(str) > 0 && len(str) <= 256
 }

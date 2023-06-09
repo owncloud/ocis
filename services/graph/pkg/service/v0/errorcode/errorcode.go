@@ -1,6 +1,7 @@
 package errorcode
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -120,4 +121,13 @@ func (e ErrorCode) String() string {
 
 func (e Error) Error() string {
 	return errorCodes[e.errorCode]
+}
+
+func RenderError(w http.ResponseWriter, r *http.Request, err error) {
+	var errcode Error
+	if errors.As(err, &errcode) {
+		errcode.Render(w, r)
+	} else {
+		GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+	}
 }

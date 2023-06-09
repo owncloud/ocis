@@ -186,6 +186,13 @@ func (i *LDAP) CreateGroup(ctx context.Context, group libregraph.Group) (*libreg
 	}
 
 	if err := i.conn.Add(ar); err != nil {
+		var lerr *ldap.Error
+		logger.Debug().Str("backend", "ldap").Str("dn", group.GetDisplayName()).Err(err).Msg("Failed to create group")
+		if errors.As(err, &lerr) {
+			if lerr.ResultCode == ldap.LDAPResultEntryAlreadyExists {
+				err = errorcode.New(errorcode.NameAlreadyExists, "group already exists")
+			}
+		}
 		return nil, err
 	}
 
