@@ -32,12 +32,7 @@ func (g Graph) GetEducationSchools(w http.ResponseWriter, r *http.Request) {
 	schools, err := g.identityEducationBackend.GetEducationSchools(r.Context())
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get schools: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -86,12 +81,7 @@ func (g Graph) PostEducationSchool(w http.ResponseWriter, r *http.Request) {
 
 	if school, err = g.identityEducationBackend.CreateEducationSchool(r.Context(), *school); err != nil {
 		logger.Debug().Err(err).Interface("school", school).Msg("could not create school: backend error")
-		var eerr errorcode.Error
-		if errors.As(err, &eerr) {
-			eerr.Render(w, r)
-			return
-		}
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -177,12 +167,8 @@ func (g Graph) GetEducationSchool(w http.ResponseWriter, r *http.Request) {
 	school, err := g.identityEducationBackend.GetEducationSchool(r.Context(), schoolID)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get school: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
+		return
 	}
 
 	render.Status(r, http.StatusOK)
@@ -211,7 +197,7 @@ func (g Graph) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
 	users, err := g.identityEducationBackend.GetEducationSchoolUsers(r.Context(), schoolID)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get school users: backend error")
-		renderInternalServerError(w, r, err)
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -223,7 +209,8 @@ func (g Graph) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 			logger.Debug().Err(err).Msg("could not delete school member: backend error")
-			renderInternalServerError(w, r, err)
+			errorcode.RenderError(w, r, err)
+			// TODO Do we need return right hear?
 		}
 	}
 
@@ -232,7 +219,7 @@ func (g Graph) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete school: backend error")
-		renderInternalServerError(w, r, err)
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -246,15 +233,6 @@ func (g Graph) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
 
 	render.Status(r, http.StatusNoContent)
 	render.NoContent(w, r)
-}
-
-func renderInternalServerError(w http.ResponseWriter, r *http.Request, err error) {
-	var errcode errorcode.Error
-	if errors.As(err, &errcode) {
-		errcode.Render(w, r)
-	} else {
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-	}
 }
 
 // GetEducationSchoolUsers implements the Service interface.
@@ -279,12 +257,7 @@ func (g Graph) GetEducationSchoolUsers(w http.ResponseWriter, r *http.Request) {
 	users, err := g.identityEducationBackend.GetEducationSchoolUsers(r.Context(), schoolID)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get school users: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -348,12 +321,7 @@ func (g Graph) PostEducationSchoolUser(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not add school user: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -406,12 +374,7 @@ func (g Graph) DeleteEducationSchoolUser(w http.ResponseWriter, r *http.Request)
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete school member: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -449,12 +412,7 @@ func (g Graph) GetEducationSchoolClasses(w http.ResponseWriter, r *http.Request)
 	classes, err := g.identityEducationBackend.GetEducationSchoolClasses(r.Context(), schoolID)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get school classes: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -518,12 +476,7 @@ func (g Graph) PostEducationSchoolClass(w http.ResponseWriter, r *http.Request) 
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not add school class: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -576,12 +529,7 @@ func (g Graph) DeleteEducationSchoolClass(w http.ResponseWriter, r *http.Request
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete school class: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 

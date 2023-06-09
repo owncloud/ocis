@@ -1,7 +1,6 @@
 package svc
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -34,12 +33,7 @@ func (g Graph) GetEducationClasses(w http.ResponseWriter, r *http.Request) {
 	classes, err := g.identityEducationBackend.GetEducationClasses(r.Context())
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get classes: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -82,12 +76,7 @@ func (g Graph) PostEducationClass(w http.ResponseWriter, r *http.Request) {
 
 	if class, err = g.identityEducationBackend.CreateEducationClass(r.Context(), *class); err != nil {
 		logger.Debug().Interface("class", class).Msg("could not create class: backend error")
-		var eerr errorcode.Error
-		if errors.As(err, &eerr) {
-			eerr.Render(w, r)
-			return
-		}
-		errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -183,12 +172,7 @@ func (g Graph) PatchEducationClass(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not change class: backend could not add members")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -233,12 +217,8 @@ func (g Graph) GetEducationClass(w http.ResponseWriter, r *http.Request) {
 	class, err := g.identityEducationBackend.GetEducationClass(r.Context(), classID)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get class: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
+		return
 	}
 
 	render.Status(r, http.StatusOK)
@@ -268,12 +248,7 @@ func (g Graph) DeleteEducationClass(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete class: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -308,12 +283,7 @@ func (g Graph) GetEducationClassMembers(w http.ResponseWriter, r *http.Request) 
 	members, err := g.identityEducationBackend.GetEducationClassMembers(r.Context(), classID)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get class members: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -377,12 +347,7 @@ func (g Graph) PostEducationClassMember(w http.ResponseWriter, r *http.Request) 
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not add class member: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -431,12 +396,7 @@ func (g Graph) DeleteEducationClassMember(w http.ResponseWriter, r *http.Request
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete class member: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 	/* TODO requires reva changes
@@ -469,12 +429,7 @@ func (g Graph) GetEducationClassTeachers(w http.ResponseWriter, r *http.Request)
 	teachers, err := g.identityEducationBackend.GetEducationClassTeachers(r.Context(), classID)
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not get class teachers: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -538,12 +493,7 @@ func (g Graph) PostEducationClassTeacher(w http.ResponseWriter, r *http.Request)
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not add class teacher: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 
@@ -592,12 +542,7 @@ func (g Graph) DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Reques
 
 	if err != nil {
 		logger.Debug().Err(err).Msg("could not delete class teacher: backend error")
-		var errcode errorcode.Error
-		if errors.As(err, &errcode) {
-			errcode.Render(w, r)
-		} else {
-			errorcode.GeneralException.Render(w, r, http.StatusInternalServerError, err.Error())
-		}
+		errorcode.RenderError(w, r, err)
 		return
 	}
 	/* TODO requires reva changes
