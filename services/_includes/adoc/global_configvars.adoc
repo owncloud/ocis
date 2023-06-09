@@ -1,5 +1,12 @@
 // collected through docs/helpers/adoc-generator.go.tmpl
 
+Note that some global environment variables have been deprecated and replaced by a new one starting with `OCIS_` for naming consistency:
+
+* All envvars starting with `LDAP_`
+* All envvars starting with `IDM_` except `IDM_CREATE_DEMO_USERS`
+* The following envvars: `REVA_GATEWAY`, `STORAGE_TRANSFER_SECRET`, `STORAGE_USERS_OCIS_ASYNC_UPLOADS`, `USERLOG_MACHINE_AUTH_API_KEY`.
+* Note that `WEB_UI_CONFIG_FILE` is not a global envar and will dropped from the list in a later release. 
+
 [.landscape]
 [caption=]
 .Environment variables with global scope available in multiple services
@@ -602,13 +609,9 @@ a| `OCIS_CACHE_DATABASE`
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
@@ -625,14 +628,10 @@ a| `OCIS_CACHE_SIZE`
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
@@ -649,14 +648,10 @@ a| `OCIS_CACHE_STORE`
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
@@ -673,14 +668,10 @@ a| `OCIS_CACHE_STORE_NODES`
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
@@ -697,14 +688,10 @@ a| `OCIS_CACHE_TTL`
 a| [subs=attributes+]
 * xref:{s-path}/frontend.adoc[frontend] +
 * xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
-* xref:{s-path}/gateway.adoc[gateway] +
 * xref:{s-path}/graph.adoc[graph] +
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
 * xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
@@ -2080,9 +2067,6 @@ a| `OCIS_SYSTEM_USER_API_KEY`
 a| [subs=attributes+]
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sharing.adoc[sharing] +
-* xref:{s-path}/sharing.adoc[sharing] +
-* xref:{s-path}/sharing.adoc[sharing] +
-* xref:{s-path}/sharing.adoc[sharing] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
 
 a| [subs=-attributes]
@@ -2099,9 +2083,6 @@ a| `OCIS_SYSTEM_USER_ID`
 a| [subs=attributes+]
 * xref:{s-path}/settings.adoc[settings] +
 * xref:{s-path}/sharing.adoc[sharing] +
-* xref:{s-path}/sharing.adoc[sharing] +
-* xref:{s-path}/sharing.adoc[sharing] +
-* xref:{s-path}/sharing.adoc[sharing] +
 * xref:{s-path}/storage-system.adoc[storage-system] +
 
 a| [subs=-attributes]
@@ -2117,9 +2098,6 @@ a| `OCIS_SYSTEM_USER_IDP`
 
 a| [subs=attributes+]
 * xref:{s-path}/settings.adoc[settings] +
-* xref:{s-path}/sharing.adoc[sharing] +
-* xref:{s-path}/sharing.adoc[sharing] +
-* xref:{s-path}/sharing.adoc[sharing] +
 * xref:{s-path}/sharing.adoc[sharing] +
 
 a| [subs=-attributes]
@@ -2346,10 +2324,7 @@ a| [subs=attributes+]
 * xref:{s-path}/proxy.adoc[proxy] +
 * xref:{s-path}/users.adoc[users] +
 * xref:{s-path}/web.adoc[web] +
-* xref:{s-path}/web.adoc[web] +
-* xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/webdav.adoc[webdav] +
-* xref:{s-path}/webfinger.adoc[webfinger] +
 * xref:{s-path}/webfinger.adoc[webfinger] +
 
 a| [subs=-attributes]
@@ -2432,7 +2407,6 @@ a| `STORAGE_USERS_PERMISSION_ENDPOINT`
 
 a| [subs=attributes+]
 * xref:{s-path}/storage-users.adoc[storage-users] +
-* xref:{s-path}/storage-users.adoc[storage-users] +
 
 a| [subs=-attributes]
 ++string ++
@@ -2461,7 +2435,6 @@ Machine auth API key used to validate internal requests necessary to access reso
 a| `WEB_UI_CONFIG_FILE`
 
 a| [subs=attributes+]
-* xref:{s-path}/web.adoc[web] +
 * xref:{s-path}/web.adoc[web] +
 
 a| [subs=-attributes]

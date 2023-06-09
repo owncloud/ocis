@@ -476,7 +476,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-The ocis application id shown in the graph. All app roles are tied to this.
+The ocis application ID shown in the graph. All app roles are tied to this ID.
 
 a|`GRAPH_APPLICATION_DISPLAYNAME` +
 
