@@ -123,6 +123,7 @@ func (e Error) Error() string {
 	return errorCodes[e.errorCode]
 }
 
+// RenderError render the Graph Error based on a code or default one
 func RenderError(w http.ResponseWriter, r *http.Request, err error) {
 	var errcode Error
 	if errors.As(err, &errcode) {

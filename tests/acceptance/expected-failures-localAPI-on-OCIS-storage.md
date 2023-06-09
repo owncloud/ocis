@@ -43,10 +43,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiSpacesShares/shareUploadTUS.feature:219](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L219)
 - [apiSpacesShares/shareUploadTUS.feature:284](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareUploadTUS.feature#L284)
 
-### [Creating group with empty name returns status code 200](https://github.com/owncloud/ocis/issues/5050)
-
-- [apiGraph/createGroup.feature:48](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/createGroup.feature#L48)
-
 ### [Settings service user can list other peoples assignments](https://github.com/owncloud/ocis/issues/5032)
 
 - [apiAccountsHashDifficulty/assignRole.feature:28](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiAccountsHashDifficulty/assignRole.feature#L28)
