@@ -74,7 +74,21 @@ To run the tests that require an email server (tests tagged with `@email`), you 
 
 ```bash
 START_EMAIL=true \
-BEHAT_FEATURE='tests/acceptance/features/apiEmailNotification/emailNotification.feature' \
+BEHAT_FEATURE='tests/acceptance/features/apiNotification/emailNotification.feature' \
+make -C tests/acceptance/docker test-ocis-feature-ocis-storage
+```
+
+{{< /hint >}}
+
+{{< hint info >}}
+To run the tests that require an antivirus service (tests tagged with `@antivirus`), you need to provide the following environment variables while running the tests.
+
+```bash
+START_ANTIVIRUS=true \
+OCIS_ASYNC_UPLOADS=true \
+OCIS_ADD_RUN_SERVICES=antivirus \
+POSTPROCESSING_STEPS=virusscan \
+BEHAT_FEATURE='tests/acceptance/features/apiAntivirus/antivirus.feature' \
 make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 ```
 
@@ -428,7 +442,7 @@ The commands are ubuntu specific and may differ according to your system. You ca
 
 #### 2. Setup clamAV With Docker
 ##### a. Create a Volume
-For `clamAV` only local sockets can currently be configured we need to create a volume in order to share the socket with `oCIS server`. Run the following command to do so:
+For `clamAV` only local sockets can currently be configured, we need to create a volume in order to share the socket with `oCIS server`. Run the following command to do so:
 ```bash
  docker volume create -d local -o device=/your/local/filesystem/path/ -o o=bind -o type=none clamav_vol
 ```
@@ -442,7 +456,7 @@ The path to the socket i.e. `/var/run/clamav/` may differ as per the image you a
 {{< /hint>}}
 
 ##### b. Change Ownership
-Change the ownership of the path of your local filesystem that the volume `clamav_vol` is mounted on. After running `clamav` through docker the ownership of the bound path gets changed. As we need to provide this path to ocis server the ownership should be changed back to $USER or whatever ownership that your server requires.
+Change the ownership of the path of your local filesystem that the volume `clamav_vol` is mounted on. After running `clamav` through docker the ownership of the bound path gets changed. As we need to provide this path to ocis server, the ownership should be changed back to $USER or whatever ownership that your server requires.
 ```bash
  sudo chown -R $USER:$USER /your/local/filesystem/path/
 ```
@@ -451,7 +465,7 @@ Make sure that `clamAV` is fully up before running this command. The command is 
 {{< /hint>}}
 
 {{< hint info >}}
-If you want to use the same volume after the container is down. Before running the container once again you need to either remove all the data inside `/your/local/filesystem/path/` or give the ownership back. For instance, it ubuntu it might be `sudo chown -R systemd-network:systemd-journal /your/local/filesystem/path/`  and repeat step 2 and 3`
+If you want to use the same volume after the container is down then before running the container once again, you either need to remove all the data inside `/your/local/filesystem/path/` or give the ownership back. For instance, on Ubuntu it might be `sudo chown -R systemd-network:systemd-journal /your/local/filesystem/path/`  and repeat `step 2 and 3`
 {{< /hint>}}
 
 ### Run oCIS
