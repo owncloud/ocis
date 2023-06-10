@@ -70,7 +70,7 @@ But some test suites that are tagged with `@env-config` require the oCIS server 
 {{< /hint >}}
 
 {{< hint info >}}
-To run the tests that requires an email server (tests tagged with `@email`), you need to provide `START_EMAIL=true` while running the tests.
+To run the tests that require an email server (tests tagged with `@email`), you need to provide `START_EMAIL=true` while running the tests.
 
 ```bash
 START_EMAIL=true \
@@ -81,7 +81,7 @@ make -C tests/acceptance/docker test-ocis-feature-ocis-storage
 {{< /hint >}}
 
 {{< hint info >}}
-To run the tests that requires an antivirus service (tests tagged with `@antivirus`), you need to provide following environment variables while running the tests.
+To run the tests that require an antivirus service (tests tagged with `@antivirus`), you need to provide the following environment variables while running the tests.
 
 ```bash
 START_ANTIVIRUS=true \
@@ -465,7 +465,7 @@ Make sure that `clamAV` is fully up before running this command. The command is 
 {{< /hint>}}
 
 {{< hint info >}}
-If you want to use the same volume after the container is down. Before running the container once again, you either need to remove all the data inside `/your/local/filesystem/path/` or give the ownership back. For instance, on ubuntu it might be `sudo chown -R systemd-network:systemd-journal /your/local/filesystem/path/`  and repeat `step 2 and 3`
+If you want to use the same volume after the container is down then before running the container once again, you either need to remove all the data inside `/your/local/filesystem/path/` or give the ownership back. For instance, on Ubuntu it might be `sudo chown -R systemd-network:systemd-journal /your/local/filesystem/path/`  and repeat `step 2 and 3`
 {{< /hint>}}
 
 ### Run oCIS
