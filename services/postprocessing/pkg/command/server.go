@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/store"
 	"github.com/go-micro/plugins/v4/events/natsjs"
@@ -42,9 +43,6 @@ func Server(cfg *config.Config) *cli.Command {
 				gr     = run.Group{}
 				logger = logging.Configure(cfg.Service.Name, cfg.Log)
 
-				evtsCfg = cfg.Postprocessing.Events
-				tlsConf *tls.Config
-
 				ctx, cancel = func() (context.Context, context.CancelFunc) {
 					if cfg.Context == nil {
 						return context.WithCancel(context.Background())
@@ -55,31 +53,7 @@ func Server(cfg *config.Config) *cli.Command {
 			defer cancel()
 
 			{
-				if evtsCfg.EnableTLS {
-					var rootCAPool *x509.CertPool
-					if evtsCfg.TLSRootCACertificate != "" {
-						rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
-						if err != nil {
-							return err
-						}
-
-						rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
-						if err != nil {
-							return err
-						}
-						evtsCfg.TLSInsecure = false
-					}
-
-					tlsConf = &tls.Config{
-						RootCAs: rootCAPool,
-					}
-				}
-
-				bus, err := stream.Nats(
-					natsjs.TLSConfig(tlsConf),
-					natsjs.Address(evtsCfg.Endpoint),
-					natsjs.ClusterID(evtsCfg.Cluster),
-				)
+				bus, err := getEventBus(cfg.Postprocessing.Events)
 				if err != nil {
 					return err
 				}
@@ -135,4 +109,33 @@ func Server(cfg *config.Config) *cli.Command {
 			return gr.Run()
 		},
 	}
+}
+
+func getEventBus(evtsCfg config.Events) (events.Stream, error) {
+	var tlsConf *tls.Config
+	if evtsCfg.EnableTLS {
+		var rootCAPool *x509.CertPool
+		if evtsCfg.TLSRootCACertificate != "" {
+			rootCrtFile, err := os.Open(evtsCfg.TLSRootCACertificate)
+			if err != nil {
+				return nil, err
+			}
+
+			rootCAPool, err = ociscrypto.NewCertPoolFromPEM(rootCrtFile)
+			if err != nil {
+				return nil, err
+			}
+			evtsCfg.TLSInsecure = false
+		}
+
+		tlsConf = &tls.Config{
+			RootCAs: rootCAPool,
+		}
+	}
+
+	return stream.Nats(
+		natsjs.TLSConfig(tlsConf),
+		natsjs.Address(evtsCfg.Endpoint),
+		natsjs.ClusterID(evtsCfg.Cluster),
+	)
 }
