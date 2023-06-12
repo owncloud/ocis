@@ -1,7 +1,6 @@
 package command
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/events"
@@ -40,7 +39,6 @@ func RestartPostprocessing(cfg *config.Config) *cli.Command {
 			}
 
 			if err := events.Publish(stream, ev); err != nil {
-				fmt.Println(err)
 				return err
 			}
 

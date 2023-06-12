@@ -60,3 +60,19 @@ When setting a custom postprocessing step (eg. `"customstep"`) the postprocessin
 Once the custom service has finished its work, it should sent an event of type `PostprocessingFinished` via the configured events system. This event needs to contain a `FinishedStep` field set to `"customstep"`. It also must contain the outcome of the step, which can be one of "delete" (abort postprocessing, delete the file), "abort" (abort postprocessing, keep the file) and "continue" (continue postprocessing, this is the success case).
 
 See the [cs3 org](https://github.com/cs3org/reva/blob/edge/pkg/events/postprocessing.go) for up-to-date information of reserved step names and event definitions.
+
+## CLI Commands
+
+### Resume Postprocessing
+
+If postprocessing fails in one step due to an unforseen error, current uploads will not be retried automatically. A system admin can instead run a CLI command to retry the failed upload which is a two step process:
+
+-   First find the upload ID of the failed upload.
+```bash
+ocis storage-users uploads list
+```
+
+-   Then use the restart command to resume postprocessing of the ID selected.
+```bash
+ocis postprocessing restart -u <uploadID>
+```

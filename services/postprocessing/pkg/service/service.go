@@ -56,11 +56,6 @@ func (pps *PostprocessingService) Run() error {
 		switch ev := e.Event.(type) {
 		case events.BytesReceived:
 			pp = postprocessing.New(ev.UploadID, ev.URL, ev.ExecutingUser, ev.Filename, ev.Filesize, ev.ResourceID, pps.steps, pps.c.Delayprocessing)
-			if err := storePP(pps.store, pp); err != nil {
-				pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot store upload")
-				continue
-			}
-
 			next = pp.Init(ev)
 		case events.PostprocessingStepFinished:
 			if ev.UploadID == "" {
@@ -101,7 +96,7 @@ func (pps *PostprocessingService) Run() error {
 		if pp != nil {
 			if err := storePP(pps.store, pp); err != nil {
 				pps.log.Error().Str("uploadID", pp.ID).Err(err).Msg("cannot store upload")
-				// TODO: should we continue here?
+				continue // TODO: should we really continue here?
 			}
 		}
 		if next != nil {
