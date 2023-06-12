@@ -1228,6 +1228,28 @@ class SpacesContext implements Context {
 		$this->featureContext->uploadFileWithContent($user, $content, $destination);
 	}
 
+    /**
+     * @When /^user "([^"]*)" uploads a file "([^"]*)" to "([^"]*)" in space "([^"]*)" using the WebDAV API$/
+     *
+     * @param string $user
+     * @param string $source
+     * @param string $destination
+     * @param string $spaceName
+     *
+     * @return void
+     * @throws GuzzleException
+     * @throws Exception
+     */
+    public function theUserUploadsALocalFileToSpace(
+        string $user,
+        string $source,
+        string $destination,
+        string $spaceName
+    ): void {
+        $this->setSpaceIDByName($user, $spaceName);
+        $this->featureContext->userUploadsAFileTo($user, $source, $destination);
+    }
+
 	/**
 	 * @When /^user "([^"]*)" uploads a file inside space "([^"]*)" owned by the user "([^"]*)" with content "([^"]*)" to "([^"]*)" using the WebDAV API$/
 	 *
