@@ -138,18 +138,16 @@ Feature: antivirus
     When user "Brian" uploads file "filesForUpload/filesWithVirus/<filename>" to "/Shares/uploadFolder/<newfilename>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
-      | message                                                                   |
+      | message                                                                        |
       | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
     And as "Brian" file "/Shares/uploadFolder/<newfilename>" should not exist
     And as "Alice" file "/uploadFolder/<newfilename>" should not exist
     Examples:
-      | dav-path-version | filename      | newfilename |
-      | old              | eicar.com     | file1.txt   |
-      | old              | eicar_com.zip | file2.zip   |
-      | old              | eicarcom2.zip | file3.zip   |
-      | new              | eicar.com     | file1.txt   |
-      | new              | eicar_com.zip | file2.zip   |
-      | new              | eicarcom2.zip | file3.zip   |
+      | dav-path-version | filename      | newfilename    |
+      | old              | eicar.com     | virusFile1.txt |
+      | old              | eicar_com.zip | virusFile2.zip |
+      | new              | eicar.com     | virusFile1.txt |
+      | new              | eicar_com.zip | virusFile2.zip |
 
 
   Scenario Outline: upload a file with virus to a user share using spaces dav endpoint
@@ -161,15 +159,14 @@ Feature: antivirus
     When user "Brian" uploads a file "filesForUpload/filesWithVirus/<filename>" to "/uploadFolder/<newfilename>" in space "Shares" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Brian" should get a notification with subject "Virus found" and message:
-      | message                                                                   |
+      | message                                                                        |
       | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
     And as "Brian" file "/Shares/uploadFolder/<newfilename>" should not exist
     And as "Alice" file "/uploadFolder/<newfilename>" should not exist
     Examples:
-      | filename      | newfilename |
-      | eicar.com     | file1.txt   |
-      | eicar_com.zip | file2.zip   |
-      | eicarcom2.zip | file3.zip   |
+      | filename      | newfilename    |
+      | eicar.com     | virusFile1.txt |
+      | eicar_com.zip | virusFile2.zip |
 
 
   Scenario Outline: upload a file with virus to a group share
@@ -188,13 +185,11 @@ Feature: antivirus
     And as "Brian" file "/Shares/uploadFolder/<newfilename>" should not exist
     And as "Alice" file "/uploadFolder/<newfilename>" should not exist
     Examples:
-      | dav-path-version | filename      | newfilename |
-      | old              | eicar.com     | file1.txt   |
-      | old              | eicar_com.zip | file2.zip   |
-      | old              | eicarcom2.zip | file3.zip   |
-      | new              | eicar.com     | file1.txt   |
-      | new              | eicar_com.zip | file2.zip   |
-      | new              | eicarcom2.zip | file3.zip   |
+      | dav-path-version | filename      | newfilename    |
+      | old              | eicar.com     | virusFile1.txt |
+      | old              | eicar_com.zip | virusFile2.zip |
+      | new              | eicar.com     | virusFile1.txt |
+      | new              | eicar_com.zip | virusFile2.zip |
 
 
   Scenario Outline: upload a file with virus to a group share using spaces dav endpoint
@@ -213,8 +208,7 @@ Feature: antivirus
     And as "Brian" file "/Shares/uploadFolder/<newfilename>" should not exist
     And as "Alice" file "/uploadFolder/<newfilename>" should not exist
     Examples:
-      | filename      | newfilename |
-      | eicar.com     | file1.txt   |
-      | eicar_com.zip | file2.zip   |
-      | eicarcom2.zip | file3.zip   |
+      | filename      | newfilename    |
+      | eicar.com     | virusFile1.txt |
+      | eicar_com.zip | virusFile2.zip |
 
