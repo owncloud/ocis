@@ -13,6 +13,7 @@ use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use GuzzleHttp\Exception\GuzzleException;
+use Helmich\JsonAssert\JsonAssertions;
 use Psr\Http\Message\ResponseInterface;
 use TestHelpers\GraphHelper;
 use TestHelpers\WebDavHelper;
@@ -2034,7 +2035,7 @@ class GraphContext implements Context {
 			!$shouldContain && $userOrGroupFound,
 			'Response contains user or group "' . $userOrGroup . '" but should not have.'
 		);
-		$this->featureContext->assertJsonDocumentMatchesSchema(
+		JsonAssertions::assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->featureContext->getJSONSchema($schemaString)
 		);
@@ -2370,7 +2371,7 @@ class GraphContext implements Context {
 				"Response does not contain event type '" . $eventType . "'."
 			);
 		}
-		$this->featureContext->assertJsonDocumentMatchesSchema(
+		JsonAssertions::assertJsonDocumentMatchesSchema(
 			$actualResponseToAssert,
 			$this->featureContext->getJSONSchema($schemaString)
 		);
@@ -2392,7 +2393,7 @@ class GraphContext implements Context {
 				"Response does not contain key 'user'"
 			);
 		}
-		$this->featureContext->assertJsonDocumentMatchesSchema(
+		JsonAssertions::assertJsonDocumentMatchesSchema(
 			$actualResponseToAssert->user,
 			$this->featureContext->getJSONSchema($schemaString)
 		);

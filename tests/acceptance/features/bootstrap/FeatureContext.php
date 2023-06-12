@@ -52,7 +52,6 @@ class FeatureContext extends BehatVariablesContext {
 	use Provisioning;
 	use Sharing;
 	use WebDav;
-	use JsonAssertions;
 
 	/**
 	 * Unix timestamp seconds
@@ -1361,7 +1360,7 @@ class FeatureContext extends BehatVariablesContext {
 		PyStringNode $schemaString
 	): void {
 		$jsonResponse = $this->getJsonDecodedResponseBodyContent();
-		$this->assertJsonDocumentMatchesSchema(
+		JsonAssertions::assertJsonDocumentMatchesSchema(
 			$jsonResponse->ocs->data,
 			$this->getJSONSchema($schemaString)
 		);
@@ -1378,7 +1377,7 @@ class FeatureContext extends BehatVariablesContext {
 	 */
 	public function theDataOfTheResponseShouldMatch(PyStringNode $schemaString): void {
 		$responseBody = $this->getJsonDecodedResponseBodyContent();
-		$this->assertJsonDocumentMatchesSchema(
+		JsonAssertions::assertJsonDocumentMatchesSchema(
 			$responseBody,
 			$this->getJSONSchema($schemaString)
 		);
