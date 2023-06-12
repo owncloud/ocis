@@ -629,10 +629,8 @@ github.com/crewjam/httperr v0.2.0 h1:b2BfXR8U3AlIHwNeFFvZ+BV1LFvKLlzMjzaTnZMybNo
 github.com/crewjam/httperr v0.2.0/go.mod h1:Jlz+Sg/XqBQhyMjdDiC+GNNRzZTD7x39Gu3pglZ5oH4=
 github.com/crewjam/saml v0.4.13 h1:TYHggH/hwP7eArqiXSJUvtOPNzQDyQ7vwmwEqlFWhMc=
 github.com/crewjam/saml v0.4.13/go.mod h1:igEejV+fihTIlHXYP8zOec3V5A8y3lws5bQBFsTm4gA=
-github.com/cs3org/reva/v2 v2.14.1-0.20230608155229-cf1aa9641f93 h1:yRhkp28pdpSbEDX+XQtq5ZiZ8jLMRnmuEKwFj9AlzfY=
-github.com/cs3org/reva/v2 v2.14.1-0.20230608155229-cf1aa9641f93/go.mod h1:E32krZG159YflDSjDWfx/QGIC2529PS5LiPnGNHu3d0=
-github.com/cs3org/reva/v2 v2.14.1-0.20230612154151-5fbd21b664e1 h1:LN4ADWFL8SbuVDCN5d5b63swaEA8D7Ojt39AgUv46qA=
-github.com/cs3org/reva/v2 v2.14.1-0.20230612154151-5fbd21b664e1/go.mod h1:E32krZG159YflDSjDWfx/QGIC2529PS5LiPnGNHu3d0=
+github.com/cs3org/reva/v2 v2.14.1-0.20230613083627-c7aeac2d3a3c h1:Pc5WFgjMoJrp757siaxbYr3FogI1QKgkHT64y+G+3Cc=
+github.com/cs3org/reva/v2 v2.14.1-0.20230613083627-c7aeac2d3a3c/go.mod h1:E32krZG159YflDSjDWfx/QGIC2529PS5LiPnGNHu3d0=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8 h1:Z9lwXumT5ACSmJ7WGnFl+OMLLjpz5uR2fyz7dC255FI=
 github.com/cubewise-code/go-mime v0.0.0-20200519001935-8c5762b177d8/go.mod h1:4abs/jPXcmJzYoYGF91JF9Uq9s/KL5n1jvFDix8KcqY=
 github.com/cyberdelia/templates v0.0.0-20141128023046-ca7fffd4298c/go.mod h1:GyV+0YP4qX0UQ7r2MoYZ+AvYDp12OF5yg4q8rGnyNh4=
