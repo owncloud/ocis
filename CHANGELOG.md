@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Add missing timestamps: [#6515](https://github.com/owncloud/ocis/pull/6515)
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
 * Enhancement - Update reva: [#6507](https://github.com/owncloud/ocis/pull/6507)
 * Enhancement - Use reva client selectors: [#6452](https://github.com/owncloud/ocis/pull/6452)
@@ -17,6 +18,13 @@ The following sections list the changes for unreleased.
 * Enhancement - Update web to v7.0.1: [#6470](https://github.com/owncloud/ocis/pull/6470)
 
 ## Details
+
+* Bugfix - Add missing timestamps: [#6515](https://github.com/owncloud/ocis/pull/6515)
+
+   We have added missing timestamps to the audit service
+
+   https://github.com/owncloud/ocis/issues/3753
+   https://github.com/owncloud/ocis/pull/6515
 
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
 
