@@ -267,6 +267,22 @@ Feature: antivirus
       | eicar_com.zip | virusFile2.zip |
 
   @env-config
+  Scenario Outline: upload a file with virus by setting antivirus infected file handling environment variable to continue
+    Given the config "ANTIVIRUS_INFECTED_FILE_HANDLING" has been set to "continue"
+    And using <dav-path-version> DAV path
+    When user "Alice" uploads file "filesForUpload/filesWithVirus/eicar.com" to "/aFileWithVirus.txt" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And user "Alice" should get a notification with subject "Virus found" and message:
+      | message                                                                             |
+      | Virus found in aFileWithVirus.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And as "Alice" file "/aFileWithVirus.txt" should exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+  @env-config
   Scenario Outline: upload a file with virus smaller than the upload threshold
     Given the config "ANTIVIRUS_MAX_SCAN_SIZE" has been set to "100"
     And using <dav-path-version> DAV path
@@ -295,7 +311,7 @@ Feature: antivirus
       | new              |
       | spaces           |
 
-  @issue-enterprise-5706   
+  @issue-enterprise-5706
   Scenario Outline: upload a file with virus and get notification in different languages
     Given user "Alice" has switched the system language to "<language>"
     And using <dav-path-version> DAV path
@@ -313,7 +329,7 @@ Feature: antivirus
       | old              | de       | Virus gefunden   | In aFileWithVirus.txt wurde potenziell schädlicher Code gefunden. Das Hochladen wurde abgebrochen. Grund: Win.Test.EICAR_HDB-1 |
       | new              | de       | Virus gefunden   | In aFileWithVirus.txt wurde potenziell schädlicher Code gefunden. Das Hochladen wurde abgebrochen. Grund: Win.Test.EICAR_HDB-1 |
       | spaces           | de       | Virus gefunden   | In aFileWithVirus.txt wurde potenziell schädlicher Code gefunden. Das Hochladen wurde abgebrochen. Grund: Win.Test.EICAR_HDB-1 |
- 
+
   @issue-enterprise-5709
   Scenario Outline: try to create a version of file by uploading virus content
     Given using <dav-path-version> DAV path
