@@ -1209,6 +1209,11 @@ func (h *Handler) addFileInfo(ctx context.Context, s *conversions.ShareData, inf
 	if s.UIDOwner == "" && owner != nil {
 		s.UIDOwner = owner.GetOpaqueId()
 	}
+
+	if info.GetSpace().GetRoot() != nil {
+		s.SpaceID = storagespace.FormatResourceID(*info.GetSpace().GetRoot())
+	}
+	s.SpaceAlias = utils.ReadPlainFromOpaque(info.GetSpace().GetOpaque(), "spaceAlias")
 }
 
 // mustGetIdentifiers always returns a struct with identifiers, if the user or group could not be found they will all be empty

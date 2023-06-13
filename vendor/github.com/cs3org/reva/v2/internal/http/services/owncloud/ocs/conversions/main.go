@@ -129,9 +129,13 @@ type ShareData struct {
 	// The type of the object being shared. This can be one of 'file' or 'folder'.
 	ItemType string `json:"item_type" xml:"item_type"`
 	// The RFC2045-compliant mimetype of the file.
-	MimeType  string `json:"mimetype" xml:"mimetype"`
-	StorageID string `json:"storage_id" xml:"storage_id"`
-	Storage   uint64 `json:"storage" xml:"storage"`
+	MimeType string `json:"mimetype" xml:"mimetype"`
+	// The space ID of the original file location
+	SpaceID string `json:"space_id" xml:"space_id"`
+	// The space alias of the original file location
+	SpaceAlias string `json:"space_alias" xml:"space_alias"`
+	StorageID  string `json:"storage_id" xml:"storage_id"`
+	Storage    uint64 `json:"storage" xml:"storage"`
 	// The unique node id of the item being shared.
 	ItemSource string `json:"item_source" xml:"item_source"`
 	// The unique node id of the item being shared. For legacy reasons item_source and file_source attributes have the same value.

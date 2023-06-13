@@ -309,8 +309,6 @@ func (m *Manager) Share(ctx context.Context, md *provider.ResourceInfo, g *colla
 		Grantee:    g.Grantee,
 	}
 
-	m.Lock()
-	defer m.Unlock()
 	_, err := m.getByKey(ctx, key)
 	if err == nil {
 		// share already exists
@@ -468,8 +466,6 @@ func (m *Manager) GetShare(ctx context.Context, ref *collaboration.ShareReferenc
 		return nil, err
 	}
 
-	m.Lock()
-	defer m.Unlock()
 	s, err := m.get(ctx, ref)
 	if err != nil {
 		return nil, err
@@ -521,8 +517,6 @@ func (m *Manager) Unshare(ctx context.Context, ref *collaboration.ShareReference
 		return err
 	}
 
-	m.Lock()
-	defer m.Unlock()
 	user := ctxpkg.ContextMustGetUser(ctx)
 
 	s, err := m.get(ctx, ref)
@@ -546,9 +540,6 @@ func (m *Manager) UpdateShare(ctx context.Context, ref *collaboration.ShareRefer
 	if err := m.initialize(ctx); err != nil {
 		return nil, err
 	}
-
-	m.Lock()
-	defer m.Unlock()
 
 	var toUpdate *collaboration.Share
 
@@ -598,6 +589,8 @@ func (m *Manager) UpdateShare(ctx context.Context, ref *collaboration.ShareRefer
 	toUpdate.Mtime = utils.TSNow()
 
 	// Update provider cache
+	unlock := m.Cache.LockSpace(toUpdate.ResourceId.SpaceId)
+	defer unlock()
 	err := m.Cache.Persist(ctx, toUpdate.ResourceId.StorageId, toUpdate.ResourceId.SpaceId)
 	// when persisting fails
 	if _, ok := err.(errtypes.IsPreconditionFailed); ok {
@@ -628,9 +621,6 @@ func (m *Manager) ListShares(ctx context.Context, filters []*collaboration.Filte
 	if err := m.initialize(ctx); err != nil {
 		return nil, err
 	}
-
-	m.Lock()
-	defer m.Unlock()
 
 	user := ctxpkg.ContextMustGetUser(ctx)
 
@@ -774,9 +764,6 @@ func (m *Manager) ListReceivedShares(ctx context.Context, filters []*collaborati
 	if err := m.initialize(ctx); err != nil {
 		return nil, err
 	}
-
-	m.Lock()
-	defer m.Unlock()
 
 	user := ctxpkg.ContextMustGetUser(ctx)
 
@@ -958,8 +945,6 @@ func (m *Manager) getReceived(ctx context.Context, ref *collaboration.ShareRefer
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "getReceived")
 	defer span.End()
 
-	m.Lock()
-	defer m.Unlock()
 	s, err := m.get(ctx, ref)
 	if err != nil {
 		return nil, err
@@ -1000,9 +985,6 @@ func (m *Manager) UpdateReceivedShare(ctx context.Context, receivedShare *collab
 	if err != nil {
 		return nil, err
 	}
-
-	m.Lock()
-	defer m.Unlock()
 
 	for i := range fieldMask.Paths {
 		switch fieldMask.Paths[i] {

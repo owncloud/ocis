@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"sync"
 	"time"
 
 	collaboration "github.com/cs3org/go-cs3apis/cs3/sharing/collaboration/v1beta1"
@@ -43,6 +44,9 @@ const tracerName = "receivedsharecache"
 // It functions as an in-memory cache with a persistence layer
 // The storage is sharded by user
 type Cache struct {
+	lockMapLock sync.Mutex
+	lockMap     map[string]*sync.Mutex
+
 	ReceivedSpaces map[string]*Spaces
 
 	storage metadata.Storage
@@ -75,11 +79,30 @@ func New(s metadata.Storage, ttl time.Duration) Cache {
 		ReceivedSpaces: map[string]*Spaces{},
 		storage:        s,
 		ttl:            ttl,
+		lockMap:        map[string]*sync.Mutex{},
 	}
+}
+
+func (c *Cache) lockUser(userID string) func() {
+	lock := c.lockMap[userID]
+	if lock == nil {
+		c.lockMapLock.Lock()
+		lock = c.lockMap[userID]
+		if lock == nil {
+			c.lockMap[userID] = &sync.Mutex{}
+			lock = c.lockMap[userID]
+		}
+		c.lockMapLock.Unlock()
+	}
+	lock.Lock()
+	return func() { lock.Unlock() }
 }
 
 // Add adds a new entry to the cache
 func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaboration.ReceivedShare) error {
+	unlock := c.lockUser(userID)
+	defer unlock()
+
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Add")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID), attribute.String("cs3.spaceid", spaceID))
@@ -103,7 +126,7 @@ func (c *Cache) Add(ctx context.Context, userID, spaceID string, rs *collaborati
 		MountPoint: rs.MountPoint,
 	}
 
-	return c.Persist(ctx, userID)
+	return c.persist(ctx, userID)
 }
 
 // Get returns one entry from the cache
@@ -116,6 +139,9 @@ func (c *Cache) Get(userID, spaceID, shareID string) *State {
 
 // Sync updates the in-memory data with the data from the storage if it is outdated
 func (c *Cache) Sync(ctx context.Context, userID string) error {
+	unlock := c.lockUser(userID)
+	defer unlock()
+
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Sync")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
@@ -172,8 +198,8 @@ func (c *Cache) Sync(ctx context.Context, userID string) error {
 	return nil
 }
 
-// Persist persists the data for one user to the storage
-func (c *Cache) Persist(ctx context.Context, userID string) error {
+// persist persists the data for one user to the storage
+func (c *Cache) persist(ctx context.Context, userID string) error {
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Persist")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))

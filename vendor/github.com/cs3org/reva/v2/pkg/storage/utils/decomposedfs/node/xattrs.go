@@ -174,3 +174,12 @@ func (n *Node) XattrInt64(key string) (int64, error) {
 	}
 	return strconv.ParseInt(b, 10, 64)
 }
+
+// XattrUint64 returns the uint64 representation of an attribute
+func (n *Node) XattrUint64(key string) (uint64, error) {
+	b, err := n.XattrString(key)
+	if err != nil {
+		return 0, err
+	}
+	return strconv.ParseUint(b, 10, 64)
+}
