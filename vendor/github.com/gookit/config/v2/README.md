@@ -84,7 +84,7 @@ package main
 
 import (
     "github.com/gookit/config/v2"
-    "github.com/gookit/config/v2/yamlv3"
+    "github.com/gookit/config/v2/yaml"
 )
 
 // go run ./examples/yaml.go
@@ -92,7 +92,7 @@ func main() {
 	config.WithOptions(config.ParseEnv)
 
 	// add driver for support yaml content
-	config.AddDriver(yamlv3.Driver)
+	config.AddDriver(yaml.Driver)
 
 	err := config.LoadFiles("testdata/yml_base.yml")
 	if err != nil {
@@ -389,7 +389,7 @@ Support parse default value by struct tag `default`
 c := config.New("test").WithOptions(config.ParseDefault)
 
 // only set name
-c.SetData(map[string]interface{}{
+c.SetData(map[string]any{
     "name": "inhere",
 })
 
@@ -421,7 +421,7 @@ dump.Println(user)
 ### Load Config
 
 - `LoadOSEnvs(nameToKeyMap map[string]string)` Load data from os ENV
-- `LoadData(dataSource ...interface{}) (err error)` Load from struts or maps
+- `LoadData(dataSource ...any) (err error)` Load from struts or maps
 - `LoadFlags(keys []string) (err error)` Load from CLI flags
 - `LoadExists(sourceFiles ...string) (err error)` 
 - `LoadFiles(sourceFiles ...string) (err error)`
@@ -445,7 +445,7 @@ dump.Println(user)
 - `Strings(key string) (arr []string)`
 - `SubDataMap(key string) maputi.Data`
 - `StringMap(key string) (mp map[string]string)`
-- `Get(key string, findByPath ...bool) (value interface{})`
+- `Get(key string, findByPath ...bool) (value any)`
 
 **Mapping data to struct:**
 
@@ -455,14 +455,14 @@ dump.Println(user)
 
 ### Setting Values
 
-- `Set(key string, val interface{}, setByPath ...bool) (err error)`
+- `Set(key string, val any, setByPath ...bool) (err error)`
 
 ### Useful Methods
 
 - `Getenv(name string, defVal ...string) (val string)`
 - `AddDriver(driver Driver)`
-- `Data() map[string]interface{}`
-- `SetData(data map[string]interface{})` set data to override the Config.Data
+- `Data() map[string]any`
+- `SetData(data map[string]any)` set data to override the Config.Data
 - `Exists(key string, findByPath ...bool) bool`
 - `DumpTo(out io.Writer, format string) (n int64, err error)`
 
@@ -497,11 +497,18 @@ Check out these projects, which use https://github.com/gookit/config :
 
 ## See also
 
-- Ini parse [gookit/ini/parser](https://github.com/gookit/ini/tree/master/parser)
-- Properties parse [gookit/properties](https://github.com/gookit/properties)
-- Json5 parse [json5](https://github.com/yosuke-furukawa/json5)
-- Yaml parse [go-yaml](https://github.com/go-yaml/yaml)
-- Toml parse [go toml](https://github.com/BurntSushi/toml)
+- Ini parser [gookit/ini/parser](https://github.com/gookit/ini/tree/master/parser)
+- Properties parser [gookit/properties](https://github.com/gookit/properties)
+- Json5 parser
+  - [yosuke-furukawa/json5](https://github.com/yosuke-furukawa/json5)
+  - [titanous/json5](https://github.com/titanous/json5)
+- Json parser
+  - [goccy/go-json](https://github.com/goccy/go-json)
+  - [json-iterator/go](https://github.com/json-iterator/go)
+- Yaml parser
+  - [goccy/go-yaml](https://github.com/goccy/go-yaml)
+  - [go-yaml/yaml](https://github.com/go-yaml/yaml)
+- Toml parser [go toml](https://github.com/BurntSushi/toml)
 - Data merge [mergo](https://github.com/imdario/mergo)
 - Map structure [mapstructure](https://github.com/mitchellh/mapstructure)
 

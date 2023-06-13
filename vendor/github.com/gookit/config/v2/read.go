@@ -90,32 +90,46 @@ func (c *Config) Exists(key string, findByPath ...bool) (ok bool) {
  *************************************************************/
 
 // Data return all config data
-func Data() map[string]interface{} { return dc.Data() }
+func Data() map[string]any { return dc.Data() }
 
-// Data get all config data
-func (c *Config) Data() map[string]interface{} {
+// Data get all config data.
+//
+// Note: will don't apply any options, like ParseEnv
+func (c *Config) Data() map[string]any {
 	return c.data
+}
+
+// Keys return all config data
+func Keys() []string { return dc.Keys() }
+
+// Keys get all config data
+func (c *Config) Keys() []string {
+	keys := make([]string, 0, len(c.data))
+	for key := range c.data {
+		keys = append(keys, key)
+	}
+	return keys
 }
 
 // Get config value by key string, support get sub-value by key path(eg. 'map.key'),
 //
 //   - ok is true, find value from config
 //   - ok is false, not found or error
-func Get(key string, findByPath ...bool) interface{} { return dc.Get(key, findByPath...) }
+func Get(key string, findByPath ...bool) any { return dc.Get(key, findByPath...) }
 
 // Get config value by key
-func (c *Config) Get(key string, findByPath ...bool) interface{} {
+func (c *Config) Get(key string, findByPath ...bool) any {
 	val, _ := c.GetValue(key, findByPath...)
 	return val
 }
 
 // GetValue get value by given key string.
-func GetValue(key string, findByPath ...bool) (interface{}, bool) {
+func GetValue(key string, findByPath ...bool) (any, bool) {
 	return dc.GetValue(key, findByPath...)
 }
 
 // GetValue get value by given key string.
-func (c *Config) GetValue(key string, findByPath ...bool) (value interface{}, ok bool) {
+func (c *Config) GetValue(key string, findByPath ...bool) (value any, ok bool) {
 	sep := c.opts.Delimiter
 	if key = formatKey(key, string(sep)); key == "" {
 		c.addError(ErrKeyIsEmpty)
@@ -235,6 +249,18 @@ func (c *Config) String(key string, defVal ...string) string {
 	return value
 }
 
+// MustString get a string by key, will panic on empty or not exists
+func MustString(key string) string { return dc.MustString(key) }
+
+// MustString get a string by key, will panic on empty or not exists
+func (c *Config) MustString(key string) string {
+	value, ok := c.getString(key)
+	if !ok {
+		panic("config: string value not found, key: " + key)
+	}
+	return value
+}
+
 func (c *Config) getString(key string) (value string, ok bool) {
 	// find from cache
 	if c.opts.EnableCache && len(c.strCache) > 0 {
@@ -257,8 +283,11 @@ func (c *Config) getString(key string) (value string, ok bool) {
 			value = envutil.ParseEnvValue(value)
 		}
 	default:
-		// value = fmt.Sprintf("%v", val)
-		value, _ = strutil.AnyToString(val, false)
+		var err error
+		value, err = strutil.AnyToString(val, false)
+		if err != nil {
+			return "", false
+		}
 	}
 
 	// add cache
@@ -516,6 +545,17 @@ func (c *Config) Strings(key string) (arr []string) {
 			c.sArrCache = make(map[string]strArr)
 		}
 		c.sArrCache[key] = arr
+	}
+	return
+}
+
+// StringsBySplit get []string by split a string value.
+func StringsBySplit(key, sep string) []string { return dc.StringsBySplit(key, sep) }
+
+// StringsBySplit get []string by split a string value.
+func (c *Config) StringsBySplit(key, sep string) (ss []string) {
+	if str, ok := c.getString(key); ok {
+		ss = strutil.Split(str, sep)
 	}
 	return
 }

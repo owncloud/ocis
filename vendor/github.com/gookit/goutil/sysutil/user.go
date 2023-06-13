@@ -46,11 +46,9 @@ var homeDir string
 
 // UserHomeDir is alias of os.UserHomeDir, but ignore error
 func UserHomeDir() string {
-	if homeDir != "" {
-		return homeDir
+	if homeDir == "" {
+		homeDir, _ = os.UserHomeDir()
 	}
-
-	homeDir, _ = os.UserHomeDir()
 	return homeDir
 }
 
@@ -78,6 +76,7 @@ func UserConfigDir(subPath string) string {
 }
 
 // ExpandPath will parse `~` as user home dir path.
-func ExpandPath(path string) string {
-	return comfunc.ExpandPath(path)
-}
+func ExpandPath(path string) string { return comfunc.ExpandHome(path) }
+
+// ExpandHome will parse `~` as user home dir path.
+func ExpandHome(path string) string { return comfunc.ExpandHome(path) }

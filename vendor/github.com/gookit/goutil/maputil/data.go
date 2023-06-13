@@ -3,12 +3,15 @@ package maputil
 import (
 	"strings"
 
+	"github.com/gookit/goutil/arrutil"
 	"github.com/gookit/goutil/mathutil"
 	"github.com/gookit/goutil/strutil"
 )
 
 // Data an map data type
 type Data map[string]any
+
+// Map alias of Data
 type Map = Data
 
 // Has value on the data map
@@ -123,6 +126,14 @@ func (d Data) Int64(key string) int64 {
 	return 0
 }
 
+// Uint value get
+func (d Data) Uint(key string) uint64 {
+	if val, ok := d.GetByPath(key); ok {
+		return mathutil.QuietUint(val)
+	}
+	return 0
+}
+
 // Str value get by key
 func (d Data) Str(key string) string {
 	if val, ok := d.GetByPath(key); ok {
@@ -137,14 +148,15 @@ func (d Data) Bool(key string) bool {
 	if !ok {
 		return false
 	}
-	if bl, ok := val.(bool); ok {
-		return bl
-	}
 
-	if str, ok := val.(string); ok {
-		return strutil.QuietBool(str)
+	switch tv := val.(type) {
+	case string:
+		return strutil.QuietBool(tv)
+	case bool:
+		return tv
+	default:
+		return false
 	}
-	return false
 }
 
 // Strings get []string value
@@ -154,10 +166,16 @@ func (d Data) Strings(key string) []string {
 		return nil
 	}
 
-	if ss, ok := val.([]string); ok {
-		return ss
+	switch typVal := val.(type) {
+	case string:
+		return []string{typVal}
+	case []string:
+		return typVal
+	case []any:
+		return arrutil.SliceToStrings(typVal)
+	default:
+		return nil
 	}
-	return nil
 }
 
 // StrSplit get strings by split key value
@@ -176,6 +194,11 @@ func (d Data) StringsByStr(key string) []string {
 	return nil
 }
 
+// StrMap get map[string]string value
+func (d Data) StrMap(key string) map[string]string {
+	return d.StringMap(key)
+}
+
 // StringMap get map[string]string value
 func (d Data) StringMap(key string) map[string]string {
 	val, ok := d.GetByPath(key)
@@ -183,10 +206,14 @@ func (d Data) StringMap(key string) map[string]string {
 		return nil
 	}
 
-	if smp, ok := val.(map[string]string); ok {
-		return smp
+	switch tv := val.(type) {
+	case map[string]string:
+		return tv
+	case map[string]any:
+		return ToStringMap(tv)
+	default:
+		return nil
 	}
-	return nil
 }
 
 // Sub get sub value as new Data
@@ -216,4 +243,18 @@ func (d Data) ToStringMap() map[string]string {
 // String data to string
 func (d Data) String() string {
 	return ToString(d)
+}
+
+// Load other data to current data map
+func (d Data) Load(sub map[string]any) {
+	for name, val := range sub {
+		d[name] = val
+	}
+}
+
+// LoadSMap to data
+func (d Data) LoadSMap(smp map[string]string) {
+	for name, val := range smp {
+		d[name] = val
+	}
 }

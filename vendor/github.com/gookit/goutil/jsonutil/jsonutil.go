@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"os"
 	"regexp"
 	"strings"
@@ -18,7 +17,16 @@ func WriteFile(filePath string, data any) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(filePath, jsonBytes, 0664)
+	return os.WriteFile(filePath, jsonBytes, 0664)
+}
+
+// WritePretty write pretty data to JSON file
+func WritePretty(filePath string, data any) error {
+	bs, err := json.MarshalIndent(data, "", "    ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(filePath, bs, 0664)
 }
 
 // ReadFile Read JSON file data
@@ -90,6 +98,35 @@ func Mapping(src, dst any) error {
 		return err
 	}
 	return Decode(bts, dst)
+}
+
+// IsJSON check if the string is valid JSON. (Note: uses json.Unmarshal)
+func IsJSON(s string) bool {
+	if s == "" {
+		return false
+	}
+
+	var js json.RawMessage
+	return json.Unmarshal([]byte(s), &js) == nil
+}
+
+// IsJSONFast simple and fast check input string is valid JSON.
+func IsJSONFast(s string) bool {
+	ln := len(s)
+	if ln < 2 {
+		return false
+	}
+	if ln == 2 {
+		return s == "{}" || s == "[]"
+	}
+
+	// object
+	if s[0] == '{' {
+		return s[ln-1] == '}' && s[1] == '"'
+	}
+
+	// array
+	return s[0] == '[' && s[ln-1] == ']'
 }
 
 // `(?s:` enable match multi line

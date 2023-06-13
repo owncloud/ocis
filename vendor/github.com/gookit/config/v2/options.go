@@ -50,6 +50,9 @@ type Options struct {
 	// WatchChange bool
 }
 
+// OptionFn option func
+type OptionFn func(*Options)
+
 func newDefaultOption() *Options {
 	return &Options{
 		ParseKey:  true,
@@ -159,10 +162,10 @@ func WithHookFunc(fn HookFunc) func(*Options) {
 func EnableCache(opts *Options) { opts.EnableCache = true }
 
 // WithOptions with options
-func WithOptions(opts ...func(*Options)) { dc.WithOptions(opts...) }
+func WithOptions(opts ...OptionFn) { dc.WithOptions(opts...) }
 
 // WithOptions apply some options
-func (c *Config) WithOptions(opts ...func(opts *Options)) *Config {
+func (c *Config) WithOptions(opts ...OptionFn) *Config {
 	if !c.IsEmpty() {
 		panic("config: Cannot set options after data has been loaded")
 	}

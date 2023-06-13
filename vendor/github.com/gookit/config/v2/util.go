@@ -13,12 +13,15 @@ import (
 // ValDecodeHookFunc returns a mapstructure.DecodeHookFunc
 // that parse ENV var, and more custom parse
 func ValDecodeHookFunc(parseEnv, parseTime bool) mapstructure.DecodeHookFunc {
-	return func(f reflect.Type, t reflect.Type, data interface{}) (interface{}, error) {
+	return func(f reflect.Type, t reflect.Type, data any) (any, error) {
 		if f.Kind() != reflect.String {
 			return data, nil
 		}
 
 		str := data.(string)
+		if parseEnv {
+			str = envutil.ParseEnvValue(str)
+		}
 		if len(str) < 2 {
 			return str, nil
 		}
@@ -32,12 +35,17 @@ func ValDecodeHookFunc(parseEnv, parseTime bool) mapstructure.DecodeHookFunc {
 					return dur, nil
 				}
 			}
-		} else if parseEnv { // parse ENV value
-			str = envutil.ParseEnvValue(str)
 		}
-
 		return str, nil
 	}
+}
+
+// resolve format, check is alias
+func (c *Config) resolveFormat(f string) string {
+	if name, ok := c.aliasMap[f]; ok {
+		return name
+	}
+	return f
 }
 
 /*************************************************************
@@ -55,7 +63,7 @@ func SetDecoder(format string, decoder Decoder) {
 //
 // Deprecated: please use driver instead
 func (c *Config) SetDecoder(format string, decoder Decoder) {
-	format = fixFormat(format)
+	format = c.resolveFormat(format)
 	c.decoders[format] = decoder
 }
 
@@ -79,7 +87,7 @@ func SetEncoder(format string, encoder Encoder) {
 //
 // Deprecated: please use driver instead
 func (c *Config) SetEncoder(format string, encoder Encoder) {
-	format = fixFormat(format)
+	format = c.resolveFormat(format)
 	c.encoders[format] = encoder
 }
 
@@ -140,21 +148,4 @@ func parseVarNameAndType(key string) (string, string) {
 // format key
 func formatKey(key, sep string) string {
 	return strings.Trim(strings.TrimSpace(key), sep)
-}
-
-// resolve fix inc/conf/yaml format
-func fixFormat(f string) string {
-	if f == Yml {
-		f = Yaml
-	}
-
-	if f == "inc" {
-		f = Ini
-	}
-
-	// eg nginx config file.
-	if f == "conf" {
-		f = Hcl
-	}
-	return f
 }
