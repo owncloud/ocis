@@ -8,10 +8,8 @@ Basic file management like up and download, move, copy, properties, trash, versi
 
 #### [Getting information about a folder overwritten by a file gives 500 error instead of 404](https://github.com/owncloud/ocis/issues/1239)
 
-- [coreApiWebdavProperties1/copyFile.feature:294](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L294)
-- [coreApiWebdavProperties1/copyFile.feature:295](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L295)
-- [coreApiWebdavProperties1/copyFile.feature:333](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L333)
-- [coreApiWebdavProperties1/copyFile.feature:334](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L334)
+- [coreApiWebdavProperties1/copyFile.feature:314](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L314)
+- [coreApiWebdavProperties1/copyFile.feature:315](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L315)
 
 #### [Custom dav properties with namespaces are rendered incorrectly](https://github.com/owncloud/ocis/issues/2140)
 
@@ -530,12 +528,12 @@ And other missing implementation of favorites
 
 #### [copying the file inside Shares folder returns 404](https://github.com/owncloud/ocis/issues/3874)
 
-- [coreApiWebdavProperties1/copyFile.feature:493](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L493)
-- [coreApiWebdavProperties1/copyFile.feature:494](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L494)
-- [coreApiWebdavProperties1/copyFile.feature:499](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L499)
-- [coreApiWebdavProperties1/copyFile.feature:519](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L519)
-- [coreApiWebdavProperties1/copyFile.feature:520](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L520)
-- [coreApiWebdavProperties1/copyFile.feature:525](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L525)
+- [coreApiWebdavProperties1/copyFile.feature:474](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L474)
+- [coreApiWebdavProperties1/copyFile.feature:475](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L475)
+- [coreApiWebdavProperties1/copyFile.feature:480](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L480)
+- [coreApiWebdavProperties1/copyFile.feature:500](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L500)
+- [coreApiWebdavProperties1/copyFile.feature:501](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L501)
+- [coreApiWebdavProperties1/copyFile.feature:506](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/coreApiWebdavProperties1/copyFile.feature#L506)
 
 ### Won't fix
 

@@ -262,33 +262,14 @@ Feature: copy file
     And user "Brian" has shared folder "BRIAN-Folder" with user "Alice"
     And user "Alice" has accepted share "/BRIAN-Folder" offered by user "Brian"
     When user "Alice" copies file "/textfile1.txt" to "/Shares/BRIAN-Folder" using the WebDAV API
-    Then the HTTP status code should be "204"
-    # Alice now sees the content of "her" file in /Shares/BRIAN-Folder
-    # The share that she received from Brian has "automatically" gone into the "declined" state
-    And the content of file "/Shares/BRIAN-Folder" for user "Alice" should be "ownCloud test text file 1"
-    And as "Alice" folder "/Shares/BRIAN-Folder/sample-folder" should not exist
-    And as "Alice" file "/textfile1.txt" should exist
-    And user "Alice" should not have any received shares
-    And the sharing API should report to user "Alice" that these shares are in the declined state
-      | path                  |
-      | /Shares/BRIAN-Folder/ |
-    # Brian still has his original BRIAN-Folder and can see that it is shared with Alice
+    Then the HTTP status code should be "412"
+    # the copy request is rejected with 412 "precondition failed"
+    # Brian's original folder should still exist and be shared with Alice
     And as "Brian" folder "BRIAN-Folder" should exist
     And as "Brian" folder "BRIAN-Folder/sample-folder" should exist
-    When user "Brian" gets all shares shared by him using the sharing API
-    Then the OCS status code should be "100"
-    And the HTTP status code should be "200"
-    And folder "/Shares/BRIAN-Folder" should be included in the response
-    # Alice can accept the share from Brian again
-    When user "Alice" accepts share "/BRIAN-Folder" offered by user "Brian" using the sharing API
-    Then the OCS status code should be "100"
-    And the HTTP status code should be "200"
-    # now Alice has "her" text file as "/Shares/BRIAN-Folder"
-    # and has the shared folder from Brian as "/Shares/BRIAN-Folder (2)"
-    And as "Alice" file "/Shares/BRIAN-Folder" should exist
-    And the content of file "/Shares/BRIAN-Folder" for user "Alice" should be "ownCloud test text file 1"
-    And as "Alice" folder "/Shares/BRIAN-Folder (2)" should exist
-    And as "Alice" folder "/Shares/BRIAN-Folder (2)/sample-folder" should exist
+    And as "Alice" folder "BRIAN-Folder" should exist
+    And as "Alice" folder "/Shares/BRIAN-Folder/sample-folder" should exist
+    And as "Alice" file "/textfile1.txt" should exist
     Examples:
       | dav_version |
       | old         |
