@@ -161,7 +161,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "share id:'shareid' uid:'' item-id:'' was removed", "file_unshared")
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "0001-01-01T00:00:00Z", "share id:'shareid' uid:'' item-id:'' was removed", "file_unshared")
 			// AuditEventSharing fields
 			checkSharingAuditEvent(t, ev.AuditEventSharing, "", "", "shareid")
 			// AuditEventShareUpdated fields
@@ -519,7 +519,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "user 'uid-123' disabled the space 'space-123'", "space_disabled")
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "0001-01-01T00:00:00Z", "user 'uid-123' disabled the space 'space-123'", "space_disabled")
 			// AuditEventSpaces fields
 			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "space-123")
 		},
@@ -553,7 +553,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "user 'uid-123' deleted the space 'space-123'", "space_deleted")
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "0001-01-01T00:00:00Z", "user 'uid-123' deleted the space 'space-123'", "space_deleted")
 			// AuditEventSpaces fields
 			checkSpacesAuditEvent(t, ev.AuditEventSpaces, "space-123")
 		},

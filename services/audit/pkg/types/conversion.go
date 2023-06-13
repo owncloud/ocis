@@ -215,7 +215,7 @@ func LinkAccessed(ev events.LinkAccessed) AuditEventLinkAccessed {
 
 // LinkAccessFailed converts a LinkAccessFailed event to an AuditEventLinkAccessed
 func LinkAccessFailed(ev events.LinkAccessFailed) AuditEventLinkAccessed {
-	base := BasicAuditEvent(ev.ShareID.OpaqueId, formatTime(ev.Timestamp), MessageLinkAccessed(ev.ShareID.GetOpaqueId(), false), ActionLinkAccessed)
+	base := BasicAuditEvent("", formatTime(ev.Timestamp), MessageLinkAccessed(ev.ShareID.GetOpaqueId(), false), ActionLinkAccessed)
 	return AuditEventLinkAccessed{
 		AuditEventSharing: SharingAuditEvent(ev.ShareID.GetOpaqueId(), "", "", base),
 		ShareToken:        ev.Token,
