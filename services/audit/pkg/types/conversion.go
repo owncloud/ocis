@@ -6,6 +6,7 @@ import (
 
 	"github.com/cs3org/reva/v2/pkg/events"
 	"github.com/cs3org/reva/v2/pkg/storagespace"
+	"github.com/cs3org/reva/v2/pkg/utils"
 
 	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -140,7 +141,7 @@ func ShareRemoved(ev events.ShareRemoved) AuditEventShareRemoved {
 		iid = ev.ShareKey.GetResourceId().GetOpaqueId()
 		with, typ = extractGrantee(ev.ShareKey.GetGrantee().GetUserId(), ev.ShareKey.GetGrantee().GetGroupId())
 	}
-	base := BasicAuditEvent(uid, "", MessageShareRemoved(uid, sid, iid), ActionShareRemoved)
+	base := BasicAuditEvent(uid, formatTime(utils.TimeToTS(ev.Timestamp)), MessageShareRemoved(uid, sid, iid), ActionShareRemoved)
 	return AuditEventShareRemoved{
 		AuditEventSharing: SharingAuditEvent(sid, iid, uid, base),
 		ShareWith:         with,
@@ -247,7 +248,7 @@ func ContainerCreated(ev events.ContainerCreated) AuditEventContainerCreated {
 // FileUploaded converts a FileUploaded event to an AuditEventFileCreated
 func FileUploaded(ev events.FileUploaded) AuditEventFileCreated {
 	iid, path, uid := extractFileDetails(ev.Ref, ev.Owner)
-	base := BasicAuditEvent(uid, "", MessageFileCreated(ev.Executant.GetOpaqueId(), iid), ActionFileCreated)
+	base := BasicAuditEvent(uid, formatTime(ev.Timestamp), MessageFileCreated(ev.Executant.GetOpaqueId(), iid), ActionFileCreated)
 	return AuditEventFileCreated{
 		AuditEventFiles: FilesAuditEvent(base, iid, uid, path),
 	}
