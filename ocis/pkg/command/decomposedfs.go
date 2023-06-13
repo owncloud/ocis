@@ -135,15 +135,19 @@ func setCmd(cfg *config.Config) *cli.Command {
 				b64, err := base64.StdEncoding.DecodeString(v[2:])
 				if err == nil {
 					v = string(b64)
+				} else {
+					fmt.Printf("Error decoding base64 string: '%s'. Using as raw string.\n", err)
 				}
 			} else if strings.HasPrefix(v, "0x") {
-				h, err := hex.DecodeString(v)
+				h, err := hex.DecodeString(v[2:])
 				if err == nil {
 					v = string(h)
+				} else {
+					fmt.Printf("Error decoding base64 string: '%s'. Using as raw string.\n", err)
 				}
 			}
 
-			err = backend.Set(path, c.String("attribute"), []byte(v[2:]))
+			err = backend.Set(path, c.String("attribute"), []byte(v))
 			if err != nil {
 				fmt.Println("Error setting attribute")
 				return err
