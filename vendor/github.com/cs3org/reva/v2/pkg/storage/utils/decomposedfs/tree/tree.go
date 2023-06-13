@@ -794,12 +794,17 @@ func (t *Tree) Propagate(ctx context.Context, n *node.Node, sizeDiff int64) (err
 				}
 			case err != nil:
 				return err
+			case sizeDiff > 0:
+				newSize = treeSize + uint64(sizeDiff)
+			case uint64(-sizeDiff) > treeSize:
+				// The sizeDiff is larger than the current treesize. Which would result in
+				// a negative new treesize. Something must have gone wrong with the accounting.
+				// Reset the current treesize to 0.
+				sublog.Error().Uint64("treeSize", treeSize).Int64("sizeDiff", sizeDiff).
+					Msg("Error when updating treesize of parent node. Updated treesize < 0. Reestting to 0")
+				newSize = 0
 			default:
-				if sizeDiff > 0 {
-					newSize = treeSize + uint64(sizeDiff)
-				} else {
-					newSize = treeSize - uint64(-sizeDiff)
-				}
+				newSize = treeSize - uint64(-sizeDiff)
 			}
 
 			// update the tree size of the node

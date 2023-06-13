@@ -948,11 +948,11 @@ func (n *Node) IsDisabled() bool {
 
 // GetTreeSize reads the treesize from the extended attributes
 func (n *Node) GetTreeSize() (treesize uint64, err error) {
-	s, err := n.XattrInt64(prefixes.TreesizeAttr)
+	s, err := n.XattrUint64(prefixes.TreesizeAttr)
 	if err != nil {
 		return 0, err
 	}
-	return uint64(s), nil
+	return s, nil
 }
 
 // SetTreeSize writes the treesize to the extended attributes

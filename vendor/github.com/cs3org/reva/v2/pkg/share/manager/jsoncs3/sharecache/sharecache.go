@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"path"
 	"path/filepath"
+	"sync"
 	"time"
 
 	"github.com/cs3org/reva/v2/pkg/appctx"
@@ -42,6 +43,9 @@ const tracerName = "sharecache"
 // It functions as an in-memory cache with a persistence layer
 // The storage is sharded by user/group
 type Cache struct {
+	lockMapLock sync.Mutex
+	lockMap     map[string]*sync.Mutex
+
 	UserShares map[string]*UserShareCache
 
 	storage   metadata.Storage
@@ -64,6 +68,21 @@ type SpaceShareIDs struct {
 	IDs   map[string]struct{}
 }
 
+func (c *Cache) lockUser(userID string) func() {
+	lock := c.lockMap[userID]
+	if lock == nil {
+		c.lockMapLock.Lock()
+		lock = c.lockMap[userID]
+		if lock == nil {
+			c.lockMap[userID] = &sync.Mutex{}
+			lock = c.lockMap[userID]
+		}
+		c.lockMapLock.Unlock()
+	}
+	lock.Lock()
+	return func() { lock.Unlock() }
+}
+
 // New returns a new Cache instance
 func New(s metadata.Storage, namespace, filename string, ttl time.Duration) Cache {
 	return Cache{
@@ -72,11 +91,15 @@ func New(s metadata.Storage, namespace, filename string, ttl time.Duration) Cach
 		namespace:  namespace,
 		filename:   filename,
 		ttl:        ttl,
+		lockMap:    map[string]*sync.Mutex{},
 	}
 }
 
 // Add adds a share to the cache
 func (c *Cache) Add(ctx context.Context, userid, shareID string) error {
+	unlock := c.lockUser(userid)
+	defer unlock()
+
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Add")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userid), attribute.String("cs3.shareid", shareID))
@@ -104,6 +127,9 @@ func (c *Cache) Add(ctx context.Context, userid, shareID string) error {
 
 // Remove removes a share for the given user
 func (c *Cache) Remove(ctx context.Context, userid, shareID string) error {
+	unlock := c.lockUser(userid)
+	defer unlock()
+
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Remove")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userid), attribute.String("cs3.shareid", shareID))
@@ -147,6 +173,9 @@ func (c *Cache) List(userid string) map[string]SpaceShareIDs {
 
 // Sync updates the in-memory data with the data from the storage if it is outdated
 func (c *Cache) Sync(ctx context.Context, userID string) error {
+	unlock := c.lockUser(userID)
+	defer unlock()
+
 	ctx, span := appctx.GetTracerProvider(ctx).Tracer(tracerName).Start(ctx, "Sync")
 	defer span.End()
 	span.SetAttributes(attribute.String("cs3.userid", userID))
