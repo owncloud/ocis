@@ -55,6 +55,9 @@ func MapOnExists(key string, dst any) error {
 }
 
 // MapOnExists mapping data to the dst structure only on key exists.
+//
+//   - Support ParseEnv on mapping
+//   - Support ParseDefault on mapping
 func (c *Config) MapOnExists(key string, dst any) error {
 	err := c.Structure(key, dst)
 	if err != nil && err == ErrNotFound {
@@ -66,12 +69,15 @@ func (c *Config) MapOnExists(key string, dst any) error {
 
 // Structure get config data and binding to the dst structure.
 //
+//   - Support ParseEnv on mapping
+//   - Support ParseDefault on mapping
+//
 // Usage:
 //
 //	dbInfo := Db{}
 //	config.Structure("db", &dbInfo)
 func (c *Config) Structure(key string, dst any) error {
-	var data interface{}
+	var data any
 	// binding all data
 	if key == "" {
 		data = c.data
@@ -133,7 +139,7 @@ func (c *Config) DumpTo(out io.Writer, format string) (n int64, err error) {
 	var ok bool
 	var encoder Encoder
 
-	format = fixFormat(format)
+	format = c.resolveFormat(format)
 	if encoder, ok = c.encoders[format]; !ok {
 		err = errors.New("not exists/register encoder for the format: " + format)
 		return

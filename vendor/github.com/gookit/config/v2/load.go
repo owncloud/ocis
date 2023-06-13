@@ -4,13 +4,15 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/gookit/goutil/errorx"
 	"github.com/gookit/goutil/fsutil"
 	"github.com/imdario/mergo"
 )
@@ -42,6 +44,10 @@ func LoadExists(sourceFiles ...string) error { return dc.LoadExists(sourceFiles.
 // LoadExists load and parse config files, but will ignore not exists file.
 func (c *Config) LoadExists(sourceFiles ...string) (err error) {
 	for _, file := range sourceFiles {
+		if file == "" {
+			continue
+		}
+
 		if err = c.loadFile(file, true, ""); err != nil {
 			return
 		}
@@ -72,7 +78,7 @@ func (c *Config) LoadRemote(format, url string) (err error) {
 	}
 
 	// read response content
-	bts, err := ioutil.ReadAll(resp.Body)
+	bts, err := io.ReadAll(resp.Body)
 	if err == nil {
 		if err = c.parseSourceCode(format, bts); err != nil {
 			return
@@ -191,20 +197,34 @@ func LoadData(dataSource ...any) error { return dc.LoadData(dataSource...) }
 //
 // The dataSources can be:
 //   - map[string]any
+//   - map[string]string
 func (c *Config) LoadData(dataSources ...any) (err error) {
 	if c.opts.Delimiter == 0 {
 		c.opts.Delimiter = defaultDelimiter
 	}
 
 	for _, ds := range dataSources {
+		if smp, ok := ds.(map[string]string); ok {
+			c.LoadSMap(smp)
+			continue
+		}
+
 		err = mergo.Merge(&c.data, ds, mergo.WithOverride)
 		if err != nil {
-			return
+			return errorx.WithStack(err)
 		}
 	}
 
 	c.fireHook(OnLoadData)
 	return
+}
+
+// LoadSMap to config
+func (c *Config) LoadSMap(smp map[string]string) {
+	for k, v := range smp {
+		c.data[k] = v
+	}
+	c.fireHook(OnLoadData)
 }
 
 // LoadSources load one or multi byte data
@@ -314,9 +334,8 @@ func (c *Config) LoadFromDir(dirPath, format string) (err error) {
 	extName := "." + format
 	extLen := len(extName)
 
-	return fsutil.FindInDir(dirPath, func(fPath string, fi os.FileInfo) error {
-		baseName := fi.Name()
-
+	return fsutil.FindInDir(dirPath, func(fPath string, ent fs.DirEntry) error {
+		baseName := ent.Name()
 		if strings.HasSuffix(baseName, extName) {
 			data, err := c.parseSourceToMap(format, fsutil.MustReadFile(fPath))
 			if err != nil {
@@ -386,7 +405,7 @@ func (c *Config) loadFile(file string, loadExist bool, format string) (err error
 	defer fd.Close()
 
 	// read file content
-	bts, err := ioutil.ReadAll(fd)
+	bts, err := io.ReadAll(fd)
 	if err == nil {
 		// get format for file ext
 		if format == "" {
@@ -431,8 +450,8 @@ func (c *Config) loadDataMap(data map[string]any) (err error) {
 }
 
 // parse config source code to Config.
-func (c *Config) parseSourceToMap(format string, blob []byte) (map[string]interface{}, error) {
-	format = fixFormat(format)
+func (c *Config) parseSourceToMap(format string, blob []byte) (map[string]any, error) {
+	format = c.resolveFormat(format)
 	decode := c.decoders[format]
 	if decode == nil {
 		return nil, errors.New("not register decoder for the format: " + format)

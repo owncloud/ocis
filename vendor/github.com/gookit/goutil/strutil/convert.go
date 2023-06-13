@@ -1,7 +1,6 @@
 package strutil
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
@@ -17,8 +16,10 @@ import (
 )
 
 var (
-	ErrDateLayout   = errors.New("invalid date layout string")
-	ErrInvalidParam = errors.New("invalid input parameter")
+	// ErrDateLayout error
+	ErrDateLayout = errors.New("invalid date layout string")
+	// ErrInvalidParam error
+	ErrInvalidParam = errors.New("invalid input for parse time")
 
 	// some regex for convert string.
 	toSnakeReg  = regexp.MustCompile("[A-Z][a-z]")
@@ -39,6 +40,8 @@ var (
 func Quote(s string) string { return strconv.Quote(s) }
 
 // Unquote remove start and end quotes by single-quote or double-quote
+//
+// tip: strconv.Unquote cannot unquote single-quote
 func Unquote(s string) string {
 	ln := len(s)
 	if ln < 2 {
@@ -70,6 +73,16 @@ func Join(sep string, ss ...string) string { return strings.Join(ss, sep) }
 // JoinList alias of strings.Join
 func JoinList(sep string, ss []string) string { return strings.Join(ss, sep) }
 
+// JoinAny type to string
+func JoinAny(sep string, parts ...any) string {
+	ss := make([]string, 0, len(parts))
+	for _, part := range parts {
+		ss = append(ss, QuietString(part))
+	}
+
+	return strings.Join(ss, sep)
+}
+
 // Implode alias of strings.Join
 func Implode(sep string, ss ...string) string { return strings.Join(ss, sep) }
 
@@ -77,8 +90,13 @@ func Implode(sep string, ss ...string) string { return strings.Join(ss, sep) }
  * convert value to string
  *************************************************************/
 
-// String convert val to string
+// String convert value to string, return error on failed
 func String(val any) (string, error) {
+	return AnyToString(val, true)
+}
+
+// ToString convert value to string, return error on failed
+func ToString(val any) (string, error) {
 	return AnyToString(val, true)
 }
 
@@ -88,9 +106,18 @@ func QuietString(in any) string {
 	return val
 }
 
-// MustString convert value to string, TODO will panic on error
-func MustString(in any) string {
+// SafeString convert value to string, will ignore error
+func SafeString(in any) string {
 	val, _ := AnyToString(in, false)
+	return val
+}
+
+// MustString convert value to string, will panic on error
+func MustString(in any) string {
+	val, err := AnyToString(in, false)
+	if err != nil {
+		panic(err)
+	}
 	return val
 }
 
@@ -99,17 +126,12 @@ func StringOrErr(val any) (string, error) {
 	return AnyToString(val, true)
 }
 
-// ToString convert value to string
-func ToString(val any) (string, error) {
-	return AnyToString(val, true)
-}
-
 // AnyToString convert value to string.
 //
-// if defaultAsErr:
+// For defaultAsErr:
 //
-//	False will use fmt.Sprint convert complex type
-//	True  will return error on fail.
+//   - False  will use fmt.Sprint convert complex type
+//   - True   will return error on fail.
 func AnyToString(val any, defaultAsErr bool) (str string, err error) {
 	if val == nil {
 		return
@@ -147,8 +169,8 @@ func AnyToString(val any, defaultAsErr bool) (str string, err error) {
 	case []byte:
 		str = string(value)
 	case time.Duration:
-		str = value.String()
-	case json.Number:
+		str = strconv.FormatInt(int64(value), 10)
+	case fmt.Stringer:
 		str = value.String()
 	default:
 		if defaultAsErr {
@@ -203,7 +225,10 @@ func QuietBool(s string) bool {
 
 // MustBool convert, will panic on error
 func MustBool(s string) bool {
-	val, _ := comfunc.StrToBool(strings.TrimSpace(s))
+	val, err := comfunc.StrToBool(strings.TrimSpace(s))
+	if err != nil {
+		panic(err)
+	}
 	return val
 }
 
@@ -226,6 +251,12 @@ func ToInt(s string) (int, error) {
 	return strconv.Atoi(strings.TrimSpace(s))
 }
 
+// Int2 convert string to int, will ignore error
+func Int2(s string) int {
+	val, _ := ToInt(s)
+	return val
+}
+
 // QuietInt convert string to int, will ignore error
 func QuietInt(s string) int {
 	val, _ := ToInt(s)
@@ -234,8 +265,7 @@ func QuietInt(s string) int {
 
 // MustInt convert string to int, will panic on error
 func MustInt(s string) int {
-	val, _ := ToInt(s)
-	return val
+	return IntOrPanic(s)
 }
 
 // IntOrPanic convert value to int, will panic on error
@@ -334,87 +364,8 @@ func ToSlice(s string, sep ...string) []string {
 // 	return cliutil.StringToOSArgs(s) // error: import cycle not allowed
 // }
 
-// MustToTime convert date string to time.Time
-func MustToTime(s string, layouts ...string) time.Time {
-	t, err := ToTime(s, layouts...)
-	if err != nil {
-		panic(err)
-	}
-	return t
-}
-
-// auto match use some commonly layouts.
-// key is layout length.
-var layoutMap = map[int][]string{
-	6:  {"200601", "060102", time.Kitchen},
-	8:  {"20060102"},
-	10: {"2006-01-02"},
-	13: {"2006-01-02 15"},
-	15: {time.Stamp},
-	16: {"2006-01-02 15:04"},
-	19: {"2006-01-02 15:04:05", time.RFC822, time.StampMilli},
-	20: {"2006-01-02 15:04:05Z"},
-	21: {time.RFC822Z},
-	22: {time.StampMicro},
-	24: {time.ANSIC},
-	25: {time.RFC3339, time.StampNano},
-	// 26: {time.Layout}, // must go >= 1.19
-	28: {time.UnixDate},
-	29: {time.RFC1123},
-	30: {time.RFC850},
-	31: {time.RFC1123Z},
-	35: {time.RFC3339Nano},
-}
-
-// ToTime convert date string to time.Time
-func ToTime(s string, layouts ...string) (t time.Time, err error) {
-	// custom layout
-	if len(layouts) > 0 {
-		if len(layouts[0]) > 0 {
-			return time.Parse(layouts[0], s)
-		}
-
-		err = ErrDateLayout
-		return
-	}
-
-	// auto match use some commonly layouts.
-	strLn := len(s)
-	maybeLayouts, ok := layoutMap[strLn]
-	if !ok {
-		err = ErrInvalidParam
-		return
-	}
-
-	var hasAlphaT bool
-	if pos := strings.IndexByte(s, 'T'); pos > 0 && pos < 12 {
-		hasAlphaT = true
-	}
-
-	hasSlashR := strings.IndexByte(s, '/') > 0
-	for _, layout := range maybeLayouts {
-		// date string has "T". eg: "2006-01-02T15:04:05"
-		if hasAlphaT {
-			layout = strings.Replace(layout, " ", "T", 1)
-		}
-
-		// date string has "/". eg: "2006/01/02 15:04:05"
-		if hasSlashR {
-			layout = strings.Replace(layout, "-", "/", -1)
-		}
-
-		t, err = time.Parse(layout, s)
-		if err == nil {
-			return
-		}
-	}
-
-	// t, err = time.ParseInLocation(layout, s, time.Local)
-	return
-}
-
 // ToDuration parses a duration string. such as "300ms", "-1.5h" or "2h45m".
 // Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
 func ToDuration(s string) (time.Duration, error) {
-	return time.ParseDuration(s)
+	return comfunc.ToDuration(s)
 }
