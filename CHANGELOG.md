@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
+* Enhancement - Update reva: [#6507](https://github.com/owncloud/ocis/pull/6507)
 * Enhancement - Use reva client selectors: [#6452](https://github.com/owncloud/ocis/pull/6452)
 * Enhancement - Add companion URL config: [#6453](https://github.com/owncloud/ocis/pull/6453)
 * Enhancement - Add imprint and privacy url config: [#6462](https://github.com/owncloud/ocis/pull/6462)
@@ -25,6 +26,12 @@ The following sections list the changes for unreleased.
    `app-provider-office365`.
 
    https://github.com/owncloud/ocis/pull/6482
+
+* Enhancement - Update reva: [#6507](https://github.com/owncloud/ocis/pull/6507)
+
+   Update reva to latest edge
+
+   https://github.com/owncloud/ocis/pull/6507
 
 * Enhancement - Use reva client selectors: [#6452](https://github.com/owncloud/ocis/pull/6452)
 
