@@ -228,3 +228,50 @@ Feature: antivirus
       | eicar.com     | virusFile1.txt |
       | eicar_com.zip | virusFile2.zip |
 
+
+  Scenario Outline: upload a file with virus to a project space
+    Given using spaces DAV path
+    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And user "Alice" has created a space "new-space" with the default quota using the GraphApi
+    And user "Alice" has created a folder "uploadFolder" in space "new-space"
+    When user "Alice" uploads a file "filesForUpload/filesWithVirus/<filename>" to "/uploadFolder/<newfilename>" in space "new-space" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And user "Alice" should get a notification with subject "Virus found" and message:
+      | message                                                                        |
+      | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And for user "Alice" the space "new-space" should not contain these entries:
+      | /uploadFolder/<newfilename> |
+    When user "Alice" uploads a file "filesForUpload/filesWithVirus/<filename>" to "/<newfilename>" in space "new-space" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And user "Alice" should get a notification with subject "Virus found" and message:
+      | message                                                                        |
+      | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And for user "Alice" the space "new-space" should not contain these entries:
+      | /<newfilename> |
+    Examples:
+      | filename      | newfilename    |
+      | eicar.com     | virusFile1.txt |
+      | eicar_com.zip | virusFile2.zip |
+
+
+  Scenario Outline: upload a file with virus to a shared project space
+    Given using spaces DAV path
+    And user "Brian" has been created with default attributes and without skeleton files
+    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And user "Alice" has created a space "new-space" with the default quota using the GraphApi
+    And user "Alice" has shared a space "new-space" with settings:
+      | shareWith | Brian  |
+      | role      | editor |
+    When user "Brian" uploads a file "/filesForUpload/filesWithVirus/<filename>" to "/<newfilename>" in space "new-space" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And user "Brian" should get a notification with subject "Virus found" and message:
+      | message                                                                        |
+      | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And for user "Brian" the space "new-space" should not contain these entries:
+      | /<newfilename> |
+    And for user "Alice" the space "new-space" should not contain these entries:
+      | /<newfilename> |
+    Examples:
+      | filename      | newfilename    |
+      | eicar.com     | virusFile1.txt |
+      | eicar_com.zip | virusFile2.zip |
