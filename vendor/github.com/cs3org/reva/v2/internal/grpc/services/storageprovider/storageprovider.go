@@ -499,6 +499,8 @@ func (s *service) CreateStorageSpace(ctx context.Context, req *provider.CreateSt
 			}
 		case errtypes.AlreadyExists:
 			st = status.NewAlreadyExists(ctx, err, "already exists")
+		case errtypes.BadRequest:
+			st = status.NewInvalid(ctx, err.Error())
 		default:
 			st = status.NewInternal(ctx, "error creating space")
 			appctx.GetLogger(ctx).
