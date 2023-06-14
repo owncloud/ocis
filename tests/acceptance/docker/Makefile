@@ -186,11 +186,19 @@ testSuite: $(OCIS_WRAPPER) build-dev-image clean-docker-container
 		COMPOSE_FILE=src/email.yml \
 		docker-compose run start_email; \
 	fi; \
+	if [ "${START_ANTIVIRUS}" == "true" ]; then \
+    		COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
+    		COMPOSE_FILE=src/antivirus.yml \
+    		docker-compose run start_antivirus; \
+    fi; \
 	COMPOSE_PROJECT_NAME=$(COMPOSE_PROJECT_NAME) \
 	COMPOSE_FILE=$(COMPOSE_FILE) \
 	STORAGE_DRIVER=$(STORAGE_DRIVER) \
 	TEST_SOURCE=$(TEST_SOURCE) \
 	WITH_WRAPPER=$(WITH_WRAPPER) \
+	OCIS_ASYNC_UPLOADS=$(OCIS_ASYNC_UPLOADS) \
+	OCIS_ADD_RUN_SERVICES=$(OCIS_ADD_RUN_SERVICES) \
+	POSTPROCESSING_STEPS=$(POSTPROCESSING_STEPS) \
 	OCIS_IMAGE_TAG=$(OCIS_IMAGE_TAG) \
 	BEHAT_SUITE=$(BEHAT_SUITE) \
 	BEHAT_FEATURE=$(BEHAT_FEATURE) \
