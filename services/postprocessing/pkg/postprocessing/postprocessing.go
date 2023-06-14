@@ -17,7 +17,14 @@ type Postprocessing struct {
 	Filesize   uint64
 	ResourceID *provider.ResourceId
 	Steps      []events.Postprocessingstep
+	Status     Status
 	PPDelay    time.Duration
+}
+
+// Status is helper struct to show current postprocessing status
+type Status struct {
+	CurrentStep events.Postprocessingstep
+	Outcome     events.PostprocessingOutcome
 }
 
 // New returns a new postprocessing instance
@@ -40,7 +47,7 @@ func (pp *Postprocessing) Init(ev events.BytesReceived) interface{} {
 		return pp.finished(events.PPOutcomeContinue)
 	}
 
-	return pp.nextStep(pp.Steps[0])
+	return pp.step(pp.Steps[0])
 }
 
 // NextStep returns the next postprocessing step
@@ -54,6 +61,14 @@ func (pp *Postprocessing) NextStep(ev events.PostprocessingStepFinished) interfa
 	}
 }
 
+// CurrentStep returns the current postprocessing step
+func (pp *Postprocessing) CurrentStep() interface{} {
+	if pp.Status.Outcome != "" {
+		return pp.finished(pp.Status.Outcome)
+	}
+	return pp.step(pp.Status.CurrentStep)
+}
+
 // Delay will sleep the configured time then continue
 func (pp *Postprocessing) Delay(ev events.StartPostprocessingStep) interface{} {
 	time.Sleep(pp.PPDelay)
@@ -64,13 +79,14 @@ func (pp *Postprocessing) next(current events.Postprocessingstep) interface{} {
 	l := len(pp.Steps)
 	for i, s := range pp.Steps {
 		if s == current && i+1 < l {
-			return pp.nextStep(pp.Steps[i+1])
+			return pp.step(pp.Steps[i+1])
 		}
 	}
 	return pp.finished(events.PPOutcomeContinue)
 }
 
-func (pp *Postprocessing) nextStep(next events.Postprocessingstep) events.StartPostprocessingStep {
+func (pp *Postprocessing) step(next events.Postprocessingstep) events.StartPostprocessingStep {
+	pp.Status.CurrentStep = next
 	return events.StartPostprocessingStep{
 		UploadID:      pp.ID,
 		URL:           pp.URL,
@@ -83,6 +99,7 @@ func (pp *Postprocessing) nextStep(next events.Postprocessingstep) events.StartP
 }
 
 func (pp *Postprocessing) finished(outcome events.PostprocessingOutcome) events.PostprocessingFinished {
+	pp.Status.Outcome = outcome
 	return events.PostprocessingFinished{
 		UploadID:      pp.ID,
 		ExecutingUser: pp.User,

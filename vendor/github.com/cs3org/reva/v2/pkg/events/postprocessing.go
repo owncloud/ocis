@@ -171,3 +171,16 @@ func (UploadReady) Unmarshal(v []byte) (interface{}, error) {
 	err := json.Unmarshal(v, &e)
 	return e, err
 }
+
+// ResumePostprocessing can be emitted to repair broken postprocessing
+type ResumePostprocessing struct {
+	UploadID  string
+	Timestamp *types.Timestamp
+}
+
+// Unmarshal to fulfill umarshaller interface
+func (ResumePostprocessing) Unmarshal(v []byte) (interface{}, error) {
+	e := ResumePostprocessing{}
+	err := json.Unmarshal(v, &e)
+	return e, err
+}

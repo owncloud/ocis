@@ -28,6 +28,7 @@ func NewPostprocessingService(stream events.Stream, logger log.Logger, sto store
 		events.StartPostprocessingStep{},
 		events.UploadReady{},
 		events.PostprocessingStepFinished{},
+		events.ResumePostprocessing{},
 	)
 	if err != nil {
 		return nil, err
@@ -46,22 +47,22 @@ func NewPostprocessingService(stream events.Stream, logger log.Logger, sto store
 // Run to fulfil Runner interface
 func (pps *PostprocessingService) Run() error {
 	for e := range pps.events {
-		var next interface{}
+		var (
+			next interface{}
+			pp   *postprocessing.Postprocessing
+			err  error
+		)
+
 		switch ev := e.Event.(type) {
 		case events.BytesReceived:
-			pp := postprocessing.New(ev.UploadID, ev.URL, ev.ExecutingUser, ev.Filename, ev.Filesize, ev.ResourceID, pps.steps, pps.c.Delayprocessing)
-			if err := storePP(pps.store, pp); err != nil {
-				pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot store upload")
-				continue
-			}
-
+			pp = postprocessing.New(ev.UploadID, ev.URL, ev.ExecutingUser, ev.Filename, ev.Filesize, ev.ResourceID, pps.steps, pps.c.Delayprocessing)
 			next = pp.Init(ev)
 		case events.PostprocessingStepFinished:
 			if ev.UploadID == "" {
 				// no current upload - this was an on demand scan
 				continue
 			}
-			pp, err := getPP(pps.store, ev.UploadID)
+			pp, err = getPP(pps.store, ev.UploadID)
 			if err != nil {
 				pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot get upload")
 				continue
@@ -71,7 +72,7 @@ func (pps *PostprocessingService) Run() error {
 			if ev.StepToStart != events.PPStepDelay {
 				continue
 			}
-			pp, err := getPP(pps.store, ev.UploadID)
+			pp, err = getPP(pps.store, ev.UploadID)
 			if err != nil {
 				pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot get upload")
 				continue
@@ -83,8 +84,21 @@ func (pps *PostprocessingService) Run() error {
 				pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot delete upload")
 				continue
 			}
+		case events.ResumePostprocessing:
+			pp, err = getPP(pps.store, ev.UploadID)
+			if err != nil {
+				pps.log.Error().Str("uploadID", ev.UploadID).Err(err).Msg("cannot get upload")
+				continue
+			}
+			next = pp.CurrentStep()
 		}
 
+		if pp != nil {
+			if err := storePP(pps.store, pp); err != nil {
+				pps.log.Error().Str("uploadID", pp.ID).Err(err).Msg("cannot store upload")
+				continue // TODO: should we really continue here?
+			}
+		}
 		if next != nil {
 			if err := events.Publish(pps.pub, next); err != nil {
 				pps.log.Error().Err(err).Msg("unable to publish event")

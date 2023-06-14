@@ -121,6 +121,7 @@ func (av Antivirus) Run() error {
 				av.l.Fatal().Err(err).Str("uploadid", ev.UploadID).Interface("resourceID", ev.ResourceID).Msg("cannot publish events - exiting")
 				return err
 			}
+			continue
 		}
 
 		av.l.Debug().Str("uploadid", ev.UploadID).Str("filename", ev.Filename).Msg("Starting virus scan.")
