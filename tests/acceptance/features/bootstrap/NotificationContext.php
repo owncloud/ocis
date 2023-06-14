@@ -202,7 +202,7 @@ class NotificationContext implements Context {
 	public function userShouldGetANotificationWithMessage(string $user, string $subject, TableNode $table):void {
 		$this->userListAllNotifications($user);
 		$this->featureContext->theHTTPStatusCodeShouldBe(200);
-		$actualMessage = $this->filterResponseAccordingToNotificationSubject($subject)->message;
+		$actualMessage = str_replace(["\r", "\n"], " ", $this->filterResponseAccordingToNotificationSubject($subject)->message);
 		$expectedMessage = $table->getColumnsHash()[0]['message'];
 		Assert::assertSame(
 			$expectedMessage,
