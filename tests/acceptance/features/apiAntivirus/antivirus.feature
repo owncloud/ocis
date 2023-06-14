@@ -315,7 +315,4 @@ Feature: antivirus
       | dav-path-version |
       | old              |
       | new              |
-    @skipOnRevaMaster
-    Examples:
-      | dav-path-version |
       | spaces           |
