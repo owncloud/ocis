@@ -15,6 +15,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
 * Enhancement - Fix the groupname validation: [#6490](https://github.com/owncloud/ocis/pull/6490)
 * Enhancement - Fix the username validation: [#6437](https://github.com/owncloud/ocis/pull/6437)
+* Enhancement - Add functionality to retry postprocessing: [#6500](https://github.com/owncloud/ocis/pull/6500)
 * Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
 * Enhancement - Update web to v7.0.1: [#6470](https://github.com/owncloud/ocis/pull/6470)
 
@@ -86,6 +87,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/6436
    https://github.com/owncloud/ocis/pull/6437
+
+* Enhancement - Add functionality to retry postprocessing: [#6500](https://github.com/owncloud/ocis/pull/6500)
+
+   Adds a ctl command to manually retry failed postprocessing on uploads
+
+   https://github.com/owncloud/ocis/pull/6500
 
 * Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
 
