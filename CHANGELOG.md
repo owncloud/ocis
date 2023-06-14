@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Add missing timestamps: [#6515](https://github.com/owncloud/ocis/pull/6515)
 * Bugfix - Handle the bad request status: [#6469](https://github.com/owncloud/ocis/pull/6469)
+* Enhancement - Add permissions to report: [#6528](https://github.com/owncloud/ocis/pull/6528)
 * Enhancement - Add more metadata to the remote item: [#6300](https://github.com/owncloud/ocis/pull/6300)
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
 * Enhancement - Update reva: [#6507](https://github.com/owncloud/ocis/pull/6507)
@@ -37,6 +38,13 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/issues/6414
    https://github.com/owncloud/ocis/pull/6469
    https://github.com/cs3org/reva/pull/3948
+
+* Enhancement - Add permissions to report: [#6528](https://github.com/owncloud/ocis/pull/6528)
+
+   The webdav REPORT endpoint only returned permissions for personal spaces and shares. Now also
+   for project spaces.
+
+   https://github.com/owncloud/ocis/pull/6528
 
 * Enhancement - Add more metadata to the remote item: [#6300](https://github.com/owncloud/ocis/pull/6300)
 
