@@ -94,17 +94,20 @@ Feature: antivirus
       | name        | sharedlink               |
       | permissions | change                   |
       | expireDate  | 2040-01-01T23:59:59+0100 |
-    When user "Alice" uploads file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt" using the WebDAV API
+    When user "Alice" uploads file "filesForUpload/filesWithVirus/<filename>" to "/<newfilename>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                        |
-      | Virus found in virusFile.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
-    And as "Alice" file "/uploadFolder/virusFile.txt" should not exist
+      | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And as "Alice" file "/uploadFolder/<newfilename>" should not exist
     Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
+      | dav-path-version | filename      | newfilename    |
+      | old              | eicar.com     | virusFile1.txt |
+      | old              | eicar_com.zip | virusFile2.zip |
+      | new              | eicar.com     | virusFile1.txt |
+      | new              | eicar_com.zip | virusFile2.zip |
+      | spaces           | eicar.com     | virusFile1.txt |
+      | spaces           | eicar_com.zip | virusFile2.zip |
 
 
   Scenario Outline: upload a file with the virus to a password-protected public share
@@ -116,17 +119,20 @@ Feature: antivirus
       | permissions | change                   |
       | password    | newpasswd                |
       | expireDate  | 2040-01-01T23:59:59+0100 |
-    When user "Alice" uploads file "filesForUpload/filesWithVirus/eicar.com" to "/virusFile.txt" using the WebDAV API
+    When user "Alice" uploads file "filesForUpload/filesWithVirus/<filename>" to "/<newfilename>" using the WebDAV API
     Then the HTTP status code should be "201"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                        |
-      | Virus found in virusFile.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
-    And as "Alice" file "/uploadFolder/virusFile.txt" should not exist
+      | Virus found in <newfilename>. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And as "Alice" file "/uploadFolder/<newfilename>" should not exist
     Examples:
-      | dav-path-version |
-      | old              |
-      | new              |
-      | spaces           |
+      | dav-path-version | filename      | newfilename    |
+      | old              | eicar.com     | virusFile1.txt |
+      | old              | eicar_com.zip | virusFile2.zip |
+      | new              | eicar.com     | virusFile1.txt |
+      | new              | eicar_com.zip | virusFile2.zip |
+      | spaces           | eicar.com     | virusFile1.txt |
+      | spaces           | eicar_com.zip | virusFile2.zip |
 
 
   Scenario Outline: upload a file with virus to a user share
