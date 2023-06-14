@@ -124,13 +124,17 @@ func (g Graph) getRemoteItem(ctx context.Context, root *storageprovider.Resource
 		return nil, err
 	}
 
-	if baseURL != nil {
+	if baseURL != nil && res.GetInfo() != nil && res.GetInfo().GetSpace() != nil {
 		// TODO read from StorageSpace ... needs Opaque for now
 		// TODO how do we build the url?
 		// for now: read from request
-		webDavURL := *baseURL
-		webDavURL.Path = path.Join(webDavURL.Path, storagespace.FormatResourceID(*root))
-		item.WebDavUrl = libregraph.PtrString(webDavURL.String())
+		item.Name = libregraph.PtrString(res.GetInfo().GetName())
+		if res.GetInfo().GetSpace().GetRoot() != nil {
+			webDavURL := *baseURL
+			relativePath := res.GetInfo().GetPath()
+			webDavURL.Path = path.Join(webDavURL.Path, storagespace.FormatResourceID(*res.GetInfo().GetSpace().GetRoot()), relativePath)
+			item.WebDavUrl = libregraph.PtrString(webDavURL.String())
+		}
 	}
 	return item, nil
 }
@@ -192,8 +196,8 @@ func cs3ResourceToRemoteItem(res *storageprovider.ResourceInfo) (*libregraph.Rem
 		Size: size,
 	}
 
-	if name := path.Base(res.Path); name != "" {
-		remoteItem.Name = &name
+	if res.GetPath() != "" {
+		remoteItem.Path = libregraph.PtrString(path.Clean(res.GetPath()))
 	}
 	if res.Etag != "" {
 		remoteItem.ETag = &res.Etag
@@ -210,6 +214,13 @@ func cs3ResourceToRemoteItem(res *storageprovider.ResourceInfo) (*libregraph.Rem
 	}
 	if res.Type == storageprovider.ResourceType_RESOURCE_TYPE_CONTAINER {
 		remoteItem.Folder = &libregraph.Folder{}
+	}
+	if res.GetSpace() != nil && res.GetSpace().GetRoot() != nil {
+		remoteItem.RootId = libregraph.PtrString(storagespace.FormatResourceID(*res.GetSpace().GetRoot()))
+		grantSpaceAlias := utils.ReadPlainFromOpaque(res.GetSpace().GetOpaque(), "spaceAlias")
+		if grantSpaceAlias != "" {
+			remoteItem.DriveAlias = libregraph.PtrString(grantSpaceAlias)
+		}
 	}
 	return remoteItem, nil
 }
