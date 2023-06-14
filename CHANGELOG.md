@@ -7,6 +7,7 @@ The following sections list the changes for unreleased.
 ## Summary
 
 * Bugfix - Add missing timestamps: [#6515](https://github.com/owncloud/ocis/pull/6515)
+* Enhancement - Add more metadata to the remote item: [#6300](https://github.com/owncloud/ocis/pull/6300)
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
 * Enhancement - Update reva: [#6507](https://github.com/owncloud/ocis/pull/6507)
 * Enhancement - Use reva client selectors: [#6452](https://github.com/owncloud/ocis/pull/6452)
@@ -27,6 +28,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3753
    https://github.com/owncloud/ocis/pull/6515
+
+* Enhancement - Add more metadata to the remote item: [#6300](https://github.com/owncloud/ocis/pull/6300)
+
+   We added the drive alias, the space name and the relative path to the remote item. This is needed
+   to resolve shared files directly on the source space.
+
+   https://github.com/owncloud/ocis/pull/6300
 
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
 
