@@ -266,15 +266,12 @@ Feature: antivirus
       | eicar.com     | virusFile1.txt |
       | eicar_com.zip | virusFile2.zip |
 
-  @env-config
-  Scenario Outline: upload a file with virus by setting antivirus infected file handling environment variable to continue
+  @env-config  @issue-6494
+  Scenario Outline: upload a file with virus by setting antivirus infected file handling config to continue
     Given the config "ANTIVIRUS_INFECTED_FILE_HANDLING" has been set to "continue"
     And using <dav-path-version> DAV path
     When user "Alice" uploads file "filesForUpload/filesWithVirus/eicar.com" to "/aFileWithVirus.txt" using the WebDAV API
     Then the HTTP status code should be "201"
-    And user "Alice" should get a notification with subject "Virus found" and message:
-      | message                                                                             |
-      | Virus found in aFileWithVirus.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
     And as "Alice" file "/aFileWithVirus.txt" should exist
     Examples:
       | dav-path-version |
