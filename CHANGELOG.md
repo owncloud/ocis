@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Use reva client selectors: [#6452](https://github.com/owncloud/ocis/pull/6452)
 * Enhancement - Add companion URL config: [#6453](https://github.com/owncloud/ocis/pull/6453)
 * Enhancement - Add imprint and privacy url config: [#6462](https://github.com/owncloud/ocis/pull/6462)
+* Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
 * Enhancement - Fix the groupname validation: [#6490](https://github.com/owncloud/ocis/pull/6490)
 * Enhancement - Fix the username validation: [#6437](https://github.com/owncloud/ocis/pull/6437)
 * Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
@@ -63,6 +64,14 @@ The following sections list the changes for unreleased.
    `WEB_OPTION_PRIVACY_URL`.
 
    https://github.com/owncloud/ocis/pull/6462
+
+* Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
+
+   Defaults for the envvar OCIS_LDAP_DISABLE_USER_MECHANISM were not used consistently,
+   correct is `attribute`.
+
+   https://github.com/owncloud/ocis/issues/6513
+   https://github.com/owncloud/ocis/pull/6516
 
 * Enhancement - Fix the groupname validation: [#6490](https://github.com/owncloud/ocis/pull/6490)
 
