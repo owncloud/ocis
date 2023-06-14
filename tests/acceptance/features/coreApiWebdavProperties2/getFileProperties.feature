@@ -9,7 +9,7 @@ Feature: get file properties
     And user "Alice" has been created with default attributes and without skeleton files
 
   @smokeTest
-  Scenario Outline: Do a PROPFIND of various file names
+  Scenario Outline: user sends a PROPFIND request on various file names
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "<file_name>"
     When user "Alice" gets the properties of file "<file_name>" using the WebDAV API
@@ -35,7 +35,7 @@ Feature: get file properties
       | spaces      | s,a,m,p,l,e.txt   |
 
   @issue-1296
-  Scenario Outline: Do a PROPFIND of various file names
+  Scenario Outline: user sends a PROPFIND request on various file with '?, #, &, +' in its name
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "<file_name>"
     When user "Alice" gets the properties of file "<file_name>" using the WebDAV API
@@ -62,7 +62,7 @@ Feature: get file properties
       | spaces      | /file &2.txt  | dav/spaces/%spaceid%/file &2.txt  |
 
   @issue-1296
-  Scenario Outline: Do a PROPFIND of various folder names
+  Scenario Outline: user sends a PROPFIND request on various folder names
     Given using <dav_version> DAV path
     And user "Alice" has created folder "<folder_name>"
     And user "Alice" has uploaded file with content "uploaded content" to "<folder_name>/file1.txt"
@@ -101,7 +101,7 @@ Feature: get file properties
       | spaces      | /folder &2.txt  | dav/spaces/%spaceid%/folder &2.txt  |
 
 
-  Scenario Outline: do a PROPFIND of various files inside various folders
+  Scenario Outline: user sends a PROPFIND request on various files inside various folders
     Given using <dav_version> DAV path
     And user "Alice" has created folder "<folder_name>"
     And user "Alice" has uploaded file with content "uploaded content" to "<folder_name>/<file_name>"
@@ -132,7 +132,7 @@ Feature: get file properties
 
   @issue-1259
   #after fixing all issues delete this Scenario and merge with the one above
-  Scenario Outline: do a PROPFIND of various files inside various folders with '?' character in its name
+  Scenario Outline: user sends a PROPFIND request on various files inside various folders with '?' character in its name
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/folder ?2.txt"
     And user "Alice" has uploaded file with content "uploaded content" to "/folder ?2.txt/file ?2.txt"
@@ -150,7 +150,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: A file that is not shared does not have a share-types property
+  Scenario Outline: file that is not shared does not have a share-types property
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/test"
     When user "Alice" gets the following properties of folder "/test" using the WebDAV API
@@ -169,7 +169,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: A file that is shared to a user has a share-types property
+  Scenario Outline: file that is shared to a user has a share-types property
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "/test"
@@ -195,7 +195,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: A file that is shared to a group has a share-types property
+  Scenario Outline: file that is shared to a group has a share-types property
     Given using <dav_version> DAV path
     And group "grp1" has been created
     And user "Alice" has created folder "/test"
@@ -221,7 +221,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: A file that is shared by link has a share-types property
+  Scenario Outline: file that is shared by link has a share-types property
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/test"
     And user "Alice" has created a public link share with settings
@@ -244,7 +244,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: A file that is shared by user,group and link has a share-types property
+  Scenario Outline: file that is shared by user,group and link has a share-types property
     Given using <dav_version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And group "grp1" has been created
@@ -281,7 +281,7 @@ Feature: get file properties
       | spaces      |
 
   @smokeTest @issue-2809
-  Scenario Outline: Retrieving private link
+  Scenario Outline: retrieving a private link
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file "filesForUpload/textfile.txt" to "/somefile.txt"
     When user "Alice" gets the following properties of file "/somefile.txt" using the WebDAV API
@@ -300,7 +300,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: Do a PROPFIND to a nonexistent URL
+  Scenario Outline: user sends a PROPFIND request on a nonexistent URL
     When user "Alice" requests "<url>" with "PROPFIND" using basic auth
     Then the HTTP status code should be "404"
     And the value of the item "/d:error/s:message" in the response about user "Alice" should be "<message1>" or "<message2>"
@@ -383,7 +383,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: Propfind the last modified date of a folder using webdav api
+  Scenario Outline: user tries to get the last modified date of a folder using webdav api
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/test"
     When user "Alice" gets the following properties of folder "/test" using the WebDAV API
@@ -402,7 +402,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: Propfind the content type of a folder using webdav api
+  Scenario Outline: user tries to get the content type of a folder using webdav api
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/test"
     When user "Alice" gets the following properties of folder "/test" using the WebDAV API
@@ -421,7 +421,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: Propfind the content type of a file using webdav api
+  Scenario Outline: user tries to get the content type of a file using webdav api
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "file.txt"
     When user "Alice" gets the following properties of folder "file.txt" using the WebDAV API
@@ -440,7 +440,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: Propfind the etag of a file using webdav api
+  Scenario Outline: user tries to get the etag of a file using webdav api
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "file.txt"
     When user "Alice" gets the following properties of folder "file.txt" using the WebDAV API
@@ -459,7 +459,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: Propfind the resource type of a file using webdav api
+  Scenario Outline: user tries to get the resource type of a file using webdav api
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "file.txt"
     When user "Alice" gets the following properties of folder "file.txt" using the WebDAV API
@@ -478,7 +478,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: Propfind the size of a file using webdav api
+  Scenario Outline: user tries to get the size of a file using webdav api
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "file.txt"
     When user "Alice" gets the following properties of folder "file.txt" using the WebDAV API
@@ -497,7 +497,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: Propfind the size of a folder using webdav api
+  Scenario Outline: user tries to get the size of a folder using webdav api
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/test"
     When user "Alice" gets the following properties of folder "/test" using the WebDAV API
@@ -516,7 +516,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: Propfind the file id of a file using webdav api
+  Scenario Outline: user tries to get the file id of a file using webdav api
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "file.txt"
     When user "Alice" gets the following properties of folder "file.txt" using the WebDAV API
@@ -535,7 +535,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: Propfind the file id of a folder using webdav api
+  Scenario Outline: user tries to get the file id of a folder using webdav api
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/test"
     When user "Alice" gets the following properties of folder "/test" using the WebDAV API
@@ -554,7 +554,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: Propfind the owner display name of a file using webdav api
+  Scenario Outline: user tries to get the owner display name of a file using webdav api
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "file.txt"
     When user "Alice" gets the following properties of file "file.txt" using the WebDAV API
@@ -573,7 +573,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: Propfind the owner display name of a folder using webdav api
+  Scenario Outline: user tries to get the owner display name of a folder using webdav api
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/test"
     When user "Alice" gets the following properties of folder "/test" using the WebDAV API
@@ -592,7 +592,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: Propfind the permissions on a file using webdav api
+  Scenario Outline: user tries to get the permissions on a file using webdav api
     Given using <dav_version> DAV path
     And user "Alice" has uploaded file with content "uploaded content" to "file.txt"
     When user "Alice" gets the following properties of folder "file.txt" using the WebDAV API
@@ -611,7 +611,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: Propfind the permissions on a folder using webdav api
+  Scenario Outline: user tries to get the permissions on a folder using webdav api
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/test"
     When user "Alice" gets the following properties of folder "/test" using the WebDAV API
@@ -630,7 +630,7 @@ Feature: get file properties
       | spaces      |
 
 
-  Scenario Outline: propfind the size of a folder with files using webdav api
+  Scenario Outline: user tries to get the size of a folder with files using webdav api
     Given using <dav_version> DAV path
     And user "Alice" has created folder "/test"
     And user "Alice" has uploaded file with content "a" to "/test/file.txt"
