@@ -264,7 +264,7 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		rootName = space.GetRootInfo().GetPath()
 		permissions = space.GetRootInfo().GetPermissionSet()
 		s.logger.Debug().Interface("grantSpace", space).Interface("mountpointRootId", mountpointRootID).Msg("searching a grant")
-	case "personal":
+	case "personal", "project":
 		permissions = space.GetRootInfo().GetPermissionSet()
 	}
 
