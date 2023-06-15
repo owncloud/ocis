@@ -603,6 +603,7 @@ class SpacesContext implements Context {
 
 	/**
 	 * @When /^user "([^"]*)" creates a space "([^"]*)" of type "([^"]*)" with quota "([^"]*)" using the Graph API$/
+	 * @When /^user "([^"]*)" tries to create a space "([^"]*)" of type "([^"]*)" with quota "([^"]*)" using the Graph API$/
 	 *
 	 * @param string $user
 	 * @param string $spaceName
