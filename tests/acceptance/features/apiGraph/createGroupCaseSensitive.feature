@@ -4,13 +4,13 @@ Feature: create groups, group names are case insensitive
   I want to create groups with similar cases
   So that I can check if the group names are case sensitive
 
-  @issue-3516
+
   Scenario Outline: group names are case insensitive, creating groups with different upper and lower case names
     Given using OCS API version "<ocs_api_version>"
     And group "<group_id1>" has been created
     When the administrator creates a group "<group_id2>" using the Graph API
     And the administrator creates a group "<group_id3>" using the Graph API
-    Then the HTTP status code of responses on all endpoints should be "400"
+    Then the HTTP status code of responses on all endpoints should be "409"
     And these groups should not exist:
     | groupname   |
     | <group_id2> |

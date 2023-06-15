@@ -24,11 +24,11 @@ Feature: create group
     | Finance (NP)    |
     | slash\Middle    |
 
-  @issue-3516
+
   Scenario: admin user tries to create a group that already exists
     Given group "mygroup" has been created
     When user "Alice" tries to create a group "mygroup" using the Graph API
-    Then the HTTP status code should be "400"
+    Then the HTTP status code should be "409"
     And group "mygroup" should exist
 
   @issue-5938
