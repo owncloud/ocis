@@ -316,3 +316,22 @@ Feature: antivirus
       | old              |
       | new              |
       | spaces           |
+      
+  @issue-enterprise-5706   
+  Scenario Outline: upload a file with virus and get notification in different languages
+    Given user "Alice" has switched the system language to "<language>"
+    And using <dav-path-version> DAV path
+    When user "Alice" uploads file "filesForUpload/filesWithVirus/eicar.com" to "/aFileWithVirus.txt" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And user "Alice" should get a notification with subject "<subject>" and message:
+      | message   |
+      | <message> |
+    And as "Alice" file "/aFileWithVirus.txt" should not exist
+    Examples:
+      | dav-path-version | language | subject          | message                                                                                                                        |
+      | old              | es       | Virus encontrado | Virus encontrado en aFileWithVirus.txt. La subida no ha sido posible. Virus: Win.Test.EICAR_HDB-1                              |
+      | new              | es       | Virus encontrado | Virus encontrado en aFileWithVirus.txt. La subida no ha sido posible. Virus: Win.Test.EICAR_HDB-1                              |
+      | spaces           | es       | Virus encontrado | Virus encontrado en aFileWithVirus.txt. La subida no ha sido posible. Virus: Win.Test.EICAR_HDB-1                              |
+      | old              | de       | Virus gefunden   | In aFileWithVirus.txt wurde potenziell schädlicher Code gefunden. Das Hochladen wurde abgebrochen. Grund: Win.Test.EICAR_HDB-1 |
+      | new              | de       | Virus gefunden   | In aFileWithVirus.txt wurde potenziell schädlicher Code gefunden. Das Hochladen wurde abgebrochen. Grund: Win.Test.EICAR_HDB-1 |
+      | spaces           | de       | Virus gefunden   | In aFileWithVirus.txt wurde potenziell schädlicher Code gefunden. Das Hochladen wurde abgebrochen. Grund: Win.Test.EICAR_HDB-1 |
