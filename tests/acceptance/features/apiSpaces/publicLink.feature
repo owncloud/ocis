@@ -6,7 +6,7 @@ Feature: public link for a space
       | username |
       | Alice    |
     And using spaces DAV path
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "public space" with the default quota using the GraphApi
     And user "Alice" has created a public link share of the space "public space" with settings:
       | permissions | 1 |

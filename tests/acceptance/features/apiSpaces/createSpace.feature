@@ -9,7 +9,7 @@ Feature: create space
 
   @issue-5938
   Scenario Outline: user with role user and user light can't create space via Graph API
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     When user "Alice" tries to create a space "Project Mars" of type "project" with the default quota using the Graph API
     Then the HTTP status code should be "403"
     And the user "Alice" should not have a space called "share space"
@@ -20,7 +20,7 @@ Feature: create space
 
 
   Scenario Outline: admin or space admin user can create a space via the Graph API with a default quota
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     When user "Alice" creates a space "Project Mars" of type "project" with the default quota using the Graph API
     Then the HTTP status code should be "201"
     And the JSON response should contain space called "Project Mars" and match
@@ -91,7 +91,7 @@ Feature: create space
 
 
   Scenario Outline: admin or space admin user can create a space via the Graph API with certain quota
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     When user "Alice" creates a space "Project Venus" of type "project" with quota "2000" using the Graph API
     Then the HTTP status code should be "201"
     And the JSON response should contain space called "Project Venus" and match

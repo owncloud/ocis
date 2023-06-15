@@ -13,7 +13,7 @@ Feature: Tag
       | Alice    |
       | Brian    |
     And using spaces DAV path
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "use-tag" with the default quota using the GraphApi
     And user "Alice" has created a folder "folderMain" in space "use-tag"
     And user "Alice" has uploaded a file inside space "use-tag" with content "some content" to "folderMain/insideTheFolder.txt"

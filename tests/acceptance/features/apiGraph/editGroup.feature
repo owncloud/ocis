@@ -6,7 +6,7 @@ Feature: edit group name
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
 
   @issue-5977
   Scenario Outline: admin user renames a group
@@ -26,7 +26,7 @@ Feature: edit group name
 
   @issue-5938
   Scenario Outline: user other than the admin can't rename a group
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     And group "grp1" has been created
     When user "Alice" tries to rename group "grp1" to "grp101" using the Graph API
     Then the HTTP status code should be "403"
