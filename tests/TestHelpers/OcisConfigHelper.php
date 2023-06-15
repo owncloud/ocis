@@ -22,6 +22,7 @@
 
 namespace TestHelpers;
 
+use GuzzleHttp\Exception\ConnectException;
 use TestHelpers\HttpRequestHelper;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
@@ -51,7 +52,12 @@ class OcisConfigHelper {
 			[],
 			$body
 		);
-		return $client->send($request);
+
+		try {
+			return $client->send($request);
+		} catch (ConnectException $e) {
+			throw new Error("Cannot connect to the ociswrapper at the moment, make sure that ociswrapper is running before proceeding with the test run.\n" . $e->getMessage());
+		}
 	}
 
 	/**
