@@ -10,7 +10,7 @@ Feature: create groups, group names are case insensitive
     And group "<group_id1>" has been created
     When the administrator creates a group "<group_id2>" using the Graph API
     And the administrator creates a group "<group_id3>" using the Graph API
-    Then the HTTP status code of responses on all endpoints should be "400"
+    Then the HTTP status code of responses on all endpoints should be "409"
     And these groups should not exist:
     | groupname   |
     | <group_id2> |
