@@ -265,7 +265,7 @@ Feature: antivirus
       | filename      | newfilename    |
       | eicar.com     | virusFile1.txt |
       | eicar_com.zip | virusFile2.zip |
-      
+
   @env-config
   Scenario Outline: upload a file with virus smaller than the upload threshold
     Given the config "ANTIVIRUS_MAX_SCAN_SIZE" has been set to "100"
@@ -289,6 +289,28 @@ Feature: antivirus
     When user "Alice" uploads file "filesForUpload/filesWithVirus/eicar_com.zip" to "/aFileWithVirus.txt" using the WebDAV API
     Then the HTTP status code should be "201"
     And as "Alice" file "/aFileWithVirus.txt" should exist
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
+  @issue-enterprise-5709
+  Scenario Outline: try to create a version of file by uploading virus content
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "hello world" to "test.txt"
+    And user "Alice" has uploaded file with content "hello nepal" to "test.txt"
+    When user "Alice" uploads file with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" to "test.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And user "Alice" should get a notification with subject "Virus found" and message:
+      | message                                                                   |
+      | Virus found in test.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And as "Alice" file "/test.txt" should exist
+    And the version folder of file "/test.txt" for user "Alice" should contain "1" element
+    And the content of file "/test.txt" for user "Alice" should be "hello nepal"
+    When user "Alice" restores version index "1" of file "/test.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And the content of file "/test.txt" for user "Alice" should be "hello world"
     Examples:
       | dav-path-version |
       | old              |
