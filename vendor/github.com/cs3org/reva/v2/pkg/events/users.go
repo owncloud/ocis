@@ -55,9 +55,9 @@ func (UserDeleted) Unmarshal(v []byte) (interface{}, error) {
 
 // UserFeature represents a user feature
 type UserFeature struct {
-	Name      string
-	Value     string
-	Timestamp *types.Timestamp
+	Name     string
+	Value    string
+	OldValue *string
 }
 
 // UserFeatureChanged is emitted when a user feature was changed

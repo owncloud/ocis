@@ -52,7 +52,7 @@ func (fs *Decomposedfs) SetArbitraryMetadata(ctx context.Context, ref *provider.
 	rp, err := fs.p.AssemblePermissions(ctx, n)
 	switch {
 	case err != nil:
-		return errtypes.InternalError(err.Error())
+		return err
 	case !rp.InitiateFileUpload: // TODO add explicit SetArbitraryMetadata grant to CS3 api, tracked in https://github.com/cs3org/cs3apis/issues/91
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
@@ -145,7 +145,7 @@ func (fs *Decomposedfs) UnsetArbitraryMetadata(ctx context.Context, ref *provide
 	rp, err := fs.p.AssemblePermissions(ctx, n)
 	switch {
 	case err != nil:
-		return errtypes.InternalError(err.Error())
+		return err
 	case !rp.InitiateFileUpload: // TODO use SetArbitraryMetadata grant to CS3 api, tracked in https://github.com/cs3org/cs3apis/issues/91
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
