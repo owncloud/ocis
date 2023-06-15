@@ -24,7 +24,7 @@ Feature: create group
     | Finance (NP)    |
     | slash\Middle    |
 
-
+  @issue-3516
   Scenario: admin user tries to create a group that already exists
     Given group "mygroup" has been created
     When user "Alice" tries to create a group "mygroup" using the Graph API

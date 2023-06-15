@@ -4,7 +4,7 @@ Feature: create groups, group names are case insensitive
   I want to create groups with similar cases
   So that I can check if the group names are case sensitive
 
-
+  @issue-3516
   Scenario Outline: group names are case insensitive, creating groups with different upper and lower case names
     Given using OCS API version "<ocs_api_version>"
     And group "<group_id1>" has been created
