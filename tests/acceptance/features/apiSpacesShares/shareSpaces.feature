@@ -13,7 +13,7 @@ Feature: Share spaces
       | Alice    |
       | Brian    |
       | Bob      |
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "share space" with the default quota using the GraphApi
     And using spaces DAV path
 
@@ -438,7 +438,7 @@ Feature: Share spaces
 
 
   Scenario Outline: user cannot share the personal space to an other user
-    Given the administrator has given "Brian" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     And user "Brian" shares a space "Brian Murphy" with settings:
       | shareWith | Bob    |
       | role      | viewer |

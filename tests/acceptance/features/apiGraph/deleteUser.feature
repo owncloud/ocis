@@ -12,7 +12,7 @@ Feature: delete user
 
 
   Scenario Outline: admin user deletes a user
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | <userName>    |
       | displayName | <displayName> |
@@ -30,7 +30,7 @@ Feature: delete user
 
   Scenario: delete a user and specify the user name in different case
     Given user "brand-new-user" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When the user "Alice" deletes a user "Brand-New-User" using the Graph API
     Then the HTTP status code should be "204"
     And user "brand-new-user" should not exist
@@ -38,8 +38,8 @@ Feature: delete user
 
   Scenario Outline: admin user deletes another user with different role
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "Admin" using the settings api
-    And the administrator has given "Brian" the role "<role>" using the settings api
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     When the user "Alice" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "204"
     And user "Brian" should not exist
@@ -52,14 +52,14 @@ Feature: delete user
 
 
   Scenario: admin user tries to delete his/her own account
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When the user "Alice" deletes a user "Alice" using the Graph API
     Then the HTTP status code should be "403"
     And user "Alice" should exist
 
 
   Scenario Outline: non-admin user tries to delete his/her own account
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     When the user "Alice" deletes a user "Alice" using the Graph API
     Then the HTTP status code should be "401"
     And user "Alice" should exist
@@ -71,13 +71,13 @@ Feature: delete user
 
 
   Scenario: admin user tries to delete a nonexistent user
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When the user "Alice" tries to delete a nonexistent user using the Graph API
     Then the HTTP status code should be "404"
 
 
   Scenario Outline: non-admin user tries to delete a nonexistent user
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     When the user "Alice" tries to delete a nonexistent user using the Graph API
     Then the HTTP status code should be "401"
     Examples:
@@ -89,8 +89,8 @@ Feature: delete user
 
   Scenario Outline: non-admin user tries to delete another user with different role
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Brian" the role "<role>" using the settings api
-    And the administrator has given "Alice" the role "<userRole>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
     When the user "Alice" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "401"
     And user "Brian" should exist
@@ -111,7 +111,7 @@ Feature: delete user
 
 
   Scenario: admin user deletes a disabled user
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
     And the user "Alice" has disabled user "Brian" using the Graph API
     When the user "Alice" deletes a user "Brian" using the Graph API
@@ -120,11 +120,11 @@ Feature: delete user
 
 
   Scenario Outline: normal user tries to delete a disabled user
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Carol" has been created with default attributes and without skeleton files
-    And the administrator has given "Brian" the role "<role>" using the settings api
-    And the administrator has given "Carol" the role "<userRole>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
+    And the administrator has assigned the role "<userRole>" to user "Carol" using the Graph API
     And the user "Alice" has disabled user "Brian" using the Graph API
     When the user "Carol" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "401"

@@ -16,7 +16,7 @@ Feature: State of the quota
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And using spaces DAV path
 
 
@@ -135,7 +135,7 @@ Feature: State of the quota
   Scenario: try to create a space with quota greater than OCIS spaces max quota
     Given the config "OCIS_SPACES_MAX_QUOTA" has been set to "50"
     And user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Brian" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Brian" using the Graph API
     When user "Brian" tries to create a space "new space" of type "project" with quota "51" using the Graph API
     Then the HTTP status code should be "400"
     And the user "Brian" should not have a space called "new space"

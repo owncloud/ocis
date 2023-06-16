@@ -12,7 +12,7 @@ Feature: Email notification
 
 
   Scenario: user gets an email notification when someone shares a project space
-    Given the administrator has given "Alice" the role "Space Admin" using the settings api
+    Given the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the GraphApi
     When user "Alice" shares a space "new-space" with settings:
       | shareWith | Brian  |

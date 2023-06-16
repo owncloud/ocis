@@ -9,7 +9,7 @@ Feature: edit user
 
   Background:
     Given user "Alice" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | Brian             |
       | displayName | Brian Murphy      |
@@ -124,7 +124,7 @@ Feature: edit user
 
 
   Scenario Outline: normal user should not be able to change their email address
-    Given the administrator has given "Brian" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     When the user "Brian" tries to change the email of user "Brian" to "newemail@example.com" using the Graph API
     Then the HTTP status code should be "401"
     And the user information of "Brian" should match this JSON schema
@@ -150,13 +150,13 @@ Feature: edit user
 
 
   Scenario Outline: normal user should not be able to edit another user's email
-    Given the administrator has given "Brian" the role "<userRole>" using the settings api
+    Given the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
     And the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | Carol             |
       | displayName | Carol King        |
       | email       | carol@example.com |
       | password    | 1234              |
-    And the administrator has given "Carol" the role "<role>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Carol" using the Graph API
     When the user "Brian" tries to change the email of user "Carol" to "newemail@example.com" using the Graph API
     Then the HTTP status code should be "401"
     And the user information of "Carol" should match this JSON schema
@@ -217,7 +217,7 @@ Feature: edit user
 
 
   Scenario Outline: normal user should not be able to change his/her own display name
-    Given the administrator has given "Brian" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     When the user "Brian" tries to change the display name of user "Brian" to "Brian Murphy" using the Graph API
     Then the HTTP status code should be "401"
     And the user information of "Alice" should match this JSON schema
@@ -243,13 +243,13 @@ Feature: edit user
 
 
   Scenario Outline: normal user should not be able to edit another user's display name
-    Given the administrator has given "Brian" the role "<userRole>" using the settings api
+    Given the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
     And the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | Carol             |
       | displayName | Carol King        |
       | email       | carol@example.com |
       | password    | 1234              |
-    And the administrator has given "Carol" the role "<role>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Carol" using the Graph API
     When the user "Brian" tries to change the display name of user "Carol" to "Alice Hansen" using the Graph API
     Then the HTTP status code should be "401"
     And the user information of "Carol" should match this JSON schema
@@ -291,13 +291,13 @@ Feature: edit user
 
 
   Scenario Outline: normal user should not be able to reset the password of another user
-    Given the administrator has given "Brian" the role "<userRole>" using the settings api
+    Given the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
     And the user "Alice" has created a new user using the Graph API with the following settings:
       | userName    | Carol             |
       | displayName | Carol King        |
       | email       | carol@example.com |
       | password    | 1234              |
-    And the administrator has given "Carol" the role "<role>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Carol" using the Graph API
     And user "Carol" has uploaded file with content "test file for reset password" to "/resetpassword.txt"
     When the user "Brian" resets the password of user "Carol" to "newpassword" using the Graph API
     Then the HTTP status code should be "401"
@@ -363,7 +363,7 @@ Feature: edit user
   @skipOnStable2.0
   Scenario Outline: normal user should not be able to disable another user
     Given user "Carol" has been created with default attributes and without skeleton files
-    And the administrator has given "Brian" the role "<role>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     When the user "Brian" tries to disable user "Carol" using the Graph API
     Then the HTTP status code should be "401"
     When user "Alice" gets information of user "Carol" using Graph API
@@ -456,7 +456,7 @@ Feature: edit user
   Scenario Outline: normal user should not be able to enable another user
     Given user "Carol" has been created with default attributes and without skeleton files
     And the user "Alice" has disabled user "Carol" using the Graph API
-    And the administrator has given "Brian" the role "<role>" using the settings api
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     When the user "Brian" tries to enable user "Carol" using the Graph API
     Then the HTTP status code should be "401"
     When user "Alice" gets information of user "Carol" using Graph API

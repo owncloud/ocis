@@ -10,7 +10,7 @@ Feature: Notification
       | Alice    |
       | Brian    |
       | Carol    |
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "notification checking" with the default quota using the GraphApi
 
 
