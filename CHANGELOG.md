@@ -23,6 +23,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add functionality to retry postprocessing: [#6500](https://github.com/owncloud/ocis/pull/6500)
 * Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
 * Enhancement - Update web to v7.0.1: [#6470](https://github.com/owncloud/ocis/pull/6470)
+* Enhancement - Allow disabling wopi chat: [#6544](https://github.com/owncloud/ocis/pull/6544)
 
 ## Details
 
@@ -151,6 +152,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/pull/6470
    https://github.com/owncloud/web/releases/tag/v7.0.1
+
+* Enhancement - Allow disabling wopi chat: [#6544](https://github.com/owncloud/ocis/pull/6544)
+
+   Add a configreva for the new reva disable-chat feature
+
+   https://github.com/owncloud/ocis/pull/6544
 # Changelog for [3.0.0] (2023-06-06)
 
 The following sections list the changes for 3.0.0.
