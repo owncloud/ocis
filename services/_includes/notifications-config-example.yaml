@@ -39,3 +39,6 @@ notifications:
   translation_path: ""
   reva_gateway: com.owncloud.api.gateway
   grpc_client_tls: null
+grpc_client_tls:
+  mode: ""
+  cacert: ""
