@@ -40,6 +40,7 @@ func AppProviderConfigFromStruct(cfg *config.Config) map[string]interface{} {
 							"app_int_url":                   cfg.Drivers.WOPI.AppInternalURL,
 							"app_name":                      cfg.Drivers.WOPI.AppName,
 							"app_url":                       cfg.Drivers.WOPI.AppURL,
+							"app_disable_chat":              cfg.Drivers.WOPI.AppDisableChat,
 							"insecure_connections":          cfg.Drivers.WOPI.Insecure,
 							"iop_secret":                    cfg.Drivers.WOPI.IopSecret,
 							"jwt_secret":                    cfg.TokenManager.JWTSecret,
