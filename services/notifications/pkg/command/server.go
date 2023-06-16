@@ -40,6 +40,11 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
+			err := grpc.Configure(grpc.GetClientOptions(&cfg.GRPCClientTLS)...)
+			if err != nil {
+				return err
+			}
+
 			gr := run.Group{}
 
 			ctx, cancel := func() (context.Context, context.CancelFunc) {
