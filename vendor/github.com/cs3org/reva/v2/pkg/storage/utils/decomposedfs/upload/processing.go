@@ -114,7 +114,7 @@ func New(ctx context.Context, info tusd.FileInfo, lu *lookup.Lookup, tp Tree, p 
 	rp, err := p.AssemblePermissions(ctx, checkNode)
 	switch {
 	case err != nil:
-		return nil, errtypes.InternalError(err.Error())
+		return nil, err
 	case !rp.InitiateFileUpload:
 		return nil, errtypes.PermissionDenied(path)
 	}

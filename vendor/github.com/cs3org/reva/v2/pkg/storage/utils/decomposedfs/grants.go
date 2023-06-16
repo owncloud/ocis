@@ -63,7 +63,7 @@ func (fs *Decomposedfs) DenyGrant(ctx context.Context, ref *provider.Reference, 
 
 	switch {
 	case err != nil:
-		return errtypes.InternalError(err.Error())
+		return err
 	case !rp.DenyGrant:
 		return errtypes.PermissionDenied(filepath.Join(grantNode.ParentID, grantNode.Name))
 	}
@@ -102,7 +102,7 @@ func (fs *Decomposedfs) AddGrant(ctx context.Context, ref *provider.Reference, g
 		rp, err := fs.p.AssemblePermissions(ctx, grantNode)
 		switch {
 		case err != nil:
-			return errtypes.InternalError(err.Error())
+			return err
 		case !rp.AddGrant:
 			f, _ := storagespace.FormatReference(ref)
 			if rp.Stat {
@@ -128,7 +128,7 @@ func (fs *Decomposedfs) ListGrants(ctx context.Context, ref *provider.Reference)
 	rp, err := fs.p.AssemblePermissions(ctx, grantNode)
 	switch {
 	case err != nil:
-		return nil, errtypes.InternalError(err.Error())
+		return nil, err
 	case !rp.ListGrants && !rp.Stat:
 		f, _ := storagespace.FormatReference(ref)
 		return nil, errtypes.NotFound(f)
@@ -186,7 +186,7 @@ func (fs *Decomposedfs) RemoveGrant(ctx context.Context, ref *provider.Reference
 		rp, err := fs.p.AssemblePermissions(ctx, grantNode)
 		switch {
 		case err != nil:
-			return errtypes.InternalError(err.Error())
+			return err
 		case !rp.RemoveGrant:
 			f, _ := storagespace.FormatReference(ref)
 			if rp.Stat {
@@ -262,7 +262,7 @@ func (fs *Decomposedfs) UpdateGrant(ctx context.Context, ref *provider.Reference
 		rp, err := fs.p.AssemblePermissions(ctx, grantNode)
 		switch {
 		case err != nil:
-			return errtypes.InternalError(err.Error())
+			return err
 		case !rp.UpdateGrant:
 			f, _ := storagespace.FormatReference(ref)
 			if rp.Stat {

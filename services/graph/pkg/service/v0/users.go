@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/CiscoM31/godata"
@@ -612,6 +613,22 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sanitizedPath := strings.TrimPrefix(r.URL.Path, "/graph/v1.0/")
+
+	odataReq, err := godata.ParseRequest(r.Context(), sanitizedPath, r.URL.Query())
+	if err != nil {
+		logger.Debug().Err(err).Interface("query", r.URL.Query()).Msg("could not get users: query error")
+		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	oldUserValues, err := g.identityBackend.GetUser(r.Context(), nameOrID, odataReq)
+	if err != nil {
+		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not get user: backend error")
+		errorcode.RenderError(w, r, err)
+		return
+	}
+
 	if nameOrID == "" {
 		logger.Debug().Msg("could not update user: missing user id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing user id")
@@ -627,7 +644,7 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if reflect.ValueOf(*changes).IsZero() {
-		logger.Debug().Interface("body", r.Body).Msg("ignoring empyt request body")
+		logger.Debug().Interface("body", r.Body).Msg("ignoring empty request body")
 		render.Status(r, http.StatusNoContent)
 		render.NoContent(w, r)
 		return
@@ -649,19 +666,47 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 				fmt.Sprintf("'%s' is not a valid email address", *mail))
 			return
 		}
-		features = append(features, events.UserFeature{Name: "email", Value: *mail})
+		features = append(features, events.UserFeature{
+			Name:     "email",
+			Value:    *mail,
+			OldValue: oldUserValues.Mail,
+		})
 	}
 
 	if name, ok := changes.GetDisplayNameOk(); ok {
-		features = append(features, events.UserFeature{Name: "displayname", Value: *name})
+		features = append(features, events.UserFeature{
+			Name:     "displayname",
+			Value:    *name,
+			OldValue: oldUserValues.DisplayName,
+		})
 	}
 
-	if changes.HasUserType() {
+	if userType, ok := changes.GetUserTypeOk(); ok {
 		if !isValidUserType(*changes.UserType) {
 			logger.Debug().Interface("user", changes).Msg("invalid userType attribute")
 			errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "invalid userType attribute, valid options are 'Member' or 'Guest'")
 			return
 		}
+		features = append(features, events.UserFeature{
+			Name:     "changeUserType",
+			Value:    *userType,
+			OldValue: oldUserValues.UserType,
+		})
+	}
+
+	if accEnabled, ok := changes.GetAccountEnabledOk(); ok {
+		oldAccVal := strconv.FormatBool(oldUserValues.GetAccountEnabled())
+		features = append(features, events.UserFeature{
+			Name:     "accountEnabled",
+			Value:    strconv.FormatBool(*accEnabled),
+			OldValue: &oldAccVal,
+		})
+	}
+
+	if changes.HasPasswordProfile() {
+		features = append(features, events.UserFeature{
+			Name: "passwordChanged",
+		})
 	}
 
 	logger.Debug().Str("nameid", nameOrID).Interface("changes", *changes).Msg("calling update user on backend")
@@ -673,8 +718,9 @@ func (g Graph) PatchUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	e := events.UserFeatureChanged{
-		UserID:   nameOrID,
-		Features: features,
+		UserID:    nameOrID,
+		Features:  features,
+		Timestamp: utils.TSNow(),
 	}
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()

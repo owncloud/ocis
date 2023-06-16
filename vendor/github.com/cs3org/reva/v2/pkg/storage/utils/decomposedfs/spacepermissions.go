@@ -17,6 +17,7 @@ import (
 // PermissionsChecker defines an interface for checking permissions on a Node
 type PermissionsChecker interface {
 	AssemblePermissions(ctx context.Context, n *node.Node) (ap provider.ResourcePermissions, err error)
+	AssembleTrashPermissions(ctx context.Context, n *node.Node) (ap provider.ResourcePermissions, err error)
 }
 
 // CS3PermissionsClient defines an interface for checking permissions against the CS3 permissions service
@@ -38,6 +39,11 @@ func NewPermissions(item PermissionsChecker, permissionsSelector pool.Selectable
 // AssemblePermissions is used to assemble file permissions
 func (p Permissions) AssemblePermissions(ctx context.Context, n *node.Node) (provider.ResourcePermissions, error) {
 	return p.item.AssemblePermissions(ctx, n)
+}
+
+// AssembleTrashPermissions is used to assemble file permissions
+func (p Permissions) AssembleTrashPermissions(ctx context.Context, n *node.Node) (provider.ResourcePermissions, error) {
+	return p.item.AssembleTrashPermissions(ctx, n)
 }
 
 // CreateSpace returns true when the user is allowed to create the space

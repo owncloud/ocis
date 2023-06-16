@@ -361,8 +361,9 @@ func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	e := events.UserFeatureChanged{
-		UserID:   nameOrID,
-		Features: features,
+		UserID:    nameOrID,
+		Features:  features,
+		Timestamp: utils.TSNow(),
 	}
 	if currentUser, ok := revactx.ContextGetUser(r.Context()); ok {
 		e.Executant = currentUser.GetId()

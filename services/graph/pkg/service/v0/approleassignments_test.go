@@ -139,6 +139,12 @@ var _ = Describe("AppRoleAssignments", func() {
 				AccountUuid: user.GetId(),
 				RoleId:      "some-appRole-ID",
 			}
+			roleService.On("ListRoleAssignments", mock.Anything, mock.Anything, mock.Anything).Return(&settings.ListRoleAssignmentsResponse{
+				Assignments: []*settingsmsg.UserRoleAssignment{
+					userRoleAssignment,
+				},
+			}, nil)
+
 			roleService.On("AssignRoleToUser", mock.Anything, mock.Anything, mock.Anything).Return(&settings.AssignRoleToUserResponse{Assignment: userRoleAssignment}, nil)
 
 			ara := libregraph.NewAppRoleAssignmentWithDefaults()

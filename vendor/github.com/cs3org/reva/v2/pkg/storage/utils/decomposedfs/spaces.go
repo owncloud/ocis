@@ -554,7 +554,7 @@ func (fs *Decomposedfs) UpdateStorageSpace(ctx context.Context, req *provider.Up
 	sp, err := fs.p.AssemblePermissions(ctx, spaceNode)
 	if err != nil {
 		return &provider.UpdateStorageSpaceResponse{
-			Status: &v1beta11.Status{Code: v1beta11.Code_CODE_INVALID, Message: err.Error()},
+			Status: status.NewStatusFromErrType(ctx, "assembling permissions failed", err),
 		}, nil
 
 	}
@@ -793,7 +793,7 @@ func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, 
 		rp, err := fs.p.AssemblePermissions(ctx, n)
 		switch {
 		case err != nil:
-			return nil, errtypes.InternalError(err.Error())
+			return nil, err
 		case !rp.Stat:
 			return nil, errtypes.NotFound(fmt.Sprintf("space %s not found", n.ID))
 		}

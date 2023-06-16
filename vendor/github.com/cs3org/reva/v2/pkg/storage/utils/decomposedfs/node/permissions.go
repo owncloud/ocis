@@ -98,6 +98,16 @@ func NewPermissions(lu PathLookup) *Permissions {
 
 // AssemblePermissions will assemble the permissions for the current user on the given node, taking into account all parent nodes
 func (p *Permissions) AssemblePermissions(ctx context.Context, n *Node) (ap provider.ResourcePermissions, err error) {
+	return p.assemblePermissions(ctx, n, true)
+}
+
+// AssembleTrashPermissions will assemble the permissions for the current user on the given node, taking into account all parent nodes
+func (p *Permissions) AssembleTrashPermissions(ctx context.Context, n *Node) (ap provider.ResourcePermissions, err error) {
+	return p.assemblePermissions(ctx, n, false)
+}
+
+// assemblePermissions will assemble the permissions for the current user on the given node, taking into account all parent nodes
+func (p *Permissions) assemblePermissions(ctx context.Context, n *Node, failOnTrashedSubtree bool) (ap provider.ResourcePermissions, err error) {
 	u, ok := ctxpkg.ContextGetUser(ctx)
 	if !ok {
 		return NoPermissions(), nil
@@ -114,16 +124,9 @@ func (p *Permissions) AssemblePermissions(ctx context.Context, n *Node) (ap prov
 		n.ID = kp[0]
 	}
 
-	// check if the current user is the owner
-	if utils.UserIDEqual(u.Id, n.Owner()) {
-		return OwnerPermissions(), nil
-	}
 	// determine root
-
 	rn := n.SpaceRoot
-
 	cn := n
-
 	ap = provider.ResourcePermissions{}
 
 	// for an efficient group lookup convert the list of groups to a map
@@ -154,6 +157,10 @@ func (p *Permissions) AssemblePermissions(ctx context.Context, n *Node) (ap prov
 			// We do not have a parent, so we assume the next valid parent is the spaceRoot (which must always exist)
 			cn = n.SpaceRoot
 		}
+		if failOnTrashedSubtree && !cn.Exists {
+			return NoPermissions(), errtypes.NotFound(n.ID)
+		}
+
 	}
 
 	// for the root node
@@ -165,6 +172,11 @@ func (p *Permissions) AssemblePermissions(ctx context.Context, n *Node) (ap prov
 		AddPermissions(&ap, &np)
 	} else {
 		appctx.GetLogger(ctx).Error().Err(err).Interface("node", cn.ID).Msg("error reading root node permissions")
+	}
+
+	// check if the current user is the owner
+	if utils.UserIDEqual(u.Id, n.Owner()) {
+		return OwnerPermissions(), nil
 	}
 
 	appctx.GetLogger(ctx).Debug().Interface("permissions", ap).Interface("node", n.ID).Interface("user", u).Msg("returning agregated permissions")

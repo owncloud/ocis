@@ -406,11 +406,11 @@ func (n *Node) Child(ctx context.Context, name string) (*Node, error) {
 }
 
 // ParentWithReader returns the parent node
-func (n *Node) ParentWithReader(r io.Reader) (p *Node, err error) {
+func (n *Node) ParentWithReader(r io.Reader) (*Node, error) {
 	if n.ParentID == "" {
 		return nil, fmt.Errorf("decomposedfs: root has no parent")
 	}
-	p = &Node{
+	p := &Node{
 		SpaceID:   n.SpaceID,
 		lu:        n.lu,
 		ID:        n.ParentID,
@@ -418,17 +418,19 @@ func (n *Node) ParentWithReader(r io.Reader) (p *Node, err error) {
 	}
 
 	// fill metadata cache using the reader
-	_, _ = p.XattrsWithReader(r)
-
-	// lookup name and parent id in extended attributes
-	p.ParentID, _ = p.XattrString(prefixes.ParentidAttr)
-	p.Name, _ = p.XattrString(prefixes.NameAttr)
-
-	// check node exists
-	if _, err := os.Stat(p.InternalPath()); err == nil {
-		p.Exists = true
+	attrs, err := p.XattrsWithReader(r)
+	switch {
+	case metadata.IsNotExist(err):
+		return p, nil // swallow not found, the node defaults to exists = false
+	case err != nil:
+		return nil, err
 	}
-	return
+	p.Exists = true
+
+	p.Name = attrs.String(prefixes.NameAttr)
+	p.ParentID = attrs.String(prefixes.ParentidAttr)
+
+	return p, err
 }
 
 // Parent returns the parent node

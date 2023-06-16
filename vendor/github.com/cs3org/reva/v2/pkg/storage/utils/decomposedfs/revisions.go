@@ -57,7 +57,7 @@ func (fs *Decomposedfs) ListRevisions(ctx context.Context, ref *provider.Referen
 	rp, err := fs.p.AssemblePermissions(ctx, n)
 	switch {
 	case err != nil:
-		return nil, errtypes.InternalError(err.Error())
+		return nil, err
 	case !rp.ListFileVersions:
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
@@ -136,7 +136,7 @@ func (fs *Decomposedfs) DownloadRevision(ctx context.Context, ref *provider.Refe
 	rp, err := fs.p.AssemblePermissions(ctx, n)
 	switch {
 	case err != nil:
-		return nil, errtypes.InternalError(err.Error())
+		return nil, err
 	case !rp.ListFileVersions || !rp.InitiateFileDownload: // TODO add explicit permission in the CS3 api?
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
@@ -190,7 +190,7 @@ func (fs *Decomposedfs) RestoreRevision(ctx context.Context, ref *provider.Refer
 	rp, err := fs.p.AssemblePermissions(ctx, n)
 	switch {
 	case err != nil:
-		return errtypes.InternalError(err.Error())
+		return err
 	case !rp.RestoreFileVersion:
 		f, _ := storagespace.FormatReference(ref)
 		if rp.Stat {
@@ -327,7 +327,7 @@ func (fs *Decomposedfs) getRevisionNode(ctx context.Context, ref *provider.Refer
 	p, err := fs.p.AssemblePermissions(ctx, n)
 	switch {
 	case err != nil:
-		return nil, errtypes.InternalError(err.Error())
+		return nil, err
 	case !hasPermission(&p):
 		return nil, errtypes.PermissionDenied(filepath.Join(n.ParentID, n.Name))
 	}
