@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-06-16-13-06-25]
+[#deprecation-note-2023-06-16-13-52-42]
 [caption=]
 .Deprecation notes for the app-provider service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -186,7 +186,7 @@ The secret to mint and validate jwt tokens.
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-06-16-13-06-25[Deprecation Note]
+xref:deprecation-note-2023-06-16-13-52-42[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -283,6 +283,15 @@ a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
 URL for end users to access the app.
+
+a|`APP_PROVIDER_WOPI_DISABLE_CHAT` +
+
+a| [subs=-attributes]
+++bool ++
+a| [subs=-attributes]
+++false ++
+a| [subs=-attributes]
+Disable the chat functionality of the office app.
 
 a|`APP_PROVIDER_WOPI_INSECURE` +
 
