@@ -69,6 +69,7 @@ type config struct {
 	JWTSecret                 string `mapstructure:"jwt_secret" docs:";The JWT secret to be used to retrieve the token TTL."`
 	AppDesktopOnly            bool   `mapstructure:"app_desktop_only" docs:"false;Specifies if the app can be opened only on desktop."`
 	InsecureConnections       bool   `mapstructure:"insecure_connections"`
+	AppDisableChat            bool   `mapstructure:"app_disable_chat"`
 }
 
 func parseConfig(m map[string]interface{}) (*config, error) {
@@ -246,20 +247,23 @@ func (p *wopiProvider) GetAppURL(ctx context.Context, resource *provider.Resourc
 		return nil, err
 	}
 
-	appFullURL := result["app-url"].(string)
+	url, err := url.Parse(result["app-url"].(string))
+	if err != nil {
+		return nil, err
+	}
 
+	urlQuery := url.Query()
 	if language != "" {
-		url, err := url.Parse(appFullURL)
-		if err != nil {
-			return nil, err
-		}
-		urlQuery := url.Query()
 		urlQuery.Set("ui", language)      // OnlyOffice
 		urlQuery.Set("lang", language)    // Collabora
 		urlQuery.Set("UI_LLCC", language) // Office365
-		url.RawQuery = urlQuery.Encode()
-		appFullURL = url.String()
 	}
+	if p.conf.AppDisableChat {
+		urlQuery.Set("dchat", "1") // OnlyOffice disable chat
+	}
+
+	url.RawQuery = urlQuery.Encode()
+	appFullURL := url.String()
 
 	// Depending on whether wopi server returned any form parameters or not,
 	// we decide whether the request method is POST or GET

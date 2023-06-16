@@ -294,37 +294,6 @@ func ReadNode(ctx context.Context, lu PathLookup, spaceID, nodeID string, canLis
 		}
 		return nil, errtypes.InternalError("Missing parent ID on node")
 	}
-	// TODO why do we stat the parent? to determine if the current node is in the trash we would need to traverse all parents...
-	// we need to traverse all parents for permissions anyway ...
-	// - we can compare to space root owner with the current user
-	// - we can compare the share permissions on the root for spaces, which would work for managers
-	// - for non managers / owners we need to traverse all path segments because an intermediate node might have been shared
-	// - if we want to support negative acls we need to traverse the path for all users (but the owner)
-	// for trashed items we need to check all parents
-	// - one of them might have the trash suffix ...
-	// - options:
-	//   - move deleted nodes in a trash folder that is still part of the tree (aka freedesktop org trash spec)
-	//     - shares should still be removed, which requires traversing all trashed children ... and it should be undoable ...
-	//     - what if a trashed file is restored? will child items be accessible by a share?
-	//   - compare paths of trash root items and the trashed file?
-	//     - to determine the relative path of a file we would need to traverse all intermediate nodes anyway
-	//   - recursively mark all children as trashed ... async ... it is ok when that is not synchronous
-	//     - how do we pick up if an error occurs? write a journal somewhere? activity log / delta?
-	//     - stat requests will not pick up trashed items at all
-	//   - recursively move all children into the trash folder?
-	//     - no need to write an additional trash entry
-	//     - can be made more robust with a journal
-	//     - same recursion mechanism can be used to purge items? sth we still need to do
-	//   - flag the two above options with dtime
-	if !skipParentCheck {
-		_, err = os.Stat(n.ParentPath())
-		if err != nil {
-			if errors.Is(err, fs.ErrNotExist) {
-				return nil, errtypes.NotFound(err.Error())
-			}
-			return nil, err
-		}
-	}
 
 	if revisionSuffix == "" {
 		n.BlobID = attrs.String(prefixes.BlobIDAttr)

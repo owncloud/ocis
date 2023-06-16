@@ -43,8 +43,7 @@ const tracerName = "sharecache"
 // It functions as an in-memory cache with a persistence layer
 // The storage is sharded by user/group
 type Cache struct {
-	lockMapLock sync.Mutex
-	lockMap     map[string]*sync.Mutex
+	lockMap sync.Map
 
 	UserShares map[string]*UserShareCache
 
@@ -69,16 +68,9 @@ type SpaceShareIDs struct {
 }
 
 func (c *Cache) lockUser(userID string) func() {
-	lock := c.lockMap[userID]
-	if lock == nil {
-		c.lockMapLock.Lock()
-		lock = c.lockMap[userID]
-		if lock == nil {
-			c.lockMap[userID] = &sync.Mutex{}
-			lock = c.lockMap[userID]
-		}
-		c.lockMapLock.Unlock()
-	}
+	v, _ := c.lockMap.LoadOrStore(userID, &sync.Mutex{})
+	lock := v.(*sync.Mutex)
+
 	lock.Lock()
 	return func() { lock.Unlock() }
 }
@@ -91,7 +83,7 @@ func New(s metadata.Storage, namespace, filename string, ttl time.Duration) Cach
 		namespace:  namespace,
 		filename:   filename,
 		ttl:        ttl,
-		lockMap:    map[string]*sync.Mutex{},
+		lockMap:    sync.Map{},
 	}
 }
 

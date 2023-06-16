@@ -43,8 +43,7 @@ const tracerName = "providercache"
 
 // Cache holds share information structured by provider and space
 type Cache struct {
-	lockMapLock sync.Mutex
-	lockMap     map[string]*sync.Mutex
+	lockMap sync.Map
 
 	Providers map[string]*Spaces
 
@@ -106,16 +105,9 @@ func (s *Shares) UnmarshalJSON(data []byte) error {
 
 // LockSpace locks the cache for a given space and returns an unlock function
 func (c *Cache) LockSpace(spaceID string) func() {
-	lock := c.lockMap[spaceID]
-	if lock == nil {
-		c.lockMapLock.Lock()
-		lock = c.lockMap[spaceID]
-		if lock == nil {
-			c.lockMap[spaceID] = &sync.Mutex{}
-			lock = c.lockMap[spaceID]
-		}
-		c.lockMapLock.Unlock()
-	}
+	v, _ := c.lockMap.LoadOrStore(spaceID, &sync.Mutex{})
+	lock := v.(*sync.Mutex)
+
 	lock.Lock()
 	return func() { lock.Unlock() }
 }
@@ -126,7 +118,7 @@ func New(s metadata.Storage, ttl time.Duration) Cache {
 		Providers: map[string]*Spaces{},
 		storage:   s,
 		ttl:       ttl,
-		lockMap:   map[string]*sync.Mutex{},
+		lockMap:   sync.Map{},
 	}
 }
 
