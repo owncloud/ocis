@@ -809,7 +809,7 @@ var _ = Describe("Users", func() {
 			user.SetMail("user@example.com")
 			user.SetId("/users/user")
 
-			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(&user, nil)
+			identityBackend.On("GetUser", mock.Anything, mock.Anything, mock.Anything).Return(user, nil)
 		})
 
 		It("handles missing userids", func() {
@@ -866,7 +866,7 @@ var _ = Describe("Users", func() {
 			data, err := json.Marshal(user)
 			Expect(err).ToNot(HaveOccurred())
 
-			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users?$invalid=true", bytes.NewBuffer(data))
+			r := httptest.NewRequest(http.MethodPost, "/graph/v1.0/users", bytes.NewBuffer(data))
 			rctx := chi.NewRouteContext()
 			rctx.URLParams.Add("userID", user.GetId())
 			r = r.WithContext(context.WithValue(revactx.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
