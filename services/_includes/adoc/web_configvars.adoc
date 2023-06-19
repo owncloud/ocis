@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-06-19-11-07-58]
+[#deprecation-note-2023-06-19-13-05-38]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -257,7 +257,7 @@ Serve ownCloud Web assets from a path on the filesystem instead of the builtin a
 
 a|`WEB_UI_CONFIG_FILE` +
 `WEB_UI_CONFIG` +
-xref:deprecation-note-2023-06-19-11-07-58[Deprecation Note]
+xref:deprecation-note-2023-06-19-13-05-38[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -267,7 +267,7 @@ Read the ownCloud Web json based configuration from this path/file. The config f
 
 a|`WEB_UI_CONFIG_FILE` +
 `WEB_UI_PATH` +
-xref:deprecation-note-2023-06-19-11-07-58[Deprecation Note]
+xref:deprecation-note-2023-06-19-13-05-38[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -476,7 +476,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Specifies the target url for the imprint link in the account menu
+Specifies the target URL for the imprint link valid for the ocis instance in the account menu.
 
 a|`WEB_OPTION_PRIVACY_URL` +
 
@@ -485,7 +485,16 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++ ++
 a| [subs=-attributes]
-Specifies the target url for the privacy link in the account menu
+Specifies the target URL for the privacy link valid for the ocis instance in the account menu.
+
+a|`WEB_OPTION_ACCESS_DENIED_HELP_URL` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+Specifies the target URL valid for the ocis instance for the generic logged out / access denied page.
 
 a|`OCIS_JWT_SECRET` +
 `WEB_JWT_SECRET` +

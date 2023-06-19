@@ -48,7 +48,8 @@
 | WEB_OPTION_CONTEXTHELPERS_READ_MORE | bool | true | Specifies whether the 'Read more' link should be displayed or not.|
 | WEB_OPTION_LOGOUT_URL | string |  | Adds a link to the user's profile page to point him to an external page, where he can manage his session and devices. This is helpful when an external IdP is used. This option is disabled by default.|
 | WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP | bool | true | Specifies whether single file link shares should be opened with the default app or not. If not opened by the default app, the Web UI just displays the file details. Defaults to 'true'.|
-| WEB_OPTION_IMPRINT_URL | string |  | Specifies the target url for the imprint link in the account menu|
-| WEB_OPTION_PRIVACY_URL | string |  | Specifies the target url for the privacy link in the account menu|
+| WEB_OPTION_IMPRINT_URL | string |  | Specifies the target URL for the imprint link valid for the ocis instance in the account menu.|
+| WEB_OPTION_PRIVACY_URL | string |  | Specifies the target URL for the privacy link valid for the ocis instance in the account menu.|
+| WEB_OPTION_ACCESS_DENIED_HELP_URL | string |  | Specifies the target URL valid for the ocis instance for the generic logged out / access denied page.|
 | OCIS_JWT_SECRET<br/>WEB_JWT_SECRET | string |  | The secret to mint and validate jwt tokens.|
 | WEB_GATEWAY_GRPC_ADDR | string | com.owncloud.api.gateway | The bind address of the GRPC service.|
