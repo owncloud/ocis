@@ -234,6 +234,23 @@ Feature: upload file
       | dav-path-version |
       | spaces           |
 
+  @issue-1248
+  Scenario Outline: upload an empty file with mtime
+    Given using <dav_version> DAV path
+    When user "Alice" uploads file "filesForUpload/zerobyte.txt" to "file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And as "Alice" file "file.txt" should exist
+    And as "Alice" the mtime of the file "file.txt" should be "Thu, 08 Aug 2019 04:18:13 GMT"
+    Examples:
+      | dav_version |
+      | old         |
+      | new         |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav_version |
+      | spaces      |
+
 
   Scenario Outline: upload a file with mtime in a folder
     Given using <dav-path-version> DAV path
@@ -251,6 +268,24 @@ Feature: upload file
     Examples:
       | dav-path-version |
       | spaces           |
+
+  @issue-1248
+  Scenario Outline: upload an empty file with mtime in a folder
+    Given using <dav_version> DAV path
+    And user "Alice" has created folder "testFolder"
+    When user "Alice" uploads file "filesForUpload/zerobyte.txt" to "/testFolder/file.txt" with mtime "Thu, 08 Aug 2019 04:18:13 GMT" using the WebDAV API
+    Then the HTTP status code should be "201"
+    And as "Alice" file "/testFolder/file.txt" should exist
+    And as "Alice" the mtime of the file "/testFolder/file.txt" should be "Thu, 08 Aug 2019 04:18:13 GMT"
+    Examples:
+      | dav_version |
+      | old         |
+      | new         |
+
+    @skipOnRevaMaster
+    Examples:
+      | dav_version |
+      | spaces      |
 
 
   Scenario Outline: moving a file does not change its mtime
