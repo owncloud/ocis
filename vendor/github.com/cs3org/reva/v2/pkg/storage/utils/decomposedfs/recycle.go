@@ -58,7 +58,7 @@ func (fs *Decomposedfs) ListRecycle(ctx context.Context, ref *provider.Reference
 	sublog := appctx.GetLogger(ctx).With().Str("space", spaceID).Str("key", key).Str("relative_path", relativePath).Logger()
 
 	// check permissions
-	trashnode, err := fs.lu.NodeFromSpaceID(ctx, ref.ResourceId)
+	trashnode, err := fs.lu.NodeFromSpaceID(ctx, spaceID)
 	if err != nil {
 		return nil, err
 	}

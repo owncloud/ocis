@@ -49,6 +49,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/migrator"
+	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/mtimesyncedcache"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options"
 	"github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree"
@@ -99,7 +100,8 @@ type Decomposedfs struct {
 	stream       events.Stream
 	cache        cache.StatCache
 
-	UserCache *ttlcache.Cache
+	UserCache    *ttlcache.Cache
+	spaceIDCache mtimesyncedcache.Cache[string, map[string]string]
 }
 
 // NewDefault returns an instance with default components

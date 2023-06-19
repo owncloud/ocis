@@ -299,17 +299,37 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 	matches := map[string]struct{}{}
 
 	if requestedUserID != nil {
-		path := filepath.Join(fs.o.Root, "indexes", "by-user-id", requestedUserID.GetOpaqueId(), nodeID)
-		m, err := filepath.Glob(path)
+		allMatches := map[string]string{}
+		indexPath := filepath.Join(fs.o.Root, "indexes", "by-user-id", requestedUserID.GetOpaqueId())
+		fi, err := os.Stat(indexPath)
+		if err == nil {
+			allMatches, err = fs.spaceIDCache.LoadOrStore("by-user-id:"+requestedUserID.GetOpaqueId(), fi.ModTime(), func() (map[string]string, error) {
+				path := filepath.Join(fs.o.Root, "indexes", "by-user-id", requestedUserID.GetOpaqueId(), "*")
+				m, err := filepath.Glob(path)
+				if err != nil {
+					return nil, err
+				}
+				matches := map[string]string{}
+				for _, match := range m {
+					link, err := os.Readlink(match)
+					if err != nil {
+						continue
+					}
+					matches[match] = link
+				}
+				return matches, nil
+			})
+		}
 		if err != nil {
 			return nil, err
 		}
-		for _, match := range m {
-			link, err := os.Readlink(match)
-			if err != nil {
-				continue
+
+		if nodeID == spaceIDAny {
+			for _, match := range allMatches {
+				matches[match] = struct{}{}
 			}
-			matches[link] = struct{}{}
+		} else {
+			matches[allMatches[nodeID]] = struct{}{}
 		}
 
 		// get Groups for userid
@@ -323,17 +343,37 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 		}
 
 		for _, group := range user.Groups {
-			path := filepath.Join(fs.o.Root, "indexes", "by-group-id", group, nodeID)
-			m, err := filepath.Glob(path)
+			indexPath := filepath.Join(fs.o.Root, "indexes", "by-group-id", group)
+			fi, err := os.Stat(indexPath)
+			if err != nil {
+				continue
+			}
+			allMatches, err := fs.spaceIDCache.LoadOrStore("by-group-id:"+group, fi.ModTime(), func() (map[string]string, error) {
+				path := filepath.Join(fs.o.Root, "indexes", "by-group-id", group, "*")
+				m, err := filepath.Glob(path)
+				if err != nil {
+					return nil, err
+				}
+				matches := map[string]string{}
+				for _, match := range m {
+					link, err := os.Readlink(match)
+					if err != nil {
+						continue
+					}
+					matches[match] = link
+				}
+				return matches, nil
+			})
 			if err != nil {
 				return nil, err
 			}
-			for _, match := range m {
-				link, err := os.Readlink(match)
-				if err != nil {
-					continue
+
+			if nodeID == spaceIDAny {
+				for _, match := range allMatches {
+					matches[match] = struct{}{}
 				}
-				matches[link] = struct{}{}
+			} else {
+				matches[allMatches[nodeID]] = struct{}{}
 			}
 		}
 
@@ -341,17 +381,40 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 
 	if requestedUserID == nil {
 		for spaceType := range spaceTypes {
-			path := filepath.Join(fs.o.Root, "indexes", "by-type", spaceType, nodeID)
-			m, err := filepath.Glob(path)
+			indexPath := filepath.Join(fs.o.Root, "indexes", "by-type")
+			if spaceType != spaceTypeAny {
+				indexPath = filepath.Join(indexPath, spaceType)
+			}
+			fi, err := os.Stat(indexPath)
+			if err != nil {
+				continue
+			}
+			allMatches, err := fs.spaceIDCache.LoadOrStore("by-type:"+spaceType, fi.ModTime(), func() (map[string]string, error) {
+				path := filepath.Join(fs.o.Root, "indexes", "by-type", spaceType, "*")
+				m, err := filepath.Glob(path)
+				if err != nil {
+					return nil, err
+				}
+				matches := map[string]string{}
+				for _, match := range m {
+					link, err := os.Readlink(match)
+					if err != nil {
+						continue
+					}
+					matches[match] = link
+				}
+				return matches, nil
+			})
 			if err != nil {
 				return nil, err
 			}
-			for _, match := range m {
-				link, err := os.Readlink(match)
-				if err != nil {
-					continue
+
+			if nodeID == spaceIDAny {
+				for _, match := range allMatches {
+					matches[match] = struct{}{}
 				}
-				matches[link] = struct{}{}
+			} else {
+				matches[allMatches[nodeID]] = struct{}{}
 			}
 		}
 	}
@@ -777,14 +840,16 @@ func (fs *Decomposedfs) linkStorageSpaceType(ctx context.Context, spaceType stri
 		if isAlreadyExists(err) {
 			appctx.GetLogger(ctx).Debug().Err(err).Str("space", spaceID).Str("spacetype", spaceType).Msg("symlink already exists")
 			// FIXME: is it ok to wipe this err if the symlink already exists?
-			err = nil
 		} else {
 			// TODO how should we handle error cases here?
 			appctx.GetLogger(ctx).Error().Err(err).Str("space", spaceID).Str("spacetype", spaceType).Msg("could not create symlink")
+			return err
 		}
 	}
 
-	return err
+	// touch index root to invalidate caches
+	now := time.Now()
+	return os.Chtimes(filepath.Join(fs.o.Root, "indexes", "by-type"), now, now)
 }
 
 func (fs *Decomposedfs) storageSpaceFromNode(ctx context.Context, n *node.Node, checkPermissions bool) (*provider.StorageSpace, error) {
