@@ -8,7 +8,7 @@ Feature: upload resources using TUS protocol
     Given these users have been created with default attributes and without skeleton files:
       | username |
       | Alice    |
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And using spaces DAV path
 
 

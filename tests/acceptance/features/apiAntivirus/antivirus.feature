@@ -221,7 +221,7 @@ Feature: antivirus
 
   Scenario Outline: upload a file with virus to a project space
     Given using spaces DAV path
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the GraphApi
     And user "Alice" has created a folder "uploadFolder" in space "new-space"
     When user "Alice" uploads a file "filesForUpload/filesWithVirus/<filename>" to "/uploadFolder/<newfilename>" in space "new-space" using the WebDAV API
@@ -247,7 +247,7 @@ Feature: antivirus
   Scenario Outline: upload a file with virus to a shared project space
     Given using spaces DAV path
     And user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the GraphApi
     And user "Alice" has shared a space "new-space" with settings:
       | shareWith | Brian  |

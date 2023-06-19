@@ -13,7 +13,7 @@ Feature: Restoring space
       | Alice    |
       | Brian    |
       | Bob      |
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "restore a space" of type "project" with quota "10"
     And using spaces DAV path
 
@@ -73,7 +73,7 @@ Feature: Restoring space
 
 
   Scenario Outline: user with role user and user light cannot restore space
-    Given the administrator has given "Brian" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     And user "Alice" has disabled a space "restore a space"
     When user "Brian" tries to restore a disabled space "restore a space" owned by user "Alice"
     Then the HTTP status code should be "404"
@@ -84,7 +84,7 @@ Feature: Restoring space
 
   @issue-5872
   Scenario Outline: admin and space admin can restore other space
-    Given the administrator has given "Brian" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     And user "Alice" has disabled a space "restore a space"
     When user "Brian" restores a disabled space "restore a space" owned by user "Alice"
     Then the HTTP status code should be "200"

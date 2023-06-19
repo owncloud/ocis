@@ -10,7 +10,7 @@ Feature: Copy test
       | username |
       | Alice    |
     And using spaces DAV path
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "new-space" with the default quota using the GraphApi
 
 

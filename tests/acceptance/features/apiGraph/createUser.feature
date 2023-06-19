@@ -12,7 +12,7 @@ Feature: create user
 
   @issue-3516
   Scenario Outline: admin creates a user
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When the user "Alice" creates a new user using GraphAPI with the following settings:
       | userName       | <userName>    |
       | displayName    | <displayName> |
@@ -38,11 +38,11 @@ Feature: create user
     Examples:
       | userName                     | displayName     | email               | password                     | code | enable | shouldOrNot |
       | withoutEmail                 | without email   |                     | 123                          | 200  | true   | should      |
-      | Alice                        | same userName   | new@example.org     | 123                          | 400  | true   | should      |
+      | Alice                        | same userName   | new@example.org     | 123                          | 409  | true   | should      |
 
 
   Scenario: user cannot be created with empty name
-    Given the administrator has given "Alice" the role "Admin" using the settings api
+    Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     When the user "Alice" creates a new user using GraphAPI with the following settings:
       | userName       |              |
       | displayName    | emptyName    |
@@ -53,7 +53,7 @@ Feature: create user
 
 
   Scenario Outline: user without admin right cannot create a user
-    Given the administrator has given "Alice" the role "<role>" using the settings api
+    Given the administrator has assigned the role "<role>" to user "Alice" using the Graph API
     When the user "Alice" creates a new user using GraphAPI with the following settings:
       | userName       | user         |
       | displayName    | user         |
@@ -68,10 +68,10 @@ Feature: create user
       | User        |
       | User Light  |
 
-  @issue-3516 @skipOnStable2.0
+
   Scenario: user cannot be created with the name of the disabled user
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the user "Alice" has disabled user "Brian" using the Graph API
     When the user "Alice" creates a new user using GraphAPI with the following settings:
       | userName       | Brian                 |
@@ -79,12 +79,12 @@ Feature: create user
       | email          | brian@example.com     |
       | password       | 123                   |
       | accountEnabled | true                  |
-    Then the HTTP status code should be "400"
+    Then the HTTP status code should be "409"
 
   @skipOnStable2.0
   Scenario: user can be created with the name of the deleted user
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "Admin" using the settings api
+    And the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And the user "Alice" has deleted a user "Brian" using the Graph API
     When the user "Alice" creates a new user using GraphAPI with the following settings:
       | userName       | Brian                 |

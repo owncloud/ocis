@@ -77,7 +77,7 @@ The following sections list the changes for 3.0.0.
 * Enhancement - Expiration Notifications: [#5330](https://github.com/owncloud/ocis/pull/5330)
 * Enhancement - Fix to prevent the email X-Site scripting: [#6429](https://github.com/owncloud/ocis/pull/6429)
 * Enhancement - Fix preview or viewing of shared animated GIFs: [#6386](https://github.com/owncloud/ocis/pull/6386)
-* Enhancement - Fix err when the user share the locked file: [#6357](https://github.com/owncloud/ocis/pull/6357)
+* Enhancement - Fix err when the user share the locked file: [#6358](https://github.com/owncloud/ocis/pull/6358)
 * Enhancement - Add fulltextsearch capabilty: [#6366](https://github.com/owncloud/ocis/pull/6366)
 * Enhancement - GDPR Export: [#6064](https://github.com/owncloud/ocis/pull/6064)
 * Enhancement - Make graph/education API errors more consistent: [#5682](https://github.com/owncloud/ocis/pull/5682)
@@ -789,7 +789,7 @@ The following sections list the changes for 3.0.0.
    Fix unexpected behavior when the user try to share the locked file
 
    https://github.com/owncloud/ocis/issues/6197
-   https://github.com/owncloud/ocis/pull/6357
+   https://github.com/owncloud/ocis/pull/6358
 
 * Enhancement - Add fulltextsearch capabilty: [#6366](https://github.com/owncloud/ocis/pull/6366)
 

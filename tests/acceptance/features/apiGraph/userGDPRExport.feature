@@ -496,8 +496,8 @@ Feature: user GDPR (General Data Protection Regulation) report
 
   Scenario Outline: user tries to generate GDPR report of other users
     Given user "Brian" has been created with default attributes and without skeleton files
-    And the administrator has given "Alice" the role "<userRole>" using the settings api
-    And the administrator has given "Brian" the role "<role>" using the settings api
+    And the administrator has assigned the role "<userRole>" to user "Alice" using the Graph API
+    And the administrator has assigned the role "<role>" to user "Brian" using the Graph API
     When user "Alice" tries to export GDPR report of user "Brian" to "/.personal_data_export.json" using Graph API
     Then the HTTP status code should be "400"
     Examples:

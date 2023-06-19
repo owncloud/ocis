@@ -13,7 +13,7 @@ Feature: Upload files into a space
       | Alice    |
       | Brian    |
       | Bob      |
-    And the administrator has given "Alice" the role "Space Admin" using the settings api
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
     And user "Alice" has created a space "Project Ceres" of type "project" with quota "2000"
     And using spaces DAV path
 
