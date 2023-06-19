@@ -2,7 +2,8 @@ package types
 
 import "strings"
 
-func SplitId(id string) (string, string) {
+// SplitStorageIDFromSpaceID splits the storage- and spaceid- from the given string
+func SplitStorageIDFromSpaceID(id string) (string, string) {
 	ids := strings.Split(id, "$")
 	if len(ids) != 2 {
 		return id, ""
