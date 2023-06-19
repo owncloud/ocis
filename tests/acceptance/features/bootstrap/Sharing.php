@@ -2355,20 +2355,24 @@ trait Sharing {
 	}
 
 	/**
-	 * @When user :user gets all shares shared by him/her using the sharing API
-	 *
 	 * @param string $user
+	 * @param string|null $endpointPath
 	 *
-	 * @return void
+	 * @return ResponseInterface
+	 * @throws JsonException
+	 * @throws GuzzleException
 	 */
-	public function userGetsAllSharesSharedByHimUsingTheSharingApi(string $user):void {
+	public function getAllShares(
+		string $user,
+		?string $endpointPath = null
+	): ResponseInterface {
 		$user = $this->getActualUsername($user);
-		$this->response = OcsApiHelper::sendRequest(
+		return OcsApiHelper::sendRequest(
 			$this->getBaseUrl(),
 			$user,
 			$this->getPasswordForUser($user),
 			"GET",
-			$this->getSharesEndpointPath(),
+			$this->getSharesEndpointPath($endpointPath),
 			$this->getStepLineRef(),
 			[],
 			$this->ocsApiVersion
@@ -2376,12 +2380,23 @@ trait Sharing {
 	}
 
 	/**
-	 * @When the administrator gets all shares shared by him/her using the sharing API
+	 * @When /^user "([^"]*)" gets all shares shared by (?:him|her) using the sharing API$/
+	 *
+	 * @param string $user
+	 *
+	 * @return void
+	 */
+	public function userGetsAllSharesSharedByHimUsingTheSharingApi(string $user):void {
+		$this->setResponse($this->getAllshares($user));
+	}
+
+	/**
+	 * @When /^the administrator gets all shares shared by (?:him|her) using the sharing API$/
 	 *
 	 * @return void
 	 */
 	public function theAdministratorGetsAllSharesSharedByHimUsingTheSharingApi():void {
-		$this->userGetsAllSharesSharedByHimUsingTheSharingApi($this->getAdminUsername());
+		$this->setResponse($this->getAllShares($this->getAdminUsername()));
 	}
 
 	/**
@@ -2393,7 +2408,6 @@ trait Sharing {
 	 * @return void
 	 */
 	public function userGetsFilteredSharesSharedByHimUsingTheSharingApi(string $user, string $shareType):void {
-		$user = $this->getActualUsername($user);
 		if ($shareType === 'public link') {
 			$shareType = 'public_link';
 		}
@@ -2402,16 +2416,7 @@ trait Sharing {
 		} else {
 			$rawShareTypes = SharingHelper::SHARE_TYPES[$shareType];
 		}
-		$this->response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$user,
-			$this->getPasswordForUser($user),
-			"GET",
-			$this->getSharesEndpointPath("?share_types=" . $rawShareTypes),
-			$this->getStepLineRef(),
-			[],
-			$this->ocsApiVersion
-		);
+		$this->setResponse($this->getAllShares($user, "?share_types=" . $rawShareTypes));
 	}
 
 	/**
@@ -2423,17 +2428,7 @@ trait Sharing {
 	 * @return void
 	 */
 	public function userGetsAllTheSharesFromTheFileUsingTheSharingApi(string $user, string $path):void {
-		$user = $this->getActualUsername($user);
-		$this->response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$user,
-			$this->getPasswordForUser($user),
-			"GET",
-			$this->getSharesEndpointPath("?path=$path"),
-			$this->getStepLineRef(),
-			[],
-			$this->ocsApiVersion
-		);
+		$this->setResponse($this->getAllShares($user, "?path=$path"));
 	}
 
 	/**
@@ -2448,17 +2443,7 @@ trait Sharing {
 		string $user,
 		string $path
 	):void {
-		$userActual = $this->getActualUsername($user);
-		$this->response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$userActual,
-			$this->getPasswordForUser($user),
-			"GET",
-			$this->getSharesEndpointPath("?reshares=true&path=$path"),
-			$this->getStepLineRef(),
-			[],
-			$this->ocsApiVersion
-		);
+		$this->setResponse($this->getAllShares($user, "?reshares=true&path=$path"));
 	}
 
 	/**
@@ -2470,17 +2455,7 @@ trait Sharing {
 	 * @return void
 	 */
 	public function userGetsAllTheSharesInsideTheFolderUsingTheSharingApi(string $user, string $path):void {
-		$user = $this->getActualUsername($user);
-		$this->response = OcsApiHelper::sendRequest(
-			$this->getBaseUrl(),
-			$user,
-			$this->getPasswordForUser($user),
-			"GET",
-			$this->getSharesEndpointPath("?path=$path&subfiles=true"),
-			$this->getStepLineRef(),
-			[],
-			$this->ocsApiVersion
-		);
+		$this->setResponse($this->getAllShares($user, "?path=$path&subfiles=true"));
 	}
 
 	/**
