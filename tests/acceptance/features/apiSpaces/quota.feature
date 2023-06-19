@@ -131,7 +131,7 @@ Feature: State of the quota
     When user "Brian" uploads file with content "more than 10 bytes content" to "lorem.txt" using the WebDAV API
     Then the HTTP status code should be "507"
 
-  @env-config
+  @env-config @skipOnStable3.0
   Scenario: try to create a space with quota greater than OCIS spaces max quota
     Given the config "OCIS_SPACES_MAX_QUOTA" has been set to "50"
     And user "Brian" has been created with default attributes and without skeleton files
