@@ -10,6 +10,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Handle the bad request status: [#6469](https://github.com/owncloud/ocis/pull/6469)
 * Enhancement - Add permissions to report: [#6528](https://github.com/owncloud/ocis/pull/6528)
 * Enhancement - Add more metadata to the remote item: [#6300](https://github.com/owncloud/ocis/pull/6300)
+* Enhancement - We added the storage id to the audit log for spaces: [#6548](https://github.com/owncloud/ocis/pull/6548)
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
 * Enhancement - Add old & new values to audit logs: [#6537](https://github.com/owncloud/ocis/pull/6537)
 * Enhancement - Update reva: [#6529](https://github.com/owncloud/ocis/pull/6529)
@@ -54,6 +55,13 @@ The following sections list the changes for unreleased.
    to resolve shared files directly on the source space.
 
    https://github.com/owncloud/ocis/pull/6300
+
+* Enhancement - We added the storage id to the audit log for spaces: [#6548](https://github.com/owncloud/ocis/pull/6548)
+
+   We added the storage id to the audit log for spaces
+
+   https://github.com/owncloud/ocis/issues/3753
+   https://github.com/owncloud/ocis/pull/6548
 
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
 
