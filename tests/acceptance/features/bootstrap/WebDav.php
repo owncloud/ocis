@@ -3338,7 +3338,7 @@ trait WebDav {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (?:deletes|unshares) (?:file|folder) "([^"]*)" using the WebDAV API$/
+	 * @When /^user "([^"]*)" deletes (?:file|folder) "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $file
