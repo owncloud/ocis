@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/cs3org/reva/v2/pkg/events"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 )
 
 // short identifiers for audit actions
@@ -139,49 +140,49 @@ func MessageFileVersionRestored(executant, item, version string) string {
 
 // MessageSpaceCreated returns the human readable string that describes the action
 func MessageSpaceCreated(executant, spaceID, name string) string {
-	storagID, spaceID := SplitStorageIDFromSpaceID(spaceID)
+	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' created a space '%s' with name '%s' (storage: '%s')", executant, spaceID, name, storagID)
 }
 
 // MessageSpaceRenamed returns the human readable string that describes the action
 func MessageSpaceRenamed(executant, spaceID, name string) string {
-	storagID, spaceID := SplitStorageIDFromSpaceID(spaceID)
+	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' renamed space '%s' to '%s' (storage: '%s')", executant, spaceID, name, storagID)
 }
 
 // MessageSpaceDisabled returns the human readable string that describes the action
 func MessageSpaceDisabled(executant, spaceID string) string {
-	storagID, spaceID := SplitStorageIDFromSpaceID(spaceID)
+	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' disabled the space '%s' (storage: '%s')", executant, spaceID, storagID)
 }
 
 // MessageSpaceEnabled returns the human readable string that describes the action
 func MessageSpaceEnabled(executant, spaceID string) string {
-	storagID, spaceID := SplitStorageIDFromSpaceID(spaceID)
+	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' (re-) enabled the space '%s' (storage: '%s')", executant, spaceID, storagID)
 }
 
 // MessageSpaceDeleted returns the human readable string that describes the action
 func MessageSpaceDeleted(executant, spaceID string) string {
-	storagID, spaceID := SplitStorageIDFromSpaceID(spaceID)
+	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' deleted the space '%s' (storage: '%s')", executant, spaceID, storagID)
 }
 
 // MessageSpaceShared returns the human readable string that describes the action
 func MessageSpaceShared(executant, spaceID, grantee string) string {
-	storagID, spaceID := SplitStorageIDFromSpaceID(spaceID)
+	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' shared the space '%s' with '%s' (storage: '%s')", executant, spaceID, grantee, storagID)
 }
 
 // MessageSpaceUnshared returns the human readable string that describes the action
 func MessageSpaceUnshared(executant, spaceID, grantee string) string {
-	storagID, spaceID := SplitStorageIDFromSpaceID(spaceID)
+	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' unshared the space '%s' with '%s' (storage: '%s')", executant, spaceID, grantee, storagID)
 }
 
 // MessageSpaceUpdated returns the human readable string that describes the action
 func MessageSpaceUpdated(executant, spaceID, name string, quota uint64, opaque map[string]string) string {
-	storagID, spaceID := SplitStorageIDFromSpaceID(spaceID)
+	storagID, spaceID := storagespace.SplitStorageID(spaceID)
 	return fmt.Sprintf("user '%s' updated space '%s'. name: '%s', quota: '%d', opaque: '%s' (storage: '%s')",
 		executant, spaceID, name, quota, opaque, storagID)
 }
