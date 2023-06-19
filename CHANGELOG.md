@@ -17,6 +17,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Use reva client selectors: [#6452](https://github.com/owncloud/ocis/pull/6452)
 * Enhancement - Add companion URL config: [#6453](https://github.com/owncloud/ocis/pull/6453)
 * Enhancement - Add imprint and privacy url config: [#6462](https://github.com/owncloud/ocis/pull/6462)
+* Enhancement - Add logged out url config: [#6549](https://github.com/owncloud/ocis/pull/6549)
 * Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
 * Enhancement - Fix the groupname validation: [#6490](https://github.com/owncloud/ocis/pull/6490)
 * Enhancement - Fix the username validation: [#6437](https://github.com/owncloud/ocis/pull/6437)
@@ -130,6 +131,13 @@ The following sections list the changes for unreleased.
    `WEB_OPTION_PRIVACY_URL`.
 
    https://github.com/owncloud/ocis/pull/6462
+
+* Enhancement - Add logged out url config: [#6549](https://github.com/owncloud/ocis/pull/6549)
+
+   Introduce a config to set the more button url on the access denied page in web via
+   `WEB_OPTION_ACCESS_DENIED_HELP_URL`.
+
+   https://github.com/owncloud/ocis/pull/6549
 
 * Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
 
