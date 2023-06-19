@@ -3520,6 +3520,40 @@ trait Sharing {
 		$this->emptyLastOCSStatusCodesArray();
 	}
 
+    /**
+     * @When /^user "([^"]*)" unshares (?:folder|file|entity) "([^"]*)" shared to "([^"]*)"$/
+     *
+     * @param string $sharer
+     * @param string $path
+     * @param string $sharee
+     *
+     * @return void
+     * @throws JsonException
+     */
+    public function userUnsharesSharedTo(string $sharer, string $path, string $sharee): void {
+        $sharer = $this->getActualUsername($sharer);
+        $sharee = $this->getActualUsername($sharee);
+
+        $response = $this->getShares($sharer, "$path&share_types=0");
+        $shareId = null;
+        foreach ($response as $shareElement) {
+            if ((string)$shareElement->share_with[0] === $sharee) {
+                $shareId = (string) $shareElement->id;
+                break;
+            }
+        }
+        Assert::assertNotNull(
+            $shareId,
+            __METHOD__ . " could not find share, offered by $sharer to $sharee"
+        );
+
+        $this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
+            $sharer,
+            'DELETE',
+            '/apps/files_sharing/api/v' . $this->sharingApiVersion . '/shares/' . $shareId
+        );
+    }
+
 	/**
 	 * @Then the sharing API should report that no shares are shared with user :user
 	 *

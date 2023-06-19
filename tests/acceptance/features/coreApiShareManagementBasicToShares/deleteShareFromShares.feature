@@ -74,7 +74,7 @@ Feature: sharing
     And as "Alice" file "/shared_file.txt" should exist in the trashbin
     And as "Brian" file "/shared_file.txt" should exist in the trashbin
 
- 
+
   Scenario: deleting a folder out of a share as recipient creates a backup for the owner
     Given using OCS API version "1"
     And user "Alice" has created folder "/shared"
@@ -226,3 +226,15 @@ Feature: sharing
       | ocs_api_version | ocs_status_code | http_status_code |
       | 1               | 404             | 200              |
       | 2               | 404             | 404              |
+
+
+   Scenario: unshare a shared resources
+     Given using OCS API version "1"
+     And user "Alice" has shared file "textfile0.txt" with user "Brian"
+     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
+     When user "Alice" unshares file "textfile0.txt" shared to "Brian"
+#     Then the OCS status code should be "200"
+     Then the HTTP status code should be "204"
+     And as "Brian" file "/Shares/shared/textfile0.txt" should not exist
+
+
