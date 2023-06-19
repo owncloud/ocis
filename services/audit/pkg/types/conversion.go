@@ -202,7 +202,7 @@ func ReceivedShareUpdated(ev events.ReceivedShareUpdated) AuditEventReceivedShar
 // LinkAccessed converts a LinkAccessed event to an AuditEventLinkAccessed
 func LinkAccessed(ev events.LinkAccessed) AuditEventLinkAccessed {
 	uid := ev.Sharer.OpaqueId
-	base := BasicAuditEvent(uid, formatTime(ev.CTime), MessageLinkAccessed(ev.ShareID.GetOpaqueId(), true), ActionLinkAccessed)
+	base := BasicAuditEvent(uid, formatTime(ev.CTime), MessageLinkAccessed(ev.Token, true), ActionLinkAccessed)
 	return AuditEventLinkAccessed{
 		AuditEventSharing: SharingAuditEvent(ev.ShareID.GetOpaqueId(), ev.ItemID.OpaqueId, uid, base),
 		ShareToken:        ev.Token,
@@ -215,7 +215,7 @@ func LinkAccessed(ev events.LinkAccessed) AuditEventLinkAccessed {
 
 // LinkAccessFailed converts a LinkAccessFailed event to an AuditEventLinkAccessed
 func LinkAccessFailed(ev events.LinkAccessFailed) AuditEventLinkAccessed {
-	base := BasicAuditEvent("", formatTime(ev.Timestamp), MessageLinkAccessed(ev.ShareID.GetOpaqueId(), false), ActionLinkAccessed)
+	base := BasicAuditEvent("", formatTime(ev.Timestamp), MessageLinkAccessed(ev.Token, false), ActionLinkAccessed)
 	return AuditEventLinkAccessed{
 		AuditEventSharing: SharingAuditEvent(ev.ShareID.GetOpaqueId(), "", "", base),
 		ShareToken:        ev.Token,

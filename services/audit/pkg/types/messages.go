@@ -94,8 +94,8 @@ func MessageShareDeclined(userid, shareid, sharerid string) string {
 }
 
 // MessageLinkAccessed returns the human readable string that describes the action
-func MessageLinkAccessed(linkid string, success bool) string {
-	return fmt.Sprintf("link '%s' was accessed. Success: %v", linkid, success)
+func MessageLinkAccessed(token string, success bool) string {
+	return fmt.Sprintf("link with token '%s' was accessed. Success: %v", token, success)
 }
 
 // MessageContainerCreated returns the human readable string that describes the action
