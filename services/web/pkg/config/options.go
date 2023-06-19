@@ -22,6 +22,7 @@ type Options struct {
 	OpenLinksWithDefaultApp  bool             `json:"openLinksWithDefaultApp,omitempty" yaml:"openLinksWithDefaultApp" env:"WEB_OPTION_OPEN_LINKS_WITH_DEFAULT_APP" desc:"Specifies whether single file link shares should be opened with the default app or not. If not opened by the default app, the Web UI just displays the file details. Defaults to 'true'."`
 	ImprintURL               string           `json:"imprintUrl,omitempty" yaml:"imprintUrl" env:"WEB_OPTION_IMPRINT_URL" desc:"Specifies the target url for the imprint link in the account menu"`
 	PrivacyURL               string           `json:"privacyUrl,omitempty" yaml:"privacyUrl" env:"WEB_OPTION_PRIVACY_URL" desc:"Specifies the target url for the privacy link in the account menu"`
+	LoggedOutHelpURL         string           `json:"loggedOutHelpUrl,omitempty" yaml:"loggedOutHelpUrl" env:"WEB_OPTION_LOGGED_OUT_HELP" desc:"Specifies the target url for the generic logged out / access denied page"`
 }
 
 // AccountEditLink are the AccountEditLink options
