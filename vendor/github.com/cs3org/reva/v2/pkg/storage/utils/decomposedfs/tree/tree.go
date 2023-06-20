@@ -376,7 +376,7 @@ func (t *Tree) ListFolder(ctx context.Context, n *node.Node) ([]*node.Node, erro
 					}
 				}
 
-				child, err := node.ReadNode(ctx, t.lookup, n.SpaceID, nodeID, false, n, true)
+				child, err := node.ReadNode(ctx, t.lookup, n.SpaceID, nodeID, false, n.SpaceRoot, true)
 				if err != nil {
 					return err
 				}
@@ -691,7 +691,12 @@ func (t *Tree) removeNode(path string, n *node.Node) error {
 
 // Propagate propagates changes to the root of the tree
 func (t *Tree) Propagate(ctx context.Context, n *node.Node, sizeDiff int64) (err error) {
-	sublog := appctx.GetLogger(ctx).With().Str("spaceid", n.SpaceID).Str("nodeid", n.ID).Logger()
+	sublog := appctx.GetLogger(ctx).With().
+		Str("method", "tree.Propagate").
+		Str("spaceid", n.SpaceID).
+		Str("nodeid", n.ID).
+		Int64("sizeDiff", sizeDiff).
+		Logger()
 	if !t.options.TreeTimeAccounting && (!t.options.TreeSizeAccounting || sizeDiff == 0) {
 		// no propagation enabled
 		sublog.Debug().Msg("propagation disabled or nothing to propagate")
@@ -712,15 +717,22 @@ func (t *Tree) Propagate(ctx context.Context, n *node.Node, sizeDiff int64) (err
 
 		var f *lockedfile.File
 		// lock parent before reading treesize or tree time
+
+		var parentFilename string
 		switch t.lookup.MetadataBackend().(type) {
 		case metadata.MessagePackBackend:
-			f, err = lockedfile.OpenFile(t.lookup.MetadataBackend().MetadataPath(n.ParentPath()), os.O_RDWR|os.O_CREATE, 0600)
+			parentFilename = t.lookup.MetadataBackend().MetadataPath(n.ParentPath())
+			f, err = lockedfile.OpenFile(parentFilename, os.O_RDWR|os.O_CREATE, 0600)
 		case metadata.XattrsBackend:
 			// we have to use dedicated lockfiles to lock directories
 			// this only works because the xattr backend also locks folders with separate lock files
-			f, err = lockedfile.OpenFile(n.ParentPath()+filelocks.LockFileSuffix, os.O_RDWR|os.O_CREATE, 0600)
+			parentFilename = n.ParentPath() + filelocks.LockFileSuffix
+			f, err = lockedfile.OpenFile(parentFilename, os.O_RDWR|os.O_CREATE, 0600)
 		}
 		if err != nil {
+			sublog.Error().Err(err).
+				Str("parent filename", parentFilename).
+				Msg("Propagation failed. Could not open metadata for parent with lock.")
 			return err
 		}
 		// always log error if closing node fails
@@ -733,6 +745,8 @@ func (t *Tree) Propagate(ctx context.Context, n *node.Node, sizeDiff int64) (err
 		}()
 
 		if n, err = n.ParentWithReader(f); err != nil {
+			sublog.Error().Err(err).
+				Msg("Propagation failed. Could not read parent node.")
 			return err
 		}
 
@@ -788,11 +802,14 @@ func (t *Tree) Propagate(ctx context.Context, n *node.Node, sizeDiff int64) (err
 			switch {
 			case metadata.IsAttrUnset(err):
 				// fallback to calculating the treesize
+				sublog.Warn().Msg("treesize attribute unset, falling back to calculating the treesize")
 				newSize, err = t.calculateTreeSize(ctx, n.InternalPath())
 				if err != nil {
 					return err
 				}
 			case err != nil:
+				sublog.Error().Err(err).
+					Msg("Faild to propagate treesize change. Error when reading the treesize attribute from parent")
 				return err
 			case sizeDiff > 0:
 				newSize = treeSize + uint64(sizeDiff)
@@ -813,12 +830,14 @@ func (t *Tree) Propagate(ctx context.Context, n *node.Node, sizeDiff int64) (err
 		}
 
 		if err = n.SetXattrs(attrs, false); err != nil {
+			sublog.Error().Err(err).Msg("Failed to update extend attributes of parent node")
 			return err
 		}
 
 		// Release node lock early, ignore already closed error
 		cerr := f.Close()
 		if cerr != nil && !errors.Is(cerr, os.ErrClosed) {
+			sublog.Error().Err(cerr).Msg("Failed to close parent node and release lock")
 			return cerr
 		}
 	}

@@ -287,7 +287,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "sharing-userid", "2001-09-09T01:46:40Z", "link 'shareid' was accessed. Success: true", "public_link_accessed")
+			checkBaseAuditEvent(t, ev.AuditEvent, "sharing-userid", "2001-09-09T01:46:40Z", "link with token 'token-123' was accessed. Success: true", "public_link_accessed")
 			// AuditEventSharing fields
 			checkSharingAuditEvent(t, ev.AuditEventSharing, "itemid-1", "sharing-userid", "shareid")
 			// AuditEventShareUpdated fields
@@ -310,7 +310,7 @@ var testCases = []struct {
 			require.NoError(t, json.Unmarshal(b, &ev))
 
 			// AuditEvent fields
-			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "link 'shareid' was accessed. Success: false", "public_link_accessed")
+			checkBaseAuditEvent(t, ev.AuditEvent, "", "", "link with token 'token-123' was accessed. Success: false", "public_link_accessed")
 			// AuditEventSharing fields
 			checkSharingAuditEvent(t, ev.AuditEventSharing, "", "", "shareid")
 			// AuditEventShareUpdated fields

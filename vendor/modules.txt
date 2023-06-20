@@ -352,7 +352,7 @@ github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1
 github.com/cs3org/go-cs3apis/cs3/storage/registry/v1beta1
 github.com/cs3org/go-cs3apis/cs3/tx/v1beta1
 github.com/cs3org/go-cs3apis/cs3/types/v1beta1
-# github.com/cs3org/reva/v2 v2.14.1-0.20230616125400-b30fdde17262
+# github.com/cs3org/reva/v2 v2.14.1-0.20230619124027-9bd3d7359257
 ## explicit; go 1.20
 github.com/cs3org/reva/v2/cmd/revad/internal/grace
 github.com/cs3org/reva/v2/cmd/revad/runtime
@@ -655,6 +655,7 @@ github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/lookup
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/metadata/prefixes
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/migrator
+github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/mtimesyncedcache
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/node
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/options
 github.com/cs3org/reva/v2/pkg/storage/utils/decomposedfs/tree

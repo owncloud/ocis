@@ -168,6 +168,7 @@ func LinkAccessFailed(r *link.GetPublicShareByTokenResponse, req *link.GetPublic
 		Status:    r.Status.Code,
 		Message:   r.Status.Message,
 		Timestamp: utils.TSNow(),
+		Token:     req.Token,
 	}
 	if r.Share != nil {
 		e.ShareID = r.Share.Id
