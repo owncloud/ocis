@@ -368,6 +368,7 @@ func formatQuery(q string) string {
 
 	fieldRe := regexp.MustCompile(`\w+:[^ ]+`)
 	if fieldRe.MatchString(cq) {
+		nameTagesRe := regexp.MustCompile(`\+?(Name|Tags)`) // detect "Name", "+Name, "Tags" and "+Tags"
 		parts := strings.Split(cq, " ")
 
 		cq = ""
@@ -376,7 +377,7 @@ func formatQuery(q string) string {
 			if len(fieldParts) > 1 {
 				key := fieldParts[0]
 				value := fieldParts[1]
-				if key == "Name" || key == "Tags" {
+				if nameTagesRe.MatchString(key) {
 					value = strings.ToLower(value) // do a lowercase query on the lowercased fields
 				}
 				cq += key + ":" + value + " "
