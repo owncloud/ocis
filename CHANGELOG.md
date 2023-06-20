@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Add token to LinkAccessedEvent: [#6554](https://github.com/owncloud/ocis/pull/6554)
 * Bugfix - Add missing timestamps: [#6515](https://github.com/owncloud/ocis/pull/6515)
 * Bugfix - Handle the bad request status: [#6469](https://github.com/owncloud/ocis/pull/6469)
 * Enhancement - Add permissions to report: [#6528](https://github.com/owncloud/ocis/pull/6528)
@@ -27,6 +28,14 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow disabling wopi chat: [#6544](https://github.com/owncloud/ocis/pull/6544)
 
 ## Details
+
+* Bugfix - Add token to LinkAccessedEvent: [#6554](https://github.com/owncloud/ocis/pull/6554)
+
+   We added the link token to the LinkAccessedEvent
+
+   https://github.com/owncloud/ocis/issues/3753
+   https://github.com/owncloud/ocis/pull/6554
+   https://github.com/cs3org/reva/pull/3993
 
 * Bugfix - Add missing timestamps: [#6515](https://github.com/owncloud/ocis/pull/6515)
 
