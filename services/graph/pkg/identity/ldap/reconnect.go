@@ -205,10 +205,10 @@ func (c ConnWithReconnect) GetConnection() (*ldap.Conn, error) {
 }
 
 func (c ConnWithReconnect) ldapAutoConnect(config Config) {
-	l, err := c.ldapConnect(config)
-	if err != nil {
-		c.logger.Error().Err(err).Msg("autoconnect could not get ldap Connection")
-	}
+	var (
+		l   *ldap.Conn
+		err error
+	)
 
 	for {
 		select {
