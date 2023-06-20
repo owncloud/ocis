@@ -331,4 +331,7 @@ require (
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
 
-replace github.com/cs3org/go-cs3apis => github.com/2403905/go-cs3apis v0.0.0-20230517122726-727045414fd1
+replace (
+	github.com/cs3org/go-cs3apis => github.com/2403905/go-cs3apis v0.0.0-20230517122726-727045414fd1
+	github.com/cs3org/reva/v2 => github.com/2403905/reva/v2 v2.0.0-20230620121624-6f01bde86fe7
+)
