@@ -82,37 +82,42 @@ func NewService(opts ...Option) (Service, error) {
 		gatewaySelector:  gatewaySelector,
 	}
 
+	if svc.config.DisablePreviews {
+		svc.thumbnailsClient = nil
+	}
 	m.Route(options.Config.HTTP.Root, func(r chi.Router) {
 
-		r.Group(func(r chi.Router) {
-			r.Use(svc.DavUserContext())
+		if !svc.config.DisablePreviews {
+			r.Group(func(r chi.Router) {
+				r.Use(svc.DavUserContext())
 
-			r.Get("/remote.php/dav/spaces/{id}", svc.SpacesThumbnail)
-			r.Get("/remote.php/dav/spaces/{id}/*", svc.SpacesThumbnail)
-			r.Get("/dav/spaces/{id}", svc.SpacesThumbnail)
-			r.Get("/dav/spaces/{id}/*", svc.SpacesThumbnail)
+				r.Get("/remote.php/dav/spaces/{id}", svc.SpacesThumbnail)
+				r.Get("/remote.php/dav/spaces/{id}/*", svc.SpacesThumbnail)
+				r.Get("/dav/spaces/{id}", svc.SpacesThumbnail)
+				r.Get("/dav/spaces/{id}/*", svc.SpacesThumbnail)
 
-			r.Get("/remote.php/dav/files/{id}", svc.Thumbnail)
-			r.Get("/remote.php/dav/files/{id}/*", svc.Thumbnail)
-			r.Get("/dav/files/{id}", svc.Thumbnail)
-			r.Get("/dav/files/{id}/*", svc.Thumbnail)
-		})
+				r.Get("/remote.php/dav/files/{id}", svc.Thumbnail)
+				r.Get("/remote.php/dav/files/{id}/*", svc.Thumbnail)
+				r.Get("/dav/files/{id}", svc.Thumbnail)
+				r.Get("/dav/files/{id}/*", svc.Thumbnail)
+			})
 
-		r.Group(func(r chi.Router) {
-			r.Use(svc.DavPublicContext())
+			r.Group(func(r chi.Router) {
+				r.Use(svc.DavPublicContext())
 
-			r.Head("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnailHead)
-			r.Head("/dav/public-files/{token}/*", svc.PublicThumbnailHead)
+				r.Head("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnailHead)
+				r.Head("/dav/public-files/{token}/*", svc.PublicThumbnailHead)
 
-			r.Get("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnail)
-			r.Get("/dav/public-files/{token}/*", svc.PublicThumbnail)
-		})
+				r.Get("/remote.php/dav/public-files/{token}/*", svc.PublicThumbnail)
+				r.Get("/dav/public-files/{token}/*", svc.PublicThumbnail)
+			})
 
-		r.Group(func(r chi.Router) {
-			r.Use(svc.WebDAVContext())
-			r.Get("/remote.php/webdav/*", svc.Thumbnail)
-			r.Get("/webdav/*", svc.Thumbnail)
-		})
+			r.Group(func(r chi.Router) {
+				r.Use(svc.WebDAVContext())
+				r.Get("/remote.php/webdav/*", svc.Thumbnail)
+				r.Get("/webdav/*", svc.Thumbnail)
+			})
+		}
 
 		// r.MethodFunc("REPORT", "/remote.php/dav/files/{id}/*", svc.Search)
 

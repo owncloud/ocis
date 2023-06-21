@@ -433,6 +433,10 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 		delete(runset, name)
 	}
 
+	// disable thumbnail service
+	if cfg.WebDAV.DisablePreviews || cfg.Web.Web.Config.Options.DisablePreviews {
+		delete(runset, "thumbnails")
+	}
 }
 
 // List running processes for the Service Controller.
