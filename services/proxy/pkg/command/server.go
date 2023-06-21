@@ -22,6 +22,7 @@ import (
 	"github.com/owncloud/ocis/v2/ocis-pkg/oidc"
 	"github.com/owncloud/ocis/v2/ocis-pkg/registry"
 	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
@@ -35,12 +36,12 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/server/debug"
 	proxyHTTP "github.com/owncloud/ocis/v2/services/proxy/pkg/server/http"
-	"github.com/owncloud/ocis/v2/services/proxy/pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 	"github.com/urfave/cli/v2"
 	microstore "go-micro.dev/v4/store"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Server is the entrypoint for the server command.
@@ -63,7 +64,7 @@ func Server(cfg *config.Config) *cli.Command {
 			)
 
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			err := tracing.Configure(cfg)
+			traceProvider, err := tracing.GetValidTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
@@ -72,7 +73,7 @@ func Server(cfg *config.Config) *cli.Command {
 				return err
 			}
 
-			var oidcHTTPClient = &http.Client{
+			oidcHTTPClient := &http.Client{
 				Transport: &http.Transport{
 					TLSClientConfig: &tls.Config{
 						MinVersion:         tls.VersionTLS12,
@@ -91,9 +92,7 @@ func Server(cfg *config.Config) *cli.Command {
 				oidc.WithJWKSOptions(cfg.OIDC.JWKS),
 			)
 
-			var (
-				m = metrics.New()
-			)
+			m := metrics.New()
 
 			gr := run.Group{}
 			ctx, cancel := func() (context.Context, context.CancelFunc) {
@@ -125,7 +124,7 @@ func Server(cfg *config.Config) *cli.Command {
 			}
 
 			{
-				middlewares := loadMiddlewares(ctx, logger, cfg, userInfoCache)
+				middlewares := loadMiddlewares(ctx, logger, cfg, userInfoCache, traceProvider)
 				server, err := proxyHTTP.Server(
 					proxyHTTP.Handler(lh.handler()),
 					proxyHTTP.Logger(logger),
@@ -134,7 +133,6 @@ func Server(cfg *config.Config) *cli.Command {
 					proxyHTTP.Metrics(metrics.New()),
 					proxyHTTP.Middlewares(middlewares),
 				)
-
 				if err != nil {
 					logger.Error().
 						Err(err).
@@ -162,7 +160,6 @@ func Server(cfg *config.Config) *cli.Command {
 					debug.Context(ctx),
 					debug.Config(cfg),
 				)
-
 				if err != nil {
 					logger.Error().Err(err).Str("server", "debug").Msg("Failed to initialize server")
 					return err
@@ -197,7 +194,6 @@ func (h *StaticRouteHandler) handler() http.Handler {
 
 		// TODO: migrate oidc well knowns here in a second wrapper
 		r.HandleFunc("/*", h.proxy.ServeHTTP)
-
 	})
 	// This is commented out due to a race issue in chi
 	//var methods = []string{"PROPFIND", "DELETE", "PROPPATCH", "MKCOL", "COPY", "MOVE", "LOCK", "UNLOCK", "REPORT"}
@@ -272,8 +268,11 @@ func (h *StaticRouteHandler) backchannelLogout(w http.ResponseWriter, r *http.Re
 	render.JSON(w, r, nil)
 }
 
-func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache microstore.Store) alice.Chain {
-	grpcClient, err := grpc.NewClient(append(grpc.GetClientOptions(cfg.GRPCClientTLS), grpc.WithTraceProvider(tracing.TraceProvider))...)
+func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config, userInfoCache microstore.Store, traceProvider trace.TracerProvider) alice.Chain {
+	grpcClient, err := grpc.NewClient(
+		append(
+			grpc.GetClientOptions(cfg.GRPCClientTLS),
+			grpc.WithTraceProvider(traceProvider))...)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("Failed to get gateway client")
 	}
@@ -330,7 +329,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 			Msg("Failed to create reva gateway service client")
 	}
 
-	var oidcHTTPClient = &http.Client{
+	oidcHTTPClient := &http.Client{
 		Transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				MinVersion:         tls.VersionTLS12,
@@ -379,12 +378,12 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 	return alice.New(
 		// first make sure we log all requests and redirect to https if necessary
 		otelhttp.NewMiddleware("proxy",
-			otelhttp.WithTracerProvider(tracing.TraceProvider),
+			otelhttp.WithTracerProvider(traceProvider),
 			otelhttp.WithSpanNameFormatter(func(name string, r *http.Request) string {
 				return fmt.Sprintf("%s %s", r.Method, r.URL.Path)
 			}),
 		),
-		middleware.Tracer(),
+		middleware.Tracer(traceProvider),
 		pkgmiddleware.TraceContext,
 		chimiddleware.RealIP,
 		chimiddleware.RequestID,
@@ -397,6 +396,7 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		),
 		router.Middleware(cfg.PolicySelector, cfg.Policies, logger),
 		middleware.Authentication(
+			traceProvider,
 			authenticators,
 			middleware.CredentialsByUserAgent(cfg.AuthMiddleware.CredentialsByUserAgent),
 			middleware.Logger(logger),

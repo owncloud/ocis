@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/router"
-	proxytracing "github.com/owncloud/ocis/v2/services/proxy/pkg/tracing"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/webdav"
 	"go.opentelemetry.io/otel/trace"
 	"golang.org/x/text/cases"
@@ -47,10 +46,10 @@ type Authenticator interface {
 }
 
 // Authentication is a higher order authentication middleware.
-func Authentication(auths []Authenticator, opts ...Option) func(next http.Handler) http.Handler {
+func Authentication(traceProvider trace.TracerProvider, auths []Authenticator, opts ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(opts...)
 	configureSupportedChallenges(options)
-	tracer := proxytracing.TraceProvider.Tracer("proxy")
+	tracer := traceProvider.Tracer("proxy")
 	spanOpts := []trace.SpanStartOption{
 		trace.WithSpanKind(trace.SpanKindServer),
 	}
