@@ -96,11 +96,11 @@ config = {
         "ocis",
     ],
     "cs3ApiTests": {
-        "skip": True,
+        "skip": False,
         "earlyFail": True,
     },
     "wopiValidatorTests": {
-        "skip": True,
+        "skip": False,
         "earlyFail": True,
     },
     "localApiTests": {
@@ -115,14 +115,14 @@ config = {
                 "apiCors",
                 "apiAsyncUpload",
             ],
-            "skip": True,
+            "skip": False,
             "earlyFail": True,
         },
         "apiNotification": {
             "suites": [
                 "apiNotification",
             ],
-            "skip": True,
+            "skip": False,
             "earlyFail": True,
             "emailNeeded": True,
             "extraEnvironment": {
@@ -153,18 +153,18 @@ config = {
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": True,
+        "skip": False,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "e2eTests": {
-        "skip": True,
+        "skip": False,
         "earlyFail": True,
     },
     "rocketchat": {
@@ -177,8 +177,8 @@ config = {
     "dockerReleases": {
         "architectures": ["arm64", "amd64"],
     },
-    "litmus": False,
-    "codestyle": False,
+    "litmus": True,
+    "codestyle": True,
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -196,22 +196,6 @@ pipelineVolumeGo = \
         "name": "gopath",
         "temp": {},
     }
-
-# # volume for pipeline to share clamav socket between steps of a pipeline
-# # to be used in combination with stepVolumeClamav
-# pipelineVolumeClamav = \
-#     {
-#         "name": "sockets",
-#         "temp": {},
-#     }
-#
-# # volume for steps to share clamav socket between steps of a pipeline
-# # socket path must be set to /var/run/clamav/ inside the image, which is the case
-# stepVolumeClamav = \
-#     {
-#         "name": "sockets",
-#         "path": "/var/run/clamav/",
-#     }
 
 # minio mc environment variables
 MINIO_MC_ENV = {
@@ -275,6 +259,7 @@ def main(ctx):
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
+        testOcisModules(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -288,34 +273,37 @@ def main(ctx):
         docs(),
     ]
 
-    # test_pipelines.append(
-    #         testPipelines(ctx)
-    # )
+    test_pipelines.append(
+        pipelineDependsOn(
+            purgeBuildArtifactCache(ctx),
+            testPipelines(ctx),
+        ),
+    )
 
-    pipelines = test_pipelines
+    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
 
-    # if ctx.build.event == "cron":
-    #     pipelines = \
-    #         pipelines + \
-    #         example_deploys(ctx)
-    # else:
-    #     pipelines = \
-    #         pipelines + \
-    #         pipelinesDependsOn(
-    #             example_deploys(ctx),
-    #             pipelines,
-    #         )
-    #
-    # # always append notification step
-    # pipelines.append(
-    #     pipelineDependsOn(
-    #         notify(),
-    #         pipelines,
-    #     ),
-    # )
-    #
-    # pipelines += checkStarlark()
-    # pipelineSanityChecks(ctx, pipelines)
+    if ctx.build.event == "cron":
+        pipelines = \
+            pipelines + \
+            example_deploys(ctx)
+    else:
+        pipelines = \
+            pipelines + \
+            pipelinesDependsOn(
+                example_deploys(ctx),
+                pipelines,
+            )
+
+    # always append notification step
+    pipelines.append(
+        pipelineDependsOn(
+            notify(),
+            pipelines,
+        ),
+    )
+
+    pipelines += checkStarlark()
+    pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
 def cachePipeline(name, steps):
@@ -824,7 +812,6 @@ def localApiTestPipeline(ctx):
                                     "refs/pull/**",
                                 ],
                             },
-                            # "volumes": [pipelineVolumeClamav] if params["antivirusNeeded"] else [],
                         }
                         pipelines.append(pipeline)
     return pipelines
@@ -2955,10 +2942,6 @@ def clamavService():
     return [{
         "name": "clamav",
         "image": OC_CI_CLAMAVD,
-        # "volumes": [{
-        #     "name": "sockets",
-        #     "path": "/var/run/clamav/",
-        # }],
     }]
 
 def waitForClamavService():
