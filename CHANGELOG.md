@@ -8,6 +8,7 @@ The following sections list the changes for unreleased.
 
 * Bugfix - Add token to LinkAccessedEvent: [#6554](https://github.com/owncloud/ocis/pull/6554)
 * Bugfix - Add missing timestamps: [#6515](https://github.com/owncloud/ocis/pull/6515)
+* Bugfix - Don't connect to ldap on startup: [#6565](https://github.com/owncloud/ocis/pull/6565)
 * Bugfix - Handle the bad request status: [#6469](https://github.com/owncloud/ocis/pull/6469)
 * Enhancement - Add permissions to report: [#6528](https://github.com/owncloud/ocis/pull/6528)
 * Enhancement - Add more metadata to the remote item: [#6300](https://github.com/owncloud/ocis/pull/6300)
@@ -43,6 +44,12 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3753
    https://github.com/owncloud/ocis/pull/6515
+
+* Bugfix - Don't connect to ldap on startup: [#6565](https://github.com/owncloud/ocis/pull/6565)
+
+   This leads to misleading error messages. Instead we connect on first request
+
+   https://github.com/owncloud/ocis/pull/6565
 
 * Bugfix - Handle the bad request status: [#6469](https://github.com/owncloud/ocis/pull/6469)
 
