@@ -65,11 +65,12 @@ type WebConfig struct {
 
 // OIDC defines the available oidc configuration
 type OIDC struct {
-	MetadataURL  string `json:"metadata_url,omitempty" yaml:"metadata_url" env:"WEB_OIDC_METADATA_URL" desc:"URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + \"/.well-known/openid-configuration\"."`
-	Authority    string `json:"authority,omitempty" yaml:"authority" env:"OCIS_URL;OCIS_OIDC_ISSUER;WEB_OIDC_AUTHORITY" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP."`
-	ClientID     string `json:"client_id,omitempty" yaml:"client_id" env:"OCIS_OIDC_CLIENT_ID;WEB_OIDC_CLIENT_ID" desc:"OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP (has no effect when using the builtin IDP)."`
-	ResponseType string `json:"response_type,omitempty" yaml:"response_type" env:"WEB_OIDC_RESPONSE_TYPE" desc:"OIDC response type to use for authentication."`
-	Scope        string `json:"scope,omitempty" yaml:"scope" env:"WEB_OIDC_SCOPE" desc:"OIDC scopes to request during authentication to authorize access to user details. Defaults to 'openid profile email'. Values are separated by blank. More example values but not limited to are 'address' or 'phone' etc."`
+	MetadataURL           string `json:"metadata_url,omitempty" yaml:"metadata_url" env:"WEB_OIDC_METADATA_URL" desc:"URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + \"/.well-known/openid-configuration\"."`
+	Authority             string `json:"authority,omitempty" yaml:"authority" env:"OCIS_URL;OCIS_OIDC_ISSUER;WEB_OIDC_AUTHORITY" desc:"URL of the OIDC issuer. It defaults to URL of the builtin IDP."`
+	ClientID              string `json:"client_id,omitempty" yaml:"client_id" env:"OCIS_OIDC_CLIENT_ID;WEB_OIDC_CLIENT_ID" desc:"OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP (has no effect when using the builtin IDP)."`
+	ResponseType          string `json:"response_type,omitempty" yaml:"response_type" env:"WEB_OIDC_RESPONSE_TYPE" desc:"OIDC response type to use for authentication."`
+	Scope                 string `json:"scope,omitempty" yaml:"scope" env:"WEB_OIDC_SCOPE" desc:"OIDC scopes to request during authentication to authorize access to user details. Defaults to 'openid profile email'. Values are separated by blank. More example values but not limited to are 'address' or 'phone' etc."`
+	PostLogoutRedirectUri string `json:"post_logout_redirect_uri,omitempty" yaml:"post_logout_redirect_uri" env:"WEB_OIDC_POST_LOGOUT_REDIRECT_URI" desc:"This value needs to point to a valid and reachable web page. The web client will trigger a redirect to that page directly after the logout action. The default value is empty and redirects to the login page."`
 }
 
 // Application defines an application for the Web app switcher.
