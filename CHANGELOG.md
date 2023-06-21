@@ -21,6 +21,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add imprint and privacy url config: [#6462](https://github.com/owncloud/ocis/pull/6462)
 * Enhancement - Add logged out url config: [#6549](https://github.com/owncloud/ocis/pull/6549)
 * Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
+* Enhancement - Skip if the simulink is a directory: [#6574](https://github.com/owncloud/ocis/pull/6574)
 * Enhancement - Fix the groupname validation: [#6490](https://github.com/owncloud/ocis/pull/6490)
 * Enhancement - Fix the username validation: [#6437](https://github.com/owncloud/ocis/pull/6437)
 * Enhancement - Add functionality to retry postprocessing: [#6500](https://github.com/owncloud/ocis/pull/6500)
@@ -163,6 +164,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/6513
    https://github.com/owncloud/ocis/pull/6516
+
+* Enhancement - Skip if the simulink is a directory: [#6574](https://github.com/owncloud/ocis/pull/6574)
+
+   Skip the error if the simulink is pointed to a directory
+
+   https://github.com/owncloud/ocis/issues/6567
+   https://github.com/owncloud/ocis/pull/6574
 
 * Enhancement - Fix the groupname validation: [#6490](https://github.com/owncloud/ocis/pull/6490)
 
