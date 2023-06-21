@@ -23,12 +23,14 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	permissionsv1beta1 "github.com/cs3org/go-cs3apis/cs3/permissions/v1beta1"
 	rpc "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	link "github.com/cs3org/go-cs3apis/cs3/sharing/link/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	types "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/rs/zerolog/log"
 
 	"github.com/cs3org/reva/v2/internal/http/services/owncloud/ocs/conversions"
@@ -36,7 +38,6 @@ import (
 	"github.com/cs3org/reva/v2/pkg/appctx"
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/publicshare"
-	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/pkg/errors"
 )
 
@@ -127,7 +128,12 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 		}
 	}
 
-	permissions, err := ocPublicPermToCs3(permKey, h)
+	// default perms: read-only
+	// TODO: the default might change depending on allowed permissions and configs
+	if permKey == nil {
+		permKey = &_defaultPublicLinkPermission
+	}
+	permissions, err := ocPublicPermToCs3(permKey)
 	if err != nil {
 		return nil, &ocsError{
 			Code:    response.MetaBadRequest.StatusCode,
@@ -135,16 +141,13 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 			Error:   err,
 		}
 	}
-	if permissions == nil {
-		// default perms: read-only
-		// TODO: the default might change depending on allowed permissions and configs
-		permissions, err = ocPublicPermToCs3(&_defaultPublicLinkPermission, h)
-		if err != nil {
-			return nil, &ocsError{
-				Code:    response.MetaServerError.StatusCode,
-				Message: "Could not convert default permissions",
-				Error:   err,
-			}
+
+	password := strings.TrimSpace(r.FormValue("password"))
+	if h.enforcePassword(permKey) && len(password) == 0 {
+		return nil, &ocsError{
+			Code:    response.MetaBadRequest.StatusCode,
+			Message: "missing required password",
+			Error:   errors.New("missing required password"),
 		}
 	}
 
@@ -172,7 +175,7 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 			Permissions: &link.PublicSharePermissions{
 				Permissions: permissions,
 			},
-			Password: r.FormValue("password"),
+			Password: password,
 		},
 	}
 
@@ -198,7 +201,6 @@ func (h *Handler) createPublicLinkShare(w http.ResponseWriter, r *http.Request, 
 		Metadata: map[string]string{
 			"name":      r.FormValue("name"),
 			"quicklink": r.FormValue("quicklink"),
-			// "password": r.FormValue("password"),
 		},
 	}
 
@@ -275,9 +277,10 @@ func (h *Handler) listPublicShares(r *http.Request, filters []*link.ListPublicSh
 
 func (h *Handler) isPublicShare(r *http.Request, oid string) (*link.PublicShare, bool) {
 	logger := appctx.GetLogger(r.Context())
-	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	client, err := h.getClient()
 	if err != nil {
 		logger.Err(err)
+		return nil, false
 	}
 
 	psRes, err := client.GetPublicShare(r.Context(), &link.GetPublicShareRequest{
@@ -301,7 +304,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 	updates := []*link.UpdatePublicShareRequest_Update{}
 	logger := appctx.GetLogger(r.Context())
 
-	gwC, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	gwC, err := h.getClient()
 	if err != nil {
 		log.Err(err).Str("shareID", share.GetId().GetOpaqueId()).Msg("updatePublicShare")
 		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "error getting a connection to the gateway service", nil)
@@ -377,7 +380,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 	}
 
 	// Permissions
-	newPermissions, err := ocPublicPermToCs3(permKey, h)
+	newPermissions, err := ocPublicPermToCs3(permKey)
 	logger.Debug().Interface("newPermissions", newPermissions).Msg("Parsed permissions")
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "invalid permissions", err)
@@ -447,6 +450,14 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 
 	// Password
 	newPassword, ok := r.Form["password"]
+	// enforcePassword
+	if h.enforcePassword(permKey) {
+		if (!ok && !share.PasswordProtected) || (ok && len(strings.TrimSpace(newPassword[0])) == 0) {
+			response.WriteOCSError(w, r, response.MetaBadRequest.StatusCode, "missing required password", err)
+			return
+		}
+	}
+
 	// update or clear password
 	if ok {
 		updatesFound = true
@@ -500,7 +511,7 @@ func (h *Handler) updatePublicShare(w http.ResponseWriter, r *http.Request, shar
 func (h *Handler) removePublicShare(w http.ResponseWriter, r *http.Request, share *link.PublicShare) {
 	ctx := r.Context()
 
-	c, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	c, err := h.getClient()
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting grpc gateway client", err)
 		return
@@ -548,6 +559,39 @@ func (h *Handler) removePublicShare(w http.ResponseWriter, r *http.Request, shar
 	response.WriteOCSSuccess(w, r, nil)
 }
 
+// enforcePassword validate Password enforce based on configuration
+// read_only:           1
+// read_write:          3 or 5
+// read_write_delete:   15
+// upload_only:         4
+func (h *Handler) enforcePassword(pk *int) bool {
+	if pk == nil {
+		return false
+	}
+	p, err := conversions.NewPermissions(decreasePermissionsIfNecessary(*pk))
+	if err != nil {
+		return false
+	}
+	if h.publicPasswordEnforced.EnforcedForReadOnly &&
+		p == conversions.PermissionRead {
+		return true
+	}
+	if h.publicPasswordEnforced.EnforcedForReadWrite &&
+		(p == conversions.PermissionRead|conversions.PermissionWrite ||
+			p == conversions.PermissionRead|conversions.PermissionCreate) {
+		return true
+	}
+	if h.publicPasswordEnforced.EnforcedForReadWriteDelete &&
+		p == conversions.PermissionRead|conversions.PermissionWrite|conversions.PermissionCreate|conversions.PermissionDelete {
+		return true
+	}
+	if h.publicPasswordEnforced.EnforcedForUploadOnly &&
+		p == conversions.PermissionCreate {
+		return true
+	}
+	return false
+}
+
 // for public links oc10 api decreases all permissions to read: stay compatible!
 func decreasePermissionsIfNecessary(perm int) int {
 	if perm == int(conversions.PermissionAll) {
@@ -556,7 +600,7 @@ func decreasePermissionsIfNecessary(perm int) int {
 	return perm
 }
 
-func ocPublicPermToCs3(pk *int, h *Handler) (*provider.ResourcePermissions, error) {
+func ocPublicPermToCs3(pk *int) (*provider.ResourcePermissions, error) {
 	if pk == nil {
 		return nil, nil
 	}

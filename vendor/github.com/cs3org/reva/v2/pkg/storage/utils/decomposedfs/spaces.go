@@ -27,6 +27,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -49,6 +50,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -429,66 +431,106 @@ func (fs *Decomposedfs) ListStorageSpaces(ctx context.Context, filter []*provide
 	// But what about sharding nodes by space?
 	// an efficient lookup would be possible if we received a spaceid&opaqueid in the request
 	// the personal spaces must also use the nodeid and not the name
+	numShares := atomic.Int64{}
+	errg, ctx := errgroup.WithContext(ctx)
+	work := make(chan string, len(matches))
+	results := make(chan *provider.StorageSpace, len(matches))
 
-	numShares := 0
-
-	for match := range matches {
-		var err error
-		// TODO introduce metadata.IsLockFile(path)
-		// do not investigate flock files any further. They indicate file locks but are not relevant here.
-		if strings.HasSuffix(match, filelocks.LockFileSuffix) {
-			continue
-		}
-		// skip metadata files
-		if fs.lu.MetadataBackend().IsMetaFile(match) {
-			continue
-		}
-		// always read link in case storage space id != node id
-		spaceID, nodeID, err = ReadSpaceAndNodeFromIndexLink(match)
-		if err != nil {
-			appctx.GetLogger(ctx).Error().Err(err).Str("match", match).Msg("could not read link, skipping")
-			continue
-		}
-
-		n, err := node.ReadNode(ctx, fs.lu, spaceID, nodeID, true, nil, true)
-		if err != nil {
-			appctx.GetLogger(ctx).Error().Err(err).Str("id", nodeID).Msg("could not read node, skipping")
-			continue
-		}
-
-		if !n.Exists {
-			continue
-		}
-
-		space, err := fs.storageSpaceFromNode(ctx, n, checkNodePermissions)
-		if err != nil {
-			switch err.(type) {
-			case errtypes.IsPermissionDenied:
-				// ok
-			case errtypes.NotFound:
-				// ok
-			default:
-				appctx.GetLogger(ctx).Error().Err(err).Str("id", nodeID).Msg("could not convert to storage space")
+	// Distribute work
+	errg.Go(func() error {
+		defer close(work)
+		for match := range matches {
+			select {
+			case work <- match:
+			case <-ctx.Done():
+				return ctx.Err()
 			}
-			continue
 		}
+		return nil
+	})
 
-		// FIXME type share evolved to grant on the edge branch ... make it configurable if the driver should support them or not for now ... ignore type share
-		if space.SpaceType == spaceTypeShare {
-			numShares++
-			// do not list shares as spaces for the owner
-			continue
-		}
-
-		// TODO apply more filters
-		_, ok1 := spaceTypes[spaceTypeAny]
-		_, ok2 := spaceTypes[space.SpaceType]
-		if ok1 || ok2 {
-			spaces = append(spaces, space)
-		}
+	// Spawn workers that'll concurrently work the queue
+	numWorkers := 20
+	if len(matches) < numWorkers {
+		numWorkers = len(matches)
 	}
+	for i := 0; i < numWorkers; i++ {
+		errg.Go(func() error {
+			for match := range work {
+				var err error
+				// TODO introduce metadata.IsLockFile(path)
+				// do not investigate flock files any further. They indicate file locks but are not relevant here.
+				if strings.HasSuffix(match, filelocks.LockFileSuffix) {
+					continue
+				}
+				// skip metadata files
+				if fs.lu.MetadataBackend().IsMetaFile(match) {
+					continue
+				}
+				// always read link in case storage space id != node id
+				spaceID, nodeID, err = ReadSpaceAndNodeFromIndexLink(match)
+				if err != nil {
+					appctx.GetLogger(ctx).Error().Err(err).Str("match", match).Msg("could not read link, skipping")
+					continue
+				}
+
+				n, err := node.ReadNode(ctx, fs.lu, spaceID, nodeID, true, nil, true)
+				if err != nil {
+					appctx.GetLogger(ctx).Error().Err(err).Str("id", nodeID).Msg("could not read node, skipping")
+					continue
+				}
+
+				if !n.Exists {
+					continue
+				}
+
+				space, err := fs.storageSpaceFromNode(ctx, n, checkNodePermissions)
+				if err != nil {
+					switch err.(type) {
+					case errtypes.IsPermissionDenied:
+						// ok
+					case errtypes.NotFound:
+						// ok
+					default:
+						appctx.GetLogger(ctx).Error().Err(err).Str("id", nodeID).Msg("could not convert to storage space")
+					}
+					continue
+				}
+
+				// FIXME type share evolved to grant on the edge branch ... make it configurable if the driver should support them or not for now ... ignore type share
+				if space.SpaceType == spaceTypeShare {
+					numShares.Add(1)
+					// do not list shares as spaces for the owner
+					continue
+				}
+
+				// TODO apply more filters
+				_, ok1 := spaceTypes[spaceTypeAny]
+				_, ok2 := spaceTypes[space.SpaceType]
+				if ok1 || ok2 {
+					select {
+					case results <- space:
+					case <-ctx.Done():
+						return ctx.Err()
+					}
+				}
+			}
+			return nil
+		})
+	}
+
+	// Wait for things to settle down, then close results chan
+	go func() {
+		_ = errg.Wait() // error is checked later
+		close(results)
+	}()
+
+	for r := range results {
+		spaces = append(spaces, r)
+	}
+
 	// if there are no matches (or they happened to be spaces for the owner) and the node is a child return a space
-	if len(matches) <= numShares && nodeID != spaceID {
+	if int64(len(matches)) <= numShares.Load() && nodeID != spaceID {
 		// try node id
 		n, err := node.ReadNode(ctx, fs.lu, spaceID, nodeID, true, nil, false) // permission to read disabled space is checked in storageSpaceFromNode
 		if err != nil {

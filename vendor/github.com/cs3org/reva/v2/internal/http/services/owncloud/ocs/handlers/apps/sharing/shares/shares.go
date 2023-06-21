@@ -86,6 +86,7 @@ type Handler struct {
 	statCache                             cache.StatCache
 	deniable                              bool
 	resharing                             bool
+	publicPasswordEnforced                passwordEnforced
 
 	getClient GatewayClientGetter
 }
@@ -101,6 +102,13 @@ type ocsError struct {
 	Error   error
 	Code    int
 	Message string
+}
+
+type passwordEnforced struct {
+	EnforcedForReadOnly        bool
+	EnforcedForReadWrite       bool
+	EnforcedForReadWriteDelete bool
+	EnforcedForUploadOnly      bool
 }
 
 func getCacheWarmupManager(c *config.Config) (sharecache.Warmup, error) {
@@ -129,6 +137,7 @@ func (h *Handler) Init(c *config.Config) {
 	_ = h.userIdentifierCache.SetTTL(time.Second * time.Duration(c.UserIdentifierCacheTTL))
 	h.deniable = c.EnableDenials
 	h.resharing = resharing(c)
+	h.publicPasswordEnforced = publicPwdEnforced(c)
 
 	h.statCache = cache.GetStatCache(c.StatCacheStore, c.StatCacheNodes, c.StatCacheDatabase, "stat", time.Duration(c.StatCacheTTL)*time.Second, c.StatCacheSize)
 	if c.CacheWarmupDriver != "" {
@@ -503,7 +512,7 @@ func (h *Handler) GetShare(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	sublog := appctx.GetLogger(ctx).With().Str("shareID", shareID).Logger()
 
-	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	client, err := h.getClient()
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting grpc gateway client", err)
 		return
@@ -695,7 +704,7 @@ func (h *Handler) updateShare(w http.ResponseWriter, r *http.Request, share *col
 	ctx := r.Context()
 	sublog := appctx.GetLogger(ctx).With().Str("shareID", share.GetId().GetOpaqueId()).Logger()
 
-	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	client, err := h.getClient()
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting grpc gateway client", err)
 		return
@@ -1110,7 +1119,7 @@ func (h *Handler) addFilters(w http.ResponseWriter, r *http.Request, ref *provid
 	ctx := r.Context()
 
 	// first check if the file exists
-	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	client, err := h.getClient()
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaServerError.StatusCode, "error getting grpc gateway client", err)
 		return nil, nil, err
@@ -1159,7 +1168,7 @@ func (h *Handler) addFileInfo(ctx context.Context, s *conversions.ShareData, inf
 	switch {
 	case h.sharePrefix == "/":
 		s.FileTarget = info.Path
-		client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+		client, err := h.getClient()
 		if err == nil {
 			gpRes, err := client.GetPath(ctx, &provider.GetPathRequest{
 				ResourceId: info.Id,
@@ -1536,6 +1545,23 @@ func (h *Handler) granteeExists(ctx context.Context, g *provider.Grantee, rid *p
 	}
 
 	return false, nil
+}
+
+func publicPwdEnforced(c *config.Config) passwordEnforced {
+	enf := passwordEnforced{}
+	if c == nil ||
+		c.Capabilities.Capabilities == nil ||
+		c.Capabilities.Capabilities.FilesSharing == nil ||
+		c.Capabilities.Capabilities.FilesSharing.Public == nil ||
+		c.Capabilities.Capabilities.FilesSharing.Public.Password == nil ||
+		c.Capabilities.Capabilities.FilesSharing.Public.Password.EnforcedFor == nil {
+		return enf
+	}
+	enf.EnforcedForReadOnly = bool(c.Capabilities.Capabilities.FilesSharing.Public.Password.EnforcedFor.ReadOnly)
+	enf.EnforcedForReadWrite = bool(c.Capabilities.Capabilities.FilesSharing.Public.Password.EnforcedFor.ReadWrite)
+	enf.EnforcedForReadWriteDelete = bool(c.Capabilities.Capabilities.FilesSharing.Public.Password.EnforcedFor.ReadWriteDelete)
+	enf.EnforcedForUploadOnly = bool(c.Capabilities.Capabilities.FilesSharing.Public.Password.EnforcedFor.UploadOnly)
+	return enf
 }
 
 // sufficientPermissions returns true if the `existing` permissions contain the `requested` permissions

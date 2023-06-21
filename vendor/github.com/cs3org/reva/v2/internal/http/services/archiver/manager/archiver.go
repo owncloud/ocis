@@ -73,6 +73,11 @@ func (a *Archiver) CreateTar(ctx context.Context, dst io.Writer) error {
 				return err
 			}
 
+			// when archiving a space we can omit the spaceroot
+			if isSpaceRoot(info) {
+				return nil
+			}
+
 			isDir := info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER
 
 			filesCount++
@@ -140,6 +145,11 @@ func (a *Archiver) CreateZip(ctx context.Context, dst io.Writer) error {
 				return err
 			}
 
+			// when archiving a space we can omit the spaceroot
+			if isSpaceRoot(info) {
+				return nil
+			}
+
 			isDir := info.Type == provider.ResourceType_RESOURCE_TYPE_CONTAINER
 
 			filesCount++
@@ -188,4 +198,10 @@ func (a *Archiver) CreateZip(ctx context.Context, dst io.Writer) error {
 
 	}
 	return w.Close()
+}
+
+func isSpaceRoot(info *provider.ResourceInfo) bool {
+	f := info.GetId()
+	s := info.GetSpace().GetRoot()
+	return f.GetOpaqueId() == s.GetOpaqueId() && f.GetSpaceId() == s.GetSpaceId()
 }
