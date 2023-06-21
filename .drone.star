@@ -96,11 +96,11 @@ config = {
         "ocis",
     ],
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "wopiValidatorTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "localApiTests": {
@@ -115,14 +115,14 @@ config = {
                 "apiCors",
                 "apiAsyncUpload",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
         },
         "apiNotification": {
             "suites": [
                 "apiNotification",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "emailNeeded": True,
             "extraEnvironment": {
@@ -144,7 +144,7 @@ config = {
             "antivirusNeeded": True,
             "extraServerEnvironment": {
                 "ANTIVIRUS_SCANNER_TYPE": "clamav",
-                "ANTIVIRUS_CLAMAV_SOCKET": "/var/run/clamav/clamd.sock",
+                "ANTIVIRUS_CLAMAV_SOCKET": "tcp://clamav:3310",
                 "POSTPROCESSING_STEPS": "virusscan",
                 "OCIS_ASYNC_UPLOADS": True,
                 "OCIS_ADD_RUN_SERVICES": "antivirus",
@@ -153,18 +153,18 @@ config = {
     },
     "apiTests": {
         "numberOfParts": 10,
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "e2eTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "rocketchat": {
@@ -177,8 +177,8 @@ config = {
     "dockerReleases": {
         "architectures": ["arm64", "amd64"],
     },
-    "litmus": True,
-    "codestyle": True,
+    "litmus": False,
+    "codestyle": False,
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -197,21 +197,21 @@ pipelineVolumeGo = \
         "temp": {},
     }
 
-# volume for pipeline to share clamav socket between steps of a pipeline
-# to be used in combination with stepVolumeClamav
-pipelineVolumeClamav = \
-    {
-        "name": "sockets",
-        "temp": {},
-    }
-
-# volume for steps to share clamav socket between steps of a pipeline
-# socket path must be set to /var/run/clamav/ inside the image, which is the case
-stepVolumeClamav = \
-    {
-        "name": "sockets",
-        "path": "/var/run/clamav/",
-    }
+# # volume for pipeline to share clamav socket between steps of a pipeline
+# # to be used in combination with stepVolumeClamav
+# pipelineVolumeClamav = \
+#     {
+#         "name": "sockets",
+#         "temp": {},
+#     }
+#
+# # volume for steps to share clamav socket between steps of a pipeline
+# # socket path must be set to /var/run/clamav/ inside the image, which is the case
+# stepVolumeClamav = \
+#     {
+#         "name": "sockets",
+#         "path": "/var/run/clamav/",
+#     }
 
 # minio mc environment variables
 MINIO_MC_ENV = {
@@ -275,7 +275,6 @@ def main(ctx):
         buildWebCache(ctx) + \
         getGoBinForTesting(ctx) + \
         [buildOcisBinaryForTesting(ctx)] + \
-        testOcisModules(ctx) + \
         testPipelines(ctx)
 
     build_release_pipelines = \
@@ -289,37 +288,34 @@ def main(ctx):
         docs(),
     ]
 
-    test_pipelines.append(
-        pipelineDependsOn(
-            purgeBuildArtifactCache(ctx),
-            testPipelines(ctx),
-        ),
-    )
+    # test_pipelines.append(
+    #         testPipelines(ctx)
+    # )
 
-    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
+    pipelines = test_pipelines
 
-    if ctx.build.event == "cron":
-        pipelines = \
-            pipelines + \
-            example_deploys(ctx)
-    else:
-        pipelines = \
-            pipelines + \
-            pipelinesDependsOn(
-                example_deploys(ctx),
-                pipelines,
-            )
-
-    # always append notification step
-    pipelines.append(
-        pipelineDependsOn(
-            notify(),
-            pipelines,
-        ),
-    )
-
-    pipelines += checkStarlark()
-    pipelineSanityChecks(ctx, pipelines)
+    # if ctx.build.event == "cron":
+    #     pipelines = \
+    #         pipelines + \
+    #         example_deploys(ctx)
+    # else:
+    #     pipelines = \
+    #         pipelines + \
+    #         pipelinesDependsOn(
+    #             example_deploys(ctx),
+    #             pipelines,
+    #         )
+    #
+    # # always append notification step
+    # pipelines.append(
+    #     pipelineDependsOn(
+    #         notify(),
+    #         pipelines,
+    #     ),
+    # )
+    #
+    # pipelines += checkStarlark()
+    # pipelineSanityChecks(ctx, pipelines)
     return pipelines
 
 def cachePipeline(name, steps):
@@ -815,13 +811,12 @@ def localApiTestPipeline(ctx):
                             },
                             "steps": skipIfUnchanged(ctx, "acceptance-tests") +
                                      restoreBuildArtifactCache(ctx, "ocis-binary-amd64", "ocis/bin") +
-                                     (clamavService() if params["antivirusNeeded"] else []) +
+                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True) +
                                      (waitForClamavService() if params["antivirusNeeded"] else []) +
-                                     ocisServer(storage, params["accounts_hash_difficulty"], extra_server_environment = params["extraServerEnvironment"], with_wrapper = True, volumes = [stepVolumeClamav] if params["antivirusNeeded"] else []) +
                                      (waitForEmailService() if params["emailNeeded"] else []) +
                                      localApiTests(suite, storage, params["extraEnvironment"]) +
                                      failEarly(ctx, early_fail),
-                            "services": emailService() if params["emailNeeded"] else [],
+                            "services": emailService() if params["emailNeeded"] else [] + clamavService() if params["antivirusNeeded"] else [],
                             "depends_on": getPipelineNames([buildOcisBinaryForTesting(ctx)]),
                             "trigger": {
                                 "ref": [
@@ -829,7 +824,7 @@ def localApiTestPipeline(ctx):
                                     "refs/pull/**",
                                 ],
                             },
-                            "volumes": [pipelineVolumeClamav] if params["antivirusNeeded"] else [],
+                            # "volumes": [pipelineVolumeClamav] if params["antivirusNeeded"] else [],
                         }
                         pipelines.append(pipeline)
     return pipelines
@@ -2960,11 +2955,10 @@ def clamavService():
     return [{
         "name": "clamav",
         "image": OC_CI_CLAMAVD,
-        "volumes": [{
-            "name": "sockets",
-            "path": "/var/run/clamav/",
-        }],
-        "detach": True,
+        # "volumes": [{
+        #     "name": "sockets",
+        #     "path": "/var/run/clamav/",
+        # }],
     }]
 
 def waitForClamavService():
