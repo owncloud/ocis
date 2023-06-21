@@ -426,6 +426,8 @@ Test suites that are tagged with `@antivirus` require antivirus service. The ava
 
 ### Setup clamAV
 #### 1. Setup Locally
+
+##### Linux OS user
 Run the following command to set up calmAV and clamAV daemon
 ```bash
 sudo apt install clamav clamav-daemon -y
@@ -440,33 +442,23 @@ sudo service clamav-daemon status
 The commands are ubuntu specific and may differ according to your system. You can find information related to installation of clamAV in their official documentation [here](https://docs.clamav.net/manual/Installing/Packages.html).
 {{< /hint>}}
 
+##### Mac OS user
+Install ClamAV using [here](https://gist.github.com/mendozao/3ea393b91f23a813650baab9964425b9)
+Start ClamAV daemon 
+```bash
+/your/location/to/brew/Cellar/clamav/1.1.0/sbin/clamd
+```
 #### 2. Setup clamAV With Docker
-##### a. Create a Volume
-For `clamAV` only local sockets can currently be configured, we need to create a volume in order to share the socket with `oCIS server`. Run the following command to do so:
+##### Linux OS user
+Run `clamAV` through docker
 ```bash
- docker volume create -d local -o device=/your/local/filesystem/path/ -o o=bind -o type=none clamav_vol
+docker run -d -p 3310:3310 owncloudci/clamavd
 ```
-##### b. Run the Container
-Run `clamAV` through docker and bind the path to the socket of clamAV from the image to the pre-created volume
-```bash
-docker run -v clamav_vol:/var/run/clamav/ owncloudci/clamavd
-```
-{{< hint info >}}
-The path to the socket i.e. `/var/run/clamav/` may differ as per the image you are using. Make sure that you're providing the correct path to the socket if you're using image other than `owncloudci/clamavd`.
-{{< /hint>}}
 
-##### b. Change Ownership
-Change the ownership of the path of your local filesystem that the volume `clamav_vol` is mounted on. After running `clamav` through docker the ownership of the bound path gets changed. As we need to provide this path to ocis server, the ownership should be changed back to $USER or whatever ownership that your server requires.
+##### Mac OS user
 ```bash
- sudo chown -R $USER:$USER /your/local/filesystem/path/
+docker run -d -p 3310:3310 -v /your/local/filesystem/path/to/clamav/:/var/lib/clamav mkodockx/docker-clamav:alpine
 ```
-{{< hint info >}}
-Make sure that `clamAV` is fully up before running this command. The command is ubuntu specific and may differ according to your system.
-{{< /hint>}}
-
-{{< hint info >}}
-If you want to use the same volume after the container is down then before running the container once again, you either need to remove all the data inside `/your/local/filesystem/path/` or give the ownership back. For instance, on Ubuntu it might be `sudo chown -R systemd-network:systemd-journal /your/local/filesystem/path/`  and repeat `step 2 and 3`
-{{< /hint>}}
 
 ### Run oCIS
 
@@ -476,14 +468,18 @@ As `antivirus` service is not enabled by default we need to enable the service w
 # run oCIS
 PROXY_ENABLE_BASIC_AUTH=true \
 ANTIVIRUS_SCANNER_TYPE="clamav" \
-ANTIVIRUS_CLAMAV_SOCKET="/var/run/clamav/clamd.ctl" \
+ANTIVIRUS_CLAMAV_SOCKET="tcp://host.docker.internal:3310" \
 POSTPROCESSING_STEPS="virusscan" \
 OCIS_ASYNC_UPLOADS=true \
 OCIS_ADD_RUN_SERVICES="antivirus"
 ocis/bin/ocis server
 ```
 {{< hint info >}}
-The value for `ANTIVIRUS_CLAMAV_SOCKET` is an example which needs adaption according your OS. If you are running `clamAv` with docker as per this documentation check the path that you mounted the volume i.e. `/your/local/filesystem/path/` to make sure the socket exists and give the full path to socket i.e. `/your/local/filesystem/path/clamd.sock` to `ANTIVIRUS_CLAMAV_SOCKET`.
+The value for `ANTIVIRUS_CLAMAV_SOCKET` is an example which needs adaption according your OS.
+
+For antivirus running localy on Linux OS, use `ANTIVIRUS_CLAMAV_SOCKET= "/var/run/clamav/clamd.ctl"`.
+For antivirus running localy on Mac OS, use `ANTIVIRUS_CLAMAV_SOCKET= "/tmp/clamd.socket"`.
+For antivirus running with docker, use `ANTIVIRUS_CLAMAV_SOCKET= "tcp://host.docker.internal:3310"`
 {{< /hint>}}
 
 #### Run the Acceptance Test
