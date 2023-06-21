@@ -6,12 +6,14 @@ package email
 import (
 	"bytes"
 	"embed"
+	"errors"
 	"html"
 	"html/template"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
+	"syscall"
 
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 )
@@ -104,16 +106,21 @@ func readImages(emailTemplatePath string) (map[string][]byte, error) {
 func read(entries []fs.DirEntry, fsys fs.FS) (map[string][]byte, error) {
 	list := make(map[string][]byte)
 	for _, e := range entries {
-		if !e.IsDir() {
-			file, err := fs.ReadFile(fsys, filepath.Join(imgDir, e.Name()))
-			if err != nil {
-				return nil, err
-			}
-			if !validateMime(file) {
+		if e.IsDir() {
+			continue
+		}
+		file, err := fs.ReadFile(fsys, filepath.Join(imgDir, e.Name()))
+		if err != nil {
+			// skip if the symbolic is a directory
+			if errors.Is(err, syscall.EISDIR) {
 				continue
 			}
-			list[e.Name()] = file
+			return nil, err
 		}
+		if !validateMime(file) {
+			continue
+		}
+		list[e.Name()] = file
 	}
 	return list, nil
 }
