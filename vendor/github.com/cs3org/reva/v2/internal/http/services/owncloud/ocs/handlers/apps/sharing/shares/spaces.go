@@ -44,7 +44,7 @@ import (
 
 func (h *Handler) getGrantee(ctx context.Context, name string) (provider.Grantee, error) {
 	log := appctx.GetLogger(ctx)
-	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	client, err := h.getClient()
 	if err != nil {
 		return provider.Grantee{}, err
 	}
@@ -96,7 +96,7 @@ func (h *Handler) addSpaceMember(w http.ResponseWriter, r *http.Request, info *p
 		return
 	}
 
-	client, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	client, err := h.getClient()
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting gateway client", err)
 		return
@@ -226,7 +226,7 @@ func (h *Handler) removeSpaceMember(w http.ResponseWriter, r *http.Request, spac
 		return
 	}
 
-	gatewayClient, err := pool.GetGatewayServiceClient(h.gatewayAddr)
+	gatewayClient, err := h.getClient()
 	if err != nil {
 		response.WriteOCSError(w, r, response.MetaNotFound.StatusCode, "error getting gateway client", err)
 		return

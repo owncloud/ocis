@@ -163,10 +163,10 @@ func (c *ConnWithReconnect) getConnection() (*ldap.Conn, error) {
 }
 
 func (c *ConnWithReconnect) ldapAutoConnect(config Config) {
-	l, err := c.ldapConnect(config)
-	if err != nil {
-		c.logger.Debug().Err(err).Msg("autoconnect could not get ldap Connection")
-	}
+	var (
+		l   *ldap.Conn
+		err error
+	)
 
 	for {
 		select {
@@ -203,7 +203,7 @@ func (c *ConnWithReconnect) ldapConnect(config Config) (*ldap.Conn, error) {
 	}
 
 	if err != nil {
-		c.logger.Debug().Err(err).Msg("could not get ldap Connection")
+		c.logger.Error().Err(err).Msg("could not get ldap Connection")
 		return nil, err
 	}
 	c.logger.Debug().Msg("LDAP Connected")
