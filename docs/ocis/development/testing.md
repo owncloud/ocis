@@ -475,7 +475,7 @@ OCIS_ADD_RUN_SERVICES="antivirus"
 ocis/bin/ocis server
 ```
 {{< hint info >}}
-The value for `ANTIVIRUS_CLAMAV_SOCKET` is an example which needs adaption according your OS. If you are running `clamAv` with docker as per this documentation check the path that you mounted the volume i.e. `/your/local/filesystem/path/` to make sure the socket exists and give the full path to socket i.e. `/your/local/filesystem/path/clamd.sock` to `ANTIVIRUS_CLAMAV_SOCKET`.
+The value for `ANTIVIRUS_CLAMAV_SOCKET` is an example which needs adaption according your OS.
 
 For antivirus running localy on Linux OS, use `ANTIVIRUS_CLAMAV_SOCKET= "/var/run/clamav/clamd.ctl"`.
 For antivirus running localy on Mac OS, use `ANTIVIRUS_CLAMAV_SOCKET= "/tmp/clamd.socket"`.
