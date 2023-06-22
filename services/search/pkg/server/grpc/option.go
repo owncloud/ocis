@@ -15,13 +15,14 @@ type Option func(o *Options)
 
 // Options defines the available options for this package.
 type Options struct {
-	Name    string
-	Logger  log.Logger
-	Context context.Context
-	Config  *config.Config
-	Metrics *metrics.Metrics
-	Flags   []cli.Flag
-	Handler *svc.Service
+	Name      string
+	Logger    log.Logger
+	Context   context.Context
+	Config    *config.Config
+	Metrics   *metrics.Metrics
+	Flags     []cli.Flag
+	Handler   *svc.Service
+	JWTSecret string
 }
 
 // newOptions initializes the available default options.
@@ -81,5 +82,12 @@ func Flags(val []cli.Flag) Option {
 func Handler(val *svc.Service) Option {
 	return func(o *Options) {
 		o.Handler = val
+	}
+}
+
+// JWTSecret provides a function to set the Config option.
+func JWTSecret(val string) Option {
+	return func(o *Options) {
+		o.JWTSecret = val
 	}
 }
