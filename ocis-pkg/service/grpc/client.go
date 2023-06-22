@@ -114,6 +114,7 @@ func GetClientOptions(t *shared.GRPCClientTLS) []ClientOption {
 	return opts
 }
 
+// NewClient returns a new grpc client
 func NewClient(opts ...ClientOption) (client.Client, error) {
 	var options ClientOptions
 	for _, opt := range opts {

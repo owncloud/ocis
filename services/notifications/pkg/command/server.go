@@ -40,7 +40,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
-			err := grpc.Configure(grpc.GetClientOptions(&cfg.GRPCClientTLS)...)
+			grpcClient, err := grpc.NewClient(grpc.GetClientOptions(&cfg.GRPCClientTLS)...)
 			if err != nil {
 				return err
 			}
@@ -137,7 +137,7 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				logger.Fatal().Err(err).Str("addr", cfg.Notifications.RevaGateway).Msg("could not get reva gateway selector")
 			}
-			valueService := settingssvc.NewValueService("com.owncloud.api.settings", grpc.DefaultClient())
+			valueService := settingssvc.NewValueService("com.owncloud.api.settings", grpcClient)
 			svc := service.NewEventsNotifier(evts, channel, logger, gatewaySelector, valueService, cfg.Notifications.MachineAuthAPIKey, cfg.Notifications.EmailTemplatePath, cfg.WebUIURL)
 
 			gr.Add(svc.Run, func(error) {
