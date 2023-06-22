@@ -38,16 +38,10 @@ services:
 
       # antivirus
       ANTIVIRUS_SCANNER_TYPE: "clamav"
-      ANTIVIRUS_CLAMAV_SOCKET: "/var/run/clamav/clamd.sock"
+      ANTIVIRUS_CLAMAV_SOCKET: tcp://clamav:3310
 
       # postprocessing step
       POSTPROCESSING_STEPS: $POSTPROCESSING_STEPS
     volumes:
       - ../../../config:/drone/src/tests/config
       - ../../../ociswrapper/bin/ociswrapper:/usr/bin/ociswrapper
-      - clamavSocket:/var/run/clamav/
-
-volumes:
-  clamavSocket:
-    external:
-      name: ocis-acceptance-tests_clamavSocket
