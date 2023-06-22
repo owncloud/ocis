@@ -15,6 +15,8 @@ import (
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/events/stream"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/token"
+	"github.com/cs3org/reva/v2/pkg/token/manager/jwt"
 	"github.com/go-micro/plugins/v4/events/natsjs"
 	"github.com/jellydator/ttlcache/v2"
 	ociscrypto "github.com/owncloud/ocis/v2/ocis-pkg/crypto"
@@ -119,20 +121,30 @@ func NewHandler(opts ...Option) (searchsvc.SearchProviderHandler, func(), error)
 		return nil, teardown, err
 	}
 
+	tokenManager, err := jwt.New(map[string]interface{}{
+		"secret":  options.JWTSecret,
+		"expires": int64(24 * 60 * 60),
+	})
+	if err != nil {
+		return nil, teardown, err
+	}
+
 	return &Service{
-		id:       cfg.GRPC.Namespace + "." + cfg.Service.Name,
-		log:      logger,
-		searcher: ss,
-		cache:    cache,
+		id:           cfg.GRPC.Namespace + "." + cfg.Service.Name,
+		log:          logger,
+		searcher:     ss,
+		cache:        cache,
+		tokenManager: tokenManager,
 	}, teardown, nil
 }
 
 // Service implements the searchServiceHandler interface
 type Service struct {
-	id       string
-	log      log.Logger
-	searcher search.Searcher
-	cache    *ttlcache.Cache
+	id           string
+	log          log.Logger
+	searcher     search.Searcher
+	cache        *ttlcache.Cache
+	tokenManager token.Manager
 }
 
 // Search handles the search
@@ -145,7 +157,13 @@ func (s Service) Search(ctx context.Context, in *searchsvc.SearchRequest, out *s
 	}
 	ctx = grpcmetadata.AppendToOutgoingContext(ctx, revactx.TokenHeader, t)
 
-	u, _ := revactx.ContextGetUser(ctx)
+	// unpack user
+	u, _, err := s.tokenManager.DismantleToken(ctx, t)
+	if err != nil {
+		return err
+	}
+	ctx = revactx.ContextSetUser(ctx, u)
+
 	key := cacheKey(in.Query, in.PageSize, in.Ref, u)
 	res, ok := s.FromCache(key)
 	if !ok {

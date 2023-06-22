@@ -33,7 +33,7 @@ func Server(cfg *config.Config) *cli.Command {
 			if err != nil {
 				return err
 			}
-			err = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
+			err = ogrpc.Configure(append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithTraceProvider(tracing.TraceProvider))...)
 			if err != nil {
 				return err
 			}
@@ -56,6 +56,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Name(cfg.Service.Name),
 				grpc.Context(ctx),
 				grpc.Metrics(mtrcs),
+				grpc.JWTSecret(cfg.Commons.TokenManager.JWTSecret),
 			)
 			defer teardown()
 			if err != nil {

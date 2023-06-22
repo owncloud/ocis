@@ -12,6 +12,7 @@ import (
 	user "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	rpcv1beta1 "github.com/cs3org/go-cs3apis/cs3/rpc/v1beta1"
 	provider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	sdk "github.com/cs3org/reva/v2/pkg/sdk/common"
@@ -81,8 +82,14 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 		return nil, err
 	}
 
+	currentUser := revactx.ContextMustGetUser(ctx)
+
 	listSpacesRes, err := gatewayClient.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
 		Filters: []*provider.ListStorageSpacesRequest_Filter{
+			{
+				Type: provider.ListStorageSpacesRequest_Filter_TYPE_USER,
+				Term: &provider.ListStorageSpacesRequest_Filter_User{User: currentUser.GetId()},
+			},
 			{
 				Type: provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
 				Term: &provider.ListStorageSpacesRequest_Filter_SpaceType{SpaceType: "+grant"},
