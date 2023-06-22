@@ -308,7 +308,8 @@ func (h *Handler) CreateShare(w http.ResponseWriter, r *http.Request) {
 		}
 
 		s := conversions.PublicShare2ShareData(share, r, h.publicURL)
-		h.addFileInfo(ctx, s, statRes.Info)
+		h.addFileInfo(ctx, s, statRes.GetInfo())
+		h.addPath(ctx, s, statRes.GetInfo())
 		h.mapUserIds(ctx, client, s)
 
 		response.WriteOCSSuccess(w, r, s)
@@ -1223,6 +1224,22 @@ func (h *Handler) addFileInfo(ctx context.Context, s *conversions.ShareData, inf
 		s.SpaceID = storagespace.FormatResourceID(*info.GetSpace().GetRoot())
 	}
 	s.SpaceAlias = utils.ReadPlainFromOpaque(info.GetSpace().GetOpaque(), "spaceAlias")
+}
+
+// addPath adds the complete path of the `ResourceInfo` to the `ShareData`. It is an expensive operation and might leak data so use it with care.
+func (h *Handler) addPath(ctx context.Context, s *conversions.ShareData, info *provider.ResourceInfo) {
+	log := appctx.GetLogger(ctx)
+	client, err := h.getClient()
+	if err != nil {
+		log.Error().Err(err).Msg("addPath failed: cannot get gateway client")
+		return
+	}
+	gpRes, err := client.GetPath(ctx, &provider.GetPathRequest{ResourceId: info.Id})
+	if err != nil || gpRes.GetStatus().GetCode() != rpc.Code_CODE_OK {
+		log.Error().Err(err).Interface("rpc response code", gpRes.GetStatus().GetCode()).Msg("addPath failed: cannot get path")
+		return
+	}
+	s.Path = gpRes.GetPath()
 }
 
 // mustGetIdentifiers always returns a struct with identifiers, if the user or group could not be found they will all be empty

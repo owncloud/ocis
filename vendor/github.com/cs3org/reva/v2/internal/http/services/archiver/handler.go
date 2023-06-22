@@ -263,11 +263,13 @@ func (s *svc) Handler() http.Handler {
 		rw.Header().Set("Content-Transfer-Encoding", "binary")
 
 		// create the archive
+		var closeArchive func()
 		if userAgent.OS == ua.Windows {
-			err = arch.CreateZip(ctx, rw)
+			closeArchive, err = arch.CreateZip(ctx, rw)
 		} else {
-			err = arch.CreateTar(ctx, rw)
+			closeArchive, err = arch.CreateTar(ctx, rw)
 		}
+		defer closeArchive()
 
 		if err != nil {
 			s.writeHTTPError(rw, err)
