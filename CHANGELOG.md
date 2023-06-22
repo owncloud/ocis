@@ -6,6 +6,7 @@ The following sections list the changes for unreleased.
 
 ## Summary
 
+* Bugfix - Add default store to postprocessing: [#6578](https://github.com/owncloud/ocis/pull/6578)
 * Bugfix - Add token to LinkAccessedEvent: [#6554](https://github.com/owncloud/ocis/pull/6554)
 * Bugfix - Add missing timestamps: [#6515](https://github.com/owncloud/ocis/pull/6515)
 * Bugfix - Don't connect to ldap on startup: [#6565](https://github.com/owncloud/ocis/pull/6565)
@@ -30,6 +31,13 @@ The following sections list the changes for unreleased.
 * Enhancement - Allow disabling wopi chat: [#6544](https://github.com/owncloud/ocis/pull/6544)
 
 ## Details
+
+* Bugfix - Add default store to postprocessing: [#6578](https://github.com/owncloud/ocis/pull/6578)
+
+   Postprocessing did not have a default store especially `database` and `table` are needed to
+   talk to nats-js
+
+   https://github.com/owncloud/ocis/pull/6578
 
 * Bugfix - Add token to LinkAccessedEvent: [#6554](https://github.com/owncloud/ocis/pull/6554)
 
