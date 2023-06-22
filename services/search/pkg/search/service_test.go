@@ -7,6 +7,7 @@ import (
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	typesv1beta1 "github.com/cs3org/go-cs3apis/cs3/types/v1beta1"
+	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/status"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	cs3mocks "github.com/cs3org/reva/v2/tests/cs3mocks/mocks"
@@ -83,7 +84,7 @@ var _ = Describe("Searchprovider", func() {
 			},
 		)
 
-		ctx = context.Background()
+		ctx = revactx.ContextSetUser(context.Background(), user)
 		indexClient = &engineMocks.Engine{}
 		extractor = &contentMocks.Extractor{}
 
