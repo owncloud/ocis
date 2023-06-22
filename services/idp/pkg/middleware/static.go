@@ -7,6 +7,7 @@ import (
 	idpTracing "github.com/owncloud/ocis/v2/services/idp/pkg/tracing"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Static is a middleware that serves static assets.
@@ -24,7 +25,10 @@ func Static(root string, fs http.FileSystem) func(http.Handler) http.Handler {
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx, span := idpTracing.TraceProvider.Tracer("idp").Start(r.Context(), "serve static asset")
+			spanOpts := []trace.SpanStartOption{
+				trace.WithSpanKind(trace.SpanKindServer),
+			}
+			ctx, span := idpTracing.TraceProvider.Tracer("idp").Start(r.Context(), "serve static asset", spanOpts...)
 			defer span.End()
 			r = r.WithContext(ctx)
 

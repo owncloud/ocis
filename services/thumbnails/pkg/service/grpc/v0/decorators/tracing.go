@@ -27,7 +27,10 @@ func (t tracing) GetThumbnail(ctx context.Context, req *thumbnailssvc.GetThumbna
 
 	if thumbnailsTracing.TraceProvider != nil {
 		tracer := thumbnailsTracing.TraceProvider.Tracer("thumbnails")
-		ctx, span = tracer.Start(ctx, "Thumbnails.GetThumbnail")
+		spanOpts := []trace.SpanStartOption{
+			trace.WithSpanKind(trace.SpanKindServer),
+		}
+		ctx, span = tracer.Start(ctx, "Thumbnails.GetThumbnail", spanOpts...)
 		defer span.End()
 
 		span.SetAttributes(
