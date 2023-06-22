@@ -364,7 +364,8 @@ func (g Graph) DeleteEducationClassMember(w http.ResponseWriter, r *http.Request
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 
 	classID := chi.URLParam(r, "classID")
-	logger.Info().Str("classID", classID).Msg("calling delete class member")
+	memberID := chi.URLParam(r, "memberID")
+	logger.Info().Str("classID", classID).Str("memberID", memberID).Msg("calling delete class member")
 	classID, err := url.PathUnescape(classID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", classID).Msg("could not delete class member: unescaping class id failed")
@@ -378,7 +379,6 @@ func (g Graph) DeleteEducationClassMember(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	memberID := chi.URLParam(r, "memberID")
 	memberID, err = url.PathUnescape(memberID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", memberID).Msg("could not delete class member: unescaping member id failed")
@@ -510,7 +510,8 @@ func (g Graph) DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Reques
 	logger := g.logger.SubloggerWithRequestID(r.Context())
 
 	classID := chi.URLParam(r, "classID")
-	logger.Info().Str("classID", classID).Msg("calling delete class teacher")
+	teacherID := chi.URLParam(r, "teacherID")
+	logger.Info().Str("classID", classID).Str("teacherID", teacherID).Msg("calling delete class teacher")
 	classID, err := url.PathUnescape(classID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", classID).Msg("could not delete class teacher: unescaping class id failed")
@@ -524,7 +525,6 @@ func (g Graph) DeleteEducationClassTeacher(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	teacherID := chi.URLParam(r, "teacherID")
 	teacherID, err = url.PathUnescape(teacherID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", teacherID).Msg("could not delete class teacher: unescaping teacher id failed")
