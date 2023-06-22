@@ -30,6 +30,11 @@ func DefaultConfig() *config.Config {
 				Cluster:  "ocis-cluster",
 			},
 		},
+		Store: config.Store{
+			Store:    "memory",
+			Database: "postprocessing",
+			Table:    "postprocessing",
+		},
 	}
 }
 
