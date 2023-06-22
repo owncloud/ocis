@@ -178,7 +178,7 @@ func TestDeleteAssignment(t *testing.T) {
 			require.Equal(t, 1, len(list))
 			require.Equal(t, assignment.Id, list[0].Id)
 
-			err = s.RemoveRoleAssignment(assignment.Id)
+			err = s.RemoveRoleAssignment(scenario.userID)
 			require.NoError(t, err)
 			// TODO: uncomment
 			// require.False(t, mdc.IDExists(assignment.RoleId))
@@ -188,8 +188,8 @@ func TestDeleteAssignment(t *testing.T) {
 			require.Equal(t, 0, len(list))
 
 			err = s.RemoveRoleAssignment(assignment.Id)
-			require.Error(t, err)
-			// TODO: do we want a custom error message?
+			require.NoError(t, err) // we do not expect an error as storage will not throw one
+			require.Equal(t, 0, len(list))
 		})
 	}
 }
