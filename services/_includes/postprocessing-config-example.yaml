@@ -17,10 +17,10 @@ debug:
   pprof: false
   zpages: false
 store:
-  store: ""
+  store: memory
   nodes: []
-  database: ""
-  table: ""
+  database: postprocessing
+  table: postprocessing
   ttl: 0s
   size: 0
 postprocessing:

@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-06-22-08-41-24]
+[#deprecation-note-2023-06-22-09-57-32]
 [caption=]
 .Deprecation notes for the postprocessing service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -153,7 +153,7 @@ a|`OCIS_PERSISTENT_STORE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ ++
+++memory ++
 a| [subs=-attributes]
 The type of the store. Supported values are: 'memory', 'ocmem', 'etcd', 'redis', 'redis-sentinel', 'nats-js', 'noop'. See the text description for details.
 
@@ -172,7 +172,7 @@ a|`POSTPROCESSING_STORE_DATABASE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ ++
+++postprocessing ++
 a| [subs=-attributes]
 The database name the configured store should use.
 
@@ -181,7 +181,7 @@ a|`POSTPROCESSING_STORE_TABLE` +
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
-++ ++
+++postprocessing ++
 a| [subs=-attributes]
 The database table the store should use.
 
@@ -265,7 +265,7 @@ a| [subs=-attributes]
 A comma separated list of postprocessing steps, processed in order of their appearance. Currently supported values by the system are: 'virusscan', 'policies' and 'delay'. Custom steps are allowed. See the documentation for instructions.
 
 a|`POSTPROCESSING_VIRUSSCAN` +
-xref:deprecation-note-2023-06-22-08-41-24[Deprecation Note]
+xref:deprecation-note-2023-06-22-09-57-32[Deprecation Note]
 a| [subs=-attributes]
 ++bool ++
 a| [subs=-attributes]
