@@ -3354,58 +3354,51 @@ trait WebDav {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has (deleted|unshared) (?:file|folder|entity) "([^"]*)"$/
+	 * @Given /^user "([^"]*)" has deleted (?:file|folder|entity) "([^"]*)"$/
 	 *
 	 * @param string $user
-	 * @param string $deletedOrUnshared
-	 * @param string $entry
+	 * @param string $resource
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasDeletedFile(string $user, string $deletedOrUnshared, string $entry):void {
+	public function userHasDeletedFile(string $user, string $resource):void {
 		$user = $this->getActualUsername($user);
-		$this->userDeletesFile($user, $entry);
+		$this->userDeletesFile($user, $resource);
 		// If the file or folder was there and got deleted then we get a 204
 		// That is good and the expected status
 		// If the file or folder was already not there then we get a 404
 		// That is not expected. Scenarios that use "Given user has deleted..."
 		// should only be using such steps when it is a file that exists and needs
 		// to be deleted.
-		if ($deletedOrUnshared === "deleted") {
-			$deleteText = "delete";
-		} else {
-			$deleteText = "unshare";
-		}
 
 		$this->theHTTPStatusCodeShouldBe(
 			["204"],
-			"HTTP status code was not 204 while trying to $deleteText resource '$entry' for user '$user'"
+			"HTTP status code was not 204 while trying to delete resource '$resource' for user '$user'"
 		);
 		$this->emptyLastHTTPStatusCodesArray();
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" has (deleted|unshared) the following (?:files|folders|resources)$/
+	 * @Given /^user "([^"]*)" has deleted the following (?:files|folders|resources)$/
 	 *
 	 * @param string $user
-	 * @param string $deletedOrUnshared
 	 * @param TableNode $table
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasDeletedFollowingFiles(string $user, string $deletedOrUnshared, TableNode $table):void {
+	public function userHasDeletedFollowingFiles(string $user, TableNode $table):void {
 		$this->verifyTableNodeColumns($table, ["path"]);
 		$paths = $table->getHash();
 
 		foreach ($paths as $file) {
-			$this->userHasDeletedFile($user, $deletedOrUnshared, $file["path"]);
+			$this->userHasDeletedFile($user, $file["path"]);
 		}
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (?:deletes|unshares) the following (?:files|folders)$/
+	 * @When /^user "([^"]*)" deletes the following (?:files|folders)$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table
@@ -3425,7 +3418,7 @@ trait WebDav {
 	}
 
 	/**
-	 * @When /^the user (?:deletes|unshares) (?:file|folder) "([^"]*)" using the WebDAV API$/
+	 * @When /^the user deletes (?:file|folder) "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $file
 	 *
@@ -3436,20 +3429,19 @@ trait WebDav {
 	}
 
 	/**
-	 * @Given /^the user has (deleted|unshared) (file|folder) "([^"]*)"$/
+	 * @Given /^the user has deleted (file|folder) "([^"]*)"$/
 	 *
-	 * @param string $deletedOrUnshared
 	 * @param string $fileOrFolder
 	 * @param string $file
 	 *
 	 * @return void
 	 */
-	public function theUserHasDeletedFile(string $deletedOrUnshared, string $fileOrFolder, string $file):void {
-		$this->userHasDeletedFile($this->getCurrentUser(), $deletedOrUnshared, $fileOrFolder, $file);
+	public function theUserHasDeletedFile(string $fileOrFolder, string $file):void {
+		$this->userHasDeletedFile($this->getCurrentUser(),$fileOrFolder, $file);
 	}
 
 	/**
-	 * @When /^user "([^"]*)" (?:deletes|unshares) these (?:files|folders|entries) without delays using the WebDAV API$/
+	 * @When /^user "([^"]*)" deletes these (?:files|folders|entries) without delays using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param TableNode $table of files or folders to delete
@@ -3469,7 +3461,7 @@ trait WebDav {
 	}
 
 	/**
-	 * @When /^the user (?:deletes|unshares) these (?:files|folders|entries) without delays using the WebDAV API$/
+	 * @When /^the user deletes these (?:files|folders|entries) without delays using the WebDAV API$/
 	 *
 	 * @param TableNode $table of files or folders to delete
 	 *
@@ -3481,7 +3473,7 @@ trait WebDav {
 	}
 
 	/**
-	 * @When /^user "([^"]*)" on "(LOCAL|REMOTE)" (?:deletes|unshares) (?:file|folder) "([^"]*)" using the WebDAV API$/
+	 * @When /^user "([^"]*)" on "(LOCAL|REMOTE)" deletes (?:file|folder) "([^"]*)" using the WebDAV API$/
 	 *
 	 * @param string $user
 	 * @param string $server
@@ -3496,30 +3488,24 @@ trait WebDav {
 	}
 
 	/**
-	 * @Given /^user "([^"]*)" on "(LOCAL|REMOTE)" has (deleted|unshared) (file|folder) "([^"]*)"$/
+	 * @Given /^user "([^"]*)" on "(LOCAL|REMOTE)" has deleted (file|folder) "([^"]*)"$/
 	 *
 	 * @param string $user
 	 * @param string $server
-	 * @param string $deletedOrUnshared
 	 * @param string $fileOrFolder
 	 * @param string $entry
 	 *
 	 * @return void
 	 */
-	public function userOnHasDeletedFile(string $user, string $server, string $deletedOrUnshared, string $fileOrFolder, string $entry):void {
+	public function userOnHasDeletedFile(string $user, string $server, string $fileOrFolder, string $entry):void {
 		$this->userOnDeletesFile($user, $server, $entry);
 		// If the file was there and got deleted then we get a 204
 		// If the file was already not there then we get a 404
 		// Either way, the outcome of the "given" step is OK
-		if ($deletedOrUnshared === "deleted") {
-			$deleteText = "delete";
-		} else {
-			$deleteText = "unshare";
-		}
 
 		$this->theHTTPStatusCodeShouldBe(
 			["204", "404"],
-			"HTTP status code was not 204 or 404 while trying to $deleteText $fileOrFolder '$entry' for user '$user' on server '$server'"
+			"HTTP status code was not 204 or 404 while trying to delete $fileOrFolder '$entry' for user '$user' on server '$server'"
 		);
 	}
 
