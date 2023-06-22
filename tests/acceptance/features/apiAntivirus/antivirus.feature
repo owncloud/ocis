@@ -348,3 +348,24 @@ Feature: antivirus
       | old              |
       | new              |
       | spaces           |
+
+
+  Scenario Outline: try to overwrite a file with the virus content in a public link share
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "hello" to "test.txt"
+    And user "Alice" has created a public link share with settings
+      | path        | /test.txt  |
+      | name        | sharedlink |
+      | permissions | change     |
+    When user "Alice" uploads file with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" to "test.txt" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And user "Alice" should get a notification with subject "Virus found" and message:
+      | message                                                                   |
+      | Virus found in test.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And the content of file "/test.txt" for user "Alice" should be "hello"
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
+
