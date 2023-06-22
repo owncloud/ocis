@@ -1,4 +1,4 @@
-@api @env-config
+@api @env-config @skipOnStable3.0
 Feature: enforce password on public link
   As a user
   I want to enforce passwords on public links shared with upload, edit, or contribute permission
@@ -12,7 +12,21 @@ Feature: enforce password on public link
     And user "Alice" has uploaded file with content "test file" to "/testfile.txt"
 
 
-  Scenario Outline: user tries to update a public link to edit permission without a password
+  Scenario Outline: create a public link with edit permission without a password when enforce-password is enabled
+    Given using OCS API version "<ocs-api-version>"
+    When user "Alice" creates a public link share using the sharing API with settings
+      | path        | /testfile.txt |
+      | permissions | 3             |
+    Then the HTTP status code should be "<http-code>"
+    Then the OCS status code should be "400"
+    And the OCS status message should be "missing required password"
+    Examples:
+      | ocs-api-version | http-code |
+      | 1               | 200       |
+      | 2               | 400       |
+
+
+  Scenario Outline: update a public link to edit permission without a password
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created a public link share with settings
       | path        | /testfile.txt |
@@ -28,7 +42,7 @@ Feature: enforce password on public link
       | 2               | 400       |
 
 
-  Scenario Outline: user updates a public link to edit permission with a password
+  Scenario Outline: updates a public link to edit permission with a password
     Given using OCS API version "<ocs-api-version>"
     And user "Alice" has created a public link share with settings
       | path        | /testfile.txt |
