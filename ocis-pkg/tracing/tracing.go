@@ -27,8 +27,8 @@ var Propagator = propagation.NewCompositeTextMapPropagator(
 	propagation.TraceContext{},
 )
 
-// GetValidTraceProvider returns a configured open-telemetry trace provider.
-func GetValidTraceProvider(c ConfigConverter, serviceName string) (trace.TracerProvider, error) {
+// GetServiceTraceProvider returns a configured open-telemetry trace provider.
+func GetServiceTraceProvider(c ConfigConverter, serviceName string) (trace.TracerProvider, error) {
 	cfg := c.Convert()
 	if cfg.Enabled {
 		return GetTraceProvider(cfg.Endpoint, cfg.Collector, serviceName, cfg.Type)

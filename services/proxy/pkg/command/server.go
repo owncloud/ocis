@@ -64,7 +64,7 @@ func Server(cfg *config.Config) *cli.Command {
 			)
 
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			traceProvider, err := tracing.GetValidTraceProvider(cfg.Tracing, cfg.Service.Name)
+			traceProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
@@ -396,12 +396,12 @@ func loadMiddlewares(ctx context.Context, logger log.Logger, cfg *config.Config,
 		),
 		router.Middleware(cfg.PolicySelector, cfg.Policies, logger),
 		middleware.Authentication(
-			traceProvider,
 			authenticators,
 			middleware.CredentialsByUserAgent(cfg.AuthMiddleware.CredentialsByUserAgent),
 			middleware.Logger(logger),
 			middleware.OIDCIss(cfg.OIDC.Issuer),
 			middleware.EnableBasicAuth(cfg.EnableBasicAuth),
+			middleware.TraceProvider(traceProvider),
 		),
 		middleware.AccountResolver(
 			middleware.Logger(logger),

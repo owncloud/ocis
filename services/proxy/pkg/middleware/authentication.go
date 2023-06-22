@@ -46,10 +46,11 @@ type Authenticator interface {
 }
 
 // Authentication is a higher order authentication middleware.
-func Authentication(traceProvider trace.TracerProvider, auths []Authenticator, opts ...Option) func(next http.Handler) http.Handler {
+func Authentication(auths []Authenticator, opts ...Option) func(next http.Handler) http.Handler {
 	options := newOptions(opts...)
 	configureSupportedChallenges(options)
-	tracer := traceProvider.Tracer("proxy")
+	tracer := getTraceProvider(options).Tracer("proxy")
+
 	spanOpts := []trace.SpanStartOption{
 		trace.WithSpanKind(trace.SpanKindServer),
 	}
@@ -204,4 +205,11 @@ func evalRequestURI(l userAgentLocker, r regexp.Regexp) {
 		}
 	}
 	l.w.Header().Add(WwwAuthenticate, fmt.Sprintf("%v realm=\"%s\", charset=\"UTF-8\"", caser.String(l.fallback), l.r.Host))
+}
+
+func getTraceProvider(o Options) trace.TracerProvider {
+	if o.TraceProvider != nil {
+		return o.TraceProvider
+	}
+	return trace.NewNoopTracerProvider()
 }

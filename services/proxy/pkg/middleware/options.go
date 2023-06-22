@@ -14,6 +14,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/user/backend"
 	"github.com/owncloud/ocis/v2/services/proxy/pkg/userroles"
 	store "go-micro.dev/v4/store"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // Option defines a single option function.
@@ -67,6 +68,8 @@ type Options struct {
 	// RoleQuotas hold userid:quota mappings. These will be used when provisioning new users.
 	// The users will get as much quota as is set for their role.
 	RoleQuotas map[string]uint64
+	// TraceProvider sets the tracing provider.
+	TraceProvider trace.TracerProvider
 }
 
 // newOptions initializes the available default options.
@@ -224,5 +227,12 @@ func AccessTokenVerifyMethod(method string) Option {
 func RoleQuotas(roleQuotas map[string]uint64) Option {
 	return func(o *Options) {
 		o.RoleQuotas = roleQuotas
+	}
+}
+
+// TraceProvider sets the tracing provider.
+func TraceProvider(tp trace.TracerProvider) Option {
+	return func(o *Options) {
+		o.TraceProvider = tp
 	}
 }
