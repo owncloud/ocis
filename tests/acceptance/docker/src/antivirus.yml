@@ -5,5 +5,5 @@ services:
       - clamav
     command: clamav:3310
   clamav:
-    image: owncloudci/clamavd
+    image: mkodockx/docker-clamav:alpine
 
