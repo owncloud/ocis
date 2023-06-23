@@ -61,8 +61,11 @@ func NewArchiver(r []*provider.ResourceId, w walker.Walker, d downloader.Downloa
 }
 
 // CreateTar creates a tar and write it into the dst Writer
-func (a *Archiver) CreateTar(ctx context.Context, dst io.Writer) error {
+func (a *Archiver) CreateTar(ctx context.Context, dst io.Writer) (func(), error) {
 	w := tar.NewWriter(dst)
+	closer := func() {
+		_ = w.Close()
+	}
 
 	var filesCount, sizeFiles int64
 
@@ -125,16 +128,19 @@ func (a *Archiver) CreateTar(ctx context.Context, dst io.Writer) error {
 		})
 
 		if err != nil {
-			return err
+			return closer, err
 		}
 
 	}
-	return w.Close()
+	return closer, nil
 }
 
 // CreateZip creates a zip and write it into the dst Writer
-func (a *Archiver) CreateZip(ctx context.Context, dst io.Writer) error {
+func (a *Archiver) CreateZip(ctx context.Context, dst io.Writer) (func(), error) {
 	w := zip.NewWriter(dst)
+	closer := func() {
+		_ = w.Close()
+	}
 
 	var filesCount, sizeFiles int64
 
@@ -193,11 +199,11 @@ func (a *Archiver) CreateZip(ctx context.Context, dst io.Writer) error {
 		})
 
 		if err != nil {
-			return err
+			return closer, err
 		}
 
 	}
-	return w.Close()
+	return closer, nil
 }
 
 func isSpaceRoot(info *provider.ResourceInfo) bool {

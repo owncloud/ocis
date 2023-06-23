@@ -57,16 +57,6 @@ The expected failures in this file are from features in the owncloud/ocis repo.
 - [apiCors/cors.feature:70](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L70)
 - [apiCors/cors.feature:71](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiCors/cors.feature#L71)
 
-#### [POST response does not return correct path when creating public link](https://github.com/owncloud/ocis/issues/5139)
-
-- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:63](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L63)
-- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:64](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L64)
-- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:65](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L65)
-- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:93](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L93)
-- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:167](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L167)
-- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:168](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L168)
-- [apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature:169](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiSpacesShares/shareSubItemOfSpaceViaPublicLink.feature#L169)
-
 #### [A User can get information of another user with Graph API](https://github.com/owncloud/ocis/issues/5125)
 
 - [apiGraph/getUser.feature:83](https://github.com/owncloud/ocis/blob/master/tests/acceptance/features/apiGraph/getUser.feature#L83)

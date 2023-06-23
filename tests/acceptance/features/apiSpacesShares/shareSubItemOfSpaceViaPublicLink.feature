@@ -151,16 +151,16 @@ Feature: Share a file or folder that is inside a space via public link
       | shareType   | 3               |
       | permissions | 1               |
     Then the fields of the last response to user "Alice" should include
-      | item_type              | file            |
-      | mimetype               | text/plain      |
-      | file_target            | /file.txt       |
-      | path                   | folder/file.txt |
-      | permissions            | 1               |
-      | share_type             | public_link     |
-      | displayname_file_owner | %displayname%   |
-      | displayname_owner      | %displayname%   |
-      | uid_file_owner         | %username%      |
-      | uid_owner              | %username%      |
+      | item_type              | file             |
+      | mimetype               | text/plain       |
+      | file_target            | /file.txt        |
+      | path                   | /folder/file.txt |
+      | permissions            | 1                |
+      | share_type             | public_link      |
+      | displayname_file_owner |                  |
+      | displayname_owner      | %displayname%    |
+      #| uid_file_owner         | %username%       |
+      | uid_owner              | %username%       |
     And for user "Brian" the space "share sub-item" should contain the last created public link of the file "folder/file.txt"
     Examples:
       | spaceRole |
