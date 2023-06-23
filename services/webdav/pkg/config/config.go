@@ -20,7 +20,7 @@ type Config struct {
 
 	HTTP HTTP `yaml:"http"`
 
-	DisablePreviews      bool            `yaml:"disablePreviews" env:"OCIS_DISABLE_PREVIEWS" desc:"Set this option to 'true' to disable previews in all the different file listing views. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all."`
+	DisablePreviews      bool            `yaml:"disablePreviews" env:"OCIS_DISABLE_PREVIEWS;WEBDAV_OPTION_DISABLE_PREVIEWS" desc:"Set this option to 'true' to disable all preview related webdav paths."`
 	OcisPublicURL        string          `yaml:"ocis_public_url" env:"OCIS_URL;OCIS_PUBLIC_URL" desc:"URL, where oCIS is reachable for users."`
 	WebdavNamespace      string          `yaml:"webdav_namespace" env:"WEBDAV_WEBDAV_NAMESPACE" desc:"CS3 path layout to use when forwarding /webdav requests"`
 	RevaGateway          string          `yaml:"reva_gateway" env:"OCIS_REVA_GATEWAY;REVA_GATEWAY" desc:"CS3 gateway used to look up user metadata" deprecationVersion:"3.0" removalVersion:"4.0.0" deprecationInfo:"REVA_GATEWAY changing name for consistency" deprecationReplacement:"OCIS_REVA_GATEWAY"`
