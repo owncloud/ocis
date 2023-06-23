@@ -155,8 +155,8 @@ func (g Graph) PostEducationUser(w http.ResponseWriter, r *http.Request) {
 // GetEducationUser implements the Service interface.
 func (g Graph) GetEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling get education user")
 	userID := chi.URLParam(r, "userID")
+	logger.Info().Str("userID", userID).Msg("calling get education user")
 	userID, err := url.PathUnescape(userID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", userID).Msg("could not get education user: unescaping education user id failed")
@@ -186,8 +186,8 @@ func (g Graph) GetEducationUser(w http.ResponseWriter, r *http.Request) {
 // DeleteEducationUser implements the Service interface.
 func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling delete education user")
 	userID := chi.URLParam(r, "userID")
+	logger.Info().Str("userID", userID).Msg("calling delete education user")
 	userID, err := url.PathUnescape(userID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", userID).Msg("could not delete education user: unescaping education user id failed")
@@ -298,8 +298,8 @@ func (g Graph) DeleteEducationUser(w http.ResponseWriter, r *http.Request) {
 // ExistingUser
 func (g Graph) PatchEducationUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling patch education user")
 	nameOrID := chi.URLParam(r, "userID")
+	logger.Info().Str("userID", nameOrID).Msg("calling patch education user")
 	nameOrID, err := url.PathUnescape(nameOrID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", nameOrID).Msg("could not update education user: unescaping education user id failed")

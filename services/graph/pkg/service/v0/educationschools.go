@@ -102,8 +102,8 @@ func (g Graph) PostEducationSchool(w http.ResponseWriter, r *http.Request) {
 // PatchEducationSchool implements the Service interface.
 func (g Graph) PatchEducationSchool(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling patch school")
 	schoolID := chi.URLParam(r, "schoolID")
+	logger.Info().Str("schoolID", schoolID).Msg("calling patch school")
 	schoolID, err := url.PathUnescape(schoolID)
 	if err != nil {
 		logger.Debug().Str("id", schoolID).Msg("could not update school: unescaping school id failed")
@@ -146,8 +146,8 @@ func (g Graph) PatchEducationSchool(w http.ResponseWriter, r *http.Request) {
 // GetEducationSchool implements the Service interface.
 func (g Graph) GetEducationSchool(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling get school")
 	schoolID := chi.URLParam(r, "schoolID")
+	logger.Info().Str("schoolID", schoolID).Msg("calling get school")
 	schoolID, err := url.PathUnescape(schoolID)
 	if err != nil {
 		logger.Debug().Str("id", schoolID).Msg("could not get school: unescaping school id failed")
@@ -178,8 +178,8 @@ func (g Graph) GetEducationSchool(w http.ResponseWriter, r *http.Request) {
 // DeleteEducationSchool implements the Service interface.
 func (g Graph) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling delete school")
 	schoolID := chi.URLParam(r, "schoolID")
+	logger.Info().Str("schoolID", schoolID).Msg("calling delete school")
 	schoolID, err := url.PathUnescape(schoolID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", schoolID).Msg("could not delete school: unescaping school id failed")
@@ -238,8 +238,8 @@ func (g Graph) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
 // GetEducationSchoolUsers implements the Service interface.
 func (g Graph) GetEducationSchoolUsers(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling get school users")
 	schoolID := chi.URLParam(r, "schoolID")
+	logger.Info().Str("schoolID", schoolID).Msg("calling get school users")
 	schoolID, err := url.PathUnescape(schoolID)
 	if err != nil {
 		logger.Debug().Str("id", schoolID).Msg("could not get school users: unescaping school id failed")
@@ -268,9 +268,9 @@ func (g Graph) GetEducationSchoolUsers(w http.ResponseWriter, r *http.Request) {
 // PostEducationSchoolUser implements the Service interface.
 func (g Graph) PostEducationSchoolUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("Calling post school user")
 
 	schoolID := chi.URLParam(r, "schoolID")
+	logger.Info().Str("schoolID", schoolID).Msg("Calling post school user")
 	schoolID, err := url.PathUnescape(schoolID)
 	if err != nil {
 		logger.Debug().
@@ -340,9 +340,10 @@ func (g Graph) PostEducationSchoolUser(w http.ResponseWriter, r *http.Request) {
 // DeleteEducationSchoolUser implements the Service interface.
 func (g Graph) DeleteEducationSchoolUser(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling delete school member")
 
 	schoolID := chi.URLParam(r, "schoolID")
+	userID := chi.URLParam(r, "userID")
+	logger.Info().Str("schoolID", schoolID).Str("userID", userID).Msg("calling delete school member")
 	schoolID, err := url.PathUnescape(schoolID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", schoolID).Msg("could not delete school member: unescaping school id failed")
@@ -356,7 +357,6 @@ func (g Graph) DeleteEducationSchoolUser(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	userID := chi.URLParam(r, "userID")
 	userID, err = url.PathUnescape(userID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", userID).Msg("could not delete school member: unescaping member id failed")
@@ -393,8 +393,8 @@ func (g Graph) DeleteEducationSchoolUser(w http.ResponseWriter, r *http.Request)
 // GetEducationSchoolClasses implements the Service interface.
 func (g Graph) GetEducationSchoolClasses(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling get school classes")
 	schoolID := chi.URLParam(r, "schoolID")
+	logger.Info().Str("schoolID", schoolID).Msg("calling get school classes")
 	schoolID, err := url.PathUnescape(schoolID)
 	if err != nil {
 		logger.Debug().Str("id", schoolID).Msg("could not get school users: unescaping school id failed")
@@ -423,9 +423,9 @@ func (g Graph) GetEducationSchoolClasses(w http.ResponseWriter, r *http.Request)
 // PostEducationSchoolClass implements the Service interface.
 func (g Graph) PostEducationSchoolClass(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("Calling post school class")
 
 	schoolID := chi.URLParam(r, "schoolID")
+	logger.Info().Str("schoolID", schoolID).Msg("Calling post school class")
 	schoolID, err := url.PathUnescape(schoolID)
 	if err != nil {
 		logger.Debug().
@@ -495,9 +495,10 @@ func (g Graph) PostEducationSchoolClass(w http.ResponseWriter, r *http.Request) 
 // DeleteEducationSchoolClass implements the Service interface.
 func (g Graph) DeleteEducationSchoolClass(w http.ResponseWriter, r *http.Request) {
 	logger := g.logger.SubloggerWithRequestID(r.Context())
-	logger.Info().Msg("calling delete school class")
 
 	schoolID := chi.URLParam(r, "schoolID")
+	classID := chi.URLParam(r, "classID")
+	logger.Info().Str("schoolID", schoolID).Str("classID", classID).Msg("calling delete school class")
 	schoolID, err := url.PathUnescape(schoolID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", schoolID).Msg("could not delete school class: unescaping school id failed")
@@ -511,7 +512,6 @@ func (g Graph) DeleteEducationSchoolClass(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	classID := chi.URLParam(r, "classID")
 	classID, err = url.PathUnescape(classID)
 	if err != nil {
 		logger.Debug().Err(err).Str("id", classID).Msg("could not delete school class: unescaping class id failed")
