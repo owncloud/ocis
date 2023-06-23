@@ -16,6 +16,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add permissions to report: [#6528](https://github.com/owncloud/ocis/pull/6528)
 * Enhancement - Add more metadata to the remote item: [#6300](https://github.com/owncloud/ocis/pull/6300)
 * Enhancement - We added the storage id to the audit log for spaces: [#6548](https://github.com/owncloud/ocis/pull/6548)
+* Enhancement - Make the post logout redirect uri configurable: [#6583](https://github.com/owncloud/ocis/pull/6583)
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
 * Enhancement - Add old & new values to audit logs: [#6537](https://github.com/owncloud/ocis/pull/6537)
 * Enhancement - Update reva: [#6529](https://github.com/owncloud/ocis/pull/6529)
@@ -106,6 +107,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/3753
    https://github.com/owncloud/ocis/pull/6548
+
+* Enhancement - Make the post logout redirect uri configurable: [#6583](https://github.com/owncloud/ocis/pull/6583)
+
+   We added a config option to change the redirect uri after the logout action of the web client.
+
+   https://github.com/owncloud/ocis/issues/6536
+   https://github.com/owncloud/ocis/pull/6583
 
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
 
