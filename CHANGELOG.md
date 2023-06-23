@@ -12,6 +12,7 @@ The following sections list the changes for unreleased.
 * Bugfix - Don't connect to ldap on startup: [#6565](https://github.com/owncloud/ocis/pull/6565)
 * Bugfix - Handle the bad request status: [#6469](https://github.com/owncloud/ocis/pull/6469)
 * Bugfix - Fix the oidc role assigner: [#6605](https://github.com/owncloud/ocis/pull/6605)
+* Enhancement - Add 'ocis decomposedfs check-treesize' command: [#6556](https://github.com/owncloud/ocis/pull/6556)
 * Enhancement - Add permissions to report: [#6528](https://github.com/owncloud/ocis/pull/6528)
 * Enhancement - Add more metadata to the remote item: [#6300](https://github.com/owncloud/ocis/pull/6300)
 * Enhancement - We added the storage id to the audit log for spaces: [#6548](https://github.com/owncloud/ocis/pull/6548)
@@ -77,6 +78,13 @@ The following sections list the changes for unreleased.
    level log to make the admin aware of that.
 
    https://github.com/owncloud/ocis/pull/6605
+
+* Enhancement - Add 'ocis decomposedfs check-treesize' command: [#6556](https://github.com/owncloud/ocis/pull/6556)
+
+   We added a 'ocis decomposedfs check-treesize' command for checking (and reparing) the
+   treesize metadata of a storage space.
+
+   https://github.com/owncloud/ocis/pull/6556
 
 * Enhancement - Add permissions to report: [#6528](https://github.com/owncloud/ocis/pull/6528)
 
