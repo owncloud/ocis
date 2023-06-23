@@ -26,6 +26,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Skip if the simulink is a directory: [#6574](https://github.com/owncloud/ocis/pull/6574)
 * Enhancement - Fix the groupname validation: [#6490](https://github.com/owncloud/ocis/pull/6490)
 * Enhancement - Fix the username validation: [#6437](https://github.com/owncloud/ocis/pull/6437)
+* Enhancement - Move proxy to service tracerprovider: [#6591](https://github.com/owncloud/ocis/pull/6591)
 * Enhancement - Add functionality to retry postprocessing: [#6500](https://github.com/owncloud/ocis/pull/6500)
 * Enhancement - Update go-micro kubernetes registry: [#6457](https://github.com/owncloud/ocis/pull/6457)
 * Enhancement - Update web to v7.0.1: [#6470](https://github.com/owncloud/ocis/pull/6470)
@@ -203,6 +204,13 @@ The following sections list the changes for unreleased.
 
    https://github.com/owncloud/ocis/issues/6436
    https://github.com/owncloud/ocis/pull/6437
+
+* Enhancement - Move proxy to service tracerprovider: [#6591](https://github.com/owncloud/ocis/pull/6591)
+
+   This moves the proxy to initialise a service tracer provider at service initialisation time,
+   instead of using a package global tracer provider.
+
+   https://github.com/owncloud/ocis/pull/6591
 
 * Enhancement - Add functionality to retry postprocessing: [#6500](https://github.com/owncloud/ocis/pull/6500)
 
