@@ -8,7 +8,7 @@ geekdocFilePath: 0020-file-search-query-language.md
 ---
 
 * Status: accepted
-* Deciders: @butonic, @micbar, @dragotin, @C0rby, @kulmann, @felix-schwarz
+* Deciders: @butonic, @micbar, @dragotin, @C0rby, @kulmann, @felix-schwarz, @JammingBen
 * Date: 2023-06-23
 
 ## Context and Problem Statement
@@ -52,9 +52,10 @@ Chosen option: [KQL - Keyword Query Language](#keyword-query-language), because 
 
 The Keyword Query Language (KQL) is used by Microsoft Share Point and other Microsoft Services. It uses very simple query elements, property restrictions and operators.
 
-* Good, because we can fulfil all our current needs
+* Good, because we can fulfill all our current needs
 * Good, because it is very similar to the used query language in iOS
 * Good, because it supports date time keywords like "today", "this week" and more
+* Good, because it can be easily extended to use "shortcuts" for eg. document types like `:presentation` which combine multiple mime types.
 * Good, because it is successfully implemented and used in similar use cases
 * Good, because it gives our clients the freedom to always use the same query language across all platforms
 * Good, because Microsoft Graph API is using it, we will have an easy transition in the future
