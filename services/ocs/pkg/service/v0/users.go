@@ -9,7 +9,6 @@ import (
 	storesvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/store/v0"
 
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
-	"github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/data"
 	"github.com/owncloud/ocis/v2/services/ocs/pkg/service/v0/response"
 	merrors "go-micro.dev/v4/errors"
@@ -29,7 +28,7 @@ func (o Ocs) GetSigningKey(w http.ResponseWriter, r *http.Request) {
 	// use the user's UUID
 	userID := u.Id.OpaqueId
 
-	c := storesvc.NewStoreService("com.owncloud.api.store", grpc.DefaultClient())
+	c := storesvc.NewStoreService("com.owncloud.api.store", o.config.GrpcClient)
 	res, err := c.Read(r.Context(), &storesvc.ReadRequest{
 		Options: &storemsg.ReadOptions{
 			Database: "proxy",
