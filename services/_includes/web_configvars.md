@@ -30,11 +30,12 @@
 | OCIS_URL<br/>WEB_UI_THEME_SERVER | string | https://localhost:9200 | Base URL to load themes from. Will be prepended to the theme path.|
 | WEB_UI_THEME_PATH | string | /themes/owncloud/theme.json | Subpath/file to load the theme. Will be appended to the URL of the theme server.|
 | OCIS_URL<br/>WEB_UI_CONFIG_SERVER | string | https://localhost:9200 | URL, where the oCIS APIs are reachable for ownCloud Web.|
-| WEB_OIDC_METADATA_URL | string | https://localhost:9200/.well-known/openid-configuration | URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + "/.well-known/openid-configuration".|
+| WEB_OIDC_METADATA_URL | string | https://localhost:9200/.well-known/openid-configuration | URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + '/.well-known/openid-configuration'.|
 | OCIS_URL<br/>OCIS_OIDC_ISSUER<br/>WEB_OIDC_AUTHORITY | string | https://localhost:9200 | URL of the OIDC issuer. It defaults to URL of the builtin IDP.|
-| OCIS_OIDC_CLIENT_ID<br/>WEB_OIDC_CLIENT_ID | string | web | OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP (has no effect when using the builtin IDP).|
-| WEB_OIDC_RESPONSE_TYPE | string | code | OIDC response type to use for authentication.|
+| OCIS_OIDC_CLIENT_ID<br/>WEB_OIDC_CLIENT_ID | string | web | The OIDC client ID which ownCloud Web uses. This client needs to be set up in your IDP. Note that this setting has no effect when using the builtin IDP.|
+| WEB_OIDC_RESPONSE_TYPE | string | code | The OIDC response type to use for authentication.|
 | WEB_OIDC_SCOPE | string | openid profile email | OIDC scopes to request during authentication to authorize access to user details. Defaults to 'openid profile email'. Values are separated by blank. More example values but not limited to are 'address' or 'phone' etc.|
+| WEB_OIDC_POST_LOGOUT_REDIRECT_URI | string |  | This value needs to point to a valid and reachable web page. The web client will trigger a redirect to that page directly after the logout action. The default value is empty and redirects to the login page.|
 | WEB_OPTION_HOME_FOLDER | string |  | Specifies a folder that is used when the user navigates 'home'. Navigating home gets triggered by clicking on the 'All files' menu item. The user will not be jailed in that directory, it simply serves as a default location. A static location can be provided, or variables of the user object to come up with a user specific home path can be used. This uses the twig template variable style and allows picking a value or a substring of a value of the authenticated user. Examples are '/Shares', '/{{.Id}}' and '/{{substr 0 3 .Id}}/{{.Id}'.|
 | WEB_OPTION_OPEN_APPS_IN_TAB | bool | false | Configures whether apps and extensions should generally open in a new tab. Defaults to false.|
 | WEB_OPTION_DISABLE_PREVIEWS | bool | false | Set this option to 'true' to disable previews in all the different file listing views. The only list view that is not affected by this setting is the trash bin, as it does not allow previewing at all.|

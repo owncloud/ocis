@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-06-23-14-02-54]
+[#deprecation-note-2023-06-23-14-07-50]
 [caption=]
 .Deprecation notes for the web service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -257,7 +257,7 @@ Serve ownCloud Web assets from a path on the filesystem instead of the builtin a
 
 a|`WEB_UI_CONFIG_FILE` +
 `WEB_UI_CONFIG` +
-xref:deprecation-note-2023-06-23-14-02-54[Deprecation Note]
+xref:deprecation-note-2023-06-23-14-07-50[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -267,7 +267,7 @@ Read the ownCloud Web json based configuration from this path/file. The config f
 
 a|`WEB_UI_CONFIG_FILE` +
 `WEB_UI_PATH` +
-xref:deprecation-note-2023-06-23-14-02-54[Deprecation Note]
+xref:deprecation-note-2023-06-23-14-07-50[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
@@ -311,7 +311,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++https://localhost:9200/.well-known/openid-configuration ++
 a| [subs=-attributes]
-URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + "/.well-known/openid-configuration".
+URL for the OIDC well-known configuration endpoint. Defaults to the oCIS API URL + '/.well-known/openid-configuration'.
 
 a|`OCIS_URL` +
 `OCIS_OIDC_ISSUER` +
@@ -332,7 +332,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++web ++
 a| [subs=-attributes]
-OIDC client ID, which ownCloud Web uses. This client needs to be set up in your IDP (has no effect when using the builtin IDP).
+The OIDC client ID which ownCloud Web uses. This client needs to be set up in your IDP. Note that this setting has no effect when using the builtin IDP.
 
 a|`WEB_OIDC_RESPONSE_TYPE` +
 
@@ -341,7 +341,7 @@ a| [subs=-attributes]
 a| [subs=-attributes]
 ++code ++
 a| [subs=-attributes]
-OIDC response type to use for authentication.
+The OIDC response type to use for authentication.
 
 a|`WEB_OIDC_SCOPE` +
 
@@ -351,6 +351,15 @@ a| [subs=-attributes]
 ++openid profile email ++
 a| [subs=-attributes]
 OIDC scopes to request during authentication to authorize access to user details. Defaults to 'openid profile email'. Values are separated by blank. More example values but not limited to are 'address' or 'phone' etc.
+
+a|`WEB_OIDC_POST_LOGOUT_REDIRECT_URI` +
+
+a| [subs=-attributes]
+++string ++
+a| [subs=-attributes]
+++ ++
+a| [subs=-attributes]
+This value needs to point to a valid and reachable web page. The web client will trigger a redirect to that page directly after the logout action. The default value is empty and redirects to the login page.
 
 a|`WEB_OPTION_HOME_FOLDER` +
 
