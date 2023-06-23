@@ -40,10 +40,13 @@ func Index(cfg *config.Config) *cli.Command {
 			return configlog.ReturnFatal(parser.ParseConfig(cfg))
 		},
 		Action: func(ctx *cli.Context) error {
-			grpcClient := grpc.DefaultClient()
-			grpcClient.Options()
+			grpcClient, err := grpc.NewClient(grpc.GetClientOptions(cfg.GRPCClientTLS)...)
+			if err != nil {
+				return err
+			}
+
 			c := searchsvc.NewSearchProviderService("com.owncloud.api.search", grpcClient)
-			_, err := c.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
+			_, err = c.IndexSpace(context.Background(), &searchsvc.IndexSpaceRequest{
 				SpaceId: ctx.String("space"),
 				UserId:  ctx.String("user"),
 			}, func(opts *client.CallOptions) { opts.RequestTimeout = 10 * time.Minute })
