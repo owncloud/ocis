@@ -16,6 +16,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.4.0"
+	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -25,6 +26,15 @@ var Propagator = propagation.NewCompositeTextMapPropagator(
 	propagation.Baggage{},
 	propagation.TraceContext{},
 )
+
+// GetServiceTraceProvider returns a configured open-telemetry trace provider.
+func GetServiceTraceProvider(c ConfigConverter, serviceName string) (trace.TracerProvider, error) {
+	cfg := c.Convert()
+	if cfg.Enabled {
+		return GetTraceProvider(cfg.Endpoint, cfg.Collector, serviceName, cfg.Type)
+	}
+	return trace.NewNoopTracerProvider(), nil
+}
 
 // GetTraceProvider returns a configured open-telemetry trace provider.
 func GetTraceProvider(endpoint, collector, serviceName, traceType string) (*sdktrace.TracerProvider, error) {
@@ -92,7 +102,6 @@ func GetTraceProvider(endpoint, collector, serviceName, traceType string) (*sdkt
 			context.Background(),
 			otlptracegrpc.WithGRPCConn(conn),
 		)
-
 		if err != nil {
 			return nil, err
 		}
@@ -184,7 +193,6 @@ func Configure(enabled bool, tracingType string, logger log.Logger) {
 				Str("type", tracingType).
 				Msg("Unknown tracing exporter")
 		}
-
 	} else {
 		logger.Debug().
 			Msg("Tracing is not enabled")
