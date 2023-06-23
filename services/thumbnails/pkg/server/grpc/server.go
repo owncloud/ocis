@@ -16,7 +16,8 @@ import (
 func NewService(opts ...Option) grpc.Service {
 	options := newOptions(opts...)
 
-	service, err := grpc.NewService(
+	service, err := grpc.NewServiceWithClient(
+		options.Config.GrpcClient,
 		grpc.TLSEnabled(options.Config.GRPC.TLS.Enabled),
 		grpc.TLSCert(
 			options.Config.GRPC.TLS.Cert,
