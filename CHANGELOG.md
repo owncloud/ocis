@@ -143,6 +143,7 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/6544
    https://github.com/owncloud/ocis/pull/6507
    https://github.com/owncloud/ocis/pull/6572
+   https://github.com/owncloud/ocis/pull/6590
 
 * Enhancement - Use reva client selectors: [#6452](https://github.com/owncloud/ocis/pull/6452)
 
