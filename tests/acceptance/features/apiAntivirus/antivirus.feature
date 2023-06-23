@@ -357,7 +357,7 @@ Feature: antivirus
       | path        | /test.txt  |
       | name        | sharedlink |
       | permissions | change     |
-    When user "Alice" uploads file with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" to "test.txt" using the WebDAV API
+    When the public overwrites file "test.txt" with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" using the new WebDAV API
     Then the HTTP status code should be "204"
     And user "Alice" should get a notification with subject "Virus found" and message:
       | message                                                                   |
@@ -368,4 +368,3 @@ Feature: antivirus
       | old              |
       | new              |
       | spaces           |
-
