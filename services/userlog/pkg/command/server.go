@@ -55,7 +55,7 @@ func Server(cfg *config.Config) *cli.Command {
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
 
-			err := ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
+			grpcClient, err := ogrpc.NewClient(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
 			if err != nil {
 				return err
 			}
@@ -101,7 +101,7 @@ func Server(cfg *config.Config) *cli.Command {
 				return fmt.Errorf("could not get reva client selector: %s", err)
 			}
 
-			hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", ogrpc.DefaultClient())
+			hClient := ehsvc.NewEventHistoryService("com.owncloud.api.eventhistory", grpcClient)
 
 			{
 				server, err := http.Server(
