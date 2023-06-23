@@ -1,6 +1,6 @@
 ---
 title: IDM
-date: 2023-06-23T05:39:41.769714832Z
+date: 2023-06-23T06:56:39.060059946Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/idm
@@ -17,7 +17,7 @@ The IDM service provides a minimal LDAP Service, based on [Libregraph idm](https
 
 It is mainly targeted at small oCIS installations. For larger setups it is recommended to replace IDM with a “real” LDAP server or to switch to an external identity management solution.
 
-IDM listens on port 9325 by default. In the default configuration it only accepts TLS-protected connections (LDAPS). The BaseDN of the LDAP tree is `o=libregraph-idm`. IDM gives LDAP write permissions to a single user (DN: `uid=libregraph,ou=sysusers,o=libregraph-idm`). Any other authenticated user has read-only access. IDM stores its data in a boltdb file `idm/ocis.boltdb` inside the oCIS base data directory.
+IDM listens on port 9235 by default. In the default configuration it only accepts TLS-protected connections (LDAPS). The BaseDN of the LDAP tree is `o=libregraph-idm`. IDM gives LDAP write permissions to a single user (DN: `uid=libregraph,ou=sysusers,o=libregraph-idm`). Any other authenticated user has read-only access. IDM stores its data in a boltdb file `idm/ocis.boltdb` inside the oCIS base data directory.
 
 Note: IDM is limited in its functionality. It only supports a subset of the LDAP operations (namely `BIND`, `SEARCH`, `ADD`, `MODIFY`, `DELETE`). Also, IDM currently does not do any schema verification (like. structural vs. auxiliary object classes, require and option attributes, syntax checks, …). Therefore it is not meant as a general purpose LDAP server.
 
