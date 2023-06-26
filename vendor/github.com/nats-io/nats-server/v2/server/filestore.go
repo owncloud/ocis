@@ -4665,7 +4665,16 @@ func (fs *fileStore) loadLast(subj string, sm *StoreMsg) (lsm *StoreMsg, err err
 			mb.mu.Unlock()
 			return nil, err
 		}
-		_, _, l := mb.filteredPendingLocked(subj, wc, mb.first.seq)
+		var l uint64
+		// Optimize if subject is not a wildcard.
+		if !wc {
+			if ss := mb.fss[subj]; ss != nil {
+				l = ss.Last
+			}
+		}
+		if l == 0 {
+			_, _, l = mb.filteredPendingLocked(subj, wc, mb.first.seq)
+		}
 		if l > 0 {
 			if mb.cacheNotLoaded() {
 				if err := mb.loadMsgsWithLock(); err != nil {
@@ -5108,10 +5117,6 @@ func compareFn(subject string) func(string, string) bool {
 // PurgeEx will remove messages based on subject filters, sequence and number of messages to keep.
 // Will return the number of purged messages.
 func (fs *fileStore) PurgeEx(subject string, sequence, keep uint64) (purged uint64, err error) {
-	if sequence > 1 && keep > 0 {
-		return 0, ErrPurgeArgMismatch
-	}
-
 	if subject == _EMPTY_ || subject == fwcs {
 		if keep == 0 && (sequence == 0 || sequence == 1) {
 			return fs.Purge()

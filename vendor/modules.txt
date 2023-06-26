@@ -1325,7 +1325,7 @@ github.com/mschoch/smat
 # github.com/nats-io/jwt/v2 v2.4.1
 ## explicit; go 1.18
 github.com/nats-io/jwt/v2
-# github.com/nats-io/nats-server/v2 v2.9.17
+# github.com/nats-io/nats-server/v2 v2.9.19
 ## explicit; go 1.19
 github.com/nats-io/nats-server/v2/conf
 github.com/nats-io/nats-server/v2/internal/ldap
@@ -1333,10 +1333,11 @@ github.com/nats-io/nats-server/v2/logger
 github.com/nats-io/nats-server/v2/server
 github.com/nats-io/nats-server/v2/server/pse
 github.com/nats-io/nats-server/v2/server/sysmem
-# github.com/nats-io/nats.go v1.24.0
+# github.com/nats-io/nats.go v1.27.0
 ## explicit; go 1.19
 github.com/nats-io/nats.go
 github.com/nats-io/nats.go/encoders/builtin
+github.com/nats-io/nats.go/internal/parser
 github.com/nats-io/nats.go/util
 # github.com/nats-io/nkeys v0.4.4
 ## explicit; go 1.19
