@@ -162,6 +162,7 @@ class FeatureContext extends BehatVariablesContext {
 	public OCSContext $ocsContext;
 	public AuthContext $authContext;
 	public GraphContext $graphContext;
+	public SpacesContext $spacesContext;
 	public AppConfigurationContext $appConfigurationContext;
 	private array $initialTrustedServer;
 
@@ -3221,12 +3222,15 @@ class FeatureContext extends BehatVariablesContext {
 		$this->ocsContext = new OCSContext();
 		$this->authContext = new AuthContext();
 		$this->appConfigurationContext = new AppConfigurationContext();
+		$this->spacesContext = new SpacesContext();
 		$this->ocsContext->before($scope);
 		$this->authContext->setUpScenario($scope);
 		$this->appConfigurationContext->setUpScenario($scope);
 		$environment->registerContext($this->ocsContext);
 		$environment->registerContext($this->authContext);
 		$environment->registerContext($this->appConfigurationContext);
+		$this->spacesContext->setUpScenario($scope);
+		$environment->registerContext($this->spacesContext);
 		$scenarioLine = $scope->getScenario()->getLine();
 		$featureFile = $scope->getFeature()->getFile();
 		$suiteName = $scope->getSuite()->getName();

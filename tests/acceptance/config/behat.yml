@@ -23,14 +23,10 @@ default:
             regularUserPassword: 123456
             ocPath: apps/testing/api/v1/occ
         - CapabilitiesContext:
-        - ChecksumContext:
-        - FavoritesContext:
         - FilesVersionsContext:
         - NotificationContext:
         - OCSContext:
         - PublicWebDavContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
 
     apiSpaces:
       paths:
@@ -41,16 +37,12 @@ default:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
-        - ChecksumContext:
-        - FavoritesContext:
         - FilesVersionsContext:
         - NotificationContext:
         - OCSContext:
         - PublicWebDavContext:
         - SearchContext:
         - TagContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
         - TUSContext:
         - SpacesTUSContext:
         - GraphContext:
@@ -88,14 +80,10 @@ default:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
-        - ChecksumContext:
-        - FavoritesContext:
         - FilesVersionsContext:
         - OCSContext:
         - PublicWebDavContext:
         - SearchContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
         - TUSContext:
         - SpacesTUSContext:
         - GraphContext:
@@ -110,13 +98,9 @@ default:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
-        - ChecksumContext:
         - FilesVersionsContext:
         - OCSContext:
         - PublicWebDavContext:
-        - FavoritesContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
         - GraphContext:
 
     apiGraph:
@@ -129,14 +113,10 @@ default:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
         - CapabilitiesContext:
-        - ChecksumContext:
-        - FavoritesContext:
         - FilesVersionsContext:
         - OCSContext:
         - PublicWebDavContext:
         - SearchContext:
-        - TrashbinContext:
-        - WebDavPropertiesContext:
         - TUSContext:
         - SpacesTUSContext:
         - OcisConfigContext:
@@ -150,12 +130,8 @@ default:
       contexts:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
-        - WebDavPropertiesContext:
-        - FavoritesContext:
-        - ChecksumContext:
         - FilesVersionsContext:
         - OCSContext:
-        - TrashbinContext:
         - GraphContext:
         - OcisConfigContext:
 
@@ -167,11 +143,8 @@ default:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
         - WebDavPropertiesContext:
-        - FavoritesContext:
-        - ChecksumContext:
         - FilesVersionsContext:
         - OCSContext:
-        - TrashbinContext:
         - GraphContext:
         - OcisConfigContext:
 
@@ -183,12 +156,8 @@ default:
         - NotificationContext:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
-        - WebDavPropertiesContext:
         - OCSContext:
         - GraphContext:
-        - TrashbinContext:
-        - FavoritesContext:
-        - ChecksumContext:
         - FilesVersionsContext:
         - SettingsContext:
 
@@ -200,12 +169,8 @@ default:
         - NotificationContext:
         - SpacesContext:
         - FeatureContext: *common_feature_context_params
-        - WebDavPropertiesContext:
         - OCSContext:
         - GraphContext:
-        - TrashbinContext:
-        - FavoritesContext:
-        - ChecksumContext:
         - FilesVersionsContext:
         - SettingsContext:
         - OcisConfigContext:
