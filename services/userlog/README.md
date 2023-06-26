@@ -30,6 +30,10 @@ For the time being, the configuration which user related events are of interest 
 
 The `userlog` service provides an API to retrieve configured events. For now, this API is mostly following the [oc10 notification GET API](https://doc.owncloud.com/server/next/developer_manual/core/apis/ocs-notification-endpoint-v1.html#get-user-notifications).
 
+## Subscribing
+
+Additionaly to the oc10 API the `userlog` service also provides an `/sse` (Server-Sent Events) endpoint to be informed by the server when an event happens. See [here](https://medium.com/yemeksepeti-teknoloji/what-is-server-sent-events-sse-and-how-to-implement-it-904938bffd73) for example for simple introduction to server sent events. The `sse` endpoint will respect language changes of the user without needing to reconnect.
+
 ## Deleting
 
 To delete events for an user, use a `DELETE` request to `ocs/v2.php/apps/notifications/api/v1/notifications` containing the IDs to delete.
