@@ -80,6 +80,7 @@ The following sections list the changes for unreleased.
    level log to make the admin aware of that.
 
    https://github.com/owncloud/ocis/pull/6605
+   https://github.com/owncloud/ocis/pull/6618
 
 * Enhancement - Add 'ocis decomposedfs check-treesize' command: [#6556](https://github.com/owncloud/ocis/pull/6556)
 
