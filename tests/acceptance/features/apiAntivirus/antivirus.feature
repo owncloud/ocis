@@ -409,7 +409,7 @@ Feature: antivirus
     And for user "Brian" the content of the file "/test.txt" of the space "Shares" should be "hello"
     And the content of file "/test.txt" for user "Alice" should be "hello"
 
-    
+
   Scenario Outline: try to overwrite a file with the virus content in user share
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
@@ -464,3 +464,37 @@ Feature: antivirus
       | Virus found in test.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
     And for user "Brian" the content of the file "/test.txt" of the space "Shares" should be "this is a test file."
     And the content of file "/test.txt" for user "Alice" should be "this is a test file."
+
+
+  Scenario: try to overwrite the .space/readme.md file
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Alice" has created a space "new-space" with the default quota using the GraphApi
+    And user "Alice" has created a folder ".space" in space "new-space"
+    And user "Alice" has uploaded a file inside space "new-space" with content "Here you can add a description for this Space." to ".space/readme.md"
+    And user "Alice" has uploaded a file inside space "new-space" with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" to ".space/readme.md"
+    Then the HTTP status code should be "204"
+    And user "Alice" should get a notification with subject "Virus found" and message:
+      | message                                                                    |
+      | Virus found in readme.md. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And for user "Alice" the content of the file ".space/readme.md" of the space "new-space" should be "Here you can add a description for this Space."
+
+
+  Scenario: try to overwrite the .space/readme.md file in space share
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has created a space "new-space" with the default quota using the GraphApi
+    And user "Alice" has shared a space "new-space" with settings:
+      | shareWith | Brian  |
+      | role      | editor |
+    And user "Alice" has created a folder ".space" in space "new-space"
+    And user "Alice" has uploaded a file inside space "new-space" with content "Here you can add a description for this Space." to ".space/readme.md"
+    And user "Alice" has set the file ".space/readme.md" as a description in a special section of the "new-space" space
+    When user "Brian" uploads a file inside space "new-space" with content "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*" to ".space/readme.md" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And user "Brian" should get a notification with subject "Virus found" and message:
+      | message                                                                    |
+      | Virus found in readme.md. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And for user "Brian" the content of the file ".space/readme.md" of the space "new-space" should be "Here you can add a description for this Space."
+    And for user "Alice" the content of the file ".space/readme.md" of the space "new-space" should be "Here you can add a description for this Space."
