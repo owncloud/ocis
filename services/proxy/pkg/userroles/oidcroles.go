@@ -93,7 +93,7 @@ func (ra oidcRoleAssigner) UpdateUserRoleAssignment(ctx context.Context, user *c
 	}
 	logger.Debug().Interface("assignedRoleIds", assignedRoles).Msg("Currently assigned roles")
 
-	if len(assignedRoles) == 0 || (assignedRoles[0] != roleIDFromClaim) {
+	if len(assignedRoles) != 1 || (assignedRoles[0] != roleIDFromClaim) {
 		logger.Debug().Interface("assignedRoleIds", assignedRoles).Interface("newRoleId", roleIDFromClaim).Msg("Updating role assignment for user")
 		newctx, err := ra.prepareAdminContext()
 		if err != nil {
