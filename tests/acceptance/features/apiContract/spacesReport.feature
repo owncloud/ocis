@@ -1,4 +1,4 @@
-@api
+@api @skipOnStable3.0
 Feature: REPORT request to project space
   As a user
   I want to check the REPORT response of project spaces
