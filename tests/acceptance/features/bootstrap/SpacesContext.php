@@ -205,6 +205,20 @@ class SpacesContext implements Context {
 	}
 
 	/**
+	 * The method finds available spaces to the user and returns the spaceId by spaceName
+	 *
+	 * @param string $user
+	 * @param string $spaceName
+	 *
+	 * @return string
+	 * @throws GuzzleException
+	 */
+	public function getSpaceIdByName(string $user, string $spaceName): string {
+		$space = $this->getSpaceByName($user, $spaceName);
+		return $space["id"];
+	}
+
+	/**
 	 * This method sets space id by Space Name
 	 * This is currently used to set space id from ocis in core so that we can reuse available resource (code) and avoid duplication
 	 *
@@ -378,14 +392,20 @@ class SpacesContext implements Context {
 	public function setUpScenario(BeforeScenarioScope $scope): void {
 		// Get the environment
 		$environment = $scope->getEnvironment();
+		// register new context
+		$this->trashbinContext = new TrashbinContext();
+		$this->webDavPropertiesContext = new WebDavPropertiesContext();
+		$this->favoritesContext = new FavoritesContext();
+		$this->checksumContext = new ChecksumContext();
+		$this->filesVersionsContext = new FilesVersionsContext();
+		$environment->registerContext($this->trashbinContext);
+		$environment->registerContext($this->webDavPropertiesContext);
+		$environment->registerContext($this->favoritesContext);
+		$environment->registerContext($this->checksumContext);
+		$environment->registerContext($this->filesVersionsContext);
 		// Get all the contexts you need in this context
 		$this->featureContext = $environment->getContext('FeatureContext');
 		$this->ocsContext = $environment->getContext('OCSContext');
-		$this->trashbinContext = $environment->getContext('TrashbinContext');
-		$this->webDavPropertiesContext = $environment->getContext('WebDavPropertiesContext');
-		$this->favoritesContext = $environment->getContext('FavoritesContext');
-		$this->checksumContext = $environment->getContext('ChecksumContext');
-		$this->filesVersionsContext = $environment->getContext('FilesVersionsContext');
 		// Run the BeforeScenario function in OCSContext to set it up correctly
 		$this->ocsContext->before($scope);
 		$this->baseUrl = \trim($this->featureContext->getBaseUrl(), "/");
