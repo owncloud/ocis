@@ -5,3 +5,4 @@ This makes no sense as the user is supposed to have only one and the update will
 We still log an error level log to make the admin aware of that.
 
 https://github.com/owncloud/ocis/pull/6605
+https://github.com/owncloud/ocis/pull/6618
