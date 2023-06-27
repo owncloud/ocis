@@ -89,3 +89,22 @@ Feature: full text search
       | old              |
       | new              |
       | spaces           |
+
+
+  Scenario Outline: search restored files using a tag
+    Given using <dav-path-version> DAV path
+    And user "Alice" has uploaded file with content "hello world" to "file1.txt"
+    And user "Alice" has uploaded file with content "Namaste nepal" to "file2.txt"
+    And user "Alice" has created the following tags for file "file1.txt" of the space "Personal":
+      | tag1 |
+    And user "Alice" has deleted file "/file1.txt"
+    And user "Alice" has restored the file with original path "/file1.txt"
+    When user "Alice" searches for "Tags:tag1" using the WebDAV API
+    Then the HTTP status code should be "207"
+    And the search result of user "Alice" should contain only these entries:
+      | /file1.txt |
+    Examples:
+      | dav-path-version |
+      | old              |
+      | new              |
+      | spaces           |
