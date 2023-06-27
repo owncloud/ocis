@@ -432,7 +432,6 @@ func (s *Service) generateRunSet(cfg *ociscfg.Config) {
 	for _, name := range cfg.Runtime.Disabled {
 		delete(runset, name)
 	}
-
 }
 
 // List running processes for the Service Controller.
