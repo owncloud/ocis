@@ -62,9 +62,15 @@ func NewService(opts ...Option) (Service, error) {
 		micro.RegisterTTL(time.Second * 30),
 		micro.RegisterInterval(time.Second * 10),
 		micro.WrapHandler(prometheus.NewHandlerWrapper()),
-		micro.WrapClient(mtracer.NewClientWrapper()),
-		micro.WrapHandler(mtracer.NewHandlerWrapper()),
-		micro.WrapSubscriber(mtracer.NewSubscriberWrapper()),
+		micro.WrapClient(mtracer.NewClientWrapper(
+			mtracer.WithTraceProvider(sopts.TraceProvider),
+		)),
+		micro.WrapHandler(mtracer.NewHandlerWrapper(
+			mtracer.WithTraceProvider(sopts.TraceProvider),
+		)),
+		micro.WrapSubscriber(mtracer.NewSubscriberWrapper(
+			mtracer.WithTraceProvider(sopts.TraceProvider),
+		)),
 	}
 
 	return Service{micro.NewService(mopts...)}, nil

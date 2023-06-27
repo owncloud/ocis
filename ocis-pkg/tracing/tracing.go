@@ -36,6 +36,14 @@ func GetServiceTraceProvider(c ConfigConverter, serviceName string) (trace.Trace
 	return trace.NewNoopTracerProvider(), nil
 }
 
+// GetPropagator gets a configured propagator.
+func GetPropagator() propagation.TextMapPropagator {
+	return propagation.NewCompositeTextMapPropagator(
+		propagation.Baggage{},
+		propagation.TraceContext{},
+	)
+}
+
 // GetTraceProvider returns a configured open-telemetry trace provider.
 func GetTraceProvider(endpoint, collector, serviceName, traceType string) (*sdktrace.TracerProvider, error) {
 	switch t := traceType; t {
