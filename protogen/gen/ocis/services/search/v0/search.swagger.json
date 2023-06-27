@@ -204,6 +204,9 @@
           "items": {
             "type": "string"
           }
+        },
+        "preview": {
+          "type": "string"
         }
       }
     },

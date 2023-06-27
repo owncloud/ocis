@@ -10,23 +10,23 @@ import (
 	"strings"
 	"time"
 
-	"github.com/blevesearch/bleve/v2/analysis/token/porter"
-	"github.com/blevesearch/bleve/v2/analysis/tokenizer/unicode"
-
 	"github.com/blevesearch/bleve/v2"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/custom"
 	"github.com/blevesearch/bleve/v2/analysis/analyzer/keyword"
 	"github.com/blevesearch/bleve/v2/analysis/token/lowercase"
+	"github.com/blevesearch/bleve/v2/analysis/token/porter"
 	"github.com/blevesearch/bleve/v2/analysis/tokenizer/single"
+	"github.com/blevesearch/bleve/v2/analysis/tokenizer/unicode"
 	"github.com/blevesearch/bleve/v2/mapping"
 	"github.com/blevesearch/bleve/v2/search/query"
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // Bleve represents a search engine which utilizes bleve to search and store resources.
@@ -163,40 +163,41 @@ func (b *Bleve) Search(_ context.Context, sir *searchService.SearchIndexRequest)
 
 	matches := make([]*searchMessage.Match, 0, len(res.Hits))
 	for _, hit := range res.Hits {
-		if sir.Ref != nil && !strings.HasPrefix(getValue[string](hit.Fields, "Path"), utils.MakeRelativePath(path.Join(sir.Ref.Path, "/"))) {
+		if sir.Ref != nil && !strings.HasPrefix(getFieldValue[string](hit.Fields, "Path"), utils.MakeRelativePath(path.Join(sir.Ref.Path, "/"))) {
 			continue
 		}
 
-		rootID, err := storagespace.ParseID(getValue[string](hit.Fields, "RootID"))
+		rootID, err := storagespace.ParseID(getFieldValue[string](hit.Fields, "RootID"))
 		if err != nil {
 			return nil, err
 		}
 
-		rID, err := storagespace.ParseID(getValue[string](hit.Fields, "ID"))
+		rID, err := storagespace.ParseID(getFieldValue[string](hit.Fields, "ID"))
 		if err != nil {
 			return nil, err
 		}
 
-		pID, _ := storagespace.ParseID(getValue[string](hit.Fields, "ParentID"))
+		pID, _ := storagespace.ParseID(getFieldValue[string](hit.Fields, "ParentID"))
 		match := &searchMessage.Match{
 			Score: float32(hit.Score),
 			Entity: &searchMessage.Entity{
 				Ref: &searchMessage.Reference{
 					ResourceId: resourceIDtoSearchID(rootID),
-					Path:       getValue[string](hit.Fields, "Path"),
+					Path:       getFieldValue[string](hit.Fields, "Path"),
 				},
 				Id:       resourceIDtoSearchID(rID),
-				Name:     getValue[string](hit.Fields, "Name"),
+				Name:     getFieldValue[string](hit.Fields, "Name"),
 				ParentId: resourceIDtoSearchID(pID),
-				Size:     uint64(getValue[float64](hit.Fields, "Size")),
-				Type:     uint64(getValue[float64](hit.Fields, "Type")),
-				MimeType: getValue[string](hit.Fields, "MimeType"),
-				Deleted:  getValue[bool](hit.Fields, "Deleted"),
-				Tags:     getSliceValue[string](hit.Fields, "Tags"),
+				Size:     uint64(getFieldValue[float64](hit.Fields, "Size")),
+				Type:     uint64(getFieldValue[float64](hit.Fields, "Type")),
+				MimeType: getFieldValue[string](hit.Fields, "MimeType"),
+				Deleted:  getFieldValue[bool](hit.Fields, "Deleted"),
+				Tags:     getFieldSliceValue[string](hit.Fields, "Tags"),
+				Preview:  getFragmentValue(hit.Fragments, "Content", 0),
 			},
 		}
 
-		if mtime, err := time.Parse(time.RFC3339, getValue[string](hit.Fields, "Mtime")); err == nil {
+		if mtime, err := time.Parse(time.RFC3339, getFieldValue[string](hit.Fields, "Mtime")); err == nil {
 			match.Entity.LastModifiedTime = &timestamppb.Timestamp{Seconds: mtime.Unix(), Nanos: int32(mtime.Nanosecond())}
 		}
 
@@ -296,20 +297,20 @@ func (b *Bleve) getResource(id string) (*Resource, error) {
 	fields := res.Hits[0].Fields
 
 	return &Resource{
-		ID:       getValue[string](fields, "ID"),
-		RootID:   getValue[string](fields, "RootID"),
-		Path:     getValue[string](fields, "Path"),
-		ParentID: getValue[string](fields, "ParentID"),
-		Type:     uint64(getValue[float64](fields, "Type")),
-		Deleted:  getValue[bool](fields, "Deleted"),
+		ID:       getFieldValue[string](fields, "ID"),
+		RootID:   getFieldValue[string](fields, "RootID"),
+		Path:     getFieldValue[string](fields, "Path"),
+		ParentID: getFieldValue[string](fields, "ParentID"),
+		Type:     uint64(getFieldValue[float64](fields, "Type")),
+		Deleted:  getFieldValue[bool](fields, "Deleted"),
 		Document: content.Document{
-			Name:     getValue[string](fields, "Name"),
-			Title:    getValue[string](fields, "Title"),
-			Size:     uint64(getValue[float64](fields, "Size")),
-			Mtime:    getValue[string](fields, "Mtime"),
-			MimeType: getValue[string](fields, "MimeType"),
-			Content:  getValue[string](fields, "Content"),
-			Tags:     getSliceValue[string](fields, "Tags"),
+			Name:     getFieldValue[string](fields, "Name"),
+			Title:    getFieldValue[string](fields, "Title"),
+			Size:     uint64(getFieldValue[float64](fields, "Size")),
+			Mtime:    getFieldValue[string](fields, "Mtime"),
+			MimeType: getFieldValue[string](fields, "MimeType"),
+			Content:  getFieldValue[string](fields, "Content"),
+			Tags:     getFieldSliceValue[string](fields, "Tags"),
 		},
 	}, nil
 }

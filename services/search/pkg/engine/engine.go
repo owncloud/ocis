@@ -4,7 +4,9 @@ import (
 	"context"
 	"regexp"
 
+	"github.com/blevesearch/bleve/v2/search"
 	storageProvider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
+
 	searchMessage "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchService "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
@@ -49,7 +51,20 @@ func escapeQuery(s string) string {
 	return queryEscape.ReplaceAllString(s, "\\$1")
 }
 
-func getValue[T any](m map[string]interface{}, key string) (out T) {
+func getFragmentValue(m search.FieldFragmentMap, key string, idx int) string {
+	val, ok := m[key]
+	if !ok {
+		return ""
+	}
+
+	if len(val) <= idx {
+		return ""
+	}
+
+	return val[idx]
+}
+
+func getFieldValue[T any](m map[string]interface{}, key string) (out T) {
 	val, ok := m[key]
 	if !ok {
 		return
@@ -60,8 +75,8 @@ func getValue[T any](m map[string]interface{}, key string) (out T) {
 	return
 }
 
-func getSliceValue[T any](m map[string]interface{}, key string) (out []T) {
-	iv := getValue[interface{}](m, key)
+func getFieldSliceValue[T any](m map[string]interface{}, key string) (out []T) {
+	iv := getFieldValue[interface{}](m, key)
 	add := func(v interface{}) {
 		cv, ok := v.(T)
 		if !ok {
