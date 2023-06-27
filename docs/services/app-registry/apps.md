@@ -493,30 +493,4 @@ App drivers represent apps, if the app is not able to register itself. Currently
 
 The CS3org WOPI server app driver is included in oCIS by default. It needs at least one WOPI compliant app (e.g. Collabora, OnlyOffice or Microsoft Online Server) or a CS3org WOPI bridge supported app (CodiMD or Etherpad) and the CS3org WOPI server.
 
-Here is a closer look at the configuration of the actual app provider in a docker-compose example (see also [full example](https://github.com/owncloud/ocis/blob/master/deployments/examples/ocis_wopi/docker-compose.yml)):
-
-```yaml
-services:
-  ocis:
-    image: owncloud/ocis:latest
-    ...
-    environment:
-      ...
-      GATEWAY_GRPC_ADDR: 0.0.0.0:9142 # make the REVA gateway accessible to the app drivers
-
-  ocis-appdriver-collabora:
-    image: owncloud/ocis:latest
-    command: storage-app-provider server # start only the app driver
-    environment:
-      STORAGE_GATEWAY_ENDPOINT: ocis:9142 # oCIS gateway endpoint
-      APP_PROVIDER_GRPC_ADDR: 0.0.0.0:9164
-      APP_PROVIDER_EXTERNAL_ADDR: ocis-appdriver-collabora:9164 # how oCIS can reach this app driver
-      OCIS_JWT_SECRET: ocis-jwt-secret
-      APP_PROVIDER_DRIVER: wopi
-      APP_PROVIDER_WOPI_DRIVER_APP_NAME: Collabora # will be used as name for this app
-      APP_PROVIDER_WOPI_DRIVER_APP_ICON_URI: https://www.collaboraoffice.com/wp-content/uploads/2019/01/CP-icon.png # will be used as icon for this app
-      APP_PROVIDER_WOPI_DRIVER_APP_URL: https://collabora.owncloud.test # endpoint of collabora
-      APP_PROVIDER_WOPI_DRIVER_INSECURE: false
-      APP_PROVIDER_WOPI_DRIVER_IOP_SECRET: wopi-iop-secret
-      APP_PROVIDER_WOPI_DRIVER_WOPI_URL: https://wopiserver.owncloud.test # endpoint of the CS3org WOPI server
-```
+The configuration of the actual app provider in a docker-compose example can be found in the [full example](https://github.com/owncloud/ocis/blob/master/deployments/examples/ocis_wopi/docker-compose.yml) especially [ocis-appprovider-collabora](https://github.com/owncloud/ocis/blob/563bf34870fec2c544bb00e0ee03133f505d5ea9/deployments/examples/ocis_wopi/docker-compose.yml#L102-L128) and [ocis-appprovider-onlyoffice](https://github.com/owncloud/ocis/blob/563bf34870fec2c544bb00e0ee03133f505d5ea9/deployments/examples/ocis_wopi/docker-compose.yml#L130-L161)
