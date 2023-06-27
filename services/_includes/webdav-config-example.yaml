@@ -42,6 +42,7 @@ http:
     enabled: false
     cert: ""
     key: ""
+disablePreviews: false
 ocis_public_url: https://127.0.0.1:9200
 webdav_namespace: /users/{{.Id.OpaqueId}}
 reva_gateway: com.owncloud.api.gateway

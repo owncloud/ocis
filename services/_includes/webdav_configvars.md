@@ -23,6 +23,7 @@
 | OCIS_HTTP_TLS_ENABLED | bool | false | Activates TLS for the http based services using the server certifcate and key configured via OCIS_HTTP_TLS_CERTIFICATE and OCIS_HTTP_TLS_KEY. If OCIS_HTTP_TLS_CERTIFICATE is not set a temporary server certificate is generated - to be used with PROXY_INSECURE_BACKEND=true.|
 | OCIS_HTTP_TLS_CERTIFICATE | string |  | Path/File name of the TLS server certificate (in PEM format) for the http services.|
 | OCIS_HTTP_TLS_KEY | string |  | Path/File name for the TLS certificate key (in PEM format) for the server certificate to use for the http services.|
+| OCIS_DISABLE_PREVIEWS<br/>WEBDAV_DISABLE_PREVIEWS | bool | false | Set this option to 'true' to disable all preview related webdav paths.|
 | OCIS_URL<br/>OCIS_PUBLIC_URL | string | https://127.0.0.1:9200 | URL, where oCIS is reachable for users.|
 | WEBDAV_WEBDAV_NAMESPACE | string | /users/{{.Id.OpaqueId}} | CS3 path layout to use when forwarding /webdav requests|
 | OCIS_REVA_GATEWAY<br/>REVA_GATEWAY | string | com.owncloud.api.gateway | CS3 gateway used to look up user metadata|
