@@ -115,7 +115,7 @@ func check(c *cli.Context) error {
 	treeSize, err := walkTree(ctx, tree, lu, n, repairFlag)
 	treesizeFromMetadata, err := n.GetTreeSize()
 	if err != nil {
-		fmt.Printf("failed to read treesize of node: %s: %s", n.ID, err)
+		fmt.Printf("failed to read treesize of node: %s: %s\n", n.ID, err)
 	}
 	if treesizeFromMetadata != treeSize {
 		fmt.Printf("Tree sizes mismatch for space: %s\n\tNodeId: %s\n\tInternalPath: %s\n\tcalculated treesize: %d\n\ttreesize in metadata: %d\n",
@@ -145,12 +145,12 @@ func walkTree(ctx context.Context, tree *tree.Tree, lu *lookup.Lookup, root *nod
 		case provider.ResourceType_RESOURCE_TYPE_CONTAINER:
 			subtreesize, err := walkTree(ctx, tree, lu, child, repair)
 			if err != nil {
-				fmt.Printf("error calculating tree size of node: %s: %s", child.ID, err)
+				fmt.Printf("error calculating tree size of node: %s: %s\n", child.ID, err)
 				return 0, err
 			}
 			treesizeFromMetadata, err := child.GetTreeSize()
 			if err != nil {
-				fmt.Printf("failed to read tree size of node: %s: %s", child.ID, err)
+				fmt.Printf("failed to read tree size of node: %s: %s\n", child.ID, err)
 				return 0, err
 			}
 			if treesizeFromMetadata != subtreesize {
@@ -170,7 +170,7 @@ func walkTree(ctx context.Context, tree *tree.Tree, lu *lookup.Lookup, root *nod
 		case provider.ResourceType_RESOURCE_TYPE_FILE:
 			blobsize, err := child.GetBlobSize()
 			if err != nil {
-				fmt.Printf("error reading blobsize of node: %s: %s", child.ID, err)
+				fmt.Printf("error reading blobsize of node: %s: %s\n", child.ID, err)
 				return 0, err
 			}
 			treesize += blobsize
