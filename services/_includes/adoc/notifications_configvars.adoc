@@ -4,7 +4,7 @@
 
 ifeval::[{show-deprecation} == true]
 
-[#deprecation-note-2023-06-27-11-18-35]
+[#deprecation-note-2023-06-27-11-38-54]
 [caption=]
 .Deprecation notes for the notifications service
 [width="100%",cols="~,~,~,~",options="header"]
@@ -319,7 +319,7 @@ a| [subs=-attributes]
 
 a|`OCIS_REVA_GATEWAY` +
 `REVA_GATEWAY` +
-xref:deprecation-note-2023-06-27-11-18-35[Deprecation Note]
+xref:deprecation-note-2023-06-27-11-38-54[Deprecation Note]
 a| [subs=-attributes]
 ++string ++
 a| [subs=-attributes]
