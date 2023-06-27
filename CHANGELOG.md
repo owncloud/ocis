@@ -26,6 +26,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add companion URL config: [#6453](https://github.com/owncloud/ocis/pull/6453)
 * Enhancement - Add imprint and privacy url config: [#6462](https://github.com/owncloud/ocis/pull/6462)
 * Enhancement - Add logged out url config: [#6549](https://github.com/owncloud/ocis/pull/6549)
+* Enhancement - Add search result content preview and term highlighting: [#6634](https://github.com/owncloud/ocis/pull/6634)
 * Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
 * Enhancement - Skip if the simulink is a directory: [#6574](https://github.com/owncloud/ocis/pull/6574)
 * Enhancement - Fix the groupname validation: [#6490](https://github.com/owncloud/ocis/pull/6490)
@@ -209,6 +210,14 @@ The following sections list the changes for unreleased.
    `WEB_OPTION_ACCESS_DENIED_HELP_URL`.
 
    https://github.com/owncloud/ocis/pull/6549
+
+* Enhancement - Add search result content preview and term highlighting: [#6634](https://github.com/owncloud/ocis/pull/6634)
+
+   The search result REPORT response now contains a content preview which highlights the search
+   term. The feature is only available if content extraction (e.g. apache tika) is configured
+
+   https://github.com/owncloud/ocis/issues/6426
+   https://github.com/owncloud/ocis/pull/6634
 
 * Enhancement - Fix envvar defaults: [#6516](https://github.com/owncloud/ocis/pull/6516)
 
