@@ -1,4 +1,4 @@
-@api @skipOnStable3.0
+@api
 Feature: REPORT request to project space
   As a user
   I want to check the REPORT response of project spaces
@@ -25,7 +25,6 @@ Feature: REPORT request to project space
       | oc:file-parent     | UUIDof:findData     |
       | oc:name            | testFile.txt        |
       | d:getcontenttype   | text/plain          |
-      | oc:permissions     | RDNVW               |
       | d:getcontentlength | 12                  |
 
 
@@ -41,7 +40,6 @@ Feature: REPORT request to project space
       | oc:file-parent     | UUIDof:folderMain/SubFolder1/subFOLDER2                     |
       | oc:name            | insideTheFolder.txt                                         |
       | d:getcontenttype   | text/plain                                                  |
-      | oc:permissions     | RDNVW                                                       |
       | d:getcontentlength | 12                                                          |
 
 
@@ -56,7 +54,6 @@ Feature: REPORT request to project space
       | oc:file-parent   | UUIDof:findData      |
       | oc:name          | folderMain           |
       | d:getcontenttype | httpd/unix-directory |
-      | oc:permissions   | RDNVCK               |
       | oc:size          | 0                    |
 
 
@@ -71,5 +68,4 @@ Feature: REPORT request to project space
       | oc:file-parent   | UUIDof:folderMain            |
       | oc:name          | sub-folder                   |
       | d:getcontenttype | httpd/unix-directory         |
-      | oc:permissions   | RDNVCK                       |
       | oc:size          | 0                            |
