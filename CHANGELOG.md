@@ -22,6 +22,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add old & new values to audit logs: [#6537](https://github.com/owncloud/ocis/pull/6537)
 * Enhancement - Update reva: [#6529](https://github.com/owncloud/ocis/pull/6529)
 * Enhancement - Use reva client selectors: [#6452](https://github.com/owncloud/ocis/pull/6452)
+* Enhancement - Thumbnails can be disabled for webdav & web now: [#6577](https://github.com/owncloud/ocis/pull/6577)
 * Enhancement - Add companion URL config: [#6453](https://github.com/owncloud/ocis/pull/6453)
 * Enhancement - Add imprint and privacy url config: [#6462](https://github.com/owncloud/ocis/pull/6462)
 * Enhancement - Add logged out url config: [#6549](https://github.com/owncloud/ocis/pull/6549)
@@ -179,6 +180,15 @@ The following sections list the changes for unreleased.
    https://github.com/owncloud/ocis/pull/6452
    https://github.com/cs3org/reva/pull/3939
    https://github.com/cs3org/reva/pull/3953
+
+* Enhancement - Thumbnails can be disabled for webdav & web now: [#6577](https://github.com/owncloud/ocis/pull/6577)
+
+   We added an env var `OCIS_DISABLE_PREVIEWS` to disable the thumbnails for web & webdav via a
+   global setting. For each service this behaviour can be disabled using the local env vars
+   `WEB_OPTION_DISABLE_PREVIEWS` (old) and `WEBDAV_DISABLE_PREVIEWS` (new).
+
+   https://github.com/owncloud/ocis/issues/192
+   https://github.com/owncloud/ocis/pull/6577
 
 * Enhancement - Add companion URL config: [#6453](https://github.com/owncloud/ocis/pull/6453)
 
