@@ -2782,7 +2782,6 @@ trait Sharing {
 		$this->setLastPublicShareData($this->getResponseXml(null, __METHOD__));
 		foreach ($bodyRows as $field => $value) {
 			if (\in_array($field, $userRelatedFieldNames)) {
-				$value = $this->substituteInLineCodes($value, $user);
 				$value = $this->substituteInLineCodes(
 					$value,
 					$user,
