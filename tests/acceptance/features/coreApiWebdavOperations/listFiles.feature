@@ -77,21 +77,7 @@ Feature: list files
   Scenario Outline: get the list of resources in the root folder with depth infinity
     Given using <dav_version> DAV path
     When user "Alice" lists the resources in "/" with depth "infinity" using the WebDAV API
-    Then the HTTP status code should be "207"
-    And the last DAV response for user "Alice" should contain these nodes
-      | name                                                      |
-      | textfile0.txt                                             |
-      | welcome.txt                                               |
-      | simple-folder/                                            |
-      | simple-folder/textfile0.txt                               |
-      | simple-folder/welcome.txt                                 |
-      | simple-folder/simple-empty-folder/                        |
-      | simple-folder/simple-folder1/                             |
-      | simple-folder/simple-folder1/simple-folder2               |
-      | simple-folder/simple-folder1/textfile0.txt                |
-      | simple-folder/simple-folder1/welcome.txt                  |
-      | simple-folder/simple-folder1/simple-folder2/textfile0.txt |
-      | simple-folder/simple-folder1/simple-folder2/welcome.txt   |
+    Then the HTTP status code should be "400"
     Examples:
       | dav_version |
       | old         |
@@ -158,17 +144,7 @@ Feature: list files
   Scenario Outline: get the list of resources in a folder with depth infinity
     Given using <dav_version> DAV path
     When user "Alice" lists the resources in "/simple-folder" with depth "infinity" using the WebDAV API
-    Then the HTTP status code should be "207"
-    And the last DAV response for user "Alice" should contain these nodes
-      | name                                                      |
-      | /simple-folder/textfile0.txt                              |
-      | /simple-folder/welcome.txt                                |
-      | /simple-folder/simple-folder1/                            |
-      | simple-folder/simple-folder1/simple-folder2               |
-      | simple-folder/simple-folder1/textfile0.txt                |
-      | simple-folder/simple-folder1/welcome.txt                  |
-      | simple-folder/simple-folder1/simple-folder2/textfile0.txt |
-      | simple-folder/simple-folder1/simple-folder2/welcome.txt   |
+    Then the HTTP status code should be "400"
     Examples:
       | dav_version |
       | old         |

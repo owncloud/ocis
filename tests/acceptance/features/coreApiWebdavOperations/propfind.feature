@@ -28,12 +28,12 @@ Feature: PROPFIND
     Examples:
       | dav_path                    | depth    | http_status |
       | /remote.php/dav/files/alice | 0        | 207         |
-      | /remote.php/dav/files/alice | infinity | 207         |
+      | /remote.php/dav/files/alice | infinity | 400         |
     @skipOnRevaMaster
     Examples:
       | dav_path                         | depth    | http_status |
       | /remote.php/dav/spaces/%spaceid% | 0        | 207         |
-      | /remote.php/dav/spaces/%spaceid% | infinity | 207         |
+      | /remote.php/dav/spaces/%spaceid% | infinity | 400        |
 
 
   Scenario: send PROPFIND request to a public link
