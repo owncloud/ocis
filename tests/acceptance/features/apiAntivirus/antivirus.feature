@@ -498,3 +498,21 @@ Feature: antivirus
       | Virus found in readme.md. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
     And for user "Brian" the content of the file ".space/readme.md" of the space "new-space" should be "Here you can add a description for this Space."
     And for user "Alice" the content of the file ".space/readme.md" of the space "new-space" should be "Here you can add a description for this Space."
+
+
+  Scenario: member of a project space tries to overwrite a file with virus content
+    Given using spaces DAV path
+    And the administrator has assigned the role "Space Admin" to user "Alice" using the Graph API
+    And user "Brian" has been created with default attributes and without skeleton files
+    And user "Alice" has created a space "new-space" with the default quota using the GraphApi
+    And user "Alice" has shared a space "new-space" with settings:
+      | shareWith | Brian  |
+      | role      | editor |
+    And user "Alice" has uploaded a file inside space "new-space" with content "hello world" to "text.txt"
+    When user "Brian" uploads a file "filesForUpload/filesWithVirus/eicar.com" to "text.txt" in space "new-space" using the WebDAV API
+    Then the HTTP status code should be "204"
+    And user "Brian" should get a notification with subject "Virus found" and message:
+      | message                                                                   |
+      | Virus found in text.txt. Upload not possible. Virus: Win.Test.EICAR_HDB-1 |
+    And for user "Brian" the content of the file "/text.txt" of the space "new-space" should be "hello world"
+    And for user "Alice" the content of the file "/text.txt" of the space "new-space" should be "hello world"
