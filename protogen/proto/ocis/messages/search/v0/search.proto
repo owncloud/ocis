@@ -31,7 +31,7 @@ message Entity {
 	string shareRootName = 11;
 	ResourceID parent_id = 12;
 	repeated string tags = 13;
-	string preview = 14;
+	string highlights = 14;
 }
 
 message Match {

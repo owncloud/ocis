@@ -190,7 +190,7 @@ func matchToPropResponse(ctx context.Context, match *searchmsg.Match) (*propfind
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getlastmodified", match.Entity.LastModifiedTime.AsTime().Format(time.RFC3339)))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("d:getcontenttype", match.Entity.MimeType))
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:permissions", match.Entity.Permissions))
-	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:preview", match.Entity.Preview))
+	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:highlights", match.Entity.Highlights))
 
 	t := tags.New(match.Entity.Tags...)
 	propstatOK.Prop = append(propstatOK.Prop, prop.Escaped("oc:tags", t.AsList()))

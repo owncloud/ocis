@@ -10,6 +10,7 @@ import (
 	sprovider "github.com/cs3org/go-cs3apis/cs3/storage/provider/v1beta1"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
 	searchsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/search/v0"
 	"github.com/owncloud/ocis/v2/services/search/pkg/content"
@@ -241,6 +242,34 @@ var _ = Describe("Bleve", func() {
 					}
 				})
 			})
+		})
+
+		Context("Highlights", func() {
+
+			It("highlights only for content searches", func() {
+				parentResource.Document.Name = "baz.pdf"
+				parentResource.Document.Content = "foo bar baz"
+				err := eng.Upsert(parentResource.ID, parentResource)
+				Expect(err).ToNot(HaveOccurred())
+
+				res, err := doSearch(rootResource.ID, "Name:baz*")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res.TotalMatches).To(Equal(int32(1)))
+				Expect(res.Matches[0].Entity.Highlights).To(Equal(""))
+			})
+
+			It("highlights search terms", func() {
+				parentResource.Document.Name = "baz.pdf"
+				parentResource.Document.Content = "foo bar baz"
+				err := eng.Upsert(parentResource.ID, parentResource)
+				Expect(err).ToNot(HaveOccurred())
+
+				res, err := doSearch(rootResource.ID, "Content:bar")
+				Expect(err).ToNot(HaveOccurred())
+				Expect(res.TotalMatches).To(Equal(int32(1)))
+				Expect(res.Matches[0].Entity.Highlights).To(Equal("foo <mark>bar</mark> baz"))
+			})
+
 		})
 	})
 
