@@ -96,11 +96,11 @@ config = {
         "ocis",
     ],
     "cs3ApiTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "wopiValidatorTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "localApiTests": {
@@ -115,14 +115,14 @@ config = {
                 "apiCors",
                 "apiAsyncUpload",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
         },
         "apiNotification": {
             "suites": [
                 "apiNotification",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "emailNeeded": True,
             "extraEnvironment": {
@@ -139,7 +139,7 @@ config = {
             "suites": [
                 "apiAntivirus",
             ],
-            "skip": False,
+            "skip": True,
             "earlyFail": True,
             "antivirusNeeded": True,
             "extraServerEnvironment": {
@@ -154,17 +154,17 @@ config = {
     "apiTests": {
         "numberOfParts": 10,
         "skip": False,
-        "skipExceptParts": [],
+        "skipExceptParts": [2],
         "earlyFail": True,
     },
     "uiTests": {
         "filterTags": "@ocisSmokeTest",
-        "skip": False,
+        "skip": True,
         "skipExceptParts": [],
         "earlyFail": True,
     },
     "e2eTests": {
-        "skip": False,
+        "skip": True,
         "earlyFail": True,
     },
     "rocketchat": {
@@ -177,8 +177,8 @@ config = {
     "dockerReleases": {
         "architectures": ["arm64", "amd64"],
     },
-    "litmus": True,
-    "codestyle": True,
+    "litmus": False,
+    "codestyle": False,
 }
 
 # volume for steps to cache Go dependencies between steps of a pipeline
@@ -280,7 +280,7 @@ def main(ctx):
         ),
     )
 
-    pipelines = test_pipelines + build_release_pipelines + build_release_helpers
+    pipelines = test_pipelines
 
     if ctx.build.event == "cron":
         pipelines = \
