@@ -1184,7 +1184,13 @@ trait WebDav {
 	public function contentOfFileForUserShouldBe(string $fileName, string $user, string $content):void {
 		$user = $this->getActualUsername($user);
 		$this->downloadFileAsUserUsingPassword($user, $fileName);
-		$this->downloadedContentShouldBe($content);
+		$actualStatus = $this->response->getStatusCode();
+		if ($actualStatus !== 200) {
+			throw new Exception(
+				"Expected status code to be '200', but got '$actualStatus'"
+			);
+		}
+		$this->checkDownloadedContentMatches($content);
 	}
 
 	/**
