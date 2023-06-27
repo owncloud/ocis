@@ -1,8 +1,8 @@
-@api 
+@api
 Feature: change shared resource
-  As a user 
+  As a user
   I want to change the shared resource
-  So that I can organize them as per my necessity 
+  So that I can organize them as per my necessity
 
   Background:
     Given using spaces DAV path
@@ -30,8 +30,9 @@ Feature: change shared resource
       | from_alice.txt |
 
 
-  Scenario: overwrite a received file share
-    Given user "Alice" has uploaded file with content "old content version 1" to "/textfile1.txt"
+  Scenario Outline: overwrite a received file share
+    Given the administrator has assigned the role "<userRole>" to user "Brian" using the Graph API
+    And user "Alice" has uploaded file with content "old content version 1" to "/textfile1.txt"
     And user "Alice" has uploaded file with content "old content version 2" to "/textfile1.txt"
     And user "Alice" has shared file "/textfile1.txt" with user "Brian"
     And user "Brian" has accepted share "/textfile1.txt" offered by user "Alice"
@@ -49,3 +50,9 @@ Feature: change shared resource
     And the downloaded content should be "old content version 2"
     When user "Brian" tries to get version of the file "/textfile1.txt" with the index "1" of the space "Shares" using the WebDAV API
     Then the HTTP status code should be "403"
+    Examples:
+      | userRole    |
+      | Admin       |
+      | Space Admin |
+      | User        |
+      | User Light  |
