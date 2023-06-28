@@ -1184,7 +1184,13 @@ trait WebDav {
 	public function contentOfFileForUserShouldBe(string $fileName, string $user, string $content):void {
 		$user = $this->getActualUsername($user);
 		$this->downloadFileAsUserUsingPassword($user, $fileName);
-		$this->downloadedContentShouldBe($content);
+		$actualStatus = $this->response->getStatusCode();
+		if ($actualStatus !== 200) {
+			throw new Exception(
+				"Expected status code to be '200', but got '$actualStatus'"
+			);
+		}
+		$this->checkDownloadedContentMatches($content);
 	}
 
 	/**
@@ -3709,38 +3715,6 @@ trait WebDav {
 	/**
 	 * Old style chunking upload
 	 *
-	 * @Given user :user has uploaded the following :total chunks to :file with old chunking
-	 *
-	 * @param string $user
-	 * @param string $total
-	 * @param string $file
-	 * @param TableNode $chunkDetails table of 2 columns, chunk number and chunk
-	 *                                content with following headings, e.g.
-	 *                                | number | content                 |
-	 *                                | 1      | first data              |
-	 *                                | 2      | followed by second data |
-	 *                                Chunks may be numbered out-of-order if desired.
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasUploadedTheFollowingTotalChunksUsingOldChunking(
-		string $user,
-		string $total,
-		string $file,
-		TableNode $chunkDetails
-	):void {
-		$this->verifyTableNodeColumns($chunkDetails, ['number', 'content']);
-		foreach ($chunkDetails->getHash() as $chunkDetail) {
-			$chunkNumber = (int) $chunkDetail['number'];
-			$chunkContent = $chunkDetail['content'];
-			$this->userHasUploadedChunkedFile($user, $chunkNumber, (int) $total, $chunkContent, $file);
-		}
-	}
-
-	/**
-	 * Old style chunking upload
-	 *
 	 * @When user :user uploads the following chunks to :file with old chunking and using the WebDAV API
 	 *
 	 * @param string $user
@@ -3762,37 +3736,6 @@ trait WebDav {
 	):void {
 		$total = \count($chunkDetails->getHash());
 		$this->userUploadsTheFollowingTotalChunksUsingOldChunking(
-			$user,
-			(string) $total,
-			$file,
-			$chunkDetails
-		);
-	}
-
-	/**
-	 * Old style chunking upload
-	 *
-	 * @Given user :user has uploaded the following chunks to :file with old chunking
-	 *
-	 * @param string $user
-	 * @param string $file
-	 * @param TableNode $chunkDetails table of 2 columns, chunk number and chunk
-	 *                                content with headings, e.g.
-	 *                                | number | content                 |
-	 *                                | 1      | first data              |
-	 *                                | 2      | followed by second data |
-	 *                                Chunks may be numbered out-of-order if desired.
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function userHasUploadedTheFollowingChunksUsingOldChunking(
-		string $user,
-		string $file,
-		TableNode $chunkDetails
-	):void {
-		$total = \count($chunkDetails->getRows());
-		$this->userHasUploadedTheFollowingTotalChunksUsingOldChunking(
 			$user,
 			(string) $total,
 			$file,
