@@ -13,6 +13,7 @@ import (
 	ctxpkg "github.com/cs3org/reva/v2/pkg/ctx"
 	"github.com/cs3org/reva/v2/pkg/errtypes"
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
+	"github.com/cs3org/reva/v2/pkg/storagespace"
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	searchmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/search/v0"
@@ -154,4 +155,32 @@ func convertToWebDAVPermissions(isShared, isMountpoint, isDir bool, p *provider.
 		fmt.Fprintf(&b, "CK")
 	}
 	return b.String()
+}
+
+func extractScope(path string) (*searchmsg.Reference, error) {
+	ref, err := storagespace.ParseReference(path)
+	if err != nil {
+		return nil, err
+	}
+	return &searchmsg.Reference{
+		ResourceId: &searchmsg.ResourceID{
+			StorageId: ref.ResourceId.StorageId,
+			SpaceId:   ref.ResourceId.SpaceId,
+			OpaqueId:  ref.ResourceId.OpaqueId,
+		},
+		Path: ref.GetPath(),
+	}, nil
+}
+
+// ParseScope extract a scope value from the query string
+func ParseScope(query string) (search, scope string) {
+	match := scopeRegex.FindStringSubmatch(query)
+	if len(match) >= 2 {
+		cut := match[0]
+		scope = strings.TrimSpace(match[1])
+		search = strings.TrimSpace(strings.ReplaceAll(query, cut, ""))
+		return
+	}
+	search = query
+	return
 }
