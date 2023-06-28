@@ -32,19 +32,22 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	conv := NewConverter(r.Header.Get(HeaderAcceptLanguage), ul.gatewaySelector, ul.cfg.MachineAuthAPIKey, ul.cfg.Service.Name, ul.cfg.TranslationPath)
+	conv := ul.getConverter(r.Header.Get(HeaderAcceptLanguage))
 
 	resp := GetEventResponseOC10{}
 	for _, e := range evs {
 		etype, ok := ul.registeredEvents[e.Type]
 		if !ok {
-			// this should not happen
+			ul.log.Error().Str("eventid", e.Id).Str("eventtype", e.Type).Msg("event not registered")
+			continue
 		}
 
 		einterface, err := etype.Unmarshal(e.Event)
 		if err != nil {
-			// this shouldn't happen either
+			ul.log.Error().Str("eventid", e.Id).Str("eventtype", e.Type).Msg("failed to umarshal event")
+			continue
 		}
+
 		noti, err := conv.ConvertEvent(e.Id, einterface)
 		if err != nil {
 			ul.log.Error().Err(err).Str("eventid", e.Id).Str("eventtype", e.Type).Msg("failed to convert event")
@@ -63,12 +66,14 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 func (ul *UserlogService) HandleSSE(w http.ResponseWriter, r *http.Request) {
 	u, ok := ctx.ContextGetUser(r.Context())
 	if !ok {
+		ul.log.Error().Msg("sse: no user in context")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	uid := u.GetId().GetOpaqueId()
 	if uid == "" {
+		ul.log.Error().Msg("sse: user in context is broken")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

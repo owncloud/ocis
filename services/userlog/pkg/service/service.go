@@ -30,8 +30,6 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-var _defaultLocale = "en"
-
 // UserlogService is the service responsible for user activities
 type UserlogService struct {
 	log              log.Logger
@@ -232,14 +230,27 @@ func (ul *UserlogService) DeleteEvents(userid string, evids []string) error {
 }
 
 func (ul *UserlogService) addEventToUser(userid string, event events.Event) error {
-	loc := getUserLang(context.Background(), userid, ul.valueClient)
-	ev, _ := NewConverter(loc, ul.gatewaySelector, ul.cfg.MachineAuthAPIKey, ul.cfg.Service.Name, ul.cfg.TranslationPath).ConvertEvent(event.ID, event.Event)
-	b, _ := json.Marshal(ev)
-
-	ul.sse.Publish(userid, &sse.Event{Data: b})
+	if err := ul.sendSSE(userid, event); err != nil {
+		ul.log.Error().Err(err).Str("userid", userid).Str("eventid", event.ID).Msg("cannot create sse event")
+	}
 	return ul.alterUserEventList(userid, func(ids []string) []string {
 		return append(ids, event.ID)
 	})
+}
+
+func (ul *UserlogService) sendSSE(userid string, event events.Event) error {
+	ev, err := ul.getConverter(ul.getUserLocale(userid)).ConvertEvent(event.ID, event.Event)
+	if err != nil {
+		return err
+	}
+
+	b, err := json.Marshal(ev)
+	if err != nil {
+		return err
+	}
+
+	ul.sse.Publish(userid, &sse.Event{Data: b})
+	return nil
 }
 
 func (ul *UserlogService) removeExpiredEvents(userid string, all []string, received []*ehmsg.Event) error {
@@ -412,6 +423,29 @@ func (ul *UserlogService) impersonate(uid *user.UserId) context.Context {
 	return ctx
 }
 
+func (ul *UserlogService) getUserLocale(userid string) string {
+	resp, err := ul.valueClient.GetValueByUniqueIdentifiers(
+		micrometadata.Set(context.Background(), middleware.AccountID, userid),
+		&settingssvc.GetValueByUniqueIdentifiersRequest{
+			AccountUuid: userid,
+			SettingId:   defaults.SettingUUIDProfileLanguage,
+		},
+	)
+	if err != nil {
+		ul.log.Error().Err(err).Str("userid", userid).Msg("cannot get users locale")
+		return ""
+	}
+	val := resp.GetValue().GetValue().GetListValue().GetValues()
+	if len(val) == 0 {
+		return ""
+	}
+	return val[0].GetStringValue()
+}
+
+func (ul *UserlogService) getConverter(locale string) *Converter {
+	return NewConverter(locale, ul.gatewaySelector, ul.cfg.MachineAuthAPIKey, ul.cfg.Service.Name, ul.cfg.TranslationPath)
+}
+
 func authenticate(usr *user.User, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], machineAuthAPIKey string) (context.Context, error) {
 	gatewayClient, err := gatewaySelector.Next()
 	if err != nil {
@@ -549,20 +583,4 @@ func editor(perms *storageprovider.ResourcePermissions) bool {
 
 func manager(perms *storageprovider.ResourcePermissions) bool {
 	return perms.DenyGrant
-}
-
-func getUserLang(ctx context.Context, userid string, vs settingssvc.ValueService) string {
-	granteeCtx := micrometadata.Set(ctx, middleware.AccountID, userid)
-	if resp, err := vs.GetValueByUniqueIdentifiers(granteeCtx,
-		&settingssvc.GetValueByUniqueIdentifiersRequest{
-			AccountUuid: userid,
-			SettingId:   defaults.SettingUUIDProfileLanguage,
-		},
-	); err == nil {
-		val := resp.GetValue().GetValue().GetListValue().GetValues()
-		if len(val) > 0 && val[0] != nil {
-			return val[0].GetStringValue()
-		}
-	}
-	return _defaultLocale
 }
