@@ -69,7 +69,7 @@ require (
 	github.com/prometheus/client_golang v1.15.1
 	github.com/riandyrn/otelchi v0.5.1
 	github.com/rogpeppe/go-internal v1.10.0
-	github.com/rs/zerolog v1.29.0
+	github.com/rs/zerolog v1.29.1
 	github.com/shamaton/msgpack/v2 v2.1.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.7.0
