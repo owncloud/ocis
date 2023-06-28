@@ -28,6 +28,7 @@ func Server(opts ...Option) grpc.Service {
 		grpc.Namespace(options.Config.GRPC.Namespace),
 		grpc.Context(options.Context),
 		grpc.Flags(options.Flags...),
+		grpc.TraceProvider(options.TraceProvider),
 	)
 	if err != nil {
 		options.Logger.Fatal().Err(err).Msg("Error creating settings service")

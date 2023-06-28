@@ -7,6 +7,7 @@ import (
 	"github.com/oklog/run"
 	"github.com/owncloud/ocis/v2/ocis-pkg/config/configlog"
 	ogrpc "github.com/owncloud/ocis/v2/ocis-pkg/service/grpc"
+	"github.com/owncloud/ocis/v2/ocis-pkg/tracing"
 	"github.com/owncloud/ocis/v2/ocis-pkg/version"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/config/parser"
@@ -16,7 +17,6 @@ import (
 	"github.com/owncloud/ocis/v2/services/settings/pkg/server/grpc"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/server/http"
 	svc "github.com/owncloud/ocis/v2/services/settings/pkg/service/v0"
-	"github.com/owncloud/ocis/v2/services/settings/pkg/tracing"
 	"github.com/urfave/cli/v2"
 )
 
@@ -31,11 +31,13 @@ func Server(cfg *config.Config) *cli.Command {
 		},
 		Action: func(c *cli.Context) error {
 			logger := logging.Configure(cfg.Service.Name, cfg.Log)
-			err := tracing.Configure(cfg)
+			tracingProvider, err := tracing.GetServiceTraceProvider(cfg.Tracing, cfg.Service.Name)
 			if err != nil {
 				return err
 			}
-			err = ogrpc.Configure(ogrpc.GetClientOptions(cfg.GRPCClientTLS)...)
+			err = ogrpc.Configure(
+				append(ogrpc.GetClientOptions(cfg.GRPCClientTLS), ogrpc.WithTraceProvider(tracingProvider))...,
+			)
 			if err != nil {
 				return err
 			}
@@ -62,6 +64,7 @@ func Server(cfg *config.Config) *cli.Command {
 				http.Config(cfg),
 				http.Metrics(mtrcs),
 				http.ServiceHandler(handle),
+				http.TraceProvider(tracingProvider),
 			)
 			if err != nil {
 				logger.Error().
@@ -82,6 +85,7 @@ func Server(cfg *config.Config) *cli.Command {
 				grpc.Config(cfg),
 				grpc.Metrics(mtrcs),
 				grpc.ServiceHandler(handle),
+				grpc.TraceProvider(tracingProvider),
 			)
 			servers.Add(grpcServer.Run, func(_ error) {
 				logger.Info().Str("server", "grpc").Msg("Shutting down server")
