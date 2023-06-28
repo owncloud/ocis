@@ -1459,96 +1459,6 @@ trait Provisioning {
 	}
 
 	/**
-	 * @When /^the groupadmin "([^"]*)" sends a user creation request for user "([^"]*)" password "([^"]*)" group "([^"]*)" using the provisioning API$/
-	 *
-	 * @param string $groupadmin
-	 * @param string $userToCreate
-	 * @param string $password
-	 * @param string $group
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theGroupAdminCreatesUserPasswordGroupUsingTheProvisioningApi(
-		string $groupadmin,
-		string $userToCreate,
-		string $password,
-		string $group
-	):void {
-		$userToCreate = $this->getActualUsername($userToCreate);
-		$password = $this->getActualPassword($password);
-		$email = $userToCreate . '@owncloud.com';
-		$bodyTable = new TableNode(
-			[
-				['userid', $userToCreate],
-				['password', $userToCreate],
-				['username', $userToCreate],
-				['email', $email],
-				['groups[]', $group],
-			]
-		);
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
-			$groupadmin,
-			"POST",
-			"/cloud/users",
-			$bodyTable
-		);
-		$this->addUserToCreatedUsersList(
-			$userToCreate,
-			$password,
-			null,
-			$email,
-			null,
-			$this->theHTTPStatusCodeWasSuccess()
-		);
-		$this->manuallyAddSkeletonFilesForUser($userToCreate, $password);
-	}
-
-	/**
-	 * @When /^the groupadmin "([^"]*)" tries to create new user "([^"]*)" password "([^"]*)" in other group "([^"]*)" using the provisioning API$/
-	 *
-	 * @param string $groupadmin
-	 * @param string $userToCreate
-	 * @param string|null $password
-	 * @param string $group
-	 *
-	 * @return void
-	 */
-	public function theGroupAdminCreatesUserPasswordInOtherGroupUsingTheProvisioningApi(
-		string $groupadmin,
-		string $userToCreate,
-		?string $password,
-		string $group
-	):void {
-		$userToCreate = $this->getActualUsername($userToCreate);
-		$password = $this->getActualPassword($password);
-		$email = $userToCreate . '@owncloud.com';
-		$bodyTable = new TableNode(
-			[
-				['userid', $userToCreate],
-				['password', $userToCreate],
-				['username', $userToCreate],
-				['email', $email],
-				['groups[]', $group],
-			]
-		);
-		$this->ocsContext->userSendsHTTPMethodToOcsApiEndpointWithBody(
-			$groupadmin,
-			"POST",
-			"/cloud/users",
-			$bodyTable
-		);
-		$this->addUserToCreatedUsersList(
-			$userToCreate,
-			$password,
-			null,
-			$email,
-			null,
-			$this->theHTTPStatusCodeWasSuccess()
-		);
-	}
-
-	/**
 	 * @param string $username
 	 * @param string|null $password
 	 *
@@ -2421,25 +2331,6 @@ trait Provisioning {
 	}
 
 	/**
-	 * @Given /^the administrator has retrieved the information of user "([^"]*)"$/
-	 *
-	 * @param string $user
-	 *
-	 * @return void
-	 * @throws JsonException
-	 */
-	public function adminHasRetrievedTheInformationOfUserUsingTheProvisioningApi(
-		string $user
-	):void {
-		if (OcisHelper::isTestingWithGraphApi()) {
-			$this->graphContext->adminHasRetrievedUserUsingTheGraphApi($user);
-		} else {
-			$this->retrieveUserInformationAsAdminUsingProvisioningApi($user);
-			$this->theHTTPStatusCodeShouldBeSuccess();
-		}
-	}
-
-	/**
 	 * @param string $requestingUser
 	 * @param string $targetUser
 	 *
@@ -2478,33 +2369,6 @@ trait Provisioning {
 			$requestingUser,
 			$targetUser
 		);
-	}
-
-	/**
-	 * @Given /^user "([^"]*)" has retrieved the information of user "([^"]*)"$/
-	 *
-	 * @param string $requestingUser
-	 * @param string $targetUser
-	 *
-	 * @return void
-	 * @throws JsonException
-	 */
-	public function userHasRetrievedTheInformationOfUserUsingTheProvisioningApi(
-		string $requestingUser,
-		string $targetUser
-	):void {
-		if (OcisHelper::isTestingWithGraphApi()) {
-			$this->graphContext->userHasRetrievedUserUsingTheGraphApi(
-				$requestingUser,
-				$targetUser
-			);
-		} else {
-			$this->userRetrieveUserInformationUsingProvisioningApi(
-				$requestingUser,
-				$targetUser
-			);
-			$this->theHTTPStatusCodeShouldBeSuccess();
-		}
 	}
 
 	/**

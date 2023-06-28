@@ -673,12 +673,7 @@ class WebDavPropertiesContext implements Context {
 				__METHOD__
 			);
 		}
-		$xmlPart = $resXml->xpath($xpath);
-		Assert::assertTrue(
-			isset($xmlPart[0]),
-			"Cannot find item with xpath \"$xpath\""
-		);
-		$value = $xmlPart[0]->__toString();
+		$value = $this->getXmlItemByXpath($resXml, $xpath);
 		$user = $this->featureContext->getActualUsername($user);
 		$expectedValue = $this->featureContext->substituteInLineCodes(
 			$expectedValue,
@@ -718,12 +713,7 @@ class WebDavPropertiesContext implements Context {
 				__METHOD__
 			);
 		}
-		$xmlPart = $resXml->xpath($xpath);
-		Assert::assertTrue(
-			isset($xmlPart[0]),
-			"Cannot find item with xpath \"$xpath\""
-		);
-		$value = $xmlPart[0]->__toString();
+		$value = $this->getXmlItemByXpath($resXml, $xpath);
 		$user = $this->featureContext->getActualUsername($user);
 		$expectedValue1 = $this->featureContext->substituteInLineCodes(
 			$expectedValue1,
@@ -742,6 +732,25 @@ class WebDavPropertiesContext implements Context {
 		$expectedValues = [$expectedValue1, $expectedValue2];
 		$isExpectedValueInMessage = \in_array($value, $expectedValues);
 		Assert::assertTrue($isExpectedValueInMessage, "The actual value \"$value\" is not one of the expected values: \"$expectedValue1\" or \"$expectedValue2\"");
+	}
+
+	/**
+	 * @param <type> $xmlResponse
+	 * @param string $xpath
+	 *
+	 * @return string
+	 * @throws Exception
+	 */
+	public function getXmlItemByXpath(
+		SimpleXMLElement $xmlResponse,
+		string $xpath
+	): string {
+		$xmlPart = $xmlResponse->xpath($xpath);
+		Assert::assertTrue(
+			isset($xmlPart[0]),
+			"Cannot find item with xpath \"$xpath\""
+		);
+		return $xmlPart[0]->__toString();
 	}
 
 	/**
@@ -1285,28 +1294,6 @@ class WebDavPropertiesContext implements Context {
 	}
 
 	/**
-	 * @Then the etag of element :path of user :user should not have changed
-	 *
-	 * @param string $path
-	 * @param string $user
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function etagOfElementOfUserShouldNotHaveChanged(string $path, string $user):void {
-		$user = $this->featureContext->getActualUsername($user);
-		$actualEtag = $this->getCurrentEtagOfElement($path, $user);
-		$storedEtag = $this->getStoredEtagOfElement($path, $user, __METHOD__);
-		Assert::assertEquals(
-			$storedEtag,
-			$actualEtag,
-			__METHOD__
-			. " The etag of element '$path' of user '$user' was not expected to change."
-			. " The stored etag was '$storedEtag' but got '$actualEtag' from the response"
-		);
-	}
-
-	/**
 	 * @Then these etags should have changed:
 	 *
 	 * @param TableNode $etagTable
@@ -1335,65 +1322,36 @@ class WebDavPropertiesContext implements Context {
 	}
 
 	/**
-	 * @Then the etag of element :path of user :user should have changed
+	 * @Then /^the etag of element "([^"]*)" of user "([^"]*)" (should|should not) have changed$/
 	 *
 	 * @param string $path
 	 * @param string $user
+	 * @param string $shouldShouldNot
 	 *
 	 * @return void
 	 * @throws Exception
 	 */
-	public function etagOfElementOfUserShouldHaveChanged(string $path, string $user):void {
+	public function etagOfElementOfUserShouldOrShouldNotHaveChanged(string $path, string $user, string $shouldShouldNot):void {
 		$user = $this->featureContext->getActualUsername($user);
 		$actualEtag = $this->getCurrentEtagOfElement($path, $user);
 		$storedEtag = $this->getStoredEtagOfElement($path, $user, __METHOD__);
-		Assert::assertNotEquals(
-			$storedEtag,
-			$actualEtag,
-			__METHOD__
-			. " The etag of element '$path' of user '$user' was expected to change."
-			. " The stored etag was '$storedEtag' and also got '$actualEtag' from the response"
-		);
-	}
-
-	/**
-	 * @Then the etag of element :path of user :user on server :server should have changed
-	 *
-	 * @param string $path
-	 * @param string $user
-	 * @param string $server
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theEtagOfElementOfUserOnServerShouldHaveChanged(
-		string $path,
-		string $user,
-		string $server
-	):void {
-		$previousServer = $this->featureContext->usingServer($server);
-		$this->etagOfElementOfUserShouldHaveChanged($path, $user);
-		$this->featureContext->usingServer($previousServer);
-	}
-
-	/**
-	 * @Then the etag of element :path of user :user on server :server should not have changed
-	 *
-	 * @param string $path
-	 * @param string $user
-	 * @param string $server
-	 *
-	 * @return void
-	 * @throws Exception
-	 */
-	public function theEtagOfElementOfUserOnServerShouldNotHaveChanged(
-		string $path,
-		string $user,
-		string $server
-	):void {
-		$previousServer = $this->featureContext->usingServer($server);
-		$this->etagOfElementOfUserShouldNotHaveChanged($path, $user);
-		$this->featureContext->usingServer($previousServer);
+		if ($shouldShouldNot === 'should not') {
+			Assert::assertEquals(
+				$storedEtag,
+				$actualEtag,
+				__METHOD__
+				. " The etag of element '$path' of user '$user' was not expected to change."
+				. " The stored etag was '$storedEtag' but got '$actualEtag' from the response"
+			);
+		} else {
+			Assert::assertNotEquals(
+				$storedEtag,
+				$actualEtag,
+				__METHOD__
+				. " The etag of element '$path' of user '$user' was expected to change."
+				. " The stored etag was '$storedEtag' and also got '$actualEtag' from the response"
+			);
+		}
 	}
 
 	/**

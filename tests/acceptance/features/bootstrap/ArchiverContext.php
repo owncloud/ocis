@@ -28,6 +28,7 @@ use TestHelpers\HttpRequestHelper;
 use TestHelpers\SetupHelper;
 use wapmorgan\UnifiedArchive\UnifiedArchive;
 use PHPUnit\Framework\Assert;
+use \Psr\Http\Message\ResponseInterface;
 
 require_once 'bootstrap.php';
 
@@ -118,18 +119,7 @@ class ArchiverContext implements Context {
 		foreach ($headersTable as $row) {
 			$headers[$row['header']] = $row ['value'];
 		}
-
-		$user = $this->featureContext->getActualUsername($user);
-		$queryString = $this->getArchiverQueryString($user, $resource, $addressType);
-		$this->featureContext->setResponse(
-			HttpRequestHelper::get(
-				$this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
-				'',
-				$user,
-				$this->featureContext->getPasswordForUser($user),
-				$headers
-			)
-		);
+		$this->featureContext->setResponse($this->downloadArchive($user, $resource, $addressType, null, $headers));
 	}
 
 	/**
@@ -151,15 +141,36 @@ class ArchiverContext implements Context {
 		string $owner,
 		string $addressType
 	): void {
+		$this->featureContext->setResponse($this->downloadArchive($downloader, $resource, $addressType, $owner));
+	}
+
+	/**
+	 * @param string $downloader
+	 * @param string $resource
+	 * @param string $addressType
+	 * @param string|null $owner
+	 * @param array|null $headers
+	 *
+	 * @return ResponseInterface
+	 * @throws GuzzleException
+	 * @throws JsonException
+	 */
+	public function downloadArchive(
+		string $downloader,
+		string $resource,
+		string $addressType,
+		?string $owner = null,
+		?array $headers = null
+	): ResponseInterface {
+		$owner = $owner ??  $downloader;
 		$downloader = $this->featureContext->getActualUsername($downloader);
 		$queryString = $this->getArchiverQueryString($owner, $resource, $addressType);
-		$this->featureContext->setResponse(
-			HttpRequestHelper::get(
-				$this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
-				'',
-				$downloader,
-				$this->featureContext->getPasswordForUser($downloader),
-			)
+		return HttpRequestHelper::get(
+			$this->featureContext->getBaseUrl() . '/archiver?' . $queryString,
+			'',
+			$downloader,
+			$this->featureContext->getPasswordForUser($downloader),
+			$headers
 		);
 	}
 

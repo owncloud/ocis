@@ -26,6 +26,7 @@ use Behat\Gherkin\Node\TableNode;
 use PHPUnit\Framework\Assert;
 use TestHelpers\HttpRequestHelper;
 use TestHelpers\WebDavHelper;
+use Psr\Http\Message\ResponseInterface;
 
 require_once 'bootstrap.php';
 
@@ -55,20 +56,7 @@ class FilesVersionsContext implements Context {
 	 * @throws Exception
 	 */
 	public function userTriesToGetFileVersions(string $user, string $file, string $fileOwner):void {
-		$user = $this->featureContext->getActualUsername($user);
-		$fileOwner = $this->featureContext->getActualUsername($fileOwner);
-		$fileId = $this->featureContext->getFileIdForPath($fileOwner, $file);
-		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $file user $fileOwner not found (the file may not exist)");
-		$response = $this->featureContext->makeDavRequest(
-			$user,
-			"PROPFIND",
-			$this->getVersionsPathForFileId($fileId),
-			null,
-			null,
-			null,
-			'2'
-		);
-		$this->featureContext->setResponse($response, $user);
+		$this->featureContext->setResponse($this->getFileVersions($user, $file, $fileOwner));
 	}
 
 	/**
@@ -81,10 +69,28 @@ class FilesVersionsContext implements Context {
 	 * @throws Exception
 	 */
 	public function userGetsFileVersions(string $user, string $file):void {
+		$this->featureContext->setResponse($this->getFileVersions($user, $file));
+	}
+
+	/**
+	 * @param string $user
+	 * @param string $file
+	 * @param string|null $fileOwner
+	 *
+	 * @return ResponseInterface
+	 * @throws JsonException
+	 * @throws GuzzleException
+	 */
+	public function getFileVersions(
+		string $user,
+		string $file,
+		?string $fileOwner = null
+	): ResponseInterface {
 		$user = $this->featureContext->getActualUsername($user);
-		$fileId = $this->featureContext->getFileIdForPath($user, $file);
-		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $file user $user not found (the file may not exist)");
-		$response = $this->featureContext->makeDavRequest(
+		$fileOwner = $fileOwner ? $this->featureContext->getActualUsername($fileOwner) : $user;
+		$fileId = $this->featureContext->getFileIdForPath($fileOwner, $file);
+		Assert::assertNotNull($fileId, __METHOD__ . " fileid of file $file user $fileOwner not found (the file may not exist)");
+		return $this->featureContext->makeDavRequest(
 			$user,
 			"PROPFIND",
 			$this->getVersionsPathForFileId($fileId),
@@ -93,7 +99,6 @@ class FilesVersionsContext implements Context {
 			null,
 			'2'
 		);
-		$this->featureContext->setResponse($response, $user);
 	}
 
 	/**
