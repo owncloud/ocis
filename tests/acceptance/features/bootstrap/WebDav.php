@@ -3334,21 +3334,21 @@ trait WebDav {
 	 * @return void
 	 */
 	public function fileHasBeenDeleted(string $file, string $user):void {
-		$this->userHasDeletedFile($user, "deleted", "file", $file);
+		$this->userHasDeletedResource($user, "deleted", "file", $file);
 	}
 
 	/**
-	 * @When /^user "([^"]*)" deletes (?:file|folder) "([^"]*)" using the WebDAV API$/
+	 * @When user :user deletes file/folder :resource using the WebDAV API
 	 *
 	 * @param string $user
-	 * @param string $file
+	 * @param string $resource
 	 *
 	 * @return void
 	 */
-	public function userDeletesFile(string $user, string $file):void {
+	public function userDeletesFile(string $user, string $resource):void {
 		$user = $this->getActualUsername($user);
 		$this->pauseUploadDelete();
-		$this->response = $this->makeDavRequest($user, 'DELETE', $file, []);
+		$this->response = $this->makeDavRequest($user, 'DELETE', $resource, []);
 		$this->lastUploadDeleteTime = \time();
 		$this->pushToLastHttpStatusCodesArray((string) $this->getResponse()->getStatusCode());
 	}
@@ -3362,7 +3362,7 @@ trait WebDav {
 	 * @return void
 	 * @throws Exception
 	 */
-	public function userHasDeletedFile(string $user, string $resource):void {
+	public function userHasDeletedResource(string $user, string $resource):void {
 		$user = $this->getActualUsername($user);
 		$this->userDeletesFile($user, $resource);
 		// If the file or folder was there and got deleted then we get a 204
@@ -3393,7 +3393,7 @@ trait WebDav {
 		$paths = $table->getHash();
 
 		foreach ($paths as $file) {
-			$this->userHasDeletedFile($user, $file["path"]);
+			$this->userHasDeletedResource($user, $file["path"]);
 		}
 	}
 
@@ -3437,7 +3437,7 @@ trait WebDav {
 	 * @return void
 	 */
 	public function theUserHasDeletedFile(string $fileOrFolder, string $file):void {
-		$this->userHasDeletedFile($this->getCurrentUser(),$fileOrFolder, $file);
+		$this->userHasDeletedResource($this->getCurrentUser(), $fileOrFolder, $file);
 	}
 
 	/**
@@ -4499,7 +4499,7 @@ trait WebDav {
 			foreach ($elementList as $element) {
 				$element = \substr((string)$element, \strlen($davPrefix));
 				if ($checkEachDelete) {
-					$this->userHasDeletedFile($user, "deleted", "file", $element);
+					$this->userHasDeletedResource($user, "deleted", "file", $element);
 				} else {
 					$this->userDeletesFile($user, $element);
 				}

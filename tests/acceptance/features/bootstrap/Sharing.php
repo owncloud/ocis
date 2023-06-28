@@ -3345,7 +3345,6 @@ trait Sharing {
 			$url
 		);
 		$this->pushToLastStatusCodesArrays();
-
 	}
 
 	/**
@@ -3555,7 +3554,7 @@ trait Sharing {
 	 * @throws JsonException
 	 */
 	public function userHasUnsharedResourceSharedTo(string $sharer, string $path, string $sharee): void {
-		$this->userUnsharesSharedTo($sharer, $path, $sharee);
+		$this->userUnsharesResourceSharedTo($sharer, $path, $sharee);
 		$this->ocsContext->assertOCSResponseIndicatesSuccess(
 			'The ocs share response does not indicate success.',
 		);
@@ -3573,7 +3572,7 @@ trait Sharing {
 	 * @return void
 	 * @throws JsonException
 	 */
-	public function userUnsharesSharedTo(string $sharer, string $path, string $sharee): void {
+	public function userUnsharesResourceSharedTo(string $sharer, string $path, string $sharee): void {
 		$sharer = $this->getActualUsername($sharer);
 		$sharee = $this->getActualUsername($sharee);
 

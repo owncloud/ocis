@@ -106,8 +106,8 @@ Feature: sharing
     And user "Carol" has stored etag of element "/PARENT"
     And user "Brian" has stored etag of element "/"
     And user "Brian" has stored etag of element "/Shares"
-    When user "Brian" unshares file "/Shares/parent.txt" using the WebDAV API
-    Then the HTTP status code should be "204"
+    When user "Brian" declines share "/Shares/parent.txt" offered by user "Carol" using the sharing API
+    Then the HTTP status code should be "200"
     And the etag of element "/" of user "Brian" should have changed
     And the etag of element "/Shares" of user "Brian" should have changed
     And the etag of element "/PARENT" of user "Carol" should not have changed
@@ -228,13 +228,15 @@ Feature: sharing
       | 2               | 404             | 404              |
 
 
-   Scenario: unshare a shared resources
-     Given using OCS API version "1"
-     And user "Alice" has shared file "textfile0.txt" with user "Brian"
-     And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
-     When user "Alice" unshares file "textfile0.txt" shared to "Brian"
-     Then the OCS status code should be "100"
-     And the HTTP status code should be "200"
-     And as "Brian" file "/Shares/shared/textfile0.txt" should not exist
-
-
+  Scenario Outline: unshare a shared resources
+    Given using OCS API version "<ocs_api_version>"
+    And user "Alice" has shared file "textfile0.txt" with user "Brian"
+    And user "Brian" has accepted share "/textfile0.txt" offered by user "Alice"
+    When user "Alice" unshares file "textfile0.txt" shared to "Brian"
+    Then the OCS status code should be "<ocs_status_code>"
+    And the HTTP status code should be "<http_status_code>"
+    And as "Brian" file "/Shares/textfile0.txt" should not exist
+    Examples:
+      | ocs_api_version | ocs_status_code | http_status_code |
+      | 1               | 100             | 200              |
+      | 2               | 200             | 200              |

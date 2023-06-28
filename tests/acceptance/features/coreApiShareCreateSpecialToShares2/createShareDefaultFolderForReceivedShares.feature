@@ -14,11 +14,11 @@ Feature: shares are received in the default folder for received shares
     And user "Alice" has created folder "FOLDER"
     When user "Alice" shares folder "/FOLDER" with user "Brian" using the sharing API
     And user "Brian" accepts share "/FOLDER" offered by user "Alice" using the sharing API
-    When user "Brian" declines share "/Shares/FOLDER" offered by user "Alice" using the sharing API
+    And user "Brian" declines share "/Shares/FOLDER" offered by user "Alice" using the sharing API
     And user "Brian" shares folder "/Shares" with user "Alice" using the sharing API
     Then the OCS status code of responses on each endpoint should be "<ocs_status_code>" respectively
     And the HTTP status code of responses on each endpoint should be "<http_status_code>" respectively
     Examples:
-      | ocs_api_version | ocs_status_code | http_status_code      |
-      | 1               | 100, 100,100,404   | 200, 200, 200, 200 |
-      | 2               | 200, 200,200,404   | 200, 200, 200, 400 |
+      | ocs_api_version | ocs_status_code    | http_status_code   |
+      | 1               | 100, 100, 100, 400 | 200, 200, 200, 200 |
+      | 2               | 200, 200, 200, 400 | 200, 200, 200, 400 |
