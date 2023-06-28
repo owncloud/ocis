@@ -144,7 +144,7 @@ Feature: delete user
       | User Light  | User Light  |
       | User Light  | Admin       |
 
-  
+
   Scenario: personal space is deleted automatically when the user is deleted
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
@@ -152,7 +152,6 @@ Feature: delete user
     Then the HTTP status code should be "204"
     When user "Alice" lists all spaces via the GraphApi with query "$filter=driveType eq 'personal'"
     Then the json responded should not contain a space with name "Brian Murphy"
-    And as "Alice" folder "Shares/new" should not exist
 
 
   Scenario: accepted share is deleted automatically when the user is deleted
@@ -160,9 +159,9 @@ Feature: delete user
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created a folder "new" in space "Brian Murphy"
     Given user "Brian" has created a share inside of space "Brian Murphy" with settings:
-      | path       | new                   |
-      | shareWith  | Alice                    |
-      | role       | viewer                   |
+      | path      | new    |
+      | shareWith | Alice  |
+      | role      | viewer |
     And user "Alice" has accepted share "/new" offered by user "Brian"
     When the user "Alice" deletes a user "Brian" using the Graph API
     Then the HTTP status code should be "204"
