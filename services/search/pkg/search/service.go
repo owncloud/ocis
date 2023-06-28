@@ -72,10 +72,31 @@ func NewService(gatewaySelector pool.Selectable[gateway.GatewayAPIClient], eng e
 
 // Search processes a search request and passes it down to the engine.
 func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*searchsvc.SearchResponse, error) {
-	if req.Query == "" {
+	s.logger.Debug().Str("query", req.Query).Msg("performing a search")
+	query, scope := ParseScope(req.Query)
+	if query == "" {
 		return nil, errtypes.BadRequest("empty query provided")
 	}
-	s.logger.Debug().Str("query", req.Query).Msg("performing a search")
+	req.Query = query
+	var filters []*provider.ListStorageSpacesRequest_Filter
+	if len(scope) > 0 {
+		scopeRef, err := extractScope(scope)
+		if err != nil {
+			return nil, err
+		}
+		if req.Ref == nil {
+			req.Ref = scopeRef
+		}
+		req.Ref.Path = scopeRef.GetPath()
+		if scopeRef.GetResourceId().OpaqueId != "" {
+			filters = []*provider.ListStorageSpacesRequest_Filter{
+				{
+					Type: provider.ListStorageSpacesRequest_Filter_TYPE_ID,
+					Term: &provider.ListStorageSpacesRequest_Filter_Id{Id: &provider.StorageSpaceId{OpaqueId: scopeRef.GetResourceId().OpaqueId}},
+				},
+			}
+		}
+	}
 
 	gatewayClient, err := s.gatewaySelector.Next()
 	if err != nil {
@@ -84,18 +105,17 @@ func (s *Service) Search(ctx context.Context, req *searchsvc.SearchRequest) (*se
 
 	currentUser := revactx.ContextMustGetUser(ctx)
 
-	listSpacesRes, err := gatewayClient.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{
-		Filters: []*provider.ListStorageSpacesRequest_Filter{
-			{
-				Type: provider.ListStorageSpacesRequest_Filter_TYPE_USER,
-				Term: &provider.ListStorageSpacesRequest_Filter_User{User: currentUser.GetId()},
-			},
-			{
-				Type: provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
-				Term: &provider.ListStorageSpacesRequest_Filter_SpaceType{SpaceType: "+grant"},
-			},
+	filters = append(filters, []*provider.ListStorageSpacesRequest_Filter{
+		{
+			Type: provider.ListStorageSpacesRequest_Filter_TYPE_USER,
+			Term: &provider.ListStorageSpacesRequest_Filter_User{User: currentUser.GetId()},
 		},
-	})
+		{
+			Type: provider.ListStorageSpacesRequest_Filter_TYPE_SPACE_TYPE,
+			Term: &provider.ListStorageSpacesRequest_Filter_SpaceType{SpaceType: "+grant"},
+		},
+	}...)
+	listSpacesRes, err := gatewayClient.ListStorageSpaces(ctx, &provider.ListStorageSpacesRequest{Filters: filters})
 	if err != nil {
 		s.logger.Error().Err(err).Msg("failed to list the user's storage spaces")
 		return nil, err
@@ -229,7 +249,7 @@ func (s *Service) searchIndex(ctx context.Context, req *searchsvc.SearchRequest,
 		rootName         string
 		permissions      *provider.ResourcePermissions
 	)
-	mountpointPrefix := ""
+	mountpointPrefix := req.GetRef().GetPath()
 	switch space.SpaceType {
 	case "mountpoint":
 		return nil, errSkipSpace // mountpoint spaces are only "links" to the shared spaces. we have to search the shared "grant" space instead
