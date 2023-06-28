@@ -158,7 +158,7 @@ Feature: delete user
     Given the administrator has assigned the role "Admin" to user "Alice" using the Graph API
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Brian" has created a folder "new" in space "Brian Murphy"
-    Given user "Brian" has created a share inside of space "Brian Murphy" with settings:
+    And user "Brian" has created a share inside of space "Brian Murphy" with settings:
       | path      | new    |
       | shareWith | Alice  |
       | role      | viewer |
