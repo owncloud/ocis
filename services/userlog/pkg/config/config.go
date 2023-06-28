@@ -28,6 +28,8 @@ type Config struct {
 	Events            Events      `yaml:"events"`
 	Persistence       Persistence `yaml:"persistence"`
 
+	DisableSSE bool `yaml:"disable_sse" env:"USERLOG_DISABLE_SSE" desc:"Disables server-sent events. Clients will no longer be able to connect to the sse endpoint."`
+
 	Context context.Context `yaml:"-"`
 }
 

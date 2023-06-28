@@ -68,8 +68,11 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		historyClient:    o.HistoryClient,
 		gatewaySelector:  o.GatewaySelector,
 		valueClient:      o.ValueClient,
-		sse:              sse.New(),
 		registeredEvents: make(map[string]events.Unmarshaller),
+	}
+
+	if !ul.cfg.DisableSSE {
+		ul.sse = sse.New()
 	}
 
 	for _, e := range o.RegisteredEvents {
@@ -79,8 +82,11 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 
 	ul.m.Route("/ocs/v2.php/apps/notifications/api/v1/notifications", func(r chi.Router) {
 		r.Get("/", ul.HandleGetEvents)
-		r.Get("/sse", ul.HandleSSE)
 		r.Delete("/", ul.HandleDeleteEvents)
+
+		if !ul.cfg.DisableSSE {
+			r.Get("/sse", ul.HandleSSE)
+		}
 	})
 
 	go ul.MemorizeEvents(ch)
@@ -230,8 +236,10 @@ func (ul *UserlogService) DeleteEvents(userid string, evids []string) error {
 }
 
 func (ul *UserlogService) addEventToUser(userid string, event events.Event) error {
-	if err := ul.sendSSE(userid, event); err != nil {
-		ul.log.Error().Err(err).Str("userid", userid).Str("eventid", event.ID).Msg("cannot create sse event")
+	if !ul.cfg.DisableSSE {
+		if err := ul.sendSSE(userid, event); err != nil {
+			ul.log.Error().Err(err).Str("userid", userid).Str("eventid", event.ID).Msg("cannot create sse event")
+		}
 	}
 	return ul.alterUserEventList(userid, func(ids []string) []string {
 		return append(ids, event.ID)
