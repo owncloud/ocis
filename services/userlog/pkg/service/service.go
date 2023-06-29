@@ -18,9 +18,14 @@ import (
 	"github.com/cs3org/reva/v2/pkg/utils"
 	"github.com/go-chi/chi/v5"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
+	"github.com/owncloud/ocis/v2/ocis-pkg/middleware"
 	ehmsg "github.com/owncloud/ocis/v2/protogen/gen/ocis/messages/eventhistory/v0"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
+	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
+	"github.com/r3labs/sse/v2"
+	micrometadata "go-micro.dev/v4/metadata"
 	"go-micro.dev/v4/store"
 	"google.golang.org/grpc/metadata"
 )
@@ -33,6 +38,8 @@ type UserlogService struct {
 	cfg              *config.Config
 	historyClient    ehsvc.EventHistoryService
 	gatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
+	valueClient      settingssvc.ValueService
+	sse              *sse.Server
 	registeredEvents map[string]events.Unmarshaller
 	translationPath  string
 }
@@ -60,7 +67,12 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		cfg:              o.Config,
 		historyClient:    o.HistoryClient,
 		gatewaySelector:  o.GatewaySelector,
+		valueClient:      o.ValueClient,
 		registeredEvents: make(map[string]events.Unmarshaller),
+	}
+
+	if !ul.cfg.DisableSSE {
+		ul.sse = sse.New()
 	}
 
 	for _, e := range o.RegisteredEvents {
@@ -68,9 +80,13 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 		ul.registeredEvents[typ.String()] = e
 	}
 
-	ul.m.Route("/", func(r chi.Router) {
-		r.Get("/*", ul.HandleGetEvents)
-		r.Delete("/*", ul.HandleDeleteEvents)
+	ul.m.Route("/ocs/v2.php/apps/notifications/api/v1/notifications", func(r chi.Router) {
+		r.Get("/", ul.HandleGetEvents)
+		r.Delete("/", ul.HandleDeleteEvents)
+
+		if !ul.cfg.DisableSSE {
+			r.Get("/sse", ul.HandleSSE)
+		}
 	})
 
 	go ul.MemorizeEvents(ch)
@@ -155,7 +171,7 @@ func (ul *UserlogService) MemorizeEvents(ch <-chan events.Event) {
 
 		// III) store the eventID for each user
 		for _, id := range users {
-			if err := ul.addEventsToUser(id, event.ID); err != nil {
+			if err := ul.addEventToUser(id, event); err != nil {
 				ul.log.Error().Err(err).Str("userID", id).Str("eventid", event.ID).Msg("failed to store event for user")
 				continue
 			}
@@ -219,10 +235,30 @@ func (ul *UserlogService) DeleteEvents(userid string, evids []string) error {
 	})
 }
 
-func (ul *UserlogService) addEventsToUser(userid string, eventids ...string) error {
+func (ul *UserlogService) addEventToUser(userid string, event events.Event) error {
+	if !ul.cfg.DisableSSE {
+		if err := ul.sendSSE(userid, event); err != nil {
+			ul.log.Error().Err(err).Str("userid", userid).Str("eventid", event.ID).Msg("cannot create sse event")
+		}
+	}
 	return ul.alterUserEventList(userid, func(ids []string) []string {
-		return append(ids, eventids...)
+		return append(ids, event.ID)
 	})
+}
+
+func (ul *UserlogService) sendSSE(userid string, event events.Event) error {
+	ev, err := ul.getConverter(ul.getUserLocale(userid)).ConvertEvent(event.ID, event.Event)
+	if err != nil {
+		return err
+	}
+
+	b, err := json.Marshal(ev)
+	if err != nil {
+		return err
+	}
+
+	ul.sse.Publish(userid, &sse.Event{Data: b})
+	return nil
 }
 
 func (ul *UserlogService) removeExpiredEvents(userid string, all []string, received []*ehmsg.Event) error {
@@ -393,6 +429,29 @@ func (ul *UserlogService) impersonate(uid *user.UserId) context.Context {
 		return nil
 	}
 	return ctx
+}
+
+func (ul *UserlogService) getUserLocale(userid string) string {
+	resp, err := ul.valueClient.GetValueByUniqueIdentifiers(
+		micrometadata.Set(context.Background(), middleware.AccountID, userid),
+		&settingssvc.GetValueByUniqueIdentifiersRequest{
+			AccountUuid: userid,
+			SettingId:   defaults.SettingUUIDProfileLanguage,
+		},
+	)
+	if err != nil {
+		ul.log.Error().Err(err).Str("userid", userid).Msg("cannot get users locale")
+		return ""
+	}
+	val := resp.GetValue().GetValue().GetListValue().GetValues()
+	if len(val) == 0 {
+		return ""
+	}
+	return val[0].GetStringValue()
+}
+
+func (ul *UserlogService) getConverter(locale string) *Converter {
+	return NewConverter(locale, ul.gatewaySelector, ul.cfg.MachineAuthAPIKey, ul.cfg.Service.Name, ul.cfg.TranslationPath)
 }
 
 func authenticate(usr *user.User, gatewaySelector pool.Selectable[gateway.GatewayAPIClient], machineAuthAPIKey string) (context.Context, error) {

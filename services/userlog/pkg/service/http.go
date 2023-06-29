@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/cs3org/reva/v2/pkg/ctx"
 	revactx "github.com/cs3org/reva/v2/pkg/ctx"
 )
 
@@ -31,11 +32,23 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	conv := NewConverter(r.Header.Get(HeaderAcceptLanguage), ul.gatewaySelector, ul.cfg.MachineAuthAPIKey, ul.cfg.Service.Name, ul.cfg.TranslationPath, ul.registeredEvents)
+	conv := ul.getConverter(r.Header.Get(HeaderAcceptLanguage))
 
 	resp := GetEventResponseOC10{}
 	for _, e := range evs {
-		noti, err := conv.ConvertEvent(e)
+		etype, ok := ul.registeredEvents[e.Type]
+		if !ok {
+			ul.log.Error().Str("eventid", e.Id).Str("eventtype", e.Type).Msg("event not registered")
+			continue
+		}
+
+		einterface, err := etype.Unmarshal(e.Event)
+		if err != nil {
+			ul.log.Error().Str("eventid", e.Id).Str("eventtype", e.Type).Msg("failed to umarshal event")
+			continue
+		}
+
+		noti, err := conv.ConvertEvent(e.Id, einterface)
 		if err != nil {
 			ul.log.Error().Err(err).Str("eventid", e.Id).Str("eventtype", e.Type).Msg("failed to convert event")
 			continue
@@ -47,6 +60,33 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 	resp.OCS.Meta.StatusCode = http.StatusOK
 	b, _ := json.Marshal(resp)
 	w.Write(b)
+}
+
+// HandleSSE is the GET handler for events
+func (ul *UserlogService) HandleSSE(w http.ResponseWriter, r *http.Request) {
+	u, ok := ctx.ContextGetUser(r.Context())
+	if !ok {
+		ul.log.Error().Msg("sse: no user in context")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	uid := u.GetId().GetOpaqueId()
+	if uid == "" {
+		ul.log.Error().Msg("sse: user in context is broken")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	stream := ul.sse.CreateStream(uid)
+	stream.AutoReplay = false
+
+	// add stream to URL
+	q := r.URL.Query()
+	q.Set("stream", uid)
+	r.URL.RawQuery = q.Encode()
+
+	ul.sse.ServeHTTP(w, r)
 }
 
 // HandleDeleteEvents is the DELETE handler for events

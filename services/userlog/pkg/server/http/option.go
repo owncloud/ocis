@@ -8,6 +8,7 @@ import (
 	"github.com/cs3org/reva/v2/pkg/rgrpc/todo/pool"
 	"github.com/owncloud/ocis/v2/ocis-pkg/log"
 	ehsvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/eventhistory/v0"
+	settingssvc "github.com/owncloud/ocis/v2/protogen/gen/ocis/services/settings/v0"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/metrics"
 	"github.com/urfave/cli/v2"
@@ -29,6 +30,7 @@ type Options struct {
 	Consumer         events.Consumer
 	GatewaySelector  pool.Selectable[gateway.GatewayAPIClient]
 	HistoryClient    ehsvc.EventHistoryService
+	ValueClient      settingssvc.ValueService
 	RegisteredEvents []events.Unmarshaller
 }
 
@@ -117,5 +119,12 @@ func History(h ehsvc.EventHistoryService) Option {
 func RegisteredEvents(evs []events.Unmarshaller) Option {
 	return func(o *Options) {
 		o.RegisteredEvents = evs
+	}
+}
+
+// Value provides a function to configure the value service client
+func Value(vs settingssvc.ValueService) Option {
+	return func(o *Options) {
+		o.ValueClient = vs
 	}
 }
