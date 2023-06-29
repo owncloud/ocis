@@ -1,6 +1,6 @@
 ---
 title: Userlog
-date: 2023-06-29T12:20:38.21806058Z
+date: 2023-06-29T13:03:36.09560945Z
 weight: 20
 geekdocRepo: https://github.com/owncloud/ocis
 geekdocEditPath: edit/master/services/userlog
@@ -22,6 +22,7 @@ The `userlog` service is a mediator between the `eventhistory` service and clien
 * [Storing](#storing)
 * [Configuring](#configuring)
 * [Retrieving](#retrieving)
+* [Subscribing](#subscribing)
 * [Deleting](#deleting)
 * [Translations](#translations)
   * [Translation Rules](#translation-rules)
@@ -54,6 +55,10 @@ For the time being, the configuration which user related events are of interest 
 ## Retrieving
 
 The `userlog` service provides an API to retrieve configured events. For now, this API is mostly following the [oc10 notification GET API](https://doc.owncloud.com/server/next/developer_manual/core/apis/ocs-notification-endpoint-v1.html#get-user-notifications).
+
+## Subscribing
+
+Additionaly to the oc10 API, the `userlog` service also provides an `/sse` (Server-Sent Events) endpoint to be informed by the server when an event happens. See [What is Server-Sent Events](https://medium.com/yemeksepeti-teknoloji/what-is-server-sent-events-sse-and-how-to-implement-it-904938bffd73) for a simple introduction and examples to server sent events. The `sse` endpoint will respect language changes of the user without needing to reconnect.
 
 ## Deleting
 
