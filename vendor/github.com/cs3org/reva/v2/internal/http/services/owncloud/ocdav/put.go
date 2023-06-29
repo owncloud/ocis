@@ -154,9 +154,17 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	opaque := &typespb.Opaque{}
+	if mtime := r.Header.Get(net.HeaderOCMtime); mtime != "" {
+		utils.AppendPlainToOpaque(opaque, net.HeaderOCMtime, mtime)
+
+		// TODO: find a way to check if the storage really accepted the value
+		w.Header().Set(net.HeaderOCMtime, "accepted")
+	}
 	if length == 0 {
 		tfRes, err := client.TouchFile(ctx, &provider.TouchFileRequest{
-			Ref: ref,
+			Opaque: opaque,
+			Ref:    ref,
 		})
 		if err != nil {
 			log.Error().Err(err).Msg("error sending grpc touch file request")
@@ -191,22 +199,7 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	opaqueMap := map[string]*typespb.OpaqueEntry{
-		net.HeaderUploadLength: {
-			Decoder: "plain",
-			Value:   []byte(strconv.FormatInt(length, 10)),
-		},
-	}
-
-	if mtime := r.Header.Get(net.HeaderOCMtime); mtime != "" {
-		opaqueMap[net.HeaderOCMtime] = &typespb.OpaqueEntry{
-			Decoder: "plain",
-			Value:   []byte(mtime),
-		}
-
-		// TODO: find a way to check if the storage really accepted the value
-		w.Header().Set(net.HeaderOCMtime, "accepted")
-	}
+	utils.AppendPlainToOpaque(opaque, net.HeaderUploadLength, strconv.FormatInt(length, 10))
 
 	// curl -X PUT https://demo.owncloud.com/remote.php/webdav/testcs.bin -u demo:demo -d '123' -v -H 'OC-Checksum: SHA1:40bd001563085fc35165329ea1ff5c5ecbdbbeef'
 
@@ -231,16 +224,13 @@ func (s *svc) handlePut(ctx context.Context, w http.ResponseWriter, r *http.Requ
 	// we do not check the algorithm here, because it might depend on the storage
 	if len(cparts) == 2 {
 		// Translate into TUS style Upload-Checksum header
-		opaqueMap[net.HeaderUploadChecksum] = &typespb.OpaqueEntry{
-			Decoder: "plain",
-			// algorithm is always lowercase, checksum is separated by space
-			Value: []byte(strings.ToLower(cparts[0]) + " " + cparts[1]),
-		}
+		// algorithm is always lowercase, checksum is separated by space
+		utils.AppendPlainToOpaque(opaque, net.HeaderUploadChecksum, strings.ToLower(cparts[0])+" "+cparts[1])
 	}
 
 	uReq := &provider.InitiateFileUploadRequest{
 		Ref:    ref,
-		Opaque: &typespb.Opaque{Map: opaqueMap},
+		Opaque: opaque,
 	}
 	if ifMatch := r.Header.Get(net.HeaderIfMatch); ifMatch != "" {
 		uReq.Options = &provider.InitiateFileUploadRequest_IfMatch{IfMatch: ifMatch}

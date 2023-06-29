@@ -806,7 +806,7 @@ func (fs *localfs) CreateDir(ctx context.Context, ref *provider.Reference) error
 }
 
 // TouchFile as defined in the storage.FS interface
-func (fs *localfs) TouchFile(ctx context.Context, ref *provider.Reference, _ bool) error {
+func (fs *localfs) TouchFile(ctx context.Context, ref *provider.Reference, _ bool, _ string) error {
 	return fmt.Errorf("unimplemented: TouchFile")
 }
 

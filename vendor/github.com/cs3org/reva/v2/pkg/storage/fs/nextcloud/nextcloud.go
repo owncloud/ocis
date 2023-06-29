@@ -266,7 +266,7 @@ func (nc *StorageDriver) CreateDir(ctx context.Context, ref *provider.Reference)
 }
 
 // TouchFile as defined in the storage.FS interface
-func (nc *StorageDriver) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool) error {
+func (nc *StorageDriver) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) error {
 	return fmt.Errorf("unimplemented: TouchFile")
 }
 

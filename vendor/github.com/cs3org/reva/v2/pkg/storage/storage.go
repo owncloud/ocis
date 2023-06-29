@@ -38,7 +38,7 @@ type FS interface {
 	GetHome(ctx context.Context) (string, error)
 	CreateHome(ctx context.Context) error
 	CreateDir(ctx context.Context, ref *provider.Reference) error
-	TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool) error
+	TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) error
 	Delete(ctx context.Context, ref *provider.Reference) error
 	Move(ctx context.Context, oldRef, newRef *provider.Reference) error
 	GetMD(ctx context.Context, ref *provider.Reference, mdKeys, fieldMask []string) (*provider.ResourceInfo, error)

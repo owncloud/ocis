@@ -76,7 +76,7 @@ type Tree interface {
 	ListFolder(ctx context.Context, node *node.Node) ([]*node.Node, error)
 	// CreateHome(owner *userpb.UserId) (n *node.Node, err error)
 	CreateDir(ctx context.Context, node *node.Node) (err error)
-	TouchFile(ctx context.Context, node *node.Node, markprocessing bool) error
+	TouchFile(ctx context.Context, node *node.Node, markprocessing bool, mtime string) error
 	// CreateReference(ctx context.Context, node *node.Node, targetURI *url.URL) error
 	Move(ctx context.Context, oldNode *node.Node, newNode *node.Node) (err error)
 	Delete(ctx context.Context, node *node.Node) (err error)
@@ -616,7 +616,7 @@ func (fs *Decomposedfs) CreateDir(ctx context.Context, ref *provider.Reference) 
 }
 
 // TouchFile as defined in the storage.FS interface
-func (fs *Decomposedfs) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool) error {
+func (fs *Decomposedfs) TouchFile(ctx context.Context, ref *provider.Reference, markprocessing bool, mtime string) error {
 	parentRef := &provider.Reference{
 		ResourceId: ref.ResourceId,
 		Path:       path.Dir(ref.Path),
@@ -655,7 +655,7 @@ func (fs *Decomposedfs) TouchFile(ctx context.Context, ref *provider.Reference, 
 	if err := n.CheckLock(ctx); err != nil {
 		return err
 	}
-	return fs.tp.TouchFile(ctx, n, markprocessing)
+	return fs.tp.TouchFile(ctx, n, markprocessing, mtime)
 }
 
 // CreateReference creates a reference as a node folder with the target stored in extended attributes

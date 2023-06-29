@@ -58,7 +58,7 @@ func RunWithOptions(mainConf map[string]interface{}, pidFile string, opts ...Opt
 		panic(err)
 	}
 
-	run(mainConf, coreConf, options.Logger, pidFile)
+	run(mainConf, coreConf, options.Logger, options.TraceProvider, pidFile)
 }
 
 type coreConf struct {
@@ -74,11 +74,21 @@ type coreConf struct {
 	TracingService string `mapstructure:"tracing_service"`
 }
 
-func run(mainConf map[string]interface{}, coreConf *coreConf, logger *zerolog.Logger, filename string) {
+func run(
+	mainConf map[string]interface{},
+	coreConf *coreConf,
+	logger *zerolog.Logger,
+	tp trace.TracerProvider,
+	filename string,
+) {
 	host, _ := os.Hostname()
 	logger.Info().Msgf("host info: %s", host)
 
-	tp := initTracing(coreConf)
+	// Only initialise tracing if we didn't get a tracer provider.
+	if tp == nil {
+		logger.Debug().Msg("No pre-existing tracer given, initializing tracing")
+		tp = initTracing(coreConf)
+	}
 	initCPUCount(coreConf, logger)
 
 	servers := initServers(mainConf, logger, tp)
@@ -241,7 +251,7 @@ func getWriter(out string) (io.Writer, error) {
 		return os.Stdout, nil
 	}
 
-	fd, err := os.OpenFile(out, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	fd, err := os.OpenFile(out, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		err = errors.Wrap(err, "error creating log file: "+out)
 		return nil, err

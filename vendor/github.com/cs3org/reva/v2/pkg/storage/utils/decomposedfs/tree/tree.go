@@ -128,7 +128,7 @@ func (t *Tree) GetMD(ctx context.Context, n *node.Node) (os.FileInfo, error) {
 }
 
 // TouchFile creates a new empty file
-func (t *Tree) TouchFile(ctx context.Context, n *node.Node, markprocessing bool) error {
+func (t *Tree) TouchFile(ctx context.Context, n *node.Node, markprocessing bool, mtime string) error {
 	if n.Exists {
 		if markprocessing {
 			return n.SetXattr(prefixes.StatusPrefix, []byte(node.ProcessingStatus))
@@ -154,6 +154,11 @@ func (t *Tree) TouchFile(ctx context.Context, n *node.Node, markprocessing bool)
 	attributes := n.NodeMetadata()
 	if markprocessing {
 		attributes[prefixes.StatusPrefix] = []byte(node.ProcessingStatus)
+	}
+	if mtime != "" {
+		if err := n.SetMtimeString(mtime); err != nil {
+			return errors.Wrap(err, "Decomposedfs: could not set mtime")
+		}
 	}
 	err = n.SetXattrs(attributes, true)
 	if err != nil {
