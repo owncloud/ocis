@@ -1953,6 +1953,20 @@ class GraphContext implements Context {
 	}
 
 	/**
+	 * @Then /^the Graph API response should have no role$/
+	 *
+	 * @return void
+	 * @throws Exception
+	 * @throws GuzzleException
+	 */
+	public function theGraphApiResponseShouldHaveNoRole(): void {
+		Assert::assertEmpty(
+			$this->featureContext->getJsonDecodedResponse($this->featureContext->getResponse())['value'],
+			"the user has a role, but should not"
+		);
+	}
+
+	/**
 	 * @When user :user gets details of the group :groupName using the Graph API
 	 *
 	 * @param string $user
@@ -2402,7 +2416,7 @@ class GraphContext implements Context {
 	 * @throws GuzzleException
 	 */
 	public function getAssignedRole(string $user) {
-		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $user;
+		$userId = $this->featureContext->getAttributeOfCreatedUser($user, 'id') ?? $this->featureContext->getUserIdByUserName($user);
 		return (
 			GraphHelper::getAssignedRole(
 				$this->featureContext->getBAseUrl(),
