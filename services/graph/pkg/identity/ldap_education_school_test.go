@@ -3,6 +3,7 @@ package identity
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/go-ldap/ldap/v3"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -49,6 +50,13 @@ var schoolEntry1 = ldap.NewEntry("ou=Test School1",
 		"ocEducationSchoolNumber": {"0042"},
 		"owncloudUUID":            {"hijk-defg"},
 	})
+var schoolEntryWithTermination = ldap.NewEntry("ou=Test School",
+	map[string][]string{
+		"ou":                                    {"Test School"},
+		"ocEducationSchoolNumber":               {"0123"},
+		"owncloudUUID":                          {"abcd-defg"},
+		"ocEducationSchoolTerminationTimestamp": {"20420131120000Z"},
+	})
 
 var (
 	filterSchoolSearchByIdExisting        = "(&(objectClass=ocEducationSchool)(|(owncloudUUID=abcd-defg)(ocEducationSchoolNumber=abcd-defg)))"
@@ -59,8 +67,20 @@ var (
 
 func TestCreateEducationSchool(t *testing.T) {
 	lm := &mocks.Client{}
-	lm.On("Add", mock.Anything).
-		Return(nil)
+
+	ldapSchoolAddRequestMatcher := func(ar *ldap.AddRequest) bool {
+		if ar.DN != "ou=Test School," {
+			return false
+		}
+		for _, attr := range ar.Attributes {
+			if attr.Type == "ocEducationSchoolTerminationTimestamp" {
+				return false
+			}
+		}
+		return true
+	}
+
+	lm.On("Add", mock.MatchedBy(ldapSchoolAddRequestMatcher)).Return(nil)
 
 	lm.On("Search", mock.Anything).
 		Return(
@@ -84,6 +104,56 @@ func TestCreateEducationSchool(t *testing.T) {
 	assert.Equal(t, res_school.GetDisplayName(), school.GetDisplayName())
 	assert.Equal(t, res_school.GetId(), school.GetId())
 	assert.Equal(t, res_school.GetSchoolNumber(), school.GetSchoolNumber())
+	assert.False(t, res_school.HasTerminationDate())
+}
+
+func TestUpdateEducationSchoolTerminationDate(t *testing.T) {
+	lm := &mocks.Client{}
+
+	ldapSchoolTerminationRequestMatcher := func(mr *ldap.ModifyRequest) bool {
+		if mr.DN != "ou=Test School" {
+			return false
+		}
+		for _, mod := range mr.Changes {
+			if mod.Operation == ldap.ReplaceAttribute &&
+				mod.Modification.Type == "ocEducationSchoolTerminationTimestamp" &&
+				mod.Modification.Vals[0] == "20420131120000Z" {
+				return true
+			}
+		}
+		return false
+	}
+	lm.On("Modify", mock.MatchedBy(ldapSchoolTerminationRequestMatcher)).Return(nil)
+	lm.On("Search", mock.Anything).
+		Return(
+			&ldap.SearchResult{
+				Entries: []*ldap.Entry{schoolEntry},
+			},
+			nil).
+		Once()
+	lm.On("Search", mock.Anything).
+		Return(
+			&ldap.SearchResult{
+				Entries: []*ldap.Entry{schoolEntryWithTermination},
+			},
+			nil).
+		Once()
+
+	b, err := getMockedBackend(lm, eduConfig, &logger)
+	assert.Nil(t, err)
+	assert.NotEqual(t, "", b.educationConfig.schoolObjectClass)
+	school := libregraph.NewEducationSchool()
+	terminationTime := time.Date(2042, time.January, 31, 12, 0, 0, 0, time.UTC)
+	school.SetTerminationDate(terminationTime)
+	res_school, err := b.UpdateEducationSchool(context.Background(), "abcd-defg", *school)
+	lm.AssertNumberOfCalls(t, "Search", 2)
+	assert.Nil(t, err)
+	assert.NotNil(t, res_school)
+	assert.Equal(t, "Test School", res_school.GetDisplayName())
+	assert.Equal(t, "abcd-defg", res_school.GetId())
+	assert.Equal(t, "0123", res_school.GetSchoolNumber())
+	assert.True(t, res_school.HasTerminationDate())
+	assert.True(t, terminationTime.Equal(res_school.GetTerminationDate()))
 }
 
 func TestUpdateEducationSchoolOperation(t *testing.T) {
@@ -96,9 +166,15 @@ func TestUpdateEducationSchoolOperation(t *testing.T) {
 		expectedOperation schoolUpdateOperation
 	}{
 		{
-			name:              "Test using school with both number and name",
+			name:              "Test using school with both number and name, unchanged",
 			displayName:       testSchoolName,
 			schoolNumber:      testSchoolNumber,
+			expectedOperation: schoolUnchanged,
+		},
+		{
+			name:              "Test using school with both number and name, unchanged",
+			displayName:       "A new name",
+			schoolNumber:      "9876",
 			expectedOperation: tooManyValues,
 		},
 		{
@@ -114,12 +190,12 @@ func TestUpdateEducationSchoolOperation(t *testing.T) {
 		{
 			name:              "Test new name",
 			displayName:       "Something new",
-			expectedOperation: displayNameUpdated,
+			expectedOperation: schoolRenamed,
 		},
 		{
 			name:              "Test new number",
 			schoolNumber:      "9876",
-			expectedOperation: schoolNumberUpdated,
+			expectedOperation: schoolPropertiesUpdated,
 		},
 	}
 
@@ -186,7 +262,7 @@ func TestDeleteEducationSchool(t *testing.T) {
 			Scope:      2,
 			SizeLimit:  1,
 			Filter:     tt.filter,
-			Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+			Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber", "ocEducationSchoolTerminationTimestamp"},
 			Controls:   []ldap.Control(nil),
 		}
 		if tt.expectedItemNotFound {
@@ -255,7 +331,7 @@ func TestGetEducationSchool(t *testing.T) {
 			Scope:      2,
 			SizeLimit:  1,
 			Filter:     tt.filter,
-			Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+			Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber", "ocEducationSchoolTerminationTimestamp"},
 			Controls:   []ldap.Control(nil),
 		}
 		if tt.expectedItemNotFound {
@@ -289,7 +365,7 @@ func TestGetEducationSchools(t *testing.T) {
 		Scope:      2,
 		SizeLimit:  0,
 		Filter:     "(objectClass=ocEducationSchool)",
-		Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+		Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber", "ocEducationSchoolTerminationTimestamp"},
 		Controls:   []ldap.Control(nil),
 	}
 	lm.On("Search", sr1).Return(&ldap.SearchResult{Entries: []*ldap.Entry{schoolEntry, schoolEntry1}}, nil)
@@ -306,7 +382,7 @@ var schoolByIDSearch1 *ldap.SearchRequest = &ldap.SearchRequest{
 	Scope:      2,
 	SizeLimit:  1,
 	Filter:     filterSchoolSearchByIdExisting,
-	Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+	Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber", "ocEducationSchoolTerminationTimestamp"},
 	Controls:   []ldap.Control(nil),
 }
 
@@ -315,7 +391,7 @@ var schoolByNumberSearch *ldap.SearchRequest = &ldap.SearchRequest{
 	Scope:      2,
 	SizeLimit:  1,
 	Filter:     filterSchoolSearchByNumberExisting,
-	Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber"},
+	Attributes: []string{"ou", "owncloudUUID", "ocEducationSchoolNumber", "ocEducationSchoolTerminationTimestamp"},
 	Controls:   []ldap.Control(nil),
 }
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/go-ldap/ldap/v3"
 	"github.com/gofrs/uuid"
@@ -31,9 +32,10 @@ type educationConfig struct {
 }
 
 type schoolAttributeMap struct {
-	displayName  string
-	schoolNumber string
-	id           string
+	displayName     string
+	schoolNumber    string
+	id              string
+	terminationDate string
 }
 
 type schoolUpdateOperation uint8
@@ -41,9 +43,13 @@ type schoolUpdateOperation uint8
 const (
 	tooManyValues schoolUpdateOperation = iota
 	schoolUnchanged
-	displayNameUpdated
-	schoolNumberUpdated
+	schoolRenamed
+	schoolPropertiesUpdated
 )
+
+const ldapDateFormat = "20060102150405Z0700"
+
+var errNotSet = errors.New("Attribute not set")
 
 func defaultEducationConfig() educationConfig {
 	return educationConfig{
@@ -95,9 +101,10 @@ func newEducationConfig(config config.LDAP) (educationConfig, error) {
 
 func newSchoolAttributeMap() schoolAttributeMap {
 	return schoolAttributeMap{
-		displayName:  "ou",
-		schoolNumber: "ocEducationSchoolNumber",
-		id:           "owncloudUUID",
+		displayName:     "ou",
+		schoolNumber:    "ocEducationSchoolNumber",
+		id:              "owncloudUUID",
+		terminationDate: "ocEducationSchoolTerminationTimestamp",
 	}
 }
 
@@ -153,19 +160,38 @@ func (i *LDAP) UpdateEducationSchoolOperation(
 	schoolUpdate libregraph.EducationSchool,
 	currentSchool libregraph.EducationSchool,
 ) schoolUpdateOperation {
-	providedDisplayName := schoolUpdate.GetDisplayName()
-	schoolNumber := schoolUpdate.GetSchoolNumber()
 
-	if providedDisplayName != "" && schoolNumber != "" {
+	providedDisplayName, displayNameIsSet := schoolUpdate.GetDisplayNameOk()
+	if displayNameIsSet {
+		if *providedDisplayName == "" || *providedDisplayName == currentSchool.GetDisplayName() {
+			// The school name hasn't changed
+			displayNameIsSet = false
+		}
+	}
+
+	var propertiesUpdated bool
+
+	switch {
+	case schoolUpdate.HasSchoolNumber():
+		if schoolUpdate.GetSchoolNumber() != "" && schoolUpdate.GetSchoolNumber() != currentSchool.GetSchoolNumber() {
+			propertiesUpdated = true
+		}
+	case schoolUpdate.HasTerminationDate():
+		if schoolUpdate.GetTerminationDate() != currentSchool.GetTerminationDate() {
+			propertiesUpdated = true
+		}
+	}
+
+	if propertiesUpdated && displayNameIsSet {
 		return tooManyValues
 	}
 
-	if providedDisplayName != "" && providedDisplayName != currentSchool.GetDisplayName() {
-		return displayNameUpdated
+	if displayNameIsSet {
+		return schoolRenamed
 	}
 
-	if schoolNumber != "" && schoolNumber != currentSchool.GetSchoolNumber() {
-		return schoolNumberUpdated
+	if propertiesUpdated {
+		return schoolPropertiesUpdated
 	}
 
 	return schoolUnchanged
@@ -199,18 +225,34 @@ func (i *LDAP) updateDisplayName(ctx context.Context, dn string, providedDisplay
 	return nil
 }
 
-// updateSchoolNumber checks if a school number is already taken, and if not updates the school number
-func (i *LDAP) updateSchoolNumber(ctx context.Context, dn string, schoolNumber string) error {
+// updateSchoolProperties updates the properties (other that displayName) of a school.
+// It checks if a school number is already taken, before updating the school number
+func (i *LDAP) updateSchoolProperties(ctx context.Context, dn string, currentSchool, updatedSchool libregraph.EducationSchool) error {
 	logger := i.logger.SubloggerWithRequestID(ctx)
-	_, err := i.getSchoolByNumberOrID(schoolNumber)
-	if err == nil {
-		errmsg := fmt.Sprintf("school number '%s' already exists", schoolNumber)
-		err = fmt.Errorf(errmsg)
-		return err
-	}
 
 	mr := ldap.NewModifyRequest(dn, nil)
-	mr.Replace(i.educationConfig.schoolAttributeMap.schoolNumber, []string{schoolNumber})
+	if updatedSchoolNumber, ok := updatedSchool.GetSchoolNumberOk(); ok {
+		if *updatedSchoolNumber != "" && currentSchool.GetSchoolNumber() != *updatedSchoolNumber {
+			_, err := i.getSchoolByNumberOrID(*updatedSchoolNumber)
+			if err == nil {
+				errmsg := fmt.Sprintf("school number '%s' already exists", *updatedSchoolNumber)
+				err = fmt.Errorf(errmsg)
+				return err
+			}
+			mr.Replace(i.educationConfig.schoolAttributeMap.schoolNumber, []string{*updatedSchoolNumber})
+		}
+	}
+
+	if updatedTerminationDate, ok := updatedSchool.GetTerminationDateOk(); ok {
+		if updatedTerminationDate == nil && currentSchool.HasTerminationDate() {
+			// Delete the termination date
+			mr.Delete(i.educationConfig.schoolAttributeMap.terminationDate, []string{})
+		}
+		if updatedTerminationDate != nil && *updatedTerminationDate != currentSchool.GetTerminationDate() {
+			ldapDateTime := updatedTerminationDate.UTC().Format(ldapDateFormat)
+			mr.Replace(i.educationConfig.schoolAttributeMap.terminationDate, []string{ldapDateTime})
+		}
+	}
 
 	if err := i.conn.Modify(mr); err != nil {
 		var lerr *ldap.Error
@@ -234,13 +276,6 @@ func (i *LDAP) UpdateEducationSchool(ctx context.Context, numberOrID string, sch
 		return nil, ErrReadOnly
 	}
 
-	providedDisplayName := school.GetDisplayName()
-	schoolNumber := school.GetSchoolNumber()
-
-	if providedDisplayName != "" && schoolNumber != "" {
-		return nil, fmt.Errorf("school name and school number cannot be updated in the same request")
-	}
-
 	e, err := i.getSchoolByNumberOrID(numberOrID)
 	if err != nil {
 		return nil, err
@@ -252,13 +287,13 @@ func (i *LDAP) UpdateEducationSchool(ctx context.Context, numberOrID string, sch
 		return nil, fmt.Errorf("school name and school number cannot be updated in the same request")
 	case schoolUnchanged:
 		logger.Debug().Str("backend", "ldap").Msg("UpdateEducationSchool: Nothing changed")
-		return i.createSchoolModelFromLDAP(e), nil
-	case displayNameUpdated:
-		if err := i.updateDisplayName(ctx, e.DN, providedDisplayName); err != nil {
+		return currentSchool, nil
+	case schoolRenamed:
+		if err := i.updateDisplayName(ctx, e.DN, school.GetDisplayName()); err != nil {
 			return nil, err
 		}
-	case schoolNumberUpdated:
-		if err := i.updateSchoolNumber(ctx, e.DN, schoolNumber); err != nil {
+	case schoolPropertiesUpdated:
+		if err := i.updateSchoolProperties(ctx, e.DN, *currentSchool, school); err != nil {
 			return nil, err
 		}
 	}
@@ -318,11 +353,7 @@ func (i *LDAP) GetEducationSchools(ctx context.Context) ([]*libregraph.Education
 		i.educationConfig.schoolScope,
 		ldap.NeverDerefAliases, 0, 0, false,
 		filter,
-		[]string{
-			i.educationConfig.schoolAttributeMap.displayName,
-			i.educationConfig.schoolAttributeMap.id,
-			i.educationConfig.schoolAttributeMap.schoolNumber,
-		},
+		i.getEducationSchoolAttrTypes(),
 		nil,
 	)
 	i.logger.Debug().Str("backend", "ldap").
@@ -640,11 +671,7 @@ func (i *LDAP) getSchoolByFilter(filter string) (*ldap.Entry, error) {
 		i.educationConfig.schoolScope,
 		ldap.NeverDerefAliases, 1, 0, false,
 		filter,
-		[]string{
-			i.educationConfig.schoolAttributeMap.displayName,
-			i.educationConfig.schoolAttributeMap.id,
-			i.educationConfig.schoolAttributeMap.schoolNumber,
-		},
+		i.getEducationSchoolAttrTypes(),
 		nil,
 	)
 	i.logger.Debug().Str("backend", "ldap").
@@ -682,11 +709,18 @@ func (i *LDAP) createSchoolModelFromLDAP(e *ldap.Entry) *libregraph.EducationSch
 	id := i.getID(e)
 	schoolNumber := i.getSchoolNumber(e)
 
+	t, err := i.getTerminationDate(e)
+	if err != nil && !errors.Is(err, errNotSet) {
+		i.logger.Error().Err(err).Str("dn", e.DN).Msg("Error reading termination date for LDAP entry")
+	}
 	if id != "" && displayName != "" && schoolNumber != "" {
 		school := libregraph.NewEducationSchool()
 		school.SetDisplayName(displayName)
 		school.SetSchoolNumber(schoolNumber)
 		school.SetId(id)
+		if t != nil {
+			school.SetTerminationDate(*t)
+		}
 		return school
 	}
 	i.logger.Warn().Str("dn", e.DN).Str("id", id).Str("displayName", displayName).Str("schoolNumber", schoolNumber).Msg("Invalid School. Missing required attribute")
@@ -706,4 +740,26 @@ func (i *LDAP) getID(e *ldap.Entry) string {
 func (i *LDAP) getDisplayName(e *ldap.Entry) string {
 	displayName := e.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.displayName)
 	return displayName
+}
+
+func (i *LDAP) getTerminationDate(e *ldap.Entry) (*time.Time, error) {
+	dateString := e.GetEqualFoldAttributeValue(i.educationConfig.schoolAttributeMap.terminationDate)
+	if dateString == "" {
+		return nil, errNotSet
+	}
+	t, err := time.Parse(ldapDateFormat, dateString)
+	if err != nil {
+		err = fmt.Errorf("Error parsing LDAP date: '%s': %w", dateString, err)
+		return nil, err
+	}
+	return &t, nil
+}
+
+func (i *LDAP) getEducationSchoolAttrTypes() []string {
+	return []string{
+		i.educationConfig.schoolAttributeMap.displayName,
+		i.educationConfig.schoolAttributeMap.id,
+		i.educationConfig.schoolAttributeMap.schoolNumber,
+		i.educationConfig.schoolAttributeMap.terminationDate,
+	}
 }

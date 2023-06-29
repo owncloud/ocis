@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/CiscoM31/godata"
 	libregraph "github.com/owncloud/libre-graph-api-go"
@@ -190,6 +191,26 @@ func (g Graph) DeleteEducationSchool(w http.ResponseWriter, r *http.Request) {
 	if schoolID == "" {
 		logger.Debug().Msg("could not delete school: missing school id")
 		errorcode.InvalidRequest.Render(w, r, http.StatusBadRequest, "missing school id")
+		return
+	}
+
+	// Read school and check if termination date is set
+	school, err := g.identityEducationBackend.GetEducationSchool(r.Context(), schoolID)
+	if err != nil {
+		logger.Debug().Err(err).Msg("could not get school: backend error")
+		errorcode.RenderError(w, r, err)
+		return
+	}
+	termination, ok := school.GetTerminationDateOk()
+	if !ok {
+		logger.Debug().Msg("cannot delete school: not termination date set")
+		errorcode.NotAllowed.Render(w, r, http.StatusMethodNotAllowed, "no termination date set")
+		return
+	}
+
+	if time.Now().Before(*termination) {
+		logger.Debug().Time("terminationDate", *termination).Msg("cannot delete school: termination date not reached")
+		errorcode.NotAllowed.Render(w, r, http.StatusMethodNotAllowed, "can't delete school before termination date")
 		return
 	}
 
