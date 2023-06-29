@@ -12,6 +12,7 @@ package libregraph
 
 import (
 	"encoding/json"
+	"time"
 )
 
 // EducationSchool Represents a school
@@ -22,6 +23,8 @@ type EducationSchool struct {
 	DisplayName *string `json:"displayName,omitempty"`
 	// School number
 	SchoolNumber *string `json:"schoolNumber,omitempty"`
+	// Date and time at which the service for this organization is scheduled to be terminated
+	TerminationDate NullableTime `json:"terminationDate,omitempty"`
 }
 
 // NewEducationSchool instantiates a new EducationSchool object
@@ -137,6 +140,49 @@ func (o *EducationSchool) SetSchoolNumber(v string) {
 	o.SchoolNumber = &v
 }
 
+// GetTerminationDate returns the TerminationDate field value if set, zero value otherwise (both if not set or set to explicit null).
+func (o *EducationSchool) GetTerminationDate() time.Time {
+	if o == nil || o.TerminationDate.Get() == nil {
+		var ret time.Time
+		return ret
+	}
+	return *o.TerminationDate.Get()
+}
+
+// GetTerminationDateOk returns a tuple with the TerminationDate field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+// NOTE: If the value is an explicit nil, `nil, true` will be returned
+func (o *EducationSchool) GetTerminationDateOk() (*time.Time, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return o.TerminationDate.Get(), o.TerminationDate.IsSet()
+}
+
+// HasTerminationDate returns a boolean if a field has been set.
+func (o *EducationSchool) HasTerminationDate() bool {
+	if o != nil && o.TerminationDate.IsSet() {
+		return true
+	}
+
+	return false
+}
+
+// SetTerminationDate gets a reference to the given NullableTime and assigns it to the TerminationDate field.
+func (o *EducationSchool) SetTerminationDate(v time.Time) {
+	o.TerminationDate.Set(&v)
+}
+
+// SetTerminationDateNil sets the value for TerminationDate to be an explicit nil
+func (o *EducationSchool) SetTerminationDateNil() {
+	o.TerminationDate.Set(nil)
+}
+
+// UnsetTerminationDate ensures that no value is present for TerminationDate, not even an explicit nil
+func (o *EducationSchool) UnsetTerminationDate() {
+	o.TerminationDate.Unset()
+}
+
 func (o EducationSchool) MarshalJSON() ([]byte, error) {
 	toSerialize := map[string]interface{}{}
 	if o.Id != nil {
@@ -147,6 +193,9 @@ func (o EducationSchool) MarshalJSON() ([]byte, error) {
 	}
 	if o.SchoolNumber != nil {
 		toSerialize["schoolNumber"] = o.SchoolNumber
+	}
+	if o.TerminationDate.IsSet() {
+		toSerialize["terminationDate"] = o.TerminationDate.Get()
 	}
 	return json.Marshal(toSerialize)
 }
