@@ -470,6 +470,8 @@ func (r ApiDeleteSchoolRequest) Execute() (*http.Response, error) {
 /*
 DeleteSchool Delete school
 
+Deletes a school. A school can only be delete if it has the terminationDate property set. And if that termination Date is in the past.
+
  @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  @param schoolId key: id or schoolNumber of school
  @return ApiDeleteSchoolRequest
