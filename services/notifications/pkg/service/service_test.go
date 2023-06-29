@@ -21,7 +21,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/graph/pkg/config/defaults"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/channels"
 	"github.com/owncloud/ocis/v2/services/notifications/pkg/service"
-	"github.com/test-go/testify/mock"
+	"github.com/stretchr/testify/mock"
 	"go-micro.dev/v4/client"
 	"google.golang.org/grpc"
 )

@@ -25,7 +25,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/userlog/mocks"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/config"
 	"github.com/owncloud/ocis/v2/services/userlog/pkg/service"
-	"github.com/test-go/testify/mock"
+	"github.com/stretchr/testify/mock"
 	microevents "go-micro.dev/v4/events"
 	microstore "go-micro.dev/v4/store"
 	"google.golang.org/grpc"

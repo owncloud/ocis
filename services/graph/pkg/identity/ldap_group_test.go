@@ -9,7 +9,7 @@ import (
 	"github.com/go-ldap/ldap/v3"
 	"github.com/owncloud/ocis/v2/services/graph/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/test-go/testify/mock"
+	"github.com/stretchr/testify/mock"
 )
 
 var groupEntry = ldap.NewEntry("cn=group",

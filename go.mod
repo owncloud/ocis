@@ -74,7 +74,6 @@ require (
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
-	github.com/test-go/testify v1.1.4
 	github.com/thejerf/suture/v4 v4.0.2
 	github.com/tus/tusd v1.10.1
 	github.com/urfave/cli/v2 v2.25.7
