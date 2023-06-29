@@ -17,6 +17,7 @@ The following sections list the changes for unreleased.
 * Enhancement - Add IDs to graph resource logging: [#6593](https://github.com/owncloud/ocis/pull/6593)
 * Enhancement - Add permissions to report: [#6528](https://github.com/owncloud/ocis/pull/6528)
 * Enhancement - Add more metadata to the remote item: [#6300](https://github.com/owncloud/ocis/pull/6300)
+* Enhancement - Add SSE Endpoint: [#5998](https://github.com/owncloud/ocis/pull/5998)
 * Enhancement - We added the storage id to the audit log for spaces: [#6548](https://github.com/owncloud/ocis/pull/6548)
 * Enhancement - Make the post logout redirect uri configurable: [#6583](https://github.com/owncloud/ocis/pull/6583)
 * Enhancement - Make the app provider service name configurable: [#6482](https://github.com/owncloud/ocis/pull/6482)
@@ -123,6 +124,12 @@ The following sections list the changes for unreleased.
    to resolve shared files directly on the source space.
 
    https://github.com/owncloud/ocis/pull/6300
+
+* Enhancement - Add SSE Endpoint: [#5998](https://github.com/owncloud/ocis/pull/5998)
+
+   Add a server-sent events (sse) endpoint for the userlog service
+
+   https://github.com/owncloud/ocis/pull/5998
 
 * Enhancement - We added the storage id to the audit log for spaces: [#6548](https://github.com/owncloud/ocis/pull/6548)
 
