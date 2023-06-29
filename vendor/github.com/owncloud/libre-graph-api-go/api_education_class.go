@@ -42,9 +42,9 @@ func (r ApiAddUserToClassRequest) Execute() (*http.Response, error) {
 /*
 AddUserToClass Assign a user to a class
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param classId key: id or externalId of class
- @return ApiAddUserToClassRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param classId key: id or externalId of class
+	@return ApiAddUserToClassRequest
 */
 func (a *EducationClassApiService) AddUserToClass(ctx context.Context, classId string) ApiAddUserToClassRequest {
 	return ApiAddUserToClassRequest{
@@ -150,8 +150,8 @@ func (r ApiCreateClassRequest) Execute() (*EducationClass, *http.Response, error
 /*
 CreateClass Add new education class
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateClassRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateClassRequest
 */
 func (a *EducationClassApiService) CreateClass(ctx context.Context) ApiCreateClassRequest {
 	return ApiCreateClassRequest{
@@ -161,7 +161,8 @@ func (a *EducationClassApiService) CreateClass(ctx context.Context) ApiCreateCla
 }
 
 // Execute executes the request
-//  @return EducationClass
+//
+//	@return EducationClass
 func (a *EducationClassApiService) CreateClassExecute(r ApiCreateClassRequest) (*EducationClass, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -260,9 +261,9 @@ func (r ApiDeleteClassRequest) Execute() (*http.Response, error) {
 /*
 DeleteClass Delete education class
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param classId key: id or externalId of class
- @return ApiDeleteClassRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param classId key: id or externalId of class
+	@return ApiDeleteClassRequest
 */
 func (a *EducationClassApiService) DeleteClass(ctx context.Context, classId string) ApiDeleteClassRequest {
 	return ApiDeleteClassRequest{
@@ -358,10 +359,10 @@ func (r ApiDeleteUserFromClassRequest) Execute() (*http.Response, error) {
 /*
 DeleteUserFromClass Unassign user from a class
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param classId key: id or externalId of class
- @param userId key: id or username of the user to unassign from class
- @return ApiDeleteUserFromClassRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param classId key: id or externalId of class
+	@param userId key: id or username of the user to unassign from class
+	@return ApiDeleteUserFromClassRequest
 */
 func (a *EducationClassApiService) DeleteUserFromClass(ctx context.Context, classId string, userId string) ApiDeleteUserFromClassRequest {
 	return ApiDeleteUserFromClassRequest{
@@ -458,9 +459,9 @@ func (r ApiGetClassRequest) Execute() (*EducationClass, *http.Response, error) {
 /*
 GetClass Get class by key
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param classId key: id or externalId of class
- @return ApiGetClassRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param classId key: id or externalId of class
+	@return ApiGetClassRequest
 */
 func (a *EducationClassApiService) GetClass(ctx context.Context, classId string) ApiGetClassRequest {
 	return ApiGetClassRequest{
@@ -471,7 +472,8 @@ func (a *EducationClassApiService) GetClass(ctx context.Context, classId string)
 }
 
 // Execute executes the request
-//  @return EducationClass
+//
+//	@return EducationClass
 func (a *EducationClassApiService) GetClassExecute(r ApiGetClassRequest) (*EducationClass, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -566,9 +568,9 @@ func (r ApiListClassMembersRequest) Execute() (*CollectionOfEducationUser, *http
 /*
 ListClassMembers Get the educationClass resources owned by an educationSchool
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param classId key: id or externalId of class
- @return ApiListClassMembersRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param classId key: id or externalId of class
+	@return ApiListClassMembersRequest
 */
 func (a *EducationClassApiService) ListClassMembers(ctx context.Context, classId string) ApiListClassMembersRequest {
 	return ApiListClassMembersRequest{
@@ -579,7 +581,8 @@ func (a *EducationClassApiService) ListClassMembers(ctx context.Context, classId
 }
 
 // Execute executes the request
-//  @return CollectionOfEducationUser
+//
+//	@return CollectionOfEducationUser
 func (a *EducationClassApiService) ListClassMembersExecute(r ApiListClassMembersRequest) (*CollectionOfEducationUser, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -673,8 +676,8 @@ func (r ApiListClassesRequest) Execute() (*CollectionOfClass, *http.Response, er
 /*
 ListClasses list education classes
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListClassesRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListClassesRequest
 */
 func (a *EducationClassApiService) ListClasses(ctx context.Context) ApiListClassesRequest {
 	return ApiListClassesRequest{
@@ -684,7 +687,8 @@ func (a *EducationClassApiService) ListClasses(ctx context.Context) ApiListClass
 }
 
 // Execute executes the request
-//  @return CollectionOfClass
+//
+//	@return CollectionOfClass
 func (a *EducationClassApiService) ListClassesExecute(r ApiListClassesRequest) (*CollectionOfClass, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -785,9 +789,9 @@ func (r ApiUpdateClassRequest) Execute() (*EducationClass, *http.Response, error
 /*
 UpdateClass Update properties of a education class
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param classId key: id or externalId of class
- @return ApiUpdateClassRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param classId key: id or externalId of class
+	@return ApiUpdateClassRequest
 */
 func (a *EducationClassApiService) UpdateClass(ctx context.Context, classId string) ApiUpdateClassRequest {
 	return ApiUpdateClassRequest{
@@ -798,7 +802,8 @@ func (a *EducationClassApiService) UpdateClass(ctx context.Context, classId stri
 }
 
 // Execute executes the request
-//  @return EducationClass
+//
+//	@return EducationClass
 func (a *EducationClassApiService) UpdateClassExecute(r ApiUpdateClassRequest) (*EducationClass, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPatch

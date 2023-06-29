@@ -41,8 +41,8 @@ func (r ApiCreateDriveRequest) Execute() (*Drive, *http.Response, error) {
 /*
 CreateDrive Create a new drive of a specific type
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateDriveRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateDriveRequest
 */
 func (a *DrivesApiService) CreateDrive(ctx context.Context) ApiCreateDriveRequest {
 	return ApiCreateDriveRequest{
@@ -52,7 +52,8 @@ func (a *DrivesApiService) CreateDrive(ctx context.Context) ApiCreateDriveReques
 }
 
 // Execute executes the request
-//  @return Drive
+//
+//	@return Drive
 func (a *DrivesApiService) CreateDriveExecute(r ApiCreateDriveRequest) (*Drive, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -158,9 +159,9 @@ func (r ApiDeleteDriveRequest) Execute() (*http.Response, error) {
 /*
 DeleteDrive Delete a specific space
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @return ApiDeleteDriveRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@return ApiDeleteDriveRequest
 */
 func (a *DrivesApiService) DeleteDrive(ctx context.Context, driveId string) ApiDeleteDriveRequest {
 	return ApiDeleteDriveRequest{
@@ -258,9 +259,9 @@ func (r ApiGetDriveRequest) Execute() (*Drive, *http.Response, error) {
 /*
 GetDrive Get drive by id
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @return ApiGetDriveRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@return ApiGetDriveRequest
 */
 func (a *DrivesApiService) GetDrive(ctx context.Context, driveId string) ApiGetDriveRequest {
 	return ApiGetDriveRequest{
@@ -271,7 +272,8 @@ func (a *DrivesApiService) GetDrive(ctx context.Context, driveId string) ApiGetD
 }
 
 // Execute executes the request
-//  @return Drive
+//
+//	@return Drive
 func (a *DrivesApiService) GetDriveExecute(r ApiGetDriveRequest) (*Drive, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -373,9 +375,9 @@ func (r ApiUpdateDriveRequest) Execute() (*Drive, *http.Response, error) {
 /*
 UpdateDrive Update the drive
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @return ApiUpdateDriveRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@return ApiUpdateDriveRequest
 */
 func (a *DrivesApiService) UpdateDrive(ctx context.Context, driveId string) ApiUpdateDriveRequest {
 	return ApiUpdateDriveRequest{
@@ -386,7 +388,8 @@ func (a *DrivesApiService) UpdateDrive(ctx context.Context, driveId string) ApiU
 }
 
 // Execute executes the request
-//  @return Drive
+//
+//	@return Drive
 func (a *DrivesApiService) UpdateDriveExecute(r ApiUpdateDriveRequest) (*Drive, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPatch

@@ -41,8 +41,8 @@ func (r ApiCreateEducationUserRequest) Execute() (*EducationUser, *http.Response
 /*
 CreateEducationUser Add new education user
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiCreateEducationUserRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiCreateEducationUserRequest
 */
 func (a *EducationUserApiService) CreateEducationUser(ctx context.Context) ApiCreateEducationUserRequest {
 	return ApiCreateEducationUserRequest{
@@ -52,7 +52,8 @@ func (a *EducationUserApiService) CreateEducationUser(ctx context.Context) ApiCr
 }
 
 // Execute executes the request
-//  @return EducationUser
+//
+//	@return EducationUser
 func (a *EducationUserApiService) CreateEducationUserExecute(r ApiCreateEducationUserRequest) (*EducationUser, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPost
@@ -151,9 +152,9 @@ func (r ApiDeleteEducationUserRequest) Execute() (*http.Response, error) {
 /*
 DeleteEducationUser Delete educationUser
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param userId key: id or username of user
- @return ApiDeleteEducationUserRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param userId key: id or username of user
+	@return ApiDeleteEducationUserRequest
 */
 func (a *EducationUserApiService) DeleteEducationUser(ctx context.Context, userId string) ApiDeleteEducationUserRequest {
 	return ApiDeleteEducationUserRequest{
@@ -255,9 +256,9 @@ func (r ApiGetEducationUserRequest) Execute() (*EducationUser, *http.Response, e
 /*
 GetEducationUser Get properties of educationUser
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param userId key: id or username of user
- @return ApiGetEducationUserRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param userId key: id or username of user
+	@return ApiGetEducationUserRequest
 */
 func (a *EducationUserApiService) GetEducationUser(ctx context.Context, userId string) ApiGetEducationUserRequest {
 	return ApiGetEducationUserRequest{
@@ -268,7 +269,8 @@ func (a *EducationUserApiService) GetEducationUser(ctx context.Context, userId s
 }
 
 // Execute executes the request
-//  @return EducationUser
+//
+//	@return EducationUser
 func (a *EducationUserApiService) GetEducationUserExecute(r ApiGetEducationUserRequest) (*EducationUser, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -379,8 +381,8 @@ func (r ApiListEducationUsersRequest) Execute() (*CollectionOfEducationUser, *ht
 /*
 ListEducationUsers Get entities from education users
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListEducationUsersRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListEducationUsersRequest
 */
 func (a *EducationUserApiService) ListEducationUsers(ctx context.Context) ApiListEducationUsersRequest {
 	return ApiListEducationUsersRequest{
@@ -390,7 +392,8 @@ func (a *EducationUserApiService) ListEducationUsers(ctx context.Context) ApiLis
 }
 
 // Execute executes the request
-//  @return CollectionOfEducationUser
+//
+//	@return CollectionOfEducationUser
 func (a *EducationUserApiService) ListEducationUsersExecute(r ApiListEducationUsersRequest) (*CollectionOfEducationUser, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -497,9 +500,9 @@ func (r ApiUpdateEducationUserRequest) Execute() (*EducationUser, *http.Response
 /*
 UpdateEducationUser Update properties of educationUser
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param userId key: id or username of user
- @return ApiUpdateEducationUserRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param userId key: id or username of user
+	@return ApiUpdateEducationUserRequest
 */
 func (a *EducationUserApiService) UpdateEducationUser(ctx context.Context, userId string) ApiUpdateEducationUserRequest {
 	return ApiUpdateEducationUserRequest{
@@ -510,7 +513,8 @@ func (a *EducationUserApiService) UpdateEducationUser(ctx context.Context, userI
 }
 
 // Execute executes the request
-//  @return EducationUser
+//
+//	@return EducationUser
 func (a *EducationUserApiService) UpdateEducationUserExecute(r ApiUpdateEducationUserRequest) (*EducationUser, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPatch

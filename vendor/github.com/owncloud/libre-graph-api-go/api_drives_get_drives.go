@@ -47,8 +47,8 @@ func (r ApiListAllDrivesRequest) Execute() (*CollectionOfDrives1, *http.Response
 /*
 ListAllDrives Get all available drives
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListAllDrivesRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListAllDrivesRequest
 */
 func (a *DrivesGetDrivesApiService) ListAllDrives(ctx context.Context) ApiListAllDrivesRequest {
 	return ApiListAllDrivesRequest{
@@ -58,7 +58,8 @@ func (a *DrivesGetDrivesApiService) ListAllDrives(ctx context.Context) ApiListAl
 }
 
 // Execute executes the request
-//  @return CollectionOfDrives1
+//
+//	@return CollectionOfDrives1
 func (a *DrivesGetDrivesApiService) ListAllDrivesExecute(r ApiListAllDrivesRequest) (*CollectionOfDrives1, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet

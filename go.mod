@@ -337,3 +337,5 @@ require (
 replace github.com/cs3org/go-cs3apis => github.com/2403905/go-cs3apis v0.0.0-20230517122726-727045414fd1
 
 // replace github.com/cs3org/reva/v2 => github.com/micbar/reva/v2 v2.0.0-20230626125956-c381fe19a108
+
+replace github.com/owncloud/libre-graph-api-go => github.com/rhafer/libre-graph-api-go v0.13.4-0.20230629154140-fa67e25dc257

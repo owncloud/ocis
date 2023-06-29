@@ -42,9 +42,9 @@ func (r ApiDeleteUserRequest) Execute() (*http.Response, error) {
 /*
 DeleteUser Delete entity from users
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param userId key: id or name of user
- @return ApiDeleteUserRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param userId key: id or name of user
+	@return ApiDeleteUserRequest
 */
 func (a *UserApiService) DeleteUser(ctx context.Context, userId string) ApiDeleteUserRequest {
 	return ApiDeleteUserRequest{
@@ -149,9 +149,9 @@ func (r ApiExportPersonalDataRequest) Execute() (*http.Response, error) {
 /*
 ExportPersonalData export personal data of a user
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param userId key: id or name of user
- @return ApiExportPersonalDataRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param userId key: id or name of user
+	@return ApiExportPersonalDataRequest
 */
 func (a *UserApiService) ExportPersonalData(ctx context.Context, userId string) ApiExportPersonalDataRequest {
 	return ApiExportPersonalDataRequest{
@@ -262,9 +262,9 @@ func (r ApiGetUserRequest) Execute() (*User, *http.Response, error) {
 /*
 GetUser Get entity from users by key
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param userId key: id or name of user
- @return ApiGetUserRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param userId key: id or name of user
+	@return ApiGetUserRequest
 */
 func (a *UserApiService) GetUser(ctx context.Context, userId string) ApiGetUserRequest {
 	return ApiGetUserRequest{
@@ -275,7 +275,8 @@ func (a *UserApiService) GetUser(ctx context.Context, userId string) ApiGetUserR
 }
 
 // Execute executes the request
-//  @return User
+//
+//	@return User
 func (a *UserApiService) GetUserExecute(r ApiGetUserRequest) (*User, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
@@ -383,9 +384,9 @@ func (r ApiUpdateUserRequest) Execute() (*User, *http.Response, error) {
 /*
 UpdateUser Update entity in users
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param userId key: id of user
- @return ApiUpdateUserRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param userId key: id of user
+	@return ApiUpdateUserRequest
 */
 func (a *UserApiService) UpdateUser(ctx context.Context, userId string) ApiUpdateUserRequest {
 	return ApiUpdateUserRequest{
@@ -396,7 +397,8 @@ func (a *UserApiService) UpdateUser(ctx context.Context, userId string) ApiUpdat
 }
 
 // Execute executes the request
-//  @return User
+//
+//	@return User
 func (a *UserApiService) UpdateUserExecute(r ApiUpdateUserRequest) (*User, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodPatch

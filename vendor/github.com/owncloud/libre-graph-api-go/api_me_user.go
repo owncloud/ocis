@@ -40,8 +40,8 @@ func (r ApiGetOwnUserRequest) Execute() (*User, *http.Response, error) {
 /*
 GetOwnUser Get current user
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetOwnUserRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetOwnUserRequest
 */
 func (a *MeUserApiService) GetOwnUser(ctx context.Context) ApiGetOwnUserRequest {
 	return ApiGetOwnUserRequest{
@@ -51,7 +51,8 @@ func (a *MeUserApiService) GetOwnUser(ctx context.Context) ApiGetOwnUserRequest 
 }
 
 // Execute executes the request
-//  @return User
+//
+//	@return User
 func (a *MeUserApiService) GetOwnUserExecute(r ApiGetOwnUserRequest) (*User, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet

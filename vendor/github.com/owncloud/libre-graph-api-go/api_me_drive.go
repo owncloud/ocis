@@ -33,8 +33,8 @@ func (r ApiGetHomeRequest) Execute() (*Drive, *http.Response, error) {
 /*
 GetHome Get personal space for user
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiGetHomeRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiGetHomeRequest
 */
 func (a *MeDriveApiService) GetHome(ctx context.Context) ApiGetHomeRequest {
 	return ApiGetHomeRequest{
@@ -44,7 +44,8 @@ func (a *MeDriveApiService) GetHome(ctx context.Context) ApiGetHomeRequest {
 }
 
 // Execute executes the request
-//  @return Drive
+//
+//	@return Drive
 func (a *MeDriveApiService) GetHomeExecute(r ApiGetHomeRequest) (*Drive, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet

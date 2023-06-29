@@ -1503,7 +1503,7 @@ github.com/opentracing/opentracing-go/log
 # github.com/orcaman/concurrent-map v1.0.0
 ## explicit
 github.com/orcaman/concurrent-map
-# github.com/owncloud/libre-graph-api-go v1.0.5-0.20230512172639-d458ad6b300b
+# github.com/owncloud/libre-graph-api-go v1.0.5-0.20230512172639-d458ad6b300b => github.com/rhafer/libre-graph-api-go v0.13.4-0.20230629154140-fa67e25dc257
 ## explicit; go 1.13
 github.com/owncloud/libre-graph-api-go
 # github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c
@@ -2196,3 +2196,4 @@ stash.kopano.io/kgol/oidc-go
 ## explicit; go 1.13
 stash.kopano.io/kgol/rndm
 # github.com/cs3org/go-cs3apis => github.com/2403905/go-cs3apis v0.0.0-20230517122726-727045414fd1
+# github.com/owncloud/libre-graph-api-go => github.com/rhafer/libre-graph-api-go v0.13.4-0.20230629154140-fa67e25dc257

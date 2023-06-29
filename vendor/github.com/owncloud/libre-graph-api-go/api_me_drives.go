@@ -47,8 +47,8 @@ func (r ApiListMyDrivesRequest) Execute() (*CollectionOfDrives, *http.Response, 
 /*
 ListMyDrives Get all drives where the current user is a regular member of
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @return ApiListMyDrivesRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@return ApiListMyDrivesRequest
 */
 func (a *MeDrivesApiService) ListMyDrives(ctx context.Context) ApiListMyDrivesRequest {
 	return ApiListMyDrivesRequest{
@@ -58,7 +58,8 @@ func (a *MeDrivesApiService) ListMyDrives(ctx context.Context) ApiListMyDrivesRe
 }
 
 // Execute executes the request
-//  @return CollectionOfDrives
+//
+//	@return CollectionOfDrives
 func (a *MeDrivesApiService) ListMyDrivesExecute(r ApiListMyDrivesRequest) (*CollectionOfDrives, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet

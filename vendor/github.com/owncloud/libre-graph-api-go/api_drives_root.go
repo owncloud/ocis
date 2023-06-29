@@ -35,9 +35,9 @@ func (r ApiGetRootRequest) Execute() (*DriveItem, *http.Response, error) {
 /*
 GetRoot Get root from arbitrary space
 
- @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- @param driveId key: id of drive
- @return ApiGetRootRequest
+	@param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+	@param driveId key: id of drive
+	@return ApiGetRootRequest
 */
 func (a *DrivesRootApiService) GetRoot(ctx context.Context, driveId string) ApiGetRootRequest {
 	return ApiGetRootRequest{
@@ -48,7 +48,8 @@ func (a *DrivesRootApiService) GetRoot(ctx context.Context, driveId string) ApiG
 }
 
 // Execute executes the request
-//  @return DriveItem
+//
+//	@return DriveItem
 func (a *DrivesRootApiService) GetRootExecute(r ApiGetRootRequest) (*DriveItem, *http.Response, error) {
 	var (
 		localVarHTTPMethod  = http.MethodGet
