@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	userv1beta1 "github.com/cs3org/go-cs3apis/cs3/identity/user/v1beta1"
@@ -342,45 +343,64 @@ var _ = Describe("Schools", func() {
 	})
 
 	Describe("DeleteEducationSchool", func() {
+		schoolWithFutureTermination := libregraph.NewEducationSchool()
+		schoolWithFutureTermination.SetId("schoolWithFutureTermination")
+		schoolWithFutureTermination.SetTerminationDate(time.Now().Add(time.Hour * 24))
+
+		schoolWithPastTermination := libregraph.NewEducationSchool()
+		schoolWithPastTermination.SetId("schoolWithPastTermination")
+		schoolWithPastTermination.SetTerminationDate(time.Now().Add(-time.Hour * 24))
+
 		Context("with an existing school", func() {
 			BeforeEach(func() {
-				identityEducationBackend.On("GetEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(newSchool, nil)
+				identityEducationBackend.On("GetEducationSchool", mock.Anything, "school1").Return(newSchool, nil)
+				identityEducationBackend.On("GetEducationSchool", mock.Anything, "schoolWithFutureTermination", mock.Anything).Return(schoolWithFutureTermination, nil)
+				identityEducationBackend.On("GetEducationSchool", mock.Anything, "schoolWithPastTermination", mock.Anything).Return(schoolWithPastTermination, nil)
 			})
-		})
 
-		It("deletes the school", func() {
-			identityEducationBackend.On("DeleteEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(nil)
-			identityEducationBackend.On("GetEducationSchoolUsers", mock.Anything, mock.Anything, mock.Anything).Return([]*libregraph.EducationUser{}, nil)
-			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/education/schools", nil)
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("schoolID", *newSchool.Id)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.DeleteEducationSchool(rr, r)
+			DescribeTable("checks terminnation date",
+				func(schoolId string, statusCode int) {
+					identityEducationBackend.On("DeleteEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+					identityEducationBackend.On("GetEducationSchoolUsers", mock.Anything, mock.Anything, mock.Anything).Return([]*libregraph.EducationUser{}, nil)
+					r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/education/schools", nil)
+					rctx := chi.NewRouteContext()
+					rctx.URLParams.Add("schoolID", schoolId)
+					r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+					svc.DeleteEducationSchool(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusNoContent))
-			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "DeleteEducationSchool", 1)
-		})
+					Expect(rr.Code).To(Equal(statusCode))
+					if rr.Code == http.StatusNoContent {
+						identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "DeleteEducationSchool", 1)
+					} else {
+						identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "DeleteEducationSchool", 0)
+					}
+				},
+				Entry("fails when school has no termination date", "school1", http.StatusMethodNotAllowed),
+				Entry("fails when school has a termination date in the future", "schoolWithFutureTermination", http.StatusMethodNotAllowed),
+				Entry("succeeds when school has a termination date in the past", "schoolWithPastTermination", http.StatusNoContent),
+			)
 
-		It("removes the users from the school", func() {
-			user1 := libregraph.NewEducationUser()
-			user1.SetId("user1")
-			user2 := libregraph.NewEducationUser()
-			user2.SetId("user2")
-			identityEducationBackend.On("GetEducationSchoolUsers", mock.Anything, mock.Anything, mock.Anything).Return([]*libregraph.EducationUser{user1, user2}, nil)
-			identityEducationBackend.On("DeleteEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(nil)
-			identityEducationBackend.On("RemoveUserFromEducationSchool", mock.Anything, mock.Anything, *user1.Id).Return(nil)
-			identityEducationBackend.On("RemoveUserFromEducationSchool", mock.Anything, mock.Anything, *user2.Id).Return(nil)
+			It("removes the users from the school", func() {
+				user1 := libregraph.NewEducationUser()
+				user1.SetId("user1")
+				user2 := libregraph.NewEducationUser()
+				user2.SetId("user2")
+				identityEducationBackend.On("GetEducationSchoolUsers", mock.Anything, mock.Anything, mock.Anything).Return([]*libregraph.EducationUser{user1, user2}, nil)
+				identityEducationBackend.On("DeleteEducationSchool", mock.Anything, mock.Anything, mock.Anything).Return(nil)
+				identityEducationBackend.On("RemoveUserFromEducationSchool", mock.Anything, mock.Anything, *user1.Id).Return(nil)
+				identityEducationBackend.On("RemoveUserFromEducationSchool", mock.Anything, mock.Anything, *user2.Id).Return(nil)
 
-			r := httptest.NewRequest(http.MethodPatch, "/graph/v1.0/education/schools", nil)
-			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("schoolID", *newSchool.Id)
-			r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
-			svc.DeleteEducationSchool(rr, r)
+				r := httptest.NewRequest(http.MethodDelete, "/graph/v1.0/education/schools", nil)
+				rctx := chi.NewRouteContext()
+				rctx.URLParams.Add("schoolID", "schoolWithPastTermination")
+				r = r.WithContext(context.WithValue(ctxpkg.ContextSetUser(ctx, currentUser), chi.RouteCtxKey, rctx))
+				svc.DeleteEducationSchool(rr, r)
 
-			Expect(rr.Code).To(Equal(http.StatusNoContent))
-			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "DeleteEducationSchool", 1)
-			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "RemoveUserFromEducationSchool", 2)
-			identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "GetEducationSchoolUsers", 1)
+				Expect(rr.Code).To(Equal(http.StatusNoContent))
+				identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "DeleteEducationSchool", 1)
+				identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "RemoveUserFromEducationSchool", 2)
+				identityEducationBackend.AssertNumberOfCalls(GinkgoT(), "GetEducationSchoolUsers", 1)
+			})
 		})
 	})
 
