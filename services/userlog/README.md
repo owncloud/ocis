@@ -32,7 +32,7 @@ The `userlog` service provides an API to retrieve configured events. For now, th
 
 ## Subscribing
 
-Additionaly to the oc10 API the `userlog` service also provides an `/sse` (Server-Sent Events) endpoint to be informed by the server when an event happens. See [here](https://medium.com/yemeksepeti-teknoloji/what-is-server-sent-events-sse-and-how-to-implement-it-904938bffd73) for example for simple introduction to server sent events. The `sse` endpoint will respect language changes of the user without needing to reconnect.
+Additionaly to the oc10 API, the `userlog` service also provides an `/sse` (Server-Sent Events) endpoint to be informed by the server when an event happens. See [What is Server-Sent Events](https://medium.com/yemeksepeti-teknoloji/what-is-server-sent-events-sse-and-how-to-implement-it-904938bffd73) for a simple introduction and examples to server sent events. The `sse` endpoint will respect language changes of the user without needing to reconnect.
 
 ## Deleting
 
