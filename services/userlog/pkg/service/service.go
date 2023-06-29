@@ -82,6 +82,7 @@ func NewUserlogService(opts ...Option) (*UserlogService, error) {
 
 	ul.m.Route("/ocs/v2.php/apps/notifications/api/v1/notifications", func(r chi.Router) {
 		r.Get("/", ul.HandleGetEvents)
+		r.Post("/", ul.HandlePostEvent)
 		r.Delete("/", ul.HandleDeleteEvents)
 
 		if !ul.cfg.DisableSSE {
@@ -235,6 +236,42 @@ func (ul *UserlogService) DeleteEvents(userid string, evids []string) error {
 	})
 }
 
+// StoreGlobalEvent will store a global event that will be returned with each `GetEvents` request
+func (ul *UserlogService) StoreGlobalEvent(typ string, data json.RawMessage) error {
+	switch typ {
+	default:
+		return fmt.Errorf("unknown event type: %s", typ)
+	case "deprovision":
+		var req DeprovisionData
+		if err := json.Unmarshal(data, &req); err != nil {
+			return err
+		}
+
+		// TODO: check for proper time format
+
+		return ul.storeGlobalEvent(typ, req)
+
+	}
+}
+
+// GetGlobalEvents will return all global events
+func (ul *UserlogService) GetGlobalEvents() (map[string]json.RawMessage, error) {
+	out := make(map[string]json.RawMessage)
+
+	recs, err := ul.store.Read("global-events")
+	if err != nil && err != store.ErrNotFound {
+		return out, err
+	}
+
+	if len(recs) > 0 {
+		if err := json.Unmarshal(recs[0].Value, &out); err != nil {
+			return out, err
+		}
+	}
+
+	return out, nil
+}
+
 func (ul *UserlogService) addEventToUser(userid string, event events.Event) error {
 	if !ul.cfg.DisableSSE {
 		if err := ul.sendSSE(userid, event); err != nil {
@@ -309,6 +346,30 @@ func (ul *UserlogService) alterUserEventList(userid string, alter func([]string)
 	return ul.store.Write(&store.Record{
 		Key:   userid,
 		Value: b,
+	})
+}
+
+func (ul *UserlogService) storeGlobalEvent(typ string, ev interface{}) error {
+	b, err := json.Marshal(ev)
+	if err != nil {
+		return err
+	}
+
+	evs, err := ul.GetGlobalEvents()
+	if err != nil && err != store.ErrNotFound {
+		return err
+	}
+
+	evs[typ] = b
+
+	val, err := json.Marshal(evs)
+	if err != nil {
+		return err
+	}
+
+	return ul.store.Write(&store.Record{
+		Key:   "global-events",
+		Value: val,
 	})
 }
 

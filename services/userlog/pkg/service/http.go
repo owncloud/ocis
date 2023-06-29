@@ -57,6 +57,23 @@ func (ul *UserlogService) HandleGetEvents(w http.ResponseWriter, r *http.Request
 		resp.OCS.Data = append(resp.OCS.Data, noti)
 	}
 
+	glevs, err := ul.GetGlobalEvents()
+	if err != nil {
+		ul.log.Error().Err(err).Int("returned statuscode", http.StatusInternalServerError).Msg("get global events failed")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	for t, data := range glevs {
+		noti, err := conv.ConvertGlobalEvent(t, data)
+		if err != nil {
+			ul.log.Error().Err(err).Str("eventtype", t).Msg("failed to convert event")
+			continue
+		}
+
+		resp.OCS.Data = append(resp.OCS.Data, noti)
+	}
+
 	resp.OCS.Meta.StatusCode = http.StatusOK
 	b, _ := json.Marshal(resp)
 	w.Write(b)
@@ -87,6 +104,40 @@ func (ul *UserlogService) HandleSSE(w http.ResponseWriter, r *http.Request) {
 	r.URL.RawQuery = q.Encode()
 
 	ul.sse.ServeHTTP(w, r)
+}
+
+// HandlePostEvent is the POST handler for events
+func (ul *UserlogService) HandlePostEvent(w http.ResponseWriter, r *http.Request) {
+	u, ok := ctx.ContextGetUser(r.Context())
+	if !ok {
+		ul.log.Error().Msg("post: no user in context")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	uid := u.GetId().GetOpaqueId()
+	if uid == "" {
+		ul.log.Error().Msg("post: user in context is broken")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// TODO: Check user is allowed to do this
+
+	var req PostEventsRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		ul.log.Error().Err(err).Int("returned statuscode", http.StatusBadRequest).Msg("request body is malformed")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if err := ul.StoreGlobalEvent(req.Type, req.Data); err != nil {
+		ul.log.Error().Err(err).Msg("post: error storing global event")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 // HandleDeleteEvents is the DELETE handler for events
@@ -129,4 +180,15 @@ type GetEventResponseOC10 struct {
 // DeleteEventsRequest is the expected body for the delete request
 type DeleteEventsRequest struct {
 	IDs []string `json:"ids"`
+}
+
+// PostEventsRequest is the expected body for the post request
+type PostEventsRequest struct {
+	Type string          `json:"type"`
+	Data json.RawMessage `json:"data"`
+}
+
+// DeprovisionData is the expected `data` for the PostEventsRequest when deprovisioning
+type DeprovisionData struct {
+	DeprovisionDate string `json:"date"`
 }

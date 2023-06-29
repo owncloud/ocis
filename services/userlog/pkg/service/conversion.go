@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"embed"
+	"encoding/json"
 	"fmt"
 	"io/fs"
 	"strings"
@@ -28,6 +29,7 @@ var (
 	_resourceTypeResource = "resource"
 	_resourceTypeSpace    = "storagespace"
 	_resourceTypeShare    = "share"
+	_resourceTypeGlobal   = "global"
 
 	_domain = "userlog"
 )
@@ -114,6 +116,22 @@ func (c *Converter) ConvertEvent(eventid string, event interface{}) (OC10Notific
 	case events.ShareRemoved:
 		return c.shareMessage(eventid, ShareRemoved, ev.Executant, ev.ItemID, ev.ShareID, ev.Timestamp)
 	}
+}
+
+// ConvertGlobalEvent converts a global event to an OC10Notification
+func (c *Converter) ConvertGlobalEvent(typ string, data json.RawMessage) (OC10Notification, error) {
+	switch typ {
+	default:
+		return OC10Notification{}, fmt.Errorf("unknown global event type: %s", typ)
+	case "deprovision":
+		var dd DeprovisionData
+		if err := json.Unmarshal(data, &dd); err != nil {
+			return OC10Notification{}, err
+		}
+
+		return c.deprovisionMessage(PlatformDeprovision, dd.DeprovisionDate)
+	}
+
 }
 
 func (c *Converter) spaceDeletedMessage(eventid string, executant *user.UserId, spaceid string, spacename string, ts time.Time) (OC10Notification, error) {
@@ -284,6 +302,28 @@ func (c *Converter) policiesMessage(eventid string, nt NotificationTemplate, exe
 		Message:        msg,
 		MessageRaw:     msgraw,
 		MessageDetails: dets,
+	}, nil
+}
+
+func (c *Converter) deprovisionMessage(nt NotificationTemplate, deproDate string) (OC10Notification, error) {
+	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.translationPath, map[string]interface{}{
+		"date": deproDate,
+	})
+	if err != nil {
+		return OC10Notification{}, err
+	}
+
+	return OC10Notification{
+		EventID: "deprovision",
+		Service: c.serviceName,
+		// UserName:       executant.GetUsername(), // TODO: do we need the deprovisioner?
+		Timestamp:      time.Now().Format(time.RFC3339Nano), // Fake timestamp? Or we store one with the event?
+		ResourceType:   _resourceTypeResource,
+		Subject:        subj,
+		SubjectRaw:     subjraw,
+		Message:        msg,
+		MessageRaw:     msgraw,
+		MessageDetails: map[string]interface{}{},
 	}, nil
 }
 

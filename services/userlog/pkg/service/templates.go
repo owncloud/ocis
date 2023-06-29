@@ -54,6 +54,11 @@ var (
 		Subject: Template("Share expired"),
 		Message: Template("Access to {resource} expired"),
 	}
+
+	PlatformDeprovision = NotificationTemplate{
+		Subject: Template("Platform will be deprovisioned"),
+		Message: Template("Attention! The platform will be deprovisioned at {date}"),
+	}
 )
 
 // holds the information to turn the raw template into a parseable go template
@@ -62,6 +67,7 @@ var _placeholders = map[string]string{
 	"{space}":    "{{ .spacename }}",
 	"{resource}": "{{ .resourcename }}",
 	"{virus}":    "{{ .virusdescription }}",
+	"{date}":     "{{ .date }}",
 }
 
 // NotificationTemplate is the data structure for the notifications
