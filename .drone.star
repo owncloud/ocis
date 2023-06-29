@@ -110,6 +110,7 @@ config = {
                 "apiCors",
                 "apiAsyncUpload",
                 "apiDownloads",
+                "apiReshare",
             ],
             "skip": False,
         },
