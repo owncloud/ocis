@@ -13,7 +13,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/invitations"
 	"github.com/owncloud/ocis/v2/services/invitations/pkg/mocks"
 	"github.com/stretchr/testify/assert"
-	"github.com/test-go/testify/mock"
+	"github.com/stretchr/testify/mock"
 )
 
 const (

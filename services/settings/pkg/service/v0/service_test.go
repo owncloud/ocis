@@ -11,7 +11,7 @@ import (
 	"github.com/owncloud/ocis/v2/services/settings/pkg/settings/mocks"
 	"github.com/owncloud/ocis/v2/services/settings/pkg/store/defaults"
 	"github.com/stretchr/testify/assert"
-	"github.com/test-go/testify/mock"
+	"github.com/stretchr/testify/mock"
 	merrors "go-micro.dev/v4/errors"
 	"go-micro.dev/v4/metadata"
 )

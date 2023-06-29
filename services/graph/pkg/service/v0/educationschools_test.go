@@ -17,7 +17,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
-	"github.com/test-go/testify/mock"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc"
 
 	libregraph "github.com/owncloud/libre-graph-api-go"
