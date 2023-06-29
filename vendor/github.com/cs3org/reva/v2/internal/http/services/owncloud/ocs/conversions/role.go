@@ -98,6 +98,7 @@ func (r *Role) OCSPermissions() Permissions {
 // R = Shareable
 // M = Mounted
 // Z = Deniable (NEW)
+// P = Purge from trashbin
 func (r *Role) WebDAVPermissions(isDir, isShared, isMountpoint, isPublic bool) string {
 	var b strings.Builder
 	if !isPublic && isShared {
@@ -127,6 +128,10 @@ func (r *Role) WebDAVPermissions(isDir, isShared, isMountpoint, isPublic bool) s
 
 	if r.CS3ResourcePermissions().DenyGrant {
 		fmt.Fprintf(&b, "Z")
+	}
+
+	if r.CS3ResourcePermissions().PurgeRecycle {
+		fmt.Fprintf(&b, "P")
 	}
 
 	return b.String()

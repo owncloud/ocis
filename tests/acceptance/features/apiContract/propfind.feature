@@ -22,7 +22,7 @@ Feature: Propfind test
       | key            | value            |
       | oc:fileid      | UUIDof:new-space |
       | oc:name        | new-space        |
-      | oc:permissions | RDNVCKZ          |
+      | oc:permissions | RDNVCKZP         |
       | oc:privatelink |                  |
       | oc:size        | 12               |
 
@@ -43,6 +43,6 @@ Feature: Propfind test
       | oc:size        | 12               |
     Examples:
       | role    | oc_permission |
-      | manager | RDNVCKZ       |
+      | manager | RDNVCKZP      |
       | editor  | DNVCK         |
       | viewer  |               |

@@ -103,7 +103,7 @@ Feature: sharing
     And user "Brian" shares folder "/merge-test-inside-twogroups-perms" with group "grp2" using the sharing API
     Then the OCS status code of responses on all endpoints should be "100"
     And the HTTP status code of responses on all endpoints should be "200"
-    And as user "Brian" folder "/merge-test-inside-twogroups-perms" should contain a property "oc:permissions" with value "RDNVCKZ" or with value "RMDNVCKZ"
+    And as user "Brian" folder "/merge-test-inside-twogroups-perms" should contain a property "oc:permissions" with value "RDNVCKZP" or with value "RMDNVCKZP"
     And as "Brian" folder "/Shares/merge-test-inside-twogroups-perms" should not exist
     And as "Brian" folder "/Shares/merge-test-inside-twogroups-perms (2)" should not exist
 
