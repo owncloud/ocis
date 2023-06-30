@@ -932,9 +932,12 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                              "sh %s/tests/config/drone/serve-hosting-discovery.sh" % (dirs["base"]),
                          ],
                      },
+                 ] +
+                 ocisServer(storage, accounts_hash_difficulty, [], [], "wopi_validator") +
+                 [
                      {
                          "name": "wopiserver",
-                         "image": "cs3org/wopiserver:v9.4.1",
+                         "image": "cs3org/wopiserver:v10.0.1",
                          "detach": True,
                          "commands": [
                              "cp %s/tests/config/drone/wopiserver.conf /etc/wopi/wopiserver.conf" % (dirs["base"]),
@@ -949,9 +952,6 @@ def wopiValidatorTests(ctx, storage, accounts_hash_difficulty = 4):
                              "curl -k --fail --retry-connrefused --retry 9 --retry-all-errors 'http://wopiserver:8880/wopi'",
                          ],
                      },
-                 ] +
-                 ocisServer(storage, accounts_hash_difficulty, [], [], "wopi_validator") +
-                 [
                      {
                          "name": "prepare-test-file-%s" % (storage),
                          "image": OC_CI_ALPINE,

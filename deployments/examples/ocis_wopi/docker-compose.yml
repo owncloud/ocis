@@ -161,7 +161,7 @@ services:
     restart: always
 
   wopiserver:
-    image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v9.4.0}
+    image: cs3org/wopiserver:${WOPISERVER_DOCKER_TAG:-v10.0.1}
     networks:
       ocis-net:
     entrypoint:
@@ -187,7 +187,7 @@ services:
     restart: always
 
   collabora:
-    image: collabora/code:22.05.10.1.1
+    image: collabora/code:22.05.14.3.1
     networks:
       ocis-net:
     environment:
@@ -210,7 +210,7 @@ services:
     restart: always
 
   onlyoffice:
-    image: onlyoffice/documentserver:7.3.0
+    image: onlyoffice/documentserver:7.3.3
     networks:
       ocis-net:
     entrypoint:
