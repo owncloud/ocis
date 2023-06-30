@@ -29,7 +29,7 @@ Feature: full text search
       | spaces           |
 
 
-  Scenario Outline: as a sharee search a file tagged by sharer using tag
+  Scenario Outline: sharee searches a file tagged by sharer using tag
     Given using <dav-path-version> DAV path
     And user "Brian" has been created with default attributes and without skeleton files
     And user "Alice" has created folder "uploadFolder"
