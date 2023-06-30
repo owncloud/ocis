@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"time"
 
 	gateway "github.com/cs3org/go-cs3apis/cs3/gateway/v1beta1"
 	group "github.com/cs3org/go-cs3apis/cs3/identity/group/v1beta1"
@@ -244,19 +245,30 @@ func (ul *UserlogService) DeleteEvents(userid string, evids []string) error {
 }
 
 // StoreGlobalEvent will store a global event that will be returned with each `GetEvents` request
-func (ul *UserlogService) StoreGlobalEvent(typ string, data json.RawMessage) error {
+func (ul *UserlogService) StoreGlobalEvent(typ string, data map[string]string) error {
 	switch typ {
 	default:
 		return fmt.Errorf("unknown event type: %s", typ)
 	case "deprovision":
-		var req DeprovisionData
-		if err := json.Unmarshal(data, &req); err != nil {
-			return err
+		dps, ok := data["deprovision_date"]
+		if !ok {
+			return errors.New("need 'deprovision_date' in request body")
 		}
 
-		// TODO: check for proper time format
+		format := data["deprovision_date_format"]
+		if format == "" {
+			format = time.RFC3339
+		}
 
-		return ul.storeGlobalEvent(typ, req)
+		date, err := time.Parse(format, dps)
+		if err != nil {
+			fmt.Println("", format, "\n", dps)
+			return fmt.Errorf("cannot parse time to format. time: '%s' format: '%s'", dps, format)
+		}
+
+		return ul.storeGlobalEvent(typ, DeprovisionData{
+			DeprovisionDate: date,
+		})
 
 	}
 }
@@ -265,7 +277,7 @@ func (ul *UserlogService) StoreGlobalEvent(typ string, data json.RawMessage) err
 func (ul *UserlogService) GetGlobalEvents() (map[string]json.RawMessage, error) {
 	out := make(map[string]json.RawMessage)
 
-	recs, err := ul.store.Read("global-events")
+	recs, err := ul.store.Read(_globalEventsKey)
 	if err != nil && err != store.ErrNotFound {
 		return out, err
 	}

@@ -186,13 +186,10 @@ type DeleteEventsRequest struct {
 
 // PostEventsRequest is the expected body for the post request
 type PostEventsRequest struct {
-	Type string          `json:"type"`
-	Data json.RawMessage `json:"data"`
-}
-
-// DeprovisionData is the expected `data` for the PostEventsRequest when deprovisioning
-type DeprovisionData struct {
-	DeprovisionDate string `json:"date"`
+	// the event type, e.g. "deprovision"
+	Type string `json:"type"`
+	// arbitray data for the event
+	Data map[string]string `json:"data"`
 }
 
 // RequireAdmin middleware is used to require the user in context to be an admin / have account management permissions

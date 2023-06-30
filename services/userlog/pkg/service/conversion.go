@@ -305,7 +305,7 @@ func (c *Converter) policiesMessage(eventid string, nt NotificationTemplate, exe
 	}, nil
 }
 
-func (c *Converter) deprovisionMessage(nt NotificationTemplate, deproDate string) (OC10Notification, error) {
+func (c *Converter) deprovisionMessage(nt NotificationTemplate, deproDate time.Time) (OC10Notification, error) {
 	subj, subjraw, msg, msgraw, err := composeMessage(nt, c.locale, c.translationPath, map[string]interface{}{
 		"date": deproDate,
 	})
